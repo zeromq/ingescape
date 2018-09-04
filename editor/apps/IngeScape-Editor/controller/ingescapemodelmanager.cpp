@@ -332,7 +332,8 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile(QJsonArray jsonArrayO
 
 
 /**
- * @brief Simulate an exit for each agent
+ * @brief Simulate an exit for each active agent
+ * an active agent has its flag "isON" equal to true
  */
 void IngeScapeModelManager::simulateExitForEachActiveAgent()
 {
@@ -345,7 +346,7 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
                 // Simulate an exit for each agent
                 onAgentExited(agent->peerId(), agent->name());
 
-                // Reset the peer id and address
+                /*// Reset the peer id and address
                 if (!agent->peerId().isEmpty())
                 {
                     _mapFromPeerIdToAgentM.remove(agent->peerId());
@@ -364,10 +365,10 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
 
                     // Delete the model of agent mapping
                     deleteAgentMapping(mapping);
-                }
+                }*/
             }
 
-            agent->setcanBeRestarted(false);
+            //agent->setcanBeRestarted(false);
         }
     }
 }
@@ -1066,7 +1067,7 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         Q_EMIT agentModelWillBeDeleted(agent);
 
         // DIS-connect to signals from the agent
-        connect(agent, 0, this, 0);
+        disconnect(agent, 0, this, 0);
 
         // Delete its model of definition if needed
         if (agent->definition() != NULL) {

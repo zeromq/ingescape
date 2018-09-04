@@ -419,8 +419,8 @@ Window {
                                 indicator: Rectangle {
                                     implicitWidth: 14
                                     implicitHeight: 14
-                                    border.width: 0;
-                                    color : IngeScapeTheme.veryDarkGreyColor
+                                    border.width: 0
+                                    color: IngeScapeTheme.veryDarkGreyColor
 
                                     I2SvgItem {
                                         visible: (control.checkedState === Qt.Checked)
@@ -552,8 +552,8 @@ Window {
                                         indicator: Rectangle {
                                             implicitWidth: 14
                                             implicitHeight: 14
-                                            border.width: 0;
-                                            color : IngeScapeTheme.veryDarkGreyColor
+                                            border.width: 0
+                                            color: IngeScapeTheme.veryDarkGreyColor
 
                                             I2SvgItem {
                                                 visible: (control.checkedState === Qt.Checked)

@@ -176,9 +176,10 @@ public:
      * @brief Re-Start the network with a port and a network device
      * @param strPort
      * @param networkDevice
+     * @param hasToClearPlatform
      * @return true when success
      */
-    Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice);
+    Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform);
 
 
     /**

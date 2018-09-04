@@ -173,7 +173,7 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
     if (agent != NULL)
     {
         // DIS-connect to signals from the agent
-        connect(agent, 0, this, 0);
+        disconnect(agent, 0, this, 0);
 
         _allAgents.removeOne(agent);
 

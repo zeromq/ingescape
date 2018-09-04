@@ -248,7 +248,7 @@ Item {
                     indicator: Rectangle {
                         implicitWidth: 14
                         implicitHeight: 14
-                        border.width: 0;
+                        border.width: 0
                         color: "transparent"
 
                         I2SvgItem {
@@ -303,7 +303,7 @@ Item {
                     indicator: Rectangle {
                         implicitWidth: 14
                         implicitHeight: 14
-                        border.width: 0;
+                        border.width: 0
                         color: "transparent"
 
                         I2SvgItem {

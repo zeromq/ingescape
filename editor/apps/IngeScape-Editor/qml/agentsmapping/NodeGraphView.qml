@@ -621,8 +621,8 @@ Item {
                     model : controller ? controller.allLinksInMapping : 0;
 
                     Link {
-                        id : link
-                        controller : rootItem.controller
+                        id: link
+                        controller: rootItem.controller
                         mapBetweenIOPVM: model.QtObject
                     }
                 }
@@ -675,9 +675,9 @@ Item {
                 isReduced: true
 
                 agentName: dropGhost.agent ? dropGhost.agent.name : ""
-                dropEnabled : (dropGhost.agent === null)
-                              ||
-                              ((dropGhost.agent && IngeScapeEditorC.agentsMappingC) && !IngeScapeEditorC.agentsMappingC.getAgentInMappingFromName(dropGhost.agent.name))
+                dropEnabled: (dropGhost.agent === null)
+                             ||
+                             (dropGhost.agent && IngeScapeEditorC.agentsMappingC && !IngeScapeEditorC.agentsMappingC.getAgentInMappingFromName(dropGhost.agent.name))
             }
         }
 
@@ -689,12 +689,12 @@ Item {
     // Delete Confirmation
     //
     Editor.DeleteConfirmationPopup {
-        id : deleteConfirmationPopup
+        id: deleteConfirmationPopup
 
-        confirmationText : "This agent is used in the actions.\nDo you want to delete it?"
+        confirmationText: "This agent is used in the actions.\nDo you want to delete it?"
 
         onDeleteConfirmed: {
-            if(controller)
+            if (controller)
             {
                 // Delete our agent
                 controller.deleteSelectedAgentInMapping();

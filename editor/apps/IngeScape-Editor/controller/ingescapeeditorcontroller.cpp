@@ -557,9 +557,10 @@ bool IngeScapeEditorController::canDeleteAgentInMapping(QString agentName)
  * @brief Re-Start the network with a port and a network device
  * @param strPort
  * @param networkDevice
+ * @param hasToClearPlatform
  * @return true when success
  */
-bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkDevice)
+bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform)
 {
     bool success = false;
 
@@ -581,7 +582,13 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
             // Port and Network device
             else
             {
-                qInfo() << "Restart the network on" << networkDevice << "with" << strPort;
+                if (hasToClearPlatform) {
+                    qInfo() << "Restart the network on" << networkDevice << "with" << strPort << "(and CLEAR the current platform)";
+                }
+                else
+                {
+                    qInfo() << "Restart the network on" << networkDevice << "with" << strPort << "(and KEEP the current platform)";
+                }
 
                 _modelManager->setisMappingActivated(false);
                 _modelManager->setisMappingControlled(false);
@@ -603,6 +610,10 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 settings.sync();
 
 
+                // Simulate an exit for each active agent
+                _modelManager->simulateExitForEachActiveAgent();
+
+
                 // Reset the list of launchers (hosts)
                 if (_launcherManager != NULL) {
                     _launcherManager->reset();
@@ -614,11 +625,12 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 }
 
 
-                // Create a new empty platform by deleting all existing data
-                createNewPlatform();
+                if (hasToClearPlatform)
+                {
+                    // Create a new empty platform by deleting all existing data
+                    createNewPlatform();
+                }
 
-                // Simulate an exit for each agent
-                _modelManager->simulateExitForEachActiveAgent();
 
                 // Start our INGESCAPE agent with the network device and the port
                 success = _networkC->start(networkDevice, "", nPort);

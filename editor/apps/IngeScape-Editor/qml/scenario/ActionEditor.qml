@@ -485,9 +485,9 @@ Window {
                                                 indicator: Rectangle {
                                                     implicitWidth: 14
                                                     implicitHeight: 14
-                                                    radius : height / 2
-                                                    border.width: 0;
-                                                    color : IngeScapeTheme.darkBlueGreyColor
+                                                    radius: height / 2
+                                                    border.width: 0
+                                                    color: IngeScapeTheme.darkBlueGreyColor
 
                                                     Rectangle {
                                                         anchors.centerIn: parent
@@ -503,7 +503,7 @@ Window {
 
                                             }
 
-                                            onCheckedChanged : {
+                                            onCheckedChanged: {
                                                 if (myEffect && checked) {
                                                     myEffect.effectType = model.value
                                                 }
@@ -1547,25 +1547,24 @@ Window {
                                                 indicator: Rectangle {
                                                     implicitWidth: 14
                                                     implicitHeight: 14
-                                                    radius : height / 2
-                                                    border.width: 0;
-                                                    color : IngeScapeTheme.darkBlueGreyColor
+                                                    radius: height / 2
+                                                    border.width: 0
+                                                    color: IngeScapeTheme.darkBlueGreyColor
 
                                                     Rectangle {
                                                         anchors.centerIn: parent
                                                         visible : control.checked
                                                         width: 8
                                                         height: 8
-                                                        radius : height / 2
-
-                                                        border.width: 0;
-                                                        color : IngeScapeTheme.whiteColor
+                                                        radius: height / 2
+                                                        border.width: 0
+                                                        color: IngeScapeTheme.whiteColor
                                                     }
                                                 }
 
                                             }
 
-                                            onCheckedChanged : {
+                                            onCheckedChanged: {
                                                 if (myCondition && checked) {
                                                     myCondition.conditionType = model.value
                                                 }
@@ -2044,8 +2043,8 @@ Window {
                             indicator: Rectangle {
                                 implicitWidth: 14
                                 implicitHeight: 14
-                                border.width: 0;
-                                color : IngeScapeTheme.darkBlueGreyColor
+                                border.width: 0
+                                color: IngeScapeTheme.darkBlueGreyColor
 
                                 I2SvgItem {
                                     visible: control.checked
@@ -2059,7 +2058,7 @@ Window {
 
                         }
 
-                        onCheckedChanged : {
+                        onCheckedChanged: {
                             if (actionM) {
                                 actionM.shallRevert = checked
                             }
@@ -2067,9 +2066,9 @@ Window {
 
 
                         Binding {
-                            target : revertActionCB
-                            property : "checked"
-                            value : (actionM && actionM.shallRevert)
+                            target: revertActionCB
+                            property: "checked"
+                            value: (actionM && actionM.shallRevert)
                         }
                     }
 
@@ -2123,24 +2122,23 @@ Window {
                                     implicitWidth: 14
                                     implicitHeight: 14
                                     radius : height / 2
-                                    border.width: 0;
-                                    color : control.enabled ?  IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
+                                    border.width: 0
+                                    color: control.enabled ?  IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
 
                                     Rectangle {
                                         anchors.centerIn: parent
                                         visible : control.checked
                                         width: 8
                                         height: 8
-                                        radius : height / 2
-
-                                        border.width: 0;
-                                        color : IngeScapeTheme.whiteColor
+                                        radius: height / 2
+                                        border.width: 0
+                                        color: IngeScapeTheme.whiteColor
                                     }
                                 }
 
                             }
 
-                            onCheckedChanged : {
+                            onCheckedChanged: {
                                 if (actionM) {
                                     actionM.shallRevertWhenValidityIsOver = checked
                                 }
@@ -2193,24 +2191,23 @@ Window {
                                         implicitWidth: 14
                                         implicitHeight: 14
                                         radius : height / 2
-                                        border.width: 0;
-                                        color : control.enabled ?  IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
+                                        border.width: 0
+                                        color: control.enabled ?  IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
 
                                         Rectangle {
                                             anchors.centerIn: parent
                                             visible : control.checked
                                             width: 8
                                             height: 8
-                                            radius : height / 2
-
-                                            border.width: 0;
+                                            radius: height / 2
+                                            border.width: 0
                                             color: IngeScapeTheme.whiteColor
                                         }
                                     }
 
                                 }
 
-                                onCheckedChanged : {
+                                onCheckedChanged: {
                                     if (actionM) {
                                         actionM.shallRevertAfterTime = checked
                                     }
@@ -2375,8 +2372,8 @@ Window {
                                 indicator: Rectangle {
                                     implicitWidth: 14
                                     implicitHeight: 14
-                                    border.width: 0;
-                                    color : IngeScapeTheme.darkBlueGreyColor
+                                    border.width: 0
+                                    color: IngeScapeTheme.darkBlueGreyColor
 
                                     I2SvgItem {
                                         visible: control.checked
@@ -2390,7 +2387,7 @@ Window {
 
                             }
 
-                            onCheckedChanged : {
+                            onCheckedChanged: {
                                 if (actionM) {
                                     actionM.shallRearm = checked
                                 }

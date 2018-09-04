@@ -36,6 +36,7 @@ I2PopupBase {
 
     onOpened: {
         combobox.selectedItem = IngeScapeEditorC.networkDevice;
+        clearPlatform.checked = true;
     }
 
     Rectangle {
@@ -151,7 +152,7 @@ I2PopupBase {
 
         // ComboBox to choose the network device
         Scenario.IngeScapeComboBox {
-            id : combobox
+            id: combobox
 
             height : 25
             width : 200
@@ -180,6 +181,57 @@ I2PopupBase {
 
         Rectangle {
             id: space3
+            color: "transparent"
+            width: 10
+            height: 10
+        }
+
+        CheckBox {
+            id: clearPlatform
+
+            anchors {
+                left: parent.left;
+                //top: parent.top
+            }
+
+            checked: true
+            activeFocusOnPress: true;
+
+            style: CheckBoxStyle {
+                label: Text {
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        verticalCenterOffset: 2
+                    }
+
+                    text: "Clear platform"
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        pixelSize: 16
+                    }
+                    color: control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                }
+
+                indicator: Rectangle {
+                    implicitWidth: 14
+                    implicitHeight: 14
+                    border.width: 0
+                    color : IngeScapeTheme.darkBlueGreyColor
+
+                    I2SvgItem {
+                        visible: control.checked
+                        anchors.centerIn: parent
+
+                        svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                        svgElementId: "check";
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            id: space4
             color: "transparent"
             width: 10
             height: 10
@@ -300,7 +352,7 @@ I2PopupBase {
                 }
 
                 // Re-Start the Network
-                var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice);
+                var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked);
                 if (success === true)
                 {
                     rootItem.close();

@@ -268,8 +268,8 @@ Item {
                             left: parent.left
                             right: parent.right
                         }
-                        height: txtAgentName.height
-                        //height: 20
+                        //height: txtAgentName.height
+                        height: 16
 
                         //color: mouseAreaToolTip.containsMouse ? IngeScapeTheme.agentsListItemRollOverBackgroundColor : IngeScapeTheme.agentsListItemBackgroundColor
                         color: "transparent"
@@ -281,7 +281,6 @@ Item {
                                 left : parent.left
                                 leftMargin: 10
                                 right: parent.right
-                                bottom: parent.bottom
                             }
 
                             // Usefull to debug to display the peer id
