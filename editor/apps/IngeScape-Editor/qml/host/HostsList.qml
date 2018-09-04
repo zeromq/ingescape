@@ -280,10 +280,14 @@ Item {
                             anchors {
                                 left : parent.left
                                 leftMargin: 10
+                                right: parent.right
                                 bottom: parent.bottom
                             }
 
+                            // Usefull to debug to display the peer id
+                            //text: model.name + " (" + model.peerId + ")"
                             text: model.name
+
                             elide: Text.ElideRight
 
                             color: model.isON ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
@@ -340,7 +344,6 @@ Item {
                                 releasedID: "supprimer"
                                 disabledID : releasedID
                             }
-
 
 
                             onClicked: {

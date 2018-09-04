@@ -34,7 +34,9 @@ HostVM::HostVM(HostM* model, QObject *parent) : QObject(parent),
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Agents are sorted on their name (alphabetical order)
-    _agentsList.setSortProperty("name");
+    //_agentsList.setSortProperty("name");
+    _agentsList.setSortProperty("isON");
+    _agentsList.setSortOrder(Qt::DescendingOrder);
 
     if (_modelM != NULL)
     {
