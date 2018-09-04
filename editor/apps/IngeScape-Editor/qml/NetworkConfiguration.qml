@@ -249,7 +249,7 @@ I2PopupBase {
 
             text: IngeScapeEditorC.errorMessageWhenConnectionFailed
 
-            color: IngeScapeTheme.redColor
+            color: IngeScapeTheme.orangeColor
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight : Font.Medium

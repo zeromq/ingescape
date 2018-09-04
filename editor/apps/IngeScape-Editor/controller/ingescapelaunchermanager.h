@@ -48,7 +48,7 @@ public:
 
 
     /**
-     * @brief Add a IngeScape Launcher
+     * @brief Add an IngeScape Launcher
      * @param peerId
      * @param hostName
      * @param ipAddress
@@ -57,7 +57,7 @@ public:
 
 
     /**
-     * @brief Remove a IngeScape Launcher
+     * @brief Remove an IngeScape Launcher
      * @param peerId
      * @param hostName
      */

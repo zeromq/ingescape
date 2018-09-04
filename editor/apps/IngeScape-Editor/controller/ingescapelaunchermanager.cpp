@@ -38,7 +38,7 @@ IngeScapeLauncherManager::~IngeScapeLauncherManager()
 
 
 /**
- * @brief Add a IngeScape Launcher
+ * @brief Add an IngeScape Launcher
  * @param peerId
  * @param hostName
  * @param ipAddress
@@ -85,7 +85,7 @@ void IngeScapeLauncherManager::addIngeScapeLauncher(QString peerId, QString host
 
 
 /**
- * @brief Remove a IngeScape Launcher
+ * @brief Remove an IngeScape Launcher
  * @param peerId
  * @param hostName
  */

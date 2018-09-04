@@ -345,30 +345,10 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
             {
                 // Simulate an exit for each agent
                 onAgentExited(agent->peerId(), agent->name());
-
-                /*// Reset the peer id and address
-                if (!agent->peerId().isEmpty())
-                {
-                    _mapFromPeerIdToAgentM.remove(agent->peerId());
-
-                    agent->setpeerId("");
-                    agent->setaddress("");
-                }
-
-                // Reset the mapping
-                if (agent->mapping() != NULL)
-                {
-                    AgentMappingM* mapping = agent->mapping();
-
-                    // Reset its model of mapping
-                    agent->setmapping(NULL);
-
-                    // Delete the model of agent mapping
-                    deleteAgentMapping(mapping);
-                }*/
             }
 
-            //agent->setcanBeRestarted(false);
+            // Force the flag indicating that the agent can NOT be restarted (by an INGESCAPE launcher)
+            agent->setcanBeRestarted(false);
         }
     }
 }
@@ -543,15 +523,15 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
  */
 void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostname, QString ipAddress, QString streamingPort)
 {
-    // Add a IngeScape Launcher to the manager
+    // Add an IngeScape Launcher to the manager
     IngeScapeLauncherManager::Instance().addIngeScapeLauncher(peerId, hostname, ipAddress, streamingPort);
 
     // Traverse the list of all agents
-    foreach (QString agentName, _mapFromNameToAgentModelsList.keys())
+    for (QString agentName : _mapFromNameToAgentModelsList.keys())
     {
         QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
 
-        foreach (AgentM* agent, agentModelsList)
+        for (AgentM* agent : agentModelsList)
         {
             if ((agent != NULL) && (agent->hostname() == hostname) && !agent->commandLine().isEmpty()) {
                 agent->setcanBeRestarted(true);
@@ -568,7 +548,7 @@ void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostname, 
  */
 void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostname)
 {
-    // Remove a IngeScape Launcher to the manager
+    // Remove an IngeScape Launcher to the manager
     IngeScapeLauncherManager::Instance().removeIngeScapeLauncher(peerId, hostname);
 
     // Traverse the list of all agents

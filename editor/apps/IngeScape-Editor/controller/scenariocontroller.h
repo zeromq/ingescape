@@ -254,7 +254,8 @@ public:
 
 
     /**
-     * @brief Clear the list of actions in the list, in the palette and in the timeline
+     * @brief Clear the current scenario
+     * (clear the list of actions in the list, in the palette and in the timeline)
      */
     Q_INVOKABLE void clearScenario();
 

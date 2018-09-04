@@ -110,7 +110,7 @@ ScenarioController::~ScenarioController()
     _agentsInMappingList.clear();
     _mapFromNameToAgentInMapping.clear();
 
-    // Clear all scenario and delete objects
+    // Clear the current scenario
     clearScenario();
 
     // Delete actions VM from the palette
@@ -903,7 +903,8 @@ void ScenarioController::executeEffectsOfAction(ActionM* action)
 
 
 /**
- * @brief Clear the list of actions in the list, in the palette and in the timeline
+ * @brief Clear the current scenario
+ * (clear the list of actions in the list, in the palette and in the timeline)
  */
 void ScenarioController::clearScenario()
 {

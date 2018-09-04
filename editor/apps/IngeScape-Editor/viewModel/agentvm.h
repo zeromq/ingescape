@@ -62,7 +62,7 @@ class AgentVM : public QObject
     // Number of clones
     I2_QML_PROPERTY_READONLY(int, clonesNumber)
 
-    // Flag indicating if our agent can be restarted (by a INGESCAPE launcher)
+    // Flag indicating if our agent can be restarted (by an INGESCAPE launcher)
     I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
 
     // State of our agent

@@ -472,6 +472,12 @@ void IngeScapeEditorController::savePlatformToDefaultFile()
  */
 void IngeScapeEditorController::createNewPlatform()
 {
+    if (_hostsSupervisionC != NULL)
+    {
+        // Clear the list of agents (global list with all agents)
+        _hostsSupervisionC->clearAgentsList();
+    }
+
     if (_agentsMappingC != NULL)
     {
         // Clear the current mapping
@@ -480,7 +486,7 @@ void IngeScapeEditorController::createNewPlatform()
 
     if (_scenarioC != NULL)
     {
-        // Reset scenario (clear the list of actions in the list, in the palette and in the timeline)
+        // Clear the current scenario
         _scenarioC->clearScenario();
     }
 
@@ -613,24 +619,17 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 // Simulate an exit for each active agent
                 _modelManager->simulateExitForEachActiveAgent();
 
-
                 // Reset the list of launchers (hosts)
                 if (_launcherManager != NULL) {
                     _launcherManager->reset();
                 }
 
-                // Reset the list of agents
-                if (_hostsSupervisionC != NULL) {
-                    _hostsSupervisionC->reset();
-                }
-
-
+                // Has to clear the current platform
                 if (hasToClearPlatform)
                 {
                     // Create a new empty platform by deleting all existing data
                     createNewPlatform();
                 }
-
 
                 // Start our INGESCAPE agent with the network device and the port
                 success = _networkC->start(networkDevice, "", nPort);

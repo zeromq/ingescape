@@ -53,9 +53,9 @@ public:
 
 
     /**
-     * @brief Reset the list of agents
+     * @brief Clear the list of agents (global list with all agents)
      */
-    void reset();
+    void clearAgentsList();
 
 
 Q_SIGNALS:

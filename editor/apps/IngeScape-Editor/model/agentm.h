@@ -51,7 +51,7 @@ class AgentM : public QObject
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
 
-    // Flag indicating if our agent can be restarted (by a INGESCAPE launcher)
+    // Flag indicating if our agent can be restarted (by an INGESCAPE launcher)
     I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
 
     // Flag indicating if our agent is muted
