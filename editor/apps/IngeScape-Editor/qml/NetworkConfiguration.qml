@@ -159,6 +159,7 @@ I2PopupBase {
 
             model: IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices : 0
             useQStringList: true
+            selectedItem: ""
 
 //            placeholderText: (IngeScapeEditorC.networkC && (IngeScapeEditorC.networkC.availableNetworkDevices.count === 0) ? "- No network device -"
 //                                                                                                                           : "- Select a network device -")
@@ -166,14 +167,20 @@ I2PopupBase {
             onSelectedItemChanged: {
                 var selectedNetworkDevice = "";
 
-                if (typeof combobox.selectedItem === "string") {
-                    console.log("onSelectedItemChanged (string) " + combobox.selectedItem);
-                    selectedNetworkDevice = combobox.selectedItem;
+                if (combobox.selectedItem)
+                {
+                    if (typeof combobox.selectedItem === "string") {
+                        //console.log("QML: onSelectedItemChanged (string) " + combobox.selectedItem);
+                        selectedNetworkDevice = combobox.selectedItem;
+                    }
+                    else {
+                        //console.log("QML: onSelectedItemChanged (object) " + combobox.selectedItem.modelData);
+                        selectedNetworkDevice = combobox.selectedItem.modelData;
+                    }
                 }
-                else {
-                    console.log("onSelectedItemChanged (object) " + combobox.selectedItem.modelData);
-                    selectedNetworkDevice = combobox.selectedItem.modelData;
-                }
+                /*else {
+                    console.log("QML: onSelectedItemChanged (null) ");
+                }*/
 
                 okButton.enabled = IngeScapeEditorC.networkC.isAvailableNetworkDevice(selectedNetworkDevice);
             }
