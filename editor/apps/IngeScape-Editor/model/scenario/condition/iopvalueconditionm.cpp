@@ -159,7 +159,7 @@ void IOPValueConditionM::setagent(AgentInMappingVM* agent)
         if (_agent != NULL)
         {
             // Fill with outputs
-            foreach (OutputVM* output, _agent->outputsList()->toList())
+            for (OutputVM* output : _agent->outputsList()->toList())
             {
                 if (output->firstModel() != NULL) {
                     _agentIopList.append(output->firstModel());
@@ -241,7 +241,7 @@ void IOPValueConditionM::_onModelsOfIOPChanged()
         _agentIopList.clear();
 
         // Check that our output list update concern our selected agent iop
-        foreach (OutputVM* outputVM, _agent->outputsList()->toList())
+        for (OutputVM* outputVM : _agent->outputsList()->toList())
         {
             if ((outputVM != NULL) && (outputVM->firstModel() != NULL))
             {

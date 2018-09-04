@@ -289,42 +289,49 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "is ON" of a model changed
+     * @brief Slot called when the hostname of a model changed
+     * @param hostname
+     */
+    void _onHostnameOfModelChanged(QString hostname);
+
+
+    /**
+     * @brief Slot called when the flag "is ON" of a model changed
      * @param isON
      */
     void _onIsONofModelChanged(bool isON);
 
 
     /**
-     * @brief Slot when the flag "can Be Restarted" of a model changed
+     * @brief Slot called when the flag "can Be Restarted" of a model changed
      * @param canBeRestarted
      */
     void _onCanBeRestartedOfModelChanged(bool canBeRestarted);
 
 
     /**
-     * @brief Slot when the flag "is Muted" of a model changed
+     * @brief Slot called when the flag "is Muted" of a model changed
      * @param isMuted
      */
     void _onIsMutedOfModelChanged(bool isMuted);
 
 
     /**
-     * @brief Slot when the flag "is Frozen" of a model changed
+     * @brief Slot called when the flag "is Frozen" of a model changed
      * @param isMuted
      */
     void _onIsFrozenOfModelChanged(bool isFrozen);
 
 
     /**
-     * @brief Slot when the definition of a model changed
+     * @brief Slot called when the definition of a model changed
      * @param definition
      */
     void _onDefinitionOfModelChanged(DefinitionM* definition);
 
 
     /**
-     * @brief Slot when the state of a model changed
+     * @brief Slot called when the state of a model changed
      * @param state
      */
     void _onStateOfModelChanged(QString state);

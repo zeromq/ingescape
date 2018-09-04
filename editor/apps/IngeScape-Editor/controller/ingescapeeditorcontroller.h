@@ -157,7 +157,7 @@ public:
 
 
     /**
-      * @brief Check if we can delete an agent (view model) from the list in supervision
+      * @brief Check if we can delete an agent (view model) from the list in agents supervision
       *        Check dependencies in the mapping and in the actions (conditions, effects)
       * @param agentName
       */
@@ -167,7 +167,7 @@ public:
     /**
       * @brief Check if we can delete an agent (in mapping) from the mapping view
       *        Check dependencies in the actions (conditions, effects)
-      * @param agent in mapping to delete
+      * @param agentName
       */
     Q_INVOKABLE bool canDeleteAgentInMapping(QString agentName);
 

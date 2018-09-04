@@ -128,6 +128,12 @@ public:
     void setisMutedOfOutput(bool isMuted, QString outputName);
 
 
+    /**
+     * @brief Clear the data about the network
+     */
+    void clearNetworkData();
+
+
 Q_SIGNALS:
 
     /**
@@ -136,6 +142,13 @@ Q_SIGNALS:
      * @param newValue
      */
     void definitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
+
+
+    /**
+     * @brief Signal emitted when the network data (of our agent) will be cleared
+     * @param peerId
+     */
+    void networkDataWillBeCleared(QString peerId);
 
 
 public Q_SLOTS:

@@ -344,20 +344,12 @@ Item {
 
 
                             onClicked: {
-                                /*if (IngeScapeEditorC.canDeleteAgentFromSupervision(model.name))
+                                if (IngeScapeEditorC.agentsSupervisionC)
                                 {
-                                    if (controller)
-                                    {
-                                        // Delete selected agent
-                                        controller.deleteSelectedAgent();
-                                    }
-                                }
-                                else {
-                                    // Emit the signal "needConfirmationtoDeleteAgent"
-                                    rootItem.needConfirmationtoDeleteAgent();
-                                }*/
+                                    console.log("QML: Remove agent model " + model.name + " on " + hostItem.model_host.name);
 
-                                console.log("Remove agent model " + model.name + " on " + hostItem.model_host.name);
+                                    IngeScapeEditorC.agentsSupervisionC.deleteModelOfAgent(model.QtObject);
+                                }
                             }
                         }
                     }

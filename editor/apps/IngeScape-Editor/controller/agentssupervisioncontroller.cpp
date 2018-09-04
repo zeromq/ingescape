@@ -102,6 +102,47 @@ void AgentsSupervisionController::deleteSelectedAgent()
 
 
 /**
+ * @brief Delete the model of agent
+ * If it is the last model of a view model, we reset all its network data (only defined by the agent definition)
+ * @param agent
+ * @return
+ */
+void AgentsSupervisionController::deleteModelOfAgent(AgentM* agent)
+{
+    // Check that the agent is OFF
+    if ((agent != NULL) && !agent->isON() && !agent->name().isEmpty() && (_modelManager != NULL))
+    {
+        // Get the list of view models of agent from a name
+        QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
+
+        for (AgentVM* iterator : agentViewModelsList)
+        {
+            // We found the view model that contains this model
+            if ((iterator != NULL) && iterator->models()->contains(agent))
+            {
+                // It is the last model of this view model
+                if (iterator->models()->count() == 1)
+                {
+                    // Clear the data about the network
+                    agent->clearNetworkData();
+                }
+                // There are other(s) model(s) in this view model
+                else
+                {
+                    // Remove the model from the list of the view model
+                    iterator->models()->remove(agent);
+
+                    // Delete the model of agent
+                    _modelManager->deleteAgentModel(agent);
+                }
+                break;
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Export the agents list to selected file
  */
 void AgentsSupervisionController::exportAgentsListToSelectedFile()
@@ -187,7 +228,7 @@ void AgentsSupervisionController::clearAgentsList()
                 if (agent->isON())
                 {
                     // Delete each model with state OFF
-                    foreach (AgentM* model, agent->models()->toList())
+                    for (AgentM* model : agent->models()->toList())
                     {
                         if ((model != NULL) && !model->isON()) {
                             _modelManager->deleteAgentModel(model);
@@ -267,7 +308,7 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
 
             AgentVM* agentUsingSameDefinition = NULL;
 
-            foreach (AgentVM* iterator, agentViewModelsList)
+            for (AgentVM* iterator : agentViewModelsList)
             {
                 // If this VM contains our model of agent
                 if ((iterator != NULL) && (iterator != agent) && (iterator->definition() != NULL)
@@ -679,7 +720,8 @@ void AgentsSupervisionController::_removeAndDeleteAgentViewModel(AgentVM* agent)
         agent->setdefinition(NULL);
 
         // Delete each model of this view model of agent
-        foreach (AgentM* model, agent->models()->toList()) {
+        for (AgentM* model : agent->models()->toList())
+        {
             _modelManager->deleteAgentModel(model);
         }
 

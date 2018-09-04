@@ -640,7 +640,7 @@ Item {
                         agentMappingVM : model.QtObject
                         controller : rootItem.controller
 
-                        onNeedConfirmationtoDeleteAgentInMapping : {
+                        onNeedConfirmationToDeleteAgentInMapping : {
                              deleteConfirmationPopup.open();
                         }
                     }

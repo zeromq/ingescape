@@ -422,12 +422,12 @@ void AgentVM::_onModelsChanged()
                 //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
                 // Connect to signals of the model
+                connect(model, &AgentM::hostnameChanged, this, &AgentVM::_onHostnameOfModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::canBeRestartedChanged, this, &AgentVM::_onCanBeRestartedOfModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged, Qt::UniqueConnection);
-                //connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentVM::_onDefinitionOfModelChangedWithPreviousAndNewValues, Qt::UniqueConnection);
                 connect(model, &AgentM::stateChanged, this, &AgentVM::_onStateOfModelChanged, Qt::UniqueConnection);
 
                 connect(model, &AgentM::hasLogInStreamChanged, this, &AgentVM::_onHasLogInStreamOfModelChanged);
@@ -462,7 +462,21 @@ void AgentVM::_onModelsChanged()
 
 
 /**
- * @brief Slot when the flag "is ON" of a model changed
+ * @brief Slot called when the hostname of a model changed
+ * @param hostname
+ */
+void AgentVM::_onHostnameOfModelChanged(QString hostname)
+{
+    Q_UNUSED(hostname)
+
+    // Update with all models of agents
+    // Allows to update "_peerIdsList", "_hashFromHostnameToModels" and "hostnames"
+    _updateWithAllModels();
+}
+
+
+/**
+ * @brief Slot called when the flag "is ON" of a model changed
  * @param isON
  */
 void AgentVM::_onIsONofModelChanged(bool isON)
@@ -475,7 +489,7 @@ void AgentVM::_onIsONofModelChanged(bool isON)
 
 
 /**
- * @brief Slot when the flag "can Be Restarted" of a model changed
+ * @brief Slot called when the flag "can Be Restarted" of a model changed
  * @param canBeRestarted
  */
 void AgentVM::_onCanBeRestartedOfModelChanged(bool canBeRestarted)
@@ -488,7 +502,7 @@ void AgentVM::_onCanBeRestartedOfModelChanged(bool canBeRestarted)
 
 
 /**
- * @brief Slot when the flag "is Muted" of a model changed
+ * @brief Slot called when the flag "is Muted" of a model changed
  * @param isMuted
  */
 void AgentVM::_onIsMutedOfModelChanged(bool isMuted)
@@ -501,7 +515,7 @@ void AgentVM::_onIsMutedOfModelChanged(bool isMuted)
 
 
 /**
- * @brief Slot when the flag "is Frozen" of a model changed
+ * @brief Slot called when the flag "is Frozen" of a model changed
  * @param isMuted
  */
 void AgentVM::_onIsFrozenOfModelChanged(bool isFrozen)
@@ -514,7 +528,7 @@ void AgentVM::_onIsFrozenOfModelChanged(bool isFrozen)
 
 
 /**
- * @brief Slot when the definition of a model changed
+ * @brief Slot called when the definition of a model changed
  * @param definition
  */
 void AgentVM::_onDefinitionOfModelChanged(DefinitionM* definition)
@@ -544,7 +558,7 @@ void AgentVM::_onDefinitionOfModelChanged(DefinitionM* definition)
 
 
 /**
- * @brief Slot when the state of a model changed
+ * @brief Slot called when the state of a model changed
  * @param state
  */
 void AgentVM::_onStateOfModelChanged(QString state)

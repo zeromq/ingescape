@@ -394,6 +394,15 @@ public Q_SLOTS:
     void onAgentMappingFilePath(QString peerId, QString mappingFilePath);
 
 
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the network data (of an agent) will be cleared
+     * @param peerId
+     */
+    void _onNetworkDataOfAgentWillBeCleared(QString peerId);
+
+
 private:
 
     /**
@@ -428,10 +437,6 @@ private:
 
     // Path to the root directory to load/save files
     QString _rootDirectoryPath;
-
-    // Path to the directory containing JSON files to save agents list
-    //QString _agentsListDirectoryPath;
-    //QString _agentsListDefaultFilePath;
 
     // Map from "peer id" to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;

@@ -150,3 +150,35 @@ void AgentM::setisMutedOfOutput(bool isMuted, QString outputName)
         _definition->setisMutedOfOutput(isMuted, outputName);
     }
 }
+
+
+/**
+ * @brief Clear the data about the network
+ */
+void AgentM::clearNetworkData()
+{
+    Q_EMIT networkDataWillBeCleared(_peerId);
+
+    setpeerId("");
+    setaddress("");
+    sethostname(HOSTNAME_NOT_DEFINED);
+    setcommandLine("");
+    setisON(false);
+    setcanBeRestarted(false);
+
+    // Reset other properties
+    setisMuted(false);
+    setcanBeFrozen(false);
+    setloggerPort("");
+    setisFrozen(false);
+    setstate("");
+    sethasLogInStream(false);
+    sethasLogInFile(false);
+    setlogFilePath("");
+    setdefinitionFilePath("");
+    setmappingFilePath("");
+
+    // Keep only the definition and the mapping
+    //setdefinition(NULL);
+    //setmapping(NULL);
+}

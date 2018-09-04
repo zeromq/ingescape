@@ -86,7 +86,8 @@ void DefinitionM::setisMutedOfOutput(bool isMuted, QString outputName)
  */
 void DefinitionM::setisMutedOfAllOutputs(bool isMuted)
 {
-    foreach (OutputM* output, _outputsList.toList()) {
+    for (OutputM* output : _outputsList.toList())
+    {
         if (output != NULL) {
             output->setisMutedAllOutputs(isMuted);
         }

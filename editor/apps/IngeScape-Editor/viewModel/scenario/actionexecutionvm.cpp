@@ -58,7 +58,7 @@ ActionExecutionVM::~ActionExecutionVM()
  */
 void ActionExecutionVM::initReverseCommandsForEffects(QList<ActionEffectVM*> effectsList)
 {
-    foreach (ActionEffectVM* effectVM, effectsList)
+    for (ActionEffectVM* effectVM : effectsList)
     {
         if ((effectVM != NULL) && (effectVM->modelM() != NULL))
         {

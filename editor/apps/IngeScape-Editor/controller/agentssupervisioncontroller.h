@@ -72,6 +72,15 @@ public:
 
 
     /**
+     * @brief Delete the model of agent
+     * If it is the last model of a view model, we reset all its network data (only defined by the agent definition)
+     * @param agent
+     * @return
+     */
+    Q_INVOKABLE void deleteModelOfAgent(AgentM* agent);
+
+
+    /**
      * @brief Export the agents list to selected file
      */
     Q_INVOKABLE void exportAgentsListToSelectedFile();

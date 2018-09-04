@@ -112,7 +112,7 @@ void ActionM::copyFrom(ActionM* actionModel)
 
         _effectsList.deleteAllItems();
 
-        foreach (ActionEffectVM* effectVM, actionModel->effectsList()->toList())
+        for (ActionEffectVM* effectVM : actionModel->effectsList()->toList())
         {
             ActionEffectVM* copiedEffectVM = new ActionEffectVM();
             copiedEffectVM->seteffectType(effectVM->effectType());
@@ -161,7 +161,7 @@ void ActionM::copyFrom(ActionM* actionModel)
 
 
         _conditionsList.deleteAllItems();
-        foreach (ActionConditionVM* conditionVM, actionModel->conditionsList()->toList())
+        for (ActionConditionVM* conditionVM : actionModel->conditionsList()->toList())
         {
             ActionConditionVM* copiedConditionVM = new ActionConditionVM();
             copiedConditionVM->setconditionType(conditionVM->conditionType());
@@ -453,7 +453,7 @@ void ActionM::_onIsValidConditionChanged(bool isValid)
 
     bool globalIsValid = true;
 
-    foreach (ActionConditionVM* condition, _conditionsList.toList())
+    for (ActionConditionVM* condition : _conditionsList.toList())
     {
         if ((condition != NULL) && (condition->modelM() != NULL))
         {

@@ -145,9 +145,10 @@ void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
 {
     if (agent != NULL)
     {
-        if (!_allAgents.contains(agent)) {
-            _allAgents.append(agent);
-        }
+        // Connect to signals from this new agent
+        connect(agent, &AgentM::networkDataWillBeCleared, this, &HostsSupervisionController::_onNetworkDataOfAgentWillBeCleared);
+
+        _allAgents.append(agent);
 
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
@@ -171,9 +172,10 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
 {
     if (agent != NULL)
     {
-        if (_allAgents.contains(agent)) {
-            _allAgents.removeOne(agent);
-        }
+        // DIS-connect to signals from the agent
+        connect(agent, 0, this, 0);
+
+        _allAgents.removeOne(agent);
 
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
@@ -190,19 +192,30 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
 
 
 /**
- * @brief Get the view model of host with an IP address
- * @param ipAddress
- * @return
+ * @brief Slot called when the network data (of an agent) will be cleared
+ * @param peerId
  */
-/*HostVM* HostsSupervisionController::_getHostWithAddress(QString ipAddress)
+void HostsSupervisionController::_onNetworkDataOfAgentWillBeCleared(QString peerId)
 {
-    if (_hashFromAddressToHostVM.contains(ipAddress)) {
-        return _hashFromAddressToHostVM.value(ipAddress);
+    Q_UNUSED(peerId)
+
+    AgentM* agent = qobject_cast<AgentM*>(sender());
+    if (agent != NULL)
+    {
+        //qDebug() << "Hosts Supervision: on Network Data of agent" << agent->name() << "will be cleared" << agent->hostname() << "(" << agent->peerId() << ")";
+
+        // Get the view model of host with its name
+        HostVM* hostVM = _getHostWithName(agent->hostname());
+
+        if ((hostVM != NULL) && hostVM->agentsList()->contains(agent))
+        {
+            // Remove this agent from the host
+            hostVM->agentsList()->remove(agent);
+
+            qDebug() << "Remove agent" << agent->name() << "from host" << hostVM->name();
+        }
     }
-    else {
-        return NULL;
-    }
-}*/
+}
 
 
 /**

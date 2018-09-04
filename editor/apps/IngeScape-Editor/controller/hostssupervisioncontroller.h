@@ -107,15 +107,16 @@ public Q_SLOTS:
     void onAgentModelWillBeDeleted(AgentM* agent);
 
 
-private:
+private Q_SLOTS:
 
     /**
-     * @brief Get the view model of host with an IP address
-     * @param ipAddress
-     * @return
+     * @brief Slot called when the network data (of an agent) will be cleared
+     * @param peerId
      */
-    //HostVM* _getHostWithAddress(QString ipAddress);
+    void _onNetworkDataOfAgentWillBeCleared(QString peerId);
 
+
+private:
 
     /**
      * @brief Get the view model of host with a name
@@ -126,9 +127,6 @@ private:
 
 
 private:
-
-    // Hash table from "IP address" to the "(view model of) Host"
-    //QHash<QString, HostVM*> _hashFromAddressToHost;
 
     // Hash table from "(host)Name" to the "(view model of) Host"
     QHash<QString, HostVM*> _hashFromNameToHost;

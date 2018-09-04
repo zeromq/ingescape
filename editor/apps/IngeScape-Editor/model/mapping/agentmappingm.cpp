@@ -62,7 +62,7 @@ void AgentMappingM::_onMappingElementsListChanged()
 {
     _idsOfMappingElements.clear();
 
-    foreach (ElementMappingM* mappingElement, _mappingElements.toList())
+    for (ElementMappingM* mappingElement : _mappingElements.toList())
     {
         if ((mappingElement != NULL) && !mappingElement->id().isEmpty()) {
             _idsOfMappingElements.append(mappingElement->id());

@@ -40,15 +40,11 @@ IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
     _isMappingControlled(false),
     _jsonHelper(jsonHelper),
     _rootDirectoryPath(rootDirectoryPath)
-    //_agentsListDirectoryPath(agentsListDirectoryPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New INGESCAPE Model Manager";
-
-    //_agentsListDefaultFilePath = QString("%1last.json").arg(_agentsListDirectoryPath);
-
 }
 
 
@@ -954,6 +950,24 @@ void IngeScapeModelManager::onAgentMappingFilePath(QString peerId, QString mappi
 
 
 /**
+ * @brief Slot called when the network data (of an agent) will be cleared
+ * @param peerId
+ */
+void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
+{
+    /*AgentM* agent = qobject_cast<AgentM*>(sender());
+    if (agent != NULL)
+    {
+        qDebug() << "Model Manager: on Network Data of agent" << agent->name() << "will be cleared" << agent->hostname() << "(" << agent->peerId() << ")";
+    }*/
+
+    if (!peerId.isEmpty()) {
+        _mapFromPeerIdToAgentM.remove(peerId);
+    }
+}
+
+
+/**
  * @brief Add a model of agent
  * @param agent
  */
@@ -961,6 +975,9 @@ void IngeScapeModelManager::addAgentModel(AgentM* agent)
 {
     if (agent != NULL)
     {
+        // Connect to signals from this new agent
+        connect(agent, &AgentM::networkDataWillBeCleared, this, &IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared);
+
         QList<AgentM*> agentModelsList = getAgentModelsListFromName(agent->name());
         agentModelsList.append(agent);
 
@@ -1047,6 +1064,9 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
     {
         // Emit the signal "Agent Model Will Be Deleted"
         Q_EMIT agentModelWillBeDeleted(agent);
+
+        // DIS-connect to signals from the agent
+        connect(agent, 0, this, 0);
 
         // Delete its model of definition if needed
         if (agent->definition() != NULL) {
