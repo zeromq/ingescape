@@ -799,7 +799,7 @@ Rectangle {
 
             anchors {
                 left: parent.left
-                leftMargin: 20
+                leftMargin: 30
                 right: parent.right
                 rightMargin: 20
                 verticalCenter: parent.top
@@ -810,9 +810,8 @@ Rectangle {
             elide: Text.ElideRight
             text: rootItem.agentName
 
-            color: (dropEnabled === true) ?
-                       (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONNameMappingColor : IngeScapeTheme.agentsOFFNameMappingColor
-            : IngeScapeTheme.lightGreyColor;
+            color: (dropEnabled === true) ? ((rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONNameMappingColor : IngeScapeTheme.agentsOFFNameMappingColor)
+                                          : IngeScapeTheme.lightGreyColor
 
             font: IngeScapeTheme.headingFont
         }
@@ -869,14 +868,20 @@ Rectangle {
 
             anchors {
                 top: parent.top
-                topMargin: 10
+                topMargin: 14
                 left: parent.left
-                leftMargin: 2
+                leftMargin: 8
             }
-            width: 15
-            height: 20
+            //width: 15
+            //height: 20
 
-            text: "D"
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                pressedID: releasedID + "_pressed"
+                releasedID: "bouton_definition"
+                disabledID : releasedID
+            }
 
             visible: rootItem._isSelected
 
