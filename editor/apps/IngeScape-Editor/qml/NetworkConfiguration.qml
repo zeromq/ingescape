@@ -35,6 +35,7 @@ I2PopupBase {
     //property var controller: null;
 
     onOpened: {
+        txtPort.text = IngeScapeEditorC.port;
         combobox.selectedItem = IngeScapeEditorC.networkDevice;
         clearPlatform.checked = true;
     }

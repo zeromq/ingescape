@@ -210,7 +210,7 @@ ApplicationWindow {
 
                 onTriggered: {
                     if (applicationLoader.item) {
-                        console.log("Configure network");
+                        //console.log("QML: open network configuration");
                         applicationLoader.item.openNetworkConfiguration();
                     }
                 }
