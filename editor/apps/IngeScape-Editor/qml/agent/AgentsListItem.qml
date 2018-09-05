@@ -72,9 +72,7 @@ Item {
             fill: parent
         }
 
-        border {
-            width: 0
-        }
+        border.width: 0
 
         color: agentItemIsHovered ? IngeScapeTheme.agentsListItemRollOverBackgroundColor : IngeScapeTheme.agentsListItemBackgroundColor
 
@@ -97,7 +95,6 @@ Item {
             anchors {
                 fill: parent
             }
-
 
             // Selected Agent
             Item {
@@ -156,37 +153,49 @@ Item {
         }
 
         Column {
-            id : columnName
+            id: columnName
 
             anchors {
-                left : parent.left
+                left: parent.left
                 leftMargin: 28
                 top: parent.top
                 topMargin: 12
-                right : bottomRow.left
+                right: middleRow.left
+                //rightMargin: 5
             }
-            height : childrenRect.height
+            height: childrenRect.height
 
-            spacing : 4
+            spacing: 4
+
+            TextMetrics {
+                id: textMetricsName
+
+                elideWidth: (columnName.width - textState.width - textState.anchors.leftMargin)
+                elide: Text.ElideRight
+
+                text: rootItem.agent ? rootItem.agent.name : ""
+                font: IngeScapeTheme.headingFont
+            }
 
             // Name
             Text {
                 id: agentName
 
                 anchors {
-                    left : parent.left
+                    left: parent.left
+                    //right: parent.right
                 }
-                elide: Text.ElideRight
 
-                text: rootItem.agent ? rootItem.agent.name : ""
+                text: textMetricsName.elidedText
+
                 color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
-
 
                 font: IngeScapeTheme.headingFont
 
                 Text {
-                    anchors
-                    {
+                    id: textState
+
+                    anchors {
                         left: parent.right
                         leftMargin: 5
                         baseline: parent.baseline
@@ -204,16 +213,16 @@ Item {
 
                 // clones
                 Rectangle {
-                    height : 16
-                    width : height
-                    radius : height/2
+                    height: 16
+                    width: height
+                    radius: height/2
 
                     visible: (model.clonesNumber > 0)
 
                     anchors {
                         verticalCenter: parent.verticalCenter
                         verticalCenterOffset: 1
-                        right : parent.left
+                        right: parent.left
                         rightMargin: 5
                     }
 
@@ -230,21 +239,15 @@ Item {
                             pixelSize : 12
                         }
                     }
-
-
                 }
             }
 
             // Definition name and version
             MouseArea {
-                id : definitionNameBtn
+                id: definitionNameBtn
 
-                anchors {
-                    left : parent.left
-                }
-
-                height : definitionNameTxt.height
-                width : childrenRect.width
+                height: definitionNameTxt.height
+                width: childrenRect.width
 
                 hoverEnabled: true
                 onClicked: {
@@ -255,13 +258,13 @@ Item {
                 }
 
                 TextMetrics {
-                    id : definitionName
+                    id: textMetricsDefinition
 
-                    elideWidth: (columnName.width - versionName.width)
+                    elideWidth: (columnName.width - versionName.width - versionName.anchors.leftMargin)
                     elide: Text.ElideRight
 
-                    text: (rootItem.agent && rootItem.agent.definition) ? rootItem.agent.definition.name
-                                                                        : ""
+                    text: (rootItem.agent && rootItem.agent.definition) ? rootItem.agent.definition.name : ""
+                    font: IngeScapeTheme.heading2Font
                 }
 
                 Text {
@@ -271,7 +274,7 @@ Item {
                         left : parent.left
                     }
 
-                    text : definitionName.elidedText
+                    text: textMetricsDefinition.elidedText
 
                     color: if (rootItem.agent)
                            {
@@ -335,8 +338,8 @@ Item {
                     id : versionName
                     anchors {
                         bottom: definitionNameTxt.bottom
-                        bottomMargin : 2
-                        left : definitionNameTxt.right
+                        bottomMargin: 2
+                        left: definitionNameTxt.right
                         leftMargin: 5
                     }
 
@@ -352,7 +355,7 @@ Item {
                     }
                 }
 
-                // underline
+                // Underline
                 Rectangle {
                     visible: definitionNameBtn.containsMouse
 
@@ -394,6 +397,7 @@ Item {
                 right : parent.right
                 rightMargin: 10
             }
+            width: childrenRect.width
 
             spacing: 5
 
@@ -451,9 +455,9 @@ Item {
                 right : parent.right
                 rightMargin: 10
             }
+            width: childrenRect.width
 
             spacing: 5
-
 
             // Button Freeze
             Button {
@@ -475,7 +479,6 @@ Item {
                     model.QtObject.changeFreeze();
                 }
             }
-
 
             // Button Options
             Button {
