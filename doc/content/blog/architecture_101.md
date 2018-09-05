@@ -324,6 +324,8 @@ void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType, void* v
 
 
 ## Integrating with legacy code and industrial frameworks
+A **real-world example** of ingeScape integration into complex existing software is presented in [this article](/blog/vlc).
+
 Sometimes, an agent may be based on a legacy application with its own architecture or an application based on an industrial framework such as Qt, Microsoft .Net or Apple Cocoa. In these situations, the application initialization process and the internal architecture are constrained. However places to integrate the ingeScape code and make this legacy or industrial application an agent are pretty much the same, independently from the underlying architecture.
 
 The ingeScape library creates its own set of threads and does not need to rely on the execution control of the main application. We designed the ingeScape library so that it can be called from any place inside an existing application code. These clean separation and easy access offer a total integration flexibility. Integrating ingeScape code inside an industrial or legacy application can be seen simply as « surgically » minimally adding the ingeScape callbacks and function calls where it suits best inside the existing or constrained code.
@@ -336,5 +338,7 @@ Independently from the programming language, here are the major steps for transf
 - If the agent requires to declare inputs, these inputs generally need to be observed and thus to be attached to callbacks. The callbacks can be developed in your application’s preferred language by relying on the language wrapping that has been achieved (in C#, Java, etc.). The callbacks may then trigger internal code in your application to react to the received inputs and then write ingeScape outputs or call tokens if relevant.
 - Finally, some internal behaviors in your application or some user interactions may also require to write ingeScape outputs or to send tokens. Generally, this is achieved by simply adding the corresponding instructions inside the existing application functions, where the information to be used or sent is the most accessible.
 
-In our experience, transforming even a very large or very old application into an ingeScape agent only requires a few hundreds lines of code to be added in strategic places, without requiring to make any change in the existing code architecture. Due to ingeScape independent threads, there no influence in the existing execution control mechanisms, except sometimes for the necessity to call some code from the ingeScape callbacks inside one of the application’s threads or queues, using provided frameworks functions to do so. This is practically the same as have a dedicated UI thread and other threads for heavy algorithms, except that ingeScape does not require complex synchronisation mechanisms.
+In our experience, transforming even a very large or very old application into an ingeScape agent only requires a few hundreds lines of code to be added in strategic places, without requiring to make any change in the existing code architecture. Due to ingeScape independent threads, there no influence in the existing execution control mechanisms, except sometimes for the necessity to call some code from the ingeScape callbacks inside one of the application’s threads or queues, using provided frameworks functions to do so. This is practically the same as having a dedicated UI thread and other threads for heavy algorithms, except that ingeScape does not require complex synchronisation mechanisms.
+
+
 
