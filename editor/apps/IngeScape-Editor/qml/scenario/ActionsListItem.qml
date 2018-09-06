@@ -22,7 +22,7 @@ Item {
     // my action
     property var action: null;
 
-    // true if action Item contains the mouse (rollover)
+    // true if action item contains the mouse (rollover)
     property bool actionItemIsHovered: false;
 
     // Flag indicating if our action is pressed

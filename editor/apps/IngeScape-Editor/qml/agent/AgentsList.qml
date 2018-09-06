@@ -400,8 +400,10 @@ Item {
 
                     hoverEnabled: true
 
+                    // Disable smoothed so that the Item pixel from where we started the drag remains under the mouse cursor
                     drag.smoothed: false
                     drag.target: draggableItem
+
                     cursorShape: (mouseArea.drag.active)? Qt.ClosedHandCursor : Qt.OpenHandCursor
 
                     onPressed: {

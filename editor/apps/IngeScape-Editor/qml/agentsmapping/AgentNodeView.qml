@@ -41,12 +41,13 @@ Rectangle {
     property var agentMappingVM: null
     property var agentName: agentMappingVM ? agentMappingVM.name : ""
 
-    property bool isReduced : agentMappingVM && agentMappingVM.isReduced
+    property bool isReduced: agentMappingVM && agentMappingVM.isReduced
 
-    //false if the agent is dropping and the drop is not available, true otherwise
-    property bool dropEnabled : true
+    // false if the agent is dropping and the drop is not available, true otherwise
+    property bool dropEnabled: true
 
-
+    // Flag indicating if the mouse is hover our agent
+    property bool agentItemIsHovered: mouseArea.containsMouse
 
     // To check if our item is selected or not
     property bool _isSelected: (controller && rootItem.agentMappingVM && (controller.selectedAgent === rootItem.agentMappingVM))
@@ -109,7 +110,6 @@ Rectangle {
     }
 
 
-
     // Animate our border when our item is selected / unselected
     Behavior on border.width {
         NumberAnimation {}
@@ -146,10 +146,10 @@ Rectangle {
 
         anchors.fill: parent
 
+        hoverEnabled: true
 
         drag.target: parent
-        // Disable smoothed so that the Item pixel from where we started
-        // the drag remains under the mouse cursor
+        // Disable smoothed so that the Item pixel from where we started the drag remains under the mouse cursor
         drag.smoothed: false
 
 
@@ -264,7 +264,6 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            //color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor
                             color: (myModel && myModel.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
                                                                                   : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
 
@@ -805,12 +804,19 @@ Rectangle {
             style: Theme.LabellessSvgButtonStyle {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
-                pressedID: releasedID + "_pressed"
+                pressedID: releasedID + "-pressed"
                 releasedID: "definition-button"
                 disabledID : releasedID
             }
 
-            visible: rootItem._isSelected
+            opacity: rootItem.agentItemIsHovered ? 1 : 0
+
+            visible: (opacity !== 0)
+            enabled: visible
+
+            Behavior on opacity {
+                NumberAnimation {}
+            }
 
             onClicked: {
                 if (IngeScapeEditorC.modelManager) {
@@ -854,10 +860,10 @@ Rectangle {
                 rightMargin: 10
             }
 
+            opacity: rootItem.agentItemIsHovered ? 1 : 0
+
             visible: (opacity !== 0)
             enabled: visible
-
-            opacity: rootItem._isSelected ? 1 : 0
 
             Behavior on opacity {
                 NumberAnimation {}
