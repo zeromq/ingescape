@@ -114,8 +114,7 @@ void ActionConditionVM::_configureToType(ActionConditionTypes::Value value)
         // AGENT
         case ActionConditionTypes::AGENT:
         {
-            setmodelM(new ActionConditionM());
-            //setmodelM(new ConditionOnAgentM());
+            setmodelM(new ConditionOnAgentM());
             _modelM->setagent(agent);
             break;
         }

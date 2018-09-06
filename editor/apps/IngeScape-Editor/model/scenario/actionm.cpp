@@ -161,24 +161,47 @@ void ActionM::copyFrom(ActionM* actionModel)
 
 
         _conditionsList.deleteAllItems();
-        for (ActionConditionVM* conditionVM : actionModel->conditionsList()->toList())
+        for (ActionConditionVM* reference : actionModel->conditionsList()->toList())
         {
-            ActionConditionVM* copiedConditionVM = new ActionConditionVM();
-            copiedConditionVM->setconditionType(conditionVM->conditionType());
-
-            IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(conditionVM->modelM());
-            if(iopCondition != NULL)
+            if ((reference != NULL) && (reference->modelM() != NULL))
             {
-                IOPValueConditionM * copiedIopCondition = new IOPValueConditionM();
-                copiedIopCondition->copyFrom(iopCondition);
-                copiedConditionVM->setmodelM(copiedIopCondition);
+                ActionConditionVM* copyVM = new ActionConditionVM();
+                copyVM->setconditionType(reference->conditionType());
+
+                switch (copyVM->conditionType())
+                {
+                case ActionConditionTypes::VALUE:
+                {
+                    IOPValueConditionM* iopValueCondition = qobject_cast<IOPValueConditionM*>(reference->modelM());
+                    if (iopValueCondition != NULL)
+                    {
+                        IOPValueConditionM* copyM = new IOPValueConditionM();
+                        copyM->copyFrom(iopValueCondition);
+
+                        copyVM->setmodelM(copyM);
+                    }
+                }
+                    break;
+
+                case ActionConditionTypes::AGENT:
+                {
+                    ConditionOnAgentM* conditionOnAgent = qobject_cast<ConditionOnAgentM*>(reference->modelM());
+                    if (conditionOnAgent != NULL)
+                    {
+                        ConditionOnAgentM* copyM = new ConditionOnAgentM();
+                        copyM->copyFrom(conditionOnAgent);
+
+                        copyVM->setmodelM(copyM);
+                    }
+                }
+                    break;
+
+                default:
+                    break;
+                }
+
+                addConditionToList(copyVM);
             }
-            else {
-                ActionConditionM * copiedIopCondition = new ActionConditionM();
-                copiedIopCondition->copyFrom(conditionVM->modelM());
-                copiedConditionVM->setmodelM(copiedIopCondition);
-            }
-            addConditionToList(copiedConditionVM);
         }
     }
 }

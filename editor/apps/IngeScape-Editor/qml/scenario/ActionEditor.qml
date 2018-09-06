@@ -557,17 +557,11 @@ Window {
                                             return model.name;
                                         }
 
-
                                         Binding {
                                             target: agentEffectCombo
                                             property: "selectedItem"
-                                            value: if (myEffect && myEffect.modelM)
-                                                   {
-                                                       myEffect.modelM.agent;
-                                                   }
-                                                   else {
-                                                       null;
-                                                   }
+                                            value: (myEffect && myEffect.modelM) ? myEffect.modelM.agent
+                                                                                 : null
                                         }
 
                                         onSelectedItemChanged: {
@@ -605,36 +599,33 @@ Window {
                                             return model.name;
                                         }
 
-
                                         Binding {
                                             target: iopEffectsCombo
                                             property: "selectedItem"
                                             value: if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP)
                                                    {
-                                                       console.log("QML (Binding): Combo set agent IOP to " + myEffect.modelM.agentIOP.name);
+                                                       //console.log("QML (Binding): Combo set agent IOP to " + myEffect.modelM.agentIOP.name);
                                                        myEffect.modelM.agentIOP;
                                                    }
                                                    else {
-                                                       console.log("QML (Binding): Combo set agent IOP to NULL !!!");
+                                                       //console.log("QML (Binding): Combo set agent IOP to NULL !!!");
                                                        null;
                                                    }
                                         }
-
 
                                         onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
                                                 if (myEffect.modelM.iopMergedList && myEffect.modelM.iopMergedList.count > 0) {
-                                                    console.log("QML: Combo Selected Item changed...set agent IOP to " + iopEffectsCombo.selectedItem + " (iopMergedList.count = " + myEffect.modelM.iopMergedList.count + ")");
+                                                    //console.log("QML: Combo Selected Item changed...set agent IOP to " + iopEffectsCombo.selectedItem + " (iopMergedList.count = " + myEffect.modelM.iopMergedList.count + ")");
                                                 }
                                                 else {
-                                                    console.log("QML: Combo Selected Item changed...set agent IOP to " + iopEffectsCombo.selectedItem + " (iopMergedList is EMPTY !!!)");
+                                                    //console.log("QML: Combo Selected Item changed...set agent IOP to " + iopEffectsCombo.selectedItem + " (iopMergedList is EMPTY !!!)");
                                                 }
 
                                                 myEffect.modelM.agentIOP = iopEffectsCombo.selectedItem;
                                             }
                                         }
-
                                     }
 
                                     // Effect Type (on Agent)
@@ -868,14 +859,10 @@ Window {
                                         }
 
                                         Binding {
-                                            target : comboEffectOnMapping_OutputAgent
-                                            property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM) {
-                                                        myEffect.modelM.outputAgent;
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
+                                            target: comboEffectOnMapping_OutputAgent
+                                            property: "selectedItem"
+                                            value: (myEffect && myEffect.modelM) ? myEffect.modelM.outputAgent
+                                                                                 : null
                                         }
 
                                         onSelectedItemChanged: {
@@ -906,14 +893,10 @@ Window {
                                         }
 
                                         Binding {
-                                            target : comboEffectOnMapping_Output
-                                            property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM) {
-                                                        myEffect.modelM.output;
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
+                                            target: comboEffectOnMapping_Output
+                                            property: "selectedItem"
+                                            value: (myEffect && myEffect.modelM) ? myEffect.modelM.output
+                                                                                 : null
                                         }
 
                                         onSelectedItemChanged: {
@@ -1060,16 +1043,11 @@ Window {
                                             return model.name;
                                         }
 
-
                                         Binding {
-                                            target : comboEffectOnMapping_InputAgent
-                                            property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM) {
-                                                        myEffect.modelM.agent;
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
+                                            target: comboEffectOnMapping_InputAgent
+                                            property: "selectedItem"
+                                            value: (myEffect && myEffect.modelM) ? myEffect.modelM.agent
+                                                                                  : null
                                         }
 
                                         onSelectedItemChanged: {
@@ -1100,14 +1078,10 @@ Window {
                                         }
 
                                         Binding {
-                                            target : comboEffectOnMapping_Input
-                                            property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM) {
-                                                        myEffect.modelM.input;
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
+                                            target: comboEffectOnMapping_Input
+                                            property: "selectedItem"
+                                            value: (myEffect && myEffect.modelM) ? myEffect.modelM.input
+                                                                                 : null
                                         }
 
                                         onSelectedItemChanged: {
@@ -1324,14 +1298,11 @@ Window {
                         IngeScapeComboBox {
                             id : validityDurationCombo
 
-                            anchors {
-                                verticalCenter : parent.verticalCenter
-                            }
+                            anchors.verticalCenter : parent.verticalCenter
+                            height: 25
+                            width: 115
 
-                            height : 25
-                            width : 115
-
-                            model : controller ? controller.validationDurationsTypesList : 0
+                            model: controller ? controller.validationDurationsTypesList : 0
 
                             function modelToString(model)
                             {
@@ -1340,20 +1311,13 @@ Window {
 
 
                             Binding {
-                                target : validityDurationCombo
-                                property : "selectedItem"
-                                value : if (actionM && controller)
-                                        {
-                                            controller.validationDurationsTypesList.getItemWithValue(actionM.validityDurationType);
-                                        }
-                                        else {
-                                            null;
-                                        }
+                                target: validityDurationCombo
+                                property: "selectedItem"
+                                value: (actionM && controller) ? controller.validationDurationsTypesList.getItemWithValue(actionM.validityDurationType)
+                                                               : null
                             }
 
-
-                            onSelectedItemChanged:
-                            {
+                            onSelectedItemChanged: {
                                 if (actionM) {
                                     actionM.validityDurationType = validityDurationCombo.selectedItem.value;
                                 }
@@ -1412,7 +1376,7 @@ Window {
                             }
 
                             onTextChanged: {
-                                if (activeFocus &&  actionM ) {
+                                if (activeFocus && actionM) {
                                     actionM.validityDurationString = text;
                                 }
                             }
@@ -1425,12 +1389,10 @@ Window {
                         }
 
                         Text {
-                            anchors {
-                                verticalCenter : parent.verticalCenter
-                            }
+                            anchors.verticalCenter : parent.verticalCenter
 
-                            visible : textFieldValidity.visible
-                            text : "seconds"
+                            text: "seconds"
+                            visible: textFieldValidity.visible
 
                             color: IngeScapeTheme.whiteColor
                             font {
@@ -1449,11 +1411,11 @@ Window {
                     id : scrollViewConditions
 
                     anchors {
-                        top : validityDuration.bottom
+                        top: validityDuration.bottom
                         topMargin: 8
-                        right : parent.right
-                        left : parent.left
-                        bottom : conditionsItem.bottom
+                        right: parent.right
+                        left: parent.left
+                        bottom: conditionsItem.bottom
                     }
 
                     enabled: conditionsItem.isOpened
@@ -1480,11 +1442,16 @@ Window {
                             model: (actionM && conditionsItem.isOpened) ? actionM.conditionsList : 0
 
                             Rectangle {
-                                height : 62
+                                id: rectToName
+
+                                // my condition
+                                property var myCondition: model.QtObject
+
                                 anchors {
                                     right : parent.right
                                     left : parent.left
                                 }
+                                height: 62
 
                                 color : "transparent"
                                 radius: 5
@@ -1492,9 +1459,6 @@ Window {
                                     width : 1
                                     color : IngeScapeTheme.blackColor
                                 }
-
-                                // my condition
-                                property var myCondition: model.QtObject
 
                                 // Condition Type
                                 Row {
@@ -1514,13 +1478,12 @@ Window {
                                     }
 
                                     Repeater {
-                                        model : controller ? controller.conditionsTypesList : 0
+                                        model: controller ? controller.conditionsTypesList : 0
 
                                         CheckBox {
-                                            id : conditionsTypeCB
-                                            anchors {
-                                                verticalCenter: parent.verticalCenter;
-                                            }
+                                            id: conditionsTypeCB
+
+                                            anchors.verticalCenter: parent.verticalCenter
 
                                             checked: myCondition && (myCondition.conditionType === model.value)
 
@@ -1572,20 +1535,21 @@ Window {
 
 
                                             Binding {
-                                                target : conditionsTypeCB
-                                                property : "checked"
-                                                value : (myCondition && myCondition.conditionType === model.value)
+                                                target: conditionsTypeCB
+                                                property: "checked"
+                                                value: (myCondition && (myCondition.conditionType === model.value))
                                             }
                                         }
                                     }
-
                                 }
+
 
                                 //
                                 // Conditions Details
                                 //
                                 Item {
-                                    id : conditionRowItem
+                                    id: conditionRowItem
+
                                     anchors {
                                         left: rowConditionsTypes.left
                                         right: parent.right
@@ -1595,22 +1559,20 @@ Window {
                                     }
 
                                     Row {
-                                        id : conditionRowFixeSize
-                                        height : agentCombo.height
-                                        spacing : 6
+                                        id: conditionRowFixeSize
+
                                         anchors {
                                             left: parent.left
                                             bottom: parent.bottom
                                         }
+                                        height: agentCombo.height
+                                        spacing: 6
 
                                         // Agent
                                         IngeScapeComboBox {
-                                            id : agentCombo
+                                            id: agentCombo
 
-                                            anchors {
-                                                verticalCenter : parent.verticalCenter
-                                            }
-
+                                            anchors.verticalCenter : parent.verticalCenter
                                             height : 25
                                             width : 148
 
@@ -1625,19 +1587,12 @@ Window {
                                                 return model.name;
                                             }
 
-
                                             Binding {
                                                 target: agentCombo
                                                 property: "selectedItem"
-                                                value: if (myCondition && myCondition.modelM)
-                                                       {
-                                                           myCondition.modelM.agent;
-                                                       }
-                                                       else {
-                                                           null;
-                                                       }
+                                                value: (myCondition && myCondition.modelM) ? myCondition.modelM.agent
+                                                                                           : null
                                             }
-
 
                                             onSelectedItemChanged: {
                                                 if (myCondition && myCondition.modelM && agentCombo.selectedItem)
@@ -1650,11 +1605,9 @@ Window {
 
                                         // Agent Inputs/Outputs
                                         IngeScapeComboBoxAgentsIOP {
-                                            id : ioCombo
+                                            id: ioCombo
 
-                                            anchors {
-                                                verticalCenter: parent.verticalCenter
-                                            }
+                                            anchors.verticalCenter: parent.verticalCenter
                                             height : 25
                                             width : 148
 
@@ -1671,13 +1624,8 @@ Window {
                                             Binding {
                                                 target: ioCombo
                                                 property: "selectedItem"
-                                                value: if (myCondition && myCondition.modelM)
-                                                       {
-                                                           myCondition.modelM.agentIOP;
-                                                       }
-                                                       else {
-                                                           null;
-                                                       }
+                                                value: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIOP
+                                                                                           : null
                                             }
 
 
@@ -1695,13 +1643,11 @@ Window {
                                         IngeScapeComboBox {
                                             id : comboAgentConditionValues
 
-                                            anchors {
-                                                verticalCenter : parent.verticalCenter
-                                            }
+                                            anchors.verticalCenter: parent.verticalCenter
                                             height: 25
                                             width: 78
 
-                                            visible: (myCondition && myCondition.conditionType === ActionConditionTypes.AGENT)
+                                            visible: (myCondition && (myCondition.conditionType === ActionConditionTypes.AGENT))
 
                                             model: (controller ? controller.allAgentConditionValues : 0)
 
@@ -1710,11 +1656,11 @@ Window {
                                                 return model.name;
                                             }
 
-
                                             Binding {
                                                 target: comboAgentConditionValues
                                                 property: "selectedItem"
-                                                value: (myCondition && myCondition.modelM && controller ? controller.allAgentConditionValues.getItemWithValue(myCondition.modelM.agentConditionValue) : null)
+                                                value: (myCondition && myCondition.modelM && controller) ? controller.allAgentConditionValues.getItemWithValue(myCondition.modelM.agentConditionValue)
+                                                                                                         : null
                                             }
 
                                             onSelectedItemChanged: {
@@ -1736,7 +1682,7 @@ Window {
                                             height: 25
                                             width: 44
 
-                                            visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
+                                            visible: (myCondition && (myCondition.conditionType === ActionConditionTypes.VALUE))
 
                                             model: (controller ? controller.allValueComparisonTypes : 0)
 
@@ -1745,11 +1691,11 @@ Window {
                                                 return model.name;
                                             }
 
-
                                             Binding {
                                                 target: comboValueComparisonTypes
                                                 property: "selectedItem"
-                                                value: (myCondition && myCondition.modelM && controller ? controller.allValueComparisonTypes.getItemWithValue(myCondition.modelM.valueComparisonType) : null)
+                                                value: (myCondition && myCondition.modelM && controller) ? controller.allValueComparisonTypes.getItemWithValue(myCondition.modelM.valueComparisonType)
+                                                                                                         : null
                                             }
 
                                             onSelectedItemChanged: {
@@ -1759,7 +1705,6 @@ Window {
                                                 }
                                             }
                                         }
-
                                     }
 
                                     // Comparison Value
@@ -1823,12 +1768,7 @@ Window {
                                         Binding {
                                             target: textFieldComparisonValue
                                             property: "text"
-                                            value: if (myCondition && myCondition.modelM) {
-                                                       myCondition.modelM.value
-                                                   }
-                                                   else {
-                                                       "";
-                                                   }
+                                            value: (myCondition && myCondition.modelM) ? myCondition.modelM.value : ""
                                         }
                                     }
 

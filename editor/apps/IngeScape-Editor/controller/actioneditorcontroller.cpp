@@ -123,8 +123,9 @@ void ActionEditorController::createNewCondition()
 {
     ActionConditionVM * conditionVM = new ActionConditionVM();
 
-    // Set a condition model
+    // Set a condition model (by default: condition on value)
     conditionVM->setmodelM(new IOPValueConditionM());
+    //conditionVM->setmodelM(new ConditionOnAgentM());
 
     // List of agents is NOT empty
     if ((_listAgentsInMapping != NULL) && !_listAgentsInMapping->isEmpty()) {
@@ -133,8 +134,9 @@ void ActionEditorController::createNewCondition()
 
     _editedAction->addConditionToList(conditionVM);
 
-    // Set condition VM type
+    // Set condition VM type (by default: condition on value)
     conditionVM->setconditionType(ActionConditionTypes::VALUE);
+    //conditionVM->setconditionType(ActionConditionTypes::AGENT);
 }
 
 
