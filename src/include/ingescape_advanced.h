@@ -31,13 +31,14 @@ PUBLIC void igs_setPublishingPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 
-
+//////////////////////////////////////////////////
 //data serialization using ZMQ
 //TODO: give code examples here or link to documentation for zmsg and zframe
 PUBLIC int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg);
 PUBLIC int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
 
+//////////////////////////////////////////////////
 //ZMQ internal bus
 typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *name,
                                          const char *address, const char *channel,
