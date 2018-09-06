@@ -1,5 +1,6 @@
 import QtQuick 2.8
 import QtQuick.Controls 1.4
+import QtQuick.Controls 2.0 as Controls2
 import QtQuick.Controls.Styles 1.4
 
 import I2Quick 1.0
@@ -203,35 +204,47 @@ Item{
 
     Rectangle {
         id: _comboButton
+
         property bool checked : false;
-        width:  parent.width;
-        height: parent.height;
-        radius: _combobox.style.radius;
+
+        width:  parent.width
+        height: parent.height
+        radius: _combobox.style.radius
+
         color: (!_combobox.enabled ? _combobox.style.backgroundColorDisabled : (_mouseAreaCombo.pressed ? _combobox.style.backgroundColorPressed : _combobox.style.backgroundColorIdle));
-        border.width:(!_combobox.enabled ? _combobox.style.borderWidthDisabled : (_mouseAreaCombo.pressed ? _combobox.style.borderWidthPressed : _combobox.style.borderWidthIdle));
-        border.color :(!_combobox.enabled ? _combobox.style.borderColorDisabled : (_mouseAreaCombo.pressed ? _combobox.style.borderColorPressed : _combobox.style.borderColorIdle));
+        border.width: (!_combobox.enabled ? _combobox.style.borderWidthDisabled : (_mouseAreaCombo.pressed ? _combobox.style.borderWidthPressed : _combobox.style.borderWidthIdle));
+        border.color: (!_combobox.enabled ? _combobox.style.borderColorDisabled : (_mouseAreaCombo.pressed ? _combobox.style.borderColorPressed : _combobox.style.borderColorIdle));
 
         Text {
-            id:_comboPlaceholder
-            visible: (_comboText.text === "");
-            anchors.verticalCenter: parent.verticalCenter;
-            anchors.left: parent.left;
-            anchors.leftMargin: 10;
-            anchors.right: _imageCombo.left;
-            anchors.rightMargin: 10;
-            font:_combobox.style.placeholderFont;
-            color: (!_combobox.enabled ? _combobox.style.currentTextColorDisabled : _combobox.style.placeholderTextColor);
-            verticalAlignment: Text.AlignVCenter;
-            elide : Text.ElideRight;
+            id: _comboPlaceholder
+
+            visible: (_comboText.text === "")
+
+            anchors {
+                verticalCenter: parent.verticalCenter
+                left: parent.left
+                leftMargin: 10
+                right: _imageCombo.left
+                rightMargin: 10
+            }
+            font: _combobox.style.placeholderFont
+            color: (!_combobox.enabled ? _combobox.style.currentTextColorDisabled : _combobox.style.placeholderTextColor)
+            verticalAlignment: Text.AlignVCenter
+            elide : Text.ElideRight
         }
+
         Text {
-            id:_comboText
-            anchors.verticalCenter: parent.verticalCenter;
-            anchors.left: parent.left;
-            anchors.leftMargin: 10;
-            anchors.right: _imageCombo.left;
-            anchors.rightMargin: 10;
-            font:_combobox.style.font;
+            id: _comboText
+
+            anchors {
+                verticalCenter: parent.verticalCenter
+                left: parent.left
+                leftMargin: 10;
+                right: _imageCombo.left
+                rightMargin: 10
+            }
+
+            font: _combobox.style.font
             color: (!_combobox.enabled ? _combobox.style.currentTextColorDisabled : (_mouseAreaCombo.pressed ?_combobox.style.currentTextColorPressed : _combobox.style.currentTextColorIdle));
             verticalAlignment: Text.AlignVCenter;
             elide : Text.ElideRight;
@@ -240,14 +253,21 @@ Item{
 
 
         I2Icon {
-            visible: style.isI2Icon;
-            id:_iconcCombo;
-            anchors.verticalCenter: parent.verticalCenter;
-            anchors.right: parent.right;
-            anchors.rightMargin: style.iconMarginRight;
-            rotation : (_comboButton.checked ? (openOnTop ? style.dropdownIconRotateIdle : style.dropdownIconRotateDowned) : (openOnTop ? style.dropdownIconRotateDowned : style.dropdownIconRotateIdle));
-            iconType:  style.dropdownIcon;
-            color:(!_combobox.enabled ? _combobox.style.borderColorDisabled : (_mouseAreaCombo.pressed ? _combobox.style.borderColorPressed : _combobox.style.borderColorIdle));
+            id: _iconcCombo
+
+            visible: style.isI2Icon
+
+            anchors {
+                verticalCenter: parent.verticalCenter
+                right: parent.right
+                rightMargin: style.iconMarginRight
+            }
+
+            rotation: (_comboButton.checked ? (openOnTop ? style.dropdownIconRotateIdle : style.dropdownIconRotateDowned)
+                                            : (openOnTop ? style.dropdownIconRotateDowned : style.dropdownIconRotateIdle) )
+            iconType: style.dropdownIcon
+            color: (!_combobox.enabled ? _combobox.style.borderColorDisabled
+                                       : (_mouseAreaCombo.pressed ? _combobox.style.borderColorPressed : _combobox.style.borderColorIdle) )
 
             Behavior on rotation {
                 NumberAnimation {}
@@ -255,13 +275,19 @@ Item{
         }
 
         Image {
-            visible: !style.isI2Icon;
-            id:_imageCombo;
-            anchors.verticalCenter: parent.verticalCenter;
-            anchors.right: parent.right;
-            anchors.rightMargin: style.iconMarginRight;
-            rotation : (_comboButton.checked ? (openOnTop ? style.dropdownIconRotateIdle : style.dropdownIconRotateDowned) : (openOnTop ? style.dropdownIconRotateDowned : style.dropdownIconRotateIdle));
-            source :  (!style.isI2Icon)?style.dropdownIcon:"";
+            id: _imageCombo
+
+            visible: !style.isI2Icon
+
+            anchors {
+                verticalCenter: parent.verticalCenter
+                right: parent.right
+                rightMargin: style.iconMarginRight
+            }
+            rotation: (_comboButton.checked ? (openOnTop ? style.dropdownIconRotateIdle : style.dropdownIconRotateDowned)
+                                            : (openOnTop ? style.dropdownIconRotateDowned : style.dropdownIconRotateIdle) )
+
+            source: !style.isI2Icon ? style.dropdownIcon : ""
 
             Behavior on rotation {
                 NumberAnimation {}
@@ -270,17 +296,36 @@ Item{
 
 
         MouseArea {
-            id:_mouseAreaCombo;
-            anchors.fill: parent;
+            id: _mouseAreaCombo
+
+            anchors.fill: parent
+
+            activeFocusOnTab: true
+            enabled: (_combolist.count !== 0)
+            hoverEnabled: true
+
             onClicked: {
                 _mouseAreaCombo.forceActiveFocus();
-                (_comboButton.checked) ? close() : open();
+                if (_comboButton.checked) {
+                    close();
+                }
+                else {
+                    open();
+                }
             }
         }
 
+        // Add tooltip on name
+        Controls2.ToolTip {
+            delay: 300
+            visible: _mouseAreaCombo.containsMouse
+            text: _comboText.text
+        }
+
         onVisibleChanged: {
-            if(!visible)
+            if (!visible) {
                 _combobox.close();
+            }
         }
     }
 
@@ -310,14 +355,17 @@ Item{
                 if (_combolist.currentIndex + 1 < _combolist.count) {
                     if (_combobox.useQStringList === false) {
                         _combobox.selectedItem = _combolist.model.get(_combolist.currentIndex + 1) ;
-                    } else {
+                    }
+                    else {
                         _combobox.selectedItem = _combolist.model[_combolist.currentIndex + 1] ;
                     }
                 }
-            } else {
+            }
+            else {
                 if (_combobox.useQStringList === false) {
                     _combobox.selectedItem = _combolist.model.get(0) ;
-                } else {
+                }
+                else {
                     _combobox.selectedItem = _combolist.model[0] ;
                 }
             }
@@ -327,7 +375,8 @@ Item{
             if (_combolist.currentIndex - 1 >= 0) {
                 if (_combobox.useQStringList === false) {
                     _combobox.selectedItem = _combolist.model.get(_combolist.currentIndex - 1) ;
-                } else {
+                }
+                else {
                     _combobox.selectedItem = _combolist.model[_combolist.currentIndex - 1] ;
                 }
             }
@@ -339,21 +388,28 @@ Item{
 
 
         ScrollView{
-             id : _scrollView
+             id: _scrollView
              visible: _comboButton.checked;
 
-             anchors.top:  parent.top;
-             anchors.bottom:  parent.bottom;
+             anchors {
+                 top:  parent.top
+                bottom:  parent.bottom
+             }
              width: _comboButton.width;
              height: ((_combolist.count < _combobox.countDisplayItem) ? _combolist.count*(_comboButton.height+1) : _combobox.countDisplayItem*(_comboButton.height+1) );
 
-             frameVisible: _combobox.style.frameVisible;
-             style: IngeScapeScrollViewStyle {}
+             frameVisible: _combobox.style.frameVisible
 
+             style: IngeScapeScrollViewStyle {
+             }
 
-            ListView {
+             // Prevent drag overshoot on Windows
+             //flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                id:_combolist
+             // Content of our scrollview
+             ListView {
+                id: _combolist
+
                 boundsBehavior: Flickable.StopAtBounds
                 width: parent.width;
                 height: ( (_combolist.count<_combobox.countDisplayItem) ? _combolist.count*(_comboButton.height+1) : _combobox.countDisplayItem*(_comboButton.height+1) );
@@ -372,13 +428,18 @@ Item{
                         radius: 0;
 
                         Text {
-                            id:_itemText
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            anchors.leftMargin : 10
-                            anchors.right: parent.right
-                            elide : Text.ElideRight
-                            font:_combobox.style.itemsFont;
+                            id: _itemText
+
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                                left: parent.left
+                                leftMargin : 10
+                                right: parent.right
+                            }
+
+                            elide: Text.ElideRight
+                            font: _combobox.style.itemsFont;
+
                             color: (_mouseAreaItem.containsPress ? _combobox.style.listItemTextColorPressed
                                                                  : ((_combolist.currentIndex === index) ? _combobox.style.listItemTextColorSelected : _combobox.style.listItemTextColorIdle));
                             text: if (!useQStringList) {
@@ -388,9 +449,13 @@ Item{
                                       modelData;
                                   }
                         }
+
                         MouseArea {
-                            id:_mouseAreaItem
-                            anchors.fill : parent
+                            id: _mouseAreaItem
+                            anchors.fill: parent
+
+                            hoverEnabled: true
+
                             onClicked: {
                                close();
 
@@ -415,6 +480,13 @@ Item{
                                 }
                             }
                         }
+
+                        // Add tooltip on name
+                        Controls2.ToolTip {
+                            delay: 300
+                            visible: _mouseAreaItem.containsMouse
+                            text: _itemText.text
+                        }
                     }
                 }
             }
@@ -429,14 +501,17 @@ Item{
             if (_combolist.currentIndex + 1 < _combolist.count) {
                 if (_combobox.useQStringList === false) {
                     _combobox.selectedItem = _combolist.model.get(_combolist.currentIndex + 1) ;
-                } else {
+                }
+                else {
                     _combobox.selectedItem = _combolist.model[_combolist.currentIndex + 1] ;
                 }
             }
-        } else {
+        }
+        else {
             if (_combobox.useQStringList === false) {
                 _combobox.selectedItem = _combolist.model.get(0) ;
-            } else {
+            }
+            else {
                 _combobox.selectedItem = _combolist.model[0] ;
             }
         }
@@ -446,7 +521,8 @@ Item{
         if (_combolist.currentIndex - 1 >= 0) {
             if (_combobox.useQStringList === false) {
                 _combobox.selectedItem = _combolist.model.get(_combolist.currentIndex - 1) ;
-            } else {
+            }
+            else {
                 _combobox.selectedItem = _combolist.model[_combolist.currentIndex - 1] ;
             }
         }

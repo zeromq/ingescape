@@ -25,16 +25,13 @@ import ".." as Editor;
 Window {
     id: rootItem
 
-    title: (actionM ? actionM.name : "Action")
+    title: actionM ? actionM.name : "Action"
 
+    width: 700
     height: minimumHeight
-    width: minimumWidth
 
     minimumWidth: 475
     minimumHeight: IngeScapeTheme.appMinHeight
-
-    //maximumWidth: 475
-    maximumHeight: IngeScapeTheme.appMinHeight
 
     flags: Qt.Dialog
 
@@ -51,12 +48,14 @@ Window {
     //--------------------------------
 
     // action model
-    property var actionM: panelController ?  panelController.editedAction : null;
+    property var actionM: panelController ? panelController.editedAction : null;
+
     // action view model
     property var actionVM: panelController ? panelController.editedViewModel : null;
 
     // our scenario controller
     property var controller: null;
+
     // our panel controller
     property var panelController: null;
 
@@ -184,9 +183,10 @@ Window {
                     }
 
                     height: 25
-                    width: 185
+                    width: 435
+
                     verticalAlignment: TextInput.AlignVCenter
-                    text: (actionM ? actionM.name : "")
+                    text: actionM ? actionM.name : ""
 
                     style: I2TextFieldStyle {
                         backgroundColor: IngeScapeTheme.darkBlueGreyColor
@@ -807,8 +807,8 @@ Window {
                                             I2SvgItem {
                                                 id : backgroundPopup
 
-                                                svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                                                svgElementId: "bulleInfos"
+                                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                                svgElementId: "tooltip"
                                             }
 
                                             Text {

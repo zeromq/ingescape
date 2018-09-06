@@ -18,14 +18,13 @@ import QtQuick.Controls 2.0 as Controls2
 import QtQuick.Controls.Styles 1.4
 
 import I2Quick 1.0
-
 import INGESCAPE 1.0
 
 import "../theme" as Theme;
 
 
 Item {
-    id : combobox
+    id: combobox
 
     height : 25
     width : 148
@@ -69,7 +68,8 @@ Item {
         {
             comboText.text = modelToString(combobox.selectedItem);
             comboBoxTooltip.text = combobox.selectedItem.name + " (" + AgentIOPValueTypes.enumToString(combobox.selectedItem.agentIOPValueType) + " " + AgentIOPTypes.enumToString(combobox.selectedItem.agentIOPType).toLowerCase() + ")";
-        }  else {
+        }
+        else {
             comboText.text = "";
             comboBoxTooltip.text = "";
         }
@@ -219,16 +219,24 @@ Item {
 
 
         MouseArea {
-            id:_mouseAreaCombo;
-            anchors.fill: parent;
-            activeFocusOnTab: true;
-            enabled : (combolist.count !== 0)
+            id: _mouseAreaCombo
+
+            anchors.fill: parent
+
+            activeFocusOnTab: true
+            enabled: (combolist.count !== 0)
+            hoverEnabled: true
 
             onClicked: {
                 _mouseAreaCombo.forceActiveFocus();
-                (comboButton.checked) ? combobox.close() : combobox.open();
+
+                if (comboButton.checked) {
+                    combobox.close();
+                }
+                else {
+                    combobox.open();
+                }
             }
-            hoverEnabled: true
         }
 
         // Add tooltip on name
@@ -240,8 +248,9 @@ Item {
         }
 
         onVisibleChanged: {
-            if(!visible)
+            if (!visible) {
                 combobox.close();
+            }
         }
     }
 
@@ -275,7 +284,7 @@ Item {
         }
 
         ScrollView {
-            id : _scrollView
+            id: _scrollView
 
             visible: comboButton.checked;
 
@@ -283,7 +292,6 @@ Item {
                 top: parent.top
                 bottom: parent.bottom
             }
-
             width: comboButton.width
             height: ((combolist.count < 5) ? (combolist.count) * (comboButton.height + 1)
                                            : 5 * (comboButton.height + 1) )
@@ -415,18 +423,22 @@ Item {
                     MouseArea {
                         id:_mouseAreaItem
                         anchors.fill : parent
+
+                        hoverEnabled: true
+
                         onClicked: {
                             close();
                             combobox.selectedItem = model.QtObject;
 
                         }
-                        hoverEnabled: true
                     }
 
                     // Add tooltip on name
-                    Controls2.ToolTip.delay: 300
-                    Controls2.ToolTip.visible: _mouseAreaItem.containsMouse
-                    Controls2.ToolTip.text: model.name + " (" + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase() + ")"
+                    Controls2.ToolTip {
+                        delay: 300
+                        visible: _mouseAreaItem.containsMouse
+                        text: model.name + " (" + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase() + ")"
+                    }
                 }
 
             }
