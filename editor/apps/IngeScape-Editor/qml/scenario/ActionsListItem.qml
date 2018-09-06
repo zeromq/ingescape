@@ -17,13 +17,17 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property var controller : null;
+    property var controller: null;
 
     // my action
     property var action: null;
 
     // true if action Item contains the mouse (rollover)
-    property bool actionItemIsHovered : false
+    property bool actionItemIsHovered: false;
+
+    // Flag indicating if our action is selected
+    property bool actionItemIsSelected: rootItem.controller && rootItem.action && (rootItem.controller.selectedAction === rootItem.action);
+
 
     width: IngeScapeTheme.leftPanelWidth
     height: 42
@@ -50,8 +54,7 @@ Item {
             fill: parent
         }
 
-
-        color: actionItemIsHovered? IngeScapeTheme.actionsListItemRollOverBackgroundColor : IngeScapeTheme.actionsListItemBackgroundColor
+        color: actionItemIsHovered ? IngeScapeTheme.actionsListItemRollOverBackgroundColor : IngeScapeTheme.actionsListItemBackgroundColor
 
         Rectangle {
             anchors {
@@ -65,155 +68,145 @@ Item {
             height: 1
         }
 
-
-
-        Item {
-            id: actionRow
+        Rectangle {
+            id: selectionFeedback
 
             anchors {
-                fill: parent
+                left: parent.left
+                top: parent.top
+                bottom: parent.bottom
             }
 
-            /*Rectangle {
-                id: grip
+            width: 6
+            color: IngeScapeTheme.selectedAgentColor
+
+            visible: rootItem.actionItemIsSelected
+        }
+
+        I2SvgItem {
+            anchors {
+                left: parent.left
+                leftMargin: 14
+                verticalCenter: parent.verticalCenter
+            }
+
+            svgFileCache: IngeScapeTheme.svgFileINGESCAPE
+            svgElementId: "grip_drag_drop_survol"
+
+            visible: rootItem.actionItemIsHovered
+        }
+
+        // Feedback visible if all conditions are valids
+        Rectangle {
+            anchors {
+                left: parent.left
+                leftMargin: 32
+                verticalCenter: parent.verticalCenter
+            }
+            height: 8
+            width: 8
+
+            radius: 4
+            color: IngeScapeTheme.selectedAgentColor
+            visible: (rootItem.action && rootItem.action.isValid)
+        }
+
+        Button {
+            id: removeButton
+
+            anchors {
+                verticalCenter: parent.verticalCenter
+
+                right: parent.right
+                rightMargin: 12
+            }
+
+            activeFocusOnPress: true
+
+            visible: rootItem.actionItemIsSelected
+
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "supprimer"
+                disabledID : releasedID
+            }
+
+            onClicked: {
+                if (controller && rootItem.action)
+                {
+                    if (controller.isInsertedInTimeLine(rootItem.action))
+                    {
+                        rootItem.needConfirmationtoDeleteAction(rootItem.action);
+                    }
+                    else {
+                        // Delete our action
+                        controller.deleteAction(rootItem.action);
+                    }
+                }
+            }
+        }
+
+        // Action name
+        MouseArea {
+            id: btnActionName
+
+            anchors {
+                left : parent.left
+                leftMargin: 44
+                verticalCenter: parent.verticalCenter
+            }
+
+            height: actionName.height
+            width: actionName.width
+
+            hoverEnabled: true
+
+            onClicked: {
+                if (controller && rootItem.action) {
+                    // Open the editor of our action
+                    controller.openActionEditorWithModel(rootItem.action);
+                }
+            }
+
+            TextMetrics {
+                id: textMetrics_ActionName
+
+                // buttons on the right
+                elideWidth: rootItem.width - btnActionName.anchors.leftMargin - 0
+                elide: Text.ElideRight
+
+                text: rootItem.action ? rootItem.action.name : ""
+                font: IngeScapeTheme.headingFont
+            }
+
+            // Name
+            Text {
+                id: actionName
 
                 anchors {
                     left: parent.left
-                    top: parent.top
-                    bottom: parent.bottom
                 }
 
-                width: 20
-                color: "black"
-            }*/
+                color: btnActionName.pressed ? IngeScapeTheme.actionsListPressedLabelColor : IngeScapeTheme.actionsListLabelColor
 
-            // Selected Action
-            Item {
-                anchors.fill: parent
-                visible : controller && rootItem.action && (controller.selectedAction === rootItem.action);
-
-                Rectangle {
-                    id: selectionFeedback
-                    anchors {
-                        left: parent.left
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-
-                    width: 6
-                    color: IngeScapeTheme.selectedAgentColor
-                }
-
-                Button {
-                    id: removeButton
-                    activeFocusOnPress: true
-
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-
-                        right : parent.right
-                        rightMargin: 12
-                    }
-
-                    style: Theme.LabellessSvgButtonStyle {
-                        fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                        pressedID: releasedID + "-pressed"
-                        releasedID: "supprimer"
-                        disabledID : releasedID
-                    }
-
-                    onClicked: {
-                        if (controller && rootItem.action)
-                        {
-                            if (controller.isInsertedInTimeLine(rootItem.action))
-                            {
-                                rootItem.needConfirmationtoDeleteAction(rootItem.action);
-                            }
-                            else {
-                                // Delete our action
-                                controller.deleteAction(rootItem.action);
-                            }
-                        }
-                    }
-                }
+                text: textMetrics_ActionName.elidedText
+                font: IngeScapeTheme.headingFont
             }
 
-
-            // Feedback visible if all conditions are valids
+            // Underline
             Rectangle {
                 anchors {
-                    verticalCenter: actionNameBtn.verticalCenter
-                    verticalCenterOffset: 2;
-                    right: actionNameBtn.left
-                    rightMargin: 5
+                    left: actionName.left
+                    right: actionName.right
+                    bottom: parent.bottom
                 }
-                height : 2
-                width : 2
+                height: 2
 
-                color: IngeScapeTheme.whiteColor
-                visible: (rootItem.action && rootItem.action.isValid)
+                visible: btnActionName.containsMouse
+                color: actionName.color
             }
-
-
-            // Action name
-            MouseArea {
-                id : actionNameBtn
-
-                anchors {
-                    left : parent.left
-                    leftMargin: 25
-                    verticalCenter: parent.verticalCenter
-                }
-
-                height : actionName.height
-                width : actionName.width
-
-                hoverEnabled: true
-                onClicked: {
-                    if (controller && rootItem.action) {
-                        // Open the editor of our action
-                        controller.openActionEditorWithModel(rootItem.action);
-                    }
-                }
-
-
-                TextMetrics {
-                    id : actName
-                    elideWidth: 220
-                    elide: Text.ElideRight
-
-                    text: (rootItem.action)? rootItem.action.name : ""
-                }
-
-                // Name
-                Text {
-                    id: actionName
-
-                    anchors {
-                        left : parent.left
-                    }
-                    text : actName.elidedText
-                    color: actionNameBtn.pressed ? IngeScapeTheme.actionsListPressedLabelColor : IngeScapeTheme.actionsListLabelColor
-
-                    font: IngeScapeTheme.headingFont
-                }
-
-                // underline
-                Rectangle {
-                    visible: actionNameBtn.containsMouse
-
-                    anchors {
-                        left : actionName.left
-                        right : actionName.right
-                        bottom : parent.bottom
-                    }
-
-                    height : 2
-                    color : actionName.color
-                }
-            }
-
         }
     }
 }

@@ -16,6 +16,7 @@
 
 #include <QDebug>
 #include <QFileDialog>
+#include <misc/ingescapeeditorutils.h>
 
 /**
  * @brief Constructor
@@ -478,7 +479,9 @@ void ScenarioController::deleteAction(ActionM* action)
             _hashFromUidToModelOfAction.remove(actionId);
 
             delete action;
-            action = NULL;
+
+            // Free the UID of the action model
+            IngeScapeEditorUtils::freeUIDofActionM(actionId);
         }
     }
 }

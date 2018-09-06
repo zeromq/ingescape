@@ -24,7 +24,6 @@ extern "C" {
 #include <czmq.h>
 }
 
-#include "misc/ingescapeeditorutils.h"
 #include "model/definitionm.h"
 
 static const QString suffix_Launcher = ".ingescapelauncher";

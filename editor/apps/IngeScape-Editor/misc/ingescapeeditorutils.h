@@ -92,6 +92,27 @@ public:
     static QString getPlatformsPath();
 
 
+    /**
+     * @brief Get an UID for a new model of action
+     * @return
+     */
+    static int getUIDforNewActionM();
+
+
+    /**
+     * @brief Free an UID of a model of action
+     * @param uid
+     */
+    static void freeUIDofActionM(int uid);
+
+
+    /**
+     * @brief Book an UID for a new model of action
+     * @param uid
+     */
+    static void bookUIDforActionM(int uid);
+
+
 protected:
     /**
      * @brief Get (and create if needed) the fullpath of a given sub-directory

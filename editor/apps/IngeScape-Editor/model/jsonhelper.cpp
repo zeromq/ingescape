@@ -15,7 +15,7 @@
 #include "jsonhelper.h"
 
 #include <QDebug>
-
+#include <misc/ingescapeeditorutils.h>
 
 /**
  * @brief Constructor
@@ -390,8 +390,13 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
 
                             if (jsonUID.isDouble() && jsonName.isString())
                             {
+                                int uid = jsonUID.toInt();
+
+                                // Book the UID of the new model of action
+                                IngeScapeEditorUtils::bookUIDforActionM(uid);
+
                                 // Create the model of action
-                                actionM = new ActionM(jsonUID.toInt(), jsonName.toString());
+                                actionM = new ActionM(uid, jsonName.toString());
 
                                 QJsonValue jsonValue = jsonAction.value("validity_duration_type");
                                 if (jsonValue.isString())

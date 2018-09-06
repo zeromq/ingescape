@@ -19,13 +19,15 @@
 #include <QDebug>
 
 
+// Biggest unique id of action model
+static int BIGGEST_UID_OF_ACTION_MODEL = -1;
+
 
 //--------------------------------------------------------------
 //
 // IngeScapeEditorUtils
 //
 //--------------------------------------------------------------
-
 
 /**
  * @brief Default constructor
@@ -141,6 +143,44 @@ QString IngeScapeEditorUtils::getSnapshotsPath()
 QString IngeScapeEditorUtils::getPlatformsPath()
 {
     return IngeScapeEditorUtils::_getSubDirectoryPath("platforms");
+}
+
+
+/**
+ * @brief Get an UID for a new model of action
+ * @return
+ */
+int IngeScapeEditorUtils::getUIDforNewActionM()
+{
+    BIGGEST_UID_OF_ACTION_MODEL++;
+
+    return BIGGEST_UID_OF_ACTION_MODEL;
+}
+
+
+/**
+ * @brief Free an UID of a model of action
+ * @param uid
+ */
+void IngeScapeEditorUtils::freeUIDofActionM(int uid)
+{
+    // Decrement only if the uid correspond to the biggest one
+    if (uid == BIGGEST_UID_OF_ACTION_MODEL)
+    {
+        BIGGEST_UID_OF_ACTION_MODEL--;
+    }
+}
+
+
+/**
+ * @brief Book an UID for a new model of action
+ * @param uid
+ */
+void IngeScapeEditorUtils::bookUIDforActionM(int uid)
+{
+    if (uid > BIGGEST_UID_OF_ACTION_MODEL) {
+        BIGGEST_UID_OF_ACTION_MODEL = uid;
+    }
 }
 
 

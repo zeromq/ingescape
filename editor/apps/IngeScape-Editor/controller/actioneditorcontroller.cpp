@@ -15,10 +15,7 @@
 #include "actioneditorcontroller.h"
 
 #include <QDebug>
-
-// Unique id of the last created model of action
-static int UID_LAST_CREATED_MODEL_OF_ACTION = -1;
-
+#include <misc/ingescapeeditorutils.h>
 
 /**
  * @brief Constructor
@@ -40,17 +37,18 @@ ActionEditorController::ActionEditorController(QString actionName,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    // Increment the unique id of the last created model of action
-    UID_LAST_CREATED_MODEL_OF_ACTION++;
+    // Get an UID for our new model of action
+    int uid = IngeScapeEditorUtils::getUIDforNewActionM();
 
-    _editedAction = new ActionM(UID_LAST_CREATED_MODEL_OF_ACTION, actionName);
+    _editedAction = new ActionM(uid, actionName);
 
     if (_originalAction != NULL)
     {
         _editedAction->copyFrom(_originalAction);
 
         // Cancel the increment because the edited action uses now (after the call to "copyFrom") the uid of the original action
-        UID_LAST_CREATED_MODEL_OF_ACTION--;
+        // Free the UID of the action model
+        IngeScapeEditorUtils::freeUIDofActionM(uid);
     }
 }
 
