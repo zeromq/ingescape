@@ -36,12 +36,27 @@
 #define IGS_UNUSED(x) (void)x;
 
 //////////////////////////////////////////////////
-//initialization and control
+// Initialization and control
 
 //start & stop the agent
 PUBLIC int igs_startWithDevice(const char *networkDevice, unsigned int port);
 PUBLIC int igs_startWithIP(const char *ipAddress, unsigned int port);
 PUBLIC int igs_stop(void);
+
+//There are four non-exclusive ways to stop the execution of an ingescape agent:
+//1- calling igs_stop from the hosting app's threads reacting on user actions or external events
+//2- handling SIGINT in the hosting app to call igs_stop and stop the rest of the app properly
+//3- monitoring the status of igs_Interrupted in the hosting app
+//4- using an igs_forcedStopCallback (see below) and calling code ON THE MAIN APP THREAD from it
+//In any case, igs_stop MUST NEVER BE CALLED directly from any ingeScape callback, as it would cause a thread deadlock.
+
+PUBLIC extern bool igs_Interrupted; //true when the ingescape library triggered SIGINT when forced to stop
+typedef void (*igs_forcedStopCallback)(void *myData);
+//register a callback when the agent is forced to stop by the ingescape platform
+PUBLIC void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData);
+
+//terminate the agent with trigger of SIGINT and call to the registered igs_forcedStopCallbacks
+PUBLIC void igs_die(void);
 
 //agent name set and get
 PUBLIC int igs_setAgentName(const char *name);
@@ -58,7 +73,6 @@ PUBLIC bool igs_isMuted(void);
 typedef void (*igs_muteCallback)(bool isMuted, void *myData);
 PUBLIC int igs_observeMute(igs_muteCallback cb, void *myData);
 
-
 //freeze and unfreeze the agent
 //When freezed, agent will not send anything on its outputs and
 //its inputs are not reactive to external data.
@@ -72,20 +86,6 @@ PUBLIC int igs_observeFreeze(igs_freezeCallback cb, void *myData);
 PUBLIC void igs_setCanBeFrozen(bool canBeFrozen);
 PUBLIC bool igs_canBeFrozen(void);
 
-//There are four non-exclusive ways to stop the execution of an ingescape agent:
-//1- calling igs_stop from the hosting app's threads reacting on user actions or external events
-//2- handling SIGINT in the hosting app to call igs_stop and stop the rest of the app properly
-//3- monitoring the status of igs_Interrupted in the hosting app
-//4- using an igs_forcedStopCallback (see below) and calling code ON THE MAIN APP THREAD from it
-//In any case, igs_stop MUST NEVER BE CALLED directly from any ingeScape callback, as it would cause a thread deadlock.
-
-PUBLIC extern bool igs_Interrupted; //true when the ingescape library triggered SIGINT when forced to stop
-typedef void (*igs_forcedStopCallback)(void *myData);
-//register a callback when the agent is forced to stop by the ingescape platform
-PUBLIC void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData);
-
-//terminate the agent with trigger of SIGINT and call to the registered igs_forcedStopCallbacks
-PUBLIC void igs_die(void);
 
 //////////////////////////////////////////////////
 //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
@@ -151,11 +151,21 @@ PUBLIC int igs_writeParameterAsDouble(const char *name, double value);
 PUBLIC int igs_writeParameterAsString(const char *name, const char *value);
 PUBLIC int igs_writeParameterAsData(const char *name, void *value, size_t size);
 
+//observe writing to IOP
+typedef void (*igs_observeCallback)(iop_t iopType, const char* name, iopType_t valueType, void* value, size_t valueSize, void* myData);
+PUBLIC int igs_observeInput(const char *name, igs_observeCallback cb, void *myData);
+PUBLIC int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData);
+PUBLIC int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData);
+
+//mute or unmute an IOP
+PUBLIC int igs_muteOutput(const char *name);
+PUBLIC int igs_unmuteOutput(const char *name);
+PUBLIC bool igs_isOutputMuted(const char *name);
+
 //check IOP type, lists and existence
 PUBLIC iopType_t igs_getTypeForInput(const char *name);
 PUBLIC iopType_t igs_getTypeForOutput(const char *name);
 PUBLIC iopType_t igs_getTypeForParameter(const char *name);
-
 
 PUBLIC int igs_getInputsNumber(void);
 PUBLIC int igs_getOutputsNumber(void);
@@ -170,16 +180,6 @@ PUBLIC bool igs_checkInputExistence(const char *name);
 PUBLIC bool igs_checkOutputExistence(const char *name);
 PUBLIC bool igs_checkParameterExistence(const char *name);
 
-//observe writing to IOP
-typedef void (*igs_observeCallback)(iop_t iopType, const char* name, iopType_t valueType, void* value, size_t valueSize, void* myData);
-PUBLIC int igs_observeInput(const char *name, igs_observeCallback cb, void *myData);
-PUBLIC int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData);
-PUBLIC int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData);
-
-//mute or unmute an IOP
-PUBLIC int igs_muteOutput(const char *name);
-PUBLIC int igs_unmuteOutput(const char *name);
-PUBLIC bool igs_isOutputMuted(const char *name);
 
 //////////////////////////////////////////////////
 //Definitions
@@ -205,13 +205,14 @@ PUBLIC int igs_removeInput(const char *name);
 PUBLIC int igs_removeOutput(const char *name);
 PUBLIC int igs_removeParameter(const char *name);
 
+
 //////////////////////////////////////////////////
 //mapping
 
 //load / set / get mapping
 PUBLIC int igs_loadMapping (const char* json_str);
 PUBLIC int igs_loadMappingFromPath (const char* file_path);
-PUBLIC int igs_clearMapping(void); //clears mapping data for the agent
+PUBLIC int igs_clearMapping(void); //clears all mapping for the agent
 PUBLIC char* igs_getMapping(void); //returns json string, must be freed by caller
 PUBLIC char *igs_getMappingName(void); //returned char* must be freed by caller
 PUBLIC char *igs_getMappingDescription(void); //returned char* must be freed by caller
