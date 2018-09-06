@@ -217,8 +217,7 @@ Item {
                 id: removeButton
 
                 anchors {
-                    top: parent.top
-                    topMargin: 6
+                    verticalCenter: parent.verticalCenter
                 }
 
                 activeFocusOnPress: true

@@ -375,7 +375,7 @@ Item {
 
                 visible: mouseArea.drag.active
 
-                agentItemIsHovered : mouseArea.containsMouse
+                agentItemIsHovered: mouseArea.containsMouse
             }
 
             // Draggable Agent Item
@@ -454,7 +454,7 @@ Item {
                         agent : model.QtObject
                         controller: rootItem.controller
 
-                        agentItemIsHovered : mouseArea.containsMouse
+                        agentItemIsHovered: mouseArea.containsMouse
                         visible: !mouseArea.drag.active
 
                         onNeedConfirmationtoDeleteAgent : {

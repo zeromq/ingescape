@@ -89,68 +89,63 @@ Item {
         }
 
 
-        Item {
-            id: agentRow
+        // Selection feedback
+        Rectangle {
+            id: selectionFeedback
 
             anchors {
-                fill: parent
+                left : parent.left
+                top : parent.top
+                bottom: parent.bottom
+            }
+            width : 6
+
+            visible: controller && rootItem.agent && (controller.selectedAgent === rootItem.agent);
+
+            color: IngeScapeTheme.selectedAgentColor
+        }
+
+        // Remove button
+        Button {
+            id: removeButton
+
+            anchors {
+                top: parent.top
+                topMargin: 10
+                right: parent.right
+                rightMargin: 12
             }
 
-            // Selected Agent
-            Item {
-                anchors.fill: parent
-                visible : controller && rootItem.agent && (controller.selectedAgent === rootItem.agent);
+            visible: (model.isON === false)
+            opacity: agentItemIsHovered ? 1 : 0
 
-                Rectangle {
-                    anchors {
-                        left : parent.left
-                        top : parent.top
-                        bottom: parent.bottom
+            activeFocusOnPress: true
+
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "delete"
+                disabledID : releasedID
+            }
+
+            onClicked: {
+
+                if (IngeScapeEditorC.canDeleteAgentFromSupervision(model.name))
+                {
+                    if (controller)
+                    {
+                        // Delete selected agent
+                        controller.deleteSelectedAgent();
                     }
-
-                    width : 6
-                    color : IngeScapeTheme.selectedAgentColor
                 }
-
-                Button {
-                    id: removeButton
-
-                    visible: (model.isON === false)
-                    activeFocusOnPress: true
-
-                    anchors {
-                        top: parent.top
-                        topMargin: 10
-                        right : parent.right
-                        rightMargin: 12
-                    }
-
-                    style: Theme.LabellessSvgButtonStyle {
-                        fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                        pressedID: releasedID + "-pressed"
-                        releasedID: "delete"
-                        disabledID : releasedID
-                    }
-
-                    onClicked: {
-
-                        if (IngeScapeEditorC.canDeleteAgentFromSupervision(model.name))
-                        {
-                            if (controller)
-                            {
-                                // Delete selected agent
-                                controller.deleteSelectedAgent();
-                            }
-                        }
-                        else {
-                            // Emit the signal "needConfirmationtoDeleteAgent"
-                            rootItem.needConfirmationtoDeleteAgent();
-                        }
-                    }
+                else {
+                    // Emit the signal "needConfirmationtoDeleteAgent"
+                    rootItem.needConfirmationtoDeleteAgent();
                 }
             }
         }
+
 
         Column {
             id: columnName
@@ -388,6 +383,7 @@ Item {
 
         }
 
+
         Row {
             id: middleRow
 
@@ -503,6 +499,8 @@ Item {
                 }
             }
         }
+
+
     }
 
     PopUp.MenuPopup {

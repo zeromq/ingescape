@@ -56,8 +56,6 @@ Rectangle {
     property int _expandCollapseAnimationDuration: 250
 
 
-
-
     width: 258
 
     height: (rootItem.agentMappingVM && !rootItem.isReduced) ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count, rootItem.agentMappingVM.outputsList.count))
@@ -745,7 +743,7 @@ Rectangle {
         //------------------------------------------
 
 
-        // Expand/collapse mask
+        // Expand / Collapse mask
         Rectangle {
             id: expandCollapseMask
 
@@ -793,6 +791,35 @@ Rectangle {
         }
 
 
+        // Button to open the definition
+        Button {
+            id: btnOpenDefinition
+
+            anchors {
+                top: parent.top
+                topMargin: 10
+                left: parent.left
+                leftMargin: 10
+            }
+
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                pressedID: releasedID + "_pressed"
+                releasedID: "definition-button"
+                disabledID : releasedID
+            }
+
+            visible: rootItem._isSelected
+
+            onClicked: {
+                if (IngeScapeEditorC.modelManager) {
+                    IngeScapeEditorC.modelManager.openDefinitionWithAgentName(rootItem.agentName);
+                }
+            }
+        }
+
+
         // Agent Name
         Text {
             id: agentName
@@ -800,26 +827,32 @@ Rectangle {
             anchors {
                 left: parent.left
                 leftMargin: 30
-                right: parent.right
-                rightMargin: 20
-                verticalCenter: parent.top
-                verticalCenterOffset: 20
+                //right: btnRemoveFromMapping.left
+                right: agentWithSameName.visible ? agentWithSameName.left : btnRemoveFromMapping.left
+                //rightMargin: 20
+                top: parent.top
+                topMargin: 10
             }
-
 
             elide: Text.ElideRight
             text: rootItem.agentName
+            font: IngeScapeTheme.headingFont
 
             color: (dropEnabled === true) ? ((rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONNameMappingColor : IngeScapeTheme.agentsOFFNameMappingColor)
                                           : IngeScapeTheme.lightGreyColor
-
-            font: IngeScapeTheme.headingFont
         }
 
 
         // Remove button
         Button {
             id: btnRemoveFromMapping
+
+            anchors {
+                top: parent.top
+                topMargin: 10
+                right: parent.right
+                rightMargin: 10
+            }
 
             visible: (opacity !== 0)
             enabled: visible
@@ -831,13 +864,6 @@ Rectangle {
             }
 
             activeFocusOnPress: true
-
-            anchors {
-                top: parent.top
-                topMargin: 10
-                right : parent.right
-                rightMargin: 10
-            }
 
             style: Theme.LabellessSvgButtonStyle {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
@@ -862,36 +888,6 @@ Rectangle {
             }
         }
 
-        // Button to open the definition
-        Button {
-            id: btnOpenDefinition
-
-            anchors {
-                top: parent.top
-                topMargin: 14
-                left: parent.left
-                leftMargin: 8
-            }
-            //width: 15
-            //height: 20
-
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                pressedID: releasedID + "_pressed"
-                releasedID: "definition-button"
-                disabledID : releasedID
-            }
-
-            visible: rootItem._isSelected
-
-            onClicked: {
-                if (IngeScapeEditorC.modelManager) {
-                    IngeScapeEditorC.modelManager.openDefinitionWithAgentName(rootItem.agentName);
-                }
-            }
-        }
-
 
         //-------------------
         //
@@ -901,28 +897,24 @@ Rectangle {
         Rectangle {
             id: agentWithSameName
 
-            height: 17
+            anchors {
+                top: parent.top
+                topMargin: 8
+                right: parent.right
+                rightMargin: 26
+            }
+            height: 16
             width: height
-            radius: height/2
+            radius: height / 2
 
             visible: (rootItem.agentMappingVM && (rootItem.agentMappingVM.activeAgentsNumber > 1))
-
-            anchors {
-                verticalCenter: agentName.verticalCenter
-                verticalCenterOffset: 2
-                right: parent.right
-                rightMargin: 25
-            }
 
             color: IngeScapeTheme.redColor
 
             Text {
-                anchors {
-                    centerIn : parent
-                    verticalCenterOffset: -1
-                }
+                anchors.centerIn: parent
 
-                text: agentMappingVM? agentMappingVM.activeAgentsNumber : ""
+                text: agentMappingVM ? agentMappingVM.activeAgentsNumber : ""
 
                 color: IngeScapeTheme.whiteColor
 
@@ -933,41 +925,6 @@ Rectangle {
                 }
             }
         }
-
-
-        /*Rectangle {
-            height: 17
-            width: height
-            radius: height/2
-
-            visible: (rootItem.agentMappingVM && !rootItem.agentMappingVM.areIdenticalsAllDefinitions)
-
-            anchors {
-                verticalCenter: agentName.verticalCenter
-                verticalCenterOffset: 2
-                left: agentWithSameName.right
-                leftMargin: 5
-            }
-
-            color : IngeScapeTheme.redColor
-
-            Text {
-                anchors {
-                    centerIn: parent
-                    verticalCenterOffset: -1
-                }
-
-                text: "!"
-
-                color: IngeScapeTheme.whiteColor
-
-                font {
-                    family: IngeScapeTheme.labelFontFamily
-                    weight: Font.Black
-                    pixelSize: 14
-                }
-            }
-        }*/
 
 
         // Drop Impossible
