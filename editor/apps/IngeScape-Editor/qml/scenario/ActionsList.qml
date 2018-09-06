@@ -81,6 +81,7 @@ Item {
     // allowing to deselect selected action
     MouseArea {
         anchors.fill: parent
+
         onClicked: {
             if (controller.selectedAction)
             {
@@ -88,6 +89,7 @@ Item {
             }
         }
     }
+
 
     //
     // List of actions
@@ -117,13 +119,6 @@ Item {
 
             delegate: componentActionsListItem
 
-            /*onCurrentIndexChanged: {
-            //console.log("onCurrentIndexChanged " + agentsList.currentIndex);
-            console.log("onCurrentIndexChanged " + model.get(agentsList.currentIndex).name);
-        }
-        onCurrentItemChanged: {
-            console.log("onCurrentItemChanged " + agentsList.currentItem);
-        }*/
 
             //
             // Transition animations
@@ -247,9 +242,7 @@ Item {
                     // TODO
                 }
             }
-
         }
-
     }
 
 
@@ -292,7 +285,9 @@ Item {
                 controller: rootItem.controller
 
                 // visible: mouseArea.drag.active
-                actionItemIsHovered : mouseArea.containsMouse
+
+                actionItemIsHovered: mouseArea.containsMouse
+                actionItemIsPressed: mouseArea.pressed
             }
 
             // Draggable Action Item
@@ -304,6 +299,7 @@ Item {
 
                 // Reference to our action that can be used by a DropArea item
                 property var action: model.QtObject
+
                 // StartTime of the action when it is dragged in timeline
                 property var temporaryStartTime: null;
 
@@ -321,12 +317,12 @@ Item {
 
                     drag.smoothed: false
                     drag.target: draggableItem
-                    cursorShape: (mouseArea.drag.active)? Qt.PointingHandCursor : Qt.OpenHandCursor //Qt.OpenHandCursor
+                    cursorShape: mouseArea.drag.active ? Qt.PointingHandCursor : Qt.OpenHandCursor //Qt.OpenHandCursor
 
                     onPressed: {
-                        if (controller) {
-                            if (controller.selectedAction === model.QtObject)
-                            {
+                        if (controller)
+                        {
+                            if (controller.selectedAction === model.QtObject) {
                                 controller.selectedAction = null;
                             }
                             else {
@@ -381,14 +377,15 @@ Item {
 
 
                     ActionsListItem {
-                        height : notDraggableItem.height
-                        width : notDraggableItem.width
+                        height: notDraggableItem.height
+                        width: notDraggableItem.width
 
-
-                        action : model.QtObject
+                        action: model.QtObject
                         controller: rootItem.controller
 
-                        actionItemIsHovered : mouseArea.containsMouse
+                        actionItemIsHovered: mouseArea.containsMouse
+                        actionItemIsPressed: mouseArea.pressed
+
                         visible: !mouseArea.drag.active
 
                         onNeedConfirmationtoDeleteAction: {
@@ -397,11 +394,14 @@ Item {
                         }
                     }
 
-                    I2CustomRectangle{
-                        id : itemDragged
-                        height : columnText.height + 8
-                        width : nameAction.width + 14
-                        color : IngeScapeTheme.darkBlueGreyColor
+                    I2CustomRectangle {
+                        id: itemDragged
+
+                        height: columnText.height + 8
+                        width: nameAction.width + 14
+
+                        color: IngeScapeTheme.darkBlueGreyColor
+
                         visible: mouseArea.drag.active
 
                         // - fuzzy radius around our rectangle
@@ -430,15 +430,15 @@ Item {
                             }
 
                             Text {
-                                id : temporaryStartTimeAction
-                                visible: text !== ""
-                                color : IngeScapeTheme.lightGreyColor
-                                text : draggableItem.temporaryStartTime?
-                                           draggableItem.temporaryStartTime.toLocaleString(Qt.locale(),"hh:mm:ss.zzz")
-                                         : "";
+                                id: temporaryStartTimeAction
 
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 horizontalAlignment: Text.AlignHCenter
+
+                                visible: (text !== "")
+                                color: IngeScapeTheme.lightGreyColor
+                                text: draggableItem.temporaryStartTime ? draggableItem.temporaryStartTime.toLocaleString(Qt.locale(), "hh:mm:ss.zzz")
+                                                                       : ""
 
                                 font {
                                     family : IngeScapeTheme.textFontFamily

@@ -280,7 +280,8 @@ Item {
                             anchors {
                                 left : parent.left
                                 leftMargin: 10
-                                right: parent.right
+                                right: (model.isON === true) ? parent.right : removeButton.left
+                                rightMargin: 5
                             }
 
                             // Usefull to debug to display the peer id
@@ -322,7 +323,7 @@ Item {
                         Controls2.ToolTip.visible: mouseAreaToolTip.containsMouse
                         Controls2.ToolTip.text: (model ? model.commandLine : "")
 
-
+                        // Remove button
                         Button {
                             id: removeButton
 
@@ -526,6 +527,7 @@ Item {
                     width: parent.width
 
                     text: qsTr("Reboot")
+                    enabled: false
 
                     style: Theme.ButtonStyleOfOption {
 
@@ -545,6 +547,7 @@ Item {
                     width: parent.width
 
                     text: qsTr("View Screen")
+                    enabled: false
 
                     style: Theme.ButtonStyleOfOption {
                         isVisibleSeparation: false

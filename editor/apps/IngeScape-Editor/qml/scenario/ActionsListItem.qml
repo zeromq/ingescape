@@ -25,6 +25,9 @@ Item {
     // true if action Item contains the mouse (rollover)
     property bool actionItemIsHovered: false;
 
+    // Flag indicating if our action is pressed
+    property bool actionItemIsPressed: false;
+
     // Flag indicating if our action is selected
     property bool actionItemIsSelected: rootItem.controller && rootItem.action && (rootItem.controller.selectedAction === rootItem.action);
 
@@ -93,7 +96,7 @@ Item {
             }
 
             svgFileCache: IngeScapeTheme.svgFileINGESCAPE
-            svgElementId: "grip-drag-drop-rollover"
+            svgElementId: rootItem.actionItemIsPressed ? "grip-drag-drop-rollover-pressed" : "grip-drag-drop-rollover"
 
             visible: rootItem.actionItemIsHovered
         }
@@ -189,13 +192,12 @@ Item {
             Button {
                 id: playButton
 
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
+                anchors.verticalCenter: parent.verticalCenter
 
                 activeFocusOnPress: true
 
-                visible: rootItem.actionItemIsSelected
+                //visible: rootItem.actionItemIsSelected
+                visible: rootItem.actionItemIsHovered
 
                 style: Theme.LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
@@ -216,13 +218,12 @@ Item {
             Button {
                 id: removeButton
 
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
+                anchors.verticalCenter: parent.verticalCenter
 
                 activeFocusOnPress: true
 
-                visible: rootItem.actionItemIsSelected
+                //visible: rootItem.actionItemIsSelected
+                visible: rootItem.actionItemIsHovered
 
                 style: Theme.LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
