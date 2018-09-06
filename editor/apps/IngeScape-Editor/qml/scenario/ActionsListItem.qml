@@ -84,9 +84,11 @@ Item {
         }
 
         I2SvgItem {
+            id: grip
+
             anchors {
-                left: parent.left
-                leftMargin: 14
+                left: selectionFeedback.right
+                leftMargin: 8
                 verticalCenter: parent.verticalCenter
             }
 
@@ -98,9 +100,11 @@ Item {
 
         // Feedback visible if all conditions are valids
         Rectangle {
+            id: feedbackValidConditions
+
             anchors {
-                left: parent.left
-                leftMargin: 32
+                left: grip.right
+                leftMargin: 8
                 verticalCenter: parent.verticalCenter
             }
             height: 8
@@ -108,44 +112,7 @@ Item {
 
             radius: 4
             color: IngeScapeTheme.selectedAgentColor
-            visible: (rootItem.action && rootItem.action.isValid)
-        }
-
-        Button {
-            id: removeButton
-
-            anchors {
-                verticalCenter: parent.verticalCenter
-
-                right: parent.right
-                rightMargin: 12
-            }
-
-            activeFocusOnPress: true
-
-            visible: rootItem.actionItemIsSelected
-
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                pressedID: releasedID + "-pressed"
-                releasedID: "delete"
-                disabledID: releasedID
-            }
-
-            onClicked: {
-                if (controller && rootItem.action)
-                {
-                    if (controller.isInsertedInTimeLine(rootItem.action))
-                    {
-                        rootItem.needConfirmationtoDeleteAction(rootItem.action);
-                    }
-                    else {
-                        // Delete our action
-                        controller.deleteAction(rootItem.action);
-                    }
-                }
-            }
+            opacity: (rootItem.action && rootItem.action.isValid) ? 1 : 0
         }
 
         // Action name
@@ -157,7 +124,6 @@ Item {
                 leftMargin: 44
                 verticalCenter: parent.verticalCenter
             }
-
             height: actionName.height
             width: actionName.width
 
@@ -173,8 +139,7 @@ Item {
             TextMetrics {
                 id: textMetrics_ActionName
 
-                // buttons on the right
-                elideWidth: rootItem.width - btnActionName.anchors.leftMargin - 0
+                elideWidth: rootItem.width - btnActionName.anchors.leftMargin - rightRow.width - rightRow.anchors.rightMargin - 5
                 elide: Text.ElideRight
 
                 text: rootItem.action ? rootItem.action.name : ""
@@ -206,6 +171,78 @@ Item {
 
                 visible: btnActionName.containsMouse
                 color: actionName.color
+            }
+        }
+
+        Row {
+            id: rightRow
+
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+                right: parent.right
+                rightMargin: 6
+            }
+
+            spacing: 12
+
+            Button {
+                id: playButton
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+
+                activeFocusOnPress: true
+
+                visible: rootItem.actionItemIsSelected
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "play-action-list"
+                    disabledID: releasedID
+                }
+
+                onClicked: {
+                    console.log("play action");
+                }
+            }
+
+            Button {
+                id: removeButton
+
+                anchors {
+                    top: parent.top
+                    topMargin: 6
+                }
+
+                activeFocusOnPress: true
+
+                visible: rootItem.actionItemIsSelected
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "delete"
+                    disabledID: releasedID
+                }
+
+                onClicked: {
+                    if (controller && rootItem.action)
+                    {
+                        if (controller.isInsertedInTimeLine(rootItem.action))
+                        {
+                            rootItem.needConfirmationtoDeleteAction(rootItem.action);
+                        }
+                        else {
+                            // Delete our action
+                            controller.deleteAction(rootItem.action);
+                        }
+                    }
+                }
             }
         }
     }
