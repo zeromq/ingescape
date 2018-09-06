@@ -206,7 +206,10 @@ Item {
                 }
 
                 onClicked: {
-                    console.log("play action");
+                    console.log("QML: play action '" + rootItem.action.name + "'");
+                    if (controller) {
+                        controller.executeEffectsOfAction(rootItem.action);
+                    }
                 }
             }
 
