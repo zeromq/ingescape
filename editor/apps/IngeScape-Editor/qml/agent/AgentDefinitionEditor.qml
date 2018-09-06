@@ -583,7 +583,7 @@ Window {
                                                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                                                     pressedID: releasedID + "-pressed"
-                                                    releasedID: model.isMutedOutput ? "muteactif" : "muteinactif"
+                                                    releasedID: model.isMutedOutput ? "active-mute" : "inactive-mute"
 
                                                     disabledID : releasedID
 

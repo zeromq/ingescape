@@ -129,7 +129,7 @@ Item {
                         fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                         pressedID: releasedID + "-pressed"
-                        releasedID: "supprimer"
+                        releasedID: "delete"
                         disabledID : releasedID
                     }
 
@@ -412,7 +412,7 @@ Item {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: model.isMuted ? "muteactif" : "muteinactif"
+                    releasedID: model.isMuted ? "active-mute" : "inactive-mute"
                     disabledID : releasedID
                 }
 
@@ -471,7 +471,7 @@ Item {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: model.isFrozen ? "freezeactif" : "freezeinactif"
+                    releasedID: model.isFrozen ? "active-freeze" : "inactive-freeze"
                     disabledID : releasedID
                 }
 

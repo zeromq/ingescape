@@ -3,8 +3,8 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1920px"
 	 height="980px" viewBox="0 0 1920 980" enable-background="new 0 0 1920 980" xml:space="preserve">
-<g id="Calque_1">
-	<g id="creernouvelagent-pressed">
+<g id="buttons-list-agents-pressed">
+	<g id="new-agent-pressed">
 		<path fill="#C7C6C6" d="M416.5,476.2c0,1.3,0,2.6,0,3.8c0,0.7,0,1.5,0,2.2c0,0.4,0.2,0.8,0.6,0.8c0.4,0,0.6-0.3,0.6-0.7
 			c0-0.1,0-0.1,0-0.2c0-2.1,0-4.1,0-6.2c0-0.3-0.2-0.7-0.4-0.9c-1-1.1-2.1-2.1-3.1-3.1c-0.3-0.3-0.6-0.4-1.1-0.4c-2.7,0-5.4,0-8.1,0
 			c-0.9,0-1,0.2-1,1c0,4.9,0,9.7,0,14.6c0,0.9,0.2,1,1.1,1c2.2,0,4.4,0,6.5,0c0.2,0,0.4,0,0.6-0.1c0.2-0.1,0.5-0.4,0.5-0.5
@@ -24,7 +24,7 @@
 			c0,0.5-0.3,0.6-0.7,0.6c-0.5,0-1,0-1.6,0c0,0.6,0,1.1,0,1.6c0,0.4-0.1,0.8-0.6,0.8c-0.4,0-0.6-0.2-0.6-0.8
 			C414.1,486.7,414.1,486.3,414.1,485.7z"/>
 	</g>
-	<g id="importer-pressed">
+	<g id="import-pressed">
 		<path fill="#C7C6C6" d="M442.4,489.8c-1.9,0-3.7,0-5.6,0c-1.6,0-2.8-1.1-2.8-2.7c0-1.2,0-2.5,0-3.7c0-0.5,0.3-0.9,0.7-0.9
 			c0.5,0,0.8,0.3,0.8,0.9c0,1.2,0,2.3,0,3.5c0,1,0.4,1.4,1.4,1.4c3.7,0,7.4,0,11.1,0c1,0,1.4-0.4,1.4-1.4c0-1.1,0-2.3,0-3.4
 			c0-0.6,0.3-0.9,0.7-0.9c0.5,0,0.8,0.3,0.8,0.9c0,1.2,0,2.5,0,3.7c0,1.5-1.2,2.6-2.7,2.7C446.2,489.8,444.3,489.8,442.4,489.8z"/>
@@ -34,7 +34,7 @@
 			c0-0.2,0-0.3,0-0.5c0.1-0.4,0.3-0.6,0.7-0.7c0.4,0,0.7,0.2,0.8,0.7c0,0.2,0,0.3,0,0.5c0,2.4,0,4.8,0,7.2
 			C443.2,481.9,443.2,482.1,443.2,482.1z"/>
 	</g>
-	<g id="exporter-pressed">
+	<g id="export-pressed">
 		<path fill="#C7C6C6" d="M469.1,490.1c-1.8,0-3.6,0-5.5,0c-1.6,0-2.7-1.1-2.8-2.7c0-1.2,0-2.4,0-3.6c0-0.5,0.3-0.9,0.8-0.9
 			c0.4,0,0.7,0.3,0.7,0.9c0,1.1,0,2.3,0,3.4c0,1,0.4,1.4,1.4,1.4c3.6,0,7.3,0,10.9,0c1,0,1.4-0.4,1.4-1.4c0-1.1,0-2.2,0-3.4
 			c0-0.6,0.3-0.9,0.7-0.9c0.5,0,0.7,0.3,0.7,0.9c0,1.2,0,2.4,0,3.6c0,1.5-1.2,2.6-2.7,2.6C472.8,490.1,471,490.1,469.1,490.1z"/>
@@ -43,7 +43,7 @@
 			c-0.3-0.2-0.4-0.4-0.4-0.8c0-0.2,0.1-0.3,0.2-0.4c1.2-1.2,2.4-2.4,3.6-3.6c0.4-0.4,0.8-0.4,1.2,0c1.2,1.2,2.4,2.4,3.6,3.6
 			c0.4,0.4,0.4,0.8,0.1,1.1c-0.3,0.3-0.7,0.3-1.1-0.1c-0.8-0.8-1.5-1.5-2.3-2.3C470,476.7,469.9,476.7,469.9,476.7z"/>
 	</g>
-	<g id="supprimerplusieurs-pressed">
+	<g id="delete-all-pressed">
 		<g>
 			<path fill="#C7C6C6" d="M505.7,478c0,1.3,0,2.6,0,3.8c0,0.7,0,1.5,0,2.2c0,0.4,0.2,0.8,0.6,0.8c0.4,0,0.6-0.3,0.6-0.7
 				c0-0.1,0-0.1,0-0.2c0-2.1,0-4.1,0-6.2c0-0.3-0.2-0.7-0.4-0.9c-1-1.1-2.1-2.1-3.1-3.1c-0.3-0.3-0.6-0.4-1.1-0.4
@@ -63,7 +63,7 @@
 		</g>
 	</g>
 </g>
-<g id="loupe">
+<g id="search">
 	<g>
 		<g>
 			<path fill="#535A66" d="M623.6,530.5c0.9-0.9,1.8-1.8,2.7-2.7c-1-1.4-1.4-2.9-1-4.5c0.3-1.2,1-2.3,2-3c2.2-1.5,5.1-1.2,6.9,0.7
@@ -72,7 +72,7 @@
 		</g>
 	</g>
 </g>
-<g id="dupliquer">
+<g id="copy">
 	<g>
 		<path fill="none" stroke="#F39200" stroke-width="0.8119" stroke-miterlimit="10" d="M666.8,521.8c0-0.1,0-0.2,0-0.2
 			c0-0.6,0-1.2,0-1.9c0-0.2,0-0.2,0.2-0.2c2.4,0,4.8,0,7.2,0c0.2,0,0.2,0.1,0.2,0.2c0,2.8,0,5.6,0,8.5c0,0.2-0.1,0.2-0.3,0.2
@@ -83,7 +83,7 @@
 			c1.1,0,2.3,0,3.4,0c0-2.8,0-5.6,0-8.4C671.7,519.7,669.4,519.7,667.1,519.7z"/>
 	</g>
 </g>
-<g id="dupliquer-pressed">
+<g id="copy-pressed">
 	<g>
 		<path fill="none" stroke="#804A1E" stroke-width="0.8119" stroke-miterlimit="10" d="M666.8,542.1c0-0.1,0-0.2,0-0.2
 			c0-0.6,0-1.2,0-1.9c0-0.2,0-0.2,0.2-0.2c2.4,0,4.8,0,7.2,0c0.2,0,0.2,0.1,0.2,0.2c0,2.8,0,5.6,0,8.5c0,0.2-0.1,0.2-0.3,0.2
@@ -94,7 +94,7 @@
 			c1.1,0,2.3,0,3.4,0c0-2.8,0-5.6,0-8.4C671.7,540,669.4,540,667.1,540z"/>
 	</g>
 </g>
-<g id="supprimer">
+<g id="delete">
 	<g>
 		<g>
 			<line fill="none" stroke="#F39200" stroke-width="1.1581" stroke-miterlimit="10" x1="703.3" y1="520.2" x2="693.3" y2="530.2"/>
@@ -102,7 +102,7 @@
 		</g>
 	</g>
 </g>
-<g id="supprimer-pressed">
+<g id="delete-pressed">
 	<g>
 		<g>
 			<g>
@@ -114,10 +114,10 @@
 		</g>
 	</g>
 </g>
-<g id="triangletrierpar">
+<g id="sort-by-arrow">
 	<polygon fill="#535A66" points="721.7,521.8 725.7,528.8 729.7,521.8 	"/>
 </g>
-<g id="creernouvelagent">
+<g id="new-agent">
 	<g>
 		<path fill="#FFFFFF" d="M420.5,446.7c0,1.3,0,2.6,0,3.8c0,0.7,0,1.5,0,2.2c0,0.4,0.2,0.8,0.6,0.8c0.4,0,0.6-0.3,0.6-0.7
 			c0-0.1,0-0.1,0-0.2c0-2.1,0-4.1,0-6.2c0-0.3-0.2-0.7-0.4-0.9c-1-1.1-2.1-2.1-3.1-3.1c-0.3-0.3-0.6-0.4-1.1-0.4c-2.7,0-5.4,0-8.1,0
@@ -139,7 +139,7 @@
 			C418.1,457.3,418.1,456.8,418.1,456.2z"/>
 	</g>
 </g>
-<g id="importer">
+<g id="import">
 	<g>
 		<g>
 			<path fill="#FFFFFF" d="M447.4,459.2c-1.9,0-3.7,0-5.6,0c-1.6,0-2.8-1.1-2.8-2.7c0-1.2,0-2.5,0-3.7c0-0.5,0.3-0.9,0.7-0.9
@@ -153,8 +153,8 @@
 		</g>
 	</g>
 </g>
-<g id="Calque_25">
-	<g id="creernouvelagent-disabled_1_">
+<g id="buttons-list-agents-disabled">
+	<g id="new-agent-disabled">
 		<path fill="#535A66" d="M417.1,510.2c0,1.3,0,2.6,0,3.8c0,0.7,0,1.5,0,2.2c0,0.4,0.2,0.8,0.6,0.8c0.4,0,0.6-0.3,0.6-0.7
 			c0-0.1,0-0.1,0-0.2c0-2.1,0-4.1,0-6.2c0-0.3-0.2-0.7-0.4-0.9c-1-1.1-2.1-2.1-3.1-3.1c-0.3-0.3-0.6-0.4-1.1-0.4c-2.7,0-5.4,0-8.1,0
 			c-0.9,0-1,0.2-1,1c0,4.9,0,9.7,0,14.6c0,0.9,0.2,1,1.1,1c2.2,0,4.4,0,6.5,0c0.2,0,0.4,0,0.6-0.1c0.2-0.1,0.5-0.4,0.5-0.5
@@ -174,7 +174,7 @@
 			c0,0.5-0.3,0.6-0.7,0.6c-0.5,0-1,0-1.6,0c0,0.6,0,1.1,0,1.6c0,0.4-0.1,0.8-0.6,0.8c-0.4,0-0.6-0.2-0.6-0.8
 			C414.7,520.7,414.7,520.2,414.7,519.7z"/>
 	</g>
-	<g id="importer-disabled_1_">
+	<g id="import-disabled">
 		<g>
 			<path fill="#535A66" d="M444,522.6c-1.9,0-3.7,0-5.6,0c-1.6,0-2.8-1.1-2.8-2.7c0-1.2,0-2.5,0-3.7c0-0.5,0.3-0.9,0.7-0.9
 				c0.5,0,0.8,0.3,0.8,0.9c0,1.2,0,2.3,0,3.5c0,1,0.4,1.4,1.4,1.4c3.7,0,7.4,0,11.1,0c1,0,1.4-0.4,1.4-1.4c0-1.1,0-2.3,0-3.4
@@ -186,7 +186,7 @@
 				C444.8,514.8,444.8,515,444.8,515z"/>
 		</g>
 	</g>
-	<g id="exporter-disabled">
+	<g id="export-disabled">
 		<path fill="#535A66" d="M470.8,523.4c-1.8,0-3.6,0-5.5,0c-1.6,0-2.7-1.1-2.8-2.7c0-1.2,0-2.4,0-3.6c0-0.5,0.3-0.9,0.8-0.9
 			c0.4,0,0.7,0.3,0.7,0.9c0,1.1,0,2.3,0,3.4c0,1,0.4,1.4,1.4,1.4c3.6,0,7.3,0,10.9,0c1,0,1.4-0.4,1.4-1.4c0-1.1,0-2.2,0-3.4
 			c0-0.6,0.3-0.9,0.7-0.9c0.5,0,0.7,0.3,0.7,0.9c0,1.2,0,2.4,0,3.6c0,1.5-1.2,2.6-2.7,2.6C474.5,523.4,472.6,523.4,470.8,523.4z"/>
@@ -195,7 +195,7 @@
 			c-0.3-0.2-0.4-0.4-0.4-0.8c0-0.2,0.1-0.3,0.2-0.4c1.2-1.2,2.4-2.4,3.6-3.6c0.4-0.4,0.8-0.4,1.2,0c1.2,1.2,2.4,2.4,3.6,3.6
 			c0.4,0.4,0.4,0.8,0.1,1.1c-0.3,0.3-0.7,0.3-1.1-0.1c-0.8-0.8-1.5-1.5-2.3-2.3C471.7,509.9,471.6,509.9,471.6,509.9z"/>
 	</g>
-	<g id="supprimerplusieurs-disabled">
+	<g id="delete-all-disabled">
 		<g>
 			<path fill="#535A66" d="M505.8,510c0,1.3,0,2.6,0,3.8c0,0.7,0,1.5,0,2.2c0,0.4,0.2,0.8,0.6,0.8c0.4,0,0.6-0.3,0.6-0.7
 				c0-0.1,0-0.1,0-0.2c0-2.1,0-4.1,0-6.2c0-0.3-0.2-0.7-0.4-0.9c-1-1.1-2.1-2.1-3.1-3.1c-0.3-0.3-0.6-0.4-1.1-0.4
@@ -215,7 +215,7 @@
 		</g>
 	</g>
 </g>
-<g id="exporter">
+<g id="export">
 	<g>
 		<path fill="#FFFFFF" d="M474.2,459.9c-1.8,0-3.6,0-5.5,0c-1.6,0-2.7-1.1-2.8-2.7c0-1.2,0-2.4,0-3.6c0-0.5,0.3-0.9,0.8-0.9
 			c0.4,0,0.7,0.3,0.7,0.9c0,1.1,0,2.3,0,3.4c0,1,0.4,1.4,1.4,1.4c3.6,0,7.3,0,10.9,0c1,0,1.4-0.4,1.4-1.4c0-1.1,0-2.2,0-3.4
@@ -226,7 +226,7 @@
 			c0.4,0.4,0.4,0.8,0.1,1.1c-0.3,0.3-0.7,0.3-1.1-0.1c-0.8-0.8-1.5-1.5-2.3-2.3C475.1,446.5,475,446.5,475,446.5z"/>
 	</g>
 </g>
-<g id="supprimerplusieurs">
+<g id="delete-all">
 	<g>
 		<g>
 			<path fill="#FFFFFF" d="M509.3,446.5c0,1.3,0,2.6,0,3.8c0,0.7,0,1.5,0,2.2c0,0.4,0.2,0.8,0.6,0.8c0.4,0,0.6-0.3,0.6-0.7
@@ -315,7 +315,7 @@
 			C824.2,528.8,821.5,531.6,818,531.6z"/>
 	</g>
 </g>
-<g id="freezeactif">
+<g id="active-freeze">
 	<g>
 		<linearGradient id="SVGID_5_" gradientUnits="userSpaceOnUse" x1="895.1262" y1="462.1766" x2="895.1262" y2="442.3766">
 			<stop  offset="0" style="stop-color:#FFFFFF"/>
@@ -336,7 +336,7 @@
 			c0.5,0,0.9,0.4,0.9,0.9S900.8,453.2,900.3,453.2z"/>
 	</g>
 </g>
-<g id="freezeactif-pressed">
+<g id="active-freeze-pressed">
 	<g>
 		<linearGradient id="SVGID_6_" gradientUnits="userSpaceOnUse" x1="895.1262" y1="485.1827" x2="895.1262" y2="465.3826">
 			<stop  offset="0" style="stop-color:#FFFFFF"/>
@@ -357,7 +357,7 @@
 			c0.5,0,0.9,0.4,0.9,0.9S900.8,476.2,900.3,476.2z"/>
 	</g>
 </g>
-<g id="freezeinactif">
+<g id="inactive-freeze">
 	<g>
 		<linearGradient id="SVGID_7_" gradientUnits="userSpaceOnUse" x1="894.4468" y1="511.6433" x2="894.4468" y2="491.8395">
 			<stop  offset="0" style="stop-color:#17191E"/>
@@ -372,7 +372,7 @@
 			c0.5,0,0.9,0.4,0.9,0.9S900.2,502.6,899.7,502.6z"/>
 	</g>
 </g>
-<g id="freezeinactif-pressed_1_">
+<g id="inactive-freeze-pressed">
 	<g>
 		<linearGradient id="SVGID_8_" gradientUnits="userSpaceOnUse" x1="894.4468" y1="534.6234" x2="894.4468" y2="514.8196">
 			<stop  offset="0" style="stop-color:#17191E"/>
@@ -387,7 +387,7 @@
 			c0.5,0,0.9,0.4,0.9,0.9S900.2,525.6,899.7,525.6z"/>
 	</g>
 </g>
-<g id="muteactif">
+<g id="active-mute">
 	<g>
 		<linearGradient id="SVGID_9_" gradientUnits="userSpaceOnUse" x1="959.9786" y1="462.1778" x2="959.9786" y2="442.3778">
 			<stop  offset="0" style="stop-color:#FFFFFF"/>
@@ -408,7 +408,7 @@
 			c0.2,0.1,0.3,0.3,0.3,0.5c0,0.9,0,1.9,0,2.8l3.1-2.4c0.3-0.3,0.8-0.2,1.1,0.1C967.9,448,967.9,448.4,967.5,448.7z"/>
 	</g>
 </g>
-<g id="muteactif-pressed_1_">
+<g id="active-mute-pressed">
 	<g>
 		<linearGradient id="SVGID_10_" gradientUnits="userSpaceOnUse" x1="959.9786" y1="485.1839" x2="959.9786" y2="465.3839">
 			<stop  offset="0" style="stop-color:#FFFFFF"/>
@@ -429,7 +429,7 @@
 			c0.2,0.1,0.3,0.3,0.3,0.5c0,0.9,0,1.9,0,2.8l3.1-2.4c0.3-0.3,0.8-0.2,1.1,0.1C967.9,471,967.9,471.5,967.5,471.7z"/>
 	</g>
 </g>
-<g id="muteinactif">
+<g id="inactive-mute">
 	<g>
 		<linearGradient id="SVGID_11_" gradientUnits="userSpaceOnUse" x1="960.0224" y1="511.6421" x2="960.0224" y2="491.8436">
 			<stop  offset="0" style="stop-color:#17191E"/>
@@ -444,7 +444,7 @@
 			c0.2,0.1,0.3,0.3,0.3,0.5c0,0.9,0,1.9,0,2.8l3.1-2.4c0.3-0.3,0.8-0.2,1.1,0.1C968,497.4,967.9,497.9,967.6,498.2z"/>
 	</g>
 </g>
-<g id="muteinactif-pressed">
+<g id="inactive-mute-pressed">
 	<g>
 		<linearGradient id="SVGID_12_" gradientUnits="userSpaceOnUse" x1="960.0224" y1="534.6222" x2="960.0224" y2="514.8237">
 			<stop  offset="0" style="stop-color:#17191E"/>
@@ -465,7 +465,7 @@
 		<line fill="none" stroke="#FFFFFF" stroke-width="2" stroke-miterlimit="10" x1="548.8" y1="512.7" x2="542.7" y2="506.7"/>
 	</g>
 </g>
-<g id="editeurDefinition">
+<g id="definition-editor">
 	<linearGradient id="tab-0_1_" gradientUnits="userSpaceOnUse" x1="469.1121" y1="616.2708" x2="469.1121" y2="586.8051">
 		<stop  offset="0" style="stop-color:#17191E"/>
 		<stop  offset="1" style="stop-color:#3C424F"/>
@@ -660,7 +660,7 @@
 		<polygon fill="#706F6F" points="1199.6,487.1 1194.7,490.4 1189.7,487.1 		"/>
 	</g>
 </g>
-<g id="bulleInfos">
+<g id="tooltip">
 	<polygon fill="#CDCCCC" points="1278.9,541.5 1288.4,552.5 1297.9,541.5 	"/>
 	<path fill="#CDCCCC" d="M1300.1,545.4H1135c-2.2,0-4-1.8-4-4v-29.7c0-2.2,1.8-4,4-4h165.1c2.2,0,4,1.8,4,4v29.7
 		C1304.1,543.6,1302.3,545.4,1300.1,545.4z"/>
@@ -784,7 +784,7 @@
 	<polygon fill="#575756" stroke="#575756" stroke-width="0.9818" stroke-miterlimit="10" points="1114.5,447.3 1119.5,452.3 
 		1114.5,457.3 	"/>
 </g>
-<g id="retour-curseur">
+<g id="return-cursor-button">
 	<g>
 		
 			<line fill="#575756" stroke="#575756" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="1057" y1="530.8" x2="1057" y2="538.8"/>
@@ -793,7 +793,7 @@
 		</g>
 	</g>
 </g>
-<g id="retour-curseur-pressed">
+<g id="return-cursor-button-pressed">
 	<g>
 		
 			<line fill="#F6F6F6" stroke="#F6F6F6" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="1128.3" y1="548.5" x2="1128.3" y2="556.5"/>
@@ -964,7 +964,7 @@
 			c0,0.3,0.1,0.4,0.4,0.4C1325,142.9,1326.2,142.9,1327.4,142.9z"/>
 	</g>
 </g>
-<g id="radio_x5F_observe_x5F_on">
+<g id="radio-observe-on">
 	<g>
 		<g>
 			<path fill="#F39200" stroke="#F39200" stroke-width="0.374" stroke-miterlimit="10" d="M1349.7,154.6c-2.3,0-4.3-1-5.9-3
@@ -977,7 +977,7 @@
 		</g>
 	</g>
 </g>
-<g id="radio_x5F_observe_x5F_off">
+<g id="radio-observe-off">
 	<g>
 		<g>
 			<path fill="#B2B2B2" stroke="#B2B2B2" stroke-width="0.374" stroke-miterlimit="10" d="M1364.4,154.6c-2.3,0-4.3-1-5.9-3
@@ -990,7 +990,7 @@
 		</g>
 	</g>
 </g>
-<g id="radio_x5F_control_x5F_on">
+<g id="radio-control-on">
 	<g>
 		<path fill="#F39200" stroke="#F39200" stroke-width="0.4675" stroke-miterlimit="10" d="M1377.2,155c-1.2,0-2.3,0-3.5,0
 			c-0.7,0-1-0.3-1-1c0-1.8,0-3.6,0-5.4c0-0.4,0.2-0.7,0.5-0.9c0.2-0.1,0.4-0.1,0.6-0.1c0.3,0,0.3,0,0.3-0.3c0-0.7,0-1.4,0-2.1
@@ -1002,7 +1002,7 @@
 			C1375.7,147.6,1376.5,147.6,1377.2,147.6z"/>
 	</g>
 </g>
-<g id="radio_x5F_control_x5F_off">
+<g id="radio-control-off">
 	<g>
 		<path fill="#B2B2B2" stroke="#B2B2B2" stroke-width="0.4675" stroke-miterlimit="10" d="M1387.4,155c-1.2,0-2.3,0-3.5,0
 			c-0.7,0-1-0.3-1-1c0-1.8,0-3.6,0-5.4c0-0.4,0.2-0.7,0.5-0.9c0.2-0.1,0.4-0.1,0.6-0.1c0.3,0,0.3,0,0.3-0.3c0-0.7,0-1.4,0-2.1
@@ -1014,7 +1014,7 @@
 			C1385.9,147.6,1386.7,147.6,1387.5,147.6z"/>
 	</g>
 </g>
-<g id="radio_x5F_control_x5F_blanc">
+<g id="radio-control-white">
 	<g>
 		<path fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.4675" stroke-miterlimit="10" d="M1398.6,155.6c-1.2,0-2.3,0-3.5,0
 			c-0.7,0-1-0.3-1-1c0-1.8,0-3.6,0-5.4c0-0.4,0.2-0.7,0.5-0.9c0.2-0.1,0.4-0.1,0.6-0.1c0.3,0,0.3,0,0.3-0.3c0-0.7,0-1.4,0-2.1
@@ -1026,7 +1026,7 @@
 			C1397.2,148.2,1397.9,148.2,1398.7,148.2z"/>
 	</g>
 </g>
-<g id="radio_x5F_observe_x5F_blanc">
+<g id="radio-observe-white">
 	<g>
 		<g>
 			<path fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.374" stroke-miterlimit="10" d="M1415.9,155.3c-2.3,0-4.3-1-5.9-3
@@ -1039,7 +1039,7 @@
 		</g>
 	</g>
 </g>
-<g id="play_x5F_actif">
+<g id="play_2_">
 	<g>
 		<linearGradient id="SVGID_21_" gradientUnits="userSpaceOnUse" x1="1578.5121" y1="194.3537" x2="1578.5121" y2="174.3537">
 			<stop  offset="0" style="stop-color:#17191E"/>
@@ -1053,7 +1053,7 @@
 			1575.2,179.3 1583.9,184.4 1575.2,189.4 		"/>
 	</g>
 </g>
-<g id="play_x5F_actif_x5F_pressed">
+<g id="play-pressed_1_">
 	<g>
 		<linearGradient id="SVGID_22_" gradientUnits="userSpaceOnUse" x1="1610.5121" y1="193.3537" x2="1610.5121" y2="173.3537">
 			<stop  offset="0" style="stop-color:#17191E"/>
@@ -1067,7 +1067,7 @@
 			1607.2,178.3 1615.9,183.4 1607.2,188.4 		"/>
 	</g>
 </g>
-<g id="pause_x5F_actif">
+<g id="pause_1_">
 	<g>
 		<linearGradient id="SVGID_23_" gradientUnits="userSpaceOnUse" x1="1578.5122" y1="234.9272" x2="1578.5122" y2="214.9272">
 			<stop  offset="0" style="stop-color:#FFFFFF"/>
@@ -1090,7 +1090,7 @@
 		</g>
 	</g>
 </g>
-<g id="pause_x5F_actif_x5F_pressed">
+<g id="pause-pressed_1_">
 	<g>
 		<linearGradient id="SVGID_24_" gradientUnits="userSpaceOnUse" x1="1613" y1="234.9272" x2="1613" y2="214.9272">
 			<stop  offset="0" style="stop-color:#FFFFFF"/>
@@ -1126,7 +1126,7 @@
 		</g>
 	</g>
 </g>
-<g id="record_x5F_pressed">
+<g id="record-pressed">
 	<g>
 		<linearGradient id="SVGID_26_" gradientUnits="userSpaceOnUse" x1="1650.7841" y1="594.2495" x2="1650.7841" y2="625.2495">
 			<stop  offset="0" style="stop-color:#17191E"/>
@@ -1159,7 +1159,7 @@
 			C1602,639.3,1601.1,638.4,1599.9,638.4z"/>
 	</g>
 </g>
-<g id="stopped_x5F_pressed">
+<g id="stop-pressed">
 	<g>
 		<linearGradient id="SVGID_28_" gradientUnits="userSpaceOnUse" x1="1650.2507" y1="660.1813" x2="1650.2507" y2="629.1813">
 			<stop  offset="0" style="stop-color:#FFFFFF"/>
@@ -1208,73 +1208,73 @@
 		</g>
 	</g>
 </g>
-<g id="grip_x5F_drag_x5F_drop_x5F_survol">
+<g id="grip-drag-drop-rollover">
 	<g>
 		<g>
 			<g>
-				<circle fill="#FFFFFF" cx="1057.3" cy="253.7" r="1.1"/>
-				<circle fill="#FFFFFF" cx="1060.4" cy="253.7" r="1.1"/>
-				<circle fill="#FFFFFF" cx="1057.3" cy="257.3" r="1.1"/>
-				<circle fill="#FFFFFF" cx="1060.4" cy="257.3" r="1.1"/>
-				<circle fill="#FFFFFF" cx="1057.3" cy="260.8" r="1.1"/>
-				<circle fill="#FFFFFF" cx="1060.4" cy="260.8" r="1.1"/>
+				<ellipse fill="#FFFFFF" cx="1057.1" cy="253.4" rx="1.2" ry="1.2"/>
+				<ellipse fill="#FFFFFF" cx="1060.4" cy="253.4" rx="1.2" ry="1.2"/>
+				<ellipse fill="#FFFFFF" cx="1057.1" cy="257.3" rx="1.2" ry="1.2"/>
+				<ellipse fill="#FFFFFF" cx="1060.4" cy="257.3" rx="1.2" ry="1.2"/>
+				<ellipse fill="#FFFFFF" cx="1057.1" cy="261.1" rx="1.2" ry="1.2"/>
+				<ellipse fill="#FFFFFF" cx="1060.4" cy="261.1" rx="1.2" ry="1.2"/>
 			</g>
-			<circle fill="#FFFFFF" cx="1063.6" cy="253.7" r="1.1"/>
-			<circle fill="#FFFFFF" cx="1063.6" cy="257.3" r="1.1"/>
-			<circle fill="#FFFFFF" cx="1063.6" cy="260.8" r="1.1"/>
+			<ellipse fill="#FFFFFF" cx="1063.8" cy="253.4" rx="1.2" ry="1.2"/>
+			<ellipse fill="#FFFFFF" cx="1063.8" cy="257.3" rx="1.2" ry="1.2"/>
+			<ellipse fill="#FFFFFF" cx="1063.8" cy="261.1" rx="1.2" ry="1.2"/>
 		</g>
-		<rect x="1055.4" y="252.2" fill="none" width="10.1" height="10.1"/>
+		<rect x="1054.9" y="251.8" fill="none" width="11" height="11"/>
 	</g>
 </g>
-<g id="grip_x5F_drag_x5F_drop_x5F_pressed">
+<g id="grip-drag-drop-rollover-pressed">
 	<g>
 		<g>
 			<g>
 				<g>
-					<circle fill="#575756" cx="1057.3" cy="298.7" r="1.1"/>
-					<circle fill="#575756" cx="1060.4" cy="298.7" r="1.1"/>
-					<circle fill="#575756" cx="1057.3" cy="302.3" r="1.1"/>
-					<circle fill="#575756" cx="1060.4" cy="302.3" r="1.1"/>
-					<circle fill="#575756" cx="1057.3" cy="305.8" r="1.1"/>
-					<circle fill="#575756" cx="1060.4" cy="305.8" r="1.1"/>
+					<ellipse fill="#575756" cx="1057.1" cy="298.5" rx="1.2" ry="1.2"/>
+					<ellipse fill="#575756" cx="1060.4" cy="298.5" rx="1.2" ry="1.2"/>
+					<ellipse fill="#575756" cx="1057.1" cy="302.3" rx="1.2" ry="1.2"/>
+					<ellipse fill="#575756" cx="1060.4" cy="302.3" rx="1.2" ry="1.2"/>
+					<ellipse fill="#575756" cx="1057.1" cy="306.1" rx="1.2" ry="1.2"/>
+					<ellipse fill="#575756" cx="1060.4" cy="306.1" rx="1.2" ry="1.2"/>
 				</g>
-				<circle fill="#575756" cx="1063.6" cy="298.7" r="1.1"/>
-				<circle fill="#575756" cx="1063.6" cy="302.3" r="1.1"/>
-				<circle fill="#575756" cx="1063.6" cy="305.8" r="1.1"/>
+				<ellipse fill="#575756" cx="1063.8" cy="298.5" rx="1.2" ry="1.2"/>
+				<ellipse fill="#575756" cx="1063.8" cy="302.3" rx="1.2" ry="1.2"/>
+				<ellipse fill="#575756" cx="1063.8" cy="306.1" rx="1.2" ry="1.2"/>
 			</g>
 		</g>
-		<rect x="1055.4" y="297.2" fill="none" width="10.1" height="10.1"/>
+		<rect x="1054.9" y="296.8" fill="none" width="11" height="11"/>
 	</g>
 </g>
-<g id="bouton_x5F_definition">
+<g id="definition-button">
 	<g>
 		<g>
-			<path fill="#F39200" d="M1086.3,264.2c4.2,0,7.6,3.4,7.6,7.6c0,4.2-3.4,7.6-7.6,7.6c-4.2,0-7.6-3.4-7.6-7.6
-				C1078.7,267.6,1082.1,264.2,1086.3,264.2z M1086.4,278c3.4,0,6.2-2.8,6.2-6.2c0-3.4-2.8-6.2-6.2-6.2c-3.4,0-6.2,2.8-6.2,6.3
-				C1080.1,275.3,1082.9,278,1086.4,278z"/>
-			<path fill="#F39200" d="M1087,273.3c0,0.9,0,1.7,0,2.6c0,0.5-0.3,0.9-0.7,0.9c-0.4,0-0.7-0.3-0.7-0.8c0-1.8,0-3.5,0-5.3
+			<path fill="#F39200" d="M1086.3,264.3c4.1,0,7.5,3.3,7.5,7.5c0,4.1-3.4,7.5-7.5,7.5c-4.1,0-7.5-3.4-7.5-7.5
+				C1078.8,267.7,1082.2,264.3,1086.3,264.3z M1086.4,278c3.4,0,6.1-2.7,6.1-6.2c0-3.4-2.8-6.2-6.1-6.2c-3.4,0-6.2,2.8-6.1,6.2
+				C1080.2,275.2,1083,278,1086.4,278z"/>
+			<path fill="#F39200" d="M1087,273.3c0,0.9,0,1.7,0,2.6c0,0.5-0.3,0.8-0.7,0.8c-0.4,0-0.7-0.3-0.7-0.8c0-1.7,0-3.5,0-5.2
 				c0-0.5,0.3-0.8,0.7-0.8c0.4,0,0.7,0.3,0.7,0.8C1087,271.6,1087,272.4,1087,273.3z"/>
-			<path fill="#F39200" d="M1087.2,267.7c0,0.5-0.4,0.9-0.8,0.9c-0.5,0-0.8-0.4-0.8-0.8c0-0.5,0.4-0.9,0.8-0.9
-				C1086.8,266.9,1087.2,267.2,1087.2,267.7z"/>
+			<path fill="#F39200" d="M1087.2,267.8c0,0.5-0.4,0.9-0.8,0.8c-0.5,0-0.8-0.4-0.8-0.8c0-0.5,0.4-0.9,0.8-0.8
+				C1086.8,267,1087.2,267.3,1087.2,267.8z"/>
 		</g>
-		<rect x="1078.2" y="263.7" fill="none" width="16.3" height="16.3"/>
+		<rect x="1078.3" y="263.8" fill="none" width="16" height="16"/>
 	</g>
 </g>
-<g id="bouton_x5F_definition_x5F_pressed">
+<g id="definition-button-pressed">
 	<g>
 		<g>
-			<path fill="#804A1E" d="M1128.3,264.2c4.2,0,7.6,3.4,7.6,7.6c0,4.2-3.4,7.6-7.6,7.6c-4.2,0-7.6-3.4-7.6-7.6
-				C1120.7,267.6,1124.1,264.2,1128.3,264.2z M1128.4,278c3.4,0,6.2-2.8,6.2-6.2c0-3.4-2.8-6.2-6.2-6.2c-3.4,0-6.2,2.8-6.2,6.3
-				C1122.1,275.3,1124.9,278,1128.4,278z"/>
-			<path fill="#804A1E" d="M1129,273.3c0,0.9,0,1.7,0,2.6c0,0.5-0.3,0.9-0.7,0.9c-0.4,0-0.7-0.3-0.7-0.8c0-1.8,0-3.5,0-5.3
+			<path fill="#804A1E" d="M1128.3,264.3c4.1,0,7.5,3.3,7.5,7.5c0,4.1-3.4,7.5-7.5,7.5c-4.1,0-7.5-3.4-7.5-7.5
+				C1120.8,267.7,1124.2,264.3,1128.3,264.3z M1128.4,277.9c3.4,0,6.1-2.7,6.1-6.2c0-3.4-2.8-6.2-6.1-6.2c-3.4,0-6.2,2.8-6.1,6.2
+				C1122.2,275.2,1125,277.9,1128.4,277.9z"/>
+			<path fill="#804A1E" d="M1129,273.3c0,0.9,0,1.7,0,2.6c0,0.5-0.3,0.8-0.7,0.8c-0.4,0-0.7-0.3-0.7-0.8c0-1.7,0-3.5,0-5.2
 				c0-0.5,0.3-0.8,0.7-0.8c0.4,0,0.7,0.3,0.7,0.8C1129,271.5,1129,272.4,1129,273.3z"/>
-			<path fill="#804A1E" d="M1129.2,267.7c0,0.5-0.4,0.9-0.8,0.9c-0.5,0-0.8-0.4-0.8-0.8c0-0.5,0.4-0.9,0.8-0.9
-				C1128.8,266.9,1129.2,267.2,1129.2,267.7z"/>
+			<path fill="#804A1E" d="M1129.2,267.7c0,0.5-0.4,0.9-0.8,0.8c-0.5,0-0.8-0.4-0.8-0.8c0-0.5,0.4-0.9,0.8-0.8
+				C1128.8,266.9,1129.2,267.3,1129.2,267.7z"/>
 		</g>
-		<rect x="1120.2" y="263.6" fill="none" width="16.3" height="16.3"/>
+		<rect x="1120.3" y="263.8" fill="none" width="16" height="16"/>
 	</g>
 </g>
-<g id="play_x5F_action_x5F_list">
+<g id="play-action-list">
 	<g>
 		<linearGradient id="SVGID_29_" gradientUnits="userSpaceOnUse" x1="979.8249" y1="268.6021" x2="979.8249" y2="248.602">
 			<stop  offset="0" style="stop-color:#17191E"/>
@@ -1287,7 +1287,7 @@
 			976.5,253.6 985.2,258.6 976.5,263.6 		"/>
 	</g>
 </g>
-<g id="play_x5F_action_x5F_list_x5F_pressed">
+<g id="play-action-list-pressed">
 	<g>
 		<linearGradient id="SVGID_30_" gradientUnits="userSpaceOnUse" x1="1011.8249" y1="267.6021" x2="1011.8249" y2="247.602">
 			<stop  offset="0" style="stop-color:#17191E"/>

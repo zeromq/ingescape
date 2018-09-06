@@ -91,7 +91,7 @@ Item {
             }
 
             svgFileCache: IngeScapeTheme.svgFileINGESCAPE
-            svgElementId: "grip_drag_drop_survol"
+            svgElementId: "grip-drag-drop-rollover"
 
             visible: rootItem.actionItemIsHovered
         }
@@ -129,8 +129,8 @@ Item {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                 pressedID: releasedID + "-pressed"
-                releasedID: "supprimer"
-                disabledID : releasedID
+                releasedID: "delete"
+                disabledID: releasedID
             }
 
             onClicked: {

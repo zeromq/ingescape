@@ -429,7 +429,7 @@ Item {
                         fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                         pressedID: releasedID + "-pressed"
-                        releasedID: "supprimer"
+                        releasedID: "delete"
                         disabledID : releasedID
                     }
 

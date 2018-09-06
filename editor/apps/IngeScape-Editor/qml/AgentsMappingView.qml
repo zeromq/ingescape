@@ -254,9 +254,9 @@ Item {
                         I2SvgItem {
                             anchors.centerIn: parent;
                             svgFileCache: IngeScapeTheme.svgFileINGESCAPE
-                            //svgElementId: control.checked ? "radio_observe_on" : "radio_observe_off"
-                            svgElementId: control.checked ? (control.pressed ? "radio_observe_on" : "radio_observe_blanc")
-                                                          : (control.pressed ? "radio_observe_on" : "radio_observe_off");
+
+                            svgElementId: control.checked ? (control.pressed ? "radio-observe-on" : "radio-observe-white")
+                                                          : (control.pressed ? "radio-observe-on" : "radio-observe-off");
                         }
                     }
                 }
@@ -309,9 +309,9 @@ Item {
                         I2SvgItem {
                             anchors.centerIn: parent;
                             svgFileCache: IngeScapeTheme.svgFileINGESCAPE
-                            //svgElementId: control.checked ? "radio_control_on" : "radio_control_off"
-                            svgElementId: control.checked ? (control.pressed ? "radio_control_on" : "radio_control_blanc")
-                                                          : (control.pressed ? "radio_control_on" : "radio_control_off");
+
+                            svgElementId: control.checked ? (control.pressed ? "radio-control-on" : "radio_control-white")
+                                                          : (control.pressed ? "radio-control-on" : "radio-control-off");
                         }
                     }
                 }

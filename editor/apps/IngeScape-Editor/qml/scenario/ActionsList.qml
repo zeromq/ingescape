@@ -200,7 +200,7 @@ Item {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: "creernouvelagent"
+                    releasedID: "new-agent"
                     disabledID : releasedID + "-disabled"
                 }
 
@@ -237,7 +237,7 @@ Item {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: "supprimerplusieurs"
+                    releasedID: "delete-all"
                     disabledID : releasedID + "-disabled"
 
                 }

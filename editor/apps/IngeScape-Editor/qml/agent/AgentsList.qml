@@ -204,7 +204,7 @@ Item {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: "creernouvelagent"
+                    releasedID: "new-agent"
                     disabledID : releasedID + "-disabled"
 
                 }
@@ -236,7 +236,7 @@ Item {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: "importer"
+                    releasedID: "import"
                     disabledID : releasedID + "-disabled"
 
                 }
@@ -282,7 +282,7 @@ Item {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: "exporter"
+                    releasedID: "export"
                     disabledID : releasedID + "-disabled"
                 }
 
@@ -299,9 +299,9 @@ Item {
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
-                height : btnRemoveAgent.height
-                width : 1
-                color : IngeScapeTheme.blueGreyColor
+                height: btnRemoveAgent.height
+                width: 1
+                color: IngeScapeTheme.blueGreyColor
             }
 
 
@@ -319,7 +319,7 @@ Item {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: "supprimerplusieurs"
+                    releasedID: "delete-all"
                     disabledID : releasedID + "-disabled"
 
                 }

@@ -843,7 +843,7 @@ Rectangle {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                 pressedID: releasedID + "-pressed"
-                releasedID: "supprimer"
+                releasedID: "delete"
                 disabledID : releasedID
             }
 
@@ -879,7 +879,7 @@ Rectangle {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                 pressedID: releasedID + "_pressed"
-                releasedID: "bouton_definition"
+                releasedID: "definition-button"
                 disabledID : releasedID
             }
 
