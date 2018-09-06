@@ -331,11 +331,12 @@ Item{
 
     I2PopupBase {
         id : popup
-        anchors.top:    (!openOnTop ? _comboButton.bottom : undefined);
+        anchors.top: (!openOnTop ? _comboButton.bottom : undefined);
         anchors.bottom: (openOnTop ? _comboButton.top : undefined);
 
         width: _comboButton.width;
-        height: ((_combolist.count < _combobox.countDisplayItem) ? _combolist.count*(_comboButton.height+1) : _combobox.countDisplayItem*(_comboButton.height+1) );
+        height: ((_combolist.count < _combobox.countDisplayItem) ? _combolist.count * (_comboButton.height + 1)
+                                                                 : _combobox.countDisplayItem * (_comboButton.height + 1) );
 
 
         isModal: true;
@@ -383,11 +384,16 @@ Item{
         }
 
         Keys.onReturnPressed: {
-            (_comboButton.checked) ? _combobox.close() : _combobox.open();
+            if (_comboButton.checked) {
+                _combobox.close();
+            }
+            else {
+                _combobox.open();
+            }
         }
 
 
-        ScrollView{
+        ScrollView {
              id: _scrollView
              visible: _comboButton.checked;
 
@@ -396,7 +402,8 @@ Item{
                 bottom:  parent.bottom
              }
              width: _comboButton.width;
-             height: ((_combolist.count < _combobox.countDisplayItem) ? _combolist.count*(_comboButton.height+1) : _combobox.countDisplayItem*(_comboButton.height+1) );
+             height: ((_combolist.count < _combobox.countDisplayItem) ? _combolist.count * (_comboButton.height + 1)
+                                                                      : _combobox.countDisplayItem * (_comboButton.height + 1) );
 
              frameVisible: _combobox.style.frameVisible
 
@@ -412,7 +419,8 @@ Item{
 
                 boundsBehavior: Flickable.StopAtBounds
                 width: parent.width;
-                height: ( (_combolist.count<_combobox.countDisplayItem) ? _combolist.count*(_comboButton.height+1) : _combobox.countDisplayItem*(_comboButton.height+1) );
+                height: ( (_combolist.count < _combobox.countDisplayItem) ? _combolist.count * (_comboButton.height + 1)
+                                                                          : _combobox.countDisplayItem * (_comboButton.height + 1) );
                 visible: parent.visible;
                 model: 0
                 currentIndex : -1

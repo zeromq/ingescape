@@ -259,7 +259,8 @@ Item {
         anchors.top:comboButton.bottom;
 
         width: comboButton.width;
-        height: ((combolist.count < 8) ? (combolist.count)*(comboButton.height+1) : 8*(comboButton.height+1) );
+        height: ((combolist.count < 5) ? (combolist.count) * (comboButton.height + 1)
+                                       : 5 * (comboButton.height + 1) );
 
 
         isModal: true;
@@ -313,7 +314,8 @@ Item {
                    topMargin: 2
                 }
                 width: parent.width;
-                height: ( (combolist.count<5) ? combolist.count*(comboButton.height+1) : 5*(comboButton.height+1) );
+                height: ((combolist.count < 5) ? combolist.count * (comboButton.height + 1)
+                                               : 5 * (comboButton.height+1) )
 
                 visible: parent.visible;
 
