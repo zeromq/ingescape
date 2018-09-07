@@ -321,7 +321,7 @@ Item{
 
         // Add tooltip on name
         Controls2.ToolTip {
-            delay: 300
+            delay: 500
             visible: _mouseAreaCombo.containsMouse
             text: _comboText.text
         }
@@ -496,7 +496,7 @@ Item{
 
                         // Add tooltip on name
                         Controls2.ToolTip {
-                            delay: 300
+                            delay: 400
                             visible: _mouseAreaItem.containsMouse
                             text: _itemText.text
                         }

@@ -110,10 +110,10 @@ Item {
                 leftMargin: 8
                 verticalCenter: parent.verticalCenter
             }
-            height: 8
-            width: 8
+            height: 4
+            width: 4
+            radius: 2
 
-            radius: 4
             color: IngeScapeTheme.selectedAgentColor
             opacity: (rootItem.action && rootItem.action.isValid) ? 1 : 0
         }
@@ -124,7 +124,7 @@ Item {
 
             anchors {
                 left : parent.left
-                leftMargin: 44
+                leftMargin: 40
                 verticalCenter: parent.verticalCenter
             }
             height: actionName.height
