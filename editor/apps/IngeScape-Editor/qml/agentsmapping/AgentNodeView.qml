@@ -278,7 +278,7 @@ Rectangle {
                             }
 
                             // Add tooltip on name
-                            Controls2.ToolTip.delay: 300
+                            Controls2.ToolTip.delay: 400
                             Controls2.ToolTip.visible: rootTooltipInput.containsMouse
                             Controls2.ToolTip.text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")": "")
                         }
@@ -536,7 +536,7 @@ Rectangle {
                             }
 
                             // Add tooltip on name
-                            Controls2.ToolTip.delay: 300
+                            Controls2.ToolTip.delay: 400
                             Controls2.ToolTip.visible: rootTooltipOutput.containsMouse
                             Controls2.ToolTip.text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")": "")
                         }
