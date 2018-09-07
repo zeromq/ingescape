@@ -54,6 +54,8 @@ Item {
 
     // allowing to deselect selected record
     MouseArea {
+        id: bgMouseArea
+
         anchors.fill: parent
 
         onClicked: {
@@ -61,75 +63,6 @@ Item {
             {
                 controller.selectedRecord = null;
             }
-        }
-    }
-
-    //
-    // List of records
-    //
-    ScrollView {
-        id: recordsListScrollView
-
-        anchors {
-            top: parent.top
-            topMargin: 78
-            bottom: parent.bottom
-            left: parent.left
-            right: parent.right
-        }
-
-        // Prevent drag overshoot on Windows
-        flickableItem.boundsBehavior: Flickable.OvershootBounds
-
-        style: IngeScapeScrollViewStyle {
-        }
-
-        // Content of our scrollview
-        ListView {
-            id: recordsList
-
-            model: controller.recordsList
-
-            delegate: componentRecordListItem
-
-            height: contentHeight
-
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-
-
-            //
-            // Transition animations
-            //
-            add: Transition {
-                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0 }
-                NumberAnimation { property: "scale"; from: 0.0; to: 1.0 }
-            }
-
-            displaced: Transition {
-                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
-
-                // ensure opacity and scale values return to 1.0
-                NumberAnimation { property: "opacity"; to: 1.0 }
-                NumberAnimation { property: "scale"; to: 1.0 }
-            }
-
-            move: Transition {
-                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
-
-                // ensure opacity and scale values return to 1.0
-                NumberAnimation { property: "opacity"; to: 1.0 }
-                NumberAnimation { property: "scale"; to: 1.0 }
-            }
-
-            remove: Transition {
-                // ensure opacity and scale values return to 0.0
-                NumberAnimation { property: "opacity"; to: 0.0 }
-                NumberAnimation { property: "scale"; to: 0.0 }
-            }
-
         }
     }
 
@@ -149,7 +82,6 @@ Item {
         }
 
         color : IngeScapeTheme.selectedTabsBackgroundColor
-
 
 
         Button {
@@ -225,6 +157,77 @@ Item {
     }
 
 
+    //
+    // List of records
+    //
+    ScrollView {
+        id: recordsListScrollView
+
+        anchors {
+            top: parent.top
+            topMargin: 78
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+        }
+
+        // Prevent drag overshoot on Windows
+        flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+        style: IngeScapeScrollViewStyle {
+        }
+
+        // Content of our scrollview
+        ListView {
+            id: recordsList
+
+            model: controller.recordsList
+
+            delegate: componentRecordListItem
+
+            height: contentHeight
+
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+
+
+            //
+            // Transition animations
+            //
+            add: Transition {
+                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0 }
+                NumberAnimation { property: "scale"; from: 0.0; to: 1.0 }
+            }
+
+            displaced: Transition {
+                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+
+                // ensure opacity and scale values return to 1.0
+                NumberAnimation { property: "opacity"; to: 1.0 }
+                NumberAnimation { property: "scale"; to: 1.0 }
+            }
+
+            move: Transition {
+                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+
+                // ensure opacity and scale values return to 1.0
+                NumberAnimation { property: "opacity"; to: 1.0 }
+                NumberAnimation { property: "scale"; to: 1.0 }
+            }
+
+            remove: Transition {
+                // ensure opacity and scale values return to 0.0
+                NumberAnimation { property: "opacity"; to: 0.0 }
+                NumberAnimation { property: "scale"; to: 0.0 }
+            }
+
+        }
+    }
+
+
+
 
     //
     // Visual representation of a record in our list
@@ -235,26 +238,39 @@ Item {
         Item {
             id: recordItem
 
-            property int margin: 5
-
-            height: 60//recordInfos.height + margin*2
-
             anchors {
-                left : parent.left
-                right : parent.right
+                left: parent.left
+                right: parent.right
             }
+            height: 60
+
+
+            // Selection feedback
+            Rectangle {
+                visible: controller && (controller.selectedRecord === model.QtObject);
+
+                anchors {
+                    left : parent.left
+                    top : parent.top
+                    bottom: parent.bottom
+                    bottomMargin: 1
+                }
+
+                width : 6
+                color : IngeScapeTheme.selectedAgentColor
+            }
+
 
             // Playing feedback
             Rectangle {
-
                 anchors {
                     fill: parent
                 }
                 visible: playPauseRecordButton.checked
-                color : IngeScapeTheme.selectedAgentColor
+                color: IngeScapeTheme.selectedAgentColor
             }
 
-            // separator
+            // Separator
             Rectangle {
                 anchors {
                     bottom: parent.bottom
@@ -270,7 +286,7 @@ Item {
             Column {
                 id: recordInfos
 
-                y: margin
+                y: 5
 
                 anchors {
                     left : parent.left
@@ -296,9 +312,9 @@ Item {
                     font: IngeScapeTheme.headingFont
                 }
 
-                // IP address
+                // Date and Time
                 Text {
-                    id: recordIP
+                    id: recordDateTime
 
                     anchors {
                         left : parent.left
@@ -318,12 +334,16 @@ Item {
 
 
             // Record can be clicked
-            MouseArea
-            {
+            MouseArea {
+                id: mouseAreaRecordItem
+
                 anchors.fill: parent
 
+                hoverEnabled: true
+
                 onPressed: {
-                    if (controller) {
+                    if (controller)
+                    {
                         if (controller.selectedRecord === model.QtObject)
                         {
                             controller.selectedRecord = null;
@@ -403,53 +423,33 @@ Item {
                 }
             }
 
+            Button {
+                id: removeButton
 
-
-
-            // Selected Record feedback
-            Item {
-                anchors.fill: parent
-                visible: controller && (controller.selectedRecord === model.QtObject);
-
-                Rectangle {
-                    anchors {
-                        left : parent.left
-                        top : parent.top
-                        bottom: parent.bottom
-                        bottomMargin: 1
-                    }
-
-                    width : 6
-                    color : IngeScapeTheme.selectedAgentColor
+                anchors {
+                    top: parent.top
+                    topMargin: 10
+                    right: parent.right
+                    rightMargin: 12
                 }
 
-                Button {
-                    id: removeButton
+                visible: mouseAreaRecordItem.containsMouse || removeButton.hovered
 
-                    activeFocusOnPress: true
+                activeFocusOnPress: true
 
-                    anchors {
-                        top: parent.top
-                        topMargin: 10
-                        right : parent.right
-                        rightMargin: 12
-                    }
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
 
-                    style: Theme.LabellessSvgButtonStyle {
-                        fileCache: IngeScapeTheme.svgFileINGESCAPE
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "delete"
+                    disabledID: releasedID
+                }
 
-                        pressedID: releasedID + "-pressed"
-                        releasedID: "delete"
-                        disabledID: releasedID
-                    }
-
-                    onClicked: {
-
-                        if (controller)
-                        {
-                            // Delete selected record
-                            controller.deleteSelectedRecord();
-                        }
+                onClicked: {
+                    if (controller)
+                    {
+                        // Delete the record
+                        controller.deleteRecord(model.QtObject);
                     }
                 }
             }

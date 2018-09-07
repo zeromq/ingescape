@@ -117,18 +117,19 @@ void RecordsSupervisionController::startOrStopToRecord(bool isStart, bool withTi
 
 
 /**
- * @brief Delete the selected agent from the list
+ * @brief Delete a record from the list
+ * @param record
  */
-void RecordsSupervisionController::deleteSelectedRecord()
+void RecordsSupervisionController::deleteRecord(RecordVM* record)
 {
-    if ((_modelManager != NULL) && (_selectedRecord != NULL) && (_selectedRecord->modelM() != NULL))
+    if ((_modelManager != NULL) && (record != NULL) && (record->modelM() != NULL))
     {
-        qDebug() << "Delete the selected record " << _selectedRecord->modelM()->name();
+        qInfo() << "Ask to delete the record " << record->modelM()->name();
 
-        // Notify the recorder that he has to remove entry from db
+        // Notify the recorder that it has to remove entry from the data base
         if (_isRecorderON)
         {
-            QString commandAndParameters = QString("%1=%2").arg(command_DeleteRecord, _selectedRecord->modelM()->id());
+            QString commandAndParameters = QString("%1=%2").arg(command_DeleteRecord, record->modelM()->id());
 
             Q_EMIT commandAskedToRecorder(commandAndParameters);
         }
@@ -291,7 +292,7 @@ void RecordsSupervisionController::onAddedRecord(QString recordJSON)
  */
 void RecordsSupervisionController::onDeletedRecord(QString recordId)
 {
-    qDebug() << "onRecordDeleted" << recordId;
+    qDebug() << "on Deleted Record" << recordId;
 
     if (_mapFromRecordIdToModel.contains(recordId))
     {

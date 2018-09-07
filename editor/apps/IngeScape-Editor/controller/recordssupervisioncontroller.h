@@ -85,9 +85,10 @@ public:
 
 
     /**
-     * @brief Delete the selected record from the list
+     * @brief Delete a record from the list
+     * @param record
      */
-    Q_INVOKABLE void deleteSelectedRecord();
+    Q_INVOKABLE void deleteRecord(RecordVM* record);
 
 
     /**
