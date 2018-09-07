@@ -54,6 +54,10 @@ install: $(TARGET_LIB) $(STARGET_LIB)
 	install ./include/ingescape.h $(DESTDIR)$(PREFIX)/include/ingescape/
 	install ./include/ingescape_advanced.h $(DESTDIR)$(PREFIX)/include/ingescape/
 
+.PHONY: install_private
+install_private: install
+	install ./include/ingescape_private.h $(DESTDIR)$(PREFIX)/include/ingescape/
+
 .PHONY: uninstall
 uninstall:
 	rm -f $(PREFIX)/lib/$(TARGET_LIB)
