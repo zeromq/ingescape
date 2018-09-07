@@ -26,6 +26,9 @@ import INGESCAPE 1.0
 // agent sub-directory
 import "../agentsmapping" as AgentMapping
 
+// popup sub-directory
+import "../popup" as Popups
+
 // theme sub-directory
 import "../theme" as Theme;
 
@@ -486,9 +489,9 @@ Item {
     // Popup about Delete Confirmation
     //
     Editor.DeleteConfirmationPopup {
-        id : deleteConfirmationPopup
+        id: deleteConfirmationPopup
 
-        confirmationText : "This agent is used in the platform.\nDo you want to completely delete it?"
+        confirmationText: "This agent is used in the platform.\nDo you want to completely delete it?"
 
         onDeleteConfirmed: {
             if (controller)
@@ -502,97 +505,19 @@ Item {
     //
     // Popup for Error messages
     //
-    I2PopupBase {
+    Popups.MessagePopup {
         id: popupErrorMessage
 
-        height: 150
-        width: 350
         anchors.centerIn: parent
-
-        isModal: true
-        dismissOnOutsideTap: true
-        keepRelativePositionToInitialParent: false
-
-        Rectangle {
-
-            anchors.fill: parent
-            radius: 5
-            border {
-                width: 2
-                color: IngeScapeTheme.editorsBackgroundBorderColor
-            }
-            color: IngeScapeTheme.editorsBackgroundColor
-
-            Text {
-                id: popupText
-
-                text: "The file does not contain an agent definition !"
-
-                anchors {
-                    left : parent.left
-                    right : parent.right
-                    verticalCenter: parent.verticalCenter
-                    verticalCenterOffset: -20
-                }
-
-                horizontalAlignment: Text.AlignHCenter
-                lineHeight: 24
-                lineHeightMode: Text.FixedHeight
-                color: IngeScapeTheme.whiteColor
-
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    pixelSize: 16
-                }
-            }
-
-            Button {
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    bottom : parent.bottom
-                    bottomMargin: 16
-                }
-
-                property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
-                height: boundingBox.height
-                width: boundingBox.width
-
-                activeFocusOnPress: true
-                text: "OK"
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.whiteColor
-                }
-
-                onClicked: {
-                    // Close our popup
-                    popupErrorMessage.close();
-                }
-            }
-        }
     }
 
 
     //
-    // Network Configuration (Popup)
+    // Agent File Paths (Popup)
     //
     AgentFilesPaths {
         id: agentFilesPathsPopup
 
         anchors.centerIn: parent
-
     }
 }

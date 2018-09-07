@@ -157,7 +157,7 @@ public:
      * @brief Import an agents list from a JSON array
      * @param jsonArrayOfAgents
      */
-    void importAgentsListFromJson(QJsonArray jsonArrayOfAgents);
+    bool importAgentsListFromJson(QJsonArray jsonArrayOfAgents);
 
 
     /**

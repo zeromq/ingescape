@@ -115,72 +115,79 @@ void IngeScapeModelManager::setisMappingControlled(bool value)
  */
 bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
 {
-    bool success = false;
+    bool success = true;
 
-    // "File Dialog" to get the file (path) to open
-    QString agentFilePath = QFileDialog::getOpenFileName(NULL,
-                                                         "Open an agent(s) definition",
-                                                         _rootDirectoryPath,
-                                                         "JSON (*.json)");
-
-    if (!agentFilePath.isEmpty() && (_jsonHelper != NULL))
+    if (_jsonHelper != NULL)
     {
-        QFile jsonFile(agentFilePath);
-        if (jsonFile.open(QIODevice::ReadOnly))
+        // "File Dialog" to get the file (path) to open
+        QString agentFilePath = QFileDialog::getOpenFileName(NULL,
+                                                             "Open an agent(s) definition",
+                                                             _rootDirectoryPath,
+                                                             "JSON (*.json)");
+
+        if (!agentFilePath.isEmpty())
         {
-            QByteArray byteArrayOfJson = jsonFile.readAll();
-            jsonFile.close();
-
-            QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
-
-            QJsonObject jsonRoot = jsonDocument.object();
-
-            // List of agents
-            if (jsonRoot.contains("agents"))
+            QFile jsonFile(agentFilePath);
+            if (jsonFile.open(QIODevice::ReadOnly))
             {
-                // Import the agents list from a json byte content
-                importAgentsListFromJson(jsonRoot.value("agents").toArray());
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+                jsonFile.close();
 
-                success = true;
-            }
-            // One agent
-            else if (jsonRoot.contains("definition"))
-            {
-                QJsonValue jsonValue = jsonRoot.value("definition");
-                if (jsonValue.isObject())
+                QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+                QJsonObject jsonRoot = jsonDocument.object();
+
+                // List of agents
+                if (jsonRoot.contains("agents"))
                 {
-                    // Create a model of agent definition from the JSON
-                    DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonValue.toObject());
-                    if (agentDefinition != NULL)
+                    // Import the agents list from a json byte content
+                    success = importAgentsListFromJson(jsonRoot.value("agents").toArray());
+                }
+                // One agent
+                else if (jsonRoot.contains("definition"))
+                {
+                    QJsonValue jsonValue = jsonRoot.value("definition");
+                    if (jsonValue.isObject())
                     {
-                        QString agentName = agentDefinition->name();
+                        // Create a model of agent definition from the JSON
+                        DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonValue.toObject());
+                        if (agentDefinition != NULL)
+                        {
+                            QString agentName = agentDefinition->name();
 
-                        // Create a new model of agent with the name of the definition
-                        AgentM* agent = new AgentM(agentName, this);
+                            // Create a new model of agent with the name of the definition
+                            AgentM* agent = new AgentM(agentName, this);
 
-                        // Add this new model of agent
-                        addAgentModel(agent);
+                            // Add this new model of agent
+                            addAgentModel(agent);
 
-                        // Add this new model of agent definition for the agent name
-                        addAgentDefinitionForAgentName(agentDefinition, agentName);
+                            // Add this new model of agent definition for the agent name
+                            addAgentDefinitionForAgentName(agentDefinition, agentName);
 
-                        // Set its definition
-                        agent->setdefinition(agentDefinition);
+                            // Set its definition
+                            agent->setdefinition(agentDefinition);
+                        }
+                        // An error occured, the definition is NULL
+                        else {
+                            qWarning() << "The file" << agentFilePath << "does not contain an agent definition !";
 
-                        success = true;
-                    }
-                    // An error occured, the definition is NULL
-                    else {
-                        qWarning() << "The file" << agentFilePath << "does not contain an agent definition !";
+                            success = false;
+                        }
                     }
                 }
+                else {
+                    qWarning() << "The file" << agentFilePath << "does not contain one or several agent definition(s) !";
+
+                    success = false;
+                }
+            }
+            else {
+                qCritical() << "Can not open file" << agentFilePath;
+
+                success = false;
             }
         }
-        else {
-            qCritical() << "Can not open file" << agentFilePath;
-        }
     }
-
     return success;
 }
 
@@ -189,8 +196,10 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
  * @brief Import an agents list from a JSON array
  * @param jsonArrayOfAgents
  */
-void IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgents)
+bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgents)
 {
+    bool success = true;
+
     if (_jsonHelper != NULL)
     {
         for (QJsonValue jsonValue : jsonArrayOfAgents)
@@ -290,10 +299,21 @@ void IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                             delete agentDefinition;
                         }
                     }
+                    else {
+                        qWarning() << "The JSON does not contain an agent definition !";
+
+                        success = false;
+                    }
+                }
+                else {
+                    qWarning() << "The JSON does not contain an agent definition !";
+
+                    success = false;
                 }
             }
         }
     }
+    return success;
 }
 
 

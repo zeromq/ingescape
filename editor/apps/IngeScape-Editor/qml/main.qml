@@ -19,10 +19,12 @@ import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
 import QtQml 2.2
 
-
 import I2Quick 1.0
 
 import INGESCAPE 1.0
+
+// popup sub-directory
+import "popup" as Popups
 
 
 ApplicationWindow {
@@ -171,13 +173,12 @@ ApplicationWindow {
                 text: qsTr("Import agents")
 
                 onTriggered: {
-                    if (IngeScapeEditorC.modelManager) {
-                        IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
-
-                        /*var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
+                    if (IngeScapeEditorC.modelManager)
+                    {
+                        var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
                         if (!success) {
                             popupErrorMessage.open();
-                        }*/
+                        }
                     }
                 }
             }
@@ -404,6 +405,16 @@ ApplicationWindow {
             objectName: "overlayLayer"
 
             anchors.fill: parent
+
+
+            //
+            // Popup for Error messages
+            //
+            Popups.MessagePopup {
+                id: popupErrorMessage
+
+                anchors.centerIn: parent
+            }
         }
 
         // Overlay layer used to display draggable agent item above the content of our window and the popups
