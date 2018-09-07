@@ -409,17 +409,18 @@ Item {
                         fuzzyColor : IngeScapeTheme.blackColor
 
                         Column {
-                            id : columnText
-                            height : temporaryStartTimeAction.visible ?
-                                         (nameAction.height + temporaryStartTimeAction.height) + 3
-                                       : nameAction.height
+                            id: columnText
+
+                            height : temporaryStartTimeAction.visible ? (nameAction.height + temporaryStartTimeAction.height) + 3
+                                                                      : nameAction.height
                             anchors.centerIn: parent
                             spacing: 6
 
                             Text {
-                                id : nameAction
-                                color : IngeScapeTheme.lightGreyColor
-                                text : model.name
+                                id: nameAction
+
+                                color: IngeScapeTheme.lightGreyColor
+                                text: model.name
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 horizontalAlignment: Text.AlignHCenter
 

@@ -59,6 +59,7 @@ ApplicationWindow {
 
     menuBar: MenuBar {
 
+        // Platform
         Menu {
             title: qsTr("Platform")
 
@@ -85,6 +86,8 @@ ApplicationWindow {
             }
         }
 
+
+        // Mapping
         Menu {
             title: qsTr("Mapping")
 
@@ -158,6 +161,7 @@ ApplicationWindow {
         }
 
 
+        // Supervision
         Menu {
             title: qsTr("Supervision")
 
@@ -169,6 +173,7 @@ ApplicationWindow {
                     //console.log("Create a new Agent");
                 }
             }
+
             MenuItem {
                 text: qsTr("Import agents")
 
@@ -182,6 +187,7 @@ ApplicationWindow {
                     }
                 }
             }
+
             MenuItem {
                 text: qsTr("Export agents")
 
@@ -203,6 +209,7 @@ ApplicationWindow {
         }
 
 
+        // Options
         Menu {
             title: qsTr("Options")
 
@@ -226,6 +233,8 @@ ApplicationWindow {
             }
         }
 
+
+        // Windows
         Menu {
             id: menuWindows
 

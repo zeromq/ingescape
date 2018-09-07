@@ -967,15 +967,15 @@ Item {
                     id: currentTimeItem
 
                     anchors {
-                        bottom : columnHeadersContent.bottom
+                        bottom: columnHeadersContent.bottom
                     }
 
                     Rectangle {
                         id: currentTimeLabel
 
                         anchors {
-                            horizontalCenter : svgCurrentTime.horizontalCenter
-                            bottom : svgCurrentTime.top
+                            horizontalCenter: svgCurrentTime.horizontalCenter
+                            bottom: svgCurrentTime.top
                             bottomMargin: -1
                         }
                         width: 80
@@ -988,13 +988,16 @@ Item {
                         }
 
                         Text {
-                            id : currentTimeText
+                            id: currentTimeText
+
                             anchors {
-                                centerIn : parent
+                                centerIn: parent
                                 verticalCenterOffset: 1
                             }
 
-                            text : controller ? controller.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss':'zzz") : "00:00:00.000"
+                            text: controller ? controller.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss':'zzz")
+                                             : "00:00:00.000"
+
                             color: IngeScapeTheme.whiteColor
                             font {
                                 family: IngeScapeTheme.textFontFamily
@@ -1273,14 +1276,12 @@ Item {
 
         Rectangle {
             anchors {
-                left : playScenarioBtn.left
-                leftMargin: -10
-                right : playScenarioBtn.right
-                rightMargin: -10
-                top : playScenarioBtn.bottom
+                horizontalCenter: playScenarioBtn.horizontalCenter
+                top: playScenarioBtn.bottom
                 topMargin: 6
             }
-            height: 21
+            width: 80
+            height: 20
             radius : 2
             color: IngeScapeTheme.blueGreyColor2
             border {
@@ -1289,9 +1290,10 @@ Item {
             }
 
             Text {
-                id : currenTime
+                id: currenTime
+
                 anchors {
-                    centerIn : parent
+                    centerIn: parent
                     verticalCenterOffset: 1
                 }
 
