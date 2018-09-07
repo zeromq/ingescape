@@ -36,7 +36,25 @@ I2PopupBase {
 
 
     property alias confirmationText: confirmationText.text
+
+    //--------------------------------
+    //
+    // Signals
+    //
+    //--------------------------------
+
+    //
     signal deleteConfirmed();
+
+    //
+    signal deleteCancelled();
+
+
+    //--------------------------------
+    //
+    // Content
+    //
+    //--------------------------------
 
     Rectangle {
 
@@ -115,6 +133,9 @@ I2PopupBase {
                 onClicked: {
                     // Close our popup
                     rootItem.close();
+
+                    // Emit the signal "Delete Cancelled"
+                    rootItem.deleteCancelled();
                 }
             }
 
@@ -154,6 +175,8 @@ I2PopupBase {
                 onClicked: {
                     // Close our popup
                     rootItem.close();
+
+                    // Emit the signal "Delete Confirmed"
                     rootItem.deleteConfirmed();
                 }
             }

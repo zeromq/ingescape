@@ -618,7 +618,7 @@ Item {
                 // Links between nodes
                 //
                 Repeater {
-                    model : controller ? controller.allLinksInMapping : 0;
+                    model: controller ? controller.allLinksInMapping : 0;
 
                     Link {
                         id: link
@@ -631,17 +631,22 @@ Item {
                 // Nodes
                 //
                 Repeater {
-                    model : controller ? controller.allAgentsInMapping : 0;
+                    model: controller ? controller.allAgentsInMapping : 0;
 
 
                     AgentNodeView {
                         id: agent
 
-                        agentMappingVM : model.QtObject
-                        controller : rootItem.controller
+                        agentMappingVM: model.QtObject
 
-                        onNeedConfirmationToDeleteAgentInMapping : {
-                             deleteConfirmationPopup.open();
+                        controller: rootItem.controller
+
+                        onNeedConfirmationToDeleteAgentInMapping: {
+                            // Set the agent
+                            deleteConfirmationPopup.myAgent = agent.agentMappingVM
+
+                            // Open the popup
+                            deleteConfirmationPopup.open();
                         }
                     }
                 }
@@ -691,13 +696,14 @@ Item {
     Editor.DeleteConfirmationPopup {
         id: deleteConfirmationPopup
 
+        property var myAgent: null;
+
         confirmationText: "This agent is used in the actions.\nDo you want to delete it?"
 
         onDeleteConfirmed: {
-            if (controller)
-            {
+            if (controller) {
                 // Delete our agent
-                controller.deleteSelectedAgentInMapping();
+                controller.deleteAgentInMapping(deleteConfirmationPopup.myAgent);
             }
         }
     }

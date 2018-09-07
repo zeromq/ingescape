@@ -463,6 +463,7 @@ Item {
     //
     Editor.DeleteConfirmationPopup {
         id : deleteConfirmationPopup
+
         property var myAction : null;
 
         confirmationText : "This action is used in the scenario.\nDo you want to completely delete it?"

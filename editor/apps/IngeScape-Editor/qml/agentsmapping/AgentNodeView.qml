@@ -39,6 +39,7 @@ Rectangle {
 
     // Model associated to our QML item
     property var agentMappingVM: null
+
     property var agentName: agentMappingVM ? agentMappingVM.name : ""
 
     property bool isReduced: agentMappingVM && agentMappingVM.isReduced
@@ -885,9 +886,10 @@ Rectangle {
                     if (IngeScapeEditorC.canDeleteAgentInMapping(rootItem.agentName))
                     {
                         // Delete our agent
-                        controller.deleteSelectedAgentInMapping();
+                        controller.deleteAgentInMapping(rootItem.agentMappingVM);
                     }
                     else {
+                        // Emit the signal "Need Confirmation to Delete Agent in Mapping"
                         rootItem.needConfirmationToDeleteAgentInMapping();
                     }
                 }
