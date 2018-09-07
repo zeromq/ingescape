@@ -16,19 +16,26 @@ Item{
     /**
      * ComboBox Properties
      */
-    //count displayable item
+
+    // count displayable item
     property int countDisplayItem: 5;
 
     //selected Item & Index
     property var selectedItem;
     property alias selectedIndex: _combolist.currentIndex;
+
     //Model
     property alias model: _combolist.model;
+
     //ScrollView
     property alias scrollViewStyle: _scrollView.style;
 
     //List Element Count
     property alias count: _combolist.count;
+
+    property alias text: _comboText.text;
+
+    property alias placeholderText: _comboPlaceholder.text;
 
     //Flag to display list on top
     property bool openOnTop: false;
@@ -75,6 +82,11 @@ Item{
     }
 
 
+    onVisibleChanged: {
+        if (!visible) {
+            close();
+        }
+    }
 
     onSelectedItemChanged: {
         _updateCurrentSelection();
@@ -88,29 +100,20 @@ Item{
         _updateCurrentSelection();
     }
 
-    onVisibleChanged: {
-        if (!visible) {
-            close();
-        }
-    }
-
-
-
     onStyleChanged: {
-        if (style){
+        if (style) {
             style.control = _combobox;
         }
     }
 
-    property alias text: _comboText.text;
-    property alias placeholderText: _comboPlaceholder.text;
 
     // signal triggered when ComboBox is closing
     signal closing();
+
     // signal triggered when ComboBox is open
     signal opening();
 
- /////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////
 
     /**
       * Function get it change for each type of list
@@ -162,7 +165,8 @@ Item{
 
                 index++;
              }
-        }  else {
+        }
+        else {
             _combolist.currentIndex = -1;
             _comboText.text = "";
         }
@@ -335,8 +339,8 @@ Item{
         anchors.bottom: (openOnTop ? _comboButton.top : undefined);
 
         width: _comboButton.width;
-        height: ((_combolist.count < _combobox.countDisplayItem) ? _combolist.count * (_comboButton.height + 1)
-                                                                 : _combobox.countDisplayItem * (_comboButton.height + 1) );
+        height: ((_combolist.count < _combobox.countDisplayItem) ? _combolist.count * _comboButton.height
+                                                                 : (_combobox.countDisplayItem + 0.5) * _comboButton.height );
 
 
         isModal: true;
@@ -395,15 +399,14 @@ Item{
 
         ScrollView {
              id: _scrollView
+
              visible: _comboButton.checked;
 
              anchors {
                  top:  parent.top
                 bottom:  parent.bottom
              }
-             width: _comboButton.width;
-             height: ((_combolist.count < _combobox.countDisplayItem) ? _combolist.count * (_comboButton.height + 1)
-                                                                      : _combobox.countDisplayItem * (_comboButton.height + 1) );
+             width: _comboButton.width
 
              frameVisible: _combobox.style.frameVisible
 
@@ -417,15 +420,17 @@ Item{
              ListView {
                 id: _combolist
 
+                width: parent.width
+
                 boundsBehavior: Flickable.StopAtBounds
-                width: parent.width;
-                height: ( (_combolist.count < _combobox.countDisplayItem) ? _combolist.count * (_comboButton.height + 1)
-                                                                          : _combobox.countDisplayItem * (_comboButton.height + 1) );
+
                 visible: parent.visible;
+
                 model: 0
+
                 currentIndex : -1
 
-                delegate:Component {
+                delegate: Component {
                     Rectangle {
                         color:  (_mouseAreaItem.containsPress ? _combobox.style.listBackgroundColorPressed : ((_combolist.currentIndex === index) ? _combobox.style.listBackgroundColorSelected : _combobox.style.listBackgroundColorIdle));
                         height: _comboButton.height

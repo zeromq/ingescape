@@ -29,6 +29,22 @@ Item {
     height : 25
     width : 148
 
+
+    // count displayable item
+    property int countDisplayItem: 5;
+
+    //selected Item
+    property var selectedItem;
+
+    //Model
+    property alias model: combolist.model
+
+    // number of inputs and outputs in IOP list (in order to place the separators)
+    property int inputsNumber: 0;
+    property int outputsNumber: 0;
+    property int parametersNumber: 0;
+
+
     onVisibleChanged: {
         if (!visible) {
             close();
@@ -42,17 +58,6 @@ Item {
     onModelChanged: {
         updateCurrentSelection();
     }
-
-    //selected Item
-    property var selectedItem;
-
-    //Model
-    property alias model: combolist.model
-
-    // number of inputs and outputs in IOP list (in order to place the separators)
-    property int inputsNumber: 0;
-    property int outputsNumber: 0;
-    property int parametersNumber: 0;
 
 
     /////////////////////////////////////////////////////
@@ -255,20 +260,21 @@ Item {
     }
 
     I2PopupBase {
-        id : popup
-        anchors.top:comboButton.bottom;
+        id: popup
 
-        width: comboButton.width;
-        height: ((combolist.count < 5) ? (combolist.count) * (comboButton.height + 1)
-                                       : 5 * (comboButton.height + 1) );
+        anchors.top: comboButton.bottom
+
+        width: comboButton.width
+        height: ((combolist.count < countDisplayItem) ? combolist.count * comboButton.height
+                                                      : (countDisplayItem + 0.5) * comboButton.height )
 
 
-        isModal: true;
+        isModal: true
         layerColor: "transparent"
-        layerObjectName: "overlayLayerComboBox";
-        dismissOnOutsideTap : true;
+        layerObjectName: "overlayLayerComboBox"
+        dismissOnOutsideTap : true
 
-        keepRelativePositionToInitialParent : true;
+        keepRelativePositionToInitialParent: true
 
         onClosed: {
             combobox.close();
@@ -279,23 +285,22 @@ Item {
         }
 
         Rectangle {
-            id : popUpBackground
-            anchors.fill : parent
+            id: popUpBackground
+
+            anchors.fill: parent
             color: "#2C333E"
         }
 
         ScrollView {
             id: _scrollView
 
-            visible: comboButton.checked;
+            visible: comboButton.checked
 
             anchors {
                 top: parent.top
                 bottom: parent.bottom
             }
             width: comboButton.width
-            height: ((combolist.count < 5) ? (combolist.count) * (comboButton.height + 1)
-                                           : 5 * (comboButton.height + 1) )
 
             style: IngeScapeScrollViewStyle {
             }
@@ -305,19 +310,17 @@ Item {
 
             // Content of our scrollview
             ListView {
-                id:combolist
-
-                boundsBehavior: Flickable.StopAtBounds
+                id: combolist
 
                 anchors {
                    top : parent.top
-                   topMargin: 2
+                   //topMargin: 2
                 }
-                width: parent.width;
-                height: ((combolist.count < 5) ? combolist.count * (comboButton.height + 1)
-                                               : 5 * (comboButton.height+1) )
+                width: parent.width
 
-                visible: parent.visible;
+                boundsBehavior: Flickable.StopAtBounds
+
+                visible: parent.visible
 
                 delegate: Rectangle {
                     anchors {
