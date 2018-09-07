@@ -1134,7 +1134,7 @@ initLoop (zsock_t *pipe, void *args){
     //set other headers for agent
     zyre_set_header(agentElements->node, "canBeFrozen", "%i", agentCanBeFrozen);
 
-#if defined __unix__ || defined __APPLE__
+#if defined __unix__ || defined __APPLE__ || defined __linux__
     int ret;
     pid_t pid;
     pid = getpid();
@@ -1294,7 +1294,7 @@ initLoop (zsock_t *pipe, void *args){
         igs_Interrupted = true;
         //in case of forced stop, we send SIGINT to our process so
         //that it can be trapped by main thread for a proper stop
-        #if defined __unix__ || defined __APPLE__
+        #if defined __unix__ || defined __APPLE__ || defined __linux__
         igs_info("triggering SIGINT");
         kill(pid, SIGINT);
         #endif
@@ -1930,7 +1930,7 @@ void igs_setCommandLineFromArgs(int argc, const char * argv[]){
     
     char cmd[COMMAND_LINE_LENGTH] = "";
     
-#if defined __unix__ || defined __APPLE__
+#if defined __linux__ || defined __APPLE__ || defined __unix__
     int ret;
     pid_t pid;
     pid = getpid();

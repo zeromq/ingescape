@@ -15,7 +15,7 @@
 #include "unixfunctions.h"
 #endif
 
-#if defined(__unix__) || defined(__unix) || \
+#if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
 #include <pthread.h>
 #endif
@@ -40,7 +40,7 @@ char logTime[128] = "";
 #define NUMBER_OF_LOGS_FOR_FFLUSH 0
 static int nb_of_entries = 0; //for fflush rotation
 
-#if defined(__unix__) || defined(__unix) || \
+#if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
 pthread_mutex_t *lock = NULL;
 #else
@@ -122,7 +122,7 @@ void admin_computeTime(char *dest){
 
 void admin_makeFilePath(const char *from, char *to, size_t size_of_to)
 {
-#if defined(__unix__) || defined(__unix) || \
+#if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
     if (from[0] == '~'){
         from++;
@@ -140,7 +140,7 @@ void admin_makeFilePath(const char *from, char *to, size_t size_of_to)
 
 void admin_lock(void)   {
     //TODO: see what to do for Windows
-#if defined(__unix__) || defined(__unix) || \
+#if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
     if (lock == NULL){
         lock = calloc(1, sizeof(pthread_mutex_t));
@@ -198,7 +198,7 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
         //create default path if current is empty
         if (strlen(admin_logFile) == 0){
             char *name = igs_getAgentName();
-#if defined(__unix__) || defined(__unix) || \
+#if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
             snprintf(admin_logFile, 4095, "~/%s_log.csv", name);
 #else
