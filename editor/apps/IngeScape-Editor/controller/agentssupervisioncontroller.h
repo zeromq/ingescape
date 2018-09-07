@@ -66,9 +66,10 @@ public:
 
 
     /**
-     * @brief Delete the selected agent from the list
+     * @brief Remove the agent from the list and delete it
+     * @param agent
      */
-    Q_INVOKABLE void deleteSelectedAgent();
+    Q_INVOKABLE void deleteAgentInList(AgentVM* agent);
 
 
     /**
@@ -214,13 +215,6 @@ private:
      * @param agent
      */
     void _checkHaveToMergeAgent(AgentVM* agent);
-
-
-    /**
-     * @brief Remove from the list and delete the view model of agent
-     * @param agent
-     */
-    void _removeAndDeleteAgentViewModel(AgentVM* agent);
 
 
     /**

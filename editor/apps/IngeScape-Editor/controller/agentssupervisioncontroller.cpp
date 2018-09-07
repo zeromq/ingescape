@@ -87,16 +87,34 @@ QList<AgentVM*> AgentsSupervisionController::getAgentViewModelsListFromName(QStr
 
 
 /**
- * @brief Delete the selected agent from the list
+ * @brief Remove the agent from the list and delete it
+ * @param agent
  */
-void AgentsSupervisionController::deleteSelectedAgent()
+void AgentsSupervisionController::deleteAgentInList(AgentVM* agent)
 {
-    if (_selectedAgent != NULL)
+    if ((_modelManager != NULL) && (agent != NULL))
     {
-        qDebug() << "Delete the selected agent" << _selectedAgent->name();
+        qInfo() << "Delete the agent" << agent->name() << "in the List";
 
-        // Remove from the list and delete the view model of agent
-        _removeAndDeleteAgentViewModel(_selectedAgent);
+        // Unselect our agent if needed
+        if (_selectedAgent == agent) {
+            setselectedAgent(NULL);
+        }
+
+        // Remove it from the list
+        _agentsList.remove(agent);
+
+        // Reset its definition
+        agent->setdefinition(NULL);
+
+        // Delete each model of this view model of agent
+        for (AgentM* model : agent->models()->toList())
+        {
+            _modelManager->deleteAgentModel(model);
+        }
+
+        // Delete the view model of agent
+        _deleteAgentViewModel(agent);
     }
 }
 
@@ -238,8 +256,8 @@ void AgentsSupervisionController::clearAgentsList()
                 // OFF
                 else
                 {
-                    // Remove from the list and delete the view model of agent
-                    _removeAndDeleteAgentViewModel(agent);
+                    // Remove the agent from the list and delete it
+                    deleteAgentInList(agent);
                 }
             }
         }
@@ -716,37 +734,6 @@ void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
                 agentUsingSameDefinition->models()->append(model);
             }
         }
-    }
-}
-
-
-/**
- * @brief Remove from the list and delete the view model of agent
- * @param agent
- */
-void AgentsSupervisionController::_removeAndDeleteAgentViewModel(AgentVM* agent)
-{
-    if ((_modelManager != NULL) && (agent != NULL))
-    {
-        // Unselect our agent if needed
-        if (_selectedAgent == agent) {
-            setselectedAgent(NULL);
-        }
-
-        // Remove it from the list
-        _agentsList.remove(agent);
-
-        // Reset its definition
-        agent->setdefinition(NULL);
-
-        // Delete each model of this view model of agent
-        for (AgentM* model : agent->models()->toList())
-        {
-            _modelManager->deleteAgentModel(model);
-        }
-
-        // Delete the view model of agent
-        _deleteAgentViewModel(agent);
     }
 }
 

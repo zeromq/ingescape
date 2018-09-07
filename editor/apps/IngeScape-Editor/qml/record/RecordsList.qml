@@ -41,7 +41,7 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property var controller : null;
+    property var controller: null;
 
 
 
@@ -55,6 +55,7 @@ Item {
     // allowing to deselect selected record
     MouseArea {
         anchors.fill: parent
+
         onClicked: {
             if (controller.selectedRecord)
             {
@@ -67,7 +68,7 @@ Item {
     // List of records
     //
     ScrollView {
-        id : recordsListScrollView
+        id: recordsListScrollView
 
         anchors {
             top: parent.top
@@ -152,10 +153,9 @@ Item {
 
 
         Button {
-            id : startStopRecordButton
+            id: startStopRecordButton
 
-            anchors
-            {
+            anchors {
                 verticalCenter: parent.verticalCenter
                 left: parent.left
                 leftMargin: 15
@@ -167,13 +167,13 @@ Item {
             style: I2SvgToggleButtonStyle {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
-                toggleCheckedReleasedID: "stop";
-                toggleCheckedPressedID: "stopped_pressed";
-                toggleUncheckedReleasedID: "record";
-                toggleUncheckedPressedID: "record_pressed";
+                toggleCheckedReleasedID: "record-stop";
+                toggleCheckedPressedID: "record-stop-pressed";
+                toggleUncheckedReleasedID: "record-start";
+                toggleUncheckedPressedID: "record-start-pressed";
 
                 // No disabled states
-                toggleCheckedDisabledID: "record"
+                toggleCheckedDisabledID: "record-start-pressed"
                 toggleUncheckedDisabledID: toggleCheckedDisabledID
 
                 labelMargin: 0;
@@ -189,15 +189,16 @@ Item {
         }
 
         Text {
-            id : currentTimeText
+            id: currentTimeText
+
             anchors {
-                left : startStopRecordButton.right
+                left: startStopRecordButton.right
                 leftMargin: 10
                 verticalCenter: parent.verticalCenter
             }
 
-            text : controller ? controller.currentRecordTime.toLocaleTimeString(Qt.locale(), "hh':'mm':'ss'.'zzz")
-                              : "00:00:00.00"
+            text: controller ? controller.currentRecordTime.toLocaleTimeString(Qt.locale(), "hh':'mm':'ss'.'zzz")
+                             : "00:00:00.00"
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -232,7 +233,7 @@ Item {
         id: componentRecordListItem
 
         Item {
-            id : recordItem
+            id: recordItem
 
             property int margin: 5
 
@@ -266,9 +267,9 @@ Item {
                 height: 1
             }
 
-            Column
-            {
-                id:recordInfos
+            Column {
+                id: recordInfos
+
                 y: margin
 
                 anchors {
@@ -348,7 +349,7 @@ Item {
 
                 running: true
 
-                visible: controller.isLoadingRecord && (controller.playingRecord !== null) && (controller.playingRecord.modelM.id === model.modelM.id)
+                visible: controller.isLoadingRecord && controller.playingRecord && controller.playingRecord.modelM && (controller.playingRecord.modelM.id === model.modelM.id)
             }
 
             // Play record button
@@ -363,22 +364,22 @@ Item {
 
                 visible: !loadingRecordIndicator.visible
                 opacity: !enabled ? 0.3 : 1
-                enabled: !controller.isRecording && (controller.playingRecord === null || controller.playingRecord.modelM.id === model.modelM.id)
+                enabled: !controller.isRecording && (   (controller.playingRecord === null)
+                                                     || (controller.playingRecord.modelM && (controller.playingRecord.modelM.id === model.modelM.id)) )
 
                 style: I2SvgToggleButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
-                    toggleCheckedReleasedID: "pause_actif";
-                    toggleCheckedPressedID: "pause_actif_pressed";
-                    toggleUncheckedReleasedID: "play_actif";
-                    toggleUncheckedPressedID: "play_actif_pressed";
+                    toggleCheckedReleasedID: "record-pause";
+                    toggleCheckedPressedID: "record-pause-pressed";
+                    toggleUncheckedReleasedID: "record-play";
+                    toggleUncheckedPressedID: "record-play-pressed";
 
                     // No disabled states
-                    toggleCheckedDisabledID: "play_actif"
+                    toggleCheckedDisabledID: "record-play-pressed"
                     toggleUncheckedDisabledID: toggleCheckedDisabledID
 
-                    labelMargin: 0;
-
+                    labelMargin: 0
                 }
 
                 onClicked: {
@@ -389,7 +390,16 @@ Item {
 
                 Connections {
                     target: controller
-                    onPlayingRecordChanged: playPauseRecordButton.checked = controller.playingRecord !== null && controller.playingRecord.modelM.id === model.modelM.id
+
+                    onPlayingRecordChanged: {
+                        if (controller.playingRecord && controller.playingRecord.modelM && (controller.playingRecord.modelM.id === model.modelM.id))
+                        {
+                            playPauseRecordButton.checked = true;
+                        }
+                        else {
+                            playPauseRecordButton.checked = false;
+                        }
+                    }
                 }
             }
 
@@ -399,7 +409,7 @@ Item {
             // Selected Record feedback
             Item {
                 anchors.fill: parent
-                visible : controller && (controller.selectedRecord === model.QtObject);
+                visible: controller && (controller.selectedRecord === model.QtObject);
 
                 Rectangle {
                     anchors {
@@ -430,7 +440,7 @@ Item {
 
                         pressedID: releasedID + "-pressed"
                         releasedID: "delete"
-                        disabledID : releasedID
+                        disabledID: releasedID
                     }
 
                     onClicked: {

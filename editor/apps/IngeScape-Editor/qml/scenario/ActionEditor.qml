@@ -2493,6 +2493,7 @@ Window {
                 width : actionDelete.width
 
                 hoverEnabled: true
+
                 onClicked: {
                     if (controller && panelController && panelController.originalAction)
                     {
@@ -2644,7 +2645,6 @@ Window {
                 // Delete our action
                 controller.deleteAction(panelController.originalAction);
             }
-
         }
     }
 

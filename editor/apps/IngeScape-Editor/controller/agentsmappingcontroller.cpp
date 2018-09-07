@@ -108,7 +108,7 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
 {
     if (agent != NULL)
     {
-        qInfo() << "Delete Agent in Mapping" << agent->name();
+        qInfo() << "Delete the agent" << agent->name() << "in the Mapping";
 
         // Unselect our agent if needed
         if (_selectedAgent == agent) {

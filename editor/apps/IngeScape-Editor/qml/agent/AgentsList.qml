@@ -452,17 +452,16 @@ Item {
 
 
                     AgentsListItem {
-                        height : notDraggableItem.height
-                        width : notDraggableItem.width
+                        height: notDraggableItem.height
+                        width: notDraggableItem.width
 
-
-                        agent : model.QtObject
+                        agent: model.QtObject
                         controller: rootItem.controller
 
                         agentItemIsHovered: mouseArea.containsMouse
                         visible: !mouseArea.drag.active
 
-                        onNeedConfirmationtoDeleteAgent : {
+                        onNeedConfirmationtoDeleteAgent: {
                             deleteConfirmationPopup.open();
                         }
 
@@ -474,8 +473,8 @@ Item {
                     }
 
                     AgentMapping.AgentNodeView {
-                        isReduced : true
-                        agentName : model.name
+                        isReduced: true
+                        agentName: model.name
                         visible: mouseArea.drag.active
                         dropEnabled : false
                     }
