@@ -19,6 +19,7 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Window 2.3
 
 import I2Quick 1.0
+
 // parent-directory
 import ".." as Editor;
 
@@ -397,8 +398,8 @@ Item {
                     I2CustomRectangle {
                         id: itemDragged
 
+                        width: Math.max(IngeScapeTheme.timeWidth, nameAction.width + 10)
                         height: columnText.height + 8
-                        width: nameAction.width + 14
 
                         color: IngeScapeTheme.darkBlueGreyColor
 
@@ -411,8 +412,8 @@ Item {
                         Column {
                             id: columnText
 
-                            height : temporaryStartTimeAction.visible ? (nameAction.height + temporaryStartTimeAction.height) + 3
-                                                                      : nameAction.height
+                            height: temporaryStartTimeAction.visible ? (nameAction.height + temporaryStartTimeAction.height) + 3
+                                                                     : nameAction.height
                             anchors.centerIn: parent
                             spacing: 6
 

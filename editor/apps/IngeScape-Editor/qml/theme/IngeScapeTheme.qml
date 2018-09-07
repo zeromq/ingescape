@@ -45,7 +45,10 @@ Item {
 
     // Height of our bottom panel
     readonly property int bottomPanelHeight: 300
+    readonly property int bottomPanelHeight_OneRow: 100
 
+    // Width of time (with format "hh:mm:ss.zzz")
+    readonly property int timeWidth: 80
 
 
     //-----------------------------------------
@@ -90,6 +93,7 @@ Item {
     readonly property color veryLightGreyColor : "#ECECEC"
 
     readonly property color orangeColor: "#F07F0A"
+
 
     //-----------------------------------------
     //

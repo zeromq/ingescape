@@ -54,6 +54,7 @@ Item {
         else
         {
             rootItem.height = IngeScapeTheme.bottomPanelHeight;
+            //rootItem.height = IngeScapeTheme.bottomPanelHeight_OneRow;
         }
     }
 
@@ -978,9 +979,11 @@ Item {
                             bottom: svgCurrentTime.top
                             bottomMargin: -1
                         }
-                        width: 80
+                        width: IngeScapeTheme.timeWidth
                         height: 20
+
                         radius: 2
+
                         color: currentTimeMouseArea.pressed ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.blueGreyColor2
                         border {
                             width: 1
@@ -1267,9 +1270,9 @@ Item {
             }
 
             Binding {
-                target : playScenarioBtn
-                property : "checked"
-                value : controller? controller.isPlaying : false
+                target: playScenarioBtn
+                property: "checked"
+                value: controller ? controller.isPlaying : false
             }
         }
 
@@ -1280,9 +1283,11 @@ Item {
                 top: playScenarioBtn.bottom
                 topMargin: 6
             }
-            width: 80
+            width: IngeScapeTheme.timeWidth
             height: 20
+
             radius : 2
+
             color: IngeScapeTheme.blueGreyColor2
             border {
                 width : 1
@@ -1303,7 +1308,6 @@ Item {
                     family: IngeScapeTheme.textFontFamily
                     pixelSize: 14
                 }
-
             }
         }
 

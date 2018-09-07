@@ -377,11 +377,13 @@ Item {
     }
 
 
-    // ghost appearing when the action vm is dragging in the timeline
+    // Ghost appearing when the action vm is dragging in the timeline
     I2CustomRectangle{
         id : itemDragged
+
+        width: Math.max(IngeScapeTheme.timeWidth, nameAction.width + 10)
         height : columnText.height + 8
-        width : nameAction.width + 14
+
         color : IngeScapeTheme.darkBlueGreyColor
         visible: actionVMMouseArea.drag.active
 
