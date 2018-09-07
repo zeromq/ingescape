@@ -400,6 +400,7 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                             {
                                                 // the new model is useless, we have to delete it
                                                 hasToDeleteNewModel = true;
+                                                break;
                                             }
                                             // New model is ON and there is already a model with the same peer id...
                                             else
@@ -414,16 +415,35 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                         }
                                     }
 
-                                    // New model is ON
-                                    if ((sameModel == NULL) && model->isON())
+                                    // We don't found this peer id
+                                    if (!hasToDeleteNewModel && (sameModel == NULL))
                                     {
-                                        for (AgentM* iterator : modelsOnHost)
+                                        // New model is ON
+                                        if (model->isON())
                                         {
-                                            // Same command line (peer id is defined) and agent is OFF --> we consider that it is the same model that evolve from OFF to ON
-                                            if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && !iterator->isON())
+                                            for (AgentM* iterator : modelsOnHost)
                                             {
-                                                sameModel = iterator;
-                                                break;
+                                                // Same command line (peer id is defined) and existing agent is OFF --> we consider that it is the same model that evolve from OFF to ON
+                                                if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && !iterator->isON())
+                                                {
+                                                    // We have to replace it by the new one
+                                                    sameModel = iterator;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        // New model is OFF
+                                        else
+                                        {
+                                            for (AgentM* iterator : modelsOnHost)
+                                            {
+                                                // Same command line (peer id is defined) and existing agent is ON --> we consider that it is the same model but OFF
+                                                if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && iterator->isON())
+                                                {
+                                                    // The new model is useless, we have to delete it
+                                                    hasToDeleteNewModel = true;
+                                                    break;
+                                                }
                                             }
                                         }
                                     }

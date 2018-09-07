@@ -379,7 +379,7 @@ Item {
 
     // Ghost appearing when the action vm is dragging in the timeline
     I2CustomRectangle{
-        id : itemDragged
+        id: itemDragged
 
         width: Math.max(IngeScapeTheme.timeWidth, nameAction.width + 10)
         height : columnText.height + 8
@@ -389,7 +389,7 @@ Item {
 
         // - fuzzy radius around our rectangle
         fuzzyRadius: 2
-        fuzzyColor : IngeScapeTheme.blackColor
+        fuzzyColor: IngeScapeTheme.blackColor
 
         Column {
             id: columnText
@@ -401,10 +401,14 @@ Item {
 
             Text {
                 id: nameAction
-                color: IngeScapeTheme.lightGreyColor
-                text: (actionVMItem.myActionVM && actionVMItem.myActionVM.modelM) ? actionVMItem.myActionVM.modelM.name : ""
+
                 anchors.horizontalCenter: parent.horizontalCenter
                 horizontalAlignment: Text.AlignHCenter
+
+                color: IngeScapeTheme.lightGreyColor
+
+                text: (actionVMItem.myActionVM && actionVMItem.myActionVM.modelM) ? actionVMItem.myActionVM.modelM.name
+                                                                                  : ""
 
                 font {
                     family : IngeScapeTheme.textFontFamily
@@ -415,13 +419,14 @@ Item {
             Text {
                 id: temporaryStartTimeAction
 
-                visible: text !== ""
-                color: IngeScapeTheme.lightGreyColor
-                text: actionVMItem.temporaryStartTime ? actionVMItem.temporaryStartTime.toLocaleString(Qt.locale(),"hh:mm:ss.zzz")
-                                                      : "";
-
                 anchors.horizontalCenter: parent.horizontalCenter
                 horizontalAlignment: Text.AlignHCenter
+
+                visible: (text !== "")
+                color: IngeScapeTheme.lightGreyColor
+
+                text: actionVMItem.temporaryStartTime ? actionVMItem.temporaryStartTime.toLocaleString(Qt.locale(),"hh:mm:ss.zzz")
+                                                      : "";
 
                 font {
                     family : IngeScapeTheme.textFontFamily
@@ -429,9 +434,7 @@ Item {
                 }
             }
         }
-
     }
-
 
 }
 
