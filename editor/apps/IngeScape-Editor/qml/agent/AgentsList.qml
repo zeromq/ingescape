@@ -361,7 +361,7 @@ Item {
         id: componentAgentListItem
 
         Item {
-            id : agentItem
+            id: agentItem
 
             width: IngeScapeTheme.leftPanelWidth
             height: 85
@@ -369,11 +369,11 @@ Item {
 
             // Not Draggable Agent Item
             AgentsListItem {
-                id : notDraggableItem
+                id: notDraggableItem
 
                 anchors.fill : parent
 
-                agent : model.QtObject
+                agent: model.QtObject
                 controller: rootItem.controller
 
                 visible: mouseArea.drag.active
@@ -383,7 +383,7 @@ Item {
 
             // Draggable Agent Item
             Item {
-                id : draggableItem
+                id: draggableItem
 
                 height : notDraggableItem.height
                 width : notDraggableItem.width
@@ -452,6 +452,8 @@ Item {
 
 
                     AgentsListItem {
+                        id: agentsListItem2
+
                         height: notDraggableItem.height
                         width: notDraggableItem.width
 
@@ -461,13 +463,21 @@ Item {
                         agentItemIsHovered: mouseArea.containsMouse
                         visible: !mouseArea.drag.active
 
-                        onNeedConfirmationtoDeleteAgent: {
+                        onNeedConfirmationToDeleteAgentInList: {
+                            // Set the agent
+                            deleteConfirmationPopup.myAgent = agentsListItem2.agent;
+
+                            // Open the popup
                             deleteConfirmationPopup.open();
                         }
 
                         onConfigureFilesPaths: {
-                            //console.log("Open 'Configure Files Paths' for " + agent.name);
-                            agentFilesPathsPopup.agent = agent;
+                            //console.log("QML: Open 'Configure Files Paths' for " + agent.name);
+
+                            // Set the agent
+                            agentFilesPathsPopup.agent = agentsListItem2.agent;
+
+                            // Open the popup
                             agentFilesPathsPopup.open();
                         }
                     }
@@ -490,12 +500,13 @@ Item {
     Editor.DeleteConfirmationPopup {
         id: deleteConfirmationPopup
 
+        property var myAgent: null;
+
         confirmationText: "This agent is used in the platform.\nDo you want to completely delete it?"
 
         onDeleteConfirmed: {
-            if (controller)
-            {
-                controller.deleteSelectedAgent();
+            if (controller) {
+                controller.deleteAgentInList(deleteConfirmationPopup.myAgent);
             }
         }
     }

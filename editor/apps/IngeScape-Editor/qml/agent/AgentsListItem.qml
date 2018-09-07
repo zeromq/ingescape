@@ -48,7 +48,7 @@ Item {
 
 
     // signal emitted when the delete confirmation popup is needed because the agent is already used in the platform
-    signal needConfirmationtoDeleteAgent();
+    signal needConfirmationToDeleteAgentInList();
 
     // signal emitted when the user clicks on the option "Set Path for Definition/Mapping"
     signal configureFilesPaths(var agent);
@@ -100,7 +100,7 @@ Item {
             }
             width : 6
 
-            visible: controller && rootItem.agent && (controller.selectedAgent === rootItem.agent);
+            visible: controller && rootItem.agent && (controller.selectedAgent === rootItem.agent)
 
             color: IngeScapeTheme.selectedAgentColor
         }
@@ -136,12 +136,12 @@ Item {
                     if (controller)
                     {
                         // Delete selected agent
-                        controller.deleteSelectedAgent();
+                        controller.deleteAgentInList(rootItem.agent);
                     }
                 }
                 else {
-                    // Emit the signal "needConfirmationtoDeleteAgent"
-                    rootItem.needConfirmationtoDeleteAgent();
+                    // Emit the signal "Need Confirmation to Delete Agent in List"
+                    rootItem.needConfirmationToDeleteAgentInList();
                 }
             }
         }
