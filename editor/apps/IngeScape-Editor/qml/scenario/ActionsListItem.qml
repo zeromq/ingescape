@@ -203,7 +203,7 @@ Item {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: "play-action-list"
+                    releasedID: "list-play"
                     disabledID: releasedID
                 }
 

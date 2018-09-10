@@ -390,13 +390,13 @@ Item {
                 style: I2SvgToggleButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
-                    toggleCheckedReleasedID: "record-pause";
-                    toggleCheckedPressedID: "record-pause-pressed";
-                    toggleUncheckedReleasedID: "record-play";
-                    toggleUncheckedPressedID: "record-play-pressed";
+                    toggleCheckedReleasedID: "pause";
+                    toggleCheckedPressedID: "pause-pressed";
+                    toggleUncheckedReleasedID: "list-play";
+                    toggleUncheckedPressedID: "list-play-pressed";
 
                     // No disabled states
-                    toggleCheckedDisabledID: "record-play-pressed"
+                    toggleCheckedDisabledID: "list-play-pressed"
                     toggleUncheckedDisabledID: toggleCheckedDisabledID
 
                     labelMargin: 0

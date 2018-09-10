@@ -1259,7 +1259,7 @@ Item {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                 pressedID: releasedID + "-pressed"
-                releasedID: (controller && controller.isPlaying) ? "pause" : "play"
+                releasedID: (controller && controller.isPlaying) ? "timeline-pause" : "timeline-play"
                 disabledID : releasedID
             }
 
