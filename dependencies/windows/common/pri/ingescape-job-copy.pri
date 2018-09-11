@@ -5,7 +5,9 @@ header_source_path = $$shell_path($$clean_path($$absolute_path($$PWD/../../../..
 header_dest_path = $$shell_path($$clean_path("C:/ingescape/include/*"))
 
 #Create a command, using the 'cmd' command line and Window's 'xcopy'
-copyHeaders.commands = $$quote(cmd /c xcopy /S /Y /I $${header_source_path} $${header_dest_path})
+copyHeaders.commands = $$quote(cmd /c xcopy /S /Y /I $$quote($${header_source_path}) $$quote($${header_dest_path}))
+
+message($$copyHeaders.commands)
 
 #dll
 win32:{
