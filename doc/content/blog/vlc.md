@@ -7,12 +7,13 @@ banner = "img/banners/vlc.jpg"
 
 IngeScape is able to integrate with minimal effort into complex existing software so that these software become ingeScape agents accessible in any ingeScape platform. To concretely illustrate this, we decided to use the famous [VLC](https://www.videolan.org) project as an example. This is a very large software project that runs on almost any software platform with its own complex (and very flexible) architecture and its own compilation scripts based on autoconf & friends.
 
-Our challenge is to keep the VLC architecture unchanged and to minimally edit the source code and compilation scripts to integrate the ingeScape library, to transform VLC into a fully-fledged ingeScape agent, that would be, if possible, usable on any operating system already supported by VLC.
+Our challenge was to keep the VLC architecture unchanged and to minimally edit the source code and compilation scripts to integrate the ingeScape library, to transform VLC into a fully-fledged ingeScape agent, that would be, if possible, usable in any family of operating systems already supported by VLC, i.e. Windows, Linux and macOS.
 
-This is how we achieved the challenge...
+NB: this article has been written with the objective of showing how to edit existing code in a large application to transform this application into an ingeScape agent. That is why we did not primarily use the VLC modules mechanism that would have made this demonstration pointless.
+
 
 ## Adaptation on macOS
-VLC is a multi-platform software. By commodity, we decided to explore it using macOS. The next chapter of this article presents the approach for Windows and Linux.
+VLC is a multi-platform software. By commodity, we decided to explore it first using macOS. The next chapter of this article presents the approach for Windows and Linux.
 
 
 ### Getting the code and checking compilation
@@ -171,7 +172,7 @@ NB: VLC already offers many ways to be controlled remotely. But we keep in mind 
 From an ingeScape point of view, the VLC agent would have only inputs to control the media player. Here are the proposed inputs:
 
 - *file* (string) : path of the media file to be opened
-- *stream* (string) : url of the string to be opened
+- *stream* (string) : url of the stream to be opened
 - *playPause* (impulsion) : play/pause toggle control
 - *fullScreen* (impulsion) : full screen toggle control
 - *volume* (boolean) : sound volume, false will go one step down and true will go one step up.
@@ -315,8 +316,7 @@ The callback is registered once at object creation, still in *awakeFromNib*:
 
 Because we already did the work for the *file* input, there is no need to adapt Makefile.am to include and link ingeScape again.
 
-After a new compilation, a test of writing the *stream* input of our VLC agent with the ingeScape editor properly loads and plays the video we provided the URL to. Our modification is thus functional and complete !
-
+After a new compilation, a test of writing the *stream* input of our VLC agent with the ingeScape editor properly loads and plays the video we provided the URL to. Our modification is thus functional and complete !<br>
 
 #### Toggling play/pause and full screen, control volume
 Another code inspection starting in the UI shows that play/pause, full screen and sound volume are also controlled from the main menu. The corresponding functions, which are *play*, *toggleFullscreen*, *volumeUp* and *volumeDown* all rely on core VLC methods and can be called easily from anywhere in the code. Because we already installed code in *modules/gui/macosx/VLCMainMenu.m*.
@@ -332,7 +332,6 @@ We need to observe three new ingeScape inputs, which are *playPause*, *fullScree
     igs_observeInput("fullScreen", observeFullScreen, NULL);
     igs_observeInput("volume", observeVolume, NULL);
 {{< / highlight >}}
-<br>
 
 And we need to add three new observe callbacks:
 
@@ -376,7 +375,6 @@ Here is the callback registration:
     
     _timeSelectionPanel = [[VLCTimeSelectionPanelController alloc] init];
 {{< / highlight >}}
-<br>
 
 And here is the callback itself:
 
@@ -395,16 +393,18 @@ void observeForcedStop(void *myData){
 ## Adaptation for Windows and Linux : making VLC cross-platform again
 While writing this article on a Mac, we used the macOS environment to investigate the code and compile it after adding our ingeScape code. During our analysis, we found out that the macOS implementation of the GUI makes it uneasy to keep all of our modifications compliant with the VLC cross-platform philosophy and to locate all the changes in the VLC library. Most of our changes were done in the *modules/gui/macosx* folder and more specifically in *modules/gui/macosx/VLCMainMenu.m*.
 
-On Windows and Linux, the default VLC UI is developed using Qt, which is a great multi-platform industrial framework that we used to develop the ingeScape editor.
+On Windows and Linux, the default VLC UI is developed using Qt, which is a great multi-platform industrial framework that we also chosed to develop the ingeScape editor.
 
-In order to make our modifications compatible also for Linux and Windows, we now need to investigate the code in *modules/gui/qt* or in *modules/gui/skins2*,which also relies on Qt.
+In order to make our modifications compatible also for Linux and Windows, we now need to investigate the code in *modules/gui/qt* or in *modules/gui/skins2*, which also relies on Qt.
 
 ### Compiling on Linux and Windows
 The Videolan Wiki provides a page for [Unix Compilation](https://wiki.videolan.org/UnixCompile/). For Windows, the Videolan Wiki provides this [page](https://wiki.videolan.org/Win32Compile/).
 
 **Linux**
 
-We are using a Debian Buster distribution because it is well [documented](https://wiki.videolan.org/UnixCompile/) for VLC compilation and all dependencies can be fetched easily. This Debian version is compliant with the minimal Qt version required by VLC (>5.9.0).
+We are using a Debian Buster distribution because it is well [documented](https://wiki.videolan.org/UnixCompile/) for VLC compilation and all dependencies can be fetched easily. This Debian version is compliant with the minimal Qt version required by VLC (>=5.9.0).
+
+To include ingeScape, first install it so that the headers are in */usr/local/include* and the lib is in */usr/local/lib*. Then edit *lib/Makefile.am* and *lib/core.c* exactly in the same way as for the macOS compilation. Rerun *configure --enable-skins2* and *make* : the new compiled version will embed ingeScape properly and already start and stop as an ingeScape agent. NB: do not forget to adapt the device name in the *igs_startWithDevice* function.
 
 We used the following commands to prepare, compile and run vlc:
 
@@ -419,28 +419,59 @@ apt-get install libxcb-xkb-dev
 make
 ./vlc
 {{< / highlight >}}
-<br>
 
+
+<br>
 **Windows**
 
-We are using the cross-compilation from our Debian Buster distribution. 
+We are using cross-compilation from Linux. In this case, we are using a Docker image provided by the VLC community that will be simpler to setup than an actual Debian distribution.
 
-Following the [compilation guide](https://wiki.videolan.org/Win32Compile/), just before the third-party *bootstrap*, we had to uninstall the standard libprotobuf package and to download (from github) and instal Protocol Buffer version 3.1.0 instead of the 3.0.0 version provided by default. The compilation process is the usual, with *autogen*, *configure*, *make* and *make install*. Just do not forget to type *ldconfig* after installing protobuf.
+The docker image is available at [https://registry.videolan.org:5000/vlc-debian-win32](https://registry.videolan.org:5000/vlc-debian-win32). Other images are listed [here](https://code.videolan.org/videolan/docker-images).
 
-We also had to disable the compilation of the bluray module, which was not working for some *java-ish* reason. We did that by renaming *contrib/src/bluray/rules.mak* so that it is ignored. We agree this is a dirty hack but the bluray module if of no use in our experiment.
-
-For libx264, we had to install the nasm package:
+It can be executed in Docker with the following commands:
 
 {{< highlight bash >}}
-apt-get install nasm
+# configuration, only each time you update the image
+docker pull registry.videolan.org:5000/vlc-debian-win64
+docker images
+docker image -t vlc-debian-win64 theshaofthevlcimage
+
+# build time, inside the vlc directory
+docker run -it -v"$(pwd):/vlc" vlc-debian-win64 /bin/bash
+{{< / highlight >}}
+
+Then, inside the container, just type:
+
+{{< highlight bash >}}
+apt-get update
+apt-get install vim
+git clone git://git.videolan.org/vlc.git
+#before continuing, edit ./extras/package/win32/build.sh to use i686 instead of x86_64
+cd vlc && ./extras/package/win32/build.sh
+make package-win32-zip
+{{< / highlight >}}
+
+To include ingeScape, first install it so that the headers are in *contrib/i686-w64-mingw32/include/ingescape/* and the win32 version of the libs are in *contrib/i686-w64-mingw32/lib/*. Then edit *lib/core.c* exactly in the same way as for the macOS compilation. Finally, edit *lib/Makefile.am* to link the VLC library to ingescape :
+
+{{< highlight bash >}}
+libvlc_la_LDFLAGS += -Wl,../src/libvlc_win32_rc.$(OBJEXT) -avoid-version -Wc,-static -lingescape
+{{< / highlight >}}
+
+Reconfigure the projet and rerun the compilation process : the new compiled version will embed ingeScape properly and already start and stop as an ingeScape agent. NB: do not forget to adapt the device name in the *igs_startWithDevice* function in *lib/core.c*.
+
+{{< highlight bash >}}
+#inside vlc/win32
+../configure --host=i686-w64-mingw32 --build=x86_64-pc-linux-gnu
+make
+make package-win32-zip
 {{< / highlight >}}
 <br>
 
-Note that compiling all the dependencies is extremely long: several hours, depending on your computer.
-
-
 ### Transforming VLC into an ingeScape agent using the Qt GUI
-The modifications we did in lib/core.c for the macOS version are applied in the same way here. Real work starts with the analysis of the GUI code based on Qt or Skins2 to integrate the ingeScape observe callbacks properly.
+The modifications we did in *lib/core.c* for the macOS version are applied in the same way here. At this stage, we have an agent which starts and stops properly and declares its inputs.
 
+But real work starts with the analysis of the GUI code based on Qt or Skins2 to integrate the ingeScape observe callbacks just like we did for macOS. We are using Qt here. And the modifications will be the same for Windows and Linux, relying on Qt cross-platform commonalities.
+
+To be continued...
 
 

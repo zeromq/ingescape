@@ -30,24 +30,32 @@ To simply print an IOP value, the easiest way is to read it as a string and to u
 void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
                   void* value, size_t valueSize, void* myData){
     
+    //NB: value is a pointer to the new IOP value. If you are sure of
+    //what you are doing, you can use it directly. If not, use the rest
+    //of the code in this function.
+    //valueSize is the actual size of the new IOP value.
+    
     if (valueType == IGS_IMPULSION_T){
         printf("%s changed (impulsion)\n", name);
     } else {
         char *convertedValue = NULL;
         switch (iopType) {
             case IGS_INPUT_T:
-            convertedValue = igs_readInputAsString(name);
-            break;
+                convertedValue = igs_readInputAsString(name);
+                break;
             case IGS_OUTPUT_T:
-            convertedValue = igs_readOutputAsString(name);
-            break;
+                convertedValue = igs_readOutputAsString(name);
+                break;
             case IGS_PARAMETER_T:
-            convertedValue = igs_readParameterAsString(name);
-            break;
+                convertedValue = igs_readParameterAsString(name);
+                break;
             default:
-            break;
+                break;
         }
         printf("%s changed to %s", name, convertedValue);
+        if (convertedValue != NULL){
+            free(convertedValue);
+        }
     }
 {{< / highlight >}}
 <br>
@@ -58,17 +66,17 @@ If the IOP is an ***Input***, functions for each specific type can be used. They
         printf("input %s changed", name);
         switch (valueType) {
             case IGS_IMPULSION_T:
-            printf(" (impulsion)\n");
-            break;
+                printf(" (impulsion)\n");
+                break;
             case IGS_BOOL_T:
-            printf(" to %d\n", igs_readInputAsBool(name));
-            break;
+                printf(" to %d\n", igs_readInputAsBool(name));
+                break;
             case IGS_INTEGER_T:
-            printf(" to %d\n", igs_readInputAsInt(name));
-            break;
+                printf(" to %d\n", igs_readInputAsInt(name));
+                break;
             case IGS_DOUBLE_T:
-            printf(" to %lf\n", igs_readInputAsDouble(name));
-            break;
+                printf(" to %lf\n", igs_readInputAsDouble(name));
+                break;
             case IGS_STRING_T:
             {
                 char *stringValue = igs_readInputAsString(name);
@@ -77,15 +85,14 @@ If the IOP is an ***Input***, functions for each specific type can be used. They
                 break;
             }
             case IGS_DATA_T:
-            //NB: for IGS_DATA_T, value and valueSize are already provided
-            printf(" with size %zu\n", valueSize);
-            break;
+                //NB: for IGS_DATA_T, value and valueSize are already provided
+                printf(" with size %zu\n", valueSize);
+                break;
             default:
-            break;
+                break;
         }
     }
     //NB: exactly the same could be done for outputs and parameters
-}
 {{< / highlight >}}
 
 ### Create command line arguments
@@ -98,8 +105,8 @@ Here is what a function describing the arguments looks like:
 void print_usage(){
     printf("Usage example: firstFullAgent --verbose --port 5670 --name firstFullAgent\n");
     printf("\nthese parameters have default value (indicated here above):\n");
-    printf("--definition : path to the definition file (default: %s)\n", DEFAULTDEFINITIONPATH);
-    printf("--mapping : path to the mapping file (default: %s)\n", DEFAULTMAPPINGPATH);
+    printf("--definition : optional path to the definition file (default: %s)\n", DEFAULTDEFINITIONPATH);
+    printf("--mapping : optional path to the mapping file (default: %s)\n", DEFAULTMAPPINGPATH);
     printf("--verbose : enable verbose mode in the application (default is disabled)\n");
     printf("--port port_number : port used for autodiscovery between agents (default: %d)\n", port);
     printf("--device device_name : name of the network device to be used (useful if several devices available)\n");
@@ -311,7 +318,8 @@ When displayed in the console, logs can use colors if *igs_setUseColorVerbose* i
 Here is how to configure and use logs:
 
 {{< highlight c "linenos=table,linenostart=1" >}}
-    igs_setLogLevel(IGS_LOG_TRACE);
+    //NB: file log and stream log are enabled optionnaly
+    igs_setLogLevel(IGS_LOG_TRACE); //set log level to TRACE (default is INFO)
     igs_setVerbose(verbose);
     igs_setUseColorVerbose(verbose);
     igs_setLogInFile(verbose);
