@@ -1482,7 +1482,7 @@ void ScenarioController::_startScenario()
     setnextActionToActivate(NULL);
 
     // "Future" actions previously added to the time line (on the first line) from the "palette" must be removed
-    QList<ActionVM*> futureActionsOnFIrstLineToRemove;
+    QList<ActionVM*> futureActionsOnFirstLineToRemove;
 
     ActionVM* tmpNextActionToActivate = NULL;
 
@@ -1496,7 +1496,7 @@ void ScenarioController::_startScenario()
             if (actionVM->lineInTimeLine() == 0)
             {
                 // We have to remove this action that ends in the future
-                futureActionsOnFIrstLineToRemove.append(actionVM);
+                futureActionsOnFirstLineToRemove.append(actionVM);
             }
             else
             {
@@ -1529,10 +1529,10 @@ void ScenarioController::_startScenario()
         }
     }
 
-    if (!futureActionsOnFIrstLineToRemove.isEmpty())
+    if (!futureActionsOnFirstLineToRemove.isEmpty())
     {
         // Remove each "future" action previously added to the time line (on the first line) from the "palette"
-        for (ActionVM* actionVM : futureActionsOnFIrstLineToRemove) {
+        for (ActionVM* actionVM : futureActionsOnFirstLineToRemove) {
             removeActionVMfromTimeLine(actionVM);
         }
     }

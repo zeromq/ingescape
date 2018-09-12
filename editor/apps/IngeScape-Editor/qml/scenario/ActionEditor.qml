@@ -2390,7 +2390,7 @@ Window {
                                 horizontalAlignment: TextInput.AlignLeft
                                 verticalAlignment: TextInput.AlignVCenter
 
-                                text : actionM ? actionM.rearmAfterTimeString : "0.0"
+                                text: actionM ? actionM.rearmAfterTimeString : "0.0"
                                 inputMethodHints: Qt.ImhFormattedNumbersOnly
                                 validator: RegExpValidator { regExp: /(\d{1,5})([.]\d{3})?$/ }
 

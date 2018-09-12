@@ -107,7 +107,7 @@ public:
 
 
     /**
-     * @brief Notify our action that it need to be rearmed
+     * @brief Rearm our action
      * @param currentTimeInMilliSeconds
      */
     void rearmCurrentActionExecution(int currentTimeInMilliSeconds);
@@ -134,6 +134,7 @@ Q_SIGNALS:
      * @param action execution
      */
     void revertAction(ActionExecutionVM* actionExecution);
+
 
     /**
      * @brief Signal emitted when the action has finished its rearm period

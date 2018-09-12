@@ -406,52 +406,61 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
                                 }
 
                                 jsonValue = jsonAction.value("validity_duration_value");
-                                if (jsonValue.isString())
-                                {
+                                if (jsonValue.isString()) {
                                     actionM->setvalidityDurationString(jsonValue.toString());
                                 }
 
+
+                                //
+                                // REVERT
+                                //
                                 jsonValue = jsonAction.value("shall_revert");
-                                if (jsonValue.isBool())
-                                {
+                                if (jsonValue.isBool()) {
                                     actionM->setshallRevert(jsonValue.toBool());
                                 }
 
                                 jsonValue = jsonAction.value("shall_revert_at_validity_end");
-                                if (jsonValue.isBool())
-                                {
+                                if (jsonValue.isBool()) {
                                     actionM->setshallRevertWhenValidityIsOver(jsonValue.toBool());
                                 }
 
                                 jsonValue = jsonAction.value("shall_revert_after_time");
-                                if (jsonValue.isBool())
-                                {
+                                if (jsonValue.isBool()) {
                                     actionM->setshallRevertAfterTime(jsonValue.toBool());
                                 }
 
-                                jsonValue = jsonAction.value("shall_rearm");
-                                if (jsonValue.isBool())
-                                {
-                                    actionM->setshallRearm(jsonValue.toBool());
-                                }
-
                                 jsonValue = jsonAction.value("revert_after_time");
-                                if (jsonValue.isString())
-                                {
+                                if (jsonValue.isString()) {
                                     actionM->setrevertAfterTimeString(jsonValue.toString());
                                 }
 
+
+                                //
+                                // REARM
+                                //
+                                jsonValue = jsonAction.value("shall_rearm");
+                                if (jsonValue.isBool()) {
+                                    actionM->setshallRearm(jsonValue.toBool());
+                                }
+
+                                jsonValue = jsonAction.value("rearm_after_time");
+                                if (jsonValue.isString()) {
+                                    actionM->setrearmAfterTimeString(jsonValue.toString());
+                                }
+
+
+                                //
+                                // EFFECTS
+                                //
                                 QJsonValue jsonEffectsList = jsonAction.value("effects");
                                 if (jsonEffectsList.isArray())
                                 {
-                                    foreach (QJsonValue jsonEffect, jsonEffectsList.toArray())
+                                    for (QJsonValue jsonEffect : jsonEffectsList.toArray())
                                     {
                                         if (jsonEffect.isObject())
                                         {
-                                            QJsonObject jsonEffectObj = jsonEffect.toObject();
-                                            ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffectObj, listAgentsInMapping);
-
-                                            if(effectVM != NULL)
+                                            ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffect.toObject(), listAgentsInMapping);
+                                            if (effectVM != NULL)
                                             {
                                                 actionM->addEffectToList(effectVM);
                                             }
@@ -459,6 +468,10 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
                                     }
                                 }
 
+
+                                //
+                                // CONDITIONS
+                                //
                                 QJsonValue jsonConditionsList = jsonAction.value("conditions");
                                 if (jsonConditionsList.isArray())
                                 {
@@ -466,10 +479,8 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
                                     {
                                         if (jsonCondition.isObject())
                                         {
-                                            QJsonObject jsonConditionObj = jsonCondition.toObject();
-                                            ActionConditionVM* conditionVM = _parseConditionsVMFromJson(jsonConditionObj, listAgentsInMapping);
-
-                                            if(conditionVM != NULL)
+                                            ActionConditionVM* conditionVM = _parseConditionsVMFromJson(jsonCondition.toObject(), listAgentsInMapping);
+                                            if (conditionVM != NULL)
                                             {
                                                 actionM->addConditionToList(conditionVM);
                                             }
@@ -610,16 +621,25 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
         jsonAgent.insert("name", actionM->name());
         jsonAgent.insert("validity_duration_type", ValidationDurationTypes::staticEnumToKey(actionM->validityDurationType()));
         jsonAgent.insert("validity_duration_value", actionM->validityDurationString());
+
+        // REVERT
         jsonAgent.insert("shall_revert", actionM->shallRevert());
         jsonAgent.insert("shall_revert_at_validity_end", actionM->shallRevertWhenValidityIsOver());
         jsonAgent.insert("shall_revert_after_time", actionM->shallRevertAfterTime());
         jsonAgent.insert("revert_after_time", actionM->revertAfterTimeString());
+
+        // REARM
         jsonAgent.insert("shall_rearm", actionM->shallRearm());
+        jsonAgent.insert("rearm_after_time", actionM->rearmAfterTimeString());
 
         bool jsonFilled = false;
 
+
+        //
+        // CONDITIONS
+        //
         QJsonArray jsonConditionsArray;
-        // Create conditions view models
+
         for (ActionConditionVM* conditionVM : actionM->conditionsList()->toList())
         {
             ActionConditionM* actionCondition = conditionVM->modelM();
@@ -672,8 +692,12 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
         // Insert the list of conditions
         jsonAgent.insert("conditions", jsonConditionsArray);
 
-        // Create effects view models
+
+        //
+        // EFFECTS
+        //
         QJsonArray jsonEffectsArray;
+
         foreach (ActionEffectVM* effectVM, actionM->effectsList()->toList())
         {
             ActionEffectM* actionEffect = effectVM->modelM();
