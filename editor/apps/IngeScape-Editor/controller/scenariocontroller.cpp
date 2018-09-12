@@ -1259,74 +1259,86 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
 
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
+    //qDebug() << "_onTimeout_DelayOrExecuteActions" << currentTimeInMilliSeconds << "_listOfActiveActions" << _listOfActiveActions.count();
+
     // Traverse the list of active actions (the current time (is) was between start time and end time of these actions)
-    foreach (ActionVM* actionVM, _listOfActiveActions.toList())
+    for (ActionVM* actionVM : _listOfActiveActions.toList())
     {
         if ((actionVM != NULL) && (actionVM->modelM() != NULL))
         {
             ActionExecutionVM* actionExecution = actionVM->currentExecution();
-
-            // Current time is after the start time of the action
-            if ((actionExecution != NULL) && (actionVM->startTime() < currentTimeInMilliSeconds)
-                    // the action has not finished or is forever
-                    && (actionVM->endTime() == -1 || actionVM->endTime() > currentTimeInMilliSeconds))
+            if (actionExecution != NULL)
             {
-
-                // Not already executed
-                if ((actionExecution != NULL) && !actionExecution->isExecuted())
+                // Current time is after the start time of the action
+                // the action has not finished or is forever
+                if ( (actionVM->startTime() < currentTimeInMilliSeconds)
+                     && ((actionVM->endTime() == -1) || (actionVM->endTime() > currentTimeInMilliSeconds)) )
                 {
-                    // Delay the current execution of this action
-                    if (!actionVM->modelM()->isValid())
+                    // Not already executed
+                    if (!actionExecution->isExecuted())
                     {
-                        actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
-                    }
-                    else {
-                        _executeAction(actionVM, actionExecution, currentTimeInMilliSeconds);
-                    }
-                }
-            }
-            // Current time is after the end time of the action (or the action has no validity duration --> Immediate)
-            else if (actionVM->endTime() <= currentTimeInMilliSeconds)
-            {
-                if ((actionExecution != NULL) && !actionVM->timerToReverse()->isActive())
-                {
-                    // the action has never been executed if there is only one Action Execution (the initial one) and its execution flag is false
-                    if ((actionVM->executionsList()->count() <= 1) && !actionExecution->isExecuted()) {
-                        actionExecution->setneverExecuted(true);
-                    }
-                    else {
-                        actionExecution->setneverExecuted(false);
-                    }
-
-                    // If there is at least another execution for this action...
-                    if ( (actionVM->executionsList()->count() > 1)
-                         || (actionExecution->neverExecuted() && (actionVM->modelM()->validityDurationType() == ValidationDurationTypes::CUSTOM)) )
-                    {
-                        // ...we remove the current execution
-                        actionVM->setcurrentExecution(NULL);
-
-                        // only if the execution has not be done
-                        if (!actionExecution->isExecuted())
+                        // Delay the current execution of this action
+                        if (!actionVM->modelM()->isValid())
                         {
-                            actionVM->executionsList()->remove(actionExecution);
+                            //qDebug() << "Delay the action" << actionVM->modelM()->name();
 
-                            // Free memory
-                            delete actionExecution;
+                            actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
+                        }
+                        else
+                        {
+                            qDebug() << "Execute the action" << actionVM->modelM()->name();
+
+                            _executeAction(actionVM, actionExecution, currentTimeInMilliSeconds);
                         }
                     }
                 }
+                // Current time is after the end time of the action (or the action has no validity duration --> Immediate)
+                else if ((actionVM->endTime() > -1) && (actionVM->endTime() <= currentTimeInMilliSeconds))
+                {
+                    if (!actionVM->timerToReverse()->isActive())
+                    {
+                        // the action has never been executed if there is only one Action Execution (the initial one) and its execution flag is false
+                        if ((actionVM->executionsList()->count() <= 1) && !actionExecution->isExecuted()) {
+                            actionExecution->setneverExecuted(true);
+                        }
+                        else {
+                            actionExecution->setneverExecuted(false);
+                        }
 
-                if (!actionVM->timerToReverse()->isActive())
-                {
-                    // Disconnect the revert action signal
-                    disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+                        // If there is at least another execution for this action...
+                        if ( (actionVM->executionsList()->count() > 1)
+                             || (actionExecution->neverExecuted() && (actionVM->modelM()->validityDurationType() == ValidationDurationTypes::CUSTOM)) )
+                        {
+                            // ...we remove the current execution
+                            actionVM->setcurrentExecution(NULL);
+
+                            // only if the execution has not be done
+                            if (!actionExecution->isExecuted())
+                            {
+                                actionVM->executionsList()->remove(actionExecution);
+
+                                // FIXME: print for DEBUG
+                                //qDebug() << "_onTimeout_DelayOrExecuteActions: execution removed in" << actionVM->modelM()->name() << "(" << actionVM->executionsList()->count() << ")";
+
+                                // Free memory
+                                delete actionExecution;
+                            }
+                        }
+                    }
+
+                    if (!actionVM->timerToReverse()->isActive())
+                    {
+                        // Disconnect the revert action signal
+                        disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+                    }
+                    if (!actionVM->timerToRearm()->isActive())
+                    {
+                        // Disconnect the rearm action signal
+                        disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
+                    }
+
+                    _listOfActiveActions.remove(actionVM);
                 }
-                if (!actionVM->timerToRearm()->isActive())
-                {
-                    // Disconnect the rearm action signal
-                    disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
-                }
-                _listOfActiveActions.remove(actionVM);
             }
         }
     }
@@ -1575,19 +1587,22 @@ void ScenarioController::_stopScenario()
     }
 
     // De-active timers for revert and rearm
-    foreach (ActionVM* actionVM, _listOfActiveActions.toList())
+    for (ActionVM* actionVM : _listOfActiveActions.toList())
     {
-        // Disconnect revert action
-        if (actionVM->timerToReverse()->isActive()) {
-            actionVM->timerToReverse()->stop();
-        }
-        disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+        if (actionVM != NULL)
+        {
+            // Disconnect revert action
+            if (actionVM->timerToReverse()->isActive()) {
+                actionVM->timerToReverse()->stop();
+            }
+            disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
 
-        // Disconnect rearm action
-        if (actionVM->timerToRearm()->isActive()) {
-            actionVM->timerToRearm()->stop();
+            // Disconnect rearm action
+            if (actionVM->timerToRearm()->isActive()) {
+                actionVM->timerToRearm()->stop();
+            }
+            disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
         }
-        disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
     }
 
     // Reset the next action VM to activate

@@ -286,6 +286,8 @@ void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
  */
 void ActionVM::rearmCurrentActionExecution(int currentTimeInMilliSeconds)
 {
+    qDebug() << "Rearm current action execution at" << currentTimeInMilliSeconds;
+
     // Create a new (view model of) action execution
     _createActionExecution(currentTimeInMilliSeconds);
 }
@@ -341,14 +343,17 @@ void ActionVM::resetDataFrom(int time)
         // Get the relative time to the action view model
         int relativeTime = time - _startTime;
 
-        // Check the actions executions
+        // Delete each action execution which is in the FUTURE
         for (ActionExecutionVM* actionExecution : _executionsList.toList())
         {
-            // The action execution is in the future
+            // This action execution is in the future
             if ((actionExecution != NULL)
                     && ( (actionExecution->executionTime() >= relativeTime) || (actionExecution->shallRevert() && (actionExecution->reverseTime() >= relativeTime)) ))
             {
                 _executionsList.remove(actionExecution);
+
+                // Free memory
+                delete actionExecution;
             }
         }
 
@@ -398,6 +403,8 @@ void ActionVM::_onTimeout_ReserseAction()
 {
     if (_currentExecution != NULL)
     {
+        //qDebug() << "Timeout: emit 'Revert Action'";
+
         // Emit the signal to send the action reversion
         Q_EMIT revertAction(_currentExecution);
     }
@@ -409,6 +416,8 @@ void ActionVM::_onTimeout_ReserseAction()
  */
 void ActionVM::_onTimeout_RearmAction()
 {
+    //qDebug() << "Timeout: emit 'Rearm Action'";
+
     // Emit the signal to send the action rearm
     Q_EMIT rearmAction();
 }
@@ -448,7 +457,7 @@ void ActionVM::_computeEndTime()
 
 /**
  * @brief Create a new (view model of) action execution
- * @param relative to our view model of action
+ * @param startTime relative to our view model of action
  */
 void ActionVM::_createActionExecution(int startTime)
 {
@@ -486,6 +495,8 @@ void ActionVM::_createActionExecution(int startTime)
 
         // Add to the list
         _executionsList.append(actionExecution);
+
+        //qDebug() << "_createActionExecution: action" << _modelM->name() << "has" << _executionsList.count() << "executions";
 
         // Set as current
         setcurrentExecution(actionExecution);

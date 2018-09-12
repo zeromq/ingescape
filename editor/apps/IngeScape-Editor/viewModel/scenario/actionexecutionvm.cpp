@@ -48,7 +48,12 @@ ActionExecutionVM::ActionExecutionVM(bool shallRevert,
   */
 ActionExecutionVM::~ActionExecutionVM()
 {
-
+    if (_shallRevert) {
+        qDebug() << "Delete Action Execution with REVERT at" << _executionTime << "seconds";
+    }
+    else {
+        qDebug() << "Delete Action Execution (without revert) at" << _executionTime << "seconds";
+    }
 }
 
 
