@@ -10,17 +10,19 @@
 #include <stdlib.h> //standard C functions such as getenv, atoi, exit, etc.
 #include <string.h> //C string handling functions
 #include <signal.h> //catching interruptions
-#include <czmq.h>
-#include <ingescape/ingescape.h>
-#include "regexp.h" //regexp utilities
+#include <czmq.h> //access to the ZeroMQ mainloop
+#include <ingescape/ingescape.h> //main ingeScape header
+
+#include "regexp.h" //regexp utilities for the command line
 
 //default agent parameters to be overriden by command line paramters
 int port = 5670;
-char *agentName = "firstFullAgent";
-char *networkDevice = "en0";
+char *agentName = "firstFullAgent"; //default agent name
+char *networkDevice = "en0"; //default network device value
 bool verbose = false;
 
 //definition and mapping as external resources
+//(used optionally)
 #define BUFFER_SIZE 1024
 #define DEFAULTDEFINITIONPATH "~/Documents/IngeScape/data/definition.json"
 char definitionFile[BUFFER_SIZE];
@@ -41,24 +43,32 @@ void interruptionReceived(int val) {
 void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
                   void* value, size_t valueSize, void* myData){
     
+    //NB: value is a pointer to the new IOP value. If you are sure of
+    //what you are doing, you can use it directly. If not, use the rest
+    //of the code in this function.
+    //valueSize is the actual size of the new IOP value.
+    
     if (valueType == IGS_IMPULSION_T){
         printf("%s changed (impulsion)\n", name);
     } else {
         char *convertedValue = NULL;
         switch (iopType) {
             case IGS_INPUT_T:
-            convertedValue = igs_readInputAsString(name);
-            break;
+                convertedValue = igs_readInputAsString(name);
+                break;
             case IGS_OUTPUT_T:
-            convertedValue = igs_readOutputAsString(name);
-            break;
+                convertedValue = igs_readOutputAsString(name);
+                break;
             case IGS_PARAMETER_T:
-            convertedValue = igs_readParameterAsString(name);
-            break;
+                convertedValue = igs_readParameterAsString(name);
+                break;
             default:
-            break;
+                break;
         }
         printf("%s changed to %s", name, convertedValue);
+        if (convertedValue != NULL){
+            free(convertedValue);
+        }
     }
     
     /*
@@ -70,17 +80,17 @@ void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
         printf("input %s changed", name);
         switch (valueType) {
             case IGS_IMPULSION_T:
-            printf(" (impulsion)\n");
-            break;
+                printf(" (impulsion)\n");
+                break;
             case IGS_BOOL_T:
-            printf(" to %d\n", igs_readInputAsBool(name));
-            break;
+                printf(" to %d\n", igs_readInputAsBool(name));
+                break;
             case IGS_INTEGER_T:
-            printf(" to %d\n", igs_readInputAsInt(name));
-            break;
+                printf(" to %d\n", igs_readInputAsInt(name));
+                break;
             case IGS_DOUBLE_T:
-            printf(" to %lf\n", igs_readInputAsDouble(name));
-            break;
+                printf(" to %lf\n", igs_readInputAsDouble(name));
+                break;
             case IGS_STRING_T:
             {
                 char *stringValue = igs_readInputAsString(name);
@@ -89,11 +99,11 @@ void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
                 break;
             }
             case IGS_DATA_T:
-            //NB: for IGS_DATA_T, value and valueSize are already provided
-            printf(" with size %zu\n", valueSize);
-            break;
+                //NB: for IGS_DATA_T, value and valueSize are already provided
+                printf(" with size %zu\n", valueSize);
+                break;
             default:
-            break;
+                break;
         }
     }
     //NB: exactly the same could be done for outputs and parameters
@@ -111,8 +121,8 @@ void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
 void print_usage(){
     printf("Usage example: firstFullAgent --verbose --port 5670 --name firstFullAgent\n");
     printf("\nthese parameters have default value (indicated here above):\n");
-    printf("--definition : path to the definition file (default: %s)\n", DEFAULTDEFINITIONPATH);
-    printf("--mapping : path to the mapping file (default: %s)\n", DEFAULTMAPPINGPATH);
+    printf("--definition : optional path to the definition file (default: %s)\n", DEFAULTDEFINITIONPATH);
+    printf("--mapping : optional path to the mapping file (default: %s)\n", DEFAULTMAPPINGPATH);
     printf("--verbose : enable verbose mode in the application (default is disabled)\n");
     printf("--port port_number : port used for autodiscovery between agents (default: %d)\n", port);
     printf("--device device_name : name of the network device to be used (useful if several devices available)\n");
@@ -143,7 +153,7 @@ int main(int argc, const char * argv[]) {
     
     //manage options
     int opt= 0;
-    bool noninteractiveloop = false;
+    bool noninteractiveloop = false; //by default, we use interacive loop
     
     char definitionPath[BUFFER_SIZE];
     strncpy(definitionPath, DEFAULTDEFINITIONPATH, BUFFER_SIZE*sizeof(char));
@@ -165,46 +175,76 @@ int main(int argc, const char * argv[]) {
     while ((opt = getopt_long(argc, (char *const *)argv,"p",long_options, &long_index )) != -1) {
         switch (opt) {
             case 'v' :
-            verbose = true;
-            break;
+                verbose = true;
+                break;
             case 'l' :
-            noninteractiveloop = true;
-            break;
+                noninteractiveloop = true;
+                break;
             case 'f' :
-            strncpy(definitionPath, optarg, BUFFER_SIZE);
-            break;
+                strncpy(definitionPath, optarg, BUFFER_SIZE);
+                break;
             case 'm' :
-            strncpy(mappingPath, optarg, BUFFER_SIZE);
-            break;
+                strncpy(mappingPath, optarg, BUFFER_SIZE);
+                break;
             case 'p' :
-            port = atoi(optarg);
-            break;
+                port = atoi(optarg);
+                break;
             case 'd' :
-            networkDevice = optarg;
-            break;
+                networkDevice = optarg;
+                break;
             case 'n' :
-            agentName = optarg;
-            break;
+                agentName = optarg;
+                break;
             case 'h' :
-            print_usage();
-            exit (0);
-            break;
+                print_usage();
+                exit (0);
+                break;
             default:
-            print_usage();
-            exit(1);
+                print_usage();
+                exit(1);
         }
     }
     
+    //transform definition and mapping path to absolute if necessary
     makeFilePath(definitionPath, definitionFile, BUFFER_SIZE*sizeof(char));
     makeFilePath(mappingPath, mappingFile, BUFFER_SIZE*sizeof(char));
     
-    igs_setLogLevel(IGS_LOG_TRACE);
+    igs_setAgentName(agentName);
+    igs_setCommandLineFromArgs(argc, argv);
+    
+    //logs configuration (optional)
+    //NB: file log and stream log are enabled optionnaly
+    igs_setLogLevel(IGS_LOG_TRACE); //set log level to TRACE (default is INFO)
     igs_setVerbose(verbose);
     igs_setUseColorVerbose(verbose);
     igs_setLogInFile(verbose);
     igs_setLogStream(verbose);
     igs_setLogPath("./log.csv");
     
+    //here is the place to intialize the agent before actually starting it
+    //ex: create IOPs, add callbacks, intitiate your agent specific code, etc.
+    
+    
+    //NB: loading external definition and mapping is optional and is a commodity if
+    //you want to avoid harcoding them.
+    //load definition (optional )
+    //igs_loadDefinitionFromPath(definitionFile);
+    //print definition if needed
+    //    char *definition = igs_getDefinition();
+    //    printf("%s\n", definition);
+    //    free(definition);
+    
+    //load mapping (optional)
+    //igs_loadMappingFromPath(mappingFile);
+    //print mapping if needed
+    //    char *mapping = igs_getMapping();
+    //    printf("%s\n", mapping);
+    //    free(mapping);
+    
+    igs_startWithDevice(networkDevice, port);
+    
+    
+    //show logging examples
     char *example = "example log message";
     igs_trace("this is a trace %s", example);
     igs_debug("this is a debug %s", example);
@@ -213,21 +253,7 @@ int main(int argc, const char * argv[]) {
     igs_error("this is an error %s", example);
     igs_fatal("this is a fatale %s", example);
     
-    igs_setAgentName(agentName);
-    
-    //load definition
-    igs_loadDefinitionFromPath(definitionFile);
-    //    char *definition = igs_getDefinition();
-    //    printf("%s\n", definition);
-    //    free(definition);
-    
-    //load mapping
-    igs_loadMappingFromPath(mappingFile);
-    //    char *mapping = igs_getMapping();
-    //    printf("%s\n", mapping);
-    //    free(mapping);
-    
-    //explore and print definition
+    //explore and print definition (definitely optional)
     long numberOfEntries;
     char **myEntries = igs_getInputsList(&numberOfEntries);
     printf("Inputs :\n");
@@ -250,10 +276,9 @@ int main(int argc, const char * argv[]) {
         igs_observeParameter(myEntries[i], myIOPCallback, NULL);
     }
     igs_freeIOPList(&myEntries, numberOfEntries);
+   
     
-    igs_startWithDevice(networkDevice, port);
-    
-    //mainloop management (two modes)
+    //mainloop management (two modes: interactive or not)
     if (noninteractiveloop){
         //Run the main loop (non-interactive mode):
         //we rely on CZMQ which is an ingeScape dependency and is thus
