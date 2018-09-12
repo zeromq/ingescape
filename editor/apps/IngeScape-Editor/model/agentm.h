@@ -42,7 +42,7 @@ class AgentM : public QObject
     // IP address of our agent
     I2_QML_PROPERTY_READONLY(QString, address)
 
-    // HostName of our agent
+    // Hostname of our agent
     I2_QML_PROPERTY_READONLY(QString, hostname)
 
     // Command line of our agent
@@ -60,9 +60,6 @@ class AgentM : public QObject
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
 
-    // Port for log in stream
-    I2_CPP_PROPERTY(QString, loggerPort)
-
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY_READONLY(bool, isFrozen)
 
@@ -74,6 +71,9 @@ class AgentM : public QObject
 
     // State of our agent
     I2_CPP_PROPERTY(QString, state)
+
+    // Port for log in stream
+    I2_CPP_PROPERTY(QString, loggerPort)
 
     // Flag indicating if our agent has its log in a stream
     I2_CPP_PROPERTY(bool, hasLogInStream)

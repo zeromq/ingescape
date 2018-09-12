@@ -47,6 +47,9 @@ class AgentVM : public QObject
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
 
+    // Flag indicating if our agent can be restarted (by an INGESCAPE launcher)
+    I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
+
     // Flag indicating if our agent is muted
     I2_QML_PROPERTY_READONLY(bool, isMuted)
 
@@ -61,9 +64,6 @@ class AgentVM : public QObject
 
     // Number of clones
     I2_QML_PROPERTY_READONLY(int, clonesNumber)
-
-    // Flag indicating if our agent can be restarted (by an INGESCAPE launcher)
-    I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
 
     // State of our agent
     I2_QML_PROPERTY(QString, state)
@@ -400,7 +400,7 @@ private:
 
 
     /**
-     * @brief Update the flag "can Be Restarted" in function of flags of models
+     * @brief Update the flag "can be Restarted" in function of flags of models
      */
     void _updateCanBeRestarted();
 
@@ -409,6 +409,12 @@ private:
      * @brief Update the flag "is Muted" in function of flags of models
      */
     void _updateIsMuted();
+
+
+    /**
+     * @brief Update the flag "can be Frozen" in function of flags of models
+     */
+    void _updateCanBeFrozen();
 
 
     /**

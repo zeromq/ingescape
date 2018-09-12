@@ -1103,14 +1103,15 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
                 }
                 }
 
-                if (resultCreateInput == 1) {
-                    qDebug() << "Create input" << inputName << "on agent" << _editorAgentName;
+                if (resultCreateInput == 1)
+                {
+                    //qDebug() << "Create input" << inputName << "on agent" << _editorAgentName;
 
                     // Begin the observe of this input
                     int resultObserveInput = igs_observeInput(inputName.toStdString().c_str(), onObserveInputCallback, this);
 
                     if (resultObserveInput == 1) {
-                        qDebug() << "Observe input" << inputName << "on agent" << _editorAgentName;
+                        //qDebug() << "Observe input" << inputName << "on agent" << _editorAgentName;
                     }
                     else {
                         qCritical() << "Can NOT observe input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultObserveInput;
@@ -1120,7 +1121,7 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
                     unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
 
                     if (id > 0) {
-                        qDebug() << "Add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "(id" << id << ")";
+                        //qDebug() << "Add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "(id" << id << ")";
                     }
                     else {
                         qCritical() << "Can NOT add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << id;

@@ -26,12 +26,12 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _name(""),
     _hostnames(""),
     _isON(false),
+    _canBeRestarted(false),
     _isMuted(false),
     _canBeFrozen(false),
     _isFrozen(false),
     _definition(NULL),
     _clonesNumber(0),
-    _canBeRestarted(false),
     _state(""),
     _hasLogInStream(false),
     _hasLogInFile(false),
@@ -667,7 +667,6 @@ void AgentVM::_updateWithAllModels()
     _peerIdsList.clear();
     QStringList temporaryListOfHostnames;
     _hashFromHostnameToModels.clear();
-    bool globalCanBeFrozen = true;
 
     for (AgentM* model : _models.toList())
     {
@@ -684,10 +683,6 @@ void AgentVM::_updateWithAllModels()
             QList<AgentM*> modelsOnHost = getModelsOnHost(model->hostname());
             modelsOnHost.append(model);
             _hashFromHostnameToModels.insert(model->hostname(), modelsOnHost);
-
-            if (!model->canBeFrozen()) {
-                globalCanBeFrozen = false;
-            }
         }
     }
 
@@ -710,12 +705,12 @@ void AgentVM::_updateWithAllModels()
     }
 
     sethostnames(globalHostnames);
-    setcanBeFrozen(globalCanBeFrozen);
 
     // Update flags in function of models
     _updateIsON();
     _updateCanBeRestarted();
     _updateIsMuted();
+    _updateCanBeFrozen();
     _updateIsFrozen();
     _updateHasLogInStream();
     _updateIsEnabledViewLogStream();
@@ -738,7 +733,7 @@ void AgentVM::_updateIsON()
     bool globalIsON = false;
     int clonesNumber = 0;
 
-    foreach (AgentM* model, _models.toList())
+    for (AgentM* model : _models.toList())
     {
         if ((model != NULL) && model->isON())
         {
@@ -749,6 +744,7 @@ void AgentVM::_updateIsON()
 
     setisON(globalIsON);
 
+    // Update the clones number
     if (clonesNumber > 1) {
         setclonesNumber(clonesNumber);
     }
@@ -759,14 +755,16 @@ void AgentVM::_updateIsON()
 
 
 /**
- * @brief Update the flag "can Be Restarted" in function of flags of models
+ * @brief Update the flag "can be Restarted" in function of flags of models
  */
 void AgentVM::_updateCanBeRestarted()
 {
     bool globalCanBeRestarted = false;
 
-    foreach (AgentM* model, _models.toList()) {
-        if ((model != NULL) && model->canBeRestarted()) {
+    for (AgentM* model : _models.toList())
+    {
+        if ((model != NULL) && model->canBeRestarted())
+        {
             globalCanBeRestarted = true;
             break;
         }
@@ -782,13 +780,34 @@ void AgentVM::_updateIsMuted()
 {
     bool globalIsMuted = false;
 
-    foreach (AgentM* model, _models.toList()) {
-        if ((model != NULL) && model->isMuted()) {
+    for (AgentM* model : _models.toList())
+    {
+        if ((model != NULL) && model->isMuted())
+        {
             globalIsMuted = true;
             break;
         }
     }
     setisMuted(globalIsMuted);
+}
+
+
+/**
+ * @brief Update the flag "can be Frozen" in function of flags of models
+ */
+void AgentVM::_updateCanBeFrozen()
+{
+    bool globalCanBeFrozen = false;
+
+    for (AgentM* model : _models.toList())
+    {
+        if ((model != NULL) && model->canBeFrozen())
+        {
+            globalCanBeFrozen = true;
+            break;
+        }
+    }
+    setcanBeFrozen(globalCanBeFrozen);
 }
 
 
@@ -799,8 +818,10 @@ void AgentVM::_updateIsFrozen()
 {
     bool globalIsFrozen = false;
 
-    foreach (AgentM* model, _models.toList()) {
-        if ((model != NULL) && model->isFrozen()) {
+    for (AgentM* model : _models.toList())
+    {
+        if ((model != NULL) && model->isFrozen())
+        {
             globalIsFrozen = true;
             break;
         }
@@ -816,8 +837,10 @@ void AgentVM::_updateHasLogInStream()
 {
     bool globalHasLogInStream = false;
 
-    foreach (AgentM* model, _models.toList()) {
-        if ((model != NULL) && model->hasLogInStream()) {
+    for (AgentM* model : _models.toList())
+    {
+        if ((model != NULL) && model->hasLogInStream())
+        {
             globalHasLogInStream = true;
             break;
         }
@@ -833,10 +856,11 @@ void AgentVM::_updateIsEnabledViewLogStream()
 {
     bool globalIsEnabledViewLogStream = false;
 
-    foreach (AgentM* model, _models.toList())
+    for (AgentM* model : _models.toList())
     {
         // Check that its logger port is defined
-        if ((model != NULL) && !model->loggerPort().isEmpty()) {
+        if ((model != NULL) && !model->loggerPort().isEmpty())
+        {
             globalIsEnabledViewLogStream = true;
             break;
         }
@@ -852,8 +876,10 @@ void AgentVM::_updateHasLogInFile()
 {
     bool globalHasLogInFile = false;
 
-    foreach (AgentM* model, _models.toList()) {
-        if ((model != NULL) && model->hasLogInFile()) {
+    for (AgentM* model : _models.toList())
+    {
+        if ((model != NULL) && model->hasLogInFile())
+        {
             globalHasLogInFile = true;
             break;
         }
