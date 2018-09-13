@@ -488,7 +488,7 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
                 }
 
                 // Notify the QML to fit the view
-                //Q_EMIT fitToView();
+                Q_EMIT fitToView();
             }
         }
     }
