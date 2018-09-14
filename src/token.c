@@ -269,7 +269,7 @@ int igs_removeArgumentFromToken(const char *tokenName, const char *argName){
             }
         }
         if (!found){
-            igs_info("no argument named %s for token %s", argName, tokenName);
+            igs_debug("no argument named %s for token %s", argName, tokenName);
         }
     }
     return 1;
@@ -340,7 +340,7 @@ int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenA
                     }
                 }
                 zyre_whisper(agentElements->node, agent->peerId, &msg);
-                igs_info("sent token %s to %s", tokenName, agentNameOrUUID);
+                igs_debug("sent token %s to %s", tokenName, agentNameOrUUID);
             }else{
                 igs_error("could not find token named %s for %s", tokenName, agentNameOrUUID);
             }
@@ -412,7 +412,7 @@ igs_tokenArgument_t* igs_getFirstArgumentForToken(const char *tokenName){
     igs_token_t *t = NULL;
     HASH_FIND_STR(igs_internal_definition->tokens_table, tokenName, t);
     if (t == NULL){
-        igs_info("could not find token with name %s", tokenName);
+        igs_debug("could not find token with name %s", tokenName);
         return NULL;
     }
     return t->arguments;
@@ -430,7 +430,7 @@ size_t igs_getNumberOfArgumentsForToken(const char *tokenName){
     igs_token_t *t = NULL;
     HASH_FIND_STR(igs_internal_definition->tokens_table, tokenName, t);
     if (t == NULL){
-        igs_info("could not find token with name %s", tokenName);
+        igs_debug("could not find token with name %s", tokenName);
         return 0;
     }
     size_t nb = 0;
@@ -451,7 +451,7 @@ bool igs_checkTokenArgumentExistence(const char *tokenName, const char *argName)
     igs_token_t *t = NULL;
     HASH_FIND_STR(igs_internal_definition->tokens_table, tokenName, t);
     if (t == NULL){
-        igs_info("could not find token with name %s", tokenName);
+        igs_debug("could not find token with name %s", tokenName);
         return false;
     }
     igs_tokenArgument_t *a = NULL;

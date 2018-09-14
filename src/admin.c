@@ -176,7 +176,7 @@ void admin_unlock(void) {
 ////////////////////////////////////////////////////////////////////////
 
 int igs_version(void){
-    igs_info("IngeScape version : %d.%d.%d\n", INGESCAPE_MAJOR, INGESCAPE_MINOR, INGESCAPE_MICRO);
+    igs_debug("IngeScape version : %d.%d.%d\n", INGESCAPE_MAJOR, INGESCAPE_MINOR, INGESCAPE_MICRO);
     return INGESCAPE_VERSION;
 }
 

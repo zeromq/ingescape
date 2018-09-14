@@ -170,7 +170,7 @@ int igs_loadMappingFromPath (const char* file_path){
         return 0;
     }
     if (strlen(file_path) == 0){
-        igs_info("Json file path is empty");
+        igs_debug("Json file path is empty");
         return 1;
     }
     mapping_t *tmp = parser_LoadMapFromPath(file_path);
@@ -194,7 +194,7 @@ int igs_loadMappingFromPath (const char* file_path){
  * 0 file path is NULL or empty
  */
 int igs_clearMapping(){
-    igs_info("Clear current mapping if needed and initiate an empty one");
+    igs_debug("Clear current mapping if needed and initiate an empty one");
     if(igs_internal_mapping != NULL){
         mapping_freeMapping(igs_internal_mapping);
     }

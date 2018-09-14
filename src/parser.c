@@ -1170,7 +1170,7 @@ int igs_loadDefinitionFromPath (const char* file_path){
     }
     
     if (strlen(file_path) == 0){
-        igs_info("Json file path is empty");
+        igs_debug("Json file path is empty");
         return 1;
     }
 
