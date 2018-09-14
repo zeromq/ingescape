@@ -250,7 +250,7 @@ PUBLIC void igs_setCommandLine(const char *line);
 PUBLIC void igs_setCommandLineFromArgs(int argc, const char * argv[]); //first element is replaced by absolute exec path on UNIX
 
 
-//When mapping agents, it is possible to request the
+//When mapping other agents, it is possible to request the
 //mapped agents to send us their current output values
 //through a private communication for our proper initialization.
 //By default, this behavior is disabled.
