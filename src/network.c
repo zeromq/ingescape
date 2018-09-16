@@ -1442,7 +1442,7 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
 //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(name, networkDevice) == 0){
             strncpy(agentElements->ipAddress, ziflist_address (iflist), IP_ADDRESS_LENGTH-1);
-            igs_debug("Starting with ip address %s and port %d on device %s", agentElements->ipAddress, port, networkDevice);
+            igs_info("Starting with ip address %s and port %d on device %s", agentElements->ipAddress, port, networkDevice);
         }
         name = ziflist_next (iflist);
     }
