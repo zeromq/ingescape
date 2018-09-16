@@ -108,8 +108,48 @@ int token_freeValuesInArguments(igs_tokenArgument_t *arg){
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 void igs_destroyArgumentsList(igs_tokenArgument_t **list){
-    token_freeTokenArguments(*list);
-    *list = NULL;
+    if (list != NULL && *list != NULL){
+        token_freeTokenArguments(*list);
+        *list = NULL;
+    }
+}
+
+igs_tokenArgument_t *igs_cloneArgumentsList(igs_tokenArgument_t *list){
+    igs_tokenArgument_t *res = NULL;
+    igs_tokenArgument_t *arg = NULL;
+    LL_FOREACH(list, arg){
+        if (arg != NULL){
+            igs_tokenArgument_t *new = calloc(1, sizeof(igs_tokenArgument_t));
+            new->type = arg->type;
+            if (arg->name != NULL){
+                new->name = strdup(arg->name);
+            }
+            new->size = arg->size;
+            switch (arg->type) {
+                case IGS_BOOL_T:
+                    new->b = arg->b;
+                    break;
+                case IGS_INTEGER_T:
+                    new->i = arg->i;
+                    break;
+                case IGS_DOUBLE_T:
+                    new->d = arg->d;
+                    break;
+                case IGS_STRING_T:
+                    new->c = strdup(arg->c);
+                    break;
+                case IGS_DATA_T:
+                    new->data = calloc(1, arg->size);
+                    memcpy(new->data, arg->data, arg->size);
+                    break;
+                    
+                default:
+                    break;
+            }
+            LL_APPEND(res, new);
+        }
+    }
+    return res;
 }
 
 void igs_addIntToArgumentsList(igs_tokenArgument_t **list, int value){
@@ -275,7 +315,7 @@ int igs_removeArgumentFromToken(const char *tokenName, const char *argName){
     return 1;
 }
 
-int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenArgument_t *list){
+int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenArgument_t **list){
     if (agentNameOrUUID == NULL || strlen(agentNameOrUUID) == 0){
         igs_error("agent name or UUID must not be NULL or empty");
         return -1;
@@ -288,7 +328,7 @@ int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenA
             //we found a matching agent
             igs_token_t *token = NULL;
             if (agent->subscriber == NULL || agent->subscriber->definition == NULL){
-                igs_error("subscriber or definition is empty for %s", agentNameOrUUID);
+                igs_error("subscriber or definition is empty for %s (cannot verify token)", agentNameOrUUID);
                 break;
             }
             HASH_FIND_STR(agent->subscriber->definition->tokens_table, tokenName, token);
@@ -299,7 +339,7 @@ int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenA
                 zmsg_addstr(msg, tokenName);
                 
                 size_t nbArguments = 0;
-                LL_COUNT(list, arg, nbArguments);
+                LL_COUNT(*list, arg, nbArguments);
                 size_t definedNbArguments = 0;
                 LL_COUNT(token->arguments, arg, definedNbArguments);
                 if (nbArguments != definedNbArguments){
@@ -307,7 +347,7 @@ int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenA
                               nbArguments, definedNbArguments);
                     break;
                 }
-                LL_FOREACH(list, arg){
+                LL_FOREACH(*list, arg){
                     zframe_t *frame = NULL;
                     switch (arg->type) {
                         case IGS_BOOL_T:
@@ -349,6 +389,8 @@ int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenA
     if (!found){
         igs_error("could not find agent name or UUID: %s", agentNameOrUUID);
     }
+    token_freeTokenArguments(*list);
+    *list = NULL;
     return 1;
 }
 
