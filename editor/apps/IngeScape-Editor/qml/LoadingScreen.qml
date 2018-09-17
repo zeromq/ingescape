@@ -25,31 +25,48 @@ Item {
 
     //----------------------------
     //
-    // Main BackgroundImage
+    // Main Background and IngeScape Image
     //
     //----------------------------
 
     Rectangle {
         anchors.fill: parent
-        color: IngeScapeTheme.blackColor
+
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: IngeScapeTheme.loadingScreen_lightBlue }
+            GradientStop { position: 1.0; color: IngeScapeTheme.loadingScreen_darkBlue }
+        }
     }
 
-    Image {
-        id: backgroundImage
-        anchors.fill: parent
-        fillMode: Image.PreserveAspectCrop
-        source: "qrc:/resources/images/Network.jpg"
-        opacity: 0.4
+    Rectangle {
+        id: ingescapeImage
+        anchors.centerIn: parent
+
+        width: 278
+        height: 278
+        color: "transparent"
+
+        I2SvgItem {
+            svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+            svgElementId: "loader_ingescape"
+        }
+
+        RotationAnimation on rotation {
+            loops: Animation.Infinite
+            from: 0
+            to: 360
+            duration: 1000
+        }
     }
 
 
     //----------------------------
     //
-    // Bottom Right Images
+    // LOGOS
     //
     //----------------------------
 
-    Row {
+    /*Row {
         anchors {
             right: parent.right
             rightMargin: 20
@@ -58,11 +75,11 @@ Item {
         }
         spacing: 20
 
-        /*Image {
-            id: logo?
-            fillMode: Image.PreserveAspectFit
-            source: "qrc:/resources/images/Logo-?.jpg"
-        }*/
+//        Image {
+//            id: logo?
+//            fillMode: Image.PreserveAspectFit
+//            source: "qrc:/resources/images/Logo-?.jpg"
+//        }
 
         Image {
             id: logoI2
@@ -70,7 +87,8 @@ Item {
             height: 86
             source: "qrc:/resources/images/Logo-Ingenuity.png"
         }
-    }
+    }*/
+
 
     //----------------------------
     //
@@ -82,23 +100,74 @@ Item {
 
         anchors {
             horizontalCenter: parent.horizontalCenter
-            top: parent.top
-            topMargin: 75
+            bottom: parent.bottom
+            bottomMargin: 150
         }
 
-        spacing: 45
+        spacing: 20
 
+        Row {
+
+            Text {
+                anchors {
+                    bottom: parent.bottom
+                }
+
+                text: qsTr("INGE")
+
+                font {
+                    family: IngeScapeTheme.loadingFontFamily
+                    pointSize: 101
+                }
+
+                color: "#6D6E70"
+            }
+            Text {
+                anchors {
+                    bottom: parent.bottom
+                }
+
+                text: qsTr("SCAPE ")
+
+                font {
+                    family: IngeScapeTheme.loadingFontFamily
+                    pointSize: 101
+                }
+
+                color: "#B5B7B6"
+            }
+
+            Text {
+                text: qsTr("EDITOR")
+
+                anchors {
+                    bottom: parent.bottom
+                    bottomMargin: 8
+                }
+
+                font {
+                    family: IngeScapeTheme.loadingFontFamily
+                    pointSize: 68
+                }
+
+                color: "#B5B7B6"
+            }
+        }
+
+        // Version
         Text {
+            id: version
 
             anchors.horizontalCenter: parent.horizontalCenter
 
-            text: qsTr("Bienvenue dans l'éditeur")
+            text: qsTr("VERSION %1").arg(Qt.application.version)
 
-            verticalAlignment: Text.AlignHCenter
+            font {
+                family: IngeScapeTheme.loadingFontFamily
+                pointSize: 21
+            }
 
-            font: IngeScapeTheme.headingFont
-
-            color: IngeScapeTheme.whiteColor
+            color: "#6D6E70"
         }
     }
 
@@ -111,7 +180,7 @@ Item {
     //----------------------------
 
 
-    Item {
+    /*Item {
         id: ingescape
 
         anchors.centerIn: parent
@@ -329,52 +398,13 @@ Item {
             ]
 
         }
-    }
+    }*/
 
-    Patxi {
+    /*Patxi {
         anchors {
             top: ingescape.bottom
             topMargin: ingescape.blockSize
             horizontalCenter: ingescape.horizontalCenter
         }
-    }
-
-
-    //----------------------------
-    //
-    // Bottom informations
-    //
-    //----------------------------
-
-    Column {
-
-        anchors {
-            bottom: parent.bottom
-            bottomMargin: 20
-            horizontalCenter: parent.horizontalCenter
-        }
-
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            text: qsTr("IngeScape Editor")
-
-            font: IngeScapeTheme.heading2Font
-
-            color: IngeScapeTheme.whiteColor
-        }
-
-        // Version
-        Text {
-            id: version
-
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            text: qsTr("Version %1").arg(Qt.application.version)
-
-            font: IngeScapeTheme.heading2Font
-
-            color: IngeScapeTheme.whiteColor
-        }
-    }
+    }*/
 }

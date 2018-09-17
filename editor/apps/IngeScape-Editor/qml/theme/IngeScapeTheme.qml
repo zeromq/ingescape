@@ -74,6 +74,9 @@ Item {
     readonly property color whiteColor: "#FFFFFF"
     readonly property color blackColor: "#17191E"
 
+    readonly property color loadingScreen_darkBlue: "#07101B"
+    readonly property color loadingScreen_lightBlue: "#35404D"
+
     readonly property color redColor: "#E30513"
     readonly property color middleDarkRedColor:"#851618"
     readonly property color darkRedColor:"#7A110E"
@@ -105,8 +108,9 @@ Item {
     readonly property string defaultFontFamily: "Arial"
 
 
-    property alias labelFontFamily : fontAkrobat.name
-    property alias textFontFamily : fontBloggerSans.name
+    property alias labelFontFamily: fontAkrobat.name
+    property alias textFontFamily: fontBloggerSans.name
+    property alias loadingFontFamily: fontTitillium.name
 
     FontLoader {
         id: fontAkrobat
@@ -132,6 +136,11 @@ Item {
 
     FontLoader {
         source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans-Light.ttf"
+    }
+
+    FontLoader {
+        id: fontTitillium
+        source: "qrc:/resources/fonts/titillium/Titillium-Regular.otf"
     }
 
 
@@ -273,10 +282,10 @@ Item {
 
 
     // Input/Output type colors
-    readonly property color yellowColor: "#ECB52E" // "#FFEE0B"
+    readonly property color yellowColor: "#ECB52E"
     readonly property color darkYellowColor: "#936F20"
 
-    readonly property color redColor2: "#E33E36" //"#E02424"
+    readonly property color redColor2: "#E33E36"
     readonly property color darkRedColor2: "#672B28"
 
     readonly property color purpleColor: "#854D97"
