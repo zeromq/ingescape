@@ -73,13 +73,13 @@ void IOPValueEffectM::setagentIOP(AgentIOPM* value)
             // Subscribe to destruction
             connect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueEffectM::_onAgentIopModelDestroyed);
 
-            qDebug() << "set agent IOP to" << _agentIOP->name();
+            //qDebug() << "set agent IOP to" << _agentIOP->name();
 
             setagentIOPType(_agentIOP->agentIOPType());
             setagentIOPName(_agentIOP->name());
         }
         else {
-            qDebug() << "set agent IOP to NULL !!!";
+            //qDebug() << "set agent IOP to NULL !!!";
 
             //setagentIOPType(AgentIOPTypes::INPUT);
             //setagentIOPName("");

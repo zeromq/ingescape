@@ -66,29 +66,37 @@ ApplicationWindow {
             MenuItem {
                 text: qsTr("Start a new platform")
                 shortcut: StandardKey.New
+
                 onTriggered: {
                     IngeScapeEditorC.createNewPlatform();
                 }
             }
+
             MenuItem {
                 text: qsTr("Open a platform...")
                 shortcut: StandardKey.Open
+
                 onTriggered: {
                     IngeScapeEditorC.loadPlatformFromSelectedFile();
                 }
             }
+
             MenuItem {
                 text: qsTr("Save the current platform...")
                 shortcut: StandardKey.Save
+
                 onTriggered: {
                     IngeScapeEditorC.savePlatformToSelectedFile();
                 }
             }
+
             MenuSeparator {
             }
+
             MenuItem {
                 text: qsTr("Platform network...")
                 shortcut: StandardKey.Preferences
+
                 onTriggered: {
                     if (applicationLoader.item) {
                         //console.log("QML: open network configuration");
@@ -99,6 +107,7 @@ ApplicationWindow {
             MenuItem {
                 text: qsTr("Create snapshot")
                 shortcut: StandardKey.AddTab
+
                 onTriggered: {
                     I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "INGESCAPE");
                 }
@@ -132,7 +141,6 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Zoom In")
-
                 shortcut: StandardKey.ZoomIn
 
                 onTriggered: {
@@ -145,7 +153,6 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Zoom Out")
-
                 shortcut: StandardKey.ZoomOut
 
                 onTriggered: {
@@ -219,6 +226,7 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Show outputs history")
+
                 onTriggered: {
                     if (applicationLoader.item) {
                         applicationLoader.item.openHistory();
@@ -252,18 +260,19 @@ ApplicationWindow {
             }
 
             Instantiator {
-                   model: IngeScapeEditorC.openedWindows
+                id: subWindowsInstantiator
+                model: 0 // IngeScapeEditorC.openedWindows
 
-                   MenuItem {
-                       text: model.QtObject.title
+                MenuItem {
+                    text: model.QtObject.title
 
-                       onTriggered: {
-                           //console.log("click on " + model.QtObject.title + " (" + model.QtObject + ")")
+                    onTriggered: {
+                        //console.log("click on " + model.QtObject.title + " (" + model.QtObject + ")")
 
-                           // Raises the window in the windowing system
-                           model.QtObject.raise();
-                       }
-                   }
+                        // Raises the window in the windowing system
+                        model.QtObject.raise();
+                    }
+                }
 
                 onObjectAdded: {
                     //console.log("onObjectAdded " + index)
@@ -403,6 +412,10 @@ ApplicationWindow {
                     return (((IngeScapeEditorC.modelManager !== null) && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
                 });
 
+                subWindowsInstantiator.model = Qt.binding(function() {
+                    return IngeScapeEditorC.openedWindows;
+                });
+
                 // Load our QML UI
                 applicationLoader.source = "IngeScapeEditor.qml";
             }
@@ -446,5 +459,4 @@ ApplicationWindow {
 
 
     }
-
 }
