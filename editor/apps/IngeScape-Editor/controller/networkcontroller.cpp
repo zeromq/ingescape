@@ -704,10 +704,6 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     igs_loadMapping(mappingByDefault.toStdString().c_str());
 
 
-    // Update the list of available network devices
-    updateAvailableNetworkDevices();
-
-
     // Begin to observe incoming messages on the bus
     int result = igs_observeBus(&onIncommingBusMessageCallback, this);
     if (result == 0) {

@@ -61,7 +61,9 @@ Item {
     //
     //--------------------------------------------------------
 
+    //
     // function allowing to open the history panel
+    //
     function openHistory() {
         //console.log("QML: function openHistory()");
 
@@ -71,7 +73,10 @@ Item {
         historyPanel.raise();
     }
 
+
+    //
     // function allowing to open the network configuration popup
+    //
     function openNetworkConfiguration() {
         if (IngeScapeEditorC.networkC) {
             IngeScapeEditorC.networkC.updateAvailableNetworkDevices();

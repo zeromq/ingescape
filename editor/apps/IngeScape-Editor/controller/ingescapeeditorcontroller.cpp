@@ -245,6 +245,14 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
 
 
+    // Update the list of available network devices
+    _networkC->updateAvailableNetworkDevices();
+
+    // There is only one available network device, we use it !
+    if (_networkC->availableNetworkDevices().count() == 1) {
+        _networkDevice = _networkC->availableNetworkDevices().at(0);
+    }
+
     // Start our INGESCAPE agent with a network device (or an IP address) and a port
     bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
