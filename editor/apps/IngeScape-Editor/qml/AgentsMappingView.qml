@@ -310,7 +310,7 @@ Item {
                             anchors.centerIn: parent;
                             svgFileCache: IngeScapeTheme.svgFileINGESCAPE
 
-                            svgElementId: control.checked ? (control.pressed ? "radio-control-on" : "radio_control-white")
+                            svgElementId: control.checked ? (control.pressed ? "radio-control-on" : "radio-control-white")
                                                           : (control.pressed ? "radio-control-on" : "radio-control-off");
                         }
                     }
