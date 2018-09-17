@@ -57,25 +57,25 @@ This pattern is the preferred one because it shows both its relevance in many in
 ingeScape addresses this possibility in two different manners:
 
 - The first one is simply by using mappings from one output to several inputs, so that the inputs are fed with text, binary of numeric data written on the other agent's output. The *mapping* concept easily enables to create the links between all agents requiring to exchange messages.
-- The second one is an actual MoM embedded in the ingeScape library. This MoM is used internally for metadata exchanges between agents. We made it available in the advanced ingeScape API so that developers can create topics (a.k.a. discussion channels) and send private messages of any kind.
+- The second one is an actual MoM embedded in the ingeScape library. This MoM is used internally for metadata exchanges between agents. We made it available in the advanced ingeScape API so that developers can create topics (a.k.a. discussion channels) and also send private messages of any kind to any other agent on the network.
 
 
 #### Data Distribution Service
 
 ingeScape does not support the [Data Distribution Service](https://en.wikipedia.org/wiki/Data_Distribution_Service) (DDS) as defined by the [Object Management Group](https://en.wikipedia.org/wiki/Object_Management_Group). However, it offers a simpler equivalent solution to the DDS DCPS layer and partially to the DLRL layer with the same spirit and objectives.
 
-Based on the ingeScape paradigm and PUB/SUB pattern, it is very easy to conceive an agent (or more) serving as data storage. This agent offers as many outputs as the variables it shall expose. Inputs can be added to this agent, to enable changing these variables. Once it is done, this agent becomes a distributed shared memory space.
+Based on the ingeScape paradigm and PUB/SUB pattern, it is very easy to conceive an agent (or more) serving as data storage. Such an agent offers as many sets of inputs and outputs as the variables it shall maintain. Once running, this agent becomes a shared persistent distributed  memory space on the network, just as any DDS broker would do.
 
-Agents interested in a variable just have to connect one of their inputs to the corresponding output. Agents wanting to modify a variable  may map one of their outputs to the corresponding input on the data storage agent to modify it.
+Agents interested in a variable's value just have to connect one of their inputs to the corresponding output. Agents needing to modify a variable may map one of their outputs to the corresponding input on the data storage agent to modify it.
 
-When an agent adds a new map from one of its inputs to another agent's output, this output is sent specifically to the input so that it is immediately updated with the latest value, so that later joiners or restarting agents do not miss the latest current value.
+When an agent maps one of its inputs to one of the data storage outputs, this output is immediately and specifically sent to the relevant agent so that it is always updated with the latest value: later joiners or restarting agents do not miss the latest current value provided by the data storage.
 
 
 #### Enterprise Service Buses
 
-An [Enterprise Service Bus](https://en.wikipedia.org/wiki/Enterprise_service_bus) (ESB) enables various types of software to offer and receive services over in network. The ingeScape paradigm is globally compliant with this approach. The *definition* models in ingeScape, that can be versioned if needed, are very similar to services descriptions. An agent can both provide and receive services to or from other agents, and redundancy is possible.
+An [Enterprise Service Bus](https://en.wikipedia.org/wiki/Enterprise_service_bus) (ESB) enables various types of software to offer and receive services over in network. The ingeScape paradigm is fully compliant with this approach. The *definition* models in ingeScape, that can be versioned if needed, are very similar to services descriptions. An agent can both provide and receive services to or from other agents, and redundancy is possible.
 
-In addition to this, the advanced ingeScape API provides a services description mechanism, already used by the ingeScape editor and some existing agents, to adapt their behavior according to the presence or absence of a given service, attached or not to a specific agent. This description mechanism works in the same way as [Zeroconf](https://en.wikipedia.org/wiki/Zero-configuration_networking), enabling each agent to publish sets of keys/values describing its capabilities.
+In addition, the advanced ingeScape API provides a services description mechanism, already used by the ingeScape editor and some existing agents, to adapt their behavior according to the presence or absence of a given service, attached or not to a specific agent. This description mechanism works in the same way as [Zeroconf](https://en.wikipedia.org/wiki/Zero-configuration_networking), enabling each agent to publish sets of keys/values describing its capabilities.
 
 
 #### What about old good Client/Server ?
