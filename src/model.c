@@ -688,8 +688,23 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     igs_debug("set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
+                {
+                    char *v = (char *)value;
+                    if (v == NULL){
+                        iop->value.b = false;
+                    }else if (strcmp(v, "false") == 0||
+                              strcmp(v, "False") == 0||
+                              strcmp(v, "FALSE") == 0){
+                        iop->value.b = false;
+                    }else if (strcmp(v, "true") == 0||
+                              strcmp(v, "True") == 0||
+                              strcmp(v, "TRUE") == 0){
+                        iop->value.b = true;
+                    }else{
+                        iop->value.b = atoi(v)?true:false;
+                    }
+                }
                     outSize = iop->valueSize = sizeof(bool);
-                    iop->value.b = (value == NULL)?false:(atoi((char*)value)?true:false);
                     outValue = &(iop->value.b);
                     igs_debug("set %s to %i", iopName, iop->value.b);
                     break;
