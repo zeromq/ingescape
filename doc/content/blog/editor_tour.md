@@ -41,7 +41,7 @@ The editor can also import agent definitions before an agent is actually availab
 
 Agent definitions can be exported and imported with the editor using a simple JSON format. The ingeScape library supports the loading and dumping of these JSON files so that the developers do not have to always hardcode an agent definition but use an external resource file instead.
 
-Here is an example of a simple agent definition: {#definition}
+Here is an example of a simple agent definition:
 
 {{< highlight json "linenos=table,linenostart=1" >}}
 {
@@ -112,7 +112,7 @@ When agents exchange data, i.e. when an agent's output is written, the existing 
 
 Just like definitions, mappings can be hardcoded by developers or managed through JSON files.
 
-Here is an example of a simple agent mapping: {#mapping}
+Here is an example of a simple agent mapping:
 
 {{< highlight json "linenos=table,linenostart=1" >}}
 {
