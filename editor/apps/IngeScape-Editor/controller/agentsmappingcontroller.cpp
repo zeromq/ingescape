@@ -141,7 +141,8 @@ void AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
         qInfo() << "Remove the link between agents" << link->outputAgent()->name() << "and" << link->inputAgent()->name();
 
         // Mapping is activated
-        if ((_modelManager != NULL) && _modelManager->isMappingActivated())
+        // AND the input agent is ON
+        if ((_modelManager != NULL) && _modelManager->isMappingActivated() && link->inputAgent()->isON())
         {
             // Set to virtual to give a feedback to the user
             link->setisVirtual(true);
@@ -150,6 +151,7 @@ void AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
             Q_EMIT commandAskedToAgentAboutMappingInput(link->inputAgent()->peerIdsList(), "UNMAP", link->input()->name(), link->outputAgent()->name(), link->output()->name());
         }
         // Mapping is NOT activated
+        // OR the input agent is OFF
         else
         {
             // Remove temporary link (this temporary link will be removed when the user will activate the mapping)

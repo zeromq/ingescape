@@ -529,7 +529,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
  */
 void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType, void* value, size_t valueSize, void* myData)
 {
-    Q_UNUSED(value);
+    Q_UNUSED(value)
     Q_UNUSED(valueSize)
 
     // Historique: on log la value et le dateTime.
