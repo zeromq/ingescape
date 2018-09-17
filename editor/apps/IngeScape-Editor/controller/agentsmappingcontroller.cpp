@@ -246,6 +246,9 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                 // Mapping is activated
                 if ((_modelManager != NULL) && _modelManager->isMappingActivated())
                 {
+                    // Add a temporary link (this temporary link will became a real link when the agent will send its mapping update)
+                    inputAgent->addTemporaryLink(input->name(), outputAgent->name(), output->name());
+
                     // Create a new VIRTUAL link between agents
                     MapBetweenIOPVM* link = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, true, this);
 
