@@ -732,8 +732,8 @@ Window {
 
                     delegate: Item {
                         anchors {
-                            left : parent.left
-                            right : parent.right
+                            left: parent.left
+                            right: parent.right
                         }
                         height : 30
 
@@ -741,18 +741,21 @@ Window {
                             id: listLine
 
                             anchors {
-                                fill: parent
+                                top: parent.top
+                                bottom: parent.bottom
+                                left: parent.left
                                 leftMargin: 2
                             }
 
                             // Date and time
                             Text {
-                                text: model.logDateTime.toLocaleString(Qt.locale(),"dd/MM hh:mm:ss.zzz")
+                                text: model.logDateTime.toLocaleString(Qt.locale(), "dd/MM hh:mm:ss.zzz")
 
                                 anchors {
                                     verticalCenter: parent.verticalCenter
                                 }
                                 verticalAlignment: Text.AlignVCenter
+
                                 width : rootItem.widthsOfColumns[0]
                                 height: parent.height
 
@@ -773,7 +776,7 @@ Window {
                                 }
                                 verticalAlignment: Text.AlignVCenter
 
-                                width : rootItem.widthsOfColumns[1]
+                                width: rootItem.widthsOfColumns[1]
                                 height: parent.height
 
                                 //elide: Text.ElideRight
@@ -786,27 +789,30 @@ Window {
                                     pixelSize: 14
                                 }
                             }
+                        }
 
-                            // Content
-                            Text {
-                                text: model.logContent
+                        // Content
+                        Text {
+                            text: model.logContent
 
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                }
-                                verticalAlignment: Text.AlignVCenter
-
-                                width : rootItem.widthsOfColumns[2]
-                                height: parent.height
-
-                                elide: Text.ElideRight
-                                color: IngeScapeTheme.whiteColor
-                                font {
-                                    family: IngeScapeTheme.textFontFamily
-                                    pixelSize: 14
-                                }
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                                left: listLine.right
+                                right: parent.right
+                                rightMargin: 2
                             }
+                            verticalAlignment: Text.AlignVCenter
 
+                            //width: rootItem.widthsOfColumns[2]
+                            height: parent.height
+
+                            elide: Text.ElideRight
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                pixelSize: 14
+                            }
                         }
 
                         // separator

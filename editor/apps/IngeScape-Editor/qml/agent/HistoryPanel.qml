@@ -865,7 +865,7 @@ Window {
 
                             // Date
                             Text {
-                                text: model.time.toLocaleString(Qt.locale(),"hh:mm:ss.zzz")
+                                text: model.time.toLocaleString(Qt.locale(), "hh:mm:ss.zzz")
 
                                 anchors {
                                     verticalCenter: parent.verticalCenter
