@@ -64,24 +64,43 @@ ApplicationWindow {
             title: qsTr("Platform")
 
             MenuItem {
-                text: qsTr("Start a new platform description")
-
+                text: qsTr("Start a new platform")
+                shortcut: StandardKey.New
                 onTriggered: {
                     IngeScapeEditorC.createNewPlatform();
                 }
             }
             MenuItem {
-                text: qsTr("Open platform description")
-
+                text: qsTr("Open a platform...")
+                shortcut: StandardKey.Open
                 onTriggered: {
                     IngeScapeEditorC.loadPlatformFromSelectedFile();
                 }
             }
             MenuItem {
-                text: qsTr("Save platform description")
-
+                text: qsTr("Save the current platform...")
+                shortcut: StandardKey.Save
                 onTriggered: {
                     IngeScapeEditorC.savePlatformToSelectedFile();
+                }
+            }
+            MenuSeparator {
+            }
+            MenuItem {
+                text: qsTr("Platform network...")
+                shortcut: StandardKey.Preferences
+                onTriggered: {
+                    if (applicationLoader.item) {
+                        //console.log("QML: open network configuration");
+                        applicationLoader.item.openNetworkConfiguration();
+                    }
+                }
+            }
+            MenuItem {
+                text: qsTr("Create snapshot")
+                shortcut: StandardKey.AddTab
+                onTriggered: {
+                    I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "INGESCAPE");
                 }
             }
         }
@@ -94,7 +113,7 @@ ApplicationWindow {
             MenuItem {
                 id: menuPlugUNplugMapping
 
-                text: "" // (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Unplug mapping") : qsTr("Plug mapping")
+                text: "" // (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Disconnect mapping") : qsTr("Connect mapping")
 
                 onTriggered: {
                     if (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) {
@@ -149,7 +168,7 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: qsTr("100%")
+                text: qsTr("Scale to 100%")
 
                 onTriggered: {
                     if (IngeScapeEditorC.agentsMappingC)
@@ -163,10 +182,10 @@ ApplicationWindow {
 
         // Supervision
         Menu {
-            title: qsTr("Supervision")
+            title: qsTr("Agents")
 
             MenuItem {
-                text: qsTr("Create a new Agent")
+                text: qsTr("Create a new Agent...")
                 enabled: false
 
                 onTriggered: {
@@ -175,7 +194,7 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: qsTr("Import agents")
+                text: qsTr("Import agents...")
 
                 onTriggered: {
                     if (IngeScapeEditorC.modelManager)
@@ -189,7 +208,7 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: qsTr("Export agents")
+                text: qsTr("Export agents...")
 
                 onTriggered: {
                     if (IngeScapeEditorC.agentsSupervisionC) {
@@ -213,24 +232,7 @@ ApplicationWindow {
         Menu {
             title: qsTr("Options")
 
-            MenuItem {
-                text: qsTr("Configure network")
 
-                onTriggered: {
-                    if (applicationLoader.item) {
-                        //console.log("QML: open network configuration");
-                        applicationLoader.item.openNetworkConfiguration();
-                    }
-                }
-            }
-
-            MenuItem {
-                text: qsTr("Create snapshot")
-
-                onTriggered: {
-                    I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "INGESCAPE");
-                }
-            }
         }
 
 
@@ -241,7 +243,7 @@ ApplicationWindow {
             title: qsTr("Windows")
 
             MenuItem {
-                text: qsTr("IngeScape Editor")
+                text: qsTr("Main window")
 
                 onTriggered: {
                     // Raises our window in the windowing system

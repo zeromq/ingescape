@@ -85,18 +85,23 @@ typedef struct igs_tokenArgument{
     struct igs_tokenArgument *next;
 } igs_tokenArgument_t;
 
-
-//arguments management
-void igs_destroyArgumentsList(igs_tokenArgument_t **list);
+//Arguments management
+//arguments list shall be initialized to NULL and filled by calling igs_add*ToArgumentsList
+//Example:
+// igs_tokenArgument_t *list = NULL;
+// igs_addIntToArgumentsList(&list, 10);
 void igs_addIntToArgumentsList(igs_tokenArgument_t **list, int value);
 void igs_addBoolToArgumentsList(igs_tokenArgument_t **list, bool value);
 void igs_addDoubleToArgumentsList(igs_tokenArgument_t **list, double value);
 void igs_addStringToArgumentsList(igs_tokenArgument_t **list, char *value);
 void igs_addDataToArgumentsList(igs_tokenArgument_t **list, void *value, size_t size);
+void igs_destroyArgumentsList(igs_tokenArgument_t **list);
+igs_tokenArgument_t *igs_cloneArgumentsList(igs_tokenArgument_t *list);
 
 //send a token to another agent
 //requires to pass agent name or UUID, token name and a list of arguments
-int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenArgument_t *list);
+//passed arguments list will be deallocated and destroyed
+int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenArgument_t **list);
 
 
 //CREATE TOKENS for our agent

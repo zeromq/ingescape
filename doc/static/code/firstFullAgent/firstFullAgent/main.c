@@ -24,9 +24,9 @@ bool verbose = false;
 //definition and mapping as external resources
 //(used optionally)
 #define BUFFER_SIZE 1024
-#define DEFAULTDEFINITIONPATH "~/Documents/IngeScape/data/definition.json"
+#define DEFAULTDEFINITIONPATH "~/Documents/IngeScape/agents/firstFullAgent_definition.json"
 char definitionFile[BUFFER_SIZE];
-#define DEFAULTMAPPINGPATH "~/Documents/IngeScape/data/mapping.json"
+#define DEFAULTMAPPINGPATH "~/Documents/IngeScape/agents/firstFullAgent_mapping.json"
 char mappingFile[BUFFER_SIZE];
 
 //SIGINT handling

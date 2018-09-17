@@ -363,7 +363,7 @@ Item {
                 }
 
                 visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingActivated
-                text : "Click on the button to synchronize with the environement and get the currently active mapping.\nOr create/load a mapping and click on the button to apply it to the environment."
+                text : "Click on the button to synchronize with the current platform and get the active mapping.\nOr create/load a platform description and click on the button to apply it to the platform."
 
                 color : IngeScapeTheme.blueGreyColor
                 font {

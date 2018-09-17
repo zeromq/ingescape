@@ -192,7 +192,7 @@ void definition_freeDefinition (definition* def) {
 int igs_clearDefinition(){
 
     //Free the structure definition loaded
-    igs_info("Clear our definition and initiate an empty one");
+    igs_debug("Clear our definition and initiate an empty one");
     if(igs_internal_definition != NULL){
         definition_freeDefinition(igs_internal_definition);
     }

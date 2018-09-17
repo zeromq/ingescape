@@ -212,7 +212,7 @@ I2PopupBase {
                         verticalCenterOffset: 2
                     }
 
-                    text: "Clear platform"
+                    text: "Clear platform when modified"
 
                     font {
                         family: IngeScapeTheme.textFontFamily
