@@ -426,9 +426,11 @@ void AgentVM::_onModelsChanged()
                 connect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::canBeRestartedChanged, this, &AgentVM::_onCanBeRestartedOfModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged, Qt::UniqueConnection);
+                connect(model, &AgentM::canBeFrozenChanged, this, &AgentVM::_onCanBeFrozenOfModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::stateChanged, this, &AgentVM::_onStateOfModelChanged, Qt::UniqueConnection);
+                connect(model, &AgentM::loggerPortChanged, this, &AgentVM::_onLoggerPortOfModelChanged, Qt::UniqueConnection);
 
                 connect(model, &AgentM::hasLogInStreamChanged, this, &AgentVM::_onHasLogInStreamOfModelChanged);
                 connect(model, &AgentM::hasLogInFileChanged, this, &AgentVM::_onHasLogInFileOfModelChanged);
@@ -515,6 +517,19 @@ void AgentVM::_onIsMutedOfModelChanged(bool isMuted)
 
 
 /**
+ * @brief Slot called when the flag "can Be Frozen" of a model changed
+ * @param canBeFrozen
+ */
+void AgentVM::_onCanBeFrozenOfModelChanged(bool canBeFrozen)
+{
+    Q_UNUSED(canBeFrozen)
+
+    // Update the flag "can Be Frozen" in function of flags of all models
+    _updateCanBeFrozen();
+}
+
+
+/**
  * @brief Slot called when the flag "is Frozen" of a model changed
  * @param isMuted
  */
@@ -567,6 +582,19 @@ void AgentVM::_onStateOfModelChanged(QString state)
 
     // Update with the state of the first model
     _updateWithStateOfFirstModel();
+}
+
+
+/**
+ * @brief Slot called when the "Logger Port" of a model changed
+ * @param loggerPort
+ */
+void AgentVM::_onLoggerPortOfModelChanged(QString loggerPort)
+{
+    Q_UNUSED(loggerPort)
+
+    // Update the flag "is Enabled View Log Stram" in function of flags of models
+    _updateIsEnabledViewLogStream();
 }
 
 

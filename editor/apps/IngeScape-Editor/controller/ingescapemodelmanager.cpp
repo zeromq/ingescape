@@ -470,6 +470,23 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
         {
             qInfo() << "The agent" << agentName << "with peer id" << peerId << "on" << hostname << "(" << ipAddress << ") is back on the network !";
 
+            // Useless !
+            //agent->sethostname(hostname);
+            //agent->setcommandLine(commandLine);
+
+            // Usefull ?
+            /*if (!hostname.isEmpty() && !commandLine.isEmpty())
+            {
+                HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
+                if (host != NULL)
+                {
+                    agent->setcanBeRestarted(true);
+                }
+            }*/
+
+            agent->setcanBeFrozen(canBeFrozen);
+            agent->setloggerPort(loggerPort);
+
             // Update the state (flag "is ON")
             agent->setisON(true);
 

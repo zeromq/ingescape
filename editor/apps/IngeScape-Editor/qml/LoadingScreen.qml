@@ -50,13 +50,16 @@ Item {
             svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
             svgElementId: "loader_ingescape"
         }
+    }
 
-        RotationAnimation on rotation {
-            loops: Animation.Infinite
-            from: 0
-            to: 360
-            duration: 1000
-        }
+    NumberAnimation {
+        target: ingescapeImage
+        property: "rotation"
+        from: 0
+        to: 360
+        duration: 1000
+        loops: Animation.Infinite
+        running: true
     }
 
 

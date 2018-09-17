@@ -317,6 +317,13 @@ private Q_SLOTS:
 
 
     /**
+     * @brief Slot called when the flag "can Be Frozen" of a model changed
+     * @param canBeFrozen
+     */
+    void _onCanBeFrozenOfModelChanged(bool canBeFrozen);
+
+
+    /**
      * @brief Slot called when the flag "is Frozen" of a model changed
      * @param isMuted
      */
@@ -335,6 +342,13 @@ private Q_SLOTS:
      * @param state
      */
     void _onStateOfModelChanged(QString state);
+
+
+    /**
+     * @brief Slot called when the "Logger Port" of a model changed
+     * @param loggerPort
+     */
+    void _onLoggerPortOfModelChanged(QString loggerPort);
 
 
     /**
