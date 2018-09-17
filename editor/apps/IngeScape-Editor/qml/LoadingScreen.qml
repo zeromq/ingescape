@@ -39,27 +39,27 @@ Item {
     }
 
     Rectangle {
-        id: ingescapeImage
         anchors.centerIn: parent
 
-        width: 278
-        height: 278
+        width: 290
+        height: 290
         color: "transparent"
 
         I2SvgItem {
+            id: svgIgescapeImage
             svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
             svgElementId: "loader_ingescape"
         }
-    }
 
-    NumberAnimation {
-        target: ingescapeImage
-        property: "rotation"
-        from: 0
-        to: 360
-        duration: 1000
-        loops: Animation.Infinite
-        running: true
+        NumberAnimation {
+            target: svgIgescapeImage
+            property: "rotation"
+            from: 0
+            to: 360
+            duration: 2200
+            loops: Animation.Infinite
+            running: true
+        }
     }
 
 
