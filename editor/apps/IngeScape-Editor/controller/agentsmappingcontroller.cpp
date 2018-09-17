@@ -87,12 +87,12 @@ void AgentsMappingController::clearMapping()
     }
 
     // 2- Delete all links
-    foreach (MapBetweenIOPVM* link, _allLinksInMapping.toList()) {
+    for (MapBetweenIOPVM* link : _allLinksInMapping.toList()) {
         _deleteLinkBetweenTwoAgents(link);
     }
 
     // 3- Delete all agents in mapping
-    foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList()) {
+    for (AgentInMappingVM* agent : _allAgentsInMapping.toList()) {
         deleteAgentInMapping(agent);
     }
 
@@ -193,7 +193,7 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
                     // Mapping is already activated
                     if ((_modelManager != NULL) && _modelManager->isMappingActivated())
                     {
-                        foreach (AgentM* model, agentsList->toList())
+                        for (AgentM* model : agentsList->toList())
                         {
                             if (model != NULL)
                             {
@@ -228,9 +228,11 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
         {
             // Search if the same link already exists
             bool alreadyLinked = false;
-            foreach (MapBetweenIOPVM* iterator, _allLinksInMapping.toList()) {
+            for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
+            {
                 if ((iterator != NULL) && (iterator->outputAgent() == outputAgent) && (iterator->output() == output)
-                        && (iterator->inputAgent() == inputAgent) && (iterator->input() == input)) {
+                        && (iterator->inputAgent() == inputAgent) && (iterator->input() == input))
+                {
                     alreadyLinked = true;
                     break;
                 }
@@ -422,7 +424,7 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
             qDebug() << "Mapping Activated in mode CONTROL";
 
             // Apply all temporary mappings
-            foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList())
+            for (AgentInMappingVM* agent : _allAgentsInMapping.toList())
             {
                 if ((agent != NULL) && (agent->temporaryMapping() != NULL))
                 {
@@ -449,7 +451,7 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
                 double randomMax = (double)RAND_MAX;
 
                 // Create all agents in mapping
-                foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys())
+                for (QString agentName : mapFromAgentNameToActiveAgentsList.keys())
                 {
                     QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
 
@@ -463,18 +465,18 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
                 }
 
                 // Create all links in mapping
-                foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList())
+                for (AgentInMappingVM* agent : _allAgentsInMapping.toList())
                 {
                     if ((agent != NULL) && (agent->temporaryMapping() != NULL))
                     {
                         // Delete all "mapping elements" in the temporary mapping
                         agent->temporaryMapping()->mappingElements()->deleteAllItems();
 
-                        foreach (AgentM* model, agent->models()->toList())
+                        for (AgentM* model : agent->models()->toList())
                         {
                             if ((model != NULL) && (model->mapping() != NULL))
                             {
-                                foreach (ElementMappingM* mappingElement, model->mapping()->mappingElements()->toList())
+                                for (ElementMappingM* mappingElement : model->mapping()->mappingElements()->toList())
                                 {
                                     if (mappingElement != NULL)
                                     {
@@ -630,14 +632,16 @@ void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
         if ((agentInMapping != NULL) && (agentInMapping->temporaryMapping() != NULL))
         {
             QStringList idsOfRemovedMappingElements;
-            foreach (QString idPreviousList, agentInMapping->temporaryMapping()->idsOfMappingElements()) {
+            for (QString idPreviousList : agentInMapping->temporaryMapping()->idsOfMappingElements())
+            {
                 if (!agent->mapping()->idsOfMappingElements().contains(idPreviousList)) {
                     idsOfRemovedMappingElements.append(idPreviousList);
                 }
             }
 
             QStringList idsOfAddedMappingElements;
-            foreach (QString idNewList, agent->mapping()->idsOfMappingElements()) {
+            for (QString idNewList : agent->mapping()->idsOfMappingElements())
+            {
                 if (!agentInMapping->temporaryMapping()->idsOfMappingElements().contains(idNewList)) {
                     idsOfAddedMappingElements.append(idNewList);
                 }
@@ -648,7 +652,7 @@ void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
             {
                 qDebug() << "unmapped" << idsOfRemovedMappingElements;
 
-                foreach (ElementMappingM* mappingElement, agentInMapping->temporaryMapping()->mappingElements()->toList())
+                for (ElementMappingM* mappingElement : agentInMapping->temporaryMapping()->mappingElements()->toList())
                 {
                     if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
                     {
@@ -661,7 +665,7 @@ void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
             {
                 qDebug() << "mapped" << idsOfAddedMappingElements;
 
-                foreach (ElementMappingM* mappingElement, agent->mapping()->mappingElements()->toList())
+                for (ElementMappingM* mappingElement : agent->mapping()->mappingElements()->toList())
                 {
                     if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
                     {
@@ -762,9 +766,15 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
                 qDebug() << "MAP will be created later:" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
             }
         }
-        else {
-            // Update the flag if needed
-            link->setisVirtual(false);
+        else
+        {
+            if (link->isVirtual())
+            {
+                qInfo() << "MAPPED" << mappingElement->id();
+
+                // Update the flag if needed
+                link->setisVirtual(false);
+            }
         }
 
         if ((link != NULL) && (link->inputAgent() != NULL))
@@ -923,7 +933,7 @@ void AgentsMappingController::_onInputsListHaveBeenAdded(QList<InputVM*> inputsL
 
         if (agentInMapping->temporaryMapping() != NULL)
         {
-            foreach (ElementMappingM* mappingElement, agentInMapping->temporaryMapping()->mappingElements()->toList())
+            for (ElementMappingM* mappingElement : agentInMapping->temporaryMapping()->mappingElements()->toList())
             {
                 if ((mappingElement != NULL) && namesOfInputs.contains(mappingElement->input()))
                 {
@@ -956,7 +966,7 @@ void AgentsMappingController::_onOutputsListHaveBeenAdded(QList<OutputVM*> outpu
         {
             if ((iterator != NULL) && (iterator != agentInMapping) && (iterator->temporaryMapping() != NULL))
             {
-                foreach (ElementMappingM* mappingElement, iterator->temporaryMapping()->mappingElements()->toList())
+                for (ElementMappingM* mappingElement : iterator->temporaryMapping()->mappingElements()->toList())
                 {
                     if ((mappingElement != NULL) && (mappingElement->outputAgent() == agentInMapping->name()) && namesOfOutputs.contains(mappingElement->output()))
                     {
@@ -1039,7 +1049,7 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
         // The agent is defined, only add models of agent in the internal list of the agentInMappingVM
         if (agentInMapping != NULL)
         {   
-            foreach (AgentM* model, agentsList)
+            for (AgentM* model : agentsList)
             {
                 if ((model != NULL) && !agentInMapping->models()->contains(model))
                 {
@@ -1128,10 +1138,9 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
 {
     if ((agent != NULL) && (_modelManager != NULL))
     {
-        foreach (MapBetweenIOPVM* link, _allLinksInMapping.toList())
+        for (MapBetweenIOPVM* link : _allLinksInMapping.toList())
         {
-            if ( (link != NULL) &&
-                    ((link->outputAgent() == agent) || (link->inputAgent() == agent)) )
+            if ( (link != NULL) && ((link->outputAgent() == agent) || (link->inputAgent() == agent)) )
             {
                 // Remove a link between two agents from the mapping
                 removeLinkBetweenTwoAgents(link);

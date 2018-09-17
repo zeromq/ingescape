@@ -572,11 +572,11 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostname)
     IngeScapeLauncherManager::Instance().removeIngeScapeLauncher(peerId, hostname);
 
     // Traverse the list of all agents
-    foreach (QString agentName, _mapFromNameToAgentModelsList.keys())
+    for (QString agentName : _mapFromNameToAgentModelsList.keys())
     {
         QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
 
-        foreach (AgentM* agent, agentModelsList)
+        for (AgentM* agent : agentModelsList)
         {
             if ((agent != NULL) && (agent->hostname() == hostname)) {
                 agent->setcanBeRestarted(false);
@@ -716,14 +716,16 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                 AgentMappingM* previousMapping = agent->mapping();
 
                 QStringList idsOfRemovedMappingElements;
-                foreach (QString idPreviousList, previousMapping->idsOfMappingElements()) {
+                for (QString idPreviousList : previousMapping->idsOfMappingElements())
+                {
                     if (!agentMapping->idsOfMappingElements().contains(idPreviousList)) {
                         idsOfRemovedMappingElements.append(idPreviousList);
                     }
                 }
 
                 QStringList idsOfAddedMappingElements;
-                foreach (QString idNewList, agentMapping->idsOfMappingElements()) {
+                for (QString idNewList : agentMapping->idsOfMappingElements())
+                {
                     if (!previousMapping->idsOfMappingElements().contains(idNewList)) {
                         idsOfAddedMappingElements.append(idNewList);
                     }
@@ -732,7 +734,8 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                 // If there are some Removed mapping elements
                 if (!idsOfRemovedMappingElements.isEmpty())
                 {
-                    foreach (ElementMappingM* mappingElement, previousMapping->mappingElements()->toList()) {
+                    for (ElementMappingM* mappingElement : previousMapping->mappingElements()->toList())
+                    {
                         if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
                         {
                             // Emit the signal "UN-mapped"
@@ -743,7 +746,8 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                 // If there are some Added mapping elements
                 if (!idsOfAddedMappingElements.isEmpty())
                 {
-                    foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
+                    for (ElementMappingM* mappingElement : agentMapping->mappingElements()->toList())
+                    {
                         if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
                         {
                             // Emit the signal "Mapped"
@@ -778,7 +782,7 @@ void IngeScapeModelManager::onValuePublished(PublishedValueM* publishedValue)
         _publishedValues.prepend(publishedValue);
 
         QList<AgentM*> agentsList = getAgentModelsListFromName(publishedValue->agentName());
-        foreach (AgentM* agent, agentsList)
+        for (AgentM* agent : agentsList)
         {
             if ((agent != NULL) && (agent->definition() != NULL))
             {
@@ -1037,11 +1041,12 @@ QHash<QString, QList<AgentM*>> IngeScapeModelManager::getMapFromAgentNameToActiv
 {
     QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList;
 
-    foreach (QString agentName, _mapFromNameToAgentModelsList.keys())
+    for (QString agentName : _mapFromNameToAgentModelsList.keys())
     {
         QList<AgentM*> allAgentsList = getAgentModelsListFromName(agentName);
         QList<AgentM*> activeAgentsList;
-        foreach (AgentM* agent, allAgentsList) {
+        for (AgentM* agent : allAgentsList)
+        {
             if ((agent != NULL) && agent->isON()) {
                 activeAgentsList.append(agent);
             }
@@ -1252,7 +1257,7 @@ void IngeScapeModelManager::_updateDefinitionVariants(QString definitionName)
     QHash<QString, QList<DefinitionM*>> mapFromVersionToDefinitionsList;
     QList<QString> versionsWithVariant;
 
-    foreach (DefinitionM* iterator, agentDefinitionsList)
+    for (DefinitionM* iterator : agentDefinitionsList)
     {
         if ((iterator != NULL) && !iterator->version().isEmpty())
         {
@@ -1284,10 +1289,10 @@ void IngeScapeModelManager::_updateDefinitionVariants(QString definitionName)
     }
 
     // The list contains only the versions that have variants
-    foreach (QString version, versionsWithVariant)
+    for (QString version : versionsWithVariant)
     {
         QList<DefinitionM*> definitionsListForVersion = mapFromVersionToDefinitionsList.value(version);
-        foreach (DefinitionM* iterator, definitionsListForVersion)
+        for (DefinitionM* iterator : definitionsListForVersion)
         {
             if (iterator != NULL) {
                 iterator->setisVariant(true);
@@ -1304,7 +1309,7 @@ void IngeScapeModelManager::_updateDefinitionVariants(QString definitionName)
 void IngeScapeModelManager::_printAgents()
 {
     qDebug() << "Print Agents:";
-    foreach (QString agentName, _mapFromNameToAgentModelsList.keys()) {
+    for (QString agentName : _mapFromNameToAgentModelsList.keys()) {
         QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
         qDebug() << agentName << ":" << agentModelsList.count() << "agents";
     }
@@ -1317,7 +1322,7 @@ void IngeScapeModelManager::_printAgents()
 void IngeScapeModelManager::_printDefinitions()
 {
     qDebug() << "Print Definitions:";
-    foreach (QString definitionName, _mapFromNameToAgentDefinitionsList.keys()) {
+    for (QString definitionName : _mapFromNameToAgentDefinitionsList.keys()) {
         QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
         qDebug() << definitionName << ":" << agentDefinitionsList.count() << "definitions";
     }
@@ -1330,7 +1335,7 @@ void IngeScapeModelManager::_printDefinitions()
 void IngeScapeModelManager::_printMappings()
 {
     qDebug() << "Print Mappings:";
-    foreach (QString mappingName, _mapFromNameToAgentMappingsList.keys()) {
+    for (QString mappingName : _mapFromNameToAgentMappingsList.keys()) {
         QList<AgentMappingM*> agentMappingsList = getAgentMappingsListFromMappingName(mappingName);
         qDebug() << mappingName << ":" << agentMappingsList.count() << "mappings";
     }
