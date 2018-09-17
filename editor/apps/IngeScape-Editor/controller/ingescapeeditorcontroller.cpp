@@ -426,6 +426,11 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
     {
         // Load the platform from JSON file
         _loadPlatformFromFile(platformFilePath);
+
+        // Force our global mapping to CONTROLLED
+        if (_modelManager != NULL) {
+            _modelManager->setisMappingControlled(true);
+        }
     }
     else {
         qDebug() << "Platform file path is empty, nothing to do";
