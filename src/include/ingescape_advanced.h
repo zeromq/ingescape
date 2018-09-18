@@ -93,7 +93,7 @@ typedef struct igs_tokenArgument{
 void igs_addIntToArgumentsList(igs_tokenArgument_t **list, int value);
 void igs_addBoolToArgumentsList(igs_tokenArgument_t **list, bool value);
 void igs_addDoubleToArgumentsList(igs_tokenArgument_t **list, double value);
-void igs_addStringToArgumentsList(igs_tokenArgument_t **list, char *value);
+void igs_addStringToArgumentsList(igs_tokenArgument_t **list, const char *value);
 void igs_addDataToArgumentsList(igs_tokenArgument_t **list, void *value, size_t size);
 void igs_destroyArgumentsList(igs_tokenArgument_t **list);
 igs_tokenArgument_t *igs_cloneArgumentsList(igs_tokenArgument_t *list);
