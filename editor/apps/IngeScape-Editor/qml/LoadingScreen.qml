@@ -51,14 +51,14 @@ Item {
 
         anchors.centerIn: parent
 
-        width: 290
-        height: 290
+        width: 297
+        height: 297
 
         I2SvgItem {
             id: logo
 
             svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
-            svgElementId: "loader_ingescape"
+            svgElementId: "loader-ingescape"
         }
 
         RotationAnimator {
@@ -71,6 +71,20 @@ Item {
             loops: Animation.Infinite
             running: root.visible
         }
+
+        /*Rectangle {
+            anchors.centerIn: parent
+
+            width: 218
+            height: 218
+            radius: 109
+
+            color: "transparent"
+            border {
+                color: "white"
+                width: 1
+            }
+        }*/
     }
 
 
@@ -82,8 +96,8 @@ Item {
 
         anchors {
             horizontalCenter: parent.horizontalCenter
-            bottom: parent.bottom
-            bottomMargin: 150
+            top: animatedLogo.bottom
+            topMargin: 50
         }
 
         spacing: 20
