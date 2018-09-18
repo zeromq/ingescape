@@ -41,14 +41,14 @@ Item {
     Rectangle {
         anchors.centerIn: parent
 
-        width: 290
-        height: 290
+        width: 297
+        height: 297
         color: "transparent"
 
         I2SvgItem {
             id: svgIgescapeImage
             svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
-            svgElementId: "loader_ingescape"
+            svgElementId: "loader-ingescape"
         }
 
         NumberAnimation {
