@@ -1511,6 +1511,7 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
     
     if (strlen(agentElements->networkDevice) == 0){
         igs_error("Device name could not be determined for IP address %s : our agent will NOT start", ipAddress);
+        agentElements = NULL;
         free(agentElements);
         return 0;
     }
