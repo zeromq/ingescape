@@ -20,16 +20,19 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
+
+
 Item {
+    id: root
 
 
-    //----------------------------
+
     //
-    // Main Background and IngeScape Image
+    // Background
     //
-    //----------------------------
-
     Rectangle {
+        id: background
+
         anchors.fill: parent
 
         gradient: Gradient {
@@ -38,67 +41,43 @@ Item {
         }
     }
 
-    Rectangle {
+
+
+    //
+    // Animated logo
+    //
+    Item {
+        id: animatedLogo
+
         anchors.centerIn: parent
 
-        width: 297
-        height: 297
-        color: "transparent"
+        width: 290
+        height: 290
 
         I2SvgItem {
-            id: svgIgescapeImage
+            id: logo
+
             svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
-            svgElementId: "loader-ingescape"
+            svgElementId: "loader_ingescape"
         }
 
-        NumberAnimation {
-            target: svgIgescapeImage
-            property: "rotation"
+        RotationAnimator {
+            target: logo
+
             from: 0
             to: 360
+
             duration: 2200
             loops: Animation.Infinite
-            running: true
+            running: root.visible
         }
     }
 
 
-    //----------------------------
+
     //
-    // LOGOS
+    // Title
     //
-    //----------------------------
-
-    /*Row {
-        anchors {
-            right: parent.right
-            rightMargin: 20
-            bottom: parent.bottom
-            bottomMargin: 20
-        }
-        spacing: 20
-
-//        Image {
-//            id: logo?
-//            fillMode: Image.PreserveAspectFit
-//            source: "qrc:/resources/images/Logo-?.jpg"
-//        }
-
-        Image {
-            id: logoI2
-            fillMode: Image.PreserveAspectFit
-            height: 86
-            source: "qrc:/resources/images/Logo-Ingenuity.png"
-        }
-    }*/
-
-
-    //----------------------------
-    //
-    // Titles
-    //
-    //----------------------------
-
     Column {
 
         anchors {
@@ -109,6 +88,8 @@ Item {
 
         spacing: 20
 
+
+        // Label: Ingescape editor
         Row {
 
             Text {
@@ -125,6 +106,7 @@ Item {
 
                 color: "#6D6E70"
             }
+
             Text {
                 anchors {
                     bottom: parent.bottom
@@ -141,12 +123,12 @@ Item {
             }
 
             Text {
-                text: qsTr("EDITOR")
-
                 anchors {
                     bottom: parent.bottom
                     bottomMargin: 8
                 }
+
+                text: qsTr("EDITOR")
 
                 font {
                     family: IngeScapeTheme.loadingFontFamily
@@ -156,6 +138,7 @@ Item {
                 color: "#B5B7B6"
             }
         }
+
 
         // Version
         Text {
@@ -173,241 +156,4 @@ Item {
             color: "#6D6E70"
         }
     }
-
-
-
-    //----------------------------
-    //
-    // Loading
-    //
-    //----------------------------
-
-
-    /*Item {
-        id: ingescape
-
-        anchors.centerIn: parent
-
-        width: childrenRect.width
-        height: childrenRect.height
-
-        property int blockSize: 16
-        property int blockRadius: 4
-        property int blockSpacing: 2
-
-
-        BlockLoadingAnimation {
-            id: letterI
-
-            blockSize: ingescape.blockSize
-            blockRadius: ingescape.blockRadius
-            blockSpacing: ingescape.blockSpacing
-
-            visibilitiesOfBlock: [
-                true, true, true, true, true,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                true, true, true, true, true
-            ]
-        }
-
-        BlockLoadingAnimation {
-            id: letterN
-
-            anchors {
-                left: letterI.right
-                leftMargin: ingescape.blockSize + ingescape.blockSpacing
-            }
-
-            blockSize: ingescape.blockSize
-            blockRadius: ingescape.blockRadius
-            blockSpacing: ingescape.blockSpacing
-
-            visibilitiesOfBlock: [
-                true, false, false, false, true,
-                true, true, false, false, true,
-                true, false, true, false, true,
-                true, false, true, false, true,
-                true, false, true, false, true,
-                true, false, false, true, true,
-                true, false, false, false, true
-            ]
-
-        }
-
-        BlockLoadingAnimation {
-            id: letterG
-
-            anchors {
-                left: letterN.right
-                leftMargin: ingescape.blockSize + ingescape.blockSpacing
-            }
-
-            blockSize: ingescape.blockSize
-            blockRadius: ingescape.blockRadius
-            blockSpacing: ingescape.blockSpacing
-
-            visibilitiesOfBlock: [
-                false, true, true, true, false,
-                true, false, false, false, true,
-                true, false, false, false, false,
-                true, false, true, true, true,
-                true, false, false, false, true,
-                true, false, false, false, true,
-                false, true, true, true, false
-            ]
-
-        }
-
-        BlockLoadingAnimation {
-            id: letterE
-
-            anchors {
-                left: letterG.right
-                leftMargin: ingescape.blockSize + ingescape.blockSpacing
-            }
-
-            blockSize: ingescape.blockSize
-            blockRadius: ingescape.blockRadius
-            blockSpacing: ingescape.blockSpacing
-
-            visibilitiesOfBlock: [
-                false, true, true, true, true,
-                true, false, false, false, false,
-                true, false, false, false, false,
-                true, true, true, true, false,
-                true, false, false, false, false,
-                true, false, false, false, false,
-                false, true, true, true, true
-            ]
-
-        }
-
-        BlockLoadingAnimation {
-            id: letterS
-
-            anchors {
-                left: letterE.right
-                leftMargin: ingescape.blockSize + ingescape.blockSpacing
-            }
-
-            blockSize: ingescape.blockSize
-            blockRadius: ingescape.blockRadius
-            blockSpacing: ingescape.blockSpacing
-
-            visibilitiesOfBlock: [
-                false, true, true, true, true,
-                true, false, false, false, false,
-                true, false, false, false, false,
-                false, true, true, true, false,
-                false, false, false, false, true,
-                false, false, false, false, true,
-                true, true, true, true, false
-            ]
-        }
-
-        BlockLoadingAnimation {
-            id: letterC
-
-            anchors {
-                left: letterS.right
-                leftMargin: ingescape.blockSize + ingescape.blockSpacing
-            }
-
-            blockSize: ingescape.blockSize
-            blockRadius: ingescape.blockRadius
-            blockSpacing: ingescape.blockSpacing
-
-            visibilitiesOfBlock: [
-                false, true, true, true, false,
-                true, false, false, false, true,
-                true, false, false, false, false,
-                true, false, false, false, false,
-                true, false, false, false, false,
-                true, false, false, false, true,
-                false, true, true, true, false
-            ]
-        }
-
-        BlockLoadingAnimation {
-            id: letterA
-
-            anchors {
-                left: letterC.right
-                leftMargin: ingescape.blockSize + ingescape.blockSpacing
-            }
-
-            blockSize: ingescape.blockSize
-            blockRadius: ingescape.blockRadius
-            blockSpacing: ingescape.blockSpacing
-
-            visibilitiesOfBlock: [
-                false, true, true, true, false,
-                true, false, false, false, true,
-                true, false, false, false, true,
-                true, true, true, true, true,
-                true, false, false, false, true,
-                true, false, false, false, true,
-                true, false, false, false, true
-            ]
-        }
-
-        BlockLoadingAnimation {
-            id: letterP
-
-            anchors {
-                left: letterA.right
-                leftMargin: ingescape.blockSize + ingescape.blockSpacing
-            }
-
-            blockSize: ingescape.blockSize
-            blockRadius: ingescape.blockRadius
-            blockSpacing: ingescape.blockSpacing
-
-            visibilitiesOfBlock: [
-                true, true, true, true, false,
-                true, false, false, false, true,
-                true, false, false, false, true,
-                true, true, true, true, false,
-                true, false, false, false, false,
-                true, false, false, false, false,
-                true, false, false, false, false
-            ]
-        }
-
-        BlockLoadingAnimation {
-            id: letterEEnd
-
-            anchors {
-                left: letterP.right
-                leftMargin: ingescape.blockSize + ingescape.blockSpacing
-            }
-
-            blockSize: ingescape.blockSize
-            blockRadius: ingescape.blockRadius
-            blockSpacing: ingescape.blockSpacing
-
-            visibilitiesOfBlock: [
-                false, true, true, true, true,
-                true, false, false, false, false,
-                true, false, false, false, false,
-                true, true, true, true, false,
-                true, false, false, false, false,
-                true, false, false, false, false,
-                false, true, true, true, true
-            ]
-
-        }
-    }*/
-
-    /*Patxi {
-        anchors {
-            top: ingescape.bottom
-            topMargin: ingescape.blockSize
-            horizontalCenter: ingescape.horizontalCenter
-        }
-    }*/
 }
