@@ -176,7 +176,7 @@ void igs_addDoubleToArgumentsList(igs_tokenArgument_t **list, double value){
     LL_APPEND(*list, new);
 }
 
-void igs_addStringToArgumentsList(igs_tokenArgument_t **list, char *value){
+void igs_addStringToArgumentsList(igs_tokenArgument_t **list, const char *value){
     igs_tokenArgument_t *new = calloc(1, sizeof(igs_tokenArgument_t));
     new->type = IGS_STRING_T;
     if (value != NULL){
