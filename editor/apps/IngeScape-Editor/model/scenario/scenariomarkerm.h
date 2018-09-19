@@ -1,14 +1,14 @@
-
 /*
- *	ScenarioMarkerM
+ *	IngeScape Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -23,9 +23,8 @@
 #include "I2PropertyHelpers.h"
 
 
-
 /**
- * @brief The ScenarioMarkerM class defines a scenario marker model
+ * @brief The ScenarioMarkerM class defines a model of scenario marker
  */
 class ScenarioMarkerM: public QObject
 {

@@ -1,3 +1,17 @@
+/*
+ *	IngeScape Editor
+ *
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *
+ */
+
 #ifndef TIMETICKM_H
 #define TIMETICKM_H
 
@@ -18,7 +32,7 @@ I2_ENUM(TimeTickTypes, NORMAL_TICK, BIG_TICK, SMALL_TICK)
 
 
 /**
- * @brief The TimeTickM class represents a given time tick on our analysis view
+ * @brief The TimeTickM class represents a given time tick on our timeline
  */
 class TimeTickM : public QObject
 {

@@ -25,23 +25,12 @@
 #include <model/definitionm.h>
 #include <model/mapping/agentmappingm.h>
 #include <model/recordm.h>
+#include <model/scenario/scenariom.h>
 
 #include "viewModel/scenario/actionvm.h"
 #include "viewModel/scenario/actioneffectvm.h"
 #include "viewModel/scenario/actionconditionvm.h"
 #include "viewModel/scenario/actioninpalettevm.h"
-
-/**
- * @brief Structure used for scenario importation from a json string
- * @param list of actions models in the list
- * @param list of actions in the palette
- * @param list of actions in the timeline
- */
-struct scenario_import_actions_lists_t {
-  QList<ActionM*>           actionsInTableList;
-  QList<ActionInPaletteVM*> actionsInPaletteList;
-  QList<ActionVM*>          actionsInTimelineList;
-};
 
 
 /**
@@ -135,13 +124,12 @@ public:
 
 
     /**
-     * @brief Initialize actions list from JSON file
-     * @param byteArrayOfJson
-     * @param agents list
-     * @return the scenario importation structure containing the list of actions
-     *         in the list, in the palette and in the timeline
+     * @brief Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
+     * @param jsonScenario
+     * @param listAgentsInMapping
+     * @return
      */
-    scenario_import_actions_lists_t * initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping);
+    ScenarioM* createModelOfScenarioFromJSON(QJsonObject jsonScenario, QList<AgentInMappingVM*> listAgentsInMapping);
 
 
     /**

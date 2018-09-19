@@ -147,22 +147,22 @@ void ScenarioController::setisPlaying(bool isPlaying)
 
 
 /**
-  * @brief Import the scenario lists structure from the json byte content
-  * @param byteArrayOfJson
+  * @brief Import the scenario from JSON
+  * @param jsonScenario
   */
-void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
+void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
 {
     if (_jsonHelper != NULL)
     {
-        // Initialize agents lists from JSON file
-        scenario_import_actions_lists_t * scenarioToImport = _jsonHelper->initActionsList(byteArrayOfJson, _agentsInMappingList.toList());
+        // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
+        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, _agentsInMappingList.toList());
         if (scenarioToImport != NULL)
         {
             // Append the list of actions
-            if (!scenarioToImport->actionsInTableList.isEmpty())
+            if (!scenarioToImport->actionsList()->isEmpty())
             {
-                // Add each actions to out list
-                foreach (ActionM* actionM, scenarioToImport->actionsInTableList)
+                // Add each action to our list
+                for (ActionM* actionM : scenarioToImport->actionsList()->toList())
                 {
                     if (actionM != NULL)
                     {
@@ -180,25 +180,21 @@ void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
             }
 
             // Set the list of actions in palette
-            if (!scenarioToImport->actionsInPaletteList.isEmpty())
+            if (!scenarioToImport->actionsInPaletteList()->isEmpty())
             {
-                foreach (ActionInPaletteVM* actionInPalette, scenarioToImport->actionsInPaletteList)
+                for (ActionInPaletteVM* actionInPalette : scenarioToImport->actionsInPaletteList()->toList())
                 {
-                    if (actionInPalette->modelM() != NULL)
-                    {
+                    if ((actionInPalette != NULL) && (actionInPalette->modelM() != NULL)) {
                         setActionInPalette(actionInPalette->indexInPanel(), actionInPalette->modelM());
                     }
-
-                    delete actionInPalette;
-                    actionInPalette = NULL;
                 }
             }
 
             // Append the list of actions in timeline
-            if (!scenarioToImport->actionsInTimelineList.isEmpty())
+            if (!scenarioToImport->actionsInTimelineList()->isEmpty())
             {
                 // Add each actionVM in to the right line of our timeline
-                foreach (ActionVM* actionVM, scenarioToImport->actionsInTimelineList)
+                for (ActionVM* actionVM : scenarioToImport->actionsInTimelineList()->toList())
                 {
                     if ((actionVM != NULL) && (actionVM->modelM() != NULL))
                     {
@@ -238,7 +234,6 @@ void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
             }
 
             delete scenarioToImport;
-            scenarioToImport = NULL;
         }
     }
 }
