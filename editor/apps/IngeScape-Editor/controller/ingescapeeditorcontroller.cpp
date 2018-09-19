@@ -432,7 +432,7 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
 
     if (!platformFilePath.isEmpty())
     {
-        // Clear the current platform by deleting all existing data
+        // First, clear the current platform by deleting all existing data
         clearCurrentPlatform();
 
         // Load the platform from JSON file
@@ -858,14 +858,19 @@ void IngeScapeEditorController::_onStartToRecord()
  */
 void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions)
 {
-    // FIXME TODO jsonExecutedActions
-    Q_UNUSED(jsonExecutedActions)
-
     if ((deltaTimeFromTimeLine >= 0) && !jsonPlatform.isEmpty())
     {
+        // First, clear the current platform by deleting all existing data
+        clearCurrentPlatform();
+
+        // FIXME TODO jsonExecutedActions
         qDebug() << "jsonExecutedActions" << jsonExecutedActions;
 
         QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonPlatform.toUtf8());
+
+        // Load the platform from JSON
+        _loadPlatformFromJSON(jsonDocument);
+
         if (jsonDocument.isObject())
         {
             QJsonObject jsonRoot = jsonDocument.object();
@@ -877,21 +882,13 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
             }
 
             // Import the mapping of agents from JSON
-            if (_agentsMappingC != NULL)
+            if ((_agentsMappingC != NULL) && jsonRoot.contains("mapping"))
             {
-                // Clear the current mapping
-                _agentsMappingC->clearMapping();
-
-                if (jsonRoot.contains("mapping")) {
-                    _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
-                }
+                _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
             }
 
             if (_scenarioC != NULL)
             {
-                // Clear scenario
-                _scenarioC->clearScenario();
-
                 // FIXME: use json directly ?
                 QByteArray byteArrayOfJson = jsonPlatform.toUtf8();
 
@@ -913,7 +910,7 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
 
 
 /**
- * @brief Load the platform from JSON file
+ * @brief Load the platform from a JSON file
  * @param platformFilePath
  */
 void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
@@ -931,6 +928,10 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                 jsonFile.close();
 
                 QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+                // Load the platform from JSON
+                _loadPlatformFromJSON(jsonDocument);
+
                 if (jsonDocument.isObject())
                 {
                     QJsonObject jsonRoot = jsonDocument.object();
@@ -942,22 +943,14 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                     }
 
                     // Import the mapping of agents from JSON
-                    if (_agentsMappingC != NULL)
+                    if ((_agentsMappingC != NULL) && jsonRoot.contains("mapping"))
                     {
-                        // Clear the current mapping
-                        _agentsMappingC->clearMapping();
-
-                        if (jsonRoot.contains("mapping")) {
-                            _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
-                        }
+                        _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
                     }
 
                     // Import the scenario from JSON
                     if (_scenarioC != NULL)
                     {
-                        // Clear scenario
-                        _scenarioC->clearScenario();
-
                         // Import new scenario
                         _scenarioC->importScenarioFromJson(byteArrayOfJson);
                     }
@@ -978,7 +971,7 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
 
 
 /**
- * @brief Save the platform to JSON file
+ * @brief Save the platform to a JSON file
  * @param platformFilePath
  */
 void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
@@ -1002,6 +995,19 @@ void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
             }
         }
     }
+}
+
+
+/**
+  * @brief Load the platform from JSON
+  * @param jsonDocument
+  */
+void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument)
+{
+    Q_UNUSED(jsonDocument)
+
+    // FIXME TODO _loadPlatformFromJSON
+    qDebug() << "FIXME TODO _loadPlatformFromJSON";
 }
 
 

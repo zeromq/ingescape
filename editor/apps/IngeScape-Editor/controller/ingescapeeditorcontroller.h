@@ -270,17 +270,24 @@ private Q_SLOTS:
 private:
 
     /**
-      * @brief Load the platform from JSON file
+      * @brief Load the platform from a JSON file
       * @param platformFilePath
       */
     void _loadPlatformFromFile(QString platformFilePath);
 
 
     /**
-      * @brief Save the platform to JSON file
+      * @brief Save the platform to a JSON file
       * @param platformFilePath
       */
     void _savePlatformToFile(QString platformFilePath);
+
+
+    /**
+      * @brief Load the platform from JSON
+      * @param jsonDocument
+      */
+    void _loadPlatformFromJSON(QJsonDocument jsonDocument);
 
 
     /**
