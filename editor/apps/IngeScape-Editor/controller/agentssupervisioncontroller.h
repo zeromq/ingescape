@@ -95,9 +95,9 @@ public:
 
 
     /**
-     * @brief Clear the list of agents
+     * @brief Remove (and delete) each UN-active agent (agent with state OFF) from the current list of agents
      */
-    void clearAgentsList();
+    void removeUNactiveAgents();
 
 
 Q_SIGNALS:

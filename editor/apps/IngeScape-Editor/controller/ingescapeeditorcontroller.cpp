@@ -432,6 +432,9 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
 
     if (!platformFilePath.isEmpty())
     {
+        // Clear the current platform by deleting all existing data
+        clearCurrentPlatform();
+
         // Load the platform from JSON file
         _loadPlatformFromFile(platformFilePath);
 
@@ -480,15 +483,15 @@ void IngeScapeEditorController::savePlatformToDefaultFile()
 
 
 /**
- * @brief Create a new platform (agents, mappings, actions, palette, timeline actions)
+ * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions)
  * by deleting all existing data
  */
-void IngeScapeEditorController::createNewPlatform()
+void IngeScapeEditorController::clearCurrentPlatform()
 {
     if (_hostsSupervisionC != NULL)
     {
-        // Clear the list of agents (global list with all agents)
-        _hostsSupervisionC->clearAgentsList();
+        // Remove each UN-active agent (agent with state OFF) from the global list with all agents
+        _hostsSupervisionC->removeUNactiveAgents();
     }
 
     if (_agentsMappingC != NULL)
@@ -505,8 +508,8 @@ void IngeScapeEditorController::createNewPlatform()
 
     if (_agentsSupervisionC != NULL)
     {
-        // Clear the list of agents
-        _agentsSupervisionC->clearAgentsList();
+        // Remove (and delete) each UN-active agent (agent with state OFF) from the list
+        _agentsSupervisionC->removeUNactiveAgents();
     }
 
     // Notify QML to reset view
@@ -640,8 +643,8 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 // Has to clear the current platform
                 if (hasToClearPlatform)
                 {
-                    // Create a new empty platform by deleting all existing data
-                    createNewPlatform();
+                    // Clear the current platform by deleting all existing data
+                    clearCurrentPlatform();
                 }
 
                 // Start our INGESCAPE agent with the network device and the port

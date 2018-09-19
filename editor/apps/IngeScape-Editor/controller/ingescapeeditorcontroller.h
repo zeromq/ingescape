@@ -144,10 +144,10 @@ public:
 
 
     /**
-      * @brief Create a new platform (actions, palette, timeline actions, mappings)
+      * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions)
       *        by deleting all existing data
       */
-    Q_INVOKABLE void createNewPlatform();
+    Q_INVOKABLE void clearCurrentPlatform();
 
 
     /**

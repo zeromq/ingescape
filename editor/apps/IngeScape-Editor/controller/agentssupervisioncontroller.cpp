@@ -230,11 +230,11 @@ QJsonArray AgentsSupervisionController::exportAgentsListToJSON()
 
 
 /**
- * @brief Clear the list of agents
+ * @brief Remove (and delete) each UN-active agent (agent with state OFF) from the current list of agents
  */
-void AgentsSupervisionController::clearAgentsList()
+void AgentsSupervisionController::removeUNactiveAgents()
 {
-    qInfo() << "Clear the current list of agents";
+    qInfo() << "Remove each UN-active agent from the current list of agents";
 
     if (_modelManager != NULL)
     {
