@@ -15,6 +15,10 @@ VERSION_PATCH = 0
 
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}.$${VERSION_PATCH}
 
+# To get the version in our C++ code
+DEFINES += "VERSION=\\\"$$VERSION\\\""
+
+
 # Qt modules used by our application
 QT += qml quick widgets concurrent svg xml scxml location positioning
 
