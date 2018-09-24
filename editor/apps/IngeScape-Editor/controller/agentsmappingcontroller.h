@@ -89,8 +89,9 @@ public:
     /**
      * @brief Remove a link between two agents from the mapping
      * @param link
+     * @return true if the link has been deleted during the call of our method
      */
-    Q_INVOKABLE void removeLinkBetweenTwoAgents(MapBetweenIOPVM* link);
+    Q_INVOKABLE bool removeLinkBetweenTwoAgents(MapBetweenIOPVM* link);
 
 
     /**
