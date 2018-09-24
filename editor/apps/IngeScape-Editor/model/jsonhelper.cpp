@@ -348,251 +348,242 @@ QString JsonHelper::getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocu
 
 
 /**
- * @brief Initialize actions list from JSON file
- * @param byteArrayOfJson
+ * @brief Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
+ * @param jsonScenario
+ * @param listAgentsInMapping
  * @return
  */
-scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping)
+ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, QList<AgentInMappingVM*> listAgentsInMapping)
 {
-    scenario_import_actions_lists_t * scenarioImport = NULL;
+    ScenarioM* scenarioImport = new ScenarioM();
 
-    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
-    if (jsonDocument.isObject())
+    QList<ActionM*> actionsListToImport;
+    QList<ActionInPaletteVM*> actionsInPalette;
+    QList<ActionVM*> actionsInTimeLine;
+
+    QHash<int, ActionM*> hashFromUidToActionM;
+
+    // ------
+    // Actions list
+    // ------
+    QJsonValue jsonActionsList = jsonScenario.value("actions");
+    if (jsonActionsList.isArray())
     {
-        QJsonObject jsonRoot = jsonDocument.object();
-        if (jsonRoot.contains("scenario"))
+        foreach (QJsonValue jsonTmp, jsonActionsList.toArray())
         {
-            QJsonObject jsonScenario = jsonRoot.value("scenario").toObject();
-
-            scenarioImport = new scenario_import_actions_lists_t();
-            QList<ActionM*> actionsListToImport;
-            QList<ActionInPaletteVM*> actionsInPalette;
-            QList<ActionVM*> actionsInTimeLine;
-            QHash<int, ActionM*> hashFromUidToActionM;
-
-            // ------
-            // Actions list
-            // ------
-            QJsonValue jsonActionsList = jsonScenario.value("actions");
-            if (jsonActionsList.isArray())
+            if (jsonTmp.isObject())
             {
-                foreach (QJsonValue jsonTmp, jsonActionsList.toArray())
+                QJsonObject jsonAction = jsonTmp.toObject();
+                ActionM* actionM = NULL;
+
+                if (jsonAction.contains("uid") && jsonAction.contains("name"))
                 {
-                    if (jsonTmp.isObject())
+                    QJsonValue jsonUID = jsonAction.value("uid");
+                    QJsonValue jsonName = jsonAction.value("name");
+
+                    if (jsonUID.isDouble() && jsonName.isString())
                     {
-                        QJsonObject jsonAction = jsonTmp.toObject();
-                        ActionM* actionM = NULL;
+                        int uid = jsonUID.toInt();
 
-                        if (jsonAction.contains("uid") && jsonAction.contains("name"))
+                        // Book the UID of the new model of action
+                        IngeScapeEditorUtils::bookUIDforActionM(uid);
+
+                        // Create the model of action
+                        actionM = new ActionM(uid, jsonName.toString());
+
+                        QJsonValue jsonValue = jsonAction.value("validity_duration_type");
+                        if (jsonValue.isString())
                         {
-                            QJsonValue jsonUID = jsonAction.value("uid");
-                            QJsonValue jsonName = jsonAction.value("name");
+                            int nValidationDurationType = ValidationDurationTypes::staticEnumFromKey(jsonValue.toString().toUpper());
+                            actionM->setvalidityDurationType(static_cast<ValidationDurationTypes::Value>(nValidationDurationType));
+                        }
 
-                            if (jsonUID.isDouble() && jsonName.isString())
+                        jsonValue = jsonAction.value("validity_duration_value");
+                        if (jsonValue.isString()) {
+                            actionM->setvalidityDurationString(jsonValue.toString());
+                        }
+
+
+                        //
+                        // REVERT
+                        //
+                        jsonValue = jsonAction.value("shall_revert");
+                        if (jsonValue.isBool()) {
+                            actionM->setshallRevert(jsonValue.toBool());
+                        }
+
+                        jsonValue = jsonAction.value("shall_revert_at_validity_end");
+                        if (jsonValue.isBool()) {
+                            actionM->setshallRevertWhenValidityIsOver(jsonValue.toBool());
+                        }
+
+                        jsonValue = jsonAction.value("shall_revert_after_time");
+                        if (jsonValue.isBool()) {
+                            actionM->setshallRevertAfterTime(jsonValue.toBool());
+                        }
+
+                        jsonValue = jsonAction.value("revert_after_time");
+                        if (jsonValue.isString()) {
+                            actionM->setrevertAfterTimeString(jsonValue.toString());
+                        }
+
+
+                        //
+                        // REARM
+                        //
+                        jsonValue = jsonAction.value("shall_rearm");
+                        if (jsonValue.isBool()) {
+                            actionM->setshallRearm(jsonValue.toBool());
+                        }
+
+                        jsonValue = jsonAction.value("rearm_after_time");
+                        if (jsonValue.isString()) {
+                            actionM->setrearmAfterTimeString(jsonValue.toString());
+                        }
+
+
+                        //
+                        // EFFECTS
+                        //
+                        QJsonValue jsonEffectsList = jsonAction.value("effects");
+                        if (jsonEffectsList.isArray())
+                        {
+                            for (QJsonValue jsonEffect : jsonEffectsList.toArray())
                             {
-                                int uid = jsonUID.toInt();
-
-                                // Book the UID of the new model of action
-                                IngeScapeEditorUtils::bookUIDforActionM(uid);
-
-                                // Create the model of action
-                                actionM = new ActionM(uid, jsonName.toString());
-
-                                QJsonValue jsonValue = jsonAction.value("validity_duration_type");
-                                if (jsonValue.isString())
+                                if (jsonEffect.isObject())
                                 {
-                                    int nValidationDurationType = ValidationDurationTypes::staticEnumFromKey(jsonValue.toString().toUpper());
-                                    actionM->setvalidityDurationType(static_cast<ValidationDurationTypes::Value>(nValidationDurationType));
-                                }
-
-                                jsonValue = jsonAction.value("validity_duration_value");
-                                if (jsonValue.isString()) {
-                                    actionM->setvalidityDurationString(jsonValue.toString());
-                                }
-
-
-                                //
-                                // REVERT
-                                //
-                                jsonValue = jsonAction.value("shall_revert");
-                                if (jsonValue.isBool()) {
-                                    actionM->setshallRevert(jsonValue.toBool());
-                                }
-
-                                jsonValue = jsonAction.value("shall_revert_at_validity_end");
-                                if (jsonValue.isBool()) {
-                                    actionM->setshallRevertWhenValidityIsOver(jsonValue.toBool());
-                                }
-
-                                jsonValue = jsonAction.value("shall_revert_after_time");
-                                if (jsonValue.isBool()) {
-                                    actionM->setshallRevertAfterTime(jsonValue.toBool());
-                                }
-
-                                jsonValue = jsonAction.value("revert_after_time");
-                                if (jsonValue.isString()) {
-                                    actionM->setrevertAfterTimeString(jsonValue.toString());
-                                }
-
-
-                                //
-                                // REARM
-                                //
-                                jsonValue = jsonAction.value("shall_rearm");
-                                if (jsonValue.isBool()) {
-                                    actionM->setshallRearm(jsonValue.toBool());
-                                }
-
-                                jsonValue = jsonAction.value("rearm_after_time");
-                                if (jsonValue.isString()) {
-                                    actionM->setrearmAfterTimeString(jsonValue.toString());
-                                }
-
-
-                                //
-                                // EFFECTS
-                                //
-                                QJsonValue jsonEffectsList = jsonAction.value("effects");
-                                if (jsonEffectsList.isArray())
-                                {
-                                    for (QJsonValue jsonEffect : jsonEffectsList.toArray())
+                                    ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffect.toObject(), listAgentsInMapping);
+                                    if (effectVM != NULL)
                                     {
-                                        if (jsonEffect.isObject())
-                                        {
-                                            ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffect.toObject(), listAgentsInMapping);
-                                            if (effectVM != NULL)
-                                            {
-                                                actionM->addEffectToList(effectVM);
-                                            }
-                                        }
+                                        actionM->addEffectToList(effectVM);
                                     }
                                 }
-
-
-                                //
-                                // CONDITIONS
-                                //
-                                QJsonValue jsonConditionsList = jsonAction.value("conditions");
-                                if (jsonConditionsList.isArray())
-                                {
-                                    foreach (QJsonValue jsonCondition, jsonConditionsList.toArray())
-                                    {
-                                        if (jsonCondition.isObject())
-                                        {
-                                            ActionConditionVM* conditionVM = _parseConditionsVMFromJson(jsonCondition.toObject(), listAgentsInMapping);
-                                            if (conditionVM != NULL)
-                                            {
-                                                actionM->addConditionToList(conditionVM);
-                                            }
-                                        }
-                                    }
-                                }
-
                             }
                         }
 
-                        if ((actionM != NULL) && !hashFromUidToActionM.contains(actionM->uid()))
+
+                        //
+                        // CONDITIONS
+                        //
+                        QJsonValue jsonConditionsList = jsonAction.value("conditions");
+                        if (jsonConditionsList.isArray())
                         {
-                            actionsListToImport.append(actionM);
-                            hashFromUidToActionM.insert(actionM->uid(), actionM);
-                        }
-                    }
-                }
-            }
-
-
-            // ------
-            // Actions in the palette
-            // ------
-            QJsonValue jsonActionsInPaletteList = jsonScenario.value("actions_palette");
-            if (jsonActionsInPaletteList.isArray())
-            {
-                for (QJsonValue jsonTmp : jsonActionsInPaletteList.toArray())
-                {
-                    if (jsonTmp.isObject())
-                    {
-                        QJsonObject jsonActionInPalette = jsonTmp.toObject();
-
-                        QJsonValue jsonActionId = jsonActionInPalette.value("action_id");
-                        //QJsonValue jsonActionName = jsonActionInPalette.value("action_name");
-                        QJsonValue jsonActionIndex = jsonActionInPalette.value("index");
-
-                        if (jsonActionId.isDouble() && jsonActionIndex.isDouble())
-                        {
-                            int actionId = jsonActionId.toInt();
-
-                            if (hashFromUidToActionM.contains(actionId))
+                            foreach (QJsonValue jsonCondition, jsonConditionsList.toArray())
                             {
-                                ActionM* actionM = hashFromUidToActionM.value(actionId);
-                                if (actionM != NULL)
+                                if (jsonCondition.isObject())
                                 {
-                                    int index = jsonActionIndex.toInt();
-                                    if (index >= 0 && index < 9)
+                                    ActionConditionVM* conditionVM = _parseConditionsVMFromJson(jsonCondition.toObject(), listAgentsInMapping);
+                                    if (conditionVM != NULL)
                                     {
-                                        // Add action in palette
-                                        actionsInPalette.append(new ActionInPaletteVM(actionM, index));
+                                        actionM->addConditionToList(conditionVM);
                                     }
                                 }
                             }
-
                         }
+
                     }
                 }
-            }
 
-
-            // ------
-            // Actions in the timeline
-            // ------
-            QJsonValue jsonActionsInTimelineList = jsonScenario.value("actions_timeline");
-            if(jsonActionsInTimelineList.isArray())
-            {
-                for (QJsonValue jsonTmp : jsonActionsInTimelineList.toArray())
+                if ((actionM != NULL) && !hashFromUidToActionM.contains(actionM->uid()))
                 {
-                    if (jsonTmp.isObject())
-                    {
-                        QJsonObject jsonActionInTimeline = jsonTmp.toObject();
-
-                        QJsonValue jsonActionId = jsonActionInTimeline.value("action_id");
-                        //QJsonValue jsonActionName = jsonActionInTimeline.value("action_name");
-                        QJsonValue jsonActionStartTime = jsonActionInTimeline.value("start_time");
-                        QJsonValue jsonActionColor = jsonActionInTimeline.value("color");
-                        QJsonValue jsonActionLineInTimeline = jsonActionInTimeline.value("line_number");
-
-                        if (jsonActionId.isDouble() && jsonActionStartTime.isDouble() && jsonActionLineInTimeline.isDouble())
-                        {
-                            int actionId = jsonActionId.toInt();
-
-                            if (hashFromUidToActionM.contains(actionId))
-                            {
-                                ActionM* actionM = hashFromUidToActionM.value(actionId);
-                                if (actionM != NULL)
-                                {
-                                    // Create the view model for the timeline
-                                    ActionVM* actionVM = new ActionVM(actionM, jsonActionStartTime.toInt());
-
-                                    // Set line in timeline
-                                    actionVM->setlineInTimeLine(jsonActionLineInTimeline.toInt());
-
-                                    if (jsonActionColor.isString()) {
-                                        actionVM->setcolor(jsonActionColor.toString());
-                                    }
-
-                                    // Add our view model of action in the list
-                                    actionsInTimeLine.append(actionVM);
-                                }
-                            }
-                        }
-                    }
+                    actionsListToImport.append(actionM);
+                    hashFromUidToActionM.insert(actionM->uid(), actionM);
                 }
             }
-
-            // Set results
-            scenarioImport->actionsInTableList.append(actionsListToImport);
-            scenarioImport->actionsInPaletteList.append(actionsInPalette);
-            scenarioImport->actionsInTimelineList.append(actionsInTimeLine);
         }
     }
+
+
+    // ------
+    // Actions in the palette
+    // ------
+    QJsonValue jsonActionsInPaletteList = jsonScenario.value("actions_palette");
+    if (jsonActionsInPaletteList.isArray())
+    {
+        for (QJsonValue jsonTmp : jsonActionsInPaletteList.toArray())
+        {
+            if (jsonTmp.isObject())
+            {
+                QJsonObject jsonActionInPalette = jsonTmp.toObject();
+
+                QJsonValue jsonActionId = jsonActionInPalette.value("action_id");
+                //QJsonValue jsonActionName = jsonActionInPalette.value("action_name");
+                QJsonValue jsonActionIndex = jsonActionInPalette.value("index");
+
+                if (jsonActionId.isDouble() && jsonActionIndex.isDouble())
+                {
+                    int actionId = jsonActionId.toInt();
+
+                    if (hashFromUidToActionM.contains(actionId))
+                    {
+                        ActionM* actionM = hashFromUidToActionM.value(actionId);
+                        if (actionM != NULL)
+                        {
+                            int index = jsonActionIndex.toInt();
+                            if (index >= 0 && index < 9)
+                            {
+                                // Add action in palette
+                                actionsInPalette.append(new ActionInPaletteVM(actionM, index));
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+
+    // ------
+    // Actions in the timeline
+    // ------
+    QJsonValue jsonActionsInTimelineList = jsonScenario.value("actions_timeline");
+    if(jsonActionsInTimelineList.isArray())
+    {
+        for (QJsonValue jsonTmp : jsonActionsInTimelineList.toArray())
+        {
+            if (jsonTmp.isObject())
+            {
+                QJsonObject jsonActionInTimeline = jsonTmp.toObject();
+
+                QJsonValue jsonActionId = jsonActionInTimeline.value("action_id");
+                //QJsonValue jsonActionName = jsonActionInTimeline.value("action_name");
+                QJsonValue jsonActionStartTime = jsonActionInTimeline.value("start_time");
+                QJsonValue jsonActionColor = jsonActionInTimeline.value("color");
+                QJsonValue jsonActionLineInTimeline = jsonActionInTimeline.value("line_number");
+
+                if (jsonActionId.isDouble() && jsonActionStartTime.isDouble() && jsonActionLineInTimeline.isDouble())
+                {
+                    int actionId = jsonActionId.toInt();
+
+                    if (hashFromUidToActionM.contains(actionId))
+                    {
+                        ActionM* actionM = hashFromUidToActionM.value(actionId);
+                        if (actionM != NULL)
+                        {
+                            // Create the view model for the timeline
+                            ActionVM* actionVM = new ActionVM(actionM, jsonActionStartTime.toInt());
+
+                            // Set line in timeline
+                            actionVM->setlineInTimeLine(jsonActionLineInTimeline.toInt());
+
+                            if (jsonActionColor.isString()) {
+                                actionVM->setcolor(jsonActionColor.toString());
+                            }
+
+                            // Add our view model of action in the list
+                            actionsInTimeLine.append(actionVM);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Set results
+    scenarioImport->actionsList()->append(actionsListToImport);
+    scenarioImport->actionsInPaletteList()->append(actionsInPalette);
+    scenarioImport->actionsInTimelineList()->append(actionsInTimeLine);
 
     return scenarioImport;
 }

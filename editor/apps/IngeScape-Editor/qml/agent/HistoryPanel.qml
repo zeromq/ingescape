@@ -19,11 +19,10 @@ import QtQuick.Window 2.3
 import I2Quick 1.0
 
 import INGESCAPE 1.0
-
 import "../theme" as Theme;
 
 
-Window {
+WindowBlockTouches {
     id: rootItem
 
     title: qsTr("Outputs history")
@@ -121,9 +120,8 @@ Window {
 
     Rectangle {
 
-        anchors {
-            fill: parent
-        }
+        anchors.fill: parent
+
         radius: 5
         border {
             width: 2
@@ -171,11 +169,11 @@ Window {
                 rightMargin: 18
             }
 
-            height : titleTxt.height
+            height: titleTxt.height
 
 
             Text {
-                id : titleTxt
+                id: titleTxt
 
                 anchors {
                     left : parent.left
@@ -193,9 +191,12 @@ Window {
         }
 
 
-        //Agents Filter
+        // Agents Filter
         Item {
-            id : _combobox
+            id: _combobox
+
+            // count displayable items
+            property int countDisplayItem: 5
 
             anchors {
                 right : parent.right
@@ -289,16 +290,17 @@ Window {
                     color : IngeScapeTheme.lightGreyColor
                     verticalAlignment: Text.AlignVCenter;
                     elide : Text.ElideRight;
-                    text : (_combobox.enabled && rootItem.controller && rootItem.controller.selectedAgentNamesList.length > 0)?
-                               (rootItem.controller.selectedAgentNamesList.length < rootItem.controller.allAgentNamesList.length)?
-                                   (rootItem.controller.selectedAgentNamesList.length === 1 ? "- " + rootItem.controller.selectedAgentNamesList.length + " agent selected -" : "- " + rootItem.controller.selectedAgentNamesList.length + " agents selected -")
-                                 : "- All agents selected -"
+                    text: (_combobox.enabled && rootItem.controller && rootItem.controller.selectedAgentNamesList.length > 0) ?
+                              (rootItem.controller.selectedAgentNamesList.length < rootItem.controller.allAgentNamesList.length) ?
+                                  (rootItem.controller.selectedAgentNamesList.length === 1 ? "- " + rootItem.controller.selectedAgentNamesList.length + " agent selected -" : "- " + rootItem.controller.selectedAgentNamesList.length + " agents selected -")
+                                : "- All agents selected -"
                     : "";
                 }
 
 
                 Image {
-                    id:_imageCombo;
+                    id: _imageCombo
+
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.right: parent.right;
                     anchors.rightMargin: 10
@@ -312,12 +314,19 @@ Window {
 
 
                 MouseArea {
-                    id:_mouseAreaCombo;
-                    anchors.fill: parent;
-                    activeFocusOnTab: true;
+                    id: _mouseAreaCombo
+
+                    anchors.fill: parent
+                    activeFocusOnTab: true
+
                     onClicked: {
                         _mouseAreaCombo.forceActiveFocus();
-                        (_comboButton.checked) ? _combobox.close() : _combobox.open();
+                        if (_comboButton.checked) {
+                            _combobox.close();
+                        }
+                        else {
+                            _combobox.open();
+                        }
                     }
                 }
 
@@ -328,11 +337,13 @@ Window {
             }
 
             I2PopupBase {
-                id : popup
-                anchors.top:_comboButton.bottom;
+                id: popup
 
-                width: _comboButton.width;
-                height: ((_combolist.count < 8) ? (_combolist.count+1)*(_comboButton.height+1) : 9*(_comboButton.height+1) );
+                anchors.top: _comboButton.bottom
+
+                width: _comboButton.width
+                height: ((_combolist.count < _combobox.countDisplayItem) ? (1 + _combolist.count) * _comboButton.height
+                                                                         : (1 + _combobox.countDisplayItem + 0.5) * _comboButton.height )
 
 
                 isModal: true;
@@ -365,10 +376,7 @@ Window {
                         top: parent.top
                         bottom: parent.bottom
                     }
-
                     width: _comboButton.width
-                    height: ((_combolist.count < 8) ? (_combolist.count+1) * (_comboButton.height+1)
-                                                    : 9 * (_comboButton.height+1) )
 
                     // Prevent drag overshoot on Windows
                     flickableItem.boundsBehavior: Flickable.OvershootBounds
@@ -378,18 +386,18 @@ Window {
 
                     contentItem: Item {
                         width: _scrollView.width;
-                        height: ( (_combolist.count<8) ? (_combolist.count+1)*(_comboButton.height+1) : 9*(_comboButton.height+1) );
+                        height: childrenRect.height
 
                         CheckBox {
                             id : filterAllAgentCB
                             anchors {
                                 left: parent.left
-                                leftMargin :10
-                                right : parent.right
-                                rightMargin : 10
-                                top : parent.top
-                                topMargin: 4
+                                leftMargin: 10
+                                right: parent.right
+                                rightMargin: 10
+                                top: parent.top
                             }
+                            height: _comboButton.height
 
                             property bool isPartiallyChecked : false
 
@@ -492,21 +500,20 @@ Window {
                         }
 
                         ListView {
-                            id:_combolist
+                            id: _combolist
 
                             boundsBehavior: Flickable.StopAtBounds
 
                             anchors {
                                 top : filterAllAgentCB.bottom
-                                topMargin: 4
+                                left: parent.left
+                                right: parent.right
                             }
+                            height: contentHeight
 
-                            width: parent.width;
-                            height: ( (_combolist.count<8) ? _combolist.count*(_comboButton.height+1) : 8*(_comboButton.height+1) );
+                            model: rootItem.controller ? rootItem.controller.allAgentNamesList : 0
 
-                            visible: parent.visible;
-
-                            model: rootItem.controller ? rootItem.controller.allAgentNamesList : 0;
+                            interactive: false
 
                             delegate: Item {
                                 anchors {
@@ -523,11 +530,11 @@ Window {
                                         verticalCenter: parent.verticalCenter
                                         left: parent.left
                                         leftMargin :10
-                                        right : parent.right
+                                        right: parent.right
                                         rightMargin : 10
                                     }
 
-                                    checked : false;
+                                    checked: false;
                                     activeFocusOnPress: true;
 
                                     style: CheckBoxStyle {

@@ -1,10 +1,22 @@
 import QtQuick 2.8
 import QtQuick.Controls 1.4
-import QtQuick.Controls 2.0 as Controls2
 import QtQuick.Controls.Styles 1.4
+
+// TOOLTIP:
+// https://doc.qt.io/qt-5.11/qtquickcontrols2-differences.html
+// Qt Quick Controls 1: Button and Action have built-in Qt Widgets-based tooltips
+// Qt Quick Controls 2: ToolTip can be attached to any Item
+
+// Needed to access to ToolTip
+import QtQuick.Controls.Private 1.0
+
+// Needed to access to ToolTip (https://doc.qt.io/qt-5.11/qml-qtquick-controls2-tooltip.html)
+import QtQuick.Controls 2.0 as Controls2
+
 
 import I2Quick 1.0
 import INGESCAPE 1.0
+
 
 Item{
     id: _combobox
@@ -17,7 +29,7 @@ Item{
      * ComboBox Properties
      */
 
-    // count displayable item
+    // count displayable items
     property int countDisplayItem: 5;
 
     //selected Item & Index
@@ -201,9 +213,9 @@ Item{
     }
 
 
-    Keys.onReturnPressed: {
-        (_comboButton.checked) ? _combobox.close() : _combobox.open();
-    }
+    /*Keys.onReturnPressed: {
+        _comboButton.checked ? _combobox.close() : _combobox.open();
+    }*/
 
 
     Rectangle {
@@ -305,8 +317,9 @@ Item{
             anchors.fill: parent
 
             activeFocusOnTab: true
+
             enabled: (_combolist.count !== 0)
-            hoverEnabled: true
+            hoverEnabled: enabled
 
             onClicked: {
                 _mouseAreaCombo.forceActiveFocus();
@@ -319,7 +332,6 @@ Item{
             }
         }
 
-        // Add tooltip on name
         Controls2.ToolTip {
             delay: 500
             visible: _mouseAreaCombo.containsMouse
@@ -334,19 +346,22 @@ Item{
     }
 
     I2PopupBase {
-        id : popup
+        id: popup
+
         anchors.top: (!openOnTop ? _comboButton.bottom : undefined);
         anchors.bottom: (openOnTop ? _comboButton.top : undefined);
 
-        width: _comboButton.width;
+        width: _comboButton.width
         height: ((_combolist.count < _combobox.countDisplayItem) ? _combolist.count * _comboButton.height
-                                                                 : (_combobox.countDisplayItem + 0.5) * _comboButton.height );
+                                                                 : (_combobox.countDisplayItem + 0.5) * _comboButton.height )
 
 
         isModal: true;
         layerColor: "transparent"
         layerObjectName: _combobox.style.layerObjectName;
-        dismissOnOutsideTap : true;
+
+        dismissOnOutsideTap: true
+        enabled: popup.isOpened
 
         keepRelativePositionToInitialParent : true;
 
@@ -354,57 +369,22 @@ Item{
             _combobox.close();
         }
 
-        // allow navigating in the list with keyboard
-        Keys.onUpPressed: {
-            if (_combobox.selectedItem) {
-                if (_combolist.currentIndex + 1 < _combolist.count) {
-                    if (_combobox.useQStringList === false) {
-                        _combobox.selectedItem = _combolist.model.get(_combolist.currentIndex + 1) ;
-                    }
-                    else {
-                        _combobox.selectedItem = _combolist.model[_combolist.currentIndex + 1] ;
-                    }
-                }
-            }
-            else {
-                if (_combobox.useQStringList === false) {
-                    _combobox.selectedItem = _combolist.model.get(0) ;
-                }
-                else {
-                    _combobox.selectedItem = _combolist.model[0] ;
-                }
-            }
-        }
-
-        Keys.onDownPressed: {
-            if (_combolist.currentIndex - 1 >= 0) {
-                if (_combobox.useQStringList === false) {
-                    _combobox.selectedItem = _combolist.model.get(_combolist.currentIndex - 1) ;
-                }
-                else {
-                    _combobox.selectedItem = _combolist.model[_combolist.currentIndex - 1] ;
-                }
-            }
-        }
-
-        Keys.onReturnPressed: {
+        /*Keys.onReturnPressed: {
             if (_comboButton.checked) {
                 _combobox.close();
             }
             else {
                 _combobox.open();
             }
-        }
+        }*/
 
 
         ScrollView {
              id: _scrollView
 
-             visible: _comboButton.checked;
-
              anchors {
-                 top:  parent.top
-                bottom:  parent.bottom
+                 top: parent.top
+                 bottom: parent.bottom
              }
              width: _comboButton.width
 
@@ -423,8 +403,6 @@ Item{
                 width: parent.width
 
                 boundsBehavior: Flickable.StopAtBounds
-
-                visible: parent.visible;
 
                 model: 0
 
@@ -465,6 +443,7 @@ Item{
 
                         MouseArea {
                             id: _mouseAreaItem
+
                             anchors.fill: parent
 
                             hoverEnabled: true
@@ -492,55 +471,35 @@ Item{
                                     _combobox.selectedItem = modelData;
                                 }
                             }
+
+                            onExited: {
+                                Tooltip.hideText();
+                            }
+                            onCanceled: {
+                                Tooltip.hideText();
+                            }
+
+                            Timer {
+                                interval: 400
+                                running: _mouseAreaItem.containsMouse
+
+                                onTriggered: {
+                                    Tooltip.showText(_mouseAreaItem, Qt.point(_mouseAreaItem.mouseX, _mouseAreaItem.mouseY), _itemText.text);
+                                }
+                            }
                         }
 
-                        // Add tooltip on name
-                        Controls2.ToolTip {
+                        // Induce bug with the trackpad (Window is no more interactive)
+                        /*Controls2.ToolTip {
                             delay: 400
                             visible: _mouseAreaItem.containsMouse
                             text: _itemText.text
-                        }
+                        }*/
+
                     }
                 }
             }
         }
-
     }
-
-
-    // allow navigating in the list with keyboard
-    Keys.onUpPressed: {
-        if (_combobox.selectedItem) {
-            if (_combolist.currentIndex + 1 < _combolist.count) {
-                if (_combobox.useQStringList === false) {
-                    _combobox.selectedItem = _combolist.model.get(_combolist.currentIndex + 1) ;
-                }
-                else {
-                    _combobox.selectedItem = _combolist.model[_combolist.currentIndex + 1] ;
-                }
-            }
-        }
-        else {
-            if (_combobox.useQStringList === false) {
-                _combobox.selectedItem = _combolist.model.get(0) ;
-            }
-            else {
-                _combobox.selectedItem = _combolist.model[0] ;
-            }
-        }
-    }
-
-    Keys.onDownPressed: {
-        if (_combolist.currentIndex - 1 >= 0) {
-            if (_combobox.useQStringList === false) {
-                _combobox.selectedItem = _combolist.model.get(_combolist.currentIndex - 1) ;
-            }
-            else {
-                _combobox.selectedItem = _combolist.model[_combolist.currentIndex - 1] ;
-            }
-        }
-
-    }
-
 }
 

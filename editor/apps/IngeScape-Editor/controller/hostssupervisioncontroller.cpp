@@ -55,11 +55,19 @@ HostsSupervisionController::~HostsSupervisionController()
 
 
 /**
- * @brief Clear the list of agents (global list with all agents)
+ * @brief Remove each UN-active agent (agent with state OFF) from the global list with all agents
  */
-void HostsSupervisionController::clearAgentsList()
+void HostsSupervisionController::removeUNactiveAgents()
 {
-    _allAgents.clear();
+    QList<AgentM*> copy = QList<AgentM*>(_allAgents);
+
+    // Remove each model with state OFF
+    for (AgentM* model : copy)
+    {
+        if ((model != NULL) && !model->isON()) {
+            _allAgents.removeOne(model);
+        }
+    }
 }
 
 

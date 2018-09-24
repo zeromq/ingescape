@@ -1317,12 +1317,12 @@ Item {
     //--------------------------------------------------------
     //
     //
-    // Analysis view - Connections / Bindings
+    // Timeline view - Connections / Bindings
     //
     //
     //--------------------------------------------------------
 
-    // ContentArea => AnalysisViewController
+    // ContentArea => ViewController
     Binding {
         target: viewController
         property: "viewportX"

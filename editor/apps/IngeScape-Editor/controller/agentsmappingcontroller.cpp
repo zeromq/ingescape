@@ -133,9 +133,12 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
 /**
  * @brief Remove a link between two agents from the mapping
  * @param link
+ * @return true if the link has been deleted during the call of our method
  */
-void AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
+bool AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
 {
+    bool linkHasBeenDeleted = false;
+
     if ((link != NULL) && (link->inputAgent() != NULL) && (link->input() != NULL) && (link->outputAgent() != NULL) && (link->output() != NULL))
     {
         qInfo() << "Remove the link between agents" << link->outputAgent()->name() << "and" << link->inputAgent()->name();
@@ -159,8 +162,12 @@ void AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
 
             // Delete the link between two agents
             _deleteLinkBetweenTwoAgents(link);
+
+            linkHasBeenDeleted = true;
         }
     }
+
+    return linkHasBeenDeleted;
 }
 
 
@@ -1001,9 +1008,6 @@ void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsL
             if ((link != NULL) && (link->inputAgent() != NULL) && (link->inputAgent() == agentInMapping)
                     && (link->input() != NULL) && inputsListWillBeRemoved.contains(link->input()))
             {
-                // Remove the link between two agents from the mapping
-                //removeLinkBetweenTwoAgents(link);
-
                 // Delete the link between two agents
                 _deleteLinkBetweenTwoAgents(link);
             }
@@ -1028,9 +1032,6 @@ void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outpu
             if ((link != NULL) && (link->outputAgent() != NULL) && (link->outputAgent() == agentInMapping)
                     && (link->output() != NULL) && outputsListWillBeRemoved.contains(link->output()))
             {
-                // Remove the link between two agents from the mapping
-                //removeLinkBetweenTwoAgents(link);
-
                 // Delete the link between two agents
                 _deleteLinkBetweenTwoAgents(link);
             }
@@ -1148,10 +1149,9 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
             if ( (link != NULL) && ((link->outputAgent() == agent) || (link->inputAgent() == agent)) )
             {
                 // Remove a link between two agents from the mapping
-                removeLinkBetweenTwoAgents(link);
+                bool linkHasBeenDeleted = removeLinkBetweenTwoAgents(link);
 
-                // Mapping is activated
-                if (_modelManager->isMappingActivated())
+                if (!linkHasBeenDeleted)
                 {
                     // We have to delete the link to clean our HMI (even if we do not have yet received the message "UNMAPPED")
                     _deleteLinkBetweenTwoAgents(link);

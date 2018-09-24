@@ -68,7 +68,7 @@ ApplicationWindow {
                 shortcut: StandardKey.New
 
                 onTriggered: {
-                    IngeScapeEditorC.createNewPlatform();
+                    IngeScapeEditorC.clearCurrentPlatform();
                 }
             }
 

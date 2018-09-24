@@ -2,7 +2,7 @@
 // Margin in minutes (left and right side of our view) to ensure that labels are not truncated
 #define TIME_MARGIN_IN_PIXELS 40
 
-// The viewport of our analysis view is approximately 1335 px
+// The viewport of our timeline view is approximately 1335 px
 #define DEFAULT_VIEWPORT_WIDTH 1400.0
 
 // Minimum and maximum values to constrain "zoom" levels

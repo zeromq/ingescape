@@ -139,10 +139,10 @@ public:
 
 
     /**
-      * @brief Import the scenario lists structure from the json byte content
-      * @param byteArrayOfJson
+      * @brief Import the scenario from JSON
+      * @param jsonScenario
       */
-    void importScenarioFromJson(QByteArray byteArrayOfJson);
+    void importScenarioFromJson(QJsonObject jsonScenario);
 
 
     /**

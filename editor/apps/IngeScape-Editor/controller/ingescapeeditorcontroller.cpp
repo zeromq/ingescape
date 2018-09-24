@@ -432,6 +432,9 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
 
     if (!platformFilePath.isEmpty())
     {
+        // First, clear the current platform by deleting all existing data
+        clearCurrentPlatform();
+
         // Load the platform from JSON file
         _loadPlatformFromFile(platformFilePath);
 
@@ -480,15 +483,15 @@ void IngeScapeEditorController::savePlatformToDefaultFile()
 
 
 /**
- * @brief Create a new platform (agents, mappings, actions, palette, timeline actions)
+ * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions)
  * by deleting all existing data
  */
-void IngeScapeEditorController::createNewPlatform()
+void IngeScapeEditorController::clearCurrentPlatform()
 {
     if (_hostsSupervisionC != NULL)
     {
-        // Clear the list of agents (global list with all agents)
-        _hostsSupervisionC->clearAgentsList();
+        // Remove each UN-active agent (agent with state OFF) from the global list with all agents
+        _hostsSupervisionC->removeUNactiveAgents();
     }
 
     if (_agentsMappingC != NULL)
@@ -505,8 +508,8 @@ void IngeScapeEditorController::createNewPlatform()
 
     if (_agentsSupervisionC != NULL)
     {
-        // Clear the list of agents
-        _agentsSupervisionC->clearAgentsList();
+        // Remove (and delete) each UN-active agent (agent with state OFF) from the list
+        _agentsSupervisionC->removeUNactiveAgents();
     }
 
     // Notify QML to reset view
@@ -640,8 +643,8 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 // Has to clear the current platform
                 if (hasToClearPlatform)
                 {
-                    // Create a new empty platform by deleting all existing data
-                    createNewPlatform();
+                    // Clear the current platform by deleting all existing data
+                    clearCurrentPlatform();
                 }
 
                 // Start our INGESCAPE agent with the network device and the port
@@ -855,62 +858,36 @@ void IngeScapeEditorController::_onStartToRecord()
  */
 void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions)
 {
-    // FIXME TODO jsonExecutedActions
-    Q_UNUSED(jsonExecutedActions)
-
     if ((deltaTimeFromTimeLine >= 0) && !jsonPlatform.isEmpty())
     {
-        qDebug() << "jsonExecutedActions" << jsonExecutedActions;
+        // First, clear the current platform by deleting all existing data
+        clearCurrentPlatform();
 
         QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonPlatform.toUtf8());
-        if (jsonDocument.isObject())
+
+        // Load the platform from JSON
+        _loadPlatformFromJSON(jsonDocument);
+
+        if (_scenarioC != NULL)
         {
-            QJsonObject jsonRoot = jsonDocument.object();
+            // Update the current time
+            _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLine));
 
-            // Import the agents list from JSON
-            if ((_modelManager != NULL) && jsonRoot.contains("agents"))
-            {
-                _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
-            }
+            // FIXME TODO jsonExecutedActions
+            qDebug() << "jsonExecutedActions" << jsonExecutedActions;
 
-            // Import the mapping of agents from JSON
-            if (_agentsMappingC != NULL)
-            {
-                // Clear the current mapping
-                _agentsMappingC->clearMapping();
-
-                if (jsonRoot.contains("mapping")) {
-                    _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
-                }
-            }
-
-            if (_scenarioC != NULL)
-            {
-                // Clear scenario
-                _scenarioC->clearScenario();
-
-                // FIXME: use json directly ?
-                QByteArray byteArrayOfJson = jsonPlatform.toUtf8();
-
-                // Import the scenario from JSON
-                _scenarioC->importScenarioFromJson(byteArrayOfJson);
-
-                // Update the current time
-                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLine));
-
-                // Import the executed actions for this scenario from JSON
-                _scenarioC->importExecutedActionsFromJson(jsonExecutedActions.toUtf8());
-            }
-
-            // Notify QML to reset view
-            Q_EMIT resetMappindAndTimeLineViews();
+            // Import the executed actions for this scenario from JSON
+            _scenarioC->importExecutedActionsFromJson(jsonExecutedActions.toUtf8());
         }
+
+        // Notify QML to reset view
+        Q_EMIT resetMappindAndTimeLineViews();
     }
 }
 
 
 /**
- * @brief Load the platform from JSON file
+ * @brief Load the platform from a JSON file
  * @param platformFilePath
  */
 void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
@@ -928,40 +905,12 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                 jsonFile.close();
 
                 QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
-                if (jsonDocument.isObject())
-                {
-                    QJsonObject jsonRoot = jsonDocument.object();
 
-                    // Import the agents list from JSON
-                    if ((_modelManager != NULL) && jsonRoot.contains("agents"))
-                    {
-                        _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
-                    }
+                // Load the platform from JSON
+                _loadPlatformFromJSON(jsonDocument);
 
-                    // Import the mapping of agents from JSON
-                    if (_agentsMappingC != NULL)
-                    {
-                        // Clear the current mapping
-                        _agentsMappingC->clearMapping();
-
-                        if (jsonRoot.contains("mapping")) {
-                            _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
-                        }
-                    }
-
-                    // Import the scenario from JSON
-                    if (_scenarioC != NULL)
-                    {
-                        // Clear scenario
-                        _scenarioC->clearScenario();
-
-                        // Import new scenario
-                        _scenarioC->importScenarioFromJson(byteArrayOfJson);
-                    }
-
-                    // Notify QML to reset view
-                    Q_EMIT resetMappindAndTimeLineViews();
-                }
+                // Notify QML to reset view
+                Q_EMIT resetMappindAndTimeLineViews();
             }
             else {
                 qCritical() << "Can not open file" << platformFilePath;
@@ -975,7 +924,7 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
 
 
 /**
- * @brief Save the platform to JSON file
+ * @brief Save the platform to a JSON file
  * @param platformFilePath
  */
 void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
@@ -997,6 +946,37 @@ void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
             else {
                 qCritical() << "Can not open file" << platformFilePath;
             }
+        }
+    }
+}
+
+
+/**
+  * @brief Load the platform from JSON
+  * @param jsonDocument
+  */
+void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument)
+{
+    if (jsonDocument.isObject())
+    {
+        QJsonObject jsonRoot = jsonDocument.object();
+
+        // Import the agents list from JSON
+        if ((_modelManager != NULL) && jsonRoot.contains("agents"))
+        {
+            _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
+        }
+
+        // Import the mapping of agents from JSON
+        if ((_agentsMappingC != NULL) && jsonRoot.contains("mapping"))
+        {
+            _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
+        }
+
+        // Import the scenario from JSON
+        if ((_scenarioC != NULL) && jsonRoot.contains("scenario"))
+        {
+            _scenarioC->importScenarioFromJson(jsonRoot.value("scenario").toObject());
         }
     }
 }
