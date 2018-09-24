@@ -22,7 +22,8 @@ import INGESCAPE 1.0
 import "../theme" as Theme;
 import ".." as Editor;
 
-Window {
+
+WindowBlockTouches {
     id: rootItem
 
     title: actionM ? actionM.name : "Action"
@@ -877,16 +878,16 @@ Window {
                                     IngeScapeComboBoxAgentsIOP {
                                         id : comboEffectOnMapping_Output
 
-                                        enabled : visible
                                         anchors {
                                             left : parent.left
                                             bottom : parent.bottom
                                         }
-
                                         height : 25
                                         width : 148
 
                                         model : (myEffect && myEffect.modelM) ? myEffect.modelM.outputsList : 0
+
+                                        enabled: visible
 
                                         function modelToString(model) {
                                             return model.name;
@@ -1062,16 +1063,16 @@ Window {
                                     IngeScapeComboBoxAgentsIOP {
                                         id : comboEffectOnMapping_Input
 
-                                        enabled : visible
                                         anchors {
                                             right : parent.right
                                             bottom : parent.bottom
                                         }
-
                                         height : 25
                                         width : 148
 
                                         model : (myEffect && myEffect.modelM) ? myEffect.modelM.inputsList : 0
+
+                                        enabled: visible
 
                                         function modelToString(model) {
                                             return model.name;
@@ -2063,7 +2064,7 @@ Window {
                                     implicitHeight: 14
                                     radius : height / 2
                                     border.width: 0
-                                    color: control.enabled ?  IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
+                                    color: control.enabled ? IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
 
                                     Rectangle {
                                         anchors.centerIn: parent
@@ -2132,7 +2133,7 @@ Window {
                                         implicitHeight: 14
                                         radius : height / 2
                                         border.width: 0
-                                        color: control.enabled ?  IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
+                                        color: control.enabled ? IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
 
                                         Rectangle {
                                             anchors.centerIn: parent
