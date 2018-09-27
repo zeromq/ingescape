@@ -369,7 +369,7 @@ Item {
                     IngeScapeEditorC.addOpenedWindow(actionEditor);
                 }
 
-                onClosing: {
+                onClosingVersion: {
                     IngeScapeEditorC.closeActionEditor(model.QtObject);
                 }
             }
@@ -399,7 +399,7 @@ Item {
                     IngeScapeEditorC.addOpenedWindow(logStreamPanel);
                 }
 
-                onClosing: {
+                onClosingVersion: {
                     IngeScapeEditorC.closeLogStreamController(model.QtObject);
                 }
             }

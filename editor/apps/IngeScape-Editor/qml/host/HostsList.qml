@@ -318,13 +318,13 @@ Item {
                             }
                         }
 
-                        // Add tooltip on name
-                        Controls2.ToolTip.delay: 400
-                        Controls2.ToolTip.visible: mouseAreaToolTip.containsMouse
-
-                        //Controls2.ToolTip.text: (model ? model.commandLine : "")
-                        Controls2.ToolTip.text: model ? model.name + "\n" + model.commandLine
-                                                      : ""
+                        Controls2.ToolTip {
+                            delay: 400
+                            visible: mouseAreaToolTip.containsMouse
+                            //text: (model ? model.commandLine : "")
+                            text: model ? model.name + "\n" + model.commandLine
+                                        : ""
+                        }
 
                         // Remove button
                         Button {

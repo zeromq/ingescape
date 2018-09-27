@@ -14,8 +14,19 @@
 
 import QtQuick 2.8
 import QtQuick.Controls 1.4
-import QtQuick.Controls 2.0 as Controls2
 import QtQuick.Controls.Styles 1.4
+
+// TOOLTIP:
+// https://doc.qt.io/qt-5.11/qtquickcontrols2-differences.html
+// Qt Quick Controls 1: Button and Action have built-in Qt Widgets-based tooltips
+// Qt Quick Controls 2: ToolTip can be attached to any Item
+
+// Needed to access to ToolTip
+import QtQuick.Controls.Private 1.0
+
+// Needed to access to ToolTip (https://doc.qt.io/qt-5.11/qml-qtquick-controls2-tooltip.html)
+import QtQuick.Controls 2.0 as Controls2
+
 
 import I2Quick 1.0
 import INGESCAPE 1.0
@@ -30,7 +41,7 @@ Item {
     width : 148
 
 
-    // count displayable item
+    // count displayable items
     property int countDisplayItem: 5;
 
     //selected Item
@@ -244,7 +255,6 @@ Item {
             }
         }
 
-        // Add tooltip on name
         Controls2.ToolTip {
             id: comboBoxTooltip
             delay: 500
@@ -272,7 +282,9 @@ Item {
         isModal: true
         layerColor: "transparent"
         layerObjectName: "overlayLayerComboBox"
-        dismissOnOutsideTap : true
+
+        dismissOnOutsideTap: true
+        enabled: popup.isOpened
 
         keepRelativePositionToInitialParent: true
 
@@ -294,7 +306,7 @@ Item {
         ScrollView {
             id: _scrollView
 
-            visible: comboButton.checked
+            //visible: comboButton.checked
 
             anchors {
                 top: parent.top
@@ -319,8 +331,6 @@ Item {
                 width: parent.width
 
                 boundsBehavior: Flickable.StopAtBounds
-
-                visible: parent.visible
 
                 delegate: Rectangle {
                     anchors {
@@ -414,7 +424,7 @@ Item {
                             right: parent.right
                         }
 
-                        color: (combobox.selectedItem === model.QtObject)?  IngeScapeTheme.orangeColor : IngeScapeTheme.whiteColor
+                        color: (combobox.selectedItem === model.QtObject) ? IngeScapeTheme.orangeColor : IngeScapeTheme.whiteColor
 
                         text: model.name
                         elide: Text.ElideRight
@@ -426,7 +436,10 @@ Item {
                     }
 
                     MouseArea {
-                        id:_mouseAreaItem
+                        id: _mouseAreaItem
+
+                        property string text: model.name + " (" + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase() + ")"
+
                         anchors.fill : parent
 
                         hoverEnabled: true
@@ -436,19 +449,33 @@ Item {
                             combobox.selectedItem = model.QtObject;
 
                         }
+
+                        onExited: {
+                            Tooltip.hideText();
+                        }
+                        onCanceled: {
+                            Tooltip.hideText();
+                        }
+
+                        Timer {
+                            interval: 400
+                            running: _mouseAreaItem.containsMouse
+
+                            onTriggered: {
+                                Tooltip.showText(_mouseAreaItem, Qt.point(_mouseAreaItem.mouseX, _mouseAreaItem.mouseY), _mouseAreaItem.text);
+                            }
+                        }
                     }
 
-                    // Add tooltip on name
-                    Controls2.ToolTip {
+                    // Induce bug with the trackpad (Window is no more interactive)
+                    /*Controls2.ToolTip {
                         delay: 400
                         visible: _mouseAreaItem.containsMouse
                         text: model.name + " (" + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase() + ")"
-                    }
+                    }*/
                 }
-
             }
         }
-
     }
 }
 

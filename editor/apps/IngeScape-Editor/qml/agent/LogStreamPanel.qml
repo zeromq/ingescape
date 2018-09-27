@@ -23,7 +23,7 @@ import INGESCAPE 1.0
 import "../theme" as Theme;
 
 
-Window {
+WindowBlockTouches {
     id: rootItem
 
     title: (controller ? qsTr("Log stream for %1").arg(controller.agentName) : qsTr("Log stream"))
@@ -235,6 +235,7 @@ Window {
 
             Rectangle {
                 id: _comboButton
+
                 property bool checked : false;
 
                 width: parent.width
@@ -297,7 +298,7 @@ Window {
 
 
                 Image {
-                    id:_imageCombo;
+                    id: _imageCombo;
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.right: parent.right;
                     anchors.rightMargin: 10
@@ -334,17 +335,16 @@ Window {
             }
 
             I2PopupBase {
-                id : popup
-                anchors.top: _comboButton.bottom;
+                id: popup
 
-                width: _comboButton.width;
-                height: ((_combolist.count < 8) ? (_combolist.count + 1) * (_comboButton.height + 1) : 9 * (_comboButton.height + 1) );
+                anchors.top: _comboButton.bottom
+                width: _comboButton.width
+                height: (1 + rootItem.controller.allLogTypes.count) * _comboButton.height
 
-
-                isModal: true;
+                isModal: true
                 layerColor: "transparent"
-                layerObjectName: "overlayLayerComboBox";
-                dismissOnOutsideTap : true;
+                layerObjectName: "overlayLayerComboBox"
+                dismissOnOutsideTap: true
 
                 keepRelativePositionToInitialParent : true;
 
@@ -368,12 +368,10 @@ Window {
                     visible: _comboButton.checked;
 
                     anchors {
-                        top: parent.top;
-                        bottom: parent.bottom;
+                        top: parent.top
+                        bottom: parent.bottom
                     }
-
-                    width: _comboButton.width;
-                    height: ((_combolist.count < 8) ? (_combolist.count + 1) * (_comboButton.height + 1) : 9 * (_comboButton.height + 1) );
+                    width: _comboButton.width
 
                     // Prevent drag overshoot on Windows
                     flickableItem.boundsBehavior: Flickable.OvershootBounds
@@ -383,18 +381,19 @@ Window {
 
                     contentItem: Item {
                         width: _scrollView.width
-                        height: ( (_combolist.count < 8) ? (_combolist.count + 1) * (_comboButton.height + 1) : 9 * (_comboButton.height + 1) )
+                        height: _scrollView.height
 
                         CheckBox {
-                            id : filterAllTypesCB
+                            id: filterAllTypesCB
+
                             anchors {
                                 left: parent.left
                                 leftMargin :10
                                 right : parent.right
                                 rightMargin : 10
                                 top : parent.top
-                                topMargin: 4
                             }
+                            height: _comboButton.height
 
                             property bool isPartiallyChecked : false
 
@@ -453,7 +452,6 @@ Window {
                                         }
                                     }
                                 }
-
                             }
 
                             onClicked : {
@@ -475,7 +473,7 @@ Window {
                             }
 
                             Connections {
-                                target : popup
+                                target: popup
 
                                 // update "all types" checkbox state
                                 onOpened : {
@@ -502,16 +500,12 @@ Window {
                             boundsBehavior: Flickable.StopAtBounds
 
                             anchors {
-                                top : filterAllTypesCB.bottom
-                                topMargin: 4
+                                top: filterAllTypesCB.bottom
+                                bottom: parent.bottom
                             }
+                            width: parent.width
 
-                            width: parent.width;
-                            height: ( (_combolist.count < 8) ? _combolist.count*(_comboButton.height + 1) : 8 * (_comboButton.height + 1) );
-
-                            visible: parent.visible;
-
-                            model: (rootItem.controller ? rootItem.controller.allLogTypes : 0)
+                            model: rootItem.controller ? rootItem.controller.allLogTypes : 0
 
                             delegate: Item {
 
