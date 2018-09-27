@@ -22,6 +22,8 @@ import INGESCAPE 1.0
 import "../theme" as Theme;
 import ".." as Editor;
 
+// validator: RegExpValidator { regExp: /^[01]$|^TRUE$|^FALSE$/ }
+
 Window {
     id: rootItem
 
