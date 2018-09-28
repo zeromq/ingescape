@@ -135,7 +135,7 @@ void AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
 {
     if (_temporaryMapping != NULL)
     {
-        // Check that there is not already the same link
+        // Get the temporary link with same names
         ElementMappingM* temporaryLink = _getTemporaryLink(inputName, outputAgentName, outputName);
         if (temporaryLink != NULL)
         {
@@ -1340,7 +1340,7 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInOutput()
  */
 ElementMappingM* AgentInMappingVM::_getTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
 {
-    foreach (ElementMappingM* iterator, _temporaryMapping->mappingElements()->toList())
+    for (ElementMappingM* iterator : _temporaryMapping->mappingElements()->toList())
     {
         if ((iterator != NULL) && (iterator->inputAgent() == _name)
                 && (iterator->input() == inputName) && (iterator->outputAgent() == outputAgentName) && (iterator->output() == outputName))
