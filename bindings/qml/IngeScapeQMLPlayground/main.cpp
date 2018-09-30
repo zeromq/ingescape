@@ -83,10 +83,10 @@ int main(int argc, char *argv[])
     //
     //------------------------------
     QApplication app(argc, argv);
-    app.setOrganizationName("Ingenuity i/o");
+    app.setOrganizationName("ingenuity.io");
     app.setOrganizationDomain("ingenuity.io");
     app.setApplicationName("IngeScapeQMLPlayground");
-    app.setApplicationVersion("0.0.0.0");
+    app.setApplicationVersion(VERSION);
 
     // - behavior when our last window is closed
     app.setQuitOnLastWindowClosed(true);

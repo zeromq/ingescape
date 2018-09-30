@@ -154,7 +154,7 @@ void AgentVM::changeState()
     // is OFF --> Execute all agents
     else
     {
-        foreach (AgentM* model, _models.toList())
+        for (AgentM* model : _models.toList())
         {
             // Check if the model has a hostname
             if ((model != NULL) && !model->hostname().isEmpty())

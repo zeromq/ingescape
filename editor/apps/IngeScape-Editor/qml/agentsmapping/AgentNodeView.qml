@@ -278,10 +278,11 @@ Rectangle {
                                 cursorShape: Qt.PointingHandCursor
                             }
 
-                            // Add tooltip on name
-                            Controls2.ToolTip.delay: 400
-                            Controls2.ToolTip.visible: rootTooltipInput.containsMouse
-                            Controls2.ToolTip.text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")": "")
+                            Controls2.ToolTip {
+                                delay: 400
+                                visible: rootTooltipInput.containsMouse
+                                text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")": "")
+                            }
                         }
 
 
@@ -536,10 +537,11 @@ Rectangle {
                                 cursorShape: Qt.PointingHandCursor
                             }
 
-                            // Add tooltip on name
-                            Controls2.ToolTip.delay: 400
-                            Controls2.ToolTip.visible: rootTooltipOutput.containsMouse
-                            Controls2.ToolTip.text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")": "")
+                            Controls2.ToolTip {
+                                delay: 400
+                                visible: rootTooltipOutput.containsMouse
+                                text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")": "")
+                            }
                         }
 
                         Rectangle {

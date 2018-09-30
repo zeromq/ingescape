@@ -30,7 +30,7 @@ ApplicationWindow {
     height: 768
 
 
-    title: qsTr("ingeScape QML Playground - %1").arg(mainWindow.editedFile)
+    title: qsTr("ingeScape QML Playground - v%1 -- %2").arg(Qt.application.version).arg(mainWindow.editedFile)
 
 
     // NB: we must override the style of our ApplicationWindow if we want a white background!
