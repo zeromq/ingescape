@@ -356,6 +356,10 @@ private:
 
     // Hash table from "agent name" to a list of waiting links (where the agent is involved as "Output Agent")
     QHash<QString, QList<ElementMappingM*>> _hashFromAgentNameToListOfWaitingLinks;
+
+    // FIXME TODO:
+    QStringList _addedLinksWhileMappingIsUNactivated;
+    QStringList _removedLinksWhileMappingIsUNactivated;
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)

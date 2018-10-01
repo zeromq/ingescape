@@ -108,9 +108,12 @@ AgentInMappingVM::~AgentInMappingVM()
  * @param inputName
  * @param outputAgentName
  * @param outputName
+ * @return true if the link has been added
  */
-void AgentInMappingVM::addTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
+bool AgentInMappingVM::addTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
 {
+    bool hasBeenAdded = false;
+
     if (_temporaryMapping != NULL)
     {
         // Check that there is not already the same link
@@ -120,8 +123,11 @@ void AgentInMappingVM::addTemporaryLink(QString inputName, QString outputAgentNa
             temporaryLink = new ElementMappingM(_name, inputName, outputAgentName, outputName);
 
             _temporaryMapping->mappingElements()->append(temporaryLink);
+
+            hasBeenAdded = true;
         }
     }
+    return hasBeenAdded;
 }
 
 
@@ -130,9 +136,12 @@ void AgentInMappingVM::addTemporaryLink(QString inputName, QString outputAgentNa
  * @param inputName
  * @param outputAgentName
  * @param outputName
+ * @return true if the link has been removed
  */
-void AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
+bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
 {
+    bool hasBeenRemoved = false;
+
     if (_temporaryMapping != NULL)
     {
         // Get the temporary link with same names
@@ -140,8 +149,11 @@ void AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         if (temporaryLink != NULL)
         {
             _temporaryMapping->mappingElements()->remove(temporaryLink);
+
+            hasBeenRemoved = true;
         }
     }
+    return hasBeenRemoved;
 }
 
 

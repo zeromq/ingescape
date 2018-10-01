@@ -160,6 +160,14 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
             // Remove temporary link (this temporary link will be removed when the user will activate the mapping)
             link->inputAgent()->removeTemporaryLink(link->input()->name(), link->outputAgent()->name(), link->output()->name());
 
+            qDebug() << "Remove TEMPORARY link" << link->id();
+            if (_addedLinksWhileMappingIsUNactivated.contains(link->id())) {
+                _addedLinksWhileMappingIsUNactivated.removeOne(link->id());
+            }
+            else {
+                _removedLinksWhileMappingIsUNactivated.append(link->id());
+            }
+
             // Delete the link between two agents
             _deleteLinkBetweenTwoAgents(link);
 
@@ -239,7 +247,8 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
             bool alreadyLinked = false;
             for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
             {
-                if ((iterator != NULL) && (iterator->outputAgent() == outputAgent) && (iterator->output() == output)
+                if ((iterator != NULL)
+                        && (iterator->outputAgent() == outputAgent) && (iterator->output() == output)
                         && (iterator->inputAgent() == inputAgent) && (iterator->input() == input))
                 {
                     alreadyLinked = true;
@@ -253,7 +262,8 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                 qInfo() << "QML asked to create the link between agents" << outputAgent->name() << "and" << inputAgent->name();
 
                 // Mapping is activated
-                if ((_modelManager != NULL) && _modelManager->isMappingActivated())
+                // AND the input agent is ON
+                if ((_modelManager != NULL) && _modelManager->isMappingActivated() && inputAgent->isON())
                 {
                     // Add a temporary link (this temporary link will became a real link when the agent will send its mapping update)
                     inputAgent->addTemporaryLink(input->name(), outputAgent->name(), output->name());
@@ -268,6 +278,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                     Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->peerIdsList(), "MAP", input->name(), outputAgent->name(), output->name());
                 }
                 // Mapping is NOT activated
+                // OR the input agent is OFF
                 else
                 {
                     // Add a temporary link (this temporary link will became a real link when the user will activate the mapping)
@@ -278,13 +289,22 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
 
                     // Add to the list
                     _allLinksInMapping.append(link);
+
+                    qDebug() << "Add TEMPORARY link" << link->id();
+                    if (_removedLinksWhileMappingIsUNactivated.contains(link->id())) {
+                        _removedLinksWhileMappingIsUNactivated.removeOne(link->id());
+                    }
+                    else {
+                        _addedLinksWhileMappingIsUNactivated.append(link->id());
+                    }
                 }
             }
             else {
                 qWarning() << "The input" << input->name() << "(of agent" << inputAgent->name() << ") is already linked to output" << output->name() << "(of agent" << outputAgent->name() << ")";
             }
         }
-        else {
+        else
+        {
             if ((output->firstModel() != NULL) && (input->firstModel() != NULL)) {
                 qDebug() << "Can not link output" << output->name() << "with type" << AgentIOPValueTypes::staticEnumToString(output->firstModel()->agentIOPValueType()) << "(of agent" << outputAgent->name() << ")"
                          << "and input" << input->name() << "with type" << AgentIOPValueTypes::staticEnumToString(input->firstModel()->agentIOPValueType()) << "(of agent" << inputAgent->name() << ")";
@@ -454,6 +474,10 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
         else
         {
             qDebug() << "Mapping Activated in mode OBSERVE";
+
+            if (!_addedLinksWhileMappingIsUNactivated.isEmpty() || !_removedLinksWhileMappingIsUNactivated.isEmpty()) {
+                qDebug() << "There were modifications in the mapping while the mapping was UN-activated. Force to CONTROL ?";
+            }
 
             // Get the map from agent name to list of active agents
             QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
@@ -792,6 +816,7 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
         if ((link != NULL) && (link->inputAgent() != NULL))
         {
             // Add the temporary link that correspond to this real link (if it does not yet exist)
+            //bool hasBeenAdded = link->inputAgent()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
             link->inputAgent()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
         }
     }
@@ -812,8 +837,10 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
         MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
         if (link != NULL)
         {
-            if (link->inputAgent() != NULL) {
+            if (link->inputAgent() != NULL)
+            {
                 // Remove the temporary link that correspond to this real link
+                //bool hasBeenRemoved = link->inputAgent()->removeTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
                 link->inputAgent()->removeTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
             }
 

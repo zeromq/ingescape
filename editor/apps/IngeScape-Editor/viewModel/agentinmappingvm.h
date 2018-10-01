@@ -102,8 +102,9 @@ public:
      * @param inputName
      * @param outputAgentName
      * @param outputName
+     * @return true if the link has been added
      */
-    void addTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
+    bool addTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
 
 
     /**
@@ -111,8 +112,9 @@ public:
      * @param inputName
      * @param outputAgentName
      * @param outputName
+     * @return true if the link has been removed
      */
-    void removeTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
+    bool removeTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
 
 
 Q_SIGNALS:
