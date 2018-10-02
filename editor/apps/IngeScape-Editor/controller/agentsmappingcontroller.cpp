@@ -161,11 +161,11 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
             link->inputAgent()->removeTemporaryLink(link->input()->name(), link->outputAgent()->name(), link->output()->name());
 
             qDebug() << "Remove TEMPORARY link" << link->id();
-            if (_addedLinksWhileMappingIsUNactivated.contains(link->id())) {
-                _addedLinksWhileMappingIsUNactivated.removeOne(link->id());
+            if (_addedLinksWhileMappingWasUNactivated.contains(link->id())) {
+                _addedLinksWhileMappingWasUNactivated.removeOne(link->id());
             }
             else {
-                _removedLinksWhileMappingIsUNactivated.append(link->id());
+                _removedLinksWhileMappingWasUNactivated.append(link->id());
             }
 
             // Delete the link between two agents
@@ -291,11 +291,11 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                     _allLinksInMapping.append(link);
 
                     qDebug() << "Add TEMPORARY link" << link->id();
-                    if (_removedLinksWhileMappingIsUNactivated.contains(link->id())) {
-                        _removedLinksWhileMappingIsUNactivated.removeOne(link->id());
+                    if (_removedLinksWhileMappingWasUNactivated.contains(link->id())) {
+                        _removedLinksWhileMappingWasUNactivated.removeOne(link->id());
                     }
                     else {
-                        _addedLinksWhileMappingIsUNactivated.append(link->id());
+                        _addedLinksWhileMappingWasUNactivated.append(link->id());
                     }
                 }
             }
@@ -415,6 +415,32 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 
 
 /**
+ * @brief Reset the modifications made while the mapping was UN-activated
+ */
+void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
+{
+    qDebug() << "Reset the modifications made while the mapping was UN-activated";
+
+    for (QString linkId : _addedLinksWhileMappingWasUNactivated)
+    {
+        qDebug() << "TODO Remove added link" << linkId;
+    }
+
+    for (QString linkId : _removedLinksWhileMappingWasUNactivated)
+    {
+        qDebug() << "TODO Add removed link" << linkId;
+    }
+
+    // Clear modifications made while the mapping was UN-activated
+    _addedLinksWhileMappingWasUNactivated.clear();
+    _removedLinksWhileMappingWasUNactivated.clear();
+
+    // FIXME TO-RENAME
+    _toRename();
+}
+
+
+/**
  * @brief Slot when a previous agent model is replaced by a new one strictly identical
  * @param previousModel
  * @param newModel
@@ -455,6 +481,10 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
         {
             qDebug() << "Mapping Activated in mode CONTROL";
 
+            // Clear modifications made while the mapping was UN-activated
+            _addedLinksWhileMappingWasUNactivated.clear();
+            _removedLinksWhileMappingWasUNactivated.clear();
+
             // Apply all temporary mappings
             for (AgentInMappingVM* agent : _allAgentsInMapping.toList())
             {
@@ -475,58 +505,20 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
         {
             qDebug() << "Mapping Activated in mode OBSERVE";
 
-            if (!_addedLinksWhileMappingIsUNactivated.isEmpty() || !_removedLinksWhileMappingIsUNactivated.isEmpty()) {
-                qDebug() << "There were modifications in the mapping while the mapping was UN-activated. Force to CONTROL ?";
-            }
-
-            // Get the map from agent name to list of active agents
-            QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
-
-            if (!mapFromAgentNameToActiveAgentsList.isEmpty())
+            // There were modifications in the mapping while the mapping was UN-activated
+            if (!_addedLinksWhileMappingWasUNactivated.isEmpty() || !_removedLinksWhileMappingWasUNactivated.isEmpty())
             {
-                double randomMax = (double)RAND_MAX;
+                qDebug() << "There were modifications in the mapping while the mapping was UN-activated. Force to CONTROL ?\n"
+                         << _addedLinksWhileMappingWasUNactivated << "to ADD\n"
+                         << _removedLinksWhileMappingWasUNactivated << "to REMOVE";
 
-                // Create all agents in mapping
-                for (QString agentName : mapFromAgentNameToActiveAgentsList.keys())
-                {
-                    QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
-
-                    // Get a random position in the current window
-                    QPointF position = _getRandomPosition(randomMax);
-
-                    //qDebug() << "Random position:" << position << "for agent" << agentName;
-
-                    // Add new model(s) of agent to the current mapping
-                    _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
-                }
-
-                // Create all links in mapping
-                for (AgentInMappingVM* agent : _allAgentsInMapping.toList())
-                {
-                    if ((agent != NULL) && (agent->temporaryMapping() != NULL))
-                    {
-                        // Delete all "mapping elements" in the temporary mapping
-                        agent->temporaryMapping()->mappingElements()->deleteAllItems();
-
-                        for (AgentM* model : agent->models()->toList())
-                        {
-                            if ((model != NULL) && (model->mapping() != NULL))
-                            {
-                                for (ElementMappingM* mappingElement : model->mapping()->mappingElements()->toList())
-                                {
-                                    if (mappingElement != NULL)
-                                    {
-                                        // Simulate slot "on Mapped"
-                                        onMapped(mappingElement);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Notify the QML to fit the view
-                Q_EMIT fitToView();
+                // The mapping has been modified but will be lost if the user stay in mode OBSERVE
+                Q_EMIT modificationsOnLinksWhileMappingUnactivated();
+            }
+            else
+            {
+                // FIXME TO-RENAME
+                _toRename();
             }
         }
     }
@@ -1209,6 +1201,66 @@ void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, 
 
         // Emit signal "Command asked to agent"
         Q_EMIT commandAskedToAgent(peerIdsList, command);
+    }
+}
+
+
+/**
+ * @brief FIXME TO-RENAME
+ */
+void AgentsMappingController::_toRename()
+{
+    if (_modelManager != NULL)
+    {
+        // Get the map from agent name to list of active agents
+        QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
+
+        if (!mapFromAgentNameToActiveAgentsList.isEmpty())
+        {
+            double randomMax = (double)RAND_MAX;
+
+            // Create all agents in mapping
+            for (QString agentName : mapFromAgentNameToActiveAgentsList.keys())
+            {
+                QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
+
+                // Get a random position in the current window
+                QPointF position = _getRandomPosition(randomMax);
+
+                //qDebug() << "Random position:" << position << "for agent" << agentName;
+
+                // Add new model(s) of agent to the current mapping
+                _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
+            }
+
+            // Create all links in mapping
+            for (AgentInMappingVM* agent : _allAgentsInMapping.toList())
+            {
+                if ((agent != NULL) && (agent->temporaryMapping() != NULL))
+                {
+                    // Delete all "mapping elements" in the temporary mapping
+                    agent->temporaryMapping()->mappingElements()->deleteAllItems();
+
+                    for (AgentM* model : agent->models()->toList())
+                    {
+                        if ((model != NULL) && (model->mapping() != NULL))
+                        {
+                            for (ElementMappingM* mappingElement : model->mapping()->mappingElements()->toList())
+                            {
+                                if (mappingElement != NULL)
+                                {
+                                    // Simulate slot "on Mapped"
+                                    onMapped(mappingElement);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Notify the QML to fit the view
+            Q_EMIT fitToView();
+        }
     }
 }
 

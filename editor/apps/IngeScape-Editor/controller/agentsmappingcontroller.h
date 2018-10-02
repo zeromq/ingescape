@@ -128,6 +128,12 @@ public:
     void importMappingFromJson(QJsonArray jsonArrayOfAgentsMapping);
 
 
+    /**
+     * @brief Reset the modifications made while the mapping was UN-activated
+     */
+    void resetModificationsWhileMappingWasUNactivated();
+
+
 Q_SIGNALS:
 
     /**
@@ -152,6 +158,14 @@ Q_SIGNALS:
      * @brief Emitted to fit all nodes in our view
      */
     void fitToView();
+
+
+    /**
+     * @brief Signal emitted when the user activates the mapping in mode OBSERVE
+     * while he made some modifications on the links betwwen agents.
+     * These modifications will be lost if the user stay in mode OBSERVE
+     */
+    void modificationsOnLinksWhileMappingUnactivated();
 
 
     /**
@@ -330,6 +344,12 @@ private:
 
 
     /**
+     * @brief FIXME TO-RENAME
+     */
+    void _toRename();
+
+
+    /**
      * @brief Get a random position in the current window
      * @param randomMax
      * @return
@@ -357,9 +377,9 @@ private:
     // Hash table from "agent name" to a list of waiting links (where the agent is involved as "Output Agent")
     QHash<QString, QList<ElementMappingM*>> _hashFromAgentNameToListOfWaitingLinks;
 
-    // FIXME TODO:
-    QStringList _addedLinksWhileMappingIsUNactivated;
-    QStringList _removedLinksWhileMappingIsUNactivated;
+    // Links added/removed while the mapping was UN-activated
+    QStringList _addedLinksWhileMappingWasUNactivated;
+    QStringList _removedLinksWhileMappingWasUNactivated;
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)
