@@ -131,7 +131,7 @@ public:
     /**
      * @brief Reset the modifications made while the mapping was UN-activated
      */
-    void resetModificationsWhileMappingWasUNactivated();
+    Q_INVOKABLE void resetModificationsWhileMappingWasUNactivated();
 
 
 Q_SIGNALS:
@@ -326,6 +326,17 @@ private:
      * @return
      */
     MapBetweenIOPVM* _getLinkFromMappingElement(ElementMappingM* mappingElement);
+
+
+    /**
+     * @brief Get the view model of link which corresponds to names
+     * @param outputAgentName
+     * @param outputName
+     * @param inputAgentName
+     * @param inputName
+     * @return
+     */
+    MapBetweenIOPVM* _getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName);
 
 
     /**

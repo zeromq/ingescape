@@ -421,9 +421,30 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
 {
     qDebug() << "Reset the modifications made while the mapping was UN-activated";
 
+    //macosAgent##value1-->ingescapeCAgent##input1
+
     for (QString linkId : _addedLinksWhileMappingWasUNactivated)
     {
         qDebug() << "TODO Remove added link" << linkId;
+
+        QStringList listOutputNamesAndInputNames = linkId.split("-->");
+        if (listOutputNamesAndInputNames.count() == 2)
+        {
+            QString outputNames = listOutputNamesAndInputNames.at(0);
+            QString inputNames = listOutputNamesAndInputNames.at(1);
+
+            QStringList listOutputNames = outputNames.split(SEPARATOR_AGENT_NAME_AND_IOP);
+            QStringList listInputNames = inputNames.split(SEPARATOR_AGENT_NAME_AND_IOP);
+
+            if ((listOutputNames.count() == 2) && (listInputNames.count() == 2))
+            {
+                // Get the view model of link which corresponds to these parameters
+                MapBetweenIOPVM* link = _getLinkFromNames(listOutputNames.at(0), listOutputNames.at(1), listInputNames.at(0), listInputNames.at(1));
+                if (link != NULL) {
+
+                }
+            }
+        }
     }
 
     for (QString linkId : _removedLinksWhileMappingWasUNactivated)
@@ -857,20 +878,7 @@ void AgentsMappingController::onHighlightLink(QStringList parameters)
         QString outputName = parameters.at(3);
 
         // Get the view model of link which corresponds to these parameters
-        MapBetweenIOPVM* link = NULL;
-
-        for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
-        {
-            if ((iterator != NULL)
-                    && (iterator->outputAgent() != NULL) && (iterator->outputAgent()->name() == outputAgentName)
-                    && (iterator->inputAgent() != NULL) && (iterator->inputAgent()->name() == inputAgentName)
-                    && (iterator->output() != NULL) && (iterator->output()->name() == outputName)
-                    && (iterator->input() != NULL) && (iterator->input()->name() == inputName))
-            {
-                link = iterator;
-                break;
-            }
-        }
+        MapBetweenIOPVM* link = _getLinkFromNames(outputAgentName, outputName, inputAgentName, inputName);
 
         if ((link != NULL) && (link->output() != NULL))
         {
@@ -903,7 +911,8 @@ void AgentsMappingController::_onAgentsInMappingChanged()
     {
         //qDebug() << _previousListOfAgentsInMapping.count() << "--> Agent in Mapping ADDED --> " << newListOfAgentsInMapping.count();
 
-        for (AgentInMappingVM* agentInMapping : newListOfAgentsInMapping) {
+        for (AgentInMappingVM* agentInMapping : newListOfAgentsInMapping)
+        {
             if ((agentInMapping != NULL) && !_previousListOfAgentsInMapping.contains(agentInMapping))
             {
                 qDebug() << "Agents Mapping Controller: Agent in mapping" << agentInMapping->name() << "ADDED";
@@ -924,7 +933,8 @@ void AgentsMappingController::_onAgentsInMappingChanged()
     {
         //qDebug() << _previousListOfAgentsInMapping.count() << "--> Agent in Mapping REMOVED --> " << newListOfAgentsInMapping.count();
 
-        for (AgentInMappingVM* agentInMapping : _previousListOfAgentsInMapping) {
+        for (AgentInMappingVM* agentInMapping : _previousListOfAgentsInMapping)
+        {
             if ((agentInMapping != NULL) && !newListOfAgentsInMapping.contains(agentInMapping))
             {
                 qDebug() << "Agents Mapping Controller: Agent in mapping" << agentInMapping->name() << "REMOVED";
@@ -956,7 +966,8 @@ void AgentsMappingController::_onInputsListHaveBeenAdded(QList<InputVM*> inputsL
     if ((agentInMapping != NULL) && !inputsListHaveBeenAdded.isEmpty())
     {
         QStringList namesOfInputs;
-        for (InputVM* input : inputsListHaveBeenAdded) {
+        for (InputVM* input : inputsListHaveBeenAdded)
+        {
             if (input != NULL) {
                 namesOfInputs.append(input->name());
             }
@@ -987,7 +998,8 @@ void AgentsMappingController::_onOutputsListHaveBeenAdded(QList<OutputVM*> outpu
     if ((agentInMapping != NULL) && !outputsListHaveBeenAdded.isEmpty())
     {
         QStringList namesOfOutputs;
-        for (OutputVM* output : outputsListHaveBeenAdded) {
+        for (OutputVM* output : outputsListHaveBeenAdded)
+        {
             if (output != NULL) {
                 namesOfOutputs.append(output->name());
             }
@@ -1150,7 +1162,36 @@ MapBetweenIOPVM* AgentsMappingController::_getLinkFromMappingElement(ElementMapp
             }
         }
     }
+    return link;
+}
 
+
+/**
+ * @brief Get the view model of link which corresponds to names
+ * @param outputAgentName
+ * @param outputName
+ * @param inputAgentName
+ * @param inputName
+ * @return
+ */
+MapBetweenIOPVM* AgentsMappingController::_getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName)
+{
+    MapBetweenIOPVM* link = NULL;
+
+    for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
+    {
+        // FIXME: An agent in mapping can have several Inputs (or Outputs) with the same name but with different types
+        // --> Instead, this method must return a list of MapBetweenIOPVM
+        if ((iterator != NULL)
+                && (iterator->outputAgent() != NULL) && (iterator->outputAgent()->name() == outputAgentName)
+                && (iterator->inputAgent() != NULL) && (iterator->inputAgent()->name() == inputAgentName)
+                && (iterator->output() != NULL) && (iterator->output()->name() == outputName)
+                && (iterator->input() != NULL) && (iterator->input()->name() == inputName))
+        {
+            link = iterator;
+            break;
+        }
+    }
     return link;
 }
 
