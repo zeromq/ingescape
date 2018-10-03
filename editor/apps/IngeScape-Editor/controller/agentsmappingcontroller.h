@@ -388,9 +388,9 @@ private:
     // Hash table from "agent name" to a list of waiting links (where the agent is involved as "Output Agent")
     QHash<QString, QList<ElementMappingM*>> _hashFromAgentNameToListOfWaitingLinks;
 
-    // Links added/removed while the mapping was UN-activated
-    QStringList _addedLinksWhileMappingWasUNactivated;
-    QStringList _removedLinksWhileMappingWasUNactivated;
+    // Hash table from "link id" to added/removed link while the mapping was UN-activated
+    QHash<QString, ElementMappingM*> _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated;
+    QHash<QString, ElementMappingM*> _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated;
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)

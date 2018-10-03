@@ -161,11 +161,18 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
             link->inputAgent()->removeTemporaryLink(link->input()->name(), link->outputAgent()->name(), link->output()->name());
 
             qDebug() << "Remove TEMPORARY link" << link->id();
-            if (_addedLinksWhileMappingWasUNactivated.contains(link->id())) {
-                _addedLinksWhileMappingWasUNactivated.removeOne(link->id());
+
+            // This link has been added while the mapping was UN-activated, just cancel the add
+            if (_hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.contains(link->id()))
+            {
+                ElementMappingM* mappingElement = _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.value(link->id());
+                _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.remove(link->id());
+                delete mappingElement;
             }
+            // Add this link to the hash
             else {
-                _removedLinksWhileMappingWasUNactivated.append(link->id());
+                ElementMappingM* mappingElement = new ElementMappingM(link->inputAgent()->name(), link->input()->name(), link->outputAgent()->name(), link->output()->name());
+                _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.insert(link->id(), mappingElement);
             }
 
             // Delete the link between two agents
@@ -243,6 +250,9 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
         // Check that the input can link to the output
         if (input->canLinkWith(output))
         {
+            // If an Input (or an Output) have the same name used for 2 different types --> test pointers instead of names
+            //MapBetweenIOPVM* link = _getLinkFromNames(outputAgent->name(), output->name(), inputAgent->name(), input->name());
+
             // Search if the same link already exists
             bool alreadyLinked = false;
             for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
@@ -291,11 +301,18 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                     _allLinksInMapping.append(link);
 
                     qDebug() << "Add TEMPORARY link" << link->id();
-                    if (_removedLinksWhileMappingWasUNactivated.contains(link->id())) {
-                        _removedLinksWhileMappingWasUNactivated.removeOne(link->id());
+
+                    // This link has been removed while the mapping was UN-activated, just cancel the suppression
+                    if (_hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.contains(link->id()))
+                    {
+                        ElementMappingM* mappingElement = _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.value(link->id());
+                        _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.remove(link->id());
+                        delete mappingElement;
                     }
+                    // Add this link to the hash
                     else {
-                        _addedLinksWhileMappingWasUNactivated.append(link->id());
+                        ElementMappingM* mappingElement = new ElementMappingM(inputAgent->name(), input->name(), outputAgent->name(), output->name());
+                        _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.insert(link->id(), mappingElement);
                     }
                 }
             }
@@ -421,62 +438,48 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
 {
     qDebug() << "Reset the modifications made while the mapping was UN-activated";
 
-    for (QString linkId : _addedLinksWhileMappingWasUNactivated)
+    for (QString linkId : _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.keys())
     {
         qDebug() << "TODO Remove added link" << linkId;
 
-        QStringList listOutputNamesAndInputNames = linkId.split("-->");
-        if (listOutputNamesAndInputNames.count() == 2)
+        ElementMappingM* mappingElement = _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.value(linkId);
+        if (mappingElement != NULL)
         {
-            QString outputNames = listOutputNamesAndInputNames.at(0);
-            QString inputNames = listOutputNamesAndInputNames.at(1);
-
-            QStringList listOutputNames = outputNames.split(SEPARATOR_AGENT_NAME_AND_IOP);
-            QStringList listInputNames = inputNames.split(SEPARATOR_AGENT_NAME_AND_IOP);
-
-            if ((listOutputNames.count() == 2) && (listInputNames.count() == 2))
+            // Get the view model of link which corresponds to a mapping element
+            MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
+            if (link != NULL)
             {
-                // Get the view model of link which corresponds to these parameters
-                MapBetweenIOPVM* link = _getLinkFromNames(listOutputNames.at(0), listOutputNames.at(1), listInputNames.at(0), listInputNames.at(1));
-                if (link != NULL)
-                {
-                    // Delete the link between two agents
-                    _deleteLinkBetweenTwoAgents(link);
-                }
+                // Delete this link (between two agents) to cancel the add
+                _deleteLinkBetweenTwoAgents(link);
             }
         }
     }
 
-    for (QString linkId : _removedLinksWhileMappingWasUNactivated)
+    for (QString linkId : _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.keys())
     {
         qDebug() << "TODO Add removed link" << linkId;
 
-        QStringList listOutputNamesAndInputNames = linkId.split("-->");
-        if (listOutputNamesAndInputNames.count() == 2)
+        ElementMappingM* mappingElement = _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.value(linkId);
+        if (mappingElement != NULL)
         {
-            QString outputNames = listOutputNamesAndInputNames.at(0);
-            QString inputNames = listOutputNamesAndInputNames.at(1);
+            // Make a copy
+            ElementMappingM* copy = new ElementMappingM(mappingElement->inputAgent(), mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
 
-            QStringList listOutputNames = outputNames.split(SEPARATOR_AGENT_NAME_AND_IOP);
-            QStringList listInputNames = inputNames.split(SEPARATOR_AGENT_NAME_AND_IOP);
+            // Simulate slot "onMapped" to create a link (between two agents) to cancel the remove
+            onMapped(copy);
 
-            if ((listOutputNames.count() == 2) && (listInputNames.count() == 2))
-            {
-                // Create a new mapping element
-                ElementMappingM* mappingElement = new ElementMappingM(listInputNames.at(0), listInputNames.at(1), listOutputNames.at(0), listOutputNames.at(1));
-
-                // Simulate slot "on Mapped"
-                onMapped(mappingElement);
-
-                // FIXME: we cannot delete this mapping element because it could be added to _hashFromAgentNameToListOfWaitingLinks in the slot "onMapped"
-                //delete mappingElement;
-            }
+            // FIXME: we cannot delete this mapping element because it could be added to _hashFromAgentNameToListOfWaitingLinks in the slot "onMapped"
+            //delete copy;
         }
     }
 
     // Clear modifications made while the mapping was UN-activated
-    _addedLinksWhileMappingWasUNactivated.clear();
-    _removedLinksWhileMappingWasUNactivated.clear();
+    qDeleteAll(_hashFromLinkIdToAddedLinkWhileMappingWasUNactivated);
+    _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.clear();
+
+    qDeleteAll(_hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated);
+    _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.clear();
+
 
     // FIXME TO-RENAME
     _toRename();
@@ -525,8 +528,12 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
             qDebug() << "Mapping Activated in mode CONTROL";
 
             // Clear modifications made while the mapping was UN-activated
-            _addedLinksWhileMappingWasUNactivated.clear();
-            _removedLinksWhileMappingWasUNactivated.clear();
+            qDeleteAll(_hashFromLinkIdToAddedLinkWhileMappingWasUNactivated);
+            _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.clear();
+
+            qDeleteAll(_hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated);
+            _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.clear();
+
 
             // Apply all temporary mappings
             for (AgentInMappingVM* agent : _allAgentsInMapping.toList())
@@ -549,11 +556,11 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
             qDebug() << "Mapping Activated in mode OBSERVE";
 
             // There were modifications in the mapping while the mapping was UN-activated
-            if (!_addedLinksWhileMappingWasUNactivated.isEmpty() || !_removedLinksWhileMappingWasUNactivated.isEmpty())
+            if (!_hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.isEmpty() || !_hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.isEmpty())
             {
                 qDebug() << "There were modifications in the mapping while the mapping was UN-activated. Force to CONTROL ?\n"
-                         << _addedLinksWhileMappingWasUNactivated << "to ADD\n"
-                         << _removedLinksWhileMappingWasUNactivated << "to REMOVE";
+                         << _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.keys() << "to ADD\n"
+                         << _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.keys() << "to REMOVE";
 
                 // The mapping has been modified but will be lost if the user stay in mode OBSERVE
                 Q_EMIT modificationsOnLinksWhileMappingUnactivated();
