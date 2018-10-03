@@ -403,10 +403,10 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
         if (!mappingElements.isEmpty())
         {
             // Create all mapping links
-            for (ElementMappingM* elementMapping : mappingElements)
+            for (ElementMappingM* mappingElement : mappingElements)
             {
-                if (elementMapping != NULL) {
-                    onMapped(elementMapping);
+                if (mappingElement != NULL) {
+                    onMapped(mappingElement);
                 }
             }
         }
@@ -420,8 +420,6 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
 {
     qDebug() << "Reset the modifications made while the mapping was UN-activated";
-
-    //macosAgent##value1-->ingescapeCAgent##input1
 
     for (QString linkId : _addedLinksWhileMappingWasUNactivated)
     {
@@ -440,8 +438,10 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
             {
                 // Get the view model of link which corresponds to these parameters
                 MapBetweenIOPVM* link = _getLinkFromNames(listOutputNames.at(0), listOutputNames.at(1), listInputNames.at(0), listInputNames.at(1));
-                if (link != NULL) {
-
+                if (link != NULL)
+                {
+                    // Delete the link between two agents
+                    _deleteLinkBetweenTwoAgents(link);
                 }
             }
         }
@@ -450,6 +450,28 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
     for (QString linkId : _removedLinksWhileMappingWasUNactivated)
     {
         qDebug() << "TODO Add removed link" << linkId;
+
+        QStringList listOutputNamesAndInputNames = linkId.split("-->");
+        if (listOutputNamesAndInputNames.count() == 2)
+        {
+            QString outputNames = listOutputNamesAndInputNames.at(0);
+            QString inputNames = listOutputNamesAndInputNames.at(1);
+
+            QStringList listOutputNames = outputNames.split(SEPARATOR_AGENT_NAME_AND_IOP);
+            QStringList listInputNames = inputNames.split(SEPARATOR_AGENT_NAME_AND_IOP);
+
+            if ((listOutputNames.count() == 2) && (listInputNames.count() == 2))
+            {
+                // Create a new mapping element
+                ElementMappingM* mappingElement = new ElementMappingM(listInputNames.at(0), listInputNames.at(1), listOutputNames.at(0), listOutputNames.at(1));
+
+                // Simulate slot "on Mapped"
+                onMapped(mappingElement);
+
+                // FIXME: we cannot delete this mapping element because it could be added to _hashFromAgentNameToListOfWaitingLinks in the slot "onMapped"
+                //delete mappingElement;
+            }
+        }
     }
 
     // Clear modifications made while the mapping was UN-activated
