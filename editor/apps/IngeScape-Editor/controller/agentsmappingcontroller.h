@@ -355,9 +355,9 @@ private:
 
 
     /**
-     * @brief FIXME TO-RENAME
+     * @brief Update the (global) mapping with all models of agents and links
      */
-    void _toRename();
+    void _updateMappingWithModelsOfAgentsAndLinks();
 
 
     /**

@@ -86,26 +86,6 @@ AgentVM::~AgentVM()
 
 
 /**
- * @brief Setter for property "Name"
- * @param value
- */
-void AgentVM::setname(QString value)
-{
-    if (_name != value)
-    {
-        QString previousName = _name;
-
-        _name = value;
-
-        // TODO: update the name of models
-        qDebug() << "Rename agent from" << previousName << "to" << _name;
-
-        Q_EMIT nameChanged(value);
-    }
-}
-
-
-/**
  * @brief Setter for property "Definition"
  * @param value
  */

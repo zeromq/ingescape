@@ -440,7 +440,7 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
 
     for (QString linkId : _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.keys())
     {
-        qDebug() << "TODO Remove added link" << linkId;
+        //qDebug() << "Remove added link" << linkId << "while the mapping was disconnected";
 
         ElementMappingM* mappingElement = _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.value(linkId);
         if (mappingElement != NULL)
@@ -457,7 +457,7 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
 
     for (QString linkId : _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.keys())
     {
-        qDebug() << "TODO Add removed link" << linkId;
+        //qDebug() << "Add removed link" << linkId << "while the mapping was disconnected";
 
         ElementMappingM* mappingElement = _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.value(linkId);
         if (mappingElement != NULL)
@@ -481,8 +481,8 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
     _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.clear();
 
 
-    // FIXME TO-RENAME
-    _toRename();
+    // Update the (global) mapping with all models of agents and links
+    _updateMappingWithModelsOfAgentsAndLinks();
 }
 
 
@@ -567,8 +567,8 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
             }
             else
             {
-                // FIXME TO-RENAME
-                _toRename();
+                // Update the (global) mapping with all models of agents and links
+                _updateMappingWithModelsOfAgentsAndLinks();
             }
         }
     }
@@ -1276,9 +1276,9 @@ void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, 
 
 
 /**
- * @brief FIXME TO-RENAME
+ * @brief Update the (global) mapping with all models of agents and links
  */
-void AgentsMappingController::_toRename()
+void AgentsMappingController::_updateMappingWithModelsOfAgentsAndLinks()
 {
     if (_modelManager != NULL)
     {
@@ -1289,7 +1289,9 @@ void AgentsMappingController::_toRename()
         {
             double randomMax = (double)RAND_MAX;
 
-            // Create all agents in mapping
+            // For each name of agent, we get all models of active agent (ON) and:
+            // - create the corresponding agent in the mapping (VM) if not yet added
+            // - or add eventually new model to existing agent in the mapping (VM)
             for (QString agentName : mapFromAgentNameToActiveAgentsList.keys())
             {
                 QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
@@ -1303,14 +1305,16 @@ void AgentsMappingController::_toRename()
                 _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
             }
 
-            // Create all links in mapping
+            // Create all links between agents in the mapping
+            // By looking the mapping of each (sub) model of the VM
             for (AgentInMappingVM* agent : _allAgentsInMapping.toList())
             {
                 if ((agent != NULL) && (agent->temporaryMapping() != NULL))
                 {
-                    // Delete all "mapping elements" in the temporary mapping
+                    // First, delete all "mapping elements" in the temporary mapping
                     agent->temporaryMapping()->mappingElements()->deleteAllItems();
 
+                    // Traverse through each model
                     for (AgentM* model : agent->models()->toList())
                     {
                         if ((model != NULL) && (model->mapping() != NULL))
