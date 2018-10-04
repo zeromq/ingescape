@@ -236,14 +236,6 @@ ApplicationWindow {
         }
 
 
-        // Options
-        Menu {
-            title: qsTr("Options")
-
-
-        }
-
-
         // Windows
         Menu {
             id: menuWindows
