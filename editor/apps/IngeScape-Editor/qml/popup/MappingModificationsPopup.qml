@@ -27,8 +27,8 @@ import INGESCAPE 1.0
 I2PopupBase {
     id: rootItem
 
-    height: 350
-    width: 550
+    height: 250
+    width: 360
 
     anchors.centerIn: parent
 
@@ -53,6 +53,21 @@ I2PopupBase {
     signal stayToObserve();
 
 
+
+    //--------------------------------
+    //
+    // Slots
+    //
+    //--------------------------------
+
+    onOpened: {
+        // Reset check-boxes
+        checkControl.checked = false;
+        checkObserve.checked = false;
+        checkCancel.checked = false;
+    }
+
+
     //--------------------------------
     //
     // Content
@@ -71,166 +86,243 @@ I2PopupBase {
         }
         color: IngeScapeTheme.editorsBackgroundColor
 
-        Text {
-            id: confirmationText
-
+        Column {
             anchors {
-                left : parent.left
-                right : parent.right
-                verticalCenter: parent.verticalCenter
-                verticalCenterOffset: -18
+                left: parent.left
+                leftMargin: 20
+                top: parent.top
+                topMargin: 20
             }
-            //horizontalAlignment: Text.AlignHCenter
+            spacing: 15
 
-            text: "Modifications on some links between agents have been made\n
-while the mapping was unactivated. Do you want to\n
-keep these modifications by passing to mode CONTROL ?\n
-to cancel your modifications by staying to mode OBSERVE ?\n
-or to cancel the activation of the mapping ?"
+            Text {
+                id: title
 
-            lineHeight: 24
-            lineHeightMode: Text.FixedHeight
-            color: IngeScapeTheme.whiteColor
-            elide: Text.ElideRight
+                anchors {
+                    left: parent.left
+                }
+                height: 25
 
-            font {
-                family: IngeScapeTheme.textFontFamily
-                pixelSize: 16
+                //horizontalAlignment: Text.AlignHCenter
+
+                text: qsTr("Mapping has changed while disconnected. You can")
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    pixelSize: 16
+                }
+            }
+
+            ExclusiveGroup {
+                id: exclusiveGroup
+            }
+
+            CheckBox {
+                id: checkControl
+
+                anchors {
+                    left: parent.left
+                }
+                height: 25
+
+                checked: false
+                exclusiveGroup: exclusiveGroup
+                activeFocusOnPress: true;
+
+                style: CheckBoxStyle {
+                    label: Text {
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            verticalCenterOffset: 2
+                        }
+                        color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
+                                               : IngeScapeTheme.disabledTextColor
+
+                        text: qsTr("Apply modified mapping to the platform")
+
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            pixelSize: 16
+                        }
+                    }
+
+                    indicator: Rectangle {
+                        implicitWidth: 14
+                        implicitHeight: 14
+                        radius: height / 2
+                        border.width: 0
+                        color: control.enabled ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.disabledTextColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+                            visible: control.checked
+                            width: 8
+                            height: 8
+                            radius: height / 2
+                            border.width: 0
+                            color: IngeScapeTheme.whiteColor
+                        }
+                    }
+                }
+            }
+
+            CheckBox {
+                id: checkObserve
+
+                anchors {
+                    left: parent.left
+                }
+                height: 25
+
+                checked: false
+                exclusiveGroup: exclusiveGroup
+                activeFocusOnPress: true;
+
+                style: CheckBoxStyle {
+                    label: Text {
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            verticalCenterOffset: 2
+                        }
+                        color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
+                                               : IngeScapeTheme.disabledTextColor
+
+                        text: qsTr("Go back to the current mapping")
+
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            pixelSize: 16
+                        }
+                    }
+
+                    indicator: Rectangle {
+                        implicitWidth: 14
+                        implicitHeight: 14
+                        radius: height / 2
+                        border.width: 0
+                        color: control.enabled ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.disabledTextColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+                            visible: control.checked
+                            width: 8
+                            height: 8
+                            radius: height / 2
+                            border.width: 0
+                            color: IngeScapeTheme.whiteColor
+                        }
+                    }
+                }
+            }
+
+            CheckBox {
+                id: checkCancel
+
+                anchors {
+                    left: parent.left
+                }
+                height: 25
+
+                checked: false
+                exclusiveGroup: exclusiveGroup
+                activeFocusOnPress: true;
+
+                style: CheckBoxStyle {
+                    label: Text {
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            verticalCenterOffset: 2
+                        }
+                        color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
+                                               : IngeScapeTheme.disabledTextColor
+
+                        text: qsTr("Remain disconnected")
+
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            pixelSize: 16
+                        }
+                    }
+
+                    indicator: Rectangle {
+                        implicitWidth: 14
+                        implicitHeight: 14
+                        radius: height / 2
+                        border.width: 0
+                        color: control.enabled ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.disabledTextColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+                            visible: control.checked
+                            width: 8
+                            height: 8
+                            radius: height / 2
+                            border.width: 0
+                            color: IngeScapeTheme.whiteColor
+                        }
+                    }
+                }
             }
         }
 
+        Button {
+            id: btnControl
 
-        Row {
             anchors {
-                horizontalCenter: parent.horizontalCenter
                 bottom: parent.bottom
-                bottomMargin: 16
-            }
-            spacing : 15
-
-            Button {
-                id: cancelButton
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-                property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
-                height: boundingBox.height * 1.5
-                width: boundingBox.width * 1.5
-
-                text: "Cancel mapping activation"
-
-                activeFocusOnPress: true
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.whiteColor
-                }
-
-                onClicked: {
-                    // Close our popup
-                    rootItem.close();
-
-                    // Emit the signal "Cancel Mapping Activation"
-                    rootItem.cancelMappingActivation();
-                }
+                bottomMargin: 20
+                right: parent.right
+                rightMargin: 20
             }
 
+            property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+            height: boundingBox.height
+            width: boundingBox.width
 
-            Button {
-                id: btnControl
+            text: "OK"
+            enabled: checkControl.checked || checkObserve.checked || checkCancel.checked
 
-                anchors {
-                    verticalCenter: parent.verticalCenter
+            activeFocusOnPress: true
+
+            style: I2SvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "button"
+                disabledID: releasedID + "-disabled"
+
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Medium
+                    pixelSize: 16
                 }
+                labelColorPressed: IngeScapeTheme.blackColor
+                labelColorReleased: IngeScapeTheme.whiteColor
+                labelColorDisabled: IngeScapeTheme.disabledTextColor
 
-                property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
-                height: boundingBox.height
-                width: boundingBox.width
+            }
 
-                text: "Mode CONTROL"
+            onClicked: {
+                // Close our popup
+                rootItem.close();
 
-                activeFocusOnPress: true
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.whiteColor
-
-                }
-
-                onClicked: {
-                    // Close our popup
-                    rootItem.close();
-
+                // CONTROL
+                if (checkControl.checked)
+                {
                     // Emit the signal "Switch to Control"
                     rootItem.switchToControl();
                 }
-            }
-
-
-            Button {
-                id: btnObserve
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
-                height: boundingBox.height
-                width: boundingBox.width
-
-                text: "Mode OBSERVE"
-
-                activeFocusOnPress: true
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.whiteColor
-
-                }
-
-                onClicked: {
-                    // Close our popup
-                    rootItem.close();
-
+                // OBSERVE
+                else if (checkObserve.checked)
+                {
                     // Emit the signal "Stay to Observe"
                     rootItem.stayToObserve();
+                }
+                else if (checkCancel.checked)
+                {
+                    // Emit the signal "Cancel Mapping Activation"
+                    rootItem.cancelMappingActivation();
                 }
             }
         }

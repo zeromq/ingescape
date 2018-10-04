@@ -2051,7 +2051,8 @@ WindowBlockTouches {
                                         verticalCenter: parent.verticalCenter
                                         verticalCenterOffset: 2
                                     }
-                                    color: control.enabled ? (control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
+                                    color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
+                                                           : IngeScapeTheme.disabledTextColor
 
                                     text: "when conditions check terminates"
                                     elide: Text.ElideRight
@@ -2067,7 +2068,7 @@ WindowBlockTouches {
                                     implicitHeight: 14
                                     radius : height / 2
                                     border.width: 0
-                                    color: control.enabled ? IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
+                                    color: control.enabled ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.disabledTextColor
 
                                     Rectangle {
                                         anchors.centerIn: parent
@@ -2109,9 +2110,9 @@ WindowBlockTouches {
                                     verticalCenter: parent.verticalCenter
                                 }
 
-                                checked : actionM && actionM.shallRevertAfterTime;
+                                checked: actionM && actionM.shallRevertAfterTime
                                 exclusiveGroup: revertActionOpt
-                                activeFocusOnPress: true;
+                                activeFocusOnPress: true
 
                                 style: CheckBoxStyle {
                                     label: Text {
@@ -2119,7 +2120,8 @@ WindowBlockTouches {
                                             verticalCenter: parent.verticalCenter
                                             verticalCenterOffset: 2
                                         }
-                                        color: control.enabled ? (control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
+                                        color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
+                                                               : IngeScapeTheme.disabledTextColor
 
                                         text: "after " // space allowing to keep selection possible for the whole row
 
@@ -2136,7 +2138,7 @@ WindowBlockTouches {
                                         implicitHeight: 14
                                         radius : height / 2
                                         border.width: 0
-                                        color: control.enabled ? IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
+                                        color: control.enabled ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.disabledTextColor
 
                                         Rectangle {
                                             anchors.centerIn: parent
@@ -2185,7 +2187,7 @@ WindowBlockTouches {
 
                                 style: I2TextFieldStyle {
                                     backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                                    backgroundDisabledColor: "#3C3C3B"
+                                    backgroundDisabledColor: IngeScapeTheme.disabledTextColor
                                     borderColor: IngeScapeTheme.whiteColor;
                                     borderErrorColor: IngeScapeTheme.redColor
                                     radiusTextBox: 1
@@ -2241,7 +2243,8 @@ WindowBlockTouches {
                                     verticalCenter: parent.verticalCenter
                                     verticalCenterOffset: 2
                                 }
-                                color: revertActionAfterCB.enabled ? (revertActionAfterCB.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
+                                color: revertActionAfterCB.enabled ? (revertActionAfterCB.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
+                                                                   : IngeScapeTheme.disabledTextColor
 
                                 text: " seconds"
                                 elide: Text.ElideRight
@@ -2361,7 +2364,8 @@ WindowBlockTouches {
 
                                 }
 
-                                color: rearmActionCB.enabled ? (rearmActionCB.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
+                                color: rearmActionCB.enabled ? (rearmActionCB.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
+                                                             : IngeScapeTheme.disabledTextColor
 
                                 text: "with trigger every "
                                 elide: Text.ElideRight
@@ -2400,7 +2404,7 @@ WindowBlockTouches {
 
                                 style: I2TextFieldStyle {
                                     backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                                    backgroundDisabledColor: "#3C3C3B"
+                                    backgroundDisabledColor: IngeScapeTheme.disabledTextColor
                                     borderColor: IngeScapeTheme.whiteColor;
                                     borderErrorColor: IngeScapeTheme.redColor
                                     radiusTextBox: 1
@@ -2457,7 +2461,8 @@ WindowBlockTouches {
                                     verticalCenterOffset: 2
                                 }
 
-                                color: rearmActionCB.enabled ? (rearmActionCB.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
+                                color: rearmActionCB.enabled ? (rearmActionCB.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
+                                                             : IngeScapeTheme.disabledTextColor
 
                                 text: " seconds"
                                 elide: Text.ElideRight
@@ -2559,7 +2564,7 @@ WindowBlockTouches {
 
                 anchors {
                     verticalCenter: okButton.verticalCenter
-                    right : okButton.left
+                    right: okButton.left
                     rightMargin: 20
                 }
 
@@ -2601,7 +2606,7 @@ WindowBlockTouches {
 
                 anchors {
                     bottom: parent.bottom
-                    right : parent.right
+                    right: parent.right
                 }
 
                 style: I2SvgButtonStyle {
