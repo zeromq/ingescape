@@ -29,7 +29,7 @@
 
 #if (defined WIN32 || defined _WIN32)
 #include <winsock2.h>
-#include <Ws2tcpip.h>
+#include <ws2tcpip.h>
 #include <iphlpapi.h>
 #endif
 
