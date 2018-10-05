@@ -143,7 +143,7 @@ gcc -W -Wall -g -I/usr/local/include/ -std=gnu99 -o main.o -c main.c
 gcc -o myFirstAgent main.o -L/usr/local/lib -lingescape
 {{< / highlight >}}
 
-You can also use an example [Qt project](/code/FirstAgent_Qt.zip) embedding ingeScape in a simple graphical Qt application with an empty UI.
+You can also use an example [Qt project](/code/firstAgent_Qt.zip) embedding ingeScape in a simple graphical Qt application with an empty UI.
 
 ### Compile on macOS (three methods)
 #### GCC/Clang
@@ -155,7 +155,7 @@ The first compilation method is the same as the one for Linux, exactly with the 
 Another method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code, is available [here](/code/firstAgent.zip).
 
 #### Qt
-You can also use an example [Qt project](/code/FirstAgent_Qt.zip) embedding ingeScape in a simple graphical Qt application with an empty UI.
+You can also use an example [Qt project](/code/firstAgent_Qt.zip) embedding ingeScape in a simple graphical Qt application with an empty UI.
 
 In some cases, if you are using Homebrew to install third-party libraries, there might be an incompatibility between the JPEG, TIFF, etc. libraries embedded in CoreImage and the ones installed in */usr/local/lib* by Homebrew. This has nothing to do with ingeScape but might block the execution of the example.
 
@@ -172,7 +172,7 @@ If this happens, you need to edit the Run properties for your Qt project by edit
 ### Compile on Microsoft Windows
 The easiest way to compile and run your first agent on Microsoft Windows is to use one of the following projects:
 
-- [Qt project](/code/FirstAgent_Qt.zip)
-- [Visual Studio 2015 project](/code/FirstAgent_VS.zip)
+- [Qt project](/code/firstAgent_Qt.zip)
+- [Visual Studio 2015 project](/code/firstAgent_VS.zip)
 
 For both projects, the ingeScape library and its dependencies have to be deployed next to the project file (.pro or .sln).
