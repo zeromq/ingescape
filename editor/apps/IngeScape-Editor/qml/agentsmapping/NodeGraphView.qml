@@ -23,6 +23,10 @@ import INGESCAPE 1.0
 // parent-directory
 import ".." as Editor;
 
+// Popups
+import "../popup/" as Popups;
+
+
 Item {
     id: rootItem
 
@@ -38,7 +42,6 @@ Item {
     // Controller associated to our view
     property var controller : null;
 
-
     // Minimum scale factor
     readonly property real minimumScale: 0.25;
 
@@ -48,16 +51,15 @@ Item {
     // Duration of automatic pan and/or zoom animations in milliseconds
     readonly property int automaticPanZoomAnimationDuration: 300;
 
-
     // Size of a cell of our background
     readonly property int backgroundCellSize: 150;
 
     // Number of subdivisions for background cells
     readonly property int backgroundCellNumberOfSubDivisions: 5
 
-
     // Zoom-in delta scale factor
     readonly property real zoomInDeltaScaleFactor: 1.2
+
 
     //--------------------------------
     //
@@ -273,6 +275,13 @@ Item {
 
         onResetZoom: {
             rootItem.setZoomLevel(1);
+        }
+
+        onModificationsOnLinksWhileMappingUnactivated: {
+            //console.log("QML: on Modifications on Links While Mapping Unactivated");
+
+            // Open the popup about mapping modifications
+            mappingModificationsPopup.open();
         }
     }
 
@@ -690,7 +699,6 @@ Item {
     }
 
 
-
     //
     // Delete Confirmation
     //
@@ -705,6 +713,48 @@ Item {
             if (controller) {
                 // Delete our agent
                 controller.deleteAgentInMapping(deleteConfirmationPopup.myAgent);
+            }
+        }
+    }
+
+
+    //
+    // Mapping Modifications Popup
+    //
+    Popups.MappingModificationsPopup {
+        id: mappingModificationsPopup
+
+        onCancelMappingActivation: {
+            console.log("on Cancel Mapping Activation");
+
+            if (IngeScapeEditorC.modelManager)
+            {
+                // UN-activate the mapping
+                IngeScapeEditorC.modelManager.isMappingActivated = false;
+            }
+        }
+
+        onSwitchToControl: {
+            console.log("on Switch To Control");
+
+            if (IngeScapeEditorC.modelManager)
+            {
+                // UN-activate the mapping
+                IngeScapeEditorC.modelManager.isMappingActivated = false;
+
+                // Switch to CONTROL
+                IngeScapeEditorC.modelManager.isMappingControlled = true;
+
+                // Activate the mapping
+                IngeScapeEditorC.modelManager.isMappingActivated = true;
+            }
+        }
+
+        onStayToObserve: {
+            console.log("on Stay To Observe");
+
+            if (controller) {
+                controller.resetModificationsWhileMappingWasUNactivated();
             }
         }
     }

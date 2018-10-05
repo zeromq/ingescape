@@ -166,6 +166,8 @@ Item {
 
 
 
+    readonly property color disabledTextColor: "#3C3C3C"
+
     //-----------------------------------------
     //
     // Window
@@ -242,7 +244,7 @@ Item {
 
 
     // Lines height in timeline
-    property int lineInTimeLineHeight : 37
+    property int lineInTimeLineHeight: 37
 
 
     //-----------------------------------------
