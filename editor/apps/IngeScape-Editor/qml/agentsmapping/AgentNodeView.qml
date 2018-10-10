@@ -8,8 +8,9 @@
  *
  *
  *	Contributors:
- *      Alexandre Lemort   <lemort@ingenuity.io>
- *      Justine Limoges    <limoges@ingenuity.io>
+ *      Alexandre Lemort    <lemort@ingenuity.io>
+ *      Justine Limoges     <limoges@ingenuity.io>
+ *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
  *
  */
 
@@ -43,6 +44,11 @@ Rectangle {
     property var agentName: agentMappingVM ? agentMappingVM.name : ""
 
     property bool isReduced: agentMappingVM && agentMappingVM.isReduced
+
+    // Flag indicating if mouse areas over input/output names (to display the tooltip) are enabled
+    // When our agent is reduced, the user must hover the header of our agent to double click on it (to open it)
+    // --> this flag allows to prevent the mouse areas over input/output names to detect a hover and to display the tooltip
+    property bool areToolTipEnabled: false
 
     // false if the agent is dropping and the drop is not available, true otherwise
     property bool dropEnabled: true
@@ -81,6 +87,22 @@ Rectangle {
         width: rootItem._isSelected ? 1 : 0
     }
 
+
+
+    /*Component.onCompleted: {
+        console.log(rootItem.agentName + " on Completed");
+    }*/
+
+
+    onIsReducedChanged: {
+        if (rootItem.isReduced)
+        {
+            //console.log(rootItem.agentName + " Reduced --> areToolTipEnabled = false");
+
+            // Disable each mouse areas over input/output names to prevent them to display the corresponding tooltip
+            rootItem.areToolTipEnabled = false;
+        }
+    }
 
 
 
@@ -171,7 +193,6 @@ Rectangle {
             }
         }
 
-
         onDoubleClicked: {
             if (agentMappingVM) {
                 agentMappingVM.isReduced = !agentMappingVM.isReduced;
@@ -202,7 +223,7 @@ Rectangle {
             }
 
             visible: (opacity !== 0)
-            opacity: (!rootItem.isReduced) ? 1 : 0
+            opacity: !rootItem.isReduced ? 1 : 0
 
             Behavior on opacity {
                 NumberAnimation {
@@ -227,7 +248,7 @@ Rectangle {
                     fill: parent
                 }
 
-                value: (rootItem.isReduced) ? 0 : 1
+                value: rootItem.isReduced ? 0 : 1
 
                 Behavior on value {
                     NumberAnimation {
@@ -274,7 +295,7 @@ Rectangle {
                                 id: rootTooltipInput
                                 anchors.fill: parent
                                 acceptedButtons: Qt.NoButton
-                                hoverEnabled: true
+                                hoverEnabled: rootItem.areToolTipEnabled
                                 cursorShape: Qt.PointingHandCursor
                             }
 
@@ -480,11 +501,7 @@ Rectangle {
                     fill: parent
                 }
 
-
-                visible: (value !== 0)
-                opacity: value
-
-                value: (rootItem.isReduced) ? 0 : 1
+                value: rootItem.isReduced ? 0 : 1
 
                 Behavior on value {
                     NumberAnimation {
@@ -519,8 +536,7 @@ Rectangle {
                                 verticalCenter: parent.verticalCenter
                             }
 
-                            horizontalAlignment : Text.AlignRight
-
+                            horizontalAlignment: Text.AlignRight
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
@@ -533,7 +549,7 @@ Rectangle {
                                 id: rootTooltipOutput
                                 anchors.fill: parent
                                 acceptedButtons: Qt.NoButton
-                                hoverEnabled: true
+                                hoverEnabled: rootItem.areToolTipEnabled
                                 cursorShape: Qt.PointingHandCursor
                             }
 
@@ -736,6 +752,22 @@ Rectangle {
             }
         }
 
+
+        // Timer started when the flag "is Reduced" evolve from true to false (reduced --> opened)
+        Timer {
+            interval: 500
+            running: !rootItem.isReduced
+
+            onTriggered: {
+                if (!rootItem.isReduced)
+                {
+                    //console.log(rootItem.agentName + " on timer triggered: areToolTipEnabled = true");
+
+                    // Enable each mouse areas over input/output names to allows them to display the corresponding tooltip
+                    rootItem.areToolTipEnabled = true;
+                }
+            }
+        }
 
 
         //------------------------------------------
