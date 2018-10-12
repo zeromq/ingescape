@@ -201,6 +201,9 @@ QJsonArray AgentsSupervisionController::exportAgentsListToJSON()
                     QJsonObject jsonDefinition = _jsonHelper->exportAgentDefinitionToJson(agent->definition());
                     jsonAgent.insert("definition", jsonDefinition);
                 }
+                else {
+                    jsonAgent.insert("definition", QJsonValue());
+                }
 
                 // Clones (models)
                 QJsonArray jsonClones = QJsonArray();

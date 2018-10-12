@@ -213,73 +213,82 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                 QJsonValue jsonDefinition = jsonAgent.value("definition");
                 QJsonValue jsonClones = jsonAgent.value("clones");
 
-                if (jsonName.isString() && jsonDefinition.isObject() && jsonClones.isArray())
+                if (jsonName.isString() && (jsonDefinition.isObject() || jsonDefinition.isNull()) && jsonClones.isArray())
                 {
                     QString agentName = jsonName.toString();
                     QJsonArray arrayOfClones = jsonClones.toArray();
 
-                    // Create a model of agent definition from JSON object
-                    DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
-                    if (agentDefinition != NULL)
+                    DefinitionM* agentDefinition = nullptr;
+
+                    if (jsonDefinition.isObject())
                     {
-                        // None clones have a defined hostname (agent is only defined by a definition)
-                        if (arrayOfClones.isEmpty())
+                        // Create a model of agent definition from JSON object
+                        agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
+                    }
+
+                    // None clones have a defined hostname (agent is only defined by a definition)
+                    if (arrayOfClones.isEmpty())
+                    {
+                        qDebug() << "Clone of" << agentName << "without hostname and command line";
+
+                        // Create a new model of agent with the name
+                        AgentM* agent = new AgentM(agentName, this);
+
+                        // Add this new model of agent
+                        addAgentModel(agent);
+
+                        if (agentDefinition != nullptr)
                         {
-                            qDebug() << "Clone of" << agentName << "without hostname and command line";
-
-                            // Create a new model of agent with the name
-                            AgentM* agent = new AgentM(agentName, this);
-
-                            // Add this new model of agent
-                            addAgentModel(agent);
-
                             // Add this new model of agent definition for the agent name
                             addAgentDefinitionForAgentName(agentDefinition, agentName);
 
                             // Set its definition
                             agent->setdefinition(agentDefinition);
                         }
-                        // There are some clones with a defined hostname
-                        else
+                    }
+                    // There are some clones with a defined hostname
+                    else
+                    {
+                        for (QJsonValue jsonValue : arrayOfClones)
                         {
-                            for (QJsonValue jsonValue : arrayOfClones)
+                            if (jsonValue.isObject())
                             {
-                                if (jsonValue.isObject())
+                                QJsonObject jsonClone = jsonValue.toObject();
+
+                                QJsonValue jsonHostname = jsonClone.value("hostname");
+                                QJsonValue jsonCommandLine = jsonClone.value("commandLine");
+                                QJsonValue jsonPeerId = jsonClone.value("peerId");
+                                QJsonValue jsonAddress = jsonClone.value("address");
+
+                                if (jsonHostname.isString() && jsonCommandLine.isString() && jsonPeerId.isString() && jsonAddress.isString())
                                 {
-                                    QJsonObject jsonClone = jsonValue.toObject();
+                                    QString hostname = jsonHostname.toString();
+                                    QString commandLine = jsonCommandLine.toString();
+                                    QString peerId = jsonPeerId.toString();
+                                    QString ipAddress = jsonAddress.toString();
 
-                                    QJsonValue jsonHostname = jsonClone.value("hostname");
-                                    QJsonValue jsonCommandLine = jsonClone.value("commandLine");
-                                    QJsonValue jsonPeerId = jsonClone.value("peerId");
-                                    QJsonValue jsonAddress = jsonClone.value("address");
-
-                                    if (jsonHostname.isString() && jsonCommandLine.isString() && jsonPeerId.isString() && jsonAddress.isString())
+                                    if (!hostname.isEmpty() && !commandLine.isEmpty())
                                     {
-                                        QString hostname = jsonHostname.toString();
-                                        QString commandLine = jsonCommandLine.toString();
-                                        QString peerId = jsonPeerId.toString();
-                                        QString ipAddress = jsonAddress.toString();
+                                        qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
 
-                                        if (!hostname.isEmpty() && !commandLine.isEmpty())
+                                        // Create a new model of agent with the name
+                                        AgentM* agent = new AgentM(agentName, peerId, ipAddress,  this);
+
+                                        // Update the hostname and the command line
+                                        agent->sethostname(hostname);
+                                        agent->setcommandLine(commandLine);
+
+                                        // Update corresponding host
+                                        HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
+                                        if (host != NULL) {
+                                            agent->setcanBeRestarted(true);
+                                        }
+
+                                        // Add this new model of agent
+                                        addAgentModel(agent);
+
+                                        if (agentDefinition != nullptr)
                                         {
-                                            qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
-
-                                            // Create a new model of agent with the name
-                                            AgentM* agent = new AgentM(agentName, peerId, ipAddress,  this);
-
-                                            // Update the hostname and the command line
-                                            agent->sethostname(hostname);
-                                            agent->setcommandLine(commandLine);
-
-                                            // Update corresponding host
-                                            HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                                            if (host != NULL) {
-                                                agent->setcanBeRestarted(true);
-                                            }
-
-                                            // Add this new model of agent
-                                            addAgentModel(agent);
-
                                             // Make a copy of the definition
                                             DefinitionM* copyOfDefinition = agentDefinition->copy();
                                             if (copyOfDefinition != NULL)
@@ -294,19 +303,17 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                     }
                                 }
                             }
-
-                            // Free memory
-                            delete agentDefinition;
                         }
                     }
-                    else {
-                        qWarning() << "The JSON does not contain an agent definition !";
 
-                        success = false;
+                    if (agentDefinition != NULL)
+                    {
+                        // Free memory
+                        delete agentDefinition;
                     }
                 }
                 else {
-                    qWarning() << "The JSON does not contain an agent definition !";
+                    qWarning() << "The JSON object does not contain an agent name !";
 
                     success = false;
                 }
