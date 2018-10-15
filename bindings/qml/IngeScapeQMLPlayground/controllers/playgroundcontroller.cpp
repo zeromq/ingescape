@@ -966,12 +966,27 @@ void PlaygroundController::_addImportPathsForFile(const QUrl& url)
             //
             // File system watcher
             //
+            // - main directory
             _fileSystemWatcher.addPath(directoryPath);
 
-            QDirIterator directoryIterator(directoryPath, QDir::AllEntries | QDir::NoDotAndDotDot, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-            while (directoryIterator.hasNext())
+            // - sub-directories if needed
+            // Avoid standard locations
+            QStringList homeDirs = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
+            QStringList desktopDirs = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
+            QStringList documentsDirs = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation);
+            QStringList downloadsDirs = QStandardPaths::standardLocations(QStandardPaths::DownloadLocation);
+
+            if (
+                !homeDirs.contains(directoryPath) && !desktopDirs.contains(directoryPath)
+                &&
+                !documentsDirs.contains(directoryPath) && !downloadsDirs.contains(directoryPath)
+                )
             {
-                _fileSystemWatcher.addPath(directoryIterator.next());
+                QDirIterator directoryIterator(directoryPath, QDir::AllEntries | QDir::NoDotAndDotDot, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+                while (directoryIterator.hasNext())
+                {
+                    _fileSystemWatcher.addPath(directoryIterator.next());
+                }
             }
         }
         else if (QString::compare(url.scheme(), "qrc", Qt::CaseInsensitive) == 0)

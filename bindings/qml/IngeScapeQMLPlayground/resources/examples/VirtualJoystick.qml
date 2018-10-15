@@ -127,17 +127,12 @@ Item {
         }
 
         MouseArea {
+            id: joystickMouseArea
+
             anchors.fill: parent
 
-            onPressed: {
-                returnToCenterAnimation.stop();
-            }
-
-            onReleased: {
-                returnToCenterAnimation.restart();
-            }
-
-            onPositionChanged: {
+            function computeJoystickPosition(mouseX, mouseY)
+            {
                 var maxDistance = Math.max((background.width/2 - thumb.width/2), 1);
                 var dx = mouseX - width/2;
                 var dy = mouseY - height/2;
@@ -155,6 +150,30 @@ Item {
                     root.joystickX = Math.cos(angle);
                     root.joystickY = -Math.sin(angle);
                 }
+            }
+
+            onPressed: {
+                returnToCenterAnimation.stop();
+
+                computeJoystickPosition(mouseX, mouseY);
+            }
+
+            onReleased: {
+                returnToCenterAnimation.restart();
+            }
+
+            onPositionChanged: {
+                computeJoystickPosition(mouseX, mouseY);
+            }
+
+
+            // Export signals as outputs
+            IngeScapeOutputBinding {
+                target: joystickMouseArea
+
+                signalHandlers: "onPressed, onReleased"
+
+                outputsPrefix: "joystick_"
             }
         }
     }
