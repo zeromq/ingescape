@@ -27,7 +27,7 @@ I2PopupBase {
     id: rootItem
 
     width: 300
-    height: 400
+    height: 350
 
     dismissOnOutsideTap: false
 
@@ -59,7 +59,7 @@ I2PopupBase {
             margins: 20
         }
 
-        spacing: 10
+        spacing: 6
 
         Text {
             id: title
@@ -74,11 +74,14 @@ I2PopupBase {
             }
         }
 
-        Rectangle {
+        Item {
             id: space1
-            color: "transparent"
-            width: 10
-            height: 10
+
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            height: 13 // spacing + 13 + spacing
         }
 
         Text {
@@ -95,9 +98,13 @@ I2PopupBase {
         TextField {
             id: txtPort
 
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
             height: 25
-            width: 200
             verticalAlignment: TextInput.AlignVCenter
+
             text: IngeScapeEditorC.port
 
             validator: IntValidator {
@@ -132,11 +139,14 @@ I2PopupBase {
             }
         }
 
-        Rectangle {
+        Item {
             id: space2
-            color: "transparent"
-            width: 10
-            height: 10
+
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            height: 13 // spacing + 13 + spacing
         }
 
         Text {
@@ -155,8 +165,11 @@ I2PopupBase {
         Scenario.IngeScapeComboBox {
             id: combobox
 
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
             height : 25
-            width : 200
 
             model: IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices : 0
             useQStringList: true
@@ -187,11 +200,34 @@ I2PopupBase {
             }
         }
 
-        Rectangle {
+        Item {
             id: space3
-            color: "transparent"
-            width: 10
-            height: 10
+
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            height: 58 // spacing + 58 + spacing
+
+            Text {
+                id: error
+
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    verticalCenter: parent.verticalCenter
+                }
+                wrapMode: Text.WordWrap
+
+                text: IngeScapeEditorC.errorMessageWhenConnectionFailed
+
+                color: IngeScapeTheme.orangeColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 16
+                }
+            }
         }
 
         CheckBox {
@@ -212,7 +248,7 @@ I2PopupBase {
                         verticalCenterOffset: 2
                     }
 
-                    text: "Clear platform when modified"
+                    text: qsTr("Clear platform when modified")
 
                     font {
                         family: IngeScapeTheme.textFontFamily
@@ -238,40 +274,15 @@ I2PopupBase {
             }
         }
 
-        Rectangle {
-            id: space4
-            color: "transparent"
-            width: 10
-            height: 10
-        }
-
-        Text {
-            id: error
-
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-
-            text: IngeScapeEditorC.errorMessageWhenConnectionFailed
-
-            color: IngeScapeTheme.orangeColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
-            }
-        }
     }
 
 
     Row {
         anchors {
-            horizontalCenter: parent.horizontalCenter
+            right: parent.right
+            rightMargin: 20
             bottom : parent.bottom
-            bottomMargin: 16
+            bottomMargin: 20
         }
         spacing : 15
 

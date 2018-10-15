@@ -36,7 +36,7 @@ class AgentVM : public QObject
     Q_OBJECT
 
     // Name of our agent
-    I2_QML_PROPERTY_CUSTOM_SETTER(QString, name)
+    I2_QML_PROPERTY_READONLY(QString, name)
 
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)

@@ -1443,6 +1443,7 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
         if (strcmp(name, networkDevice) == 0){
             strncpy(agentElements->ipAddress, ziflist_address (iflist), IP_ADDRESS_LENGTH-1);
             igs_info("Starting with ip address %s and port %d on device %s", agentElements->ipAddress, port, networkDevice);
+            break;
         }
         name = ziflist_next (iflist);
     }
@@ -1504,6 +1505,7 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
         if (strcmp(ziflist_address (iflist), ipAddress) == 0){
             strncpy(agentElements->networkDevice, name, 15);
             igs_info("Starting with ip address %s and port %d on device %s", ipAddress, port, agentElements->networkDevice);
+            break;
         }
         name = ziflist_next (iflist);
     }

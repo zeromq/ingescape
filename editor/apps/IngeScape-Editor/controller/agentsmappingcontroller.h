@@ -128,6 +128,12 @@ public:
     void importMappingFromJson(QJsonArray jsonArrayOfAgentsMapping);
 
 
+    /**
+     * @brief Reset the modifications made while the mapping was UN-activated
+     */
+    Q_INVOKABLE void resetModificationsWhileMappingWasUNactivated();
+
+
 Q_SIGNALS:
 
     /**
@@ -152,6 +158,14 @@ Q_SIGNALS:
      * @brief Emitted to fit all nodes in our view
      */
     void fitToView();
+
+
+    /**
+     * @brief Signal emitted when the user activates the mapping in mode OBSERVE
+     * while he made some modifications on the links betwwen agents.
+     * These modifications will be lost if the user stay in mode OBSERVE
+     */
+    void modificationsOnLinksWhileMappingUnactivated();
 
 
     /**
@@ -315,6 +329,17 @@ private:
 
 
     /**
+     * @brief Get the view model of link which corresponds to names
+     * @param outputAgentName
+     * @param outputName
+     * @param inputAgentName
+     * @param inputName
+     * @return
+     */
+    MapBetweenIOPVM* _getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName);
+
+
+    /**
      * @brief Remove all the links with this agent
      * @param agent
      */
@@ -327,6 +352,12 @@ private:
      * @param temporaryMapping
      */
     void _overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping);
+
+
+    /**
+     * @brief Update the (global) mapping with all models of agents and links
+     */
+    void _updateMappingWithModelsOfAgentsAndLinks();
 
 
     /**
@@ -356,6 +387,10 @@ private:
 
     // Hash table from "agent name" to a list of waiting links (where the agent is involved as "Output Agent")
     QHash<QString, QList<ElementMappingM*>> _hashFromAgentNameToListOfWaitingLinks;
+
+    // Hash table from "link id" to added/removed link while the mapping was UN-activated
+    QHash<QString, ElementMappingM*> _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated;
+    QHash<QString, ElementMappingM*> _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated;
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)

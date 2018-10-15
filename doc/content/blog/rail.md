@@ -1,5 +1,5 @@
 +++
-title = "Innovative operational supervision environment for RATP RER Ligne A in Paris"
+title = "Operational supervision environment for RER Ligne A in Paris"
 date = "2018-04-20T11:57:11+02:00"
 categories = ["works"]
 banner = "img/banners/ratp.png"
@@ -19,6 +19,6 @@ Massive communication flows are handled by the applications to:
 - locate all the trains in real-time,
 - feed all the user interfaces with results from the computation algorithms (schedules, resources allocation, alerts and notifications, etc.).
 
-This project has widely benefited from the iterative architecture and integration capabilities offered by ingeScape. Tests around connections and data exchange have started very early in the global process, enabling to quickly provide proof of concepts and to create a positive loop between engineering and UX design activites, one providing feedback to the other about opportunities and limits.
+This project has widely benefited from the iterative architecture and integration capabilities supported by ingeScape. Tests around connections and data exchange have started very early in the global process, enabling to quickly provide proof of concepts and to create a positive loop between engineering and UX design activites, one providing feedback to the other about opportunities and limits.
 
-Logging and record capabilities offered by ingeScape have been actively included in the project activities for archiving, training and technical validation.
+Logging and record capabilities as offered by ingeScape have been actively included in the project activities for archiving, training and technical validation.

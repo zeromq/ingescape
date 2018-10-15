@@ -25,14 +25,14 @@ import "theme" as Theme;
 I2PopupBase {
     id: rootItem
 
-    height : 150
-    width : 290
+    height: 150
+    width: 290
 
     anchors.centerIn: parent
 
     isModal: true
-    dismissOnOutsideTap : false;
-    keepRelativePositionToInitialParent : false;
+    dismissOnOutsideTap: false
+    keepRelativePositionToInitialParent: false
 
 
     property alias confirmationText: confirmationText.text

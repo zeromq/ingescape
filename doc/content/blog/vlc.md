@@ -451,10 +451,16 @@ cd vlc && ./extras/package/win32/build.sh
 make package-win32-zip
 {{< / highlight >}}
 
-To include ingeScape, first install it so that the headers are in *contrib/i686-w64-mingw32/include/ingescape/* and the win32 version of the libs are in *contrib/i686-w64-mingw32/lib/*. Then edit *lib/core.c* exactly in the same way as for the macOS compilation. Finally, edit *lib/Makefile.am* to link the VLC library to ingescape :
+To include ingeScape, first install it so that the headers are in *contrib/i686-w64-mingw32/include/ingescape/* and the win32 version of the libs are in *contrib/i686-w64-mingw32/lib/*. Then edit *lib/core.c* exactly in the same way as for the macOS compilation. Then, edit *lib/Makefile.am* to link the VLC library to ingescape :
 
 {{< highlight bash >}}
 libvlc_la_LDFLAGS += -Wl,../src/libvlc_win32_rc.$(OBJEXT) -avoid-version -Wc,-static -lingescape
+{{< / highlight >}}
+
+Finally, to anticipate our actions in the VLC GUI Qt module, edit *modules/gui/qt/Makefile.am* to link the VLC library to ingescape for this module as well :
+
+{{< highlight bash >}}
+
 {{< / highlight >}}
 
 Reconfigure the projet and rerun the compilation process : the new compiled version will embed ingeScape properly and already start and stop as an ingeScape agent. NB: do not forget to adapt the device name in the *igs_startWithDevice* function in *lib/core.c*.

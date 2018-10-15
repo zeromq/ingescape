@@ -160,6 +160,21 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
             // Remove temporary link (this temporary link will be removed when the user will activate the mapping)
             link->inputAgent()->removeTemporaryLink(link->input()->name(), link->outputAgent()->name(), link->output()->name());
 
+            qDebug() << "Remove TEMPORARY link" << link->id();
+
+            // This link has been added while the mapping was UN-activated, just cancel the add
+            if (_hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.contains(link->id()))
+            {
+                ElementMappingM* mappingElement = _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.value(link->id());
+                _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.remove(link->id());
+                delete mappingElement;
+            }
+            // Add this link to the hash
+            else {
+                ElementMappingM* mappingElement = new ElementMappingM(link->inputAgent()->name(), link->input()->name(), link->outputAgent()->name(), link->output()->name());
+                _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.insert(link->id(), mappingElement);
+            }
+
             // Delete the link between two agents
             _deleteLinkBetweenTwoAgents(link);
 
@@ -235,11 +250,15 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
         // Check that the input can link to the output
         if (input->canLinkWith(output))
         {
+            // If an Input (or an Output) have the same name used for 2 different types --> test pointers instead of names
+            //MapBetweenIOPVM* link = _getLinkFromNames(outputAgent->name(), output->name(), inputAgent->name(), input->name());
+
             // Search if the same link already exists
             bool alreadyLinked = false;
             for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
             {
-                if ((iterator != NULL) && (iterator->outputAgent() == outputAgent) && (iterator->output() == output)
+                if ((iterator != NULL)
+                        && (iterator->outputAgent() == outputAgent) && (iterator->output() == output)
                         && (iterator->inputAgent() == inputAgent) && (iterator->input() == input))
                 {
                     alreadyLinked = true;
@@ -253,7 +272,8 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                 qInfo() << "QML asked to create the link between agents" << outputAgent->name() << "and" << inputAgent->name();
 
                 // Mapping is activated
-                if ((_modelManager != NULL) && _modelManager->isMappingActivated())
+                // AND the input agent is ON
+                if ((_modelManager != NULL) && _modelManager->isMappingActivated() && inputAgent->isON())
                 {
                     // Add a temporary link (this temporary link will became a real link when the agent will send its mapping update)
                     inputAgent->addTemporaryLink(input->name(), outputAgent->name(), output->name());
@@ -268,6 +288,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                     Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->peerIdsList(), "MAP", input->name(), outputAgent->name(), output->name());
                 }
                 // Mapping is NOT activated
+                // OR the input agent is OFF
                 else
                 {
                     // Add a temporary link (this temporary link will became a real link when the user will activate the mapping)
@@ -278,13 +299,29 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
 
                     // Add to the list
                     _allLinksInMapping.append(link);
+
+                    qDebug() << "Add TEMPORARY link" << link->id();
+
+                    // This link has been removed while the mapping was UN-activated, just cancel the suppression
+                    if (_hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.contains(link->id()))
+                    {
+                        ElementMappingM* mappingElement = _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.value(link->id());
+                        _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.remove(link->id());
+                        delete mappingElement;
+                    }
+                    // Add this link to the hash
+                    else {
+                        ElementMappingM* mappingElement = new ElementMappingM(inputAgent->name(), input->name(), outputAgent->name(), output->name());
+                        _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.insert(link->id(), mappingElement);
+                    }
                 }
             }
             else {
                 qWarning() << "The input" << input->name() << "(of agent" << inputAgent->name() << ") is already linked to output" << output->name() << "(of agent" << outputAgent->name() << ")";
             }
         }
-        else {
+        else
+        {
             if ((output->firstModel() != NULL) && (input->firstModel() != NULL)) {
                 qDebug() << "Can not link output" << output->name() << "with type" << AgentIOPValueTypes::staticEnumToString(output->firstModel()->agentIOPValueType()) << "(of agent" << outputAgent->name() << ")"
                          << "and input" << input->name() << "with type" << AgentIOPValueTypes::staticEnumToString(input->firstModel()->agentIOPValueType()) << "(of agent" << inputAgent->name() << ")";
@@ -383,14 +420,69 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
         if (!mappingElements.isEmpty())
         {
             // Create all mapping links
-            for (ElementMappingM* elementMapping : mappingElements)
+            for (ElementMappingM* mappingElement : mappingElements)
             {
-                if (elementMapping != NULL) {
-                    onMapped(elementMapping);
+                if (mappingElement != NULL) {
+                    onMapped(mappingElement);
                 }
             }
         }
     }
+}
+
+
+/**
+ * @brief Reset the modifications made while the mapping was UN-activated
+ */
+void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
+{
+    qDebug() << "Reset the modifications made while the mapping was UN-activated";
+
+    for (QString linkId : _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.keys())
+    {
+        //qDebug() << "Remove added link" << linkId << "while the mapping was disconnected";
+
+        ElementMappingM* mappingElement = _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.value(linkId);
+        if (mappingElement != NULL)
+        {
+            // Get the view model of link which corresponds to a mapping element
+            MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
+            if (link != NULL)
+            {
+                // Delete this link (between two agents) to cancel the add
+                _deleteLinkBetweenTwoAgents(link);
+            }
+        }
+    }
+
+    for (QString linkId : _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.keys())
+    {
+        //qDebug() << "Add removed link" << linkId << "while the mapping was disconnected";
+
+        ElementMappingM* mappingElement = _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.value(linkId);
+        if (mappingElement != NULL)
+        {
+            // Make a copy
+            ElementMappingM* copy = new ElementMappingM(mappingElement->inputAgent(), mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
+
+            // Simulate slot "onMapped" to create a link (between two agents) to cancel the remove
+            onMapped(copy);
+
+            // FIXME: we cannot delete this mapping element because it could be added to _hashFromAgentNameToListOfWaitingLinks in the slot "onMapped"
+            //delete copy;
+        }
+    }
+
+    // Clear modifications made while the mapping was UN-activated
+    qDeleteAll(_hashFromLinkIdToAddedLinkWhileMappingWasUNactivated);
+    _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.clear();
+
+    qDeleteAll(_hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated);
+    _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.clear();
+
+
+    // Update the (global) mapping with all models of agents and links
+    _updateMappingWithModelsOfAgentsAndLinks();
 }
 
 
@@ -435,6 +527,14 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
         {
             qDebug() << "Mapping Activated in mode CONTROL";
 
+            // Clear modifications made while the mapping was UN-activated
+            qDeleteAll(_hashFromLinkIdToAddedLinkWhileMappingWasUNactivated);
+            _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.clear();
+
+            qDeleteAll(_hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated);
+            _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.clear();
+
+
             // Apply all temporary mappings
             for (AgentInMappingVM* agent : _allAgentsInMapping.toList())
             {
@@ -455,54 +555,20 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
         {
             qDebug() << "Mapping Activated in mode OBSERVE";
 
-            // Get the map from agent name to list of active agents
-            QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
-
-            if (!mapFromAgentNameToActiveAgentsList.isEmpty())
+            // There were modifications in the mapping while the mapping was UN-activated
+            if (!_hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.isEmpty() || !_hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.isEmpty())
             {
-                double randomMax = (double)RAND_MAX;
+                qDebug() << "There were modifications in the mapping while the mapping was UN-activated. Force to CONTROL ?\n"
+                         << _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated.keys() << "to ADD\n"
+                         << _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated.keys() << "to REMOVE";
 
-                // Create all agents in mapping
-                for (QString agentName : mapFromAgentNameToActiveAgentsList.keys())
-                {
-                    QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
-
-                    // Get a random position in the current window
-                    QPointF position = _getRandomPosition(randomMax);
-
-                    //qDebug() << "Random position:" << position << "for agent" << agentName;
-
-                    // Add new model(s) of agent to the current mapping
-                    _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
-                }
-
-                // Create all links in mapping
-                for (AgentInMappingVM* agent : _allAgentsInMapping.toList())
-                {
-                    if ((agent != NULL) && (agent->temporaryMapping() != NULL))
-                    {
-                        // Delete all "mapping elements" in the temporary mapping
-                        agent->temporaryMapping()->mappingElements()->deleteAllItems();
-
-                        for (AgentM* model : agent->models()->toList())
-                        {
-                            if ((model != NULL) && (model->mapping() != NULL))
-                            {
-                                for (ElementMappingM* mappingElement : model->mapping()->mappingElements()->toList())
-                                {
-                                    if (mappingElement != NULL)
-                                    {
-                                        // Simulate slot "on Mapped"
-                                        onMapped(mappingElement);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Notify the QML to fit the view
-                Q_EMIT fitToView();
+                // The mapping has been modified but will be lost if the user stay in mode OBSERVE
+                Q_EMIT modificationsOnLinksWhileMappingUnactivated();
+            }
+            else
+            {
+                // Update the (global) mapping with all models of agents and links
+                _updateMappingWithModelsOfAgentsAndLinks();
             }
         }
     }
@@ -792,6 +858,7 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
         if ((link != NULL) && (link->inputAgent() != NULL))
         {
             // Add the temporary link that correspond to this real link (if it does not yet exist)
+            //bool hasBeenAdded = link->inputAgent()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
             link->inputAgent()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
         }
     }
@@ -812,8 +879,10 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
         MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
         if (link != NULL)
         {
-            if (link->inputAgent() != NULL) {
+            if (link->inputAgent() != NULL)
+            {
                 // Remove the temporary link that correspond to this real link
+                //bool hasBeenRemoved = link->inputAgent()->removeTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
                 link->inputAgent()->removeTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
             }
 
@@ -838,20 +907,7 @@ void AgentsMappingController::onHighlightLink(QStringList parameters)
         QString outputName = parameters.at(3);
 
         // Get the view model of link which corresponds to these parameters
-        MapBetweenIOPVM* link = NULL;
-
-        for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
-        {
-            if ((iterator != NULL)
-                    && (iterator->outputAgent() != NULL) && (iterator->outputAgent()->name() == outputAgentName)
-                    && (iterator->inputAgent() != NULL) && (iterator->inputAgent()->name() == inputAgentName)
-                    && (iterator->output() != NULL) && (iterator->output()->name() == outputName)
-                    && (iterator->input() != NULL) && (iterator->input()->name() == inputName))
-            {
-                link = iterator;
-                break;
-            }
-        }
+        MapBetweenIOPVM* link = _getLinkFromNames(outputAgentName, outputName, inputAgentName, inputName);
 
         if ((link != NULL) && (link->output() != NULL))
         {
@@ -884,7 +940,8 @@ void AgentsMappingController::_onAgentsInMappingChanged()
     {
         //qDebug() << _previousListOfAgentsInMapping.count() << "--> Agent in Mapping ADDED --> " << newListOfAgentsInMapping.count();
 
-        for (AgentInMappingVM* agentInMapping : newListOfAgentsInMapping) {
+        for (AgentInMappingVM* agentInMapping : newListOfAgentsInMapping)
+        {
             if ((agentInMapping != NULL) && !_previousListOfAgentsInMapping.contains(agentInMapping))
             {
                 qDebug() << "Agents Mapping Controller: Agent in mapping" << agentInMapping->name() << "ADDED";
@@ -905,7 +962,8 @@ void AgentsMappingController::_onAgentsInMappingChanged()
     {
         //qDebug() << _previousListOfAgentsInMapping.count() << "--> Agent in Mapping REMOVED --> " << newListOfAgentsInMapping.count();
 
-        for (AgentInMappingVM* agentInMapping : _previousListOfAgentsInMapping) {
+        for (AgentInMappingVM* agentInMapping : _previousListOfAgentsInMapping)
+        {
             if ((agentInMapping != NULL) && !newListOfAgentsInMapping.contains(agentInMapping))
             {
                 qDebug() << "Agents Mapping Controller: Agent in mapping" << agentInMapping->name() << "REMOVED";
@@ -937,7 +995,8 @@ void AgentsMappingController::_onInputsListHaveBeenAdded(QList<InputVM*> inputsL
     if ((agentInMapping != NULL) && !inputsListHaveBeenAdded.isEmpty())
     {
         QStringList namesOfInputs;
-        for (InputVM* input : inputsListHaveBeenAdded) {
+        for (InputVM* input : inputsListHaveBeenAdded)
+        {
             if (input != NULL) {
                 namesOfInputs.append(input->name());
             }
@@ -968,7 +1027,8 @@ void AgentsMappingController::_onOutputsListHaveBeenAdded(QList<OutputVM*> outpu
     if ((agentInMapping != NULL) && !outputsListHaveBeenAdded.isEmpty())
     {
         QStringList namesOfOutputs;
-        for (OutputVM* output : outputsListHaveBeenAdded) {
+        for (OutputVM* output : outputsListHaveBeenAdded)
+        {
             if (output != NULL) {
                 namesOfOutputs.append(output->name());
             }
@@ -1131,7 +1191,36 @@ MapBetweenIOPVM* AgentsMappingController::_getLinkFromMappingElement(ElementMapp
             }
         }
     }
+    return link;
+}
 
+
+/**
+ * @brief Get the view model of link which corresponds to names
+ * @param outputAgentName
+ * @param outputName
+ * @param inputAgentName
+ * @param inputName
+ * @return
+ */
+MapBetweenIOPVM* AgentsMappingController::_getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName)
+{
+    MapBetweenIOPVM* link = NULL;
+
+    for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
+    {
+        // FIXME: An agent in mapping can have several Inputs (or Outputs) with the same name but with different types
+        // --> Instead, this method must return a list of MapBetweenIOPVM
+        if ((iterator != NULL)
+                && (iterator->outputAgent() != NULL) && (iterator->outputAgent()->name() == outputAgentName)
+                && (iterator->inputAgent() != NULL) && (iterator->inputAgent()->name() == inputAgentName)
+                && (iterator->output() != NULL) && (iterator->output()->name() == outputName)
+                && (iterator->input() != NULL) && (iterator->input()->name() == inputName))
+        {
+            link = iterator;
+            break;
+        }
+    }
     return link;
 }
 
@@ -1182,6 +1271,70 @@ void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, 
 
         // Emit signal "Command asked to agent"
         Q_EMIT commandAskedToAgent(peerIdsList, command);
+    }
+}
+
+
+/**
+ * @brief Update the (global) mapping with all models of agents and links
+ */
+void AgentsMappingController::_updateMappingWithModelsOfAgentsAndLinks()
+{
+    if (_modelManager != NULL)
+    {
+        // Get the map from agent name to list of active agents
+        QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
+
+        if (!mapFromAgentNameToActiveAgentsList.isEmpty())
+        {
+            double randomMax = (double)RAND_MAX;
+
+            // For each name of agent, we get all models of active agent (ON) and:
+            // - create the corresponding agent in the mapping (VM) if not yet added
+            // - or add eventually new model to existing agent in the mapping (VM)
+            for (QString agentName : mapFromAgentNameToActiveAgentsList.keys())
+            {
+                QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
+
+                // Get a random position in the current window
+                QPointF position = _getRandomPosition(randomMax);
+
+                //qDebug() << "Random position:" << position << "for agent" << agentName;
+
+                // Add new model(s) of agent to the current mapping
+                _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
+            }
+
+            // Create all links between agents in the mapping
+            // By looking the mapping of each (sub) model of the VM
+            for (AgentInMappingVM* agent : _allAgentsInMapping.toList())
+            {
+                if ((agent != NULL) && (agent->temporaryMapping() != NULL))
+                {
+                    // First, delete all "mapping elements" in the temporary mapping
+                    agent->temporaryMapping()->mappingElements()->deleteAllItems();
+
+                    // Traverse through each model
+                    for (AgentM* model : agent->models()->toList())
+                    {
+                        if ((model != NULL) && (model->mapping() != NULL))
+                        {
+                            for (ElementMappingM* mappingElement : model->mapping()->mappingElements()->toList())
+                            {
+                                if (mappingElement != NULL)
+                                {
+                                    // Simulate slot "on Mapped"
+                                    onMapped(mappingElement);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Notify the QML to fit the view
+            Q_EMIT fitToView();
+        }
     }
 }
 

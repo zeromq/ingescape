@@ -168,11 +168,12 @@ int main(int argc, const char * argv[]) {
         {"device",      required_argument, 0,  'd' },
         {"port",        required_argument, 0,  'p' },
         {"name",        required_argument, 0,  'n' },
-        {"help",        no_argument, 0,  'h' }
+        {"help",        no_argument, 0,  'h' },
+        {0, 0, 0, 0}
     };
     
     int long_index =0;
-    while ((opt = getopt_long(argc, (char *const *)argv,"p",long_options, &long_index )) != -1) {
+    while ((opt = getopt_long(argc, (char *const *)argv,"",long_options, &long_index )) != -1) {
         switch (opt) {
             case 'v' :
                 verbose = true;
