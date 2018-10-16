@@ -56,5 +56,6 @@
         <file>qml/popup/MessagePopup.qml</file>
         <file>resources/fonts/titillium/Titillium-Regular.otf</file>
         <file>qml/popup/MappingModificationsPopup.qml</file>
+        <file>qml/theme/IngeScapeComboboxStyle.qml</file>
     </qresource>
 </RCC>

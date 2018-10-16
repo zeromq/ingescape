@@ -212,8 +212,11 @@ void registerCustomQmlTypes()
     // - Singleton used to enable consistent app styling through predefined colors, fonts, etc.
     qmlRegisterSingletonType(QUrl("qrc:/qml/theme/IngeScapeTheme.qml"), "INGESCAPE", 1, 0, "IngeScapeTheme");
 
-    // - Srollview style
+    // - Scrollview style
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeScrollViewStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeScrollViewStyle");
+
+    // - Combobox style
+    qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeComboboxStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeComboboxStyle");
 
 }
 
