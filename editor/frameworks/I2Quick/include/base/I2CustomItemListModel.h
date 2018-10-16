@@ -168,12 +168,14 @@ public: // List API
      */
     Q_INVOKABLE virtual bool contains(QObject *item) const = 0;
 
+
     /**
      * @brief Get index of a given item in our list
      * @param item
      * @return Index of our item OR -1 if no item matched
      */
     Q_INVOKABLE virtual int indexOf(QObject *item) const = 0;
+
 
     /**
      * @brief Removes all items from the list
@@ -182,10 +184,12 @@ public: // List API
      */
     virtual void clear() = 0;
 
+
     /**
      * @brief Delete all items in our list
      */
     virtual void deleteAllItems() = 0;
+
 
     /**
      * @brief Get a generic QList, i.e. a QList of QObjects, representation of our list model
@@ -209,6 +213,35 @@ public: // List API
     {
       return Qt::UserRole;
     }
+
+
+//
+// QList-like comfort API
+//
+public:
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    AbstractI2CustomItemListModel& operator+= (QObject* item)
+    {
+        append(item);
+        return (*this);
+    }
+
+
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    AbstractI2CustomItemListModel& operator<< (QObject* item)
+    {
+        append(item);
+        return (*this);
+    }
+
 
 
 Q_SIGNALS:
@@ -281,7 +314,13 @@ public:
                              << QByteArrayLiteral("edit")
                              << QByteArrayLiteral("toolTip")
                              << QByteArrayLiteral("statusTip")
-                             << QByteArrayLiteral("whatsThis");
+                             << QByteArrayLiteral("whatsThis")
+                             << QByteArrayLiteral("QtObject");
+
+        // - list of keywords that can create issues with QML
+        QList<QByteArray> qmlWarningRoleNames;
+        qmlWarningRoleNames << QByteArrayLiteral("index")
+                            << QByteArrayLiteral("model");
 
         // Specific role that will be used to return our item
         _roleNames.insert(QtObjectRole(), QByteArrayLiteral ("QtObject"));
@@ -298,6 +337,14 @@ public:
             // Check if we can add it to our list of roles
             if (!qmlReservedRoleNames.contains(propertyName))
             {
+                // Check if we must display a warning
+                if (qmlWarningRoleNames.contains(propertyName))
+                {
+                    qWarning () << "I2CustomItemListModel warning: class " << metaObject.className()
+                                << " should not have a property named " << propertyName
+                                << ", it can create issues with QML";
+                }
+
                 // NB: Roles must be greater than QtObjectRole()
                 int role = propertyRoleStartIndex + index;
                 _roleNames.insert(role, propertyName);
@@ -312,9 +359,9 @@ public:
             }
             else
             {
-                qWarning () << "I2CustomItemListModel warning: class " << metaObject.className()
-                            << " must not have a property named " << propertyName
-                            << ", it is a reserved keyword";
+                qCritical () << "I2CustomItemListModel error: class " << metaObject.className()
+                             << " must not have a property named " << propertyName
+                             << ", it is a reserved keyword and can create issues with QML";
             }
         }
     }
@@ -327,6 +374,15 @@ public:
     {
         // Clear our list
         clear();
+
+        // Clear our hashtable associating a role value (int) to a property name
+        _roleNames.clear();
+
+        // Clear our hashtable associating a signal index to a role value
+        _signalRoles.clear();
+
+        // Clear our list of notify signals of our item class
+        _propertyNotifySignals.clear();
     }
 
 
@@ -1158,7 +1214,6 @@ public: // List API
 
 
 
-
     /**
      * @brief Check if a given item is in our list
      * @param item
@@ -1376,6 +1431,61 @@ public: // Extra list API
     }
 
 
+
+//
+// QList-like comfort API
+//
+public:
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    I2CustomItemListModel& operator+= (CustomItemType* item)
+    {
+        appendRow(item);
+        return (*this);
+    }
+
+
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    I2CustomItemListModel& operator<< (CustomItemType* item)
+    {
+        appendRow(item);
+        return (*this);
+    }
+
+
+    /**
+     * @brief Append a list of items to our list
+     * @param list
+     * @return
+     */
+    I2CustomItemListModel& operator+= (const QList<CustomItemType*> &list)
+    {
+        append(list);
+        return (*this);
+    }
+
+
+    /**
+     * @brief Append a list of items to our list
+     * @param list
+     * @return
+     */
+    I2CustomItemListModel& operator<< (const QList<CustomItemType*> &list)
+    {
+        append(list);
+        return (*this);
+    }
+
+
+
+public:
     /**
      * @brief Called when an item of our list has changed
      */
@@ -1514,9 +1624,6 @@ public: // Extra list API
                     // Remove item at the invalid index
                     _list.takeAt(invalidIndex);
 
-                    // Unsubscribe to all signals
-                    disconnect(deletedItem, 0, this, 0);
-
                     endRemoveRows();
 
 
@@ -1541,9 +1648,6 @@ public: // Extra list API
                         int invalidIndex = deletedItemIndexes.at(index);
                         _list.takeAt(invalidIndex);
                     }
-
-                    // Unsubscribe to all signals
-                    disconnect(deletedItem, 0, this, 0);
 
                     endResetModel();
 

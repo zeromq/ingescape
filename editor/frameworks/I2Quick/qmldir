@@ -3,6 +3,11 @@ plugin I2Quick
 classname I2QuickPlugin
 typeinfo I2Quick.qmltypes
 I2Combobox 1.0 qml/components/I2Combobox.qml
+I2ComboboxBase 1.0 qml/components/I2ComboboxBase.qml
+I2ComboboxItemModel 1.0 qml/components/I2ComboboxItemModel.qml
+I2ComboboxObjectList 1.0 qml/components/I2ComboboxObjectList.qml
+I2ComboboxStringList 1.0 qml/components/I2ComboboxStringList.qml
+I2ComboboxBaseDelegate 1.0 qml/components/I2ComboboxBaseDelegate.qml
 I2ICon 1.0 qml/components/I2ICon.qml
 I2MultiTouchButton 1.0 qml/components/I2MultiTouchButton.qml
 I2VirtualKeyboard 1.0 qml/components/I2VirtualKeyboard.qml

@@ -22,6 +22,7 @@
 #include <QElapsedTimer>
 
 #include "base/I2CustomItemListModel.h"
+#include "helpers/i2enumpropertyhelpers.h"
 
 // To export symbols
 #include "i2quick_global.h"
@@ -30,13 +31,7 @@
 /**
  * @brief The FilterPatternSyntax class defines custom enum values to interpret the meaning of the filter pattern
  */
-class I2QUICK_EXPORT FilterPatternSyntax : public QObject {
-    Q_GADGET
-public:
-    enum Value { RegExp, Wildcard, FixedString };
-    Q_ENUMS (Value)
-};
-
+I2_ENUM(FilterPatternSyntax, RegExp, Wildcard, FixedString)
 
 
 
@@ -167,6 +162,35 @@ public:
      * @param sortFilterList
      */
     virtual void setSourceModelFromSortFilterList(AbstractI2CustomItemSortFilterProxyModel* sortFilterList) = 0;
+
+
+//
+// QList-like comfort API
+//
+public:
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    AbstractI2CustomItemSortFilterProxyModel& operator+= (QObject* item)
+    {
+        append(item);
+        return (*this);
+    }
+
+
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    AbstractI2CustomItemSortFilterProxyModel& operator<< (QObject* item)
+    {
+        append(item);
+        return (*this);
+    }
+
 
 
 Q_SIGNALS:
@@ -1330,6 +1354,85 @@ public: // Extra list API
     }
 
 
+//
+// QList-like comfort API
+//
+public:
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    I2CustomItemSortFilterProxyModel& operator+= (CustomItemType* item)
+    {
+        if (_originalList != NULL)
+        {
+            _originalList->appendRow(item);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: can not add an item without a sourceModel";
+        }
+
+        return (*this);
+    }
+
+
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    I2CustomItemSortFilterProxyModel& operator<< (CustomItemType* item)
+    {
+        if (_originalList != NULL)
+        {
+            _originalList->appendRow(item);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: can not add an item without a sourceModel";
+        }
+    }
+
+
+    /**
+     * @brief Append a list of items to our list
+     * @param list
+     * @return
+     */
+    I2CustomItemSortFilterProxyModel& operator+= (const QList<CustomItemType*> &list)
+    {
+        if (_originalList != NULL)
+        {
+            _originalList->append(list);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: can not add a list of items without a sourceModel";
+        }
+    }
+
+
+    /**
+     * @brief Append a list of items to our list
+     * @param list
+     * @return
+     */
+    I2CustomItemSortFilterProxyModel& operator<< (const QList<CustomItemType*> &list)
+    {
+        if (_originalList != NULL)
+        {
+            _originalList->append(list);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: can not add a list of items without a sourceModel";
+        }
+    }
+
+
+public:
     /**
      * @brief Called when our source model triggers a countChanged signal
      */
@@ -1480,6 +1583,60 @@ public:
         Q_UNUSED(sourceModel)
         qWarning() << "I2CustomItemSortFilterListModel warning: the sourceModel can not be modified. It is defined at creation";
     }
+
+
+
+//
+// QList-like comfort API
+//
+public:
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    I2CustomItemSortFilterListModel& operator+= (CustomItemType* item)
+    {
+        _list.appendRow(item);
+        return (*this);
+    }
+
+
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    I2CustomItemSortFilterListModel& operator<< (CustomItemType* item)
+    {
+        _list.appendRow(item);
+        return (*this);
+    }
+
+
+    /**
+     * @brief Append a list of items to our list
+     * @param list
+     * @return
+     */
+    I2CustomItemSortFilterListModel& operator+= (const QList<CustomItemType*> &list)
+    {
+        _list.append(list);
+        return (*this);
+    }
+
+
+    /**
+     * @brief Append a list of items to our list
+     * @param list
+     * @return
+     */
+    I2CustomItemSortFilterListModel& operator<< (const QList<CustomItemType*> &list)
+    {
+        _list.append(list);
+        return (*this);
+    }
+
 
 
 protected:
