@@ -22,6 +22,10 @@
 #include <zyre.h>
 #include "ingescape.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MAX_STRING_MSG_LENGTH 4096
 
 //network configuration
@@ -148,5 +152,9 @@ PUBLIC bool igs_checkTokenArgumentExistence(const char *tokenName, const char *a
 //////////////////////////////////////////////////
 //security
 //TODO when officially supported in Zyre 2.0.x
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ingescape_advanced_h */

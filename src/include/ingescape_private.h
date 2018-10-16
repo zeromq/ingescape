@@ -36,6 +36,10 @@
 #include "ingescape.h"
 #include "ingescape_advanced.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MAX_PATH 2048
 #define MAX_IOP_NAME_LENGTH 256
 #define MAX_AGENT_NAME_LENGTH 256
@@ -248,5 +252,9 @@ extern serviceHeader_t *serviceHeaders;
 void token_freeToken(igs_token_t *t);
 bool token_addValuesToArgumentsFromMessage(const char *name, igs_tokenArgument_t *arg, zmsg_t *msg);
 int token_freeValuesInArguments(igs_tokenArgument_t *arg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ingescape_private_h */

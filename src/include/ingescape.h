@@ -14,6 +14,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if (defined WIN32 || defined _WIN32)
 #if defined INGESCAPE
 #define PUBLIC __declspec(dllexport)
@@ -319,6 +323,10 @@ PUBLIC const char* igs_getIpcFolderPath(void);
 //IPC is activated by default be can be deactivated here
 PUBLIC void igs_setAllowIpc(bool allow);
 PUBLIC bool igs_getAllowIpc(void);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* ingescape_public_h */

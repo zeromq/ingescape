@@ -1,0 +1,45 @@
+#!/bin/sh
+scriptversion=2018-10-16; # UTC
+
+# Copyright © 2018 Ingenuity i/o. All rights reserved.
+
+me=$0
+INGESCAPE_MAJOR="#define INGESCAPE_MAJOR"
+INGESCAPE_MINOR="#define INGESCAPE_MINOR"
+INGESCAPE_MICRO="#define INGESCAPE_MICRO"
+
+version="$me $scriptversion
+Copyright © 2018 Ingenuity i/o. All rights reserved."
+
+usage="\
+Usage: $me [OPTION]... file.c
+Print a version string, from $INGESCAPE_MAJOR, $INGESCAPE_MINOR and $INGESCAPE_MICRO found in given file
+Options:
+   --help             display this help and exit
+   --version          output version information and exit
+Running without arguments will suffice in most cases."
+
+while test $# -gt 0; do
+  case $1 in
+    --help) echo "$usage"; exit 0;;
+    --version) echo "$version"; exit 0;;
+    -*)
+      echo "$0: Unknown option '$1'." >&2
+      echo "$0: Try '--help' for more information." >&2
+      exit 1;;
+    *)
+      version_file="$1";;
+  esac
+  shift
+done
+
+if test -z "$version_file"; then
+    echo "$usage"
+    exit 1
+fi
+
+major=`cat $version_file | grep "$INGESCAPE_MAJOR" | cut -d ' ' -f 3`
+minor=`cat $version_file | grep "$INGESCAPE_MINOR" | cut -d ' ' -f 3`
+micro=`cat $version_file | grep "$INGESCAPE_MICRO" | cut -d ' ' -f 3`
+
+echo "$major.$minor.$micro"

@@ -11,9 +11,6 @@
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
-#if (defined WIN32 || defined _WIN32)
-#include "unixfunctions.h"
-#endif
 
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))

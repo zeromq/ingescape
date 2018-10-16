@@ -1,0 +1,51 @@
+image: fafesty/compile-with-zyre
+
+stages:
+  - build
+
+#build-unix:
+#  stage: build
+#  script:
+#    - cd $CI_PROJECT_DIR
+#    - ./autogen.sh
+#    - ./configure
+#    - make
+#  artifacts:
+#    paths:
+#     - src/libingescape.la
+#     - src/.libs
+
+#build-win32-x86:
+#  stage: build
+#
+#  script:
+#    - cd $CI_PROJECT_DIR
+#    - ./autogen.sh
+#    - ./configure --prefix=/usr/x86_64-w64-mingw32 --exec-prefix=/usr/x86_64-w64-mingw32 --build=x86_64-pc-linux-gnu --host=x86_64-w64-mingw32 LDFLAGS="-L/usr/x86_64-w64-mingw32/lib" PKG_CONFIG_LIBDIR=/usr/x86_64-w64-mingw32/lib/pkgconfig
+#    - make
+#
+#  artifacts:
+#    paths:
+#     - src/libingescape.def
+#     - src/.libs/libingescape.a
+#     - src/.libs/libingescape.dll
+#     - src/.libs/libingescape.dll.a
+
+build-win32-i686:
+  stage: build
+
+  script:
+    - cd $CI_PROJECT_DIR
+    - ./autogen.sh
+    - ./configure --prefix=/usr/i686-w64-mingw32 --exec-prefix=/usr/i686-w64-mingw32 --build=x86_64-pc-linux-gnu --host=i686-w64-mingw32 LDFLAGS="-L/usr/i686-w64-mingw32/lib" PKG_CONFIG_LIBDIR=/usr/i686-w64-mingw32/lib/pkgconfig
+    - make
+
+  only:
+    - autotool
+
+  artifacts:
+    paths:
+     - src/libingescape.def
+     - src/.libs/libingescape.a
+     - src/.libs/libingescape.dll
+     - src/.libs/libingescape.dll.a

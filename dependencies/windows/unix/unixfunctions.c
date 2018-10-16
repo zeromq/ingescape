@@ -1,9 +1,9 @@
 #include <windows.h>
 
-char *strndup(const char *str, int chars)
+char *strndup(const char *str, size_t chars)
 {
     char *buffer;
-    int n;
+    size_t n;
 
     buffer = (char *) malloc(chars +1);
     if (buffer)
