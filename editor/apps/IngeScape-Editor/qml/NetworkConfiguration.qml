@@ -23,14 +23,6 @@ import INGESCAPE 1.0
 // scenario sub-directory
 import "scenario" as Scenario
 
-// TOOLTIP:
-// https://doc.qt.io/qt-5.11/qtquickcontrols2-differences.html
-// Qt Quick Controls 1: Button and Action have built-in Qt Widgets-based tooltips
-// Qt Quick Controls 2: ToolTip can be attached to any Item
-
-// Needed to access to ToolTip
-import QtQuick.Controls.Private 1.0
-
 // Needed to access to ToolTip (https://doc.qt.io/qt-5.11/qml-qtquick-controls2-tooltip.html)
 import QtQuick.Controls 2.0 as Controls2
 
@@ -191,6 +183,38 @@ I2PopupBase {
                     selectedNetworkDevice = combobox.selectedItem;
                 }
                 okButton.enabled = IngeScapeEditorC.networkC.isAvailableNetworkDevice(selectedNetworkDevice);
+            }
+
+            mouseArea.hoverEnabled: true
+
+            Controls2.ToolTip {
+                delay: 500
+                visible: combobox.containsMouse
+                text: combobox.text
+            }
+
+            delegate: customDelegate.component
+
+            IngeScapeToolTipComboboxDelegate {
+                id: customDelegate
+
+                comboboxStyle: combobox.style
+                selection: combobox.selectedIndex
+
+                height: combobox.comboButton.height
+                width:  combobox.comboButton.width
+
+                // Called from the component's MouseArea
+                // 'index' is the index of the clicked component inside the model.
+                function onDelegateClicked(index) {
+                    combobox.onDelegateClicked(index)
+                }
+
+                // Called from the component to get the text of the current item to display
+                // 'index' is the index of the component to be displayed inside the model.
+                function getItemText(index) {
+                    return combobox.modelToString(combobox.model[index]);
+                }
             }
         }
 
