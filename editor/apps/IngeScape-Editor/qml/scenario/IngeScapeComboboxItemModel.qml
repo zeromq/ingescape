@@ -5,7 +5,12 @@ import QtQuick.Controls 2.0 as Controls2
 import I2Quick 1.0
 import INGESCAPE 1.0
 
-
+/**
+  * Custom combobox for IngeScape editor based on I2ComboboxItemModel.
+  *
+  * It defines a tooltip missing from I2ComboboxItemModel and use a custom delegate
+  * to define a tooltip missing from I2ComboboxBaseDelegate
+  */
 I2ComboboxItemModel {
     id: agentEffectCombo
 
@@ -17,7 +22,6 @@ I2ComboboxItemModel {
     {
         return entry.name;
     }
-
 
     Controls2.ToolTip {
         delay: 500
