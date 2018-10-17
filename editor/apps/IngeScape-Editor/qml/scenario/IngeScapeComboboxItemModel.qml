@@ -8,15 +8,17 @@ import INGESCAPE 1.0
 /**
   * Custom combobox for IngeScape editor based on I2ComboboxItemModel.
   *
-  * It defines a tooltip missing from I2ComboboxItemModel and use a custom delegate
-  * to define a tooltip missing from I2ComboboxBaseDelegate
+  * It defines a tooltip missing from I2ComboboxItemModel and use a
+  * custom delegate to define a tooltip missing from I2ComboboxBaseDelegate.
+  *
+  * It accesses the properties _mouseArea to show the tooltip
   */
 I2ComboboxItemModel {
     id: agentEffectCombo
 
     style: IngeScapeComboboxStyle {}
     scrollViewStyle: IngeScapeScrollViewStyle {}
-    mouseArea.hoverEnabled: true
+    _mouseArea.hoverEnabled: true
 
     function modelToString(entry)
     {
@@ -25,7 +27,7 @@ I2ComboboxItemModel {
 
     Controls2.ToolTip {
         delay: 500
-        visible: agentEffectCombo.containsMouse
+        visible: _mouseArea.containsMouse
         text: agentEffectCombo.text
     }
 

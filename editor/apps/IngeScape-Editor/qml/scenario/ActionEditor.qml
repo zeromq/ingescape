@@ -570,8 +570,8 @@ WindowBlockTouches {
                                     }
 
                                     // Agent Inputs/Outputs
-                                    IngeScapeComboBoxAgentsIOP {
-                                        id : iopEffectsCombo
+                                    IngeScapeComboboxItemModelAgentsIOP {
+                                        id: iopEffectsCombo
 
                                         anchors {
                                             left: agentEffectCombo.right
@@ -591,35 +591,16 @@ WindowBlockTouches {
                                         outputsNumber: (myEffect && myEffect.modelM && myEffect.modelM.agent) ? myEffect.modelM.agent.outputsList.count : 0;
                                         parametersNumber: (myEffect && myEffect.modelM && myEffect.modelM.agent) ? myEffect.modelM.agent.parametersList.count : 0;
 
-                                        function modelToString(model)
-                                        {
-                                            return model.name;
-                                        }
-
                                         Binding {
                                             target: iopEffectsCombo
-                                            property: "selectedItem"
-                                            value: if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP)
-                                                   {
-                                                       //console.log("QML (Binding): Combo set agent IOP to " + myEffect.modelM.agentIOP.name);
-                                                       myEffect.modelM.agentIOP;
-                                                   }
-                                                   else {
-                                                       //console.log("QML (Binding): Combo set agent IOP to NULL !!!");
-                                                       null;
-                                                   }
+                                            property: "selectedIndex"
+                                            value: (myEffect && myEffect.modelM && myEffect.modelM.agentIOP) ? myEffect.modelM.iopMergedList.indexOf(myEffect.modelM.agentIOP)
+                                                                                                             : -1
                                         }
 
                                         onSelectedItemChanged: {
-                                            if (myEffect && myEffect.modelM)
+                                            if ((iopEffectsCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
                                             {
-                                                if (myEffect.modelM.iopMergedList && myEffect.modelM.iopMergedList.count > 0) {
-                                                    //console.log("QML: Combo Selected Item changed...set agent IOP to " + iopEffectsCombo.selectedItem + " (iopMergedList.count = " + myEffect.modelM.iopMergedList.count + ")");
-                                                }
-                                                else {
-                                                    //console.log("QML: Combo Selected Item changed...set agent IOP to " + iopEffectsCombo.selectedItem + " (iopMergedList is EMPTY !!!)");
-                                                }
-
                                                 myEffect.modelM.agentIOP = iopEffectsCombo.selectedItem;
                                             }
                                         }
@@ -852,8 +833,8 @@ WindowBlockTouches {
                                     }
 
                                     // Outputs (of output agent)
-                                    IngeScapeComboBoxAgentsIOP {
-                                        id : comboEffectOnMapping_Output
+                                    IngeScapeComboboxItemModelAgentsIOP {
+                                        id: comboEffectOnMapping_Output
 
                                         anchors {
                                             left : parent.left
@@ -863,27 +844,21 @@ WindowBlockTouches {
                                         width : 148
 
                                         model : (myEffect && myEffect.modelM) ? myEffect.modelM.outputsList : 0
-
                                         enabled: visible
-
-                                        function modelToString(model) {
-                                            return model.name;
-                                        }
 
                                         Binding {
                                             target: comboEffectOnMapping_Output
-                                            property: "selectedItem"
-                                            value: (myEffect && myEffect.modelM) ? myEffect.modelM.output
-                                                                                 : null
+                                            property: "selectedIndex"
+                                            value: (myEffect && myEffect.modelM && myEffect.modelM.outputsList) ? myEffect.modelM.outputsList.indexOf(myEffect.modelM.output)
+                                                                                 : -1
                                         }
 
                                         onSelectedItemChanged: {
-                                            if (comboEffectOnMapping_Output.selectedIndex >= 0 && myEffect && myEffect.modelM)
+                                            if ((comboEffectOnMapping_Output.selectedIndex >= 0) && myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.output = comboEffectOnMapping_Output.selectedItem;
                                             }
                                         }
-
                                     }
 
                                     // ON/OFF slider
@@ -1034,8 +1009,8 @@ WindowBlockTouches {
                                     }
 
                                     // Intputs (of input agent)
-                                    IngeScapeComboBoxAgentsIOP {
-                                        id : comboEffectOnMapping_Input
+                                    IngeScapeComboboxItemModelAgentsIOP {
+                                        id: comboEffectOnMapping_Input
 
                                         anchors {
                                             right : parent.right
@@ -1045,28 +1020,22 @@ WindowBlockTouches {
                                         width : 148
 
                                         model : (myEffect && myEffect.modelM) ? myEffect.modelM.inputsList : 0
-
                                         enabled: visible
-
-                                        function modelToString(model) {
-                                            return model.name;
-                                        }
 
                                         Binding {
                                             target: comboEffectOnMapping_Input
-                                            property: "selectedItem"
-                                            value: (myEffect && myEffect.modelM) ? myEffect.modelM.input
-                                                                                 : null
+                                            property: "selectedIndex"
+                                            value: (myEffect && myEffect.modelM && myEffect.modelM.inputsList) ? myEffect.modelM.inputsList.indexOf(myEffect.modelM.input)
+                                                                                                               : -1
                                         }
 
                                         onSelectedItemChanged: {
-                                            if (comboEffectOnMapping_Input.selectedIndex >= 0 && myEffect && myEffect.modelM)
+                                            if ((comboEffectOnMapping_Input.selectedIndex >= 0) && myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.input = comboEffectOnMapping_Input.selectedItem;
                                             }
                                         }
                                     }
-
                                 }
 
 
@@ -1567,7 +1536,7 @@ WindowBlockTouches {
                                         }
 
                                         // Agent Inputs/Outputs
-                                        IngeScapeComboBoxAgentsIOP {
+                                        IngeScapeComboboxItemModelAgentsIOP {
                                             id: ioCombo
 
                                             anchors.verticalCenter: parent.verticalCenter
@@ -1579,20 +1548,15 @@ WindowBlockTouches {
 
                                             model: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIopList : 0
 
-                                            // Condition on a value is available only for outputs (no need of separator position)
-                                            inputsNumber: 0
-                                            outputsNumber: 0
-                                            parametersNumber: 0
-
                                             Binding {
                                                 target: ioCombo
-                                                property: "selectedItem"
-                                                value: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIOP
-                                                                                           : null
+                                                property: "selectedIndex"
+                                                value: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIopList.indexOf(myCondition.modelM.agentIOP)
+                                                                                           : -1
                                             }
 
                                             onSelectedItemChanged: {
-                                                if (myCondition && myCondition.modelM)
+                                                if ((ioCombo.selectedIndex >= 0) && myCondition && myCondition.modelM)
                                                 {
                                                     myCondition.modelM.agentIOP = ioCombo.selectedItem;
                                                 }
@@ -1621,7 +1585,7 @@ WindowBlockTouches {
                                             onSelectedItemChanged: {
                                                 if (comboAgentConditionValues.selectedIndex >= 0 && myCondition && myCondition.modelM)
                                                 {
-                                                    myCondition.modelM.agent = comboAgentConditionValues.selectedItem;
+                                                    myCondition.modelM.agentConditionValue = comboAgentConditionValues.selectedItem.value;
                                                 }
                                             }
                                         }

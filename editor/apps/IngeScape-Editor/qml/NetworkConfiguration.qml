@@ -185,7 +185,7 @@ I2PopupBase {
                 okButton.enabled = IngeScapeEditorC.networkC.isAvailableNetworkDevice(selectedNetworkDevice);
             }
 
-            mouseArea.hoverEnabled: true
+            _mouseArea.hoverEnabled: true
 
             Controls2.ToolTip {
                 delay: 500

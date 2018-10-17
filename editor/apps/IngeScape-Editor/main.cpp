@@ -218,11 +218,17 @@ void registerCustomQmlTypes()
     // - Combobox style
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeComboboxStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeComboboxStyle");
 
+    // - Combobox for ItemModel with tooltip delegate
+    qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeComboboxItemModel.qml"), "INGESCAPE", 1, 0, "IngeScapeComboboxItemModel");
+
+    // - Combobox for Agents IOP model with a custom tooltip delegate to show the color circles
+    qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeComboboxItemModelAgentsIOP.qml"), "INGESCAPE", 1, 0, "IngeScapeComboboxItemModelAgentsIOP");
+
     // - Combobox delegate with tooltip
     qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeToolTipComboboxDelegate.qml"), "INGESCAPE", 1, 0, "IngeScapeToolTipComboboxDelegate");
 
-    // - Combobox for ItemModel with tooltip delegate
-    qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeComboboxItemModel.qml"), "INGESCAPE", 1, 0, "IngeScapeComboboxItemModel");
+    // - Combobox delegate for Agents IOP comboboxes to show the color circles
+    qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeToolTipComboboxDelegateAgentsIOP.qml"), "INGESCAPE", 1, 0, "IngeScapeToolTipComboboxDelegateAgentsIOP");
 
 }
 
