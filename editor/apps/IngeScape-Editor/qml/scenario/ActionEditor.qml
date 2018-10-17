@@ -22,6 +22,8 @@ import INGESCAPE 1.0
 import "../theme" as Theme;
 import ".." as Editor;
 
+import QtQuick.Controls 2.0 as Controls2
+
 
 // validator: RegExpValidator { regExp: /^[01]$|^TRUE$|^FALSE$/ }
 
@@ -540,8 +542,8 @@ WindowBlockTouches {
                                     visible: (myEffect && myEffect.effectType !== ActionEffectTypes.MAPPING)
 
                                     // Agent
-                                    IngeScapeComboBox {
-                                        id : agentEffectCombo
+                                    IngeScapeComboboxItemModel {
+                                        id: agentEffectCombo
 
                                         anchors {
                                             left: parent.left
@@ -552,24 +554,15 @@ WindowBlockTouches {
 
                                         model: controller ? controller.agentsInMappingList : 0
 
-                                        enabled: (controller && controller.agentsInMappingList.count !== 0)
-                                        placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
-                                                                                                                     : "- Select an item -")
-
-                                        function modelToString(model)
-                                        {
-                                            return model.name;
-                                        }
-
                                         Binding {
                                             target: agentEffectCombo
-                                            property: "selectedItem"
-                                            value: (myEffect && myEffect.modelM) ? myEffect.modelM.agent
-                                                                                 : null
+                                            property: "selectedIndex"
+                                            value: (myEffect && myEffect.modelM) ? controller.agentsInMappingList.indexOf(myEffect.modelM.agent)
+                                                                                 : -1
                                         }
 
                                         onSelectedItemChanged: {
-                                            if (myEffect && myEffect.modelM)
+                                            if ((agentEffectCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.agent = agentEffectCombo.selectedItem;
                                             }
@@ -630,52 +623,6 @@ WindowBlockTouches {
                                                 myEffect.modelM.agentIOP = iopEffectsCombo.selectedItem;
                                             }
                                         }
-                                    }
-
-                                    // Effect Type (on Agent)
-                                    IngeScapeComboBox {
-                                        id : effectTypeCombo
-
-                                        anchors {
-                                            left: agentEffectCombo.right
-                                            leftMargin: 6
-                                            verticalCenter : parent.verticalCenter
-                                        }
-                                        height: 25
-                                        width: 98
-
-                                        visible: (myEffect && (myEffect.effectType === ActionEffectTypes.AGENT))
-                                        enabled: visible
-
-                                        model: (controller ? controller.agentEffectValuesList : 0)
-
-                                        function modelToString(model)
-                                        {
-                                            return model.name;
-                                        }
-
-
-                                        Binding {
-                                            target: effectTypeCombo
-                                            property: "selectedItem"
-                                            value: if (myEffect && myEffect.modelM && controller)
-                                                   {
-                                                       controller.agentEffectValuesList.getItemWithValue(myEffect.modelM.agentEffectValue);
-                                                   }
-                                                   else {
-                                                       null;
-                                                   }
-                                        }
-
-
-                                        onSelectedItemChanged:
-                                        {
-                                            if (myEffect && myEffect.modelM && effectTypeCombo.selectedItem)
-                                            {
-                                                myEffect.modelM.agentEffectValue = effectTypeCombo.selectedItem.value;
-                                            }
-                                        }
-
                                     }
 
                                     // Target Value
@@ -824,6 +771,38 @@ WindowBlockTouches {
                                         }
 
                                     }
+
+                                    // Effect Type (on Agent)
+                                    IngeScapeComboboxItemModel {
+                                        id: effectTypeCombo
+
+                                        anchors {
+                                            left: agentEffectCombo.right
+                                            leftMargin: 6
+                                            verticalCenter : parent.verticalCenter
+                                        }
+                                        height: 25
+                                        width: 98
+
+                                        visible: (myEffect && (myEffect.effectType === ActionEffectTypes.AGENT))
+                                        enabled: visible
+
+                                        model: (controller ? controller.agentEffectValuesList : 0)
+
+                                        Binding {
+                                            target: effectTypeCombo
+                                            property: "selectedIndex"
+                                            value: (myEffect && myEffect.modelM && controller) ? controller.agentEffectValuesList.indexOfEnumValue(myEffect.modelM.agentEffectValue)
+                                                                                               : -1
+                                        }
+
+                                        onSelectedItemChanged: {
+                                            if ((effectTypeCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
+                                            {
+                                                myEffect.modelM.agentEffectValue = effectTypeCombo.selectedItem.value;
+                                            }
+                                        }
+                                    }
                                 }
 
                                 //
@@ -840,8 +819,8 @@ WindowBlockTouches {
                                     visible: (myEffect && myEffect.effectType === ActionEffectTypes.MAPPING)
 
                                     // Output Agent
-                                    IngeScapeComboBox {
-                                        id : comboEffectOnMapping_OutputAgent
+                                    IngeScapeComboboxItemModel {
+                                        id: comboEffectOnMapping_OutputAgent
 
                                         anchors {
                                             left : parent.left
@@ -857,20 +836,15 @@ WindowBlockTouches {
                                         enabled: controller && (controller.agentsInMappingList.count !== 0)
                                         placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
                                                                                                                      : "- Select an item -")
-
-                                        function modelToString(model) {
-                                            return model.name;
-                                        }
-
                                         Binding {
                                             target: comboEffectOnMapping_OutputAgent
-                                            property: "selectedItem"
-                                            value: (myEffect && myEffect.modelM) ? myEffect.modelM.outputAgent
-                                                                                 : null
+                                            property: "selectedIndex"
+                                            value: (myEffect && myEffect.modelM) ? controller.agentsInMappingList.indexOf(myEffect.modelM.outputAgent)
+                                                                                 : -1
                                         }
 
                                         onSelectedItemChanged: {
-                                            if (myEffect && myEffect.modelM)
+                                            if ((comboEffectOnMapping_OutputAgent.selectedIndex >= 0) && myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.outputAgent = comboEffectOnMapping_OutputAgent.selectedItem;
                                             }
@@ -904,7 +878,7 @@ WindowBlockTouches {
                                         }
 
                                         onSelectedItemChanged: {
-                                            if (myEffect && myEffect.modelM)
+                                            if (comboEffectOnMapping_Output.selectedIndex >= 0 && myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.output = comboEffectOnMapping_Output.selectedItem;
                                             }
@@ -912,6 +886,7 @@ WindowBlockTouches {
 
                                     }
 
+                                    // ON/OFF slider
                                     Item {
                                         id: disableMappingItem
 
@@ -1025,8 +1000,8 @@ WindowBlockTouches {
                                     }
 
                                     // Input Agent
-                                    IngeScapeComboBox {
-                                        id : comboEffectOnMapping_InputAgent
+                                    IngeScapeComboboxItemModel {
+                                        id: comboEffectOnMapping_InputAgent
 
                                         anchors {
                                             right : parent.right
@@ -1043,19 +1018,15 @@ WindowBlockTouches {
                                         placeholderText: (controller && controller.agentsInMappingList.count === 0 ? "- No Item -"
                                                                                                                    : "- Select an item -")
 
-                                        function modelToString(model) {
-                                            return model.name;
-                                        }
-
                                         Binding {
                                             target: comboEffectOnMapping_InputAgent
-                                            property: "selectedItem"
-                                            value: (myEffect && myEffect.modelM) ? myEffect.modelM.agent
-                                                                                  : null
+                                            property: "selectedIndex"
+                                            value: (myEffect && myEffect.modelM) ? controller.agentsInMappingList.indexOf(myEffect.modelM.agent)
+                                                                                 : -1
                                         }
 
                                         onSelectedItemChanged: {
-                                            if (myEffect && myEffect.modelM)
+                                            if ((comboEffectOnMapping_InputAgent.selectedIndex >= 0) && myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.agent = comboEffectOnMapping_InputAgent.selectedItem;
                                             }
@@ -1089,7 +1060,7 @@ WindowBlockTouches {
                                         }
 
                                         onSelectedItemChanged: {
-                                            if (myEffect && myEffect.modelM)
+                                            if (comboEffectOnMapping_Input.selectedIndex >= 0 && myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.input = comboEffectOnMapping_Input.selectedItem;
                                             }
@@ -1299,8 +1270,8 @@ WindowBlockTouches {
                         }
                         spacing : 6
 
-                        IngeScapeComboBox {
-                            id : validityDurationCombo
+                        IngeScapeComboboxItemModel {
+                            id: validityDurationCombo
 
                             anchors.verticalCenter : parent.verticalCenter
                             height: 25
@@ -1308,25 +1279,19 @@ WindowBlockTouches {
 
                             model: controller ? controller.validationDurationsTypesList : 0
 
-                            function modelToString(model)
-                            {
-                                return model.name;
-                            }
-
-
                             Binding {
                                 target: validityDurationCombo
-                                property: "selectedItem"
-                                value: (actionM && controller) ? controller.validationDurationsTypesList.getItemWithValue(actionM.validityDurationType)
-                                                               : null
+                                property: "selectedIndex"
+                                value: (actionM && controller) ? controller.validationDurationsTypesList.indexOfEnumValue(actionM.validityDurationType)
+                                                               : -1
                             }
 
                             onSelectedItemChanged: {
-                                if (actionM) {
+                                if (validityDurationCombo.selectedIndex >= 0 && actionM)
+                                {
                                     actionM.validityDurationType = validityDurationCombo.selectedItem.value;
                                 }
                             }
-
                         }
 
                         TextField {
@@ -1573,7 +1538,7 @@ WindowBlockTouches {
                                         spacing: 6
 
                                         // Agent
-                                        IngeScapeComboBox {
+                                        IngeScapeComboboxItemModel {
                                             id: agentCombo
 
                                             anchors.verticalCenter : parent.verticalCenter
@@ -1586,25 +1551,19 @@ WindowBlockTouches {
                                             placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
                                                                                                                          : "- Select an item -")
 
-                                            function modelToString(model)
-                                            {
-                                                return model.name;
-                                            }
-
                                             Binding {
                                                 target: agentCombo
-                                                property: "selectedItem"
-                                                value: (myCondition && myCondition.modelM) ? myCondition.modelM.agent
-                                                                                           : null
+                                                property: "selectedIndex"
+                                                value: (myCondition && myCondition.modelM) ? controller.agentsInMappingList.indexOf(myCondition.modelM.agent)
+                                                                                           : -1
                                             }
 
                                             onSelectedItemChanged: {
-                                                if (myCondition && myCondition.modelM && agentCombo.selectedItem)
+                                                if (agentCombo.selectedIndex >= 0 && actionM)
                                                 {
                                                     myCondition.modelM.agent = agentCombo.selectedItem;
                                                 }
                                             }
-
                                         }
 
                                         // Agent Inputs/Outputs
@@ -1632,20 +1591,17 @@ WindowBlockTouches {
                                                                                            : null
                                             }
 
-
                                             onSelectedItemChanged: {
                                                 if (myCondition && myCondition.modelM)
                                                 {
                                                     myCondition.modelM.agentIOP = ioCombo.selectedItem;
                                                 }
                                             }
-
                                         }
 
-
                                         // Combo to select the value of the agent condition
-                                        IngeScapeComboBox {
-                                            id : comboAgentConditionValues
+                                        IngeScapeComboboxItemModel {
+                                            id: comboAgentConditionValues
 
                                             anchors.verticalCenter: parent.verticalCenter
                                             height: 25
@@ -1655,30 +1611,24 @@ WindowBlockTouches {
 
                                             model: (controller ? controller.allAgentConditionValues : 0)
 
-                                            function modelToString(model)
-                                            {
-                                                return model.name;
-                                            }
-
                                             Binding {
                                                 target: comboAgentConditionValues
-                                                property: "selectedItem"
-                                                value: (myCondition && myCondition.modelM && controller) ? controller.allAgentConditionValues.getItemWithValue(myCondition.modelM.agentConditionValue)
-                                                                                                         : null
+                                                property: "selectedIndex"
+                                                value: (myCondition && myCondition.modelM && controller) ? controller.allAgentConditionValues.indexOfEnumValue(myCondition.modelM.agentConditionValue)
+                                                                                           : -1
                                             }
 
                                             onSelectedItemChanged: {
-                                                if (myCondition && myCondition.modelM && comboAgentConditionValues.selectedItem)
+                                                if (comboAgentConditionValues.selectedIndex >= 0 && myCondition && myCondition.modelM)
                                                 {
-                                                    myCondition.modelM.agentConditionValue = comboAgentConditionValues.selectedItem.value;
+                                                    myCondition.modelM.agent = comboAgentConditionValues.selectedItem;
                                                 }
                                             }
                                         }
 
-
                                         // Combo to select the type of the value comparison
-                                        IngeScapeComboBox {
-                                            id : comboValueComparisonTypes
+                                        IngeScapeComboboxItemModel {
+                                            id: comboValueComparisonTypes
 
                                             anchors {
                                                 verticalCenter : parent.verticalCenter
@@ -1690,20 +1640,15 @@ WindowBlockTouches {
 
                                             model: (controller ? controller.allValueComparisonTypes : 0)
 
-                                            function modelToString(model)
-                                            {
-                                                return model.name;
-                                            }
-
                                             Binding {
                                                 target: comboValueComparisonTypes
-                                                property: "selectedItem"
-                                                value: (myCondition && myCondition.modelM && controller) ? controller.allValueComparisonTypes.getItemWithValue(myCondition.modelM.valueComparisonType)
-                                                                                                         : null
+                                                property: "selectedIndex"
+                                                value: (myCondition && myCondition.modelM && controller) ? controller.allValueComparisonTypes.indexOfEnumValue(myCondition.modelM.valueComparisonType)
+                                                                                           : -1
                                             }
 
                                             onSelectedItemChanged: {
-                                                if (myCondition && myCondition.modelM && comboValueComparisonTypes.selectedItem)
+                                                if (comboValueComparisonTypes.selectedIndex >= 0 && myCondition && myCondition.modelM)
                                                 {
                                                     myCondition.modelM.valueComparisonType = comboValueComparisonTypes.selectedItem.value;
                                                 }

@@ -221,6 +221,9 @@ void registerCustomQmlTypes()
     // - Combobox delegate with tooltip
     qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeToolTipComboboxDelegate.qml"), "INGESCAPE", 1, 0, "IngeScapeToolTipComboboxDelegate");
 
+    // - Combobox for ItemModel with tooltip delegate
+    qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeComboboxItemModel.qml"), "INGESCAPE", 1, 0, "IngeScapeComboboxItemModel");
+
 }
 
 

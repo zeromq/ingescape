@@ -58,5 +58,6 @@
         <file>qml/popup/MappingModificationsPopup.qml</file>
         <file>qml/theme/IngeScapeComboboxStyle.qml</file>
         <file>qml/scenario/IngeScapeToolTipComboboxDelegate.qml</file>
+        <file>qml/scenario/IngeScapeComboboxItemModel.qml</file>
     </qresource>
 </RCC>
