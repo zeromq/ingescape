@@ -1,20 +1,18 @@
 import QtQuick 2.0
 
+// Dependency for Tooltip
+import QtQuick.Controls 1.4
+import QtQuick.Controls.Private 1.0
+
 import I2Quick 1.0
-import QtQuick.Controls 2.0 as Controls2
 import "qrc:/qml/styles/combobox/" as I2StyleComboboxPath
 
 /**
-  * This component is the base delegate used by the I2ComboboxBase derived
-  * components.
+  * This component is the based on the implementation ofI2ComboboxBaseDelegate.
   *
-  * It represents the manner in which elements of the combobox's list view
-  * will be displayed. It may be sufficient to derive this class to custom
-  * without the render of a combobox withtout deriving the entire I2ComboboxBase.
-  *
-  * The functions onDelegateClicked(index) and getItemText(index) MUST be
-  * defined in sub-classes in order to correctly display model properties
-  * and return click events to the parent combobox.
+  * It adds tooltips to the delegate component.
+  * Tooltip mechanics are "old school" (pre QtQuick Controls 2.0) because
+  * of a bug with trackpads, at least under Mac OSX.
   */
 Item {
     id: comboboxDelegate
@@ -70,12 +68,24 @@ Item {
                 onClicked: {
                     onDelegateClicked(index);
                 }
-            }
 
-            Controls2.ToolTip {
-                visible: mouseArea.containsMouse
-                delay: 500
-                text: text.text
+                // Tooltip is handled without QtQuick.Controls 2.0
+                // Because os a issues with the trackpad (Window is no more interactive)
+                onExited: {
+                    Tooltip.hideText();
+                }
+                onCanceled: {
+                    Tooltip.hideText();
+                }
+
+                Timer {
+                    interval: 400
+                    running: mouseArea.containsMouse
+
+                    onTriggered: {
+                        Tooltip.showText(mouseArea, Qt.point(mouseArea.mouseX, mouseArea.mouseY), text.text);
+                    }
+                }
             }
         }
     }
