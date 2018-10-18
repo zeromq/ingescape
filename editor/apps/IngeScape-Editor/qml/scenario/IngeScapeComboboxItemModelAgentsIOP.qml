@@ -101,7 +101,7 @@ I2ComboboxItemModel {
     Controls2.ToolTip {
         id: tooltip
         delay: 500
-        visible: agentEffectCombo.containsMouse
+        visible: _mouseArea.containsMouse
         text: agentEffectCombo.text
     }
 

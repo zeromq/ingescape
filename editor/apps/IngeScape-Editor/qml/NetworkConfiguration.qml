@@ -189,7 +189,7 @@ I2PopupBase {
 
             Controls2.ToolTip {
                 delay: 500
-                visible: combobox.containsMouse
+                visible: combobox._mouseArea.containsMouse
                 text: combobox.text
             }
 
