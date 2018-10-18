@@ -7,7 +7,7 @@
 TARGET = ingescape
 
 TEMPLATE = lib
-#CONFIG += console
+CONFIG += plugin
 
 DEFINES += INGESCAPE
 
@@ -21,6 +21,12 @@ win32:{
 
 #UNCOMMENT THIS LINE TO RASPBERRY BUILD OR COMMENT FOR ANOTHER UNIX PLATFORM
 #CONFIG+=raspberry_compilation
+
+
+# To build temp files (*.o, moc_*.cpp and qrc_*.cpp) in a temp dir
+OBJECTS_DIR = tmp
+MOC_DIR = tmp
+RCC_DIR = tmp
 
 
 #include ('ingescape-dev.pri')
