@@ -194,11 +194,11 @@ WindowBlockTouches {
             }
         }
 
+        //* Log Types Filter
+        DropDownCheckboxes {
+            id: dropDown
 
-
-        // Log Types Filter
-        Item {
-            id : _combobox
+            countDisplayItem: rootItem.controller ? 1 + rootItem.controller.allLogTypes.count : 0
 
             anchors {
                 right : parent.right
@@ -209,424 +209,151 @@ WindowBlockTouches {
 
             height : 25
             width : 197
+            model: rootItem.controller ? rootItem.controller.allLogTypes : 0
 
-            onVisibleChanged: {
-                if (!visible) {
-                    close();
+            placeholderText: "- Select a type -"
+            text: (rootItem.controller && rootItem.controller.selectedLogTypes.count > 0) ? ((rootItem.controller.selectedLogTypes.count < rootItem.controller.allLogTypes.count) ? ("- " + rootItem.controller.selectedLogTypes.count + ((rootItem.controller.selectedLogTypes.count === 1) ? " type selected -" : " types selected -"))
+                                                                                                                                                                                  : "- All types selected -")
+                                                                                          : "";
+            checkAllText: " All types"
+
+            onCheckAll: {
+                rootItem.controller.showAllLogs()
+                rootItem.clickAllLogTypes();
+            }
+
+            onUncheckAll: {
+                rootItem.controller.hideAllLogs()
+                rootItem.clickAllLogTypes();
+            }
+
+            onPopupOpen: {
+                // reset isPartiallyChecked and checkedState properties
+                isPartiallyChecked = false;
+                checkAllState = Qt.Unchecked;
+
+                if (rootItem.controller && (rootItem.controller.selectedLogTypes.count > 0))
+                {
+                    if (rootItem.controller.selectedLogTypes.count === rootItem.controller.allLogTypes.count) {
+                        checkAllState = Qt.Checked;
+                    }
+                    else {
+                        isPartiallyChecked = true;
+                    }
                 }
             }
 
-            /***
-            * open function : open the combobox
-            ***/
-            function open() {
-                _comboButton.checked = true;
-                popup.open();
-            }
-
-            /***
-            * close function : close the combobox
-            ***/
-            function close() {
-                _comboButton.checked = false;
-                _combobox.forceActiveFocus();
-                popup.close();
-            }
-
-            Rectangle {
-                id: _comboButton
-
-                property bool checked : false;
-
-                width: parent.width
-                height: parent.height
-                radius: 1
-
-                border.width: _mouseAreaCombo.containsPress ? 1 : 0
-                border.color: IngeScapeTheme.darkBlueGreyColor
-                color: _mouseAreaCombo.containsPress ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
-
-                Text {
-                    id: _comboPlaceholder
-
-                    visible: (_comboText.text === "");
-                    text: "- Select a type -"
-                    anchors {
-                        verticalCenter: parent.verticalCenter;
-                        left: parent.left;
-                        leftMargin: 10
-                        right: _imageCombo.left;
-                        rightMargin: 10
-                    }
-
-
-                    font {
-                        pixelSize: 15
-                        family: IngeScapeTheme.textFontFamily;
-                        italic : true;
-                    }
-
-                    color : IngeScapeTheme.greyColor
-                    verticalAlignment: Text.AlignVCenter;
-                    elide : Text.ElideRight;
+            delegate: Item {
+                anchors {
+                    left: parent.left
+                    right: parent.right
                 }
 
+                width: dropDown.comboButton.width
+                height: dropDown.comboButton.height
 
-                Text {
-                    id:_comboText
+                CheckBox {
+                    id : filterLogTypeCB
 
                     anchors {
-                        verticalCenter: parent.verticalCenter;
-                        left: parent.left;
-                        leftMargin: 10
-                        right: _imageCombo.left;
-                        rightMargin: 10
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        leftMargin :10
+                        right : parent.right
+                        rightMargin : 10
                     }
 
-                    font {
-                        pixelSize: 15
-                        family: IngeScapeTheme.textFontFamily;
-                    }
+                    checked: false;
+                    activeFocusOnPress: true;
 
-                    color : IngeScapeTheme.lightGreyColor
-                    verticalAlignment: Text.AlignVCenter;
-                    elide : Text.ElideRight;
-                    text: (rootItem.controller && rootItem.controller.selectedLogTypes.count > 0) ? ((rootItem.controller.selectedLogTypes.count < rootItem.controller.allLogTypes.count) ? ("- " + rootItem.controller.selectedLogTypes.count + ((rootItem.controller.selectedLogTypes.count === 1) ? " type selected -" : " types selected -"))
-                                                                                                                                                                                             : "- All types selected -")
-                                                                                                   : "";
-                }
-
-
-                Image {
-                    id: _imageCombo;
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.right: parent.right;
-                    anchors.rightMargin: 10
-                    rotation : (_comboButton.checked ? 180 : 0);
-                    source : "image://I2svg/resources/SVG/ingescape-pictos.svg#iconCombo";
-
-                    Behavior on rotation {
-                        NumberAnimation {}
-                    }
-                }
-
-
-                MouseArea {
-                    id: _mouseAreaCombo;
-                    anchors.fill: parent;
-                    activeFocusOnTab: true;
-                    onClicked: {
-                        _mouseAreaCombo.forceActiveFocus();
-
-                        if (_comboButton.checked) {
-                            _combobox.close();
-                        }
-                        else {
-                            _combobox.open();
-                        }
-                    }
-                }
-
-                onVisibleChanged: {
-                    if (!visible) {
-                        _combobox.close();
-                    }
-                }
-            }
-
-            I2PopupBase {
-                id: popup
-
-                anchors.top: _comboButton.bottom
-                width: _comboButton.width
-                height: (1 + rootItem.controller.allLogTypes.count) * _comboButton.height
-
-                isModal: true
-                layerColor: "transparent"
-                layerObjectName: "overlayLayerComboBox"
-                dismissOnOutsideTap: true
-
-                keepRelativePositionToInitialParent : true;
-
-                onClosed: {
-                    _combobox.close();
-                }
-
-                onOpened: {
-
-                }
-
-                Rectangle {
-                    id : popUpBackground
-                    anchors.fill : parent
-                    color: IngeScapeTheme.darkBlueGreyColor
-                }
-
-                ScrollView {
-                    id : _scrollView
-
-                    visible: _comboButton.checked;
-
-                    anchors {
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-                    width: _comboButton.width
-
-                    // Prevent drag overshoot on Windows
-                    flickableItem.boundsBehavior: Flickable.OvershootBounds
-
-                    style: IngeScapeScrollViewStyle {
-                    }
-
-                    contentItem: Item {
-                        width: _scrollView.width
-                        height: _scrollView.height
-
-                        CheckBox {
-                            id: filterAllTypesCB
-
+                    style: CheckBoxStyle {
+                        label: Text {
                             anchors {
-                                left: parent.left
-                                leftMargin :10
-                                right : parent.right
-                                rightMargin : 10
-                                top : parent.top
-                            }
-                            height: _comboButton.height
-
-                            property bool isPartiallyChecked : false
-
-                            checked: false;
-                            partiallyCheckedEnabled: false;
-                            activeFocusOnPress: true;
-
-                            style: CheckBoxStyle {
-                                label: Text {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                        verticalCenterOffset: 1
-                                    }
-
-                                    color: IngeScapeTheme.lightGreyColor
-
-                                    text: " All types"
-                                    elide: Text.ElideRight
-
-                                    font {
-                                        family: IngeScapeTheme.textFontFamily
-                                        pixelSize: 16
-                                    }
-
-                                }
-
-                                indicator: Rectangle {
-                                    implicitWidth: 14
-                                    implicitHeight: 14
-                                    border.width: 0
-                                    color: IngeScapeTheme.veryDarkGreyColor
-
-                                    I2SvgItem {
-                                        visible: (control.checkedState === Qt.Checked)
-                                        anchors.centerIn: parent
-
-                                        svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
-                                        svgElementId: "check";
-
-                                    }
-
-                                    Text {
-                                        visible : filterAllTypesCB.isPartiallyChecked
-                                        anchors {
-                                            centerIn: parent
-                                        }
-
-                                        color: IngeScapeTheme.lightGreyColor
-
-                                        text: "-"
-                                        elide: Text.ElideRight
-
-                                        font {
-                                            family: IngeScapeTheme.textFontFamily
-                                            pixelSize: 16
-                                        }
-                                    }
-                                }
+                                verticalCenter: parent.verticalCenter
+                                verticalCenterOffset: 1
                             }
 
-                            onClicked : {
-                                // reset isPartiallyChecked property
-                                filterAllTypesCB.isPartiallyChecked =  false;
+                            //color: IngeScapeTheme.lightGreyColor
+                            color: IngeScapeTheme.colorOfLogType(model.value)
 
-                                // show / hide all log types
-                                if (rootItem.controller) {
-                                    if (filterAllTypesCB.checked) {
-                                        rootItem.controller.showAllLogs()
-                                    }
-                                    else {
-                                        rootItem.controller.hideAllLogs()
-                                    }
-                                }
+                            text: " " + model.name
+                            elide: Text.ElideRight
 
-                                // signal the change to all log type check-boxes
-                                rootItem.clickAllLogTypes();
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                pixelSize: 16
                             }
 
-                            Connections {
-                                target: popup
+                        }
 
-                                // update "all types" checkbox state
-                                onOpened : {
-                                    // reset isPartiallyChecked and checkedState properties
-                                    filterAllTypesCB.isPartiallyChecked = false;
-                                    filterAllTypesCB.checkedState = Qt.Unchecked;
+                        indicator: Rectangle {
+                            implicitWidth: 14
+                            implicitHeight: 14
+                            border.width: 0
+                            color: IngeScapeTheme.veryDarkGreyColor
 
-                                    if (rootItem.controller && (rootItem.controller.selectedLogTypes.count > 0))
-                                    {
-                                        if (rootItem.controller.selectedLogTypes.count === rootItem.controller.allLogTypes.count) {
-                                            filterAllTypesCB.checkedState = Qt.Checked;
-                                        }
-                                        else {
-                                            filterAllTypesCB.isPartiallyChecked = true;
-                                        }
-                                    }
-                                }
+                            I2SvgItem {
+                                visible: (control.checkedState === Qt.Checked)
+                                anchors.centerIn: parent
+
+                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                svgElementId: "check";
+
                             }
                         }
 
-                        ListView {
-                            id: _combolist
+                    }
 
-                            boundsBehavior: Flickable.StopAtBounds
-
-                            anchors {
-                                top: filterAllTypesCB.bottom
-                                bottom: parent.bottom
+                    onClicked : {
+                        if (rootItem.controller)
+                        {
+                            if (checked) {
+                                rootItem.controller.showLogsOfType(model.value)
                             }
-                            width: parent.width
+                            else {
+                                rootItem.controller.hideLogsOfType(model.value)
+                            }
 
-                            model: rootItem.controller ? rootItem.controller.allLogTypes : 0
+                            // update "all agents" checkbox state
+                            // reset isPartiallyChecked and checkedState properties
+                            dropDown.isPartiallyChecked = false;
+                            dropDown.checkAllState = Qt.Unchecked;
 
-                            delegate: Item {
-
-                                anchors {
-                                    left: parent.left
-                                    right: parent.right
+                            if (rootItem.controller.selectedLogTypes.count > 0)
+                            {
+                                if (rootItem.controller.selectedLogTypes.count === rootItem.controller.allLogTypes.count) {
+                                    dropDown.checkAllState = Qt.Checked;
                                 }
-
-                                width: _comboButton.width
-                                height: _comboButton.height
-
-                                CheckBox {
-                                    id : filterLogTypeCB
-
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                        left: parent.left
-                                        leftMargin :10
-                                        right : parent.right
-                                        rightMargin : 10
-                                    }
-
-                                    checked: false;
-                                    activeFocusOnPress: true;
-
-                                    style: CheckBoxStyle {
-                                        label: Text {
-                                            anchors {
-                                                verticalCenter: parent.verticalCenter
-                                                verticalCenterOffset: 1
-                                            }
-
-                                            //color: IngeScapeTheme.lightGreyColor
-                                            color: IngeScapeTheme.colorOfLogType(model.value)
-
-                                            text: " " + model.name
-                                            elide: Text.ElideRight
-
-                                            font {
-                                                family: IngeScapeTheme.textFontFamily
-                                                pixelSize: 16
-                                            }
-
-                                        }
-
-                                        indicator: Rectangle {
-                                            implicitWidth: 14
-                                            implicitHeight: 14
-                                            border.width: 0
-                                            color: IngeScapeTheme.veryDarkGreyColor
-
-                                            I2SvgItem {
-                                                visible: (control.checkedState === Qt.Checked)
-                                                anchors.centerIn: parent
-
-                                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
-                                                svgElementId: "check";
-
-                                            }
-                                        }
-
-                                    }
-
-                                    onClicked : {
-                                        if (rootItem.controller)
-                                        {
-                                            if (filterLogTypeCB.checked) {
-                                                rootItem.controller.showLogsOfType(model.value)
-                                            }
-                                            else {
-                                                rootItem.controller.hideLogsOfType(model.value)
-                                            }
-
-                                            // update "all agents" checkbox state
-                                            // reset isPartiallyChecked and checkedState properties
-                                            filterAllTypesCB.isPartiallyChecked = false;
-                                            filterAllTypesCB.checkedState = Qt.Unchecked;
-
-                                            if (rootItem.controller.selectedLogTypes.count > 0)
-                                            {
-                                                if (rootItem.controller.selectedLogTypes.count === rootItem.controller.allLogTypes.count) {
-                                                    filterAllTypesCB.checkedState = Qt.Checked;
-                                                }
-                                                else {
-                                                    filterAllTypesCB.isPartiallyChecked = true;
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    Connections {
-                                        target : popup
-
-                                        onOpened : {
-                                            // update checkbox state when the pop up is opening
-                                            if (rootItem.controller) {
-                                                filterLogTypeCB.checked = rootItem.controller.isSelectedLogType(model.value);
-                                            }
-                                        }
-                                    }
-
-                                    Connections {
-                                        target : rootItem
-
-                                        onClickAllLogTypes : {
-                                            // update checkbox state when the special check box "All Log Types" is selected or unselected
-                                            if (rootItem.controller) {
-                                                filterLogTypeCB.checked = rootItem.controller.isSelectedLogType(model.value);
-                                            }
-                                        }
-                                    }
+                                else {
+                                    dropDown.isPartiallyChecked = true;
                                 }
+                            }
+                        }
+                    }
+
+                    Connections {
+                        target : dropDown.popup
+                        onOpened : {
+                            // update checkbox state when the pop up is opening
+                            if (rootItem.controller) {
+                                filterLogTypeCB.checked = rootItem.controller.isSelectedLogType(model.value);
+                            }
+                        }
+                    }
+
+                    Connections {
+                        target : rootItem
+
+                        onClickAllLogTypes : {
+                            // update checkbox state when the special check box "All Log Types" is selected or unselected
+                            if (rootItem.controller) {
+                                filterLogTypeCB.checked = rootItem.controller.isSelectedLogType(model.value);
                             }
                         }
                     }
                 }
             }
         }
-
-
-
 
         // Logs List
         Item {

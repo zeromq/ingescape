@@ -37,10 +37,8 @@
         <file>resources/SVG/ingescape-pictos.svg</file>
         <file>qml/theme/LabellessSvgButtonStyle.qml</file>
         <file>qml/scenario/ActionsListItem.qml</file>
-        <file>qml/scenario/IngeScapeComboBox.qml</file>
         <file>qml/agent/HistoryPanel.qml</file>
         <file>qml/theme/IngeScapeScrollViewStyle.qml</file>
-        <file>qml/scenario/IngeScapeComboBoxAgentsIOP.qml</file>
         <file>qml/scenario/ActionsPanel.qml</file>
         <file>qml/scenario/ScenarioTimeLine.qml</file>
         <file>qml/scenario/ActionInTimeLine.qml</file>
@@ -61,5 +59,6 @@
         <file>qml/scenario/IngeScapeComboboxItemModel.qml</file>
         <file>qml/scenario/IngeScapeComboboxItemModelAgentsIOP.qml</file>
         <file>qml/scenario/IngeScapeToolTipComboboxDelegateAgentsIOP.qml</file>
+        <file>qml/agent/DropDownCheckboxes.qml</file>
     </qresource>
 </RCC>
