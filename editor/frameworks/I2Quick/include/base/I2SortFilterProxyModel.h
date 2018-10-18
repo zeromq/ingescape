@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2016-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -105,6 +105,37 @@ public:
     {
       return Qt::UserRole;
     }
+
+
+
+//
+// QList-like comfort API
+//
+public:
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    I2SortFilterProxyModel& operator+= (QObject* item)
+    {
+        append(item);
+        return (*this);
+    }
+
+
+    /**
+     * @brief Append an item to our list
+     * @param item
+     * @return
+     */
+    I2SortFilterProxyModel& operator<< (QObject* item)
+    {
+        append(item);
+        return (*this);
+    }
+
+
 
 
 // Function defined by QSortFilterProxyModel
@@ -303,13 +334,9 @@ protected Q_SLOTS:
 
 
    /**
-    * @brief Called when an item of our source list has changed
-    * @param source_top_left
-    * @param source_bottom_right
-    * @param roles
+    * @brief Called when our count may have changed
     */
-   void _onSourceDataChanged(const QModelIndex &source_top_left, const QModelIndex &source_bottom_right, const QVector<int> &roles) ;
-
+   void _onCountMayHaveChanged();
 
 
 protected:

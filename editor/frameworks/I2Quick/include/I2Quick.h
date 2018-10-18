@@ -40,10 +40,11 @@
 #include "base/I2EnumListModel.h"
 #include "base/I2SortFilterProxyModel.h"
 
-
 #include "base/I2SignalUtils.h"
 #include "base/I2StringUtils.h"
 #include "base/I2Utils.h"
+
+#include "base/I2DynamicTranslator.h"
 
 
 //----------
@@ -92,7 +93,7 @@
 
 
 #include "system/I2LogsManager.h"
-
+#include "system/I2Settings.h"
 
 
 
@@ -105,7 +106,7 @@
 
 
 /**
- * @brief The I2Quick class defines a set of utility funcitons to register QML extensions
+ * @brief The I2Quick class defines a set of utility functions to register QML extensions
  */
 class I2QUICK_EXPORT I2Quick
 {

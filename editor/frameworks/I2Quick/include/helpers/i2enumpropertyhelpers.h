@@ -28,6 +28,7 @@
 #include <QtQml>
 #include <QQmlProperty>
 #include <QtGlobal>
+#include <QMetaType>
 
 
 #include "i2quick_global.h"
@@ -86,61 +87,17 @@
   \param list of all values
 
 
-  For example, I2_ENUM (Fruit, APPLE, BANANA, KIWI) will generate the following code section:
+  For example
   \code
-  class Fruit : public I2AbstractQmlEnumClass {
-        Q_OBJECT
-    public:
-        enum Value { APPLE, BANANA, KIWI };
-        Q_ENUMS(Value);
-        static QObject *qmlSingleton(QQmlEngine *engine, QJSEngine *scriptEngine) {
-            Q_UNUSED(engine);
-            Q_UNUSED(scriptEngine);
-            return new Fruit ();
-        }
-        int getEnumeratorIndex() Q_DECL_OVERRIDE {
-            return staticMetaObject.indexOfEnumerator("Value");
-        }
-        QMetaEnum getEnumerator(int index) Q_DECL_OVERRIDE {
-            return staticMetaObject.enumerator(index);
-        }
-        Q_INVOKABLE QList<Fruit::Value> allValues() {
-            QList<Fruit::Value> result;
-            static int enumIndex = getEnumeratorIndex();
-            if (enumIndex != -1) {
-                QMetaEnum enumType = getEnumerator(enumIndex);
-                for (int index = 0; index < enumType.keyCount(); ++index) {
-                    Fruit::Value currentEnumItemValue = static_cast<Fruit::Value>(enumType.value(index));
-                    result.append(currentEnumItemValue);
-                }
-            }
-            return result;
-        }
-        static QString staticEnumToString(int value) {
-            Fruit instance;
-            return instance.enumToString(value);
-        }
-        static QString staticEnumToKey(int value) {
-            Fruit instance;
-            return instance.enumToKey(value);
-        }
-        static int staticEnumFromKey(QString key) {
-            Fruit instance;
-            return instance.enumFromKey(key);
-        }
-        static QStringList staticAllKeys() {
-            Fruit instance;
-            return instance.allKeys();
-        }
-        static QList<Fruit::Value> staticAllValues() {
-            Fruit instance;
-            return instance.allValues();
-        }
-  };
+  I2_ENUM (Fruit, APPLE, BANANA, KIWI) will generate the following code section:
   \endcode
 
   NB: To use the 'enumToString' method in QML, the enum class must be registered as a singleton.
       If it is registered as an uncreatable type, the 'enumToString' method will not be available in QML
+
+  \code
+  Fruit::qmlRegister("MyUri", 1, 0);
+  \endcode
 
   */
 #define I2_ENUM(name, ...) \
@@ -150,7 +107,7 @@
         explicit name(QObject* parent = 0) : I2AbstractQmlEnumClass(parent) { \
         } \
         enum Value { __VA_ARGS__ }; \
-        Q_ENUMS (Value) \
+        Q_ENUM (Value) \
         static QObject *qmlSingleton(QQmlEngine *engine, QJSEngine *scriptEngine) { \
             Q_UNUSED(engine); \
             Q_UNUSED(scriptEngine); \
@@ -194,7 +151,12 @@
             name instance; \
             return instance.allValues(); \
         } \
-    };
+        static void qmlRegister(const char* uri, int versionMajor, int versionMinor, const char* qmlName = #name) { \
+            qmlRegisterSingletonType<name>(uri, versionMajor, versionMinor, qmlName, &name::qmlSingleton); \
+        } \
+    }; \
+    QML_DECLARE_TYPE(name) \
+    Q_DECLARE_METATYPE(name::Value)
 
 
 
@@ -206,58 +168,10 @@
   \param list of all values
 
 
-  For example, I2_ENUM_CUSTOM (Fruit, APPLE, BANANA, KIWI) will generate the following code section:
+  For example
+
   \code
-  class Fruit : public I2AbstractQmlEnumClass {
-        Q_OBJECT
-    public:
-        enum Value { APPLE, BANANA, KIWI };
-        Q_ENUMS(Value);
-        static QObject *qmlSingleton(QQmlEngine *engine, QJSEngine *scriptEngine) {
-            Q_UNUSED(engine);
-            Q_UNUSED(scriptEngine);
-            return new Fruit ();
-        }
-        Q_INVOKABLE virtual QString enumToString(int value) Q_DECL_OVERRIDE;
-        int getEnumeratorIndex() Q_DECL_OVERRIDE {
-            return staticMetaObject.indexOfEnumerator("Value");
-        }
-        QMetaEnum getEnumerator(int index) Q_DECL_OVERRIDE {
-            return staticMetaObject.enumerator(index);
-        }
-        Q_INVOKABLE QList<Fruit::Value> allValues() {
-            QList<Fruit::Value> result;
-            static int enumIndex = getEnumeratorIndex();
-            if (enumIndex != -1) {
-                QMetaEnum enumType = getEnumerator(enumIndex);
-                for (int index = 0; index < enumType.keyCount(); ++index) {
-                    Fruit::Value currentEnumItemValue = static_cast<Fruit::Value>(enumType.value(index));
-                    result.append(currentEnumItemValue);
-                }
-            }
-            return result;
-        }
-        static QString staticEnumToString(int value) {
-            Fruit instance;
-            return instance.enumToString(value);
-        }
-        static QString staticEnumToKey(int value) {
-            Fruit instance;
-            return instance.enumToKey(value);
-        }
-        static int staticEnumFromKey(QString key) {
-            Fruit instance;
-            return instance.enumFromKey(key);
-        }
-        static QStringList staticAllKeys() {
-            Fruit instance;
-            return instance.allKeys();
-        }
-        static QList<Fruit::Value> staticAllValues() {
-            Fruit instance;
-            return instance.allValues();
-        }
-  };
+  I2_ENUM_CUSTOM (Fruit, APPLE, BANANA, KIWI) will generate the following code section:
   \endcode
 
   NB: The method 'enumToString' method must be implemented in your .cpp file
@@ -265,13 +179,17 @@
   NB: To use the 'enumToString' method in QML, the enum class must be registered as a singleton.
       If it is registered as an uncreatable type, the 'enumToString' method will not be available in QML
 
+  \code
+  Fruit::qmlRegister("MyUri", 1, 0);
+  \endcode
+
   */
 #define I2_ENUM_CUSTOM(name, ...) \
     class name : public I2AbstractQmlEnumClass { \
         Q_OBJECT \
     public: \
         enum Value { __VA_ARGS__ }; \
-        Q_ENUMS (Value) \
+        Q_ENUM (Value) \
         static QObject *qmlSingleton(QQmlEngine *engine, QJSEngine *scriptEngine) { \
             Q_UNUSED(engine); \
             Q_UNUSED(scriptEngine); \
@@ -316,7 +234,12 @@
             name instance; \
             return instance.allValues(); \
         } \
-    };
+        static void qmlRegister(const char* uri, int versionMajor, int versionMinor, const char* qmlName = #name) { \
+            qmlRegisterSingletonType<name>(uri, versionMajor, versionMinor, qmlName, &name::qmlSingleton); \
+        } \
+    }; \
+    QML_DECLARE_TYPE(name) \
+    Q_DECLARE_METATYPE(name::Value)
 
 
 
@@ -333,11 +256,13 @@ class I2QUICK_EXPORT I2AbstractQmlEnumClass: public QObject {
 public:
     I2AbstractQmlEnumClass(QObject *parent = 0);
 
+
     /**
      * @brief Get index of our enumerator
      * @return
      */
     virtual int getEnumeratorIndex() = 0;
+
 
     /**
      * @brief Get a given enumerator

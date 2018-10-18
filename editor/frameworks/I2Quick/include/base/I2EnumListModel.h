@@ -35,13 +35,13 @@ class I2QUICK_EXPORT I2EnumListItemData : public QObject
     Q_OBJECT
 
     // Value of our enum
-    Q_PROPERTY (int value READ value)
+    Q_PROPERTY (int value READ value CONSTANT)
 
     // Pretty name of our enum i.e. the name that will be used to display our enum value in a textfield
-    Q_PROPERTY (QString name READ name)
+    Q_PROPERTY (QString name READ name CONSTANT)
 
     // Key of our enum i.e. the identifier of our enum value as declared in C++
-    Q_PROPERTY (QString key READ key)
+    Q_PROPERTY (QString key READ key CONSTANT)
 
 public:
     /**

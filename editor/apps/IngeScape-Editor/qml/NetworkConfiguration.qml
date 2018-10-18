@@ -23,6 +23,9 @@ import INGESCAPE 1.0
 // scenario sub-directory
 import "scenario" as Scenario
 
+// Needed to access to ToolTip (https://doc.qt.io/qt-5.11/qml-qtquick-controls2-tooltip.html)
+import QtQuick.Controls 2.0 as Controls2
+
 I2PopupBase {
     id: rootItem
 
@@ -36,7 +39,7 @@ I2PopupBase {
 
     onOpened: {
         txtPort.text = IngeScapeEditorC.port;
-        combobox.selectedItem = IngeScapeEditorC.networkDevice;
+        combobox.selectedIndex = IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices.indexOf(IngeScapeEditorC.networkDevice) : -1;
         clearPlatform.checked = true;
     }
 
@@ -160,10 +163,9 @@ I2PopupBase {
             }
         }
 
-
-        // ComboBox to choose the network device
-        Scenario.IngeScapeComboBox {
+        I2ComboboxStringList {
             id: combobox
+            model: IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices : 0
 
             anchors {
                 left: parent.left
@@ -171,32 +173,48 @@ I2PopupBase {
             }
             height : 25
 
-            model: IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices : 0
-            useQStringList: true
-            selectedItem: ""
-
-//            placeholderText: (IngeScapeEditorC.networkC && (IngeScapeEditorC.networkC.availableNetworkDevices.count === 0) ? "- No network device -"
-//                                                                                                                           : "- Select a network device -")
+            style: IngeScapeComboboxStyle {}
+            scrollViewStyle: IngeScapeScrollViewStyle {}
 
             onSelectedItemChanged: {
                 var selectedNetworkDevice = "";
-
                 if (combobox.selectedItem)
                 {
-                    if (typeof combobox.selectedItem === "string") {
-                        //console.log("QML: onSelectedItemChanged (string) " + combobox.selectedItem);
-                        selectedNetworkDevice = combobox.selectedItem;
-                    }
-                    else {
-                        //console.log("QML: onSelectedItemChanged (object) " + combobox.selectedItem.modelData);
-                        selectedNetworkDevice = combobox.selectedItem.modelData;
-                    }
+                    selectedNetworkDevice = combobox.selectedItem;
                 }
-                /*else {
-                    console.log("QML: onSelectedItemChanged (null) ");
-                }*/
-
                 okButton.enabled = IngeScapeEditorC.networkC.isAvailableNetworkDevice(selectedNetworkDevice);
+            }
+
+            _mouseArea.hoverEnabled: true
+
+            Controls2.ToolTip {
+                delay: 500
+                visible: combobox._mouseArea.containsMouse
+                text: combobox.text
+            }
+
+            delegate: customDelegate.component
+
+            IngeScapeToolTipComboboxDelegate {
+                id: customDelegate
+
+                comboboxStyle: combobox.style
+                selection: combobox.selectedIndex
+
+                height: combobox.comboButton.height
+                width:  combobox.comboButton.width
+
+                // Called from the component's MouseArea
+                // 'index' is the index of the clicked component inside the model.
+                function onDelegateClicked(index) {
+                    combobox.onDelegateClicked(index)
+                }
+
+                // Called from the component to get the text of the current item to display
+                // 'index' is the index of the component to be displayed inside the model.
+                function getItemText(index) {
+                    return combobox.modelToString(combobox.model[index]);
+                }
             }
         }
 

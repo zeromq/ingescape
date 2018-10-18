@@ -190,14 +190,9 @@ WindowBlockTouches {
             }
         }
 
-
         // Agents Filter
-        Item {
-            id: _combobox
-
-            // count displayable items
-            property int countDisplayItem: 5
-
+        DropDownCheckboxes {
+            id: dropDown
             anchors {
                 right : parent.right
                 rightMargin: 20
@@ -209,424 +204,150 @@ WindowBlockTouches {
             width : 197
             enabled: rootItem.controller && rootItem.controller.allAgentNamesList.length > 0
 
-            onVisibleChanged: {
-                if (!visible) {
-                    close();
+            model: rootItem.controller ? rootItem.controller.allAgentNamesList : 0
+
+            placeholderText: enabled ? "- Select an agent -" : "- No agent -"
+            text: (enabled && rootItem.controller && rootItem.controller.selectedAgentNamesList.length > 0) ?
+                      (rootItem.controller.selectedAgentNamesList.length < rootItem.controller.allAgentNamesList.length) ?
+                          (rootItem.controller.selectedAgentNamesList.length === 1 ? "- " + rootItem.controller.selectedAgentNamesList.length + " agent selected -" : "- " + rootItem.controller.selectedAgentNamesList.length + " agents selected -")
+                        : "- All agents selected -"
+            : "";
+            checkAllText: " All agents"
+
+            onCheckAll: {
+                rootItem.controller.showValuesOfAllAgents()
+                rootItem.clickAllAgents();
+            }
+
+            onUncheckAll: {
+                rootItem.controller.hideValuesOfAllAgents()
+                rootItem.clickAllAgents();
+            }
+
+            onPopupOpen: {
+                // update "all agents" checkbox state
+                // reset isPartiallyChecked and checkedState properties
+                isPartiallyChecked = false;
+                checkAllState = Qt.Unchecked;
+
+                if (rootItem.controller && (rootItem.controller.selectedAgentNamesList.length > 0))
+                {
+                    if (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length) {
+                        checkAllState = Qt.Checked;
+                    }
+                    else {
+                        isPartiallyChecked = true;
+                    }
                 }
             }
 
-            /***
-            * open function : open the combobox
-            ***/
-            function open() {
-                _comboButton.checked = true;
-                popup.open();
-            }
+            delegate: Item {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
 
-            /***
-            * close function : close the combobox
-            ***/
-            function close() {
-                _comboButton.checked = false;
-                _combobox.forceActiveFocus();
-                popup.close();
-            }
+                width: dropDown.comboButton.width
+                height: dropDown.comboButton.height
 
-            Rectangle {
-                id: _comboButton
-
-                property bool checked : false
-
-                width: parent.width
-                height: parent.height
-                radius: 1
-
-                border.width: _mouseAreaCombo.containsPress ? 1 : 0;
-                border.color: IngeScapeTheme.darkBlueGreyColor
-                color : _mouseAreaCombo.containsPress? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
-
-                Text {
-                    id:_comboPlaceholder
-
-                    visible: (_comboText.text === "");
-                    text : _combobox.enabled? "- Select an agent -" : "- No agent -"
+                CheckBox {
+                    id : filterAgentCB
                     anchors {
-                        verticalCenter: parent.verticalCenter;
-                        left: parent.left;
-                        leftMargin: 10
-                        right: _imageCombo.left;
-                        rightMargin: 10
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        leftMargin :10
+                        right: parent.right
+                        rightMargin : 10
                     }
 
+                    checked: false;
+                    activeFocusOnPress: true;
 
-                    font {
-                        pixelSize: 15
-                        family: IngeScapeTheme.textFontFamily;
-                        italic : true;
-                    }
-
-                    color : IngeScapeTheme.greyColor
-                    verticalAlignment: Text.AlignVCenter;
-                    elide : Text.ElideRight;
-                }
-
-
-                Text {
-                    id:_comboText
-
-                    anchors {
-                        verticalCenter: parent.verticalCenter;
-                        left: parent.left;
-                        leftMargin: 10
-                        right: _imageCombo.left;
-                        rightMargin: 10
-                    }
-
-                    font {
-                        pixelSize: 15
-                        family: IngeScapeTheme.textFontFamily;
-                    }
-
-                    color : IngeScapeTheme.lightGreyColor
-                    verticalAlignment: Text.AlignVCenter;
-                    elide : Text.ElideRight;
-                    text: (_combobox.enabled && rootItem.controller && rootItem.controller.selectedAgentNamesList.length > 0) ?
-                              (rootItem.controller.selectedAgentNamesList.length < rootItem.controller.allAgentNamesList.length) ?
-                                  (rootItem.controller.selectedAgentNamesList.length === 1 ? "- " + rootItem.controller.selectedAgentNamesList.length + " agent selected -" : "- " + rootItem.controller.selectedAgentNamesList.length + " agents selected -")
-                                : "- All agents selected -"
-                    : "";
-                }
-
-
-                Image {
-                    id: _imageCombo
-
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.right: parent.right;
-                    anchors.rightMargin: 10
-                    rotation : (_comboButton.checked ? 180 : 0);
-                    source : "image://I2svg/resources/SVG/ingescape-pictos.svg#iconCombo";
-
-                    Behavior on rotation {
-                        NumberAnimation {}
-                    }
-                }
-
-
-                MouseArea {
-                    id: _mouseAreaCombo
-
-                    anchors.fill: parent
-                    activeFocusOnTab: true
-
-                    onClicked: {
-                        _mouseAreaCombo.forceActiveFocus();
-                        if (_comboButton.checked) {
-                            _combobox.close();
-                        }
-                        else {
-                            _combobox.open();
-                        }
-                    }
-                }
-
-                onVisibleChanged: {
-                    if(!visible)
-                        _combobox.close();
-                }
-            }
-
-            I2PopupBase {
-                id: popup
-
-                anchors.top: _comboButton.bottom
-
-                width: _comboButton.width
-                height: ((_combolist.count < _combobox.countDisplayItem) ? (1 + _combolist.count) * _comboButton.height
-                                                                         : (1 + _combobox.countDisplayItem + 0.5) * _comboButton.height )
-
-
-                isModal: true;
-                layerColor: "transparent"
-                layerObjectName: "overlayLayerComboBox";
-                dismissOnOutsideTap : true;
-
-                keepRelativePositionToInitialParent : true;
-
-                onClosed: {
-                    _combobox.close();
-                }
-
-                onOpened: {
-
-                }
-
-                Rectangle {
-                    id : popUpBackground
-                    anchors.fill : parent
-                    color: IngeScapeTheme.darkBlueGreyColor
-                }
-
-                ScrollView {
-                    id : _scrollView
-
-                    visible: _comboButton.checked;
-
-                    anchors {
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-                    width: _comboButton.width
-
-                    // Prevent drag overshoot on Windows
-                    flickableItem.boundsBehavior: Flickable.OvershootBounds
-
-                    style: IngeScapeScrollViewStyle {
-                    }
-
-                    contentItem: Item {
-                        width: _scrollView.width;
-                        height: childrenRect.height
-
-                        CheckBox {
-                            id : filterAllAgentCB
+                    style: CheckBoxStyle {
+                        label: Text {
                             anchors {
-                                left: parent.left
-                                leftMargin: 10
-                                right: parent.right
-                                rightMargin: 10
-                                top: parent.top
-                            }
-                            height: _comboButton.height
-
-                            property bool isPartiallyChecked : false
-
-                            checked: false;
-                            partiallyCheckedEnabled: false;
-                            activeFocusOnPress: true;
-
-                            style: CheckBoxStyle {
-                                label: Text {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                        verticalCenterOffset: 1
-                                    }
-
-                                    color: IngeScapeTheme.lightGreyColor
-
-                                    text: " All agents"
-                                    elide: Text.ElideRight
-
-                                    font {
-                                        family: IngeScapeTheme.textFontFamily
-                                        pixelSize: 16
-                                    }
-
-                                }
-
-                                indicator: Rectangle {
-                                    implicitWidth: 14
-                                    implicitHeight: 14
-                                    border.width: 0
-                                    color: IngeScapeTheme.veryDarkGreyColor
-
-                                    I2SvgItem {
-                                        visible: (control.checkedState === Qt.Checked)
-                                        anchors.centerIn: parent
-
-                                        svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
-                                        svgElementId: "check";
-
-                                    }
-
-                                    Text {
-                                        visible : filterAllAgentCB.isPartiallyChecked
-                                        anchors {
-                                            centerIn: parent
-                                        }
-
-                                        color: IngeScapeTheme.lightGreyColor
-
-                                        text: "-"
-                                        elide: Text.ElideRight
-
-                                        font {
-                                            family: IngeScapeTheme.textFontFamily
-                                            pixelSize: 16
-                                        }
-                                    }
-                                }
-
+                                verticalCenter: parent.verticalCenter
+                                verticalCenterOffset: 1
                             }
 
-                            onClicked : {
-                                // reset isPartiallyChecked property
-                                filterAllAgentCB.isPartiallyChecked =  false;
+                            color: IngeScapeTheme.lightGreyColor
 
-                                // show / hide agents values
-                                if (rootItem.controller) {
-                                    if (filterAllAgentCB.checked) {
-                                        rootItem.controller.showValuesOfAllAgents()
-                                    }
-                                    else {
-                                        rootItem.controller.hideValuesOfAllAgents()
-                                    }
-                                }
+                            text: " " + modelData
+                            elide: Text.ElideRight
 
-                                // signal the change to all agents checkboxes
-                                rootItem.clickAllAgents();
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                pixelSize: 16
                             }
 
-                            Connections {
-                                target : popup
+                        }
 
-                                onOpened : {
-                                    // update "all agents" checkbox state
-                                    // reset isPartiallyChecked and checkedState properties
-                                    filterAllAgentCB.isPartiallyChecked = false;
-                                    filterAllAgentCB.checkedState = Qt.Unchecked;
+                        indicator: Rectangle {
+                            implicitWidth: 14
+                            implicitHeight: 14
+                            border.width: 0
+                            color: IngeScapeTheme.veryDarkGreyColor
 
-                                    if (rootItem.controller && (rootItem.controller.selectedAgentNamesList.length > 0))
-                                    {
-                                        if (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length) {
-                                            filterAllAgentCB.checkedState = Qt.Checked;
-                                        }
-                                        else {
-                                            filterAllAgentCB.isPartiallyChecked = true;
-                                        }
-                                    }
-                                }
+                            I2SvgItem {
+                                visible: (control.checkedState === Qt.Checked)
+                                anchors.centerIn: parent
+
+                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                svgElementId: "check";
+
                             }
                         }
 
-                        ListView {
-                            id: _combolist
+                    }
 
-                            boundsBehavior: Flickable.StopAtBounds
-
-                            anchors {
-                                top : filterAllAgentCB.bottom
-                                left: parent.left
-                                right: parent.right
+                    onClicked : {
+                        if (rootItem.controller) {
+                            if (checked) {
+                                rootItem.controller.showValuesOfAgent(modelData)
                             }
-                            height: contentHeight
+                            else {
+                                rootItem.controller.hideValuesOfAgent(modelData)
+                            }
 
-                            model: rootItem.controller ? rootItem.controller.allAgentNamesList : 0
+                            // update "all agents" checkbox state
+                            // reset isPartiallyChecked and checkedState properties
+                            dropDown.isPartiallyChecked = false;
+                            dropDown.checkAllState = Qt.Unchecked;
 
-                            interactive: false
-
-                            delegate: Item {
-                                anchors {
-                                    left: parent.left
-                                    right: parent.right
+                            if (rootItem.controller && (rootItem.controller.selectedAgentNamesList.length > 0))
+                            {
+                                if (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length) {
+                                    dropDown.checkAllState = Qt.Checked;
                                 }
-
-                                width: _comboButton.width
-                                height: _comboButton.height
-
-                                CheckBox {
-                                    id : filterAgentCB
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                        left: parent.left
-                                        leftMargin :10
-                                        right: parent.right
-                                        rightMargin : 10
-                                    }
-
-                                    checked: false;
-                                    activeFocusOnPress: true;
-
-                                    style: CheckBoxStyle {
-                                        label: Text {
-                                            anchors {
-                                                verticalCenter: parent.verticalCenter
-                                                verticalCenterOffset: 1
-                                            }
-
-                                            color: IngeScapeTheme.lightGreyColor
-
-                                            text: " " + modelData
-                                            elide: Text.ElideRight
-
-                                            font {
-                                                family: IngeScapeTheme.textFontFamily
-                                                pixelSize: 16
-                                            }
-
-                                        }
-
-                                        indicator: Rectangle {
-                                            implicitWidth: 14
-                                            implicitHeight: 14
-                                            border.width: 0
-                                            color: IngeScapeTheme.veryDarkGreyColor
-
-                                            I2SvgItem {
-                                                visible: (control.checkedState === Qt.Checked)
-                                                anchors.centerIn: parent
-
-                                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
-                                                svgElementId: "check";
-
-                                            }
-                                        }
-
-                                    }
-
-                                    onClicked : {
-                                        if (rootItem.controller) {
-                                            if (filterAgentCB.checked) {
-                                                rootItem.controller.showValuesOfAgent(modelData)
-                                            }
-                                            else {
-                                                rootItem.controller.hideValuesOfAgent(modelData)
-                                            }
-
-                                            // update "all agents" checkbox state
-                                            // reset isPartiallyChecked and checkedState properties
-                                            filterAllAgentCB.isPartiallyChecked = false;
-                                            filterAllAgentCB.checkedState = Qt.Unchecked;
-
-                                            if (rootItem.controller && (rootItem.controller.selectedAgentNamesList.length > 0))
-                                            {
-                                                if (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length) {
-                                                    filterAllAgentCB.checkedState = Qt.Checked;
-                                                }
-                                                else {
-                                                    filterAllAgentCB.isPartiallyChecked = true;
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    Connections {
-                                        target : popup
-                                        onOpened : {
-                                            // update agents checkboxes states when the pop up is opening
-                                            if (controller) {
-                                                filterAgentCB.checked = controller.areShownValuesOfAgent(modelData);
-                                            }
-                                        }
-                                    }
-
-                                    Connections {
-                                        target : rootItem
-                                        onClickAllAgents : {
-                                            // update agents checkboxes states when the "pop up is opening   "All Agents" check box is selected or unselected
-                                            if (controller) {
-                                                filterAgentCB.checked = controller.areShownValuesOfAgent(modelData);
-                                            }
-                                        }
-                                    }
+                                else {
+                                    dropDown.isPartiallyChecked = true;
                                 }
+                            }
+                        }
+                    }
+
+                    Connections {
+                        target : dropDown.popup
+                        onOpened : {
+                            // update agents checkboxes states when the pop up is opening
+                            if (controller) {
+                                filterAgentCB.checked = controller.areShownValuesOfAgent(modelData);
+                            }
+                        }
+                    }
+
+                    Connections {
+                        target : rootItem
+                        onClickAllAgents : {
+                            // update agents checkboxes states when the "pop up is opening   "All Agents" check box is selected or unselected
+                            if (controller) {
+                                filterAgentCB.checked = controller.areShownValuesOfAgent(modelData);
                             }
                         }
                     }
                 }
             }
         }
-
 
         // History List
         Item {
