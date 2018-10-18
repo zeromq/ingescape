@@ -324,6 +324,11 @@ public:
                              << QByteArrayLiteral("statusTip")
                              << QByteArrayLiteral("whatsThis");
 
+        // - list of keywords that can create issues with QML
+        QList<QByteArray> qmlWarningRoleNames;
+        qmlWarningRoleNames << QByteArrayLiteral("index")
+                            << QByteArrayLiteral("model");
+
         // Specific role that will be used to return our item
         _roleNames.insert(QtObjectRole(), QByteArrayLiteral ("QtObject"));
 
@@ -339,6 +344,14 @@ public:
             // Check if we can add it to our list of roles
             if (!qmlReservedRoleNames.contains(propertyName))
             {
+                // Check if we must display a warning
+                if (qmlWarningRoleNames.contains(propertyName))
+                {
+                    qWarning () << "I2CustomItemHashModel warning: class " << customItemHashPairMetaObject.className()
+                                << " should not have a property named " << propertyName
+                                << ", it can create issues with QML";
+                }
+
                 // NB: Roles must be greater than QtObjectRole()
                 int role = propertyRoleStartIndex + index;
                 _roleNames.insert(role, propertyName);
@@ -350,6 +363,12 @@ public:
                     _propertyNotifySignals.append(signalIndex);
                     _signalRoles.insert(signalIndex, role);
                 }
+            }
+            else
+            {
+                qCritical () << "I2CustomItemHashModel error: class " << customItemHashPairMetaObject.className()
+                             << " must not have a property named " << propertyName
+                             << ", it is a reserved keyword and can create issues with QML";
             }
         }
     }
@@ -1354,9 +1373,6 @@ public: // Hash API
 
             // - remove item at the invalid index
             _list.takeAt(invalidIndex);
-
-            // - unsubscribe to all signals
-            disconnect(deletedItem, 0, this, 0);
 
             // - end of list update
             endRemoveRows();

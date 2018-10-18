@@ -210,6 +210,14 @@ private Q_SLOTS:
 
 private:
 
+
+    /**
+     * @brief Manage a new model inside an existing view model
+     * @param model
+     * @param agentVM
+     */
+    void _manageNewModelInsideExistingVM(AgentM* model, AgentVM* agentVM);
+
     /**
      * @brief Check if we have to merge an agent with another one that have the same definition
      * @param agent

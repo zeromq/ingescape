@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2016-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -99,11 +99,14 @@ private:
 
     // Log file
     QFile *_logFile;
-    QMutex _lockedFile;
+
     QString _filePath;
+
     bool _isAppend;
+
     I2LogLevel _logLevel;
 
+    QMutex _lockedFile;
 };
 
 #endif // I2LOGSMANAGER_H

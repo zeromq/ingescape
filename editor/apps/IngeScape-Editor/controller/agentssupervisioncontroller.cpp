@@ -188,16 +188,22 @@ QJsonArray AgentsSupervisionController::exportAgentsListToJSON()
     {
         for (AgentVM* agent : _agentsList.toList())
         {
-            if ((agent != NULL) && !agent->name().isEmpty() && (agent->definition() != NULL))
+            if ((agent != NULL) && !agent->name().isEmpty())
             {
                 QJsonObject jsonAgent = QJsonObject();
 
                 // Name
                 jsonAgent.insert("agentName", agent->name());
 
-                // Definition
-                QJsonObject jsonDefinition = _jsonHelper->exportAgentDefinitionToJson(agent->definition());
-                jsonAgent.insert("definition", jsonDefinition);
+                if (agent->definition() != NULL)
+                {
+                    // Definition
+                    QJsonObject jsonDefinition = _jsonHelper->exportAgentDefinitionToJson(agent->definition());
+                    jsonAgent.insert("definition", jsonDefinition);
+                }
+                else {
+                    jsonAgent.insert("definition", QJsonValue());
+                }
 
                 // Clones (models)
                 QJsonArray jsonClones = QJsonArray();
@@ -276,30 +282,55 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
         // Get the list of view models of agent from a name
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(model->name());
 
-        // Create a new view model of agent
-        AgentVM* agent = new AgentVM(model, this);
+        AgentVM* agentWithoutDefinition = NULL;
 
-        // Connect slots to signals from this new view model of agent
-        connect(agent, &AgentVM::definitionChangedWithPreviousAndNewValues, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewValues);
-        connect(agent, &AgentVM::differentDefinitionDetectedOnModelOfAgent, this, &AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent);
-        connect(agent, &AgentVM::loadAgentDefinitionFromPath, this, &AgentsSupervisionController::_onLoadAgentDefinitionFromPath);
-        connect(agent, &AgentVM::loadAgentMappingFromPath, this, &AgentsSupervisionController::_onLoadAgentMappingFromPath);
-        connect(agent, &AgentVM::downloadAgentDefinitionToPath, this, &AgentsSupervisionController::_onDownloadAgentDefinitionToPath);
-        connect(agent, &AgentVM::downloadAgentMappingToPath, this, &AgentsSupervisionController::_onDownloadAgentMappingToPath);
+        if (!agentViewModelsList.isEmpty())
+        {
+            for (AgentVM* iterator : agentViewModelsList)
+            {
+                // If this agent VM does not have any definition either
+                if ((iterator != NULL) && (iterator->definition() == NULL))
+                {
+                    qDebug() << "There is already an agent with the same name" << model->name() << "and no definition !";
 
-        // Propagate some signals from this new view model of agent
-        connect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
-        connect(agent, &AgentVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
-        connect(agent, &AgentVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
-        connect(agent, &AgentVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
-        connect(agent, &AgentVM::openLogStreamOfAgents, this, &AgentsSupervisionController::openLogStreamOfAgents);
+                    agentWithoutDefinition = iterator;
+                    break;
+                }
+            }
+        }
+
+        if (agentWithoutDefinition != NULL)
+        {
+            // Manage the new model inside the existing view model without definition
+            _manageNewModelInsideExistingVM(model, agentWithoutDefinition);
+        }
+        else
+        {
+            // Create a new view model of agent
+            AgentVM* agent = new AgentVM(model, this);
+
+            // Connect slots to signals from this new view model of agent
+            connect(agent, &AgentVM::definitionChangedWithPreviousAndNewValues, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewValues);
+            connect(agent, &AgentVM::differentDefinitionDetectedOnModelOfAgent, this, &AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent);
+            connect(agent, &AgentVM::loadAgentDefinitionFromPath, this, &AgentsSupervisionController::_onLoadAgentDefinitionFromPath);
+            connect(agent, &AgentVM::loadAgentMappingFromPath, this, &AgentsSupervisionController::_onLoadAgentMappingFromPath);
+            connect(agent, &AgentVM::downloadAgentDefinitionToPath, this, &AgentsSupervisionController::_onDownloadAgentDefinitionToPath);
+            connect(agent, &AgentVM::downloadAgentMappingToPath, this, &AgentsSupervisionController::_onDownloadAgentMappingToPath);
+
+            // Propagate some signals from this new view model of agent
+            connect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
+            connect(agent, &AgentVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
+            connect(agent, &AgentVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
+            connect(agent, &AgentVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
+            connect(agent, &AgentVM::openLogStreamOfAgents, this, &AgentsSupervisionController::openLogStreamOfAgents);
 
 
-        agentViewModelsList.append(agent);
-        _mapFromNameToAgentViewModelsList.insert(model->name(), agentViewModelsList);
+            agentViewModelsList.append(agent);
+            _mapFromNameToAgentViewModelsList.insert(model->name(), agentViewModelsList);
 
-        // Add our view model to the list
-        _agentsList.append(agent);
+            // Add our view model to the list
+            _agentsList.append(agent);
+        }
     }
 }
 
@@ -328,7 +359,7 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
 
             for (AgentVM* iterator : agentViewModelsList)
             {
-                // If this VM contains our model of agent
+                // If this agent VM does not correspond to the sender agent
                 if ((iterator != NULL) && (iterator != agent) && (iterator->definition() != NULL)
                         &&
                         // The 2 definitions are strictly identicals
@@ -361,150 +392,8 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                         agent = NULL;
 
 
-                        // Manage the new agent model
-                        QString hostname = model->hostname();
-
-                        // Hostname is not defined
-                        // There is already an existing model of agent (in the VM agentUsingSameDefinition)
-                        if (hostname == HOSTNAME_NOT_DEFINED)
-                        {
-                            //qDebug() << "Delete Model of agent" << model->name() << "on" << hostname;
-
-                            // Delete this new (fake) model of agent
-                            _modelManager->deleteAgentModel(model);
-                        }
-                        // Hostname is a real one
-                        else
-                        {
-                            // Get the list of agent models on the same host
-                            QList<AgentM*> modelsOnHost = agentUsingSameDefinition->getModelsOnHost(hostname);
-
-                            // There is NO agent on this host yet
-                            if (modelsOnHost.isEmpty())
-                            {
-                                qDebug() << "Add model of agent" << model->name() << "on" << hostname;
-
-                                // Add the model of agent to the list of the VM
-                                agentUsingSameDefinition->models()->append(model);
-                            }
-                            // There is already agent models on this host
-                            else
-                            {
-                                // Peer id is empty (the agent has never appeared on the network)
-                                if (model->peerId().isEmpty())
-                                {
-                                    qDebug() << "Add model of agent" << model->name() << "on" << hostname;
-
-                                    // Add the model of agent to the list of the VM
-                                    agentUsingSameDefinition->models()->append(model);
-                                }
-                                // Peer id is defined: check if it is an agent that evolve from OFF to ON
-                                else
-                                {
-                                    bool hasToDeleteNewModel = false;
-                                    AgentM* sameModel = NULL;
-
-                                    QString peerId = model->peerId();
-                                    QString commandLine = model->commandLine();
-
-                                    // Search a model already added with the same peer id...
-                                    for (AgentM* iterator : modelsOnHost)
-                                    {
-                                        // Same peer id
-                                        if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId))
-                                        {
-                                            // New model is OFF and there is already a model with the same peer id...
-                                            if (!model->isON())
-                                            {
-                                                // the new model is useless, we have to delete it
-                                                hasToDeleteNewModel = true;
-                                                break;
-                                            }
-                                            // New model is ON and there is already a model with the same peer id...
-                                            else
-                                            {
-                                                // The model already added is OFF, we have to replace it by the new one
-                                                if (!iterator->isON())
-                                                {
-                                                    sameModel = iterator;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    // We don't found this peer id
-                                    if (!hasToDeleteNewModel && (sameModel == NULL))
-                                    {
-                                        // New model is ON
-                                        if (model->isON())
-                                        {
-                                            for (AgentM* iterator : modelsOnHost)
-                                            {
-                                                // Same command line (peer id is defined) and existing agent is OFF --> we consider that it is the same model that evolve from OFF to ON
-                                                if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && !iterator->isON())
-                                                {
-                                                    // We have to replace it by the new one
-                                                    sameModel = iterator;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        // New model is OFF
-                                        else
-                                        {
-                                            for (AgentM* iterator : modelsOnHost)
-                                            {
-                                                // Same command line (peer id is defined) and existing agent is ON --> we consider that it is the same model but OFF
-                                                if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && iterator->isON())
-                                                {
-                                                    // The new model is useless, we have to delete it
-                                                    hasToDeleteNewModel = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    // We have to remove the new model
-                                    if (hasToDeleteNewModel)
-                                    {
-                                        //qDebug() << "Delete Model of agent" << model->name() << "on" << hostname;
-
-                                        // Delete this new (fake) model of agent
-                                        _modelManager->deleteAgentModel(model);
-                                    }
-                                    // Else if we have to replace an existing (same) model by the new one
-                                    else if (sameModel != NULL)
-                                    {
-                                        int index = agentUsingSameDefinition->models()->indexOf(sameModel);
-                                        if (index > -1)
-                                        {
-                                            // Emit signal "Identical Agent Model Replaced"
-                                            Q_EMIT identicalAgentModelReplaced(sameModel, model);
-
-                                            qDebug() << "Replace model of agent" << model->name() << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
-
-                                            // Replace the model
-                                            agentUsingSameDefinition->models()->replace(index, model);
-
-                                            // Delete the previous model of agent
-                                            _modelManager->deleteAgentModel(sameModel);
-                                        }
-                                    }
-                                    // Else, we add the new model
-                                    else
-                                    {
-                                        qDebug() << "Add model of agent" << model->name() << "on" << hostname;
-
-                                        // Add the model of agent to the list of the VM
-                                        agentUsingSameDefinition->models()->append(model);
-                                    }
-
-                                    qDebug() << "There are" << agentUsingSameDefinition->models()->count() << "models of agent" << model->name() << "with the same definition";
-                                }
-                            }
-                        }
+                        // Manage the new model inside the existing view model with the same definition
+                        _manageNewModelInsideExistingVM(model, agentUsingSameDefinition);
                     }
                 }
             }
@@ -685,6 +574,163 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
             }
             else {
                 qCritical() << "Can not open file" << mappingFilePath << "(to save the mapping of" << agent->name() << ")";
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Manage a new model inside an existing view model
+ * @param model
+ * @param agentVM
+ */
+void AgentsSupervisionController::_manageNewModelInsideExistingVM(AgentM* model, AgentVM* agentVM)
+{
+    if ((model != nullptr) && (agentVM != nullptr) && (_modelManager != nullptr))
+    {
+        // Manage the new agent model
+        QString hostname = model->hostname();
+
+        // Hostname is not defined
+        // There is already an existing model of agent (in the VM agentUsingSameDefinition)
+        if (hostname == HOSTNAME_NOT_DEFINED)
+        {
+            //qDebug() << "Delete Model of agent" << model->name() << "on" << hostname;
+
+            // Delete this new (fake) model of agent
+            _modelManager->deleteAgentModel(model);
+        }
+        // Hostname is a real one
+        else
+        {
+            // Get the list of agent models on the same host
+            QList<AgentM*> modelsOnHost = agentVM->getModelsOnHost(hostname);
+
+            // There is NO agent on this host yet
+            if (modelsOnHost.isEmpty())
+            {
+                qDebug() << "Add model of agent" << model->name() << "on" << hostname;
+
+                // Add the model of agent to the list of the VM
+                agentVM->models()->append(model);
+            }
+            // There is already agent models on this host
+            else
+            {
+                // Peer id is empty (the agent has never appeared on the network)
+                if (model->peerId().isEmpty())
+                {
+                    qDebug() << "Add model of agent" << model->name() << "on" << hostname;
+
+                    // Add the model of agent to the list of the VM
+                    agentVM->models()->append(model);
+                }
+                // Peer id is defined: check if it is an agent that evolve from OFF to ON
+                else
+                {
+                    bool hasToDeleteNewModel = false;
+                    AgentM* sameModel = NULL;
+
+                    QString peerId = model->peerId();
+                    QString commandLine = model->commandLine();
+
+                    // Search a model already added with the same peer id...
+                    for (AgentM* iterator : modelsOnHost)
+                    {
+                        // Same peer id
+                        if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId))
+                        {
+                            // New model is OFF and there is already a model with the same peer id...
+                            if (!model->isON())
+                            {
+                                // the new model is useless, we have to delete it
+                                hasToDeleteNewModel = true;
+                                break;
+                            }
+                            // New model is ON and there is already a model with the same peer id...
+                            else
+                            {
+                                // The model already added is OFF, we have to replace it by the new one
+                                if (!iterator->isON())
+                                {
+                                    sameModel = iterator;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // We don't found this peer id
+                    if (!hasToDeleteNewModel && (sameModel == NULL))
+                    {
+                        // New model is ON
+                        if (model->isON())
+                        {
+                            for (AgentM* iterator : modelsOnHost)
+                            {
+                                // Same command line (peer id is defined) and existing agent is OFF --> we consider that it is the same model that evolve from OFF to ON
+                                if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && !iterator->isON())
+                                {
+                                    // We have to replace it by the new one
+                                    sameModel = iterator;
+                                    break;
+                                }
+                            }
+                        }
+                        // New model is OFF
+                        else
+                        {
+                            for (AgentM* iterator : modelsOnHost)
+                            {
+                                // Same command line (peer id is defined) and existing agent is ON --> we consider that it is the same model but OFF
+                                if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && iterator->isON())
+                                {
+                                    // The new model is useless, we have to delete it
+                                    hasToDeleteNewModel = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // We have to remove the new model
+                    if (hasToDeleteNewModel)
+                    {
+                        //qDebug() << "Delete Model of agent" << model->name() << "on" << hostname;
+
+                        // Delete this new (fake) model of agent
+                        _modelManager->deleteAgentModel(model);
+                    }
+                    // Else if we have to replace an existing (same) model by the new one
+                    else if (sameModel != NULL)
+                    {
+                        int index = agentVM->models()->indexOf(sameModel);
+                        if (index > -1)
+                        {
+                            // Emit signal "Identical Agent Model Replaced"
+                            Q_EMIT identicalAgentModelReplaced(sameModel, model);
+
+                            qDebug() << "Replace model of agent" << model->name() << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
+
+                            // Replace the model
+                            agentVM->models()->replace(index, model);
+
+                            // Delete the previous model of agent
+                            _modelManager->deleteAgentModel(sameModel);
+                        }
+                    }
+                    // Else, we add the new model
+                    else
+                    {
+                        qDebug() << "Add model of agent" << model->name() << "on" << hostname;
+
+                        // Add the model of agent to the list of the VM
+                        agentVM->models()->append(model);
+                    }
+
+                    qDebug() << "There are" << agentVM->models()->count() << "models of agent" << model->name() << "with the same definition";
+                }
             }
         }
     }

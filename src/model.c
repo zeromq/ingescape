@@ -1157,13 +1157,18 @@ char ** igs_getParametersList(long *nbOfElements){
 }
 
 void igs_freeIOPList(char ***list, long nbOfElements){
-    if (nbOfElements < 1)
+    //FIXME: secure this function if nbOfElements exceeds allocated value
+    if (list != NULL && *list != NULL){
+        if (nbOfElements < 1)
         return;
-    for (int i = 0; i < nbOfElements; i++){
-        free((*list)[i]);
+        for (int i = 0; i < nbOfElements; i++){
+            if ((*list)[i] != NULL){
+                free((*list)[i]);
+            }
+        }
+        free(*list);
+        *list = NULL;
     }
-    free(*list);
-    *list = NULL;
 }
 
 bool igs_checkInputExistence(const char *name){

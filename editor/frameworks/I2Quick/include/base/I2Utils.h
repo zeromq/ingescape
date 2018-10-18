@@ -10,10 +10,9 @@
  *	Contributors:
  *		Alexandre Lemort <lemort@ingenuity.io>
  *      Luc Sorignet <sorignet@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
-
-
 
 #ifndef I2UTILS_H
 #define I2UTILS_H
@@ -28,6 +27,26 @@
 // To export symbols
 #include "i2quick_global.h"
 
+/**
+ * i2_qlist_cast cast a Qlist<T> to a QList<T2>
+ * (cast each element)
+ * T and T2 must be pointer
+ * T and T2 must be castable
+ */
+ template <class T,class T2> QList<T2> i2_qlist_cast(QList<T> list)
+{
+     QList<T2> listAnyClass = QList<T2>();
+       for( int i = 0; i < list.length(); i++ )
+       {
+           T2 pAnyClass = qobject_cast<T2>(list.at(i));
+
+           if(pAnyClass)
+           {
+               listAnyClass.append(pAnyClass);
+           }
+       }
+       return listAnyClass;
+}
 
 /**
  * @brief The I2Utils class defines a set of utility functions
@@ -72,8 +91,14 @@ public:
 
 
     /**
-     * @brief get the root path where are stored all app data
-     * or create it if not exist
+      * @brief Create a directory if it does not exist
+      * @param directoryPath
+      */
+    static void createDirectoryIfNotExist(QString directoryPath);
+
+
+    /**
+     * @brief DEPRECATED get the root path where are stored all app data or create it if not exist
      * @param appRootDirName name of the application (or name of the dir)
      * @return
      */
@@ -97,6 +122,23 @@ public:
      */
     static bool dumpEmbeddedResourceFileIfNeeded(QString resourceFilePath, QString targetFilePath);
 
+
+    /**
+     * @brief Get (and create if needed) the root path of the current application
+     * "[Documents Location]/[Root Directory Name]/"
+     * @param rootDirectoryName
+     * @return
+     */
+    static QString getRootPathInDocuments(QString rootDirectoryName = "App");
+
+
+    /**
+     * @brief Get (and create if needed) the path of the sub directory of the current application
+     * "[Documents Location]/[Root Directory Name]/[Sub Directory Name]"
+     * @param subDirectoryName
+     * @return
+     */
+    static QString getSubDirectoryPathInDocuments(QString subDirectoryName);
 
 };
 
