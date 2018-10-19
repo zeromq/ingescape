@@ -617,81 +617,92 @@ void AgentsMappingController::onAgentModelWillBeDeleted(AgentM* agent)
  */
 void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
 {
-    if ((agent != NULL) && (_modelManager != NULL) && _modelManager->isMappingActivated())
+    if ((agent != NULL) && (_modelManager != NULL))
     {
         QString agentName = agent->name();
 
-        // CONTROL
-        if (_modelManager->isMappingControlled())
+        // Get the agent in mapping for the agent name
+        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
+
+        // The mapping is activated
+        if (_modelManager->isMappingActivated())
         {
-            //qDebug() << "CONTROL: Model of" << agentName << "is defined. CLEAR its MAPPING !";
-
-            QStringList peerIdsList = QStringList(agent->peerId());
-
-            // Get the agent in mapping for the agent name
-            AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
-
-            // The agent is not yet in the mapping...
-            if (agentInMapping == NULL)
+            // CONTROL
+            if (_modelManager->isMappingControlled())
             {
-                // Send the command "Clear Mapping" on the network to this agent
-                Q_EMIT commandAskedToAgent(peerIdsList, command_ClearMapping);
+                //qDebug() << "CONTROL: Model of" << agentName << "is defined. CLEAR its MAPPING !";
+
+                QStringList peerIdsList = QStringList(agent->peerId());
+
+                // The agent is not yet in the mapping...
+                if (agentInMapping == NULL)
+                {
+                    // Send the command "Clear Mapping" on the network to this agent
+                    Q_EMIT commandAskedToAgent(peerIdsList, command_ClearMapping);
+                }
+                // The agent is already in the mapping
+                else
+                {
+                    if (!agentInMapping->models()->contains(agent))
+                    {
+                        agentInMapping->models()->append(agent);
+
+                        // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+                        _overWriteMappingOfAgentModel(agent, agentInMapping->temporaryMapping());
+                    }
+                }
             }
-            // The agent is already in the mapping
+            // OBSERVE
             else
             {
-                if (!agentInMapping->models()->contains(agent))
-                {
-                    agentInMapping->models()->append(agent);
+                //qDebug() << "OBSERVE: Model of" << agentName << "is defined. ADD in MAPPING view !" << agent;
 
-                    // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-                    _overWriteMappingOfAgentModel(agent, agentInMapping->temporaryMapping());
+                // The agent is not yet in the mapping...
+                if (agentInMapping == NULL)
+                {
+                    QList<AgentM*> activeAgentsList;
+                    activeAgentsList.append(agent);
+
+                    double randomMax = (double)RAND_MAX;
+
+                    // Get a random position in the current window
+                    QPointF position = _getRandomPosition(randomMax);
+
+                    //qDebug() << "Random position:" << position << "for agent" << agentName;
+
+                    // Add new model(s) of agent to the current mapping
+                    _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
+                }
+                // The agent is already in the mapping
+                else
+                {
+                    if (!agentInMapping->models()->contains(agent)) {
+                        agentInMapping->models()->append(agent);
+                    }
+                }
+
+                // If there are waiting links (where this agent is involved as "Output Agent")
+                if (_hashFromAgentNameToListOfWaitingLinks.contains(agentName))
+                {
+                    QList<ElementMappingM*> listOfWaitingLinks = _hashFromAgentNameToListOfWaitingLinks.value(agentName);
+                    for (ElementMappingM* mappingElement : listOfWaitingLinks)
+                    {
+                        qDebug() << "Create waiting MAP..." << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
+
+                        // Create the link corresponding to the mapping element
+                        onMapped(mappingElement);
+                    }
                 }
             }
         }
-        // OBSERVE
+        // The mapping is NOT activated
         else
         {
-            //qDebug() << "OBSERVE: Model of" << agentName << "is defined. ADD in MAPPING view !" << agent;
-
-            // Get the agent in mapping for the agent name
-            AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
-
-            // The agent is not yet in the mapping...
-            if (agentInMapping == NULL)
+            if ((agentInMapping != nullptr) && !agentInMapping->models()->contains(agent))
             {
-                QList<AgentM*> activeAgentsList;
-                activeAgentsList.append(agent);
-
-                double randomMax = (double)RAND_MAX;
-
-                // Get a random position in the current window
-                QPointF position = _getRandomPosition(randomMax);
-
-                //qDebug() << "Random position:" << position << "for agent" << agentName;
-
-                // Add new model(s) of agent to the current mapping
-                _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
-            }
-            // The agent is already in the mapping
-            else
-            {
-                if (!agentInMapping->models()->contains(agent)) {
-                    agentInMapping->models()->append(agent);
-                }
-            }
-
-            // If there are waiting links (where this agent is involved as "Output Agent")
-            if (_hashFromAgentNameToListOfWaitingLinks.contains(agentName))
-            {
-                QList<ElementMappingM*> listOfWaitingLinks = _hashFromAgentNameToListOfWaitingLinks.value(agentName);
-                for (ElementMappingM* mappingElement : listOfWaitingLinks)
-                {
-                    qDebug() << "Create waiting MAP..." << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
-
-                    // Create the link corresponding to the mapping element
-                    onMapped(mappingElement);
-                }
+                // FIXME: Even if the definition is different, the agent in mapping will be modified !
+                // What do we do with the mapping (links) of this agent ?
+                agentInMapping->models()->append(agent);
             }
         }
     }

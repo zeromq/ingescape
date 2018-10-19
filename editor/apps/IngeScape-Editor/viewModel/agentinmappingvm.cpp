@@ -259,7 +259,8 @@ void AgentInMappingVM::_onModelsChanged()
     {
         //qDebug() << _previousAgentsList.count() << "--> ADD --> " << newAgentsList.count();
 
-        for (AgentM* model : newAgentsList) {
+        for (AgentM* model : newAgentsList)
+        {
             if ((model != NULL) && !_previousAgentsList.contains(model))
             {
                 qDebug() << "Agent in Mapping VM: New model" << model->name() << "ADDED (" << model->peerId() << ")";
@@ -278,7 +279,8 @@ void AgentInMappingVM::_onModelsChanged()
     {
         //qDebug() << _previousAgentsList.count() << "--> REMOVE --> " << newAgentsList.count();
 
-        for (AgentM* model : _previousAgentsList) {
+        for (AgentM* model : _previousAgentsList)
+        {
             if ((model != NULL) && !newAgentsList.contains(model))
             {
                 qDebug() << "Agent in Mapping VM: Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
@@ -1188,7 +1190,7 @@ void AgentInMappingVM::_updateIsON()
     bool globalIsON = false;
     int activeAgentsNumber = 0;
 
-    foreach (AgentM* model, _models.toList())
+    for (AgentM* model : _models.toList())
     {
         if ((model != NULL) && model->isON())
         {
