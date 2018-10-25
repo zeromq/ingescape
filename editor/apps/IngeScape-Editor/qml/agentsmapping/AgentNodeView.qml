@@ -868,9 +868,7 @@ Rectangle {
             anchors {
                 left: parent.left
                 leftMargin: 30
-                //right: btnRemoveFromMapping.left
                 right: agentWithSameName.visible ? agentWithSameName.left : btnRemoveFromMapping.left
-                //rightMargin: 20
                 top: parent.top
                 topMargin: 10
             }

@@ -125,12 +125,6 @@ void IngeScapeModelManager::addAgentModel(AgentM* agent)
         // Connect to signals from this new agent
         connect(agent, &AgentM::networkDataWillBeCleared, this, &IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared);
 
-        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agent->name());
-        agentModelsList.append(agent);
-
-        // Update the list in the map
-        _mapFromNameToAgentModelsList.insert(agent->name(), agentModelsList);
-
         if (!agent->peerId().isEmpty()) {
             _mapFromPeerIdToAgentM.insert(agent->peerId(), agent);
         }
@@ -138,7 +132,7 @@ void IngeScapeModelManager::addAgentModel(AgentM* agent)
         // Emit the signal "Agent Model Created"
         Q_EMIT agentModelCreated(agent);
 
-        //_printAgents();
+        _printAgents();
     }
 }
 
@@ -442,13 +436,15 @@ void IngeScapeModelManager::openDefinitionWithAgentName(QString agentName)
 {
     if (!agentName.isEmpty())
     {
-        // Get the list of models of agent with the name
-        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
-        if (!agentModelsList.isEmpty())
+        // Get the (view model of) agents grouped for this name
+        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agentName);
+
+        if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->models()->isEmpty())
         {
             // By default, we take the first one
-            AgentM* agent = agentModelsList.at(0);
-            if ((agent != NULL) && (agent->definition() != NULL))
+            AgentM* agent = agentsGroupedByName->models()->at(0);
+
+            if ((agent != nullptr) && (agent->definition() != NULL))
             {
                 // Open its definition
                 openDefinition(agent->definition());
@@ -589,8 +585,8 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
 
         if (agent != NULL)
         {
-            // Get the (view model of) agents grouped from a name
-            AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedFromName(agentName);
+            // Get the (view model of) agents grouped for this name
+            AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agentName);
             if (agentsGroupedByName == nullptr)
             {
                 // Create a new view model of agents grouped by name
@@ -628,8 +624,8 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
             Q_EMIT removeInputsToEditorForOutputs(agentName, agent->definition()->outputsList()->toList());
         }
 
-        // Get the (view model of) agents grouped from a name
-        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedFromName(agentName);
+        // Get the (view model of) agents grouped for this name
+        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agentName);
         if (agentsGroupedByName != nullptr)
         {
             // Manage when a model of agent exited from our network
@@ -650,15 +646,17 @@ void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostname, 
     // Add an IngeScape Launcher to the manager
     IngeScapeLauncherManager::Instance().addIngeScapeLauncher(peerId, hostname, ipAddress, streamingPort);
 
-    // Traverse the list of all agents
-    for (QString agentName : _mapFromNameToAgentModelsList.keys())
+    // Traverse the list of all agents grouped by name
+    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
     {
-        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
-
-        for (AgentM* agent : agentModelsList)
+        if (agentsGroupedByName != nullptr)
         {
-            if ((agent != NULL) && (agent->hostname() == hostname) && !agent->commandLine().isEmpty()) {
-                agent->setcanBeRestarted(true);
+            // Traverse the list of all models
+            for (AgentM* agent : agentsGroupedByName->models()->toList())
+            {
+                if ((agent != NULL) && (agent->hostname() == hostname) && !agent->commandLine().isEmpty()) {
+                    agent->setcanBeRestarted(true);
+                }
             }
         }
     }
@@ -675,15 +673,17 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostname)
     // Remove an IngeScape Launcher to the manager
     IngeScapeLauncherManager::Instance().removeIngeScapeLauncher(peerId, hostname);
 
-    // Traverse the list of all agents
-    for (QString agentName : _mapFromNameToAgentModelsList.keys())
+    // Traverse the list of all agents grouped by name
+    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
     {
-        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
-
-        for (AgentM* agent : agentModelsList)
+        if (agentsGroupedByName != nullptr)
         {
-            if ((agent != NULL) && (agent->hostname() == hostname)) {
-                agent->setcanBeRestarted(false);
+            // Traverse the list of all models
+            for (AgentM* agent : agentsGroupedByName->models()->toList())
+            {
+                if ((agent != NULL) && (agent->hostname() == hostname)) {
+                    agent->setcanBeRestarted(false);
+                }
             }
         }
     }
@@ -885,38 +885,12 @@ void IngeScapeModelManager::onValuePublished(PublishedValueM* publishedValue)
         // Add to the list at the first position
         _publishedValues.prepend(publishedValue);
 
-        QList<AgentM*> agentsList = getAgentModelsListFromName(publishedValue->agentName());
-        for (AgentM* agent : agentsList)
+        // Get the (view model of) agents grouped for the name
+        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(publishedValue->agentName());
+        if (agentsGroupedByName != nullptr)
         {
-            if ((agent != NULL) && (agent->definition() != NULL))
-            {
-                switch (publishedValue->iopType())
-                {
-                case AgentIOPTypes::OUTPUT: {
-                    OutputM* output = agent->definition()->getOutputWithName(publishedValue->iopName());
-                    if (output != NULL) {
-                        output->setcurrentValue(publishedValue->value());
-                    }
-                    break;
-                }
-                case AgentIOPTypes::INPUT: {
-                    AgentIOPM* input = agent->definition()->getInputWithName(publishedValue->iopName());
-                    if (input != NULL) {
-                        input->setcurrentValue(publishedValue->value());
-                    }
-                    break;
-                }
-                case AgentIOPTypes::PARAMETER: {
-                    AgentIOPM* parameter = agent->definition()->getParameterWithName(publishedValue->iopName());
-                    if (parameter != NULL) {
-                        parameter->setcurrentValue(publishedValue->value());
-                    }
-                    break;
-                }
-                default:
-                    break;
-                }
-            }
+            // Update the current value of an I/O/P of this agent(s)
+            agentsGroupedByName->updateCurrentValueOfIOP(publishedValue);
         }
     }
 }
@@ -1093,11 +1067,11 @@ AgentM* IngeScapeModelManager::getAgentModelFromPeerId(QString peerId)
 
 
 /**
- * @brief Get the (view model of) agents grouped from a name
+ * @brief Get the (view model of) agents grouped for a name
  * @param name
  * @return
  */
-AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedFromName(QString name)
+AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString name)
 {
     if (_hashFromNameToAgentsGrouped.contains(name)) {
         return _hashFromNameToAgentsGrouped.value(name);
@@ -1109,45 +1083,32 @@ AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedFromName(QString n
 
 
 /**
- * @brief Get the list of models of agent from a name
- * @param name
- * @return
- */
-QList<AgentM*> IngeScapeModelManager::getAgentModelsListFromName(QString name)
-{
-    if (_mapFromNameToAgentModelsList.contains(name)) {
-        return _mapFromNameToAgentModelsList.value(name);
-    }
-    else {
-        return QList<AgentM*>();
-    }
-}
-
-
-/**
  * @brief Get the map from agent name to list of active agents
  * @return
  */
 QHash<QString, QList<AgentM*>> IngeScapeModelManager::getMapFromAgentNameToActiveAgentsList()
 {
-    QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList;
+    QHash<QString, QList<AgentM*>> hashFromAgentNameToActiveAgentsList;
 
-    for (QString agentName : _mapFromNameToAgentModelsList.keys())
+    // Traverse the list of all agents grouped by name
+    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
     {
-        QList<AgentM*> allAgentsList = getAgentModelsListFromName(agentName);
-        QList<AgentM*> activeAgentsList;
-        for (AgentM* agent : allAgentsList)
+        if ((agentsGroupedByName != nullptr) && agentsGroupedByName->isON())
         {
-            if ((agent != NULL) && agent->isON()) {
-                activeAgentsList.append(agent);
+            QList<AgentM*> activeAgentsList;
+            for (AgentM* agent : agentsGroupedByName->models()->toList())
+            {
+                if ((agent != NULL) && agent->isON()) {
+                    activeAgentsList.append(agent);
+                }
             }
-        }
-        if (!activeAgentsList.isEmpty()) {
-            mapFromAgentNameToActiveAgentsList.insert(agentName, activeAgentsList);
+            if (!activeAgentsList.isEmpty()) {
+                hashFromAgentNameToActiveAgentsList.insert(agentsGroupedByName->name(), activeAgentsList);
+            }
         }
     }
 
-    return mapFromAgentNameToActiveAgentsList;
+    return hashFromAgentNameToActiveAgentsList;
 }
 
 
@@ -1179,11 +1140,16 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
             deleteAgentMapping(temp);
         }
 
-        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agent->name());
-        agentModelsList.removeOne(agent);
+        // FIXME: do not use AgentsGroupedByNameVM inside a basic function about AgentM
+        // --> Only AgentsGroupedByNameVM could call this function
+        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agent->name());
+        if ((agentsGroupedByName != NULL)
+                && agentsGroupedByName->models()->contains(agent))
+        {
+            agentsGroupedByName->models()->remove(agent);
 
-        // Update the list in the map
-        _mapFromNameToAgentModelsList.insert(agent->name(), agentModelsList);
+            // FIXME: manage if models.isEmpty --> remove this agentsGroupedByName
+        }
 
         if (!agent->peerId().isEmpty()) {
             _mapFromPeerIdToAgentM.remove(agent->peerId());
@@ -1195,7 +1161,7 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         //delete agent;
         agent->deleteLater();
 
-        //_printAgents();
+        _printAgents();
     }
 }
 
@@ -1400,9 +1366,11 @@ void IngeScapeModelManager::_updateDefinitionVariants(QString definitionName)
 void IngeScapeModelManager::_printAgents()
 {
     qDebug() << "Print Agents:";
-    for (QString agentName : _mapFromNameToAgentModelsList.keys()) {
-        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
-        qDebug() << agentName << ":" << agentModelsList.count() << "agents";
+    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
+    {
+        if (agentsGroupedByName != nullptr) {
+            qDebug() << agentsGroupedByName->name() << ":" << agentsGroupedByName->models()->count() << "agents";
+        }
     }
 }
 

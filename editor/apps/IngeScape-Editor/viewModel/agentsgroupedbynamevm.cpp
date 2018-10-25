@@ -98,6 +98,50 @@ void AgentsGroupedByNameVM::manageAgentExitedNetwork(AgentM* model)
 
 
 /**
+ * @brief Update the current value of an I/O/P of our agent(s)
+ * @param publishedValue
+ */
+void AgentsGroupedByNameVM::updateCurrentValueOfIOP(PublishedValueM* publishedValue)
+{
+    if (publishedValue != NULL)
+    {
+        for (AgentM* agent : _models)
+        {
+            if ((agent != NULL) && (agent->definition() != NULL))
+            {
+                switch (publishedValue->iopType())
+                {
+                case AgentIOPTypes::OUTPUT: {
+                    OutputM* output = agent->definition()->getOutputWithName(publishedValue->iopName());
+                    if (output != NULL) {
+                        output->setcurrentValue(publishedValue->value());
+                    }
+                    break;
+                }
+                case AgentIOPTypes::INPUT: {
+                    AgentIOPM* input = agent->definition()->getInputWithName(publishedValue->iopName());
+                    if (input != NULL) {
+                        input->setcurrentValue(publishedValue->value());
+                    }
+                    break;
+                }
+                case AgentIOPTypes::PARAMETER: {
+                    AgentIOPM* parameter = agent->definition()->getParameterWithName(publishedValue->iopName());
+                    if (parameter != NULL) {
+                        parameter->setcurrentValue(publishedValue->value());
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Slot called when the list of models changed
  */
 void AgentsGroupedByNameVM::_onModelsChanged()

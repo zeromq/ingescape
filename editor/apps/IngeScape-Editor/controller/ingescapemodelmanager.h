@@ -90,19 +90,11 @@ public:
 
 
     /**
-     * @brief Get the (view model of) agents grouped from a name
+     * @brief Get the (view model of) agents grouped for a name
      * @param name
      * @return
      */
-    AgentsGroupedByNameVM* getAgentsGroupedFromName(QString name);
-
-
-    /**
-     * @brief Get the list of models of agent from a name
-     * @param name
-     * @return
-     */
-    QList<AgentM*> getAgentModelsListFromName(QString name);
+    AgentsGroupedByNameVM* getAgentsGroupedForName(QString name);
 
 
     /**
@@ -473,9 +465,6 @@ private:
 
     // Map from "peer id" to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
-
-    // Map from "agent name" to a list of models of agent
-    QHash<QString, QList<AgentM*>> _mapFromNameToAgentModelsList;
 
     // Map from "definition name" to a list (of models) of agent definition
     QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;

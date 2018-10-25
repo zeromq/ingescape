@@ -389,15 +389,17 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                         }
                     }
 
-                    // Get the list of models of agent from the name
-                    QList<AgentM*> agentModelsList = _modelManager->getAgentModelsListFromName(agentName);
+                    // Get the (view model of) agents grouped for this name
+                    AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
 
-                    if (!position.isNull() && !agentModelsList.isEmpty())
+                    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->models()->isEmpty() && !position.isNull())
                     {
-                        qDebug() << "Position:" << position.x() << position.y() << "is defined for" << agentName << "with" << agentModelsList.count() << "models";
+                        qDebug() << "Position:" << position.x() << position.y() << "is defined for" << agentName << "with" << agentsGroupedByName->models()->count() << "models";
+
+                        // FIXME TODO: use directly the AgentsGroupedByNameVM instead of agentsGroupedByName->models()->toList()
 
                         // Create a new Agent In Mapping
-                        _addAgentModelsToMappingAtPosition(agentName, agentModelsList, position);
+                        _addAgentModelsToMappingAtPosition(agentName, agentsGroupedByName->models()->toList(), position);
 
                         // Get the agent in mapping from the name
                         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
@@ -1293,6 +1295,8 @@ void AgentsMappingController::_updateMappingWithModelsOfAgentsAndLinks()
 {
     if (_modelManager != NULL)
     {
+        // FIXME: use AgentsGroupedByNameVM instead of the function "getMapFromAgentNameToActiveAgentsList"
+
         // Get the map from agent name to list of active agents
         QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
 

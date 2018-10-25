@@ -19,6 +19,8 @@
 
 #include <I2PropertyHelpers.h>
 #include <model/agentm.h>
+#include <model/publishedvaluem.h>
+
 
 /**
  * @brief The AgentsGroupedByNameVM class defines a view model of group of agents who have the same name
@@ -68,6 +70,13 @@ public:
      * @param model
      */
     void manageAgentExitedNetwork(AgentM* model);
+
+
+    /**
+     * @brief Update the current value of an I/O/P of our agent(s)
+     * @param publishedValue
+     */
+    void updateCurrentValueOfIOP(PublishedValueM* publishedValue);
 
 
 Q_SIGNALS:
