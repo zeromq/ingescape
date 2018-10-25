@@ -23,6 +23,7 @@
 #include <model/jsonhelper.h>
 #include <model/agentm.h>
 #include <model/publishedvaluem.h>
+#include <viewModel/agentsgroupedbynamevm.h>
 
 
 /**
@@ -32,14 +33,17 @@ class IngeScapeModelManager : public QObject
 {
     Q_OBJECT
 
-    // List of opened definitions
-    I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
+    // List of all agents grouped by name
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentsGroupedByNameVM, allAgentsGroupedByName)
 
     // Flag indicating if our global mapping is activated
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingActivated)
 
     // Flag indicating if our global mapping is controlled (or passive)
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingControlled)
+
+    // List of opened definitions
+    I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
 
     // List of all published values
     I2_QOBJECT_LISTMODEL(PublishedValueM, publishedValues)
@@ -54,7 +58,6 @@ public:
      */
     explicit IngeScapeModelManager(JsonHelper* jsonHelper,
                                    QString rootDirectoryPath,
-                                   //QString agentsListDirectoryPath,
                                    QObject *parent = nullptr);
 
 
@@ -72,11 +75,26 @@ public:
 
 
     /**
+     * @brief Add a view model of agents grouped by name
+     * @param agentsGroupedByName
+     */
+    void addAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName);
+
+
+    /**
      * @brief Get the model of agent from a Peer Id
      * @param peerId
      * @return
      */
     AgentM* getAgentModelFromPeerId(QString peerId);
+
+
+    /**
+     * @brief Get the (view model of) agents grouped from a name
+     * @param name
+     * @return
+     */
+    AgentsGroupedByNameVM* getAgentsGroupedFromName(QString name);
 
 
     /**
@@ -203,6 +221,20 @@ Q_SIGNALS:
      * @param agent
      */
     void agentModelWillBeDeleted(AgentM* agent);
+
+
+    /**
+     * @brief Signal emitted when a new view model of agents grouped by name has been created
+     * @param agentsGroupedByName
+     */
+    void agentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName);
+
+
+    /**
+     * @brief Signal emitted when a view model of agents grouped by name will be deleted
+     * @param agentsGroupedByName
+     */
+    void agentsGroupedByNameWillBeDeleted(AgentsGroupedByNameVM* agentsGroupedByName);
 
 
     /**
@@ -450,6 +482,9 @@ private:
 
     // Map from "mapping name" to a list (of models) of agent mapping
     QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
+
+    // Hash table from a name to the group of agents with this name
+    QHash<QString, AgentsGroupedByNameVM*> _hashFromNameToAgentsGrouped;
 
 };
 

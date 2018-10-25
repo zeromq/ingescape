@@ -93,7 +93,8 @@ SOURCES += main.cpp \
     model/logm.cpp \
     sortFilter/logssortfilter.cpp \
     model/scenario/condition/conditiononagentm.cpp \
-    misc/qquickwindowblocktouches.cpp
+    misc/qquickwindowblocktouches.cpp \
+    viewModel/agentsgroupedbynamevm.cpp
 
 HEADERS += \
     stable.h \
@@ -164,7 +165,8 @@ HEADERS += \
     model/logm.h \
     sortFilter/logssortfilter.h \
     model/scenario/condition/conditiononagentm.h \
-    misc/qquickwindowblocktouches.h
+    misc/qquickwindowblocktouches.h \
+    viewModel/agentsgroupedbynamevm.h
 
 
 RESOURCES += qml.qrc

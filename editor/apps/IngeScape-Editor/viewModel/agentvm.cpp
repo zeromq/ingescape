@@ -425,7 +425,8 @@ void AgentVM::_onModelsChanged()
     {
         //qDebug() << _previousAgentsList.count() << "--> REMOVE --> " << newAgentsList.count();
 
-        for (AgentM* model : _previousAgentsList) {
+        for (AgentM* model : _previousAgentsList)
+        {
             if ((model != NULL) && !newAgentsList.contains(model))
             {
                 //qDebug() << "Old model" << model->name() << "REMOVED (" << model->peerId() << ")";

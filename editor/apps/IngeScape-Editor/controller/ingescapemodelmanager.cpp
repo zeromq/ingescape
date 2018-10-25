@@ -27,14 +27,11 @@
 /**
  * @brief Constructor
  * @param jsonHelper
- * @param agentsListDirectoryPath
- * @param agentsMappingsDirectoryPath
- * @param dataDirectoryPath
+ * @param rootDirectoryPath
  * @param parent
  */
 IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
                                              QString rootDirectoryPath,
-                                             //QString agentsListDirectoryPath,
                                              QObject *parent) : QObject(parent),
     _isMappingActivated(false),
     _isMappingControlled(false),
@@ -45,6 +42,9 @@ IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New INGESCAPE Model Manager";
+
+    // Agents grouped are sorted on their name (alphabetical order)
+    _allAgentsGroupedByName.setSortProperty("name");
 }
 
 
@@ -60,6 +60,10 @@ IngeScapeModelManager::~IngeScapeModelManager()
 
     // Free memory
     _publishedValues.deleteAllItems();
+
+    // Free memory
+    _hashFromNameToAgentsGrouped.clear();
+    _allAgentsGroupedByName.deleteAllItems();
 
     // Reset pointers
     _jsonHelper = NULL;
@@ -106,6 +110,55 @@ void IngeScapeModelManager::setisMappingControlled(bool value)
         }
 
         Q_EMIT isMappingControlledChanged(value);
+    }
+}
+
+
+/**
+ * @brief Add a model of agent
+ * @param agent
+ */
+void IngeScapeModelManager::addAgentModel(AgentM* agent)
+{
+    if (agent != NULL)
+    {
+        // Connect to signals from this new agent
+        connect(agent, &AgentM::networkDataWillBeCleared, this, &IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared);
+
+        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agent->name());
+        agentModelsList.append(agent);
+
+        // Update the list in the map
+        _mapFromNameToAgentModelsList.insert(agent->name(), agentModelsList);
+
+        if (!agent->peerId().isEmpty()) {
+            _mapFromPeerIdToAgentM.insert(agent->peerId(), agent);
+        }
+
+        // Emit the signal "Agent Model Created"
+        Q_EMIT agentModelCreated(agent);
+
+        //_printAgents();
+    }
+}
+
+
+/**
+ * @brief Add a view model of agents grouped by name
+ * @param agentsGroupedByName
+ */
+void IngeScapeModelManager::addAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName)
+{
+    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
+    {
+        // Add to the hash table
+        _hashFromNameToAgentsGrouped.insert(agentsGroupedByName->name(), agentsGroupedByName);
+
+        // Add to the sorted list
+        _allAgentsGroupedByName.append(agentsGroupedByName);
+
+        // Emit the signal "Agents grouped by name has been created"
+        Q_EMIT agentsGroupedByNameHasBeenCreated(agentsGroupedByName);
     }
 }
 
@@ -533,6 +586,25 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
             // Add this new model of agent
             addAgentModel(agent);
         }
+
+        if (agent != NULL)
+        {
+            // Get the (view model of) agents grouped from a name
+            AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedFromName(agentName);
+            if (agentsGroupedByName == nullptr)
+            {
+                // Create a new view model of agents grouped by name
+                agentsGroupedByName = new AgentsGroupedByNameVM(agent, this);
+
+                // Add this view model of agents grouped by name
+                addAgentsGroupedByName(agentsGroupedByName);
+            }
+            else
+            {
+                // Manage when a model of agent entered on our network
+                agentsGroupedByName->manageAgentEnteredNetwork(agent);
+            }
+        }
     }
 }
 
@@ -554,6 +626,14 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
 
         if ((agent->definition() != NULL) && !agent->definition()->outputsList()->isEmpty()) {
             Q_EMIT removeInputsToEditorForOutputs(agentName, agent->definition()->outputsList()->toList());
+        }
+
+        // Get the (view model of) agents grouped from a name
+        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedFromName(agentName);
+        if (agentsGroupedByName != nullptr)
+        {
+            // Manage when a model of agent exited from our network
+            agentsGroupedByName->manageAgentExitedNetwork(agent);
         }
     }
 }
@@ -997,35 +1077,6 @@ void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
 
 
 /**
- * @brief Add a model of agent
- * @param agent
- */
-void IngeScapeModelManager::addAgentModel(AgentM* agent)
-{
-    if (agent != NULL)
-    {
-        // Connect to signals from this new agent
-        connect(agent, &AgentM::networkDataWillBeCleared, this, &IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared);
-
-        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agent->name());
-        agentModelsList.append(agent);
-
-        // Update the list in the map
-        _mapFromNameToAgentModelsList.insert(agent->name(), agentModelsList);
-
-        if (!agent->peerId().isEmpty()) {
-            _mapFromPeerIdToAgentM.insert(agent->peerId(), agent);
-        }
-
-        // Emit the signal "Agent Model Created"
-        Q_EMIT agentModelCreated(agent);
-
-        //_printAgents();
-    }
-}
-
-
-/**
  * @brief Get the model of agent from a Peer Id
  * @param peerId
  * @return
@@ -1034,6 +1085,22 @@ AgentM* IngeScapeModelManager::getAgentModelFromPeerId(QString peerId)
 {
     if (_mapFromPeerIdToAgentM.contains(peerId)) {
         return _mapFromPeerIdToAgentM.value(peerId);
+    }
+    else {
+        return NULL;
+    }
+}
+
+
+/**
+ * @brief Get the (view model of) agents grouped from a name
+ * @param name
+ * @return
+ */
+AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedFromName(QString name)
+{
+    if (_hashFromNameToAgentsGrouped.contains(name)) {
+        return _hashFromNameToAgentsGrouped.value(name);
     }
     else {
         return NULL;
