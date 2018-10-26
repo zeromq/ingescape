@@ -87,7 +87,7 @@ DefinitionM* JsonHelper::createModelOfAgentDefinitionFromJSON(QJsonObject jsonDe
 
         if (jsonParameters.isArray())
         {
-            foreach (QJsonValue jsonParameter, jsonParameters.toArray())
+            for (QJsonValue jsonParameter : jsonParameters.toArray())
             {
                 if (jsonParameter.isObject())
                 {
@@ -102,7 +102,7 @@ DefinitionM* JsonHelper::createModelOfAgentDefinitionFromJSON(QJsonObject jsonDe
 
         if (jsonInputs.isArray())
         {
-            foreach (QJsonValue jsonInput, jsonInputs.toArray())
+            for (QJsonValue jsonInput : jsonInputs.toArray())
             {
                 if (jsonInput.isObject())
                 {
@@ -117,7 +117,7 @@ DefinitionM* JsonHelper::createModelOfAgentDefinitionFromJSON(QJsonObject jsonDe
 
         if (jsonOutputs.isArray())
         {
-            foreach (QJsonValue jsonOutput, jsonOutputs.toArray())
+            for (QJsonValue jsonOutput : jsonOutputs.toArray())
             {
                 if (jsonOutput.isObject())
                 {

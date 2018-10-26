@@ -75,10 +75,52 @@ public:
 
 
     /**
+     * @brief Delete a model of agent
+     * @param agent
+     */
+    void deleteAgentModel(AgentM* agent);
+
+
+    /**
      * @brief Add a view model of agents grouped by name
      * @param agentsGroupedByName
      */
     void addAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName);
+
+
+    /**
+     * @brief Delete a view model of agents grouped by name
+     * @param agentsGroupedByName
+     */
+    void deleteAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName);
+
+
+    /**
+     * @brief Add a model of agent definition for an agent name
+     * @param agentDefinition
+     */
+    void addAgentDefinitionModel(DefinitionM* agentDefinition);
+
+
+    /**
+     * @brief Delete a model of agent definition
+     * @param definition
+     */
+    void deleteAgentDefinitionModel(DefinitionM* definition);
+
+
+    /**
+     * @brief Add a model of agent mapping for an agent name
+     * @param agentMapping
+     */
+    void addAgentMappingModel(AgentMappingM* agentMapping);
+
+
+    /**
+     * @brief Delete a model of agent mapping
+     * @param agentMapping
+     */
+    void deleteAgentMappingModel(AgentMappingM* agentMapping);
 
 
     /**
@@ -98,48 +140,11 @@ public:
 
 
     /**
-     * @brief Get the map from agent name to list of active agents
-     * @return
-     */
-    QHash<QString, QList<AgentM*>> getMapFromAgentNameToActiveAgentsList();
-
-
-    /**
-     * @brief Delete a model of agent
-     * @param agent
-     */
-    void deleteAgentModel(AgentM* agent);
-
-
-    /**
-     * @brief Add a model of agent definition for an agent name
-     * @param agentDefinition
-     * @param agentName
-     */
-    void addAgentDefinitionForAgentName(DefinitionM* agentDefinition, QString agentName);
-
-
-    /**
      * @brief Get the list (of models) of agent definition from a definition name
      * @param definitionName
      * @return
      */
     QList<DefinitionM*> getAgentDefinitionsListFromDefinitionName(QString definitionName);
-
-
-    /**
-     * @brief Delete a model of agent definition
-     * @param definition
-     */
-    void deleteAgentDefinition(DefinitionM* definition);
-
-
-    /**
-     * @brief Add a model of agent mapping for an agent name
-     * @param agentMapping
-     * @param agentName
-     */
-    void addAgentMappingForAgentName(AgentMappingM* agentMapping, QString agentName);
 
 
     /**
@@ -151,10 +156,10 @@ public:
 
 
     /**
-     * @brief Delete a model of agent mapping
-     * @param agentMapping
+     * @brief Get the map from agent name to list of active agents
+     * @return
      */
-    void deleteAgentMapping(AgentMappingM* agentMapping);
+    QHash<QString, QList<AgentM*>> getMapFromAgentNameToActiveAgentsList();
 
 
     /**

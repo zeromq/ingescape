@@ -138,6 +138,60 @@ void IngeScapeModelManager::addAgentModel(AgentM* agent)
 
 
 /**
+ * @brief Delete a model of agent
+ * @param agent
+ */
+void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
+{
+    if (agent != NULL)
+    {
+        // Emit the signal "Agent Model Will Be Deleted"
+        Q_EMIT agentModelWillBeDeleted(agent);
+
+        // DIS-connect to signals from the agent
+        disconnect(agent, 0, this, 0);
+
+        // Delete its model of definition if needed
+        if (agent->definition() != NULL) {
+            DefinitionM* temp = agent->definition();
+            agent->setdefinition(NULL);
+            deleteAgentDefinitionModel(temp);
+        }
+
+        // Delete its model of mapping if needed
+        if (agent->mapping() != NULL) {
+            AgentMappingM* temp = agent->mapping();
+            agent->setmapping(NULL);
+            deleteAgentMappingModel(temp);
+        }
+
+        // FIXME: do not use AgentsGroupedByNameVM inside a basic function about AgentM
+        // --> Only AgentsGroupedByNameVM could call this function
+        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agent->name());
+        if ((agentsGroupedByName != NULL)
+                && agentsGroupedByName->models()->contains(agent))
+        {
+            agentsGroupedByName->models()->remove(agent);
+
+            // FIXME: manage if models.isEmpty --> remove this agentsGroupedByName
+        }
+
+        if (!agent->peerId().isEmpty()) {
+            _mapFromPeerIdToAgentM.remove(agent->peerId());
+        }
+
+        // Free memory...later
+        // the call to "agent->setdefinition" will produce the call of the slot _onAgentDefinitionChangedWithPreviousAndNewValues
+        // ...and in some cases, the call to deleteAgentModel on this agent. So we cannot call directly "delete agent;"
+        //delete agent;
+        agent->deleteLater();
+
+        _printAgents();
+    }
+}
+
+
+/**
  * @brief Add a view model of agents grouped by name
  * @param agentsGroupedByName
  */
@@ -154,6 +208,219 @@ void IngeScapeModelManager::addAgentsGroupedByName(AgentsGroupedByNameVM* agents
         // Emit the signal "Agents grouped by name has been created"
         Q_EMIT agentsGroupedByNameHasBeenCreated(agentsGroupedByName);
     }
+}
+
+
+/**
+ * @brief Delete a view model of agents grouped by name
+ * @param agentsGroupedByName
+ */
+void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName)
+{
+    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
+    {
+        // Remove from the hash table
+        _hashFromNameToAgentsGrouped.remove(agentsGroupedByName->name());
+
+        // Remove from the sorted list
+        _allAgentsGroupedByName.remove(agentsGroupedByName);
+
+        // Emit the signal "Agents grouped by name will be deleted"
+        Q_EMIT agentsGroupedByNameWillBeDeleted(agentsGroupedByName);
+
+        // Free memory
+        delete agentsGroupedByName;
+    }
+}
+
+
+/**
+ * @brief Add a model of agent definition for an agent name
+ * @param agentDefinition
+ */
+void IngeScapeModelManager::addAgentDefinitionModel(DefinitionM* agentDefinition)
+{
+    if (agentDefinition != NULL)
+    {
+        QString definitionName = agentDefinition->name();
+
+        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
+        agentDefinitionsList.append(agentDefinition);
+
+        // Update the list in the map
+        _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
+
+        //_printDefinitions();
+
+        // Update definition variants of a list of definitions with the same name
+        _updateDefinitionVariants(definitionName);
+    }
+}
+
+
+/**
+ * @brief Delete a model of agent definition
+ * @param definition
+ */
+void IngeScapeModelManager::deleteAgentDefinitionModel(DefinitionM* definition)
+{
+    if (definition != NULL)
+    {
+        QString definitionName = definition->name();
+
+        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
+        agentDefinitionsList.removeOne(definition);
+
+        // Update the list in the map
+        _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
+
+        // Free memory
+        delete definition;
+
+        //_printDefinitions();
+
+        // Update definition variants of a list of definitions with the same name
+        _updateDefinitionVariants(definitionName);
+    }
+}
+
+
+/**
+ * @brief Add a model of agent mapping for an agent name
+ * @param agentMapping
+ */
+void IngeScapeModelManager::addAgentMappingModel(AgentMappingM* agentMapping)
+{
+    if (agentMapping != NULL)
+    {
+        QString mappingName = agentMapping->name();
+
+        QList<AgentMappingM*> agentMappingsList = getAgentMappingsListFromMappingName(mappingName);
+        agentMappingsList.append(agentMapping);
+
+        // Update the list in the map
+        _mapFromNameToAgentMappingsList.insert(mappingName, agentMappingsList);
+
+        //_printMappings();
+    }
+}
+
+
+/**
+ * @brief Delete a model of agent mapping
+ * @param agentMapping
+ */
+void IngeScapeModelManager::deleteAgentMappingModel(AgentMappingM* agentMapping)
+{
+    if (agentMapping != NULL)
+    {
+        QString mappingName = agentMapping->name();
+
+        QList<AgentMappingM*> agentMappingsList = getAgentMappingsListFromMappingName(mappingName);
+        agentMappingsList.removeOne(agentMapping);
+
+        // Update the list in the map
+        _mapFromNameToAgentMappingsList.insert(mappingName, agentMappingsList);
+
+        // Free memory
+        delete agentMapping;
+
+        //_printMappings();
+    }
+}
+
+
+/**
+ * @brief Get the model of agent from a Peer Id
+ * @param peerId
+ * @return
+ */
+AgentM* IngeScapeModelManager::getAgentModelFromPeerId(QString peerId)
+{
+    if (_mapFromPeerIdToAgentM.contains(peerId)) {
+        return _mapFromPeerIdToAgentM.value(peerId);
+    }
+    else {
+        return NULL;
+    }
+}
+
+
+/**
+ * @brief Get the (view model of) agents grouped for a name
+ * @param name
+ * @return
+ */
+AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString name)
+{
+    if (_hashFromNameToAgentsGrouped.contains(name)) {
+        return _hashFromNameToAgentsGrouped.value(name);
+    }
+    else {
+        return NULL;
+    }
+}
+
+
+/**
+ * @brief Get the list (of models) of agent definition from a definition name
+ * @param name
+ * @return
+ */
+QList<DefinitionM*> IngeScapeModelManager::getAgentDefinitionsListFromDefinitionName(QString definitionName)
+{
+    if (_mapFromNameToAgentDefinitionsList.contains(definitionName)) {
+        return _mapFromNameToAgentDefinitionsList.value(definitionName);
+    }
+    else {
+        return QList<DefinitionM*>();
+    }
+}
+
+
+/**
+ * @brief Get the list (of models) of agent mapping from a mapping name
+ * @param mappingName
+ * @return
+ */
+QList<AgentMappingM*> IngeScapeModelManager::getAgentMappingsListFromMappingName(QString mappingName)
+{
+    if (_mapFromNameToAgentMappingsList.contains(mappingName)) {
+        return _mapFromNameToAgentMappingsList.value(mappingName);
+    }
+    else {
+        return QList<AgentMappingM*>();
+    }
+}
+
+
+/**
+ * @brief Get the map from agent name to list of active agents
+ * @return
+ */
+QHash<QString, QList<AgentM*>> IngeScapeModelManager::getMapFromAgentNameToActiveAgentsList()
+{
+    QHash<QString, QList<AgentM*>> hashFromAgentNameToActiveAgentsList;
+
+    // Traverse the list of all agents grouped by name
+    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
+    {
+        if ((agentsGroupedByName != nullptr) && agentsGroupedByName->isON())
+        {
+            QList<AgentM*> activeAgentsList;
+            for (AgentM* agent : agentsGroupedByName->models()->toList())
+            {
+                if ((agent != NULL) && agent->isON()) {
+                    activeAgentsList.append(agent);
+                }
+            }
+            if (!activeAgentsList.isEmpty()) {
+                hashFromAgentNameToActiveAgentsList.insert(agentsGroupedByName->name(), activeAgentsList);
+            }
+        }
+    }
+
+    return hashFromAgentNameToActiveAgentsList;
 }
 
 
@@ -208,8 +475,8 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
                             // Add this new model of agent
                             addAgentModel(agent);
 
-                            // Add this new model of agent definition for the agent name
-                            addAgentDefinitionForAgentName(agentDefinition, agentName);
+                            // Add this new model of agent definition
+                            addAgentDefinitionModel(agentDefinition);
 
                             // Set its definition
                             agent->setdefinition(agentDefinition);
@@ -286,8 +553,8 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
 
                         if (agentDefinition != nullptr)
                         {
-                            // Add this new model of agent definition for the agent name
-                            addAgentDefinitionForAgentName(agentDefinition, agentName);
+                            // Add this new model of agent definition
+                            addAgentDefinitionModel(agentDefinition);
 
                             // Set its definition
                             agent->setdefinition(agentDefinition);
@@ -340,8 +607,8 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                             DefinitionM* copyOfDefinition = agentDefinition->copy();
                                             if (copyOfDefinition != NULL)
                                             {
-                                                // Add this new model of agent definition for the agent name
-                                                addAgentDefinitionForAgentName(copyOfDefinition, agentName);
+                                                // Add this new model of agent definition
+                                                addAgentDefinitionModel(copyOfDefinition);
 
                                                 // Set its definition
                                                 agent->setdefinition(copyOfDefinition);
@@ -709,8 +976,8 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
             {
                  if (agent->definition() == NULL)
                  {
-                     // Add this new model of agent definition for the agent name
-                     addAgentDefinitionForAgentName(agentDefinition, agentName);
+                     // Add this new model of agent definition
+                     addAgentDefinitionModel(agentDefinition);
 
                      // Set this definition to the agent
                      agent->setdefinition(agentDefinition);
@@ -740,8 +1007,8 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                          }
 
 
-                         // Add this new model of agent definition for the agent name
-                         addAgentDefinitionForAgentName(agentDefinition, agentName);
+                         // Add this new model of agent definition
+                         addAgentDefinitionModel(agentDefinition);
 
                          // Set this definition to the agent
                          agent->setdefinition(agentDefinition);
@@ -763,7 +1030,7 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
 
 
                          // Delete the previous model of agent definition
-                         deleteAgentDefinition(previousDefinition);
+                         deleteAgentDefinitionModel(previousDefinition);
                      }
                  }
 
@@ -804,7 +1071,7 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
             if (agent->mapping() == NULL)
             {
                 // Add this new model of agent mapping
-                addAgentMappingForAgentName(agentMapping, agentName);
+                addAgentMappingModel(agentMapping);
 
                 // Set this mapping to the agent
                 agent->setmapping(agentMapping);
@@ -860,14 +1127,14 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                     }
                 }
 
-                // Add a model of agent mapping for an agent name
-                addAgentMappingForAgentName(agentMapping, agentName);
+                // Add this new model of agent mapping
+                addAgentMappingModel(agentMapping);
 
                 // Set this new mapping to the agent
                 agent->setmapping(agentMapping);
 
                 // Delete a model of agent mapping
-                deleteAgentMapping(previousMapping);
+                deleteAgentMappingModel(previousMapping);
             }
         }
     }
@@ -1047,256 +1314,6 @@ void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
 
     if (!peerId.isEmpty()) {
         _mapFromPeerIdToAgentM.remove(peerId);
-    }
-}
-
-
-/**
- * @brief Get the model of agent from a Peer Id
- * @param peerId
- * @return
- */
-AgentM* IngeScapeModelManager::getAgentModelFromPeerId(QString peerId)
-{
-    if (_mapFromPeerIdToAgentM.contains(peerId)) {
-        return _mapFromPeerIdToAgentM.value(peerId);
-    }
-    else {
-        return NULL;
-    }
-}
-
-
-/**
- * @brief Get the (view model of) agents grouped for a name
- * @param name
- * @return
- */
-AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString name)
-{
-    if (_hashFromNameToAgentsGrouped.contains(name)) {
-        return _hashFromNameToAgentsGrouped.value(name);
-    }
-    else {
-        return NULL;
-    }
-}
-
-
-/**
- * @brief Get the map from agent name to list of active agents
- * @return
- */
-QHash<QString, QList<AgentM*>> IngeScapeModelManager::getMapFromAgentNameToActiveAgentsList()
-{
-    QHash<QString, QList<AgentM*>> hashFromAgentNameToActiveAgentsList;
-
-    // Traverse the list of all agents grouped by name
-    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
-    {
-        if ((agentsGroupedByName != nullptr) && agentsGroupedByName->isON())
-        {
-            QList<AgentM*> activeAgentsList;
-            for (AgentM* agent : agentsGroupedByName->models()->toList())
-            {
-                if ((agent != NULL) && agent->isON()) {
-                    activeAgentsList.append(agent);
-                }
-            }
-            if (!activeAgentsList.isEmpty()) {
-                hashFromAgentNameToActiveAgentsList.insert(agentsGroupedByName->name(), activeAgentsList);
-            }
-        }
-    }
-
-    return hashFromAgentNameToActiveAgentsList;
-}
-
-
-/**
- * @brief Delete a model of agent
- * @param agent
- */
-void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
-{
-    if (agent != NULL)
-    {
-        // Emit the signal "Agent Model Will Be Deleted"
-        Q_EMIT agentModelWillBeDeleted(agent);
-
-        // DIS-connect to signals from the agent
-        disconnect(agent, 0, this, 0);
-
-        // Delete its model of definition if needed
-        if (agent->definition() != NULL) {
-            DefinitionM* temp = agent->definition();
-            agent->setdefinition(NULL);
-            deleteAgentDefinition(temp);
-        }
-
-        // Delete its model of mapping if needed
-        if (agent->mapping() != NULL) {
-            AgentMappingM* temp = agent->mapping();
-            agent->setmapping(NULL);
-            deleteAgentMapping(temp);
-        }
-
-        // FIXME: do not use AgentsGroupedByNameVM inside a basic function about AgentM
-        // --> Only AgentsGroupedByNameVM could call this function
-        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agent->name());
-        if ((agentsGroupedByName != NULL)
-                && agentsGroupedByName->models()->contains(agent))
-        {
-            agentsGroupedByName->models()->remove(agent);
-
-            // FIXME: manage if models.isEmpty --> remove this agentsGroupedByName
-        }
-
-        if (!agent->peerId().isEmpty()) {
-            _mapFromPeerIdToAgentM.remove(agent->peerId());
-        }
-
-        // Free memory...later
-        // the call to "agent->setdefinition" will produce the call of the slot _onAgentDefinitionChangedWithPreviousAndNewValues
-        // ...and in some cases, the call to deleteAgentModel on this agent. So we cannot call directly "delete agent;"
-        //delete agent;
-        agent->deleteLater();
-
-        _printAgents();
-    }
-}
-
-
-/**
- * @brief Add a model of agent definition for an agent name
- * @param agentDefinition
- * @param agentName
- */
-void IngeScapeModelManager::addAgentDefinitionForAgentName(DefinitionM* agentDefinition, QString agentName)
-{
-    Q_UNUSED(agentName)
-
-    if (agentDefinition != NULL)
-    {
-        QString definitionName = agentDefinition->name();
-
-        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
-        agentDefinitionsList.append(agentDefinition);
-
-        // Update the list in the map
-        _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
-
-        //_printDefinitions();
-
-        // Update definition variants of a list of definitions with the same name
-        _updateDefinitionVariants(definitionName);
-    }
-}
-
-
-/**
- * @brief Get the list (of models) of agent definition from a definition name
- * @param name
- * @return
- */
-QList<DefinitionM*> IngeScapeModelManager::getAgentDefinitionsListFromDefinitionName(QString definitionName)
-{
-    if (_mapFromNameToAgentDefinitionsList.contains(definitionName)) {
-        return _mapFromNameToAgentDefinitionsList.value(definitionName);
-    }
-    else {
-        return QList<DefinitionM*>();
-    }
-}
-
-
-/**
- * @brief Delete a model of agent definition
- * @param definition
- */
-void IngeScapeModelManager::deleteAgentDefinition(DefinitionM* definition)
-{
-    if (definition != NULL)
-    {
-        QString definitionName = definition->name();
-
-        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
-        agentDefinitionsList.removeOne(definition);
-
-        // Update the list in the map
-        _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
-
-        // Free memory
-        delete definition;
-
-        //_printDefinitions();
-
-        // Update definition variants of a list of definitions with the same name
-        _updateDefinitionVariants(definitionName);
-    }
-}
-
-
-/**
- * @brief Add a model of agent mapping for an agent name
- * @param agentMapping
- * @param agentName
- */
-void IngeScapeModelManager::addAgentMappingForAgentName(AgentMappingM* agentMapping, QString agentName)
-{
-    Q_UNUSED(agentName)
-
-    if (agentMapping != NULL)
-    {
-        QString mappingName = agentMapping->name();
-
-        QList<AgentMappingM*> agentMappingsList = getAgentMappingsListFromMappingName(mappingName);
-        agentMappingsList.append(agentMapping);
-
-        // Update the list in the map
-        _mapFromNameToAgentMappingsList.insert(mappingName, agentMappingsList);
-
-        //_printMappings();
-    }
-}
-
-
-/**
- * @brief Get the list (of models) of agent mapping from a mapping name
- * @param mappingName
- * @return
- */
-QList<AgentMappingM*> IngeScapeModelManager::getAgentMappingsListFromMappingName(QString mappingName)
-{
-    if (_mapFromNameToAgentMappingsList.contains(mappingName)) {
-        return _mapFromNameToAgentMappingsList.value(mappingName);
-    }
-    else {
-        return QList<AgentMappingM*>();
-    }
-}
-
-
-/**
- * @brief Delete a model of agent mapping
- * @param agentMapping
- */
-void IngeScapeModelManager::deleteAgentMapping(AgentMappingM* agentMapping)
-{
-    if (agentMapping != NULL)
-    {
-        QString mappingName = agentMapping->name();
-
-        QList<AgentMappingM*> agentMappingsList = getAgentMappingsListFromMappingName(mappingName);
-        agentMappingsList.removeOne(agentMapping);
-
-        // Update the list in the map
-        _mapFromNameToAgentMappingsList.insert(mappingName, agentMappingsList);
-
-        // Free memory
-        delete agentMapping;
-
-        //_printMappings();
     }
 }
 
