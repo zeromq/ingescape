@@ -208,7 +208,7 @@ void AgentsGroupedByNameVM::_onIsONofModelChanged(bool isON)
  */
 void AgentsGroupedByNameVM::_updateWithAllModels()
 {
-    qDebug() << "Update with all models of" << _name << "(" << this << ")";
+    qDebug() << "Update with all models (" << _models.count() << ") of" << _name  << "(" << this << ")";
 
     // Update flags in function of models
     _updateIsON();

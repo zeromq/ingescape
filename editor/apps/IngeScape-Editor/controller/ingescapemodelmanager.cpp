@@ -962,7 +962,7 @@ void IngeScapeModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInS
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != NULL) {
-        qDebug() << agent->name() << "Has Log in STREAM ?" << hasLogInStream;
+        //qDebug() << agent->name() << "Has Log in STREAM ?" << hasLogInStream;
 
         agent->sethasLogInStream(hasLogInStream);
     }
@@ -979,6 +979,7 @@ void IngeScapeModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFil
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != NULL) {
         //qDebug() << agent->name() << "Has Log in FILE ?" << hasLogInFile;
+
         agent->sethasLogInFile(hasLogInFile);
     }
 }
@@ -993,7 +994,7 @@ void IngeScapeModelManager::onAgentLogFilePath(QString peerId, QString logFilePa
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != NULL) {
-        qDebug() << agent->name() << "Log file path:" << logFilePath;
+        //qDebug() << agent->name() << "Log file path:" << logFilePath;
 
         agent->setlogFilePath(logFilePath);
     }
@@ -1009,7 +1010,7 @@ void IngeScapeModelManager::onAgentDefinitionFilePath(QString peerId, QString de
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != NULL) {
-        qDebug() << agent->name() << "Definition file path:" << definitionFilePath;
+        //qDebug() << agent->name() << "Definition file path:" << definitionFilePath;
 
         agent->setdefinitionFilePath(definitionFilePath);
     }
@@ -1025,7 +1026,7 @@ void IngeScapeModelManager::onAgentMappingFilePath(QString peerId, QString mappi
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != NULL) {
-        qDebug() << agent->name() << "Mapping file path:" << mappingFilePath;
+        //qDebug() << agent->name() << "Mapping file path:" << mappingFilePath;
 
         agent->setmappingFilePath(mappingFilePath);
     }

@@ -353,6 +353,49 @@ Item {
     }
 
 
+    //
+    // DEBUG: list of all "Agents Grouped by Name"
+    //
+    ListView {
+        id: debug
+
+        anchors {
+            bottom: parent.bottom
+            bottomMargin: 100
+            left: parent.left
+            right: parent.right
+        }
+        height: contentHeight
+
+        model: IngeScapeEditorC.modelManager.allAgentsGroupedByName
+
+        delegate: Rectangle {
+            anchors {
+                left: parent.left
+                leftMargin: 10
+                right: parent.right
+                rightMargin: 10
+            }
+            height: 25
+
+            color: model.isON ? "#FF2222" : "#AA2222"
+
+            Row {
+                spacing: 20
+
+                Text {
+                    text: model.name
+                    color: "white"
+                }
+
+                Text {
+                    text: model.models.count
+                    color: "white"
+                }
+            }
+        }
+    }
+
 
     //
     // Visual representation of an agent in our list
