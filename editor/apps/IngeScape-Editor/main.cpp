@@ -196,6 +196,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<ActionVM>("INGESCAPE", 1, 0, "ActionVM", "Internal class");
     qmlRegisterUncreatableType<AgentInMappingVM>("INGESCAPE", 1, 0, "AgentInMappingVM", "Internal class");
     qmlRegisterUncreatableType<AgentIOPVM>("INGESCAPE", 1, 0, "AgentIOPVM", "Internal class");
+    qmlRegisterUncreatableType<AgentsGroupedByDefinitionVM>("INGESCAPE", 1, 0, "AgentsGroupedByDefinitionVM", "Internal class");
     qmlRegisterUncreatableType<AgentsGroupedByNameVM>("INGESCAPE", 1, 0, "AgentsGroupedByNameVM", "Internal class");
     qmlRegisterUncreatableType<AgentVM>("INGESCAPE", 1, 0, "AgentVM", "Internal class");
     qmlRegisterUncreatableType<InputVM>("INGESCAPE", 1, 0, "InputVM", "Internal class");

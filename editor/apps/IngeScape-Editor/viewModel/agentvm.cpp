@@ -24,8 +24,8 @@
  */
 AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _name(""),
-    _hostnames(""),
     _isON(false),
+    _hostnames(""),
     _canBeRestarted(false),
     _isMuted(false),
     _canBeFrozen(false),
@@ -671,7 +671,7 @@ void AgentVM::_onOpenValuesHistoryOfAgent()
  */
 void AgentVM::_updateWithAllModels()
 {
-    qDebug() << "Update with all models of" << _name << "(" << this << ")";
+    qDebug() << "Agent VM: Update with all models of" << _name << "(" << this << ")";
 
     _peerIdsList.clear();
     QStringList temporaryListOfHostnames;

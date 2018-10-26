@@ -237,12 +237,12 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_recordsSupervisionC, &RecordsSupervisionController::startToRecord, this, &IngeScapeEditorController::_onStartToRecord);
 
 
-    if (!_platformDefaultFilePath.isEmpty())
+    /*if (!_platformDefaultFilePath.isEmpty())
     {
         // Load the platform (agents, mappings, actions, palette, timeline actions)
         // from the default file "last.json"
         _loadPlatformFromFile(_platformDefaultFilePath);
-    }
+    }*/
 
 
     // Update the list of available network devices
@@ -523,7 +523,7 @@ void IngeScapeEditorController::clearCurrentPlatform()
 void IngeScapeEditorController::processBeforeClosing()
 {
     // Save the platform to the default file
-    savePlatformToDefaultFile();
+    //savePlatformToDefaultFile();
 }
 
 

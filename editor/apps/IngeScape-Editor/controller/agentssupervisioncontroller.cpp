@@ -776,7 +776,7 @@ void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
                 _deleteAgentViewModel(agent);
                 agent = NULL;
 
-                // Add the model of agent to the list of the new view model
+                // Add the model of agent to the list of the view model
                 agentUsingSameDefinition->models()->append(model);
             }
         }

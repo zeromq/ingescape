@@ -16,10 +16,10 @@
 #define AGENTSGROUPEDBYNAMEVM_H
 
 #include <QObject>
-
 #include <I2PropertyHelpers.h>
 #include <model/agentm.h>
 #include <model/publishedvaluem.h>
+#include <viewModel/agentsgroupedbydefinitionvm.h>
 
 
 /**
@@ -36,11 +36,11 @@ class AgentsGroupedByNameVM : public QObject
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
 
-    // Hostname(s) on the network of our agent(s)
-    //I2_QML_PROPERTY_READONLY(QString, hostnames)
-
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
+
+    // Hostname(s) on the network of our agent(s)
+    //I2_QML_PROPERTY_READONLY(QString, hostnames)
 
 
 public:
@@ -59,17 +59,10 @@ public:
 
 
     /**
-     * @brief Manage when a model of agent entered on our network
+     * @brief Manage a new model of agent
      * @param model
      */
-    void manageAgentEnteredNetwork(AgentM* model);
-
-
-    /**
-     * @brief Manage when a model of agent exited from our network
-     * @param model
-     */
-    void manageAgentExitedNetwork(AgentM* model);
+    void manageNewModel(AgentM* model);
 
 
     /**
@@ -80,8 +73,37 @@ public:
 
 
 Q_SIGNALS:
+    /**
+     * @brief Signal emitted when a new view model of agents grouped by definition has been created
+     * @param agentsGroupedByDefinition
+     */
+    void agentsGroupedByDefinitionHasBeenCreated(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+
+
+    /**
+     * @brief Signal emitted when a view model of agents grouped by definition will be deleted
+     * @param agentsGroupedByDefinition
+     */
+    void agentsGroupedByDefinitionWillBeDeleted(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+
+
+    /**
+     * @brief Signal emitted when a model of agent has to be deleted
+     * @param model
+     */
+    void agentModelHasToBeDeleted(AgentM* model);
+
+
+    /**
+     * @brief Signal emitted when a previous model of agent will be replaced by a new one strictly identical
+     * @param previousModel
+     * @param newModel
+     */
+    void identicalAgentModelWillBeReplaced(AgentM* previousModel, AgentM* newModel);
+
 
 public Q_SLOTS:
+
 
 private Q_SLOTS:
 
@@ -96,6 +118,14 @@ private Q_SLOTS:
      * @param isON
      */
     void _onIsONofModelChanged(bool isON);
+
+
+    /**
+     * @brief Slot called when the definition of a model changed (with previous and new values)
+     * @param previousDefinition
+     * @param newDefinition
+     */
+    void _onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousDefinition, DefinitionM* newDefinition);
 
 
 private:
@@ -117,14 +147,19 @@ private:
     QList<AgentM*> _previousAgentsList;
 
     // List of peer ids of our models
-    //QStringList _peerIdsList;
+    QStringList _peerIdsList;
 
-    // Hash table from a hostname to a list of models of agents
-    //QHash<DefinitionM*, AgentsGroupedByDefinitionVM> _hashFromDefinitionTo...;
+    // View model of agents grouped by definition NULL
+    AgentsGroupedByDefinitionVM* _agentsGroupedByDefinitionNULL = nullptr;
+
+    // Hash table from a definition to a (view model of) agents grouped by definition
+    QHash<DefinitionM*, AgentsGroupedByDefinitionVM*> _hashFromDefinitionToAgentsGroupedByDefinition;
+
+    // Map from "definition name" to a list (of view models) of agents grouped by definition
+    //QHash<QString, QList<AgentsGroupedByDefinitionVM*>> _mapFromDefinitionNameToAgentsGroupedByDefinitionList;
 
     // Hash table from a hostname to a list of models of agents
     //QHash<QString, QList<AgentM*>> _hashFromHostnameToModels;
-
 };
 
 QML_DECLARE_TYPE(AgentsGroupedByNameVM)

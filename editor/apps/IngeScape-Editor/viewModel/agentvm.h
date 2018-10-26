@@ -41,11 +41,11 @@ class AgentVM : public QObject
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
 
-    // Hostname(s) on the network of our agent(s)
-    I2_QML_PROPERTY_READONLY(QString, hostnames)
-
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
+
+    // Hostname(s) on the network of our agent(s)
+    I2_QML_PROPERTY_READONLY(QString, hostnames)
 
     // Flag indicating if our agent can be restarted (by an INGESCAPE launcher)
     I2_QML_PROPERTY_READONLY(bool, canBeRestarted)

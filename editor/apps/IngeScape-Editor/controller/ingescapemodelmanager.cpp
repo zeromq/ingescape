@@ -848,10 +848,8 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
 
             // Add this new model of agent
             addAgentModel(agent);
-        }
 
-        if (agent != NULL)
-        {
+
             // Get the (view model of) agents grouped for this name
             AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agentName);
             if (agentsGroupedByName == nullptr)
@@ -864,8 +862,8 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
             }
             else
             {
-                // Manage when a model of agent entered on our network
-                agentsGroupedByName->manageAgentEnteredNetwork(agent);
+                // Manage the new model of agent
+                agentsGroupedByName->manageNewModel(agent);
             }
         }
     }
@@ -892,12 +890,10 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
         }
 
         // Get the (view model of) agents grouped for this name
-        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agentName);
+        /*AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agentName);
         if (agentsGroupedByName != nullptr)
         {
-            // Manage when a model of agent exited from our network
-            agentsGroupedByName->manageAgentExitedNetwork(agent);
-        }
+        }*/
     }
 }
 
