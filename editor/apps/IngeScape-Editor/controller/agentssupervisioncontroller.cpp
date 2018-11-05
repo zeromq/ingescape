@@ -336,6 +336,42 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
 
 
 /**
+ * @brief Slot called when a new view model of agents grouped by definition has been created
+ * @param agentsGroupedByDefinition
+ */
+void AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
+{
+    if (agentsGroupedByDefinition != nullptr)
+    {
+        if (agentsGroupedByDefinition->definition() == nullptr) {
+            qDebug() << "on Agents Grouped by Definition 'NULL' has been Created" << agentsGroupedByDefinition->name();
+        }
+        else {
+            qDebug() << "on Agents Grouped by Definition" << agentsGroupedByDefinition->definition()->name() << "has been Created" << agentsGroupedByDefinition->name();
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when a view model of agents grouped by definition will be deleted
+ * @param agentsGroupedByDefinition
+ */
+void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
+{
+    if (agentsGroupedByDefinition != nullptr)
+    {
+        if (agentsGroupedByDefinition->definition() == nullptr) {
+            qDebug() << "on Agents Grouped by Definition 'NULL' will be Deleted" << agentsGroupedByDefinition->name();
+        }
+        else {
+            qDebug() << "on Agents Grouped by Definition" << agentsGroupedByDefinition->definition()->name() << "will be Deleted" << agentsGroupedByDefinition->name();
+        }
+    }
+}
+
+
+/**
  * @brief Slot when the definition of a view model of agent changed (with previous and new values)
  * @param previousDefinition
  * @param newDefinition

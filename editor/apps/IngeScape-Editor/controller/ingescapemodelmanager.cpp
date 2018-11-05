@@ -199,6 +199,9 @@ void IngeScapeModelManager::addAgentsGroupedByName(AgentsGroupedByNameVM* agents
 {
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
     {
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted);
+
         // Add to the hash table
         _hashFromNameToAgentsGrouped.insert(agentsGroupedByName->name(), agentsGroupedByName);
 
@@ -855,10 +858,13 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
             if (agentsGroupedByName == nullptr)
             {
                 // Create a new view model of agents grouped by name
-                agentsGroupedByName = new AgentsGroupedByNameVM(agent, this);
+                agentsGroupedByName = new AgentsGroupedByNameVM(agentName, this);
 
                 // Add this view model of agents grouped by name
                 addAgentsGroupedByName(agentsGroupedByName);
+
+                // Manage the new model of agent
+                agentsGroupedByName->manageNewModel(agent);
             }
             else
             {

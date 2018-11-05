@@ -235,6 +235,20 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when a new view model of agents grouped by definition has been created
+     * @param agentsGroupedByDefinition
+     */
+    void agentsGroupedByDefinitionHasBeenCreated(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+
+
+    /**
+     * @brief Signal emitted when a view model of agents grouped by definition will be deleted
+     * @param agentsGroupedByDefinition
+     */
+    void agentsGroupedByDefinitionWillBeDeleted(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+
+
+    /**
      * @brief Emitted when inputs must be added to our Editor for a list of outputs
      * @param agentName
      * @param outputsList

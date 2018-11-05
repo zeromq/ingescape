@@ -16,31 +16,22 @@
 
 /**
  * @brief Constructor
- * @param model
+ * @param agentName
  * @param parent
  */
-AgentsGroupedByNameVM::AgentsGroupedByNameVM(AgentM* model,
+AgentsGroupedByNameVM::AgentsGroupedByNameVM(QString agentName,
                                              QObject *parent) : QObject(parent),
-    _name(""),
+    _name(agentName),
     _isON(false),
     _peerIdsList(QStringList())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (model != NULL)
-    {
-        // Init the name
-        _name = model->name();
+    qInfo() << "New View Model of Agents grouped by name" << _name;
 
-        qInfo() << "New View Model of Agents grouped by name" << _name;
-
-        // Connect to signal "Count Changed" from the list of models
-        connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByNameVM::_onModelsChanged);
-
-        // Manage the (new) model of agent
-        manageNewModel(model);
-    }
+    // Connect to signal "Count Changed" from the list of models
+    connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByNameVM::_onModelsChanged);
 }
 
 
@@ -93,6 +84,9 @@ void AgentsGroupedByNameVM::manageNewModel(AgentM* model)
             {
                 // Create the special view model of agents grouped by definition NULL
                 _agentsGroupedByDefinitionNULL = new AgentsGroupedByDefinitionVM(model, NULL);
+
+                // Emit the signal "Agents grouped by definition has been created"
+                Q_EMIT agentsGroupedByDefinitionHasBeenCreated(_agentsGroupedByDefinitionNULL);
             }
             else
             {

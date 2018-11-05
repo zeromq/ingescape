@@ -153,10 +153,24 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot when a new model of agent has been created
+     * @brief Slot called when a new model of agent has been created
      * @param agent
      */
     void onAgentModelCreated(AgentM* agent);
+
+
+    /**
+     * @brief Slot called when a new view model of agents grouped by definition has been created
+     * @param agentsGroupedByDefinition
+     */
+    void onAgentsGroupedByDefinitionHasBeenCreated(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+
+
+    /**
+     * @brief Slot called when a view model of agents grouped by definition will be deleted
+     * @param agentsGroupedByDefinition
+     */
+    void onAgentsGroupedByDefinitionWillBeDeleted(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
 
 private Q_SLOTS:

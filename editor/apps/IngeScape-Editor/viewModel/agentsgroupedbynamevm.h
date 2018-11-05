@@ -46,10 +46,10 @@ class AgentsGroupedByNameVM : public QObject
 public:
     /**
      * @brief Constructor
-     * @param model
+     * @param agentName
      * @param parent
      */
-    explicit AgentsGroupedByNameVM(AgentM* model, QObject *parent = nullptr);
+    explicit AgentsGroupedByNameVM(QString agentName, QObject *parent = nullptr);
 
 
     /**
