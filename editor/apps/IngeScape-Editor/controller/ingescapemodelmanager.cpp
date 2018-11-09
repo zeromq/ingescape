@@ -165,26 +165,32 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
             deleteAgentMappingModel(temp);
         }
 
+        if (!agent->peerId().isEmpty()) {
+            _mapFromPeerIdToAgentM.remove(agent->peerId());
+        }
+
         // FIXME: do not use AgentsGroupedByNameVM inside a basic function about AgentM
         // --> Only AgentsGroupedByNameVM could call this function
         AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agent->name());
-        if ((agentsGroupedByName != NULL)
-                && agentsGroupedByName->models()->contains(agent))
-        {
+
+        // Remove the model from the view model of agents grouped by name
+        if ((agentsGroupedByName != nullptr) && agentsGroupedByName->models()->contains(agent)) {
             agentsGroupedByName->models()->remove(agent);
-
-            // FIXME: manage if models.isEmpty --> remove this agentsGroupedByName
-        }
-
-        if (!agent->peerId().isEmpty()) {
-            _mapFromPeerIdToAgentM.remove(agent->peerId());
         }
 
         // Free memory...later
         // the call to "agent->setdefinition" will produce the call of the slot _onAgentDefinitionChangedWithPreviousAndNewValues
         // ...and in some cases, the call to deleteAgentModel on this agent. So we cannot call directly "delete agent;"
         //delete agent;
-        agent->deleteLater();
+        //agent->deleteLater();
+
+        // Free memory
+        delete agent;
+
+        // Delete the view model of agents grouped by name if it does not contain model anymore
+        if ((agentsGroupedByName != nullptr) && agentsGroupedByName->models()->isEmpty()) {
+            deleteAgentsGroupedByName(agentsGroupedByName);
+        }
 
         _printAgents();
     }

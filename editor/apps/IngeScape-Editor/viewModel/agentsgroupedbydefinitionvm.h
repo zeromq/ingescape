@@ -106,6 +106,11 @@ public:
 
 Q_SIGNALS:
 
+    /**
+     * @brief Signal emitted when our view model has become useless (no more model)
+     */
+    void noMoreModelAndUseless();
+
 
 public Q_SLOTS:
 

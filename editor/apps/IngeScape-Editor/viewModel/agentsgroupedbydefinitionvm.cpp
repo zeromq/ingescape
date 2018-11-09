@@ -203,8 +203,15 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
 
     _previousAgentsList = newAgentsList;
 
-    // Update with all models
-    _updateWithAllModels();
+    if (_models.isEmpty())
+    {
+        // There is no more model, our VM is useless
+        Q_EMIT noMoreModelAndUseless();
+    }
+    else {
+        // Update with all models
+        _updateWithAllModels();
+    }
 }
 
 

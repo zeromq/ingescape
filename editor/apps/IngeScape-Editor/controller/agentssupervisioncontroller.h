@@ -22,7 +22,8 @@
 #include <I2PropertyHelpers.h>
 
 #include <controller/ingescapemodelmanager.h>
-#include <viewModel/agentvm.h>
+//#include <viewModel/agentvm.h>
+#include <viewModel/agentsgroupedbydefinitionvm.h>
 
 
 /**
@@ -33,10 +34,12 @@ class AgentsSupervisionController : public QObject
     Q_OBJECT
 
     // Sorted list of agents
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentVM, agentsList)
+    //I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentVM, agentsList)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentsGroupedByDefinitionVM, agentsList)
 
     // Selected agent in the agents list
-    I2_QML_PROPERTY_DELETE_PROOF(AgentVM*, selectedAgent)
+    //I2_QML_PROPERTY_DELETE_PROOF(AgentVM*, selectedAgent)
+    I2_QML_PROPERTY_DELETE_PROOF(AgentsGroupedByDefinitionVM*, selectedAgent)
 
 
 public:
@@ -62,23 +65,24 @@ public:
      * @param name
      * @return
      */
-    QList<AgentVM*> getAgentViewModelsListFromName(QString name);
+    //QList<AgentVM*> getAgentViewModelsListFromName(QString name);
 
 
     /**
      * @brief Remove the agent from the list and delete it
      * @param agent
      */
-    Q_INVOKABLE void deleteAgentInList(AgentVM* agent);
+    //Q_INVOKABLE void deleteAgentInList(AgentVM* agent);
+    Q_INVOKABLE void deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
 
     /**
-     * @brief Delete the model of agent
+     * @brief FIXME Delete the model of agent
      * If it is the last model of a view model, we reset all its network data (only defined by the agent definition)
      * @param agent
      * @return
      */
-    Q_INVOKABLE void deleteModelOfAgent(AgentM* agent);
+    //Q_INVOKABLE void deleteModelOfAgent(AgentM* agent);
 
 
     /**
@@ -156,7 +160,7 @@ public Q_SLOTS:
      * @brief Slot called when a new model of agent has been created
      * @param agent
      */
-    void onAgentModelCreated(AgentM* agent);
+    //void onAgentModelCreated(AgentM* agent);
 
 
     /**
@@ -180,7 +184,7 @@ private Q_SLOTS:
      * @param previousValue
      * @param newValue
      */
-    void _onAgentDefinitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
+    //void _onAgentDefinitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
 
 
     /**
@@ -188,7 +192,7 @@ private Q_SLOTS:
      * (compared to the definition of our view model)
      * @param model
      */
-    void _onDifferentDefinitionDetectedOnModelOfAgent(AgentM* model);
+    //void _onDifferentDefinitionDetectedOnModelOfAgent(AgentM* model);
 
 
     /**
@@ -196,14 +200,14 @@ private Q_SLOTS:
      * @param peerIdsList
      * @param definitionFilePath
      */
-    void _onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath);
+    //void _onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath);
 
 
     /**
      * @brief Slot called when we have to load an agent mapping from a JSON file (path)
      * @param mappingFilePath
      */
-    void _onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath);
+    //void _onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath);
 
 
     /**
@@ -211,7 +215,7 @@ private Q_SLOTS:
      * @param agentDefinition
      * @param definitionFilePath
      */
-    void _onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath);
+    //void _onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath);
 
 
     /**
@@ -219,7 +223,7 @@ private Q_SLOTS:
      * @param agentMapping
      * @param mappingFilePath
      */
-    void _onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath);
+    //void _onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath);
 
 
 private:
@@ -230,20 +234,21 @@ private:
      * @param model
      * @param agentVM
      */
-    void _manageNewModelInsideExistingVM(AgentM* model, AgentVM* agentVM);
+    //void _manageNewModelInsideExistingVM(AgentM* model, AgentVM* agentVM);
 
     /**
      * @brief Check if we have to merge an agent with another one that have the same definition
      * @param agent
      */
-    void _checkHaveToMergeAgent(AgentVM* agent);
+    //void _checkHaveToMergeAgent(AgentVM* agent);
 
 
     /**
      * @brief Delete the view model of agent
      * @param agent
      */
-    void _deleteAgentViewModel(AgentVM* agent);
+    //void _deleteAgentViewModel(AgentVM* agent);
+    //void _deleteAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinitionVM);
 
 
 private:
@@ -255,7 +260,7 @@ private:
     JsonHelper* _jsonHelper;
 
     // Map from agent name to a list of view models of agent
-    QHash<QString, QList<AgentVM*>> _mapFromNameToAgentViewModelsList;
+    //QHash<QString, QList<AgentVM*>> _mapFromNameToAgentViewModelsList;
 };
 
 QML_DECLARE_TYPE(AgentsSupervisionController)

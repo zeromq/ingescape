@@ -85,10 +85,13 @@ void AgentsGroupedByNameVM::manageNewModel(AgentM* model)
                 // Create the special view model of agents grouped by definition NULL
                 _agentsGroupedByDefinitionNULL = new AgentsGroupedByDefinitionVM(model, nullptr);
 
+                // Connect to signals from this view model of agents grouped by definition
+                connect(_agentsGroupedByDefinitionNULL, &AgentsGroupedByDefinitionVM::noMoreModelAndUseless, this, &AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition);
+
                 // Emit the signal "Agents grouped by definition has been created"
                 Q_EMIT agentsGroupedByDefinitionHasBeenCreated(_agentsGroupedByDefinitionNULL);
 
-                // Debug
+                // DEBUG
                 _listOfGroupsByDefinition.append(_agentsGroupedByDefinitionNULL);
             }
             else
@@ -144,6 +147,50 @@ void AgentsGroupedByNameVM::updateCurrentValueOfIOP(PublishedValueM* publishedVa
                 default:
                     break;
                 }
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Delete the view model of agents grouped by definition
+ * @param agentsGroupedByDefinition
+ */
+void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
+{
+    if (agentsGroupedByDefinition != NULL)
+    {
+        // Emit the signal "Agents grouped by definition will be deleted"
+        Q_EMIT agentsGroupedByDefinitionWillBeDeleted(agentsGroupedByDefinition);
+
+        // DIS-connect to signals from this view model of agents grouped by definition
+        disconnect(_agentsGroupedByDefinitionNULL, 0, this, 0);
+
+        // DEBUG
+        _listOfGroupsByDefinition.remove(agentsGroupedByDefinition);
+
+        if (agentsGroupedByDefinition->definition() != nullptr) {
+            // Remove from the hash table
+            _hashFromDefinitionToAgentsGroupedByDefinition.remove(agentsGroupedByDefinition->definition());
+        }
+        // The definition is NULL
+        else if (agentsGroupedByDefinition == _agentsGroupedByDefinitionNULL) {
+            _agentsGroupedByDefinitionNULL = nullptr;
+        }
+
+        // Make a copy of the list of models
+        QList<AgentM*> copy = agentsGroupedByDefinition->models()->toList();
+
+        // Free memory
+        delete agentsGroupedByDefinition;
+
+        // Delete each model of agent
+        for (AgentM* model : copy)
+        {
+            if (model != nullptr) {
+                // Emit the signal to delete this model of agent
+                Q_EMIT agentModelHasToBeDeleted(model);
             }
         }
     }
@@ -402,13 +449,16 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                 // Create a new view model of agents grouped by definition
                 AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = new AgentsGroupedByDefinitionVM(model, copy);
 
+                // Connect to signals from this view model of agents grouped by definition
+                connect(_agentsGroupedByDefinitionNULL, &AgentsGroupedByDefinitionVM::noMoreModelAndUseless, this, &AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition);
+
                 // Add to the hash table
                 _hashFromDefinitionToAgentsGroupedByDefinition.insert(copy, agentsGroupedByDefinition);
 
                 // Emit the signal "Agents grouped by definition has been created"
                 Q_EMIT agentsGroupedByDefinitionHasBeenCreated(agentsGroupedByDefinition);
 
-                // Debug
+                // DEBUG
                 _listOfGroupsByDefinition.append(agentsGroupedByDefinition);
             }
         }
@@ -417,6 +467,19 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
         {
             // FIXME TODO: gérer la fusion si la new def est devenue identique, gérer la scission si la new def est devenue différente
         }
+    }
+}
+
+
+/**
+ * @brief Slot called when a view model of agents grouped by definition has become useless (no more model)
+ */
+void AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition()
+{
+    AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
+    if (agentsGroupedByDefinition != nullptr) {
+        // Delete the view model of agents grouped by definition
+        deleteAgentsGroupedByDefinition(agentsGroupedByDefinition);
     }
 }
 

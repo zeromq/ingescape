@@ -75,6 +75,13 @@ public:
     void updateCurrentValueOfIOP(PublishedValueM* publishedValue);
 
 
+    /**
+     * @brief Delete the view model of agents grouped by definition
+     * @param agentsGroupedByDefinition
+     */
+    void deleteAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+
+
 Q_SIGNALS:
     /**
      * @brief Signal emitted when a new view model of agents grouped by definition has been created
@@ -129,6 +136,12 @@ private Q_SLOTS:
      * @param newDefinition
      */
     void _onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousDefinition, DefinitionM* newDefinition);
+
+
+    /**
+     * @brief Slot called when a view model of agents grouped by definition has become useless (no more model)
+     */
+    void _onUselessAgentsGroupedByDefinition();
 
 
 private:

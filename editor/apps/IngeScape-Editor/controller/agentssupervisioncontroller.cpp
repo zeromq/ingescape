@@ -59,7 +59,7 @@ AgentsSupervisionController::~AgentsSupervisionController()
     // Clean-up current selection
     setselectedAgent(NULL);
 
-    _mapFromNameToAgentViewModelsList.clear();
+    //_mapFromNameToAgentViewModelsList.clear();
 
     // Delete all VM of agents
     _agentsList.deleteAllItems();
@@ -75,7 +75,7 @@ AgentsSupervisionController::~AgentsSupervisionController()
  * @param name
  * @return
  */
-QList<AgentVM*> AgentsSupervisionController::getAgentViewModelsListFromName(QString name)
+/*QList<AgentVM*> AgentsSupervisionController::getAgentViewModelsListFromName(QString name)
 {
     if (_mapFromNameToAgentViewModelsList.contains(name)) {
         return _mapFromNameToAgentViewModelsList.value(name);
@@ -83,38 +83,45 @@ QList<AgentVM*> AgentsSupervisionController::getAgentViewModelsListFromName(QStr
     else {
         return QList<AgentVM*>();
     }
-}
+}*/
 
 
 /**
  * @brief Remove the agent from the list and delete it
  * @param agent
  */
-void AgentsSupervisionController::deleteAgentInList(AgentVM* agent)
+//void AgentsSupervisionController::deleteAgentInList(AgentVM* agent)
+void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
 {
-    if ((_modelManager != NULL) && (agent != NULL))
+    if ((_modelManager != NULL) && (agentsGroupedByDefinition != NULL))
     {
-        qInfo() << "Delete the agent" << agent->name() << "in the List";
+        qInfo() << "Delete the agent" << agentsGroupedByDefinition->name() << "in the List";
 
         // Unselect our agent if needed
-        if (_selectedAgent == agent) {
+        if (_selectedAgent == agentsGroupedByDefinition) {
             setselectedAgent(NULL);
         }
 
         // Remove it from the list
-        _agentsList.remove(agent);
+        _agentsList.remove(agentsGroupedByDefinition);
 
         // Reset its definition
-        agent->setdefinition(NULL);
+        //agentsGroupedByDefinition->setdefinition(NULL);
 
         // Delete each model of this view model of agent
-        for (AgentM* model : agent->models()->toList())
+        /*for (AgentM* model : agentsGroupedByDefinition->models()->toList())
         {
             _modelManager->deleteAgentModel(model);
-        }
+        }*/
 
         // Delete the view model of agent
-        _deleteAgentViewModel(agent);
+        //_deleteAgentViewModel(agent);
+
+        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentsGroupedByDefinition->name());
+        if (agentsGroupedByName != NULL) {
+            // Delete the view model of agents grouped by definition
+            agentsGroupedByName->deleteAgentsGroupedByDefinition(agentsGroupedByDefinition);
+        }
     }
 }
 
@@ -125,7 +132,7 @@ void AgentsSupervisionController::deleteAgentInList(AgentVM* agent)
  * @param agent
  * @return
  */
-void AgentsSupervisionController::deleteModelOfAgent(AgentM* agent)
+/*void AgentsSupervisionController::deleteModelOfAgent(AgentM* agent)
 {
     // Check that the agent is OFF
     if ((agent != NULL) && !agent->isON() && !agent->name().isEmpty() && (_modelManager != NULL))
@@ -157,7 +164,7 @@ void AgentsSupervisionController::deleteModelOfAgent(AgentM* agent)
             }
         }
     }
-}
+}*/
 
 
 /**
@@ -186,7 +193,8 @@ QJsonArray AgentsSupervisionController::exportAgentsListToJSON()
 
     if (_jsonHelper != NULL)
     {
-        for (AgentVM* agent : _agentsList.toList())
+        // FIXME REPAIR: exportAgentsListToJSON
+        /*for (AgentVM* agent : _agentsList.toList())
         {
             if ((agent != NULL) && !agent->name().isEmpty())
             {
@@ -229,7 +237,7 @@ QJsonArray AgentsSupervisionController::exportAgentsListToJSON()
 
                 jsonArray.append(jsonAgent);
             }
-        }
+        }*/
     }
     return jsonArray;
 }
@@ -244,7 +252,8 @@ void AgentsSupervisionController::removeUNactiveAgents()
 
     if (_modelManager != NULL)
     {
-        for (AgentVM* agent : _agentsList.toList())
+        // FIXME REPAIR: removeUNactiveAgents
+        /*for (AgentVM* agent : _agentsList.toList())
         {
             if (agent != NULL)
             {
@@ -266,7 +275,7 @@ void AgentsSupervisionController::removeUNactiveAgents()
                     deleteAgentInList(agent);
                 }
             }
-        }
+        }*/
     }
 }
 
@@ -275,7 +284,7 @@ void AgentsSupervisionController::removeUNactiveAgents()
  * @brief Slot when a new model of agent has been created
  * @param agent
  */
-void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
+/*void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
 {
     if (model != NULL)
     {
@@ -332,7 +341,7 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
             _agentsList.append(agent);
         }
     }
-}
+}*/
 
 
 /**
@@ -349,6 +358,9 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated(Agen
         else {
             qDebug() << "on Agents Grouped by Definition" << agentsGroupedByDefinition->definition()->name() << "has been Created" << agentsGroupedByDefinition->name();
         }
+
+        // Add our view model to the list
+        _agentsList.append(agentsGroupedByDefinition);
     }
 }
 
@@ -376,7 +388,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
  * @param previousDefinition
  * @param newDefinition
  */
-void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewValues(DefinitionM* previousDefinition, DefinitionM* newDefinition)
+/*void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewValues(DefinitionM* previousDefinition, DefinitionM* newDefinition)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
     if ((agent != NULL) && (_modelManager != NULL) && (newDefinition != NULL))
@@ -441,7 +453,7 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
             _checkHaveToMergeAgent(agent);
         }
     }
-}
+}*/
 
 
 /**
@@ -449,7 +461,7 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
  * (compared to the definition of our view model)
  * @param model
  */
-void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(AgentM* model)
+/*void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(AgentM* model)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
     if ((agent != NULL) && (model != NULL) && (agent->definition() != NULL) && (model->definition() != NULL))
@@ -484,7 +496,7 @@ void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(A
             agentUsingSameDefinition->models()->append(model);
         }
     }
-}
+}*/
 
 
 /**
@@ -492,7 +504,7 @@ void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(A
  * @param peerIdsList
  * @param definitionFilePath
  */
-void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath)
+/*void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
     if ((_jsonHelper != NULL) && (agent != NULL) && !peerIdsList.isEmpty() && !definitionFilePath.isEmpty())
@@ -517,14 +529,14 @@ void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList pee
             qCritical() << "Can not open file" << definitionFilePath << "(to load the definition of" << agent->name() << ")";
         }
     }
-}
+}*/
 
 
 /**
  * @brief Slot called when we have to load an agent mapping from a JSON file (path)
  * @param mappingFilePath
  */
-void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath)
+/*void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
     if ((_jsonHelper != NULL) && (agent != NULL) && !peerIdsList.isEmpty() && !mappingFilePath.isEmpty())
@@ -549,7 +561,7 @@ void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerId
             qCritical() << "Can not open file" << mappingFilePath << "(to load the mapping of" << agent->name() << ")";
         }
     }
-}
+}*/
 
 
 /**
@@ -557,7 +569,7 @@ void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerId
  * @param agentDefinition
  * @param definitionFilePath
  */
-void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath)
+/*void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
     if ((_jsonHelper != NULL) && (agent != NULL) && (agentDefinition != NULL) && !definitionFilePath.isEmpty())
@@ -567,9 +579,9 @@ void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* 
         if (!jsonOfDefinition.isEmpty())
         {
             QFile jsonFile(definitionFilePath);
-            /*if (jsonFile.exists()) {
-                qWarning() << "The file" << definitionFilePath << "already exist !";
-            }*/
+            //if (jsonFile.exists()) {
+            //    qWarning() << "The file" << definitionFilePath << "already exist !";
+            //}
 
             if (jsonFile.open(QIODevice::WriteOnly))
             {
@@ -581,7 +593,7 @@ void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* 
             }
         }
     }
-}
+}*/
 
 
 /**
@@ -589,7 +601,7 @@ void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* 
  * @param agentMapping
  * @param mappingFilePath
  */
-void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath)
+/*void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
     if ((_jsonHelper != NULL) && (agent != NULL) && (agentMapping != NULL) && !mappingFilePath.isEmpty())
@@ -599,9 +611,9 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
         if (!jsonOfMapping.isEmpty())
         {
             QFile jsonFile(mappingFilePath);
-            /*if (jsonFile.exists()) {
-                qWarning() << "The file" << mappingFilePath << "already exist !";
-            }*/
+            //if (jsonFile.exists()) {
+            //    qWarning() << "The file" << mappingFilePath << "already exist !";
+            //}
 
             if (jsonFile.open(QIODevice::WriteOnly))
             {
@@ -613,7 +625,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
             }
         }
     }
-}
+}*/
 
 
 /**
@@ -621,7 +633,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
  * @param model
  * @param agentVM
  */
-void AgentsSupervisionController::_manageNewModelInsideExistingVM(AgentM* model, AgentVM* agentVM)
+/*void AgentsSupervisionController::_manageNewModelInsideExistingVM(AgentM* model, AgentVM* agentVM)
 {
     if ((model != nullptr) && (agentVM != nullptr) && (_modelManager != nullptr))
     {
@@ -770,14 +782,14 @@ void AgentsSupervisionController::_manageNewModelInsideExistingVM(AgentM* model,
             }
         }
     }
-}
+}*/
 
 
 /**
  * @brief Check if we have to merge an agent with another one that have the same definition
  * @param agent
  */
-void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
+/*void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
 {
     if ((agent != NULL) && (agent->definition() != NULL) && (agent->models()->count() == 1))
     {
@@ -817,14 +829,14 @@ void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
             }
         }
     }
-}
+}*/
 
 
 /**
  * @brief Delete the view model of agent
  * @param agent
  */
-void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
+/*void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
 {
     if (agent != NULL)
     {
@@ -838,7 +850,7 @@ void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
         agentViewModelsList.removeOne(agent);
 
         // Update the list in the map
-        _mapFromNameToAgentViewModelsList.insert(agent->name(), agentViewModelsList);
+        //_mapFromNameToAgentViewModelsList.insert(agent->name(), agentViewModelsList);
 
         // DIS-connect from signals from this old view model of agent
         disconnect(agent, 0, this, 0);
@@ -846,4 +858,4 @@ void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
         // Free memory
         delete agent;
     }
-}
+}*/

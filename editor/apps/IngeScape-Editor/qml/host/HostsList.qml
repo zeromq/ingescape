@@ -354,7 +354,8 @@ Item {
                                 {
                                     console.log("QML: Remove agent model " + model.name + " on " + hostItem.model_host.name);
 
-                                    IngeScapeEditorC.agentsSupervisionC.deleteModelOfAgent(model.QtObject);
+                                    // FIXME REPAIR: deleteModelOfAgent
+                                    //IngeScapeEditorC.agentsSupervisionC.deleteModelOfAgent(model.QtObject);
                                 }
                             }
                         }
