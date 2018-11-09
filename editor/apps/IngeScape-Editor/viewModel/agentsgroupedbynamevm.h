@@ -42,6 +42,9 @@ class AgentsGroupedByNameVM : public QObject
     // Hostname(s) on the network of our agent(s)
     //I2_QML_PROPERTY_READONLY(QString, hostnames)
 
+    // FIXME DEBUG: List of groups of agents, grouped by definition
+    I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, listOfGroupsByDefinition)
+
 
 public:
     /**

@@ -83,10 +83,13 @@ void AgentsGroupedByNameVM::manageNewModel(AgentM* model)
             if (_agentsGroupedByDefinitionNULL == nullptr)
             {
                 // Create the special view model of agents grouped by definition NULL
-                _agentsGroupedByDefinitionNULL = new AgentsGroupedByDefinitionVM(model, NULL);
+                _agentsGroupedByDefinitionNULL = new AgentsGroupedByDefinitionVM(model, nullptr);
 
                 // Emit the signal "Agents grouped by definition has been created"
                 Q_EMIT agentsGroupedByDefinitionHasBeenCreated(_agentsGroupedByDefinitionNULL);
+
+                // Debug
+                _listOfGroupsByDefinition.append(_agentsGroupedByDefinitionNULL);
             }
             else
             {
@@ -404,6 +407,9 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
 
                 // Emit the signal "Agents grouped by definition has been created"
                 Q_EMIT agentsGroupedByDefinitionHasBeenCreated(agentsGroupedByDefinition);
+
+                // Debug
+                _listOfGroupsByDefinition.append(agentsGroupedByDefinition);
             }
         }
         // The previous definition was already defined (and the new definition is defined)

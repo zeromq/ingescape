@@ -370,27 +370,114 @@ Item {
         model: IngeScapeEditorC.modelManager.allAgentsGroupedByName
 
         delegate: Rectangle {
+
+            property var groupByNameVM: model.QtObject
+
             anchors {
                 left: parent.left
                 leftMargin: 10
-                right: parent.right
-                rightMargin: 10
+                //right: parent.right
+                //rightMargin: 10
             }
-            height: 25
+            width: childrenRect.width + 5
+            height: columnListOfGroupsByDefinition.height + 5
 
-            color: model.isON ? "#FF2222" : "#AA2222"
+            color: groupByNameVM.isON ? "#FF2222" : "#882222"
 
             Row {
                 spacing: 20
 
                 Text {
-                    text: model.name
+                    text: groupByNameVM.name
                     color: "white"
                 }
 
                 Text {
-                    text: model.models.count
+                    text: groupByNameVM.models.count + " M"
                     color: "white"
+                }
+
+                Column {
+                    id: columnListOfGroupsByDefinition
+
+                    height: childrenRect.height + 5
+
+                    Repeater {
+                        model: groupByNameVM.listOfGroupsByDefinition
+
+                        Rectangle {
+
+                            property var groupByDefinitionVM: model.QtObject
+
+                            width: childrenRect.width + 5
+                            height: childrenRect.height + 5
+
+                            color: groupByDefinitionVM.isON ? "#22FF22" : "#228822"
+
+                            Row {
+                                spacing: 20
+
+                                /*Text {
+                                    text: groupByDefinitionVM.name
+                                    color: "white"
+                                }*/
+
+                                Text {
+                                    text: groupByDefinitionVM.definition ? groupByDefinitionVM.definition.name : "Def is NULL"
+                                    color: "white"
+                                    width: 150
+                                    elide: Text.ElideMiddle
+                                }
+
+                                Text {
+                                    text: groupByDefinitionVM.models.count + " M"
+                                    color: "white"
+                                }
+
+
+                                Column {
+                                    id: columnAgents
+
+                                    height: childrenRect.height + 5
+
+                                    Repeater {
+                                        model: groupByDefinitionVM.models
+
+                                        Rectangle {
+
+                                            property var agentM: model.QtObject
+
+                                            width: childrenRect.width
+                                            height: 25
+
+                                            color: agentM.isON ? "#2222FF" : "#222288"
+
+                                            Row {
+                                                spacing: 20
+
+                                                Text {
+                                                    text: agentM.hostname
+                                                    color: "white"
+                                                }
+
+                                                Text {
+                                                    text: agentM.peerId
+                                                    color: "white"
+                                                }
+
+                                                Text {
+                                                    text: agentM.commandLine
+                                                    color: "white"
+                                                    width: 400
+                                                    elide: Text.ElideLeft
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
