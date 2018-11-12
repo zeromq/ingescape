@@ -42,13 +42,24 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 {
     qInfo() << "Delete View Model of Agents grouped by name" << _name;
 
-    // Clear view models of agents grouped by definition
-    if (_agentsGroupedByDefinitionNULL != nullptr) {
+    // DEBUG
+    _listOfGroupsByDefinition.clear();
+
+    // Delete all view models of agents grouped by definition
+    if (_agentsGroupedByDefinitionNULL != nullptr)
+    {
+        disconnect(_agentsGroupedByDefinitionNULL, 0, this, 0);
+
         delete _agentsGroupedByDefinitionNULL;
         _agentsGroupedByDefinitionNULL = nullptr;
     }
 
-    qDeleteAll(_hashFromDefinitionToAgentsGroupedByDefinition);
+    for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : _hashFromDefinitionToAgentsGroupedByDefinition.values())
+    {
+        disconnect(agentsGroupedByDefinition, 0, this, 0);
+
+        delete agentsGroupedByDefinition;
+    }
     _hashFromDefinitionToAgentsGroupedByDefinition.clear();
 
 

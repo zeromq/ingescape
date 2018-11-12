@@ -324,6 +324,13 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot called when a model of agent has to be deleted
+     * @param model
+     */
+    void onAgentModelHasToBeDeleted(AgentM* model);
+
+
+    /**
      * @brief Slot called when a launcher enter the network
      * @param peerId
      * @param hostname

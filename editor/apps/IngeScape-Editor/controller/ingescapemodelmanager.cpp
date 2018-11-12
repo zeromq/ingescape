@@ -207,6 +207,7 @@ void IngeScapeModelManager::addAgentsGroupedByName(AgentsGroupedByNameVM* agents
     {
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::onAgentModelHasToBeDeleted);
 
         // Add to the hash table
         _hashFromNameToAgentsGrouped.insert(agentsGroupedByName->name(), agentsGroupedByName);
@@ -906,6 +907,18 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
         if (agentsGroupedByName != nullptr)
         {
         }*/
+    }
+}
+
+
+/**
+ * @brief Slot called when a model of agent has to be deleted
+ * @param model
+ */
+void IngeScapeModelManager::onAgentModelHasToBeDeleted(AgentM* model)
+{
+    if (model != nullptr) {
+        deleteAgentModel(model);
     }
 }
 

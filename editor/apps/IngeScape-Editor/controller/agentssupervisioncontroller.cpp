@@ -61,8 +61,9 @@ AgentsSupervisionController::~AgentsSupervisionController()
 
     //_mapFromNameToAgentViewModelsList.clear();
 
-    // Delete all VM of agents
-    _agentsList.deleteAllItems();
+    // Deleted elsewhere (in the destructor of AgentsGroupedByNameVM)
+    //_agentsList.deleteAllItems();
+    _agentsList.clear();
 
     // Reset pointers
     _modelManager = NULL;
