@@ -137,6 +137,14 @@ private Q_SLOTS:
     void _onIsONofModelChanged(bool isON);
 
 
+    /**
+     * @brief Slot called when the definition of a model changed (with previous and new values)
+     * @param previousDefinition
+     * @param newDefinition
+     */
+    //void _onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousDefinition, DefinitionM* newDefinition);
+
+
 private:
     /**
      * @brief Update with all models of agents

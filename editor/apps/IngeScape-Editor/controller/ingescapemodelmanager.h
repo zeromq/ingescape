@@ -82,10 +82,10 @@ public:
 
 
     /**
-     * @brief Add a view model of agents grouped by name
+     * @brief Save a new view model of agents grouped by name
      * @param agentsGroupedByName
      */
-    void addAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName);
+    void _saveNewAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName);
 
 
     /**

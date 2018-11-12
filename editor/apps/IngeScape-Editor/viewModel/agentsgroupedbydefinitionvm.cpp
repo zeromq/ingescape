@@ -168,11 +168,13 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
                 // Connect to signals of the model
                 connect(model, &AgentM::hostnameChanged, this, &AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged);
                 connect(model, &AgentM::isONChanged, this, &AgentsGroupedByDefinitionVM::_onIsONofModelChanged);
+
+                //connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentsGroupedByDefinitionVM::_onDefinitionOfModelChangedWithPreviousAndNewValues);
+
                 /*connect(model, &AgentM::canBeRestartedChanged, this, &AgentsGroupedByDefinitionVM::_onCanBeRestartedOfModelChanged);
                 connect(model, &AgentM::isMutedChanged, this, &AgentsGroupedByDefinitionVM::_onIsMutedOfModelChanged);
                 connect(model, &AgentM::canBeFrozenChanged, this, &AgentsGroupedByDefinitionVM::_onCanBeFrozenOfModelChanged);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentsGroupedByDefinitionVM::_onIsFrozenOfModelChanged);
-                connect(model, &AgentM::definitionChanged, this, &AgentsGroupedByDefinitionVM::_onDefinitionOfModelChanged);
                 connect(model, &AgentM::stateChanged, this, &AgentsGroupedByDefinitionVM::_onStateOfModelChanged);
                 connect(model, &AgentM::loggerPortChanged, this, &AgentsGroupedByDefinitionVM::_onLoggerPortOfModelChanged);
 
@@ -240,6 +242,24 @@ void AgentsGroupedByDefinitionVM::_onIsONofModelChanged(bool isON)
     // Update the flag "is ON" in function of flags of all models
     _updateIsON();
 }
+
+
+/**
+ * @brief Slot called when the definition of a model changed (with previous and new values)
+ * @param previousDefinition
+ * @param newDefinition
+ */
+/*void AgentsGroupedByDefinitionVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousDefinition, DefinitionM* newDefinition)
+{
+    AgentM* model = qobject_cast<AgentM*>(sender());
+
+    // The previous definition was already defined (and the new definition is defined)
+    if ((model != nullptr) && (newDefinition != nullptr) && (previousDefinition != nullptr))
+    {
+        // We remove this model because its definition became different from our
+        _models.remove(model);
+    }
+}*/
 
 
 /**

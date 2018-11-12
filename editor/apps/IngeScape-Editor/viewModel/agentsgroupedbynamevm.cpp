@@ -96,14 +96,8 @@ void AgentsGroupedByNameVM::manageNewModel(AgentM* model)
                 // Create the special view model of agents grouped by definition NULL
                 _agentsGroupedByDefinitionNULL = new AgentsGroupedByDefinitionVM(model, nullptr);
 
-                // Connect to signals from this view model of agents grouped by definition
-                connect(_agentsGroupedByDefinitionNULL, &AgentsGroupedByDefinitionVM::noMoreModelAndUseless, this, &AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition);
-
-                // Emit the signal "Agents grouped by definition has been created"
-                Q_EMIT agentsGroupedByDefinitionHasBeenCreated(_agentsGroupedByDefinitionNULL);
-
-                // DEBUG
-                _listOfGroupsByDefinition.append(_agentsGroupedByDefinitionNULL);
+                // Save this new view model of agents grouped by definition
+                _saveNewAgentsGroupedByDefinition(_agentsGroupedByDefinitionNULL);
             }
             else
             {
@@ -279,10 +273,10 @@ void AgentsGroupedByNameVM::_onIsONofModelChanged(bool isON)
 void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousDefinition, DefinitionM* newDefinition)
 {
     AgentM* model = qobject_cast<AgentM*>(sender());
-    if ((model != nullptr) && (newDefinition != NULL))
+    if ((model != nullptr) && (newDefinition != nullptr))
     {
         // The previous definition was NULL (and the new definition is defined)
-        if (previousDefinition == NULL)
+        if (previousDefinition == nullptr)
         {
             // Remove the model of agent from the list of the special view model of agents grouped by definition NULL
             if ((_agentsGroupedByDefinitionNULL != nullptr) && _agentsGroupedByDefinitionNULL->models()->contains(model)) {
@@ -460,23 +454,30 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                 // Create a new view model of agents grouped by definition
                 AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = new AgentsGroupedByDefinitionVM(model, copy);
 
-                // Connect to signals from this view model of agents grouped by definition
-                connect(_agentsGroupedByDefinitionNULL, &AgentsGroupedByDefinitionVM::noMoreModelAndUseless, this, &AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition);
-
-                // Add to the hash table
-                _hashFromDefinitionToAgentsGroupedByDefinition.insert(copy, agentsGroupedByDefinition);
-
-                // Emit the signal "Agents grouped by definition has been created"
-                Q_EMIT agentsGroupedByDefinitionHasBeenCreated(agentsGroupedByDefinition);
-
-                // DEBUG
-                _listOfGroupsByDefinition.append(agentsGroupedByDefinition);
+                // Save this new view model of agents grouped by definition
+                _saveNewAgentsGroupedByDefinition(agentsGroupedByDefinition);
             }
         }
         // The previous definition was already defined (and the new definition is defined)
         else
         {
-            // FIXME TODO: gérer la fusion si la new def est devenue identique, gérer la scission si la new def est devenue différente
+            // Search the current agents grouped (by definition) with the previous definition
+            for (DefinitionM* iterator : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
+            {
+                // The 2 definitions are strictly identicals
+                if ((iterator != nullptr) && DefinitionM::areIdenticals(iterator, previousDefinition))
+                {
+                    AgentsGroupedByDefinitionVM* currentGroup = _hashFromDefinitionToAgentsGroupedByDefinition.value(iterator);
+                    if (currentGroup != nullptr) {
+                        // Remove the model from the current group
+                        currentGroup->models()->remove(model);
+                    }
+                    break;
+                }
+            }
+
+            // Check if we have to merge this model of agent with an existing view model of agents (grouped by definition) that have the same definition
+            _checkHaveToMergeAgent(model);
         }
     }
 }
@@ -524,4 +525,82 @@ void AgentsGroupedByNameVM::_updateIsON()
     }
 
     setisON(globalIsON);
+}
+
+
+/**
+ * @brief Check if we have to merge the model of agent with an existing view model of agents (grouped by definition) that have the same definition
+ * @param model
+ */
+void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
+{
+    if ((model != nullptr) && (model->definition() != nullptr))
+    {
+        DefinitionM* newDefinition = model->definition();
+
+        AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition = nullptr;
+
+        // Traverse the list of each definition
+        for (DefinitionM* iterator : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
+        {
+            // The 2 definitions are strictly identicals
+            if ((iterator != nullptr) && DefinitionM::areIdenticals(iterator, newDefinition))
+            {
+                qDebug() << "There is exactly the same agent definition for name" << newDefinition->name() << "and version" << newDefinition->version();
+
+                groupOfAgentsWithSameDefinition = _hashFromDefinitionToAgentsGroupedByDefinition.value(iterator);
+                break;
+            }
+        }
+
+        // Exactly the same definition
+        if (groupOfAgentsWithSameDefinition != nullptr)
+        {
+            // FIXME TODO: Manage all cases (this model replace an existing one with state OFF)
+
+            // Manage the new agent model
+            //QString hostname = model->hostname();
+
+            //qDebug() << "Add model of agent" << _name << "on" << hostname;
+
+            // Add the model of agent to the view model of agents grouped by definition
+            groupOfAgentsWithSameDefinition->models()->append(model);
+        }
+        else
+        {
+            // Make a copy of the definition
+            DefinitionM* copy = newDefinition->copy();
+
+            // Create a new view model of agents grouped by definition
+            AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = new AgentsGroupedByDefinitionVM(model, copy);
+
+            // Save this new view model of agents grouped by definition
+            _saveNewAgentsGroupedByDefinition(agentsGroupedByDefinition);
+        }
+    }
+}
+
+
+/**
+ * @brief Save a new view model of agents grouped by definition
+ * @param agentsGroupedByDefinition
+ */
+void AgentsGroupedByNameVM::_saveNewAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
+{
+    if (agentsGroupedByDefinition != nullptr)
+    {
+        // Connect to signals from this view model of agents grouped by definition
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::noMoreModelAndUseless, this, &AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition);
+
+        // Add to the hash table from definition
+        if (agentsGroupedByDefinition->definition() != nullptr) {
+            _hashFromDefinitionToAgentsGroupedByDefinition.insert(agentsGroupedByDefinition->definition(), agentsGroupedByDefinition);
+        }
+
+        // Emit the signal "Agents grouped by definition has been created"
+        Q_EMIT agentsGroupedByDefinitionHasBeenCreated(agentsGroupedByDefinition);
+
+        // DEBUG
+        _listOfGroupsByDefinition.append(agentsGroupedByDefinition);
+    }
 }

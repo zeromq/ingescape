@@ -158,6 +158,20 @@ private:
     void _updateIsON();
 
 
+    /**
+     * @brief Check if we have to merge the model of agent with an existing view model of agents (grouped by definition) that have the same definition
+     * @param model
+     */
+    void _checkHaveToMergeAgent(AgentM* model);
+
+
+    /**
+     * @brief Save a new view model of agents grouped by definition
+     * @param agentsGroupedByDefinition
+     */
+    void _saveNewAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+
+
 private:
     // Previous list of models of agents
     QList<AgentM*> _previousAgentsList;

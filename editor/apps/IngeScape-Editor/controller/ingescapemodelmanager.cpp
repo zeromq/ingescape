@@ -198,10 +198,10 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
 
 
 /**
- * @brief Add a view model of agents grouped by name
+ * @brief Save a new view model of agents grouped by name
  * @param agentsGroupedByName
  */
-void IngeScapeModelManager::addAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName)
+void IngeScapeModelManager::_saveNewAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName)
 {
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
     {
@@ -867,8 +867,8 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
                 // Create a new view model of agents grouped by name
                 agentsGroupedByName = new AgentsGroupedByNameVM(agentName, this);
 
-                // Add this view model of agents grouped by name
-                addAgentsGroupedByName(agentsGroupedByName);
+                // Save this new view model of agents grouped by name
+                _saveNewAgentsGroupedByName(agentsGroupedByName);
 
                 // Manage the new model of agent
                 agentsGroupedByName->manageNewModel(agent);
