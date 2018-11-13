@@ -72,7 +72,6 @@ public:
      * @brief Remove the agent from the list and delete it
      * @param agent
      */
-    //Q_INVOKABLE void deleteAgentInList(AgentVM* agent);
     Q_INVOKABLE void deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
 
@@ -251,6 +250,22 @@ private:
     //void _deleteAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinitionVM);
 
 
+    /**
+     * @brief Get the list of definitions with a name
+     * @param definitionName
+     * @return
+     */
+    QList<DefinitionM*> _getDefinitionsListWithName(QString definitionName);
+
+
+    /**
+     * @brief Update the definition variants (same name, same version but the lists of I/O/P are differents)
+     * @param definitionName
+     * @param definitionsList
+     */
+    void _updateDefinitionVariants(QString definitionName, QList<DefinitionM*> definitionsList);
+
+
 private:
 
     // Manager for the data model of INGESCAPE
@@ -261,6 +276,9 @@ private:
 
     // Map from agent name to a list of view models of agent
     //QHash<QString, QList<AgentVM*>> _mapFromNameToAgentViewModelsList;
+
+    // Hash table from a definition name to a list of definitions with this name
+    QHash<QString, QList<DefinitionM*>> _hashFromDefinitionNameToDefinitionsList;
 };
 
 QML_DECLARE_TYPE(AgentsSupervisionController)

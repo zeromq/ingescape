@@ -203,6 +203,26 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
 
 
 /**
+ * @brief Get the list of definitions with a specific name
+ * @param definitionName
+ * @return
+ */
+QList<DefinitionM*> AgentsGroupedByNameVM::getDefinitionsWithName(QString definitionName)
+{
+    QList<DefinitionM*> definitionsList;
+
+    for (DefinitionM* definition : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
+    {
+        if ((definition != nullptr) && (definition->name() == definitionName))
+        {
+            definitionsList.append(definition);
+        }
+    }
+    return definitionsList;
+}
+
+
+/**
  * @brief Slot called when the list of models changed
  */
 void AgentsGroupedByNameVM::_onModelsChanged()

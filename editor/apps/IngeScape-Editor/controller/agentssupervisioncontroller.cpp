@@ -59,6 +59,8 @@ AgentsSupervisionController::~AgentsSupervisionController()
     // Clean-up current selection
     setselectedAgent(NULL);
 
+    _hashFromDefinitionNameToDefinitionsList.clear();
+
     //_mapFromNameToAgentViewModelsList.clear();
 
     // Deleted elsewhere (in the destructor of AgentsGroupedByNameVM)
@@ -91,13 +93,13 @@ AgentsSupervisionController::~AgentsSupervisionController()
  * @brief Remove the agent from the list and delete it
  * @param agent
  */
-//void AgentsSupervisionController::deleteAgentInList(AgentVM* agent)
 void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
 {
     if ((_modelManager != NULL) && (agentsGroupedByDefinition != NULL))
     {
         qInfo() << "Delete the agent" << agentsGroupedByDefinition->name() << "in the List";
 
+        /* Called in the slot "onAgentsGroupedByDefinitionWillBeDeleted"
         // Unselect our agent if needed
         if (_selectedAgent == agentsGroupedByDefinition) {
             setselectedAgent(NULL);
@@ -105,18 +107,7 @@ void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM*
 
         // Remove it from the list
         _agentsList.remove(agentsGroupedByDefinition);
-
-        // Reset its definition
-        //agentsGroupedByDefinition->setdefinition(NULL);
-
-        // Delete each model of this view model of agent
-        /*for (AgentM* model : agentsGroupedByDefinition->models()->toList())
-        {
-            _modelManager->deleteAgentModel(model);
-        }*/
-
-        // Delete the view model of agent
-        //_deleteAgentViewModel(agent);
+        */
 
         AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentsGroupedByDefinition->name());
         if (agentsGroupedByName != NULL) {
@@ -353,15 +344,29 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated(Agen
 {
     if (agentsGroupedByDefinition != nullptr)
     {
-        if (agentsGroupedByDefinition->definition() == nullptr) {
-            qDebug() << "on Agents Grouped by Definition 'NULL' has been Created" << agentsGroupedByDefinition->name();
-        }
-        else {
-            qDebug() << "on Agents Grouped by Definition" << agentsGroupedByDefinition->definition()->name() << "has been Created" << agentsGroupedByDefinition->name();
-        }
-
         // Add our view model to the list
         _agentsList.append(agentsGroupedByDefinition);
+
+        if (agentsGroupedByDefinition->definition() != nullptr)
+        {
+            DefinitionM* definition = agentsGroupedByDefinition->definition();
+            QString definitionName = definition->name();
+
+            qDebug() << "on Agents Grouped by Definition" << definitionName << "has been Created" << agentsGroupedByDefinition->name();
+
+            // Get the list of definitions with a name
+            QList<DefinitionM*> definitionsList = _getDefinitionsListWithName(definitionName);
+
+            definitionsList.append(definition);
+            _hashFromDefinitionNameToDefinitionsList.insert(definitionName, definitionsList);
+
+            // Update the definition variants (same name, same version but the lists of I/O/P are differents)
+            _updateDefinitionVariants(definitionName, definitionsList);
+        }
+        else
+        {
+            qDebug() << "on Agents Grouped by Definition 'NULL' has been Created" << agentsGroupedByDefinition->name();
+        }
     }
 }
 
@@ -374,11 +379,33 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
 {
     if (agentsGroupedByDefinition != nullptr)
     {
-        if (agentsGroupedByDefinition->definition() == nullptr) {
-            qDebug() << "on Agents Grouped by Definition 'NULL' will be Deleted" << agentsGroupedByDefinition->name();
+        // Unselect our agent if needed
+        if (_selectedAgent == agentsGroupedByDefinition) {
+            setselectedAgent(NULL);
         }
-        else {
-            qDebug() << "on Agents Grouped by Definition" << agentsGroupedByDefinition->definition()->name() << "will be Deleted" << agentsGroupedByDefinition->name();
+
+        // Remove it from the list
+        _agentsList.remove(agentsGroupedByDefinition);
+
+        if (agentsGroupedByDefinition->definition() != nullptr)
+        {
+            DefinitionM* definition = agentsGroupedByDefinition->definition();
+            QString definitionName = definition->name();
+
+            qDebug() << "on Agents Grouped by Definition" << definitionName << "will be Deleted" << agentsGroupedByDefinition->name();
+
+            // Get the list of definitions with a name
+            QList<DefinitionM*> definitionsList = _getDefinitionsListWithName(definitionName);
+
+            definitionsList.removeOne(definition);
+            _hashFromDefinitionNameToDefinitionsList.insert(definitionName, definitionsList);
+
+            // Update the definition variants (same name, same version but the lists of I/O/P are differents)
+            _updateDefinitionVariants(definitionName, definitionsList);
+        }
+        else
+        {
+            qDebug() << "on Agents Grouped by Definition 'NULL' will be Deleted" << agentsGroupedByDefinition->name();
         }
     }
 }
@@ -860,3 +887,79 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
         delete agent;
     }
 }*/
+
+
+/**
+ * @brief Get the list of definitions with a name
+ * @param definitionName
+ * @return
+ */
+QList<DefinitionM*> AgentsSupervisionController::_getDefinitionsListWithName(QString definitionName)
+{
+    if (_hashFromDefinitionNameToDefinitionsList.contains(definitionName)) {
+        return _hashFromDefinitionNameToDefinitionsList.value(definitionName);
+    }
+    else {
+        return QList<DefinitionM*>();
+    }
+}
+
+
+/**
+ * @brief Update the definition variants (same name, same version but the lists of I/O/P are differents)
+ * @param definitionName
+ * @param definitionsList
+ */
+void AgentsSupervisionController::_updateDefinitionVariants(QString definitionName, QList<DefinitionM*> definitionsList)
+{
+    Q_UNUSED(definitionName)
+    //qDebug() << "Update the definition variants for definition name" << definitionName << "(" << definitionsList.count() << "definitions)";
+
+    // We can use versions as keys of the map because the list contains only definition with the same name
+    QHash<QString, QList<DefinitionM*>> hashFromVersionToDefinitionsList;
+    QList<QString> versionsWithVariant;
+
+    for (DefinitionM* iterator : definitionsList)
+    {
+        if ((iterator != nullptr) && !iterator->version().isEmpty())
+        {
+            // First, reset all
+            iterator->setisVariant(false);
+
+            QString version = iterator->version();
+            QList<DefinitionM*> definitionsListForVersion;
+
+            // Other(s) definition(s) have the same version (and the same name)
+            if (hashFromVersionToDefinitionsList.contains(version))
+            {
+                definitionsListForVersion = hashFromVersionToDefinitionsList.value(version);
+
+                // If this version is not already in the list of versions with variant
+                if (!versionsWithVariant.contains(version))
+                {
+                    // We compare I/O/P between current iterator and the first one
+                    DefinitionM* first = definitionsListForVersion.first();
+                    if ((first != nullptr) && !DefinitionM::areIdenticals(first, iterator)) {
+                        versionsWithVariant.append(version);
+                    }
+                }
+            }
+
+            definitionsListForVersion.append(iterator);
+            hashFromVersionToDefinitionsList.insert(version, definitionsListForVersion);
+        }
+    }
+
+    // The list contains only the versions that have variants
+    for (QString version : versionsWithVariant)
+    {
+        QList<DefinitionM*> definitionsListForVersion = hashFromVersionToDefinitionsList.value(version);
+        for (DefinitionM* iterator : definitionsListForVersion)
+        {
+            if (iterator != nullptr) {
+                iterator->setisVariant(true);
+                //qDebug() << iterator->name() << iterator->version() << "is variant";
+            }
+        }
+    }
+}

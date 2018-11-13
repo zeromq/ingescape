@@ -82,6 +82,14 @@ public:
     void deleteAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
 
+    /**
+     * @brief Get the list of definitions with a specific name
+     * @param definitionName
+     * @return
+     */
+    QList<DefinitionM*> getDefinitionsWithName(QString definitionName);
+
+
 Q_SIGNALS:
     /**
      * @brief Signal emitted when a new view model of agents grouped by definition has been created

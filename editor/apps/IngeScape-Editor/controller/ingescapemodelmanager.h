@@ -96,34 +96,6 @@ public:
 
 
     /**
-     * @brief Add a model of agent definition for an agent name
-     * @param agentDefinition
-     */
-    void addAgentDefinitionModel(DefinitionM* agentDefinition);
-
-
-    /**
-     * @brief Delete a model of agent definition
-     * @param definition
-     */
-    void deleteAgentDefinitionModel(DefinitionM* definition);
-
-
-    /**
-     * @brief Add a model of agent mapping for an agent name
-     * @param agentMapping
-     */
-    void addAgentMappingModel(AgentMappingM* agentMapping);
-
-
-    /**
-     * @brief Delete a model of agent mapping
-     * @param agentMapping
-     */
-    void deleteAgentMappingModel(AgentMappingM* agentMapping);
-
-
-    /**
      * @brief Get the model of agent from a Peer Id
      * @param peerId
      * @return
@@ -137,22 +109,6 @@ public:
      * @return
      */
     AgentsGroupedByNameVM* getAgentsGroupedForName(QString name);
-
-
-    /**
-     * @brief Get the list (of models) of agent definition from a definition name
-     * @param definitionName
-     * @return
-     */
-    QList<DefinitionM*> getAgentDefinitionsListFromDefinitionName(QString definitionName);
-
-
-    /**
-     * @brief Get the list (of models) of agent mapping from a mapping name
-     * @param name
-     * @return
-     */
-    QList<AgentMappingM*> getAgentMappingsListFromMappingName(QString mappingName);
 
 
     /**
@@ -457,28 +413,9 @@ private Q_SLOTS:
 private:
 
     /**
-     * @brief Update definition variants of the list of definitions with the same name
-     * @param definitionName
-     */
-    void _updateDefinitionVariants(QString definitionName);
-
-
-    /**
      * @brief Print all models of agents (for Debug)
      */
     void _printAgents();
-
-
-    /**
-     * @brief Print all models of agent definitions (for Debug)
-     */
-    void _printDefinitions();
-
-
-    /**
-     * @brief Print all models of agent mappings (for Debug)
-     */
-    void _printMappings();
 
 
 private:
@@ -491,12 +428,6 @@ private:
 
     // Map from "peer id" to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
-
-    // Map from "definition name" to a list (of models) of agent definition
-    QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
-
-    // Map from "mapping name" to a list (of models) of agent mapping
-    QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
 
     // Hash table from a name to the group of agents with this name
     QHash<QString, AgentsGroupedByNameVM*> _hashFromNameToAgentsGrouped;
