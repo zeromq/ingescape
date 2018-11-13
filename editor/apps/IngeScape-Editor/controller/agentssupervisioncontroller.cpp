@@ -344,6 +344,11 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated(Agen
 {
     if (agentsGroupedByDefinition != nullptr)
     {
+        // Propagate some signals from this new view model of agents grouped by definition
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
+
         // Add our view model to the list
         _agentsList.append(agentsGroupedByDefinition);
 
@@ -383,6 +388,9 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
         if (_selectedAgent == agentsGroupedByDefinition) {
             setselectedAgent(NULL);
         }
+
+        // DIS-connect to signals from this view model of agents grouped by definition
+        disconnect(agentsGroupedByDefinition, 0, this, 0);
 
         // Remove it from the list
         _agentsList.remove(agentsGroupedByDefinition);

@@ -97,6 +97,87 @@ public:
 
 
     /**
+     * @brief Change the state of our agent
+     */
+    Q_INVOKABLE void changeState();
+
+
+    /**
+     * @brief Mute / UN-mute all outputs of our agent
+     */
+    Q_INVOKABLE void changeMuteAllOutputs();
+
+
+    /**
+     * @brief Freeze / UN-freeze our agent
+     */
+    Q_INVOKABLE void changeFreeze();
+
+
+    /**
+     * @brief Load a (new) definition
+     */
+    Q_INVOKABLE void loadDefinition();
+
+
+    /**
+     * @brief Load a (new) mapping
+     */
+    Q_INVOKABLE void loadMapping();
+
+
+    /**
+     * @brief Download the current definition
+     */
+    Q_INVOKABLE void downloadDefinition();
+
+
+    /**
+     * @brief Download the current mapping
+     */
+    Q_INVOKABLE void downloadMapping();
+
+
+    /**
+     * @brief Change the flag "(has) Log in Stream"
+     */
+    Q_INVOKABLE void changeLogInStream();
+
+
+    /**
+     * @brief Change the flag "(has) Log in File"
+     */
+    Q_INVOKABLE void changeLogInFile();
+
+
+    /**
+     * @brief Save the "files paths" of our agent
+     * @param definitionFilePath
+     * @param mappingFilePath
+     * @param logFilePath
+     */
+    Q_INVOKABLE void saveFilesPaths(QString definitionFilePath, QString mappingFilePath, QString logFilePath);
+
+
+    /**
+     * @brief Save the definition of our agent to its path
+     */
+    Q_INVOKABLE void saveDefinitionToPath();
+
+
+    /**
+     * @brief Save the mapping of our agent to its path
+     */
+    Q_INVOKABLE void saveMappingToPath();
+
+
+    /**
+     * @brief Open the "Log Stream" of our agent
+     */
+    Q_INVOKABLE void openLogStream();
+
+
+    /**
      * @brief Get the list of agent models on a host
      * @param hostname
      * @return
@@ -110,6 +191,77 @@ Q_SIGNALS:
      * @brief Signal emitted when our view model has become useless (no more model)
      */
     void noMoreModelAndUseless();
+
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param command
+     * @param hostname
+     * @param commandLine
+     */
+    void commandAskedToLauncher(QString command, QString hostname, QString commandLine);
+
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to agent(s)
+     * @param peerIdsList
+     * @param command
+     */
+    void commandAskedToAgent(QStringList peerIdsList, QString command);
+
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to agent(s) about one of its output
+     * @param peerIdsList
+     * @param command
+     * @param outputName
+     */
+    void commandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName);
+
+
+    /**
+     * @brief Signal emitted when we have to open the values history of our agent
+     * @param agentName
+     */
+    //void openValuesHistoryOfAgent(QString agentName);
+
+
+    /**
+     * @brief Signal emitted when we have to load agent(s) definition from a JSON file (path)
+     * @param peerIdsList
+     * @param definitionFilePath
+     */
+    void loadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath);
+
+
+    /**
+     * @brief Signal emitted when we have to load agent(s) mapping from a JSON file (path)
+     * @param mappingFilePath
+     */
+    void loadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath);
+
+
+    /**
+     * @brief Signal emitted when we have to download an agent definition to a JSON file (path)
+     * @param agentDefinition
+     * @param definitionFilePath
+     */
+    void downloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath);
+
+
+    /**
+     * @brief Signal emitted when we have to download an agent mapping to a JSON file (path)
+     * @param agentMapping
+     * @param mappingFilePath
+     */
+    void downloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath);
+
+
+    /**
+     * @brief Signal emitted when we have to open the "Log Stream" of a list of agents
+     * @param models
+     */
+    void openLogStreamOfAgents(QList<AgentM*> models);
 
 
 public Q_SLOTS:
@@ -138,11 +290,94 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the definition of a model changed (with previous and new values)
-     * @param previousDefinition
-     * @param newDefinition
+     * @brief Slot called when the flag "can Be Restarted" of a model changed
+     * @param canBeRestarted
      */
-    //void _onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousDefinition, DefinitionM* newDefinition);
+    void _onCanBeRestartedOfModelChanged(bool canBeRestarted);
+
+
+    /**
+     * @brief Slot called when the flag "is Muted" of a model changed
+     * @param isMuted
+     */
+    void _onIsMutedOfModelChanged(bool isMuted);
+
+
+    /**
+     * @brief Slot called when the flag "can Be Frozen" of a model changed
+     * @param canBeFrozen
+     */
+    void _onCanBeFrozenOfModelChanged(bool canBeFrozen);
+
+
+    /**
+     * @brief Slot called when the flag "is Frozen" of a model changed
+     * @param isMuted
+     */
+    void _onIsFrozenOfModelChanged(bool isFrozen);
+
+
+    /**
+     * @brief Slot called when the state of a model changed
+     * @param state
+     */
+    void _onStateOfModelChanged(QString state);
+
+
+    /**
+     * @brief Slot called when the "Logger Port" of a model changed
+     * @param loggerPort
+     */
+    void _onLoggerPortOfModelChanged(QString loggerPort);
+
+
+    /**
+     * @brief Slot called when the flag "has Log in Stream" of a model changed
+     * @param hasLogInStream
+     */
+    void _onHasLogInStreamOfModelChanged(bool hasLogInStream);
+
+
+    /**
+     * @brief Slot called when the flag "has Log in File" of a model changed
+     * @param hasLogInFile
+     */
+    void _onHasLogInFileOfModelChanged(bool hasLogInFile);
+
+
+    /**
+     * @brief Slot called when the path of "Log File" of a model changed
+     * @param logFilePath
+     */
+    void _onLogFilePathOfModelChanged(QString logFilePath);
+
+
+    /**
+     * @brief Slot called when the path of "Definition File" of a model changed
+     * @param definitionFilePath
+     */
+    void _onDefinitionFilePathOfModelChanged(QString definitionFilePath);
+
+
+    /**
+     * @brief Slot called when the path of "Mapping File" of a model changed
+     * @param mappingFilePath
+     */
+    void _onMappingFilePathOfModelChanged(QString mappingFilePath);
+
+
+    /**
+     * @brief Slot when a command must be sent on the network to an agent about one of its output
+     * @param command
+     * @param outputName
+     */
+    //void _onCommandAskedToAgentAboutOutput(QString command, QString outputName);
+
+
+    /**
+     * @brief Slot when we have to open the values history of our agent
+     */
+    //void _onOpenValuesHistoryOfAgent();
 
 
 private:
@@ -153,9 +388,63 @@ private:
 
 
     /**
-     * @brief Update the flag "is ON" in function of flags of models
+     * @brief Update the flag "can be Frozen" in function of flags of models
      */
-    void _updateIsON();
+    void _updateCanBeFrozen();
+
+
+    /**
+     * @brief Update the flag "is Frozen" in function of flags of models
+     */
+    void _updateIsFrozen();
+
+
+    /**
+     * @brief Update the flag "has Log in Stram" in function of flags of models
+     */
+    void _updateHasLogInStream();
+
+
+    /**
+     * @brief Update the flag "is Enabled View Log Stram" in function of flags of models
+     */
+    void _updateIsEnabledViewLogStream();
+
+
+    /**
+     * @brief Update the flag "has Log in File" in function of flags of models
+     */
+    void _updateHasLogInFile();
+
+
+    /**
+     * @brief Update with the definition of the first model
+     */
+    void _updateWithDefinitionOfFirstModel();
+
+
+    /**
+     * @brief Update with the state of the first model
+     */
+    void _updateWithStateOfFirstModel();
+
+
+    /**
+     * @brief Update with the log file path of the first model
+     */
+    void _updateWithLogFilePathOfFirstModel();
+
+
+    /**
+     * @brief Update with the definition file path of the first model
+     */
+    void _updateWithDefinitionFilePathOfFirstModel();
+
+
+    /**
+     * @brief Update with the mapping file path of the first model
+     */
+    void _updateWithMappingFilePathOfFirstModel();
 
 
 private:

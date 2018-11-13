@@ -115,7 +115,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to an agent
+     * @brief Signal emitted when a command must be sent on the network to agent(s)
      * @param peerIdsList
      * @param command
      */
@@ -123,7 +123,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to an agent about one of its output
+     * @brief Signal emitted when a command must be sent on the network to agent(s) about one of its output
      * @param peerIdsList
      * @param command
      * @param outputName

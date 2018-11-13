@@ -621,8 +621,19 @@ void AgentsGroupedByNameVM::_saveNewAgentsGroupedByDefinition(AgentsGroupedByDef
 {
     if (agentsGroupedByDefinition != nullptr)
     {
-        // Connect to signals from this view model of agents grouped by definition
+        // Connect slots to signals from this new view model of agents grouped by definition
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::noMoreModelAndUseless, this, &AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition);
+        /*connect(agent, &AgentVM::loadAgentDefinitionFromPath, this, &AgentsSupervisionController::_onLoadAgentDefinitionFromPath);
+        connect(agent, &AgentVM::loadAgentMappingFromPath, this, &AgentsSupervisionController::_onLoadAgentMappingFromPath);
+        connect(agent, &AgentVM::downloadAgentDefinitionToPath, this, &AgentsSupervisionController::_onDownloadAgentDefinitionToPath);
+        connect(agent, &AgentVM::downloadAgentMappingToPath, this, &AgentsSupervisionController::_onDownloadAgentMappingToPath);*/
+
+        // Propagate some signals from this new view model of agents grouped by definition
+        /*connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToLauncher, this, &AgentsGroupedByNameVM::commandAskedToLauncher);
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgent, this, &AgentsGroupedByNameVM::commandAskedToAgent);
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgentAboutOutput, this, &AgentsGroupedByNameVM::commandAskedToAgentAboutOutput);
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openValuesHistoryOfAgent, this, &AgentsGroupedByNameVM::openValuesHistoryOfAgent);
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openLogStreamOfAgents, this, &AgentsGroupedByNameVM::openLogStreamOfAgents);*/
 
         // Add to the hash table from definition
         if (agentsGroupedByDefinition->definition() != nullptr) {
