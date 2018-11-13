@@ -306,8 +306,13 @@ int main(int argc, char *argv[])
         igs_setLogPath(logFilePath.toStdString().c_str());
         igs_setLogInFile(true);
 
+#ifdef QT_DEBUG
+        // Use a custom message format
+        qSetMessagePattern("%{time hh:mm:ss.zzz} %{type} %{if-category}%{category} %{endif}file://%{file}:%{line} %{message}");
+#else
         // Replace the default message handler with our own logger
         qInstallMessageHandler(LogMessageHandler);
+#endif
 
         qInfo() << "Application" << app.applicationName() << "is running with version" << app.applicationVersion();
 
