@@ -210,6 +210,7 @@ void IngeScapeModelManager::_saveNewAgentsGroupedByName(AgentsGroupedByNameVM* a
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::onAgentModelHasToBeDeleted);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &IngeScapeModelManager::onDefinitionsToOpen);
 
         // Add to the hash table
         _hashFromNameToAgentsGrouped.insert(agentsGroupedByName->name(), agentsGroupedByName);
@@ -571,36 +572,6 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
 
 
 /**
- * @brief Open the definition with an agent name
- * @param agentName
- */
-void IngeScapeModelManager::openDefinitionWithAgentName(QString agentName)
-{
-    if (!agentName.isEmpty())
-    {
-        // Get the (view model of) agents grouped for this name
-        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agentName);
-
-        // FIXME TODO: il peut y avoir un agentM avec def NULL et pour autant y avoir un AgentsGroupedByDefinitionVM avec definition
-        // --> faire un getter qui retourne le premier AgentsGroupedByDefinitionVM ou la première définition trouvé ?
-        // --> ou bien ouvrir toutes les définitions dans ce cas ?
-
-        if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->models()->isEmpty())
-        {
-            // By default, we take the first one
-            AgentM* agent = agentsGroupedByName->models()->at(0);
-
-            if ((agent != nullptr) && (agent->definition() != NULL))
-            {
-                // Open its definition
-                openDefinition(agent->definition());
-            }
-        }
-    }
-}
-
-
-/**
  * @brief Open a definition
  * If there are variants of this definition, we open each variant
  * @param definition
@@ -643,21 +614,8 @@ void IngeScapeModelManager::openDefinition(DefinitionM* definition)
             definitionsToOpen.append(definition);
         }
 
-        // Traverse the list of definitions to open
-        for (DefinitionM* iterator : definitionsToOpen)
-        {
-            if (iterator != NULL)
-            {
-                if (!_openedDefinitions.contains(iterator)) {
-                    _openedDefinitions.append(iterator);
-                }
-                else {
-                    qDebug() << "The 'Definition'" << iterator->name() << "is already opened...bring to front !";
-
-                    Q_EMIT iterator->bringToFront();
-                }
-            }
-        }
+        // Open the list of definitions
+        _openDefinitions(definitionsToOpen);
     }
 }
 
@@ -800,6 +758,16 @@ void IngeScapeModelManager::onAgentModelHasToBeDeleted(AgentM* model)
     if (model != nullptr) {
         deleteAgentModel(model);
     }
+}
+
+
+/**
+ * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
+ * @param definitionsList
+ */
+void IngeScapeModelManager::onDefinitionsToOpen(QList<DefinitionM*> definitionsList)
+{
+    _openDefinitions(definitionsList);
 }
 
 
@@ -1202,6 +1170,30 @@ void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
 
     if (!peerId.isEmpty()) {
         _mapFromPeerIdToAgentM.remove(peerId);
+    }
+}
+
+
+/**
+ * @brief Open a list of definitions (if the definition is already opened, we bring it to front)
+ * @param definitionsToOpen
+ */
+void IngeScapeModelManager::_openDefinitions(QList<DefinitionM*> definitionsToOpen)
+{
+    // Traverse the list of definitions to open
+    for (DefinitionM* definition : definitionsToOpen)
+    {
+        if (definition != nullptr)
+        {
+            if (!_openedDefinitions.contains(definition)) {
+                _openedDefinitions.append(definition);
+            }
+            else {
+                qDebug() << "The 'Definition'" << definition->name() << "is already opened...bring it to front !";
+
+                Q_EMIT definition->bringToFront();
+            }
+        }
     }
 }
 

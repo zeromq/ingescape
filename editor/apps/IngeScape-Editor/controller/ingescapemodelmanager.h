@@ -146,13 +146,6 @@ public:
 
 
     /**
-     * @brief Open the definition with an agent name
-     * @param agentName
-     */
-    Q_INVOKABLE void openDefinitionWithAgentName(QString agentName);
-
-
-    /**
      * @brief Open a definition
      * If there are variants of this definition, we open each variant
      * @param definition
@@ -287,6 +280,13 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
+     * @param definitionsList
+     */
+    void onDefinitionsToOpen(QList<DefinitionM*> definitionsList);
+
+
+    /**
      * @brief Slot called when a launcher enter the network
      * @param peerId
      * @param hostname
@@ -411,6 +411,13 @@ private Q_SLOTS:
 
 
 private:
+
+    /**
+     * @brief Open a list of definitions (if the definition is already opened, we bring it to front)
+     * @param definitionsToOpen
+     */
+    void _openDefinitions(QList<DefinitionM*> definitionsToOpen);
+
 
     /**
      * @brief Print all models of agents (for Debug)

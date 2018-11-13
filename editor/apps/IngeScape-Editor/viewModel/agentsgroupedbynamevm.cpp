@@ -223,6 +223,18 @@ QList<DefinitionM*> AgentsGroupedByNameVM::getDefinitionsWithName(QString defini
 
 
 /**
+ * @brief Open the definition(s)
+ * If there are several "Agents Grouped by Definition", we have to open each definition
+ */
+void AgentsGroupedByNameVM::openDefinition()
+{
+    QList<DefinitionM*> allDefinitions = _hashFromDefinitionToAgentsGroupedByDefinition.keys();
+
+    Q_EMIT definitionsToOpen(allDefinitions);
+}
+
+
+/**
  * @brief Slot called when the list of models changed
  */
 void AgentsGroupedByNameVM::_onModelsChanged()

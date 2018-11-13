@@ -90,6 +90,13 @@ public:
     QList<DefinitionM*> getDefinitionsWithName(QString definitionName);
 
 
+    /**
+     * @brief Open the definition(s)
+     * If there are several "Agents Grouped by Definition", we have to open each definition
+     */
+    Q_INVOKABLE void openDefinition();
+
+
 Q_SIGNALS:
     /**
      * @brief Signal emitted when a new view model of agents grouped by definition has been created
@@ -118,6 +125,13 @@ Q_SIGNALS:
      * @param newModel
      */
     void identicalAgentModelWillBeReplaced(AgentM* previousModel, AgentM* newModel);
+
+
+    /**
+     * @brief Signal emitted when the definition(s) of our agent must be opened
+     * @param definitionsList
+     */
+    void definitionsToOpen(QList<DefinitionM*> definitionsList);
 
 
 public Q_SLOTS:
@@ -192,9 +206,6 @@ private:
 
     // Hash table from a definition to a (view model of) agents grouped by definition
     QHash<DefinitionM*, AgentsGroupedByDefinitionVM*> _hashFromDefinitionToAgentsGroupedByDefinition;
-
-    // Map from "definition name" to a list (of view models) of agents grouped by definition
-    //QHash<QString, QList<AgentsGroupedByDefinitionVM*>> _mapFromDefinitionNameToAgentsGroupedByDefinitionList;
 
     // Hash table from a hostname to a list of models of agents
     //QHash<QString, QList<AgentM*>> _hashFromHostnameToModels;
