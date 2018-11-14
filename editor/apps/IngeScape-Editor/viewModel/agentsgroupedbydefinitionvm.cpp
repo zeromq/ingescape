@@ -417,10 +417,10 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
                 connect(model, &AgentM::isMutedChanged, this, &AgentsGroupedByDefinitionVM::_onIsMutedOfModelChanged);
                 connect(model, &AgentM::canBeFrozenChanged, this, &AgentsGroupedByDefinitionVM::_onCanBeFrozenOfModelChanged);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentsGroupedByDefinitionVM::_onIsFrozenOfModelChanged);
-                connect(model, &AgentM::stateChanged, this, &AgentsGroupedByDefinitionVM::_onStateOfModelChanged);
                 connect(model, &AgentM::loggerPortChanged, this, &AgentsGroupedByDefinitionVM::_onLoggerPortOfModelChanged);
                 connect(model, &AgentM::hasLogInStreamChanged, this, &AgentsGroupedByDefinitionVM::_onHasLogInStreamOfModelChanged);
                 connect(model, &AgentM::hasLogInFileChanged, this, &AgentsGroupedByDefinitionVM::_onHasLogInFileOfModelChanged);
+                connect(model, &AgentM::stateChanged, this, &AgentsGroupedByDefinitionVM::_onStateOfModelChanged);
                 connect(model, &AgentM::logFilePathChanged, this, &AgentsGroupedByDefinitionVM::_onLogFilePathOfModelChanged);
                 connect(model, &AgentM::definitionFilePathChanged, this, &AgentsGroupedByDefinitionVM::_onDefinitionFilePathOfModelChanged);
                 connect(model, &AgentM::mappingFilePathChanged, this, &AgentsGroupedByDefinitionVM::_onMappingFilePathOfModelChanged);
@@ -632,15 +632,31 @@ void AgentsGroupedByDefinitionVM::_onIsMutedOfModelChanged(bool isMuted)
 
 
 /**
- * @brief Slot called when the flag "can Be Frozen" of a model changed
+ * @brief Slot called when the flag "can be Frozen" of a model changed
  * @param canBeFrozen
  */
 void AgentsGroupedByDefinitionVM::_onCanBeFrozenOfModelChanged(bool canBeFrozen)
 {
-    Q_UNUSED(canBeFrozen)
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        setcanBeFrozen(canBeFrozen);
+    }
+    // Several models
+    else
+    {
+        bool globalCanBeFrozen = false;
 
-    // Update the flag "can Be Frozen" in function of flags of all models
-    _updateCanBeFrozen();
+        for (AgentM* model : _models.toList())
+        {
+            if ((model != nullptr) && model->canBeFrozen())
+            {
+                globalCanBeFrozen = true;
+                break;
+            }
+        }
+        setcanBeFrozen(globalCanBeFrozen);
+    }
 }
 
 
@@ -650,23 +666,26 @@ void AgentsGroupedByDefinitionVM::_onCanBeFrozenOfModelChanged(bool canBeFrozen)
  */
 void AgentsGroupedByDefinitionVM::_onIsFrozenOfModelChanged(bool isFrozen)
 {
-    Q_UNUSED(isFrozen)
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        setisFrozen(isFrozen);
+    }
+    // Several models
+    else
+    {
+        bool globalIsFrozen = false;
 
-    // Update the flag "is Frozen" in function of all models
-    _updateIsFrozen();
-}
-
-
-/**
- * @brief Slot called when the state of a model changed
- * @param state
- */
-void AgentsGroupedByDefinitionVM::_onStateOfModelChanged(QString state)
-{
-    Q_UNUSED(state)
-
-    // Update with the state of the first model
-    _updateWithStateOfFirstModel();
+        for (AgentM* model : _models.toList())
+        {
+            if ((model != nullptr) && model->isFrozen())
+            {
+                globalIsFrozen = true;
+                break;
+            }
+        }
+        setisFrozen(globalIsFrozen);
+    }
 }
 
 
@@ -676,10 +695,28 @@ void AgentsGroupedByDefinitionVM::_onStateOfModelChanged(QString state)
  */
 void AgentsGroupedByDefinitionVM::_onLoggerPortOfModelChanged(QString loggerPort)
 {
-    Q_UNUSED(loggerPort)
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        // Check that its logger port is defined
+        setisEnabledViewLogStream(!loggerPort.isEmpty());
+    }
+    // Several models
+    else
+    {
+        bool globalIsEnabledViewLogStream = false;
 
-    // Update the flag "is Enabled View Log Stram" in function of flags of models
-    _updateIsEnabledViewLogStream();
+        for (AgentM* model : _models.toList())
+        {
+            // Check that its logger port is defined
+            if ((model != nullptr) && !model->loggerPort().isEmpty())
+            {
+                globalIsEnabledViewLogStream = true;
+                break;
+            }
+        }
+        setisEnabledViewLogStream(globalIsEnabledViewLogStream);
+    }
 }
 
 
@@ -689,10 +726,26 @@ void AgentsGroupedByDefinitionVM::_onLoggerPortOfModelChanged(QString loggerPort
  */
 void AgentsGroupedByDefinitionVM::_onHasLogInStreamOfModelChanged(bool hasLogInStream)
 {
-    Q_UNUSED(hasLogInStream)
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        sethasLogInStream(hasLogInStream);
+    }
+    // Several models
+    else
+    {
+        bool globalHasLogInStream = false;
 
-    // Update the flag "has Log in Stream" in function of all models
-    _updateHasLogInStream();
+        for (AgentM* model : _models.toList())
+        {
+            if ((model != nullptr) && model->hasLogInStream())
+            {
+                globalHasLogInStream = true;
+                break;
+            }
+        }
+        sethasLogInStream(globalHasLogInStream);
+    }
 }
 
 
@@ -702,10 +755,55 @@ void AgentsGroupedByDefinitionVM::_onHasLogInStreamOfModelChanged(bool hasLogInS
  */
 void AgentsGroupedByDefinitionVM::_onHasLogInFileOfModelChanged(bool hasLogInFile)
 {
-    Q_UNUSED(hasLogInFile)
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        sethasLogInFile(hasLogInFile);
+    }
+    // Several models
+    else
+    {
+        bool globalHasLogInFile = false;
 
-    // Update the flag "has Log in File" in function of all models
-    _updateHasLogInFile();
+        for (AgentM* model : _models.toList())
+        {
+            if ((model != nullptr) && model->hasLogInFile())
+            {
+                globalHasLogInFile = true;
+                break;
+            }
+        }
+        sethasLogInFile(globalHasLogInFile);
+    }
+}
+
+
+/**
+ * @brief Slot called when the state of a model changed
+ * @param state
+ */
+void AgentsGroupedByDefinitionVM::_onStateOfModelChanged(QString state)
+{
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        setstate(state);
+    }
+    // Several models
+    else
+    {
+        QString globalStates = "";
+
+        for (AgentM* model : _models.toList())
+        {
+            if ((model != nullptr) && !model->state().isEmpty())
+            {
+                globalStates = model->state();
+                break;
+            }
+        }
+        setstate(globalStates);
+    }
 }
 
 
@@ -715,10 +813,26 @@ void AgentsGroupedByDefinitionVM::_onHasLogInFileOfModelChanged(bool hasLogInFil
  */
 void AgentsGroupedByDefinitionVM::_onLogFilePathOfModelChanged(QString logFilePath)
 {
-    Q_UNUSED(logFilePath)
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        setlogFilePath(logFilePath);
+    }
+    // Several models
+    else
+    {
+        QString globalLogFilePath = "";
 
-    // Update with the log file path of the first model
-    _updateWithLogFilePathOfFirstModel();
+        for (AgentM* model : _models.toList())
+        {
+            if ((model != nullptr) && !model->logFilePath().isEmpty())
+            {
+                globalLogFilePath = model->logFilePath();
+                break;
+            }
+        }
+        setlogFilePath(globalLogFilePath);
+    }
 }
 
 
@@ -728,10 +842,26 @@ void AgentsGroupedByDefinitionVM::_onLogFilePathOfModelChanged(QString logFilePa
  */
 void AgentsGroupedByDefinitionVM::_onDefinitionFilePathOfModelChanged(QString definitionFilePath)
 {
-    Q_UNUSED(definitionFilePath)
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        setdefinitionFilePath(definitionFilePath);
+    }
+    // Several models
+    else
+    {
+        QString globalDefinitionFilePath = "";
 
-    // Update with the definition file path of the first model
-    _updateWithDefinitionFilePathOfFirstModel();
+        for (AgentM* model : _models.toList())
+        {
+            if ((model != nullptr) && !model->definitionFilePath().isEmpty())
+            {
+                globalDefinitionFilePath = model->definitionFilePath();
+                break;
+            }
+        }
+        setdefinitionFilePath(globalDefinitionFilePath);
+    }
 }
 
 
@@ -741,10 +871,26 @@ void AgentsGroupedByDefinitionVM::_onDefinitionFilePathOfModelChanged(QString de
  */
 void AgentsGroupedByDefinitionVM::_onMappingFilePathOfModelChanged(QString mappingFilePath)
 {
-    Q_UNUSED(mappingFilePath)
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        setmappingFilePath(mappingFilePath);
+    }
+    // Several models
+    else
+    {
+        QString globalMappingFilePath = "";
 
-    // Update with the mapping file path of the first model
-    _updateWithMappingFilePathOfFirstModel();
+        for (AgentM* model : _models.toList())
+        {
+            if ((model != nullptr) && !model->mappingFilePath().isEmpty())
+            {
+                globalMappingFilePath = model->mappingFilePath();
+                break;
+            }
+        }
+        setmappingFilePath(globalMappingFilePath);
+    }
 }
 
 
@@ -790,6 +936,15 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
     int clonesNumber = 0;
     bool globalCanBeRestarted = false;
     bool globalIsMuted = false;
+    bool globalCanBeFrozen = false;
+    bool globalIsFrozen = false;
+    bool globalIsEnabledViewLogStream = false;
+    bool globalHasLogInStream = false;
+    bool globalHasLogInFile = false;
+    QString globalState = "";
+    QString globalLogFilePath = "";
+    QString globalDefinitionFilePath = "";
+    QString globalMappingFilePath = "";
 
     // Most of the time, there is only one model
     if (_models.count() == 1)
@@ -813,6 +968,15 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
             //clonesNumber = 1;
             globalCanBeRestarted = model->canBeRestarted();
             globalIsMuted = model->isMuted();
+            globalCanBeFrozen = model->canBeFrozen();
+            globalIsFrozen = model->isFrozen();
+            globalIsEnabledViewLogStream = !model->loggerPort().isEmpty();
+            globalHasLogInStream = model->hasLogInStream();
+            globalHasLogInFile = model->hasLogInFile();
+            globalState = model->state();
+            globalLogFilePath = model->logFilePath();
+            globalDefinitionFilePath = model->definitionFilePath();
+            globalMappingFilePath = model->mappingFilePath();
         }
     }
     // Several models
@@ -837,17 +1001,57 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
                     temporaryListOfHostnames.append(model->hostname());
                 }
 
-                if (model->isON()) {
+                if (model->isON())
+                {
+                    //if (!globalIsON) {
                     globalIsON = true;
+                    //}
+
                     clonesNumber++;
                 }
 
-                if (model->canBeRestarted()) {
+                if (!globalCanBeRestarted && model->canBeRestarted()) {
                     globalCanBeRestarted = true;
                 }
 
-                if (model->isMuted()) {
+                if (!globalIsMuted && model->isMuted()) {
                     globalIsMuted = true;
+                }
+
+                if (!globalCanBeFrozen && model->canBeFrozen()) {
+                    globalCanBeFrozen = true;
+                }
+
+                if (!globalIsFrozen && model->isFrozen()) {
+                    globalIsFrozen = true;
+                }
+
+                if (!globalIsEnabledViewLogStream && !model->loggerPort().isEmpty()) {
+                    globalIsEnabledViewLogStream = true;
+                }
+
+                if (!globalHasLogInStream && model->hasLogInStream()) {
+                    globalHasLogInStream = true;
+                }
+
+                if (!globalHasLogInFile && model->hasLogInFile()) {
+                    globalHasLogInFile = true;
+                }
+
+                if (globalState.isEmpty() && !model->state().isEmpty()) {
+                    globalState = model->state();
+                }
+
+                if (globalLogFilePath.isEmpty() && !model->logFilePath().isEmpty()) {
+                    globalLogFilePath = model->logFilePath();
+                }
+
+                if (globalDefinitionFilePath.isEmpty() && !model->definitionFilePath().isEmpty()) {
+                    globalDefinitionFilePath = model->definitionFilePath();
+                }
+
+                if (globalMappingFilePath.isEmpty() && !model->mappingFilePath().isEmpty()) {
+                    globalMappingFilePath = model->mappingFilePath();
                 }
             }
         }
@@ -884,176 +1088,15 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
 
     setcanBeRestarted(globalCanBeRestarted);
     setisMuted(globalIsMuted);
-
-
-
-    _updateCanBeFrozen();
-    _updateIsFrozen();
-    _updateHasLogInStream();
-    _updateIsEnabledViewLogStream();
-    _updateHasLogInFile();
-
-    // Update with the first model
-    _updateWithStateOfFirstModel();
-    _updateWithLogFilePathOfFirstModel();
-    _updateWithDefinitionFilePathOfFirstModel();
-    _updateWithMappingFilePathOfFirstModel();
-}
-
-
-/**
- * @brief Update the flag "can be Frozen" in function of flags of models
- */
-void AgentsGroupedByDefinitionVM::_updateCanBeFrozen()
-{
-    bool globalCanBeFrozen = false;
-
-    for (AgentM* model : _models.toList())
-    {
-        if ((model != nullptr) && model->canBeFrozen())
-        {
-            globalCanBeFrozen = true;
-            break;
-        }
-    }
     setcanBeFrozen(globalCanBeFrozen);
-}
-
-
-/**
- * @brief Update the flag "is Frozen" in function of flags of models
- */
-void AgentsGroupedByDefinitionVM::_updateIsFrozen()
-{
-    bool globalIsFrozen = false;
-
-    for (AgentM* model : _models.toList())
-    {
-        if ((model != nullptr) && model->isFrozen())
-        {
-            globalIsFrozen = true;
-            break;
-        }
-    }
     setisFrozen(globalIsFrozen);
-}
-
-
-/**
- * @brief Update the flag "has Log in Stram" in function of flags of models
- */
-void AgentsGroupedByDefinitionVM::_updateHasLogInStream()
-{
-    bool globalHasLogInStream = false;
-
-    for (AgentM* model : _models.toList())
-    {
-        if ((model != nullptr) && model->hasLogInStream())
-        {
-            globalHasLogInStream = true;
-            break;
-        }
-    }
-    sethasLogInStream(globalHasLogInStream);
-}
-
-
-/**
- * @brief Update the flag "is Enabled View Log Stram" in function of flags of models
- */
-void AgentsGroupedByDefinitionVM::_updateIsEnabledViewLogStream()
-{
-    bool globalIsEnabledViewLogStream = false;
-
-    for (AgentM* model : _models.toList())
-    {
-        // Check that its logger port is defined
-        if ((model != nullptr) && !model->loggerPort().isEmpty())
-        {
-            globalIsEnabledViewLogStream = true;
-            break;
-        }
-    }
     setisEnabledViewLogStream(globalIsEnabledViewLogStream);
-}
-
-
-/**
- * @brief Update the flag "has Log in File" in function of flags of models
- */
-void AgentsGroupedByDefinitionVM::_updateHasLogInFile()
-{
-    bool globalHasLogInFile = false;
-
-    for (AgentM* model : _models.toList())
-    {
-        if ((model != nullptr) && model->hasLogInFile())
-        {
-            globalHasLogInFile = true;
-            break;
-        }
-    }
+    sethasLogInStream(globalHasLogInStream);
     sethasLogInFile(globalHasLogInFile);
-}
-
-
-/**
- * @brief Update with the state of the first model
- */
-void AgentsGroupedByDefinitionVM::_updateWithStateOfFirstModel()
-{
-    if (!_models.isEmpty())
-    {
-        AgentM* model = _models.at(0);
-        if (model != nullptr) {
-            setstate(model->state());
-        }
-    }
-}
-
-
-/**
- * @brief Update with the log file path of the first model
- */
-void AgentsGroupedByDefinitionVM::_updateWithLogFilePathOfFirstModel()
-{
-    if (!_models.isEmpty())
-    {
-        AgentM* model = _models.at(0);
-        if (model != nullptr) {
-            setlogFilePath(model->logFilePath());
-        }
-    }
-}
-
-
-/**
- * @brief Update with the definition file path of the first model
- */
-void AgentsGroupedByDefinitionVM::_updateWithDefinitionFilePathOfFirstModel()
-{
-    if (!_models.isEmpty())
-    {
-        AgentM* model = _models.at(0);
-        if (model != nullptr) {
-            setdefinitionFilePath(model->definitionFilePath());
-        }
-    }
-}
-
-
-/**
- * @brief Update with the mapping file path of the first model
- */
-void AgentsGroupedByDefinitionVM::_updateWithMappingFilePathOfFirstModel()
-{
-    if (!_models.isEmpty())
-    {
-        AgentM* model = _models.at(0);
-        if (model != nullptr) {
-            setmappingFilePath(model->mappingFilePath());
-        }
-    }
+    setstate(globalState);
+    setlogFilePath(globalLogFilePath);
+    setdefinitionFilePath(globalDefinitionFilePath);
+    setmappingFilePath(globalMappingFilePath);
 }
 
 

@@ -32,6 +32,7 @@ static const QString prefix_Definition = "EXTERNAL_DEFINITION#";
 static const QString prefix_Mapping = "EXTERNAL_MAPPING#";
 
 static const QString prefix_Muted = "MUTED=";
+static const QString prefix_CanBeFrozen = "CANBEFROZEN=";
 static const QString prefix_Frozen = "FROZEN=";
 static const QString prefix_OutputMuted = "OUTPUT_MUTED ";
 static const QString prefix_OutputUnmuted = "OUTPUT_UNMUTED ";
@@ -224,6 +225,12 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             {
                 // Manage the message "MUTED / UN-MUTED"
                 networkController->manageMessageMutedUnmuted(peerId, message.remove(0, prefix_Muted.length()));
+            }
+            // CAN BE FROZEN / CAN NOT BE FROZEN
+            else if (message.startsWith(prefix_CanBeFrozen))
+            {
+                // Manage the message "CAN BE FROZEN / CAN NOT BE FROZEN"
+                networkController->manageMessageCanBeFrozenOrNot(peerId, message.remove(0, prefix_CanBeFrozen.length()));
             }
             // FROZEN / UN-FROZEN
             else if (message.startsWith(prefix_Frozen))
@@ -778,17 +785,29 @@ void NetworkController::stop()
  */
 void NetworkController::manageMessageMutedUnmuted(QString peerId, QString message)
 {
+    // Emit the signal "is Muted from Agent Updated"
     if (message == "0") {
-        //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
-
-        // Emit the signal "is Muted from Agent Updated"
         Q_EMIT isMutedFromAgentUpdated(peerId, false);
     }
     else if (message == "1") {
-        //qDebug() << peerName << "(" << peerId << ") MUTED";
-
-        // Emit the signal "is Muted from Agent Updated"
         Q_EMIT isMutedFromAgentUpdated(peerId, true);
+    }
+}
+
+
+/**
+ * @brief Manage the message "CAN BE FROZEN / CAN NOT BE FROZEN"
+ * @param peerId
+ * @param message
+ */
+void NetworkController::manageMessageCanBeFrozenOrNot(QString peerId, QString message)
+{
+    // Emit the signal "can be Frozen from Agent Updated"
+    if (message == "0") {
+        Q_EMIT canBeFrozenFromAgentUpdated(peerId, false);
+    }
+    else if (message == "1") {
+        Q_EMIT canBeFrozenFromAgentUpdated(peerId, true);
     }
 }
 
@@ -800,16 +819,11 @@ void NetworkController::manageMessageMutedUnmuted(QString peerId, QString messag
  */
 void NetworkController::manageMessageFrozenUnfrozen(QString peerId, QString message)
 {
+    // Emit the signal "is Frozen from Agent Updated"
     if (message == "0") {
-        //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
-
-        // Emit the signal "is Frozen from Agent Updated"
         Q_EMIT isFrozenFromAgentUpdated(peerId, false);
     }
     else if (message == "1") {
-        //qDebug() << peerName << "(" << peerId << ") FROZEN";
-
-        // Emit the signal "is Frozen from Agent Updated"
         Q_EMIT isFrozenFromAgentUpdated(peerId, true);
     }
 }

@@ -1003,7 +1003,7 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
  */
 void IngeScapeModelManager::onValuePublished(PublishedValueM* publishedValue)
 {
-    if (publishedValue != NULL)
+    if (publishedValue != nullptr)
     {
         // Add to the list at the first position
         _publishedValues.prepend(publishedValue);
@@ -1027,8 +1027,22 @@ void IngeScapeModelManager::onValuePublished(PublishedValueM* publishedValue)
 void IngeScapeModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if(agent != NULL) {
+    if (agent != nullptr) {
         agent->setisMuted(isMuted);
+    }
+}
+
+
+/**
+ * @brief Slot called when the flag "can be Frozen" from an agent updated
+ * @param peerId
+ * @param canBeFrozen
+ */
+void IngeScapeModelManager::onCanBeFrozenFromAgentUpdated(QString peerId, bool canBeFrozen)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if (agent != nullptr) {
+        agent->setcanBeFrozen(canBeFrozen);
     }
 }
 
@@ -1041,7 +1055,7 @@ void IngeScapeModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMut
 void IngeScapeModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if(agent != NULL) {
+    if (agent != nullptr) {
         agent->setisFrozen(isFrozen);
     }
 }
@@ -1056,7 +1070,7 @@ void IngeScapeModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFr
 void IngeScapeModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if(agent != NULL) {
+    if (agent != nullptr) {
         agent->setisMutedOfOutput(isMuted, outputName);
     }
 }
@@ -1070,7 +1084,7 @@ void IngeScapeModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bo
 void IngeScapeModelManager::onAgentStateChanged(QString peerId, QString stateName)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != NULL) {
+    if (agent != nullptr) {
         agent->setstate(stateName);
     }
 }
@@ -1084,9 +1098,7 @@ void IngeScapeModelManager::onAgentStateChanged(QString peerId, QString stateNam
 void IngeScapeModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInStream)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != NULL) {
-        //qDebug() << agent->name() << "Has Log in STREAM ?" << hasLogInStream;
-
+    if (agent != nullptr) {
         agent->sethasLogInStream(hasLogInStream);
     }
 }
@@ -1100,9 +1112,7 @@ void IngeScapeModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInS
 void IngeScapeModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFile)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != NULL) {
-        //qDebug() << agent->name() << "Has Log in FILE ?" << hasLogInFile;
-
+    if (agent != nullptr) {
         agent->sethasLogInFile(hasLogInFile);
     }
 }
@@ -1116,9 +1126,7 @@ void IngeScapeModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFil
 void IngeScapeModelManager::onAgentLogFilePath(QString peerId, QString logFilePath)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != NULL) {
-        //qDebug() << agent->name() << "Log file path:" << logFilePath;
-
+    if (agent != nullptr) {
         agent->setlogFilePath(logFilePath);
     }
 }
@@ -1132,9 +1140,7 @@ void IngeScapeModelManager::onAgentLogFilePath(QString peerId, QString logFilePa
 void IngeScapeModelManager::onAgentDefinitionFilePath(QString peerId, QString definitionFilePath)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != NULL) {
-        //qDebug() << agent->name() << "Definition file path:" << definitionFilePath;
-
+    if (agent != nullptr) {
         agent->setdefinitionFilePath(definitionFilePath);
     }
 }
@@ -1148,9 +1154,7 @@ void IngeScapeModelManager::onAgentDefinitionFilePath(QString peerId, QString de
 void IngeScapeModelManager::onAgentMappingFilePath(QString peerId, QString mappingFilePath)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != NULL) {
-        //qDebug() << agent->name() << "Mapping file path:" << mappingFilePath;
-
+    if (agent != nullptr) {
         agent->setmappingFilePath(mappingFilePath);
     }
 }

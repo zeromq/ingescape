@@ -304,7 +304,7 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the flag "can Be Frozen" of a model changed
+     * @brief Slot called when the flag "can be Frozen" of a model changed
      * @param canBeFrozen
      */
     void _onCanBeFrozenOfModelChanged(bool canBeFrozen);
@@ -385,66 +385,6 @@ private:
      * @brief Update with all models of agents
      */
     void _updateWithAllModels();
-
-
-    /**
-     * @brief Update the flag "can be Frozen" in function of flags of models
-     */
-    void _updateCanBeFrozen();
-
-
-    /**
-     * @brief Update the flag "is Frozen" in function of flags of models
-     */
-    void _updateIsFrozen();
-
-
-    /**
-     * @brief Update the flag "has Log in Stram" in function of flags of models
-     */
-    void _updateHasLogInStream();
-
-
-    /**
-     * @brief Update the flag "is Enabled View Log Stram" in function of flags of models
-     */
-    void _updateIsEnabledViewLogStream();
-
-
-    /**
-     * @brief Update the flag "has Log in File" in function of flags of models
-     */
-    void _updateHasLogInFile();
-
-
-    /**
-     * @brief Update with the definition of the first model
-     */
-    void _updateWithDefinitionOfFirstModel();
-
-
-    /**
-     * @brief Update with the state of the first model
-     */
-    void _updateWithStateOfFirstModel();
-
-
-    /**
-     * @brief Update with the log file path of the first model
-     */
-    void _updateWithLogFilePathOfFirstModel();
-
-
-    /**
-     * @brief Update with the definition file path of the first model
-     */
-    void _updateWithDefinitionFilePathOfFirstModel();
-
-
-    /**
-     * @brief Update with the mapping file path of the first model
-     */
-    void _updateWithMappingFilePathOfFirstModel();
 
 
 private:

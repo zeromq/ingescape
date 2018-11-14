@@ -85,6 +85,14 @@ public:
 
 
     /**
+     * @brief Manage the message "CAN BE FROZEN / CAN NOT BE FROZEN"
+     * @param peerId
+     * @param message
+     */
+    void manageMessageCanBeFrozenOrNot(QString peerId, QString message);
+
+
+    /**
      * @brief Manage the message "FROZEN / UN-FROZEN"
      * @param peerId
      * @param message
@@ -244,6 +252,14 @@ Q_SIGNALS:
      * @param isMuted
      */
     void isMutedFromAgentUpdated(QString peerId, bool isMuted);
+
+
+    /**
+     * @brief Signal emitted when the flag "can be Frozen" from an agent updated
+     * @param peerId
+     * @param canBeFrozen
+     */
+    void canBeFrozenFromAgentUpdated(QString peerId, bool canBeFrozen);
 
 
     /**
