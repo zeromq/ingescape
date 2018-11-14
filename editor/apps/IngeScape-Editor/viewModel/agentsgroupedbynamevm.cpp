@@ -449,16 +449,17 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                             // Else if we have to replace an existing (same) model by the new one
                             else if (sameModel != NULL)
                             {
-                                int index = groupOfAgentsWithSameDefinition->models()->indexOf(sameModel);
-                                if (index > -1)
+                                if (groupOfAgentsWithSameDefinition->models()->contains(sameModel))
                                 {
                                     // Emit the signal "Identical Agent Model will be Replaced"
                                     Q_EMIT identicalAgentModelWillBeReplaced(sameModel, model);
 
                                     qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
 
-                                    // Replace the model
-                                    groupOfAgentsWithSameDefinition->models()->replace(index, model);
+                                    // First add the new model before remove the previous model
+                                    // (allows to prevent to have 0 model at a given moment and to prevent to emit signal noMoreModelAndUseless that remove the groupOfAgentsWithSameDefinition)
+                                    groupOfAgentsWithSameDefinition->models()->append(model);
+                                    groupOfAgentsWithSameDefinition->models()->remove(sameModel);
 
                                     // Emit the signal to delete the previous model of agent
                                     Q_EMIT agentModelHasToBeDeleted(sameModel);
