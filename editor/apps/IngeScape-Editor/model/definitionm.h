@@ -80,11 +80,18 @@ public:
 
 
     /**
-     * @brief Set the flag "is Muted" of an Output of our agent definition
+     * @brief Set the flag "is Muted Output" of an output of our agent definition
      * @param isMuted
      * @param outputName
      */
-    void setisMutedOfOutput(bool isMuted, QString outputName);
+    void setisMutedOutput(bool isMuted, QString outputName);
+
+
+    /**
+     * @brief Get the flag "is Muted Output" of an output of our agent definition
+     * @param outputName
+     */
+    bool getIsMutedOutput(QString outputName);
 
 
     /**
@@ -145,6 +152,14 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when the flag "is Muted Output" of an output changed
+     * @param isMutedOutput
+     * @param outputName
+     */
+    void isMutedOutputChanged(bool isMutedOutput, QString outputName);
+
+
+    /**
      * @brief Signal emitted when we have to open the values history of our agent definition
      */
     void openValuesHistoryOfAgent();
@@ -180,10 +195,10 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "is Muted" of an output changed
-     * @param isMuted
+     * @brief Slot called when the flag "is Muted Output" of an output changed
+     * @param isMutedOutput
      */
-    //void _onIsMutedChanged(bool isMuted);
+    void _onIsMutedOutputChanged(bool isMutedOutput);
 
 
     /**

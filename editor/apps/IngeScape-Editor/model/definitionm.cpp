@@ -67,15 +67,31 @@ DefinitionM::~DefinitionM()
 
 
 /**
- * @brief Set the flag "is Muted" of an Output of our agent definition
+ * @brief Set the flag "is Muted Output" of an output of our agent definition
  * @param isMuted
  * @param outputName
  */
-void DefinitionM::setisMutedOfOutput(bool isMuted, QString outputName)
+void DefinitionM::setisMutedOutput(bool isMuted, QString outputName)
 {
     OutputM* output = getOutputWithName(outputName);
     if (output != nullptr) {
         output->setisMutedOutput(isMuted);
+    }
+}
+
+
+/**
+ * @brief Get the flag "is Muted Output" of an output of our agent definition
+ * @param outputName
+ */
+bool DefinitionM::getIsMutedOutput(QString outputName)
+{
+    OutputM* output = getOutputWithName(outputName);
+    if (output != nullptr) {
+        return output->isMutedOutput();
+    }
+    else {
+        return false;
     }
 }
 
@@ -152,7 +168,7 @@ void DefinitionM::_onOutputsListChanged()
 
                 // Connect to signals from the output
                 connect(output, &OutputM::commandAsked, this, &DefinitionM::commandAskedForOutput);
-                //connect(output, &OutputM::isMutedChanged, this, &DefinitionM::_onIsMutedChanged);
+                connect(output, &OutputM::isMutedOutputChanged, this, &DefinitionM::_onIsMutedOutputChanged);
             }
         }
     }
@@ -166,9 +182,8 @@ void DefinitionM::_onOutputsListChanged()
                 _outputsIdsList.removeOne(output->id());
                 _mapFromOutputNameToOutput.remove(output->name());
 
-                // DIS-connect from signals from the output
-                disconnect(output, &OutputM::commandAsked, this, &DefinitionM::commandAskedForOutput);
-                //disconnect(output, &OutputM::isMutedChanged, this, &DefinitionM::_onIsMutedChanged);
+                // DIS-connect to signals from the output
+                disconnect(output, 0, this, 0);
             }
         }
     }
@@ -218,12 +233,16 @@ void DefinitionM::_onParametersListChanged()
 
 
 /**
- * @brief Slot when the flag "is Muted" of an output changed
- * @param isMuted
+ * @brief Slot called when the flag "is Muted Output" of an output changed
+ * @param isMutedOutput
  */
-/*void DefinitionM::_onIsMutedChanged(bool isMuted)
+void DefinitionM::_onIsMutedOutputChanged(bool isMutedOutput)
 {
-}*/
+    OutputM* output = qobject_cast<OutputM*>(sender());
+    if (output != nullptr) {
+        Q_EMIT isMutedOutputChanged(isMutedOutput, output->name());
+    }
+}
 
 
 /**

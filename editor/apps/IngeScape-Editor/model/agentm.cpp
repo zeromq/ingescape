@@ -109,7 +109,7 @@ void AgentM::setisMuted(bool value)
     {
         _isMuted = value;
 
-        if (_definition != NULL) {
+        if (_definition != nullptr) {
             _definition->setisMutedOfAllOutputs(_isMuted);
         }
 
@@ -128,7 +128,15 @@ void AgentM::setdefinition(DefinitionM *value)
     {
         DefinitionM* previousValue = _definition;
 
+        if (previousValue != nullptr) {
+            disconnect(previousValue, &DefinitionM::isMutedOutputChanged, this, &AgentM::isMutedOutputChanged);
+        }
+
         _definition = value;
+
+        if (_definition != nullptr) {
+            connect(_definition, &DefinitionM::isMutedOutputChanged, this, &AgentM::isMutedOutputChanged);
+        }
 
         // Emit default signal for QML
         Q_EMIT definitionChanged(value);
@@ -147,7 +155,7 @@ void AgentM::setdefinition(DefinitionM *value)
 void AgentM::setisMutedOfOutput(bool isMuted, QString outputName)
 {
     if (_definition != NULL) {
-        _definition->setisMutedOfOutput(isMuted, outputName);
+        _definition->setisMutedOutput(isMuted, outputName);
     }
 }
 

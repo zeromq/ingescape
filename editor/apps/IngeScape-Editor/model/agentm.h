@@ -146,6 +146,14 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when the flag "is Muted Output" of an output changed
+     * @param isMutedOutput
+     * @param outputName
+     */
+    void isMutedOutputChanged(bool isMutedOutput, QString outputName);
+
+
+    /**
      * @brief Signal emitted when the network data (of our agent) will be cleared
      * @param peerId
      */

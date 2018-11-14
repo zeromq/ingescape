@@ -46,7 +46,7 @@ class AgentsGroupedByDefinitionVM : public QObject
     I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
 
     // Flag indicating if our agent is muted
-    I2_QML_PROPERTY_READONLY(bool, isMuted)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(bool, isMuted)
 
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
@@ -364,6 +364,14 @@ private Q_SLOTS:
      * @param mappingFilePath
      */
     void _onMappingFilePathOfModelChanged(QString mappingFilePath);
+
+
+    /**
+     * @brief Slot called when the flag "is Muted Output" of an output (of a model) changed
+     * @param isMutedOutput
+     * @param outputName
+     */
+    void _onIsMutedOutputOfModelChanged(bool isMutedOutput, QString outputName);
 
 
     /**

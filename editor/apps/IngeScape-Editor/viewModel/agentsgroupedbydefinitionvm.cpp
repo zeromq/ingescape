@@ -102,6 +102,26 @@ AgentsGroupedByDefinitionVM::~AgentsGroupedByDefinitionVM()
 
 
 /**
+ * @brief Setter for property "is Muted"
+ * @param value
+ */
+void AgentsGroupedByDefinitionVM::setisMuted(bool value)
+{
+    if (_isMuted != value)
+    {
+        _isMuted = value;
+
+        // Update our definition which is not directly linked to a real model of agent
+        if (_definition != nullptr) {
+            _definition->setisMutedOfAllOutputs(value);
+        }
+
+        Q_EMIT isMutedChanged(value);
+    }
+}
+
+
+/**
  * @brief Change the state of our agent
  */
 void AgentsGroupedByDefinitionVM::changeState()
@@ -395,6 +415,7 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
                 connect(model, &AgentM::logFilePathChanged, this, &AgentsGroupedByDefinitionVM::_onLogFilePathOfModelChanged);
                 connect(model, &AgentM::definitionFilePathChanged, this, &AgentsGroupedByDefinitionVM::_onDefinitionFilePathOfModelChanged);
                 connect(model, &AgentM::mappingFilePathChanged, this, &AgentsGroupedByDefinitionVM::_onMappingFilePathOfModelChanged);
+                connect(model, &AgentM::isMutedOutputChanged, this, &AgentsGroupedByDefinitionVM::_onIsMutedOutputOfModelChanged);
             }
         }
     }
@@ -861,6 +882,39 @@ void AgentsGroupedByDefinitionVM::_onMappingFilePathOfModelChanged(QString mappi
             }
         }
         setmappingFilePath(globalMappingFilePath);
+    }
+}
+
+
+/**
+ * @brief Slot called when the flag "is Muted Output" of an output (of a model) changed
+ * @param isMutedOutput
+ * @param outputName
+ */
+void AgentsGroupedByDefinitionVM::_onIsMutedOutputOfModelChanged(bool isMutedOutput, QString outputName)
+{
+    if (_definition != nullptr)
+    {
+        // Most of the time, there is only one model
+        if (_models.count() == 1)
+        {
+            _definition->setisMutedOutput(isMutedOutput, outputName);
+        }
+        // Several models
+        else
+        {
+            bool globalIsMutedOutput = false;
+
+            for (AgentM* model : _models.toList())
+            {
+                if ((model != nullptr) && (model->definition() != nullptr) && model->definition()->getIsMutedOutput(outputName))
+                {
+                    globalIsMutedOutput = true;
+                    break;
+                }
+            }
+            _definition->setisMutedOutput(globalIsMutedOutput, outputName);
+        }
     }
 }
 
