@@ -122,36 +122,27 @@ void AgentsGroupedByNameVM::updateCurrentValueOfIOP(PublishedValueM* publishedVa
 {
     if (publishedValue != nullptr)
     {
+        AgentIOPTypes::Value iopType = publishedValue->iopType();
+        QString iopName = publishedValue->iopName();
+        QVariant currentValue = publishedValue->value();
+
+        // FIXME: Is it usefull to store values in the definition of each model ?
         for (AgentM* agent : _models)
         {
             if ((agent != NULL) && (agent->definition() != NULL))
             {
-                switch (publishedValue->iopType())
-                {
-                case AgentIOPTypes::OUTPUT: {
-                    OutputM* output = agent->definition()->getOutputWithName(publishedValue->iopName());
-                    if (output != NULL) {
-                        output->setcurrentValue(publishedValue->value());
-                    }
-                    break;
-                }
-                case AgentIOPTypes::INPUT: {
-                    AgentIOPM* input = agent->definition()->getInputWithName(publishedValue->iopName());
-                    if (input != NULL) {
-                        input->setcurrentValue(publishedValue->value());
-                    }
-                    break;
-                }
-                case AgentIOPTypes::PARAMETER: {
-                    AgentIOPM* parameter = agent->definition()->getParameterWithName(publishedValue->iopName());
-                    if (parameter != NULL) {
-                        parameter->setcurrentValue(publishedValue->value());
-                    }
-                    break;
-                }
-                default:
-                    break;
-                }
+                // Update the current value of an I/O/P of the agent definition
+                agent->definition()->updateCurrentValueOfIOP(iopType, iopName, currentValue);
+            }
+        }
+
+        //
+        for (DefinitionM* definition : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
+        {
+            if (definition != nullptr)
+            {
+                // Update the current value of an I/O/P of the agents grouped by definition
+                definition->updateCurrentValueOfIOP(iopType, iopName, currentValue);
             }
         }
     }

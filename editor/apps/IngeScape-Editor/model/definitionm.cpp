@@ -330,6 +330,43 @@ AgentIOPM* DefinitionM::getParameterWithName(QString parameterName)
 
 
 /**
+ * @brief Update the current value of an I/O/P of our agent definition
+ * @param iopType
+ * @param iopName
+ * @param value
+ */
+void DefinitionM::updateCurrentValueOfIOP(AgentIOPTypes::Value iopType, QString iopName, QVariant value)
+{
+    switch (iopType)
+    {
+    case AgentIOPTypes::OUTPUT: {
+        OutputM* output = getOutputWithName(iopName);
+        if (output != NULL) {
+            output->setcurrentValue(value);
+        }
+        break;
+    }
+    case AgentIOPTypes::INPUT: {
+        AgentIOPM* input = getInputWithName(iopName);
+        if (input != NULL) {
+            input->setcurrentValue(value);
+        }
+        break;
+    }
+    case AgentIOPTypes::PARAMETER: {
+        AgentIOPM* parameter = getParameterWithName(iopName);
+        if (parameter != NULL) {
+            parameter->setcurrentValue(value);
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+
+/**
  * @brief Make a copy of our definition
  * @return
  */

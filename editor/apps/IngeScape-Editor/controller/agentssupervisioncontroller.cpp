@@ -74,22 +74,6 @@ AgentsSupervisionController::~AgentsSupervisionController()
 
 
 /**
- * @brief Get the list of view models of agent from a name
- * @param name
- * @return
- */
-/*QList<AgentVM*> AgentsSupervisionController::getAgentViewModelsListFromName(QString name)
-{
-    if (_mapFromNameToAgentViewModelsList.contains(name)) {
-        return _mapFromNameToAgentViewModelsList.value(name);
-    }
-    else {
-        return QList<AgentVM*>();
-    }
-}*/
-
-
-/**
  * @brief Remove the agent from the list and delete it
  * @param agent
  */
@@ -98,16 +82,6 @@ void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM*
     if ((_modelManager != NULL) && (agentsGroupedByDefinition != NULL))
     {
         qInfo() << "Delete the agent" << agentsGroupedByDefinition->name() << "in the List";
-
-        /* Called in the slot "onAgentsGroupedByDefinitionWillBeDeleted"
-        // Unselect our agent if needed
-        if (_selectedAgent == agentsGroupedByDefinition) {
-            setselectedAgent(NULL);
-        }
-
-        // Remove it from the list
-        _agentsList.remove(agentsGroupedByDefinition);
-        */
 
         AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentsGroupedByDefinition->name());
         if (agentsGroupedByName != NULL) {
@@ -344,7 +318,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated(Agen
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
-        //connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openLogStreamOfAgents, this, &AgentsSupervisionController::openLogStreamOfAgents);
 
         // Connect some signals from this new view model of agents grouped by definition to slots

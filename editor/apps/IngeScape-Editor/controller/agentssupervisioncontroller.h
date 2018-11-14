@@ -22,7 +22,6 @@
 #include <I2PropertyHelpers.h>
 
 #include <controller/ingescapemodelmanager.h>
-//#include <viewModel/agentvm.h>
 #include <viewModel/agentsgroupedbydefinitionvm.h>
 
 
@@ -34,11 +33,9 @@ class AgentsSupervisionController : public QObject
     Q_OBJECT
 
     // Sorted list of agents
-    //I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentVM, agentsList)
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentsGroupedByDefinitionVM, agentsList)
 
     // Selected agent in the agents list
-    //I2_QML_PROPERTY_DELETE_PROOF(AgentVM*, selectedAgent)
     I2_QML_PROPERTY_DELETE_PROOF(AgentsGroupedByDefinitionVM*, selectedAgent)
 
 
@@ -61,14 +58,6 @@ public:
 
 
     /**
-     * @brief Get the list of view models of agent from a name
-     * @param name
-     * @return
-     */
-    //QList<AgentVM*> getAgentViewModelsListFromName(QString name);
-
-
-    /**
      * @brief Remove the agent from the list and delete it
      * @param agent
      */
@@ -76,7 +65,7 @@ public:
 
 
     /**
-     * @brief FIXME Delete the model of agent
+     * @brief FIXME REPAIR: Delete the model of agent
      * If it is the last model of a view model, we reset all its network data (only defined by the agent definition)
      * @param agent
      * @return
@@ -235,6 +224,7 @@ private:
      */
     //void _manageNewModelInsideExistingVM(AgentM* model, AgentVM* agentVM);
 
+
     /**
      * @brief Check if we have to merge an agent with another one that have the same definition
      * @param agent
@@ -247,7 +237,6 @@ private:
      * @param agent
      */
     //void _deleteAgentViewModel(AgentVM* agent);
-    //void _deleteAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinitionVM);
 
 
     /**
@@ -273,9 +262,6 @@ private:
 
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
-
-    // Map from agent name to a list of view models of agent
-    //QHash<QString, QList<AgentVM*>> _mapFromNameToAgentViewModelsList;
 
     // Hash table from a definition name to a list of definitions with this name
     QHash<QString, QList<DefinitionM*>> _hashFromDefinitionNameToDefinitionsList;

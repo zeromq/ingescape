@@ -223,7 +223,7 @@ Q_SIGNALS:
      * @brief Signal emitted when we have to open the values history of our agent
      * @param agentName
      */
-    //void openValuesHistoryOfAgent(QString agentName);
+    void openValuesHistoryOfAgent(QString agentName);
 
 
     /**
@@ -385,7 +385,7 @@ private Q_SLOTS:
     /**
      * @brief Slot called when we have to open the values history of our agent
      */
-    //void _onOpenValuesHistoryOfAgent();
+    void _onOpenValuesHistoryOfAgent();
 
 
 private:

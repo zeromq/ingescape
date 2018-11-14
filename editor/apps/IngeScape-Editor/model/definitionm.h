@@ -135,6 +135,15 @@ public:
 
 
     /**
+     * @brief Update the current value of an I/O/P of our agent definition
+     * @param iopType
+     * @param iopName
+     * @param value
+     */
+    void updateCurrentValueOfIOP(AgentIOPTypes::Value iopType, QString iopName, QVariant value);
+
+
+    /**
      * @brief Make a copy of our definition
      * @return
      */

@@ -54,7 +54,7 @@ AgentsGroupedByDefinitionVM::AgentsGroupedByDefinitionVM(AgentM* model,
             qInfo() << "New View Model of Agents grouped by definition" << _definition->name() << "(and name" << _name << ")";
 
             connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput);
-            //connect(_definition, &DefinitionM::openValuesHistoryOfAgent, this, &AgentsGroupedByDefinitionVM::_onOpenValuesHistoryOfAgent);
+            connect(_definition, &DefinitionM::openValuesHistoryOfAgent, this, &AgentsGroupedByDefinitionVM::_onOpenValuesHistoryOfAgent);
         }
         else {
             qInfo() << "New View Model of Agents grouped by definition 'NULL'" << "(and name" << _name << ")";
@@ -933,12 +933,12 @@ void AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput(QString comm
 /**
  * @brief Slot called when we have to open the values history of our agent
  */
-/*void AgentsGroupedByDefinitionVM::_onOpenValuesHistoryOfAgent()
+void AgentsGroupedByDefinitionVM::_onOpenValuesHistoryOfAgent()
 {
     Q_EMIT openValuesHistoryOfAgent(_name);
 
     qDebug() << "Open Values History of Agent" << _name;
-}*/
+}
 
 
 /**
