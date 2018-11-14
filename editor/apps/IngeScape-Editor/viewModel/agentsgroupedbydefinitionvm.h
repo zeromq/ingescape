@@ -31,7 +31,7 @@ class AgentsGroupedByDefinitionVM : public QObject
     I2_QML_PROPERTY_READONLY(QString, name)
 
     // Definition of our agent(s)
-    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
+    I2_QML_PROPERTY_READONLY(DefinitionM*, definition)
 
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
@@ -227,6 +227,13 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when we have to open the "Log Stream" of a list of agents
+     * @param models
+     */
+    void openLogStreamOfAgents(QList<AgentM*> models);
+
+
+    /**
      * @brief Signal emitted when we have to load agent(s) definition from a JSON file (path)
      * @param peerIdsList
      * @param definitionFilePath
@@ -255,13 +262,6 @@ Q_SIGNALS:
      * @param mappingFilePath
      */
     void downloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath);
-
-
-    /**
-     * @brief Signal emitted when we have to open the "Log Stream" of a list of agents
-     * @param models
-     */
-    void openLogStreamOfAgents(QList<AgentM*> models);
 
 
 public Q_SLOTS:
@@ -367,15 +367,15 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when a command must be sent on the network to an agent about one of its output
+     * @brief Slot called when a command must be sent on the network to agent(s) about one of its output
      * @param command
      * @param outputName
      */
-    //void _onCommandAskedToAgentAboutOutput(QString command, QString outputName);
+    void _onCommandAskedToAgentAboutOutput(QString command, QString outputName);
 
 
     /**
-     * @brief Slot when we have to open the values history of our agent
+     * @brief Slot called when we have to open the values history of our agent
      */
     //void _onOpenValuesHistoryOfAgent();
 

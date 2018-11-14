@@ -313,10 +313,6 @@ void AgentsSupervisionController::removeUNactiveAgents()
             // Connect slots to signals from this new view model of agent
             connect(agent, &AgentVM::definitionChangedWithPreviousAndNewValues, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewValues);
             connect(agent, &AgentVM::differentDefinitionDetectedOnModelOfAgent, this, &AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent);
-            connect(agent, &AgentVM::loadAgentDefinitionFromPath, this, &AgentsSupervisionController::_onLoadAgentDefinitionFromPath);
-            connect(agent, &AgentVM::loadAgentMappingFromPath, this, &AgentsSupervisionController::_onLoadAgentMappingFromPath);
-            connect(agent, &AgentVM::downloadAgentDefinitionToPath, this, &AgentsSupervisionController::_onDownloadAgentDefinitionToPath);
-            connect(agent, &AgentVM::downloadAgentMappingToPath, this, &AgentsSupervisionController::_onDownloadAgentMappingToPath);
 
             // Propagate some signals from this new view model of agent
             connect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
@@ -348,6 +344,14 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated(Agen
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
+        //connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openLogStreamOfAgents, this, &AgentsSupervisionController::openLogStreamOfAgents);
+
+        // Connect some signals from this new view model of agents grouped by definition to slots
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::loadAgentDefinitionFromPath, this, &AgentsSupervisionController::_onLoadAgentDefinitionFromPath);
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::loadAgentMappingFromPath, this, &AgentsSupervisionController::_onLoadAgentMappingFromPath);
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::downloadAgentDefinitionToPath, this, &AgentsSupervisionController::_onDownloadAgentDefinitionToPath);
+        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::downloadAgentMappingToPath, this, &AgentsSupervisionController::_onDownloadAgentMappingToPath);
 
         // Add our view model to the list
         _agentsList.append(agentsGroupedByDefinition);
@@ -540,10 +544,10 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
  * @param peerIdsList
  * @param definitionFilePath
  */
-/*void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath)
+void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath)
 {
-    AgentVM* agent = qobject_cast<AgentVM*>(sender());
-    if ((_jsonHelper != NULL) && (agent != NULL) && !peerIdsList.isEmpty() && !definitionFilePath.isEmpty())
+    AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
+    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && !peerIdsList.isEmpty() && !definitionFilePath.isEmpty())
     {
         QFile jsonFile(definitionFilePath);
         if (jsonFile.open(QIODevice::ReadOnly))
@@ -562,20 +566,20 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
             Q_EMIT commandAskedToAgent(peerIdsList, command);
         }
         else {
-            qCritical() << "Can not open file" << definitionFilePath << "(to load the definition of" << agent->name() << ")";
+            qCritical() << "Can not open file" << definitionFilePath << "(to load the definition of" << agentsGroupedByDefinition->name() << ")";
         }
     }
-}*/
+}
 
 
 /**
  * @brief Slot called when we have to load an agent mapping from a JSON file (path)
  * @param mappingFilePath
  */
-/*void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath)
+void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath)
 {
-    AgentVM* agent = qobject_cast<AgentVM*>(sender());
-    if ((_jsonHelper != NULL) && (agent != NULL) && !peerIdsList.isEmpty() && !mappingFilePath.isEmpty())
+    AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
+    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && !peerIdsList.isEmpty() && !mappingFilePath.isEmpty())
     {
         QFile jsonFile(mappingFilePath);
         if (jsonFile.open(QIODevice::ReadOnly))
@@ -594,10 +598,10 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
             Q_EMIT commandAskedToAgent(peerIdsList, command);
         }
         else {
-            qCritical() << "Can not open file" << mappingFilePath << "(to load the mapping of" << agent->name() << ")";
+            qCritical() << "Can not open file" << mappingFilePath << "(to load the mapping of" << agentsGroupedByDefinition->name() << ")";
         }
     }
-}*/
+}
 
 
 /**
@@ -605,10 +609,10 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
  * @param agentDefinition
  * @param definitionFilePath
  */
-/*void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath)
+void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath)
 {
-    AgentVM* agent = qobject_cast<AgentVM*>(sender());
-    if ((_jsonHelper != NULL) && (agent != NULL) && (agentDefinition != NULL) && !definitionFilePath.isEmpty())
+    AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
+    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && (agentDefinition != nullptr) && !definitionFilePath.isEmpty())
     {
         // Get the JSON of the agent definition
         QString jsonOfDefinition = _jsonHelper->getJsonOfAgentDefinition(agentDefinition, QJsonDocument::Indented);
@@ -625,11 +629,11 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
                 jsonFile.close();
             }
             else {
-                qCritical() << "Can not open file" << definitionFilePath << "(to save the definition of" << agent->name() << ")";
+                qCritical() << "Can not open file" << definitionFilePath << "(to save the definition of" << agentsGroupedByDefinition->name() << ")";
             }
         }
     }
-}*/
+}
 
 
 /**
@@ -637,10 +641,10 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
  * @param agentMapping
  * @param mappingFilePath
  */
-/*void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath)
+void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath)
 {
-    AgentVM* agent = qobject_cast<AgentVM*>(sender());
-    if ((_jsonHelper != NULL) && (agent != NULL) && (agentMapping != NULL) && !mappingFilePath.isEmpty())
+    AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
+    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && (agentMapping != nullptr) && !mappingFilePath.isEmpty())
     {
         // Get the JSON of the agent mapping
         QString jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agentMapping, QJsonDocument::Indented);
@@ -657,11 +661,11 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
                 jsonFile.close();
             }
             else {
-                qCritical() << "Can not open file" << mappingFilePath << "(to save the mapping of" << agent->name() << ")";
+                qCritical() << "Can not open file" << mappingFilePath << "(to save the mapping of" << agentsGroupedByDefinition->name() << ")";
             }
         }
     }
-}*/
+}
 
 
 /**

@@ -1072,6 +1072,14 @@ void IngeScapeModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bo
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->setisMutedOfOutput(isMuted, outputName);
+
+        // FIXME TODO: setisMutedOfOutput
+        // Get the (view model of) agents grouped for the name
+        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agent->name());
+        if (agentsGroupedByName != nullptr)
+        {
+
+        }
     }
 }
 

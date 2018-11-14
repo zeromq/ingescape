@@ -74,7 +74,7 @@ DefinitionM::~DefinitionM()
 void DefinitionM::setisMutedOfOutput(bool isMuted, QString outputName)
 {
     OutputM* output = getOutputWithName(outputName);
-    if (output != NULL) {
+    if (output != nullptr) {
         output->setisMutedOutput(isMuted);
     }
 }
@@ -88,7 +88,7 @@ void DefinitionM::setisMutedOfAllOutputs(bool isMuted)
 {
     for (OutputM* output : _outputsList.toList())
     {
-        if (output != NULL) {
+        if (output != nullptr) {
             output->setisMutedAllOutputs(isMuted);
         }
     }

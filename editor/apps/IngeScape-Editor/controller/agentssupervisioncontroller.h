@@ -199,14 +199,14 @@ private Q_SLOTS:
      * @param peerIdsList
      * @param definitionFilePath
      */
-    //void _onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath);
+    void _onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath);
 
 
     /**
      * @brief Slot called when we have to load an agent mapping from a JSON file (path)
      * @param mappingFilePath
      */
-    //void _onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath);
+    void _onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath);
 
 
     /**
@@ -214,7 +214,7 @@ private Q_SLOTS:
      * @param agentDefinition
      * @param definitionFilePath
      */
-    //void _onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath);
+    void _onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath);
 
 
     /**
@@ -222,7 +222,7 @@ private Q_SLOTS:
      * @param agentMapping
      * @param mappingFilePath
      */
-    //void _onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath);
+    void _onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath);
 
 
 private:

@@ -52,6 +52,9 @@ AgentsGroupedByDefinitionVM::AgentsGroupedByDefinitionVM(AgentM* model,
 
         if (_definition != nullptr) {
             qInfo() << "New View Model of Agents grouped by definition" << _definition->name() << "(and name" << _name << ")";
+
+            connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput);
+            //connect(_definition, &DefinitionM::openValuesHistoryOfAgent, this, &AgentsGroupedByDefinitionVM::_onOpenValuesHistoryOfAgent);
         }
         else {
             qInfo() << "New View Model of Agents grouped by definition 'NULL'" << "(and name" << _name << ")";
@@ -75,6 +78,8 @@ AgentsGroupedByDefinitionVM::~AgentsGroupedByDefinitionVM()
     {
         qInfo() << "Delete View Model of Agents grouped by definition" << _definition->name() << "(and name" << _name << ")";
 
+        disconnect(_definition, 0, this, 0);
+
         // Reset and delete the definition
         DefinitionM* temp = _definition;
         setdefinition(NULL);
@@ -93,40 +98,6 @@ AgentsGroupedByDefinitionVM::~AgentsGroupedByDefinitionVM()
     // Free the memory elsewhere
     //_models.deleteAllItems();
     _models.clear();
-}
-
-
-/**
- * @brief Setter for property "Definition"
- * @param value
- */
-void AgentsGroupedByDefinitionVM::setdefinition(DefinitionM* value)
-{
-    if (_definition != value)
-    {
-        //DefinitionM* previousValue = _definition;
-
-        // Previous value
-        /*if (previousValue != NULL)
-        {
-            // DIS-connect from signals from the previous definition
-            disconnect(previousValue, &DefinitionM::commandAskedForOutput, this, &AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput);
-            disconnect(previousValue, &DefinitionM::openValuesHistoryOfAgent, this, &AgentsGroupedByDefinitionVM::_onOpenValuesHistoryOfAgent);
-        }*/
-
-        _definition = value;
-
-        // New value
-        /*if (_definition != NULL)
-        {
-            // Connect to signal from the new definition
-            connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput);
-            connect(_definition, &DefinitionM::openValuesHistoryOfAgent, this, &AgentsGroupedByDefinitionVM::_onOpenValuesHistoryOfAgent);
-        }*/
-
-        // Emit default signal for QML
-        Q_EMIT definitionChanged(value);
-    }
 }
 
 
@@ -895,18 +866,18 @@ void AgentsGroupedByDefinitionVM::_onMappingFilePathOfModelChanged(QString mappi
 
 
 /**
- * @brief Slot when a command must be sent on the network to an agent about one of its output
+ * @brief Slot called when a command must be sent on the network to agent(s) about one of its output
  * @param command
  * @param outputName
  */
-/*void AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput(QString command, QString outputName)
+void AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput(QString command, QString outputName)
 {
     Q_EMIT commandAskedToAgentAboutOutput(_peerIdsList, command, outputName);
-}*/
+}
 
 
 /**
- * @brief Slot when we have to open the values history of our agent
+ * @brief Slot called when we have to open the values history of our agent
  */
 /*void AgentsGroupedByDefinitionVM::_onOpenValuesHistoryOfAgent()
 {
