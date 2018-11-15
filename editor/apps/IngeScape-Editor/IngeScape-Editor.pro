@@ -95,7 +95,10 @@ SOURCES += main.cpp \
     model/scenario/condition/conditiononagentm.cpp \
     misc/qquickwindowblocktouches.cpp \
     viewModel/agentsgroupedbynamevm.cpp \
-    viewModel/agentsgroupedbydefinitionvm.cpp
+    viewModel/agentsgroupedbydefinitionvm.cpp \
+    viewModel/link/linkinputvm.cpp \
+    viewModel/link/linkoutputvm.cpp \
+    viewModel/link/linkvm.cpp
 
 HEADERS += \
     stable.h \
@@ -168,7 +171,10 @@ HEADERS += \
     model/scenario/condition/conditiononagentm.h \
     misc/qquickwindowblocktouches.h \
     viewModel/agentsgroupedbynamevm.h \
-    viewModel/agentsgroupedbydefinitionvm.h
+    viewModel/agentsgroupedbydefinitionvm.h \
+    viewModel/link/linkinputvm.h \
+    viewModel/link/linkoutputvm.h \
+    viewModel/link/linkvm.h
 
 
 RESOURCES += qml.qrc

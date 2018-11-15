@@ -21,6 +21,10 @@
 #include <model/publishedvaluem.h>
 #include <viewModel/agentsgroupedbydefinitionvm.h>
 
+#include <viewModel/iop/inputvm.h>
+#include <viewModel/iop/outputvm.h>
+//#include <viewModel/iop/parametervm.h>
+
 
 /**
  * @brief The AgentsGroupedByNameVM class defines a view model of group of agents who have the same name
@@ -47,6 +51,15 @@ class AgentsGroupedByNameVM : public QObject
 
     // Number of agents which are OFF
     I2_QML_PROPERTY_READONLY(int, numberOfAgentsOFF)
+
+    // List of view models of inputs
+    //I2_QOBJECT_LISTMODEL(InputVM, inputsList)
+
+    // List of view models of outputs
+    //I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
+
+    // List of view models of parameters
+    //I2_QOBJECT_LISTMODEL(ParameterVM, parametersList)
 
     // FIXME DEBUG: List of groups of agents, grouped by definition
     I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, listOfGroupsByDefinition)

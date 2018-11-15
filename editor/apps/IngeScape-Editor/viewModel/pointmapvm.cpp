@@ -25,8 +25,7 @@ PointMapVM::PointMapVM(QString name,
                        QObject *parent) : AgentIOPVM(name,
                                                      id,
                                                      parent),
-    _position(QPointF()),
-    _isDefinedInAllDefinitions(true)
+    _position(QPointF())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

@@ -1169,7 +1169,7 @@ void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachIOP()
     }
 
     // Update the flag "Is Defined in All Definitions" for each parameter
-    /*for (ParameterVM* parameter : _parametersList.toList())
+    for (ParameterVM* parameter : _parametersList.toList())
     {
         if (parameter != NULL)
         {
@@ -1180,7 +1180,7 @@ void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachIOP()
                 parameter->setisDefinedInAllDefinitions(false);
             }
         }
-    }*/
+    }
 }
 
 

@@ -40,6 +40,9 @@ class AgentIOPVM : public QObject
     // Models of our agent Input / Output / Parameter
     //I2_QOBJECT_LISTMODEL(AgentIOPM, models)
 
+    // Flag indicating if our input/output is defined in all definitions
+    I2_QML_PROPERTY_READONLY(bool, isDefinedInAllDefinitions)
+
 
 public:
     /**

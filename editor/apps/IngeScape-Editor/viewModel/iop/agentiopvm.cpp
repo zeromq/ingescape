@@ -24,7 +24,8 @@ AgentIOPVM::AgentIOPVM(QString name,
                        QString id,
                        QObject *parent) : QObject(parent),
     _name(name),
-    _id(id)
+    _id(id),
+    _isDefinedInAllDefinitions(true)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
