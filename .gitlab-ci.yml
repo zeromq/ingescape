@@ -1,48 +1,77 @@
-image: fafesty/compile-with-zyre
+# Gitlab ci
 
+# Define job order
 stages:
   - linux
   - cross
   - headers
+  - installer
 
+# Define default condition to launch job
+.default-conditions: &default-conditions
+  only:
+    - autotool
+
+# Define ingescape library files
+.build-ingescape-files: &build-ingescape-files
+  <<: *default-conditions
+  only:
+    changes:
+      - src/**/*
+      - autogen.sh
+      - configure.ac
+      - Makefile.am
+
+# Define ingescape installer files
+.build-ingescape-installer: &build-ingescape-installer
+  <<: *default-conditions
+  only:
+    changes:
+      - packaging/windows/*
+
+# Create ingescape library for linux
 linux-x86:
+  <<: *build-ingescape-files
   stage: linux
+  image: fafesty/compile-with-zyre
   script:
-    - cd $CI_PROJECT_DIR
     - git clean -xfd
     - ./autogen.sh
     - ./configure
     - make
     - mkdir linux-x86
     - cp src/libingescape.la src/.libs/libingescape.a src/.libs/libingescape.so src/.libs/libingescape.so.0 src/.libs/libingescape.so.0.8.1 linux-x86/
-  only:
-   - autotool
   artifacts:
     paths:
       - linux-x86
 
-win32-x86:
+# Create ingescape library for windows 64 bits
+win32-x86_64:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer
   stage: cross
+  image: fafesty/compile-with-zyre
   script:
-    - cd $CI_PROJECT_DIR
     - git clean -xfd
     - ./autogen.sh
     - ./configure --prefix=/usr/x86_64-w64-mingw32 --exec-prefix=/usr/x86_64-w64-mingw32 --build=x86_64-pc-linux-gnu --host=x86_64-w64-mingw32 LDFLAGS="-L/usr/x86_64-w64-mingw32/lib" PKG_CONFIG_LIBDIR=/usr/x86_64-w64-mingw32/lib/pkgconfig
     - make
-    - mkdir win32-x86
-    - cp src/libingescape.def src/.libs/libingescape.a src/.libs/libingescape.dll src/.libs/libingescape.dll.a win32-x86/
-    - cp /usr/lib/gcc/x86_64-w64-mingw32/6.3-win32/libstdc++-6.dll /usr/lib/gcc/x86_64-w64-mingw32/6.3-win32/libgcc_s_seh-1.dll   win32-x86/
-    - cp /usr/x86_64-w64-mingw32/bin/libzyre.dll /usr/x86_64-w64-mingw32/bin/libczmq.dll /usr/x86_64-w64-mingw32/bin/libzmq.dll /usr/x86_64-w64-mingw32/bin/libsodium-23.dll /usr/x86_64-w64-mingw32/bin/libyajl.dll  win32-x86/
-  only:
-    - autotool
+    - mkdir win32-x86_64
+    - cp src/libingescape.def src/.libs/libingescape.a src/.libs/libingescape.dll src/.libs/libingescape.dll.a win32-x86_64/
+    - cp /usr/lib/gcc/x86_64-w64-mingw32/6.3-win32/libstdc++-6.dll /usr/lib/gcc/x86_64-w64-mingw32/6.3-win32/libgcc_s_seh-1.dll   win32-x86_64/
+    - cp /usr/x86_64-w64-mingw32/bin/libzyre.dll /usr/x86_64-w64-mingw32/bin/libczmq.dll /usr/x86_64-w64-mingw32/bin/libzmq.dll /usr/x86_64-w64-mingw32/bin/libsodium-23.dll /usr/x86_64-w64-mingw32/bin/libyajl.dll  win32-x86_64/
   artifacts:
     paths:
-     - win32-x86
+     - win32-x86_64
+    expire_in: 1 week
 
+# Create ingescape library for windows 32 bits
 win32-i686:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer
   stage: cross
+  image: fafesty/compile-with-zyre
   script:
-    - cd $CI_PROJECT_DIR
     - git clean -xfd
     - ./autogen.sh
     - ./configure --prefix=/usr/i686-w64-mingw32 --exec-prefix=/usr/i686-w64-mingw32 --build=x86_64-pc-linux-gnu --host=i686-w64-mingw32 LDFLAGS="-L/usr/i686-w64-mingw32/lib" PKG_CONFIG_LIBDIR=/usr/i686-w64-mingw32/lib/pkgconfig
@@ -51,20 +80,51 @@ win32-i686:
     - cp src/libingescape.def src/.libs/libingescape.a src/.libs/libingescape.dll src/.libs/libingescape.dll.a win32-i686/
     - cp /usr/lib/gcc/i686-w64-mingw32/6.3-win32/libstdc++-6.dll /usr/lib/gcc/i686-w64-mingw32/6.3-win32/libgcc_s_sjlj-1.dll win32-i686/
     - cp /usr/i686-w64-mingw32/bin/libzyre.dll /usr/i686-w64-mingw32/bin/libczmq.dll /usr/i686-w64-mingw32/bin/libzmq.dll /usr/i686-w64-mingw32/bin/libsodium-23.dll /usr/i686-w64-mingw32/bin/libyajl.dll  win32-i686/
-  only:
-    - autotool
   artifacts:
     paths:
      - win32-i686
+    expire_in: 1 week
 
-includes:
-  stage: headers
+# Create runtime install for windows
+installer-runtime:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer
+  stage: installer
+  image: fafesty/compile-with-zyre
   script:
-   - cd $CI_PROJECT_DIR
-   - mkdir -p include/ingescape
-   - cp src/include/ingescape.h src/include/ingescape_advanced.h include/ingescape/
-  only:
-   - autotool
+   - apt-get update
+   - apt-get install -y nsis
+   - makensis packaging/windows/ingescape-runtime.nsi
+   - mv packaging/windows/Ingescape-Runtime-Installer.exe ./
+  dependencies:
+   - win32-x86_64
+   - win32-i686
   artifacts:
     paths:
-      - include
+      - Ingescape-Runtime-Installer.exe
+
+# Create sdk install for windows
+installer-sdk:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer
+  stage: installer
+  image: fafesty/compile-with-zyre
+  script:
+   - apt-get update
+   - apt-get install -y nsis
+   - makensis packaging/windows/ingescape-sdk.nsi
+   - mv packaging/windows/Ingescape-Sdk-Installer.exe ./
+  dependencies:
+   - win32-x86_64
+   - win32-i686
+  artifacts:
+    paths:
+      - Ingescape-Sdk-Installer.exe
+
+# TODO Add job to package for debian
+# TODO Add job to package for redhat
+# TODO Add job to compile on cyclone and generate macos installer
+# TODO Add job to deploy ingescape website on commit (Can filter to launch job on doc folder changes and only master git's branche)
+# TODO Add job to compile editor
+# TODO Add job to compile ingeprob
+# TODO Add job to package bindings
