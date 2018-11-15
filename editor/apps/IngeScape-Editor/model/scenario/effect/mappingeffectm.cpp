@@ -87,7 +87,7 @@ MappingEffectM::~MappingEffectM()
 * @brief Custom setter for property "output agent"
 * @param value
 */
-void MappingEffectM::setoutputAgent(AgentInMappingVM* value)
+void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
 {
     // Value of (output) agent changed
     if (_outputAgent != value)
@@ -95,9 +95,9 @@ void MappingEffectM::setoutputAgent(AgentInMappingVM* value)
         if (_outputAgent != NULL)
         {
             // UN-subscribe to destruction
-            disconnect(_outputAgent, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
+            disconnect(_outputAgent, &AgentsGroupedByNameVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
 
-            disconnect(_outputAgent, &AgentInMappingVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofOutputAgentChanged);
+            disconnect(_outputAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofOutputAgentChanged);
         }
 
         // set the new value
@@ -112,7 +112,7 @@ void MappingEffectM::setoutputAgent(AgentInMappingVM* value)
         if (_outputAgent != NULL)
         {
             // Subscribe to destruction
-            connect(_outputAgent, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
+            connect(_outputAgent, &AgentsGroupedByNameVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
 
             // Fill outputs
             foreach (OutputVM* output, _outputAgent->outputsList()->toList())
@@ -127,7 +127,7 @@ void MappingEffectM::setoutputAgent(AgentInMappingVM* value)
                 setoutput(_outputsList.at(0));
             }
 
-            connect(_outputAgent, &AgentInMappingVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofOutputAgentChanged);
+            connect(_outputAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofOutputAgentChanged);
         }
 
         Q_EMIT outputAgentChanged(value);
@@ -223,10 +223,10 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
 * @brief Setter for property "Agent"
 * @param agent
 */
-void MappingEffectM::setagent(AgentInMappingVM* agent)
+void MappingEffectM::setagent(AgentsGroupedByNameVM* agent)
 {
     // Save the previous agent before the call to the setter of our mother class
-    AgentInMappingVM* previousAgent = _agent;
+    AgentsGroupedByNameVM* previousAgent = _agent;
 
     // Call setter of mother class
     ActionEffectM::setagent(agent);
@@ -235,7 +235,7 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
     if (previousAgent != _agent)
     {
         if (previousAgent != NULL) {
-            disconnect(previousAgent, &AgentInMappingVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofInputAgentChanged);
+            disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofInputAgentChanged);
         }
 
         // Reset the input
@@ -259,7 +259,7 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
                 setinput(_inputsList.at(0));
             }
 
-            connect(_agent, &AgentInMappingVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofInputAgentChanged);
+            connect(_agent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofInputAgentChanged);
         }
     }
 }
@@ -269,9 +269,9 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
  * @brief Get a pair with the agent and the command (with parameters) of our effect
  * @return
  */
-QPair<AgentInMappingVM*, QStringList> MappingEffectM::getAgentAndCommandWithParameters()
+QPair<AgentsGroupedByNameVM*, QStringList> MappingEffectM::getAgentAndCommandWithParameters()
 {
-    QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters;
+    QPair<AgentsGroupedByNameVM*, QStringList> pairAgentAndCommandWithParameters;
 
     if ((_agent != NULL) && (_input != NULL) && (_outputAgent != NULL) && (_output != NULL))
     {
@@ -282,11 +282,11 @@ QPair<AgentInMappingVM*, QStringList> MappingEffectM::getAgentAndCommandWithPara
         switch (_mappingEffectValue)
         {
         case MappingEffectValues::MAPPED: {
-            commandAndParameters << "MAP";
+            commandAndParameters << command_MapAgents;
             break;
         }
         case MappingEffectValues::UNMAPPED: {
-            commandAndParameters << "UNMAP";
+            commandAndParameters << command_UnmapAgents;
             break;
         }
         default:
@@ -319,11 +319,11 @@ QPair<QString, QStringList> MappingEffectM::getAgentNameAndReverseCommandWithPar
         switch (_mappingEffectValue)
         {
         case MappingEffectValues::MAPPED: {
-            reverseCommandAndParameters << "UNMAP";
+            reverseCommandAndParameters << command_UnmapAgents;
             break;
         }
         case MappingEffectValues::UNMAPPED: {
-            reverseCommandAndParameters << "MAP";
+            reverseCommandAndParameters << command_MapAgents;
             break;
         }
         default:

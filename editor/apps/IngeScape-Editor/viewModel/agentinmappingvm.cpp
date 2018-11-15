@@ -15,22 +15,20 @@
 #include "agentinmappingvm.h"
 
 /**
- * @brief Default constructor
- * @param models. The first agent is needed to instanciate an agent mapping VM.
- * Typically passing during the drag-drop from the list of agents on the left side.
+ * @brief Constructor
+ * @param agentsGroupedByName Models of agents grouped by the same name
  * @param position Position of the top left corner
  * @param parent
  */
-AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
+AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
                                    QPointF position,
                                    QObject *parent) : QObject(parent),
     _name(""),
+    _agentsGroupedByName(agentsGroupedByName),
     _position(position),
-    _isON(false),
     _isReduced(false),
     _reducedMapValueTypeGroupInInput(AgentIOPValueTypeGroups::MIXED),
     _reducedMapValueTypeGroupInOutput(AgentIOPValueTypeGroups::MIXED),
-    _activeAgentsNumber(0),
     _temporaryMapping(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -51,13 +49,12 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
             _temporaryMapping = new AgentMappingM(mappingName, "0.0", mappingDescription);
 
 
-            // Connect to signal "Count Changed" from the list of models
-            connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onModelsChanged);
+            // Connect to signal "Count Changed" from the list of ...
             //connect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onInputsListChanged);
             //connect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onOutputsListChanged);
 
             // Initialize our list
-            _models.append(models);
+            //_models.append(models);
         }
         else {
             qCritical() << "No agent model for the agent in mapping !";
@@ -73,11 +70,15 @@ AgentInMappingVM::~AgentInMappingVM()
 {
     qInfo() << "Delete View Model of Agent in Mapping" << _name;
 
-    disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onModelsChanged);
     //disconnect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onInputsListChanged);
     //disconnect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onOutputsListChanged);
 
-    if (_temporaryMapping != NULL) {
+    if (_agentsGroupedByName != nullptr) {
+        // Deleted elsewhere
+        setagentsGroupedByName(nullptr);
+    }
+
+    if (_temporaryMapping != nullptr) {
         delete _temporaryMapping;
     }
 
@@ -93,12 +94,6 @@ AgentInMappingVM::~AgentInMappingVM()
     _inputsList.deleteAllItems();
     _outputsList.deleteAllItems();
     _parametersList.deleteAllItems();
-
-    // Clear the previous list of models
-    _previousAgentsList.clear();
-
-    // Clear the list of definition
-    _models.clear();
 }
 
 
@@ -249,7 +244,7 @@ ParameterVM* AgentInMappingVM::getParameterFromId(QString parameterId)
 /**
  * @brief Slot when the list of models changed
  */
-void AgentInMappingVM::_onModelsChanged()
+/*void AgentInMappingVM::_onModelsChanged()
 {
     QList<AgentM*> newAgentsList = _models.toList();
 
@@ -265,7 +260,6 @@ void AgentInMappingVM::_onModelsChanged()
                 qDebug() << "Agent in Mapping VM: New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
                 // Connect to signals from a model
-                connect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
                 connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues);
 
                 // A model of agent has been added to our list
@@ -285,7 +279,6 @@ void AgentInMappingVM::_onModelsChanged()
                 qDebug() << "Agent in Mapping VM: Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
 
                 // DIS-connect from signals from a model
-                disconnect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
                 disconnect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues);
 
                 // A model of agent has been removed from our list
@@ -296,9 +289,11 @@ void AgentInMappingVM::_onModelsChanged()
 
     _previousAgentsList = newAgentsList;
 
-    // Update with all models
-    _updateWithAllModels();
-}
+
+    // Update the group (of value type) of the reduced map (= brin) in input and in output of our agent
+    _updateReducedMapValueTypeGroupInInput();
+    _updateReducedMapValueTypeGroupInOutput();
+}*/
 
 
 /**
@@ -323,19 +318,6 @@ void AgentInMappingVM::_onModelsChanged()
         }
     }
 }*/
-
-
-/**
- * @brief Slot when the flag "is ON" of a model changed
- * @param isON
- */
-void AgentInMappingVM::_onIsONofModelChanged(bool isON)
-{
-    Q_UNUSED(isON)
-
-    // Update the flag "is ON" in function of flags of all models
-    _updateIsON();
-}
 
 
 /**
@@ -1148,55 +1130,6 @@ ParameterVM* AgentInMappingVM::_parameterModelRemoved(AgentIOPM* parameter)
     }
 
     return parameterVM;
-}
-
-
-/**
- * @brief Update with all models of agents
- */
-void AgentInMappingVM::_updateWithAllModels()
-{
-    _peerIdsList.clear();
-
-    if (!_models.isEmpty())
-    {
-        for (AgentM* model : _models.toList())
-        {
-            if ((model != NULL) && !model->peerId().isEmpty()) {
-                _peerIdsList.append(model->peerId());
-            }
-        }
-    }
-
-    // Update flags in function of models
-    _updateIsON();
-
-    // Update the group (of value type) of the reduced map (= brin) in input and in output of our agent
-    _updateReducedMapValueTypeGroupInInput();
-    _updateReducedMapValueTypeGroupInOutput();
-}
-
-
-/**
- * @brief Update the flag "is ON" in function of flags of models
- */
-void AgentInMappingVM::_updateIsON()
-{
-    bool globalIsON = false;
-    int activeAgentsNumber = 0;
-
-    for (AgentM* model : _models.toList())
-    {
-        if ((model != NULL) && model->isON())
-        {
-            globalIsON = true;
-            //break;
-            activeAgentsNumber++;
-        }
-    }
-
-    setisON(globalIsON);
-    setactiveAgentsNumber(activeAgentsNumber);
 }
 
 

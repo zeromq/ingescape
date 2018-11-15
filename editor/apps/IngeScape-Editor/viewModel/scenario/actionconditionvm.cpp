@@ -94,18 +94,17 @@ void ActionConditionVM::setconditionType(ActionConditionTypes::Value value)
  */
 void ActionConditionVM::_configureToType(ActionConditionTypes::Value value)
 {
-    AgentInMappingVM* agent = NULL;
+    AgentsGroupedByNameVM* agent = nullptr;
 
     // Delete the old condition if exists
-    if (_modelM != NULL)
+    if (_modelM != nullptr)
     {
         // Save the agent
         agent = _modelM->agent();
 
         ActionConditionM* tmp = _modelM;
-        setmodelM(NULL);
+        setmodelM(nullptr);
         delete tmp;
-        tmp = NULL;
     }
 
     // Create the new model of condition

@@ -62,7 +62,7 @@ public:
      * @brief Get a pair with the agent and the command (with parameters) of our effect
      * @return
      */
-    QPair<AgentInMappingVM*, QStringList> getAgentAndCommandWithParameters() Q_DECL_OVERRIDE;
+    QPair<AgentsGroupedByNameVM*, QStringList> getAgentAndCommandWithParameters() Q_DECL_OVERRIDE;
 
 
     /**

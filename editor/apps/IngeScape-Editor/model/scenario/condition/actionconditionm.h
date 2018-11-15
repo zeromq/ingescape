@@ -21,7 +21,7 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-#include "viewModel/agentinmappingvm.h"
+#include <viewModel/agentsgroupedbynamevm.h>
 
 
 /**
@@ -31,8 +31,8 @@ class ActionConditionM: public QObject
 {
     Q_OBJECT
 
-    // Agent
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agent)
+    // View model of agents grouped by name
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentsGroupedByNameVM*, agent)
 
     // Flag indicating if our condition is valid
     I2_QML_PROPERTY(bool, isValid)

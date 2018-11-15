@@ -133,7 +133,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _recordsSupervisionC = new RecordsSupervisionController(_modelManager, _jsonHelper, this);
 
     // Create the controller for agents mapping
-    _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, rootPath, this);
+    _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, this);
 
     // Create the controller for scenario management
     _scenarioC = new ScenarioController(_modelManager, _jsonHelper, this);
@@ -188,12 +188,12 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _valuesHistoryC, &ValuesHistoryController::onAgentModelCreated);
-    connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentModelWillBeDeleted);
     connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
 
     connect(_modelManager, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated);
     connect(_modelManager, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted);
 
+    connect(_modelManager, &IngeScapeModelManager::agentsGroupedByNameWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentsGroupedByNameWillBeDeleted);
     connect(_modelManager, &IngeScapeModelManager::activeAgentDefined, _agentsMappingC, &AgentsMappingController::onActiveAgentDefined);
     connect(_modelManager, &IngeScapeModelManager::activeAgentMappingDefined, _agentsMappingC, &AgentsMappingController::onActiveAgentMappingDefined);
     connect(_modelManager, &IngeScapeModelManager::mapped, _agentsMappingC, &AgentsMappingController::onMapped);
@@ -207,7 +207,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgentAboutOutput, _networkC, &NetworkController::onCommandAskedToAgentAboutOutput);
-    connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelReplaced, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelReplaced);
+    //connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelReplaced, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelReplaced);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openValuesHistoryOfAgent, _valuesHistoryC, &ValuesHistoryController::filterValuesToShowOnlyAgent);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openLogStreamOfAgents, this, &IngeScapeEditorController::_onOpenLogStreamOfAgents);
 
@@ -222,8 +222,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Connect to signals from the controller for mapping of agents
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
-    connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _scenarioC, &ScenarioController::onAgentInMappingAdded);
-    connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _scenarioC, &ScenarioController::onAgentInMappingRemoved);
 
 
     // Connect to signals from the controller of the scenario

@@ -135,10 +135,10 @@ void IOPValueConditionM::copyFrom(ActionConditionM* condition)
  * @brief Setter for property "Agent"
  * @param agent
  */
-void IOPValueConditionM::setagent(AgentInMappingVM* agent)
+void IOPValueConditionM::setagent(AgentsGroupedByNameVM* agent)
 {
     // Save the previous agent before the call to the setter of our mother class
-    AgentInMappingVM* previousAgent = _agent;
+    AgentsGroupedByNameVM* previousAgent = _agent;
 
     // Call the setter of our mother class
     ActionConditionM::setagent(agent);
@@ -147,7 +147,7 @@ void IOPValueConditionM::setagent(AgentInMappingVM* agent)
     if (previousAgent != _agent)
     {
         if (previousAgent != NULL) {
-            disconnect(previousAgent, &AgentInMappingVM::modelsOfIOPChanged, this, &IOPValueConditionM::_onModelsOfIOPChanged);
+            disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueConditionM::_onModelsOfIOPChanged);
         }
 
         // Reset the agent IOP
@@ -171,7 +171,7 @@ void IOPValueConditionM::setagent(AgentInMappingVM* agent)
                 setagentIOP(_agentIopList.at(0));
             }
 
-            connect(_agent, &AgentInMappingVM::modelsOfIOPChanged, this, &IOPValueConditionM::_onModelsOfIOPChanged);
+            connect(_agent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueConditionM::_onModelsOfIOPChanged);
         }
     }
 }

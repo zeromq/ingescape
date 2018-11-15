@@ -40,11 +40,16 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    if (_modelManager != nullptr)
+    {
+        // Sort agents on their property "name"
+        _sortedListOfAgents.setSourceModel(_modelManager->allAgentsGroupedByName());
+        _sortedListOfAgents.setSortProperty("name");
+    }
+
     // Configure our filtered list of "actionVM in timeline"
     _filteredListActionsInTimeLine.setSourceModel(&_actionsInTimeLine);
 
-    // Set the agent in mapping list sort by name property
-    _agentsInMappingList.setSortProperty("name");
 
     // Fill the list of all values of condition on agent (state)
     _allAgentConditionValues.fillWithAllEnumValues();
@@ -107,9 +112,8 @@ ScenarioController::~ScenarioController()
     disconnect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayOrExecuteActions);
     _timerToRegularlyDelayActions.stop();
 
-    // Clear list and hash table of agents in mapping
-    _agentsInMappingList.clear();
-    _mapFromNameToAgentInMapping.clear();
+    // Clear the sorted list of agents (by their name)
+    _sortedListOfAgents.clear();
 
     // Clear the current scenario
     clearScenario();
@@ -155,7 +159,7 @@ void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
     if (_jsonHelper != NULL)
     {
         // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
-        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, _agentsInMappingList.toList());
+        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, _sortedListOfAgents.toList());
         if (scenarioToImport != NULL)
         {
             // Append the list of actions
@@ -351,7 +355,7 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
             setselectedAction(action);
 
             // Create action editor controller
-            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), action, agentsInMappingList());
+            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), action, _sortedListOfAgents.toList());
 
             _hashActionEditorControllerFromModelOfAction.insert(action, actionEditorC);
 
@@ -362,7 +366,7 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
     else
     {
         // Create action editor controller
-        ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), NULL, agentsInMappingList());
+        ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), NULL, _sortedListOfAgents.toList());
 
         _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
 
@@ -394,7 +398,7 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
             setselectedAction(action->modelM());
 
             // Create action editor controller
-            actionEditorC = new ActionEditorController(_buildNewActionName(), action->modelM(), agentsInMappingList());
+            actionEditorC = new ActionEditorController(_buildNewActionName(), action->modelM(), _sortedListOfAgents.toList());
 
             _hashActionEditorControllerFromViewModelOfAction.insert(action, actionEditorC);
 
@@ -890,7 +894,7 @@ void ScenarioController::executeEffectsOfAction(ActionM* action)
             if ((effectVM != NULL) && (effectVM->modelM() != NULL))
             {
                 // Get the pair with the agent and the command (with parameters) of the effect
-                QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters = effectVM->modelM()->getAgentAndCommandWithParameters();
+                QPair<AgentsGroupedByNameVM*, QStringList> pairAgentAndCommandWithParameters = effectVM->modelM()->getAgentAndCommandWithParameters();
 
                 // Execute the command for the agent
                 _executeCommandForAgent(pairAgentAndCommandWithParameters.first, pairAgentAndCommandWithParameters.second);
@@ -1048,39 +1052,13 @@ bool ScenarioController::isInsertedInTimeLine(ActionM* actionM)
 
 
 /**
-  * @brief Slot called when an agent is added in the mapping
-  */
-void ScenarioController::onAgentInMappingAdded(AgentInMappingVM* agentAdded)
-{
-    if ((agentAdded != NULL) && !_mapFromNameToAgentInMapping.contains(agentAdded->name()))
-    {
-        _mapFromNameToAgentInMapping.insert(agentAdded->name(), agentAdded);
-        _agentsInMappingList.append(agentAdded);
-    }
-}
-
-
-/**
-  * @brief Slot called when an agent is removed from the mapping
-  */
-void ScenarioController::onAgentInMappingRemoved(AgentInMappingVM* agentRemoved)
-{
-    if ((agentRemoved != NULL) && _mapFromNameToAgentInMapping.contains(agentRemoved->name()))
-    {
-        _mapFromNameToAgentInMapping.remove(agentRemoved->name());
-        _agentsInMappingList.remove(agentRemoved);
-    }
-}
-
-
-/**
  * @brief Slot called when an action must be reverted
  * @param actionExecution
  */
 void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
 {
     ActionVM* actionVM = qobject_cast<ActionVM*>(sender());
-    if ((actionVM != NULL) && (actionExecution != NULL))
+    if ((actionVM != nullptr) && (actionExecution != nullptr))
     {
         int currentTimeInMilliSeconds = actionVM->startTime() + actionExecution->reverseTime();
 
@@ -1609,28 +1587,12 @@ void ScenarioController::_stopScenario()
 
 
 /**
- * @brief Get the agent in mapping from an agent name
- * @param agentName
- * @return
- */
-AgentInMappingVM* ScenarioController::_getAgentInMappingFromName(QString agentName)
-{
-    if (_mapFromNameToAgentInMapping.contains(agentName)) {
-        return _mapFromNameToAgentInMapping.value(agentName);
-    }
-    else {
-        return NULL;
-    }
-}
-
-
-/**
  * @brief Execute reverse effects of an action
  * @param actionExecution
  */
 void ScenarioController::_executeReverseEffectsOfAction(ActionExecutionVM* actionExecution)
 {
-    if ((actionExecution != NULL) && actionExecution->shallRevert())
+    if ((_modelManager != nullptr) && (actionExecution != nullptr) && actionExecution->shallRevert())
     {
         // Get the list of pairs <agent name, reverse command (and parameters)>
         QList<QPair<QString, QStringList>> reverseCommandsForAgents = actionExecution->getReverseCommands();
@@ -1639,11 +1601,11 @@ void ScenarioController::_executeReverseEffectsOfAction(ActionExecutionVM* actio
         {
             QPair<QString, QStringList> pairAgentNameAndReverseCommand = reverseCommandsForAgents.at(i);
 
-            AgentInMappingVM* agent = _getAgentInMappingFromName(pairAgentNameAndReverseCommand.first);
-            if (agent != NULL)
+            AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(pairAgentNameAndReverseCommand.first);
+            if (agentsGroupedByName != nullptr)
             {
                 // Execute the (reverse) command for the agent
-                _executeCommandForAgent(agent, pairAgentNameAndReverseCommand.second);
+                _executeCommandForAgent(agentsGroupedByName, pairAgentNameAndReverseCommand.second);
             }
         }
     }
@@ -1652,24 +1614,24 @@ void ScenarioController::_executeReverseEffectsOfAction(ActionExecutionVM* actio
 
 /**
  * @brief Execute a command for an agent
- * @param agent
+ * @param agentsGroupedByName
  * @param commandAndParameters
  */
-void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStringList commandAndParameters)
+void ScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* agentsGroupedByName, QStringList commandAndParameters)
 {
-    if ((agent != NULL) && (commandAndParameters.count() > 0))
+    if ((agentsGroupedByName != nullptr) && !commandAndParameters.isEmpty())
     {
-        qInfo() << "Execute command" << commandAndParameters << "for agent" << agent->name() << "(" << agent->peerIdsList().count() << "peer ids)";
+        qInfo() << "Execute command" << commandAndParameters << "for agent" << agentsGroupedByName->name() << "(" << agentsGroupedByName->peerIdsList().count() << "peer ids)";
 
         QString command = commandAndParameters.at(0);
 
         // START
         if (command == command_StartAgent)
         {
-            foreach (AgentM* model, agent->models()->toList())
+            for (AgentM* model : agentsGroupedByName->models()->toList())
             {
                 // Check if the model has a hostname
-                if ((model != NULL) && !model->hostname().isEmpty())
+                if ((model != nullptr) && !model->hostname().isEmpty())
                 {
                     // Emit signal "Command asked to launcher"
                     Q_EMIT commandAskedToLauncher(command, model->hostname(), model->commandLine());
@@ -1682,10 +1644,10 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                   || (command == command_FreezeAgent) || (command == command_UnfreezeAgent) )
         {
             // Emit signal "Command asked to agent"
-            Q_EMIT commandAskedToAgent(agent->peerIdsList(), command);
+            Q_EMIT commandAskedToAgent(agentsGroupedByName->peerIdsList(), command);
         }
         // MAP or UNMAP
-        else if ((command == "MAP") || (command == "UNMAP"))
+        else if ((command == command_MapAgents) || (command == command_UnmapAgents))
         {
             if (commandAndParameters.count() == 4)
             {
@@ -1694,10 +1656,10 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                 QString outputName = commandAndParameters.at(3);
 
                 // Emit signal "Command asked to agent about Mapping Input"
-                Q_EMIT commandAskedToAgentAboutMappingInput(agent->peerIdsList(), command, inputName, outputAgentName, outputName);
+                Q_EMIT commandAskedToAgentAboutMappingInput(agentsGroupedByName->peerIdsList(), command, inputName, outputAgentName, outputName);
             }
             else {
-                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to map an input of agent" << agent->name();
+                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to map an input of agent" << agentsGroupedByName->name();
             }
         }
         // SET_INPUT / SET_OUTPUT / SET_PARAMETER
@@ -1709,10 +1671,10 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                 QString value = commandAndParameters.at(2);
 
                 // Emit signal "Command asked to agent about Setting Value"
-                Q_EMIT commandAskedToAgentAboutSettingValue(agent->peerIdsList(), command, agentIOPName, value);
+                Q_EMIT commandAskedToAgentAboutSettingValue(agentsGroupedByName->peerIdsList(), command, agentIOPName, value);
             }
             else {
-                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to set a value to agent" << agent->name();
+                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to set a value to agent" << agentsGroupedByName->name();
             }
         }
     }

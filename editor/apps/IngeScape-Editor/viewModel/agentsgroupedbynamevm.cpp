@@ -96,7 +96,7 @@ void AgentsGroupedByNameVM::manageNewModel(AgentM* model)
     {
         qDebug() << "Grouped by" << _name << "manage" << model << "entered";
 
-        // FIXME: depends of cases (definition, ...)
+        // Simply add to our list
         _models.append(model);
 
         if (model->definition() == nullptr)
@@ -497,7 +497,7 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                                 if (groupOfAgentsWithSameDefinition->models()->contains(sameModel))
                                 {
                                     // Emit the signal "Identical Agent Model will be Replaced"
-                                    Q_EMIT identicalAgentModelWillBeReplaced(sameModel, model);
+                                    //Q_EMIT identicalAgentModelWillBeReplaced(sameModel, model);
 
                                     qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
 

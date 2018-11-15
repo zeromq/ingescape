@@ -414,7 +414,8 @@ Item {
 
                     if (IngeScapeEditorC.agentsMappingC)
                     {
-                        IngeScapeEditorC.agentsMappingC.dropAgentToMappingAtPosition(dragItem.agent.name, dragItem.agent.models, dropPosition);
+                        // FIXME REPAIR: dropAgentToMappingAtPosition
+                        //IngeScapeEditorC.agentsMappingC.dropAgentToMappingAtPosition(dragItem.agent.name, dragItem.agent.models, dropPosition);
                     }
 
                     // Restore opacity of our source

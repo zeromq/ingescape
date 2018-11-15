@@ -58,12 +58,10 @@ public:
      * @brief Constructor
      * @param modelManager
      * @param jsonHelper
-     * @param directoryPath
      * @param parent
      */
     explicit AgentsMappingController(IngeScapeModelManager* modelManager,
                                      JsonHelper* jsonHelper,
-                                     QString directoryPath,
                                      QObject *parent = nullptr);
 
 
@@ -95,7 +93,7 @@ public:
 
 
     /**
-     * @brief Called when an agent from the list is dropped on the current mapping at a position
+     * @brief FIXME REPAIR: Called when an agent from the list is dropped on the current mapping at a position
      * @param agentName
      * @param models
      * @param position
@@ -172,14 +170,14 @@ Q_SIGNALS:
      * @brief Emitted when a new "Agent in Mapping" is added
      * @param agent
      */
-    void agentInMappingAdded(AgentInMappingVM* addedAgent);
+    //void agentInMappingAdded(AgentInMappingVM* addedAgent);
 
 
     /**
      * @brief Emitted when an "Agent in Mapping" is removed
      * @param agent
      */
-    void agentInMappingRemoved(AgentInMappingVM* removedAgent);
+    //void agentInMappingRemoved(AgentInMappingVM* removedAgent);
 
 
     /**
@@ -208,7 +206,7 @@ public Q_SLOTS:
      * @param previousModel
      * @param newModel
      */
-    void onIdenticalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
+    //void onIdenticalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
 
 
     /**
@@ -226,14 +224,14 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a model of agent will be deleted
-     * @param agent
+     * @brief Slot called when a view model of agents grouped by name will be deleted
+     * @param agentsGroupedByName
      */
-    void onAgentModelWillBeDeleted(AgentM* agent);
+    void onAgentsGroupedByNameWillBeDeleted(AgentsGroupedByNameVM* agentsGroupedByName);
 
 
     /**
-     * @brief Slot when an active agent has been defined
+     * @brief Slot called when an active agent has been defined
      * @param agent
      */
     void onActiveAgentDefined(AgentM* agent);
@@ -304,13 +302,22 @@ private Q_SLOTS:
 
 
 private:
+
+    /**
+     * @brief Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
+     * @param agentsGroupedByName
+     * @param position
+     */
+    void _createAgentInMappingAtPosition(AgentsGroupedByNameVM* agentsGroupedByName, QPointF position);
+
+
     /**
      * @brief Add new model(s) of agent to the current mapping at a specific position
      * @param agentName
      * @param agentsList
      * @param position
      */
-    void _addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position);
+    //void _addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position);
 
 
     /**
@@ -355,7 +362,7 @@ private:
 
 
     /**
-     * @brief Update the (global) mapping with all models of agents and links
+     * @brief FIXME REPAIR: Update the (global) mapping with all models of agents and links
      */
     void _updateMappingWithModelsOfAgentsAndLinks();
 
@@ -376,11 +383,8 @@ private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 
-    // Path to the directory to load/save files
-    QString _directoryPath;
-
-    // Map from agent name to the (view model of) agent in mapping
-    QHash<QString, AgentInMappingVM*> _mapFromNameToAgentInMapping;
+    // Hash table from agent name to the (view model of) agent in mapping
+    QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;
 
     // Previous list of agents in mapping
     QList<AgentInMappingVM*> _previousListOfAgentsInMapping;

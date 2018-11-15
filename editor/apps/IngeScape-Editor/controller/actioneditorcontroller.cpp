@@ -21,18 +21,18 @@
  * @brief Constructor
  * @param actionName
  * @param originalAction
- * @param listAgentsInMapping
+ * @param allAgentsGroupedByName
  * @param parent
  */
 ActionEditorController::ActionEditorController(QString actionName,
-                                               ActionM *originalAction,
-                                               I2CustomItemSortFilterListModel<AgentInMappingVM> *listAgentsInMapping,
+                                               ActionM* originalAction,
+                                               QList<AgentsGroupedByNameVM*> allAgentsGroupedByName,
                                                QObject *parent) : QObject(parent),
     _originalAction(originalAction),
     _editedAction(NULL),
     _originalViewModel(NULL),
     _editedViewModel(NULL),
-    _listAgentsInMapping(listAgentsInMapping)
+    _allAgentsGroupedByName(allAgentsGroupedByName)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -42,7 +42,7 @@ ActionEditorController::ActionEditorController(QString actionName,
 
     _editedAction = new ActionM(uid, actionName);
 
-    if (_originalAction != NULL)
+    if (_originalAction != nullptr)
     {
         _editedAction->copyFrom(_originalAction);
 
@@ -58,26 +58,24 @@ ActionEditorController::ActionEditorController(QString actionName,
  */
 ActionEditorController::~ActionEditorController()
 {
-    //_listAgentsInMapping->clear();
+    _allAgentsGroupedByName.clear();
 
-    setoriginalAction(NULL);
+    setoriginalAction(nullptr);
 
-    if (_editedAction != NULL)
+    if (_editedAction != nullptr)
     {
         ActionM* tmp = _editedAction;
-        seteditedAction(NULL);
+        seteditedAction(nullptr);
         delete tmp;
-        tmp = NULL;
     }
 
-    setoriginalViewModel(NULL);
+    setoriginalViewModel(nullptr);
 
-    if (_editedViewModel != NULL)
+    if (_editedViewModel != nullptr)
     {
         ActionVM* tmp = _editedViewModel;
-        seteditedViewModel(NULL);
+        seteditedViewModel(nullptr);
         delete tmp;
-        tmp = NULL;
     }
 }
 
@@ -128,8 +126,8 @@ void ActionEditorController::createNewCondition()
     //conditionVM->setmodelM(new ConditionOnAgentM());
 
     // List of agents is NOT empty
-    if ((_listAgentsInMapping != NULL) && !_listAgentsInMapping->isEmpty()) {
-        conditionVM->modelM()->setagent(_listAgentsInMapping->at(0));
+    if (!_allAgentsGroupedByName.isEmpty()) {
+        conditionVM->modelM()->setagent(_allAgentsGroupedByName.at(0));
     }
 
     _editedAction->addConditionToList(conditionVM);
@@ -163,12 +161,12 @@ void ActionEditorController::createNewEffect()
     effectVM->setmodelM(new IOPValueEffectM());
 
     // List of agents is NOT empty
-    if ((_listAgentsInMapping != NULL) && !_listAgentsInMapping->isEmpty())
+    if (!_allAgentsGroupedByName.isEmpty())
     {
-        effectVM->modelM()->setagent(_listAgentsInMapping->at(0));
+        effectVM->modelM()->setagent(_allAgentsGroupedByName.at(0));
 
-        if (_listAgentsInMapping->count() > 1) {
-            effectVM->setsecondAgentInMapping(_listAgentsInMapping->at(1));
+        if (_allAgentsGroupedByName.count() > 1) {
+            effectVM->setsecondAgentForMapping(_allAgentsGroupedByName.at(1));
         }
     }
 

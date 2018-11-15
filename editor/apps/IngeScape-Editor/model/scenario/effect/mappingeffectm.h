@@ -42,7 +42,7 @@ class MappingEffectM: public ActionEffectM
     I2_QML_PROPERTY(MappingEffectValues::Value, mappingEffectValue)
 
     // Output Agent
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, outputAgent)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentsGroupedByNameVM*, outputAgent)
 
     // Output of the output agent
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, output)
@@ -88,14 +88,14 @@ public:
     * @brief Setter for property "Agent"
     * @param agent
     */
-    void setagent(AgentInMappingVM* agent) Q_DECL_OVERRIDE;
+    void setagent(AgentsGroupedByNameVM* agent) Q_DECL_OVERRIDE;
 
 
     /**
      * @brief Get a pair with the agent and the command (with parameters) of our effect
      * @return
      */
-    QPair<AgentInMappingVM*, QStringList> getAgentAndCommandWithParameters() Q_DECL_OVERRIDE;
+    QPair<AgentsGroupedByNameVM*, QStringList> getAgentAndCommandWithParameters() Q_DECL_OVERRIDE;
 
 
     /**

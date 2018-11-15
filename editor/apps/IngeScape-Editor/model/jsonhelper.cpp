@@ -350,10 +350,10 @@ QString JsonHelper::getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocu
 /**
  * @brief Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
  * @param jsonScenario
- * @param listAgentsInMapping
+ * @param allAgentsGroupedByName
  * @return
  */
-ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, QList<AgentInMappingVM*> listAgentsInMapping)
+ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, QList<AgentsGroupedByNameVM*> allAgentsGroupedByName)
 {
     ScenarioM* scenarioImport = new ScenarioM();
 
@@ -452,7 +452,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, Q
                             {
                                 if (jsonEffect.isObject())
                                 {
-                                    ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffect.toObject(), listAgentsInMapping);
+                                    ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffect.toObject(), allAgentsGroupedByName);
                                     if (effectVM != NULL)
                                     {
                                         actionM->addEffectToList(effectVM);
@@ -472,7 +472,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, Q
                             {
                                 if (jsonCondition.isObject())
                                 {
-                                    ActionConditionVM* conditionVM = _parseConditionsVMFromJson(jsonCondition.toObject(), listAgentsInMapping);
+                                    ActionConditionVM* conditionVM = _parseConditionsVMFromJson(jsonCondition.toObject(), allAgentsGroupedByName);
                                     if (conditionVM != NULL)
                                     {
                                         actionM->addConditionToList(conditionVM);
@@ -815,7 +815,10 @@ QJsonArray JsonHelper::exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsI
 {
     QJsonArray jsonArray;
 
-    for (AgentInMappingVM* agentInMapping : agentsInMapping)
+    // FIXME REPAIR: exportAllAgentsInMapping
+    Q_UNUSED(agentsInMapping)
+
+    /*for (AgentInMappingVM* agentInMapping : agentsInMapping)
     {
         if ((agentInMapping != NULL) && (agentInMapping->temporaryMapping() != NULL) && !agentInMapping->models()->isEmpty())
         {
@@ -835,7 +838,7 @@ QJsonArray JsonHelper::exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsI
             // Append to the list of agents
             jsonArray.append(jsonAgent);
         }
-    }
+    }*/
 
     return jsonArray;
 }
@@ -1123,10 +1126,10 @@ ElementMappingM* JsonHelper::_createModelOfElementMapping(QString inputAgentName
 /**
  * @brief Create an action effect VM from JSON object
  * @param jsonObject
- * @param list of agents in mapping
+ * @param allAgentsGroupedByName
  * @return
  */
-ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentInMappingVM*> listAgentsInMapping)
+ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentsGroupedByNameVM*> allAgentsGroupedByName)
 {
     ActionEffectVM* actionEffectVM = NULL;
 
@@ -1158,13 +1161,13 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                         QString agentIOPName = jsonIOPName.toString();
 
-                        AgentInMappingVM* agent = NULL;
-                        AgentIOPM* iopAgentM = NULL;
+                        AgentsGroupedByNameVM* agent = nullptr;
+                        AgentIOPM* iopAgentM = nullptr;
                         bool found = false;
 
-                        for (AgentInMappingVM* iterator : listAgentsInMapping)
+                        for (AgentsGroupedByNameVM* iterator : allAgentsGroupedByName)
                         {
-                            if ((iterator != NULL) && (iterator->name() == agentName))
+                            if ((iterator != nullptr) && (iterator->name() == agentName))
                             {
                                 agent = iterator;
 
@@ -1232,9 +1235,9 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                         // Check agent name and iop name exists
                         QString agentName = jsonAgentName.toString();
 
-                        AgentInMappingVM* agent = NULL;
+                        AgentsGroupedByNameVM* agent = nullptr;
 
-                        foreach (AgentInMappingVM* iterator, listAgentsInMapping)
+                        for (AgentsGroupedByNameVM* iterator : allAgentsGroupedByName)
                         {
                             if ((iterator != NULL) && (iterator->name() == agentName))
                             {
@@ -1282,18 +1285,18 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                         QString inputAgentName = jsonInputAgentName.toString();
                         QString inputName = jsonInputName.toString();
 
-                        AgentInMappingVM* inputAgent = NULL;
+                        AgentsGroupedByNameVM* inputAgent = nullptr;
                         AgentIOPM* input = NULL;
-                        AgentInMappingVM* outputAgent = NULL;
+                        AgentsGroupedByNameVM* outputAgent = nullptr;
                         AgentIOPM* output = NULL;
                         bool found = false;
 
                         QList<AgentIOPM*> outputsList;
                         QList<AgentIOPM*> inputsList;
 
-                        foreach (AgentInMappingVM* iterator, listAgentsInMapping)
+                        for (AgentsGroupedByNameVM* iterator : allAgentsGroupedByName)
                         {
-                            if (iterator != NULL)
+                            if (iterator != nullptr)
                             {
                                 if (iterator->name() == outputAgentName)
                                 {
@@ -1380,10 +1383,10 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 /**
  * @brief Create an action condition VM from JSON object
  * @param jsonObject
- * @param list of agents in mapping
+ * @param allAgentsGroupedByName
  * @return
  */
-ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentInMappingVM*> listAgentsInMapping)
+ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentsGroupedByNameVM*> allAgentsGroupedByName)
 {
     ActionConditionVM* actionConditionVM = NULL;
 
@@ -1406,15 +1409,15 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                         QString agentName = jsonAgentName.toString();
                         QString agentIOPName = jsonIOPName.toString();
 
-                        AgentInMappingVM* agentM = NULL;
+                        AgentsGroupedByNameVM* agent = NULL;
                         AgentIOPM* iopAgentM = NULL;
                         bool found = false;
 
-                        foreach (AgentInMappingVM* agent, listAgentsInMapping)
+                        for (AgentsGroupedByNameVM* iterator : allAgentsGroupedByName)
                         {
-                            if (agent->name() == agentName)
+                            if (iterator->name() == agentName)
                             {
-                                agentM = agent;
+                                agent = iterator;
 
                                 // Go only through outputs
                                 for (OutputVM* outputVM : agent->outputsList()->toList())
@@ -1433,7 +1436,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             }
                         }
 
-                        if ((agentM != NULL) && (iopAgentM != NULL))
+                        if ((agent != nullptr) && (iopAgentM != nullptr))
                         {
                             // Create model
                             IOPValueConditionM* iopConditionM = new IOPValueConditionM();
@@ -1459,7 +1462,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             }
 
                             // set agent
-                            iopConditionM->setagent(agentM);
+                            iopConditionM->setagent(agent);
                             iopConditionM->setagentIOP(iopAgentM);                            
                         }
                     }
@@ -1474,18 +1477,18 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                         // Check agent name and iop name exists
                         QString agentName = jsonAgentName.toString();
 
-                        AgentInMappingVM* agentM = NULL;
+                        AgentsGroupedByNameVM* agent = nullptr;
 
-                        foreach (AgentInMappingVM* agent, listAgentsInMapping)
+                        for (AgentsGroupedByNameVM* iterator : allAgentsGroupedByName)
                         {
-                            if (agent->name() == agentName)
+                            if (iterator->name() == agentName)
                             {
-                                agentM = agent;
+                                agent = iterator;
                                 break;
                             }
                         }
 
-                        if (agentM != NULL)
+                        if (agent != nullptr)
                         {
                             // Create model
                             ConditionOnAgentM* conditionOnAgent = new ConditionOnAgentM();
@@ -1505,7 +1508,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             }
 
                             // set agent
-                            conditionOnAgent->setagent(agentM);
+                            conditionOnAgent->setagent(agent);
                         }
                     }
                     break;

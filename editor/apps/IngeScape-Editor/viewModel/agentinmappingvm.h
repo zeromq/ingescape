@@ -29,8 +29,8 @@
 
 
 /**
- * @brief The AgentInMappingVM class a view model of agent in the mapping
- * Allows to manage when several agents have the same name
+ * @brief The AgentInMappingVM class a view model of agent in the global mapping
+ * Allows to manage agents and links graphically
  */
 class AgentInMappingVM : public QObject
 {
@@ -40,13 +40,7 @@ class AgentInMappingVM : public QObject
     I2_QML_PROPERTY_READONLY(QString, name)
 
     // Agents grouped by name
-    //I2_QML_PROPERTY_READONLY(AgentsGroupedByNameVM, groupOfAgents)
-
-    // List of models of agents
-    I2_QOBJECT_LISTMODEL(AgentM, models)
-
-    // List of peer ids of models
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdsList)
+    I2_QML_PROPERTY_READONLY(AgentsGroupedByNameVM*, agentsGroupedByName)
 
     // List of view models of inputs
     I2_QOBJECT_LISTMODEL(InputVM, inputsList)
@@ -60,9 +54,6 @@ class AgentInMappingVM : public QObject
     // The position corresponds to the corner Top-Left of the box
     I2_QML_PROPERTY(QPointF, position)
 
-    // Flag indicating if our agent is ON (vs OFF)
-    I2_QML_PROPERTY_READONLY(bool, isON)
-
     // Flag indicating if our agent is reduced
     I2_QML_PROPERTY(bool, isReduced)
 
@@ -72,22 +63,18 @@ class AgentInMappingVM : public QObject
     // Group of value type of the reduced map (= brin) in output of the agent
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedMapValueTypeGroupInOutput)
 
-    // Number of active agents
-    I2_QML_PROPERTY_READONLY(int, activeAgentsNumber)
-
     // Mapping currently edited (temporary until the user activate the mapping)
     I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
 
 
 public:
     /**
-     * @brief Default constructor
-     * @param models The first agent is needed to instanciate an agent mapping VM.
-     * Typically passing during the drag-drop from the list of agents on the left side.
+     * @brief Constructor
+     * @param agentsGroupedByName Models of agents grouped by the same name
      * @param position Position of the top left corner
      * @param parent
      */
-    explicit AgentInMappingVM(QList<AgentM*> models,
+    explicit AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
                               QPointF position,
                               QObject* parent = nullptr);
 
@@ -219,13 +206,6 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "is ON" of a model changed
-     * @param isON
-     */
-    void _onIsONofModelChanged(bool isON);
-
-
-    /**
      * @brief Slot called when the definition of a model changed (with previous and new values)
      * @param previousValue
      * @param newValue
@@ -299,18 +279,6 @@ private:
 
 
     /**
-     * @brief Update with all models of agents
-     */
-    void _updateWithAllModels();
-
-
-    /**
-     * @brief Update the flag "is ON" in function of flags of models
-     */
-    void _updateIsON();
-
-
-    /**
      * @brief Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
      */
     void _updateIsDefinedInAllDefinitionsForEachIOP();
@@ -339,9 +307,6 @@ private:
 
 
 private:
-
-    // Previous list of models of agents
-    QList<AgentM*> _previousAgentsList;
 
     // Input name as key is not unique (value type can be different)
     // Map from an input name to a list of view models of inputs

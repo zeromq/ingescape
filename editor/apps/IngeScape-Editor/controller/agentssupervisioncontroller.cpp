@@ -800,53 +800,6 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
 
 
 /**
- * @brief Check if we have to merge an agent with another one that have the same definition
- * @param agent
- */
-/*void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
-{
-    if ((agent != NULL) && (agent->definition() != NULL) && (agent->models()->count() == 1))
-    {
-        AgentM* model = agent->models()->at(0);
-        if (model != NULL)
-        {
-            AgentVM* agentUsingSameDefinition = NULL;
-
-            // Get the list of view models of agent from a name
-            QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
-            for (AgentVM* iterator : agentViewModelsList)
-            {
-                if ((iterator != NULL) && (iterator != agent) && (iterator->definition() != NULL)
-                        // The 2 definitions are strictly identicals
-                        && DefinitionM::areIdenticals(iterator->definition(), agent->definition()))
-                {
-                    agentUsingSameDefinition = iterator;
-                    break;
-                }
-            }
-
-            // A view model of agent already exists with exactly the same definition
-            if (agentUsingSameDefinition != NULL)
-            {
-                // The previous view model of agent is useless, we have to remove it from the list
-                _agentsList.remove(agent);
-
-                // Reset its definition
-                agent->setdefinition(NULL);
-
-                // Delete it
-                _deleteAgentViewModel(agent);
-                agent = NULL;
-
-                // Add the model of agent to the list of the view model
-                agentUsingSameDefinition->models()->append(model);
-            }
-        }
-    }
-}*/
-
-
-/**
  * @brief Delete the view model of agent
  * @param agent
  */

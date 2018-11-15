@@ -22,8 +22,7 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <model/definitionm.h>
-#include <model/mapping/agentmappingm.h>
+#include <viewModel/agentinmappingvm.h>
 #include <model/recordm.h>
 #include <model/scenario/scenariom.h>
 
@@ -126,10 +125,10 @@ public:
     /**
      * @brief Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
      * @param jsonScenario
-     * @param listAgentsInMapping
+     * @param allAgentsGroupedByName
      * @return
      */
-    ScenarioM* createModelOfScenarioFromJSON(QJsonObject jsonScenario, QList<AgentInMappingVM*> listAgentsInMapping);
+    ScenarioM* createModelOfScenarioFromJSON(QJsonObject jsonScenario, QList<AgentsGroupedByNameVM*> allAgentsGroupedByName);
 
 
     /**
@@ -191,20 +190,21 @@ private:
 
 
     /**
-     * @brief Create a model of agent mapping with JSON and the input agent name corresponding
-     * @param inputAgentName, byteArrayOfJson
+     * @brief Create an action effect VM from JSON object
+     * @param jsonEffect
+     * @param allAgentsGroupedByName
      * @return
      */
-    ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentInMappingVM *> listAgentsInMapping);
+    ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentsGroupedByNameVM*> allAgentsGroupedByName);
 
 
     /**
      * @brief Create an action condition VM from JSON object
      * @param jsonObject
-     * @param list of agents in mapping
+     * @param allAgentsGroupedByName
      * @return
      */
-    ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentInMappingVM*> listAgentsInMapping);
+    ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentsGroupedByNameVM*> allAgentsGroupedByName);
 
 };
 

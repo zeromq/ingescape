@@ -51,6 +51,9 @@ class AgentsGroupedByNameVM : public QObject
     // FIXME DEBUG: List of groups of agents, grouped by definition
     I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, listOfGroupsByDefinition)
 
+    // Mapping currently edited (temporary until the user activate the mapping)
+    //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, currentMapping)
+
 
 public:
     /**
@@ -127,11 +130,11 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a previous model of agent will be replaced by a new one strictly identical
+     * @brief FIXME Usefull ? Signal emitted when a previous model of agent will be replaced by a new one strictly identical
      * @param previousModel
      * @param newModel
      */
-    void identicalAgentModelWillBeReplaced(AgentM* previousModel, AgentM* newModel);
+    //void identicalAgentModelWillBeReplaced(AgentM* previousModel, AgentM* newModel);
 
 
     /**

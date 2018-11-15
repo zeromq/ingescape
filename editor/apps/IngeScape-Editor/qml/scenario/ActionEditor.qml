@@ -552,12 +552,12 @@ WindowBlockTouches {
                                         height: parent.height
                                         width: 148
 
-                                        model: controller ? controller.agentsInMappingList : 0
+                                        model: controller ? controller.sortedListOfAgents : 0
 
                                         Binding {
                                             target: agentEffectCombo
                                             property: "selectedIndex"
-                                            value: (myEffect && myEffect.modelM) ? controller.agentsInMappingList.indexOf(myEffect.modelM.agent)
+                                            value: (myEffect && myEffect.modelM) ? controller.sortedListOfAgents.indexOf(myEffect.modelM.agent)
                                                                                  : -1
                                         }
 
@@ -812,15 +812,15 @@ WindowBlockTouches {
                                         height : 25
                                         width : 148
 
-                                        model: controller ? controller.agentsInMappingList : 0
+                                        model: controller ? controller.sortedListOfAgents : 0
 
-                                        enabled: controller && (controller.agentsInMappingList.count !== 0)
-                                        placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
+                                        enabled: controller && (controller.sortedListOfAgents.count !== 0)
+                                        placeholderText: (controller && (controller.sortedListOfAgents.count === 0) ? "- No Item -"
                                                                                                                      : "- Select an item -")
                                         Binding {
                                             target: comboEffectOnMapping_OutputAgent
                                             property: "selectedIndex"
-                                            value: (myEffect && myEffect.modelM) ? controller.agentsInMappingList.indexOf(myEffect.modelM.outputAgent)
+                                            value: (myEffect && myEffect.modelM) ? controller.sortedListOfAgents.indexOf(myEffect.modelM.outputAgent)
                                                                                  : -1
                                         }
 
@@ -987,16 +987,16 @@ WindowBlockTouches {
                                         height : 25
                                         width : 148
 
-                                        model : controller ? controller.agentsInMappingList : 0
+                                        model : controller ? controller.sortedListOfAgents : 0
 
-                                        enabled: (controller && (controller.agentsInMappingList.count !== 0))
-                                        placeholderText: (controller && controller.agentsInMappingList.count === 0 ? "- No Item -"
+                                        enabled: (controller && (controller.sortedListOfAgents.count !== 0))
+                                        placeholderText: (controller && controller.sortedListOfAgents.count === 0 ? "- No Item -"
                                                                                                                    : "- Select an item -")
 
                                         Binding {
                                             target: comboEffectOnMapping_InputAgent
                                             property: "selectedIndex"
-                                            value: (myEffect && myEffect.modelM) ? controller.agentsInMappingList.indexOf(myEffect.modelM.agent)
+                                            value: (myEffect && myEffect.modelM) ? controller.sortedListOfAgents.indexOf(myEffect.modelM.agent)
                                                                                  : -1
                                         }
 
@@ -1514,16 +1514,16 @@ WindowBlockTouches {
                                             height : 25
                                             width : 148
 
-                                            model: controller ? controller.agentsInMappingList : 0
+                                            model: controller ? controller.sortedListOfAgents : 0
 
-                                            enabled: (controller && (controller.agentsInMappingList.count !== 0))
-                                            placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
+                                            enabled: (controller && (controller.sortedListOfAgents.count !== 0))
+                                            placeholderText: (controller && (controller.sortedListOfAgents.count === 0) ? "- No Item -"
                                                                                                                          : "- Select an item -")
 
                                             Binding {
                                                 target: agentCombo
                                                 property: "selectedIndex"
-                                                value: (myCondition && myCondition.modelM) ? controller.agentsInMappingList.indexOf(myCondition.modelM.agent)
+                                                value: (myCondition && myCondition.modelM) ? controller.sortedListOfAgents.indexOf(myCondition.modelM.agent)
                                                                                            : -1
                                             }
 

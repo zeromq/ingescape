@@ -96,9 +96,9 @@ void EffectOnAgentM::copyFrom(ActionEffectM* effect)
  * @brief Get a pair with the agent and the command (with parameters) of our effect
  * @return
  */
-QPair<AgentInMappingVM*, QStringList> EffectOnAgentM::getAgentAndCommandWithParameters()
+QPair<AgentsGroupedByNameVM*, QStringList> EffectOnAgentM::getAgentAndCommandWithParameters()
 {
-    QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters;
+    QPair<AgentsGroupedByNameVM*, QStringList> pairAgentAndCommandWithParameters;
 
     if (_agent != NULL)
     {

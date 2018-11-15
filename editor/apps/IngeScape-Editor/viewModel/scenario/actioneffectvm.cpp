@@ -53,7 +53,7 @@ QString ActionEffectTypes::enumToString(int value)
 ActionEffectVM::ActionEffectVM(QObject *parent) : QObject(parent),
     _modelM(NULL),
     _effectType(ActionEffectTypes::VALUE),
-    _secondAgentInMapping(NULL)
+    _secondAgentForMapping(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -66,7 +66,7 @@ ActionEffectVM::ActionEffectVM(QObject *parent) : QObject(parent),
 ActionEffectVM::~ActionEffectVM()
 {
     // reset pointer
-    setsecondAgentInMapping(NULL);
+    setsecondAgentForMapping(NULL);
 
     if (_modelM != NULL)
     {
@@ -100,18 +100,17 @@ void ActionEffectVM::seteffectType(ActionEffectTypes::Value value)
  */
 void ActionEffectVM::_configureToType(ActionEffectTypes::Value effectType)
 {
-    AgentInMappingVM* agent = NULL;
+    AgentsGroupedByNameVM* agent = nullptr;
 
     // Delete the old model of effect if exists
-    if (_modelM != NULL)
+    if (_modelM != nullptr)
     {
         // Save the agent
         agent = _modelM->agent();
 
         ActionEffectM* tmp = _modelM;
-        setmodelM(NULL);
+        setmodelM(nullptr);
         delete tmp;
-        tmp = NULL;
     }
 
     // Create the new model of effect
@@ -132,8 +131,8 @@ void ActionEffectVM::_configureToType(ActionEffectTypes::Value effectType)
             setmodelM(mappingEffect);
             _modelM->setagent(agent);
 
-            if (_secondAgentInMapping != NULL) {
-                mappingEffect->setoutputAgent(_secondAgentInMapping);
+            if (_secondAgentForMapping != nullptr) {
+                mappingEffect->setoutputAgent(_secondAgentForMapping);
             }
             else {
                 mappingEffect->setoutputAgent(agent);

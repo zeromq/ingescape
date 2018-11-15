@@ -207,6 +207,7 @@ void IngeScapeModelManager::_saveNewAgentsGroupedByName(AgentsGroupedByNameVM* a
 {
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
     {
+        // Connect to its signals
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::onAgentModelHasToBeDeleted);
@@ -232,6 +233,9 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
 {
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
     {
+        // DIS-connect to its signals
+        disconnect(agentsGroupedByName, 0, this, 0);
+
         // Remove from the hash table
         _hashFromNameToAgentsGrouped.remove(agentsGroupedByName->name());
 

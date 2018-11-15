@@ -139,7 +139,7 @@ Q_SIGNALS:
      * @param previousModel
      * @param newModel
      */
-    void identicalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
+    //void identicalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
 
 
 public Q_SLOTS:
@@ -223,13 +223,6 @@ private:
      * @param agentVM
      */
     //void _manageNewModelInsideExistingVM(AgentM* model, AgentVM* agentVM);
-
-
-    /**
-     * @brief Check if we have to merge an agent with another one that have the same definition
-     * @param agent
-     */
-    //void _checkHaveToMergeAgent(AgentVM* agent);
 
 
     /**

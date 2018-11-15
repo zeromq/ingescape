@@ -119,10 +119,10 @@ void IOPValueEffectM::copyFrom(ActionEffectM* effect)
 * @brief Setter for property "Agent"
 * @param agent
 */
-void IOPValueEffectM::setagent(AgentInMappingVM* agent)
+void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
 {
     // Save the previous agent before the call to the setter of our mother class
-    AgentInMappingVM* previousAgent = _agent;
+    AgentsGroupedByNameVM* previousAgent = _agent;
 
     // Call the setter of our mother class
     ActionEffectM::setagent(agent);
@@ -131,7 +131,7 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
     if (previousAgent != _agent)
     {
         if (previousAgent != NULL) {
-            disconnect(previousAgent, &AgentInMappingVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
+            disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
         }
 
         qDebug() << "setagent: setagentIOP(NULL)";
@@ -177,7 +177,7 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
                 setagentIOP(_iopMergedList.at(0));
             }
 
-            connect(_agent, &AgentInMappingVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
+            connect(_agent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
          }
     }
 }
@@ -187,9 +187,9 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
  * @brief Get a pair with the agent and the command (with parameters) of our effect
  * @return
  */
-QPair<AgentInMappingVM*, QStringList> IOPValueEffectM::getAgentAndCommandWithParameters()
+QPair<AgentsGroupedByNameVM*, QStringList> IOPValueEffectM::getAgentAndCommandWithParameters()
 {
-    QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters;
+    QPair<AgentsGroupedByNameVM*, QStringList> pairAgentAndCommandWithParameters;
 
     if ((_agent != NULL) && (_agentIOP != NULL))
     {

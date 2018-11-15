@@ -64,7 +64,7 @@ public:
     * @brief Setter for property "Agent"
     * @param agent
     */
-    void setagent(AgentInMappingVM* agent) Q_DECL_OVERRIDE;
+    void setagent(AgentsGroupedByNameVM* agent) Q_DECL_OVERRIDE;
 
 
     /**

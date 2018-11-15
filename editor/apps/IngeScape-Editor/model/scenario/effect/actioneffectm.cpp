@@ -61,14 +61,14 @@ void ActionEffectM::copyFrom(ActionEffectM* effect)
 * @brief Custom setter for agent
 * @param value
 */
-void ActionEffectM::setagent(AgentInMappingVM* value)
+void ActionEffectM::setagent(AgentsGroupedByNameVM* value)
 {
     if(_agent != value)
     {
         if (_agent != NULL)
         {
             // UN-subscribe to destruction
-            disconnect(_agent, &AgentInMappingVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
+            disconnect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
         }
 
         _agent = value;
@@ -76,7 +76,7 @@ void ActionEffectM::setagent(AgentInMappingVM* value)
         if (_agent != NULL)
         {
             // Subscribe to destruction
-            connect(_agent, &AgentInMappingVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
+            connect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
         }
 
         Q_EMIT agentChanged(value);

@@ -41,14 +41,14 @@ ActionConditionM::~ActionConditionM()
 * @brief Custom setter for agent
 * @param agent
 */
-void ActionConditionM::setagent(AgentInMappingVM* value)
+void ActionConditionM::setagent(AgentsGroupedByNameVM* value)
 {
     if (_agent != value)
     {
         if (_agent != NULL)
         {
             // UnSubscribe to destruction
-            disconnect(_agent, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
+            disconnect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
         }
 
         // Reset
@@ -59,7 +59,7 @@ void ActionConditionM::setagent(AgentInMappingVM* value)
         if (_agent != NULL)
         {
             // Subscribe to destruction
-            connect(_agent, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
+            connect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
         }
 
         Q_EMIT agentChanged(value);
@@ -92,7 +92,7 @@ void ActionConditionM::initializeConnections()
         resetConnections();
 
         // Connect to signal emitted when the flag "is ON" changed
-        connect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentIsOnChanged);
+        connect(_agent, &AgentsGroupedByNameVM::isONChanged, this, &ActionConditionM::_onAgentIsOnChanged);
 
         // Force the call of the slot
         _onAgentIsOnChanged(_agent->isON());
@@ -108,7 +108,7 @@ void ActionConditionM::resetConnections()
     if (_agent != NULL)
     {
         // DIS-connect to signal emitted when the flag "is ON" changed
-        disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentIsOnChanged);
+        disconnect(_agent, &AgentsGroupedByNameVM::isONChanged, this, &ActionConditionM::_onAgentIsOnChanged);
     }
 }
 
