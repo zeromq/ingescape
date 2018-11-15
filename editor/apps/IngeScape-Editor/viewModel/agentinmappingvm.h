@@ -20,6 +20,7 @@
 
 #include <I2PropertyHelpers.h>
 
+#include <viewModel/agentsgroupedbynamevm.h>
 #include <viewModel/iop/inputvm.h>
 #include <viewModel/iop/outputvm.h>
 #include <viewModel/iop/parametervm.h>
@@ -37,6 +38,9 @@ class AgentInMappingVM : public QObject
 
     // Name of our agent
     I2_QML_PROPERTY_READONLY(QString, name)
+
+    // Agents grouped by name
+    //I2_QML_PROPERTY_READONLY(AgentsGroupedByNameVM, groupOfAgents)
 
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)

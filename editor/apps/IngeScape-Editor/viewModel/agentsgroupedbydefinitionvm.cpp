@@ -89,13 +89,14 @@ AgentsGroupedByDefinitionVM::~AgentsGroupedByDefinitionVM()
         qInfo() << "Delete View Model of Agents grouped by definition 'NULL'" << "(and name" << _name << ")";
     }
 
-    // Connect to signal "Count Changed" from the list of models
+    // DIS-connect to signal "Count Changed" from the list of models
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByDefinitionVM::_onModelsChanged);
 
     // Clear the previous list of models
     _previousAgentsList.clear();
 
-    // Free the memory elsewhere
+    // Models are deleted elsewhere (the signal "agentModelHasToBeDeleted" is emitted for each of them
+    // in the method "AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition" just before our destructor)
     //_models.deleteAllItems();
     _models.clear();
 }

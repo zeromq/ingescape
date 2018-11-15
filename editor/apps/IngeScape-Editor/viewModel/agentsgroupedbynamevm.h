@@ -74,6 +74,7 @@ public:
 
     /**
      * @brief Delete the view model of agents grouped by definition
+     * And emit the signal "agentModelHasToBeDeleted" for each of its model of agent
      * @param agentsGroupedByDefinition
      */
     void deleteAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
@@ -204,8 +205,6 @@ private:
     // Hash table from a definition to a (view model of) agents grouped by definition
     QHash<DefinitionM*, AgentsGroupedByDefinitionVM*> _hashFromDefinitionToAgentsGroupedByDefinition;
 
-    // Hash table from a hostname to a list of models of agents
-    //QHash<QString, QList<AgentM*>> _hashFromHostnameToModels;
 };
 
 QML_DECLARE_TYPE(AgentsGroupedByNameVM)

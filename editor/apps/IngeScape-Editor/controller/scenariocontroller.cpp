@@ -1312,7 +1312,7 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
                             {
                                 actionVM->executionsList()->remove(actionExecution);
 
-                                // FIXME: print for DEBUG
+                                // Print for DEBUG
                                 //qDebug() << "_onTimeout_DelayOrExecuteActions: execution removed in" << actionVM->modelM()->name() << "(" << actionVM->executionsList()->count() << ")";
 
                                 // Free memory

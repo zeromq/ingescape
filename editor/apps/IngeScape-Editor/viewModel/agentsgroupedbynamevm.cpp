@@ -42,37 +42,37 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 {
     qInfo() << "Delete View Model of Agents grouped by name" << _name;
 
+    // DIS-connect to signal "Count Changed" from the list of models
+    disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByNameVM::_onModelsChanged);
+
     // DEBUG
     _listOfGroupsByDefinition.clear();
 
     // Delete all view models of agents grouped by definition
     if (_agentsGroupedByDefinitionNULL != nullptr)
     {
-        disconnect(_agentsGroupedByDefinitionNULL, 0, this, 0);
+        // Delete the view model of agents grouped by definition
+        // And emit the signal "agentModelHasToBeDeleted" for each of its model of agent
+        deleteAgentsGroupedByDefinition(_agentsGroupedByDefinitionNULL);
 
-        delete _agentsGroupedByDefinitionNULL;
-        _agentsGroupedByDefinitionNULL = nullptr;
+        //_agentsGroupedByDefinitionNULL = nullptr;
     }
 
     for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : _hashFromDefinitionToAgentsGroupedByDefinition.values())
     {
-        disconnect(agentsGroupedByDefinition, 0, this, 0);
-
-        delete agentsGroupedByDefinition;
+        // Delete the view model of agents grouped by definition
+        // And emit the signal "agentModelHasToBeDeleted" for each of its model of agent
+        deleteAgentsGroupedByDefinition(agentsGroupedByDefinition);
     }
     _hashFromDefinitionToAgentsGroupedByDefinition.clear();
-
-
-    disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByNameVM::_onModelsChanged);
 
     // Clear the previous list of models
     _previousAgentsList.clear();
 
-    // Free the memory elsewhere
+    // All models have already been deleted (the signal "agentModelHasToBeDeleted" is emitted for each of them
+    // in the method "AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition" just before)
     //_models.deleteAllItems();
     _models.clear();
-
-    //_hashFromHostnameToModels.clear();
 }
 
 
@@ -107,8 +107,8 @@ void AgentsGroupedByNameVM::manageNewModel(AgentM* model)
         }
         else
         {
-            // FIXME TODO: Manage a new model of agent that already have a definition...
-            qDebug() << "Manage a new model of agent that already have a definition...TODO";
+            // FIXME TODO ? Manage a new model of agent that already have a definition. Possible ?
+            qWarning() << "Manage a new model of agent that already have a definition...TODO";
         }
     }
 }
@@ -136,7 +136,7 @@ void AgentsGroupedByNameVM::updateCurrentValueOfIOP(PublishedValueM* publishedVa
             }
         }
 
-        //
+        // Traverse the list of definitions (groups of agents grouped by definition)
         for (DefinitionM* definition : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
         {
             if (definition != nullptr)
@@ -151,6 +151,7 @@ void AgentsGroupedByNameVM::updateCurrentValueOfIOP(PublishedValueM* publishedVa
 
 /**
  * @brief Delete the view model of agents grouped by definition
+ * And emit the signal "agentModelHasToBeDeleted" for each of its model of agent
  * @param agentsGroupedByDefinition
  */
 void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
@@ -161,7 +162,7 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
         Q_EMIT agentsGroupedByDefinitionWillBeDeleted(agentsGroupedByDefinition);
 
         // DIS-connect to signals from this view model of agents grouped by definition
-        disconnect(_agentsGroupedByDefinitionNULL, 0, this, 0);
+        disconnect(agentsGroupedByDefinition, 0, this, 0);
 
         // DEBUG
         _listOfGroupsByDefinition.remove(agentsGroupedByDefinition);
