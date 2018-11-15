@@ -36,7 +36,10 @@ class AgentsGroupedByDefinitionVM : public QObject
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
 
-    // Flag indicating if our agent is ON (vs OFF)
+    // List of peer ids of models
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdsList)
+
+    // Flag indicating if our agent(s) is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
 
     // Hostname(s) on the network of our agent(s)
@@ -279,7 +282,7 @@ private Q_SLOTS:
      * @brief Slot called when the hostname of a model changed
      * @param hostname
      */
-    void _onHostnameOfModelChanged(QString hostname);
+    //void _onHostnameOfModelChanged(QString hostname);
 
 
     /**
@@ -398,9 +401,6 @@ private:
 private:
     // Previous list of models of agents
     QList<AgentM*> _previousAgentsList;
-
-    // List of peer ids of our models
-    QStringList _peerIdsList;
 
     // Hash table from a hostname to a list of models of agents
     QHash<QString, QList<AgentM*>> _hashFromHostnameToModels;

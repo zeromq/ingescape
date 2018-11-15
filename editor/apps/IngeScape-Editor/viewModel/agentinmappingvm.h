@@ -72,9 +72,6 @@ class AgentInMappingVM : public QObject
     // Group of value type of the reduced map (= brin) in output of the agent
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedMapValueTypeGroupInOutput)
 
-    // Flag indicating if all definitions are strictly identicals
-    I2_QML_PROPERTY_READONLY(bool, areIdenticalsAllDefinitions)
-
     // Number of active agents
     I2_QML_PROPERTY_READONLY(int, activeAgentsNumber)
 
@@ -311,12 +308,6 @@ private:
      * @brief Update the flag "is ON" in function of flags of models
      */
     void _updateIsON();
-
-
-    /**
-     * @brief Update the flag "Are Identicals All Definitions"
-     */
-    void _updateAreIdenticalsAllDefinitions();
 
 
     /**

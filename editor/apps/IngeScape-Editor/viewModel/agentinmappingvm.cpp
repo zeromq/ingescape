@@ -30,7 +30,6 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
     _isReduced(false),
     _reducedMapValueTypeGroupInInput(AgentIOPValueTypeGroups::MIXED),
     _reducedMapValueTypeGroupInOutput(AgentIOPValueTypeGroups::MIXED),
-    _areIdenticalsAllDefinitions(true),
     _activeAgentsNumber(0),
     _temporaryMapping(NULL)
 {
@@ -586,9 +585,6 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         // Emit signal "models of Inputs/Outputs/Parameters Changed"
         Q_EMIT modelsOfIOPChanged();
 
-
-        // Update the flag "Are Identicals All Definitions"
-        //_updateAreIdenticalsAllDefinitions();
 
         // Update the flag "Are Identicals All Definitions"
         _updateIsDefinedInAllDefinitionsForEachIOP();
@@ -1174,7 +1170,6 @@ void AgentInMappingVM::_updateWithAllModels()
 
     // Update flags in function of models
     _updateIsON();
-    //_updateAreIdenticalsAllDefinitions();
 
     // Update the group (of value type) of the reduced map (= brin) in input and in output of our agent
     _updateReducedMapValueTypeGroupInInput();
@@ -1202,40 +1197,6 @@ void AgentInMappingVM::_updateIsON()
 
     setisON(globalIsON);
     setactiveAgentsNumber(activeAgentsNumber);
-}
-
-
-/**
- * @brief Update the flag "Are Identicals All Definitions"
- */
-void AgentInMappingVM::_updateAreIdenticalsAllDefinitions()
-{
-    bool areIdenticalsAllDefinitions = true;
-
-    if (!_models.isEmpty())
-    {
-        QList<AgentM*> modelsList = _models.toList();
-        DefinitionM* firstDefinition = NULL;
-
-        for (int i = 0; i < modelsList.count(); i++)
-        {
-            AgentM* model = modelsList.at(i);
-            if (model != NULL)
-            {
-                if (i == 0) {
-                    firstDefinition = model->definition();
-                }
-                else if ((firstDefinition != NULL) && (model->definition() != NULL)
-                         // Definitions are differents
-                         && !DefinitionM::areIdenticals(firstDefinition, model->definition()))
-                {
-                    areIdenticalsAllDefinitions = false;
-                    break;
-                }
-            }
-        }
-    }
-    setareIdenticalsAllDefinitions(areIdenticalsAllDefinitions);
 }
 
 

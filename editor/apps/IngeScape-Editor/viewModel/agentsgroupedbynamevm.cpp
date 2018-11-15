@@ -22,8 +22,10 @@
 AgentsGroupedByNameVM::AgentsGroupedByNameVM(QString agentName,
                                              QObject *parent) : QObject(parent),
     _name(agentName),
+    _peerIdsList(QStringList()),
     _isON(false),
-    _peerIdsList(QStringList())
+    _numberOfAgentsON(0),
+    _numberOfAgentsOFF(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -44,6 +46,14 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 
     // DIS-connect to signal "Count Changed" from the list of models
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByNameVM::_onModelsChanged);
+
+    // DIS-connect from signals of each model
+    for (AgentM* model : _models)
+    {
+        if (model != nullptr) {
+            disconnect(model, 0, this, 0);
+        }
+    }
 
     // DEBUG
     _listOfGroupsByDefinition.clear();
@@ -245,7 +255,6 @@ void AgentsGroupedByNameVM::_onModelsChanged()
                 //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
                 // Connect to signals of the model
-                //connect(model, &AgentM::hostnameChanged, this, &AgentsGroupedByNameVM::_onHostnameOfModelChanged);
                 connect(model, &AgentM::isONChanged, this, &AgentsGroupedByNameVM::_onIsONofModelChanged);
                 connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues);
 
@@ -271,8 +280,15 @@ void AgentsGroupedByNameVM::_onModelsChanged()
 
     _previousAgentsList = newAgentsList;
 
-    // Update with all models
-    _updateWithAllModels();
+    /*if (_models.isEmpty())
+    {
+        // There is no more model, our VM is useless
+        Q_EMIT noMoreModelAndUseless();
+    }
+    else {*/
+        // Update with all models
+        _updateWithAllModels();
+    //}
 }
 
 
@@ -282,10 +298,47 @@ void AgentsGroupedByNameVM::_onModelsChanged()
  */
 void AgentsGroupedByNameVM::_onIsONofModelChanged(bool isON)
 {
-    Q_UNUSED(isON)
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        setisON(isON);
 
-    // Update the flag "is ON" in function of flags of all models
-    _updateIsON();
+        if (isON) {
+            setnumberOfAgentsON(1);
+            setnumberOfAgentsOFF(0);
+        }
+        else {
+            setnumberOfAgentsON(0);
+            setnumberOfAgentsOFF(1);
+        }
+    }
+    // Several models
+    else
+    {
+        bool globalIsON = false;
+        int numberOfAgentsON = 0;
+        int numberOfAgentsOFF = 0;
+
+        for (AgentM* model : _models.toList())
+        {
+            if (model != nullptr)
+            {
+                if (model->isON())
+                {
+                    globalIsON = true;
+
+                    numberOfAgentsON++;
+                }
+                else {
+                    numberOfAgentsOFF++;
+                }
+            }
+        }
+
+        setisON(globalIsON);
+        setnumberOfAgentsON(numberOfAgentsON);
+        setnumberOfAgentsOFF(numberOfAgentsOFF);
+    }
 }
 
 
@@ -528,28 +581,78 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
 {
     qDebug() << "Grouped by" << _name << ": Update with all (" << _models.count() << ") models (" << this << ")";
 
-    // Update flags in function of models
-    _updateIsON();
-}
+    // Note: hostname is never empty (default value is HOSTNAME_NOT_DEFINED)
+    _peerIdsList.clear();
+    //_hashFromHostnameToModels.clear();
 
-
-/**
- * @brief Update the flag "is ON" in function of flags of models
- */
-void AgentsGroupedByNameVM::_updateIsON()
-{
     bool globalIsON = false;
+    int numberOfAgentsON = 0;
+    int numberOfAgentsOFF = 0;
 
-    for (AgentM* model : _models.toList())
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
     {
-        if ((model != NULL) && model->isON())
+        AgentM* model = _models.at(0);
+        if (model != nullptr)
         {
-            globalIsON = true;
-            break;
+            if (!model->peerId().isEmpty()) {
+                _peerIdsList = QStringList(model->peerId());
+            }
+
+            //QList<AgentM*> modelsOnHost;
+            //modelsOnHost.append(model);
+            //_hashFromHostnameToModels.insert(model->hostname(), modelsOnHost);
+
+            globalIsON = model->isON();
+
+            if (model->isON()) {
+                numberOfAgentsON = 1;
+                numberOfAgentsOFF = 0;
+            }
+            else {
+                numberOfAgentsON = 0;
+                numberOfAgentsOFF = 1;
+            }
+        }
+    }
+    // Several models
+    else
+    {
+        // Update with all models of agents
+        for (AgentM* model : _models.toList())
+        {
+            if (model != nullptr)
+            {
+                if (!model->peerId().isEmpty()) {
+                    _peerIdsList.append(model->peerId());
+                }
+
+                //QList<AgentM*> modelsOnHost = getModelsOnHost(model->hostname());
+                //modelsOnHost.append(model);
+                //_hashFromHostnameToModels.insert(model->hostname(), modelsOnHost);
+
+                if (model->isON())
+                {
+                    //if (!globalIsON) {
+                    globalIsON = true;
+                    //}
+
+                    numberOfAgentsON++;
+                }
+                else {
+                    numberOfAgentsOFF++;
+                }
+            }
         }
     }
 
+
+    //
+    // Update properties
+    //
     setisON(globalIsON);
+    setnumberOfAgentsON(numberOfAgentsON);
+    setnumberOfAgentsOFF(numberOfAgentsOFF);
 }
 
 

@@ -26,6 +26,7 @@ AgentsGroupedByDefinitionVM::AgentsGroupedByDefinitionVM(AgentM* model,
                                                          QObject *parent) : QObject(parent),
     _name(""),
     _definition(definition),
+    _peerIdsList(QStringList()),
     _isON(false),
     _hostnames(""),
     _canBeRestarted(false),
@@ -39,8 +40,7 @@ AgentsGroupedByDefinitionVM::AgentsGroupedByDefinitionVM(AgentM* model,
     _logFilePath(""),
     _definitionFilePath(""),
     _mappingFilePath(""),
-    _isEnabledViewLogStream(false),
-    _peerIdsList(QStringList())
+    _isEnabledViewLogStream(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -89,8 +89,17 @@ AgentsGroupedByDefinitionVM::~AgentsGroupedByDefinitionVM()
         qInfo() << "Delete View Model of Agents grouped by definition 'NULL'" << "(and name" << _name << ")";
     }
 
+
     // DIS-connect to signal "Count Changed" from the list of models
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByDefinitionVM::_onModelsChanged);
+
+    // DIS-connect from signals of each model
+    for (AgentM* model : _models)
+    {
+        if (model != nullptr) {
+            disconnect(model, 0, this, 0);
+        }
+    }
 
     // Clear the previous list of models
     _previousAgentsList.clear();
@@ -403,7 +412,7 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
                 //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
                 // Connect to signals of the model
-                connect(model, &AgentM::hostnameChanged, this, &AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged);
+                //connect(model, &AgentM::hostnameChanged, this, &AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged);
                 connect(model, &AgentM::isONChanged, this, &AgentsGroupedByDefinitionVM::_onIsONofModelChanged);
                 connect(model, &AgentM::canBeRestartedChanged, this, &AgentsGroupedByDefinitionVM::_onCanBeRestartedOfModelChanged);
                 connect(model, &AgentM::isMutedChanged, this, &AgentsGroupedByDefinitionVM::_onIsMutedOfModelChanged);
@@ -455,7 +464,7 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
  * @brief Slot called when the hostname of a model changed
  * @param hostname
  */
-void AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged(QString hostname)
+/*void AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged(QString hostname)
 {
     // Note: hostname is never empty (default value is HOSTNAME_NOT_DEFINED)
 
@@ -523,7 +532,7 @@ void AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged(QString hostname)
     }
 
     sethostnames(globalHostnames);
-}
+}*/
 
 
 /**
@@ -954,6 +963,7 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
         qDebug() << "Grouped by definition 'NULL': Update with all (" << _models.count() << ") models of" << _name << "(" << this << ")";
     }
 
+    // Note: hostname is never empty (default value is HOSTNAME_NOT_DEFINED)
     _peerIdsList.clear();
     _hashFromHostnameToModels.clear();
 
@@ -1124,5 +1134,3 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
     setdefinitionFilePath(globalDefinitionFilePath);
     setmappingFilePath(globalMappingFilePath);
 }
-
-

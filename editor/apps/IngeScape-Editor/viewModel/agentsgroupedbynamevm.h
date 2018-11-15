@@ -36,8 +36,17 @@ class AgentsGroupedByNameVM : public QObject
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
 
-    // Flag indicating if our agent is ON (vs OFF)
+    // List of peer ids of models
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdsList)
+
+    // Flag indicating if our agent(s) is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
+
+    // Number of agents which are ON
+    I2_QML_PROPERTY_READONLY(int, numberOfAgentsON)
+
+    // Number of agents which are OFF
+    I2_QML_PROPERTY_READONLY(int, numberOfAgentsOFF)
 
     // FIXME DEBUG: List of groups of agents, grouped by definition
     I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, listOfGroupsByDefinition)
@@ -173,12 +182,6 @@ private:
 
 
     /**
-     * @brief Update the flag "is ON" in function of flags of models
-     */
-    void _updateIsON();
-
-
-    /**
      * @brief Check if we have to merge the model of agent with an existing view model of agents (grouped by definition) that have the same definition
      * @param model
      */
@@ -195,9 +198,6 @@ private:
 private:
     // Previous list of models of agents
     QList<AgentM*> _previousAgentsList;
-
-    // List of peer ids of our models
-    QStringList _peerIdsList;
 
     // View model of agents grouped by definition NULL
     AgentsGroupedByDefinitionVM* _agentsGroupedByDefinitionNULL = nullptr;

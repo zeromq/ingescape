@@ -382,19 +382,40 @@ Item {
             width: childrenRect.width + 5
             height: columnListOfGroupsByDefinition.height + 5
 
-            color: groupByNameVM.isON ? "#FF2222" : "#882222"
+            color: groupByNameVM.isON ? "#22CCCC" : "#227777"
 
             Row {
-                spacing: 20
+                spacing: 15
 
                 Text {
                     text: groupByNameVM.name
-                    color: "white"
+                    width: 150
+                    color: groupByNameVM.isON ? "white" : "#888888"
+                    font.pointSize: 14
                 }
 
                 Text {
                     text: groupByNameVM.models.count + " M"
-                    color: "white"
+                    color: groupByNameVM.isON ? "white" : "#888888"
+                    font.pointSize: 14
+                }
+
+                Text {
+                    text: groupByNameVM.numberOfAgentsON + " ON"
+                    color: "#00FF00"
+                    font {
+                        pointSize: 14
+                        weight: Font.Bold
+                    }
+                }
+
+                Text {
+                    text: groupByNameVM.numberOfAgentsOFF + " OFF"
+                    color: "#FF0000"
+                    font {
+                        pointSize: 14
+                        weight: Font.Bold
+                    }
                 }
 
                 Column {
@@ -412,26 +433,23 @@ Item {
                             width: childrenRect.width + 5
                             height: childrenRect.height + 5
 
-                            color: groupByDefinitionVM.isON ? "#22FF22" : "#228822"
+                            color: groupByDefinitionVM.isON ? "#22CC22" : "#227722"
 
                             Row {
-                                spacing: 20
-
-                                /*Text {
-                                    text: groupByDefinitionVM.name
-                                    color: "white"
-                                }*/
+                                spacing: 15
 
                                 Text {
                                     text: groupByDefinitionVM.definition ? groupByDefinitionVM.definition.name : "Def is NULL"
-                                    color: "white"
+                                    color: groupByDefinitionVM.isON ? "white" : "#888888"
                                     width: 150
                                     elide: Text.ElideMiddle
+                                    font.pointSize: 14
                                 }
 
                                 Text {
                                     text: groupByDefinitionVM.models.count + " M"
-                                    color: "white"
+                                    color: groupByDefinitionVM.isON ? "white" : "#888888"
+                                    font.pointSize: 14
                                 }
 
 
@@ -450,24 +468,25 @@ Item {
                                             width: childrenRect.width
                                             height: 25
 
-                                            color: agentM.isON ? "#2222FF" : "#222288"
+                                            color: agentM.isON ? "#2222CC" : "#222277"
 
                                             Row {
-                                                spacing: 20
+                                                spacing: 15
 
                                                 Text {
                                                     text: agentM.hostname
-                                                    color: "white"
+                                                    color: agentM.isON ? "white" : "#888888"
+                                                    font.pointSize: 14
                                                 }
 
                                                 Text {
                                                     text: agentM.peerId
-                                                    color: "white"
+                                                    color: agentM.isON ? "white" : "#888888"
                                                 }
 
                                                 Text {
                                                     text: agentM.commandLine
-                                                    color: "white"
+                                                    color: agentM.isON ? "white" : "#888888"
                                                     width: 400
                                                     elide: Text.ElideLeft
                                                 }
