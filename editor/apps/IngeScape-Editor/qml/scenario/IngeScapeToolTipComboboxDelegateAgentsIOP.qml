@@ -136,7 +136,7 @@ Item {
                 color: (mouseArea.containsPress ? comboboxStyle.listItemTextColorPressed
                                                 : (selection === index ? comboboxStyle.listItemTextColorSelected
                                                                        : comboboxStyle.listItemTextColorIdle));
-                text: getItemText(index);
+                text: index >= 0 ? getItemText(index) : "";
             }
 
             MouseArea {
