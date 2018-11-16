@@ -70,7 +70,6 @@ SOURCES += main.cpp \
     model/scenario/effect/effectonagentm.cpp \
     sortFilter/valueshistorysortfilter.cpp \
     viewModel/agentvm.cpp \
-    viewModel/pointmapvm.cpp \
     viewModel/agentinmappingvm.cpp \
     viewModel/mapbetweeniopvm.cpp \
     viewModel/scenario/actionvm.cpp \
@@ -147,7 +146,6 @@ HEADERS += \
     model/scenario/effect/effectonagentm.h \
     sortFilter/valueshistorysortfilter.h \
     viewModel/agentvm.h \
-    viewModel/pointmapvm.h \
     viewModel/agentinmappingvm.h \
     viewModel/mapbetweeniopvm.h \
     viewModel/scenario/actionvm.h \

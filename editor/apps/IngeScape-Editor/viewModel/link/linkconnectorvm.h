@@ -21,7 +21,7 @@
 
 
 /**
- * @brief The LinkConnectorVM class
+ * @brief The LinkConnectorVM is the base class for derived class of view model of link Input / Output
  */
 class LinkConnectorVM : public QObject
 {

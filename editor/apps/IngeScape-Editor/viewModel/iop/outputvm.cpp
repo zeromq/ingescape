@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -14,7 +14,6 @@
  */
 
 #include "outputvm.h"
-#include <viewModel/iop/inputvm.h>
 
 /**
  * @brief Constructor
@@ -26,7 +25,7 @@
 OutputVM::OutputVM(QString outputName,
                    QString outputId,
                    OutputM* modelM,
-                   QObject *parent) : PointMapVM(outputName,
+                   QObject *parent) : AgentIOPVM(outputName,
                                                  outputId,
                                                  parent),
     _firstModel(NULL),

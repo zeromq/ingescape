@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -51,7 +51,7 @@ public:
      * @param parent
      */
     explicit AgentIOPVM(QString name,
-                        QString id = "",
+                        QString id,
                         QObject *parent = nullptr);
 
 

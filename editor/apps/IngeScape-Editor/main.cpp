@@ -206,7 +206,6 @@ void registerCustomQmlTypes()
     //qmlRegisterUncreatableType<MapBetweenIOPVM>("INGESCAPE", 1, 0, "MapBetweenIOPVM", "Internal class");
     qmlRegisterUncreatableType<OutputVM>("INGESCAPE", 1, 0, "OutputVM", "Internal class");
     qmlRegisterUncreatableType<ParameterVM>("INGESCAPE", 1, 0, "ParameterVM", "Internal class");
-    //qmlRegisterUncreatableType<PointMapVM>("INGESCAPE", 1, 0, "PointMapVM", "Internal class");
 
 
     //------------------

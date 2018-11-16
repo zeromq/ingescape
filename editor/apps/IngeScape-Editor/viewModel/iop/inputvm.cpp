@@ -14,7 +14,6 @@
  */
 
 #include "inputvm.h"
-#include <viewModel/iop/outputvm.h>
 
 /**
  * @brief Constructor
@@ -26,7 +25,7 @@
 InputVM::InputVM(QString inputName,
                  QString inputId,
                  AgentIOPM* modelM,
-                 QObject *parent) : PointMapVM(inputName,
+                 QObject *parent) : AgentIOPVM(inputName,
                                                inputId,
                                                parent),
     _firstModel(NULL)
