@@ -33,11 +33,11 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
                                                            JsonHelper* jsonHelper,
                                                            QObject *parent) : QObject(parent),
     _isRecorderON(false),
-    _selectedRecord(NULL),
+    _selectedRecord(nullptr),
     _isRecording(false),
     _isRecordingTimeLine(false),
     _isLoadingRecord(false),
-    _playingRecord(NULL),
+    _playingRecord(nullptr),
     _currentRecordTime(QTime::fromMSecsSinceStartOfDay(0)),
     _modelManager(modelManager),
     _jsonHelper(jsonHelper)
@@ -67,8 +67,8 @@ RecordsSupervisionController::~RecordsSupervisionController()
     _recordsList.deleteAllItems();
 
     // Reset pointers
-    _modelManager = NULL;
-    _jsonHelper = NULL;
+    _modelManager = nullptr;
+    _jsonHelper = nullptr;
 }
 
 

@@ -51,10 +51,10 @@ QString MappingEffectValues::enumToString(int value)
  */
 MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
     _mappingEffectValue(MappingEffectValues::MAPPED),
-    _outputAgent(NULL),
-    _output(NULL),
+    _outputAgent(nullptr),
+    _output(nullptr),
     _outputName(""),
-    _input(NULL),
+    _input(nullptr),
     _inputName("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -434,7 +434,7 @@ void MappingEffectM::_updateInputSelected()
 {
     if ((_agent != nullptr) && !_inputName.isEmpty())
     {
-        AgentIOPM* newAgentIOP = NULL;
+        AgentIOPM* newAgentIOP = nullptr;
 
         foreach (InputVM* input, _agent->inputsList()->toList())
         {
@@ -462,7 +462,7 @@ void MappingEffectM::_updateOutputSelected()
 {
     if ((_outputAgent != nullptr) && !_outputName.isEmpty())
     {
-        AgentIOPM* newAgentIOP = NULL;
+        AgentIOPM* newAgentIOP = nullptr;
 
         foreach (OutputVM* output, _outputAgent->outputsList()->toList())
         {

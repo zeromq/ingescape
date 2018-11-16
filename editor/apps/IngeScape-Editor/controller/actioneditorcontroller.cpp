@@ -29,9 +29,9 @@ ActionEditorController::ActionEditorController(QString actionName,
                                                QList<AgentsGroupedByNameVM*> allAgentsGroupedByName,
                                                QObject *parent) : QObject(parent),
     _originalAction(originalAction),
-    _editedAction(NULL),
-    _originalViewModel(NULL),
-    _editedViewModel(NULL),
+    _editedAction(nullptr),
+    _originalViewModel(nullptr),
+    _editedViewModel(nullptr),
     _allAgentsGroupedByName(allAgentsGroupedByName)
 {
     // Force ownership of our object, it will prevent Qml from stealing it

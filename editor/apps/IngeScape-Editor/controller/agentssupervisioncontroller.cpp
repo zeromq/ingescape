@@ -28,7 +28,7 @@
 AgentsSupervisionController::AgentsSupervisionController(IngeScapeModelManager* modelManager,
                                                          JsonHelper* jsonHelper,
                                                          QObject *parent) : QObject(parent),
-    _selectedAgent(NULL),
+    _selectedAgent(nullptr),
     _modelManager(modelManager),
     _jsonHelper(jsonHelper)
 {
@@ -68,8 +68,8 @@ AgentsSupervisionController::~AgentsSupervisionController()
     _agentsList.clear();
 
     // Reset pointers
-    _modelManager = NULL;
-    _jsonHelper = NULL;
+    _modelManager = nullptr;
+    _jsonHelper = nullptr;
 }
 
 
@@ -257,7 +257,7 @@ void AgentsSupervisionController::removeUNactiveAgents()
         // Get the list of view models of agent from a name
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(model->name());
 
-        AgentVM* agentWithoutDefinition = NULL;
+        AgentVM* agentWithoutDefinition = nullptr;
 
         if (!agentViewModelsList.isEmpty())
         {
@@ -417,7 +417,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
             // Get the list of view models of agent from a name
             QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
 
-            AgentVM* agentUsingSameDefinition = NULL;
+            AgentVM* agentUsingSameDefinition = nullptr;
 
             for (AgentVM* iterator : agentViewModelsList)
             {
@@ -451,7 +451,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
 
                         // Delete it
                         _deleteAgentViewModel(agent);
-                        agent = NULL;
+                        agent = nullptr;
 
 
                         // Manage the new model inside the existing view model with the same definition
@@ -483,7 +483,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
         // Remove the model of agent from the list of the view model
         agent->models()->remove(model);
 
-        AgentVM* agentUsingSameDefinition = NULL;
+        AgentVM* agentUsingSameDefinition = nullptr;
 
         // Get the list of view models of agent from a name
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(model->name());
@@ -692,7 +692,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
                 else
                 {
                     bool hasToDeleteNewModel = false;
-                    AgentM* sameModel = NULL;
+                    AgentM* sameModel = nullptr;
 
                     QString peerId = model->peerId();
                     QString commandLine = model->commandLine();

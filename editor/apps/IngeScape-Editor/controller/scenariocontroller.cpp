@@ -27,12 +27,12 @@
 ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
                                        JsonHelper* jsonHelper,
                                        QObject *parent) : QObject(parent),
-    _selectedAction(NULL),
-    _selectedActionVMInTimeline(NULL),
+    _selectedAction(nullptr),
+    _selectedActionVMInTimeline(nullptr),
     _linesNumberInTimeLine(MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE),
     _isPlaying(false),
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
-    _nextActionToActivate(NULL),
+    _nextActionToActivate(nullptr),
     _modelManager(modelManager),
     _jsonHelper(jsonHelper),
     _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut(0)
@@ -122,8 +122,8 @@ ScenarioController::~ScenarioController()
     _actionsInPaletteList.deleteAllItems();
 
     // Reset pointers
-    _modelManager = NULL;
-    _jsonHelper = NULL;
+    _modelManager = nullptr;
+    _jsonHelper = nullptr;
 }
 
 
@@ -541,7 +541,7 @@ void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC
         // Remove action editor from model of action
         else
         {
-            ActionM* action = NULL;
+            ActionM* action = nullptr;
             if (actionEditorC->originalAction() != nullptr) {
                 action = actionEditorC->originalAction();
             }
@@ -639,7 +639,7 @@ void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int l
         }
         else {
             delete actionVM;
-            actionVM = NULL;
+            actionVM = nullptr;
         }
     }
 }
@@ -1151,7 +1151,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
         if (_nextActionToActivate != nullptr) {
             currentTimeInMilliSeconds = _nextActionToActivate->startTime();
         }
-        ActionVM* tmpNextActionToActivate = NULL;
+        ActionVM* tmpNextActionToActivate = nullptr;
 
 
         // Traverse the list of actions to evaluate
@@ -1469,7 +1469,7 @@ void ScenarioController::_startScenario()
     // "Future" actions previously added to the time line (on the first line) from the "palette" must be removed
     QList<ActionVM*> futureActionsOnFirstLineToRemove;
 
-    ActionVM* tmpNextActionToActivate = NULL;
+    ActionVM* tmpNextActionToActivate = nullptr;
 
     // Look for the current and futures actions
     for (ActionVM* actionVM : _actionsInTimeLine.toList())
@@ -1724,7 +1724,7 @@ ActionM* ScenarioController::_getModelOfActionWithId(int actionId)
         return _hashFromUidToModelOfAction.value(actionId);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1756,7 +1756,7 @@ I2CustomItemSortFilterListModel<ActionVM>* ScenarioController::_getSortedListOfA
         return _hashFromLineIndexToSortedViewModelsOfAction.value(index);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1771,7 +1771,7 @@ ActionEditorController* ScenarioController::_getActionEditorFromModelOfAction(Ac
         return _hashActionEditorControllerFromModelOfAction.value(action);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1786,6 +1786,6 @@ ActionEditorController* ScenarioController::_getActionEditorFromViewModelOfActio
         return _hashActionEditorControllerFromViewModelOfAction.value(action);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }

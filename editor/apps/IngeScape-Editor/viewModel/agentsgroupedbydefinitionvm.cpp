@@ -264,7 +264,7 @@ void AgentsGroupedByDefinitionVM::downloadMapping()
     if (!mappingFilePath.isEmpty() && !_models.isEmpty())
     {
         // Get the mapping of an active agent
-        AgentMappingM* agentMapping = NULL;
+        AgentMappingM* agentMapping = nullptr;
         for (AgentM* model : _models.toList())
         {
             if ((model != nullptr) && model->isON() && (model->mapping() != nullptr))

@@ -33,8 +33,8 @@ AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelMan
       _viewWidth(1920 - 320), // Full HD - Width of left panel
       _viewHeight(1080 - 100), // Full HD - Height of top & bottom bars of OS
       _isEmptyMapping(true),
-      _selectedAgent(NULL),
-      _selectedLink(NULL),
+      _selectedAgent(nullptr),
+      _selectedLink(nullptr),
       _modelManager(modelManager),
       _jsonHelper(jsonHelper)
 {
@@ -69,8 +69,8 @@ AgentsMappingController::~AgentsMappingController()
     _allAgentsInMapping.deleteAllItems();
 
     // Reset pointers
-    _modelManager = NULL;
-    _jsonHelper = NULL;
+    _modelManager = nullptr;
+    _jsonHelper = nullptr;
 }
 
 
@@ -837,8 +837,8 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
 
             if ((outputAgent != nullptr) && (inputAgent != nullptr))
             {
-                OutputVM* output = NULL;
-                InputVM* input = NULL;
+                OutputVM* output = nullptr;
+                InputVM* input = nullptr;
 
                 // Get the list of view models of output from the output name
                 QList<OutputVM*> outputsWithSameName = outputAgent->getOutputsListFromName(mappingElement->output());

@@ -66,7 +66,7 @@ IngeScapeModelManager::~IngeScapeModelManager()
     _allAgentsGroupedByName.deleteAllItems();
 
     // Reset pointers
-    _jsonHelper = NULL;
+    _jsonHelper = nullptr;
 }
 
 
@@ -262,7 +262,7 @@ AgentM* IngeScapeModelManager::getAgentModelFromPeerId(QString peerId)
         return _mapFromPeerIdToAgentM.value(peerId);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -278,7 +278,7 @@ AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString na
         return _hashFromNameToAgentsGrouped.value(name);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -919,7 +919,7 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if ((agent != nullptr) && (_jsonHelper != nullptr))
     {
-        AgentMappingM* agentMapping = NULL;
+        AgentMappingM* agentMapping = nullptr;
 
         if (mappingJSON.isEmpty())
         {

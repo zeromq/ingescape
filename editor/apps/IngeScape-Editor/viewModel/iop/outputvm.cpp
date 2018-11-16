@@ -28,7 +28,7 @@ OutputVM::OutputVM(QString outputName,
                    QObject *parent) : AgentIOPVM(outputName,
                                                  outputId,
                                                  parent),
-    _firstModel(NULL),
+    _firstModel(nullptr),
     _isPublishedNewValue(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it

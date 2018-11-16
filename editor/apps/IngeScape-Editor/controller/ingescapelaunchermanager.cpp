@@ -125,7 +125,7 @@ HostM* IngeScapeLauncherManager::getHostWithName(QString hostName)
         return _mapFromNameToHost.value(hostName);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 

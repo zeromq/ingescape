@@ -30,7 +30,7 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _isMuted(false),
     _canBeFrozen(false),
     _isFrozen(false),
-    _definition(NULL),
+    _definition(nullptr),
     _clonesNumber(0),
     _state(""),
     _hasLogInStream(false),
@@ -254,7 +254,7 @@ void AgentVM::downloadMapping()
     if (!mappingFilePath.isEmpty() && !_models.isEmpty())
     {
         // Get the mapping of an active agent
-        AgentMappingM* agentMapping = NULL;
+        AgentMappingM* agentMapping = nullptr;
         for (AgentM* model : _models.toList())
         {
             if ((model != nullptr) && model->isON() && (model->mapping() != nullptr))
@@ -902,7 +902,7 @@ void AgentVM::_updateHasLogInFile()
  */
 void AgentVM::_updateWithDefinitionOfFirstModel()
 {
-    DefinitionM* definition = NULL;
+    DefinitionM* definition = nullptr;
     if (!_models.isEmpty())
     {
          AgentM* model = _models.at(0);

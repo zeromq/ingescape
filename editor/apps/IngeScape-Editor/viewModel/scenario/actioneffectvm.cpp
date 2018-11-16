@@ -51,7 +51,7 @@ QString ActionEffectTypes::enumToString(int value)
  * @param parent
  */
 ActionEffectVM::ActionEffectVM(QObject *parent) : QObject(parent),
-    _modelM(NULL),
+    _modelM(nullptr),
     _effectType(ActionEffectTypes::VALUE),
     _secondAgentForMapping(NULL)
 {
@@ -73,7 +73,7 @@ ActionEffectVM::~ActionEffectVM()
         ActionEffectM* tmp = _modelM;
         setmodelM(nullptr);
         delete tmp;
-        tmp = NULL;
+        tmp = nullptr;
     }
 }
 

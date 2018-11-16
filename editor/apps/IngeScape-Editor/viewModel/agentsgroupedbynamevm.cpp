@@ -419,7 +419,7 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                         else
                         {
                             bool hasToDeleteNewModel = false;
-                            AgentM* sameModel = NULL;
+                            AgentM* sameModel = nullptr;
 
                             QString peerId = model->peerId();
                             QString commandLine = model->commandLine();

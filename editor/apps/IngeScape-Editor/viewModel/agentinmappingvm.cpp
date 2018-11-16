@@ -182,7 +182,7 @@ InputVM* AgentInMappingVM::getInputFromId(QString inputId)
         return _mapFromUniqueIdToInput.value(inputId);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -212,7 +212,7 @@ OutputVM* AgentInMappingVM::getOutputFromId(QString outputId)
         return _mapFromUniqueIdToOutput.value(outputId);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -242,7 +242,7 @@ ParameterVM* AgentInMappingVM::getParameterFromId(QString parameterId)
         return _mapFromUniqueIdToParameter.value(parameterId);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -437,7 +437,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         {
             if ((input != nullptr) && !input->id().isEmpty())
             {
-                InputVM* inputVM = NULL;
+                InputVM* inputVM = nullptr;
 
                 // This input was already in the previous definition (just replace the model)
                 if (previousValue->inputsIdsList().contains(input->id()))
@@ -484,7 +484,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         {
             if ((output != nullptr) && !output->id().isEmpty())
             {
-                OutputVM* outputVM = NULL;
+                OutputVM* outputVM = nullptr;
 
                 // This output was already in the previous definition (just replace the model)
                 if (previousValue->outputsIdsList().contains(output->id()))
@@ -531,7 +531,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         {
             if ((parameter != nullptr) && !parameter->id().isEmpty())
             {
-                ParameterVM* parameterVM = NULL;
+                ParameterVM* parameterVM = nullptr;
 
                 // This parameter was already in the previous definition (just replace the model)
                 if (previousValue->parametersIdsList().contains(parameter->id()))
@@ -758,13 +758,13 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
  */
 InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
 {
-    InputVM* inputVM = NULL;
+    InputVM* inputVM = nullptr;
 
     if (input != nullptr)
     {
         // First, we get a ghost of this input: an input without id (only the same name)
         QList<InputVM*> inputsWithSameName = getInputsListFromName(input->name());
-        InputVM* inputWithoutId = NULL;
+        InputVM* inputWithoutId = nullptr;
 
         foreach (InputVM* iterator, inputsWithSameName)
         {
@@ -851,7 +851,7 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
  */
 InputVM* AgentInMappingVM::_inputModelRemoved(AgentIOPM* input)
 {
-    InputVM* inputVM = NULL;
+    InputVM* inputVM = nullptr;
 
     if (input != nullptr)
     {
@@ -887,13 +887,13 @@ InputVM* AgentInMappingVM::_inputModelRemoved(AgentIOPM* input)
  */
 OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
 {
-    OutputVM* outputVM = NULL;
+    OutputVM* outputVM = nullptr;
 
     if (output != nullptr)
     {
         // First, we get a ghost of this output: an output without id (only the same name)
         QList<OutputVM*> outputsWithSameName = getOutputsListFromName(output->name());
-        OutputVM* outputWithoutId = NULL;
+        OutputVM* outputWithoutId = nullptr;
 
         foreach (OutputVM* iterator, outputsWithSameName)
         {
@@ -981,7 +981,7 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
  */
 OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
 {
-    OutputVM* outputVM = NULL;
+    OutputVM* outputVM = nullptr;
 
     if (output != nullptr)
     {
@@ -1017,13 +1017,13 @@ OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
  */
 ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
 {
-    ParameterVM* parameterVM = NULL;
+    ParameterVM* parameterVM = nullptr;
 
     if (parameter != nullptr)
     {
         // First, we get a ghost of this parameter: a parameter without id (only the same name)
         QList<ParameterVM*> parametersWithSameName = getParametersListFromName(parameter->name());
-        ParameterVM* parameterWithoutId = NULL;
+        ParameterVM* parameterWithoutId = nullptr;
 
         foreach (ParameterVM* iterator, parametersWithSameName)
         {
@@ -1110,7 +1110,7 @@ ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
  */
 ParameterVM* AgentInMappingVM::_parameterModelRemoved(AgentIOPM* parameter)
 {
-    ParameterVM* parameterVM = NULL;
+    ParameterVM* parameterVM = nullptr;
 
     if (parameter != nullptr)
     {

@@ -28,7 +28,7 @@
  * @param parent
  */
 IOPValueEffectM::IOPValueEffectM(QObject *parent) : ActionEffectM(parent),
-    _agentIOP(NULL),
+    _agentIOP(nullptr),
     _agentIOPType(AgentIOPTypes::INPUT),
     _agentIOPName(""),
     _value("")
@@ -313,7 +313,7 @@ QPair<QString, QStringList> IOPValueEffectM::getAgentNameAndReverseCommandWithPa
   */
 void IOPValueEffectM::_onModelsOfIOPChanged()
 {
-    AgentIOPM* newAgentIOP = NULL;
+    AgentIOPM* newAgentIOP = nullptr;
 
     qDebug() << "_on Models of IOP changed" << AgentIOPTypes::staticEnumToString(_agentIOPType) << _agentIOPName;
 

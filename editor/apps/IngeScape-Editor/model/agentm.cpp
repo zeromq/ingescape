@@ -53,8 +53,8 @@ AgentM::AgentM(QString name,
     _isMuted(false),
     _canBeFrozen(false),
     _isFrozen(false),
-    _definition(NULL),
-    _mapping(NULL),
+    _definition(nullptr),
+    _mapping(nullptr),
     _state(""),
     _loggerPort(""),
     _hasLogInStream(false),
@@ -84,7 +84,7 @@ AgentM::~AgentM()
         //DefinitionM* temp = _definition;
         setdefinition(nullptr);
         //delete temp;
-        //temp = NULL;
+        //temp = nullptr;
     }
 
     // Delete our agent mapping
@@ -94,7 +94,7 @@ AgentM::~AgentM()
         //AgentMappingM* temp = _mapping;
         setmapping(nullptr);
         //delete temp;
-        //temp = NULL;
+        //temp = nullptr;
     }
 }
 

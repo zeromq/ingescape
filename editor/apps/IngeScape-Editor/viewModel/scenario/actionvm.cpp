@@ -26,12 +26,12 @@
 ActionVM::ActionVM(ActionM* model,
                    int startTime,
                    QObject *parent) : QObject(parent),
-    _modelM(NULL),
+    _modelM(nullptr),
     _startTime(startTime),
     _startTimeString("00:00:00.000"),
     _lineInTimeLine(-1),
     _areAllConditionsValid(false),
-    _currentExecution(NULL),
+    _currentExecution(nullptr),
     _endTime(startTime)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -96,7 +96,7 @@ ActionVM::~ActionVM()
         disconnect(_timerToReverse, 0, this, 0);
         _timerToReverse->stop();
         delete _timerToReverse;
-        _timerToReverse = NULL;
+        _timerToReverse = nullptr;
     }
 
     // Remove rearm timer
@@ -105,7 +105,7 @@ ActionVM::~ActionVM()
         disconnect(_timerToRearm, 0, this, 0);
         _timerToRearm->stop();
         delete _timerToRearm;
-        _timerToRearm = NULL;
+        _timerToRearm = nullptr;
     }
 }
 

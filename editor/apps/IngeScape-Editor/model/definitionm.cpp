@@ -292,7 +292,7 @@ AgentIOPM* DefinitionM::getInputWithName(QString inputName)
         return _mapFromInputNameToInput.value(inputName);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -308,7 +308,7 @@ OutputM* DefinitionM::getOutputWithName(QString outputName)
         return _mapFromOutputNameToOutput.value(outputName);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -324,7 +324,7 @@ AgentIOPM* DefinitionM::getParameterWithName(QString parameterName)
         return _mapFromParameterNameToParameter.value(parameterName);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 

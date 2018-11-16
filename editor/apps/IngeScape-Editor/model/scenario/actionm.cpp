@@ -515,7 +515,7 @@ void ActionM::_onEffectDestructionAsked()
                 _effectsList.remove(effectVM);
 
                 delete effectVM;
-                effectVM = NULL;
+                effectVM = nullptr;
             }
         }
     }
@@ -540,7 +540,7 @@ void ActionM::_onConditionDestructionAsked()
                 _conditionsList.remove(conditionVM);
 
                 delete conditionVM;
-                conditionVM = NULL;
+                conditionVM = nullptr;
             }
         }
     }

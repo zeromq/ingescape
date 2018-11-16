@@ -53,7 +53,7 @@ QString ValueComparisonTypes::enumToString(int value)
  * @param parent
  */
 IOPValueConditionM::IOPValueConditionM(QObject *parent) : ActionConditionM(parent),
-    _agentIOP(NULL),
+    _agentIOP(nullptr),
     _agentIOPName(""),
     _value(""),
     _valueComparisonType(ValueComparisonTypes::EQUAL_TO)

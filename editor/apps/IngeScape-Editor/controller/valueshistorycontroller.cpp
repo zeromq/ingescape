@@ -41,7 +41,7 @@ ValuesHistoryController::ValuesHistoryController(IngeScapeModelManager* modelMan
  */
 ValuesHistoryController::~ValuesHistoryController()
 {
-    _modelManager = NULL;
+    _modelManager = nullptr;
 }
 
 

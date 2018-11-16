@@ -43,7 +43,7 @@ JsonHelper::~JsonHelper()
  */
 DefinitionM* JsonHelper::createModelOfAgentDefinitionFromBytes(QByteArray byteArrayOfJson)
 {
-    DefinitionM* agentDefinition = NULL;
+    DefinitionM* agentDefinition = nullptr;
 
     QJsonDocument jsonAgentDefinition = QJsonDocument::fromJson(byteArrayOfJson);
     if (jsonAgentDefinition.isObject())
@@ -71,7 +71,7 @@ DefinitionM* JsonHelper::createModelOfAgentDefinitionFromBytes(QByteArray byteAr
  */
 DefinitionM* JsonHelper::createModelOfAgentDefinitionFromJSON(QJsonObject jsonDefinition)
 {
-    DefinitionM* definition = NULL;
+    DefinitionM* definition = nullptr;
 
     QJsonValue jsonName = jsonDefinition.value("name");
     QJsonValue jsonDescription = jsonDefinition.value("description");
@@ -142,7 +142,7 @@ DefinitionM* JsonHelper::createModelOfAgentDefinitionFromJSON(QJsonObject jsonDe
  */
 AgentMappingM* JsonHelper::createModelOfAgentMappingFromBytes(QString inputAgentName, QByteArray byteArrayOfJson)
 {
-    AgentMappingM* agentMapping = NULL;
+    AgentMappingM* agentMapping = nullptr;
 
     QJsonDocument jsonAgentMapping = QJsonDocument::fromJson(byteArrayOfJson);
     if (jsonAgentMapping.isObject())
@@ -171,7 +171,7 @@ AgentMappingM* JsonHelper::createModelOfAgentMappingFromBytes(QString inputAgent
  */
 AgentMappingM* JsonHelper::createModelOfAgentMappingFromJSON(QString inputAgentName, QJsonObject jsonMapping)
 {
-    AgentMappingM* agentMapping = NULL;
+    AgentMappingM* agentMapping = nullptr;
 
     QJsonValue jsonName = jsonMapping.value("name");
     QJsonValue jsonDescription = jsonMapping.value("description");
@@ -374,7 +374,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, Q
             if (jsonTmp.isObject())
             {
                 QJsonObject jsonAction = jsonTmp.toObject();
-                ActionM* actionM = NULL;
+                ActionM* actionM = nullptr;
 
                 if (jsonAction.contains("uid") && jsonAction.contains("name"))
                 {
@@ -898,7 +898,7 @@ QList<RecordM*> JsonHelper::createRecordModelList(QByteArray byteArrayOfJson)
  */
 AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTypes::Value agentIOPType)
 {
-    AgentIOPM* agentIOP = NULL;
+    AgentIOPM* agentIOP = nullptr;
 
     QJsonValue jsonName = jsonObject.value("name");
     QJsonValue jsonType = jsonObject.value("type");
@@ -1104,7 +1104,7 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
  */
 ElementMappingM* JsonHelper::_createModelOfElementMapping(QString inputAgentName, QJsonObject jsonObject)
 {
-    ElementMappingM* mappingElement = NULL;
+    ElementMappingM* mappingElement = nullptr;
 
     QJsonValue jsonInputName = jsonObject.value("input_name");
     QJsonValue jsonOutputAgentName = jsonObject.value("agent_name");
@@ -1131,7 +1131,7 @@ ElementMappingM* JsonHelper::_createModelOfElementMapping(QString inputAgentName
  */
 ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentsGroupedByNameVM*> allAgentsGroupedByName)
 {
-    ActionEffectVM* actionEffectVM = NULL;
+    ActionEffectVM* actionEffectVM = nullptr;
 
     QJsonValue jsonValue = jsonEffect.value("type");
     if (jsonValue.isString())
@@ -1286,9 +1286,9 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                         QString inputName = jsonInputName.toString();
 
                         AgentsGroupedByNameVM* inputAgent = nullptr;
-                        AgentIOPM* input = NULL;
+                        AgentIOPM* input = nullptr;
                         AgentsGroupedByNameVM* outputAgent = nullptr;
-                        AgentIOPM* output = NULL;
+                        AgentIOPM* output = nullptr;
                         bool found = false;
 
                         QList<AgentIOPM*> outputsList;
@@ -1388,7 +1388,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
  */
 ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentsGroupedByNameVM*> allAgentsGroupedByName)
 {
-    ActionConditionVM* actionConditionVM = NULL;
+    ActionConditionVM* actionConditionVM = nullptr;
 
     QJsonValue jsonValue = jsonCondition.value("type");
     if(jsonValue.isString())
@@ -1409,8 +1409,8 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                         QString agentName = jsonAgentName.toString();
                         QString agentIOPName = jsonIOPName.toString();
 
-                        AgentsGroupedByNameVM* agent = NULL;
-                        AgentIOPM* iopAgentM = NULL;
+                        AgentsGroupedByNameVM* agent = nullptr;
+                        AgentIOPM* iopAgentM = nullptr;
                         bool found = false;
 
                         for (AgentsGroupedByNameVM* iterator : allAgentsGroupedByName)

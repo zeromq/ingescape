@@ -165,7 +165,7 @@ static void zactorCallback(zsock_t *pipe, void *args)
             zloop_poller_end(loop, &zyrePollItem);
 
             zsock_destroy(&zSocket);
-            zSocket = NULL;
+            zSocket = nullptr;
 
             // Clean
             zloop_destroy(&loop);
@@ -232,7 +232,7 @@ LogStreamController::~LogStreamController()
         zstr_send(_zActor, "STOP");
 
         //zactor_destroy(&_zActor);
-        //_zActor = NULL;
+        //_zActor = nullptr;
     }
 }
 

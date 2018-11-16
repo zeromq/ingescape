@@ -19,7 +19,7 @@
  * @param parent
  */
 ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
-    _agent(NULL),
+    _agent(nullptr),
     _isValid(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it

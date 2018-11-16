@@ -236,7 +236,7 @@ HostVM* HostsSupervisionController::_getHostWithName(QString hostName)
         return _hashFromNameToHost.value(hostName);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 

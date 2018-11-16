@@ -49,7 +49,7 @@ QString ActionConditionTypes::enumToString(int value)
  * @param parent
  */
 ActionConditionVM::ActionConditionVM(QObject *parent) : QObject(parent),
-    _modelM(NULL),
+    _modelM(nullptr),
     _conditionType(ActionConditionTypes::VALUE)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -67,7 +67,7 @@ ActionConditionVM::~ActionConditionVM()
         ActionConditionM* tmp = _modelM;
         setmodelM(nullptr);
         delete tmp;
-        tmp = NULL;
+        tmp = nullptr;
     }
 }
 

@@ -36,16 +36,16 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _ipAddress(""),
     _port(0),
     _errorMessageWhenConnectionFailed(""),
-    _modelManager(NULL),
-    _agentsSupervisionC(NULL),
-    _agentsMappingC(NULL),
-    _networkC(NULL),
-    _scenarioC(NULL),
-    _valuesHistoryC(NULL),
-    _timeLineC(NULL),
-    _launcherManager(NULL),
-    _terminationSignalWatcher(NULL),
-    _jsonHelper(NULL),
+    _modelManager(nullptr),
+    _agentsSupervisionC(nullptr),
+    _agentsMappingC(nullptr),
+    _networkC(nullptr),
+    _scenarioC(nullptr),
+    _valuesHistoryC(nullptr),
+    _timeLineC(nullptr),
+    _launcherManager(nullptr),
+    _terminationSignalWatcher(nullptr),
+    _jsonHelper(nullptr),
     _platformDirectoryPath(""),
     _platformDefaultFilePath("")
 {
@@ -305,7 +305,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
     {
         disconnect(_terminationSignalWatcher, 0);
         delete _terminationSignalWatcher;
-        _terminationSignalWatcher = NULL;
+        _terminationSignalWatcher = nullptr;
     }
 
 
@@ -319,7 +319,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         //IngeScapeLauncherManager* temp = _launcherManager;
         setlauncherManager(nullptr);
         //delete temp;
-        //temp = NULL;
+        //temp = nullptr;
     }
 
     if (_timeLineC != nullptr)
@@ -329,7 +329,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         AbstractTimeActionslineScenarioViewController* temp = _timeLineC;
         settimeLineC(nullptr);
         delete temp;
-        temp = NULL;
+        temp = nullptr;
     }
 
     if (_valuesHistoryC != nullptr)
@@ -339,7 +339,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         ValuesHistoryController* temp = _valuesHistoryC;
         setvaluesHistoryC(nullptr);
         delete temp;
-        temp = NULL;
+        temp = nullptr;
     }
 
     if (_agentsMappingC != nullptr)
@@ -349,7 +349,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         AgentsMappingController* temp = _agentsMappingC;
         setagentsMappingC(nullptr);
         delete temp;
-        temp = NULL;
+        temp = nullptr;
     }
 
     if (_agentsSupervisionC != nullptr)
@@ -359,7 +359,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         AgentsSupervisionController* temp = _agentsSupervisionC;
         setagentsSupervisionC(nullptr);
         delete temp;
-        temp = NULL;
+        temp = nullptr;
     }
 
     if (_modelManager != nullptr)
@@ -369,7 +369,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         IngeScapeModelManager* temp = _modelManager;
         setmodelManager(nullptr);
         delete temp;
-        temp = NULL;
+        temp = nullptr;
     }
 
     if (_networkC != nullptr)
@@ -379,7 +379,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         NetworkController* temp = _networkC;
         setnetworkC(nullptr);
         delete temp;
-        temp = NULL;
+        temp = nullptr;
     }
 
     if (_scenarioC != nullptr)
@@ -389,14 +389,14 @@ IngeScapeEditorController::~IngeScapeEditorController()
         ScenarioController* temp = _scenarioC;
         setscenarioC(nullptr);
         delete temp;
-        temp = NULL;
+        temp = nullptr;
     }
 
     // Delete json helper
     if (_jsonHelper != nullptr)
     {
         delete _jsonHelper;
-        _jsonHelper = NULL;
+        _jsonHelper = nullptr;
     }
 
     qInfo() << "Delete IngeScape Editor Controller";
@@ -789,7 +789,7 @@ void IngeScapeEditorController::_onOpenLogStreamOfAgents(QList<AgentM*> models)
 
                 qDebug() << "Open the 'Log Stream' of" << model->name() << "(Address:" << model->address() << "+ Logger Port:" << model->loggerPort() << "--> Subscriber Address:" << subscriberAddress << ")";
 
-                LogStreamController* logStreamController = NULL;
+                LogStreamController* logStreamController = nullptr;
 
                 for (LogStreamController* iterator : _openedLogStreamControllers.toList())
                 {
