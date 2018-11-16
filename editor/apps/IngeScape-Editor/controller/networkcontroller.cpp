@@ -674,7 +674,7 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     QString version = QApplication::instance()->applicationVersion();
 
     // Set trace mode
-    igs_setVerbose(false);
+    igs_setVerbose(true);
 
     // Set the name of our agent
     igs_setAgentName(_editorAgentName.toStdString().c_str());

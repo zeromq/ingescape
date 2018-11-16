@@ -119,7 +119,7 @@ public:
 
 
     /**
-     * @brief Get the (view model of) link between agents in the global mapping from an agent name
+     * @brief Get the (view model of) link between agents in the global mapping from a link name
      * @param name
      * @return
      */
@@ -335,26 +335,7 @@ private:
 
 
     /**
-     * @brief Get the view model of link which corresponds to a mapping element
-     * @param mappingElement
-     * @return
-     */
-    //LinkVM* _getLinkFromMappingElement(ElementMappingM* mappingElement);
-
-
-    /**
-     * @brief Get the view model of link which corresponds to names
-     * @param outputAgentName
-     * @param outputName
-     * @param inputAgentName
-     * @param inputName
-     * @return
-     */
-    //LinkVM* _getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName);
-
-
-    /**
-     * @brief Remove all the links with this agent
+     * @brief Remove all the links with an agent
      * @param agent
      */
     void _removeAllLinksWithAgent(AgentInMappingVM* agent);

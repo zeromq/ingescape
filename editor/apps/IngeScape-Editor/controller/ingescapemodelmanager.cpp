@@ -949,28 +949,28 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
 
                 AgentMappingM* previousMapping = agent->mapping();
 
-                QStringList idsOfRemovedMappingElements;
-                for (QString idPreviousList : previousMapping->namesOfMappingElements())
+                QStringList namesOfRemovedMappingElements;
+                for (QString namePreviousList : previousMapping->namesOfMappingElements())
                 {
-                    if (!agentMapping->namesOfMappingElements().contains(idPreviousList)) {
-                        idsOfRemovedMappingElements.append(idPreviousList);
+                    if (!agentMapping->namesOfMappingElements().contains(namePreviousList)) {
+                        namesOfRemovedMappingElements.append(namePreviousList);
                     }
                 }
 
-                QStringList idsOfAddedMappingElements;
-                for (QString idNewList : agentMapping->namesOfMappingElements())
+                QStringList namesOfAddedMappingElements;
+                for (QString nameNewList : agentMapping->namesOfMappingElements())
                 {
-                    if (!previousMapping->namesOfMappingElements().contains(idNewList)) {
-                        idsOfAddedMappingElements.append(idNewList);
+                    if (!previousMapping->namesOfMappingElements().contains(nameNewList)) {
+                        namesOfAddedMappingElements.append(nameNewList);
                     }
                 }
 
                 // If there are some Removed mapping elements
-                if (!idsOfRemovedMappingElements.isEmpty())
+                if (!namesOfRemovedMappingElements.isEmpty())
                 {
                     for (ElementMappingM* mappingElement : previousMapping->mappingElements()->toList())
                     {
-                        if ((mappingElement != nullptr) && idsOfRemovedMappingElements.contains(mappingElement->id()))
+                        if ((mappingElement != nullptr) && namesOfRemovedMappingElements.contains(mappingElement->name()))
                         {
                             // Emit the signal "UN-mapped"
                             Q_EMIT unmapped(mappingElement);
@@ -978,11 +978,11 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                     }
                 }
                 // If there are some Added mapping elements
-                if (!idsOfAddedMappingElements.isEmpty())
+                if (!namesOfAddedMappingElements.isEmpty())
                 {
                     for (ElementMappingM* mappingElement : agentMapping->mappingElements()->toList())
                     {
-                        if ((mappingElement != nullptr) && idsOfAddedMappingElements.contains(mappingElement->id()))
+                        if ((mappingElement != nullptr) && namesOfAddedMappingElements.contains(mappingElement->name()))
                         {
                             // Emit the signal "Mapped"
                             Q_EMIT mapped(mappingElement);

@@ -43,7 +43,7 @@ LinkVM::LinkVM(AgentInMappingVM* outputAgent,
 
     if ((_outputAgent != nullptr) && (_linkOutput != nullptr) && (_inputAgent != nullptr) && (_linkInput != nullptr))
     {
-        // Identifier with all names: [outputAgent##linkOutput-->inputAgent##linkInput]
+        // Name with all names formatted: "outputAgent##output-->inputAgent##input"
         _name = QString("%1%2%3-->%4%2%5").arg(_outputAgent->name(), SEPARATOR_AGENT_NAME_AND_IOP, _linkOutput->name(), _inputAgent->name(), _linkInput->name());
 
         // Identifier with names and ids: [outputAgent##linkOutput::Type-->inputAgent##linkInput::Type]
