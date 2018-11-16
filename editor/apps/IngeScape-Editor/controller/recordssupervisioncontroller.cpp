@@ -57,7 +57,7 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
 RecordsSupervisionController::~RecordsSupervisionController()
 {
     // Clean-up current selection
-    setselectedRecord(NULL);
+    setselectedRecord(nullptr);
 
     _mapFromRecordIdToViewModel.clear();
 
@@ -159,7 +159,7 @@ void RecordsSupervisionController::controlRecord(QString recordId, bool startPla
             else
             {
                 commandAndParameters = QString("%1=%2").arg(command_StopTheRecord, recordId);
-                setplayingRecord(NULL);
+                setplayingRecord(nullptr);
             }
 
             Q_EMIT commandAskedToRecorder(commandAndParameters);
@@ -345,7 +345,7 @@ void RecordsSupervisionController::onEndOfRecord()
     setisLoadingRecord(false);
 
     if (_playingRecord != NULL) {
-        setplayingRecord(NULL);
+        setplayingRecord(nullptr);
     }
 }
 
@@ -391,10 +391,10 @@ void RecordsSupervisionController::_deleteRecordVMwithModel(RecordM* model)
             _mapFromRecordIdToViewModel.remove(model->id());
 
             if (_playingRecord != NULL) {
-                setplayingRecord(NULL);
+                setplayingRecord(nullptr);
             }
             if (_selectedRecord == vm) {
-                setselectedRecord(NULL);
+                setselectedRecord(nullptr);
             }
 
             // Remove from the displayed list

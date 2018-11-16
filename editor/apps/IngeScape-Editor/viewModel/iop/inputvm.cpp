@@ -49,7 +49,7 @@ InputVM::~InputVM()
 {
     //qInfo() << "Delete Input VM" << _name << "(" << _id << ")";
 
-    setfirstModel(NULL);
+    setfirstModel(nullptr);
 
     // DIS-connect to signal "Count Changed" from the list of models
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &InputVM::_onModelsChanged);
@@ -68,6 +68,6 @@ void InputVM::_onModelsChanged()
         setfirstModel(_models.at(0));
     }
     else {
-        setfirstModel(NULL);
+        setfirstModel(nullptr);
     }
 }

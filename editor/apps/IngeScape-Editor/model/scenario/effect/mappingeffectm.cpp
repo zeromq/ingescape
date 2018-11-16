@@ -73,13 +73,13 @@ MappingEffectM::~MappingEffectM()
     _outputsList.clear();
 
     // Reset output agent
-    setoutputAgent(NULL);
+    setoutputAgent(nullptr);
 
     // Reset output
-    setoutput(NULL);
+    setoutput(nullptr);
 
     // Reset input
-    setinput(NULL);
+    setinput(nullptr);
 }
 
 
@@ -104,7 +104,7 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
         _outputAgent = value;
 
         // Reset the output
-        setoutput(NULL);
+        setoutput(nullptr);
 
         // Clear the list and the selected output
         _outputsList.clear();
@@ -239,7 +239,7 @@ void MappingEffectM::setagent(AgentsGroupedByNameVM* agent)
         }
 
         // Reset the input
-        setinput(NULL);
+        setinput(nullptr);
 
         // Clear the inputs list
         _inputsList.clear();
@@ -347,7 +347,7 @@ void MappingEffectM::_onOutputAgentDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
-    setoutputAgent(NULL);
+    setoutputAgent(nullptr);
 }
 
 
@@ -359,7 +359,7 @@ void MappingEffectM::_onInputDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
-    setinput(NULL);
+    setinput(nullptr);
 }
 
 /**
@@ -370,7 +370,7 @@ void MappingEffectM::_onOutputDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
-    setoutput(NULL);
+    setoutput(nullptr);
 }
 
 

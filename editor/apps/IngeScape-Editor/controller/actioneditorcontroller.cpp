@@ -89,7 +89,7 @@ void ActionEditorController::validateModification()
     if (_originalAction == NULL)
     {
         setoriginalAction(_editedAction);
-        seteditedAction(NULL);
+        seteditedAction(nullptr);
     }
     else {
         _originalAction->copyFrom(_editedAction);

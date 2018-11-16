@@ -317,7 +317,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         disconnect(_launcherManager);
 
         //IngeScapeLauncherManager* temp = _launcherManager;
-        setlauncherManager(NULL);
+        setlauncherManager(nullptr);
         //delete temp;
         //temp = NULL;
     }
@@ -327,7 +327,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         disconnect(_timeLineC);
 
         AbstractTimeActionslineScenarioViewController* temp = _timeLineC;
-        settimeLineC(NULL);
+        settimeLineC(nullptr);
         delete temp;
         temp = NULL;
     }
@@ -337,7 +337,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         disconnect(_valuesHistoryC);
 
         ValuesHistoryController* temp = _valuesHistoryC;
-        setvaluesHistoryC(NULL);
+        setvaluesHistoryC(nullptr);
         delete temp;
         temp = NULL;
     }
@@ -347,7 +347,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         disconnect(_agentsMappingC);
 
         AgentsMappingController* temp = _agentsMappingC;
-        setagentsMappingC(NULL);
+        setagentsMappingC(nullptr);
         delete temp;
         temp = NULL;
     }
@@ -357,7 +357,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         disconnect(_agentsSupervisionC);
 
         AgentsSupervisionController* temp = _agentsSupervisionC;
-        setagentsSupervisionC(NULL);
+        setagentsSupervisionC(nullptr);
         delete temp;
         temp = NULL;
     }
@@ -367,7 +367,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         disconnect(_modelManager);
 
         IngeScapeModelManager* temp = _modelManager;
-        setmodelManager(NULL);
+        setmodelManager(nullptr);
         delete temp;
         temp = NULL;
     }
@@ -377,7 +377,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         disconnect(_networkC);
 
         NetworkController* temp = _networkC;
-        setnetworkC(NULL);
+        setnetworkC(nullptr);
         delete temp;
         temp = NULL;
     }
@@ -387,7 +387,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         disconnect(_scenarioC);
 
         ScenarioController* temp = _scenarioC;
-        setscenarioC(NULL);
+        setscenarioC(nullptr);
         delete temp;
         temp = NULL;
     }

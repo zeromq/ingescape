@@ -57,7 +57,7 @@ AgentsSupervisionController::AgentsSupervisionController(IngeScapeModelManager* 
 AgentsSupervisionController::~AgentsSupervisionController()
 {
     // Clean-up current selection
-    setselectedAgent(NULL);
+    setselectedAgent(nullptr);
 
     _hashFromDefinitionNameToDefinitionsList.clear();
 
@@ -364,7 +364,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
     {
         // Unselect our agent if needed
         if (_selectedAgent == agentsGroupedByDefinition) {
-            setselectedAgent(NULL);
+            setselectedAgent(nullptr);
         }
 
         // DIS-connect to signals from this view model of agents grouped by definition
@@ -447,7 +447,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
                         _agentsList.remove(agent);
 
                         // Reset its definition
-                        agent->setdefinition(NULL);
+                        agent->setdefinition(nullptr);
 
                         // Delete it
                         _deleteAgentViewModel(agent);
@@ -809,7 +809,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
     {
         // Unselect our agent if needed
         if (_selectedAgent == agent) {
-            setselectedAgent(NULL);
+            setselectedAgent(nullptr);
         }
 
         // Get the list of view models of agent from a name

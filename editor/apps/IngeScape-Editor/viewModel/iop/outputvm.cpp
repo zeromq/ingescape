@@ -62,7 +62,7 @@ OutputVM::~OutputVM()
 
     //qInfo() << "Delete Output VM" << _name << "(" << _id << ")";
 
-    setfirstModel(NULL);
+    setfirstModel(nullptr);
 
     // DIS-connect to signal "Count Changed" from the list of models
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &OutputVM::_onModelsChanged);
@@ -72,7 +72,7 @@ OutputVM::~OutputVM()
 }
 
 
-// FIXME: rather dans LinkOutputVM than in OutputVM
+// FIXME: rather in LinkOutputVM than in OutputVM
 /**
  * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
  */
@@ -92,7 +92,7 @@ void OutputVM::_onModelsChanged()
         setfirstModel(_models.at(0));
     }
     else {
-        setfirstModel(NULL);
+        setfirstModel(nullptr);
     }
 
     //

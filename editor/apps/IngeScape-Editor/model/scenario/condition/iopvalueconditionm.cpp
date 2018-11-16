@@ -73,7 +73,7 @@ IOPValueConditionM::~IOPValueConditionM()
     _agentIopList.clear();
 
     // reset agent IOP pointer
-    setagentIOP(NULL);
+    setagentIOP(nullptr);
 }
 
 
@@ -151,7 +151,7 @@ void IOPValueConditionM::setagent(AgentsGroupedByNameVM* agent)
         }
 
         // Reset the agent IOP
-        setagentIOP(NULL);
+        setagentIOP(nullptr);
 
         // Clear the list
         _agentIopList.clear();
@@ -264,7 +264,7 @@ void IOPValueConditionM::_onAgentIopModelDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
-    setagentIOP(NULL);
+    setagentIOP(nullptr);
 }
 
 

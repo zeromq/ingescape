@@ -41,7 +41,7 @@ HostsSupervisionController::HostsSupervisionController(QObject *parent) : QObjec
 HostsSupervisionController::~HostsSupervisionController()
 {
     // Clean-up current selection
-    setselectedHost(NULL);
+    setselectedHost(nullptr);
 
     // Clear the hash table
     _hashFromNameToHost.clear();
@@ -131,7 +131,7 @@ void HostsSupervisionController::onHostModelWillBeRemoved(HostM* host)
 
             if (_selectedHost == hostVM) {
                 // Clean-up current selection
-                setselectedHost(NULL);
+                setselectedHost(nullptr);
             }
 
             // Remove from the sorted list of hosts

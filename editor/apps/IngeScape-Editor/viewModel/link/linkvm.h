@@ -30,6 +30,12 @@ class LinkVM : public QObject
 {
     Q_OBJECT
 
+    // Identifier with all names: [outputAgent##output-->inputAgent##input]
+    I2_CPP_NOSIGNAL_PROPERTY(QString, name)
+
+    // Identifier with agents names and Input/Output ids: [outputAgent##output::type-->inputAgent##input::type]
+    //I2_CPP_NOSIGNAL_PROPERTY(QString, id)
+
     // View model of the output agent of our link (link starts from this agent)
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, outputAgent)
 
@@ -44,12 +50,6 @@ class LinkVM : public QObject
 
     // Flag indicating if our link is virtual (agents are not really linked on the network)
     I2_QML_PROPERTY_READONLY(bool, isVirtual)
-
-    // Identifier with all names: [outputAgent##output-->inputAgent##input]
-    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
-
-    // Identifier with agents names and Input/Output ids: [outputAgent##output::type-->inputAgent##input::type]
-    //I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
 
 
 public:

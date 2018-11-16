@@ -443,7 +443,7 @@ void ScenarioController::deleteAction(ActionM* action)
 
         // Unselect our action if needed
         if (_selectedAction == action) {
-            setselectedAction(NULL);
+            setselectedAction(nullptr);
         }
 
         // Remove action from the palette if exists
@@ -915,13 +915,13 @@ void ScenarioController::clearScenario()
     _stopScenario();
 
     // Clean-up current selection
-    setselectedAction(NULL);
+    setselectedAction(nullptr);
 
     // Delete actions VM from the timeline
     _actionsInTimeLine.deleteAllItems();
 
     // Clean-up current selection
-    setselectedActionVMInTimeline(NULL);
+    setselectedActionVMInTimeline(nullptr);
 
     // Clear the lists of action editors
     _hashActionEditorControllerFromModelOfAction.clear();
@@ -939,7 +939,7 @@ void ScenarioController::clearScenario()
     for (ActionInPaletteVM* actionInPalette : _actionsInPaletteList.toList())
     {
         if (actionInPalette != NULL) {
-            actionInPalette->setmodelM(NULL);
+            actionInPalette->setmodelM(nullptr);
         }
     }
 
@@ -1072,7 +1072,7 @@ void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
         if ((actionVM->endTime() >= 0) && (currentTimeInMilliSeconds >= actionVM->endTime()))
         {
             // ...we remove the current execution
-            actionVM->setcurrentExecution(NULL);
+            actionVM->setcurrentExecution(nullptr);
 
             // Remove from the list of "active" actions
             disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
@@ -1117,7 +1117,7 @@ void ScenarioController::onRearmAction()
         if ((actionVM->endTime() >= 0) && (currentTimeInMilliSeconds >= actionVM->endTime()))
         {
             // ...we remove the current execution
-            actionVM->setcurrentExecution(NULL);
+            actionVM->setcurrentExecution(nullptr);
 
             // Remove from the list of "active" actions
             disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
@@ -1213,7 +1213,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
         }
         else {
             // Reset the next action to activate
-            setnextActionToActivate(NULL);
+            setnextActionToActivate(nullptr);
         }
     }
 }
@@ -1283,7 +1283,7 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
                              || (actionExecution->neverExecuted() && (actionVM->modelM()->validityDurationType() == ValidationDurationTypes::CUSTOM)) )
                         {
                             // ...we remove the current execution
-                            actionVM->setcurrentExecution(NULL);
+                            actionVM->setcurrentExecution(nullptr);
 
                             // only if the execution has not be done
                             if (!actionExecution->isExecuted())
@@ -1464,7 +1464,7 @@ void ScenarioController::_startScenario()
     // Reset lists and next action to activate
     _listOfActionsToEvaluate.clear();
     _listOfActiveActions.clear();
-    setnextActionToActivate(NULL);
+    setnextActionToActivate(nullptr);
 
     // "Future" actions previously added to the time line (on the first line) from the "palette" must be removed
     QList<ActionVM*> futureActionsOnFirstLineToRemove;
@@ -1579,7 +1579,7 @@ void ScenarioController::_stopScenario()
     }
 
     // Reset the next action VM to activate
-    setnextActionToActivate(NULL);
+    setnextActionToActivate(nullptr);
 
     // Reset the connections for conditions of all actions
     resetConditionsConnectionsOfAllActions();

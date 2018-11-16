@@ -48,7 +48,7 @@ ParameterVM::~ParameterVM()
 {
     //qInfo() << "Delete Parameter VM" << _name << "(" << _id << ")";
 
-    setfirstModel(NULL);
+    setfirstModel(nullptr);
 
     // DIS-connect to signal "Count Changed" from the list of models
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &ParameterVM::_onModelsChanged);
@@ -67,6 +67,6 @@ void ParameterVM::_onModelsChanged()
         setfirstModel(_models.at(0));
     }
     else {
-        setfirstModel(NULL);
+        setfirstModel(nullptr);
     }
 }

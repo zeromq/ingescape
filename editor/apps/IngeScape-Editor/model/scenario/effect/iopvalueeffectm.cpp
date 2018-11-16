@@ -48,7 +48,7 @@ IOPValueEffectM::~IOPValueEffectM()
     _iopMergedList.clear();
 
     // reset agent IOP pointer
-    setagentIOP(NULL);
+    setagentIOP(nullptr);
 }
 
 
@@ -137,7 +137,7 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
         qDebug() << "setagent: setagentIOP(NULL)";
 
         // Reset the agent IOP
-        setagentIOP(NULL);
+        setagentIOP(nullptr);
 
         // Clear the list
         _iopMergedList.clear();
@@ -380,5 +380,5 @@ void IOPValueEffectM::_onAgentIopModelDestroyed(QObject* sender)
 
     qDebug() << "_on Agent IOP Model Destroyed --> setagentIOP(NULL)";
 
-    setagentIOP(NULL);
+    setagentIOP(nullptr);
 }

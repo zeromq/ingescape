@@ -35,7 +35,7 @@ class OutputVM : public AgentIOPVM
     // Models of our agent output
     I2_QOBJECT_LISTMODEL(OutputM, models)
 
-    // FIXME: rather dans LinkOutputVM than in OutputVM
+    // FIXME: rather in LinkOutputVM than in OutputVM
     // Flag indicating if a new value is published on our output
     I2_QML_PROPERTY_READONLY(bool, isPublishedNewValue)
 
@@ -60,7 +60,7 @@ public:
     ~OutputVM();
 
 
-    // FIXME: rather dans LinkOutputVM than in OutputVM
+    // FIXME: rather in LinkOutputVM than in OutputVM
     /**
      * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
      */

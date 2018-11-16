@@ -65,7 +65,7 @@ ActionConditionVM::~ActionConditionVM()
     if (_modelM != NULL)
     {
         ActionConditionM* tmp = _modelM;
-        setmodelM(NULL);
+        setmodelM(nullptr);
         delete tmp;
         tmp = NULL;
     }

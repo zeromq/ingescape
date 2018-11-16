@@ -41,7 +41,7 @@ ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
 ActionEffectM::~ActionEffectM()
 {
     // Reset agent to null
-    setagent(NULL);
+    setagent(nullptr);
 }
 
 
@@ -92,7 +92,7 @@ void ActionEffectM::_onAgentDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
-    setagent(NULL);
+    setagent(nullptr);
 
     Q_EMIT askForDestruction();
 }

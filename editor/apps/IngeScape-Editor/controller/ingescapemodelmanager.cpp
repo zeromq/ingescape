@@ -155,7 +155,7 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         if (agent->definition() != NULL)
         {
             DefinitionM* temp = agent->definition();
-            agent->setdefinition(NULL);
+            agent->setdefinition(nullptr);
             delete temp;
         }
 
@@ -163,7 +163,7 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         if (agent->mapping() != NULL)
         {
             AgentMappingM* temp = agent->mapping();
-            agent->setmapping(NULL);
+            agent->setmapping(nullptr);
             delete temp;
         }
 

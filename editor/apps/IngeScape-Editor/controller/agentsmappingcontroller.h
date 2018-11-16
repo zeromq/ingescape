@@ -100,21 +100,30 @@ public:
 
 
     /**
-     * @brief Slot when a link from an output is dropped over an input on the current mapping (or when a link to an input is dropped over an output)
+     * @brief Slot called when a link from an output is dropped over an input on the current mapping
+     * Or when a link to an input is dropped over an output
      * @param outputAgent
-     * @param output
+     * @param linkOutput
      * @param inputAgent
-     * @param input
+     * @param linkInput
      */
-    Q_INVOKABLE void dropLinkBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input);
+    Q_INVOKABLE void dropLinkBetweenAgents(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput);
 
 
     /**
-     * @brief Get the agent in mapping from an agent name
+     * @brief Get the (view model of) agent in the global mapping from an agent name
      * @param name
      * @return
      */
     Q_INVOKABLE AgentInMappingVM* getAgentInMappingFromName(QString name);
+
+
+    /**
+     * @brief Get the (view model of) link between agents in the global mapping from an agent name
+     * @param name
+     * @return
+     */
+    LinkVM* getLinkInMappingFromName(QString name);
 
 
     /**
@@ -330,7 +339,7 @@ private:
      * @param mappingElement
      * @return
      */
-    LinkVM* _getLinkFromMappingElement(ElementMappingM* mappingElement);
+    //LinkVM* _getLinkFromMappingElement(ElementMappingM* mappingElement);
 
 
     /**
@@ -341,7 +350,7 @@ private:
      * @param inputName
      * @return
      */
-    LinkVM* _getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName);
+    //LinkVM* _getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName);
 
 
     /**
@@ -381,18 +390,21 @@ private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 
+    // Previous list of agents in mapping
+    QList<AgentInMappingVM*> _previousListOfAgentsInMapping;
+
     // Hash table from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;
 
-    // Previous list of agents in mapping
-    QList<AgentInMappingVM*> _previousListOfAgentsInMapping;
+    // Hash table from link name to the (view model of) link between agents in mapping
+    QHash<QString, LinkVM*> _hashFromNameToLinkInMapping;
 
     // Hash table from "agent name" to a list of waiting links (where the agent is involved as "Output Agent")
     QHash<QString, QList<ElementMappingM*>> _hashFromAgentNameToListOfWaitingLinks;
 
-    // Hash table from "link id" to added/removed link while the mapping was UN-activated
-    QHash<QString, ElementMappingM*> _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated;
-    QHash<QString, ElementMappingM*> _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated;
+    // Hash table from "link name" to added/removed link while the mapping was UN-activated
+    QHash<QString, ElementMappingM*> _hashFromLinkNameToAddedLinkWhileMappingWasUNactivated;
+    QHash<QString, ElementMappingM*> _hashFromLinkNameToRemovedLinkWhileMappingWasUNactivated;
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)

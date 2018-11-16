@@ -41,7 +41,7 @@ ActionInPaletteVM::ActionInPaletteVM(ActionM* actionM,
 ActionInPaletteVM::~ActionInPaletteVM()
 {
     if (_modelM != NULL) {
-        setmodelM(NULL);
+        setmodelM(nullptr);
     }
 }
 

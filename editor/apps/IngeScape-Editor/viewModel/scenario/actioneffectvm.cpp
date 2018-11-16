@@ -66,12 +66,12 @@ ActionEffectVM::ActionEffectVM(QObject *parent) : QObject(parent),
 ActionEffectVM::~ActionEffectVM()
 {
     // reset pointer
-    setsecondAgentForMapping(NULL);
+    setsecondAgentForMapping(nullptr);
 
     if (_modelM != NULL)
     {
         ActionEffectM* tmp = _modelM;
-        setmodelM(NULL);
+        setmodelM(nullptr);
         delete tmp;
         tmp = NULL;
     }

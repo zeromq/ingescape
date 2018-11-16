@@ -63,3 +63,13 @@ bool LinkOutputVM::canLinkWith(LinkConnectorVM* linkConnector)
         return false;
     }
 }
+
+
+/**
+ * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
+ */
+void LinkOutputVM::simulateCurrentValueOfModelChanged()
+{
+    // FIXME: rather in LinkOutputVM than in OutputVM
+    //_onCurrentValueOfModelChanged(QVariant());
+}

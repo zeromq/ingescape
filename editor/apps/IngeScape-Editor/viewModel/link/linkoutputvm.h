@@ -31,7 +31,7 @@ class LinkOutputVM : public LinkConnectorVM
     // View model of output
     I2_QML_PROPERTY_READONLY(OutputVM*, output)
 
-    // FIXME: rather dans LinkOutputVM than in OutputVM
+    // FIXME: rather in LinkOutputVM than in OutputVM
     // Flag indicating if a new value is published on our output
     //I2_QML_PROPERTY_READONLY(bool, isPublishedNewValue)
 
@@ -50,6 +50,12 @@ public:
      * @brief Destructor
      */
     ~LinkOutputVM();
+
+
+    /**
+     * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
+     */
+    void simulateCurrentValueOfModelChanged();
 
 
 Q_SIGNALS:

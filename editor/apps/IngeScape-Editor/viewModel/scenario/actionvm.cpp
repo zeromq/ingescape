@@ -82,13 +82,13 @@ ActionVM::ActionVM(ActionM* model,
 ActionVM::~ActionVM()
 {
     // Reset current execution
-    setcurrentExecution(NULL);
+    setcurrentExecution(nullptr);
 
     // Delete all executions
     _executionsList.deleteAllItems();
 
     // Reset model of action
-    setmodelM(NULL);
+    setmodelM(nullptr);
 
     // Remove revert timer
     if (_timerToReverse != NULL)
@@ -249,7 +249,7 @@ void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
         // No reverse
         else
         {
-            setcurrentExecution(NULL);
+            setcurrentExecution(nullptr);
 
             // Shall rearm
             if (_modelM->shallRearm())
@@ -269,7 +269,7 @@ void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
 {
     if (_currentExecution != NULL)
     {
-        setcurrentExecution(NULL);
+        setcurrentExecution(nullptr);
 
         // Shall rearm
         if (_modelM->shallRearm() && ((currentTimeInMilliSeconds < _endTime) || (_endTime == -1)) )
@@ -338,7 +338,7 @@ void ActionVM::resetDataFrom(int time)
         }
 
         // Reset the current action execution
-        setcurrentExecution(NULL);
+        setcurrentExecution(nullptr);
 
         // Get the relative time to the action view model
         int relativeTime = time - _startTime;

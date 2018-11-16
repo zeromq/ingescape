@@ -82,7 +82,7 @@ AgentM::~AgentM()
         //disconnect(_definition);
 
         //DefinitionM* temp = _definition;
-        setdefinition(NULL);
+        setdefinition(nullptr);
         //delete temp;
         //temp = NULL;
     }
@@ -92,7 +92,7 @@ AgentM::~AgentM()
         //disconnect(_mapping);
 
         //AgentMappingM* temp = _mapping;
-        setmapping(NULL);
+        setmapping(nullptr);
         //delete temp;
         //temp = NULL;
     }
@@ -187,6 +187,6 @@ void AgentM::clearNetworkData()
     setmappingFilePath("");
 
     // Keep only the definition and the mapping
-    //setdefinition(NULL);
-    //setmapping(NULL);
+    //setdefinition(nullptr);
+    //setmapping(nullptr);
 }

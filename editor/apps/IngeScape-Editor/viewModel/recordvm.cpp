@@ -44,7 +44,7 @@ RecordVM::~RecordVM()
 {
     if (_modelM != NULL) {
         qDebug() << "Delete View Model of Record" << _modelM->name();
-        setmodelM(NULL);
+        setmodelM(nullptr);
     }
 }
 

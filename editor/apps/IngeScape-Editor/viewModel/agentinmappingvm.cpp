@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -1256,11 +1256,11 @@ ElementMappingM* AgentInMappingVM::_getTemporaryLink(QString inputName, QString 
 {
     for (ElementMappingM* iterator : _temporaryMapping->mappingElements()->toList())
     {
-        if ((iterator != NULL) && (iterator->inputAgent() == _name)
+        if ((iterator != nullptr) && (iterator->inputAgent() == _name)
                 && (iterator->input() == inputName) && (iterator->outputAgent() == outputAgentName) && (iterator->output() == outputName))
         {
             return iterator;
         }
     }
-    return NULL;
+    return nullptr;
 }

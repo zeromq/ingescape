@@ -45,7 +45,7 @@ AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
     // Call the setter to update the corresponding group
     setagentIOPValueType(agentIOPValueType);
 
-    // Create the unique identifier with name and value type
+    // Create the unique identifier with name and value type: "Name::ValueType"
     _id = QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(_agentIOPValueType));
 }
 
@@ -59,6 +59,10 @@ AgentIOPM::~AgentIOPM()
 }
 
 
+/**
+ * @brief Setter for property "Agent IOP Value Type"
+ * @param value
+ */
 void AgentIOPM::setagentIOPValueType(AgentIOPValueTypes::Value value)
 {
     if (_agentIOPValueType != value)

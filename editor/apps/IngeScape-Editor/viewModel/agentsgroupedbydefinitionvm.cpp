@@ -82,7 +82,7 @@ AgentsGroupedByDefinitionVM::~AgentsGroupedByDefinitionVM()
 
         // Reset and delete the definition
         DefinitionM* temp = _definition;
-        setdefinition(NULL);
+        setdefinition(nullptr);
         delete temp;
     }
     else {

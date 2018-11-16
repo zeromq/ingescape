@@ -60,7 +60,7 @@ HostVM::~HostVM()
     qInfo() << "Delete View Model of Host" << _name;
 
     if (_modelM != NULL) {
-        setmodelM(NULL);
+        setmodelM(nullptr);
     }
 
     // Clear the list of agents

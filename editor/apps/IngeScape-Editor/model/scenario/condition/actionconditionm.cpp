@@ -132,7 +132,7 @@ void ActionConditionM::_onAgentDestroyed(QObject* sender)
     Q_UNUSED(sender)
 
     // Reset our agent
-    setagent(NULL);
+    setagent(nullptr);
 
     Q_EMIT askForDestruction();
 }

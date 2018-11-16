@@ -30,6 +30,8 @@ LinkVM::LinkVM(AgentInMappingVM* outputAgent,
                LinkInputVM* linkInput,
                bool isVirtual,
                QObject *parent) : QObject(parent),
+    _name(""),
+    //_id(""),
     _outputAgent(outputAgent),
     _linkOutput(linkOutput),
     _inputAgent(inputAgent),
@@ -41,10 +43,13 @@ LinkVM::LinkVM(AgentInMappingVM* outputAgent,
 
     if ((_outputAgent != nullptr) && (_linkOutput != nullptr) && (_inputAgent != nullptr) && (_linkInput != nullptr))
     {
-        qInfo() << "Create new Link between" << _outputAgent->name() << "." << _linkOutput->name() << "-->" << _inputAgent->name() << "." << _linkInput->name();
-
         // Identifier with all names: [outputAgent##linkOutput-->inputAgent##linkInput]
-        _id = QString("%1%2%3-->%4%2%5").arg(_outputAgent->name(), SEPARATOR_AGENT_NAME_AND_IOP, _linkOutput->name(), _inputAgent->name(), _linkInput->name());
+        _name = QString("%1%2%3-->%4%2%5").arg(_outputAgent->name(), SEPARATOR_AGENT_NAME_AND_IOP, _linkOutput->name(), _inputAgent->name(), _linkInput->name());
+
+        // Identifier with names and ids: [outputAgent##linkOutput::Type-->inputAgent##linkInput::Type]
+        //_id = QString("%1%2%3-->%4%2%5").arg(_outputAgent->name(), SEPARATOR_AGENT_NAME_AND_IOP, _linkOutput->id(), _inputAgent->name(), _linkInput->id());
+
+        qInfo() << "Create new Link" << _name;
     }
 }
 
@@ -54,10 +59,7 @@ LinkVM::LinkVM(AgentInMappingVM* outputAgent,
  */
 LinkVM::~LinkVM()
 {
-    if ((_outputAgent != nullptr) && (_linkOutput != nullptr) && (_inputAgent != nullptr) && (_linkInput != nullptr))
-    {
-        qInfo() << "Delete Link between" << _outputAgent->name() << "." << _linkOutput->name() << "-->" << _inputAgent->name() << "." << _linkInput->name();
-    }
+    qInfo() << "Delete Link" << _name;
 
     setoutputAgent(nullptr);
     setlinkOutput(nullptr);

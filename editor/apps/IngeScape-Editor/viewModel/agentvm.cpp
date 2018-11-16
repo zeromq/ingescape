@@ -71,7 +71,7 @@ AgentVM::~AgentVM()
     qInfo() << "Delete View Model of Agent" << _name;
 
     // Reset the definition
-    setdefinition(NULL);
+    setdefinition(nullptr);
 
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentVM::_onModelsChanged);
 
