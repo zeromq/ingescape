@@ -62,7 +62,7 @@ ActionConditionVM::ActionConditionVM(QObject *parent) : QObject(parent),
  */
 ActionConditionVM::~ActionConditionVM()
 {
-    if (_modelM != NULL)
+    if (_modelM != nullptr)
     {
         ActionConditionM* tmp = _modelM;
         setmodelM(nullptr);

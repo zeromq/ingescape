@@ -64,7 +64,7 @@ void HostsSupervisionController::removeUNactiveAgents()
     // Remove each model with state OFF
     for (AgentM* model : copy)
     {
-        if ((model != NULL) && !model->isON()) {
+        if ((model != nullptr) && !model->isON()) {
             _allAgents.removeOne(model);
         }
     }
@@ -77,13 +77,13 @@ void HostsSupervisionController::removeUNactiveAgents()
  */
 void HostsSupervisionController::onHostModelCreated(HostM* host)
 {
-    if (host != NULL)
+    if (host != nullptr)
     {
         QString hostname = host->name();
 
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(hostname);
-        if (hostVM == NULL)
+        if (hostVM == nullptr)
         {
             // Create a view model for this model of host
             hostVM = new HostVM(host, this);
@@ -99,7 +99,7 @@ void HostsSupervisionController::onHostModelCreated(HostM* host)
             // Associate host with existing agents if necessary
             for (AgentM* agent : _allAgents)
             {
-                if ((agent != NULL) && (agent->hostname() == hostname) && !hostVM->agentsList()->contains(agent))
+                if ((agent != nullptr) && (agent->hostname() == hostname) && !hostVM->agentsList()->contains(agent))
                 {
                     qDebug() << "Add (existing) agent" << agent->name() << "to new host" << hostname;
 
@@ -117,13 +117,13 @@ void HostsSupervisionController::onHostModelCreated(HostM* host)
  */
 void HostsSupervisionController::onHostModelWillBeRemoved(HostM* host)
 {
-    if (host != NULL)
+    if (host != nullptr)
     {
         QString hostname = host->name();
 
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(hostname);
-        if (hostVM != NULL)
+        if (hostVM != nullptr)
         {
             disconnect(hostVM, 0, this, 0);
 
@@ -150,7 +150,7 @@ void HostsSupervisionController::onHostModelWillBeRemoved(HostM* host)
  */
 void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
 {
-    if (agent != NULL)
+    if (agent != nullptr)
     {
         // Connect to signals from this new agent
         connect(agent, &AgentM::networkDataWillBeCleared, this, &HostsSupervisionController::_onNetworkDataOfAgentWillBeCleared);
@@ -160,7 +160,7 @@ void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
 
-        if ((hostVM != NULL) && !hostVM->agentsList()->contains(agent))
+        if ((hostVM != nullptr) && !hostVM->agentsList()->contains(agent))
         {
             // Add this agent to the host
             hostVM->agentsList()->append(agent);
@@ -177,7 +177,7 @@ void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
  */
 void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
 {
-    if (agent != NULL)
+    if (agent != nullptr)
     {
         // DIS-connect to signals from the agent
         disconnect(agent, 0, this, 0);
@@ -187,7 +187,7 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
 
-        if ((hostVM != NULL) && hostVM->agentsList()->contains(agent))
+        if ((hostVM != nullptr) && hostVM->agentsList()->contains(agent))
         {
             // Remove this agent from the host
             hostVM->agentsList()->remove(agent);
@@ -207,14 +207,14 @@ void HostsSupervisionController::_onNetworkDataOfAgentWillBeCleared(QString peer
     Q_UNUSED(peerId)
 
     AgentM* agent = qobject_cast<AgentM*>(sender());
-    if (agent != NULL)
+    if (agent != nullptr)
     {
         //qDebug() << "Hosts Supervision: on Network Data of agent" << agent->name() << "will be cleared" << agent->hostname() << "(" << agent->peerId() << ")";
 
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
 
-        if ((hostVM != NULL) && hostVM->agentsList()->contains(agent))
+        if ((hostVM != nullptr) && hostVM->agentsList()->contains(agent))
         {
             // Remove this agent from the host
             hostVM->agentsList()->remove(agent);

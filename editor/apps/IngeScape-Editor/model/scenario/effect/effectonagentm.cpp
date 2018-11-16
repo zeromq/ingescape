@@ -85,7 +85,7 @@ void EffectOnAgentM::copyFrom(ActionEffectM* effect)
     ActionEffectM::copyFrom(effect);
 
     EffectOnAgentM* effectOnAgent = qobject_cast<EffectOnAgentM*>(effect);
-    if (effectOnAgent != NULL)
+    if (effectOnAgent != nullptr)
     {
         setagentEffectValue(effectOnAgent->agentEffectValue());
     }
@@ -100,7 +100,7 @@ QPair<AgentsGroupedByNameVM*, QStringList> EffectOnAgentM::getAgentAndCommandWit
 {
     QPair<AgentsGroupedByNameVM*, QStringList> pairAgentAndCommandWithParameters;
 
-    if (_agent != NULL)
+    if (_agent != nullptr)
     {
         pairAgentAndCommandWithParameters.first = _agent;
 
@@ -151,7 +151,7 @@ QPair<QString, QStringList> EffectOnAgentM::getAgentNameAndReverseCommandWithPar
 {
     QPair<QString, QStringList> pairAgentNameAndReverseCommand;
 
-    if (_agent != NULL)
+    if (_agent != nullptr)
     {
         pairAgentNameAndReverseCommand.first = _agent->name();
 

@@ -86,7 +86,7 @@ ActionEditorController::~ActionEditorController()
 void ActionEditorController::validateModification()
 {
     // Save action model changes
-    if (_originalAction == NULL)
+    if (_originalAction == nullptr)
     {
         setoriginalAction(_editedAction);
         seteditedAction(nullptr);
@@ -96,7 +96,7 @@ void ActionEditorController::validateModification()
     }
 
     // Save action view model changes if it's an action editor from a view model
-    if ((_editedViewModel != NULL) && (_originalViewModel != NULL))
+    if ((_editedViewModel != nullptr) && (_originalViewModel != nullptr))
     {
         _originalViewModel->setcolor(_editedViewModel->color());
         _originalViewModel->setstartTimeString(_editedViewModel->startTimeString());

@@ -31,7 +31,7 @@ RecordVM::RecordVM(RecordM* model,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_modelM != NULL) {
+    if (_modelM != nullptr) {
         qDebug() << "New View Model of Record" << _modelM->name();
     }
 }
@@ -42,7 +42,7 @@ RecordVM::RecordVM(RecordM* model,
  */
 RecordVM::~RecordVM()
 {
-    if (_modelM != NULL) {
+    if (_modelM != nullptr) {
         qDebug() << "Delete View Model of Record" << _modelM->name();
         setmodelM(nullptr);
     }

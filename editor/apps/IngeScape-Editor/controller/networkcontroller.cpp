@@ -68,7 +68,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
     Q_UNUSED(channel)
 
     NetworkController* networkController = (NetworkController*)myData;
-    if (networkController != NULL)
+    if (networkController != nullptr)
     {
         QString peerId = QString(peer);
         QString peerName = QString(name);
@@ -541,7 +541,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
 
     // Historique: on log la value et le dateTime.
     NetworkController* networkController = (NetworkController*)myData;
-    if (networkController != NULL)
+    if (networkController != nullptr)
     {
         if (iopType == IGS_INPUT_T)
         {
@@ -1069,7 +1069,7 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
 {
     foreach (OutputM* output, outputsList)
     {
-        if ((output != NULL) && !output->id().isEmpty())
+        if ((output != nullptr) && !output->id().isEmpty())
         {
             QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, output->id());
 
@@ -1161,7 +1161,7 @@ void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QLis
 {
     foreach (OutputM* output, outputsList)
     {
-        if ((output != NULL) && !output->id().isEmpty())
+        if ((output != nullptr) && !output->id().isEmpty())
         {
             QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, output->id());
 

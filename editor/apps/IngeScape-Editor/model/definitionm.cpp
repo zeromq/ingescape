@@ -123,7 +123,7 @@ void DefinitionM::_onInputsListChanged()
     {
         for (AgentIOPM* input : newInputsList)
         {
-            if ((input != NULL) && !_previousInputsList.contains(input))
+            if ((input != nullptr) && !_previousInputsList.contains(input))
             {
                 _inputsIdsList.append(input->id());
                 _mapFromInputNameToInput.insert(input->name(), input);
@@ -135,7 +135,7 @@ void DefinitionM::_onInputsListChanged()
     {
         for (AgentIOPM* input : _previousInputsList)
         {
-            if ((input != NULL) && !newInputsList.contains(input))
+            if ((input != nullptr) && !newInputsList.contains(input))
             {
                 _inputsIdsList.removeOne(input->id());
                 _mapFromInputNameToInput.remove(input->name());
@@ -161,7 +161,7 @@ void DefinitionM::_onOutputsListChanged()
     {
         for (OutputM* output : newOutputsList)
         {
-            if ((output != NULL) && !_previousOutputsList.contains(output))
+            if ((output != nullptr) && !_previousOutputsList.contains(output))
             {
                 _outputsIdsList.append(output->id());
                 _mapFromOutputNameToOutput.insert(output->name(), output);
@@ -177,7 +177,7 @@ void DefinitionM::_onOutputsListChanged()
     {
         for (OutputM* output : _previousOutputsList)
         {
-            if ((output != NULL) && !newOutputsList.contains(output))
+            if ((output != nullptr) && !newOutputsList.contains(output))
             {
                 _outputsIdsList.removeOne(output->id());
                 _mapFromOutputNameToOutput.remove(output->name());
@@ -206,7 +206,7 @@ void DefinitionM::_onParametersListChanged()
     {
         for (AgentIOPM* parameter : newParametersList)
         {
-            if ((parameter != NULL) && !_previousParametersList.contains(parameter))
+            if ((parameter != nullptr) && !_previousParametersList.contains(parameter))
             {
                 _parametersIdsList.append(parameter->id());
                 _mapFromParameterNameToParameter.insert(parameter->name(), parameter);
@@ -218,7 +218,7 @@ void DefinitionM::_onParametersListChanged()
     {
         for (AgentIOPM* parameter : _previousParametersList)
         {
-            if ((parameter != NULL) && !newParametersList.contains(parameter))
+            if ((parameter != nullptr) && !newParametersList.contains(parameter))
             {
                 _parametersIdsList.removeOne(parameter->id());
                 _mapFromParameterNameToParameter.remove(parameter->name());
@@ -255,7 +255,7 @@ bool DefinitionM::areIdenticals(DefinitionM* definition1, DefinitionM* definitio
 {
     bool areIdenticals = false;
 
-    if ((definition1 != NULL) && (definition2 != NULL))
+    if ((definition1 != nullptr) && (definition2 != nullptr))
     {
         // Same name and same version
         if ((definition1->name() == definition2->name())
@@ -341,21 +341,21 @@ void DefinitionM::updateCurrentValueOfIOP(AgentIOPTypes::Value iopType, QString 
     {
     case AgentIOPTypes::OUTPUT: {
         OutputM* output = getOutputWithName(iopName);
-        if (output != NULL) {
+        if (output != nullptr) {
             output->setcurrentValue(value);
         }
         break;
     }
     case AgentIOPTypes::INPUT: {
         AgentIOPM* input = getInputWithName(iopName);
-        if (input != NULL) {
+        if (input != nullptr) {
             input->setcurrentValue(value);
         }
         break;
     }
     case AgentIOPTypes::PARAMETER: {
         AgentIOPM* parameter = getParameterWithName(iopName);
-        if (parameter != NULL) {
+        if (parameter != nullptr) {
             parameter->setcurrentValue(value);
         }
         break;
@@ -380,7 +380,7 @@ DefinitionM* DefinitionM::copy()
     QList<AgentIOPM*> copiesOfInputs;
     for (AgentIOPM* iterator : _inputsList)
     {
-        if (iterator != NULL)
+        if (iterator != nullptr)
         {
             AgentIOPM* copyOfInput = new AgentIOPM(iterator->agentIOPType(),
                                                    iterator->name(),
@@ -400,7 +400,7 @@ DefinitionM* DefinitionM::copy()
     QList<OutputM*> copiesOfOutputs;
     for (OutputM* iterator : _outputsList)
     {
-        if (iterator != NULL)
+        if (iterator != nullptr)
         {
             OutputM* copyOfOutput = new OutputM(iterator->name(),
                                                 iterator->agentIOPValueType());
@@ -419,7 +419,7 @@ DefinitionM* DefinitionM::copy()
     QList<AgentIOPM*> copiesOfParameters;
     for (AgentIOPM* iterator : _parametersList)
     {
-        if (iterator != NULL)
+        if (iterator != nullptr)
         {
             AgentIOPM* copyOfParameter = new AgentIOPM(iterator->agentIOPType(),
                                                        iterator->name(),

@@ -92,7 +92,7 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
     // Value of (output) agent changed
     if (_outputAgent != value)
     {
-        if (_outputAgent != NULL)
+        if (_outputAgent != nullptr)
         {
             // UN-subscribe to destruction
             disconnect(_outputAgent, &AgentsGroupedByNameVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
@@ -109,7 +109,7 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
         // Clear the list and the selected output
         _outputsList.clear();
 
-        if (_outputAgent != NULL)
+        if (_outputAgent != nullptr)
         {
             // Subscribe to destruction
             connect(_outputAgent, &AgentsGroupedByNameVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
@@ -117,7 +117,7 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
             // Fill outputs
             foreach (OutputVM* output, _outputAgent->outputsList()->toList())
             {
-                if ((output != NULL) && (output->firstModel() != NULL)) {
+                if ((output != nullptr) && (output->firstModel() != nullptr)) {
                     _outputsList.append(output->firstModel());
                 }
             }
@@ -143,7 +143,7 @@ void MappingEffectM::setoutput(AgentIOPM* value)
 {
     if (_output != value)
     {
-        if (_output != NULL)
+        if (_output != nullptr)
         {
             // UnSubscribe to destruction
             disconnect(_output, &AgentIOPM::destroyed, this, &MappingEffectM::_onOutputDestroyed);
@@ -151,7 +151,7 @@ void MappingEffectM::setoutput(AgentIOPM* value)
 
         _output = value;
 
-        if (_output != NULL)
+        if (_output != nullptr)
         {
             setoutputName(_output->name());
 
@@ -172,7 +172,7 @@ void MappingEffectM::setinput(AgentIOPM* value)
 {
     if (_input != value)
     {
-        if(_input != NULL)
+        if(_input != nullptr)
         {
             // UnSubscribe to destruction
             disconnect(_input, &AgentIOPM::destroyed, this, &MappingEffectM::_onInputDestroyed);
@@ -180,7 +180,7 @@ void MappingEffectM::setinput(AgentIOPM* value)
 
         _input = value;
 
-        if(_input != NULL)
+        if(_input != nullptr)
         {
             setinputName(_input->name());
 
@@ -203,7 +203,7 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
     ActionEffectM::copyFrom(effect);
 
     MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effect);
-    if(mappingEffect != NULL)
+    if(mappingEffect != nullptr)
     {
         _inputsList.clear();
         _inputsList.append(mappingEffect->inputsList()->toList());
@@ -234,7 +234,7 @@ void MappingEffectM::setagent(AgentsGroupedByNameVM* agent)
     // Value of (input) agent changed
     if (previousAgent != _agent)
     {
-        if (previousAgent != NULL) {
+        if (previousAgent != nullptr) {
             disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofInputAgentChanged);
         }
 
@@ -244,12 +244,12 @@ void MappingEffectM::setagent(AgentsGroupedByNameVM* agent)
         // Clear the inputs list
         _inputsList.clear();
 
-        if (_agent != NULL)
+        if (_agent != nullptr)
         {
             // Fill inputs
             foreach (InputVM* input, _agent->inputsList()->toList())
             {
-                if ((input != NULL) && (input->firstModel() != NULL)) {
+                if ((input != nullptr) && (input->firstModel() != nullptr)) {
                     _inputsList.append(input->firstModel());
                 }
             }
@@ -273,7 +273,7 @@ QPair<AgentsGroupedByNameVM*, QStringList> MappingEffectM::getAgentAndCommandWit
 {
     QPair<AgentsGroupedByNameVM*, QStringList> pairAgentAndCommandWithParameters;
 
-    if ((_agent != NULL) && (_input != NULL) && (_outputAgent != NULL) && (_output != NULL))
+    if ((_agent != nullptr) && (_input != nullptr) && (_outputAgent != nullptr) && (_output != nullptr))
     {
         pairAgentAndCommandWithParameters.first = _agent;
 
@@ -310,7 +310,7 @@ QPair<QString, QStringList> MappingEffectM::getAgentNameAndReverseCommandWithPar
 {
     QPair<QString, QStringList> pairAgentNameAndReverseCommand;
 
-    if ((_agent != NULL) && (_input != NULL) && (_outputAgent != NULL) && (_output != NULL))
+    if ((_agent != nullptr) && (_input != nullptr) && (_outputAgent != nullptr) && (_output != nullptr))
     {
         pairAgentNameAndReverseCommand.first = _agent->name();
 
@@ -380,13 +380,13 @@ void MappingEffectM::_onOutputDestroyed(QObject* sender)
 void MappingEffectM::_onModelsOfIOPofInputAgentChanged()
 {
     // If we have a selected agent IOP
-    if ((_agent != NULL) && !_inputName.isEmpty())
+    if ((_agent != nullptr) && !_inputName.isEmpty())
     {
         _inputsList.clear();
 
         foreach (InputVM* inputVM, _agent->inputsList()->toList())
         {
-            if ((inputVM != NULL) && inputVM->firstModel() != NULL)
+            if ((inputVM != nullptr) && inputVM->firstModel() != nullptr)
             {
                 _inputsList.append(inputVM->firstModel());
 
@@ -407,13 +407,13 @@ void MappingEffectM::_onModelsOfIOPofInputAgentChanged()
 void MappingEffectM::_onModelsOfIOPofOutputAgentChanged()
 {
     // If we have a selected agent IOP
-    if ((_outputAgent != NULL) && !_outputName.isEmpty())
+    if ((_outputAgent != nullptr) && !_outputName.isEmpty())
     {
         _outputsList.clear();
 
         foreach (OutputVM* outputVM, _outputAgent->outputsList()->toList())
         {
-            if ((outputVM != NULL) && outputVM->firstModel() != NULL)
+            if ((outputVM != nullptr) && outputVM->firstModel() != nullptr)
             {
                 _outputsList.append(outputVM->firstModel());
 
@@ -432,13 +432,13 @@ void MappingEffectM::_onModelsOfIOPofOutputAgentChanged()
 */
 void MappingEffectM::_updateInputSelected()
 {
-    if ((_agent != NULL) && !_inputName.isEmpty())
+    if ((_agent != nullptr) && !_inputName.isEmpty())
     {
         AgentIOPM* newAgentIOP = NULL;
 
         foreach (InputVM* input, _agent->inputsList()->toList())
         {
-            if ((input != NULL) && (input->firstModel() != NULL))
+            if ((input != nullptr) && (input->firstModel() != nullptr))
             {
                 if (_inputName == input->firstModel()->name()) {
                     newAgentIOP = input->firstModel();
@@ -460,13 +460,13 @@ void MappingEffectM::_updateInputSelected()
 */
 void MappingEffectM::_updateOutputSelected()
 {
-    if ((_outputAgent != NULL) && !_outputName.isEmpty())
+    if ((_outputAgent != nullptr) && !_outputName.isEmpty())
     {
         AgentIOPM* newAgentIOP = NULL;
 
         foreach (OutputVM* output, _outputAgent->outputsList()->toList())
         {
-            if ((output != NULL) && (output->firstModel() != NULL))
+            if ((output != nullptr) && (output->firstModel() != nullptr))
             {
                 if (_outputName == output->firstModel()->name()) {
                     newAgentIOP = output->firstModel();

@@ -78,7 +78,7 @@ AgentM::~AgentM()
     qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") on" << _hostname << "(" << _address << ")";
 
     // Delete our agent definition
-    if (_definition != NULL) {
+    if (_definition != nullptr) {
         //disconnect(_definition);
 
         //DefinitionM* temp = _definition;
@@ -88,7 +88,7 @@ AgentM::~AgentM()
     }
 
     // Delete our agent mapping
-    if (_mapping != NULL) {
+    if (_mapping != nullptr) {
         //disconnect(_mapping);
 
         //AgentMappingM* temp = _mapping;
@@ -154,7 +154,7 @@ void AgentM::setdefinition(DefinitionM *value)
  */
 void AgentM::setisMutedOfOutput(bool isMuted, QString outputName)
 {
-    if (_definition != NULL) {
+    if (_definition != nullptr) {
         _definition->setisMutedOutput(isMuted, outputName);
     }
 }

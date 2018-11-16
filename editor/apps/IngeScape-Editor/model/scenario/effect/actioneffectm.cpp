@@ -51,7 +51,7 @@ ActionEffectM::~ActionEffectM()
 */
 void ActionEffectM::copyFrom(ActionEffectM* effect)
 {
-    if (effect != NULL) {
+    if (effect != nullptr) {
         setagent(effect->agent());
     }
 }
@@ -65,7 +65,7 @@ void ActionEffectM::setagent(AgentsGroupedByNameVM* value)
 {
     if(_agent != value)
     {
-        if (_agent != NULL)
+        if (_agent != nullptr)
         {
             // UN-subscribe to destruction
             disconnect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
@@ -73,7 +73,7 @@ void ActionEffectM::setagent(AgentsGroupedByNameVM* value)
 
         _agent = value;
 
-        if (_agent != NULL)
+        if (_agent != nullptr)
         {
             // Subscribe to destruction
             connect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);

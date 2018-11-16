@@ -93,7 +93,7 @@ DefinitionM* JsonHelper::createModelOfAgentDefinitionFromJSON(QJsonObject jsonDe
                 {
                     // Create a model of agent Parameter
                     AgentIOPM* agentParameter = _createModelOfAgentIOP(jsonParameter.toObject(), AgentIOPTypes::PARAMETER);
-                    if (agentParameter != NULL) {
+                    if (agentParameter != nullptr) {
                         definition->parametersList()->append(agentParameter);
                     }
                 }
@@ -108,7 +108,7 @@ DefinitionM* JsonHelper::createModelOfAgentDefinitionFromJSON(QJsonObject jsonDe
                 {
                     // Create a model of agent Input
                     AgentIOPM* agentInput = _createModelOfAgentIOP(jsonInput.toObject(), AgentIOPTypes::INPUT);
-                    if (agentInput != NULL) {
+                    if (agentInput != nullptr) {
                         definition->inputsList()->append(agentInput);
                     }
                 }
@@ -123,7 +123,7 @@ DefinitionM* JsonHelper::createModelOfAgentDefinitionFromJSON(QJsonObject jsonDe
                 {
                     // Create a model of agent Output
                     AgentIOPM* agentOutput = _createModelOfAgentIOP(jsonOutput.toObject(), AgentIOPTypes::OUTPUT);
-                    if (agentOutput != NULL) {
+                    if (agentOutput != nullptr) {
                         definition->outputsList()->append(agentOutput);
                     }
                 }
@@ -192,7 +192,7 @@ AgentMappingM* JsonHelper::createModelOfAgentMappingFromJSON(QString inputAgentN
                 if (jsonMap.isObject())
                 {
                     ElementMappingM* mappingElement = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
-                    if (mappingElement != NULL) {
+                    if (mappingElement != nullptr) {
                         mappingElements.append(mappingElement);
                     }
                 }
@@ -216,7 +216,7 @@ QJsonObject JsonHelper::exportAgentDefinitionToJson(DefinitionM* agentDefinition
 {
     QJsonObject jsonDefinition = QJsonObject();
 
-    if (agentDefinition != NULL)
+    if (agentDefinition != nullptr)
     {
         jsonDefinition.insert("name", agentDefinition->name());
         jsonDefinition.insert("version", agentDefinition->version());
@@ -225,7 +225,7 @@ QJsonObject JsonHelper::exportAgentDefinitionToJson(DefinitionM* agentDefinition
         QJsonArray jsonInputs = QJsonArray();
         for (AgentIOPM* agentIOP : agentDefinition->inputsList()->toList())
         {
-            if (agentIOP != NULL) {
+            if (agentIOP != nullptr) {
                 // Get JSON object from the agent Input/Output/Parameter
                 QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
 
@@ -236,7 +236,7 @@ QJsonObject JsonHelper::exportAgentDefinitionToJson(DefinitionM* agentDefinition
         QJsonArray jsonOutputs = QJsonArray();
         for (AgentIOPM* agentIOP : agentDefinition->outputsList()->toList())
         {
-            if (agentIOP != NULL) {
+            if (agentIOP != nullptr) {
                 // Get JSON object from the agent Input/Output/Parameter
                 QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
 
@@ -247,7 +247,7 @@ QJsonObject JsonHelper::exportAgentDefinitionToJson(DefinitionM* agentDefinition
         QJsonArray jsonParameters = QJsonArray();
         for (AgentIOPM* agentIOP : agentDefinition->parametersList()->toList())
         {
-            if (agentIOP != NULL) {
+            if (agentIOP != nullptr) {
                 // Get JSON object from the agent Input/Output/Parameter
                 QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
 
@@ -273,7 +273,7 @@ QJsonObject JsonHelper::exportAgentMappingToJson(AgentMappingM* agentMapping)
 {
     QJsonObject jsonMapping;
 
-    if (agentMapping != NULL)
+    if (agentMapping != nullptr)
     {
         jsonMapping.insert("name", agentMapping->name());
         jsonMapping.insert("description", agentMapping->description());
@@ -281,7 +281,7 @@ QJsonObject JsonHelper::exportAgentMappingToJson(AgentMappingM* agentMapping)
 
         QJsonArray jsonArray;
         foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
-            if (mappingElement != NULL)
+            if (mappingElement != nullptr)
             {
                 QJsonObject jsonMappingElement;
                 jsonMappingElement.insert("input_name", mappingElement->input());
@@ -308,7 +308,7 @@ QString JsonHelper::getJsonOfAgentDefinition(DefinitionM* agentDefinition, QJson
 {
     QString jsonOfDefinition = "";
 
-    if (agentDefinition != NULL)
+    if (agentDefinition != nullptr)
     {
         QJsonObject jsonDefinition = exportAgentDefinitionToJson(agentDefinition);
 
@@ -332,7 +332,7 @@ QString JsonHelper::getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocu
 {
     QString jsonOfMapping = "";
 
-    if (agentMapping != NULL)
+    if (agentMapping != nullptr)
     {
         QJsonObject jsonMapping = exportAgentMappingToJson(agentMapping);
 
@@ -453,7 +453,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, Q
                                 if (jsonEffect.isObject())
                                 {
                                     ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffect.toObject(), allAgentsGroupedByName);
-                                    if (effectVM != NULL)
+                                    if (effectVM != nullptr)
                                     {
                                         actionM->addEffectToList(effectVM);
                                     }
@@ -473,7 +473,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, Q
                                 if (jsonCondition.isObject())
                                 {
                                     ActionConditionVM* conditionVM = _parseConditionsVMFromJson(jsonCondition.toObject(), allAgentsGroupedByName);
-                                    if (conditionVM != NULL)
+                                    if (conditionVM != nullptr)
                                     {
                                         actionM->addConditionToList(conditionVM);
                                     }
@@ -484,7 +484,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, Q
                     }
                 }
 
-                if ((actionM != NULL) && !hashFromUidToActionM.contains(actionM->uid()))
+                if ((actionM != nullptr) && !hashFromUidToActionM.contains(actionM->uid()))
                 {
                     actionsListToImport.append(actionM);
                     hashFromUidToActionM.insert(actionM->uid(), actionM);
@@ -517,7 +517,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, Q
                     if (hashFromUidToActionM.contains(actionId))
                     {
                         ActionM* actionM = hashFromUidToActionM.value(actionId);
-                        if (actionM != NULL)
+                        if (actionM != nullptr)
                         {
                             int index = jsonActionIndex.toInt();
                             if (index >= 0 && index < 9)
@@ -559,7 +559,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, Q
                     if (hashFromUidToActionM.contains(actionId))
                     {
                         ActionM* actionM = hashFromUidToActionM.value(actionId);
-                        if (actionM != NULL)
+                        if (actionM != nullptr)
                         {
                             // Create the view model for the timeline
                             ActionVM* actionVM = new ActionVM(actionM, jsonActionStartTime.toInt());
@@ -636,7 +636,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
             ActionConditionM* actionCondition = conditionVM->modelM();
             jsonFilled = false;
 
-            if ((actionCondition != NULL) && (actionCondition->agent() != NULL))
+            if ((actionCondition != nullptr) && (actionCondition->agent() != nullptr))
             {
                 QJsonObject jsonCondition;
                 jsonCondition.insert("type", ActionConditionTypes::staticEnumToKey(conditionVM->conditionType()));
@@ -647,7 +647,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
                 case ActionConditionTypes::VALUE:
                 {
                     IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(actionCondition);
-                    if ((iopCondition != NULL) && (iopCondition->agentIOP() != NULL))
+                    if ((iopCondition != nullptr) && (iopCondition->agentIOP() != nullptr))
                     {
                         jsonCondition.insert("iop_name", iopCondition->agentIOP()->name());
                         jsonCondition.insert("operator", ValueComparisonTypes::staticEnumToKey(iopCondition->valueComparisonType()));
@@ -661,7 +661,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
                 case ActionConditionTypes::AGENT:
                 {
                     ConditionOnAgentM* conditionOnAgent = qobject_cast<ConditionOnAgentM*>(actionCondition);
-                    if (conditionOnAgent != NULL)
+                    if (conditionOnAgent != nullptr)
                     {
                         jsonCondition.insert("value", AgentConditionValues::staticEnumToKey(conditionOnAgent->agentConditionValue()));
 
@@ -695,7 +695,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
 
             jsonFilled = false;
 
-            if(actionEffect != NULL)
+            if(actionEffect != nullptr)
             {
                 QJsonObject jsonEffect;
                 jsonEffect.insert("type", ActionEffectTypes::staticEnumToKey(effectVM->effectType()));
@@ -705,7 +705,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
                 case ActionEffectTypes::AGENT:
                 {
                     EffectOnAgentM* effectOnAgent = qobject_cast<EffectOnAgentM*>(actionEffect);
-                    if ((effectOnAgent != NULL) && (effectOnAgent->agent() != NULL))
+                    if ((effectOnAgent != nullptr) && (effectOnAgent->agent() != nullptr))
                     {
                         jsonEffect.insert("agent_name", effectOnAgent->agent()->name());
                         jsonEffect.insert("value", AgentEffectValues::staticEnumToKey(effectOnAgent->agentEffectValue()));
@@ -717,7 +717,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
                 case ActionEffectTypes::VALUE:
                 {
                     IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(actionEffect);
-                    if ((iopEffect != NULL) && (iopEffect->agent() != NULL) && (iopEffect->agentIOP() != NULL))
+                    if ((iopEffect != nullptr) && (iopEffect->agent() != nullptr) && (iopEffect->agentIOP() != nullptr))
                     {
                         jsonEffect.insert("agent_name", iopEffect->agent()->name());
                         jsonEffect.insert("iop_type", AgentIOPTypes::staticEnumToKey(iopEffect->agentIOP()->agentIOPType()));
@@ -732,8 +732,8 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
                 case ActionEffectTypes::MAPPING:
                 {
                     MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(actionEffect);
-                    if ((mappingEffect != NULL) && (mappingEffect->agent() != NULL) && (mappingEffect->input() != NULL)
-                            && (mappingEffect->outputAgent() != NULL)  && (mappingEffect->output() != NULL))
+                    if ((mappingEffect != nullptr) && (mappingEffect->agent() != nullptr) && (mappingEffect->input() != nullptr)
+                            && (mappingEffect->outputAgent() != nullptr)  && (mappingEffect->output() != nullptr))
                     {
                         jsonEffect.insert("input_agent_name", mappingEffect->agent()->name());
                         jsonEffect.insert("input_name", mappingEffect->input()->name());
@@ -769,7 +769,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
     QJsonArray jsonActionsInPaletteArray;
     for (ActionInPaletteVM* actionInPalette : actionsInPaletteList)
     {
-        if (actionInPalette->modelM() != NULL)
+        if (actionInPalette->modelM() != nullptr)
         {
             QJsonObject jsonActionsInPalette;
             jsonActionsInPalette.insert("index", actionInPalette->indexInPanel());
@@ -788,7 +788,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
     QJsonArray jsonActionsInTimelineArray;
     for (ActionVM* actionVM : actionsInTimeLine)
     {
-        if ((actionVM != NULL) && (actionVM->modelM() != NULL) && (actionVM->startTime() >= 0))
+        if ((actionVM != nullptr) && (actionVM->modelM() != nullptr) && (actionVM->startTime() >= 0))
         {
             QJsonObject jsonActionsInTimeLine;
             jsonActionsInTimeLine.insert("action_id", actionVM->modelM()->uid());
@@ -820,7 +820,7 @@ QJsonArray JsonHelper::exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsI
 
     /*for (AgentInMappingVM* agentInMapping : agentsInMapping)
     {
-        if ((agentInMapping != NULL) && (agentInMapping->temporaryMapping() != NULL) && !agentInMapping->models()->isEmpty())
+        if ((agentInMapping != nullptr) && (agentInMapping->temporaryMapping() != nullptr) && !agentInMapping->models()->isEmpty())
         {
             QJsonObject jsonAgent;
 
@@ -1032,7 +1032,7 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
 {
     QJsonObject jsonAgentIOP;
 
-    if (agentIOP != NULL)
+    if (agentIOP != nullptr)
     {
         jsonAgentIOP.insert("name", agentIOP->name());
         jsonAgentIOP.insert("type", AgentIOPValueTypes::staticEnumToKey(agentIOP->agentIOPValueType()));
@@ -1174,7 +1174,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 // Go through the inputs
                                 foreach (InputVM* inputVM, iterator->inputsList()->toList())
                                 {
-                                    if ((inputVM != NULL) && (inputVM->firstModel() != NULL))
+                                    if ((inputVM != nullptr) && (inputVM->firstModel() != nullptr))
                                     {
                                         if (!found && (agentIOPType == AgentIOPTypes::INPUT) && (agentIOPName == inputVM->name()))
                                         {
@@ -1187,7 +1187,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 // Go through the outputs
                                 foreach (OutputVM* outputVM, iterator->outputsList()->toList())
                                 {
-                                    if ((outputVM != NULL) && (outputVM->firstModel() != NULL))
+                                    if ((outputVM != nullptr) && (outputVM->firstModel() != nullptr))
                                     {
                                         if (!found && (agentIOPType == AgentIOPTypes::OUTPUT) && (agentIOPName == outputVM->name()))
                                         {
@@ -1201,7 +1201,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             }
                         }
 
-                        if ((agent != NULL) && (iopAgentM != NULL))
+                        if ((agent != nullptr) && (iopAgentM != nullptr))
                         {
                             // Create model
                             IOPValueEffectM* iopEffectM = new IOPValueEffectM();
@@ -1239,14 +1239,14 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                         for (AgentsGroupedByNameVM* iterator : allAgentsGroupedByName)
                         {
-                            if ((iterator != NULL) && (iterator->name() == agentName))
+                            if ((iterator != nullptr) && (iterator->name() == agentName))
                             {
                                 agent = iterator;
                                 break;
                             }
                         }
 
-                        if (agent != NULL)
+                        if (agent != nullptr)
                         {
                             // Create model
                             EffectOnAgentM* effectOnAgent = new EffectOnAgentM();
@@ -1312,7 +1312,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                             found = true;
                                         }
 
-                                        if (outputVM->firstModel() != NULL) {
+                                        if (outputVM->firstModel() != nullptr) {
                                             outputsList.append(outputVM->firstModel());
                                         }
                                     }
@@ -1332,7 +1332,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                             found = true;
                                         }
 
-                                        if (inputVM->firstModel() != NULL) {
+                                        if (inputVM->firstModel() != nullptr) {
                                             inputsList.append(inputVM->firstModel());
                                         }
                                     }
@@ -1340,7 +1340,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             }
                         }
 
-                        if ((inputAgent != NULL) && (input != NULL) && (outputAgent != NULL) && (output != NULL))
+                        if ((inputAgent != nullptr) && (input != nullptr) && (outputAgent != nullptr) && (output != nullptr))
                         {
                             // Create model
                             MappingEffectM* mappingEffectM = new MappingEffectM();
@@ -1422,7 +1422,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                                 // Go only through outputs
                                 for (OutputVM* outputVM : agent->outputsList()->toList())
                                 {
-                                    if ((outputVM != NULL) && (outputVM->firstModel() != NULL))
+                                    if ((outputVM != nullptr) && (outputVM->firstModel() != nullptr))
                                     {
                                         if (!found && (outputVM->name() == agentIOPName))
                                         {

@@ -43,7 +43,7 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (model != NULL)
+    if (model != nullptr)
     {
         // Init the name
         _name = model->name();
@@ -96,7 +96,7 @@ void AgentVM::setdefinition(DefinitionM* value)
         DefinitionM* previousValue = _definition;
 
         // Previous value
-        if (previousValue != NULL)
+        if (previousValue != nullptr)
         {
             // DIS-connect from signals from the previous definition
             disconnect(previousValue, &DefinitionM::commandAskedForOutput, this, &AgentVM::_onCommandAskedToAgentAboutOutput);
@@ -106,7 +106,7 @@ void AgentVM::setdefinition(DefinitionM* value)
         _definition = value;
 
         // New value
-        if (_definition != NULL)
+        if (_definition != nullptr)
         {
             // Connect to signal from the new definition
             connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentVM::_onCommandAskedToAgentAboutOutput);
@@ -137,7 +137,7 @@ void AgentVM::changeState()
         for (AgentM* model : _models.toList())
         {
             // Check if the model has a hostname
-            if ((model != NULL) && !model->hostname().isEmpty())
+            if ((model != nullptr) && !model->hostname().isEmpty())
             {
                 Q_EMIT commandAskedToLauncher(command_StartAgent, model->hostname(), model->commandLine());
             }
@@ -215,7 +215,7 @@ void AgentVM::loadMapping()
 void AgentVM::downloadDefinition()
 {
     QString defaultDefinitionName = QString("Definition_of_%1.json").arg(_name);
-    if (_definition != NULL) {
+    if (_definition != nullptr) {
         defaultDefinitionName = QString("%1.json").arg(_definition->name());
     }
 
@@ -225,7 +225,7 @@ void AgentVM::downloadDefinition()
                                                               defaultDefinitionName,
                                                               "JSON (*.json)");
 
-    if (!definitionFilePath.isEmpty() && (_definition != NULL)) {
+    if (!definitionFilePath.isEmpty() && (_definition != nullptr)) {
         Q_EMIT downloadAgentDefinitionToPath(_definition, definitionFilePath);
     }
 }
@@ -240,7 +240,7 @@ void AgentVM::downloadMapping()
     if (!_models.isEmpty())
     {
         AgentM* model = _models.at(0);
-        if ((model != NULL) && (model->mapping() != NULL)) {
+        if ((model != nullptr) && (model->mapping() != nullptr)) {
             defaultMappingName = QString("%1.json").arg(model->mapping()->name());
         }
     }
@@ -257,13 +257,13 @@ void AgentVM::downloadMapping()
         AgentMappingM* agentMapping = NULL;
         for (AgentM* model : _models.toList())
         {
-            if ((model != NULL) && model->isON() && (model->mapping() != NULL))
+            if ((model != nullptr) && model->isON() && (model->mapping() != nullptr))
             {
                 agentMapping = model->mapping();
                 break;
             }
         }
-        if (agentMapping != NULL) {
+        if (agentMapping != nullptr) {
             Q_EMIT downloadAgentMappingToPath(agentMapping, mappingFilePath);
         }
     }
@@ -397,7 +397,7 @@ void AgentVM::_onModelsChanged()
 
         for (AgentM* model : newAgentsList)
         {
-            if ((model != NULL) && !_previousAgentsList.contains(model))
+            if ((model != nullptr) && !_previousAgentsList.contains(model))
             {
                 //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
@@ -427,7 +427,7 @@ void AgentVM::_onModelsChanged()
 
         for (AgentM* model : _previousAgentsList)
         {
-            if ((model != NULL) && !newAgentsList.contains(model))
+            if ((model != nullptr) && !newAgentsList.contains(model))
             {
                 //qDebug() << "Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
 
@@ -529,13 +529,13 @@ void AgentVM::_onIsFrozenOfModelChanged(bool isFrozen)
  */
 void AgentVM::_onDefinitionOfModelChanged(DefinitionM* definition)
 {
-    if ((_models.count() > 1) && (_definition != NULL) && (definition != NULL))
+    if ((_models.count() > 1) && (_definition != nullptr) && (definition != nullptr))
     {
         // The modified definition is different from the definition of our view model of agent
         if (!DefinitionM::areIdenticals(_definition, definition))
         {
             AgentM* agent = qobject_cast<AgentM*>(sender());
-            if (agent != NULL)
+            if (agent != nullptr)
             {
                 // Emit the signal "Different Definition Detected on this model of Agent"
                 Q_EMIT differentDefinitionDetectedOnModelOfAgent(agent);
@@ -679,7 +679,7 @@ void AgentVM::_updateWithAllModels()
 
     for (AgentM* model : _models.toList())
     {
-        if (model != NULL)
+        if (model != nullptr)
         {
             if (!model->peerId().isEmpty()) {
                 _peerIdsList.append(model->peerId());
@@ -744,7 +744,7 @@ void AgentVM::_updateIsON()
 
     for (AgentM* model : _models.toList())
     {
-        if ((model != NULL) && model->isON())
+        if ((model != nullptr) && model->isON())
         {
             globalIsON = true;
             clonesNumber++;
@@ -772,7 +772,7 @@ void AgentVM::_updateCanBeRestarted()
 
     for (AgentM* model : _models.toList())
     {
-        if ((model != NULL) && model->canBeRestarted())
+        if ((model != nullptr) && model->canBeRestarted())
         {
             globalCanBeRestarted = true;
             break;
@@ -791,7 +791,7 @@ void AgentVM::_updateIsMuted()
 
     for (AgentM* model : _models.toList())
     {
-        if ((model != NULL) && model->isMuted())
+        if ((model != nullptr) && model->isMuted())
         {
             globalIsMuted = true;
             break;
@@ -810,7 +810,7 @@ void AgentVM::_updateCanBeFrozen()
 
     for (AgentM* model : _models.toList())
     {
-        if ((model != NULL) && model->canBeFrozen())
+        if ((model != nullptr) && model->canBeFrozen())
         {
             globalCanBeFrozen = true;
             break;
@@ -829,7 +829,7 @@ void AgentVM::_updateIsFrozen()
 
     for (AgentM* model : _models.toList())
     {
-        if ((model != NULL) && model->isFrozen())
+        if ((model != nullptr) && model->isFrozen())
         {
             globalIsFrozen = true;
             break;
@@ -848,7 +848,7 @@ void AgentVM::_updateHasLogInStream()
 
     for (AgentM* model : _models.toList())
     {
-        if ((model != NULL) && model->hasLogInStream())
+        if ((model != nullptr) && model->hasLogInStream())
         {
             globalHasLogInStream = true;
             break;
@@ -868,7 +868,7 @@ void AgentVM::_updateIsEnabledViewLogStream()
     for (AgentM* model : _models.toList())
     {
         // Check that its logger port is defined
-        if ((model != NULL) && !model->loggerPort().isEmpty())
+        if ((model != nullptr) && !model->loggerPort().isEmpty())
         {
             globalIsEnabledViewLogStream = true;
             break;
@@ -887,7 +887,7 @@ void AgentVM::_updateHasLogInFile()
 
     for (AgentM* model : _models.toList())
     {
-        if ((model != NULL) && model->hasLogInFile())
+        if ((model != nullptr) && model->hasLogInFile())
         {
             globalHasLogInFile = true;
             break;
@@ -906,7 +906,7 @@ void AgentVM::_updateWithDefinitionOfFirstModel()
     if (!_models.isEmpty())
     {
          AgentM* model = _models.at(0);
-         if (model != NULL) {
+         if (model != nullptr) {
              definition = model->definition();
          }
     }
@@ -922,7 +922,7 @@ void AgentVM::_updateWithStateOfFirstModel()
     if (!_models.isEmpty())
     {
         AgentM* model = _models.at(0);
-        if (model != NULL) {
+        if (model != nullptr) {
             setstate(model->state());
         }
     }
@@ -937,7 +937,7 @@ void AgentVM::_updateWithLogFilePathOfFirstModel()
     if (!_models.isEmpty())
     {
         AgentM* model = _models.at(0);
-        if (model != NULL) {
+        if (model != nullptr) {
             setlogFilePath(model->logFilePath());
         }
     }
@@ -952,7 +952,7 @@ void AgentVM::_updateWithDefinitionFilePathOfFirstModel()
     if (!_models.isEmpty())
     {
         AgentM* model = _models.at(0);
-        if (model != NULL) {
+        if (model != nullptr) {
             setdefinitionFilePath(model->definitionFilePath());
         }
     }
@@ -967,7 +967,7 @@ void AgentVM::_updateWithMappingFilePathOfFirstModel()
     if (!_models.isEmpty())
     {
         AgentM* model = _models.at(0);
-        if (model != NULL) {
+        if (model != nullptr) {
             setmappingFilePath(model->mappingFilePath());
         }
     }

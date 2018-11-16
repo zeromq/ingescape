@@ -45,7 +45,7 @@ void ActionConditionM::setagent(AgentsGroupedByNameVM* value)
 {
     if (_agent != value)
     {
-        if (_agent != NULL)
+        if (_agent != nullptr)
         {
             // UnSubscribe to destruction
             disconnect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
@@ -56,7 +56,7 @@ void ActionConditionM::setagent(AgentsGroupedByNameVM* value)
 
         _agent = value;
 
-        if (_agent != NULL)
+        if (_agent != nullptr)
         {
             // Subscribe to destruction
             connect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
@@ -73,7 +73,7 @@ void ActionConditionM::setagent(AgentsGroupedByNameVM* value)
 */
 void ActionConditionM::copyFrom(ActionConditionM* condition)
 {
-    if (condition != NULL)
+    if (condition != nullptr)
     {
         setagent(condition->agent());
         setisValid(condition->isValid());
@@ -86,7 +86,7 @@ void ActionConditionM::copyFrom(ActionConditionM* condition)
   */
 void ActionConditionM::initializeConnections()
 {
-    if (_agent != NULL)
+    if (_agent != nullptr)
     {
         // Reset the agent connections
         resetConnections();
@@ -105,7 +105,7 @@ void ActionConditionM::initializeConnections()
   */
 void ActionConditionM::resetConnections()
 {
-    if (_agent != NULL)
+    if (_agent != nullptr)
     {
         // DIS-connect to signal emitted when the flag "is ON" changed
         disconnect(_agent, &AgentsGroupedByNameVM::isONChanged, this, &ActionConditionM::_onAgentIsOnChanged);

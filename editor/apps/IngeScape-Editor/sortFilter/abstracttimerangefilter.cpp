@@ -88,7 +88,7 @@ bool AbstractTimeRangeFilter::filterAccepts(QObject* item, int index) const
 
     // Try to cast our item as an TimeTickM
     TimeTickM * timeTickItem = dynamic_cast<TimeTickM*>(item);
-    if (timeTickItem != NULL)
+    if (timeTickItem != nullptr)
     {
         //
         // We have an TimeTickM item
@@ -103,7 +103,7 @@ bool AbstractTimeRangeFilter::filterAccepts(QObject* item, int index) const
     }
     else {
         ActionVM * actionVMItem = dynamic_cast<ActionVM*>(item);
-        if (actionVMItem != NULL)
+        if (actionVMItem != nullptr)
         {
             // Check if our time is valid
             if (actionVMItem->startTime() > 0)

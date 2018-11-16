@@ -85,7 +85,7 @@ void IOPValueConditionM::setagentIOP(AgentIOPM* agentIop)
 {
     if (_agentIOP != agentIop)
     {
-        if (_agentIOP != NULL)
+        if (_agentIOP != nullptr)
         {
             // UnSubscribe to destruction
             disconnect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueConditionM::_onAgentIopModelDestroyed);
@@ -95,7 +95,7 @@ void IOPValueConditionM::setagentIOP(AgentIOPM* agentIop)
 
         _agentIOP = agentIop;
 
-        if (_agentIOP != NULL)
+        if (_agentIOP != nullptr)
         {
             setagentIOPName(_agentIOP->name());
 
@@ -118,7 +118,7 @@ void IOPValueConditionM::copyFrom(ActionConditionM* condition)
     ActionConditionM::copyFrom(condition);
 
     IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(condition);
-    if (iopCondition != NULL)
+    if (iopCondition != nullptr)
     {
         setagentIOP(iopCondition->agentIOP());
         setagentIOPName(iopCondition->agentIOPName());
@@ -146,7 +146,7 @@ void IOPValueConditionM::setagent(AgentsGroupedByNameVM* agent)
     // Value of agent changed
     if (previousAgent != _agent)
     {
-        if (previousAgent != NULL) {
+        if (previousAgent != nullptr) {
             disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueConditionM::_onModelsOfIOPChanged);
         }
 
@@ -156,12 +156,12 @@ void IOPValueConditionM::setagent(AgentsGroupedByNameVM* agent)
         // Clear the list
         _agentIopList.clear();
 
-        if (_agent != NULL)
+        if (_agent != nullptr)
         {
             // Fill with outputs
             for (OutputVM* output : _agent->outputsList()->toList())
             {
-                if (output->firstModel() != NULL) {
+                if (output->firstModel() != nullptr) {
                     _agentIopList.append(output->firstModel());
                 }
             }
@@ -182,12 +182,12 @@ void IOPValueConditionM::setagent(AgentsGroupedByNameVM* agent)
   */
 void IOPValueConditionM::initializeConnections()
 {
-    if (_agent != NULL)
+    if (_agent != nullptr)
     {
         // Call our mother class
         ActionConditionM::initializeConnections();
 
-        if (_agentIOP != NULL)
+        if (_agentIOP != nullptr)
         {
             // Subscribe to value change
             connect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
@@ -204,12 +204,12 @@ void IOPValueConditionM::initializeConnections()
   */
 void IOPValueConditionM::resetConnections()
 {
-    if (_agent != NULL)
+    if (_agent != nullptr)
     {
         // Call our mother class
         ActionConditionM::resetConnections();
 
-        if (_agentIOP != NULL)
+        if (_agentIOP != nullptr)
         {
             // UnSubscribe to value change
             disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
@@ -243,7 +243,7 @@ void IOPValueConditionM::_onModelsOfIOPChanged()
         // Check that our output list update concern our selected agent iop
         for (OutputVM* outputVM : _agent->outputsList()->toList())
         {
-            if ((outputVM != NULL) && (outputVM->firstModel() != NULL))
+            if ((outputVM != nullptr) && (outputVM->firstModel() != nullptr))
             {
                 _agentIopList.append(outputVM->firstModel());
 
@@ -278,7 +278,7 @@ void IOPValueConditionM::_onCurrentValueChanged(QVariant currentValue)
 
     bool isValid = false;
 
-    if (_agentIOP != NULL)
+    if (_agentIOP != nullptr)
     {
         // According to the iop type
         switch(_agentIOP->agentIOPValueType())
@@ -397,7 +397,7 @@ void IOPValueConditionM::_updateAgentIOPSelected(AgentIOPM * newAgentIOP)
     if (newAgentIOP != _agentIOP)
     {
         // Disconnect old agent iop
-        if (_agentIOP != NULL)
+        if (_agentIOP != nullptr)
         {
             // UnSubscribe to value change
             disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
@@ -407,7 +407,7 @@ void IOPValueConditionM::_updateAgentIOPSelected(AgentIOPM * newAgentIOP)
         setagentIOP(newAgentIOP);
 
         // Connect new agent iop
-        if (newAgentIOP != NULL)
+        if (newAgentIOP != nullptr)
         {
             // Subscribe to value change
             connect(newAgentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);

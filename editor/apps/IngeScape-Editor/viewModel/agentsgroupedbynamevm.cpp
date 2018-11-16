@@ -139,7 +139,7 @@ void AgentsGroupedByNameVM::updateCurrentValueOfIOP(PublishedValueM* publishedVa
         // FIXME: Is it usefull to store values in the definition of each model ?
         for (AgentM* agent : _models)
         {
-            if ((agent != NULL) && (agent->definition() != NULL))
+            if ((agent != nullptr) && (agent->definition() != nullptr))
             {
                 // Update the current value of an I/O/P of the agent definition
                 agent->definition()->updateCurrentValueOfIOP(iopType, iopName, currentValue);
@@ -166,7 +166,7 @@ void AgentsGroupedByNameVM::updateCurrentValueOfIOP(PublishedValueM* publishedVa
  */
 void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
 {
-    if (agentsGroupedByDefinition != NULL)
+    if (agentsGroupedByDefinition != nullptr)
     {
         // Emit the signal "Agents grouped by definition will be deleted"
         Q_EMIT agentsGroupedByDefinitionWillBeDeleted(agentsGroupedByDefinition);
@@ -250,7 +250,7 @@ void AgentsGroupedByNameVM::_onModelsChanged()
 
         for (AgentM* model : newAgentsList)
         {
-            if ((model != NULL) && !_previousAgentsList.contains(model))
+            if ((model != nullptr) && !_previousAgentsList.contains(model))
             {
                 //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
@@ -268,7 +268,7 @@ void AgentsGroupedByNameVM::_onModelsChanged()
 
         for (AgentM* model : _previousAgentsList)
         {
-            if ((model != NULL) && !newAgentsList.contains(model))
+            if ((model != nullptr) && !newAgentsList.contains(model))
             {
                 //qDebug() << "Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
 
@@ -428,7 +428,7 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                             for (AgentM* iterator : modelsOnHost)
                             {
                                 // Same peer id
-                                if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId))
+                                if ((iterator != nullptr) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId))
                                 {
                                     // New model is OFF and there is already a model with the same peer id...
                                     if (!model->isON())
@@ -451,7 +451,7 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                             }
 
                             // We don't found this peer id
-                            if (!hasToDeleteNewModel && (sameModel == NULL))
+                            if (!hasToDeleteNewModel && (sameModel == nullptr))
                             {
                                 // New model is ON
                                 if (model->isON())
@@ -459,7 +459,7 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                                     for (AgentM* iterator : modelsOnHost)
                                     {
                                         // Same command line (peer id is defined) and existing agent is OFF --> we consider that it is the same model that evolve from OFF to ON
-                                        if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && !iterator->isON())
+                                        if ((iterator != nullptr) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && !iterator->isON())
                                         {
                                             // We have to replace it by the new one
                                             sameModel = iterator;
@@ -473,7 +473,7 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                                     for (AgentM* iterator : modelsOnHost)
                                     {
                                         // Same command line (peer id is defined) and existing agent is ON --> we consider that it is the same model but OFF
-                                        if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && iterator->isON())
+                                        if ((iterator != nullptr) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && iterator->isON())
                                         {
                                             // The new model is useless, we have to delete it
                                             hasToDeleteNewModel = true;
@@ -492,7 +492,7 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                                 Q_EMIT agentModelHasToBeDeleted(model);
                             }
                             // Else if we have to replace an existing (same) model by the new one
-                            else if (sameModel != NULL)
+                            else if (sameModel != nullptr)
                             {
                                 if (groupOfAgentsWithSameDefinition->models()->contains(sameModel))
                                 {

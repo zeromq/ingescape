@@ -73,7 +73,7 @@ void ConditionOnAgentM::copyFrom(ActionConditionM* condition)
     ActionConditionM::copyFrom(condition);
 
     ConditionOnAgentM* conditionOnAgent = qobject_cast<ConditionOnAgentM*>(condition);
-    if (conditionOnAgent != NULL)
+    if (conditionOnAgent != nullptr)
     {
         setagentConditionValue(conditionOnAgent->agentConditionValue());
     }
@@ -95,7 +95,7 @@ void ConditionOnAgentM::setagent(AgentsGroupedByNameVM* agent)
     // Value of agent changed
     if (previousAgent != _agent)
     {
-        if (_agent != NULL) {
+        if (_agent != nullptr) {
             _onAgentIsOnChanged(_agent->isON());
         }
     }

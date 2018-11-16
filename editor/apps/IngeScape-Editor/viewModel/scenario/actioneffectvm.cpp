@@ -68,7 +68,7 @@ ActionEffectVM::~ActionEffectVM()
     // reset pointer
     setsecondAgentForMapping(nullptr);
 
-    if (_modelM != NULL)
+    if (_modelM != nullptr)
     {
         ActionEffectM* tmp = _modelM;
         setmodelM(nullptr);

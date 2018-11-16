@@ -49,7 +49,7 @@ void IngeScapeLauncherManager::addIngeScapeLauncher(QString peerId, QString host
     {
         // For test purposes, we create a host each time there is a new launcher detected
         HostM* host = getHostWithName(hostName);
-        if (host == NULL)
+        if (host == nullptr)
         {
             // Create a new host
             host = new HostM(hostName, peerId, ipAddress, streamingPort, this);
@@ -96,7 +96,7 @@ void IngeScapeLauncherManager::removeIngeScapeLauncher(QString peerId, QString h
     if (!hostName.isEmpty())
     {
         HostM* host = getHostWithName(hostName);
-        if (host != NULL)
+        if (host != nullptr)
         {
             // Emit signal that the host model will be removed
             Q_EMIT hostModelWillBeRemoved(host);
@@ -138,7 +138,7 @@ HostM* IngeScapeLauncherManager::getHostWithName(QString hostName)
 QString IngeScapeLauncherManager::getPeerIdOfLauncherWithHostName(QString hostName)
 {
     HostM* host = getHostWithName(hostName);
-    if (host != NULL) {
+    if (host != nullptr) {
         return host->peerId();
     }
     else {
@@ -154,7 +154,7 @@ void IngeScapeLauncherManager::reset()
 {
     for (HostM* host : _hosts)
     {
-        if (host != NULL)
+        if (host != nullptr)
         {
             // Emit signal that the host model will be removed
             Q_EMIT hostModelWillBeRemoved(host);

@@ -43,7 +43,7 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     if (models.count() > 0)
     {
         AgentM* firstModel = models.first();
-        if (firstModel != NULL)
+        if (firstModel != nullptr)
         {
             // Set the name of our agent in mapping
             _name = firstModel->name();
@@ -114,11 +114,11 @@ bool AgentInMappingVM::addTemporaryLink(QString inputName, QString outputAgentNa
 {
     bool hasBeenAdded = false;
 
-    if (_temporaryMapping != NULL)
+    if (_temporaryMapping != nullptr)
     {
         // Check that there is not already the same link
         ElementMappingM* temporaryLink = _getTemporaryLink(inputName, outputAgentName, outputName);
-        if (temporaryLink == NULL)
+        if (temporaryLink == nullptr)
         {
             temporaryLink = new ElementMappingM(_name, inputName, outputAgentName, outputName);
 
@@ -142,11 +142,11 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
 {
     bool hasBeenRemoved = false;
 
-    if (_temporaryMapping != NULL)
+    if (_temporaryMapping != nullptr)
     {
         // Get the temporary link with same names
         ElementMappingM* temporaryLink = _getTemporaryLink(inputName, outputAgentName, outputName);
-        if (temporaryLink != NULL)
+        if (temporaryLink != nullptr)
         {
             _temporaryMapping->mappingElements()->remove(temporaryLink);
 
@@ -261,7 +261,7 @@ ParameterVM* AgentInMappingVM::getParameterFromId(QString parameterId)
 
         for (AgentM* model : newAgentsList)
         {
-            if ((model != NULL) && !_previousAgentsList.contains(model))
+            if ((model != nullptr) && !_previousAgentsList.contains(model))
             {
                 qDebug() << "Agent in Mapping VM: New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
@@ -280,7 +280,7 @@ ParameterVM* AgentInMappingVM::getParameterFromId(QString parameterId)
 
         for (AgentM* model : _previousAgentsList)
         {
-            if ((model != NULL) && !newAgentsList.contains(model))
+            if ((model != nullptr) && !newAgentsList.contains(model))
             {
                 qDebug() << "Agent in Mapping VM: Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
 
@@ -308,7 +308,7 @@ ParameterVM* AgentInMappingVM::getParameterFromId(QString parameterId)
 /*void AgentInMappingVM::_onInputsListChanged()
 {
     foreach (InputVM* input, _inputsList.toList()) {
-        if ((input != NULL) && (input->firstModel() != NULL)) {
+        if ((input != nullptr) && (input->firstModel() != nullptr)) {
         }
     }
 }*/
@@ -320,7 +320,7 @@ ParameterVM* AgentInMappingVM::getParameterFromId(QString parameterId)
 /*void AgentInMappingVM::_onOutputsListChanged()
 {
     foreach (OutputVM* output, _outputsList.toList()) {
-        if ((output != NULL) && (output->firstModel() != NULL)) {
+        if ((output != nullptr) && (output->firstModel() != nullptr)) {
         }
     }
 }*/
@@ -334,7 +334,7 @@ ParameterVM* AgentInMappingVM::getParameterFromId(QString parameterId)
 void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue)
 {
     //AgentM* agent = qobject_cast<AgentM*>(sender());
-    if ((previousValue != NULL) && (newValue != NULL)) // && (agent != NULL)
+    if ((previousValue != nullptr) && (newValue != nullptr)) // && (agent != nullptr)
     {
         //
         // Check if input(s) have been removed
@@ -342,10 +342,10 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         QList<InputVM*> inputsListToRemove;
         for (AgentIOPM* input : previousValue->inputsList()->toList())
         {
-            if ((input != NULL) && !input->id().isEmpty() && !newValue->inputsIdsList().contains(input->id()))
+            if ((input != nullptr) && !input->id().isEmpty() && !newValue->inputsIdsList().contains(input->id()))
             {
                 InputVM* inputVM = _inputModelRemoved(input);
-                if (inputVM != NULL)
+                if (inputVM != nullptr)
                 {
                     // The view model of input is empty
                     if (inputVM->models()->isEmpty()) {
@@ -373,10 +373,10 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         QList<OutputVM*> outputsListToRemove;
         for (OutputM* output : previousValue->outputsList()->toList())
         {
-            if ((output != NULL) && !output->id().isEmpty() && !newValue->outputsIdsList().contains(output->id()))
+            if ((output != nullptr) && !output->id().isEmpty() && !newValue->outputsIdsList().contains(output->id()))
             {
                 OutputVM* outputVM = _outputModelRemoved(output);
-                if (outputVM != NULL)
+                if (outputVM != nullptr)
                 {
                     // The view model of output is empty
                     if (outputVM->models()->isEmpty()) {
@@ -404,10 +404,10 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         QList<ParameterVM*> parametersListToRemove;
         for (AgentIOPM* parameter : previousValue->parametersList()->toList())
         {
-            if ((parameter != NULL) && !parameter->id().isEmpty() && !newValue->parametersIdsList().contains(parameter->id()))
+            if ((parameter != nullptr) && !parameter->id().isEmpty() && !newValue->parametersIdsList().contains(parameter->id()))
             {
                 ParameterVM* parameterVM = _parameterModelRemoved(parameter);
-                if (parameterVM != NULL)
+                if (parameterVM != nullptr)
                 {
                     // The view model of parameter is empty
                     if (parameterVM->models()->isEmpty()) {
@@ -435,7 +435,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         QList<InputVM*> inputsListToAdd;
         for (AgentIOPM* input : newValue->inputsList()->toList())
         {
-            if ((input != NULL) && !input->id().isEmpty())
+            if ((input != nullptr) && !input->id().isEmpty())
             {
                 InputVM* inputVM = NULL;
 
@@ -445,7 +445,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                     AgentIOPM* previousModelOfInput = previousValue->getInputWithName(input->name());
                     inputVM = getInputFromId(input->id());
 
-                    if ((inputVM != NULL) && (previousModelOfInput != NULL))
+                    if ((inputVM != nullptr) && (previousModelOfInput != nullptr))
                     {
                         int index = inputVM->models()->indexOf(previousModelOfInput);
                         if (index > -1) {
@@ -457,7 +457,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                 else
                 {
                     inputVM = _inputModelAdded(input);
-                    if (inputVM != NULL)
+                    if (inputVM != nullptr)
                     {
                         // New view model of input
                         if (!_inputsList.contains(inputVM)) {
@@ -482,7 +482,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         QList<OutputVM*> outputsListToAdd;
         for (OutputM* output : newValue->outputsList()->toList())
         {
-            if ((output != NULL) && !output->id().isEmpty())
+            if ((output != nullptr) && !output->id().isEmpty())
             {
                 OutputVM* outputVM = NULL;
 
@@ -492,7 +492,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                     OutputM* previousModelOfOutput = previousValue->getOutputWithName(output->name());
                     outputVM = getOutputFromId(output->id());
 
-                    if ((outputVM != NULL)  && (previousModelOfOutput != NULL))
+                    if ((outputVM != nullptr)  && (previousModelOfOutput != nullptr))
                     {
                         int index = outputVM->models()->indexOf(previousModelOfOutput);
                         if (index > -1) {
@@ -504,7 +504,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                 else
                 {
                     outputVM = _outputModelAdded(output);
-                    if (outputVM != NULL)
+                    if (outputVM != nullptr)
                     {
                         // New view model of output
                         if (!_outputsList.contains(outputVM)) {
@@ -529,7 +529,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         QList<ParameterVM*> parametersListToAdd;
         for (AgentIOPM* parameter : newValue->parametersList()->toList())
         {
-            if ((parameter != NULL) && !parameter->id().isEmpty())
+            if ((parameter != nullptr) && !parameter->id().isEmpty())
             {
                 ParameterVM* parameterVM = NULL;
 
@@ -539,7 +539,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                     AgentIOPM* previousModelOfParameter = previousValue->getParameterWithName(parameter->name());
                     parameterVM = getParameterFromId(parameter->id());
 
-                    if ((parameterVM != NULL) && (previousModelOfParameter != NULL))
+                    if ((parameterVM != nullptr) && (previousModelOfParameter != nullptr))
                     {
                         int index = parameterVM->models()->indexOf(previousModelOfParameter);
                         if (index > -1) {
@@ -551,7 +551,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                 else
                 {
                     parameterVM = _parameterModelAdded(parameter);
-                    if (parameterVM != NULL)
+                    if (parameterVM != nullptr)
                     {
                         // New view model of parameter
                         if (!_parametersList.contains(parameterVM)) {
@@ -586,7 +586,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
  */
 void AgentInMappingVM::_agentModelAdded(AgentM* model)
 {
-    if ((model != NULL) && (model->definition() != NULL))
+    if ((model != nullptr) && (model->definition() != nullptr))
     {
         QList<InputVM*> inputsListToAdd;
         QList<OutputVM*> outputsListToAdd;
@@ -596,7 +596,7 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
         foreach (AgentIOPM* input, model->definition()->inputsList()->toList())
         {
             InputVM* inputVM = _inputModelAdded(input);
-            if (inputVM != NULL)
+            if (inputVM != nullptr)
             {
                 // New view model of input
                 if (!_inputsList.contains(inputVM)) {
@@ -609,7 +609,7 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
         foreach (OutputM* output, model->definition()->outputsList()->toList())
         {
             OutputVM* outputVM = _outputModelAdded(output);
-            if (outputVM != NULL)
+            if (outputVM != nullptr)
             {
                 // New view model of output
                 if (!_outputsList.contains(outputVM)) {
@@ -622,7 +622,7 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
         foreach (AgentIOPM* parameter, model->definition()->parametersList()->toList())
         {
             ParameterVM* parameterVM = _parameterModelAdded(parameter);
-            if (parameterVM != NULL)
+            if (parameterVM != nullptr)
             {
                 // New view model of parameter
                 if (!_parametersList.contains(parameterVM)) {
@@ -656,7 +656,7 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
  */
 void AgentInMappingVM::_agentModelRemoved(AgentM* model)
 {
-    if ((model != NULL) && (model->definition() != NULL))
+    if ((model != nullptr) && (model->definition() != nullptr))
     {
         //
         // Traverse the list of models of inputs in the definition
@@ -665,7 +665,7 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
         foreach (AgentIOPM* input, model->definition()->inputsList()->toList())
         {
             InputVM* inputVM = _inputModelRemoved(input);
-            if (inputVM != NULL)
+            if (inputVM != nullptr)
             {
                 // The view model of input is empty
                 if (inputVM->models()->isEmpty()) {
@@ -693,7 +693,7 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
         foreach (OutputM* output, model->definition()->outputsList()->toList())
         {
             OutputVM* outputVM = _outputModelRemoved(output);
-            if (outputVM != NULL)
+            if (outputVM != nullptr)
             {
                 // The view model of output is empty
                 if (outputVM->models()->isEmpty()) {
@@ -721,7 +721,7 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
         foreach (AgentIOPM* parameter, model->definition()->parametersList()->toList())
         {
             ParameterVM* parameterVM = _parameterModelRemoved(parameter);
-            if (parameterVM != NULL)
+            if (parameterVM != nullptr)
             {
                 // The view model of parameter is empty
                 if (parameterVM->models()->isEmpty()) {
@@ -760,7 +760,7 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
 {
     InputVM* inputVM = NULL;
 
-    if (input != NULL)
+    if (input != nullptr)
     {
         // First, we get a ghost of this input: an input without id (only the same name)
         QList<InputVM*> inputsWithSameName = getInputsListFromName(input->name());
@@ -769,7 +769,7 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
         foreach (InputVM* iterator, inputsWithSameName)
         {
             // Already a view model with an EMPTY id (NOT defined)
-            if ((iterator != NULL) && iterator->id().isEmpty()) {
+            if ((iterator != nullptr) && iterator->id().isEmpty()) {
                 inputWithoutId = iterator;
                 break;
             }
@@ -779,7 +779,7 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
         if (input->id().isEmpty())
         {
             // There is already a view model without id
-            if (inputWithoutId != NULL)
+            if (inputWithoutId != nullptr)
             {
                 inputVM = inputWithoutId;
 
@@ -806,7 +806,7 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
         else
         {
             // There is already a view model without id
-            if (inputWithoutId != NULL)
+            if (inputWithoutId != nullptr)
             {
                 // FIXME TODO: gestion du ghost...passage en view model avec id
             }
@@ -814,7 +814,7 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
             inputVM = getInputFromId(input->id());
 
             // There is already a view model for this id
-            if (inputVM != NULL)
+            if (inputVM != nullptr)
             {
                 // Add this new model to the list
                 inputVM->models()->append(input);
@@ -853,13 +853,13 @@ InputVM* AgentInMappingVM::_inputModelRemoved(AgentIOPM* input)
 {
     InputVM* inputVM = NULL;
 
-    if (input != NULL)
+    if (input != nullptr)
     {
         // Input id is defined
         if (!input->id().isEmpty())
         {
             inputVM = getInputFromId(input->id());
-            if (inputVM != NULL)
+            if (inputVM != nullptr)
             {
                 // Remove this model from the list
                 inputVM->models()->remove(input);
@@ -867,7 +867,7 @@ InputVM* AgentInMappingVM::_inputModelRemoved(AgentIOPM* input)
             /*else
             {
                 inputVM = getInputFromName(input->name());
-                if (inputVM != NULL)
+                if (inputVM != nullptr)
                 {
                     // Remove this model from the list
                     inputVM->models().remove(input);
@@ -889,7 +889,7 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
 {
     OutputVM* outputVM = NULL;
 
-    if (output != NULL)
+    if (output != nullptr)
     {
         // First, we get a ghost of this output: an output without id (only the same name)
         QList<OutputVM*> outputsWithSameName = getOutputsListFromName(output->name());
@@ -898,7 +898,7 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
         foreach (OutputVM* iterator, outputsWithSameName)
         {
             // Already a view model with an EMPTY id (NOT defined)
-            if ((iterator != NULL) && iterator->id().isEmpty()) {
+            if ((iterator != nullptr) && iterator->id().isEmpty()) {
                 outputWithoutId = iterator;
                 break;
             }
@@ -908,7 +908,7 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
         if (output->id().isEmpty())
         {
             // There is already a view model without id
-            if (outputWithoutId != NULL)
+            if (outputWithoutId != nullptr)
             {
                 outputVM = outputWithoutId;
 
@@ -935,7 +935,7 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
         else
         {
             // There is already a view model without id
-            if (outputWithoutId != NULL)
+            if (outputWithoutId != nullptr)
             {
                 // FIXME TODO: gestion du ghost...passage en view model avec id
             }
@@ -943,7 +943,7 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
             outputVM = getOutputFromId(output->id());
 
             // There is already a view model for this id
-            if (outputVM != NULL)
+            if (outputVM != nullptr)
             {
                 // Add this new model to the list
                 outputVM->models()->append(output);
@@ -983,13 +983,13 @@ OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
 {
     OutputVM* outputVM = NULL;
 
-    if (output != NULL)
+    if (output != nullptr)
     {
         // Output id is defined
         if (!output->id().isEmpty())
         {
             outputVM = getOutputFromId(output->id());
-            if (outputVM != NULL)
+            if (outputVM != nullptr)
             {
                 // Remove this model from the list
                 outputVM->models()->remove(output);
@@ -997,7 +997,7 @@ OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
             /*else
             {
                 outputVM = getOutputFromName(output->name());
-                if (outputVM != NULL)
+                if (outputVM != nullptr)
                 {
                     // Remove this model from the list
                     outputVM->models().remove(output);
@@ -1019,7 +1019,7 @@ ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
 {
     ParameterVM* parameterVM = NULL;
 
-    if (parameter != NULL)
+    if (parameter != nullptr)
     {
         // First, we get a ghost of this parameter: a parameter without id (only the same name)
         QList<ParameterVM*> parametersWithSameName = getParametersListFromName(parameter->name());
@@ -1028,7 +1028,7 @@ ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
         foreach (ParameterVM* iterator, parametersWithSameName)
         {
             // Already a view model with an EMPTY id (NOT defined)
-            if ((iterator != NULL) && iterator->id().isEmpty()) {
+            if ((iterator != nullptr) && iterator->id().isEmpty()) {
                 parameterWithoutId = iterator;
                 break;
             }
@@ -1038,7 +1038,7 @@ ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
         if (parameter->id().isEmpty())
         {
             // There is already a view model without id
-            if (parameterWithoutId != NULL)
+            if (parameterWithoutId != nullptr)
             {
                 parameterVM = parameterWithoutId;
 
@@ -1065,7 +1065,7 @@ ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
         else
         {
             // There is already a view model without id
-            if (parameterWithoutId != NULL)
+            if (parameterWithoutId != nullptr)
             {
                 // FIXME TODO: gestion du ghost...passage en view model avec id
             }
@@ -1073,7 +1073,7 @@ ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
             parameterVM = getParameterFromId(parameter->id());
 
             // There is already a view model for this id
-            if (parameterVM != NULL)
+            if (parameterVM != nullptr)
             {
                 // Add this new model to the list
                 parameterVM->models()->append(parameter);
@@ -1112,13 +1112,13 @@ ParameterVM* AgentInMappingVM::_parameterModelRemoved(AgentIOPM* parameter)
 {
     ParameterVM* parameterVM = NULL;
 
-    if (parameter != NULL)
+    if (parameter != nullptr)
     {
         // Parameter id is defined
         if (!parameter->id().isEmpty())
         {
             parameterVM = getParameterFromId(parameter->id());
-            if (parameterVM != NULL)
+            if (parameterVM != nullptr)
             {
                 // Remove this model from the list
                 parameterVM->models()->remove(parameter);
@@ -1126,7 +1126,7 @@ ParameterVM* AgentInMappingVM::_parameterModelRemoved(AgentIOPM* parameter)
             /*else
             {
                 parameterVM = getParameterFromName(parameter->name());
-                if (parameterVM != NULL)
+                if (parameterVM != nullptr)
                 {
                     // Remove this model from the list
                     parameterVM->models().remove(parameter);
@@ -1149,7 +1149,7 @@ void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachIOP()
     // Update the flag "Is Defined in All Definitions" for each input
     for (InputVM* input : _inputsList.toList())
     {
-        if (input != NULL)
+        if (input != nullptr)
         {
             if (input->models()->count() == numberOfModels) {
                 input->setisDefinedInAllDefinitions(true);
@@ -1163,7 +1163,7 @@ void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachIOP()
     // Update the flag "Is Defined in All Definitions" for each output
     for (OutputVM* output : _outputsList.toList())
     {
-        if (output != NULL)
+        if (output != nullptr)
         {
             if (output->models()->count() == numberOfModels) {
                 output->setisDefinedInAllDefinitions(true);
@@ -1177,7 +1177,7 @@ void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachIOP()
     // Update the flag "Is Defined in All Definitions" for each parameter
     for (ParameterVM* parameter : _parametersList.toList())
     {
-        if (parameter != NULL)
+        if (parameter != nullptr)
         {
             if (parameter->models()->count() == numberOfModels) {
                 parameter->setisDefinedInAllDefinitions(true);
@@ -1200,7 +1200,7 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInInput()
     for (int i = 0; i < _inputsList.count(); i++)
     {
         InputVM* input = _inputsList.at(i);
-        if ((input != NULL) && (input->firstModel() != NULL))
+        if ((input != nullptr) && (input->firstModel() != nullptr))
         {
             if (i == 0) {
                 globalReducedMapValueTypeGroupInInput = input->firstModel()->agentIOPValueTypeGroup();
@@ -1228,7 +1228,7 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInOutput()
     for (int i = 0; i < _outputsList.count(); i++)
     {
         OutputVM* output = _outputsList.at(i);
-        if ((output != NULL) && (output->firstModel() != NULL)) {
+        if ((output != nullptr) && (output->firstModel() != nullptr)) {
             if (i == 0) {
                 globalReducedMapValueTypeGroupInOutput = output->firstModel()->agentIOPValueTypeGroup();
             }

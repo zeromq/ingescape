@@ -243,7 +243,7 @@ public:
      * @param line index
      * @param optional dragged action VM when already in the time-line
      */
-    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineIndex, ActionVM* draggedActionVM = NULL);
+    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineIndex, ActionVM* draggedActionVM = nullptr);
 
 
     /**

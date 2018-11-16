@@ -60,7 +60,7 @@ void IOPValueEffectM::setagentIOP(AgentIOPM* value)
 {
     if (_agentIOP != value)
     {
-        if (_agentIOP != NULL)
+        if (_agentIOP != nullptr)
         {
             // UN-subscribe to destruction
             disconnect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueEffectM::_onAgentIopModelDestroyed);
@@ -68,7 +68,7 @@ void IOPValueEffectM::setagentIOP(AgentIOPM* value)
 
         _agentIOP = value;
 
-        if (_agentIOP != NULL)
+        if (_agentIOP != nullptr)
         {
             // Subscribe to destruction
             connect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueEffectM::_onAgentIopModelDestroyed);
@@ -100,7 +100,7 @@ void IOPValueEffectM::copyFrom(ActionEffectM* effect)
     ActionEffectM::copyFrom(effect);
 
     IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(effect);
-    if (iopEffect != NULL)
+    if (iopEffect != nullptr)
     {
         setagentIOP(iopEffect->agentIOP());
         // iopEffect->agentIOP can be NULL, so we have to set agent IOP "Type" and "Name"
@@ -130,7 +130,7 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
     // Value of agent changed
     if (previousAgent != _agent)
     {
-        if (previousAgent != NULL) {
+        if (previousAgent != nullptr) {
             disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
         }
 
@@ -142,12 +142,12 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
         // Clear the list
         _iopMergedList.clear();
 
-        if (_agent != NULL)
+        if (_agent != nullptr)
         {
             // Fill with inputs
             foreach (InputVM* input, _agent->inputsList()->toList())
             {
-                if ((input != NULL) && (input->firstModel() != NULL))
+                if ((input != nullptr) && (input->firstModel() != nullptr))
                 {
                     _iopMergedList.append(input->firstModel());
                 }
@@ -156,7 +156,7 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
             // Fill with outputs
             foreach (OutputVM* output, _agent->outputsList()->toList())
             {
-                if ((output != NULL) && (output->firstModel() != NULL))
+                if ((output != nullptr) && (output->firstModel() != nullptr))
                 {
                     _iopMergedList.append(output->firstModel());
                 }
@@ -165,7 +165,7 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
             // Fill with parameters
             foreach (ParameterVM* parameter, _agent->parametersList()->toList())
             {
-                if ((parameter != NULL) && (parameter->firstModel() != NULL))
+                if ((parameter != nullptr) && (parameter->firstModel() != nullptr))
                 {
                     _iopMergedList.append(parameter->firstModel());
                 }
@@ -191,7 +191,7 @@ QPair<AgentsGroupedByNameVM*, QStringList> IOPValueEffectM::getAgentAndCommandWi
 {
     QPair<AgentsGroupedByNameVM*, QStringList> pairAgentAndCommandWithParameters;
 
-    if ((_agent != NULL) && (_agentIOP != NULL))
+    if ((_agent != nullptr) && (_agentIOP != nullptr))
     {
         pairAgentAndCommandWithParameters.first = _agent;
 
@@ -251,7 +251,7 @@ QPair<QString, QStringList> IOPValueEffectM::getAgentNameAndReverseCommandWithPa
 {
     QPair<QString, QStringList> pairAgentNameAndReverseCommand;
 
-    if ((_agent != NULL) && (_agentIOP != NULL))
+    if ((_agent != nullptr) && (_agentIOP != nullptr))
     {
         pairAgentNameAndReverseCommand.first = _agent->name();
 
@@ -325,7 +325,7 @@ void IOPValueEffectM::_onModelsOfIOPChanged()
         // Add inputs to the merged list
         foreach (InputVM* inputVM, _agent->inputsList()->toList())
         {
-            if ((inputVM != NULL) && (inputVM->firstModel() != NULL))
+            if ((inputVM != nullptr) && (inputVM->firstModel() != nullptr))
             {
                 _iopMergedList.append(inputVM->firstModel());
 
@@ -338,7 +338,7 @@ void IOPValueEffectM::_onModelsOfIOPChanged()
         // Add outputs to the merged list
         foreach (OutputVM* outputVM, _agent->outputsList()->toList())
         {
-            if ((outputVM != NULL) && (outputVM->firstModel() != NULL))
+            if ((outputVM != nullptr) && (outputVM->firstModel() != nullptr))
             {
                 _iopMergedList.append(outputVM->firstModel());
 
@@ -351,7 +351,7 @@ void IOPValueEffectM::_onModelsOfIOPChanged()
         // Add parameters to the merged list
         foreach (ParameterVM* parameterVM, _agent->parametersList()->toList())
         {
-            if ((parameterVM != NULL) && (parameterVM->firstModel() != NULL))
+            if ((parameterVM != nullptr) && (parameterVM->firstModel() != nullptr))
             {
                 _iopMergedList.append(parameterVM->firstModel());
 

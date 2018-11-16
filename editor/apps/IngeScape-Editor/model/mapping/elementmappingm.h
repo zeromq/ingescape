@@ -27,8 +27,8 @@ class ElementMappingM : public QObject
 {  
     Q_OBJECT
 
-    // Identifier with all names: [outputAgent##output-->inputAgent##input]
-    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
+    // Name with all names formatted: "outputAgent##output-->inputAgent##input"
+    I2_CPP_NOSIGNAL_PROPERTY(QString, name)
 
     // Input agent name
     I2_QML_PROPERTY_READONLY(QString, inputAgent)

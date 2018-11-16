@@ -104,7 +104,7 @@ void CollapsibleColumn::updatePolish()
             for (QList<QQuickItem *>::const_iterator iterator = childrenList.constBegin(); iterator != childrenList.constEnd(); ++iterator)
             {
                 QQuickItem* child = (*iterator);
-                if (child != NULL)
+                if (child != nullptr)
                 {
                     child->setY(0);
                 }
@@ -119,7 +119,7 @@ void CollapsibleColumn::updatePolish()
             for (QList<QQuickItem *>::const_iterator iterator = childrenList.constBegin(); iterator != childrenList.constEnd(); ++iterator)
             {
                 QQuickItem* child = (*iterator);
-                if (child != NULL)
+                if (child != nullptr)
                 {
                     // Filter invisible items and repeaters
                     if (child->isVisible() && !child->inherits("QQuickRepeater"))
@@ -152,7 +152,7 @@ void CollapsibleColumn::itemChange(ItemChange change, const ItemChangeData& valu
     if (change == QQuickItem::ItemChildAddedChange)
     {
         QQuickItem* child = value.item;
-        if (child != NULL)
+        if (child != nullptr)
         {
             connect(child, &QQuickItem::visibleChanged, this, &CollapsibleColumn::polish, Qt::UniqueConnection);
             connect(child, &QQuickItem::heightChanged, this, &CollapsibleColumn::polish, Qt::UniqueConnection);
@@ -162,7 +162,7 @@ void CollapsibleColumn::itemChange(ItemChange change, const ItemChangeData& valu
     else if (change == QQuickItem::ItemChildRemovedChange)
     {
         QQuickItem* child = value.item;
-        if (child != NULL)
+        if (child != nullptr)
         {
             disconnect(child, &QQuickItem::visibleChanged, this, &CollapsibleColumn::polish);
             disconnect(child, &QQuickItem::heightChanged, this, &CollapsibleColumn::polish);

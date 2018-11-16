@@ -122,7 +122,7 @@ void RecordsSupervisionController::startOrStopToRecord(bool isStart, bool withTi
  */
 void RecordsSupervisionController::deleteRecord(RecordVM* record)
 {
-    if ((_modelManager != NULL) && (record != NULL) && (record->modelM() != NULL))
+    if ((_modelManager != nullptr) && (record != nullptr) && (record->modelM() != nullptr))
     {
         qInfo() << "Ask to delete the record " << record->modelM()->name();
 
@@ -147,7 +147,7 @@ void RecordsSupervisionController::controlRecord(QString recordId, bool startPla
     if (_isRecorderON && _mapFromRecordIdToViewModel.contains(recordId))
     {
         RecordVM* recordVM = _mapFromRecordIdToViewModel.value(recordId);
-        if (recordVM != NULL)
+        if (recordVM != nullptr)
         {
             QString commandAndParameters = "";
 
@@ -226,7 +226,7 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
 
         for (RecordM* model : copy)
         {
-            if (model != NULL)
+            if (model != nullptr)
             {
                 // Delete the view model of record with the model
                 _deleteRecordVMwithModel(model);
@@ -237,7 +237,7 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
         }
     }
 
-    if (!recordsJSON.isEmpty() && (_jsonHelper != NULL))
+    if (!recordsJSON.isEmpty() && (_jsonHelper != nullptr))
     {
         QByteArray byteArrayOfJson = recordsJSON.toUtf8();
         QList<RecordM*> recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
@@ -246,7 +246,7 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
         {
             for (RecordM* record : recordsList)
             {
-                if ((record != NULL) && !_mapFromRecordIdToModel.contains(record->id()))
+                if ((record != nullptr) && !_mapFromRecordIdToModel.contains(record->id()))
                 {
                     _mapFromRecordIdToModel.insert(record->id(), record);
 
@@ -265,7 +265,7 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
  */
 void RecordsSupervisionController::onAddedRecord(QString recordJSON)
 {
-    if (!recordJSON.isEmpty() && (_jsonHelper != NULL))
+    if (!recordJSON.isEmpty() && (_jsonHelper != nullptr))
     {
         QByteArray byteArrayOfJson = recordJSON.toUtf8();
         QList<RecordM*> recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
@@ -274,7 +274,7 @@ void RecordsSupervisionController::onAddedRecord(QString recordJSON)
         {
             RecordM* newRecord = recordsList.at(0);
 
-            if ((newRecord != NULL) && !_mapFromRecordIdToModel.contains(newRecord->id()))
+            if ((newRecord != nullptr) && !_mapFromRecordIdToModel.contains(newRecord->id()))
             {
                 _mapFromRecordIdToModel.insert(newRecord->id(), newRecord);
 
@@ -300,7 +300,7 @@ void RecordsSupervisionController::onDeletedRecord(QString recordId)
 
         _mapFromRecordIdToModel.remove(recordId);
 
-        if (model != NULL)
+        if (model != nullptr)
         {
             // Delete the view model of record with the model
             _deleteRecordVMwithModel(model);
@@ -344,7 +344,7 @@ void RecordsSupervisionController::onEndOfRecord()
 {
     setisLoadingRecord(false);
 
-    if (_playingRecord != NULL) {
+    if (_playingRecord != nullptr) {
         setplayingRecord(nullptr);
     }
 }
@@ -365,7 +365,7 @@ void RecordsSupervisionController::_onTimeout_DisplayTime()
  */
 void RecordsSupervisionController::_createRecordVMwithModel(RecordM* model)
 {
-    if ((model != NULL) && !_mapFromRecordIdToViewModel.contains(model->id()))
+    if ((model != nullptr) && !_mapFromRecordIdToViewModel.contains(model->id()))
     {
         RecordVM* vm = new RecordVM(model);
 
@@ -383,14 +383,14 @@ void RecordsSupervisionController::_createRecordVMwithModel(RecordM* model)
  */
 void RecordsSupervisionController::_deleteRecordVMwithModel(RecordM* model)
 {
-    if ((model != NULL) && _mapFromRecordIdToViewModel.contains(model->id()))
+    if ((model != nullptr) && _mapFromRecordIdToViewModel.contains(model->id()))
     {
         RecordVM* vm = _mapFromRecordIdToViewModel.value(model->id());
-        if (vm != NULL)
+        if (vm != nullptr)
         {
             _mapFromRecordIdToViewModel.remove(model->id());
 
-            if (_playingRecord != NULL) {
+            if (_playingRecord != nullptr) {
                 setplayingRecord(nullptr);
             }
             if (_selectedRecord == vm) {

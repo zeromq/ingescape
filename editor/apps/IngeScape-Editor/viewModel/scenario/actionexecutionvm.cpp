@@ -65,7 +65,7 @@ void ActionExecutionVM::initReverseCommandsForEffects(QList<ActionEffectVM*> eff
 {
     for (ActionEffectVM* effectVM : effectsList)
     {
-        if ((effectVM != NULL) && (effectVM->modelM() != NULL))
+        if ((effectVM != nullptr) && (effectVM->modelM() != nullptr))
         {
             // Get the pair with the agent name and the reverse command (with parameters) of the effect
             QPair<QString, QStringList> pairAgentNameAndReverseCommand = effectVM->modelM()->getAgentNameAndReverseCommandWithParameters();

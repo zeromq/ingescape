@@ -45,7 +45,7 @@ AgentsGroupedByDefinitionVM::AgentsGroupedByDefinitionVM(AgentM* model,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (model != NULL)
+    if (model != nullptr)
     {
         // Init the name
         _name = model->name();
@@ -147,7 +147,7 @@ void AgentsGroupedByDefinitionVM::changeState()
         for (AgentM* model : _models.toList())
         {
             // Check if the model has a hostname
-            if ((model != NULL) && !model->hostname().isEmpty())
+            if ((model != nullptr) && !model->hostname().isEmpty())
             {
                 Q_EMIT commandAskedToLauncher(command_StartAgent, model->hostname(), model->commandLine());
             }
@@ -225,7 +225,7 @@ void AgentsGroupedByDefinitionVM::loadMapping()
 void AgentsGroupedByDefinitionVM::downloadDefinition()
 {
     QString defaultDefinitionName = QString("Definition_of_%1.json").arg(_name);
-    if (_definition != NULL) {
+    if (_definition != nullptr) {
         defaultDefinitionName = QString("%1.json").arg(_definition->name());
     }
 
@@ -235,7 +235,7 @@ void AgentsGroupedByDefinitionVM::downloadDefinition()
                                                               defaultDefinitionName,
                                                               "JSON (*.json)");
 
-    if (!definitionFilePath.isEmpty() && (_definition != NULL)) {
+    if (!definitionFilePath.isEmpty() && (_definition != nullptr)) {
         Q_EMIT downloadAgentDefinitionToPath(_definition, definitionFilePath);
     }
 }
@@ -250,7 +250,7 @@ void AgentsGroupedByDefinitionVM::downloadMapping()
     if (!_models.isEmpty())
     {
         AgentM* model = _models.at(0);
-        if ((model != NULL) && (model->mapping() != NULL)) {
+        if ((model != nullptr) && (model->mapping() != nullptr)) {
             defaultMappingName = QString("%1.json").arg(model->mapping()->name());
         }
     }
@@ -267,13 +267,13 @@ void AgentsGroupedByDefinitionVM::downloadMapping()
         AgentMappingM* agentMapping = NULL;
         for (AgentM* model : _models.toList())
         {
-            if ((model != NULL) && model->isON() && (model->mapping() != NULL))
+            if ((model != nullptr) && model->isON() && (model->mapping() != nullptr))
             {
                 agentMapping = model->mapping();
                 break;
             }
         }
-        if (agentMapping != NULL) {
+        if (agentMapping != nullptr) {
             Q_EMIT downloadAgentMappingToPath(agentMapping, mappingFilePath);
         }
     }
@@ -407,7 +407,7 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
 
         for (AgentM* model : newAgentsList)
         {
-            if ((model != NULL) && !_previousAgentsList.contains(model))
+            if ((model != nullptr) && !_previousAgentsList.contains(model))
             {
                 //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
@@ -436,7 +436,7 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
 
         for (AgentM* model : _previousAgentsList)
         {
-            if ((model != NULL) && !newAgentsList.contains(model))
+            if ((model != nullptr) && !newAgentsList.contains(model))
             {
                 //qDebug() << "Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
 

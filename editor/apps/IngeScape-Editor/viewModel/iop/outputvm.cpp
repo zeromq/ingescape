@@ -104,7 +104,7 @@ void OutputVM::_onModelsChanged()
         //qDebug() << _previousModelsList.count() << "--> ADD --> " << newModelsList.count();
 
         for (OutputM* model : newModelsList) {
-            if ((model != NULL) && !_previousModelsList.contains(model))
+            if ((model != nullptr) && !_previousModelsList.contains(model))
             {
                 //qDebug() << "Output VM: New model" << model->name() << "ADDED";
 
@@ -119,7 +119,7 @@ void OutputVM::_onModelsChanged()
         //qDebug() << _previousModelsList.count() << "--> REMOVE --> " << newModelsList.count();
 
         for (OutputM* model : _previousModelsList) {
-            if ((model != NULL) && !newModelsList.contains(model))
+            if ((model != nullptr) && !newModelsList.contains(model))
             {
                 //qDebug() << "Output VM: Old model" << model->name() << "REMOVED";
 
@@ -142,7 +142,7 @@ void OutputVM::_onCurrentValueOfModelChanged(QVariant value)
     Q_UNUSED(value)
 
     /*OutputM* model = qobject_cast<OutputM*>(sender());
-    if (model != NULL) {
+    if (model != nullptr) {
         qDebug() << "On Current Value of Model Changed" << model->name() << value.toString();
     }*/
 

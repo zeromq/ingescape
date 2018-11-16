@@ -276,7 +276,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
                      [=] () {
                         qDebug() << "\n\n\n CATCH Termination Signal \n\n\n";
 
-                        if (QApplication::instance() != NULL)
+                        if (QApplication::instance() != nullptr)
                         {
                             QApplication::instance()->quit();
                         }
@@ -301,7 +301,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
     //
     // Clean-up our TerminationSignalWatcher first
     //
-    if (_terminationSignalWatcher != NULL)
+    if (_terminationSignalWatcher != nullptr)
     {
         disconnect(_terminationSignalWatcher, 0);
         delete _terminationSignalWatcher;
@@ -312,7 +312,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
     //
     // Clean-up sub-controllers
     //
-    if (_launcherManager != NULL)
+    if (_launcherManager != nullptr)
     {
         disconnect(_launcherManager);
 
@@ -322,7 +322,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         //temp = NULL;
     }
 
-    if (_timeLineC != NULL)
+    if (_timeLineC != nullptr)
     {
         disconnect(_timeLineC);
 
@@ -332,7 +332,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = NULL;
     }
 
-    if (_valuesHistoryC != NULL)
+    if (_valuesHistoryC != nullptr)
     {
         disconnect(_valuesHistoryC);
 
@@ -342,7 +342,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = NULL;
     }
 
-    if (_agentsMappingC != NULL)
+    if (_agentsMappingC != nullptr)
     {
         disconnect(_agentsMappingC);
 
@@ -352,7 +352,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = NULL;
     }
 
-    if (_agentsSupervisionC != NULL)
+    if (_agentsSupervisionC != nullptr)
     {
         disconnect(_agentsSupervisionC);
 
@@ -362,7 +362,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = NULL;
     }
 
-    if (_modelManager != NULL)
+    if (_modelManager != nullptr)
     {
         disconnect(_modelManager);
 
@@ -372,7 +372,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = NULL;
     }
 
-    if (_networkC != NULL)
+    if (_networkC != nullptr)
     {
         disconnect(_networkC);
 
@@ -382,7 +382,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = NULL;
     }
 
-    if (_scenarioC != NULL)
+    if (_scenarioC != nullptr)
     {
         disconnect(_scenarioC);
 
@@ -393,7 +393,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
     }
 
     // Delete json helper
-    if (_jsonHelper != NULL)
+    if (_jsonHelper != nullptr)
     {
         delete _jsonHelper;
         _jsonHelper = NULL;
@@ -441,7 +441,7 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
         _loadPlatformFromFile(platformFilePath);
 
         // Force our global mapping to CONTROLLED
-        if (_modelManager != NULL) {
+        if (_modelManager != nullptr) {
             _modelManager->setisMappingControlled(true);
         }
     }
@@ -490,25 +490,25 @@ void IngeScapeEditorController::savePlatformToDefaultFile()
  */
 void IngeScapeEditorController::clearCurrentPlatform()
 {
-    if (_hostsSupervisionC != NULL)
+    if (_hostsSupervisionC != nullptr)
     {
         // Remove each UN-active agent (agent with state OFF) from the global list with all agents
         _hostsSupervisionC->removeUNactiveAgents();
     }
 
-    if (_agentsMappingC != NULL)
+    if (_agentsMappingC != nullptr)
     {
         // Clear the current mapping
         _agentsMappingC->clearMapping();
     }
 
-    if (_scenarioC != NULL)
+    if (_scenarioC != nullptr)
     {
         // Clear the current scenario
         _scenarioC->clearScenario();
     }
 
-    if (_agentsSupervisionC != NULL)
+    if (_agentsSupervisionC != nullptr)
     {
         // Remove (and delete) each UN-active agent (agent with state OFF) from the list
         _agentsSupervisionC->removeUNactiveAgents();
@@ -541,16 +541,16 @@ bool IngeScapeEditorController::canDeleteAgentFromSupervision(QString agentName)
     if (!agentName.isEmpty())
     {
         // Check if the agent is in the curent mapping
-        if (_agentsMappingC != NULL)
+        if (_agentsMappingC != nullptr)
         {
             AgentInMappingVM* agentInMapping = _agentsMappingC->getAgentInMappingFromName(agentName);
-            if (agentInMapping != NULL) {
+            if (agentInMapping != nullptr) {
                 canBeDeleted = false;
             }
         }
 
         // Check if the agent is in action condition or effect
-        if (canBeDeleted && (_scenarioC != NULL)) {
+        if (canBeDeleted && (_scenarioC != nullptr)) {
             canBeDeleted = !_scenarioC->isAgentUsedInActions(agentName);
         }
     }
@@ -569,7 +569,7 @@ bool IngeScapeEditorController::canDeleteAgentInMapping(QString agentName)
     bool canBeDeleted = true;
 
     // Check if the agent is in action condition or effect
-    if (_scenarioC != NULL) {
+    if (_scenarioC != nullptr) {
         canBeDeleted = !_scenarioC->isAgentUsedInActions(agentName);
     }
 
@@ -591,7 +591,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
     // Reset the error message
     seterrorMessageWhenConnectionFailed("");
 
-    if ((_networkC != NULL) && (_modelManager != NULL))
+    if ((_networkC != nullptr) && (_modelManager != nullptr))
     {
         bool isInt = false;
         int nPort = strPort.toInt(&isInt);
@@ -638,7 +638,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 _modelManager->simulateExitForEachActiveAgent();
 
                 // Reset the list of launchers (hosts)
-                if (_launcherManager != NULL) {
+                if (_launcherManager != nullptr) {
                     _launcherManager->reset();
                 }
 
@@ -681,7 +681,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
  */
 void IngeScapeEditorController::closeDefinition(DefinitionM* definition)
 {
-    if ((definition != NULL) && (_modelManager != NULL) && _modelManager->openedDefinitions()->contains(definition))
+    if ((definition != nullptr) && (_modelManager != nullptr) && _modelManager->openedDefinitions()->contains(definition))
     {
         _modelManager->openedDefinitions()->remove(definition);
     }
@@ -694,7 +694,7 @@ void IngeScapeEditorController::closeDefinition(DefinitionM* definition)
  */
 void IngeScapeEditorController::closeActionEditor(ActionEditorController* actionEditorC)
 {
-    if ((actionEditorC != NULL) && (_scenarioC != NULL)) {
+    if ((actionEditorC != nullptr) && (_scenarioC != nullptr)) {
         _scenarioC->closeActionEditor(actionEditorC);
     }
 }
@@ -706,7 +706,7 @@ void IngeScapeEditorController::closeActionEditor(ActionEditorController* action
  */
 void IngeScapeEditorController::closeLogStreamController(LogStreamController* logStreamC)
 {
-    if (logStreamC != NULL)
+    if (logStreamC != nullptr)
     {
         // Remove from the list
         _openedLogStreamControllers.remove(logStreamC);
@@ -723,7 +723,7 @@ void IngeScapeEditorController::closeLogStreamController(LogStreamController* lo
  */
 void IngeScapeEditorController::addOpenedWindow(QObject* window)
 {
-    if (window != NULL)
+    if (window != nullptr)
     {
         //qDebug() << "Add Opened Window:" << window << "(" << _openedWindows.count() << ")";
 
@@ -740,7 +740,7 @@ void IngeScapeEditorController::addOpenedWindow(QObject* window)
  */
 void IngeScapeEditorController::removeOpenedWindow(QObject* window)
 {
-    if (window != NULL)
+    if (window != nullptr)
     {
         //qDebug() << "Remove Opened Window:" << window << "(" << _openedWindows.count() << ")";
 
@@ -783,7 +783,7 @@ void IngeScapeEditorController::_onOpenLogStreamOfAgents(QList<AgentM*> models)
     {
         for (AgentM* model : models)
         {
-            if ((model != NULL) && model->isON())
+            if ((model != nullptr) && model->isON())
             {
                 QString subscriberAddress = QString("tcp://%1:%2").arg(model->address(), model->loggerPort());
 
@@ -793,13 +793,13 @@ void IngeScapeEditorController::_onOpenLogStreamOfAgents(QList<AgentM*> models)
 
                 for (LogStreamController* iterator : _openedLogStreamControllers.toList())
                 {
-                    if ((iterator != NULL) && (iterator->agentName() == model->name()) && (iterator->subscriberAddress() == subscriberAddress))
+                    if ((iterator != nullptr) && (iterator->agentName() == model->name()) && (iterator->subscriberAddress() == subscriberAddress))
                     {
                         logStreamController = iterator;
                     }
                 }
 
-                if (logStreamController != NULL)
+                if (logStreamController != nullptr)
                 {
                     qDebug() << "The 'Log Stream' for" << logStreamController->agentName() << "on" << logStreamController->subscriberAddress() << "already exists...bring to front !";
 
@@ -826,7 +826,7 @@ void IngeScapeEditorController::_onStartToRecord()
     // Get the JSON of the current platform
     QJsonDocument jsonDocument = _getJsonOfCurrentPlatform();
 
-    if ((_networkC != NULL) && !jsonDocument.isNull() && !jsonDocument.isEmpty())
+    if ((_networkC != nullptr) && !jsonDocument.isNull() && !jsonDocument.isEmpty())
     {
         QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
 
@@ -838,7 +838,7 @@ void IngeScapeEditorController::_onStartToRecord()
         // Add the delta of the start time from the Time Line
         int deltaTimeFromTimeLine = 0;
 
-        if (_scenarioC != NULL) {
+        if (_scenarioC != nullptr) {
             deltaTimeFromTimeLine = _scenarioC->currentTime().msecsSinceStartOfDay();
         }
         commandAndParameters.append(QString::number(deltaTimeFromTimeLine));
@@ -870,7 +870,7 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
         // Load the platform from JSON
         _loadPlatformFromJSON(jsonDocument);
 
-        if (_scenarioC != NULL)
+        if (_scenarioC != nullptr)
         {
             // Update the current time
             _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLine));
@@ -964,19 +964,19 @@ void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
         QJsonObject jsonRoot = jsonDocument.object();
 
         // Import the agents list from JSON
-        if ((_modelManager != NULL) && jsonRoot.contains("agents"))
+        if ((_modelManager != nullptr) && jsonRoot.contains("agents"))
         {
             _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
         }
 
         // Import the mapping of agents from JSON
-        if ((_agentsMappingC != NULL) && jsonRoot.contains("mapping"))
+        if ((_agentsMappingC != nullptr) && jsonRoot.contains("mapping"))
         {
             _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
         }
 
         // Import the scenario from JSON
-        if ((_scenarioC != NULL) && jsonRoot.contains("scenario"))
+        if ((_scenarioC != nullptr) && jsonRoot.contains("scenario"))
         {
             _scenarioC->importScenarioFromJson(jsonRoot.value("scenario").toObject());
         }
@@ -992,12 +992,12 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
 {
     QJsonDocument jsonDocument;
 
-    if (_jsonHelper != NULL)
+    if (_jsonHelper != nullptr)
     {
         QJsonObject platformJsonObject;
 
         // Save the agents list
-        if (_agentsSupervisionC != NULL)
+        if (_agentsSupervisionC != nullptr)
         {
             // Export the agents list to JSON
             QJsonArray arrayOfAgents = _agentsSupervisionC->exportAgentsListToJSON();
@@ -1008,7 +1008,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
         }
 
         // Save the mapping
-        if (_agentsMappingC != NULL)
+        if (_agentsMappingC != nullptr)
         {
             QJsonArray arrayOfMappings = _jsonHelper->exportAllAgentsInMapping(_agentsMappingC->allAgentsInMapping()->toList());
 
@@ -1018,7 +1018,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
         }
 
         // Save the scenario
-        if (_scenarioC != NULL)
+        if (_scenarioC != nullptr)
         {
             // actions list
             // actions list in the palette

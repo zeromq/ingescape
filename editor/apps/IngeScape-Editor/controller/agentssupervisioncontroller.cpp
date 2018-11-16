@@ -35,7 +35,7 @@ AgentsSupervisionController::AgentsSupervisionController(IngeScapeModelManager* 
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_modelManager != NULL)
+    if (_modelManager != nullptr)
     {
         // Agents are sorted on their name (alphabetical order)
         _agentsList.setSortProperty("name");
@@ -79,12 +79,12 @@ AgentsSupervisionController::~AgentsSupervisionController()
  */
 void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
 {
-    if ((_modelManager != NULL) && (agentsGroupedByDefinition != NULL))
+    if ((_modelManager != nullptr) && (agentsGroupedByDefinition != nullptr))
     {
         qInfo() << "Delete the agent" << agentsGroupedByDefinition->name() << "in the List";
 
         AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentsGroupedByDefinition->name());
-        if (agentsGroupedByName != NULL) {
+        if (agentsGroupedByName != nullptr) {
             // Delete the view model of agents grouped by definition
             agentsGroupedByName->deleteAgentsGroupedByDefinition(agentsGroupedByDefinition);
         }
@@ -101,7 +101,7 @@ void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM*
 /*void AgentsSupervisionController::deleteModelOfAgent(AgentM* agent)
 {
     // Check that the agent is OFF
-    if ((agent != NULL) && !agent->isON() && !agent->name().isEmpty() && (_modelManager != NULL))
+    if ((agent != nullptr) && !agent->isON() && !agent->name().isEmpty() && (_modelManager != nullptr))
     {
         // Get the list of view models of agent from a name
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
@@ -109,7 +109,7 @@ void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM*
         for (AgentVM* iterator : agentViewModelsList)
         {
             // We found the view model that contains this model
-            if ((iterator != NULL) && iterator->models()->contains(agent))
+            if ((iterator != nullptr) && iterator->models()->contains(agent))
             {
                 // It is the last model of this view model
                 if (iterator->models()->count() == 1)
@@ -138,7 +138,7 @@ void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM*
  */
 void AgentsSupervisionController::exportAgentsListToSelectedFile()
 {
-    if (_modelManager != NULL)
+    if (_modelManager != nullptr)
     {
         // Export the agents list to JSON
         QJsonArray arrayOfAgents = exportAgentsListToJSON();
@@ -157,19 +157,19 @@ QJsonArray AgentsSupervisionController::exportAgentsListToJSON()
 {
     QJsonArray jsonArray = QJsonArray();
 
-    if (_jsonHelper != NULL)
+    if (_jsonHelper != nullptr)
     {
         // FIXME REPAIR: exportAgentsListToJSON
         /*for (AgentVM* agent : _agentsList.toList())
         {
-            if ((agent != NULL) && !agent->name().isEmpty())
+            if ((agent != nullptr) && !agent->name().isEmpty())
             {
                 QJsonObject jsonAgent = QJsonObject();
 
                 // Name
                 jsonAgent.insert("agentName", agent->name());
 
-                if (agent->definition() != NULL)
+                if (agent->definition() != nullptr)
                 {
                     // Definition
                     QJsonObject jsonDefinition = _jsonHelper->exportAgentDefinitionToJson(agent->definition());
@@ -185,7 +185,7 @@ QJsonArray AgentsSupervisionController::exportAgentsListToJSON()
                 for (AgentM* model : agent->models()->toList())
                 {
                     // Hostname and Command Line must be defined to be added to the array of clones
-                    if ((model != NULL) && !model->hostname().isEmpty() && !model->commandLine().isEmpty())
+                    if ((model != nullptr) && !model->hostname().isEmpty() && !model->commandLine().isEmpty())
                     {
                         qDebug() << "Export" << agent->name() << "on" << model->hostname() << "at" << model->commandLine() << "(" << model->peerId() << ")";
 
@@ -216,12 +216,12 @@ void AgentsSupervisionController::removeUNactiveAgents()
 {
     qInfo() << "Remove each UN-active agent from the current list of agents";
 
-    if (_modelManager != NULL)
+    if (_modelManager != nullptr)
     {
         // FIXME REPAIR: removeUNactiveAgents
         /*for (AgentVM* agent : _agentsList.toList())
         {
-            if (agent != NULL)
+            if (agent != nullptr)
             {
                 // ON
                 if (agent->isON())
@@ -229,7 +229,7 @@ void AgentsSupervisionController::removeUNactiveAgents()
                     // Delete each model with state OFF
                     for (AgentM* model : agent->models()->toList())
                     {
-                        if ((model != NULL) && !model->isON()) {
+                        if ((model != nullptr) && !model->isON()) {
                             _modelManager->deleteAgentModel(model);
                         }
                     }
@@ -252,7 +252,7 @@ void AgentsSupervisionController::removeUNactiveAgents()
  */
 /*void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
 {
-    if (model != NULL)
+    if (model != nullptr)
     {
         // Get the list of view models of agent from a name
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(model->name());
@@ -264,7 +264,7 @@ void AgentsSupervisionController::removeUNactiveAgents()
             for (AgentVM* iterator : agentViewModelsList)
             {
                 // If this agent VM does not have any definition either
-                if ((iterator != NULL) && (iterator->definition() == NULL))
+                if ((iterator != nullptr) && (iterator->definition() == nullptr))
                 {
                     qDebug() << "There is already an agent with the same name" << model->name() << "and no definition !";
 
@@ -274,7 +274,7 @@ void AgentsSupervisionController::removeUNactiveAgents()
             }
         }
 
-        if (agentWithoutDefinition != NULL)
+        if (agentWithoutDefinition != nullptr)
         {
             // Manage the new model inside the existing view model without definition
             _manageNewModelInsideExistingVM(model, agentWithoutDefinition);
@@ -405,10 +405,10 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
 /*void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewValues(DefinitionM* previousDefinition, DefinitionM* newDefinition)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
-    if ((agent != NULL) && (_modelManager != NULL) && (newDefinition != NULL))
+    if ((agent != nullptr) && (_modelManager != nullptr) && (newDefinition != nullptr))
     {
         // The previous definition was NULL (and the new definition is defined)
-        if (previousDefinition == NULL)
+        if (previousDefinition == nullptr)
         {
             //
             // Update our list of agents with the new definition for this agent
@@ -422,7 +422,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
             for (AgentVM* iterator : agentViewModelsList)
             {
                 // If this agent VM does not correspond to the sender agent
-                if ((iterator != NULL) && (iterator != agent) && (iterator->definition() != NULL)
+                if ((iterator != nullptr) && (iterator != agent) && (iterator->definition() != nullptr)
                         &&
                         // The 2 definitions are strictly identicals
                         DefinitionM::areIdenticals(iterator->definition(), newDefinition))
@@ -435,13 +435,13 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
             }
 
             // Exactly the same definition
-            if (agentUsingSameDefinition != NULL)
+            if (agentUsingSameDefinition != nullptr)
             {
                 // It must have only one model of agent
                 if (agent->models()->count() == 1)
                 {
                     AgentM* model = agent->models()->at(0);
-                    if (model != NULL)
+                    if (model != nullptr)
                     {
                         // The current view model for this model of agent is useless, we have to remove it from the list
                         _agentsList.remove(agent);
@@ -478,7 +478,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
 /*void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(AgentM* model)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
-    if ((agent != NULL) && (model != NULL) && (agent->definition() != NULL) && (model->definition() != NULL))
+    if ((agent != nullptr) && (model != nullptr) && (agent->definition() != nullptr) && (model->definition() != nullptr))
     {
         // Remove the model of agent from the list of the view model
         agent->models()->remove(model);
@@ -489,7 +489,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(model->name());
         for (AgentVM* iterator : agentViewModelsList)
         {
-            if ((iterator != NULL) && (iterator->definition() != NULL)
+            if ((iterator != nullptr) && (iterator->definition() != nullptr)
                     // The 2 definitions are strictly identicals
                     && DefinitionM::areIdenticals(iterator->definition(), model->definition()))
             {
@@ -498,7 +498,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
             }
         }
 
-        if (agentUsingSameDefinition == NULL)
+        if (agentUsingSameDefinition == nullptr)
         {
             // Allows to create a new view model of agent for this model
             onAgentModelCreated(model);
@@ -701,7 +701,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
                     for (AgentM* iterator : modelsOnHost)
                     {
                         // Same peer id
-                        if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId))
+                        if ((iterator != nullptr) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId))
                         {
                             // New model is OFF and there is already a model with the same peer id...
                             if (!model->isON())
@@ -724,7 +724,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
                     }
 
                     // We don't found this peer id
-                    if (!hasToDeleteNewModel && (sameModel == NULL))
+                    if (!hasToDeleteNewModel && (sameModel == nullptr))
                     {
                         // New model is ON
                         if (model->isON())
@@ -732,7 +732,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
                             for (AgentM* iterator : modelsOnHost)
                             {
                                 // Same command line (peer id is defined) and existing agent is OFF --> we consider that it is the same model that evolve from OFF to ON
-                                if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && !iterator->isON())
+                                if ((iterator != nullptr) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && !iterator->isON())
                                 {
                                     // We have to replace it by the new one
                                     sameModel = iterator;
@@ -746,7 +746,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
                             for (AgentM* iterator : modelsOnHost)
                             {
                                 // Same command line (peer id is defined) and existing agent is ON --> we consider that it is the same model but OFF
-                                if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && iterator->isON())
+                                if ((iterator != nullptr) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && iterator->isON())
                                 {
                                     // The new model is useless, we have to delete it
                                     hasToDeleteNewModel = true;
@@ -765,7 +765,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
                         _modelManager->deleteAgentModel(model);
                     }
                     // Else if we have to replace an existing (same) model by the new one
-                    else if (sameModel != NULL)
+                    else if (sameModel != nullptr)
                     {
                         int index = agentVM->models()->indexOf(sameModel);
                         if (index > -1)
@@ -805,7 +805,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
  */
 /*void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
 {
-    if (agent != NULL)
+    if (agent != nullptr)
     {
         // Unselect our agent if needed
         if (_selectedAgent == agent) {

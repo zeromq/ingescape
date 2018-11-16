@@ -64,7 +64,7 @@ void AgentMappingM::_onMappingElementsListChanged()
 
     for (ElementMappingM* mappingElement : _mappingElements.toList())
     {
-        if ((mappingElement != NULL) && !mappingElement->id().isEmpty()) {
+        if ((mappingElement != nullptr) && !mappingElement->id().isEmpty()) {
             _idsOfMappingElements.append(mappingElement->id());
         }
     }

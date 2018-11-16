@@ -26,7 +26,7 @@ ValuesHistoryController::ValuesHistoryController(IngeScapeModelManager* modelMan
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_modelManager != NULL)
+    if (_modelManager != nullptr)
     {
         //
         // Link our list to the list of the model manager
@@ -124,7 +124,7 @@ bool ValuesHistoryController::areShownValuesOfAgent(QString agentName)
  */
 void ValuesHistoryController::onAgentModelCreated(AgentM* agent)
 {
-    if ((agent != NULL) && !agent->name().isEmpty())
+    if ((agent != nullptr) && !agent->name().isEmpty())
     {
         QString agentName = agent->name();
 

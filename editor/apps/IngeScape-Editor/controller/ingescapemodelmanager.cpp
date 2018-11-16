@@ -120,7 +120,7 @@ void IngeScapeModelManager::setisMappingControlled(bool value)
  */
 void IngeScapeModelManager::addAgentModel(AgentM* agent)
 {
-    if (agent != NULL)
+    if (agent != nullptr)
     {
         // Connect to signals from this new agent
         connect(agent, &AgentM::networkDataWillBeCleared, this, &IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared);
@@ -143,7 +143,7 @@ void IngeScapeModelManager::addAgentModel(AgentM* agent)
  */
 void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
 {
-    if (agent != NULL)
+    if (agent != nullptr)
     {
         // Emit the signal "Agent Model Will Be Deleted"
         Q_EMIT agentModelWillBeDeleted(agent);
@@ -152,7 +152,7 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         disconnect(agent, 0, this, 0);
 
         // Delete its model of definition if needed
-        if (agent->definition() != NULL)
+        if (agent->definition() != nullptr)
         {
             DefinitionM* temp = agent->definition();
             agent->setdefinition(nullptr);
@@ -160,7 +160,7 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         }
 
         // Delete its model of mapping if needed
-        if (agent->mapping() != NULL)
+        if (agent->mapping() != nullptr)
         {
             AgentMappingM* temp = agent->mapping();
             agent->setmapping(nullptr);
@@ -299,7 +299,7 @@ QHash<QString, QList<AgentM*>> IngeScapeModelManager::getMapFromAgentNameToActiv
             QList<AgentM*> activeAgentsList;
             for (AgentM* agent : agentsGroupedByName->models()->toList())
             {
-                if ((agent != NULL) && agent->isON()) {
+                if ((agent != nullptr) && agent->isON()) {
                     activeAgentsList.append(agent);
                 }
             }
@@ -320,7 +320,7 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
 {
     bool success = true;
 
-    if (_jsonHelper != NULL)
+    if (_jsonHelper != nullptr)
     {
         // "File Dialog" to get the file (path) to open
         QString agentFilePath = QFileDialog::getOpenFileName(NULL,
@@ -354,7 +354,7 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
                     {
                         // Create a model of agent definition from the JSON
                         DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonValue.toObject());
-                        if (agentDefinition != NULL)
+                        if (agentDefinition != nullptr)
                         {
                             QString agentName = agentDefinition->name();
 
@@ -400,7 +400,7 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
 {
     bool success = true;
 
-    if (_jsonHelper != NULL)
+    if (_jsonHelper != nullptr)
     {
         for (QJsonValue jsonValue : jsonArrayOfAgents)
         {
@@ -477,7 +477,7 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
 
                                         // Update corresponding host
                                         HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                                        if (host != NULL) {
+                                        if (host != nullptr) {
                                             agent->setcanBeRestarted(true);
                                         }
 
@@ -488,7 +488,7 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                         {
                                             // Make a copy of the definition
                                             DefinitionM* copyOfDefinition = agentDefinition->copy();
-                                            if (copyOfDefinition != NULL)
+                                            if (copyOfDefinition != nullptr)
                                             {
                                                 // Set its definition
                                                 agent->setdefinition(copyOfDefinition);
@@ -500,7 +500,7 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                         }
                     }
 
-                    if (agentDefinition != NULL)
+                    if (agentDefinition != nullptr)
                     {
                         // Free memory
                         delete agentDefinition;
@@ -560,7 +560,7 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
 {
     for (AgentM* agent : _mapFromPeerIdToAgentM.values())
     {
-        if (agent != NULL)
+        if (agent != nullptr)
         {
             if (agent->isON())
             {
@@ -582,7 +582,7 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
  */
 void IngeScapeModelManager::openDefinition(DefinitionM* definition)
 {
-    if (definition != NULL)
+    if (definition != nullptr)
     {
         QString definitionName = definition->name();
 
@@ -605,7 +605,7 @@ void IngeScapeModelManager::openDefinition(DefinitionM* definition)
                         for (DefinitionM* iterator : definitionsList)
                         {
                             // Same name, same version and variant, we have to open it
-                            if ((iterator != NULL) && (iterator->version() == definition->version()) && iterator->isVariant()) {
+                            if ((iterator != nullptr) && (iterator->version() == definition->version()) && iterator->isVariant()) {
                                 definitionsToOpen.append(iterator);
                             }
                         }
@@ -641,7 +641,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
         AgentM* agent = getAgentModelFromPeerId(peerId);
 
         // An agent with this peer id already exist
-        if (agent != NULL)
+        if (agent != nullptr)
         {
             qInfo() << "The agent" << agentName << "with peer id" << peerId << "on" << hostname << "(" << ipAddress << ") is back on the network !";
 
@@ -653,7 +653,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
             /*if (!hostname.isEmpty() && !commandLine.isEmpty())
             {
                 HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                if (host != NULL)
+                if (host != nullptr)
                 {
                     agent->setcanBeRestarted(true);
                 }
@@ -669,7 +669,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
             // Now, we just set its flag to ON and we have to emit "addInputsToEditorForOutputs"
             // Because we consider that its definition will be the same...consequently, when "onDefinitionReceived" will be called,
             // there will be no change detected and the signal "addInputsToEditorForOutputs" will not be called
-            if ((agent->definition() != NULL) && !agent->definition()->outputsList()->isEmpty())
+            if ((agent->definition() != nullptr) && !agent->definition()->outputsList()->isEmpty())
             {
                 Q_EMIT addInputsToEditorForOutputs(agentName, agent->definition()->outputsList()->toList());
             }
@@ -686,7 +686,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
             if (!hostname.isEmpty() && !commandLine.isEmpty())
             {
                 HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                if (host != NULL)
+                if (host != nullptr)
                 {
                     agent->setcanBeRestarted(true);
                 }
@@ -733,14 +733,14 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
 void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != NULL)
+    if (agent != nullptr)
     {
         qInfo() << "The agent" << agentName << "with peer id" << peerId << "exited from the network !";
 
         // Update the state (flag "is ON")
         agent->setisON(false);
 
-        if ((agent->definition() != NULL) && !agent->definition()->outputsList()->isEmpty()) {
+        if ((agent->definition() != nullptr) && !agent->definition()->outputsList()->isEmpty()) {
             Q_EMIT removeInputsToEditorForOutputs(agentName, agent->definition()->outputsList()->toList());
         }
 
@@ -794,7 +794,7 @@ void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostname, 
             // Traverse the list of all models
             for (AgentM* agent : agentsGroupedByName->models()->toList())
             {
-                if ((agent != NULL) && (agent->hostname() == hostname) && !agent->commandLine().isEmpty()) {
+                if ((agent != nullptr) && (agent->hostname() == hostname) && !agent->commandLine().isEmpty()) {
                     agent->setcanBeRestarted(true);
                 }
             }
@@ -821,7 +821,7 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostname)
             // Traverse the list of all models
             for (AgentM* agent : agentsGroupedByName->models()->toList())
             {
-                if ((agent != NULL) && (agent->hostname() == hostname)) {
+                if ((agent != nullptr) && (agent->hostname() == hostname)) {
                     agent->setcanBeRestarted(false);
                 }
             }
@@ -838,16 +838,16 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostname)
  */
 void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON)
 {
-    if (!definitionJSON.isEmpty() && (_jsonHelper != NULL))
+    if (!definitionJSON.isEmpty() && (_jsonHelper != nullptr))
     {
         AgentM* agent = getAgentModelFromPeerId(peerId);
-        if (agent != NULL)
+        if (agent != nullptr)
         {
             // Create a model of agent definition from JSON
             DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
-            if (agentDefinition != NULL)
+            if (agentDefinition != nullptr)
             {
-                 if (agent->definition() == NULL)
+                 if (agent->definition() == nullptr)
                  {
                      // Set this definition to the agent
                      agent->setdefinition(agentDefinition);
@@ -860,14 +860,14 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                  else
                  {
                      DefinitionM* previousDefinition = agent->definition();
-                     if (previousDefinition != NULL)
+                     if (previousDefinition != nullptr)
                      {
                          //
                          // Check if output(s) have been removed
                          //
                          QList<OutputM*> removedOutputsList;
                          for (OutputM* output : previousDefinition->outputsList()->toList()) {
-                             if ((output != NULL) && !output->id().isEmpty() && !agentDefinition->outputsIdsList().contains(output->id())) {
+                             if ((output != nullptr) && !output->id().isEmpty() && !agentDefinition->outputsIdsList().contains(output->id())) {
                                  removedOutputsList.append(output);
                              }
                          }
@@ -885,7 +885,7 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                          //
                          QList<OutputM*> addedOutputsList;
                          for (OutputM* output : agentDefinition->outputsList()->toList()) {
-                             if ((output != NULL) && !output->id().isEmpty() && !previousDefinition->outputsIdsList().contains(output->id())) {
+                             if ((output != nullptr) && !output->id().isEmpty() && !previousDefinition->outputsIdsList().contains(output->id())) {
                                  addedOutputsList.append(output);
                              }
                          }
@@ -917,7 +917,7 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
 void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName, QString mappingJSON)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if ((agent != NULL) && (_jsonHelper != NULL))
+    if ((agent != nullptr) && (_jsonHelper != nullptr))
     {
         AgentMappingM* agentMapping = NULL;
 
@@ -932,9 +932,9 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
             agentMapping = _jsonHelper->createModelOfAgentMappingFromBytes(agentName, mappingJSON.toUtf8());
         }
 
-        if (agentMapping != NULL)
+        if (agentMapping != nullptr)
         {
-            if (agent->mapping() == NULL)
+            if (agent->mapping() == nullptr)
             {
                 // Set this mapping to the agent
                 agent->setmapping(agentMapping);
@@ -970,7 +970,7 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                 {
                     for (ElementMappingM* mappingElement : previousMapping->mappingElements()->toList())
                     {
-                        if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
+                        if ((mappingElement != nullptr) && idsOfRemovedMappingElements.contains(mappingElement->id()))
                         {
                             // Emit the signal "UN-mapped"
                             Q_EMIT unmapped(mappingElement);
@@ -982,7 +982,7 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                 {
                     for (ElementMappingM* mappingElement : agentMapping->mappingElements()->toList())
                     {
-                        if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
+                        if ((mappingElement != nullptr) && idsOfAddedMappingElements.contains(mappingElement->id()))
                         {
                             // Emit the signal "Mapped"
                             Q_EMIT mapped(mappingElement);
@@ -1171,7 +1171,7 @@ void IngeScapeModelManager::onAgentMappingFilePath(QString peerId, QString mappi
 void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
 {
     /*AgentM* agent = qobject_cast<AgentM*>(sender());
-    if (agent != NULL)
+    if (agent != nullptr)
     {
         qDebug() << "Model Manager: on Network Data of agent" << agent->name() << "will be cleared" << agent->hostname() << "(" << agent->peerId() << ")";
     }*/

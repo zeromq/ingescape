@@ -38,7 +38,7 @@ HostVM::HostVM(HostM* model, QObject *parent) : QObject(parent),
     _agentsList.setSortProperty("isON");
     _agentsList.setSortOrder(Qt::DescendingOrder);
 
-    if (_modelM != NULL)
+    if (_modelM != nullptr)
     {
         _name = _modelM->name();
 
@@ -59,7 +59,7 @@ HostVM::~HostVM()
 {
     qInfo() << "Delete View Model of Host" << _name;
 
-    if (_modelM != NULL) {
+    if (_modelM != nullptr) {
         setmodelM(nullptr);
     }
 
@@ -94,7 +94,7 @@ void HostVM::changeState()
  */
 void HostVM::startAgent(AgentM* agent)
 {
-    if (agent != NULL)
+    if (agent != nullptr)
     {
          Q_EMIT commandAskedToLauncher(command_StartAgent, agent->hostname(), agent->commandLine());
     }
@@ -107,7 +107,7 @@ void HostVM::startAgent(AgentM* agent)
  */
 void HostVM::stopAgent(AgentM* agent)
 {
-    if (agent != NULL)
+    if (agent != nullptr)
     {
         QStringList peerIdsList = QStringList(agent->peerId());
 
