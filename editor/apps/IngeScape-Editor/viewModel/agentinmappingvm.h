@@ -21,11 +21,12 @@
 #include <I2PropertyHelpers.h>
 
 #include <viewModel/agentsgroupedbynamevm.h>
-#include <viewModel/iop/inputvm.h>
-#include <viewModel/iop/outputvm.h>
-#include <viewModel/iop/parametervm.h>
-
-#include <model/agentm.h>
+//#include <model/agentm.h>
+//#include <viewModel/iop/inputvm.h>
+//#include <viewModel/iop/outputvm.h>
+//#include <viewModel/iop/parametervm.h>
+#include <viewModel/link/linkinputvm.h>
+#include <viewModel/link/linkoutputvm.h>
 
 
 /**
@@ -43,13 +44,19 @@ class AgentInMappingVM : public QObject
     I2_QML_PROPERTY_READONLY(AgentsGroupedByNameVM*, agentsGroupedByName)
 
     // List of view models of inputs
-    I2_QOBJECT_LISTMODEL(InputVM, inputsList)
+    //I2_QOBJECT_LISTMODEL(InputVM, inputsList)
 
     // List of view models of outputs
-    I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
+    //I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
 
     // List of view models of parameters
-    I2_QOBJECT_LISTMODEL(ParameterVM, parametersList)
+    //I2_QOBJECT_LISTMODEL(ParameterVM, parametersList)
+
+    // List of view models of link inputs
+    I2_QOBJECT_LISTMODEL(LinkInputVM, linkInputsList)
+
+    // List of view models of link outputs
+    I2_QOBJECT_LISTMODEL(LinkOutputVM, linkOutputsList)
 
     // The position corresponds to the corner Top-Left of the box
     I2_QML_PROPERTY(QPointF, position)

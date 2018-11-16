@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -16,9 +16,7 @@
 #define PARAMETERVM_H
 
 #include <QObject>
-
 #include <I2PropertyHelpers.h>
-
 #include <viewModel/iop/agentiopvm.h>
 
 /**

@@ -16,10 +16,9 @@
 #define AGENTIOPVM_H
 
 #include <QObject>
-
 #include <I2PropertyHelpers.h>
-
 #include <model/iop/agentiopm.h>
+
 
 /**
  * @brief The AgentIOPVM is the base class for derived class of View Model of agent Input / Output / Parameter

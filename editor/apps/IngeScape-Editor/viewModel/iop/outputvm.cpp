@@ -73,33 +73,13 @@ OutputVM::~OutputVM()
 }
 
 
-
+// FIXME: rather dans LinkOutputVM than in OutputVM
 /**
  * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
  */
 void OutputVM::simulateCurrentValueOfModelChanged()
 {
     _onCurrentValueOfModelChanged(QVariant());
-}
-
-
-/**
- * @brief Return true if our output can link with the input (types are compatible)
- * @param pointMap
- * @return
- */
-bool OutputVM::canLinkWith(PointMapVM* pointMap)
-{
-    InputVM* input = qobject_cast<InputVM*>(pointMap);
-    if ((input != NULL) && (input->firstModel() != NULL)
-            && (_firstModel != NULL))
-    {
-        // Call parent class function
-        return _canLinkOutputToInput(_firstModel->agentIOPValueType(), input->firstModel()->agentIOPValueType());
-    }
-    else {
-        return false;
-    }
 }
 
 

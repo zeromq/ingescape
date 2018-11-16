@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -17,17 +17,15 @@
 #define OUTPUTVM_H
 
 #include <QObject>
-
 #include <I2PropertyHelpers.h>
-
-#include <viewModel/pointmapvm.h>
 #include <model/iop/outputm.h>
+#include <viewModel/iop/agentiopvm.h>
 
 
 /**
  * @brief The OutputVM class defines a view model of output
  */
-class OutputVM : public PointMapVM
+class OutputVM : public AgentIOPVM
 {
     Q_OBJECT
 
@@ -37,6 +35,7 @@ class OutputVM : public PointMapVM
     // Models of our agent output
     I2_QOBJECT_LISTMODEL(OutputM, models)
 
+    // FIXME: rather dans LinkOutputVM than in OutputVM
     // Flag indicating if a new value is published on our output
     I2_QML_PROPERTY_READONLY(bool, isPublishedNewValue)
 
@@ -50,8 +49,8 @@ public:
      * @param parent
      */
     explicit OutputVM(QString outputName,
-                      QString outputId = "",
-                      OutputM* modelM = NULL,
+                      QString outputId,
+                      OutputM* modelM,
                       QObject* parent = nullptr);
 
 
@@ -61,6 +60,7 @@ public:
     ~OutputVM();
 
 
+    // FIXME: rather dans LinkOutputVM than in OutputVM
     /**
      * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
      */
@@ -71,13 +71,6 @@ Q_SIGNALS:
 
 
 public Q_SLOTS:
-
-    /**
-     * @brief Return true if our output can link with the input (types are compatible)
-     * @param pointMap
-     * @return
-     */
-    bool canLinkWith(PointMapVM* pointMap) Q_DECL_OVERRIDE;
 
 
 private Q_SLOTS:

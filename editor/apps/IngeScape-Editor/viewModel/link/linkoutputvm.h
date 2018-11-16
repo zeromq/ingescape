@@ -16,27 +16,24 @@
 #define LINKOUTPUTVM_H
 
 #include <QObject>
-
 #include <I2PropertyHelpers.h>
+#include <viewModel/link/linkconnectorvm.h>
 #include <viewModel/iop/outputvm.h>
 
 
 /**
  * @brief The LinkOutputVM class defines a view model of link output
  */
-class LinkOutputVM : public QObject
+class LinkOutputVM : public LinkConnectorVM
 {
     Q_OBJECT
-
-    // Name of our agent Output
-    I2_QML_PROPERTY_READONLY(QString, name)
 
     // View model of output
     I2_QML_PROPERTY_READONLY(OutputVM*, output)
 
-    // Geometry for the connector in the view
-    // Position the center of the connector (Absolute coordinate)
-    I2_QML_PROPERTY(QPointF, position)
+    // FIXME: rather dans LinkOutputVM than in OutputVM
+    // Flag indicating if a new value is published on our output
+    //I2_QML_PROPERTY_READONLY(bool, isPublishedNewValue)
 
 
 public:
@@ -54,9 +51,18 @@ public:
      */
     ~LinkOutputVM();
 
-signals:
 
-public slots:
+Q_SIGNALS:
+
+
+public Q_SLOTS:
+
+    /**
+     * @brief Return true if our output can link with the input (types are compatible)
+     * @param linkConnector
+     * @return
+     */
+    bool canLinkWith(LinkConnectorVM* linkConnector) Q_DECL_OVERRIDE;
 
 };
 

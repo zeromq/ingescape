@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -56,26 +56,6 @@ InputVM::~InputVM()
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &InputVM::_onModelsChanged);
 
     _models.clear();
-}
-
-
-/**
- * @brief Return true if our input can link with the output (types are compatible)
- * @param pointMap
- * @return
- */
-bool InputVM::canLinkWith(PointMapVM* pointMap)
-{
-    OutputVM* output = qobject_cast<OutputVM*>(pointMap);
-    if ((output != NULL) && (output->firstModel() != NULL)
-            && (_firstModel != NULL))
-    {
-        // Call parent class function
-        return _canLinkOutputToInput(output->firstModel()->agentIOPValueType(), _firstModel->agentIOPValueType());
-    }
-    else {
-        return false;
-    }
 }
 
 

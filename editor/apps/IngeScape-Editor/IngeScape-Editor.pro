@@ -98,7 +98,8 @@ SOURCES += main.cpp \
     viewModel/agentsgroupedbydefinitionvm.cpp \
     viewModel/link/linkinputvm.cpp \
     viewModel/link/linkoutputvm.cpp \
-    viewModel/link/linkvm.cpp
+    viewModel/link/linkvm.cpp \
+    viewModel/link/linkconnectorvm.cpp
 
 HEADERS += \
     stable.h \
@@ -174,7 +175,8 @@ HEADERS += \
     viewModel/agentsgroupedbydefinitionvm.h \
     viewModel/link/linkinputvm.h \
     viewModel/link/linkoutputvm.h \
-    viewModel/link/linkvm.h
+    viewModel/link/linkvm.h \
+    viewModel/link/linkconnectorvm.h
 
 
 RESOURCES += qml.qrc

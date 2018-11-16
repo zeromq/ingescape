@@ -13,6 +13,7 @@
  */
 
 #include "linkoutputvm.h"
+#include <viewModel/link/linkinputvm.h>
 
 
 /**
@@ -21,15 +22,14 @@
  * @param parent
  */
 LinkOutputVM::LinkOutputVM(OutputVM* output,
-                           QObject *parent) : QObject(parent),
-    _output(output),
-    _position(QPointF())
+                           QObject *parent) : LinkConnectorVM(parent),
+    _output(output)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     if (_output != nullptr) {
-        _name = _output->name();
+        setname(_output->name());
     }
 }
 
@@ -41,5 +41,25 @@ LinkOutputVM::~LinkOutputVM()
 {
     if (_output != nullptr) {
         setoutput(nullptr);
+    }
+}
+
+
+/**
+ * @brief Return true if our output can link with the input (types are compatible)
+ * @param linkConnector
+ * @return
+ */
+bool LinkOutputVM::canLinkWith(LinkConnectorVM* linkConnector)
+{
+    LinkInputVM* linkInput = qobject_cast<LinkInputVM*>(linkConnector);
+    if ((linkInput != nullptr) && (linkInput->input() != nullptr) && (linkInput->input()->firstModel() != nullptr)
+            && (_output != nullptr) && (_output->firstModel() != nullptr))
+    {
+        // Call parent class function
+        return _canLinkOutputToInput(_output->firstModel()->agentIOPValueType(), linkInput->input()->firstModel()->agentIOPValueType());
+    }
+    else {
+        return false;
     }
 }

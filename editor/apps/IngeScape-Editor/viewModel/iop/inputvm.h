@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -17,17 +17,15 @@
 #define INPUTVM_H
 
 #include <QObject>
-
 #include <I2PropertyHelpers.h>
-
-#include <viewModel/pointmapvm.h>
 #include <model/iop/agentiopm.h>
+#include <viewModel/iop/agentiopvm.h>
 
 
 /**
  * @brief The InputVM class defines a view model of input
  */
-class InputVM : public PointMapVM
+class InputVM : public AgentIOPVM
 {
     Q_OBJECT
 
@@ -60,14 +58,8 @@ public:
 
 Q_SIGNALS:
 
-public Q_SLOTS:
 
-    /**
-     * @brief Return true if our input can link with the output (types are compatible)
-     * @param pointMap
-     * @return
-     */
-    bool canLinkWith(PointMapVM* pointMap) Q_DECL_OVERRIDE;
+public Q_SLOTS:
 
 
 private Q_SLOTS:
@@ -76,8 +68,6 @@ private Q_SLOTS:
      */
     void _onModelsChanged();
 
-
-private:
 
 };
 

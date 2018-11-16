@@ -16,27 +16,20 @@
 #define LINKINPUTVM_H
 
 #include <QObject>
-
 #include <I2PropertyHelpers.h>
+#include <viewModel/link/linkconnectorvm.h>
 #include <viewModel/iop/inputvm.h>
 
 
 /**
  * @brief The LinkInputVM class defines a view model of link input
  */
-class LinkInputVM : public QObject
+class LinkInputVM : public LinkConnectorVM
 {
     Q_OBJECT
 
-    // Name of our agent Input
-    I2_QML_PROPERTY_READONLY(QString, name)
-
     // View model of input
     I2_QML_PROPERTY_READONLY(InputVM*, input)
-
-    // Geometry for the connector in the view
-    // Position the center of the connector (Absolute coordinate)
-    I2_QML_PROPERTY(QPointF, position)
 
 
 public:
@@ -56,9 +49,18 @@ public:
     ~LinkInputVM();
 
 
-signals:
+Q_SIGNALS:
 
-public slots:
+
+public Q_SLOTS:
+
+    /**
+     * @brief Return true if our input can link with the output (types are compatible)
+     * @param linkConnector
+     * @return
+     */
+    bool canLinkWith(LinkConnectorVM* linkConnector) Q_DECL_OVERRIDE;
+
 
 };
 

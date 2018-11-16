@@ -199,13 +199,14 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<AgentsGroupedByDefinitionVM>("INGESCAPE", 1, 0, "AgentsGroupedByDefinitionVM", "Internal class");
     qmlRegisterUncreatableType<AgentsGroupedByNameVM>("INGESCAPE", 1, 0, "AgentsGroupedByNameVM", "Internal class");
     qmlRegisterUncreatableType<InputVM>("INGESCAPE", 1, 0, "InputVM", "Internal class");
+    qmlRegisterUncreatableType<LinkConnectorVM>("INGESCAPE", 1, 0, "LinkConnectorVM", "Internal class");
     qmlRegisterUncreatableType<LinkInputVM>("INGESCAPE", 1, 0, "LinkInputVM", "Internal class");
     qmlRegisterUncreatableType<LinkOutputVM>("INGESCAPE", 1, 0, "LinkOutputVM", "Internal class");
     qmlRegisterUncreatableType<LinkVM>("INGESCAPE", 1, 0, "LinkVM", "Internal class");
-    qmlRegisterUncreatableType<MapBetweenIOPVM>("INGESCAPE", 1, 0, "MapBetweenIOPVM", "Internal class");
+    //qmlRegisterUncreatableType<MapBetweenIOPVM>("INGESCAPE", 1, 0, "MapBetweenIOPVM", "Internal class");
     qmlRegisterUncreatableType<OutputVM>("INGESCAPE", 1, 0, "OutputVM", "Internal class");
     qmlRegisterUncreatableType<ParameterVM>("INGESCAPE", 1, 0, "ParameterVM", "Internal class");
-    qmlRegisterUncreatableType<PointMapVM>("INGESCAPE", 1, 0, "PointMapVM", "Internal class");
+    //qmlRegisterUncreatableType<PointMapVM>("INGESCAPE", 1, 0, "PointMapVM", "Internal class");
 
 
     //------------------

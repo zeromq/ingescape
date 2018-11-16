@@ -23,7 +23,7 @@
 
 #include <viewModel/iop/inputvm.h>
 #include <viewModel/iop/outputvm.h>
-//#include <viewModel/iop/parametervm.h>
+#include <viewModel/iop/parametervm.h>
 
 
 /**
