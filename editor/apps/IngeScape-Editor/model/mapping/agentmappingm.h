@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -42,8 +42,8 @@ class AgentMappingM : public QObject
     // List of (mapping) elements of our agent mapping
     I2_QOBJECT_LISTMODEL(ElementMappingM, mappingElements)
 
-    // List of the ids of mapping elements
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, idsOfMappingElements)
+    // List of the names of mapping elements
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, namesOfMappingElements)
 
 
 public:

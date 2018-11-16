@@ -766,17 +766,17 @@ void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
         if ((agentInMapping != nullptr) && (agentInMapping->temporaryMapping() != nullptr))
         {
             QStringList idsOfRemovedMappingElements;
-            for (QString idPreviousList : agentInMapping->temporaryMapping()->idsOfMappingElements())
+            for (QString idPreviousList : agentInMapping->temporaryMapping()->namesOfMappingElements())
             {
-                if (!agent->mapping()->idsOfMappingElements().contains(idPreviousList)) {
+                if (!agent->mapping()->namesOfMappingElements().contains(idPreviousList)) {
                     idsOfRemovedMappingElements.append(idPreviousList);
                 }
             }
 
             QStringList idsOfAddedMappingElements;
-            for (QString idNewList : agent->mapping()->idsOfMappingElements())
+            for (QString idNewList : agent->mapping()->namesOfMappingElements())
             {
-                if (!agentInMapping->temporaryMapping()->idsOfMappingElements().contains(idNewList)) {
+                if (!agentInMapping->temporaryMapping()->namesOfMappingElements().contains(idNewList)) {
                     idsOfAddedMappingElements.append(idNewList);
                 }
             }

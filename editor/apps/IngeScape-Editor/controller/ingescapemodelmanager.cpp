@@ -950,17 +950,17 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                 AgentMappingM* previousMapping = agent->mapping();
 
                 QStringList idsOfRemovedMappingElements;
-                for (QString idPreviousList : previousMapping->idsOfMappingElements())
+                for (QString idPreviousList : previousMapping->namesOfMappingElements())
                 {
-                    if (!agentMapping->idsOfMappingElements().contains(idPreviousList)) {
+                    if (!agentMapping->namesOfMappingElements().contains(idPreviousList)) {
                         idsOfRemovedMappingElements.append(idPreviousList);
                     }
                 }
 
                 QStringList idsOfAddedMappingElements;
-                for (QString idNewList : agentMapping->idsOfMappingElements())
+                for (QString idNewList : agentMapping->namesOfMappingElements())
                 {
-                    if (!previousMapping->idsOfMappingElements().contains(idNewList)) {
+                    if (!previousMapping->namesOfMappingElements().contains(idNewList)) {
                         idsOfAddedMappingElements.append(idNewList);
                     }
                 }
