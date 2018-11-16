@@ -15,11 +15,22 @@
 #include "linkinputvm.h"
 
 
-LinkInputVM::LinkInputVM(QObject *parent) : QObject(parent),
+/**
+ * @brief Constructor
+ * @param input
+ * @param parent
+ */
+LinkInputVM::LinkInputVM(InputVM* input,
+                         QObject *parent) : QObject(parent),
+    _input(input),
     _position(QPointF())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    if (_input != nullptr) {
+        _name = _input->name();
+    }
 }
 
 
@@ -28,5 +39,7 @@ LinkInputVM::LinkInputVM(QObject *parent) : QObject(parent),
  */
 LinkInputVM::~LinkInputVM()
 {
-
+    if (_input != nullptr) {
+        setinput(nullptr);
+    }
 }

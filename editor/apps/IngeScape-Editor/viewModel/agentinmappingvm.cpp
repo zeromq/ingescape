@@ -34,6 +34,12 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    if (_agentsGroupedByName != nullptr)
+    {
+        _name = _agentsGroupedByName->name();
+
+    }
+
     if (models.count() > 0)
     {
         AgentM* firstModel = models.first();

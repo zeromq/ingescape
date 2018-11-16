@@ -28,15 +28,25 @@ class LinkOutputVM : public QObject
 {
     Q_OBJECT
 
+    // Name of our agent Output
+    I2_QML_PROPERTY_READONLY(QString, name)
+
+    // View model of output
+    I2_QML_PROPERTY_READONLY(OutputVM*, output)
+
     // Geometry for the connector in the view
     // Position the center of the connector (Absolute coordinate)
     I2_QML_PROPERTY(QPointF, position)
 
-    // OutputVM viewModel
-
 
 public:
-    explicit LinkOutputVM(QObject *parent = nullptr);
+    /**
+     * @brief Constructor
+     * @param output
+     * @param parent
+     */
+    explicit LinkOutputVM(OutputVM* output,
+                          QObject *parent = nullptr);
 
 
     /**

@@ -28,21 +28,33 @@ class LinkInputVM : public QObject
 {
     Q_OBJECT
 
+    // Name of our agent Input
+    I2_QML_PROPERTY_READONLY(QString, name)
+
+    // View model of input
+    I2_QML_PROPERTY_READONLY(InputVM*, input)
+
     // Geometry for the connector in the view
     // Position the center of the connector (Absolute coordinate)
     I2_QML_PROPERTY(QPointF, position)
 
-    // InputVM viewModel
-
 
 public:
-    explicit LinkInputVM(QObject *parent = nullptr);
+
+    /**
+     * @brief Constructor
+     * @param input
+     * @param parent
+     */
+    explicit LinkInputVM(InputVM* input,
+                         QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
     ~LinkInputVM();
+
 
 signals:
 

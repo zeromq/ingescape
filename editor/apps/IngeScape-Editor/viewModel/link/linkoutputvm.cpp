@@ -15,11 +15,22 @@
 #include "linkoutputvm.h"
 
 
-LinkOutputVM::LinkOutputVM(QObject *parent) : QObject(parent),
+/**
+ * @brief Constructor
+ * @param output
+ * @param parent
+ */
+LinkOutputVM::LinkOutputVM(OutputVM* output,
+                           QObject *parent) : QObject(parent),
+    _output(output),
     _position(QPointF())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    if (_output != nullptr) {
+        _name = _output->name();
+    }
 }
 
 
@@ -28,5 +39,7 @@ LinkOutputVM::LinkOutputVM(QObject *parent) : QObject(parent),
  */
 LinkOutputVM::~LinkOutputVM()
 {
-
+    if (_output != nullptr) {
+        setoutput(nullptr);
+    }
 }

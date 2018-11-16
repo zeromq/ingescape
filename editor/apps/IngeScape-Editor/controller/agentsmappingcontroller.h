@@ -24,6 +24,7 @@
 #include <controller/ingescapemodelmanager.h>
 #include <viewModel/agentinmappingvm.h>
 #include <viewModel/mapbetweeniopvm.h>
+#include <viewModel/link/linkvm.h>
 
 
 /**
