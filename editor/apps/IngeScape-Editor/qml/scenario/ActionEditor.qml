@@ -569,7 +569,7 @@ WindowBlockTouches {
                                         }
                                     }
 
-                                    // Agent Inputs/Outputs
+                                    // Agent's Inputs/Outputs
                                     IngeScapeComboboxItemModelAgentsIOP {
                                         id: iopEffectsCombo
 
@@ -621,11 +621,19 @@ WindowBlockTouches {
                                         }
                                         height: 25
 
-                                        visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE)
+                                        visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) &&
+                                                 (myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType !== AgentIOPValueTypes.IMPULSION & myEffect.modelM.agentIOP.agentIOPValueType !== AgentIOPValueTypes.BOOL)
                                         enabled: visible
 
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
+
+                                        validator: RegExpValidator {
+                                            regExp:  myEffect && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.STRING ?
+                                                         /* STRING */ /.*/ : (myEffect && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.INTEGER ?
+                                                                                  /* INTEGER */ /-?[0-9]+/ :
+                                                                                  /* DOUBLE */ /-?[0-9]+(\.[0-9]+)?/)
+                                        }
 
                                         text: (myEffect && myEffect.modelM) ? myEffect.modelM.value : ""
 
@@ -676,6 +684,50 @@ WindowBlockTouches {
                                                    else {
                                                        "";
                                                    }
+                                        }
+                                    }
+
+                                    I2ComboboxStringList {
+                                        id: comboboxTargetValue
+
+                                        anchors {
+                                            left: iopEffectsCombo.right
+                                            leftMargin: 6
+
+                                            right: (btnWarningActionEditor.visible ? btnWarningActionEditor.left : parent.right)
+                                            rightMargin: (btnWarningActionEditor.visible ? 6 : 0)
+
+                                            verticalCenter: parent.verticalCenter
+                                        }
+                                        height: 25
+
+                                        visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) &&
+                                                 (myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.BOOL)
+                                        enabled: visible
+
+                                        model: [ "FALSE", "TRUE" ]
+
+                                        style: IngeScapeComboboxStyle {}
+
+                                        Binding {
+                                            target: comboboxTargetValue
+                                            property: "selectedIndex"
+                                            value: if (myEffect && myEffect.modelM && myEffect.modelM.value !== "") { // Empty values from the text field won't change the value of the combobox
+
+                                                       // Only "1" and "0" values from the TextField update the combobox since its the two values assigned to the model by this combobox
+                                                       if (Number(myEffect.modelM.value) === 0) {
+                                                           comboboxTargetValue.model.indexOf("FALSE")
+                                                       } else if (Number(myEffect.modelM.value) === 1) {
+                                                           comboboxTargetValue.model.indexOf("TRUE")
+                                                       }
+                                                   }
+
+                                        }
+
+                                        onSelectedItemChanged: {
+                                            if (selectedIndex >= 0 && myEffect && myEffect.modelM) {
+                                                myEffect.modelM.value = (selectedItem === "TRUE" ? "1" : "0")
+                                            }
                                         }
                                     }
 
