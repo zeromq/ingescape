@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -18,12 +18,9 @@
 
 #include <QObject>
 #include <QtQml>
-
 #include <I2PropertyHelpers.h>
-
 #include <controller/ingescapemodelmanager.h>
 #include <viewModel/agentinmappingvm.h>
-#include <viewModel/mapbetweeniopvm.h>
 #include <viewModel/link/linkvm.h>
 
 
@@ -41,8 +38,8 @@ class AgentsMappingController : public QObject
     // List of all agents in mapping
     I2_QOBJECT_LISTMODEL(AgentInMappingVM, allAgentsInMapping)
 
-    // List of all links between agents in mapping
-    I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allLinksInMapping)
+    // List of all links between agents in the global mapping
+    I2_QOBJECT_LISTMODEL(LinkVM, allLinksInMapping)
 
     // Flag indicating if our mapping is empty
     I2_QML_PROPERTY_READONLY(bool, isEmptyMapping)
@@ -51,7 +48,7 @@ class AgentsMappingController : public QObject
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
 
     // Selected link between agents in the mapping
-    I2_QML_PROPERTY_DELETE_PROOF(MapBetweenIOPVM*, selectedLink)
+    I2_QML_PROPERTY_DELETE_PROOF(LinkVM*, selectedLink)
 
 
 public:
@@ -90,7 +87,7 @@ public:
      * @param link
      * @return true if the link has been deleted during the call of our method
      */
-    Q_INVOKABLE bool removeLinkBetweenTwoAgents(MapBetweenIOPVM* link);
+    Q_INVOKABLE bool removeLinkBetweenTwoAgents(LinkVM* link);
 
 
     /**
@@ -325,7 +322,7 @@ private:
      * @brief Delete a link between two agents
      * @param link
      */
-    void _deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link);
+    void _deleteLinkBetweenTwoAgents(LinkVM* link);
 
 
     /**
@@ -333,7 +330,7 @@ private:
      * @param mappingElement
      * @return
      */
-    MapBetweenIOPVM* _getLinkFromMappingElement(ElementMappingM* mappingElement);
+    LinkVM* _getLinkFromMappingElement(ElementMappingM* mappingElement);
 
 
     /**
@@ -344,7 +341,7 @@ private:
      * @param inputName
      * @return
      */
-    MapBetweenIOPVM* _getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName);
+    LinkVM* _getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName);
 
 
     /**

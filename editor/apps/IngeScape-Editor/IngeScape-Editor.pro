@@ -71,7 +71,6 @@ SOURCES += main.cpp \
     sortFilter/valueshistorysortfilter.cpp \
     viewModel/agentvm.cpp \
     viewModel/agentinmappingvm.cpp \
-    viewModel/mapbetweeniopvm.cpp \
     viewModel/scenario/actionvm.cpp \
     viewModel/iop/inputvm.cpp \
     viewModel/iop/outputvm.cpp \
@@ -147,7 +146,6 @@ HEADERS += \
     sortFilter/valueshistorysortfilter.h \
     viewModel/agentvm.h \
     viewModel/agentinmappingvm.h \
-    viewModel/mapbetweeniopvm.h \
     viewModel/scenario/actionvm.h \
     viewModel/iop/inputvm.h \
     viewModel/iop/outputvm.h \

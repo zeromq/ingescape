@@ -85,7 +85,7 @@ void AgentsMappingController::clearMapping()
     }
 
     // 2- Delete all links
-    for (MapBetweenIOPVM* link : _allLinksInMapping.toList()) {
+    for (LinkVM* link : _allLinksInMapping.toList()) {
         _deleteLinkBetweenTwoAgents(link);
     }
 
@@ -133,7 +133,7 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
  * @param link
  * @return true if the link has been deleted during the call of our method
  */
-bool AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
+bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
 {
     bool linkHasBeenDeleted = false;
 
@@ -256,11 +256,11 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
         if (input->canLinkWith(output))
         {
             // If an Input (or an Output) have the same name used for 2 different types --> test pointers instead of names
-            //MapBetweenIOPVM* link = _getLinkFromNames(outputAgent->name(), output->name(), inputAgent->name(), input->name());
+            //LinkVM* link = _getLinkFromNames(outputAgent->name(), output->name(), inputAgent->name(), input->name());
 
             // Search if the same link already exists
             bool alreadyLinked = false;
-            for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
+            for (LinkVM* iterator : _allLinksInMapping.toList())
             {
                 if ((iterator != NULL)
                         && (iterator->outputAgent() == outputAgent) && (iterator->output() == output)
@@ -284,7 +284,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                     inputAgent->addTemporaryLink(input->name(), outputAgent->name(), output->name());
 
                     // Create a new VIRTUAL link between agents
-                    MapBetweenIOPVM* link = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, true, this);
+                    LinkVM* link = new LinkVM(outputAgent, output, inputAgent, input, true, this);
 
                     // Add to the list
                     _allLinksInMapping.append(link);
@@ -304,7 +304,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                     inputAgent->addTemporaryLink(input->name(), outputAgent->name(), output->name());
 
                     // Create a new link between agents
-                    MapBetweenIOPVM* link = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, false, this);
+                    LinkVM* link = new LinkVM(outputAgent, output, inputAgent, input, false, this);
 
                     // Add to the list
                     _allLinksInMapping.append(link);
@@ -460,7 +460,7 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
         if (mappingElement != NULL)
         {
             // Get the view model of link which corresponds to a mapping element
-            MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
+            LinkVM* link = _getLinkFromMappingElement(mappingElement);
             if (link != NULL)
             {
                 // Delete this link (between two agents) to cancel the add
@@ -801,7 +801,7 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
         //qDebug() << "MAPPED" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
 
         // Try to get the virtual link which corresponds to the mapping element
-        MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
+        LinkVM* link = _getLinkFromMappingElement(mappingElement);
 
         if (link == NULL)
         {
@@ -838,7 +838,7 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
                     qInfo() << "MAPPED" << mappingElement->id();
 
                     // Create a new map between agents
-                    link = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, false, this);
+                    link = new LinkVM(outputAgent, output, inputAgent, input, false, this);
 
                     // Add to the list
                     _allLinksInMapping.append(link);
@@ -910,7 +910,7 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
         qInfo() << "UN-mapped" << mappingElement->id();
 
         // Get the view model of link which corresponds to a mapping element
-        MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
+        LinkVM* link = _getLinkFromMappingElement(mappingElement);
         if (link != NULL)
         {
             if (link->inputAgent() != NULL)
@@ -941,7 +941,7 @@ void AgentsMappingController::onHighlightLink(QStringList parameters)
         QString outputName = parameters.at(3);
 
         // Get the view model of link which corresponds to these parameters
-        MapBetweenIOPVM* link = _getLinkFromNames(outputAgentName, outputName, inputAgentName, inputName);
+        LinkVM* link = _getLinkFromNames(outputAgentName, outputName, inputAgentName, inputName);
 
         if ((link != NULL) && (link->output() != NULL))
         {
@@ -1093,7 +1093,7 @@ void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsL
     {
         //qDebug() << "_on Intputs List Will Be Removed from agent" << agentInMapping->name() << inputsListWillBeRemoved.count();
 
-        for (MapBetweenIOPVM* link : _allLinksInMapping.toList())
+        for (LinkVM* link : _allLinksInMapping.toList())
         {
             if ((link != NULL) && (link->inputAgent() != NULL) && (link->inputAgent() == agentInMapping)
                     && (link->input() != NULL) && inputsListWillBeRemoved.contains(link->input()))
@@ -1117,7 +1117,7 @@ void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outpu
     {
         //qDebug() << "_on Outputs List Will Be Removed from agent" << agentInMapping->name() << outputsListWillBeRemoved.count();
 
-        for (MapBetweenIOPVM* link : _allLinksInMapping.toList())
+        for (LinkVM* link : _allLinksInMapping.toList())
         {
             if ((link != NULL) && (link->outputAgent() != NULL) && (link->outputAgent() == agentInMapping)
                     && (link->output() != NULL) && outputsListWillBeRemoved.contains(link->output()))
@@ -1209,7 +1209,7 @@ void AgentsMappingController::_createAgentInMappingAtPosition(AgentsGroupedByNam
  * @brief Delete a link between two agents
  * @param link
  */
-void AgentsMappingController::_deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
+void AgentsMappingController::_deleteLinkBetweenTwoAgents(LinkVM* link)
 {
     if (link != NULL)
     {
@@ -1232,16 +1232,16 @@ void AgentsMappingController::_deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
  * @param mappingElement
  * @return
  */
-MapBetweenIOPVM* AgentsMappingController::_getLinkFromMappingElement(ElementMappingM* mappingElement)
+LinkVM* AgentsMappingController::_getLinkFromMappingElement(ElementMappingM* mappingElement)
 {
-    MapBetweenIOPVM* link = NULL;
+    LinkVM* link = NULL;
 
     if (mappingElement != NULL)
     {
-        for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
+        for (LinkVM* iterator : _allLinksInMapping.toList())
         {
             // FIXME: An agent in mapping can have several Inputs (or Outputs) with the same name but with different types
-            // --> Instead, this method must return a list of MapBetweenIOPVM
+            // --> Instead, this method must return a list of LinkVM
             if ((iterator != NULL)
                     && (iterator->outputAgent() != NULL) && (iterator->outputAgent()->name() == mappingElement->outputAgent())
                     && (iterator->inputAgent() != NULL) && (iterator->inputAgent()->name() == mappingElement->inputAgent())
@@ -1265,14 +1265,14 @@ MapBetweenIOPVM* AgentsMappingController::_getLinkFromMappingElement(ElementMapp
  * @param inputName
  * @return
  */
-MapBetweenIOPVM* AgentsMappingController::_getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName)
+LinkVM* AgentsMappingController::_getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName)
 {
-    MapBetweenIOPVM* link = NULL;
+    LinkVM* link = NULL;
 
-    for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
+    for (LinkVM* iterator : _allLinksInMapping.toList())
     {
         // FIXME: An agent in mapping can have several Inputs (or Outputs) with the same name but with different types
-        // --> Instead, this method must return a list of MapBetweenIOPVM
+        // --> Instead, this method must return a list of LinkVM
         if ((iterator != NULL)
                 && (iterator->outputAgent() != NULL) && (iterator->outputAgent()->name() == outputAgentName)
                 && (iterator->inputAgent() != NULL) && (iterator->inputAgent()->name() == inputAgentName)
@@ -1295,7 +1295,7 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
 {
     if ((agent != NULL) && (_modelManager != NULL))
     {
-        for (MapBetweenIOPVM* link : _allLinksInMapping.toList())
+        for (LinkVM* link : _allLinksInMapping.toList())
         {
             if ( (link != NULL) && ((link->outputAgent() == agent) || (link->inputAgent() == agent)) )
             {
