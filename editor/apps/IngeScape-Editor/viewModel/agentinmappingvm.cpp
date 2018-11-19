@@ -301,7 +301,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
  * @param previousValue
  * @param newValue
  */
-void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue)
+/*void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue)
 {
     //AgentM* agent = qobject_cast<AgentM*>(sender());
     if ((previousValue != nullptr) && (newValue != nullptr)) // && (agent != nullptr)
@@ -547,7 +547,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         // Update the flag "Are Identicals All Definitions"
         //_updateIsDefinedInAllDefinitionsForEachIOP();
     }
-}
+}*/
 
 
 /**

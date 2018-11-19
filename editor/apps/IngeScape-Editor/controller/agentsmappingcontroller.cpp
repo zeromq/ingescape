@@ -1022,11 +1022,11 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 // Emit the signal "Agent in Mapping Added"
                 //Q_EMIT agentInMappingAdded(agentInMapping);
 
-                // Connect to signals from the new agent in mapping
-                connect(agentInMapping, &AgentInMappingVM::inputsListHaveBeenAdded, this, &AgentsMappingController::_onInputsListHaveBeenAdded);
+                // FIXME REPAIR: Connect to signals from the new agent in mapping
+                /*connect(agentInMapping, &AgentInMappingVM::inputsListHaveBeenAdded, this, &AgentsMappingController::_onInputsListHaveBeenAdded);
                 connect(agentInMapping, &AgentInMappingVM::outputsListHaveBeenAdded, this, &AgentsMappingController::_onOutputsListHaveBeenAdded);
                 connect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
-                connect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
+                connect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);*/
             }
         }
     }
@@ -1058,7 +1058,7 @@ void AgentsMappingController::_onAgentsInMappingChanged()
  * @brief Slot called when some view models of inputs have been added to an agent in mapping
  * @param inputsListHaveBeenAdded
  */
-void AgentsMappingController::_onInputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded)
+/*void AgentsMappingController::_onInputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != nullptr) && !inputsListHaveBeenAdded.isEmpty())
@@ -1083,14 +1083,14 @@ void AgentsMappingController::_onInputsListHaveBeenAdded(QList<InputVM*> inputsL
             }
         }
     }
-}
+}*/
 
 
 /**
  * @brief Slot called when some view models of outputs have been added to an agent in mapping
  * @param outputsListHaveBeenAdded
  */
-void AgentsMappingController::_onOutputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded)
+/*void AgentsMappingController::_onOutputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != nullptr) && !outputsListHaveBeenAdded.isEmpty())
@@ -1118,14 +1118,14 @@ void AgentsMappingController::_onOutputsListHaveBeenAdded(QList<OutputVM*> outpu
             }
         }
     }
-}
+}*/
 
 
 /**
  * @brief Slot when some view models of inputs will be removed from an agent in mapping
  * @param inputsListWillBeRemoved
  */
-void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved)
+/*void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != nullptr) && !inputsListWillBeRemoved.isEmpty())
@@ -1142,14 +1142,14 @@ void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsL
             }
         }
     }
-}
+}*/
 
 
 /**
  * @brief Slot when some view models of outputs will be removed from an agent in mapping
  * @param outputsListWillBeRemoved
  */
-void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved)
+/*void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != nullptr) && !outputsListWillBeRemoved.isEmpty())
@@ -1166,7 +1166,7 @@ void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outpu
             }
         }
     }
-}
+}*/
 
 
 /**

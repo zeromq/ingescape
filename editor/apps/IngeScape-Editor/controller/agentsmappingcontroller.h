@@ -284,28 +284,28 @@ private Q_SLOTS:
      * @brief Slot called when some view models of inputs have been added to an agent in mapping
      * @param inputsListHaveBeenAdded
      */
-    void _onInputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded);
+    //void _onInputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded);
 
 
     /**
      * @brief Slot called when some view models of outputs have been added to an agent in mapping
      * @param outputsListHaveBeenAdded
      */
-    void _onOutputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded);
+    //void _onOutputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded);
 
 
     /**
      * @brief Slot called when some view models of inputs will be removed from an agent in mapping
      * @param inputsListWillBeRemoved
      */
-    void _onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
+    //void _onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
 
 
     /**
      * @brief Slot called when some view models of outputs will be removed from an agent in mapping
      * @param outputsListWillBeRemoved
      */
-    void _onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+    //void _onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
 private:

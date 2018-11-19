@@ -180,7 +180,7 @@ private Q_SLOTS:
      * @param previousValue
      * @param newValue
      */
-    void _onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
+    //void _onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
 
 
 private:

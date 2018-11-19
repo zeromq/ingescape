@@ -300,10 +300,10 @@ bool ScenarioController::isAgentUsedInActions(QString agentName)
 {
     bool exists = false;
 
-    foreach (ActionM* actionM, _actionsList.toList())
+    for (ActionM* actionM : _actionsList.toList())
     {
         // Check the action conditions
-        foreach (ActionConditionVM* conditionVM, actionM->conditionsList()->toList())
+        for (ActionConditionVM* conditionVM : actionM->conditionsList()->toList())
         {
             if ((conditionVM->modelM() != nullptr) && (conditionVM->modelM()->agent() != nullptr)
                     && (conditionVM->modelM()->agent()->name() == agentName))
@@ -316,7 +316,7 @@ bool ScenarioController::isAgentUsedInActions(QString agentName)
         // Check the action effects
         if (!exists)
         {
-            foreach (ActionEffectVM* effectVM, actionM->effectsList()->toList())
+            for (ActionEffectVM* effectVM : actionM->effectsList()->toList())
             {
                 if ((effectVM->modelM() != nullptr) && (effectVM->modelM()->agent() != nullptr)
                         && (effectVM->modelM()->agent()->name() == agentName))
@@ -889,7 +889,7 @@ void ScenarioController::executeEffectsOfAction(ActionM* action)
         }
 
         // Execute the actions effects
-        foreach (ActionEffectVM* effectVM, action->effectsList()->toList())
+        for (ActionEffectVM* effectVM : action->effectsList()->toList())
         {
             if ((effectVM != nullptr) && (effectVM->modelM() != nullptr))
             {
@@ -1455,7 +1455,7 @@ void ScenarioController::_startScenario()
     }
 
     // Disconnect from signals
-    foreach (ActionVM* actionVM, _listOfActionsToEvaluate.toList())
+    for (ActionVM* actionVM : _listOfActionsToEvaluate.toList())
     {
         disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
         disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
