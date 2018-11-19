@@ -27,7 +27,7 @@
  * @param parent
  */
 ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
-    _agent(NULL)
+    _agent(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

@@ -190,7 +190,7 @@ LogStreamController::LogStreamController(QString agentName,
     _agentName(agentName),
     _agentHostname(agentHostname),
     _subscriberAddress(subscriberAddress),
-    _zActor(NULL)
+    _zActor(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

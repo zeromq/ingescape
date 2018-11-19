@@ -29,7 +29,7 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     _isReduced(false),
     _reducedMapValueTypeGroupInInput(AgentIOPValueTypeGroups::MIXED),
     _reducedMapValueTypeGroupInOutput(AgentIOPValueTypeGroups::MIXED),
-    _temporaryMapping(NULL)
+    _temporaryMapping(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

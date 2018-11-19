@@ -25,7 +25,7 @@
  * @param parent
  */
 HostsSupervisionController::HostsSupervisionController(QObject *parent) : QObject(parent),
-    _selectedHost(NULL)
+    _selectedHost(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

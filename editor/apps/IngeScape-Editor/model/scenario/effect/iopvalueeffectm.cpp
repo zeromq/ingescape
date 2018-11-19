@@ -134,7 +134,7 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
             disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
         }
 
-        qDebug() << "setagent: setagentIOP(NULL)";
+        qDebug() << "setagent: setagentIOP(nullptr)";
 
         // Reset the agent IOP
         setagentIOP(nullptr);
@@ -378,7 +378,7 @@ void IOPValueEffectM::_onAgentIopModelDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
-    qDebug() << "_on Agent IOP Model Destroyed --> setagentIOP(NULL)";
+    qDebug() << "_on Agent IOP Model Destroyed --> setagentIOP(nullptr)";
 
     setagentIOP(nullptr);
 }
