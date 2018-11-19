@@ -26,8 +26,8 @@ ParameterVM::ParameterVM(QString parameterName,
                          AgentIOPM* modelM,
                          QObject *parent) : AgentIOPVM(parameterName,
                                                        parameterId,
-                                                       parent),
-    _firstModel(NULL)
+                                                       parent)
+    //_firstModel(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -35,9 +35,9 @@ ParameterVM::ParameterVM(QString parameterName,
     //qInfo() << "New Parameter VM" << _name << "(" << _id << ")";
 
     // Connect to signal "Count Changed" from the list of models
-    connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &ParameterVM::_onModelsChanged);
+    //connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &ParameterVM::_onModelsChanged);
 
-    _models.append(modelM);
+    //_models.append(modelM);
 }
 
 
@@ -48,19 +48,19 @@ ParameterVM::~ParameterVM()
 {
     //qInfo() << "Delete Parameter VM" << _name << "(" << _id << ")";
 
-    setfirstModel(nullptr);
+    //setfirstModel(nullptr);
 
     // DIS-connect to signal "Count Changed" from the list of models
-    disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &ParameterVM::_onModelsChanged);
+    //disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &ParameterVM::_onModelsChanged);
 
-    _models.clear();
+    //_models.clear();
 }
 
 
 /**
  * @brief Slot when the list of models changed
  */
-void ParameterVM::_onModelsChanged()
+/*void ParameterVM::_onModelsChanged()
 {
     // Update the first model
     if (!_models.isEmpty()) {
@@ -69,4 +69,4 @@ void ParameterVM::_onModelsChanged()
     else {
         setfirstModel(nullptr);
     }
-}
+}*/

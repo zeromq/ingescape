@@ -30,10 +30,10 @@ class OutputVM : public AgentIOPVM
     Q_OBJECT
 
     // First model of our agent Output
-    I2_QML_PROPERTY_READONLY_DELETE_PROOF(OutputM*, firstModel)
+    //I2_QML_PROPERTY_READONLY_DELETE_PROOF(OutputM*, firstModel)
 
     // Models of our agent output
-    I2_QOBJECT_LISTMODEL(OutputM, models)
+    //I2_QOBJECT_LISTMODEL(OutputM, models)
 
     // FIXME: rather in LinkOutputVM than in OutputVM
     // Flag indicating if a new value is published on our output
@@ -77,7 +77,7 @@ private Q_SLOTS:
     /**
      * @brief Slot when the list of models changed
      */
-    void _onModelsChanged();
+    //void _onModelsChanged();
 
 
     /**

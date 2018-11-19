@@ -58,6 +58,21 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
     // DEBUG
     _listOfGroupsByDefinition.clear();
 
+
+    // Clear hash tables of Inputs, Outputs and Parameters
+    _hashFromNameToInputsList.clear();
+    _hashFromIdToInput.clear();
+    _hashFromNameToOutputsList.clear();
+    _hashFromIdToOutput.clear();
+    _hashFromNameToParametersList.clear();
+    _hashFromIdToParameter.clear();
+
+    // Delete all view models of Inputs, Outputs and Parameters
+    _inputsList.deleteAllItems();
+    _outputsList.deleteAllItems();
+    _parametersList.deleteAllItems();
+
+
     // Delete all view models of agents grouped by definition
     if (_agentsGroupedByDefinitionNULL != nullptr)
     {
@@ -177,9 +192,20 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
         // DEBUG
         _listOfGroupsByDefinition.remove(agentsGroupedByDefinition);
 
-        if (agentsGroupedByDefinition->definition() != nullptr) {
+        if (agentsGroupedByDefinition->definition() != nullptr)
+        {
+            DefinitionM* definition = agentsGroupedByDefinition->definition();
+
             // Remove from the hash table
-            _hashFromDefinitionToAgentsGroupedByDefinition.remove(agentsGroupedByDefinition->definition());
+            _hashFromDefinitionToAgentsGroupedByDefinition.remove(definition);
+
+            // Manage the list of Inputs / Outputs / Parameters of the new definition
+            //_manageInputsOfNewDefinition(definition);
+            //_manageOutputsOfNewDefinition(definition);
+            //_manageParametersOfNewDefinition(definition);
+
+            // Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
+            _updateIsDefinedInAllDefinitionsForEachIOP(_hashFromDefinitionToAgentsGroupedByDefinition.count());
         }
         // The definition is NULL
         else if (agentsGroupedByDefinition == _agentsGroupedByDefinitionNULL) {
@@ -233,6 +259,96 @@ void AgentsGroupedByNameVM::openDefinition()
     QList<DefinitionM*> allDefinitions = _hashFromDefinitionToAgentsGroupedByDefinition.keys();
 
     Q_EMIT definitionsToOpen(allDefinitions);
+}
+
+
+/**
+ * @brief Return the list of view models of input from an input name
+ * @param inputName
+ */
+QList<InputVM*> AgentsGroupedByNameVM::getInputsListFromName(QString inputName)
+{
+    if (_hashFromNameToInputsList.contains(inputName)) {
+        return _hashFromNameToInputsList.value(inputName);
+    }
+    else {
+        return QList<InputVM*>();
+    }
+}
+
+
+/**
+ * @brief Return the view model of input from an input id
+ * @param inputId
+ */
+InputVM* AgentsGroupedByNameVM::getInputFromId(QString inputId)
+{
+    if (_hashFromIdToInput.contains(inputId)) {
+        return _hashFromIdToInput.value(inputId);
+    }
+    else {
+        return nullptr;
+    }
+}
+
+
+/**
+ * @brief Return the list of view models of output from an output name
+ * @param outputName
+ */
+QList<OutputVM*> AgentsGroupedByNameVM::getOutputsListFromName(QString outputName)
+{
+    if (_hashFromNameToOutputsList.contains(outputName)) {
+        return _hashFromNameToOutputsList.value(outputName);
+    }
+    else {
+        return QList<OutputVM*>();
+    }
+}
+
+
+/**
+ * @brief Return the view model of output from an output id
+ * @param outputId
+ */
+OutputVM* AgentsGroupedByNameVM::getOutputFromId(QString outputId)
+{
+    if (_hashFromIdToOutput.contains(outputId)) {
+        return _hashFromIdToOutput.value(outputId);
+    }
+    else {
+        return nullptr;
+    }
+}
+
+
+/**
+ * @brief Return the list of view models of parameter from a parameter name
+ * @param parameterName
+ */
+QList<ParameterVM*> AgentsGroupedByNameVM::getParametersListFromName(QString parameterName)
+{
+    if (_hashFromNameToParametersList.contains(parameterName)) {
+        return _hashFromNameToParametersList.value(parameterName);
+    }
+    else {
+        return QList<ParameterVM*>();
+    }
+}
+
+
+/**
+ * @brief Return the view model of parameter from a parameter id
+ * @param parameterId
+ */
+ParameterVM* AgentsGroupedByNameVM::getParameterFromId(QString parameterId)
+{
+    if (_hashFromIdToParameter.contains(parameterId)) {
+        return _hashFromIdToParameter.value(parameterId);
+    }
+    else {
+        return nullptr;
+    }
 }
 
 
@@ -721,8 +837,19 @@ void AgentsGroupedByNameVM::_saveNewAgentsGroupedByDefinition(AgentsGroupedByDef
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::noMoreModelAndUseless, this, &AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition);
 
         // Add to the hash table from definition
-        if (agentsGroupedByDefinition->definition() != nullptr) {
-            _hashFromDefinitionToAgentsGroupedByDefinition.insert(agentsGroupedByDefinition->definition(), agentsGroupedByDefinition);
+        if (agentsGroupedByDefinition->definition() != nullptr)
+        {
+            DefinitionM* definition = agentsGroupedByDefinition->definition();
+
+            _hashFromDefinitionToAgentsGroupedByDefinition.insert(definition, agentsGroupedByDefinition);
+
+            // Manage the list of Inputs / Outputs / Parameters of the new definition
+            _manageInputsOfNewDefinition(definition);
+            _manageOutputsOfNewDefinition(definition);
+            _manageParametersOfNewDefinition(definition);
+
+            // Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
+            _updateIsDefinedInAllDefinitionsForEachIOP(_hashFromDefinitionToAgentsGroupedByDefinition.count());
         }
 
         // Emit the signal "Agents grouped by definition has been created"
@@ -732,3 +859,230 @@ void AgentsGroupedByNameVM::_saveNewAgentsGroupedByDefinition(AgentsGroupedByDef
         _listOfGroupsByDefinition.append(agentsGroupedByDefinition);
     }
 }
+
+
+/**
+ * @brief Manage the list of inputs of the new definition
+ * @param definition
+ */
+void AgentsGroupedByNameVM::_manageInputsOfNewDefinition(DefinitionM* definition)
+{
+    if ((definition != nullptr) && !definition->inputsList()->isEmpty())
+    {
+        QList<InputVM*> inputsListToAdd;
+
+        for (AgentIOPM* input : definition->inputsList()->toList())
+        {
+            if (input != nullptr)
+            {
+                // Manage this new model of input
+                InputVM* inputVM = _manageNewInputModel(input);
+
+                // Not already in the list, it is a new view model of input
+                if ((inputVM != nullptr) && !_inputsList.contains(inputVM)) {
+                    inputsListToAdd.append(inputVM);
+                }
+            }
+        }
+
+        if (!inputsListToAdd.isEmpty()) {
+            _inputsList.append(inputsListToAdd);
+        }
+    }
+}
+
+
+/**
+ * @brief Manage the list of outputs of the new definition
+ * @param definition
+ */
+void AgentsGroupedByNameVM::_manageOutputsOfNewDefinition(DefinitionM* definition)
+{
+    if ((definition != nullptr) && !definition->outputsList()->isEmpty())
+    {
+
+    }
+}
+
+
+/**
+ * @brief Manage the list of parameters of the new definition
+ * @param definition
+ */
+void AgentsGroupedByNameVM::_manageParametersOfNewDefinition(DefinitionM* definition)
+{
+    if ((definition != nullptr) && !definition->parametersList()->isEmpty())
+    {
+
+    }
+}
+
+
+/**
+ * @brief Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
+ * @param numberOfDefinitions
+ */
+void AgentsGroupedByNameVM::_updateIsDefinedInAllDefinitionsForEachIOP(int numberOfDefinitions)
+{
+    // Update the flag "Is Defined in All Definitions" for each input
+    for (InputVM* input : _inputsList.toList())
+    {
+        if (input != nullptr)
+        {
+            if (input->models()->count() == numberOfDefinitions) {
+                input->setisDefinedInAllDefinitions(true);
+            }
+            else {
+                input->setisDefinedInAllDefinitions(false);
+            }
+        }
+    }
+
+    // Update the flag "Is Defined in All Definitions" for each output
+    for (OutputVM* output : _outputsList.toList())
+    {
+        if (output != nullptr)
+        {
+            if (output->models()->count() == numberOfDefinitions) {
+                output->setisDefinedInAllDefinitions(true);
+            }
+            else {
+                output->setisDefinedInAllDefinitions(false);
+            }
+        }
+    }
+
+    // Update the flag "Is Defined in All Definitions" for each parameter
+    for (ParameterVM* parameter : _parametersList.toList())
+    {
+        if (parameter != nullptr)
+        {
+            if (parameter->models()->count() == numberOfDefinitions) {
+                parameter->setisDefinedInAllDefinitions(true);
+            }
+            else {
+                parameter->setisDefinedInAllDefinitions(false);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Manage a new model of input
+ * @param input
+ * @return
+ */
+InputVM* AgentsGroupedByNameVM::_manageNewInputModel(AgentIOPM* input)
+{
+    InputVM* inputVM = nullptr;
+
+    if ((input != nullptr) && !input->name().isEmpty())
+    {
+        // First, we get a ghost of this input: an input without id (only the same name)
+        QList<InputVM*> inputsWithSameName = getInputsListFromName(input->name());
+
+        // Input id is defined
+        if (!input->id().isEmpty())
+        {
+            inputVM = getInputFromId(input->id());
+
+            // There is already a view model for this id
+            if (inputVM != nullptr)
+            {
+                // Add this new model to the list
+                inputVM->models()->append(input);
+            }
+            // There is not yet a view model for this id
+            else
+            {
+                // Create a new view model of input
+                inputVM = new InputVM(input->name(),
+                                      input->id(),
+                                      input,
+                                      this);
+
+                // Don't add to the list here (this input will be added globally via temporary list)
+
+                // Add to the hash table with the input id
+                _hashFromIdToInput.insert(input->id(), inputVM);
+
+                // Update the hash table with the input name
+                inputsWithSameName.append(inputVM);
+                _hashFromNameToInputsList.insert(input->name(), inputsWithSameName);
+            }
+        }
+        // Input id is NOT defined
+        else {
+            // FIXME TODO: Manage the model of input with an empty id (defined name but no type)
+            qCritical() << "FIXME TODO: Manage the model of input" << input->name() << "with an empty id (agent" << _name << ")";
+        }
+    }
+    return inputVM;
+}
+
+
+/**
+ * @brief Manage a new model of output
+ * @param output
+ * @return
+ */
+OutputVM* AgentsGroupedByNameVM::_manageNewOutputModel(OutputM* output)
+{
+    OutputVM* outputVM = nullptr;
+
+    if ((input != nullptr) && !input->name().isEmpty())
+    {
+        // First, we get a ghost of this input: an input without id (only the same name)
+        QList<OutputVM*> inputsWithSameName = getOutputsListFromName(input->name());
+
+        // Input id is defined
+        if (!input->id().isEmpty())
+        {
+            outputVM = getInputFromId(input->id());
+
+            // There is already a view model for this id
+            if (inputVM != nullptr)
+            {
+                // Add this new model to the list
+                inputVM->models()->append(input);
+            }
+            // There is not yet a view model for this id
+            else
+            {
+                // Create a new view model of input
+                outputVM = new OutputVM(input->name(),
+                                      input->id(),
+                                      input,
+                                      this);
+
+                // Don't add to the list here (this input will be added globally via temporary list)
+
+                // Add to the hash table with the input id
+                _hashFromIdToInput.insert(input->id(), inputVM);
+
+                // Update the hash table with the input name
+                inputsWithSameName.append(inputVM);
+                _hashFromNameToInputsList.insert(input->name(), inputsWithSameName);
+            }
+        }
+        // Input id is NOT defined
+        else {
+            // FIXME TODO: Manage the model of input with an empty id (defined name but no type)
+            qCritical() << "FIXME TODO: Manage the model of input" << input->name() << "with an empty id (agent" << _name << ")";
+        }
+    }
+    return outputVM;
+}
+
+
+/**
+ * @brief Manage a new model of parameter
+ * @param parameter
+ * @return
+ */
+ParameterVM* AgentsGroupedByNameVM::_manageNewParameterModel(AgentIOPM* parameter)
+{
+
+}
+

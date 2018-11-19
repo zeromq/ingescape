@@ -35,23 +35,27 @@ class AgentIOPVM : public QObject
 
     // First model of our agent Input / Output / Parameter
     //I2_QML_PROPERTY_READONLY_DELETE_PROOF(AgentIOPM*, firstModel)
+    I2_QML_PROPERTY_READONLY(AgentIOPM*, firstModel)
 
     // Models of our agent Input / Output / Parameter
-    //I2_QOBJECT_LISTMODEL(AgentIOPM, models)
+    I2_QOBJECT_LISTMODEL(AgentIOPM, models)
 
     // Flag indicating if our input/output is defined in all definitions
     I2_QML_PROPERTY_READONLY(bool, isDefinedInAllDefinitions)
 
 
 public:
+
     /**
      * @brief Constructor
      * @param name
      * @param id
+     * @param modelM
      * @param parent
      */
     explicit AgentIOPVM(QString name,
                         QString id,
+                        AgentIOPM* modelM,
                         QObject *parent = nullptr);
 
 
@@ -59,6 +63,22 @@ public:
      * @brief Destructor
      */
     ~AgentIOPVM();
+
+
+Q_SIGNALS:
+
+
+public Q_SLOTS:
+
+
+private Q_SLOTS:
+    /**
+     * @brief Slot called when the list of models changed
+     */
+    void _onModelsChanged();
+
+
+private:
 
 
 };

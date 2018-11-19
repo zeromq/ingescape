@@ -43,9 +43,9 @@ OutputVM::OutputVM(QString outputName,
 
 
     // Connect to signal "Count Changed" from the list of models
-    connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &OutputVM::_onModelsChanged);
+    //connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &OutputVM::_onModelsChanged);
 
-    _models.append(modelM);
+    //_models.append(modelM);
 }
 
 
@@ -62,13 +62,13 @@ OutputVM::~OutputVM()
 
     //qInfo() << "Delete Output VM" << _name << "(" << _id << ")";
 
-    setfirstModel(nullptr);
+    //setfirstModel(nullptr);
 
     // DIS-connect to signal "Count Changed" from the list of models
-    disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &OutputVM::_onModelsChanged);
+    //disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &OutputVM::_onModelsChanged);
 
-    _previousModelsList.clear();
-    _models.clear();
+    //_previousModelsList.clear();
+    //_models.clear();
 }
 
 
@@ -85,7 +85,7 @@ void OutputVM::simulateCurrentValueOfModelChanged()
 /**
  * @brief Slot when the list of models changed
  */
-void OutputVM::_onModelsChanged()
+/*void OutputVM::_onModelsChanged()
 {
     // Update the first model
     if (!_models.isEmpty()) {
@@ -130,7 +130,7 @@ void OutputVM::_onModelsChanged()
     }
 
     _previousModelsList = newModelsList;
-}
+}*/
 
 
 /**

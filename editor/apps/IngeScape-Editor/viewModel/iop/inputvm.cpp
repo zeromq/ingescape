@@ -27,8 +27,9 @@ InputVM::InputVM(QString inputName,
                  AgentIOPM* modelM,
                  QObject *parent) : AgentIOPVM(inputName,
                                                inputId,
-                                               parent),
-    _firstModel(NULL)
+                                               modelM,
+                                               parent)
+    //_firstModel(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -36,9 +37,9 @@ InputVM::InputVM(QString inputName,
     //qInfo() << "New Input VM" << _name << "(" << _id << ")";
 
     // Connect to signal "Count Changed" from the list of models
-    connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &InputVM::_onModelsChanged);
+    //connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &InputVM::_onModelsChanged);
 
-    _models.append(modelM);
+    //_models.append(modelM);
 }
 
 
@@ -49,19 +50,19 @@ InputVM::~InputVM()
 {
     //qInfo() << "Delete Input VM" << _name << "(" << _id << ")";
 
-    setfirstModel(nullptr);
+    //setfirstModel(nullptr);
 
     // DIS-connect to signal "Count Changed" from the list of models
-    disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &InputVM::_onModelsChanged);
+    //disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &InputVM::_onModelsChanged);
 
-    _models.clear();
+    //_models.clear();
 }
 
 
 /**
  * @brief Slot when the list of models changed
  */
-void InputVM::_onModelsChanged()
+/*void InputVM::_onModelsChanged()
 {
     // Update the first model
     if (!_models.isEmpty()) {
@@ -70,4 +71,4 @@ void InputVM::_onModelsChanged()
     else {
         setfirstModel(nullptr);
     }
-}
+}*/

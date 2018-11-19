@@ -79,6 +79,10 @@ AgentInMappingVM::~AgentInMappingVM()
     //disconnect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onInputsListChanged);
     //disconnect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onOutputsListChanged);
 
+    // Delete all view models of link Inputs/Outputs
+    _linkInputsList.deleteAllItems();
+    _linkOutputsList.deleteAllItems();
+
     if (_agentsGroupedByName != nullptr) {
         // Deleted elsewhere
         setagentsGroupedByName(nullptr);
@@ -87,19 +91,6 @@ AgentInMappingVM::~AgentInMappingVM()
     if (_temporaryMapping != nullptr) {
         delete _temporaryMapping;
     }
-
-    // Clear maps of Inputs, Outputs and Parameters
-    _mapFromNameToInputsList.clear();
-    _mapFromUniqueIdToInput.clear();
-    _mapFromNameToOutputsList.clear();
-    _mapFromUniqueIdToOutput.clear();
-    _mapFromNameToParametersList.clear();
-    _mapFromUniqueIdToParameter.clear();
-
-    // Delete elements in the lists of Inputs & Outputs
-    _inputsList.deleteAllItems();
-    _outputsList.deleteAllItems();
-    _parametersList.deleteAllItems();
 }
 
 
@@ -154,96 +145,6 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         }
     }
     return hasBeenRemoved;
-}
-
-
-/**
- * @brief Return the list of view models of input from the input name
- * @param inputName
- */
-QList<InputVM*> AgentInMappingVM::getInputsListFromName(QString inputName)
-{
-    if (_mapFromNameToInputsList.contains(inputName)) {
-        return _mapFromNameToInputsList.value(inputName);
-    }
-    else {
-        return QList<InputVM*>();
-    }
-}
-
-
-/**
- * @brief Return the view model of input from the input id
- * @param inputId
- */
-InputVM* AgentInMappingVM::getInputFromId(QString inputId)
-{
-    if (_mapFromUniqueIdToInput.contains(inputId)) {
-        return _mapFromUniqueIdToInput.value(inputId);
-    }
-    else {
-        return nullptr;
-    }
-}
-
-
-/**
- * @brief Return the list of view models of output from the output name
- * @param outputName
- */
-QList<OutputVM*> AgentInMappingVM::getOutputsListFromName(QString outputName)
-{
-    if (_mapFromNameToOutputsList.contains(outputName)) {
-        return _mapFromNameToOutputsList.value(outputName);
-    }
-    else {
-        return QList<OutputVM*>();
-    }
-}
-
-
-/**
- * @brief Return the view model of output from the output id
- * @param outputId
- */
-OutputVM* AgentInMappingVM::getOutputFromId(QString outputId)
-{
-    if (_mapFromUniqueIdToOutput.contains(outputId)) {
-        return _mapFromUniqueIdToOutput.value(outputId);
-    }
-    else {
-        return nullptr;
-    }
-}
-
-
-/**
- * @brief Return the list of view models of parameter from the parameter name
- * @param parameterName
- */
-QList<ParameterVM*> AgentInMappingVM::getParametersListFromName(QString parameterName)
-{
-    if (_mapFromNameToParametersList.contains(parameterName)) {
-        return _mapFromNameToParametersList.value(parameterName);
-    }
-    else {
-        return QList<ParameterVM*>();
-    }
-}
-
-
-/**
- * @brief Return the view model of parameter from the parameter id
- * @param parameterId
- */
-ParameterVM* AgentInMappingVM::getParameterFromId(QString parameterId)
-{
-    if (_mapFromUniqueIdToParameter.contains(parameterId)) {
-        return _mapFromUniqueIdToParameter.value(parameterId);
-    }
-    else {
-        return nullptr;
-    }
 }
 
 
@@ -575,7 +476,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
 
 
         // Update the flag "Are Identicals All Definitions"
-        _updateIsDefinedInAllDefinitionsForEachIOP();
+        //_updateIsDefinedInAllDefinitionsForEachIOP();
     }
 }
 
@@ -645,7 +546,7 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
         Q_EMIT modelsOfIOPChanged();
 
         // Update the flag "Are Identicals All Definitions"
-        _updateIsDefinedInAllDefinitionsForEachIOP();
+        //_updateIsDefinedInAllDefinitionsForEachIOP();
     }
 }
 
@@ -746,7 +647,7 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
         Q_EMIT modelsOfIOPChanged();
 
         // Update the flag "Are Identicals All Definitions"
-        _updateIsDefinedInAllDefinitionsForEachIOP();
+        //_updateIsDefinedInAllDefinitionsForEachIOP();
     }
 }
 
@@ -1142,7 +1043,7 @@ ParameterVM* AgentInMappingVM::_parameterModelRemoved(AgentIOPM* parameter)
 /**
  * @brief Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
  */
-void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachIOP()
+/*void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachIOP()
 {
     int numberOfModels = _models.count();
 
@@ -1187,7 +1088,7 @@ void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachIOP()
             }
         }
     }
-}
+}*/
 
 
 /**

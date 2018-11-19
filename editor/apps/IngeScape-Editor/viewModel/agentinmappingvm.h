@@ -148,50 +148,6 @@ Q_SIGNALS:
     void modelsOfIOPChanged();
 
 
-public Q_SLOTS:
-
-    /**
-     * @brief Return the list of view models of input from the input name
-     * @param inputName
-     */
-    QList<InputVM*> getInputsListFromName(QString inputName);
-
-
-    /**
-     * @brief Return the view model of input from the input id
-     * @param inputId
-     */
-    InputVM* getInputFromId(QString inputId);
-
-
-    /**
-     * @brief Return the list of view models of output from the output name
-     * @param outputName
-     */
-    QList<OutputVM*> getOutputsListFromName(QString outputName);
-
-
-    /**
-     * @brief Return the view model of output from the output id
-     * @param outputId
-     */
-    OutputVM* getOutputFromId(QString outputId);
-
-
-    /**
-     * @brief Return the list of view models of parameter from the parameter name
-     * @param parameterName
-     */
-    QList<ParameterVM*> getParametersListFromName(QString parameterName);
-
-
-    /**
-     * @brief Return the view model of parameter from the parameter id
-     * @param parameterId
-     */
-    ParameterVM* getParameterFromId(QString parameterId);
-
-
 private Q_SLOTS:
 
     /**
@@ -241,7 +197,7 @@ private:
      * @param input
      * @return
      */
-    InputVM* _inputModelAdded(AgentIOPM* input);
+    //InputVM* _inputModelAdded(AgentIOPM* input);
 
 
     /**
@@ -249,7 +205,7 @@ private:
      * @param input
      * @return
      */
-    InputVM* _inputModelRemoved(AgentIOPM* input);
+    //InputVM* _inputModelRemoved(AgentIOPM* input);
 
 
     /**
@@ -257,7 +213,7 @@ private:
      * @param output
      * @return
      */
-    OutputVM* _outputModelAdded(OutputM* output);
+    //OutputVM* _outputModelAdded(OutputM* output);
 
 
     /**
@@ -265,7 +221,7 @@ private:
      * @param output
      * @return
      */
-    OutputVM* _outputModelRemoved(OutputM* output);
+    //OutputVM* _outputModelRemoved(OutputM* output);
 
 
 
@@ -274,7 +230,7 @@ private:
      * @param parameter
      * @return
      */
-    ParameterVM* _parameterModelAdded(AgentIOPM* parameter);
+    //ParameterVM* _parameterModelAdded(AgentIOPM* parameter);
 
 
     /**
@@ -282,13 +238,13 @@ private:
      * @param parameter
      * @return
      */
-    ParameterVM* _parameterModelRemoved(AgentIOPM* parameter);
+    //ParameterVM* _parameterModelRemoved(AgentIOPM* parameter);
 
 
     /**
      * @brief Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
      */
-    void _updateIsDefinedInAllDefinitionsForEachIOP();
+    //void _updateIsDefinedInAllDefinitionsForEachIOP();
 
 
     /**
@@ -315,26 +271,6 @@ private:
 
 private:
 
-    // Input name as key is not unique (value type can be different)
-    // Map from an input name to a list of view models of inputs
-    QHash<QString, QList<InputVM*>> _mapFromNameToInputsList;
-
-    // Map from a (unique) input id to a view model of input
-    QHash<QString, InputVM*> _mapFromUniqueIdToInput;
-
-    // Output name as key is not unique (value type can be different)
-    // Map from an output name to a list of view models of outputs
-    QHash<QString, QList<OutputVM*>> _mapFromNameToOutputsList;
-
-    // Map from a (unique) output id to a view model of output
-    QHash<QString, OutputVM*> _mapFromUniqueIdToOutput;
-
-    // Parameter name as key is not unique (value type can be different)
-    // Map from a parameter name to a list of view models of parameters
-    QHash<QString, QList<ParameterVM*>> _mapFromNameToParametersList;
-
-    // Map from a (unique) parameter id to a view model of parameter
-    QHash<QString, ParameterVM*> _mapFromUniqueIdToParameter;
 };
 
 QML_DECLARE_TYPE(AgentInMappingVM)

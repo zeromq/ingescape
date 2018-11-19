@@ -53,13 +53,13 @@ class AgentsGroupedByNameVM : public QObject
     I2_QML_PROPERTY_READONLY(int, numberOfAgentsOFF)
 
     // List of view models of inputs
-    //I2_QOBJECT_LISTMODEL(InputVM, inputsList)
+    I2_QOBJECT_LISTMODEL(InputVM, inputsList)
 
     // List of view models of outputs
-    //I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
+    I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
 
     // List of view models of parameters
-    //I2_QOBJECT_LISTMODEL(ParameterVM, parametersList)
+    I2_QOBJECT_LISTMODEL(ParameterVM, parametersList)
 
     // FIXME DEBUG: List of groups of agents, grouped by definition
     I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, listOfGroupsByDefinition)
@@ -118,6 +118,48 @@ public:
      * If there are several "Agents Grouped by Definition", we have to open each definition
      */
     Q_INVOKABLE void openDefinition();
+
+
+    /**
+     * @brief Return the list of view models of input from an input name
+     * @param inputName
+     */
+    QList<InputVM*> getInputsListFromName(QString inputName);
+
+
+    /**
+     * @brief Return the view model of input from an input id
+     * @param inputId
+     */
+    InputVM* getInputFromId(QString inputId);
+
+
+    /**
+     * @brief Return the list of view models of output from an output name
+     * @param outputName
+     */
+    QList<OutputVM*> getOutputsListFromName(QString outputName);
+
+
+    /**
+     * @brief Return the view model of output from an output id
+     * @param outputId
+     */
+    OutputVM* getOutputFromId(QString outputId);
+
+
+    /**
+     * @brief Return the list of view models of parameter from a parameter name
+     * @param parameterName
+     */
+    QList<ParameterVM*> getParametersListFromName(QString parameterName);
+
+
+    /**
+     * @brief Return the view model of parameter from a parameter id
+     * @param parameterId
+     */
+    ParameterVM* getParameterFromId(QString parameterId);
 
 
 Q_SIGNALS:
@@ -211,6 +253,59 @@ private:
     void _saveNewAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
 
+    /**
+     * @brief Manage the list of inputs of the new definition
+     * @param definition
+     */
+    void _manageInputsOfNewDefinition(DefinitionM* definition);
+
+
+    /**
+     * @brief Manage the list of outputs of the new definition
+     * @param definition
+     */
+    void _manageOutputsOfNewDefinition(DefinitionM* definition);
+
+
+    /**
+     * @brief Manage the list of parameters of the new definition
+     * @param definition
+     */
+    void _manageParametersOfNewDefinition(DefinitionM* definition);
+
+
+    /**
+     * @brief Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
+     * @param numberOfDefinitions
+     */
+    void _updateIsDefinedInAllDefinitionsForEachIOP(int numberOfDefinitions);
+
+
+    /**
+     * @brief Manage a new model of input
+     * @param input
+     * @return
+     */
+    InputVM* _manageNewInputModel(AgentIOPM* input);
+
+
+    /**
+     * @brief Manage a new model of output
+     * @param output
+     * @return
+     */
+    OutputVM* _manageNewOutputModel(OutputM* output);
+
+
+    /**
+     * @brief Manage a new model of parameter
+     * @param parameter
+     * @return
+     */
+    ParameterVM* _manageNewParameterModel(AgentIOPM* parameter);
+
+
+
 private:
     // Previous list of models of agents
     QList<AgentM*> _previousAgentsList;
@@ -221,6 +316,26 @@ private:
     // Hash table from a definition to a (view model of) agents grouped by definition
     QHash<DefinitionM*, AgentsGroupedByDefinitionVM*> _hashFromDefinitionToAgentsGroupedByDefinition;
 
+    // Input name as key is not unique (value type can be different)
+    // Hash table from an input name to a list of view models of inputs
+    QHash<QString, QList<InputVM*>> _hashFromNameToInputsList;
+
+    // Hash table from a (unique) input id to a view model of input
+    QHash<QString, InputVM*> _hashFromIdToInput;
+
+    // Output name as key is not unique (value type can be different)
+    // Hash table from an output name to a list of view models of outputs
+    QHash<QString, QList<OutputVM*>> _hashFromNameToOutputsList;
+
+    // Hash table from a (unique) output id to a view model of output
+    QHash<QString, OutputVM*> _hashFromIdToOutput;
+
+    // Parameter name as key is not unique (value type can be different)
+    // Hash table from a parameter name to a list of view models of parameters
+    QHash<QString, QList<ParameterVM*>> _hashFromNameToParametersList;
+
+    // Hash table from a (unique) parameter id to a view model of parameter
+    QHash<QString, ParameterVM*> _hashFromIdToParameter;
 };
 
 QML_DECLARE_TYPE(AgentsGroupedByNameVM)
