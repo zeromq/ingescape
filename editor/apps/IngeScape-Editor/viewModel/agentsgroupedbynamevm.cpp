@@ -199,10 +199,10 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
             // Remove from the hash table
             _hashFromDefinitionToAgentsGroupedByDefinition.remove(definition);
 
-            // Manage the list of Inputs / Outputs / Parameters of the new definition
-            //_manageInputsOfNewDefinition(definition);
-            //_manageOutputsOfNewDefinition(definition);
-            //_manageParametersOfNewDefinition(definition);
+            // Manage the list of Inputs / Outputs / Parameters of the removed definition
+            _manageInputsOfRemovedDefinition(definition);
+            _manageOutputsOfRemovedDefinition(definition);
+            _manageParametersOfRemovedDefinition(definition);
 
             // Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
             _updateIsDefinedInAllDefinitionsForEachIOP(_hashFromDefinitionToAgentsGroupedByDefinition.count());
@@ -843,13 +843,16 @@ void AgentsGroupedByNameVM::_saveNewAgentsGroupedByDefinition(AgentsGroupedByDef
 
             _hashFromDefinitionToAgentsGroupedByDefinition.insert(definition, agentsGroupedByDefinition);
 
-            // Manage the list of Inputs / Outputs / Parameters of the new definition
-            _manageInputsOfNewDefinition(definition);
-            _manageOutputsOfNewDefinition(definition);
-            _manageParametersOfNewDefinition(definition);
+            // Manage the list of Inputs / Outputs / Parameters of the added definition
+            _manageInputsOfAddedDefinition(definition);
+            _manageOutputsOfAddedDefinition(definition);
+            _manageParametersOfAddedDefinition(definition);
 
             // Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
             _updateIsDefinedInAllDefinitionsForEachIOP(_hashFromDefinitionToAgentsGroupedByDefinition.count());
+
+            // Emit signal "models of Inputs/Outputs/Parameters Changed"
+            //Q_EMIT modelsOfIOPChanged();
         }
 
         // Emit the signal "Agents grouped by definition has been created"
@@ -862,10 +865,10 @@ void AgentsGroupedByNameVM::_saveNewAgentsGroupedByDefinition(AgentsGroupedByDef
 
 
 /**
- * @brief Manage the list of inputs of the new definition
+ * @brief Manage the list of inputs of the added definition
  * @param definition
  */
-void AgentsGroupedByNameVM::_manageInputsOfNewDefinition(DefinitionM* definition)
+void AgentsGroupedByNameVM::_manageInputsOfAddedDefinition(DefinitionM* definition)
 {
     if ((definition != nullptr) && !definition->inputsList()->isEmpty())
     {
@@ -876,44 +879,242 @@ void AgentsGroupedByNameVM::_manageInputsOfNewDefinition(DefinitionM* definition
             if (input != nullptr)
             {
                 // Manage this new model of input
-                InputVM* inputVM = _manageNewInputModel(input);
+                QPair<bool, InputVM*> pair = _manageNewInputModel(input);
 
-                // Not already in the list, it is a new view model of input
-                if ((inputVM != nullptr) && !_inputsList.contains(inputVM)) {
-                    inputsListToAdd.append(inputVM);
+                // We have to add a new view model of input
+                if (pair.first)
+                {
+                    InputVM* inputVM = pair.second;
+                    if (inputVM != nullptr) {
+                        inputsListToAdd.append(inputVM);
+                    }
                 }
             }
         }
 
-        if (!inputsListToAdd.isEmpty()) {
+        if (!inputsListToAdd.isEmpty())
+        {
             _inputsList.append(inputsListToAdd);
+
+            // Emit the signal "Inputs have been Added"
+            //Q_EMIT inputsHaveBeenAdded(inputsListToAdd);
         }
     }
 }
 
 
 /**
- * @brief Manage the list of outputs of the new definition
+ * @brief Manage the list of outputs of the added definition
  * @param definition
  */
-void AgentsGroupedByNameVM::_manageOutputsOfNewDefinition(DefinitionM* definition)
+void AgentsGroupedByNameVM::_manageOutputsOfAddedDefinition(DefinitionM* definition)
 {
     if ((definition != nullptr) && !definition->outputsList()->isEmpty())
     {
+        QList<OutputVM*> outputsListToAdd;
 
+        for (OutputM* output : definition->outputsList()->toList())
+        {
+            if (output != nullptr)
+            {
+                // Manage this new model of output
+                QPair<bool, OutputVM*> pair = _manageNewOutputModel(output);
+
+                // We have to add a new view model of output
+                if (pair.first)
+                {
+                    OutputVM* outputVM = pair.second;
+                    if (outputVM != nullptr) {
+                        outputsListToAdd.append(outputVM);
+                    }
+                }
+            }
+        }
+
+        if (!outputsListToAdd.isEmpty())
+        {
+            _outputsList.append(outputsListToAdd);
+
+            // Emit the signal "Outputs have been Added"
+            //Q_EMIT outputsHaveBeenAdded(outputsListToAdd);
+        }
     }
 }
 
 
 /**
- * @brief Manage the list of parameters of the new definition
+ * @brief Manage the list of parameters of the added definition
  * @param definition
  */
-void AgentsGroupedByNameVM::_manageParametersOfNewDefinition(DefinitionM* definition)
+void AgentsGroupedByNameVM::_manageParametersOfAddedDefinition(DefinitionM* definition)
 {
     if ((definition != nullptr) && !definition->parametersList()->isEmpty())
     {
+        QList<ParameterVM*> parametersListToAdd;
 
+        for (ParameterVM* parameter : definition->parametersList()->toList())
+        {
+            if (parameter != nullptr)
+            {
+                // Manage this new model of parameter
+                QPair<bool, ParameterVM*> pair = _manageNewParameterModel(output);
+
+                // We have to add a new view model of output
+                if (pair.first)
+                {
+                    ParameterVM* parameterVM = pair.second;
+                    if (parameterVM != nullptr) {
+                        parametersListToAdd.append(parameterVM);
+                    }
+                }
+            }
+        }
+
+        if (!parametersListToAdd.isEmpty())
+        {
+            _parametersList.append(parametersListToAdd);
+
+            // Emit the signal "Parameters have been Added"
+            //Q_EMIT parametersHaveBeenAdded(parametersListToAdd);
+        }
+    }
+}
+
+
+/**
+ * @brief Manage the list of inputs of the removed definition
+ * @param definition
+ */
+void AgentsGroupedByNameVM::_manageInputsOfRemovedDefinition(DefinitionM* definition)
+{
+    if ((definition != nullptr) && !definition->inputsList()->isEmpty())
+    {
+        QList<InputVM*> inputsListToRemove;
+
+        for (AgentIOPM* input : definition->inputsList()->toList())
+        {
+            if (input != nullptr)
+            {
+                // Manage this old model of input
+                QPair<bool, InputVM*> pair = _manageOldInputModel(input);
+
+                // We have to remove an old view model of input
+                if (pair.first)
+                {
+                    InputVM* inputVM = pair.second;
+                    if (inputVM != nullptr) {
+                        inputsListToRemove.append(inputVM);
+                    }
+                }
+            }
+        }
+
+        if (!inputsListToRemove.isEmpty())
+        {
+            // Emit the signal "Inputs will be Removed"
+            //Q_EMIT inputsWillBeRemoved(inputsListToRemove);
+
+            // FIXME TODO I2 Quick: Allow to remove a QList
+            //_inputsList.remove(inputsListToRemove);
+            for (InputVM* inputVM : inputsListToRemove)
+            {
+                if (inputVM != nullptr) {
+                    _inputsList.remove(inputVM);
+                }
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Manage the list of outputs of the removed definition
+ * @param definition
+ */
+void AgentsGroupedByNameVM::_manageOutputsOfRemovedDefinition(DefinitionM* definition)
+{
+    if ((definition != nullptr) && !definition->outputsList()->isEmpty())
+    {
+        QList<OutputVM*> outputsListToRemove;
+
+        for (AgentIOPM* output : definition->outputsList()->toList())
+        {
+            if (output != nullptr)
+            {
+                // Manage this old model of output
+                QPair<bool, OutputVM*> pair = _manageOldOutputModel(output);
+
+                // We have to remove an old view model of output
+                if (pair.first)
+                {
+                    OutputVM* outputVM = pair.second;
+                    if (outputVM != nullptr) {
+                        outputsListToRemove.append(outputVM);
+                    }
+                }
+            }
+        }
+
+        if (!outputsListToRemove.isEmpty())
+        {
+            // Emit the signal "outputs will be Removed"
+            //Q_EMIT outputsWillBeRemoved(outputsListToRemove);
+
+            // FIXME TODO I2 Quick: Allow to remove a QList
+            //_outputsList.remove(outputsListToRemove);
+            for (OutputVM* outputVM : outputsListToRemove)
+            {
+                if (outputVM != nullptr) {
+                    _outputsList.remove(outputVM);
+                }
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Manage the list of parameters of the removed definition
+ * @param definition
+ */
+void AgentsGroupedByNameVM::_manageParametersOfRemovedDefinition(DefinitionM* definition)
+{
+    if ((definition != nullptr) && !definition->parametersList()->isEmpty())
+    {
+        QList<ParameterVM*> parametersListToRemove;
+
+        for (AgentIOPM* parameter : definition->parametersList()->toList())
+        {
+            if (parameter != nullptr)
+            {
+                // Manage this old model of parameter
+                QPair<bool, ParameterVM*> pair = _manageOldParameterModel(parameter);
+
+                // We have to remove an old view model of parameter
+                if (pair.first)
+                {
+                    ParameterVM* parameterVM = pair.second;
+                    if (parameterVM != nullptr) {
+                        parametersListToRemove.append(parameterVM);
+                    }
+                }
+            }
+        }
+
+        if (!parametersListToRemove.isEmpty())
+        {
+            // Emit the signal "parameters will be Removed"
+            //Q_EMIT parametersWillBeRemoved(parametersListToRemove);
+
+            // FIXME TODO I2 Quick: Allow to remove a QList
+            //_parametersList.remove(parametersListToRemove);
+            for (ParameterVM* parameterVM : parametersListToRemove)
+            {
+                if (parameterVM != nullptr) {
+                    _parametersList.remove(parameterVM);
+                }
+            }
+        }
     }
 }
 
@@ -973,15 +1174,13 @@ void AgentsGroupedByNameVM::_updateIsDefinedInAllDefinitionsForEachIOP(int numbe
  * @param input
  * @return
  */
-InputVM* AgentsGroupedByNameVM::_manageNewInputModel(AgentIOPM* input)
+QPair<bool, InputVM*> AgentsGroupedByNameVM::_manageNewInputModel(AgentIOPM* input)
 {
+    bool haveToAdd = false;
     InputVM* inputVM = nullptr;
 
     if ((input != nullptr) && !input->name().isEmpty())
     {
-        // First, we get a ghost of this input: an input without id (only the same name)
-        QList<InputVM*> inputsWithSameName = getInputsListFromName(input->name());
-
         // Input id is defined
         if (!input->id().isEmpty())
         {
@@ -996,6 +1195,8 @@ InputVM* AgentsGroupedByNameVM::_manageNewInputModel(AgentIOPM* input)
             // There is not yet a view model for this id
             else
             {
+                haveToAdd = true;
+
                 // Create a new view model of input
                 inputVM = new InputVM(input->name(),
                                       input->id(),
@@ -1007,18 +1208,21 @@ InputVM* AgentsGroupedByNameVM::_manageNewInputModel(AgentIOPM* input)
                 // Add to the hash table with the input id
                 _hashFromIdToInput.insert(input->id(), inputVM);
 
-                // Update the hash table with the input name
+                // Update the list of view models of input for this name
+                QList<InputVM*> inputsWithSameName = getInputsListFromName(input->name());
                 inputsWithSameName.append(inputVM);
                 _hashFromNameToInputsList.insert(input->name(), inputsWithSameName);
             }
         }
         // Input id is NOT defined
-        else {
+        else
+        {
             // FIXME TODO: Manage the model of input with an empty id (defined name but no type)
             qCritical() << "FIXME TODO: Manage the model of input" << input->name() << "with an empty id (agent" << _name << ")";
         }
     }
-    return inputVM;
+
+    return QPair<bool, InputVM*>(haveToAdd, inputVM);
 }
 
 
@@ -1027,52 +1231,55 @@ InputVM* AgentsGroupedByNameVM::_manageNewInputModel(AgentIOPM* input)
  * @param output
  * @return
  */
-OutputVM* AgentsGroupedByNameVM::_manageNewOutputModel(OutputM* output)
+QPair<bool, OutputVM*> AgentsGroupedByNameVM::_manageNewOutputModel(OutputM* output)
 {
+    bool haveToAdd = false;
     OutputVM* outputVM = nullptr;
 
-    if ((input != nullptr) && !input->name().isEmpty())
+    if ((output != nullptr) && !output->name().isEmpty())
     {
-        // First, we get a ghost of this input: an input without id (only the same name)
-        QList<OutputVM*> inputsWithSameName = getOutputsListFromName(input->name());
-
-        // Input id is defined
-        if (!input->id().isEmpty())
+        // Output id is defined
+        if (!output->id().isEmpty())
         {
-            outputVM = getInputFromId(input->id());
+            outputVM = getOutputFromId(output->id());
 
             // There is already a view model for this id
-            if (inputVM != nullptr)
+            if (outputVM != nullptr)
             {
                 // Add this new model to the list
-                inputVM->models()->append(input);
+                outputVM->models()->append(output);
             }
             // There is not yet a view model for this id
             else
             {
-                // Create a new view model of input
-                outputVM = new OutputVM(input->name(),
-                                      input->id(),
-                                      input,
-                                      this);
+                haveToAdd = true;
 
-                // Don't add to the list here (this input will be added globally via temporary list)
+                // Create a new view model of output
+                outputVM = new OutputVM(output->name(),
+                                        output->id(),
+                                        output,
+                                        this);
 
-                // Add to the hash table with the input id
-                _hashFromIdToInput.insert(input->id(), inputVM);
+                // Don't add to the list here (this output will be added globally via temporary list)
 
-                // Update the hash table with the input name
-                inputsWithSameName.append(inputVM);
-                _hashFromNameToInputsList.insert(input->name(), inputsWithSameName);
+                // Add to the hash table with the output id
+                _hashFromIdToOutput.insert(output->id(), outputVM);
+
+                // Update the list of view models of output for this name
+                QList<OutputVM*> outputsWithSameName = getOutputsListFromName(output->name());
+                outputsWithSameName.append(outputVM);
+                _hashFromNameToOutputsList.insert(output->name(), outputsWithSameName);
             }
         }
-        // Input id is NOT defined
-        else {
-            // FIXME TODO: Manage the model of input with an empty id (defined name but no type)
-            qCritical() << "FIXME TODO: Manage the model of input" << input->name() << "with an empty id (agent" << _name << ")";
+        // Output id is NOT defined
+        else
+        {
+            // FIXME TODO: Manage the model of output with an empty id (defined name but no type)
+            qCritical() << "FIXME TODO: Manage the model of output" << output->name() << "with an empty id (agent" << _name << ")";
         }
     }
-    return outputVM;
+
+    return QPair<bool, OutputVM*>(haveToAdd, outputVM);
 }
 
 
@@ -1081,8 +1288,189 @@ OutputVM* AgentsGroupedByNameVM::_manageNewOutputModel(OutputM* output)
  * @param parameter
  * @return
  */
-ParameterVM* AgentsGroupedByNameVM::_manageNewParameterModel(AgentIOPM* parameter)
+QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageNewParameterModel(AgentIOPM* parameter)
 {
+    bool haveToAdd = false;
+    ParameterVM* parameterVM = nullptr;
 
+    if ((parameter != nullptr) && !parameter->name().isEmpty())
+    {
+        // Parameter id is defined
+        if (!parameter->id().isEmpty())
+        {
+            parameterVM = getParameterFromId(parameter->id());
+
+            // There is already a view model for this id
+            if (parameterVM != nullptr)
+            {
+                // Add this new model to the list
+                parameterVM->models()->append(parameter);
+            }
+            // There is not yet a view model for this id
+            else
+            {
+                haveToAdd = true;
+
+                // Create a new view model of parameter
+                parameterVM = new ParameterVM(parameter->name(),
+                                              parameter->id(),
+                                              parameter,
+                                              this);
+
+                // Don't add to the list here (this parameter will be added globally via temporary list)
+
+                // Add to the hash table with the parameter id
+                _hashFromIdToParameter.insert(parameter->id(), parameterVM);
+
+                // Update the list of view models of parameter for this name
+                QList<ParameterVM*> parametersWithSameName = getParametersListFromName(parameter->name());
+                parametersWithSameName.append(parameterVM);
+                _hashFromNameToParametersList.insert(parameter->name(), parametersWithSameName);
+            }
+        }
+        // Parameter id is NOT defined
+        else
+        {
+            // FIXME TODO: Manage the model of parameter with an empty id (defined name but no type)
+            qCritical() << "FIXME TODO: Manage the model of parameter" << parameter->name() << "with an empty id (agent" << _name << ")";
+        }
+    }
+
+    return QPair<bool, ParameterVM*>(haveToAdd, parameterVM);
+}
+
+
+/**
+ * @brief Manage an old model of input (just before being deleted)
+ * @param input
+ * @return
+ */
+QPair<bool, InputVM*> AgentsGroupedByNameVM::_manageOldInputModel(AgentIOPM* input)
+{
+    bool haveToRemove = false;
+    InputVM* inputVM = nullptr;
+
+    if ((input != nullptr) && !input->name().isEmpty())
+    {
+        // Input id is defined
+        if (!input->id().isEmpty())
+        {
+            inputVM = getInputFromId(input->id());
+
+            if (inputVM != nullptr)
+            {
+                // Remove this old model from the list
+                inputVM->models()->remove(input);
+
+                // The view model of input is empty !
+                if (inputVM->models()->isEmpty())
+                {
+                    haveToRemove = true;
+
+                    // Don't remove from the list here (this input will be removed globally via temporary list)
+
+                    // Remove from the hash table with the input id
+                    _hashFromIdToInput.remove(input->id());
+
+                    // Update the list of view models of input for this name
+                    QList<InputVM*> inputsWithSameName = getInputsListFromName(input->name());
+                    inputsWithSameName.removeOne(inputVM);
+                    _hashFromNameToInputsList.insert(input->name(), inputsWithSameName);
+                }
+            }
+        }
+    }
+
+    return QPair<bool, InputVM*>(haveToRemove, inputVM);
+}
+
+
+/**
+ * @brief Manage an old model of output (just before being deleted)
+ * @param output
+ * @return
+ */
+QPair<bool, OutputVM*> AgentsGroupedByNameVM::_manageOldOutputModel(OutputM* output)
+{
+    bool haveToRemove = false;
+    OutputVM* outputVM = nullptr;
+
+    if ((output != nullptr) && !output->name().isEmpty())
+    {
+        // Input id is defined
+        if (!output->id().isEmpty())
+        {
+            outputVM = getOutputFromId(output->id());
+
+            if (outputVM != nullptr)
+            {
+                // Remove this old model from the list
+                outputVM->models()->remove(output);
+
+                // The view model of output is empty !
+                if (outputVM->models()->isEmpty())
+                {
+                    haveToRemove = true;
+
+                    // Don't remove from the list here (this output will be removed globally via temporary list)
+
+                    // Remove from the hash table with the output id
+                    _hashFromIdToOutput.remove(output->id());
+
+                    // Update the list of view models of output for this name
+                    QList<OutputVM*> outputsWithSameName = getOutputsListFromName(output->name());
+                    outputsWithSameName.removeOne(outputVM);
+                    _hashFromNameToOutputsList.insert(output->name(), outputsWithSameName);
+                }
+            }
+        }
+    }
+
+    return QPair<bool, OutputVM*>(haveToRemove, outputVM);
+}
+
+
+/**
+ * @brief Manage an old model of parameter (just before being deleted)
+ * @param parameter
+ * @return
+ */
+QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageOldParameterModel(AgentIOPM* parameter)
+{
+    bool haveToRemove = false;
+    ParameterVM* parameterVM = nullptr;
+
+    if ((parameter != nullptr) && !parameter->name().isEmpty())
+    {
+        // parameter id is defined
+        if (!parameter->id().isEmpty())
+        {
+            parameterVM = getParameterFromId(parameter->id());
+
+            if (parameterVM != nullptr)
+            {
+                // Remove this old model from the list
+                parameterVM->models()->remove(parameter);
+
+                // The view model of parameter is empty !
+                if (parameterVM->models()->isEmpty())
+                {
+                    haveToRemove = true;
+
+                    // Don't remove from the list here (this parameter will be removed globally via temporary list)
+
+                    // Remove from the hash table with the parameter id
+                    _hashFromIdToParameter.remove(parameter->id());
+
+                    // Update the list of view models of parameter for this name
+                    QList<ParameterVM*> parametersWithSameName = getParametersListFromName(parameter->name());
+                    parametersWithSameName.removeOne(parameterVM);
+                    _hashFromNameToParametersList.insert(parameter->name(), parametersWithSameName);
+                }
+            }
+        }
+    }
+
+    return QPair<bool, ParameterVM*>(haveToRemove, parameterVM);
 }
 

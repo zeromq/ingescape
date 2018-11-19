@@ -254,24 +254,45 @@ private:
 
 
     /**
-     * @brief Manage the list of inputs of the new definition
+     * @brief Manage the list of inputs of the added definition
      * @param definition
      */
-    void _manageInputsOfNewDefinition(DefinitionM* definition);
+    void _manageInputsOfAddedDefinition(DefinitionM* definition);
 
 
     /**
-     * @brief Manage the list of outputs of the new definition
+     * @brief Manage the list of outputs of the added definition
      * @param definition
      */
-    void _manageOutputsOfNewDefinition(DefinitionM* definition);
+    void _manageOutputsOfAddedDefinition(DefinitionM* definition);
 
 
     /**
-     * @brief Manage the list of parameters of the new definition
+     * @brief Manage the list of parameters of the added definition
      * @param definition
      */
-    void _manageParametersOfNewDefinition(DefinitionM* definition);
+    void _manageParametersOfAddedDefinition(DefinitionM* definition);
+
+
+    /**
+     * @brief Manage the list of inputs of the removed definition
+     * @param definition
+     */
+    void _manageInputsOfRemovedDefinition(DefinitionM* definition);
+
+
+    /**
+     * @brief Manage the list of outputs of the removed definition
+     * @param definition
+     */
+    void _manageOutputsOfRemovedDefinition(DefinitionM* definition);
+
+
+    /**
+     * @brief Manage the list of parameters of the removed definition
+     * @param definition
+     */
+    void _manageParametersOfRemovedDefinition(DefinitionM* definition);
 
 
     /**
@@ -286,7 +307,7 @@ private:
      * @param input
      * @return
      */
-    InputVM* _manageNewInputModel(AgentIOPM* input);
+    QPair<bool, InputVM*> _manageNewInputModel(AgentIOPM* input);
 
 
     /**
@@ -294,7 +315,7 @@ private:
      * @param output
      * @return
      */
-    OutputVM* _manageNewOutputModel(OutputM* output);
+    QPair<bool, OutputVM*> _manageNewOutputModel(OutputM* output);
 
 
     /**
@@ -302,7 +323,31 @@ private:
      * @param parameter
      * @return
      */
-    ParameterVM* _manageNewParameterModel(AgentIOPM* parameter);
+    QPair<bool, ParameterVM*> _manageNewParameterModel(AgentIOPM* parameter);
+
+
+    /**
+     * @brief Manage an old model of input (just before being deleted)
+     * @param input
+     * @return
+     */
+    QPair<bool, InputVM*> _manageOldInputModel(AgentIOPM* input);
+
+
+    /**
+     * @brief Manage an old model of output (just before being deleted)
+     * @param output
+     * @return
+     */
+    QPair<bool, OutputVM*> _manageOldOutputModel(OutputM* output);
+
+
+    /**
+     * @brief Manage an old model of parameter (just before being deleted)
+     * @param parameter
+     * @return
+     */
+    QPair<bool, ParameterVM*> _manageOldParameterModel(AgentIOPM* parameter);
 
 
 

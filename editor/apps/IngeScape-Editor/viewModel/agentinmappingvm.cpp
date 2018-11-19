@@ -54,11 +54,6 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
             QString mappingDescription = QString("Mapping description of %1 in IngeScape Editor").arg(_name);
             _temporaryMapping = new AgentMappingM(mappingName, "0.0", mappingDescription);
 
-
-            // Connect to signal "Count Changed" from the list of ...
-            //connect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onInputsListChanged);
-            //connect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onOutputsListChanged);
-
             // Initialize our list
             //_models.append(models);
         }
@@ -75,9 +70,6 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
 AgentInMappingVM::~AgentInMappingVM()
 {
     qInfo() << "Delete View Model of Agent in Mapping" << _name;
-
-    //disconnect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onInputsListChanged);
-    //disconnect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onOutputsListChanged);
 
     // Delete all view models of link Inputs/Outputs
     _linkInputsList.deleteAllItems();
@@ -200,30 +192,6 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
     // Update the group (of value type) of the reduced map (= brin) in input and in output of our agent
     _updateReducedMapValueTypeGroupInInput();
     _updateReducedMapValueTypeGroupInOutput();
-}*/
-
-
-/**
- * @brief Slot when the list of (view models of) inputs changed
- */
-/*void AgentInMappingVM::_onInputsListChanged()
-{
-    foreach (InputVM* input, _inputsList.toList()) {
-        if ((input != nullptr) && (input->firstModel() != nullptr)) {
-        }
-    }
-}*/
-
-
-/**
- * @brief Slot when the list of (view models of) outputs changed
- */
-/*void AgentInMappingVM::_onOutputsListChanged()
-{
-    foreach (OutputVM* output, _outputsList.toList()) {
-        if ((output != nullptr) && (output->firstModel() != nullptr)) {
-        }
-    }
 }*/
 
 
@@ -485,7 +453,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
  * @brief A model of agent has been added to our list
  * @param model
  */
-void AgentInMappingVM::_agentModelAdded(AgentM* model)
+/*void AgentInMappingVM::_agentModelAdded(AgentM* model)
 {
     if ((model != nullptr) && (model->definition() != nullptr))
     {
@@ -548,14 +516,14 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
         // Update the flag "Are Identicals All Definitions"
         //_updateIsDefinedInAllDefinitionsForEachIOP();
     }
-}
+}*/
 
 
 /**
  * @brief A model of agent has been removed from our list
  * @param model
  */
-void AgentInMappingVM::_agentModelRemoved(AgentM* model)
+/*void AgentInMappingVM::_agentModelRemoved(AgentM* model)
 {
     if ((model != nullptr) && (model->definition() != nullptr))
     {
@@ -649,7 +617,7 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
         // Update the flag "Are Identicals All Definitions"
         //_updateIsDefinedInAllDefinitionsForEachIOP();
     }
-}
+}*/
 
 
 /**
@@ -657,7 +625,7 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
  * @param input
  * @return
  */
-InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
+/*InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
 {
     InputVM* inputVM = nullptr;
 
@@ -742,7 +710,7 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
     }
 
     return inputVM;
-}
+}*/
 
 
 /**
@@ -750,7 +718,7 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
  * @param input
  * @return
  */
-InputVM* AgentInMappingVM::_inputModelRemoved(AgentIOPM* input)
+/*InputVM* AgentInMappingVM::_inputModelRemoved(AgentIOPM* input)
 {
     InputVM* inputVM = nullptr;
 
@@ -765,20 +733,11 @@ InputVM* AgentInMappingVM::_inputModelRemoved(AgentIOPM* input)
                 // Remove this model from the list
                 inputVM->models()->remove(input);
             }
-            /*else
-            {
-                inputVM = getInputFromName(input->name());
-                if (inputVM != nullptr)
-                {
-                    // Remove this model from the list
-                    inputVM->models().remove(input);
-                }
-            }*/
         }
     }
 
     return inputVM;
-}
+}*/
 
 
 /**
@@ -786,7 +745,7 @@ InputVM* AgentInMappingVM::_inputModelRemoved(AgentIOPM* input)
  * @param output
  * @return
  */
-OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
+/*OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
 {
     OutputVM* outputVM = nullptr;
 
@@ -871,7 +830,7 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
     }
 
     return outputVM;
-}
+}*/
 
 
 
@@ -880,7 +839,7 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
  * @param output
  * @return
  */
-OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
+/*OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
 {
     OutputVM* outputVM = nullptr;
 
@@ -895,20 +854,11 @@ OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
                 // Remove this model from the list
                 outputVM->models()->remove(output);
             }
-            /*else
-            {
-                outputVM = getOutputFromName(output->name());
-                if (outputVM != nullptr)
-                {
-                    // Remove this model from the list
-                    outputVM->models().remove(output);
-                }
-            }*/
         }
     }
 
     return outputVM;
-}
+}*/
 
 
 /**
@@ -916,7 +866,7 @@ OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
  * @param parameter
  * @return
  */
-ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
+/*ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
 {
     ParameterVM* parameterVM = nullptr;
 
@@ -1001,7 +951,7 @@ ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
     }
 
     return parameterVM;
-}
+}*/
 
 
 /**
@@ -1009,7 +959,7 @@ ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
  * @param parameter
  * @return
  */
-ParameterVM* AgentInMappingVM::_parameterModelRemoved(AgentIOPM* parameter)
+/*ParameterVM* AgentInMappingVM::_parameterModelRemoved(AgentIOPM* parameter)
 {
     ParameterVM* parameterVM = nullptr;
 
@@ -1024,20 +974,11 @@ ParameterVM* AgentInMappingVM::_parameterModelRemoved(AgentIOPM* parameter)
                 // Remove this model from the list
                 parameterVM->models()->remove(parameter);
             }
-            /*else
-            {
-                parameterVM = getParameterFromName(parameter->name());
-                if (parameterVM != nullptr)
-                {
-                    // Remove this model from the list
-                    parameterVM->models().remove(parameter);
-                }
-            }*/
         }
     }
 
     return parameterVM;
-}
+}*/
 
 
 /**

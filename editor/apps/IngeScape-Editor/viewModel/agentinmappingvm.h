@@ -43,15 +43,6 @@ class AgentInMappingVM : public QObject
     // Agents grouped by name
     I2_QML_PROPERTY_READONLY(AgentsGroupedByNameVM*, agentsGroupedByName)
 
-    // List of view models of inputs
-    //I2_QOBJECT_LISTMODEL(InputVM, inputsList)
-
-    // List of view models of outputs
-    //I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
-
-    // List of view models of parameters
-    //I2_QOBJECT_LISTMODEL(ParameterVM, parametersList)
-
     // List of view models of link inputs
     I2_QOBJECT_LISTMODEL(LinkInputVM, linkInputsList)
 
@@ -153,19 +144,7 @@ private Q_SLOTS:
     /**
      * @brief Slot when the list of models changed
      */
-    void _onModelsChanged();
-
-
-    /**
-     * @brief Slot when the list of (view models of) inputs changed
-     */
-    //void _onInputsListChanged();
-
-
-    /**
-     * @brief Slot when the list of (view models of) outputs changed
-     */
-    //void _onOutputsListChanged();
+    //void _onModelsChanged();
 
 
     /**
@@ -182,14 +161,14 @@ private:
      * @brief A model of agent has been added to our list
      * @param model
      */
-    void _agentModelAdded(AgentM* model);
+    //void _agentModelAdded(AgentM* model);
 
 
     /**
      * @brief A model of agent has been removed from our list
      * @param model
      */
-    void _agentModelRemoved(AgentM* model);
+    //void _agentModelRemoved(AgentM* model);
 
 
     /**
