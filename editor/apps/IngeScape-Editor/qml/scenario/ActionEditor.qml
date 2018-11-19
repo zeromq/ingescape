@@ -599,6 +599,10 @@ WindowBlockTouches {
                                             if ((iopEffectsCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.agentIOP = iopEffectsCombo.selectedItem;
+
+                                                // Revalidate text field and combo entry regarding which one is visible and the type of the selected IOP.
+                                                textFieldTargetValue.revalidateText()
+                                                comboboxTargetValue.revalidateCombo()
                                             }
                                         }
                                     }
@@ -617,6 +621,25 @@ WindowBlockTouches {
                                             verticalCenter: parent.verticalCenter
                                         }
                                         height: 25
+
+                                        // Force the content's format according to the IOP value type.
+                                        // e.g. Switching from DOUBLE to INTEGER will truncate the value to its integer part (no decimals).
+                                        function revalidateText() {
+                                            if (visible) {
+                                                if (myEffect && myEffect.modelM) {
+                                                    if (myEffect.modelM.agentIOP) {
+                                                        if (myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.INTEGER) {
+                                                            myEffect.modelM.value = Number(myEffect.modelM.value).toFixed(0)
+                                                        } else if (myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.DOUBLE) {
+                                                            myEffect.modelM.value = Number(myEffect.modelM.value)
+                                                        }
+                                                    }
+                                                    text = myEffect.modelM.value
+                                                } else {
+                                                    text = ""
+                                                }
+                                            }
+                                        }
 
                                         visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) &&
                                                  (myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType !== AgentIOPValueTypes.IMPULSION & myEffect.modelM.agentIOP.agentIOPValueType !== AgentIOPValueTypes.BOOL)
@@ -702,6 +725,18 @@ WindowBlockTouches {
                                             verticalCenter: parent.verticalCenter
                                         }
                                         height: 25
+
+                                        // Force the value to "1" (aka. "TRUE") for every value that is not "0" (aka. "FALSE")
+                                        // e.g. "1337.42" will be transformed to "1" while "0" will stay "0"
+                                        function revalidateCombo() {
+                                            if (visible) {
+                                                if (myEffect && myEffect.modelM) {
+                                                    if (Number(myEffect.modelM.value) !== 0) {
+                                                        myEffect.modelM.value = "1"
+                                                    }
+                                                }
+                                            }
+                                        }
 
                                         visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) &&
                                                  (myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.BOOL)
