@@ -84,6 +84,34 @@ public:
 
 
     /**
+     * @brief Return the list of view models of link input from an input name
+     * @param inputName
+     */
+    QList<LinkInputVM*> getLinkInputsListFromName(QString inputName);
+
+
+    /**
+     * @brief Return the view model of link input from an input id
+     * @param inputId
+     */
+    LinkInputVM* getLinkInputFromId(QString inputId);
+
+
+    /**
+     * @brief Return the list of view models of link output from an output name
+     * @param outputName
+     */
+    QList<LinkOutputVM*> getLinkOutputsListFromName(QString outputName);
+
+
+    /**
+     * @brief Return the view model of link output from an output id
+     * @param outputId
+     */
+    LinkOutputVM* getLinkOutputFromId(QString outputId);
+
+
+    /**
      * @brief Add a temporary link (this temporary link will became a real link when the user will activate the mapping)
      * @param inputName
      * @param outputAgentName
@@ -249,6 +277,20 @@ private:
 
 
 private:
+
+    // Input name as key is not unique (value type can be different)
+    // Hash table from an input name to a list of view models of link inputs
+    QHash<QString, QList<LinkInputVM*>> _hashFromNameToLinkInputsList;
+
+    // Hash table from a (unique) input id to a view model of link input
+    QHash<QString, LinkInputVM*> _hashFromIdToLinkInput;
+
+    // Output name as key is not unique (value type can be different)
+    // Hash table from an output name to a list of view models of link outputs
+    QHash<QString, QList<LinkOutputVM*>> _hashFromNameToLinkOutputsList;
+
+    // Hash table from a (unique) output id to a view model of link output
+    QHash<QString, LinkOutputVM*> _hashFromIdToLinkOutput;
 
 };
 

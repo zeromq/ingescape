@@ -38,27 +38,62 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     {
         _name = _agentsGroupedByName->name();
 
-    }
+        // Create the mapping currently edited
+        QString mappingName = QString("Mapping name of %1 in IngeScape Editor").arg(_name);
+        QString mappingDescription = QString("Mapping description of %1 in IngeScape Editor").arg(_name);
+        _temporaryMapping = new AgentMappingM(mappingName, "0.0", mappingDescription);
 
-    if (models.count() > 0)
-    {
-        AgentM* firstModel = models.first();
-        if (firstModel != nullptr)
+
+        //
+        // FIXME TODO: Constructor of AgentInMappingVM
+        //
+        QList<LinkInputVM*> tempLinkInputs;
+        QList<LinkInputVM*> tempLinkOutputs;
+
+        for (InputVM* input : _agentsGroupedByName->inputsList()->toList())
         {
-            // Set the name of our agent in mapping
-            _name = firstModel->name();
+            if (input != nullptr)
+            {
+                LinkInputVM* linkInput = new LinkInputVM(input);
 
+                tempLinkInputs.append(linkInput);
 
-            // Create the mapping currently edited
-            QString mappingName = QString("Mapping name of %1 in IngeScape Editor").arg(_name);
-            QString mappingDescription = QString("Mapping description of %1 in IngeScape Editor").arg(_name);
-            _temporaryMapping = new AgentMappingM(mappingName, "0.0", mappingDescription);
+                // Add to the hash table with the input id
+                if (!input->id().isEmpty()) {
+                    _hashFromIdToLinkInput.insert(input->id(), linkInput);
+                }
 
-            // Initialize our list
-            //_models.append(models);
+                // Update the list of view models of link input for this name
+                QList<LinkInputVM*> linkInputsWithSameName = getLinkInputsListFromName(input->name());
+                linkInputsWithSameName.append(linkInput);
+                _hashFromNameToLinkInputsList.insert(input->name(), linkInputsWithSameName);
+            }
         }
-        else {
-            qCritical() << "No agent model for the agent in mapping !";
+        for (OutputVM* output : _agentsGroupedByName->outputsList()->toList())
+        {
+            if (output != nullptr)
+            {
+                LinkInputVM* linkOutput = new LinkOutputVM(output);
+
+                tempLinkOutputs.append(linkOutput);
+
+                // Add to the hash table with the input id
+                if (!output->id().isEmpty()) {
+                    _hashFromIdToLinkOutput.insert(output->id(), linkOutput);
+                }
+
+                // Update the list of view models of link output for this name
+                QList<LinkOutputVM*> linkOutputsWithSameName = getLinkOutputsListFromName(output->name());
+                linkOutputsWithSameName.append(linkOutput);
+                _hashFromNameToLinkOutputsList.insert(output->name(), linkOutputsWithSameName);
+            }
+        }
+
+        if (!tempLinkInputs.isEmpty()) {
+            _linkInputsList.append(tempLinkInputs);
+        }
+        if (!tempLinkOutputs.isEmpty()) {
+            _linkOutputsList.append(tempLinkOutputs);
         }
     }
 }
@@ -71,6 +106,12 @@ AgentInMappingVM::~AgentInMappingVM()
 {
     qInfo() << "Delete View Model of Agent in Mapping" << _name;
 
+    // Clear hash tables of Inputs, Outputs and Parameters
+    _hashFromNameToLinkInputsList.clear();
+    _hashFromIdToLinkInput.clear();
+    _hashFromNameToLinkOutputsList.clear();
+    _hashFromIdToLinkOutput.clear();
+
     // Delete all view models of link Inputs/Outputs
     _linkInputsList.deleteAllItems();
     _linkOutputsList.deleteAllItems();
@@ -82,6 +123,66 @@ AgentInMappingVM::~AgentInMappingVM()
 
     if (_temporaryMapping != nullptr) {
         delete _temporaryMapping;
+    }
+}
+
+
+/**
+ * @brief Return the list of view models of link input from an input name
+ * @param inputName
+ */
+QList<LinkInputVM*> AgentInMappingVM::getLinkInputsListFromName(QString inputName)
+{
+    if (_hashFromNameToLinkInputsList.contains(inputName)) {
+        return _hashFromNameToLinkInputsList.value(inputName);
+    }
+    else {
+        return QList<LinkInputVM*>();
+    }
+}
+
+
+/**
+ * @brief Return the view model of link input from an input id
+ * @param inputId
+ */
+LinkInputVM* AgentInMappingVM::getLinkInputFromId(QString inputId)
+{
+    if (_hashFromIdToLinkInput.contains(inputId)) {
+        return _hashFromIdToLinkInput.value(inputId);
+    }
+    else {
+        return nullptr;
+    }
+}
+
+
+/**
+ * @brief Return the list of view models of link output from an output name
+ * @param outputName
+ */
+QList<LinkOutputVM*> AgentInMappingVM::getLinkOutputsListFromName(QString outputName)
+{
+    if (_hashFromNameToLinkOutputsList.contains(outputName)) {
+        return _hashFromNameToLinkOutputsList.value(outputName);
+    }
+    else {
+        return QList<LinkOutputVM*>();
+    }
+}
+
+
+/**
+ * @brief Return the view model of link output from an output id
+ * @param outputId
+ */
+LinkOutputVM* AgentInMappingVM::getLinkOutputFromId(QString outputId)
+{
+    if (_hashFromIdToLinkOutput.contains(outputId)) {
+        return _hashFromIdToLinkOutput.value(outputId);
+    }
+    else {
+        return nullptr;
     }
 }
 

@@ -342,9 +342,10 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
         }
         else
         {
-            if ((output->firstModel() != nullptr) && (input->firstModel() != nullptr)) {
-                qDebug() << "Can not link output" << linkOutput->name() << "with type" << AgentIOPValueTypes::staticEnumToString(linkOutput->firstModel()->agentIOPValueType()) << "(of agent" << outputAgent->name() << ")"
-                         << "and input" << linkInput->name() << "with type" << AgentIOPValueTypes::staticEnumToString(linkInput->firstModel()->agentIOPValueType()) << "(of agent" << inputAgent->name() << ")";
+            if ((linkOutput->output()->firstModel() != nullptr) && (linkInput->input()->firstModel() != nullptr))
+            {
+                qDebug() << "Can not link output" << linkOutput->name() << "with type" << AgentIOPValueTypes::staticEnumToString(linkOutput->output()->firstModel()->agentIOPValueType()) << "(of agent" << outputAgent->name() << ")"
+                         << "and input" << linkInput->name() << "with type" << AgentIOPValueTypes::staticEnumToString(linkInput->input()->firstModel()->agentIOPValueType()) << "(of agent" << inputAgent->name() << ")";
             }
         }
     }
@@ -736,7 +737,7 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                     QList<ElementMappingM*> listOfWaitingLinks = _hashFromAgentNameToListOfWaitingLinks.value(agentName);
                     for (ElementMappingM* mappingElement : listOfWaitingLinks)
                     {
-                        qDebug() << "Create waiting MAP..." << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
+                        qDebug() << "Create waiting MAP..." << mappingElement->name();
 
                         // Create the link corresponding to the mapping element
                         onMapped(mappingElement);
@@ -837,41 +838,47 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
 
             if ((outputAgent != nullptr) && (inputAgent != nullptr))
             {
-                OutputVM* output = nullptr;
-                InputVM* input = nullptr;
+                LinkOutputVM* linkOutput = nullptr;
+                LinkInputVM* linkInput = nullptr;
 
-                // Get the list of view models of output from the output name
-                QList<OutputVM*> outputsWithSameName = outputAgent->getOutputsListFromName(mappingElement->output());
-                if (outputsWithSameName.count() == 1) {
-                    output = outputsWithSameName.first();
-                }
-                else {
-                    qWarning() << "There are" << outputsWithSameName.count() << "outputs with the same name" << mappingElement->output() << "."
-                               << "We cannot choose and create the link" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
-                }
-
-                // Get the list of view models of input from the input name
-                QList<InputVM*> inputsWithSameName = inputAgent->getInputsListFromName(mappingElement->input());
-                if (inputsWithSameName.count() == 1) {
-                    input = inputsWithSameName.first();
-                }
-                else {
-                    qWarning() << "There are" << inputsWithSameName.count() << "inputs with the same name" << mappingElement->input() << "."
-                               << "We cannot choose and create the link" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
+                if (outputAgent->agentsGroupedByName() != nullptr)
+                {
+                    // Get the list of view models of link output from the output name
+                    QList<LinkOutputVM*> linkOutputsWithSameName = outputAgent->getLinkOutputsListFromName(mappingElement->output());
+                    if (linkOutputsWithSameName.count() == 1) {
+                        linkOutput = linkOutputsWithSameName.at(0);
+                    }
+                    else {
+                        qWarning() << "There are" << linkOutputsWithSameName.count() << "link outputs with the same name" << mappingElement->output() << "."
+                                   << "We cannot choose and create the link" << mappingElement->name();
+                    }
                 }
 
-                if ((output != nullptr) && (input != nullptr))
+                if (inputAgent->agentsGroupedByName() != nullptr)
+                {
+                    // Get the list of view models of input from the input name
+                    QList<LinkInputVM*> linkInputsWithSameName = inputAgent->getLinkInputsListFromName(mappingElement->input());
+                    if (linkInputsWithSameName.count() == 1) {
+                        linkInput = linkInputsWithSameName.at(0);
+                    }
+                    else {
+                        qWarning() << "There are" << linkInputsWithSameName.count() << "link inputs with the same name" << mappingElement->input() << "."
+                                   << "We cannot choose and create the link" << mappingElement->name();
+                    }
+                }
+
+                if ((linkOutput != nullptr) && (linkInput != nullptr))
                 {
                     qInfo() << "MAPPED" << mappingElement->name();
 
                     // Create a new map between agents
-                    link = new LinkVM(outputAgent, output, inputAgent, input, false, this);
+                    link = new LinkVM(outputAgent, linkOutput, inputAgent, linkInput, false, this);
 
                     // Add to the list and to the hash
                     _allLinksInMapping.append(link);
                     _hashFromNameToLinkInMapping.insert(link->name(), link);
 
-                    qDebug() << "MAP has been created:" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
+                    qDebug() << "MAP has been created:" << mappingElement->name();
 
                     // If there is a list of waiting links (where the agent is involved as "Output Agent")
                     if (_hashFromAgentNameToListOfWaitingLinks.contains(mappingElement->outputAgent()))
@@ -903,7 +910,7 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
                 // Update the hash table
                 _hashFromAgentNameToListOfWaitingLinks.insert(mappingElement->outputAgent(), listOfWaitingLinks);
 
-                qDebug() << "MAP will be created later:" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
+                qDebug() << "MAP will be created later:" << mappingElement->name();
             }
         }
         else
