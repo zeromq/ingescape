@@ -25,9 +25,6 @@ import ".." as Editor;
 import QtQuick.Controls 2.0 as Controls2
 
 
-// validator: RegExpValidator { regExp: /^[01]$|^TRUE$|^FALSE$/ }
-
-
 WindowBlockTouches {
     id: rootItem
 
@@ -628,12 +625,17 @@ WindowBlockTouches {
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
 
-                                        validator: RegExpValidator {
-                                            regExp:  myEffect && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.STRING ?
-                                                         /* STRING */ /.*/ : (myEffect && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.INTEGER ?
-                                                                                  /* INTEGER */ /-?[0-9]+/ :
-                                                                                  /* DOUBLE */ /-?[0-9]+(\.[0-9]+)?/)
-                                        }
+                                        property var stringValidator: RegExpValidator { regExp: /.*/ }
+                                        property var intValidator: IntValidator {}
+                                        property var doubleValidator: DoubleValidator {}
+
+                                        validator: if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.STRING) {
+                                                       stringValidator
+                                                   } else if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.INTEGER) {
+                                                       intValidator
+                                                   } else {
+                                                       doubleValidator
+                                                   }
 
                                         text: (myEffect && myEffect.modelM) ? myEffect.modelM.value : ""
 
