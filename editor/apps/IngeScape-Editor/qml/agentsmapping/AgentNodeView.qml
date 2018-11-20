@@ -286,8 +286,8 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            color: (myModel && myModel.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
-                                                                                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
+                            color: (myModel && myModel.input && myModel.input.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
+                                                                                                         : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
 
                             font: IngeScapeTheme.heading2Font
 
@@ -302,7 +302,7 @@ Rectangle {
                             Controls2.ToolTip {
                                 delay: 400
                                 visible: rootTooltipInput.containsMouse
-                                text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")": "")
+                                text: ((myModel && myModel.input && myModel.input.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.input.firstModel.agentIOPValueType) + ")": "")
                             }
                         }
 
@@ -394,8 +394,8 @@ Rectangle {
                                 color : IngeScapeTheme.whiteColor
                             }
 
-                            color: if (agentMappingVM && myModel && myModel.firstModel) {
-                                       IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.firstModel.agentIOPValueTypeGroup, true);
+                            color: if (myModel && myModel.input && myModel.input.firstModel) {
+                                       IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.input.firstModel.agentIOPValueTypeGroup, true);
                                    }
                                    else {
                                        IngeScapeTheme.whiteColor
@@ -540,9 +540,8 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            //color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor
-                            color: (myModel && myModel.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
-                                                                                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
+                            color: (myModel && myModel.output && myModel.output.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
+                                                                                                           : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
                             font: IngeScapeTheme.heading2Font
 
                             MouseArea {
@@ -556,7 +555,7 @@ Rectangle {
                             Controls2.ToolTip {
                                 delay: 400
                                 visible: rootTooltipOutput.containsMouse
-                                text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")": "")
+                                text: ((myModel && myModel.output && myModel.output.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.output.firstModel.agentIOPValueType) + ")": "")
                             }
                         }
 
@@ -645,12 +644,12 @@ Rectangle {
                             radius: height/2
 
                             border {
-                                width : 0
-                                color : IngeScapeTheme.whiteColor
+                                width: 0
+                                color: IngeScapeTheme.whiteColor
                             }
 
-                            color: if (agentMappingVM && myModel && myModel.firstModel) {
-                                       IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.firstModel.agentIOPValueTypeGroup, (!myModel.firstModel.isMuted));
+                            color: if (myModel && myModel.output && myModel.output.firstModel) {
+                                       IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.output.firstModel.agentIOPValueTypeGroup, !myModel.output.firstModel.isMuted);
                                    }
                                    else {
                                        IngeScapeTheme.whiteColor
@@ -664,7 +663,7 @@ Rectangle {
                                 svgFileCache: IngeScapeTheme.svgFileINGESCAPE
                                 svgElementId: "outputIsMuted"
 
-                                visible: (myModel.output && myModel.output.firstModel && myModel.firstModel.isMuted)
+                                visible: (myModel.output && myModel.output.firstModel && myModel.output.firstModel.isMuted)
                             }
                         }
 
