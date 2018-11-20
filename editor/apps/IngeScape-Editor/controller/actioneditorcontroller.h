@@ -112,6 +112,7 @@ public Q_SLOTS:
 
 
 private:
+    // FIXME: if the list of agents change, this list is not updated
     // List of all agents grouped by name
     QList<AgentsGroupedByNameVM*> _allAgentsGroupedByName;
 

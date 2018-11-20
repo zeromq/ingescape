@@ -59,6 +59,8 @@ WindowBlockTouches {
     // action view model
     property var actionVM: panelController ? panelController.editedViewModel : null;
 
+    property var allAgentsGroupedByName: IngeScapeEditorC.modelManager ? IngeScapeEditorC.modelManager.allAgentsGroupedByName : null;
+
     // our scenario controller
     property var controller: null;
 
@@ -552,13 +554,13 @@ WindowBlockTouches {
                                         height: parent.height
                                         width: 148
 
-                                        model: controller ? controller.sortedListOfAgents : 0
+                                        model: rootItem.allAgentsGroupedByName
 
                                         Binding {
                                             target: agentEffectCombo
                                             property: "selectedIndex"
-                                            value: (myEffect && myEffect.modelM) ? controller.sortedListOfAgents.indexOf(myEffect.modelM.agent)
-                                                                                 : -1
+                                            value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupedByName) ? rootItem.allAgentsGroupedByName.indexOf(myEffect.modelM.agent)
+                                                                                                                    : -1
                                         }
 
                                         onSelectedItemChanged: {
@@ -812,16 +814,17 @@ WindowBlockTouches {
                                         height : 25
                                         width : 148
 
-                                        model: controller ? controller.sortedListOfAgents : 0
+                                        model: rootItem.allAgentsGroupedByName
 
-                                        enabled: controller && (controller.sortedListOfAgents.count !== 0)
-                                        placeholderText: (controller && (controller.sortedListOfAgents.count === 0) ? "- No Item -"
-                                                                                                                     : "- Select an item -")
+                                        enabled: (rootItem.allAgentsGroupedByName && (rootItem.allAgentsGroupedByName.count > 0))
+                                        placeholderText: (rootItem.allAgentsGroupedByName && (rootItem.allAgentsGroupedByName.count === 0) ? "- No Item -"
+                                                                                                                                           : "- Select an item -")
+
                                         Binding {
                                             target: comboEffectOnMapping_OutputAgent
                                             property: "selectedIndex"
-                                            value: (myEffect && myEffect.modelM) ? controller.sortedListOfAgents.indexOf(myEffect.modelM.outputAgent)
-                                                                                 : -1
+                                            value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupedByName) ? rootItem.allAgentsGroupedByName.indexOf(myEffect.modelM.outputAgent)
+                                                                                                                    : -1
                                         }
 
                                         onSelectedItemChanged: {
@@ -987,17 +990,17 @@ WindowBlockTouches {
                                         height : 25
                                         width : 148
 
-                                        model : controller ? controller.sortedListOfAgents : 0
+                                        model : rootItem.allAgentsGroupedByName
 
-                                        enabled: (controller && (controller.sortedListOfAgents.count !== 0))
-                                        placeholderText: (controller && controller.sortedListOfAgents.count === 0 ? "- No Item -"
-                                                                                                                   : "- Select an item -")
+                                        enabled: (rootItem.allAgentsGroupedByName && (rootItem.allAgentsGroupedByName.count > 0))
+                                        placeholderText: (rootItem.allAgentsGroupedByName && (rootItem.allAgentsGroupedByName.count === 0) ? "- No Item -"
+                                                                                                                                           : "- Select an item -")
 
                                         Binding {
                                             target: comboEffectOnMapping_InputAgent
                                             property: "selectedIndex"
-                                            value: (myEffect && myEffect.modelM) ? controller.sortedListOfAgents.indexOf(myEffect.modelM.agent)
-                                                                                 : -1
+                                            value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupedByName) ? rootItem.allAgentsGroupedByName.indexOf(myEffect.modelM.agent)
+                                                                                                                    : -1
                                         }
 
                                         onSelectedItemChanged: {
@@ -1514,17 +1517,17 @@ WindowBlockTouches {
                                             height : 25
                                             width : 148
 
-                                            model: controller ? controller.sortedListOfAgents : 0
+                                            model: rootItem.allAgentsGroupedByName
 
-                                            enabled: (controller && (controller.sortedListOfAgents.count !== 0))
-                                            placeholderText: (controller && (controller.sortedListOfAgents.count === 0) ? "- No Item -"
-                                                                                                                         : "- Select an item -")
+                                            enabled: (rootItem.allAgentsGroupedByName && (rootItem.allAgentsGroupedByName.count > 0))
+                                            placeholderText: (rootItem.allAgentsGroupedByName && (rootItem.allAgentsGroupedByName.count === 0) ? "- No Item -"
+                                                                                                                                               : "- Select an item -")
 
                                             Binding {
                                                 target: agentCombo
                                                 property: "selectedIndex"
-                                                value: (myCondition && myCondition.modelM) ? controller.sortedListOfAgents.indexOf(myCondition.modelM.agent)
-                                                                                           : -1
+                                                value: (myCondition && myCondition.modelM && rootItem.allAgentsGroupedByName) ? rootItem.allAgentsGroupedByName.indexOf(myCondition.modelM.agent)
+                                                                                                                              : -1
                                             }
 
                                             onSelectedItemChanged: {

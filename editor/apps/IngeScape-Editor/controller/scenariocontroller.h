@@ -75,9 +75,6 @@ class ScenarioController: public QObject
     // --- List of effects type
     I2_ENUM_LISTMODEL(ActionEffectTypes, effectsTypesList)
 
-    // Sorted list of agents (by their name)
-    I2_QOBJECT_SORTFILTERPROXY(AgentsGroupedByNameVM, sortedListOfAgents)
-
     // List of actions in palette
     I2_QOBJECT_LISTMODEL(ActionInPaletteVM, actionsInPaletteList)
 

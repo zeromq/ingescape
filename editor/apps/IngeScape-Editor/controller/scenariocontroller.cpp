@@ -40,12 +40,6 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_modelManager != nullptr)
-    {
-        // Sort agents on their property "name"
-        _sortedListOfAgents.setSourceModel(_modelManager->allAgentsGroupedByName());
-        _sortedListOfAgents.setSortProperty("name");
-    }
 
     // Configure our filtered list of "actionVM in timeline"
     _filteredListActionsInTimeLine.setSourceModel(&_actionsInTimeLine);
@@ -112,9 +106,6 @@ ScenarioController::~ScenarioController()
     disconnect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayOrExecuteActions);
     _timerToRegularlyDelayActions.stop();
 
-    // Clear the sorted list of agents (by their name)
-    _sortedListOfAgents.clear();
-
     // Clear the current scenario
     clearScenario();
 
@@ -156,10 +147,10 @@ void ScenarioController::setisPlaying(bool isPlaying)
   */
 void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
 {
-    if (_jsonHelper != nullptr)
+    if ((_modelManager != nullptr) && (_jsonHelper != nullptr))
     {
         // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
-        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, _sortedListOfAgents.toList());
+        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, _modelManager->allAgentsGroupedByName()->toList());
         if (scenarioToImport != nullptr)
         {
             // Append the list of actions
@@ -338,40 +329,43 @@ bool ScenarioController::isAgentUsedInActions(QString agentName)
   */
 void ScenarioController::openActionEditorWithModel(ActionM* action)
 {
-    if (action != nullptr)
+    if (_modelManager != nullptr)
     {
-        ActionEditorController* actionEditorC = _getActionEditorFromModelOfAction(action);
-
-        // The corresponding editor is already opened
-        if (actionEditorC != nullptr)
+        if (action != nullptr)
         {
-            qDebug() << "The 'Action Editor' of" << action->name() << "is already opened...bring to front !";
+            ActionEditorController* actionEditorC = _getActionEditorFromModelOfAction(action);
 
-            Q_EMIT actionEditorC->bringToFront();
+            // The corresponding editor is already opened
+            if (actionEditorC != nullptr)
+            {
+                qDebug() << "The 'Action Editor' of" << action->name() << "is already opened...bring to front !";
+
+                Q_EMIT actionEditorC->bringToFront();
+            }
+            else
+            {
+                // Set selected action
+                setselectedAction(action);
+
+                // Create an action editor
+                ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), action, _modelManager->allAgentsGroupedByName()->toList());
+
+                _hashActionEditorControllerFromModelOfAction.insert(action, actionEditorC);
+
+                // Add to the list of opened action editors
+                _openedActionsEditorsControllers.append(actionEditorC);
+            }
         }
         else
         {
-            // Set selected action
-            setselectedAction(action);
+            // Create an action editor
+            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), nullptr, _modelManager->allAgentsGroupedByName()->toList());
 
-            // Create action editor controller
-            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), action, _sortedListOfAgents.toList());
-
-            _hashActionEditorControllerFromModelOfAction.insert(action, actionEditorC);
+            _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
 
             // Add to the list of opened action editors
             _openedActionsEditorsControllers.append(actionEditorC);
         }
-    }
-    else
-    {
-        // Create action editor controller
-        ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), NULL, _sortedListOfAgents.toList());
-
-        _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
-
-        // Add to the list of opened action editors
-        _openedActionsEditorsControllers.append(actionEditorC);
     }
 }
 
@@ -382,7 +376,7 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
   */
 void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
 {
-    if ((action != nullptr) && (action->modelM() != nullptr))
+    if ((_modelManager != nullptr) && (action != nullptr) && (action->modelM() != nullptr))
     {
         ActionEditorController* actionEditorC = _getActionEditorFromViewModelOfAction(action);
 
@@ -397,8 +391,8 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
         {
             setselectedAction(action->modelM());
 
-            // Create action editor controller
-            actionEditorC = new ActionEditorController(_buildNewActionName(), action->modelM(), _sortedListOfAgents.toList());
+            // Create an action editor
+            actionEditorC = new ActionEditorController(_buildNewActionName(), action->modelM(), _modelManager->allAgentsGroupedByName()->toList());
 
             _hashActionEditorControllerFromViewModelOfAction.insert(action, actionEditorC);
 
