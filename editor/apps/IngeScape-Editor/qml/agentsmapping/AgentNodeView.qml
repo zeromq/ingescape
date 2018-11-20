@@ -66,7 +66,7 @@ Rectangle {
 
     width: 258
 
-    height: (rootItem.agentMappingVM && !rootItem.isReduced) ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count, rootItem.agentMappingVM.outputsList.count))
+    height: (rootItem.agentMappingVM && !rootItem.isReduced) ? (54 + 22 * Math.max(rootItem.agentMappingVM.linkInputsList.count, rootItem.agentMappingVM.linkOutputsList.count))
                                                              : 42
 
 
@@ -259,7 +259,7 @@ Rectangle {
 
                 Repeater {
                     // List of intput slots VM
-                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.inputsList : 0)
+                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.linkInputsList : 0)
 
                     delegate: Item {
                         id: inputSlotItem
@@ -512,7 +512,7 @@ Rectangle {
 
                 Repeater {
                     // List of output slots VM
-                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.outputsList : 0)
+                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.linkOutputsList : 0)
 
                     delegate: Item {
                         id: outputSlotItem
@@ -664,7 +664,7 @@ Rectangle {
                                 svgFileCache: IngeScapeTheme.svgFileINGESCAPE
                                 svgElementId: "outputIsMuted"
 
-                                visible : myModel.firstModel && myModel.firstModel.isMuted
+                                visible: (myModel.output && myModel.output.firstModel && myModel.firstModel.isMuted)
                             }
                         }
 
@@ -950,14 +950,14 @@ Rectangle {
             width: height
             radius: height / 2
 
-            visible: (rootItem.agentMappingVM && (rootItem.agentMappingVM.activeAgentsNumber > 1))
+            visible: (rootItem.agentMappingVM && agentMappingVM.agentsGroupedByName && (agentMappingVM.agentsGroupedByName.numberOfAgentsON > 1))
 
             color: IngeScapeTheme.redColor
 
             Text {
                 anchors.centerIn: parent
 
-                text: agentMappingVM ? agentMappingVM.activeAgentsNumber : ""
+                text: (agentMappingVM && agentMappingVM.agentsGroupedByName ? agentMappingVM.agentsGroupedByName.numberOfAgentsON : "")
 
                 color: IngeScapeTheme.whiteColor
 
@@ -1010,7 +1010,7 @@ Rectangle {
                         IngeScapeTheme.whiteColor
                     }
 
-            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.inputsList.count > 0)) ? 1 : 0
+            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.linkInputsList.count > 0)) ? 1 : 0
             visible: (opacity !== 0)
 
             Behavior on opacity {
@@ -1039,7 +1039,7 @@ Rectangle {
                         IngeScapeTheme.whiteColor
                     }
 
-            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.outputsList.count > 0)) ? 1 : 0
+            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.linkOutputsList.count > 0)) ? 1 : 0
             visible: (opacity !== 0)
 
             Behavior on opacity {
