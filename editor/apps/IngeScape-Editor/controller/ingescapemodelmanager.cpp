@@ -323,7 +323,7 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
     if (_jsonHelper != nullptr)
     {
         // "File Dialog" to get the file (path) to open
-        QString agentFilePath = QFileDialog::getOpenFileName(NULL,
+        QString agentFilePath = QFileDialog::getOpenFileName(nullptr,
                                                              "Open an agent(s) definition",
                                                              _rootDirectoryPath,
                                                              "JSON (*.json)");
@@ -525,7 +525,7 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
 void IngeScapeModelManager::exportAgentsListToSelectedFile(QJsonArray jsonArrayOfAgents)
 {
     // "File Dialog" to get the file (path) to save
-    QString agentsListFilePath = QFileDialog::getSaveFileName(NULL,
+    QString agentsListFilePath = QFileDialog::getSaveFileName(nullptr,
                                                               "Save agents",
                                                               _rootDirectoryPath,
                                                               "JSON (*.json)");

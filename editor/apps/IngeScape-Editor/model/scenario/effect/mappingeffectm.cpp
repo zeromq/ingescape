@@ -116,7 +116,7 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
             connect(_outputAgent, &AgentsGroupedByNameVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
 
             // Fill outputs
-            foreach (OutputVM* output, _outputAgent->outputsList()->toList())
+            for (OutputVM* output : _outputAgent->outputsList()->toList())
             {
                 if ((output != nullptr) && (output->firstModel() != nullptr)) {
                     _outputsList.append(output->firstModel());
@@ -250,7 +250,7 @@ void MappingEffectM::setagent(AgentsGroupedByNameVM* agent)
         if (_agent != nullptr)
         {
             // Fill inputs
-            foreach (InputVM* input, _agent->inputsList()->toList())
+            for (InputVM* input : _agent->inputsList()->toList())
             {
                 if ((input != nullptr) && (input->firstModel() != nullptr)) {
                     _inputsList.append(input->firstModel());
@@ -388,7 +388,7 @@ void MappingEffectM::_onModelsOfIOPofInputAgentChanged()
     {
         _inputsList.clear();
 
-        foreach (InputVM* inputVM, _agent->inputsList()->toList())
+        for (InputVM* inputVM : _agent->inputsList()->toList())
         {
             if ((inputVM != nullptr) && inputVM->firstModel() != nullptr)
             {
@@ -415,7 +415,7 @@ void MappingEffectM::_onModelsOfIOPofOutputAgentChanged()
     {
         _outputsList.clear();
 
-        foreach (OutputVM* outputVM, _outputAgent->outputsList()->toList())
+        for (OutputVM* outputVM : _outputAgent->outputsList()->toList())
         {
             if ((outputVM != nullptr) && outputVM->firstModel() != nullptr)
             {
@@ -440,7 +440,7 @@ void MappingEffectM::_updateInputSelected()
     {
         AgentIOPM* newAgentIOP = nullptr;
 
-        foreach (InputVM* input, _agent->inputsList()->toList())
+        for (InputVM* input : _agent->inputsList()->toList())
         {
             if ((input != nullptr) && (input->firstModel() != nullptr))
             {
@@ -468,7 +468,7 @@ void MappingEffectM::_updateOutputSelected()
     {
         AgentIOPM* newAgentIOP = nullptr;
 
-        foreach (OutputVM* output, _outputAgent->outputsList()->toList())
+        for (OutputVM* output : _outputAgent->outputsList()->toList())
         {
             if ((output != nullptr) && (output->firstModel() != nullptr))
             {

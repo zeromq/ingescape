@@ -426,10 +426,10 @@ QObject* IngeScapeEditorController::qmlSingleton(QQmlEngine* engine, QJSEngine* 
 void IngeScapeEditorController::loadPlatformFromSelectedFile()
 {
     // "File Dialog" to get the files (paths) to open
-    QString platformFilePath = QFileDialog::getOpenFileName(NULL,
-                                                                "Open platform",
-                                                                _platformDirectoryPath,
-                                                                "JSON (*.json)");
+    QString platformFilePath = QFileDialog::getOpenFileName(nullptr,
+                                                            "Open platform",
+                                                            _platformDirectoryPath,
+                                                            "JSON (*.json)");
 
     if (!platformFilePath.isEmpty())
     {
@@ -457,10 +457,10 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
 void IngeScapeEditorController::savePlatformToSelectedFile()
 {
     // "File Dialog" to get the file (path) to save
-    QString platformFilePath = QFileDialog::getSaveFileName(NULL,
-                                                              "Save platform",
-                                                              _platformDirectoryPath,
-                                                              "JSON (*.json)");
+    QString platformFilePath = QFileDialog::getSaveFileName(nullptr,
+                                                            "Save platform",
+                                                            _platformDirectoryPath,
+                                                            "JSON (*.json)");
 
     if (!platformFilePath.isEmpty()) {
         // Save the platform to JSON file

@@ -65,7 +65,7 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     // Initialize the 9 items of the palette with NULL action
     for (int i = 0; i < 9; i++)
     {
-        _actionsInPaletteList.append(new ActionInPaletteVM(NULL, i));
+        _actionsInPaletteList.append(new ActionInPaletteVM(nullptr, i));
     }
 
     // Add the first timeline line
@@ -400,7 +400,7 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
             actionEditorC->setoriginalViewModel(action);
 
             // Create the temporary edited action view model
-            ActionVM* temporaryActionVM = new ActionVM(NULL, -1);
+            ActionVM* temporaryActionVM = new ActionVM(nullptr, -1);
             temporaryActionVM->setstartTimeString(action->startTimeString());
             temporaryActionVM->setcolor(action->color());
 
@@ -444,8 +444,9 @@ void ScenarioController::deleteAction(ActionM* action)
         for (int index = 0; index < _actionsInPaletteList.count(); index++)
         {
             ActionInPaletteVM* actionInPaletteVM = _actionsInPaletteList.at(index);
-            if ((actionInPaletteVM->modelM() != nullptr) && (actionInPaletteVM->modelM() == action)) {
-                setActionInPalette(index, NULL);
+
+            if ((actionInPaletteVM != nullptr) && (actionInPaletteVM->modelM() != nullptr) && (actionInPaletteVM->modelM() == action)) {
+                setActionInPalette(index, nullptr);
             }
         }
 

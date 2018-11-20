@@ -146,7 +146,7 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
         if (_agent != nullptr)
         {
             // Fill with inputs
-            foreach (InputVM* input, _agent->inputsList()->toList())
+            for (InputVM* input : _agent->inputsList()->toList())
             {
                 if ((input != nullptr) && (input->firstModel() != nullptr))
                 {
@@ -155,7 +155,7 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
             }
 
             // Fill with outputs
-            foreach (OutputVM* output, _agent->outputsList()->toList())
+            for (OutputVM* output : _agent->outputsList()->toList())
             {
                 if ((output != nullptr) && (output->firstModel() != nullptr))
                 {
@@ -164,7 +164,7 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
             }
 
             // Fill with parameters
-            foreach (ParameterVM* parameter, _agent->parametersList()->toList())
+            for (ParameterVM* parameter : _agent->parametersList()->toList())
             {
                 if ((parameter != nullptr) && (parameter->firstModel() != nullptr))
                 {
@@ -325,7 +325,7 @@ void IOPValueEffectM::_onModelsOfIOPChanged()
         _iopMergedList.clear();
 
         // Add inputs to the merged list
-        foreach (InputVM* inputVM, _agent->inputsList()->toList())
+        for (InputVM* inputVM : _agent->inputsList()->toList())
         {
             if ((inputVM != nullptr) && (inputVM->firstModel() != nullptr))
             {
@@ -338,7 +338,7 @@ void IOPValueEffectM::_onModelsOfIOPChanged()
         }
 
         // Add outputs to the merged list
-        foreach (OutputVM* outputVM, _agent->outputsList()->toList())
+        for (OutputVM* outputVM : _agent->outputsList()->toList())
         {
             if ((outputVM != nullptr) && (outputVM->firstModel() != nullptr))
             {
@@ -351,7 +351,7 @@ void IOPValueEffectM::_onModelsOfIOPChanged()
         }
 
         // Add parameters to the merged list
-        foreach (ParameterVM* parameterVM, _agent->parametersList()->toList())
+        for (ParameterVM* parameterVM : _agent->parametersList()->toList())
         {
             if ((parameterVM != nullptr) && (parameterVM->firstModel() != nullptr))
             {

@@ -190,7 +190,7 @@ void AgentsGroupedByDefinitionVM::changeFreeze()
 void AgentsGroupedByDefinitionVM::loadDefinition()
 {
     // "File Dialog" to get the file path to open
-    QString definitionFilePath = QFileDialog::getOpenFileName(NULL,
+    QString definitionFilePath = QFileDialog::getOpenFileName(nullptr,
                                                               "Open definition",
                                                               "",
                                                               "JSON (*.json)");
@@ -208,7 +208,7 @@ void AgentsGroupedByDefinitionVM::loadDefinition()
 void AgentsGroupedByDefinitionVM::loadMapping()
 {
     // "File Dialog" to get the file path to open
-    QString mappingFilePath = QFileDialog::getOpenFileName(NULL,
+    QString mappingFilePath = QFileDialog::getOpenFileName(nullptr,
                                                            "Open mapping",
                                                            "",
                                                            "JSON (*.json)");
@@ -230,7 +230,7 @@ void AgentsGroupedByDefinitionVM::downloadDefinition()
     }
 
     // "File Dialog" to get the file path to save
-    QString definitionFilePath = QFileDialog::getSaveFileName(NULL,
+    QString definitionFilePath = QFileDialog::getSaveFileName(nullptr,
                                                               "Save definition",
                                                               defaultDefinitionName,
                                                               "JSON (*.json)");
@@ -256,7 +256,7 @@ void AgentsGroupedByDefinitionVM::downloadMapping()
     }
 
     // "File Dialog" to get the file path to save
-    QString mappingFilePath = QFileDialog::getSaveFileName(NULL,
+    QString mappingFilePath = QFileDialog::getSaveFileName(nullptr,
                                                            "Save mapping",
                                                            defaultMappingName,
                                                            "JSON (*.json)");

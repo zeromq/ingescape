@@ -338,7 +338,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_inputsList.remove(inputsListToRemove);
-            foreach (InputVM* inputVM, inputsListToRemove) {
+            for (InputVM* inputVM, inputsListToRemove) {
                 _inputsList.remove(inputVM);
             }
         }
@@ -369,7 +369,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_outputsList.remove(outputsListToRemove);
-            foreach (OutputVM* outputVM, outputsListToRemove) {
+            for (OutputVM* outputVM, outputsListToRemove) {
                 _outputsList.remove(outputVM);
             }
         }
@@ -400,7 +400,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_parametersList.remove(parametersListToRemove);
-            foreach (ParameterVM* parameterVM, parametersListToRemove) {
+            for (ParameterVM* parameterVM, parametersListToRemove) {
                 _parametersList.remove(parameterVM);
             }
         }
@@ -570,7 +570,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         QList<ParameterVM*> parametersListToAdd;
 
         // Traverse the list of models of inputs in the definition
-        foreach (AgentIOPM* input, model->definition()->inputsList()->toList())
+        for (AgentIOPM* input, model->definition()->inputsList()->toList())
         {
             InputVM* inputVM = _inputModelAdded(input);
             if (inputVM != nullptr)
@@ -583,7 +583,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         }
 
         // Traverse the list of models of outputs in the definition
-        foreach (OutputM* output, model->definition()->outputsList()->toList())
+        for (OutputM* output, model->definition()->outputsList()->toList())
         {
             OutputVM* outputVM = _outputModelAdded(output);
             if (outputVM != nullptr)
@@ -596,7 +596,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         }
 
         // Traverse the list of models of parameters in the definition
-        foreach (AgentIOPM* parameter, model->definition()->parametersList()->toList())
+        for (AgentIOPM* parameter, model->definition()->parametersList()->toList())
         {
             ParameterVM* parameterVM = _parameterModelAdded(parameter);
             if (parameterVM != nullptr)
@@ -639,7 +639,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         // Traverse the list of models of inputs in the definition
         //
         QList<InputVM*> inputsListToRemove;
-        foreach (AgentIOPM* input, model->definition()->inputsList()->toList())
+        for (AgentIOPM* input, model->definition()->inputsList()->toList())
         {
             InputVM* inputVM = _inputModelRemoved(input);
             if (inputVM != nullptr)
@@ -657,7 +657,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_inputsList.remove(inputsListToRemove);
-            foreach (InputVM* inputVM, inputsListToRemove) {
+            for (InputVM* inputVM, inputsListToRemove) {
                 _inputsList.remove(inputVM);
             }
         }
@@ -667,7 +667,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         // Traverse the list of models of outputs in the definition
         //
         QList<OutputVM*> outputsListToRemove;
-        foreach (OutputM* output, model->definition()->outputsList()->toList())
+        for (OutputM* output, model->definition()->outputsList()->toList())
         {
             OutputVM* outputVM = _outputModelRemoved(output);
             if (outputVM != nullptr)
@@ -685,7 +685,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_outputsList.remove(outputsListToRemove);
-            foreach (OutputVM* outputVM, outputsListToRemove) {
+            for (OutputVM* outputVM, outputsListToRemove) {
                 _outputsList.remove(outputVM);
             }
         }
@@ -695,7 +695,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         // Traverse the list of models of parameters in the definition
         //
         QList<ParameterVM*> parametersListToRemove;
-        foreach (AgentIOPM* parameter, model->definition()->parametersList()->toList())
+        for (AgentIOPM* parameter, model->definition()->parametersList()->toList())
         {
             ParameterVM* parameterVM = _parameterModelRemoved(parameter);
             if (parameterVM != nullptr)
@@ -713,7 +713,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_parametersList.remove(parametersListToRemove);
-            foreach (ParameterVM* parameterVM, parametersListToRemove) {
+            for (ParameterVM* parameterVM, parametersListToRemove) {
                 _parametersList.remove(parameterVM);
             }
         }
@@ -743,7 +743,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         QList<InputVM*> inputsWithSameName = getInputsListFromName(input->name());
         InputVM* inputWithoutId = nullptr;
 
-        foreach (InputVM* iterator, inputsWithSameName)
+        for (InputVM* iterator, inputsWithSameName)
         {
             // Already a view model with an EMPTY id (NOT defined)
             if ((iterator != nullptr) && iterator->id().isEmpty()) {
@@ -863,7 +863,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         QList<OutputVM*> outputsWithSameName = getOutputsListFromName(output->name());
         OutputVM* outputWithoutId = nullptr;
 
-        foreach (OutputVM* iterator, outputsWithSameName)
+        for (OutputVM* iterator, outputsWithSameName)
         {
             // Already a view model with an EMPTY id (NOT defined)
             if ((iterator != nullptr) && iterator->id().isEmpty()) {
@@ -984,7 +984,7 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         QList<ParameterVM*> parametersWithSameName = getParametersListFromName(parameter->name());
         ParameterVM* parameterWithoutId = nullptr;
 
-        foreach (ParameterVM* iterator, parametersWithSameName)
+        for (ParameterVM* iterator, parametersWithSameName)
         {
             // Already a view model with an EMPTY id (NOT defined)
             if ((iterator != nullptr) && iterator->id().isEmpty()) {

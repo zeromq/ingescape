@@ -884,7 +884,7 @@ void NetworkController::sendCommandWithJsonToRecorder(QStringList commandAndPara
             // Create ZMQ message
             zmsg_t* msg = zmsg_new();
 
-            foreach (QString string, commandAndParameters)
+            for (QString string : commandAndParameters)
             {
                 // Add a frame with STRING
                 zframe_t* frameString = zframe_new(string.toStdString().c_str(), string.length());
@@ -977,7 +977,7 @@ void NetworkController::onCommandAskedToAgent(QStringList peerIdsList, QString c
 {
     if (!command.isEmpty() && (peerIdsList.count() > 0))
     {
-        foreach (QString peerId, peerIdsList)
+        for (QString peerId : peerIdsList)
         {
             // Send the command to a peer id of agent
             int success = igs_busSendStringToAgent(peerId.toStdString().c_str(), "%s", command.toStdString().c_str());
@@ -998,7 +998,7 @@ void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList
 {
     if (!command.isEmpty() && !outputName.isEmpty() && (peerIdsList.count() > 0))
     {
-        foreach (QString peerId, peerIdsList)
+        for (QString peerId : peerIdsList)
         {
             // Send the command to a peer id of agent
             int success = igs_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s",
@@ -1022,7 +1022,7 @@ void NetworkController::onCommandAskedToAgentAboutSettingValue(QStringList peerI
 {
     if (!command.isEmpty() && !agentIOPName.isEmpty() && !value.isEmpty() && (peerIdsList.count() > 0))
     {
-        foreach (QString peerId, peerIdsList)
+        for (QString peerId : peerIdsList)
         {
             // Send the command to a peer id of agent
             int success = igs_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s %s",
@@ -1046,7 +1046,7 @@ void NetworkController::onCommandAskedToAgentAboutSettingValue(QStringList peerI
  */
 void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName)
 {
-    foreach (QString peerId, peerIdsList)
+    for (QString peerId : peerIdsList)
     {
         // Send the command to a peer id of agent
         int success = igs_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s %s %s",
@@ -1067,7 +1067,7 @@ void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerI
  */
 void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
 {
-    foreach (OutputM* output, outputsList)
+    for (OutputM* output : outputsList)
     {
         if ((output != nullptr) && !output->id().isEmpty())
         {
@@ -1159,7 +1159,7 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
  */
 void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
 {
-    foreach (OutputM* output, outputsList)
+    for (OutputM* output : outputsList)
     {
         if ((output != nullptr) && !output->id().isEmpty())
         {

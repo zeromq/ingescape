@@ -187,7 +187,7 @@ AgentMappingM* JsonHelper::createModelOfAgentMappingFromJSON(QString inputAgentN
         {
             QList<ElementMappingM*> mappingElements;
 
-            foreach (QJsonValue jsonMap, jsonMappingOut.toArray())
+            for (QJsonValue jsonMap : jsonMappingOut.toArray())
             {
                 if (jsonMap.isObject())
                 {
@@ -280,7 +280,8 @@ QJsonObject JsonHelper::exportAgentMappingToJson(AgentMappingM* agentMapping)
         jsonMapping.insert("version", agentMapping->version());
 
         QJsonArray jsonArray;
-        foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
+        for (ElementMappingM* mappingElement : agentMapping->mappingElements()->toList())
+        {
             if (mappingElement != nullptr)
             {
                 QJsonObject jsonMappingElement;
@@ -369,7 +370,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, Q
     QJsonValue jsonActionsList = jsonScenario.value("actions");
     if (jsonActionsList.isArray())
     {
-        foreach (QJsonValue jsonTmp, jsonActionsList.toArray())
+        for (QJsonValue jsonTmp : jsonActionsList.toArray())
         {
             if (jsonTmp.isObject())
             {
@@ -468,7 +469,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, Q
                         QJsonValue jsonConditionsList = jsonAction.value("conditions");
                         if (jsonConditionsList.isArray())
                         {
-                            foreach (QJsonValue jsonCondition, jsonConditionsList.toArray())
+                            for (QJsonValue jsonCondition : jsonConditionsList.toArray())
                             {
                                 if (jsonCondition.isObject())
                                 {
@@ -604,7 +605,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
     // Actions list
     // ----
     QJsonArray jsonActionsArray;
-    foreach (ActionM* actionM, actionsList)
+    for (ActionM* actionM : actionsList)
     {
         // Create properties
         QJsonObject jsonAgent;
@@ -689,7 +690,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
         //
         QJsonArray jsonEffectsArray;
 
-        foreach (ActionEffectVM* effectVM, actionM->effectsList()->toList())
+        for (ActionEffectVM* effectVM : actionM->effectsList()->toList())
         {
             ActionEffectM* actionEffect = effectVM->modelM();
 
@@ -861,7 +862,7 @@ QList<RecordM*> JsonHelper::createRecordModelList(QByteArray byteArrayOfJson)
 
         if (recordsValue.isArray())
         {   
-            foreach (QJsonValue jsonValue, recordsValue.toArray())
+            for (QJsonValue jsonValue : recordsValue.toArray())
             {
                 if (jsonValue.isObject())
                 {
@@ -1172,7 +1173,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 agent = iterator;
 
                                 // Go through the inputs
-                                foreach (InputVM* inputVM, iterator->inputsList()->toList())
+                                for (InputVM* inputVM : iterator->inputsList()->toList())
                                 {
                                     if ((inputVM != nullptr) && (inputVM->firstModel() != nullptr))
                                     {
@@ -1185,7 +1186,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 }
 
                                 // Go through the outputs
-                                foreach (OutputVM* outputVM, iterator->outputsList()->toList())
+                                for (OutputVM* outputVM : iterator->outputsList()->toList())
                                 {
                                     if ((outputVM != nullptr) && (outputVM->firstModel() != nullptr))
                                     {
@@ -1304,7 +1305,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                     found = false;
 
                                     // Go through the outputs
-                                    foreach (OutputVM* outputVM, iterator->outputsList()->toList())
+                                    for (OutputVM* outputVM : iterator->outputsList()->toList())
                                     {
                                         if (!found && (outputVM->name() == outputName))
                                         {
@@ -1324,7 +1325,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                     found = false;
 
                                     // Go through the inputs
-                                    foreach (InputVM* inputVM, iterator->inputsList()->toList())
+                                    for (InputVM* inputVM : iterator->inputsList()->toList())
                                     {
                                         if (!found && (inputVM->name() == inputName))
                                         {
