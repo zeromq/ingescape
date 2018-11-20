@@ -145,13 +145,6 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot called when a new model of agent has been created
-     * @param agent
-     */
-    //void onAgentModelCreated(AgentM* agent);
-
-
-    /**
      * @brief Slot called when a new view model of agents grouped by definition has been created
      * @param agentsGroupedByDefinition
      */
@@ -166,22 +159,6 @@ public Q_SLOTS:
 
 
 private Q_SLOTS:
-
-    /**
-     * @brief Slot called when the definition of a view model of agent changed (with previous and new values)
-     * @param previousValue
-     * @param newValue
-     */
-    //void _onAgentDefinitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
-
-
-    /**
-     * @brief Slot called when a different definition is detected on a model of agent
-     * (compared to the definition of our view model)
-     * @param model
-     */
-    //void _onDifferentDefinitionDetectedOnModelOfAgent(AgentM* model);
-
 
     /**
      * @brief Slot called when we have to load an agent definition from a JSON file (path)
@@ -215,22 +192,6 @@ private Q_SLOTS:
 
 
 private:
-
-
-    /**
-     * @brief Manage a new model inside an existing view model
-     * @param model
-     * @param agentVM
-     */
-    //void _manageNewModelInsideExistingVM(AgentM* model, AgentVM* agentVM);
-
-
-    /**
-     * @brief Delete the view model of agent
-     * @param agent
-     */
-    //void _deleteAgentViewModel(AgentVM* agent);
-
 
     /**
      * @brief Get the list of definitions with a name

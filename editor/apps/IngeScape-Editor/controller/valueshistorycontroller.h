@@ -106,7 +106,7 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot called when a new model of agent has been created
+     * @brief FIXME: use AgentsGroupedByNameVM instead - Slot called when a new model of agent has been created
      * @param agent
      */
     void onAgentModelCreated(AgentM* agent);

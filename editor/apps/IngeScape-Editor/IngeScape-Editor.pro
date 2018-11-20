@@ -69,7 +69,6 @@ SOURCES += main.cpp \
     model/scenario/effect/mappingeffectm.cpp \
     model/scenario/effect/effectonagentm.cpp \
     sortFilter/valueshistorysortfilter.cpp \
-    viewModel/agentvm.cpp \
     viewModel/agentinmappingvm.cpp \
     viewModel/scenario/actionvm.cpp \
     viewModel/iop/inputvm.cpp \
@@ -144,7 +143,6 @@ HEADERS += \
     model/scenario/effect/mappingeffectm.h \
     model/scenario/effect/effectonagentm.h \
     sortFilter/valueshistorysortfilter.h \
-    viewModel/agentvm.h \
     viewModel/agentinmappingvm.h \
     viewModel/scenario/actionvm.h \
     viewModel/iop/inputvm.h \

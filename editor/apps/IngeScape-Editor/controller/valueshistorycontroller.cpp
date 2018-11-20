@@ -119,7 +119,7 @@ bool ValuesHistoryController::areShownValuesOfAgent(QString agentName)
 
 
 /**
- * @brief Slot called when a new model of agent has been created
+ * @brief FIXME: use AgentsGroupedByNameVM instead - Slot called when a new model of agent has been created
  * @param agent
  */
 void ValuesHistoryController::onAgentModelCreated(AgentM* agent)
