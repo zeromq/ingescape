@@ -47,7 +47,7 @@ void ActionConditionM::setagent(AgentsGroupedByNameVM* value)
     {
         if (_agent != nullptr)
         {
-            // UnSubscribe to destruction
+            // UN-subscribe to destruction
             disconnect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
         }
 

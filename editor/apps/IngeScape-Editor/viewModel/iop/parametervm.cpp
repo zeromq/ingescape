@@ -26,6 +26,7 @@ ParameterVM::ParameterVM(QString parameterName,
                          AgentIOPM* modelM,
                          QObject *parent) : AgentIOPVM(parameterName,
                                                        parameterId,
+                                                       modelM,
                                                        parent)
     //_firstModel(nullptr)
 {

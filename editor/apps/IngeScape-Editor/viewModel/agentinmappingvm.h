@@ -164,7 +164,7 @@ Q_SIGNALS:
     /**
      * @brief Signal emitted when the models of Inputs/Outputs/Parameters changed
      */
-    void modelsOfIOPChanged();
+    //void modelsOfIOPChanged();
 
 
 private Q_SLOTS:
@@ -256,12 +256,14 @@ private:
 
     /**
      * @brief Update the group (of value type) of the reduced map (= brin) in input of our agent
+     * FIXME RENAME: _updateReducedMapValueTypeGroupInInput
      */
     void _updateReducedMapValueTypeGroupInInput();
 
 
     /**
      * @brief Update the group (of value type) of the reduced map (= brin) in output of our agent
+     * FIXME RENAME: _updateReducedMapValueTypeGroupInOutput
      */
     void _updateReducedMapValueTypeGroupInOutput();
 

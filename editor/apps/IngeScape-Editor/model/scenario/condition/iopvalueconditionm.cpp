@@ -87,7 +87,7 @@ void IOPValueConditionM::setagentIOP(AgentIOPM* agentIop)
     {
         if (_agentIOP != nullptr)
         {
-            // UnSubscribe to destruction
+            // UN-subscribe to destruction
             disconnect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueConditionM::_onAgentIopModelDestroyed);
         }
 
@@ -147,7 +147,8 @@ void IOPValueConditionM::setagent(AgentsGroupedByNameVM* agent)
     if (previousAgent != _agent)
     {
         if (previousAgent != nullptr) {
-            disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueConditionM::_onModelsOfIOPChanged);
+            // FIXME REPAIR
+            //disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueConditionM::_onModelsOfIOPChanged);
         }
 
         // Reset the agent IOP
@@ -171,7 +172,8 @@ void IOPValueConditionM::setagent(AgentsGroupedByNameVM* agent)
                 setagentIOP(_agentIopList.at(0));
             }
 
-            connect(_agent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueConditionM::_onModelsOfIOPChanged);
+            // FIXME REPAIR
+            //connect(_agent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueConditionM::_onModelsOfIOPChanged);
         }
     }
 }
@@ -211,7 +213,7 @@ void IOPValueConditionM::resetConnections()
 
         if (_agentIOP != nullptr)
         {
-            // UnSubscribe to value change
+            // UN-subscribe to value change
             disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
         }
     }
@@ -432,7 +434,7 @@ void IOPValueConditionM::_updateAgentIOPSelected(AgentIOPM * newAgentIOP)
         // Disconnect old agent iop
         if (_agentIOP != nullptr)
         {
-            // UnSubscribe to value change
+            // UN-subscribe to value change
             disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
         }
 

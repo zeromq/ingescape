@@ -45,10 +45,13 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
 
 
         //
-        // FIXME TODO: Constructor of AgentInMappingVM
+        // FIXME TODO: Constructor of AgentInMappingVM --> gérer les évolutions des listes de _agentsGroupedByName
+        //
+        //connect(_agentsGroupedByName->inputsList()->countChanged();
+        //connect(_agentsGroupedByName->outputsList()->countChanged();
         //
         QList<LinkInputVM*> tempLinkInputs;
-        QList<LinkInputVM*> tempLinkOutputs;
+        QList<LinkOutputVM*> tempLinkOutputs;
 
         for (InputVM* input : _agentsGroupedByName->inputsList()->toList())
         {
@@ -73,7 +76,7 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
         {
             if (output != nullptr)
             {
-                LinkInputVM* linkOutput = new LinkOutputVM(output);
+                LinkOutputVM* linkOutput = new LinkOutputVM(output);
 
                 tempLinkOutputs.append(linkOutput);
 
@@ -95,6 +98,10 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
         if (!tempLinkOutputs.isEmpty()) {
             _linkOutputsList.append(tempLinkOutputs);
         }
+
+        // Update the group (of value type) of the reduced map (= brin) in input and in output of our agent
+        _updateReducedMapValueTypeGroupInInput();
+        _updateReducedMapValueTypeGroupInOutput();
     }
 }
 
@@ -1140,16 +1147,18 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInInput()
 {
     AgentIOPValueTypeGroups::Value globalReducedMapValueTypeGroupInInput = AgentIOPValueTypeGroups::UNKNOWN;
 
-    for (int i = 0; i < _inputsList.count(); i++)
+    for (int i = 0; i < _linkInputsList.count(); i++)
     {
-        InputVM* input = _inputsList.at(i);
-        if ((input != nullptr) && (input->firstModel() != nullptr))
+        LinkInputVM* linkInput = _linkInputsList.at(i);
+
+        if ((linkInput != nullptr) && (linkInput->input() != nullptr) && (linkInput->input()->firstModel() != nullptr))
         {
             if (i == 0) {
-                globalReducedMapValueTypeGroupInInput = input->firstModel()->agentIOPValueTypeGroup();
+                globalReducedMapValueTypeGroupInInput = linkInput->input()->firstModel()->agentIOPValueTypeGroup();
             }
-            else {
-                if (globalReducedMapValueTypeGroupInInput != input->firstModel()->agentIOPValueTypeGroup())
+            else
+            {
+                if (globalReducedMapValueTypeGroupInInput != linkInput->input()->firstModel()->agentIOPValueTypeGroup())
                 {
                     globalReducedMapValueTypeGroupInInput = AgentIOPValueTypeGroups::MIXED;
                     break;
@@ -1168,15 +1177,18 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInOutput()
 {
     AgentIOPValueTypeGroups::Value globalReducedMapValueTypeGroupInOutput = AgentIOPValueTypeGroups::UNKNOWN;
 
-    for (int i = 0; i < _outputsList.count(); i++)
+    for (int i = 0; i < _linkOutputsList.count(); i++)
     {
-        OutputVM* output = _outputsList.at(i);
-        if ((output != nullptr) && (output->firstModel() != nullptr)) {
+        LinkOutputVM* linkOutput = _linkOutputsList.at(i);
+
+        if ((linkOutput != nullptr) && (linkOutput->output() != nullptr) && (linkOutput->output()->firstModel() != nullptr))
+        {
             if (i == 0) {
-                globalReducedMapValueTypeGroupInOutput = output->firstModel()->agentIOPValueTypeGroup();
+                globalReducedMapValueTypeGroupInOutput = linkOutput->output()->firstModel()->agentIOPValueTypeGroup();
             }
-            else {
-                if (globalReducedMapValueTypeGroupInOutput != output->firstModel()->agentIOPValueTypeGroup())
+            else
+            {
+                if (globalReducedMapValueTypeGroupInOutput != linkOutput->output()->firstModel()->agentIOPValueTypeGroup())
                 {
                     globalReducedMapValueTypeGroupInOutput = AgentIOPValueTypeGroups::MIXED;
                     break;

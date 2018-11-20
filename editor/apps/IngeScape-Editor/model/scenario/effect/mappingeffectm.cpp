@@ -97,7 +97,8 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
             // UN-subscribe to destruction
             disconnect(_outputAgent, &AgentsGroupedByNameVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
 
-            disconnect(_outputAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofOutputAgentChanged);
+            // FIXME REPAIR
+            //disconnect(_outputAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofOutputAgentChanged);
         }
 
         // set the new value
@@ -127,7 +128,8 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
                 setoutput(_outputsList.at(0));
             }
 
-            connect(_outputAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofOutputAgentChanged);
+            // FIXME REPAIR
+            //connect(_outputAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofOutputAgentChanged);
         }
 
         Q_EMIT outputAgentChanged(value);
@@ -235,7 +237,8 @@ void MappingEffectM::setagent(AgentsGroupedByNameVM* agent)
     if (previousAgent != _agent)
     {
         if (previousAgent != nullptr) {
-            disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofInputAgentChanged);
+            // FIXME REPAIR
+            //disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofInputAgentChanged);
         }
 
         // Reset the input
@@ -259,7 +262,8 @@ void MappingEffectM::setagent(AgentsGroupedByNameVM* agent)
                 setinput(_inputsList.at(0));
             }
 
-            connect(_agent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofInputAgentChanged);
+            // FIXME REPAIR
+            //connect(_agent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofInputAgentChanged);
         }
     }
 }

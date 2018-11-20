@@ -131,7 +131,8 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
     if (previousAgent != _agent)
     {
         if (previousAgent != nullptr) {
-            disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
+            // FIXME REPAIR
+            //disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
         }
 
         qDebug() << "setagent: setagentIOP(nullptr)";
@@ -177,7 +178,8 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
                 setagentIOP(_iopMergedList.at(0));
             }
 
-            connect(_agent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
+            // FIXME REPAIR
+            //connect(_agent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
          }
     }
 }

@@ -96,7 +96,7 @@ public:
      * @param models
      * @param position
      */
-    Q_INVOKABLE void dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* models, QPointF position);
+    //Q_INVOKABLE void dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* models, QPointF position);
 
 
     /**

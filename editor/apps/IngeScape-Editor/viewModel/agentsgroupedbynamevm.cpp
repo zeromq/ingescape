@@ -206,6 +206,9 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
 
             // Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
             _updateIsDefinedInAllDefinitionsForEachIOP(_hashFromDefinitionToAgentsGroupedByDefinition.count());
+
+            // Emit signal "models of Inputs/Outputs/Parameters Changed"
+            //Q_EMIT modelsOfIOPChanged();
         }
         // The definition is NULL
         else if (agentsGroupedByDefinition == _agentsGroupedByDefinitionNULL) {
@@ -952,12 +955,12 @@ void AgentsGroupedByNameVM::_manageParametersOfAddedDefinition(DefinitionM* defi
     {
         QList<ParameterVM*> parametersListToAdd;
 
-        for (ParameterVM* parameter : definition->parametersList()->toList())
+        for (AgentIOPM* parameter : definition->parametersList()->toList())
         {
             if (parameter != nullptr)
             {
                 // Manage this new model of parameter
-                QPair<bool, ParameterVM*> pair = _manageNewParameterModel(output);
+                QPair<bool, ParameterVM*> pair = _manageNewParameterModel(parameter);
 
                 // We have to add a new view model of output
                 if (pair.first)
@@ -1037,7 +1040,7 @@ void AgentsGroupedByNameVM::_manageOutputsOfRemovedDefinition(DefinitionM* defin
     {
         QList<OutputVM*> outputsListToRemove;
 
-        for (AgentIOPM* output : definition->outputsList()->toList())
+        for (OutputM* output : definition->outputsList()->toList())
         {
             if (output != nullptr)
             {
