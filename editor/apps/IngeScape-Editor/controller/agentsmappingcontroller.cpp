@@ -196,27 +196,27 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
 
 
 /**
- * @brief FIXME REPAIR: Called when an agent from the list is dropped on the current mapping at a position
+ * @brief Called when an agent from the list is dropped on the current mapping at a position
  * @param agentName
- * @param models
  * @param position
  */
-/*void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* models, QPointF position)
+void AgentsMappingController::dropAgentNameToMappingAtPosition(QString agentName, QPointF position)
 {
     // Check that there is NOT yet an agent in the current mapping for this name
     AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
-    if (agentInMapping == nullptr)
+    if ((agentInMapping == nullptr) && (_modelManager != nullptr))
     {
-        I2CustomItemListModel<AgentM>* agentsList = dynamic_cast<I2CustomItemListModel<AgentM>*>(models);
-        if (agentsList != nullptr)
+        // Get the (view model of) agents grouped for this name
+        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
+        if (agentsGroupedByName != nullptr)
         {
-            // Add new model(s) of agent to the current mapping at a specific position
-            _addAgentModelsToMappingAtPosition(agentName, agentsList->toList(), position);
+            // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
+            _createAgentInMappingAtPosition(agentsGroupedByName, position);
 
             agentInMapping = getAgentInMappingFromName(agentName);
             if (agentInMapping != nullptr)
             {
-                // Get the mapping currently edited (temporary until the user activate the mapping)
+                /*// Get the mapping currently edited (temporary until the user activate the mapping)
                 AgentMappingM* temporaryMapping = agentInMapping->temporaryMapping();
                 if (temporaryMapping != nullptr)
                 {
@@ -226,6 +226,7 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
                     // Mapping is already activated
                     if ((_modelManager != nullptr) && _modelManager->isMappingActivated())
                     {
+                        // FIXME REPAIR
                         for (AgentM* model : agentsList->toList())
                         {
                             if (model != nullptr)
@@ -235,14 +236,14 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
                             }
                         }
                     }
-                }
+                }*/
 
                 // Selects this new agent
                 setselectedAgent(agentInMapping);
             }
         }
     }
-}*/
+}
 
 
 /**

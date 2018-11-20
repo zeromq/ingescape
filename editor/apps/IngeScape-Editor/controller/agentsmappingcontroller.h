@@ -91,12 +91,11 @@ public:
 
 
     /**
-     * @brief FIXME REPAIR: Called when an agent from the list is dropped on the current mapping at a position
+     * @brief Called when an agent from the list is dropped on the current mapping at a position
      * @param agentName
-     * @param models
      * @param position
      */
-    //Q_INVOKABLE void dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* models, QPointF position);
+    Q_INVOKABLE void dropAgentNameToMappingAtPosition(QString agentName, QPointF position);
 
 
     /**
