@@ -41,6 +41,8 @@ Rectangle {
     // Model associated to our QML item
     property var agentMappingVM: null
 
+    property var agentsGroupedByName: agentMappingVM ? agentMappingVM.agentsGroupedByName : null
+
     property var agentName: agentMappingVM ? agentMappingVM.name : ""
 
     property bool isReduced: agentMappingVM && agentMappingVM.isReduced
@@ -78,7 +80,7 @@ Rectangle {
     radius: 6
 
     color: (dropEnabled === true) ? (mouseArea.pressed ? IngeScapeTheme.darkGreyColor2
-                                                       : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.veryDarkGreyColor)
+                                                       : (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON) ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.veryDarkGreyColor)
                                   : IngeScapeTheme.darkGreyColor2
 
 
@@ -286,8 +288,8 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            color: (myModel && myModel.input && myModel.input.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
-                                                                                                         : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
+                            color: (myModel && myModel.input && myModel.input.isDefinedInAllDefinitions) ? (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
+                                                                                                         : (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
 
                             font: IngeScapeTheme.heading2Font
 
@@ -540,8 +542,8 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            color: (myModel && myModel.output && myModel.output.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
-                                                                                                           : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
+                            color: (myModel && myModel.output && myModel.output.isDefinedInAllDefinitions) ? (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
+                                                                                                           : (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
                             font: IngeScapeTheme.heading2Font
 
                             MouseArea {
@@ -879,7 +881,7 @@ Rectangle {
             text: rootItem.agentName
             font: IngeScapeTheme.headingFont
 
-            color: (dropEnabled === true) ? ((rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONNameMappingColor : IngeScapeTheme.agentsOFFNameMappingColor)
+            color: (dropEnabled === true) ? ((rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON) ? IngeScapeTheme.agentsONNameMappingColor : IngeScapeTheme.agentsOFFNameMappingColor)
                                           : IngeScapeTheme.lightGreyColor
         }
 
@@ -949,14 +951,14 @@ Rectangle {
             width: height
             radius: height / 2
 
-            visible: (rootItem.agentMappingVM && agentMappingVM.agentsGroupedByName && (agentMappingVM.agentsGroupedByName.numberOfAgentsON > 1))
+            visible: (rootItem.agentsGroupedByName && (rootItem.agentsGroupedByName.numberOfAgentsON > 1))
 
             color: IngeScapeTheme.redColor
 
             Text {
                 anchors.centerIn: parent
 
-                text: (agentMappingVM && agentMappingVM.agentsGroupedByName ? agentMappingVM.agentsGroupedByName.numberOfAgentsON : "")
+                text: (rootItem.agentsGroupedByName ? rootItem.agentsGroupedByName.numberOfAgentsON : "")
 
                 color: IngeScapeTheme.whiteColor
 
