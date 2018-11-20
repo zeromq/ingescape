@@ -273,7 +273,7 @@ void IOPValueConditionM::_onAgentIopModelDestroyed(QObject* sender)
   */
 void IOPValueConditionM::_onCurrentValueChanged(QVariant currentValue)
 {
-    // Trim the condition value to compare with
+    // Returns a string that has whitespace removed from the start and the end.
     QString valueTrimmed = _value.trimmed();
 
     bool isValid = false;
@@ -283,103 +283,136 @@ void IOPValueConditionM::_onCurrentValueChanged(QVariant currentValue)
         // According to the iop type
         switch(_agentIOP->agentIOPValueType())
         {
-            case AgentIOPValueTypes::INTEGER :
-            case AgentIOPValueTypes::DOUBLE :
-            {
-                double dblConditionValue = valueTrimmed.toDouble();
-                double dblCurrentValue = currentValue.toDouble();
+        /*case AgentIOPValueTypes::IMPULSION:
+        {
+            isValid = true;
+            break;
+        }*/
+        case AgentIOPValueTypes::INTEGER:
+        case AgentIOPValueTypes::DOUBLE:
+        {
+            bool conversionConditionValueToDoubleSucceeded = false;
+            double dblConditionValue = valueTrimmed.toDouble(&conversionConditionValueToDoubleSucceeded);
 
-                switch(_valueComparisonType)
-                {
-                    case ValueComparisonTypes::INFERIOR_TO:
-                    {
-                        isValid = ((dblCurrentValue < dblConditionValue) ? true : false);
-                        break;
-                    }
-                    case ValueComparisonTypes::SUPERIOR_TO:
-                    {
-                        isValid = ((dblCurrentValue > dblConditionValue) ? true : false);
-                        break;
-                    }
-                    case ValueComparisonTypes::EQUAL_TO:
-                    {
-                        isValid = qFuzzyCompare(dblConditionValue, dblCurrentValue);
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
-                }
-                break;
-            }
-            case AgentIOPValueTypes::MIXED :
-            case AgentIOPValueTypes::STRING :
-            case AgentIOPValueTypes::DATA :
+            bool conversionCurrentValueToDoubleSucceeded = false;
+            double dblCurrentValue = currentValue.toDouble(&conversionCurrentValueToDoubleSucceeded);
+
+            if (conversionConditionValueToDoubleSucceeded && conversionCurrentValueToDoubleSucceeded)
             {
                 switch(_valueComparisonType)
                 {
-                    case ValueComparisonTypes::INFERIOR_TO:
-                    {
-                        isValid = (currentValue.toString().compare(valueTrimmed) < 0 ? true : false);
-                        break;
-                    }
-                    case ValueComparisonTypes::SUPERIOR_TO:
-                    {
-                        isValid = (currentValue.toString().compare(valueTrimmed) > 0 ? true : false);
-                        break;
-                    }
-                    case ValueComparisonTypes::EQUAL_TO:
-                    {
-                        isValid = (currentValue.toString().compare(valueTrimmed) == 0 ? true : false);
-                        break;
-                    }
-                    default :
-                    {
-                        break;
-                    }
+                case ValueComparisonTypes::INFERIOR_TO:
+                {
+                    isValid = (dblCurrentValue < dblConditionValue) ? true : false;
+                    break;
                 }
+                case ValueComparisonTypes::SUPERIOR_TO:
+                {
+                    isValid = (dblCurrentValue > dblConditionValue) ? true : false;
+                    break;
+                }
+                case ValueComparisonTypes::EQUAL_TO:
+                {
+                    isValid = qFuzzyCompare(dblConditionValue, dblCurrentValue);
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+                }
+
                 break;
             }
-            case AgentIOPValueTypes::BOOL :
+        }
+        case AgentIOPValueTypes::STRING:
+        case AgentIOPValueTypes::DATA:
+        {
+            switch(_valueComparisonType)
             {
-                bool boolConditionValue = false;
-                if (valueTrimmed.toUpper() == "TRUE" || valueTrimmed.toInt() == 1)
-                {
+            case ValueComparisonTypes::INFERIOR_TO:
+            {
+                isValid = (currentValue.toString().compare(valueTrimmed) < 0) ? true : false;
+                break;
+            }
+            case ValueComparisonTypes::SUPERIOR_TO:
+            {
+                isValid = (currentValue.toString().compare(valueTrimmed) > 0) ? true : false;
+                break;
+            }
+            case ValueComparisonTypes::EQUAL_TO:
+            {
+                isValid = (currentValue.toString().compare(valueTrimmed) == 0) ? true : false;
+                break;
+            }
+            default:
+            {
+                break;
+            }
+            }
+
+            break;
+        }
+        case AgentIOPValueTypes::BOOL:
+        {
+            bool boolConditionValue = false;
+
+            bool conversionToIntSucceeded = false;
+            int intValue = valueTrimmed.toInt(&conversionToIntSucceeded);
+
+            // Int
+            if (conversionToIntSucceeded)
+            {
+                if (intValue == 0) {
+                    boolConditionValue = false;
+                }
+                else {
                     boolConditionValue = true;
                 }
-
-                switch(_valueComparisonType)
-                {
-                    case ValueComparisonTypes::INFERIOR_TO :
-                    {
-                        isValid = (currentValue.toBool() < boolConditionValue ? true : false);
-                        break;
-                    }
-                    case ValueComparisonTypes::SUPERIOR_TO :
-                    {
-                        isValid = (currentValue.toBool() > boolConditionValue ? true : false);
-                        break;
-                    }
-                    case ValueComparisonTypes::EQUAL_TO :
-                    {
-                        isValid = (currentValue.toBool() == boolConditionValue ? true : false);
-                        break;
-                    }
-                    default :
-                    {
-                        break;
-                    }
-                }
-
-                break;
             }
-            default :
+            // String (bool)
+            else if (valueTrimmed.toLower() == "false") {
+                boolConditionValue = false;
+            }
+            // String (bool)
+            else if (valueTrimmed.toLower() == "true") {
+                boolConditionValue = true;
+            }
+            else {
+                qWarning() << "Bad value" << valueTrimmed << "for value condition of" << _agentIOPName;
+            }
+
+            switch(_valueComparisonType)
             {
-                qDebug() << "IOP Value Comparison could not be done for" << AgentIOPValueTypes::staticEnumToString(_agentIOP->agentIOPValueType()) << " type : " << _agent->name() << "." << _agentIOP->name();
+            case ValueComparisonTypes::INFERIOR_TO:
+            {
+                isValid = (currentValue.toBool() < boolConditionValue) ? true : false;
                 break;
             }
+            case ValueComparisonTypes::SUPERIOR_TO:
+            {
+                isValid = (currentValue.toBool() > boolConditionValue) ? true : false;
+                break;
+            }
+            case ValueComparisonTypes::EQUAL_TO:
+            {
+                isValid = (currentValue.toBool() == boolConditionValue) ? true : false;
+                break;
+            }
+            default:
+            {
+                break;
+            }
+            }
 
+            break;
+        }
+        //case AgentIOPValueTypes::MIXED:
+        default:
+        {
+            qDebug() << "IOP Value Comparison could not be done for" << AgentIOPValueTypes::staticEnumToString(_agentIOP->agentIOPValueType()) << " type : " << _agent->name() << "." << _agentIOP->name();
+            break;
+        }
         }
     }
 
