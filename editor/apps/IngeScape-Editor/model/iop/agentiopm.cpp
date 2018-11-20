@@ -90,13 +90,15 @@ void AgentIOPM::setdefaultValue(QVariant value)
     {
         _defaultValue = value;
 
+        Q_EMIT defaultValueChanged(value);
+
         // Get a displayable value: convert a variant into a string (in function of the value type)
-        setdisplayableDefaultValue(Enums::getDisplayableValue(_agentIOPValueType, _defaultValue));
+        //setdisplayableDefaultValue(Enums::getDisplayableValue(_agentIOPValueType, _defaultValue));
+
+        setdisplayableDefaultValue(_defaultValue.toString());
 
         // Set the current value
         setcurrentValue(_defaultValue);
-
-        Q_EMIT defaultValueChanged(value);
     }
 }
 
@@ -111,7 +113,9 @@ void AgentIOPM::setcurrentValue(QVariant value)
         _currentValue = value;
 
         // Get a displayable value: convert a variant into a string (in function of the value type)
-        setdisplayableCurrentValue(Enums::getDisplayableValue(_agentIOPValueType, _currentValue));
+        //setdisplayableCurrentValue(Enums::getDisplayableValue(_agentIOPValueType, _currentValue));
+
+        setdisplayableCurrentValue(_currentValue.toString());
     }
 
     // Emit the signal even if the value has not changed to show the animation

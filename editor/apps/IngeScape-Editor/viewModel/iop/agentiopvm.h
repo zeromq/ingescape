@@ -43,6 +43,12 @@ class AgentIOPVM : public QObject
     // Flag indicating if our input/output is defined in all definitions
     I2_QML_PROPERTY_READONLY(bool, isDefinedInAllDefinitions)
 
+    // Current value of our Input / Output / Parameter
+    //I2_CPP_PROPERTY_CUSTOM_SETTER(QVariant, currentValue)
+
+    // Displayable current value of our Input / Output / Parameter
+    //I2_QML_PROPERTY_READONLY(QString, displayableCurrentValue)
+
 
 public:
 
@@ -67,19 +73,41 @@ public:
 
 Q_SIGNALS:
 
+    /**
+     * @brief Signal emitted when the current value of our agent I/O/P changed
+     * @param value
+     */
+    void currentValueChanged(QVariant value);
+
 
 public Q_SLOTS:
 
 
-private Q_SLOTS:
+protected Q_SLOTS:
     /**
      * @brief Slot called when the list of models changed
      */
     void _onModelsChanged();
 
 
+    /**
+     * @brief Slot called when the current value (of a model) changed
+     * @param value
+     */
+    //void _onCurrentValueOfModelChanged(QVariant value);
+
+
 private:
 
+    /**
+     * @brief Update the first model
+     */
+    void _updateFirstModel();
+
+private:
+
+    // Previous list of models
+    QList<AgentIOPM*> _previousModelsList;
 
 };
 

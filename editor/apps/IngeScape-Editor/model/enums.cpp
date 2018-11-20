@@ -118,38 +118,42 @@ AgentIOPValueTypeGroups::Value Enums::getGroupForAgentIOPValueType(AgentIOPValue
  */
 QString Enums::getDisplayableValue(AgentIOPValueTypes::Value valueType, QVariant value)
 {
-    Q_UNUSED(valueType)
-
     // To String
-    return value.toString();
+    //return value.toString();
 
-    /*QString displayableValue = "";
+    QString displayableValue = "";
 
     switch (valueType)
     {
     case AgentIOPValueTypes::INTEGER:
+        displayableValue = Enums::getDisplayableValueFromInteger(value.toInt());
         break;
 
     case AgentIOPValueTypes::DOUBLE:
+        displayableValue = Enums::getDisplayableValueFromDouble(value.toDouble());
         break;
 
     case AgentIOPValueTypes::STRING:
+        displayableValue = Enums::getDisplayableValueFromString(value.toString());
         break;
 
     case AgentIOPValueTypes::BOOL:
+        displayableValue = Enums::getDisplayableValueFromBool(value.toBool());
         break;
 
     case AgentIOPValueTypes::IMPULSION:
+        displayableValue = "";
         break;
 
     case AgentIOPValueTypes::DATA:
+        displayableValue = Enums::getDisplayableValueFromData(value.toByteArray());
         break;
 
     default:
         break;
     }
 
-    return displayableValue;*/
+    return displayableValue;
 }
 
 QString Enums::getDisplayableValueFromInteger(int value)

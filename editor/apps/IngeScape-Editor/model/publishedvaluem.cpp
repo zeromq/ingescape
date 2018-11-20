@@ -59,7 +59,9 @@ PublishedValueM::PublishedValueM(QDateTime time,
     }
 
     // Get a displayable value: convert a variant into a string (in function of the value type)
-    _displayableValue = Enums::getDisplayableValue(_iopValueType, _value);
+    //_displayableValue = Enums::getDisplayableValue(_iopValueType, _value);
+
+    _displayableValue = _value.toString();
 
     //qDebug() << "New Published Value at" << _time.toString("dd/MM/yy hh:mm:ss.zzz") << "on" << AgentIOPTypes::staticEnumToString(_iopType) << "of" << _agentName << "." << _iopName << "with type" << AgentIOPValueTypes::staticEnumToString(_iopValueType) << ":" << _displayableValue;
 }

@@ -148,6 +148,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+
 protected Q_SLOTS:
 
     /**

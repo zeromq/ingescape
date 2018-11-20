@@ -680,15 +680,6 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                 // The agent is already in the mapping
                 else
                 {
-                    /* FIXME Useless
-                    if (!agentInMapping->models()->contains(agent))
-                    {
-                        agentInMapping->models()->append(agent);
-
-                        // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-                        _overWriteMappingOfAgentModel(agent, agentInMapping->temporaryMapping());
-                    }*/
-
                     // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
                     _overWriteMappingOfAgentModel(agent, agentInMapping->temporaryMapping());
                 }
@@ -726,9 +717,6 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                 else
                 {
                     // Nothing to do...already added to AgentsGroupedByName
-                    /*if (!agentInMapping->models()->contains(agent)) {
-                        agentInMapping->models()->append(agent);
-                    }*/
                 }
 
                 // If there are waiting links (where this agent is involved as "Output Agent")
@@ -749,12 +737,9 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
         else
         {
             // Nothing to do...already added to AgentsGroupedByName
-            /*if ((agentInMapping != nullptr) && !agentInMapping->models()->contains(agent))
-            {
-                // FIXME: Even if the definition is different, the agent in mapping will be modified !
-                // What do we do with the mapping (links) of this agent ?
-                agentInMapping->models()->append(agent);
-            }*/
+
+            // FIXME: Even if the definition is different, the agent in mapping will be modified !
+            // What do we do with the mapping (links) of this agent ?
         }
     }
 }

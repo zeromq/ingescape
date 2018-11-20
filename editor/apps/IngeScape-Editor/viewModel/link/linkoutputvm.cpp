@@ -23,14 +23,24 @@
  */
 LinkOutputVM::LinkOutputVM(OutputVM* output,
                            QObject *parent) : LinkConnectorVM(parent),
-    _output(output)
+    _output(output),
+    _isPublishedNewValue(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_output != nullptr) {
+    if (_output != nullptr)
+    {
         setname(_output->name());
+
+        // Connect to signals from the view model of output
+        connect(_output, &OutputVM::currentValueChanged, this, &LinkOutputVM::_oncurrentValueChanged);
     }
+
+    // Init the timer to reset the flag "is Published New Value"
+    // Allows to play an animation when the value changed
+    _timer.setInterval(500);
+    connect(&_timer, &QTimer::timeout, this, &LinkOutputVM::_onTimeout);
 }
 
 
@@ -39,9 +49,29 @@ LinkOutputVM::LinkOutputVM(OutputVM* output,
  */
 LinkOutputVM::~LinkOutputVM()
 {
-    if (_output != nullptr) {
+    //
+    // Stop and clean the timer
+    //
+    _timer.stop();
+    disconnect(&_timer, 0, this, 0);
+
+
+    if (_output != nullptr)
+    {
+        // DIS-connect to signals from the view model of output
+        disconnect(_output, &OutputVM::currentValueChanged, this, &LinkOutputVM::_oncurrentValueChanged);
+
         setoutput(nullptr);
     }
+}
+
+
+/**
+ * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
+ */
+void LinkOutputVM::simulateCurrentValueOfModelChanged()
+{
+    _oncurrentValueChanged(QVariant());
 }
 
 
@@ -66,10 +96,37 @@ bool LinkOutputVM::canLinkWith(LinkConnectorVM* linkConnector)
 
 
 /**
- * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
+ * @brief Slot called when the current value (of our output) changed
+ * @param value
  */
-void LinkOutputVM::simulateCurrentValueOfModelChanged()
+void LinkOutputVM::_oncurrentValueChanged(QVariant value)
 {
-    // FIXME: rather in LinkOutputVM than in OutputVM
-    //_onCurrentValueOfModelChanged(QVariant());
+    Q_UNUSED(value)
+
+    /*if (_output != nullptr) {
+        qDebug() << "On Current Value of Output Changed" << _name << value.toString();
+    }*/
+
+    // Check that the flag is not already to true
+    if (!_isPublishedNewValue)
+    {
+        setisPublishedNewValue(true);
+
+        // Start the timer to reset the flag "is Published New Value"
+        _timer.start();
+    }
 }
+
+
+/**
+ * @brief Slot when the timer time out
+ */
+void LinkOutputVM::_onTimeout()
+{
+    // Stop the timer
+    _timer.stop();
+
+    // Reset the flag
+    setisPublishedNewValue(false);
+}
+

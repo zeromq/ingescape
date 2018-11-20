@@ -56,6 +56,7 @@ AgentIOPVM::~AgentIOPVM()
     setfirstModel(nullptr);
 
     // Models are deleted elsewhere
+    _previousModelsList.clear();
     _models.clear();
 }
 
@@ -64,12 +65,81 @@ AgentIOPVM::~AgentIOPVM()
  * @brief Slot called when the list of models changed
  */
 void AgentIOPVM::_onModelsChanged()
-{
+{   
+    //
+    QList<AgentIOPM*> newModelsList = _models.toList();
+
+    // Model of I/O/P added
+    if (_previousModelsList.count() < newModelsList.count())
+    {
+        //qDebug() << _previousModelsList.count() << "--> ADD --> " << newModelsList.count();
+
+        for (AgentIOPM* model : newModelsList)
+        {
+            if ((model != nullptr) && !_previousModelsList.contains(model))
+            {
+                //qDebug() << "Agent IOP VM: New model" << model->name() << "ADDED";
+
+                // Connect to signals from this new model
+                //connect(model, &AgentIOPM::currentValueChanged, this, &AgentIOPVM::_onCurrentValueOfModelChanged);
+                connect(model, &AgentIOPM::currentValueChanged, this, &AgentIOPVM::currentValueChanged);
+            }
+        }
+    }
+    // Model of I/O/P removed
+    else if (_previousModelsList.count() > newModelsList.count())
+    {
+        //qDebug() << _previousModelsList.count() << "--> REMOVE --> " << newModelsList.count();
+
+        for (AgentIOPM* model : _previousModelsList)
+        {
+            if ((model != nullptr) && !newModelsList.contains(model))
+            {
+                //qDebug() << "Agent IOP VM: Old model" << model->name() << "REMOVED";
+
+                // DIS-connect to signals from this previous model
+                //disconnect(model, &AgentIOPM::currentValueChanged, this, &AgentIOPVM::_onCurrentValueOfModelChanged);
+                disconnect(model, &AgentIOPM::currentValueChanged, this, &AgentIOPVM::currentValueChanged);
+            }
+        }
+    }
+
+    _previousModelsList = newModelsList;
+
     // Update the first model
-    if (!_models.isEmpty()) {
+    _updateFirstModel();
+}
+
+
+/**
+ * @brief Slot called when the current value (of a model) changed
+ * @param value
+ */
+/*void AgentIOPVM::_onCurrentValueOfModelChanged(QVariant value)
+{
+    AgentIOPM* model = qobject_cast<AgentIOPM*>(sender());
+    if (model != nullptr) {
+        qDebug() << "On Current Value of Model Changed" << model->name() << value.toString();
+    }
+
+    // ?
+    //setcurrentValue(value);
+
+    Q_EMIT currentValueChanged(value);
+}*/
+
+
+/**
+ * @brief Update the first model
+ */
+void AgentIOPVM::_updateFirstModel()
+{
+    if (!_models.isEmpty())
+    {
         setfirstModel(_models.at(0));
     }
-    else {
+    else
+    {
         setfirstModel(nullptr);
     }
 }

@@ -9,7 +9,6 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -18,7 +17,6 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <model/iop/agentiopm.h>
 #include <viewModel/iop/agentiopvm.h>
 
 
@@ -28,12 +26,6 @@
 class InputVM : public AgentIOPVM
 {
     Q_OBJECT
-
-    // First model of our agent input
-    //I2_QML_PROPERTY_READONLY_DELETE_PROOF(AgentIOPM*, firstModel)
-
-    // Models of our agent input
-    //I2_QOBJECT_LISTMODEL(AgentIOPM, models)
 
 
 public:
@@ -60,14 +52,6 @@ Q_SIGNALS:
 
 
 public Q_SLOTS:
-
-
-private Q_SLOTS:
-    /**
-     * @brief Slot when the list of models changed
-     */
-    //void _onModelsChanged();
-
 
 };
 

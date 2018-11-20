@@ -30,10 +30,10 @@ class LinkOutputVM : public LinkConnectorVM
 
     // View model of output
     I2_QML_PROPERTY_READONLY(OutputVM*, output)
+    //I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(OutputVM*, output)
 
-    // FIXME: rather in LinkOutputVM than in OutputVM
     // Flag indicating if a new value is published on our output
-    //I2_QML_PROPERTY_READONLY(bool, isPublishedNewValue)
+    I2_QML_PROPERTY_READONLY(bool, isPublishedNewValue)
 
 
 public:
@@ -69,6 +69,28 @@ public Q_SLOTS:
      * @return
      */
     bool canLinkWith(LinkConnectorVM* linkConnector) Q_DECL_OVERRIDE;
+
+
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the current value (of our output) changed
+     * @param value
+     */
+    void _oncurrentValueChanged(QVariant value);
+
+
+    /**
+     * @brief Slot when the timer time out
+     */
+    void _onTimeout();
+
+
+private:
+
+    // Timer to reset the flag "is Published New Value"
+    // Allows to play an animation when the value changed
+    QTimer _timer;
 
 };
 
