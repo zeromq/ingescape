@@ -855,12 +855,8 @@ Rectangle {
             }
 
             onClicked: {
-                // FIXME REPAIR: Remplacer l'apppel openDefinitionWithAgentName...
-                /*if (IngeScapeEditorC.modelManager) {
-                    IngeScapeEditorC.modelManager.openDefinitionWithAgentName(rootItem.agentName);
-                }*/
-                //...par openDefinition sur le AgentsGroupedByNameVM
-                //rootItem.agentMappingVM.openDefinition();
+                // Open the definition(s)
+                rootItem.agentsGroupedByName.openDefinition();
             }
         }
 
