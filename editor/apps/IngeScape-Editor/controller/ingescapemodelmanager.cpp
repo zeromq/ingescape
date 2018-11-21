@@ -120,7 +120,7 @@ void IngeScapeModelManager::setisMappingControlled(bool value)
  */
 void IngeScapeModelManager::addAgentModel(AgentM* agent)
 {
-    if (agent != nullptr)
+    if ((agent != nullptr) && !agent->name().isEmpty())
     {
         // Connect to signals from this new agent
         connect(agent, &AgentM::networkDataWillBeCleared, this, &IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared);
@@ -129,8 +129,24 @@ void IngeScapeModelManager::addAgentModel(AgentM* agent)
             _mapFromPeerIdToAgentM.insert(agent->peerId(), agent);
         }
 
+        // Get the (view model of) agents grouped for this name
+        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agent->name());
+        if (agentsGroupedByName == nullptr)
+        {
+            // Create a new view model of agents grouped by name
+            agentsGroupedByName = new AgentsGroupedByNameVM(agent->name(), this);
+
+            // Save this new view model of agents grouped by name
+            _saveNewAgentsGroupedByName(agentsGroupedByName);
+        }
+
+        if (agentsGroupedByName != nullptr) {
+            // Add the new model of agent
+            agentsGroupedByName->addNewAgentModel(agent);
+        }
+
         // Emit the signal "Agent Model Created"
-        Q_EMIT agentModelCreated(agent);
+        //Q_EMIT agentModelCreated(agent);
 
         _printAgents();
     }
@@ -143,7 +159,7 @@ void IngeScapeModelManager::addAgentModel(AgentM* agent)
  */
 void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
 {
-    if (agent != nullptr)
+    if ((agent != nullptr) && !agent->name().isEmpty())
     {
         // Emit the signal "Agent Model Will Be Deleted"
         Q_EMIT agentModelWillBeDeleted(agent);
@@ -171,25 +187,19 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
             _mapFromPeerIdToAgentM.remove(agent->peerId());
         }
 
-        // FIXME: do not use AgentsGroupedByNameVM inside a basic function about AgentM
-        // --> Only AgentsGroupedByNameVM could call this function
+        // Get the (view model of) agents grouped for this name
         AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agent->name());
-
-        // Remove the model from the view model of agents grouped by name
-        if ((agentsGroupedByName != nullptr) && agentsGroupedByName->models()->contains(agent)) {
-            agentsGroupedByName->models()->remove(agent);
+        if (agentsGroupedByName != nullptr)
+        {
+            // Remove the old model of agent
+            agentsGroupedByName->removeOldAgentModel(agent);
         }
-
-        // Free memory...later
-        // the call to "agent->setdefinition" will produce the call of the slot _onAgentDefinitionChangedWithPreviousAndNewValues
-        // ...and in some cases, the call to deleteAgentModel on this agent. So we cannot call directly "delete agent;"
-        //delete agent;
-        //agent->deleteLater();
 
         // Free memory
         delete agent;
 
         // Delete the view model of agents grouped by name if it does not contain model anymore
+        // FIXME TODO: create _onUselessAgentsGroupedByName
         if ((agentsGroupedByName != nullptr) && agentsGroupedByName->models()->isEmpty()) {
             deleteAgentsGroupedByName(agentsGroupedByName);
         }
@@ -207,7 +217,8 @@ void IngeScapeModelManager::_saveNewAgentsGroupedByName(AgentsGroupedByNameVM* a
 {
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
     {
-        // Connect to its signals
+        // Connect to signals from this new view model of agents grouped by definition
+        //connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreModelAndUseless, this, &IngeScapeModelManager::_onUselessAgentsGroupedByName);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::onAgentModelHasToBeDeleted);
@@ -700,26 +711,6 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
 
             // Add this new model of agent
             addAgentModel(agent);
-
-
-            // Get the (view model of) agents grouped for this name
-            AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agentName);
-            if (agentsGroupedByName == nullptr)
-            {
-                // Create a new view model of agents grouped by name
-                agentsGroupedByName = new AgentsGroupedByNameVM(agentName, this);
-
-                // Save this new view model of agents grouped by name
-                _saveNewAgentsGroupedByName(agentsGroupedByName);
-
-                // Manage the new model of agent
-                agentsGroupedByName->manageNewModel(agent);
-            }
-            else
-            {
-                // Manage the new model of agent
-                agentsGroupedByName->manageNewModel(agent);
-            }
         }
     }
 }

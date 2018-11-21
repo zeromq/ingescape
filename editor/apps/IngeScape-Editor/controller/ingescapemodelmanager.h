@@ -159,7 +159,7 @@ Q_SIGNALS:
      * @brief Signal emitted when a new model of agent has been created
      * @param agent
      */
-    void agentModelCreated(AgentM* agent);
+    //void agentModelCreated(AgentM* agent);
 
 
     /**

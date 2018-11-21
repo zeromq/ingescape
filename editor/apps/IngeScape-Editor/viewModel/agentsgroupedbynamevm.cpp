@@ -32,8 +32,6 @@ AgentsGroupedByNameVM::AgentsGroupedByNameVM(QString agentName,
 
     qInfo() << "New View Model of Agents grouped by name" << _name;
 
-    // Connect to signal "Count Changed" from the list of models
-    connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByNameVM::_onModelsChanged);
 }
 
 
@@ -44,14 +42,15 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 {
     qInfo() << "Delete View Model of Agents grouped by name" << _name;
 
-    // DIS-connect to signal "Count Changed" from the list of models
-    disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByNameVM::_onModelsChanged);
-
-    // DIS-connect from signals of each model
-    for (AgentM* model : _models)
+    // If the list of models is not empty
+    if (!_models.isEmpty())
     {
-        if (model != nullptr) {
-            disconnect(model, 0, this, 0);
+        QList<AgentM*> copy = _models.toList();
+        for (AgentM* model : copy)
+        {
+            if (model != nullptr) {
+                Q_EMIT agentModelHasToBeDeleted(model);
+            }
         }
     }
 
@@ -91,8 +90,6 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
     }
     _hashFromDefinitionToAgentsGroupedByDefinition.clear();
 
-    // Clear the previous list of models
-    _previousAgentsList.clear();
 
     // All models have already been deleted (the signal "agentModelHasToBeDeleted" is emitted for each of them
     // in the method "AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition" just before)
@@ -102,17 +99,27 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 
 
 /**
- * @brief Manage a new model of agent
+ * @brief Add a new model of agent
  * @param model
  */
-void AgentsGroupedByNameVM::manageNewModel(AgentM* model)
+void AgentsGroupedByNameVM::addNewAgentModel(AgentM* model)
 {
     if (model != nullptr)
     {
-        qDebug() << "Grouped by" << _name << "manage" << model << "entered";
+        qDebug() << "Grouped by" << _name << ": Add new model" << model;
 
-        // Simply add to our list
-        _models.append(model);
+        if (!_models.contains(model))
+        {
+            // Connect to signals from the model
+            connect(model, &AgentM::isONChanged, this, &AgentsGroupedByNameVM::_onIsONofModelChanged);
+            connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues);
+
+            // Add to our list
+            _models.append(model);
+
+            // Update with all models
+            _updateWithAllModels();
+        }
 
         if (model->definition() == nullptr)
         {
@@ -134,6 +141,38 @@ void AgentsGroupedByNameVM::manageNewModel(AgentM* model)
         {
             // FIXME TODO ? Manage a new model of agent that already have a definition. Possible ?
             qWarning() << "Manage a new model of agent that already have a definition...TODO";
+        }
+    }
+}
+
+
+/**
+ * @brief Remove an old model of agent
+ * @param model
+ */
+void AgentsGroupedByNameVM::removeOldAgentModel(AgentM* model)
+{
+    if (model != nullptr)
+    {
+        qDebug() << "Grouped by" << _name << ": Remove old model" << model;
+
+        if (_models.contains(model))
+        {
+            // DIS-connect to signals from the model
+            disconnect(model, 0, this, 0);
+
+            // Remove from our list
+            _models.remove(model);
+        }
+
+        if (_models.isEmpty())
+        {
+            // There is no more model, our VM is useless
+            Q_EMIT noMoreModelAndUseless();
+        }
+        else {
+            // Update with all models
+            _updateWithAllModels();
         }
     }
 }
@@ -356,62 +395,6 @@ ParameterVM* AgentsGroupedByNameVM::getParameterFromId(QString parameterId)
 
 
 /**
- * @brief Slot called when the list of models changed
- */
-void AgentsGroupedByNameVM::_onModelsChanged()
-{
-    QList<AgentM*> newAgentsList = _models.toList();
-
-    // Model of agent added
-    if (_previousAgentsList.count() < newAgentsList.count())
-    {
-        //qDebug() << _previousAgentsList.count() << "--> ADD --> " << newAgentsList.count();
-
-        for (AgentM* model : newAgentsList)
-        {
-            if ((model != nullptr) && !_previousAgentsList.contains(model))
-            {
-                //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
-
-                // Connect to signals of the model
-                connect(model, &AgentM::isONChanged, this, &AgentsGroupedByNameVM::_onIsONofModelChanged);
-                connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues);
-
-            }
-        }
-    }
-    // Model of agent removed
-    else if (_previousAgentsList.count() > newAgentsList.count())
-    {
-        //qDebug() << _previousAgentsList.count() << "--> REMOVE --> " << newAgentsList.count();
-
-        for (AgentM* model : _previousAgentsList)
-        {
-            if ((model != nullptr) && !newAgentsList.contains(model))
-            {
-                //qDebug() << "Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
-
-                // DIS-connect from signals of the model
-                disconnect(model, 0, this, 0);
-            }
-        }
-    }
-
-    _previousAgentsList = newAgentsList;
-
-    /*if (_models.isEmpty())
-    {
-        // There is no more model, our VM is useless
-        Q_EMIT noMoreModelAndUseless();
-    }
-    else {*/
-        // Update with all models
-        _updateWithAllModels();
-    //}
-}
-
-
-/**
  * @brief Slot called when the flag "is ON" of a model changed
  * @param isON
  */
@@ -522,6 +505,9 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
 
                         // Add the model of agent to the view model of agents grouped by definition
                         groupOfAgentsWithSameDefinition->models()->append(model);
+
+                        // Emit the signal to notify that the new model has been added
+                        Q_EMIT agentModelHasBeenAdded(model);
                     }
                     // There is already some agent models on this host
                     else
@@ -533,6 +519,9 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
 
                             // Add the model of agent to the view model of agents grouped by definition
                             groupOfAgentsWithSameDefinition->models()->append(model);
+
+                            // Emit the signal to notify that the new model has been added
+                            Q_EMIT agentModelHasBeenAdded(model);
                         }
                         // Peer id is defined: check if it is an agent that evolve from OFF to ON
                         else
@@ -615,14 +604,15 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                             {
                                 if (groupOfAgentsWithSameDefinition->models()->contains(sameModel))
                                 {
-                                    // Emit the signal "Identical Agent Model will be Replaced"
-                                    //Q_EMIT identicalAgentModelWillBeReplaced(sameModel, model);
-
                                     qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
 
                                     // First add the new model before remove the previous model
                                     // (allows to prevent to have 0 model at a given moment and to prevent to emit signal noMoreModelAndUseless that remove the groupOfAgentsWithSameDefinition)
                                     groupOfAgentsWithSameDefinition->models()->append(model);
+
+                                    // Emit the signal to notify that the new model has been added
+                                    Q_EMIT agentModelHasBeenAdded(model);
+
                                     groupOfAgentsWithSameDefinition->models()->remove(sameModel);
 
                                     // Emit the signal to delete the previous model of agent
@@ -636,6 +626,9 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
 
                                 // Add the model of agent to the view model of agents grouped by definition
                                 groupOfAgentsWithSameDefinition->models()->append(model);
+
+                                // Emit the signal to notify that the new model has been added
+                                Q_EMIT agentModelHasBeenAdded(model);
                             }
                         }
                     }
@@ -700,9 +693,7 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
 {
     qDebug() << "Grouped by" << _name << ": Update with all (" << _models.count() << ") models (" << this << ")";
 
-    // Note: hostname is never empty (default value is HOSTNAME_NOT_DEFINED)
     _peerIdsList.clear();
-    //_hashFromHostnameToModels.clear();
 
     bool globalIsON = false;
     int numberOfAgentsON = 0;
@@ -717,10 +708,6 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
             if (!model->peerId().isEmpty()) {
                 _peerIdsList = QStringList(model->peerId());
             }
-
-            //QList<AgentM*> modelsOnHost;
-            //modelsOnHost.append(model);
-            //_hashFromHostnameToModels.insert(model->hostname(), modelsOnHost);
 
             globalIsON = model->isON();
 
@@ -745,10 +732,6 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
                 if (!model->peerId().isEmpty()) {
                     _peerIdsList.append(model->peerId());
                 }
-
-                //QList<AgentM*> modelsOnHost = getModelsOnHost(model->hostname());
-                //modelsOnHost.append(model);
-                //_hashFromHostnameToModels.insert(model->hostname(), modelsOnHost);
 
                 if (model->isON())
                 {
@@ -812,6 +795,9 @@ void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
 
             // Add the model of agent to the view model of agents grouped by definition
             groupOfAgentsWithSameDefinition->models()->append(model);
+
+            // Emit the signal to notify that the new model has been added
+            Q_EMIT agentModelHasBeenAdded(model);
         }
         else
         {

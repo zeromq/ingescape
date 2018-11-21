@@ -185,8 +185,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_modelManager, &IngeScapeModelManager::isMappingActivatedChanged, _agentsMappingC, &AgentsMappingController::onIsMappingActivatedChanged);
     connect(_modelManager, &IngeScapeModelManager::isMappingControlledChanged, _agentsMappingC, &AgentsMappingController::onIsMappingControlledChanged);
 
-    connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelCreated);
-    connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _valuesHistoryC, &ValuesHistoryController::onAgentModelCreated);
+    // FIXME REPAIR: agentModelCreated
+    //connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelCreated);
+    //connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _valuesHistoryC, &ValuesHistoryController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
 
     connect(_modelManager, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated);

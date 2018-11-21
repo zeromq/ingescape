@@ -84,10 +84,17 @@ public:
 
 
     /**
-     * @brief Manage a new model of agent
+     * @brief Add a new model of agent
      * @param model
      */
-    void manageNewModel(AgentM* model);
+    void addNewAgentModel(AgentM* model);
+
+
+    /**
+     * @brief Remove an old model of agent
+     * @param model
+     */
+    void removeOldAgentModel(AgentM* model);
 
 
     /**
@@ -163,6 +170,13 @@ public:
 
 
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when our view model has become useless (no more model)
+     */
+    void noMoreModelAndUseless();
+
+
     /**
      * @brief Signal emitted when a new view model of agents grouped by definition has been created
      * @param agentsGroupedByDefinition
@@ -178,18 +192,17 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when a model of agent has been added
+     * @param model
+     */
+    void agentModelHasBeenAdded(AgentM* model);
+
+
+    /**
      * @brief Signal emitted when a model of agent has to be deleted
      * @param model
      */
     void agentModelHasToBeDeleted(AgentM* model);
-
-
-    /**
-     * @brief FIXME Usefull ? Signal emitted when a previous model of agent will be replaced by a new one strictly identical
-     * @param previousModel
-     * @param newModel
-     */
-    //void identicalAgentModelWillBeReplaced(AgentM* previousModel, AgentM* newModel);
 
 
     /**
@@ -231,12 +244,6 @@ public Q_SLOTS:
 
 
 private Q_SLOTS:
-
-    /**
-     * @brief Slot called when the list of models changed
-     */
-    void _onModelsChanged();
-
 
     /**
      * @brief Slot called when the flag "is ON" of a model changed
@@ -380,8 +387,6 @@ private:
 
 
 private:
-    // Previous list of models of agents
-    QList<AgentM*> _previousAgentsList;
 
     // View model of agents grouped by definition NULL
     AgentsGroupedByDefinitionVM* _agentsGroupedByDefinitionNULL = nullptr;
