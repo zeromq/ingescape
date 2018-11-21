@@ -424,7 +424,7 @@ Item {
                     height: childrenRect.height + 5
 
                     Repeater {
-                        model: groupByNameVM.listOfGroupsByDefinition
+                        model: groupByNameVM.allGroupsByDefinition
 
                         Rectangle {
 

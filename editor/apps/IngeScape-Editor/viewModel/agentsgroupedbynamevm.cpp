@@ -42,8 +42,8 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 {
     qInfo() << "Delete View Model of Agents grouped by name" << _name;
 
-    // If the list of models is not empty
-    if (!_models.isEmpty())
+    // Models are managed by agents grouped by definition (do not manage them here)
+    /*if (!_models.isEmpty())
     {
         QList<AgentM*> copy = _models.toList();
         for (AgentM* model : copy)
@@ -52,11 +52,7 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
                 Q_EMIT agentModelHasToBeDeleted(model);
             }
         }
-    }
-
-    // DEBUG
-    _listOfGroupsByDefinition.clear();
-
+    }*/
 
     // Clear hash tables of Inputs, Outputs and Parameters
     _hashFromNameToInputsList.clear();
@@ -72,23 +68,21 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
     _parametersList.deleteAllItems();
 
 
-    // Delete all view models of agents grouped by definition
-    if (_agentsGroupedByDefinitionNULL != nullptr)
+    // If the list of groups of agent(s grouped by definition) is not empty
+    if (!_allGroupsByDefinition.isEmpty())
     {
-        // Delete the view model of agents grouped by definition
-        // And emit the signal "agentModelHasToBeDeleted" for each of its model of agent
-        deleteAgentsGroupedByDefinition(_agentsGroupedByDefinitionNULL);
+        // Delete all view models of agents grouped by definition
+        for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : _allGroupsByDefinition)
+        {
+            // Delete the view model of agents grouped by definition
+            // And emit the signal "agentModelHasToBeDeleted" for each of its model of agent
+            deleteAgentsGroupedByDefinition(agentsGroupedByDefinition);
+        }
 
         //_agentsGroupedByDefinitionNULL = nullptr;
+        //_hashFromDefinitionToAgentsGroupedByDefinition.clear();
+        _allGroupsByDefinition.clear();
     }
-
-    for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : _hashFromDefinitionToAgentsGroupedByDefinition.values())
-    {
-        // Delete the view model of agents grouped by definition
-        // And emit the signal "agentModelHasToBeDeleted" for each of its model of agent
-        deleteAgentsGroupedByDefinition(agentsGroupedByDefinition);
-    }
-    _hashFromDefinitionToAgentsGroupedByDefinition.clear();
 
 
     // All models have already been deleted (the signal "agentModelHasToBeDeleted" is emitted for each of them
@@ -168,7 +162,7 @@ void AgentsGroupedByNameVM::removeOldAgentModel(AgentM* model)
         if (_models.isEmpty())
         {
             // There is no more model, our VM is useless
-            Q_EMIT noMoreModelAndUseless();
+            //Q_EMIT noMoreModelAndUseless();
         }
         else {
             // Update with all models
@@ -228,9 +222,6 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
         // DIS-connect to signals from this view model of agents grouped by definition
         disconnect(agentsGroupedByDefinition, 0, this, 0);
 
-        // DEBUG
-        _listOfGroupsByDefinition.remove(agentsGroupedByDefinition);
-
         if (agentsGroupedByDefinition->definition() != nullptr)
         {
             DefinitionM* definition = agentsGroupedByDefinition->definition();
@@ -250,9 +241,13 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
             //Q_EMIT modelsOfIOPChanged();
         }
         // The definition is NULL
-        else if (agentsGroupedByDefinition == _agentsGroupedByDefinitionNULL) {
+        else if (agentsGroupedByDefinition == _agentsGroupedByDefinitionNULL)
+        {
             _agentsGroupedByDefinitionNULL = nullptr;
         }
+
+        // Remove from the list
+        _allGroupsByDefinition.remove(agentsGroupedByDefinition);
 
         // Make a copy of the list of models
         QList<AgentM*> copy = agentsGroupedByDefinition->models()->toList();
@@ -260,13 +255,23 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
         // Free memory
         delete agentsGroupedByDefinition;
 
-        // Delete each model of agent
-        for (AgentM* model : copy)
+        if (!copy.isEmpty())
         {
-            if (model != nullptr) {
-                // Emit the signal to delete this model of agent
-                Q_EMIT agentModelHasToBeDeleted(model);
+            // Delete each model of agent
+            for (AgentM* model : copy)
+            {
+                if (model != nullptr) {
+                    // Emit the signal to delete this model of agent
+                    Q_EMIT agentModelHasToBeDeleted(model);
+                }
             }
+        }
+
+        // FIXME the list _allGroupsByDefinition can be empty temporary
+        // When the definition of a model evolve from NULL to a defined one (in _onDefinitionOfModelChangedWithPreviousAndNewValues)
+        if (_allGroupsByDefinition.isEmpty()) {
+            // Emit the signal "No more Agents Grouped by Definition" (our view model if useless)
+            //Q_EMIT noMoreAgentsGroupedByDefinitionAndUseless();
         }
     }
 }
@@ -844,11 +849,11 @@ void AgentsGroupedByNameVM::_saveNewAgentsGroupedByDefinition(AgentsGroupedByDef
             //Q_EMIT modelsOfIOPChanged();
         }
 
+        // Add to the list
+        _allGroupsByDefinition.append(agentsGroupedByDefinition);
+
         // Emit the signal "Agents grouped by definition has been created"
         Q_EMIT agentsGroupedByDefinitionHasBeenCreated(agentsGroupedByDefinition);
-
-        // DEBUG
-        _listOfGroupsByDefinition.append(agentsGroupedByDefinition);
     }
 }
 

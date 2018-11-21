@@ -199,7 +199,6 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         delete agent;
 
         // Delete the view model of agents grouped by name if it does not contain model anymore
-        // FIXME TODO: create _onUselessAgentsGroupedByName
         if ((agentsGroupedByName != nullptr) && agentsGroupedByName->models()->isEmpty()) {
             deleteAgentsGroupedByName(agentsGroupedByName);
         }
@@ -219,6 +218,7 @@ void IngeScapeModelManager::_saveNewAgentsGroupedByName(AgentsGroupedByNameVM* a
     {
         // Connect to signals from this new view model of agents grouped by definition
         //connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreModelAndUseless, this, &IngeScapeModelManager::_onUselessAgentsGroupedByName);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreAgentsGroupedByDefinitionAndUseless, this, &IngeScapeModelManager::_onUselessAgentsGroupedByName);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::onAgentModelHasToBeDeleted);
@@ -1151,6 +1151,19 @@ void IngeScapeModelManager::onAgentMappingFilePath(QString peerId, QString mappi
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->setmappingFilePath(mappingFilePath);
+    }
+}
+
+
+/**
+ * @brief Slot called when a view model of agents grouped by name has become useless (no more agents grouped by definition)
+ */
+void IngeScapeModelManager::_onUselessAgentsGroupedByName()
+{
+    AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
+    if (agentsGroupedByName != nullptr) {
+        // Delete the view model of agents grouped by name
+        deleteAgentsGroupedByName(agentsGroupedByName);
     }
 }
 

@@ -61,8 +61,8 @@ class AgentsGroupedByNameVM : public QObject
     // List of view models of parameters
     I2_QOBJECT_LISTMODEL(ParameterVM, parametersList)
 
-    // FIXME DEBUG: List of groups of agents, grouped by definition
-    I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, listOfGroupsByDefinition)
+    // List of all groups of agents grouped by definition
+    I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, allGroupsByDefinition)
 
     // Current mapping (real mapping without edition)
     //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, currentMapping)
@@ -174,7 +174,13 @@ Q_SIGNALS:
     /**
      * @brief Signal emitted when our view model has become useless (no more model)
      */
-    void noMoreModelAndUseless();
+    //void noMoreModelAndUseless();
+
+
+    /**
+     * @brief Signal emitted when our view model has become useless (no more agents grouped by definition)
+     */
+    void noMoreAgentsGroupedByDefinitionAndUseless();
 
 
     /**

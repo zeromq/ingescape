@@ -412,6 +412,12 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     /**
+     * @brief Slot called when a view model of agents grouped by name has become useless (no more agents grouped by definition)
+     */
+    void _onUselessAgentsGroupedByName();
+
+
+    /**
      * @brief Slot called when the network data (of an agent) will be cleared
      * @param peerId
      */
