@@ -21,10 +21,6 @@
 #include <I2PropertyHelpers.h>
 
 #include <viewModel/agentsgroupedbynamevm.h>
-//#include <model/agentm.h>
-//#include <viewModel/iop/inputvm.h>
-//#include <viewModel/iop/outputvm.h>
-//#include <viewModel/iop/parametervm.h>
 #include <viewModel/link/linkinputvm.h>
 #include <viewModel/link/linkoutputvm.h>
 

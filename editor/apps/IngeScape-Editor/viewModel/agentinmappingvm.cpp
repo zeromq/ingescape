@@ -217,6 +217,8 @@ void AgentInMappingVM::_onInputsHaveBeenAdded(QList<InputVM*> newInputs)
     {
         if ((input != nullptr) && !input->name().isEmpty())
         {
+            qDebug() << "_onInputsHaveBeenAdded" << input->name();
+
             LinkInputVM* linkInput = new LinkInputVM(input);
 
             tempLinkInputs.append(linkInput);
@@ -255,6 +257,8 @@ void AgentInMappingVM::_onOutputsHaveBeenAdded(QList<OutputVM*> newOutputs)
     {
         if ((output != nullptr) && !output->name().isEmpty())
         {
+            qDebug() << "_onOutputsHaveBeenAdded" << output->name();
+
             LinkOutputVM* linkOutput = new LinkOutputVM(output);
 
             tempLinkOutputs.append(linkOutput);

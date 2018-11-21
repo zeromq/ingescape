@@ -80,10 +80,10 @@ I2CubicBezierCurve {
     stroke: if (rootItem._isBrin && linkOutput && viewModel && viewModel.outputAgent)
             {
                 if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingActivated) {
-                    IngeScapeTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedMapValueTypeGroupInOutput, true);
+                    IngeScapeTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, true);
                 }
                 else {
-                    IngeScapeTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedMapValueTypeGroupInOutput, false);
+                    IngeScapeTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, false);
                 }
             }
             else
@@ -104,7 +104,7 @@ I2CubicBezierCurve {
             }
 
 
-    strokeWidth: (rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinDefaultWidth : IngeScapeTheme.agentsMappingLinkDefaultWidth)
+    strokeWidth: rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinDefaultWidth : IngeScapeTheme.agentsMappingLinkDefaultWidth
 
     strokeDashArray: (viewModel && viewModel.isVirtual) ? (rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinVirtualStrokeDashArray : IngeScapeTheme.agentsMappingLinkVirtualStrokeDashArray)
                                                         : ""
@@ -113,8 +113,9 @@ I2CubicBezierCurve {
     fuzzyColor: IngeScapeTheme.lightGreyColor
     fuzzyRadius: (viewModel && controller && (controller.selectedLink === viewModel)) ? 2 : 0
 
-    opacity: mouseArea.pressed ? 0.8 : 1;
+    opacity: mouseArea.pressed ? 0.8 : 1
 
+    z: (linkOutput && linkOutput.isPublishedNewValue) ? 1 : 0
 
 
     //--------------------------------
