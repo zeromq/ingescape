@@ -119,14 +119,14 @@ bool ValuesHistoryController::areShownValuesOfAgent(QString agentName)
 
 
 /**
- * @brief FIXME: use AgentsGroupedByNameVM instead - Slot called when a new model of agent has been created
- * @param agent
+ * @brief Slot called when a new view model of agents grouped by name has been created
+ * @param agentsGroupedByName
  */
-void ValuesHistoryController::onAgentModelCreated(AgentM* agent)
+void ValuesHistoryController::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName)
 {
-    if ((agent != nullptr) && !agent->name().isEmpty())
+    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
     {
-        QString agentName = agent->name();
+        QString agentName = agentsGroupedByName->name();
 
         if (!_allAgentNamesList.contains(agentName))
         {
