@@ -295,7 +295,6 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                     // Create a new VIRTUAL link between agents
                     LinkVM* link = new LinkVM(outputAgent, linkOutput, inputAgent, linkInput, true, this);
 
-                    // Add to the list and to the hash
                     _allLinksInMapping.append(link);
                     _hashFromNameToLinkInMapping.insert(link->name(), link);
 
@@ -316,7 +315,6 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                     // Create a new link between agents
                     LinkVM* link = new LinkVM(outputAgent, linkOutput, inputAgent, linkInput, false, this);
 
-                    // Add to the list and to the hash
                     _allLinksInMapping.append(link);
                     _hashFromNameToLinkInMapping.insert(link->name(), link);
 
@@ -853,7 +851,6 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
                     // Create a new map between agents
                     link = new LinkVM(outputAgent, linkOutput, inputAgent, linkInput, false, this);
 
-                    // Add to the list and to the hash
                     _allLinksInMapping.append(link);
                     _hashFromNameToLinkInMapping.insert(link->name(), link);
 

@@ -223,7 +223,6 @@ void AgentInMappingVM::_onInputsHaveBeenAdded(QList<InputVM*> newInputs)
 
             tempLinkInputs.append(linkInput);
 
-            // Add to the hash table with the input id
             if (!input->id().isEmpty()) {
                 _hashFromIdToLinkInput.insert(input->id(), linkInput);
             }
@@ -263,7 +262,6 @@ void AgentInMappingVM::_onOutputsHaveBeenAdded(QList<OutputVM*> newOutputs)
 
             tempLinkOutputs.append(linkOutput);
 
-            // Add to the hash table with the input id
             if (!output->id().isEmpty()) {
                 _hashFromIdToLinkOutput.insert(output->id(), linkOutput);
             }

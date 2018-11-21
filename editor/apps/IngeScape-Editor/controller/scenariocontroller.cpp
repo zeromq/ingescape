@@ -1645,6 +1645,7 @@ void ScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* agentsGr
                   || (command == command_MuteAgent) || (command == command_UnmuteAgent)
                   || (command == command_FreezeAgent) || (command == command_UnfreezeAgent) )
         {
+            // Emit signal "Command asked to agent"
             Q_EMIT commandAskedToAgent(agentsGroupedByName->peerIdsList(), command);
         }
         // MAP or UNMAP
@@ -1656,6 +1657,7 @@ void ScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* agentsGr
                 QString outputAgentName = commandAndParameters.at(2);
                 QString outputName = commandAndParameters.at(3);
 
+                // Emit signal "Command asked to agent about Mapping Input"
                 Q_EMIT commandAskedToAgentAboutMappingInput(agentsGroupedByName->peerIdsList(), command, inputName, outputAgentName, outputName);
             }
             else {
@@ -1670,6 +1672,7 @@ void ScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* agentsGr
                 QString agentIOPName = commandAndParameters.at(1);
                 QString value = commandAndParameters.at(2);
 
+                // Emit signal "Command asked to agent about Setting Value"
                 Q_EMIT commandAskedToAgentAboutSettingValue(agentsGroupedByName->peerIdsList(), command, agentIOPName, value);
             }
             else {

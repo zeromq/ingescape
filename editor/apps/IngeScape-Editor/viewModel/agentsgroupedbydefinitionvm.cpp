@@ -63,7 +63,6 @@ AgentsGroupedByDefinitionVM::AgentsGroupedByDefinitionVM(AgentM* model,
         // Connect to signal "Count Changed" from the list of models
         connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByDefinitionVM::_onModelsChanged);
 
-        // Add to the list
         _models.append(model);
     }
 }

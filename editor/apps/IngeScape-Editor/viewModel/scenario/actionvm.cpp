@@ -493,7 +493,6 @@ void ActionVM::_createActionExecution(int startTime)
         // Create a new (view model of) action execution
         ActionExecutionVM* actionExecution = new ActionExecutionVM(_modelM->shallRevert(), startTime, reverseTime, this);
 
-        // Add to the list
         _executionsList.append(actionExecution);
 
         //qDebug() << "_createActionExecution: action" << _modelM->name() << "has" << _executionsList.count() << "executions";

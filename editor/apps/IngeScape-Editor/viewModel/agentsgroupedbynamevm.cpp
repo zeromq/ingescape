@@ -108,7 +108,6 @@ void AgentsGroupedByNameVM::addNewAgentModel(AgentM* model)
             connect(model, &AgentM::isONChanged, this, &AgentsGroupedByNameVM::_onIsONofModelChanged);
             connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues);
 
-            // Add to our list
             _models.append(model);
 
             // Update with all models
@@ -830,7 +829,6 @@ void AgentsGroupedByNameVM::_saveNewAgentsGroupedByDefinition(AgentsGroupedByDef
         // Connect slots to signals from this new view model of agents grouped by definition
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::noMoreModelAndUseless, this, &AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition);
 
-        // Add to the hash table from definition
         if (agentsGroupedByDefinition->definition() != nullptr)
         {
             DefinitionM* definition = agentsGroupedByDefinition->definition();
@@ -849,7 +847,6 @@ void AgentsGroupedByNameVM::_saveNewAgentsGroupedByDefinition(AgentsGroupedByDef
             //Q_EMIT modelsOfIOPChanged();
         }
 
-        // Add to the list
         _allGroupsByDefinition.append(agentsGroupedByDefinition);
 
         // Emit the signal "Agents grouped by definition has been created"
@@ -1199,7 +1196,6 @@ QPair<bool, InputVM*> AgentsGroupedByNameVM::_manageNewInputModel(AgentIOPM* inp
 
                 // Don't add to the list here (this input will be added globally via temporary list)
 
-                // Add to the hash table with the input id
                 _hashFromIdToInput.insert(input->id(), inputVM);
 
                 // Update the list of view models of input for this name
@@ -1256,7 +1252,6 @@ QPair<bool, OutputVM*> AgentsGroupedByNameVM::_manageNewOutputModel(OutputM* out
 
                 // Don't add to the list here (this output will be added globally via temporary list)
 
-                // Add to the hash table with the output id
                 _hashFromIdToOutput.insert(output->id(), outputVM);
 
                 // Update the list of view models of output for this name
@@ -1313,7 +1308,6 @@ QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageNewParameterModel(AgentI
 
                 // Don't add to the list here (this parameter will be added globally via temporary list)
 
-                // Add to the hash table with the parameter id
                 _hashFromIdToParameter.insert(parameter->id(), parameterVM);
 
                 // Update the list of view models of parameter for this name

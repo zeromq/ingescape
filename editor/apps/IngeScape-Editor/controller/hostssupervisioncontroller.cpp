@@ -95,7 +95,6 @@ void HostsSupervisionController::onHostModelHasBeenCreated(HostM* host)
 
             _hashFromNameToHost.insert(hostName, hostVM);
 
-            // Add to the sorted list of hosts
             _hostsList.append(hostVM);
 
             // Associate host with existing agents if necessary

@@ -217,10 +217,8 @@ void IngeScapeModelManager::_saveNewAgentsGroupedByName(AgentsGroupedByNameVM* a
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::onAgentModelHasToBeDeleted);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &IngeScapeModelManager::onDefinitionsToOpen);
 
-        // Add to the hash table
         _hashFromNameToAgentsGrouped.insert(agentsGroupedByName->name(), agentsGroupedByName);
 
-        // Add to the sorted list
         _allAgentsGroupedByName.append(agentsGroupedByName);
 
         // Emit the signal "Agents grouped by name has been created"
