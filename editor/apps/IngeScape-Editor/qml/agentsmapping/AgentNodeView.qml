@@ -1001,7 +1001,7 @@ Rectangle {
             radius : height/2
 
             color : if (agentMappingVM) {
-                        IngeScapeTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedMapValueTypeGroupInInput, true);
+                        IngeScapeTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedLinkInputsValueTypeGroup, true);
                     }
                     else {
                         IngeScapeTheme.whiteColor
@@ -1030,7 +1030,7 @@ Rectangle {
             radius : height/2
 
             color : if (agentMappingVM) {
-                        IngeScapeTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedMapValueTypeGroupInOutput, true);
+                        IngeScapeTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedLinkOutputsValueTypeGroup, true);
                     }
                     else {
                         IngeScapeTheme.whiteColor

@@ -55,11 +55,11 @@ class AgentInMappingVM : public QObject
     // Flag indicating if our agent is reduced
     I2_QML_PROPERTY(bool, isReduced)
 
-    // Group of value type of the reduced map (= brin) in input of the agent
-    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedMapValueTypeGroupInInput)
+    // Group of value type of the reduced link inputs of our agent (= brin)
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedLinkInputsValueTypeGroup)
 
-    // Group of value type of the reduced map (= brin) in output of the agent
-    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedMapValueTypeGroupInOutput)
+    // Group of value type of the reduced link outputs of our agent (= brin)
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedLinkOutputsValueTypeGroup)
 
     // Mapping currently edited (temporary until the user activate the mapping)
     I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
@@ -283,17 +283,15 @@ private:
 
 
     /**
-     * @brief Update the group (of value type) of the reduced map (= brin) in input of our agent
-     * FIXME RENAME: _updateReducedMapValueTypeGroupInInput
+     * @brief Update the group (of value type) of the reduced link inputs of our agent (= brin)
      */
-    void _updateReducedMapValueTypeGroupInInput();
+    void _updateReducedLinkInputsValueTypeGroup();
 
 
     /**
-     * @brief Update the group (of value type) of the reduced map (= brin) in output of our agent
-     * FIXME RENAME: _updateReducedMapValueTypeGroupInOutput
+     * @brief Update the group (of value type) of the reduced link outputs of our agent (= brin)
      */
-    void _updateReducedMapValueTypeGroupInOutput();
+    void _updateReducedLinkOutputsValueTypeGroup();
 
 
     /**

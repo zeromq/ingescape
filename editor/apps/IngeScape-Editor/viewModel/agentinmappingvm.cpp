@@ -27,8 +27,8 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     _agentsGroupedByName(agentsGroupedByName),
     _position(position),
     _isReduced(false),
-    _reducedMapValueTypeGroupInInput(AgentIOPValueTypeGroups::MIXED),
-    _reducedMapValueTypeGroupInOutput(AgentIOPValueTypeGroups::MIXED),
+    _reducedLinkInputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
+    _reducedLinkOutputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
     _temporaryMapping(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -237,8 +237,8 @@ void AgentInMappingVM::_onInputsHaveBeenAdded(QList<InputVM*> newInputs)
     {
         _linkInputsList.append(tempLinkInputs);
 
-        // Update the group (of value type) of the reduced map (= brin) in input of our agent
-        _updateReducedMapValueTypeGroupInInput();
+        // Update the group (of value type) of the reduced link inputs of our agent (= brin)
+        _updateReducedLinkInputsValueTypeGroup();
     }
 }
 
@@ -275,8 +275,8 @@ void AgentInMappingVM::_onOutputsHaveBeenAdded(QList<OutputVM*> newOutputs)
     {
         _linkOutputsList.append(tempLinkOutputs);
 
-        // Update the group (of value type) of the reduced map (= brin) in output of our agent
-        _updateReducedMapValueTypeGroupInOutput();
+        // Update the group (of value type) of the reduced link outputs of our agent (= brin)
+        _updateReducedLinkOutputsValueTypeGroup();
     }
 }
 
@@ -348,8 +348,8 @@ void AgentInMappingVM::_onInputsWillBeRemoved(QList<InputVM*> oldInputs)
             }
         }
 
-        // Update the group (of value type) of the reduced map (= brin) in input of our agent
-        _updateReducedMapValueTypeGroupInInput();
+        // Update the group (of value type) of the reduced link inputs of our agent (= brin)
+        _updateReducedLinkInputsValueTypeGroup();
     }
 }
 
@@ -421,8 +421,8 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
             }
         }
 
-        // Update the group (of value type) of the reduced map (= brin) in output of our agent
-        _updateReducedMapValueTypeGroupInOutput();
+        // Update the group (of value type) of the reduced link outputs of our agent (= brin)
+        _updateReducedLinkOutputsValueTypeGroup();
     }
 }
 
@@ -474,11 +474,6 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
     }
 
     _previousAgentsList = newAgentsList;
-
-
-    // Update the group (of value type) of the reduced map (= brin) in input and in output of our agent
-    _updateReducedMapValueTypeGroupInInput();
-    _updateReducedMapValueTypeGroupInOutput();
 }*/
 
 
@@ -1320,11 +1315,11 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
 
 
 /**
- * @brief Update the group (of value type) of the reduced map (= brin) in input of our agent
+ * @brief Update the group (of value type) of the reduced link inputs of our agent (= brin)
  */
-void AgentInMappingVM::_updateReducedMapValueTypeGroupInInput()
+void AgentInMappingVM::_updateReducedLinkInputsValueTypeGroup()
 {
-    AgentIOPValueTypeGroups::Value globalReducedMapValueTypeGroupInInput = AgentIOPValueTypeGroups::UNKNOWN;
+    AgentIOPValueTypeGroups::Value globalReducedLinkInputsValueTypeGroup = AgentIOPValueTypeGroups::UNKNOWN;
 
     for (int i = 0; i < _linkInputsList.count(); i++)
     {
@@ -1333,28 +1328,28 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInInput()
         if ((linkInput != nullptr) && (linkInput->input() != nullptr) && (linkInput->input()->firstModel() != nullptr))
         {
             if (i == 0) {
-                globalReducedMapValueTypeGroupInInput = linkInput->input()->firstModel()->agentIOPValueTypeGroup();
+                globalReducedLinkInputsValueTypeGroup = linkInput->input()->firstModel()->agentIOPValueTypeGroup();
             }
             else
             {
-                if (globalReducedMapValueTypeGroupInInput != linkInput->input()->firstModel()->agentIOPValueTypeGroup())
+                if (globalReducedLinkInputsValueTypeGroup != linkInput->input()->firstModel()->agentIOPValueTypeGroup())
                 {
-                    globalReducedMapValueTypeGroupInInput = AgentIOPValueTypeGroups::MIXED;
+                    globalReducedLinkInputsValueTypeGroup = AgentIOPValueTypeGroups::MIXED;
                     break;
                 }
             }
         }
     }
-    setreducedMapValueTypeGroupInInput(globalReducedMapValueTypeGroupInInput);
+    setreducedLinkInputsValueTypeGroup(globalReducedLinkInputsValueTypeGroup);
 }
 
 
 /**
- * @brief Update the group (of value type) of the reduced map (= brin) in output of our agent
+ * @brief Update the group (of value type) of the reduced link outputs of our agent (= brin)
  */
-void AgentInMappingVM::_updateReducedMapValueTypeGroupInOutput()
+void AgentInMappingVM::_updateReducedLinkOutputsValueTypeGroup()
 {
-    AgentIOPValueTypeGroups::Value globalReducedMapValueTypeGroupInOutput = AgentIOPValueTypeGroups::UNKNOWN;
+    AgentIOPValueTypeGroups::Value globalReducedLinkOutputsValueTypeGroup = AgentIOPValueTypeGroups::UNKNOWN;
 
     for (int i = 0; i < _linkOutputsList.count(); i++)
     {
@@ -1363,19 +1358,19 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInOutput()
         if ((linkOutput != nullptr) && (linkOutput->output() != nullptr) && (linkOutput->output()->firstModel() != nullptr))
         {
             if (i == 0) {
-                globalReducedMapValueTypeGroupInOutput = linkOutput->output()->firstModel()->agentIOPValueTypeGroup();
+                globalReducedLinkOutputsValueTypeGroup = linkOutput->output()->firstModel()->agentIOPValueTypeGroup();
             }
             else
             {
-                if (globalReducedMapValueTypeGroupInOutput != linkOutput->output()->firstModel()->agentIOPValueTypeGroup())
+                if (globalReducedLinkOutputsValueTypeGroup != linkOutput->output()->firstModel()->agentIOPValueTypeGroup())
                 {
-                    globalReducedMapValueTypeGroupInOutput = AgentIOPValueTypeGroups::MIXED;
+                    globalReducedLinkOutputsValueTypeGroup = AgentIOPValueTypeGroups::MIXED;
                     break;
                 }
             }
         }
     }
-    setreducedMapValueTypeGroupInOutput(globalReducedMapValueTypeGroupInOutput);
+    setreducedLinkOutputsValueTypeGroup(globalReducedLinkOutputsValueTypeGroup);
 }
 
 
