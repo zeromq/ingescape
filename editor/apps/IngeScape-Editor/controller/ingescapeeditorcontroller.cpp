@@ -203,7 +203,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Connect to signals from the controller for supervision of agents
-    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, this, &IngeScapeEditorController::_onCommandAskedToLauncher);
+    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgentAboutOutput, _networkC, &NetworkController::onCommandAskedToAgentAboutOutput);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openValuesHistoryOfAgent, _valuesHistoryC, &ValuesHistoryController::filterValuesToShowOnlyAgent);
@@ -219,7 +219,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Connect to signals from the controller of the scenario
-    connect(_scenarioC, &ScenarioController::commandAskedToLauncher, this, &IngeScapeEditorController::_onCommandAskedToLauncher);
+    connect(_scenarioC, &ScenarioController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);
     connect(_scenarioC, &ScenarioController::commandAskedToRecorder, this, &IngeScapeEditorController::_onCommandAskedToRecorder);
     connect(_scenarioC, &ScenarioController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutSettingValue, _networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
@@ -873,26 +873,6 @@ void IngeScapeEditorController::_onCommandAskedToRecorder(QString commandAndPara
     if ((_networkC != nullptr) && (_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
     {
         _networkC->onCommandAskedToRecorder(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
-    }
-}
-
-
-/**
- * @brief Slot called when a command must be sent on the network to a launcher
- * @param hostname
- * @param command
- * @param commandLine
- */
-void IngeScapeEditorController::_onCommandAskedToLauncher(QString hostname, QString command, QString commandLine)
-{
-    if ((_networkC != nullptr) && (_hostsSupervisionC != nullptr) && !hostname.isEmpty())
-    {
-        // Get the peer id of the Launcher on the HostName
-        QString peerIdOfLauncher = _hostsSupervisionC->getPeerIdOfLauncherOnHostName(hostname);
-        if (!peerIdOfLauncher.isEmpty())
-        {
-            _networkC->onCommandAskedToLauncher(peerIdOfLauncher, command, commandLine);
-        }
     }
 }
 

@@ -96,11 +96,11 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
-     * @param hostname
+     * @param peerIdOfLauncher
      * @param command
      * @param commandLine
      */
-    void commandAskedToLauncher(QString hostname, QString command, QString commandLine);
+    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
 
 
     /**
@@ -151,6 +151,15 @@ public Q_SLOTS:
 
 
 private Q_SLOTS:
+
+    /**
+     * @brief Slot called when a command must be sent on the network to a launcher
+     * @param hostname
+     * @param command
+     * @param commandLine
+     */
+    void _onCommandAskedToLauncher(QString hostname, QString command, QString commandLine);
+
 
     /**
      * @brief Slot called when we have to load an agent definition from a JSON file (path)

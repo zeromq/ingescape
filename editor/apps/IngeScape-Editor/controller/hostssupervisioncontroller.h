@@ -53,14 +53,6 @@ public:
 
 
     /**
-     * @brief Get the peer id of a Launcher on a HostName
-     * @param hostName
-     * @return
-     */
-    QString getPeerIdOfLauncherOnHostName(QString hostName);
-
-
-    /**
      * @brief Remove each UN-active agent (agent with state OFF) from the global list with all agents
      */
     void removeUNactiveAgents();

@@ -104,6 +104,14 @@ public:
 
 
     /**
+     * @brief Get the peer id of the Launcher on a host
+     * @param hostName
+     * @return
+     */
+    QString getPeerIdOfLauncherOnHost(QString hostName);
+
+
+    /**
      * @brief Get the model of agent from a Peer Id
      * @param peerId
      * @return

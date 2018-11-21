@@ -270,15 +270,6 @@ private Q_SLOTS:
     void _onCommandAskedToRecorder(QString commandAndParameters);
 
 
-    /**
-     * @brief Slot called when a command must be sent on the network to a launcher
-     * @param hostname
-     * @param command
-     * @param commandLine
-     */
-    void _onCommandAskedToLauncher(QString hostname, QString command, QString commandLine);
-
-
 private:
 
     /**

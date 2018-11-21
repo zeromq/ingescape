@@ -278,11 +278,11 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
-     * @param hostname
+     * @param peerIdOfLauncher
      * @param command
      * @param commandLine
      */
-    void commandAskedToLauncher(QString hostname, QString command, QString commandLine);
+    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
 
 
     /**

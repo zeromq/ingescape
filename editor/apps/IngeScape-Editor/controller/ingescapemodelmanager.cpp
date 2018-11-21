@@ -272,6 +272,25 @@ HostM* IngeScapeModelManager::getHostModelWithName(QString hostName)
 
 
 /**
+ * @brief Get the peer id of the Launcher on a host
+ * @param hostName
+ * @return
+ */
+QString IngeScapeModelManager::getPeerIdOfLauncherOnHost(QString hostName)
+{
+    // Get the model of host with the name
+    HostM* host = getHostModelWithName(hostName);
+
+    if (host != nullptr) {
+        return host->peerId();
+    }
+    else {
+        return "";
+    }
+}
+
+
+/**
  * @brief Get the model of agent from a Peer Id
  * @param peerId
  * @return
