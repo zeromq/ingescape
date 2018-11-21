@@ -44,7 +44,6 @@ SOURCES += main.cpp \
     controller/actioneditorcontroller.cpp \
     controller/valueshistorycontroller.cpp \
     controller/abstracttimeactionslinescenarioviewcontroller.cpp \
-    controller/ingescapelaunchermanager.cpp \
     misc/ingescapeeditorsettings.cpp \
     misc/ingescapeeditorutils.cpp \
     misc/terminationsignalwatcher.cpp \
@@ -118,7 +117,6 @@ HEADERS += \
     controller/actioneditorcontroller.h \
     controller/valueshistorycontroller.h \
     controller/abstracttimeactionslinescenarioviewcontroller.h \
-    controller/ingescapelaunchermanager.h \
     misc/ingescapeeditorsettings.h \
     misc/ingescapeeditorutils.h \
     misc/terminationsignalwatcher.h \

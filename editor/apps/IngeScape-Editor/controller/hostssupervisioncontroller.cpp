@@ -32,6 +32,8 @@ HostsSupervisionController::HostsSupervisionController(QObject *parent) : QObjec
 
     // Hosts are sorted on their name (alphabetical order)
     _hostsList.setSortProperty("name");
+
+    // FIXME REPAIR setcanBeRestarted()
 }
 
 
@@ -94,14 +96,14 @@ void HostsSupervisionController::removeUNactiveAgents()
  * @brief Slot called when a new model of host has been created
  * @param host
  */
-void HostsSupervisionController::onHostModelCreated(HostM* host)
+void HostsSupervisionController::onHostModelHasBeenCreated(HostM* host)
 {
     if (host != nullptr)
     {
-        QString hostname = host->name();
+        QString hostName = host->name();
 
         // Get the view model of host with its name
-        HostVM* hostVM = _getHostWithName(hostname);
+        HostVM* hostVM = _getHostWithName(hostName);
         if (hostVM == nullptr)
         {
             // Create a view model for this model of host
@@ -110,7 +112,7 @@ void HostsSupervisionController::onHostModelCreated(HostM* host)
             connect(hostVM, &HostVM::commandAskedToAgent, this, &HostsSupervisionController::commandAskedToAgent);
             connect(hostVM, &HostVM::commandAskedToLauncher, this, &HostsSupervisionController::commandAskedToLauncher);
 
-            _hashFromNameToHost.insert(hostname, hostVM);
+            _hashFromNameToHost.insert(hostName, hostVM);
 
             // Add to the sorted list of hosts
             _hostsList.append(hostVM);
@@ -118,9 +120,9 @@ void HostsSupervisionController::onHostModelCreated(HostM* host)
             // Associate host with existing agents if necessary
             for (AgentM* agent : _allAgents)
             {
-                if ((agent != nullptr) && (agent->hostname() == hostname) && !hostVM->agentsList()->contains(agent))
+                if ((agent != nullptr) && (agent->hostname() == hostName) && !hostVM->agentsList()->contains(agent))
                 {
-                    qDebug() << "Add (existing) agent" << agent->name() << "to new host" << hostname;
+                    qDebug() << "Add (existing) agent" << agent->name() << "to new host" << hostName;
 
                     hostVM->agentsList()->append(agent);
                 }
@@ -131,22 +133,22 @@ void HostsSupervisionController::onHostModelCreated(HostM* host)
 
 
 /**
- * @brief Slot called when a model of host will be removed
+ * @brief Slot called when a model of host will be deleted
  * @param host
  */
-void HostsSupervisionController::onHostModelWillBeRemoved(HostM* host)
+void HostsSupervisionController::onHostModelWillBeDeleted(HostM* host)
 {
     if (host != nullptr)
     {
-        QString hostname = host->name();
+        QString hostName = host->name();
 
         // Get the view model of host with its name
-        HostVM* hostVM = _getHostWithName(hostname);
+        HostVM* hostVM = _getHostWithName(hostName);
         if (hostVM != nullptr)
         {
             disconnect(hostVM, 0, this, 0);
 
-            _hashFromNameToHost.remove(hostname);
+            _hashFromNameToHost.remove(hostName);
 
             if (_selectedHost == hostVM) {
                 // Clean-up current selection

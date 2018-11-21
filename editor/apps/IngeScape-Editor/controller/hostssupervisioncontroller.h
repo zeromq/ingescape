@@ -91,14 +91,14 @@ public Q_SLOTS:
      * @brief Slot called when a new model of host has been created
      * @param host
      */
-    void onHostModelCreated(HostM* host);
+    void onHostModelHasBeenCreated(HostM* host);
 
 
     /**
-     * @brief Slot called when a model of host will be removed
+     * @brief Slot called when a model of host will be deleted
      * @param host
      */
-    void onHostModelWillBeRemoved(HostM* host);
+    void onHostModelWillBeDeleted(HostM* host);
 
 
     /**

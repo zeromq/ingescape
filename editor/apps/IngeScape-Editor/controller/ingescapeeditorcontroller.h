@@ -28,7 +28,6 @@
 #include <controller/agentsmappingcontroller.h>
 #include <controller/agentssupervisioncontroller.h>
 #include <controller/hostssupervisioncontroller.h>
-#include <controller/ingescapelaunchermanager.h>
 #include <controller/ingescapemodelmanager.h>
 #include <controller/logstreamcontroller.h>
 #include <controller/networkcontroller.h>
@@ -87,9 +86,6 @@ class IngeScapeEditorController : public QObject
 
     // Controller for the time line
     I2_QML_PROPERTY_READONLY(AbstractTimeActionslineScenarioViewController*, timeLineC)
-
-    // Manager for launchers of INGESCAPE agents
-    I2_QML_PROPERTY_READONLY(IngeScapeLauncherManager*, launcherManager)
 
     // Opened log stream viewers
     I2_QOBJECT_LISTMODEL(LogStreamController, openedLogStreamControllers)

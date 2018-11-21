@@ -18,10 +18,7 @@
 #include <QQmlEngine>
 #include <QDebug>
 #include <QFileDialog>
-
 #include <I2Quick.h>
-
-#include "controller/ingescapelaunchermanager.h"
 
 
 /**
@@ -126,7 +123,7 @@ void IngeScapeModelManager::addAgentModel(AgentM* agent)
         connect(agent, &AgentM::networkDataWillBeCleared, this, &IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared);
 
         if (!agent->peerId().isEmpty()) {
-            _mapFromPeerIdToAgentM.insert(agent->peerId(), agent);
+            _hashFromPeerIdToAgent.insert(agent->peerId(), agent);
         }
 
         // Get the (view model of) agents grouped for this name
@@ -147,8 +144,6 @@ void IngeScapeModelManager::addAgentModel(AgentM* agent)
 
         // Emit the signal "Agent Model Created"
         //Q_EMIT agentModelCreated(agent);
-
-        _printAgents();
     }
 }
 
@@ -184,7 +179,7 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         }
 
         if (!agent->peerId().isEmpty()) {
-            _mapFromPeerIdToAgentM.remove(agent->peerId());
+            _hashFromPeerIdToAgent.remove(agent->peerId());
         }
 
         // Get the (view model of) agents grouped for this name
@@ -202,8 +197,6 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         if ((agentsGroupedByName != nullptr) && agentsGroupedByName->models()->isEmpty()) {
             deleteAgentsGroupedByName(agentsGroupedByName);
         }
-
-        _printAgents();
     }
 }
 
@@ -263,14 +256,30 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
 
 
 /**
+ * @brief Get the model of host with a name
+ * @param hostName
+ * @return
+ */
+HostM* IngeScapeModelManager::getHostModelWithName(QString hostName)
+{
+    if (_hashFromNameToHost.contains(hostName)) {
+        return _hashFromNameToHost.value(hostName);
+    }
+    else {
+        return nullptr;
+    }
+}
+
+
+/**
  * @brief Get the model of agent from a Peer Id
  * @param peerId
  * @return
  */
 AgentM* IngeScapeModelManager::getAgentModelFromPeerId(QString peerId)
 {
-    if (_mapFromPeerIdToAgentM.contains(peerId)) {
-        return _mapFromPeerIdToAgentM.value(peerId);
+    if (_hashFromPeerIdToAgent.contains(peerId)) {
+        return _hashFromPeerIdToAgent.value(peerId);
     }
     else {
         return nullptr;
@@ -298,7 +307,7 @@ AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString na
  * @brief Get the map from agent name to list of active agents
  * @return
  */
-QHash<QString, QList<AgentM*>> IngeScapeModelManager::getMapFromAgentNameToActiveAgentsList()
+/*QHash<QString, QList<AgentM*>> IngeScapeModelManager::getMapFromAgentNameToActiveAgentsList()
 {
     QHash<QString, QList<AgentM*>> hashFromAgentNameToActiveAgentsList;
 
@@ -321,7 +330,7 @@ QHash<QString, QList<AgentM*>> IngeScapeModelManager::getMapFromAgentNameToActiv
     }
 
     return hashFromAgentNameToActiveAgentsList;
-}
+}*/
 
 
 /**
@@ -486,12 +495,6 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                         agent->sethostname(hostname);
                                         agent->setcommandLine(commandLine);
 
-                                        // Update corresponding host
-                                        HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                                        if (host != nullptr) {
-                                            agent->setcanBeRestarted(true);
-                                        }
-
                                         // Add this new model of agent
                                         addAgentModel(agent);
 
@@ -569,7 +572,7 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile(QJsonArray jsonArrayO
  */
 void IngeScapeModelManager::simulateExitForEachActiveAgent()
 {
-    for (AgentM* agent : _mapFromPeerIdToAgentM.values())
+    for (AgentM* agent : _hashFromPeerIdToAgent.values())
     {
         if (agent != nullptr)
         {
@@ -661,15 +664,6 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
             //agent->setcommandLine(commandLine);
 
             // Usefull ?
-            /*if (!hostname.isEmpty() && !commandLine.isEmpty())
-            {
-                HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                if (host != nullptr)
-                {
-                    agent->setcanBeRestarted(true);
-                }
-            }*/
-
             agent->setcanBeFrozen(canBeFrozen);
             agent->setloggerPort(loggerPort);
 
@@ -693,16 +687,6 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
 
             agent->sethostname(hostname);
             agent->setcommandLine(commandLine);
-
-            if (!hostname.isEmpty() && !commandLine.isEmpty())
-            {
-                HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                if (host != nullptr)
-                {
-                    agent->setcanBeRestarted(true);
-                }
-            }
-
             agent->setcanBeFrozen(canBeFrozen);
             agent->setloggerPort(loggerPort);
 
@@ -769,23 +753,52 @@ void IngeScapeModelManager::onDefinitionsToOpen(QList<DefinitionM*> definitionsL
 /**
  * @brief Slot called when a launcher enter the network
  * @param peerId
- * @param hostname
+ * @param hostName
  * @param ipAddress
  */
-void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostname, QString ipAddress, QString streamingPort)
+void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort)
 {
-    // Add an IngeScape Launcher to the manager
-    IngeScapeLauncherManager::Instance().addIngeScapeLauncher(peerId, hostname, ipAddress, streamingPort);
+    if (!hostName.isEmpty())
+    {
+        // Get the model of host with the name
+        HostM* host = getHostModelWithName(hostName);
+        if (host == nullptr)
+        {
+            // Create a new host
+            host = new HostM(hostName, peerId, ipAddress, streamingPort, this);
+
+            _hashFromNameToHost.insert(hostName, host);
+
+            Q_EMIT hostModelHasBeenCreated(host);
+        }
+        else
+        {
+            // Update peer id
+            if (host->peerId() != peerId) {
+                host->setpeerId(peerId);
+            }
+
+            // Update IP address
+            if (host->ipAddress() != ipAddress) {
+                host->setipAddress(ipAddress);
+            }
+
+            // Update streaming port
+            if (host->streamingPort() != streamingPort) {
+                host->setstreamingPort(streamingPort);
+            }
+        }
+    }
 
     // Traverse the list of all agents grouped by name
     for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
     {
         if (agentsGroupedByName != nullptr)
         {
-            // Traverse the list of all models
+            // Traverse the list of its models
             for (AgentM* agent : agentsGroupedByName->models()->toList())
             {
-                if ((agent != nullptr) && (agent->hostname() == hostname) && !agent->commandLine().isEmpty()) {
+                if ((agent != nullptr) && (agent->hostname() == hostName) && !agent->commandLine().isEmpty()) {
                     agent->setcanBeRestarted(true);
                 }
             }
@@ -797,12 +810,26 @@ void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostname, 
 /**
  * @brief Slot called when a launcher quit the network
  * @param peerId
- * @param hostname
+ * @param hostName
  */
-void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostname)
+void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
 {
-    // Remove an IngeScape Launcher to the manager
-    IngeScapeLauncherManager::Instance().removeIngeScapeLauncher(peerId, hostname);
+    Q_UNUSED(peerId)
+
+    if (!hostName.isEmpty())
+    {
+        // Get the model of host with the name
+        HostM* host = getHostModelWithName(hostName);
+        if (host != nullptr)
+        {
+            Q_EMIT hostModelWillBeDeleted(host);
+
+            _hashFromNameToHost.remove(hostName);
+
+            // Free memory
+            delete host;
+        }
+    }
 
     // Traverse the list of all agents grouped by name
     for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
@@ -812,7 +839,7 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostname)
             // Traverse the list of all models
             for (AgentM* agent : agentsGroupedByName->models()->toList())
             {
-                if ((agent != nullptr) && (agent->hostname() == hostname)) {
+                if ((agent != nullptr) && (agent->hostname() == hostName)) {
                     agent->setcanBeRestarted(false);
                 }
             }
@@ -1181,7 +1208,7 @@ void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
     }*/
 
     if (!peerId.isEmpty()) {
-        _mapFromPeerIdToAgentM.remove(peerId);
+        _hashFromPeerIdToAgent.remove(peerId);
     }
 }
 
@@ -1205,21 +1232,6 @@ void IngeScapeModelManager::_openDefinitions(QList<DefinitionM*> definitionsToOp
 
                 Q_EMIT definition->bringToFront();
             }
-        }
-    }
-}
-
-
-/**
- * @brief Print all models of agents (for Debug)
- */
-void IngeScapeModelManager::_printAgents()
-{
-    qDebug() << "Print Agents:";
-    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
-    {
-        if (agentsGroupedByName != nullptr) {
-            qDebug() << agentsGroupedByName->name() << ":" << agentsGroupedByName->models()->count() << "agents";
         }
     }
 }

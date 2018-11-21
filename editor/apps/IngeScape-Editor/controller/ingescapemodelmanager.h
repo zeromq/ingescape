@@ -19,8 +19,8 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
-
 #include <model/jsonhelper.h>
+#include <model/hostm.h>
 #include <model/agentm.h>
 #include <model/publishedvaluem.h>
 #include <viewModel/agentsgroupedbynamevm.h>
@@ -96,6 +96,14 @@ public:
 
 
     /**
+     * @brief Get the model of host with a name
+     * @param hostName
+     * @return
+     */
+    HostM* getHostModelWithName(QString hostName);
+
+
+    /**
      * @brief Get the model of agent from a Peer Id
      * @param peerId
      * @return
@@ -115,7 +123,7 @@ public:
      * @brief Get the map from agent name to list of active agents
      * @return
      */
-    QHash<QString, QList<AgentM*>> getMapFromAgentNameToActiveAgentsList();
+    //QHash<QString, QList<AgentM*>> getMapFromAgentNameToActiveAgentsList();
 
 
     /**
@@ -154,6 +162,7 @@ public:
 
 
 Q_SIGNALS:
+
 
     /**
      * @brief Signal emitted when a new model of agent has been created
@@ -195,6 +204,20 @@ Q_SIGNALS:
      * @param agentsGroupedByDefinition
      */
     void agentsGroupedByDefinitionWillBeDeleted(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+
+
+    /**
+     * @brief Signal emitted when a model of host has been created
+     * @param host
+     */
+    void hostModelHasBeenCreated(HostM* host);
+
+
+    /**
+     * @brief Signal emitted when a model of host will be deleted
+     * @param host
+     */
+    void hostModelWillBeDeleted(HostM* host);
 
 
     /**
@@ -289,18 +312,18 @@ public Q_SLOTS:
     /**
      * @brief Slot called when a launcher enter the network
      * @param peerId
-     * @param hostname
+     * @param hostName
      * @param ipAddress
      */
-    void onLauncherEntered(QString peerId, QString hostname, QString ipAddress, QString streamingPort);
+    void onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort);
 
 
     /**
      * @brief Slot called when a launcher quit the network
      * @param peerId
-     * @param hostname
+     * @param hostName
      */
-    void onLauncherExited(QString peerId, QString hostname);
+    void onLauncherExited(QString peerId, QString hostName);
     
 
     /**
@@ -433,12 +456,6 @@ private:
     void _openDefinitions(QList<DefinitionM*> definitionsToOpen);
 
 
-    /**
-     * @brief Print all models of agents (for Debug)
-     */
-    void _printAgents();
-
-
 private:
 
     // Helper to manage JSON files
@@ -448,11 +465,13 @@ private:
     QString _rootDirectoryPath;
 
     // Map from "peer id" to a model of agent
-    QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
+    QHash<QString, AgentM*> _hashFromPeerIdToAgent;
 
     // Hash table from a name to the group of agents with this name
     QHash<QString, AgentsGroupedByNameVM*> _hashFromNameToAgentsGrouped;
 
+    // Hash table from "Name" to the "Host" (corresponding to an INGESCAPE launcher)
+    QHash<QString, HostM*> _hashFromNameToHost;
 };
 
 QML_DECLARE_TYPE(IngeScapeModelManager)

@@ -43,7 +43,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _scenarioC(nullptr),
     _valuesHistoryC(nullptr),
     _timeLineC(nullptr),
-    _launcherManager(nullptr),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
     _platformDirectoryPath(""),
@@ -144,10 +143,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Create the controller for the time line
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
 
-    // Create the manager for launchers of INGESCAPE agents
-    //_launcherManager = new IngeScapeLauncherManager(this);
-    _launcherManager = &IngeScapeLauncherManager::Instance();
-
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &IngeScapeModelManager::onAgentEntered);
     connect(_networkC, &NetworkController::agentExited, _modelManager, &IngeScapeModelManager::onAgentExited);
@@ -189,12 +184,15 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelCreated);
     //connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
 
+    connect(_modelManager, &IngeScapeModelManager::hostModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onHostModelHasBeenCreated);
+    connect(_modelManager, &IngeScapeModelManager::hostModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onHostModelWillBeDeleted);
+
     connect(_modelManager, &IngeScapeModelManager::agentsGroupedByNameHasBeenCreated, _valuesHistoryC, &ValuesHistoryController::onAgentsGroupedByNameHasBeenCreated);
+    connect(_modelManager, &IngeScapeModelManager::agentsGroupedByNameWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentsGroupedByNameWillBeDeleted);
 
     connect(_modelManager, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated);
     connect(_modelManager, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted);
 
-    connect(_modelManager, &IngeScapeModelManager::agentsGroupedByNameWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentsGroupedByNameWillBeDeleted);
     connect(_modelManager, &IngeScapeModelManager::activeAgentDefined, _agentsMappingC, &AgentsMappingController::onActiveAgentDefined);
     connect(_modelManager, &IngeScapeModelManager::activeAgentMappingDefined, _agentsMappingC, &AgentsMappingController::onActiveAgentMappingDefined);
     connect(_modelManager, &IngeScapeModelManager::mapped, _agentsMappingC, &AgentsMappingController::onMapped);
@@ -210,10 +208,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgentAboutOutput, _networkC, &NetworkController::onCommandAskedToAgentAboutOutput);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openValuesHistoryOfAgent, _valuesHistoryC, &ValuesHistoryController::filterValuesToShowOnlyAgent);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openLogStreamOfAgents, this, &IngeScapeEditorController::_onOpenLogStreamOfAgents);
-
-    // Connect to signals from the ingescape launcher manager
-    connect(_launcherManager, &IngeScapeLauncherManager::hostModelCreated, _hostsSupervisionC, &HostsSupervisionController::onHostModelCreated);
-    connect(_launcherManager, &IngeScapeLauncherManager::hostModelWillBeRemoved, _hostsSupervisionC, &HostsSupervisionController::onHostModelWillBeRemoved);
 
     // Connect to signals from the controller for supervision of hosts
     connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
@@ -306,20 +300,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
         disconnect(_terminationSignalWatcher, 0);
         delete _terminationSignalWatcher;
         _terminationSignalWatcher = nullptr;
-    }
-
-
-    //
-    // Clean-up sub-controllers
-    //
-    if (_launcherManager != nullptr)
-    {
-        disconnect(_launcherManager);
-
-        //IngeScapeLauncherManager* temp = _launcherManager;
-        setlauncherManager(nullptr);
-        //delete temp;
-        //temp = nullptr;
     }
 
     if (_timeLineC != nullptr)
@@ -636,11 +616,6 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
 
                 // Simulate an exit for each active agent
                 _modelManager->simulateExitForEachActiveAgent();
-
-                // Reset the list of launchers (hosts)
-                if (_launcherManager != nullptr) {
-                    _launcherManager->reset();
-                }
 
                 // Has to clear the current platform
                 if (hasToClearPlatform)

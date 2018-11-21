@@ -127,7 +127,6 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<AgentsMappingController>("INGESCAPE", 1, 0, "AgentsMappingController", "Internal Class");
     qmlRegisterUncreatableType<AgentsSupervisionController>("INGESCAPE", 1, 0, "AgentsSupervisionController", "Internal Class");
     qmlRegisterUncreatableType<HostsSupervisionController>("INGESCAPE", 1, 0, "HostsSupervisionController", "Internal Class");
-    qmlRegisterUncreatableType<IngeScapeLauncherManager>("INGESCAPE", 1, 0, "IngeScapeLauncherManager", "Internal Class");
     qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal Class");
     qmlRegisterUncreatableType<LogStreamController>("INGESCAPE", 1, 0, "LogStreamController", "Internal Class");
     qmlRegisterUncreatableType<ScenarioController>("INGESCAPE", 1, 0, "ScenarioController", "Internal Class");
