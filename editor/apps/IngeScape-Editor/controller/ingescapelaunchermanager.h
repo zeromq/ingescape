@@ -73,14 +73,6 @@ public:
 
 
     /**
-     * @brief Get the peer id of a Launcher with a HostName
-     * @param hostName
-     * @return
-     */
-    QString getPeerIdOfLauncherWithHostName(QString hostName);
-
-
-    /**
      * @brief Reset the list of launchers (hosts)
      */
     void reset();

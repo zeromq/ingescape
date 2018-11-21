@@ -957,31 +957,22 @@ void NetworkController::sendCommandWithJsonToRecorder(QString peerIdOfRecorder, 
 
 
 /**
- * @brief Slot when a command must be sent on the network to a launcher
+ * @brief Slot called when a command must be sent on the network to a launcher
+ * @param peerIdOfLauncher
  * @param command
- * @param hostname
  * @param commandLine
  */
-void NetworkController::onCommandAskedToLauncher(QString command, QString hostname, QString commandLine)
+void NetworkController::onCommandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine)
 {
-    if (!hostname.isEmpty())
+    if (!peerIdOfLauncher.isEmpty())
     {
-        // Get the peer id of The IngeScape Launcher with a HostName
-        QString peerIdLauncher = IngeScapeLauncherManager::Instance().getPeerIdOfLauncherWithHostName(hostname);
+        // Send the command with command line to the peer id of the launcher
+        int success = igs_busSendStringToAgent(peerIdOfLauncher.toStdString().c_str(),
+                                               "%s %s",
+                                               command.toStdString().c_str(),
+                                               commandLine.toStdString().c_str());
 
-        if (!peerIdLauncher.isEmpty())
-        {
-            // Send the command with command line to the peer id of the launcher
-            int success = igs_busSendStringToAgent(peerIdLauncher.toStdString().c_str(),
-                                                   "%s %s",
-                                                   command.toStdString().c_str(),
-                                                   commandLine.toStdString().c_str());
-
-            qInfo() << "Send command" << command << "to launcher on" << hostname << "with command line" << commandLine << "with success ?" << success;
-        }
-        else {
-            qInfo() << "There is no launcher on" << hostname;
-        }
+        qInfo() << "Send command" << command << "with command line" << commandLine << "to launcher" << peerIdOfLauncher << "with success ?" << success;
     }
 }
 

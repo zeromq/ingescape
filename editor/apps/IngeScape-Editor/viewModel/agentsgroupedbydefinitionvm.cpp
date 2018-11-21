@@ -149,7 +149,7 @@ void AgentsGroupedByDefinitionVM::changeState()
             // Check if the model has a hostname
             if ((model != nullptr) && !model->hostname().isEmpty())
             {
-                Q_EMIT commandAskedToLauncher(command_StartAgent, model->hostname(), model->commandLine());
+                Q_EMIT commandAskedToLauncher(model->hostname(), command_StartAgent, model->commandLine());
             }
         }
     }

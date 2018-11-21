@@ -55,6 +55,25 @@ HostsSupervisionController::~HostsSupervisionController()
 
 
 /**
+ * @brief Get the peer id of a Launcher on a HostName
+ * @param hostName
+ * @return
+ */
+QString HostsSupervisionController::getPeerIdOfLauncherOnHostName(QString hostName)
+{
+    // Get the view model of host with its name
+    HostVM* hostVM = _getHostWithName(hostName);
+
+    if ((hostVM != nullptr) && (hostVM->modelM() != nullptr)) {
+        return hostVM->modelM()->peerId();
+    }
+    else {
+        return "";
+    }
+}
+
+
+/**
  * @brief Remove each UN-active agent (agent with state OFF) from the global list with all agents
  */
 void HostsSupervisionController::removeUNactiveAgents()

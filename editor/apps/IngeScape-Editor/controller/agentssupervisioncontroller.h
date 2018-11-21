@@ -96,11 +96,11 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
-     * @param command
      * @param hostname
+     * @param command
      * @param commandLine
      */
-    void commandAskedToLauncher(QString command, QString hostname, QString commandLine);
+    void commandAskedToLauncher(QString hostname, QString command, QString commandLine);
 
 
     /**
@@ -132,14 +132,6 @@ Q_SIGNALS:
      * @param models
      */
     void openLogStreamOfAgents(QList<AgentM*> models);
-
-
-    /**
-     * @brief Signal emitted when a previous agent model is replaced by a new one strictly identical
-     * @param previousModel
-     * @param newModel
-     */
-    //void identicalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
 
 
 public Q_SLOTS:

@@ -22,8 +22,6 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-
-#include "controller/ingescapelaunchermanager.h"
 #include <model/iop/outputm.h>
 #include <model/publishedvaluem.h>
 
@@ -356,11 +354,11 @@ public Q_SLOTS:
 
     /**
      * @brief Slot called when a command must be sent on the network to a launcher
+     * @param peerIdOfLauncher
      * @param command
-     * @param hostname
      * @param commandLine
      */
-    void onCommandAskedToLauncher(QString command, QString hostname, QString commandLine);
+    void onCommandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
 
 
     /**

@@ -131,23 +131,6 @@ HostM* IngeScapeLauncherManager::getHostWithName(QString hostName)
 
 
 /**
- * @brief Get the peer id of a Launcher with a HostName
- * @param hostName
- * @return
- */
-QString IngeScapeLauncherManager::getPeerIdOfLauncherWithHostName(QString hostName)
-{
-    HostM* host = getHostWithName(hostName);
-    if (host != nullptr) {
-        return host->peerId();
-    }
-    else {
-        return "";
-    }
-}
-
-
-/**
  * @brief Reset the list of launchers (hosts)
  */
 void IngeScapeLauncherManager::reset()

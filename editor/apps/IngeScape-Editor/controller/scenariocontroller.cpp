@@ -1629,7 +1629,7 @@ void ScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* agentsGr
                 if ((model != nullptr) && !model->hostname().isEmpty())
                 {
                     // Emit signal "Command asked to launcher"
-                    Q_EMIT commandAskedToLauncher(command, model->hostname(), model->commandLine());
+                    Q_EMIT commandAskedToLauncher(model->hostname(), command, model->commandLine());
                 }
             }
         }

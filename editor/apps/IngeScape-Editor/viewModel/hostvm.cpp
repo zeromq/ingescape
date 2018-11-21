@@ -44,7 +44,7 @@ HostVM::HostVM(HostM* model, QObject *parent) : QObject(parent),
 
         qInfo() << "New View Model of Host" << _name;
 
-        if (_modelM->streamingPort().length() > 0)
+        if (!_modelM->streamingPort().isEmpty())
         {
             _canProvideStream = true;
         }
@@ -94,9 +94,9 @@ void HostVM::changeState()
  */
 void HostVM::startAgent(AgentM* agent)
 {
-    if (agent != nullptr)
+    if ((agent != nullptr) && (_modelM != nullptr))
     {
-         Q_EMIT commandAskedToLauncher(command_StartAgent, agent->hostname(), agent->commandLine());
+         Q_EMIT commandAskedToLauncher(_modelM->peerId(), command_StartAgent, agent->commandLine());
     }
 }
 

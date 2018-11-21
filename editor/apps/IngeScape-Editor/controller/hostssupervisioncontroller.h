@@ -53,6 +53,14 @@ public:
 
 
     /**
+     * @brief Get the peer id of a Launcher on a HostName
+     * @param hostName
+     * @return
+     */
+    QString getPeerIdOfLauncherOnHostName(QString hostName);
+
+
+    /**
      * @brief Remove each UN-active agent (agent with state OFF) from the global list with all agents
      */
     void removeUNactiveAgents();
@@ -70,11 +78,11 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param peerIdOfLauncher
      * @param command
-     * @param hostname
      * @param commandLine
      */
-    void commandAskedToLauncher(QString command, QString hostname, QString commandLine);
+    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
 
 
 public Q_SLOTS:
