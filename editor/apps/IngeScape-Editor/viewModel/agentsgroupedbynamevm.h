@@ -64,7 +64,7 @@ class AgentsGroupedByNameVM : public QObject
     // FIXME DEBUG: List of groups of agents, grouped by definition
     I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, listOfGroupsByDefinition)
 
-    // Mapping currently edited (temporary until the user activate the mapping)
+    // Current mapping (real mapping without edition)
     //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, currentMapping)
 
 
@@ -197,6 +197,34 @@ Q_SIGNALS:
      * @param definitionsList
      */
     void definitionsToOpen(QList<DefinitionM*> definitionsList);
+
+
+    /**
+     * @brief Signal emitted when some view models of inputs have been added to our agent(s grouped by name)
+     * @param newInputs
+     */
+    void inputsHaveBeenAdded(QList<InputVM*> newInputs);
+
+
+    /**
+     * @brief Signal emitted when some view models of outputs have been added to our agent(s grouped by name)
+     * @param newOutputs
+     */
+    void outputsHaveBeenAdded(QList<OutputVM*> newOutputs);
+
+
+    /**
+     * @brief Signal emitted when some view models of inputs will be removed from our agent(s grouped by name)
+     * @param oldInputs
+     */
+    void inputsWillBeRemoved(QList<InputVM*> oldInputs);
+
+
+    /**
+     * @brief Signal emitted when some view models of outputs will be removed from our agent(s grouped by name)
+     * @param oldOutputs
+     */
+    void outputsWillBeRemoved(QList<OutputVM*> oldOutputs);
 
 
 public Q_SLOTS:

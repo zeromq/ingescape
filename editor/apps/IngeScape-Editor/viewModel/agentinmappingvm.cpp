@@ -38,70 +38,27 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     {
         _name = _agentsGroupedByName->name();
 
+        // Connect to signals from the agents grouped by name
+        connect(_agentsGroupedByName, &AgentsGroupedByNameVM::inputsHaveBeenAdded, this, &AgentInMappingVM::_onInputsHaveBeenAdded);
+        connect(_agentsGroupedByName, &AgentsGroupedByNameVM::outputsHaveBeenAdded, this, &AgentInMappingVM::_onOutputsHaveBeenAdded);
+        connect(_agentsGroupedByName, &AgentsGroupedByNameVM::inputsWillBeRemoved, this, &AgentInMappingVM::_onInputsWillBeRemoved);
+        connect(_agentsGroupedByName, &AgentsGroupedByNameVM::outputsWillBeRemoved, this, &AgentInMappingVM::_onOutputsWillBeRemoved);
+
+
         // Create the mapping currently edited
         QString mappingName = QString("Mapping name of %1 in IngeScape Editor").arg(_name);
         QString mappingDescription = QString("Mapping description of %1 in IngeScape Editor").arg(_name);
         _temporaryMapping = new AgentMappingM(mappingName, "0.0", mappingDescription);
 
 
-        //
-        // FIXME TODO: Constructor of AgentInMappingVM --> gérer les évolutions des listes de _agentsGroupedByName
-        //
-        //connect(_agentsGroupedByName->inputsList()->countChanged();
-        //connect(_agentsGroupedByName->outputsList()->countChanged();
-        //
-        QList<LinkInputVM*> tempLinkInputs;
-        QList<LinkOutputVM*> tempLinkOutputs;
-
-        for (InputVM* input : _agentsGroupedByName->inputsList()->toList())
-        {
-            if (input != nullptr)
-            {
-                LinkInputVM* linkInput = new LinkInputVM(input);
-
-                tempLinkInputs.append(linkInput);
-
-                // Add to the hash table with the input id
-                if (!input->id().isEmpty()) {
-                    _hashFromIdToLinkInput.insert(input->id(), linkInput);
-                }
-
-                // Update the list of view models of link input for this name
-                QList<LinkInputVM*> linkInputsWithSameName = getLinkInputsListFromName(input->name());
-                linkInputsWithSameName.append(linkInput);
-                _hashFromNameToLinkInputsList.insert(input->name(), linkInputsWithSameName);
-            }
+        if (!_agentsGroupedByName->inputsList()->isEmpty()) {
+            // Some view models of inputs have been added to the agent(s grouped by name)
+            _onInputsHaveBeenAdded(_agentsGroupedByName->inputsList()->toList());
         }
-        for (OutputVM* output : _agentsGroupedByName->outputsList()->toList())
-        {
-            if (output != nullptr)
-            {
-                LinkOutputVM* linkOutput = new LinkOutputVM(output);
-
-                tempLinkOutputs.append(linkOutput);
-
-                // Add to the hash table with the input id
-                if (!output->id().isEmpty()) {
-                    _hashFromIdToLinkOutput.insert(output->id(), linkOutput);
-                }
-
-                // Update the list of view models of link output for this name
-                QList<LinkOutputVM*> linkOutputsWithSameName = getLinkOutputsListFromName(output->name());
-                linkOutputsWithSameName.append(linkOutput);
-                _hashFromNameToLinkOutputsList.insert(output->name(), linkOutputsWithSameName);
-            }
+        if (!_agentsGroupedByName->outputsList()->isEmpty()) {
+            // Some view models of outputs have been added to the agent(s grouped by name)
+            _onOutputsHaveBeenAdded(_agentsGroupedByName->outputsList()->toList());
         }
-
-        if (!tempLinkInputs.isEmpty()) {
-            _linkInputsList.append(tempLinkInputs);
-        }
-        if (!tempLinkOutputs.isEmpty()) {
-            _linkOutputsList.append(tempLinkOutputs);
-        }
-
-        // Update the group (of value type) of the reduced map (= brin) in input and in output of our agent
-        _updateReducedMapValueTypeGroupInInput();
-        _updateReducedMapValueTypeGroupInOutput();
     }
 }
 
@@ -245,6 +202,228 @@ bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         }
     }
     return hasBeenRemoved;
+}
+
+
+/**
+ * @brief Slot called when some view models of inputs have been added to the agent(s grouped by name)
+ * @param newInputs
+ */
+void AgentInMappingVM::_onInputsHaveBeenAdded(QList<InputVM*> newInputs)
+{
+    QList<LinkInputVM*> tempLinkInputs;
+
+    for (InputVM* input : newInputs)
+    {
+        if ((input != nullptr) && !input->name().isEmpty())
+        {
+            LinkInputVM* linkInput = new LinkInputVM(input);
+
+            tempLinkInputs.append(linkInput);
+
+            // Add to the hash table with the input id
+            if (!input->id().isEmpty()) {
+                _hashFromIdToLinkInput.insert(input->id(), linkInput);
+            }
+
+            // Update the list of view models of link input for this name
+            QList<LinkInputVM*> linkInputsWithSameName = getLinkInputsListFromName(input->name());
+            linkInputsWithSameName.append(linkInput);
+            _hashFromNameToLinkInputsList.insert(input->name(), linkInputsWithSameName);
+        }
+    }
+
+    if (!tempLinkInputs.isEmpty())
+    {
+        _linkInputsList.append(tempLinkInputs);
+
+        // Update the group (of value type) of the reduced map (= brin) in input of our agent
+        _updateReducedMapValueTypeGroupInInput();
+    }
+}
+
+
+/**
+ * @brief Slot called when some view models of outputs have been added to the agent(s grouped by name)
+ * @param newOutputs
+ */
+void AgentInMappingVM::_onOutputsHaveBeenAdded(QList<OutputVM*> newOutputs)
+{
+    QList<LinkOutputVM*> tempLinkOutputs;
+
+    for (OutputVM* output : newOutputs)
+    {
+        if ((output != nullptr) && !output->name().isEmpty())
+        {
+            LinkOutputVM* linkOutput = new LinkOutputVM(output);
+
+            tempLinkOutputs.append(linkOutput);
+
+            // Add to the hash table with the input id
+            if (!output->id().isEmpty()) {
+                _hashFromIdToLinkOutput.insert(output->id(), linkOutput);
+            }
+
+            // Update the list of view models of link output for this name
+            QList<LinkOutputVM*> linkOutputsWithSameName = getLinkOutputsListFromName(output->name());
+            linkOutputsWithSameName.append(linkOutput);
+            _hashFromNameToLinkOutputsList.insert(output->name(), linkOutputsWithSameName);
+        }
+    }
+
+    if (!tempLinkOutputs.isEmpty())
+    {
+        _linkOutputsList.append(tempLinkOutputs);
+
+        // Update the group (of value type) of the reduced map (= brin) in output of our agent
+        _updateReducedMapValueTypeGroupInOutput();
+    }
+}
+
+
+/**
+ * @brief Slot called when some view models of inputs will be removed from the agent(s grouped by name)
+ * @param oldInputs
+ */
+void AgentInMappingVM::_onInputsWillBeRemoved(QList<InputVM*> oldInputs)
+{
+    QList<LinkInputVM*> tempLinkInputs;
+
+    for (InputVM* input : oldInputs)
+    {
+        if ((input != nullptr) && !input->name().isEmpty())
+        {
+            qDebug() << "_onInputsWillBeRemoved" << input->name();
+
+            // Get the list of view models of link input for this name
+            QList<LinkInputVM*> linkInputsWithSameName = getLinkInputsListFromName(input->name());
+
+            LinkInputVM* linkInput = nullptr;
+
+            // Input Id is defined
+            if (!input->id().isEmpty())
+            {
+                // Get the view model of link input for this input id
+                linkInput = getLinkInputFromId(input->id());
+                if (linkInput != nullptr)
+                {
+                    // Remove from the hash table with the input id
+                    _hashFromIdToLinkInput.remove(input->id());
+                }
+            }
+            // Input Id is empty...
+            else
+            {
+                // ...search our link in the list
+                for (LinkInputVM* iterator : linkInputsWithSameName)
+                {
+                    if ((iterator != nullptr) && (iterator->input() != nullptr) && (iterator->input() == input))
+                    {
+                        linkInput = iterator;
+                        break;
+                    }
+                }
+            }
+
+            if (linkInput != nullptr)
+            {
+                tempLinkInputs.append(linkInput);
+
+                linkInputsWithSameName.removeOne(linkInput);
+            }
+
+            // Update the list of view models of link input for this name
+            _hashFromNameToLinkInputsList.insert(input->name(), linkInputsWithSameName);
+        }
+    }
+
+    if (!tempLinkInputs.isEmpty())
+    {
+        // FIXME TODO I2 Quick: Allow to remove a QList
+        //_linkInputsList.remove(tempLinkInputs);
+        for (LinkInputVM* linkInput : tempLinkInputs)
+        {
+            if (linkInput != nullptr) {
+                _linkInputsList.remove(linkInput);
+            }
+        }
+
+        // Update the group (of value type) of the reduced map (= brin) in input of our agent
+        _updateReducedMapValueTypeGroupInInput();
+    }
+}
+
+
+/**
+ * @brief Slot called when some view models of outputs will be removed from the agent(s grouped by name)
+ * @param oldOutputs
+ */
+void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
+{
+    QList<LinkOutputVM*> tempLinkOutputs;
+
+    for (OutputVM* output : oldOutputs)
+    {
+        if ((output != nullptr) && !output->name().isEmpty())
+        {
+            qDebug() << "_onOutputsWillBeRemoved" << output->name();
+
+            // Get the list of view models of link output for this name
+            QList<LinkOutputVM*> linkOutputsWithSameName = getLinkOutputsListFromName(output->name());
+
+            LinkOutputVM* linkOutput = nullptr;
+
+            // Output Id is defined
+            if (!output->id().isEmpty())
+            {
+                // Get the view model of link output for this output id
+                linkOutput = getLinkOutputFromId(output->id());
+                if (linkOutput != nullptr)
+                {
+                    // Remove from the hash table with the output id
+                    _hashFromIdToLinkOutput.remove(output->id());
+                }
+            }
+            // Output Id is empty...
+            else
+            {
+                // ...search our link in the list
+                for (LinkOutputVM* iterator : linkOutputsWithSameName)
+                {
+                    if ((iterator != nullptr) && (iterator->output() != nullptr) && (iterator->output() == output))
+                    {
+                        linkOutput = iterator;
+                        break;
+                    }
+                }
+            }
+
+            if (linkOutput != nullptr)
+            {
+                tempLinkOutputs.append(linkOutput);
+
+                linkOutputsWithSameName.removeOne(linkOutput);
+            }
+
+            // Update the list of view models of link output for this name
+            _hashFromNameToLinkOutputsList.insert(output->name(), linkOutputsWithSameName);
+        }
+    }
+
+    if (!tempLinkOutputs.isEmpty())
+    {
+        // FIXME TODO I2 Quick: Allow to remove a QList
+        //_linkOutputsList.remove(tempLinkOutputs);
+        for (LinkOutputVM* linkOutput : tempLinkOutputs)
+        {
+            if (linkOutput != nullptr) {
+                _linkOutputsList.remove(linkOutput);
+            }
+        }
+
+        // Update the group (of value type) of the reduced map (= brin) in output of our agent
+        _updateReducedMapValueTypeGroupInOutput();
+    }
 }
 
 

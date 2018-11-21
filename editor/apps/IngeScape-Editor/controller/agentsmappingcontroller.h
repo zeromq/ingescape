@@ -274,9 +274,9 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     /**
-     * @brief Slot when the list of "Agents in Mapping" changed
+     * @brief Slot called when the list of all "Agents in Mapping" changed
      */
-    void _onAgentsInMappingChanged();
+    void _onAllAgentsInMappingChanged();
 
 
     /**

@@ -900,7 +900,7 @@ void AgentsGroupedByNameVM::_manageInputsOfAddedDefinition(DefinitionM* definiti
             _inputsList.append(inputsListToAdd);
 
             // Emit the signal "Inputs have been Added"
-            //Q_EMIT inputsHaveBeenAdded(inputsListToAdd);
+            Q_EMIT inputsHaveBeenAdded(inputsListToAdd);
         }
     }
 }
@@ -939,7 +939,7 @@ void AgentsGroupedByNameVM::_manageOutputsOfAddedDefinition(DefinitionM* definit
             _outputsList.append(outputsListToAdd);
 
             // Emit the signal "Outputs have been Added"
-            //Q_EMIT outputsHaveBeenAdded(outputsListToAdd);
+            Q_EMIT outputsHaveBeenAdded(outputsListToAdd);
         }
     }
 }
@@ -1015,7 +1015,7 @@ void AgentsGroupedByNameVM::_manageInputsOfRemovedDefinition(DefinitionM* defini
         if (!inputsListToRemove.isEmpty())
         {
             // Emit the signal "Inputs will be Removed"
-            //Q_EMIT inputsWillBeRemoved(inputsListToRemove);
+            Q_EMIT inputsWillBeRemoved(inputsListToRemove);
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_inputsList.remove(inputsListToRemove);
@@ -1060,8 +1060,8 @@ void AgentsGroupedByNameVM::_manageOutputsOfRemovedDefinition(DefinitionM* defin
 
         if (!outputsListToRemove.isEmpty())
         {
-            // Emit the signal "outputs will be Removed"
-            //Q_EMIT outputsWillBeRemoved(outputsListToRemove);
+            // Emit the signal "Outputs will be Removed"
+            Q_EMIT outputsWillBeRemoved(outputsListToRemove);
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_outputsList.remove(outputsListToRemove);
@@ -1106,7 +1106,7 @@ void AgentsGroupedByNameVM::_manageParametersOfRemovedDefinition(DefinitionM* de
 
         if (!parametersListToRemove.isEmpty())
         {
-            // Emit the signal "parameters will be Removed"
+            // Emit the signal "Parameters will be Removed"
             //Q_EMIT parametersWillBeRemoved(parametersListToRemove);
 
             // FIXME TODO I2 Quick: Allow to remove a QList

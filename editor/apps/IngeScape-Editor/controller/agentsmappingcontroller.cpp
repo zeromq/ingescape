@@ -41,8 +41,8 @@ AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelMan
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    // Connect to signal "Count Changed" from the list of agents in mapping
-    connect(&_allAgentsInMapping, &AbstractI2CustomItemListModel::countChanged, this, &AgentsMappingController::_onAgentsInMappingChanged);
+    // Connect to signal "Count Changed" from the list of all agents in mapping
+    connect(&_allAgentsInMapping, &AbstractI2CustomItemListModel::countChanged, this, &AgentsMappingController::_onAllAgentsInMappingChanged);
 }
 
 
@@ -216,7 +216,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(QString agentName
             agentInMapping = getAgentInMappingFromName(agentName);
             if (agentInMapping != nullptr)
             {
-                /*// Get the mapping currently edited (temporary until the user activate the mapping)
+                // Get the mapping currently edited (temporary until the user activate the mapping)
                 AgentMappingM* temporaryMapping = agentInMapping->temporaryMapping();
                 if (temporaryMapping != nullptr)
                 {
@@ -226,8 +226,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(QString agentName
                     // Mapping is already activated
                     if ((_modelManager != nullptr) && _modelManager->isMappingActivated())
                     {
-                        // FIXME REPAIR
-                        for (AgentM* model : agentsList->toList())
+                        for (AgentM* model : agentsGroupedByName->models()->toList())
                         {
                             if (model != nullptr)
                             {
@@ -236,7 +235,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(QString agentName
                             }
                         }
                     }
-                }*/
+                }
 
                 // Selects this new agent
                 setselectedAgent(agentInMapping);
@@ -693,9 +692,6 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                 // The agent is not yet in the mapping...
                 if (agentInMapping == nullptr)
                 {
-                    //QList<AgentM*> activeAgentsList;
-                    //activeAgentsList.append(agent);
-
                     // Get the (view model of) agents grouped for a name
                     AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
                     if (agentsGroupedByName != nullptr)
@@ -706,9 +702,6 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                         QPointF position = _getRandomPosition(randomMax);
 
                         //qDebug() << "Random position:" << position << "for agent" << agentName;
-
-                        // Add new model(s) of agent to the current mapping
-                        //_addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
 
                         // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
                         _createAgentInMappingAtPosition(agentsGroupedByName, position);
@@ -980,12 +973,12 @@ void AgentsMappingController::onHighlightLink(QStringList parameters)
 
 
 /**
- * @brief Slot when the list of "Agents in Mapping" changed
+ * @brief Slot called when the list of all "Agents in Mapping" changed
  */
-void AgentsMappingController::_onAgentsInMappingChanged()
+void AgentsMappingController::_onAllAgentsInMappingChanged()
 {
     // Update the flag "is Empty Mapping"
-    if (_allAgentsInMapping.count() == 0) {
+    if (_allAgentsInMapping.isEmpty()) {
         setisEmptyMapping(true);
     }
     else {
@@ -1294,7 +1287,7 @@ void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, 
     // AND
     // Global mapping is activated and controlled !
     if ((agentModel != nullptr) && agentModel->isON() && (temporaryMapping != nullptr) && (_jsonHelper != nullptr)
-            && (_modelManager != nullptr) && _modelManager->isMappingActivated()  && _modelManager->isMappingControlled())
+            && (_modelManager != nullptr) && _modelManager->isMappingActivated() && _modelManager->isMappingControlled())
     {
         QStringList peerIdsList = QStringList(agentModel->peerId());
 

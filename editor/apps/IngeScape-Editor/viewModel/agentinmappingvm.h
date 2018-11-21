@@ -137,28 +137,28 @@ Q_SIGNALS:
      * @brief Signal emitted when some view models of inputs have been added to our agent in mapping
      * @param inputsListHaveBeenAdded
      */
-    void inputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded);
+    //void inputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded);
 
 
     /**
      * @brief Signal emitted when some view models of outputs have been added to our agent in mapping
      * @param outputsListHaveBeenAdded
      */
-    void outputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded);
+    //void outputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded);
 
 
     /**
      * @brief Signal emitted when some view models of inputs will be removed from our agent in mapping
      * @param inputsListWillBeRemoved
      */
-    void inputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
+    //void inputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
 
 
     /**
      * @brief Signal emitted when some view models of outputs will be removed from our agent in mapping
      * @param outputsListWillBeRemoved
      */
-    void outputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+    //void outputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
     /**
@@ -168,6 +168,34 @@ Q_SIGNALS:
 
 
 private Q_SLOTS:
+
+    /**
+     * @brief Slot called when some view models of inputs have been added to the agent(s grouped by name)
+     * @param newInputs
+     */
+    void _onInputsHaveBeenAdded(QList<InputVM*> newInputs);
+
+
+    /**
+     * @brief Slot called when some view models of outputs have been added to the agent(s grouped by name)
+     * @param newOutputs
+     */
+    void _onOutputsHaveBeenAdded(QList<OutputVM*> newOutputs);
+
+
+    /**
+     * @brief Slot called when some view models of inputs will be removed from the agent(s grouped by name)
+     * @param oldInputs
+     */
+    void _onInputsWillBeRemoved(QList<InputVM*> oldInputs);
+
+
+    /**
+     * @brief Slot called when some view models of outputs will be removed from the agent(s grouped by name)
+     * @param oldOutputs
+     */
+    void _onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs);
+
 
     /**
      * @brief Slot when the list of models changed
