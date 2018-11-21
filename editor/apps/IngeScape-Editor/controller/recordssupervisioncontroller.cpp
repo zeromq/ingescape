@@ -32,6 +32,8 @@
 RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager* modelManager,
                                                            JsonHelper* jsonHelper,
                                                            QObject *parent) : QObject(parent),
+    _peerIdOfRecorder(""),
+    _peerNameOfRecorder(""),
     _isRecorderON(false),
     _selectedRecord(nullptr),
     _isRecording(false),
@@ -59,7 +61,7 @@ RecordsSupervisionController::~RecordsSupervisionController()
     // Clean-up current selection
     setselectedRecord(nullptr);
 
-    _mapFromRecordIdToViewModel.clear();
+    _hashFromRecordIdToViewModel.clear();
 
     disconnect(&_timerToDisplayTime, &QTimer::timeout, this, &RecordsSupervisionController::_onTimeout_DisplayTime);
 
@@ -109,7 +111,7 @@ void RecordsSupervisionController::startOrStopToRecord(bool isStart, bool withTi
                 _timerToDisplayTime.stop();
                 setcurrentRecordTime(QTime(0, 0, 0, 0));
 
-                Q_EMIT commandAskedToRecorder(command_StopToRecord);
+                Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, command_StopToRecord);
             }
         }
     }
@@ -122,7 +124,7 @@ void RecordsSupervisionController::startOrStopToRecord(bool isStart, bool withTi
  */
 void RecordsSupervisionController::deleteRecord(RecordVM* record)
 {
-    if ((_modelManager != nullptr) && (record != nullptr) && (record->modelM() != nullptr))
+    if ((record != nullptr) && (record->modelM() != nullptr))
     {
         qInfo() << "Ask to delete the record " << record->modelM()->name();
 
@@ -131,7 +133,7 @@ void RecordsSupervisionController::deleteRecord(RecordVM* record)
         {
             QString commandAndParameters = QString("%1=%2").arg(command_DeleteRecord, record->modelM()->id());
 
-            Q_EMIT commandAskedToRecorder(commandAndParameters);
+            Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
         }
     }
 }
@@ -144,9 +146,9 @@ void RecordsSupervisionController::deleteRecord(RecordVM* record)
  */
 void RecordsSupervisionController::controlRecord(QString recordId, bool startPlaying)
 {
-    if (_isRecorderON && _mapFromRecordIdToViewModel.contains(recordId))
+    if (_isRecorderON && _hashFromRecordIdToViewModel.contains(recordId))
     {
-        RecordVM* recordVM = _mapFromRecordIdToViewModel.value(recordId);
+        RecordVM* recordVM = _hashFromRecordIdToViewModel.value(recordId);
         if (recordVM != nullptr)
         {
             QString commandAndParameters = "";
@@ -162,7 +164,7 @@ void RecordsSupervisionController::controlRecord(QString recordId, bool startPla
                 setplayingRecord(nullptr);
             }
 
-            Q_EMIT commandAskedToRecorder(commandAndParameters);
+            Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
         }
     }
 }
@@ -179,17 +181,17 @@ void RecordsSupervisionController::onRecorderEntered(QString peerId, QString pee
 {
     qDebug() << "Recorder Entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
 
-    if (!_isRecorderON)
+    if (!_isRecorderON && !peerId.isEmpty() && !peerName.isEmpty())
     {
-        _peerIdOfRecorder = peerId;
-        _peerNameOfRecorder = peerName;
+        setpeerIdOfRecorder(peerId);
+        setpeerNameOfRecorder(peerName);
 
         setisRecorderON(true);
 
         qDebug() << "New recorder on the network, get all its records...";
 
         // Get all records
-        Q_EMIT commandAskedToRecorder("GET_RECORDS");
+        Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, "GET_RECORDS");
     }
 }
 
@@ -205,8 +207,8 @@ void RecordsSupervisionController::onRecorderExited(QString peerId, QString peer
 
     if (_isRecorderON && (_peerIdOfRecorder == peerId))
     {
-        _peerIdOfRecorder = "";
-        _peerNameOfRecorder = "";
+        setpeerIdOfRecorder("");
+        setpeerNameOfRecorder("");
 
         setisRecorderON(false);
     }
@@ -219,10 +221,10 @@ void RecordsSupervisionController::onRecorderExited(QString peerId, QString peer
  */
 void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
 {
-    if (!_mapFromRecordIdToModel.isEmpty())
+    if (!_hashFromRecordIdToModel.isEmpty())
     {
-        QList<RecordM*> copy = _mapFromRecordIdToModel.values();
-        _mapFromRecordIdToModel.clear();
+        QList<RecordM*> copy = _hashFromRecordIdToModel.values();
+        _hashFromRecordIdToModel.clear();
 
         for (RecordM* model : copy)
         {
@@ -246,9 +248,9 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
         {
             for (RecordM* record : recordsList)
             {
-                if ((record != nullptr) && !_mapFromRecordIdToModel.contains(record->id()))
+                if ((record != nullptr) && !_hashFromRecordIdToModel.contains(record->id()))
                 {
-                    _mapFromRecordIdToModel.insert(record->id(), record);
+                    _hashFromRecordIdToModel.insert(record->id(), record);
 
                     // Create a view model of record with this model
                     _createRecordVMwithModel(record);
@@ -274,9 +276,9 @@ void RecordsSupervisionController::onAddedRecord(QString recordJSON)
         {
             RecordM* newRecord = recordsList.at(0);
 
-            if ((newRecord != nullptr) && !_mapFromRecordIdToModel.contains(newRecord->id()))
+            if ((newRecord != nullptr) && !_hashFromRecordIdToModel.contains(newRecord->id()))
             {
-                _mapFromRecordIdToModel.insert(newRecord->id(), newRecord);
+                _hashFromRecordIdToModel.insert(newRecord->id(), newRecord);
 
                 // Create a view model of record with this model
                 _createRecordVMwithModel(newRecord);
@@ -294,11 +296,11 @@ void RecordsSupervisionController::onDeletedRecord(QString recordId)
 {
     qDebug() << "on Deleted Record" << recordId;
 
-    if (_mapFromRecordIdToModel.contains(recordId))
+    if (_hashFromRecordIdToModel.contains(recordId))
     {
-        RecordM* model = _mapFromRecordIdToModel.value(recordId);
+        RecordM* model = _hashFromRecordIdToModel.value(recordId);
 
-        _mapFromRecordIdToModel.remove(recordId);
+        _hashFromRecordIdToModel.remove(recordId);
 
         if (model != nullptr)
         {
@@ -365,11 +367,11 @@ void RecordsSupervisionController::_onTimeout_DisplayTime()
  */
 void RecordsSupervisionController::_createRecordVMwithModel(RecordM* model)
 {
-    if ((model != nullptr) && !_mapFromRecordIdToViewModel.contains(model->id()))
+    if ((model != nullptr) && !_hashFromRecordIdToViewModel.contains(model->id()))
     {
         RecordVM* vm = new RecordVM(model);
 
-        _mapFromRecordIdToViewModel.insert(model->id(), vm);
+        _hashFromRecordIdToViewModel.insert(model->id(), vm);
 
         // Insert in the displayed list
         _recordsList.insert(0, vm);
@@ -383,12 +385,12 @@ void RecordsSupervisionController::_createRecordVMwithModel(RecordM* model)
  */
 void RecordsSupervisionController::_deleteRecordVMwithModel(RecordM* model)
 {
-    if ((model != nullptr) && _mapFromRecordIdToViewModel.contains(model->id()))
+    if ((model != nullptr) && _hashFromRecordIdToViewModel.contains(model->id()))
     {
-        RecordVM* vm = _mapFromRecordIdToViewModel.value(model->id());
+        RecordVM* vm = _hashFromRecordIdToViewModel.value(model->id());
         if (vm != nullptr)
         {
-            _mapFromRecordIdToViewModel.remove(model->id());
+            _hashFromRecordIdToViewModel.remove(model->id());
 
             if (_playingRecord != nullptr) {
                 setplayingRecord(nullptr);
@@ -405,5 +407,3 @@ void RecordsSupervisionController::_deleteRecordVMwithModel(RecordM* model)
         }
     }
 }
-
-

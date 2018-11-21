@@ -267,6 +267,13 @@ private Q_SLOTS:
     void _onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions);
 
 
+    /**
+     * @brief Slot called when a command must be sent on the network to a recorder
+     * @param commandAndParameters
+     */
+    void _onCommandAskedToRecorder(QString commandAndParameters);
+
+
 private:
 
     /**

@@ -227,7 +227,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // Connect to signals from the controller of the scenario
     connect(_scenarioC, &ScenarioController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);
-    connect(_scenarioC, &ScenarioController::commandAskedToRecorder, _networkC, &NetworkController::onCommandAskedToRecorder);
+    connect(_scenarioC, &ScenarioController::commandAskedToRecorder, this, &IngeScapeEditorController::_onCommandAskedToRecorder);
     connect(_scenarioC, &ScenarioController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutSettingValue, _networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
     connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
@@ -827,7 +827,8 @@ void IngeScapeEditorController::_onStartToRecord()
     // Get the JSON of the current platform
     QJsonDocument jsonDocument = _getJsonOfCurrentPlatform();
 
-    if ((_networkC != nullptr) && !jsonDocument.isNull() && !jsonDocument.isEmpty())
+    if ((_networkC != nullptr) && (_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON()
+            && !jsonDocument.isNull() && !jsonDocument.isEmpty())
     {
         QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
 
@@ -848,7 +849,7 @@ void IngeScapeEditorController::_onStartToRecord()
         commandAndParameters.append(jsonString);
 
         // Send the command, parameters and the content of the JSON file to the recorder
-        _networkC->sendCommandWithJsonToRecorder(commandAndParameters);
+        _networkC->sendCommandWithJsonToRecorder(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
     }
 }
 
@@ -885,6 +886,19 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
 
         // Notify QML to reset view
         Q_EMIT resetMappindAndTimeLineViews();
+    }
+}
+
+
+/**
+ * @brief Slot called when a command must be sent on the network to a recorder
+ * @param commandAndParameters
+ */
+void IngeScapeEditorController::_onCommandAskedToRecorder(QString commandAndParameters)
+{
+    if ((_networkC != nullptr) && (_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
+    {
+        _networkC->onCommandAskedToRecorder(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
     }
 }
 

@@ -38,12 +38,6 @@ class NetworkController: public QObject
     // List of available network devices
     I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
 
-    // List of peer id of IngeScape Launchers
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdOfLaunchers)
-
-    // List of peer id of IngeScape Recorders
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdOfRecorders)
-
 
 public:
 
@@ -74,6 +68,29 @@ public:
      * @brief Stop our INGESCAPE agent
      */
     void stop();
+
+
+    /**
+     * @brief Get the IngeScape type of a peer id
+     * @param peerId
+     * @return
+     */
+    IngeScapeTypes::Value getIngeScapeTypeOfPeerId(QString peerId);
+
+
+    /**
+     * @brief Manage a peer id which entered the network
+     * @param peerId
+     * @param ingeScapeType
+     */
+    void manageEnteredPeerId(QString peerId, IngeScapeTypes::Value ingeScapeType);
+
+
+    /**
+     * @brief Manage a peer id which exited the network
+     * @param peerId
+     */
+    void manageExitedPeerId(QString peerId);
 
 
     /**
@@ -116,9 +133,10 @@ public:
 
     /**
      * @brief Send a command, parameters and the content of a JSON file to the recorder
+     * @param peerIdOfRecorder
      * @param commandAndParameters
      */
-    void sendCommandWithJsonToRecorder(QStringList commandAndParameters);
+    void sendCommandWithJsonToRecorder(QString peerIdOfRecorder, QStringList commandAndParameters);
 
 
 Q_SIGNALS:
@@ -347,9 +365,10 @@ public Q_SLOTS:
 
     /**
      * @brief Slot called when a command must be sent on the network to a recorder
+     * @param peerIdOfRecorder
      * @param commandAndParameters
      */
-    void onCommandAskedToRecorder(QString commandAndParameters);
+    void onCommandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters);
 
 
     /**
@@ -423,6 +442,9 @@ private:
 
     // Our IngeScape agent is successfully started if the result of igs_startWithDevice / igs_startWithIP is 1 (O otherwise)
     int _isIngeScapeAgentStarted;
+
+    // Hash table from a peer id to a type of IngeScape elements on the network
+    QHash<QString, IngeScapeTypes::Value> _hashFromPeerIdToIngeScapeType;
 
 
     // Map from "Input (on our editor) Name" to the number of agents in state ON

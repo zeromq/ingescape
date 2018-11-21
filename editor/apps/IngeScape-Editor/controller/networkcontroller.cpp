@@ -168,9 +168,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 qDebug() << "Our zyre event is about IngeScape LAUNCHER";
 
                 // Save the peer id of this launcher
-                QStringList peerIdOfLaunchers = networkController->peerIdOfLaunchers();
-                peerIdOfLaunchers.append(peerId);
-                networkController->setpeerIdOfLaunchers(peerIdOfLaunchers);
+                networkController->manageEnteredPeerId(peerId, IngeScapeTypes::LAUNCHER);
 
                 if (peerName.endsWith(suffix_Launcher)) {
                     hostname = peerName.left(peerName.length() - suffix_Launcher.length());
@@ -185,9 +183,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 qDebug() << "Our zyre event is about IngeScape RECORDER";
 
                 // Save the peer id of this recorder
-                QStringList peerIdOfRecorders = networkController->peerIdOfRecorders();
-                peerIdOfRecorders.append(peerId);
-                networkController->setpeerIdOfRecorders(peerIdOfRecorders);
+                networkController->manageEnteredPeerId(peerId, IngeScapeTypes::RECORDER);
 
                 // Emit the signal "Recorder Entered"
                 Q_EMIT networkController->recorderEntered(peerId, peerName, ipAddress, hostname);
@@ -492,8 +488,13 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
         {
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
 
+            //Get the IngeScape type of a peer id
+            IngeScapeTypes::Value ingeScapeType = networkController->getIngeScapeTypeOfPeerId(peerId);
+
+            switch (ingeScapeType)
+            {
             // IngeScape LAUNCHER
-            if (networkController->peerIdOfLaunchers().contains(peerId))
+            case IngeScapeTypes::LAUNCHER:
             {
                 QString hostname = "";
 
@@ -503,23 +504,32 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Emit the signal "Launcher Exited"
                 Q_EMIT networkController->launcherExited(peerId, hostname);
+
+                break;
             }
             // IngeScape RECORDER
-            else if (networkController->peerIdOfRecorders().contains(peerId))
+            case IngeScapeTypes::RECORDER:
             {
                 // Emit the signal "Recorder Exited"
                 Q_EMIT networkController->recorderExited(peerId, peerName);
 
-                QStringList peerIdOfRecorders = networkController->peerIdOfRecorders();
-                peerIdOfRecorders.removeOne(peerId);
-                networkController->setpeerIdOfRecorders(peerIdOfRecorders);
+                break;
             }
             // IngeScape AGENT
-            else
+            case IngeScapeTypes::AGENT:
             {
                 // Emit the signal "Agent Exited"
                 Q_EMIT networkController->agentExited(peerId, peerName);
+
+                break;
             }
+            default:
+                qWarning() << "Unknown peer id" << peerId << "(" << peerName << ")";
+                break;
+            }
+
+            // Manage the peer id which exited the network
+            networkController->manageExitedPeerId(peerId);
         }
     }
 }
@@ -779,6 +789,47 @@ void NetworkController::stop()
 
 
 /**
+ * @brief Get the IngeScape type of a peer id
+ * @param peerId
+ * @return
+ */
+IngeScapeTypes::Value NetworkController::getIngeScapeTypeOfPeerId(QString peerId)
+{
+    if (_hashFromPeerIdToIngeScapeType.contains(peerId)) {
+        return _hashFromPeerIdToIngeScapeType.value(peerId);
+    }
+    else {
+        return IngeScapeTypes::UNKNOWN;
+    }
+}
+
+
+/**
+ * @brief Manage a peer id which entered the network
+ * @param peerId
+ * @param ingeScapeType
+ */
+void NetworkController::manageEnteredPeerId(QString peerId, IngeScapeTypes::Value ingeScapeType)
+{
+    if (!_hashFromPeerIdToIngeScapeType.contains(peerId)) {
+        _hashFromPeerIdToIngeScapeType.insert(peerId, ingeScapeType);
+    }
+}
+
+
+/**
+ * @brief Manage a peer id which exited the network
+ * @param peerId
+ */
+void NetworkController::manageExitedPeerId(QString peerId)
+{
+    if (_hashFromPeerIdToIngeScapeType.contains(peerId)) {
+        _hashFromPeerIdToIngeScapeType.remove(peerId);
+    }
+}
+
+
+/**
  * @brief Manage the message "MUTED / UN-MUTED"
  * @param peerId
  * @param message
@@ -871,43 +922,33 @@ bool NetworkController::isAvailableNetworkDevice(QString networkDevice)
 
 /**
  * @brief Send a command, parameters and the content of a JSON file to the recorder
+ * @param peerIdOfRecorder
  * @param commandAndParameters
  */
-void NetworkController::sendCommandWithJsonToRecorder(QStringList commandAndParameters)
+void NetworkController::sendCommandWithJsonToRecorder(QString peerIdOfRecorder, QStringList commandAndParameters)
 {
-    if (_peerIdOfRecorders.count() == 1)
+    if (!peerIdOfRecorder.isEmpty() && !commandAndParameters.isEmpty())
     {
-        QString peerIdOfRecorder = _peerIdOfRecorders.first();
+        // Create ZMQ message
+        zmsg_t* msg = zmsg_new();
 
-        if (!peerIdOfRecorder.isEmpty() && !commandAndParameters.isEmpty())
+        for (QString string : commandAndParameters)
         {
-            // Create ZMQ message
-            zmsg_t* msg = zmsg_new();
-
-            for (QString string : commandAndParameters)
-            {
-                // Add a frame with STRING
-                zframe_t* frameString = zframe_new(string.toStdString().c_str(), string.length());
-                zmsg_append(msg, &frameString);
-            }
-
-            //int framesNumber = zmsg_size(msg);
-
-            // Send ZMQ message to the recorder
-            int success = igs_busSendZMQMsgToAgent(peerIdOfRecorder.toStdString().c_str(), &msg);
-
-            // Do not print the JSON file content
-            commandAndParameters.removeLast();
-            qInfo() << "Send command, parameters and the content of a JSON file" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
-
-            zmsg_destroy(&msg);
+            // Add a frame with STRING
+            zframe_t* frameString = zframe_new(string.toStdString().c_str(), string.length());
+            zmsg_append(msg, &frameString);
         }
-    }
-    else if (_peerIdOfRecorders.count() == 0) {
-        qDebug() << "There is no recorder !";
-    }
-    else {
-        qWarning() << "There are several recorders (" << _peerIdOfRecorders.count() << ")";
+
+        //int framesNumber = zmsg_size(msg);
+
+        // Send ZMQ message to the recorder
+        int success = igs_busSendZMQMsgToAgent(peerIdOfRecorder.toStdString().c_str(), &msg);
+
+        // Do not print the JSON file content
+        commandAndParameters.removeLast();
+        qInfo() << "Send command, parameters and the content of a JSON file" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
+
+        zmsg_destroy(&msg);
     }
 }
 
@@ -944,26 +985,17 @@ void NetworkController::onCommandAskedToLauncher(QString command, QString hostna
 
 /**
  * @brief Slot called when a command must be sent on the network to a recorder
+ * @param peerIdOfRecorder
  * @param commandAndParameters
  */
-void NetworkController::onCommandAskedToRecorder(QString commandAndParameters)
+void NetworkController::onCommandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters)
 {
-    if (_peerIdOfRecorders.count() == 1)
+    if (!peerIdOfRecorder.isEmpty() && !commandAndParameters.isEmpty())
     {
-        QString peerIdOfRecorder = _peerIdOfRecorders.first();
-        if (!peerIdOfRecorder.isEmpty())
-        {
-            // Send the command (and parameters) to the peer id of the recorder
-            int success = igs_busSendStringToAgent(peerIdOfRecorder.toStdString().c_str(), "%s", commandAndParameters.toStdString().c_str());
+        // Send the command (and parameters) to the peer id of the recorder
+        int success = igs_busSendStringToAgent(peerIdOfRecorder.toStdString().c_str(), "%s", commandAndParameters.toStdString().c_str());
 
-            qInfo() << "Send command (and parameters)" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
-        }
-    }
-    else if (_peerIdOfRecorders.count() == 0) {
-        qDebug() << "There is no recorder !";
-    }
-    else {
-        qWarning() << "There are several recorders (" << _peerIdOfRecorders.count() << ")";
+        qInfo() << "Send command (and parameters)" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
     }
 }
 

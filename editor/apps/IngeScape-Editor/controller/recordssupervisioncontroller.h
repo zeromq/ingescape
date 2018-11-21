@@ -33,6 +33,12 @@ class RecordsSupervisionController : public QObject
 {
     Q_OBJECT
 
+    // Peer id of the recorder
+    I2_CPP_NOSIGNAL_PROPERTY(QString, peerIdOfRecorder)
+
+    // Peer name of the recorder
+    I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfRecorder)
+
     // Flag indicating is there is a recorder with state ON
     I2_QML_PROPERTY_READONLY(bool, isRecorderON)
 
@@ -103,9 +109,10 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network to the recorder
+     * @param peerIdOfRecorder
      * @param commandAndParameters
      */
-    void commandAskedToRecorder(QString commandAndParameters);
+    void commandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters);
 
 
     /**
@@ -208,20 +215,14 @@ private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 
-    // Map from record id to a model of record
-    QHash<QString, RecordM*> _mapFromRecordIdToModel;
+    // Hash table from record id to a model of record
+    QHash<QString, RecordM*> _hashFromRecordIdToModel;
 
-    // Map from record id to a view model of record
-    QHash<QString, RecordVM*> _mapFromRecordIdToViewModel;
+    // Hash table from record id to a view model of record
+    QHash<QString, RecordVM*> _hashFromRecordIdToViewModel;
 
     // Timer to rdisplay elapsed time on current record
     QTimer _timerToDisplayTime;
-
-    // Peer id of the recorder
-    QString _peerIdOfRecorder;
-
-    // Peer name of the recorder
-    QString _peerNameOfRecorder;
 
 };
 
