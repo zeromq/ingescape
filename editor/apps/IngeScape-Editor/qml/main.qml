@@ -218,8 +218,8 @@ ApplicationWindow {
                 text: qsTr("Export agents...")
 
                 onTriggered: {
-                    if (IngeScapeEditorC.agentsSupervisionC) {
-                        IngeScapeEditorC.agentsSupervisionC.exportAgentsListToSelectedFile();
+                    if (IngeScapeEditorC.modelManager) {
+                        IngeScapeEditorC.modelManager.exportAgentsListToSelectedFile();
                     }
                 }
             }

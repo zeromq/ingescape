@@ -646,9 +646,8 @@ QJsonArray IngeScapeModelManager::exportAgentsListToJSON()
 
 /**
  * @brief Export the agents list to selected file
- * @param jsonArrayOfAgents
  */
-void IngeScapeModelManager::exportAgentsListToSelectedFile(QJsonArray jsonArrayOfAgents)
+void IngeScapeModelManager::exportAgentsListToSelectedFile()
 {
     // "File Dialog" to get the file (path) to save
     QString agentsListFilePath = QFileDialog::getSaveFileName(nullptr,
@@ -659,6 +658,9 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile(QJsonArray jsonArrayO
     if (!agentsListFilePath.isEmpty())
     {
         qInfo() << "Save the agents list to JSON file" << agentsListFilePath;
+
+        // Export the agents list to JSON
+        QJsonArray jsonArrayOfAgents = exportAgentsListToJSON();
 
         QJsonObject jsonRoot = QJsonObject();
         jsonRoot.insert("agents", jsonArrayOfAgents);

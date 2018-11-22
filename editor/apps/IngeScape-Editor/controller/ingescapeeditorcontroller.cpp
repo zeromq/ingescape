@@ -998,16 +998,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
             }
         }
 
-        // Save the agents list
-        /*if (_agentsSupervisionC != nullptr)
-        {
-            // Export the agents list to JSON
-            QJsonArray arrayOfAgents = _agentsSupervisionC->exportAgentsListToJSON();
-
-            if (!arrayOfAgents.isEmpty()) {
-                platformJsonObject.insert("agents", arrayOfAgents);
-            }
-        }*/
+        // FIXME REPAIR: suite de _getJsonOfCurrentPlatform
 
         // Save the mapping
         /*if (_agentsMappingC != nullptr)

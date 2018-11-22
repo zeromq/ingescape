@@ -169,9 +169,8 @@ public:
 
     /**
      * @brief Export the agents list to selected file
-     * @param jsonArrayOfAgents
      */
-    void exportAgentsListToSelectedFile(QJsonArray jsonArrayOfAgents);
+    Q_INVOKABLE void exportAgentsListToSelectedFile();
 
 
     /**

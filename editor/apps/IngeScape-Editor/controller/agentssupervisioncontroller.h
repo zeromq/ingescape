@@ -74,19 +74,6 @@ public:
 
 
     /**
-     * @brief Export the agents list to selected file
-     */
-    Q_INVOKABLE void exportAgentsListToSelectedFile();
-
-
-    /**
-     * @brief Export the agents list to JSON
-     * @return
-     */
-    QJsonArray exportAgentsListToJSON();
-
-
-    /**
      * @brief Remove (and delete) each UN-active agent (agent with state OFF) from the current list of agents
      */
     void removeUNactiveAgents();

@@ -290,9 +290,9 @@ Item {
                 }
 
                 onClicked: {
-                    if (IngeScapeEditorC.agentsSupervisionC) {
+                    if (IngeScapeEditorC.modelManager) {
                         //console.log("Export Agent(s)")
-                        IngeScapeEditorC.agentsSupervisionC.exportAgentsListToSelectedFile();
+                        IngeScapeEditorC.modelManager.exportAgentsListToSelectedFile();
                     }
                 }
             }
