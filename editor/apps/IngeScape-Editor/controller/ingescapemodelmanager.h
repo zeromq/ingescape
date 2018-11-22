@@ -478,8 +478,9 @@ private:
     // Hash table from a name to the group of agents with this name
     QHash<QString, AgentsGroupedByNameVM*> _hashFromNameToAgentsGrouped;
 
-    // Hash table from "Name" to the "Host" (corresponding to an INGESCAPE launcher)
+    // Hash table from name to a model of host (corresponding to an INGESCAPE launcher)
     QHash<QString, HostM*> _hashFromNameToHost;
+
 };
 
 QML_DECLARE_TYPE(IngeScapeModelManager)

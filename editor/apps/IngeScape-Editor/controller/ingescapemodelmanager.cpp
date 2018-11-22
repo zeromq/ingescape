@@ -58,9 +58,20 @@ IngeScapeModelManager::~IngeScapeModelManager()
     // Free memory
     _publishedValues.deleteAllItems();
 
+    qDeleteAll(_hashFromNameToHost);
+    _hashFromNameToHost.clear();
+
     // Free memory
     _hashFromNameToAgentsGrouped.clear();
-    _allAgentsGroupedByName.deleteAllItems();
+
+    // Delete all view model of agents grouped by name
+    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
+    {
+        if (agentsGroupedByName != nullptr) {
+            deleteAgentsGroupedByName(agentsGroupedByName);
+        }
+    }
+    _allAgentsGroupedByName.clear();
 
     // Reset pointers
     _jsonHelper = nullptr;
@@ -192,11 +203,6 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
 
         // Free memory
         delete agent;
-
-        // Delete the view model of agents grouped by name if it does not contain model anymore
-        if ((agentsGroupedByName != nullptr) && agentsGroupedByName->models()->isEmpty()) {
-            deleteAgentsGroupedByName(agentsGroupedByName);
-        }
     }
 }
 

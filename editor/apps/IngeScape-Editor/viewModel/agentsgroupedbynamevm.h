@@ -394,8 +394,12 @@ private:
 
 private:
 
+    // Flag indicating if our "agents grouped by name" can be deleted when its list of all agents grouped by definition is empty
+    // The list "allGroupsByDefinition" can be TEMPORARY empty during the execution of "_onDefinitionOfModelChangedWithPreviousAndNewValues"
+    bool _canBeDeleted_whenListOfAllGroupsByDefinition_isEmpty;
+
     // View model of agents grouped by definition NULL
-    AgentsGroupedByDefinitionVM* _agentsGroupedByDefinitionNULL = nullptr;
+    AgentsGroupedByDefinitionVM* _agentsGroupedByDefinitionNULL;
 
     // Hash table from a definition to a (view model of) agents grouped by definition
     QHash<DefinitionM*, AgentsGroupedByDefinitionVM*> _hashFromDefinitionToAgentsGroupedByDefinition;
@@ -420,6 +424,7 @@ private:
 
     // Hash table from a (unique) parameter id to a view model of parameter
     QHash<QString, ParameterVM*> _hashFromIdToParameter;
+
 };
 
 QML_DECLARE_TYPE(AgentsGroupedByNameVM)
