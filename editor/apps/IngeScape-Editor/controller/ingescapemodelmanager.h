@@ -65,13 +65,26 @@ public:
      * @brief Destructor
      */
     ~IngeScapeModelManager();
-    
+
 
     /**
-     * @brief Add a model of agent
-     * @param agent
+     * @brief Create a new model of agent with a name, a definition (can be NULL) and some properties
+     * @param agentName
+     * @param definition optional (NULL by default)
+     * @param peerId optional (empty by default)
+     * @param ipAddress optional (empty by default)
+     * @param hostname optional (default value)
+     * @param commandLine optional (empty by default)
+     * @param isON optional (false by default)
+     * @return
      */
-    void addAgentModel(AgentM* agent);
+    AgentM* createAgentModel(QString agentName,
+                             DefinitionM* definition = nullptr,
+                             QString peerId = "",
+                             QString ipAddress = "",
+                             QString hostname = HOSTNAME_NOT_DEFINED,
+                             QString commandLine = "",
+                             bool isON = false);
 
 
     /**
@@ -176,7 +189,7 @@ Q_SIGNALS:
      * @brief Signal emitted when a new model of agent has been created
      * @param agent
      */
-    //void agentModelCreated(AgentM* agent);
+    void agentModelHasBeenCreated(AgentM* agent);
 
 
     /**

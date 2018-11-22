@@ -9,7 +9,6 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *      Bruno Lemenicier   <lemenicier@ingenuity.io>
  *
  */
 
@@ -97,7 +96,7 @@ public Q_SLOTS:
      * @brief Slot called when a new model of agent has been created
      * @param agent
      */
-    void onAgentModelCreated(AgentM* agent);
+    void onAgentModelHasBeenCreated(AgentM* agent);
 
 
     /**

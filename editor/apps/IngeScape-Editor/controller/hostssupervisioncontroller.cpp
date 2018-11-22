@@ -9,7 +9,6 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *      Bruno Lemenicier   <lemenicier@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
@@ -149,7 +148,7 @@ void HostsSupervisionController::onHostModelWillBeDeleted(HostM* host)
  * @brief Slot called when a new model of agent has been created
  * @param agent
  */
-void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
+void HostsSupervisionController::onAgentModelHasBeenCreated(AgentM* agent)
 {
     if (agent != nullptr)
     {

@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -18,37 +18,29 @@
 #include <QQmlEngine>
 #include <QDebug>
 
-/**
- * @brief Constructor without peer id and address
- * @param name
- * @param parent
- */
-AgentM::AgentM(QString name,
-               QObject *parent) : AgentM(name,
-                                         "",
-                                         "",
-                                         parent)
-{
-}
-
 
 /**
- * @brief Constructor with peer id and address
+ * @brief Constructor
  * @param name
  * @param peerId
  * @param ipAddress
+ * @param hostname
+ * @param commandLine
  * @param parent
  */
 AgentM::AgentM(QString name,
                QString peerId,
                QString ipAddress,
+               QString hostname,
+               QString commandLine,
+               bool isON,
                QObject *parent) : QObject(parent),
     _name(name),
     _peerId(peerId),
     _address(ipAddress),
-    _hostname(HOSTNAME_NOT_DEFINED),
-    _commandLine(""),
-    _isON(false),
+    _hostname(hostname),
+    _commandLine(commandLine),
+    _isON(isON),
     _canBeRestarted(false),
     _isMuted(false),
     _canBeFrozen(false),
@@ -66,7 +58,7 @@ AgentM::AgentM(QString name,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Agent" << _name << "(" << _peerId << ") at" << _address;
+    qInfo() << "New Model of Agent" << _name << "(" << _peerId << ") on" << _hostname << "(" << _address << ") and command" << _commandLine;
 }
 
 
@@ -75,7 +67,7 @@ AgentM::AgentM(QString name,
  */
 AgentM::~AgentM()
 {
-    qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") on" << _hostname << "(" << _address << ")";
+    qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") on" << _hostname << "(" << _address << ") and command" << _commandLine;
 
     // Delete our agent definition
     if (_definition != nullptr) {

@@ -123,19 +123,52 @@ void IngeScapeModelManager::setisMappingControlled(bool value)
 
 
 /**
- * @brief Add a model of agent
- * @param agent
+ * @brief Create a new model of agent with a name, a definition (can be NULL) and some properties
+ * @param agentName
+ * @param definition optional (NULL by default)
+ * @param peerId optional (empty by default)
+ * @param ipAddress optional (empty by default)
+ * @param hostname optional (default value)
+ * @param commandLine optional (empty by default)
+ * @param isON optional (false by default)
+ * @return
  */
-void IngeScapeModelManager::addAgentModel(AgentM* agent)
+AgentM* IngeScapeModelManager::createAgentModel(QString agentName,
+                                                DefinitionM* definition,
+                                                QString peerId,
+                                                QString ipAddress,
+                                                QString hostname,
+                                                QString commandLine,
+                                                bool isON)
 {
-    if ((agent != nullptr) && !agent->name().isEmpty())
+    AgentM* agent = nullptr;
+
+    if (!agentName.isEmpty())
     {
+        // Create a new model of agent
+        agent = new AgentM(agentName,
+                           peerId,
+                           ipAddress,
+                           hostname,
+                           commandLine,
+                           isON,
+                           this);
+
+        // If defined, set the definition
+        if (definition != nullptr) {
+            agent->setdefinition(definition);
+        }
+
         // Connect to signals from this new agent
         connect(agent, &AgentM::networkDataWillBeCleared, this, &IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared);
 
         if (!agent->peerId().isEmpty()) {
             _hashFromPeerIdToAgent.insert(agent->peerId(), agent);
         }
+
+        // Emit the signal "Agent Model has been Created"
+        Q_EMIT agentModelHasBeenCreated(agent);
+
 
         // Get the (view model of) agents grouped for this name
         AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agent->name());
@@ -152,10 +185,9 @@ void IngeScapeModelManager::addAgentModel(AgentM* agent)
             // Add the new model of agent
             agentsGroupedByName->addNewAgentModel(agent);
         }
-
-        // Emit the signal "Agent Model Created"
-        //Q_EMIT agentModelCreated(agent);
     }
+
+    return agent;
 }
 
 
@@ -167,7 +199,7 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
 {
     if ((agent != nullptr) && !agent->name().isEmpty())
     {
-        // Emit the signal "Agent Model Will Be Deleted"
+        // Emit the signal "Agent Model will be Deleted"
         Q_EMIT agentModelWillBeDeleted(agent);
 
         // DIS-connect to signals from the agent
@@ -399,16 +431,10 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
                         DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonValue.toObject());
                         if (agentDefinition != nullptr)
                         {
-                            QString agentName = agentDefinition->name();
-
                             // Create a new model of agent with the name of the definition
-                            AgentM* agent = new AgentM(agentName, this);
+                            AgentM* agent = createAgentModel(agentDefinition->name(), agentDefinition);
 
-                            // Add this new model of agent
-                            addAgentModel(agent);
-
-                            // Set its definition
-                            agent->setdefinition(agentDefinition);
+                            Q_UNUSED(agent)
                         }
                         // An error occured, the definition is NULL
                         else {
@@ -474,17 +500,10 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                     {
                         qDebug() << "Clone of" << agentName << "without hostname and command line";
 
-                        // Create a new model of agent with the name
-                        AgentM* agent = new AgentM(agentName, this);
+                        // Create a new model of agent
+                        AgentM* agent = createAgentModel(agentName, agentDefinition);
 
-                        // Add this new model of agent
-                        addAgentModel(agent);
-
-                        if (agentDefinition != nullptr)
-                        {
-                            // Set its definition
-                            agent->setdefinition(agentDefinition);
-                        }
+                        Q_UNUSED(agent)
                     }
                     // There are some clones with a defined hostname
                     else
@@ -507,39 +526,33 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                     QString peerId = jsonPeerId.toString();
                                     QString ipAddress = jsonAddress.toString();
 
-                                    if (!hostname.isEmpty() && !commandLine.isEmpty())
+                                    if (!hostname.isEmpty() && !commandLine.isEmpty() && !peerId.isEmpty() && !ipAddress.isEmpty())
                                     {
                                         qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
 
-                                        // Create a new model of agent with the name
-                                        AgentM* agent = new AgentM(agentName, peerId, ipAddress,  this);
-
-                                        // Update the hostname and the command line
-                                        agent->sethostname(hostname);
-                                        agent->setcommandLine(commandLine);
-
-                                        // Add this new model of agent
-                                        addAgentModel(agent);
-
-                                        if (agentDefinition != nullptr)
-                                        {
-                                            // Make a copy of the definition
-                                            DefinitionM* copyOfDefinition = agentDefinition->copy();
-                                            if (copyOfDefinition != nullptr)
-                                            {
-                                                // Set its definition
-                                                agent->setdefinition(copyOfDefinition);
-                                            }
+                                        // Make a copy of the definition
+                                        DefinitionM* copyOfDefinition = nullptr;
+                                        if (agentDefinition != nullptr) {
+                                            copyOfDefinition = agentDefinition->copy();
                                         }
+
+                                        // Create a new model of agent
+                                        AgentM* agent = createAgentModel(agentName,
+                                                                         copyOfDefinition,
+                                                                         peerId,
+                                                                         ipAddress,
+                                                                         hostname,
+                                                                         commandLine);
+
+                                        Q_UNUSED(agent)
                                     }
                                 }
                             }
                         }
                     }
 
-                    if (agentDefinition != nullptr)
-                    {
-                        // Free memory
+                    // Free memory
+                    if (agentDefinition != nullptr) {
                         delete agentDefinition;
                     }
                 }
@@ -706,18 +719,19 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
         else
         {
             // Create a new model of agent
-            agent = new AgentM(agentName, peerId, ipAddress, this);
+            AgentM* agent = createAgentModel(agentName,
+                                             nullptr,
+                                             peerId,
+                                             ipAddress,
+                                             hostname,
+                                             commandLine,
+                                             true);
 
-            agent->sethostname(hostname);
-            agent->setcommandLine(commandLine);
-            agent->setcanBeFrozen(canBeFrozen);
-            agent->setloggerPort(loggerPort);
-
-            // Update the state (flag "is ON")
-            agent->setisON(true);
-
-            // Add this new model of agent
-            addAgentModel(agent);
+            if (agent != nullptr)
+            {
+                agent->setcanBeFrozen(canBeFrozen);
+                agent->setloggerPort(loggerPort);
+            }
         }
     }
 }

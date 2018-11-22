@@ -10,7 +10,6 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort <lemort@ingenuity.io>
- *      Bruno Lemenicier <lemenicier@ingenuity.io>
  *
  */
 
