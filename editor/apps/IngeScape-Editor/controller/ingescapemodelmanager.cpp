@@ -240,32 +240,6 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
 
 
 /**
- * @brief Save a new view model of agents grouped by name
- * @param agentsGroupedByName
- */
-void IngeScapeModelManager::_saveNewAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName)
-{
-    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
-    {
-        // Connect to signals from this new view model of agents grouped by definition
-        //connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreModelAndUseless, this, &IngeScapeModelManager::_onUselessAgentsGroupedByName);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreAgentsGroupedByDefinitionAndUseless, this, &IngeScapeModelManager::_onUselessAgentsGroupedByName);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::onAgentModelHasToBeDeleted);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &IngeScapeModelManager::onDefinitionsToOpen);
-
-        _hashFromNameToAgentsGrouped.insert(agentsGroupedByName->name(), agentsGroupedByName);
-
-        _allAgentsGroupsByName.append(agentsGroupedByName);
-
-        // Emit the signal "Agents grouped by name has been created"
-        Q_EMIT agentsGroupedByNameHasBeenCreated(agentsGroupedByName);
-    }
-}
-
-
-/**
  * @brief Delete a view model of agents grouped by name
  * @param agentsGroupedByName
  */
@@ -1324,6 +1298,32 @@ void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
 
     if (!peerId.isEmpty()) {
         _hashFromPeerIdToAgent.remove(peerId);
+    }
+}
+
+
+/**
+ * @brief Save a new view model of agents grouped by name
+ * @param agentsGroupedByName
+ */
+void IngeScapeModelManager::_saveNewAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName)
+{
+    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
+    {
+        // Connect to signals from this new view model of agents grouped by definition
+        //connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreModelAndUseless, this, &IngeScapeModelManager::_onUselessAgentsGroupedByName);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreAgentsGroupedByDefinitionAndUseless, this, &IngeScapeModelManager::_onUselessAgentsGroupedByName);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::onAgentModelHasToBeDeleted);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &IngeScapeModelManager::onDefinitionsToOpen);
+
+        _hashFromNameToAgentsGrouped.insert(agentsGroupedByName->name(), agentsGroupedByName);
+
+        _allAgentsGroupsByName.append(agentsGroupedByName);
+
+        // Emit the signal "Agents grouped by name has been created"
+        Q_EMIT agentsGroupedByNameHasBeenCreated(agentsGroupedByName);
     }
 }
 

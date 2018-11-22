@@ -275,7 +275,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName("Ingenuity i/o");
     app.setOrganizationDomain("ingenuity.io");
     app.setApplicationName("IngeScape-Editor");
-    app.setApplicationVersion("0.8.1");
+    app.setApplicationVersion("0.9.0");
 
     // - behavior when our last window is closed
     app.setQuitOnLastWindowClosed(true);

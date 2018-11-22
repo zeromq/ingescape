@@ -602,6 +602,8 @@ Item {
 
                     text: qsTr("Download Definition...")
 
+                    enabled: (rootItem.agent && rootItem.agent.definition) ? true : false
+
                     style: Theme.ButtonStyleOfOption {
 
                     }

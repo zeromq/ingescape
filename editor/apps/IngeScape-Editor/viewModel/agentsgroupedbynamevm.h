@@ -280,6 +280,9 @@ private:
     void _updateWithAllModels();
 
 
+    void _toRENAME(AgentM* model);
+
+
     /**
      * @brief Check if we have to merge the model of agent with an existing view model of agents (grouped by definition) that have the same definition
      * @param model

@@ -95,13 +95,6 @@ public:
 
 
     /**
-     * @brief Save a new view model of agents grouped by name
-     * @param agentsGroupedByName
-     */
-    void _saveNewAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName);
-
-
-    /**
      * @brief Delete a view model of agents grouped by name
      * @param agentsGroupedByName
      */
@@ -475,6 +468,13 @@ private Q_SLOTS:
 
 
 private:
+
+    /**
+     * @brief Save a new view model of agents grouped by name
+     * @param agentsGroupedByName
+     */
+    void _saveNewAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName);
+
 
     /**
      * @brief Open a list of definitions (if the definition is already opened, we bring it to front)
