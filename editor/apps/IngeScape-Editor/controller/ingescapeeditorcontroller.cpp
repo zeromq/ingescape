@@ -239,6 +239,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }*/
 
 
+    // Create a fake launcher for fake agents
+    _modelManager->onLauncherEntered("0", HOSTNAME_NOT_DEFINED, "0.0.0.0", "");
+
+
     // Update the list of available network devices
     _networkC->updateAvailableNetworkDevices();
 
