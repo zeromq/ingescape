@@ -150,7 +150,7 @@ void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
     if ((_modelManager != nullptr) && (_jsonHelper != nullptr))
     {
         // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
-        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, _modelManager->allAgentsGroupedByName()->toList());
+        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, _modelManager->allAgentsGroupsByName()->toList());
         if (scenarioToImport != nullptr)
         {
             // Append the list of actions
@@ -348,7 +348,7 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
                 setselectedAction(action);
 
                 // Create an action editor
-                ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), action, _modelManager->allAgentsGroupedByName()->toList());
+                ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), action, _modelManager->allAgentsGroupsByName()->toList());
 
                 _hashActionEditorControllerFromModelOfAction.insert(action, actionEditorC);
 
@@ -359,7 +359,7 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
         else
         {
             // Create an action editor
-            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), nullptr, _modelManager->allAgentsGroupedByName()->toList());
+            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), nullptr, _modelManager->allAgentsGroupsByName()->toList());
 
             _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
 
@@ -392,7 +392,7 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
             setselectedAction(action->modelM());
 
             // Create an action editor
-            actionEditorC = new ActionEditorController(_buildNewActionName(), action->modelM(), _modelManager->allAgentsGroupedByName()->toList());
+            actionEditorC = new ActionEditorController(_buildNewActionName(), action->modelM(), _modelManager->allAgentsGroupsByName()->toList());
 
             _hashActionEditorControllerFromViewModelOfAction.insert(action, actionEditorC);
 

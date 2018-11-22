@@ -329,7 +329,7 @@ Item {
         }
         height: contentHeight
 
-        model: IngeScapeEditorC.modelManager.allAgentsGroupedByName
+        model: IngeScapeEditorC.modelManager.allAgentsGroupsByName
 
         delegate: Rectangle {
 
@@ -389,7 +389,7 @@ Item {
                     height: childrenRect.height + 5
 
                     Repeater {
-                        model: groupByNameVM.allGroupsByDefinition
+                        model: groupByNameVM.allAgentsGroupsByDefinition
 
                         Rectangle {
 

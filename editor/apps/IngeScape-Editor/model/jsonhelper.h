@@ -125,10 +125,10 @@ public:
     /**
      * @brief Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
      * @param jsonScenario
-     * @param allAgentsGroupedByName
+     * @param allAgentsGroupsByName
      * @return
      */
-    ScenarioM* createModelOfScenarioFromJSON(QJsonObject jsonScenario, QList<AgentsGroupedByNameVM*> allAgentsGroupedByName);
+    ScenarioM* createModelOfScenarioFromJSON(QJsonObject jsonScenario, QList<AgentsGroupedByNameVM*> allAgentsGroupsByName);
 
 
     /**
@@ -192,19 +192,19 @@ private:
     /**
      * @brief Create an action effect VM from JSON object
      * @param jsonEffect
-     * @param allAgentsGroupedByName
+     * @param allAgentsGroupsByName
      * @return
      */
-    ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentsGroupedByNameVM*> allAgentsGroupedByName);
+    ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentsGroupedByNameVM*> allAgentsGroupsByName);
 
 
     /**
      * @brief Create an action condition VM from JSON object
      * @param jsonObject
-     * @param allAgentsGroupedByName
+     * @param allAgentsGroupsByName
      * @return
      */
-    ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentsGroupedByNameVM*> allAgentsGroupedByName);
+    ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentsGroupedByNameVM*> allAgentsGroupsByName);
 
 };
 

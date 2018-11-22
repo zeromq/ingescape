@@ -507,7 +507,7 @@ void IngeScapeEditorController::clearCurrentPlatform()
 void IngeScapeEditorController::processBeforeClosing()
 {
     // Save the platform to the default file
-    //savePlatformToDefaultFile();
+    savePlatformToDefaultFile();
 }
 
 
@@ -988,7 +988,18 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
         QJsonObject platformJsonObject;
 
         // Save the agents list
-        if (_agentsSupervisionC != nullptr)
+        if (_modelManager != nullptr)
+        {
+            // Export the agents list to JSON
+            QJsonArray arrayOfAgents = _modelManager->exportAgentsListToJSON();
+
+            if (!arrayOfAgents.isEmpty()) {
+                platformJsonObject.insert("agents", arrayOfAgents);
+            }
+        }
+
+        // Save the agents list
+        /*if (_agentsSupervisionC != nullptr)
         {
             // Export the agents list to JSON
             QJsonArray arrayOfAgents = _agentsSupervisionC->exportAgentsListToJSON();
@@ -996,20 +1007,20 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
             if (!arrayOfAgents.isEmpty()) {
                 platformJsonObject.insert("agents", arrayOfAgents);
             }
-        }
+        }*/
 
         // Save the mapping
-        if (_agentsMappingC != nullptr)
+        /*if (_agentsMappingC != nullptr)
         {
             QJsonArray arrayOfMappings = _jsonHelper->exportAllAgentsInMapping(_agentsMappingC->allAgentsInMapping()->toList());
 
             if (!arrayOfMappings.isEmpty()) {
                 platformJsonObject.insert("mapping", arrayOfMappings);
             }
-        }
+        }*/
 
         // Save the scenario
-        if (_scenarioC != nullptr)
+        /*if (_scenarioC != nullptr)
         {
             // actions list
             // actions list in the palette
@@ -1019,7 +1030,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
                                                                    _scenarioC->actionsInTimeLine()->toList());
 
             platformJsonObject.insert("scenario", jsonScenario);
-        }
+        }*/
 
         jsonDocument = QJsonDocument(platformJsonObject);
     }

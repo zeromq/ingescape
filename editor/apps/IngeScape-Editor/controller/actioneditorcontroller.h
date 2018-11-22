@@ -55,12 +55,12 @@ public:
      * @brief Constructor
      * @param actionName
      * @param originalAction
-     * @param allAgentsGroupedByName
+     * @param allAgentsGroupsByName
      * @param parent
      */
     explicit ActionEditorController(QString actionName,
                                     ActionM* originalAction,
-                                    QList<AgentsGroupedByNameVM*> allAgentsGroupedByName,
+                                    QList<AgentsGroupedByNameVM*> allAgentsGroupsByName,
                                     QObject *parent = 0);
 
 
@@ -114,7 +114,7 @@ public Q_SLOTS:
 private:
     // FIXME: if the list of agents change, this list is not updated
     // List of all agents grouped by name
-    QList<AgentsGroupedByNameVM*> _allAgentsGroupedByName;
+    QList<AgentsGroupedByNameVM*> _allAgentsGroupsByName;
 
 
 };

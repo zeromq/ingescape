@@ -1309,7 +1309,7 @@ void AgentsMappingController::_updateMappingWithModelsOfAgentsAndLinks()
         // FIXME: use AgentsGroupedByNameVM instead of the function "getMapFromAgentNameToActiveAgentsList"
 
         /*// Traverse the list of all "agents grouped by name"
-        for (AgentsGroupedByNameVM* agentsGroupedByName : _modelManager->allAgentsGroupedByName())
+        for (AgentsGroupedByNameVM* agentsGroupedByName : _modelManager->allAgentsGroupsByName())
         {
             // Only when the agent(s) is ON
             if ((agentsGroupedByName != nullptr) && agentsGroupedByName->isON())

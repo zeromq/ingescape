@@ -41,7 +41,7 @@ IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
     qInfo() << "New INGESCAPE Model Manager";
 
     // Agents grouped are sorted on their name (alphabetical order)
-    _allAgentsGroupedByName.setSortProperty("name");
+    _allAgentsGroupsByName.setSortProperty("name");
 }
 
 
@@ -65,13 +65,13 @@ IngeScapeModelManager::~IngeScapeModelManager()
     _hashFromNameToAgentsGrouped.clear();
 
     // Delete all view model of agents grouped by name
-    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
+    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
     {
         if (agentsGroupedByName != nullptr) {
             deleteAgentsGroupedByName(agentsGroupedByName);
         }
     }
-    _allAgentsGroupedByName.clear();
+    _allAgentsGroupsByName.clear();
 
     // Reset pointers
     _jsonHelper = nullptr;
@@ -257,7 +257,7 @@ void IngeScapeModelManager::_saveNewAgentsGroupedByName(AgentsGroupedByNameVM* a
 
         _hashFromNameToAgentsGrouped.insert(agentsGroupedByName->name(), agentsGroupedByName);
 
-        _allAgentsGroupedByName.append(agentsGroupedByName);
+        _allAgentsGroupsByName.append(agentsGroupedByName);
 
         // Emit the signal "Agents grouped by name has been created"
         Q_EMIT agentsGroupedByNameHasBeenCreated(agentsGroupedByName);
@@ -280,7 +280,7 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
         _hashFromNameToAgentsGrouped.remove(agentsGroupedByName->name());
 
         // Remove from the sorted list
-        _allAgentsGroupedByName.remove(agentsGroupedByName);
+        _allAgentsGroupsByName.remove(agentsGroupedByName);
 
         // Emit the signal "Agents grouped by name will be deleted"
         Q_EMIT agentsGroupedByNameWillBeDeleted(agentsGroupedByName);
@@ -367,7 +367,7 @@ AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString na
     QHash<QString, QList<AgentM*>> hashFromAgentNameToActiveAgentsList;
 
     // Traverse the list of all agents grouped by name
-    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
+    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
     {
         if ((agentsGroupedByName != nullptr) && agentsGroupedByName->isON())
         {
@@ -526,7 +526,8 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                     QString peerId = jsonPeerId.toString();
                                     QString ipAddress = jsonAddress.toString();
 
-                                    if (!hostname.isEmpty() && !commandLine.isEmpty() && !peerId.isEmpty() && !ipAddress.isEmpty())
+                                    //if (!hostname.isEmpty() && !commandLine.isEmpty() && !peerId.isEmpty() && !ipAddress.isEmpty())
+                                    if (!hostname.isEmpty() && !commandLine.isEmpty())
                                     {
                                         qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
 
@@ -565,6 +566,81 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
         }
     }
     return success;
+}
+
+
+/**
+ * @brief Export the agents list to JSON
+ * @return
+ */
+QJsonArray IngeScapeModelManager::exportAgentsListToJSON()
+{
+    QJsonArray jsonArrayAgentsGroupedByName = QJsonArray();
+
+    if (_jsonHelper != nullptr)
+    {
+        // List of all groups (of agents) grouped by name
+        for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
+        {
+            if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
+            {
+                QJsonObject jsonAgentsGroupedByName = QJsonObject();
+
+                // Name
+                jsonAgentsGroupedByName.insert("agentName", agentsGroupedByName->name());
+
+                QJsonArray jsonArrayAgentsGroupedByDefinition = QJsonArray();
+
+                // List of all groups (of agents) grouped by definition
+                for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : agentsGroupedByName->allAgentsGroupsByDefinition()->toList())
+                {
+                    if (agentsGroupedByDefinition != nullptr)
+                    {
+                        QJsonObject jsonAgentsGroupedByDefinition = QJsonObject();
+
+                        // Definition
+                        if (agentsGroupedByDefinition->definition() != nullptr)
+                        {
+                            QJsonObject jsonDefinition = _jsonHelper->exportAgentDefinitionToJson(agentsGroupedByDefinition->definition());
+                            jsonAgentsGroupedByDefinition.insert("definition", jsonDefinition);
+                        }
+                        else {
+                            jsonAgentsGroupedByDefinition.insert("definition", QJsonValue());
+                        }
+
+                        // Clones (models)
+                        QJsonArray jsonClones = QJsonArray();
+
+                        for (AgentM* model : agentsGroupedByDefinition->models()->toList())
+                        {
+                            // Hostname and Command Line must be defined to be added to the array of clones
+                            if ((model != nullptr) && !model->hostname().isEmpty() && !model->commandLine().isEmpty())
+                            {
+                                qDebug() << "Export" << model->name() << "on" << model->hostname() << "at" << model->commandLine() << "(" << model->peerId() << ")";
+
+                                QJsonObject jsonClone = QJsonObject();
+                                jsonClone.insert("hostname", model->hostname());
+                                jsonClone.insert("commandLine", model->commandLine());
+                                jsonClone.insert("peerId", model->peerId());
+                                jsonClone.insert("address", model->address());
+
+                                jsonClones.append(jsonClone);
+                            }
+                        }
+
+                        jsonAgentsGroupedByDefinition.insert("clones", jsonClones);
+
+                        jsonArrayAgentsGroupedByDefinition.append(jsonAgentsGroupedByDefinition);
+                    }
+                }
+
+                jsonAgentsGroupedByName.insert("definitions", jsonArrayAgentsGroupedByDefinition);
+
+                jsonArrayAgentsGroupedByName.append(jsonAgentsGroupedByName);
+            }
+        }
+    }
+    return jsonArrayAgentsGroupedByName;
 }
 
 
@@ -643,7 +719,7 @@ void IngeScapeModelManager::openDefinition(DefinitionM* definition)
         // Variant --> we have to open each variants of this definition
         if (definition->isVariant())
         {
-            for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
+            for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
             {
                 if (agentsGroupedByName != nullptr)
                 {
@@ -828,7 +904,7 @@ void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostName, 
     }
 
     // Traverse the list of all agents grouped by name
-    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
+    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
     {
         if (agentsGroupedByName != nullptr)
         {
@@ -869,7 +945,7 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
     }
 
     // Traverse the list of all agents grouped by name
-    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupedByName.toList())
+    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
     {
         if (agentsGroupedByName != nullptr)
         {

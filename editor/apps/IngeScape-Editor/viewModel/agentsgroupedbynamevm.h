@@ -61,8 +61,8 @@ class AgentsGroupedByNameVM : public QObject
     // List of view models of parameters
     I2_QOBJECT_LISTMODEL(ParameterVM, parametersList)
 
-    // List of all groups of agents grouped by definition
-    I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, allGroupsByDefinition)
+    // List of all groups (of agents) grouped by definition
+    I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, allAgentsGroupsByDefinition)
 
     // Current mapping (real mapping without edition)
     //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, currentMapping)
@@ -395,8 +395,8 @@ private:
 private:
 
     // Flag indicating if our "agents grouped by name" can be deleted when its list of all agents grouped by definition is empty
-    // The list "allGroupsByDefinition" can be TEMPORARY empty during the execution of "_onDefinitionOfModelChangedWithPreviousAndNewValues"
-    bool _canBeDeleted_whenListOfAllGroupsByDefinition_isEmpty;
+    // The list "allAgentsGroupsByDefinition" can be TEMPORARY empty during the execution of "_onDefinitionOfModelChangedWithPreviousAndNewValues"
+    bool _canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty;
 
     // View model of agents grouped by definition NULL
     AgentsGroupedByDefinitionVM* _agentsGroupedByDefinitionNULL;

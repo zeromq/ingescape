@@ -33,8 +33,8 @@ class IngeScapeModelManager : public QObject
 {
     Q_OBJECT
 
-    // List of all agents grouped by name
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentsGroupedByNameVM, allAgentsGroupedByName)
+    // List of all groups (of agents) grouped by name
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentsGroupedByNameVM, allAgentsGroupsByName)
 
     // Flag indicating if our global mapping is activated
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingActivated)
@@ -158,6 +158,13 @@ public:
      * @param jsonArrayOfAgents
      */
     bool importAgentsListFromJson(QJsonArray jsonArrayOfAgents);
+
+
+    /**
+     * @brief Export the agents list to JSON
+     * @return
+     */
+    QJsonArray exportAgentsListToJSON();
 
 
     /**

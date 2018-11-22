@@ -21,18 +21,18 @@
  * @brief Constructor
  * @param actionName
  * @param originalAction
- * @param allAgentsGroupedByName
+ * @param allAgentsGroupsByName
  * @param parent
  */
 ActionEditorController::ActionEditorController(QString actionName,
                                                ActionM* originalAction,
-                                               QList<AgentsGroupedByNameVM*> allAgentsGroupedByName,
+                                               QList<AgentsGroupedByNameVM*> allAgentsGroupsByName,
                                                QObject *parent) : QObject(parent),
     _originalAction(originalAction),
     _editedAction(nullptr),
     _originalViewModel(nullptr),
     _editedViewModel(nullptr),
-    _allAgentsGroupedByName(allAgentsGroupedByName)
+    _allAgentsGroupsByName(allAgentsGroupsByName)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -58,7 +58,7 @@ ActionEditorController::ActionEditorController(QString actionName,
  */
 ActionEditorController::~ActionEditorController()
 {
-    _allAgentsGroupedByName.clear();
+    _allAgentsGroupsByName.clear();
 
     setoriginalAction(nullptr);
 
@@ -126,8 +126,8 @@ void ActionEditorController::createNewCondition()
     //conditionVM->setmodelM(new ConditionOnAgentM());
 
     // List of agents is NOT empty
-    if (!_allAgentsGroupedByName.isEmpty()) {
-        conditionVM->modelM()->setagent(_allAgentsGroupedByName.at(0));
+    if (!_allAgentsGroupsByName.isEmpty()) {
+        conditionVM->modelM()->setagent(_allAgentsGroupsByName.at(0));
     }
 
     _editedAction->addConditionToList(conditionVM);
@@ -161,12 +161,12 @@ void ActionEditorController::createNewEffect()
     effectVM->setmodelM(new IOPValueEffectM());
 
     // List of agents is NOT empty
-    if (!_allAgentsGroupedByName.isEmpty())
+    if (!_allAgentsGroupsByName.isEmpty())
     {
-        effectVM->modelM()->setagent(_allAgentsGroupedByName.at(0));
+        effectVM->modelM()->setagent(_allAgentsGroupsByName.at(0));
 
-        if (_allAgentsGroupedByName.count() > 1) {
-            effectVM->setsecondAgentForMapping(_allAgentsGroupedByName.at(1));
+        if (_allAgentsGroupsByName.count() > 1) {
+            effectVM->setsecondAgentForMapping(_allAgentsGroupsByName.at(1));
         }
     }
 

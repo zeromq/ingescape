@@ -26,7 +26,7 @@ AgentsGroupedByNameVM::AgentsGroupedByNameVM(QString agentName,
     _isON(false),
     _numberOfAgentsON(0),
     _numberOfAgentsOFF(0),
-    _canBeDeleted_whenListOfAllGroupsByDefinition_isEmpty(true),
+    _canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty(true),
     _agentsGroupedByDefinitionNULL(nullptr)
 
 {
@@ -45,9 +45,9 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 {
     qInfo() << "Delete View Model of Agents grouped by name" << _name;
 
-    // Set the flag to prevent the deletion of our "agents grouped by name" because the list "allGroupsByDefinition"
+    // Set the flag to prevent the deletion of our "agents grouped by name" because the list "allAgentsGroupsByDefinition"
     // will be empty during the execution of this destructor (prevent several call to this destructor)
-    _canBeDeleted_whenListOfAllGroupsByDefinition_isEmpty = false;
+    _canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty = false;
 
     // Models are managed by agents grouped by definition (do not manage them here)
     /*if (!_models.isEmpty())
@@ -76,10 +76,10 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 
 
     // If the list of groups of agent(s grouped by definition) is not empty
-    if (!_allGroupsByDefinition.isEmpty())
+    if (!_allAgentsGroupsByDefinition.isEmpty())
     {
         // Delete all view models of agents grouped by definition
-        for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : _allGroupsByDefinition.toList())
+        for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : _allAgentsGroupsByDefinition.toList())
         {
             // Delete the view model of agents grouped by definition
             // And emit the signal "agentModelHasToBeDeleted" for each of its model of agent
@@ -88,7 +88,7 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 
         //_agentsGroupedByDefinitionNULL = nullptr;
         //_hashFromDefinitionToAgentsGroupedByDefinition.clear();
-        //_allGroupsByDefinition.clear();
+        //_allAgentsGroupsByDefinition.clear();
     }
 
 
@@ -253,7 +253,7 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
         }
 
         // Remove from the list
-        _allGroupsByDefinition.remove(agentsGroupedByDefinition);
+        _allAgentsGroupsByDefinition.remove(agentsGroupedByDefinition);
 
         // Make a copy of the list of models
         QList<AgentM*> copy = agentsGroupedByDefinition->models()->toList();
@@ -274,8 +274,8 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
         }
 
         // Check the flag indicating if our "agents grouped by name" can be deleted when its list of all agents grouped by definition is empty
-        // The list "allGroupsByDefinition" can be TEMPORARY empty during the execution of "_onDefinitionOfModelChangedWithPreviousAndNewValues"
-        if (_allGroupsByDefinition.isEmpty() && _canBeDeleted_whenListOfAllGroupsByDefinition_isEmpty)
+        // The list "allAgentsGroupsByDefinition" can be TEMPORARY empty during the execution of "_onDefinitionOfModelChangedWithPreviousAndNewValues"
+        if (_allAgentsGroupsByDefinition.isEmpty() && _canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty)
         {
             // Emit the signal "No more Agents Grouped by Definition" (our view model if useless)
             Q_EMIT noMoreAgentsGroupedByDefinitionAndUseless();
@@ -469,9 +469,9 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
         // The previous definition was NULL (and the new definition is defined)
         if (previousDefinition == nullptr)
         {
-            // Set the flag to prevent the deletion of our "agents grouped by name" because the list "allGroupsByDefinition"
+            // Set the flag to prevent the deletion of our "agents grouped by name" because the list "allAgentsGroupsByDefinition"
             // will be TEMPORARY empty during the execution of "_onDefinitionOfModelChangedWithPreviousAndNewValues"
-            _canBeDeleted_whenListOfAllGroupsByDefinition_isEmpty = false;
+            _canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty = false;
 
             if ((_agentsGroupedByDefinitionNULL != nullptr) && _agentsGroupedByDefinitionNULL->models()->contains(model))
             {
@@ -665,8 +665,8 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                 _saveNewAgentsGroupedByDefinition(agentsGroupedByDefinition);
             }
 
-            // Reset the flag to allow the deletion of our "agents grouped by name" when the list "allGroupsByDefinition" is empty
-            _canBeDeleted_whenListOfAllGroupsByDefinition_isEmpty = true;
+            // Reset the flag to allow the deletion of our "agents grouped by name" when the list "allAgentsGroupsByDefinition" is empty
+            _canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty = true;
         }
         // The previous definition was already defined (and the new definition is defined)
         else
@@ -863,7 +863,7 @@ void AgentsGroupedByNameVM::_saveNewAgentsGroupedByDefinition(AgentsGroupedByDef
             //Q_EMIT modelsOfIOPChanged();
         }
 
-        _allGroupsByDefinition.append(agentsGroupedByDefinition);
+        _allAgentsGroupsByDefinition.append(agentsGroupedByDefinition);
 
         // Emit the signal "Agents grouped by definition has been created"
         Q_EMIT agentsGroupedByDefinitionHasBeenCreated(agentsGroupedByDefinition);
