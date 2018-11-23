@@ -845,11 +845,11 @@ void AgentsGroupedByNameVM::_createAgentsGroupedByDefinition(DefinitionM* defini
     // Create a new view model of agents grouped by definition
     AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = new AgentsGroupedByDefinitionVM(_name, definition);
 
-    // Add the model
-    agentsGroupedByDefinition->models()->append(model);
-
     // Connect slots to signals from this new view model of agents grouped by definition
     connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::noMoreModelAndUseless, this, &AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition);
+
+    // Add the model
+    agentsGroupedByDefinition->models()->append(model);
 
     if (definition != nullptr)
     {

@@ -144,18 +144,18 @@ AgentMappingM* JsonHelper::createModelOfAgentMappingFromBytes(QString inputAgent
 {
     AgentMappingM* agentMapping = nullptr;
 
-    QJsonDocument jsonAgentMapping = QJsonDocument::fromJson(byteArrayOfJson);
-    if (jsonAgentMapping.isObject())
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonDocument.isObject())
     {
-        QJsonObject jsonObject = jsonAgentMapping.object();
+        QJsonObject jsonRoot = jsonDocument.object();
 
-        if (jsonObject.contains("mapping"))
+        if (jsonRoot.contains("mapping"))
         {
-            QJsonValue jsonValue = jsonObject.value("mapping");
-            if (jsonValue.isObject())
+            QJsonValue jsonAgentMapping = jsonRoot.value("mapping");
+            if (jsonAgentMapping.isObject())
             {
                 // Create a model of agent mapping from JSON object
-                agentMapping = createModelOfAgentMappingFromJSON(inputAgentName, jsonValue.toObject());
+                agentMapping = createModelOfAgentMappingFromJSON(inputAgentName, jsonAgentMapping.toObject());
             }
         }
     }

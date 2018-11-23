@@ -470,10 +470,10 @@ private Q_SLOTS:
 private:
 
     /**
-     * @brief Save a new view model of agents grouped by name
-     * @param agentsGroupedByName
+     * @brief Create a new view model of agents grouped by name
+     * @param model
      */
-    void _saveNewAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName);
+    void _createAgentsGroupedByName(AgentM* model);
 
 
     /**
