@@ -170,6 +170,7 @@ typedef struct zyreloopElements{
     zactor_t *agentActor;
     zyre_t *node;
     zsock_t *publisher;
+    zsock_t *ipcPublisher;
     zsock_t *logger;
     zloop_t *loop;
 } zyreloopElements_t;
@@ -224,6 +225,7 @@ extern bool network_needToSendDefinitionUpdate;
 extern bool network_needToUpdateMapping;
 extern subscriber_t *subscribers;
 extern zyreloopElements_t *agentElements;
+extern char *ipcFolderPath;
 int network_publishOutput (const char* output_name);
 
 // parser

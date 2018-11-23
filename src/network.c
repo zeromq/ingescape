@@ -128,6 +128,8 @@ bool network_needToUpdateMapping = false;
 unsigned int network_discoveryInterval = 1000;
 unsigned int network_agentTimeout = 30000;
 unsigned int network_publishingPort = 0;
+char *ipcFolderPath = NULL;
+#define DEFAULT_IPC_PATH "/tmp/ingescape"
 
 //we manage agent data as a global variables inside the network module for now
 zyreloopElements_t *agentElements = NULL;
@@ -495,12 +497,30 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     }
 
                     if (extractOK){
-                        *(insert + 1) = '\0';
-                        strcat(endpointAddress, v);
                         //we found a possible publisher to subscribe to
+                        *(insert + 1) = '\0'; //close endpointAddress string after ':' location
+                        
+                         //check towards our own ip address (without port)
+                        char *incomingIpAddress = endpointAddress + 6; //ignore tcp://
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+                        *insert = '\0';
+                        bool useIPC = false;
+                        const char *ipcAddress = NULL;
+                        if (strcmp(agentElements->ipAddress, incomingIpAddress) == 0){
+                            //same IP address : we can try to use ipc instead of TCP
+                            //try to recover agent ipc address
+                            ipcAddress = zyre_event_header(zyre_event, "ipc");
+                            if (ipcAddress != NULL){
+                                useIPC = true;
+                                igs_debug("Use ipc address (%s) to subscribe to %s", ipcAddress, name);
+                            }
+                        }
+                        *insert = ':';
+#endif
+                        //add port to the endpoint to compose it fully
+                        strcat(endpointAddress, v);
                         subscriber_t *subscriber;
                         HASH_FIND_STR(subscribers, peer, subscriber);
-                        
                         if (subscriber != NULL){
                             //we have a reconnection with same peerId
                             igs_debug("Peer id %s was connected before with agent name %s : reset and recreate subscription", peer, subscriber->agentName);
@@ -527,7 +547,15 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         zagent->subscriber = subscriber;
                         subscriber->agentName = strdup(name);
                         subscriber->agentPeerId = strdup (peer);
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+                        if (useIPC){
+                            subscriber->subscriber = zsock_new_sub(ipcAddress, NULL);
+                        }else{
+                            subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
+                        }
+#else
                         subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
+#endif
                         assert(subscriber->subscriber);
                         subscriber->definition = NULL;
                         subscriber->mappingsFilters = NULL;
@@ -540,7 +568,15 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         subscriber->pollItem->revents = 0;
                         zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
                         zloop_poller_set_tolerant(loop, subscriber->pollItem);
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+                        if (useIPC){
+                            igs_debug("Subscription created for %s at %s",subscriber->agentName,ipcAddress);
+                        }else{
+                            igs_debug("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
+                        }
+#else
                         igs_debug("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
+#endif
                     }
                 }
                 free(k);
@@ -1097,14 +1133,13 @@ initLoop (zsock_t *pipe, void *args){
         }
     }
     
-    //start publisher
+    //start TCP publisher
     char endpoint[256];
     if (network_publishingPort == 0){
-        sprintf(endpoint, "tcp://%s:*", agentElements->ipAddress);
+        snprintf(endpoint, 255, "tcp://%s:*", agentElements->ipAddress);
     }else{
-        sprintf(endpoint, "tcp://%s:%d", agentElements->ipAddress, network_publishingPort);
+        snprintf(endpoint, 255, "tcp://%s:%d", agentElements->ipAddress, network_publishingPort);
     }
-    
     zsock_t *publisher = agentElements->publisher = zsock_new_pub(endpoint);
     if (agentElements->publisher == NULL){
         igs_error("Could not create publishing socket : Agent will interrupt immediately.");
@@ -1117,6 +1152,26 @@ initLoop (zsock_t *pipe, void *args){
         }
         zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
     }
+    
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+    //start ipc publisher
+    char *ipcEndpoint = NULL;
+    char *ipcFullPath = NULL;
+    if (ipcFolderPath == NULL){
+        ipcFolderPath = strdup(DEFAULT_IPC_PATH);
+    }
+    ipcFullPath = calloc(1, strlen(ipcFolderPath)+strlen(zyre_uuid(node))+2);
+    sprintf(ipcFullPath, "%s/%s", ipcFolderPath, zyre_uuid(node));
+    ipcEndpoint = calloc(1, strlen(ipcFolderPath)+strlen(zyre_uuid(node))+8);
+    sprintf(ipcEndpoint, "ipc://%s/%s", ipcFolderPath, zyre_uuid(node));
+    
+    zsock_t *ipcPublisher = agentElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
+    if (ipcPublisher == NULL){
+        igs_error("Could not create IPC publishing socket (%s) : Agent will interrupt immediately.", ipcEndpoint);
+        canContinue = false;
+    }
+    zyre_set_header(agentElements->node, "ipc", "%s", ipcEndpoint);
+#endif
     
     //start logger stream if needed
     zsock_t *logger = NULL;
@@ -1276,6 +1331,15 @@ initLoop (zsock_t *pipe, void *args){
     zclock_sleep (100);
     zyre_destroy (&node);
     zsock_destroy(&publisher);
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+    if (ipcPublisher != NULL){
+        zsock_destroy(&ipcPublisher);
+        zsys_file_delete(ipcFullPath); //destroy ipcPath in file system
+        //NB: ipcPath is based on peer id which is unique. It will never be used again.
+    }
+    free(ipcFullPath);
+    free(ipcEndpoint);
+#endif
     if (logger != NULL){
         zsock_destroy(&logger);
     }
@@ -1353,12 +1417,16 @@ int network_publishOutput (const char* output_name){
                 default:
                     break;
             }
+            zmsg_t *msgBis = zmsg_dup(msg);
             if (zmsg_send(&msg, agentElements->publisher) != 0){
                 igs_error("Could not publish output %s on the network\n",output_name);
+                zmsg_destroy(&msgBis);
             }else{
                 result = 1;
+                if (zmsg_send(&msgBis, agentElements->ipcPublisher) != 0){
+                    igs_error("Could not publish output %s using IPC\n",output_name);
+                }
             }
-            
         }else{
             if(found_iop == NULL){
                 igs_error("Output %s is unknown", output_name);
@@ -2063,3 +2131,25 @@ void igs_setPublishingPort(unsigned int port){
     }
     network_publishingPort = port;
 }
+
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+void igs_setIpcFolderPath(char *path){
+    if (strcmp(path, DEFAULT_IPC_PATH) == 0
+        || (ipcFolderPath != NULL && strcmp(path, ipcFolderPath) == 0)){
+        igs_debug("IPC folder path already is '%s'", path);
+    }else{
+        if (*path == '/'){
+            if (ipcFolderPath != NULL){
+                free(ipcFolderPath);
+            }
+            if (!zsys_file_exists(path)){
+                igs_info("folder %s was created automatically", path);
+                zsys_dir_create("%s", path);
+            }
+            ipcFolderPath = strdup(path);
+        }else{
+            igs_error("IPC folder path must be absolute");
+        }
+    }
+}
+#endif

@@ -304,5 +304,9 @@ PUBLIC void igs_setMappingPath(const char *path);
 PUBLIC void igs_writeDefinitionToPath(void);
 PUBLIC void igs_writeMappingToPath(void);
 
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+//set IPC folder path for the agent. Default is /tmp/ingesscape/
+PUBLIC void igs_setIpcFolderPath(char *path);
+#endif
 
 #endif /* ingescape_public_h */
