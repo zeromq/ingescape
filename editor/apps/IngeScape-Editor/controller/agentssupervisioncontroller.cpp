@@ -93,43 +93,6 @@ void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM*
 
 
 /**
- * @brief Remove (and delete) each UN-active agent (agent with state OFF) from the current list of agents
- */
-void AgentsSupervisionController::removeUNactiveAgents()
-{
-    qInfo() << "Remove each UN-active agent from the current list of agents";
-
-    if (_modelManager != nullptr)
-    {
-        // FIXME REPAIR: removeUNactiveAgents
-        /*for (AgentVM* agent : _agentsList.toList())
-        {
-            if (agent != nullptr)
-            {
-                // ON
-                if (agent->isON())
-                {
-                    // Delete each model with state OFF
-                    for (AgentM* model : agent->models()->toList())
-                    {
-                        if ((model != nullptr) && !model->isON()) {
-                            _modelManager->deleteAgentModel(model);
-                        }
-                    }
-                }
-                // OFF
-                else
-                {
-                    // Remove the agent from the list and delete it
-                    deleteAgentInList(agent);
-                }
-            }
-        }*/
-    }
-}
-
-
-/**
  * @brief Slot called when a new view model of agents grouped by definition has been created
  * @param agentsGroupedByDefinition
  */
@@ -392,8 +355,8 @@ QList<DefinitionM*> AgentsSupervisionController::_getDefinitionsListWithName(QSt
  */
 void AgentsSupervisionController::_updateDefinitionVariants(QString definitionName, QList<DefinitionM*> definitionsList)
 {
-    Q_UNUSED(definitionName)
-    //qDebug() << "Update the definition variants for definition name" << definitionName << "(" << definitionsList.count() << "definitions)";
+    //Q_UNUSED(definitionName)
+    qDebug() << "Update the definition variants for definition name" << definitionName << "(" << definitionsList.count() << "definitions)";
 
     // We can use versions as keys of the map because the list contains only definition with the same name
     QHash<QString, QList<DefinitionM*>> hashFromVersionToDefinitionsList;

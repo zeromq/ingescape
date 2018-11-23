@@ -472,12 +472,6 @@ void IngeScapeEditorController::savePlatformToDefaultFile()
  */
 void IngeScapeEditorController::clearCurrentPlatform()
 {
-    if (_hostsSupervisionC != nullptr)
-    {
-        // Remove each UN-active agent (agent with state OFF) from the global list with all agents
-        _hostsSupervisionC->removeUNactiveAgents();
-    }
-
     if (_agentsMappingC != nullptr)
     {
         // Clear the current mapping
@@ -490,10 +484,10 @@ void IngeScapeEditorController::clearCurrentPlatform()
         _scenarioC->clearScenario();
     }
 
-    if (_agentsSupervisionC != nullptr)
+    if (_modelManager != nullptr)
     {
-        // Remove (and delete) each UN-active agent (agent with state OFF) from the list
-        _agentsSupervisionC->removeUNactiveAgents();
+        // Delete agents OFF
+        _modelManager->deleteAgentsOFF();
     }
 
     // Notify QML to reset view
@@ -616,8 +610,8 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 settings.sync();
 
 
-                // Simulate an exit for each active agent
-                _modelManager->simulateExitForEachActiveAgent();
+                // Simulate an exit for agent ON
+                _modelManager->simulateExitForEachAgentON();
 
                 // Has to clear the current platform
                 if (hasToClearPlatform)

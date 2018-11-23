@@ -120,6 +120,12 @@ public:
 
 
     /**
+     * @brief Delete agents OFF
+     */
+    void deleteAgentsOFF();
+
+
+    /**
      * @brief Get the list of definitions with a specific name
      * @param definitionName
      * @return

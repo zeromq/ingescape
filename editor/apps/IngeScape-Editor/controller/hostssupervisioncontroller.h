@@ -61,12 +61,6 @@ public:
     Q_INVOKABLE void removeAgentModelFromHost(AgentM* agent, HostVM* host);
 
 
-    /**
-     * @brief Remove each UN-active agent (agent with state OFF) from the global list with all agents
-     */
-    void removeUNactiveAgents();
-
-
 Q_SIGNALS:
 
     /**

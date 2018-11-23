@@ -167,10 +167,15 @@ public:
 
 
     /**
-     * @brief Simulate an exit for each active agent
-     * an active agent has its flag "isON" equal to true
+     * @brief Simulate an exit for each agent ON
      */
-    void simulateExitForEachActiveAgent();
+    void simulateExitForEachAgentON();
+
+
+    /**
+     * @brief Delete agents OFF
+     */
+    void deleteAgentsOFF();
 
 
     /**

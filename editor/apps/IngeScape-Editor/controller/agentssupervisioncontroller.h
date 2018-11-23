@@ -63,12 +63,6 @@ public:
     Q_INVOKABLE void deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
 
-    /**
-     * @brief Remove (and delete) each UN-active agent (agent with state OFF) from the current list of agents
-     */
-    void removeUNactiveAgents();
-
-
 Q_SIGNALS:
 
     /**

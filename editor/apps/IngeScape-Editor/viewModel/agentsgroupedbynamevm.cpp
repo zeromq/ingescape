@@ -322,6 +322,41 @@ void AgentsGroupedByNameVM::removeAgentModelFromHost(AgentM* model)
 
 
 /**
+ * @brief Delete agents OFF
+ */
+void AgentsGroupedByNameVM::deleteAgentsOFF()
+{
+    for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : _allAgentsGroupsByDefinition.toList())
+    {
+        if (agentsGroupedByDefinition != nullptr)
+        {
+            // group is ON
+            if (agentsGroupedByDefinition->isON())
+            {
+                for (AgentM* model : agentsGroupedByDefinition->models()->toList())
+                {
+                    // model is OFF
+                    if ((model != nullptr) && !model->isON())
+                    {
+                        agentsGroupedByDefinition->models()->remove(model);
+
+                        // Emit the signal to delete the model of agent
+                        Q_EMIT agentModelHasToBeDeleted(model);
+                    }
+                }
+            }
+            // group is OFF
+            else
+            {
+                // Delete the view model of agents grouped by definition
+                deleteAgentsGroupedByDefinition(agentsGroupedByDefinition);
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Get the list of definitions with a specific name
  * @param definitionName
  * @return

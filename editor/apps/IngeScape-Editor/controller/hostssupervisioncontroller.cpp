@@ -87,23 +87,6 @@ void HostsSupervisionController::removeAgentModelFromHost(AgentM* agent, HostVM*
 
 
 /**
- * @brief Remove each UN-active agent (agent with state OFF) from the global list with all agents
- */
-void HostsSupervisionController::removeUNactiveAgents()
-{
-    QList<AgentM*> copy = QList<AgentM*>(_allAgents);
-
-    // Remove each model with state OFF
-    for (AgentM* model : copy)
-    {
-        if ((model != nullptr) && !model->isON()) {
-            _allAgents.removeOne(model);
-        }
-    }
-}
-
-
-/**
  * @brief Slot called when a new model of host has been created
  * @param host
  */

@@ -228,8 +228,9 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
 {
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
     {
+        // FIXME: agentsGroupedByDefinitionWillBeDeleted and agentModelHasToBeDeleted
         // DIS-connect to its signals
-        disconnect(agentsGroupedByName, 0, this, 0);
+        //disconnect(agentsGroupedByName, 0, this, 0);
 
         // Remove from the hash table
         _hashFromNameToAgentsGrouped.remove(agentsGroupedByName->name());
@@ -651,10 +652,9 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile()
 
 
 /**
- * @brief Simulate an exit for each active agent
- * an active agent has its flag "isON" equal to true
+ * @brief Simulate an exit for each agent ON
  */
-void IngeScapeModelManager::simulateExitForEachActiveAgent()
+void IngeScapeModelManager::simulateExitForEachAgentON()
 {
     for (AgentM* agent : _hashFromPeerIdToAgent.values())
     {
@@ -666,8 +666,34 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
                 onAgentExited(agent->peerId(), agent->name());
             }
 
-            // Force the flag indicating that the agent can NOT be restarted (by an INGESCAPE launcher)
+            // FIXME Usefull ? Force the flag indicating that the agent can NOT be restarted (by an INGESCAPE launcher)
             agent->setcanBeRestarted(false);
+        }
+    }
+}
+
+
+/**
+ * @brief Delete agents OFF
+ */
+void IngeScapeModelManager::deleteAgentsOFF()
+{
+    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
+    {
+        if (agentsGroupedByName != nullptr)
+        {
+            // ON
+            if (agentsGroupedByName->isON())
+            {
+                // Delete agents OFF
+                agentsGroupedByName->deleteAgentsOFF();
+            }
+            // OFF
+            else
+            {
+                // Delete the view model of agents grouped by name
+                deleteAgentsGroupedByName(agentsGroupedByName);
+            }
         }
     }
 }
