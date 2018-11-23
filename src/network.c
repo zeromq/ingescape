@@ -80,6 +80,7 @@ bool isWholeAgentMuted = false;
 bool igs_Interrupted = false;
 bool network_RequestOutputsFromMappedAgents = false;
 bool forcedStop = false;
+bool allowIpc = true;
 
 
 //global parameters
@@ -548,7 +549,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         subscriber->agentName = strdup(name);
                         subscriber->agentPeerId = strdup (peer);
 #if defined __unix__ || defined __APPLE__ || defined __linux__
-                        if (useIPC){
+                        if (allowIpc && useIPC){
                             subscriber->subscriber = zsock_new_sub(ipcAddress, NULL);
                         }else{
                             subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
@@ -1370,75 +1371,78 @@ initLoop (zsock_t *pipe, void *args){
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 
-int network_publishOutput (const char* output_name){
+int network_publishOutput (const agent_iop_t *iop){
     int result = 0;
-    agent_iop_t * found_iop = model_findIopByName(output_name,IGS_OUTPUT_T);
+    if (iop == NULL){
+        igs_warn("passed IOP is NULL");
+        return 0;
+    }
     
-    if(agentElements != NULL && agentElements->publisher != NULL && found_iop != NULL)
+    if(agentElements != NULL && agentElements->publisher != NULL && iop != NULL)
     {
-        if(!isWholeAgentMuted && !found_iop->is_muted && found_iop->name != NULL && !isFrozen)
+        if(!isWholeAgentMuted && !iop->is_muted && iop->name != NULL && !isFrozen)
         {
             zmsg_t *msg = zmsg_new();
-            zmsg_addstr(msg, output_name);
-            zmsg_addstrf(msg, "%d", found_iop->value_type);
+            zmsg_addstr(msg, iop->name);
+            zmsg_addstrf(msg, "%d", iop->value_type);
             void *data = NULL;
             size_t size = 0;
-            switch (found_iop->value_type) {
+            switch (iop->value_type) {
                 case IGS_INTEGER_T:
-                    zmsg_addmem(msg, &(found_iop->value.i), sizeof(int));
-                    igs_debug("publish %s -> %d",found_iop->name,found_iop->value.i);
+                    zmsg_addmem(msg, &(iop->value.i), sizeof(int));
+                    igs_debug("publish %s -> %d",iop->name,iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
-                    zmsg_addmem(msg, &(found_iop->value.d), sizeof(double));
-                    igs_debug("publish %s -> %f",found_iop->name,found_iop->value.d);
+                    zmsg_addmem(msg, &(iop->value.d), sizeof(double));
+                    igs_debug("publish %s -> %f",iop->name,iop->value.d);
                     break;
                 case IGS_BOOL_T:
-                    zmsg_addmem(msg, &(found_iop->value.b), sizeof(bool));
-                    igs_debug("publish %s -> %d",found_iop->name,found_iop->value.b);
+                    zmsg_addmem(msg, &(iop->value.b), sizeof(bool));
+                    igs_debug("publish %s -> %d",iop->name,iop->value.b);
                     break;
                 case IGS_STRING_T:
-                    zmsg_addstr(msg, found_iop->value.s);
-                    igs_debug("publish %s -> %s",found_iop->name,found_iop->value.s);
+                    zmsg_addstr(msg, iop->value.s);
+                    igs_debug("publish %s -> %s",iop->name,iop->value.s);
                     break;
                 case IGS_IMPULSION_T:
                     zmsg_addmem(msg, NULL, 0);
-                    igs_debug("publish impulsion %s",found_iop->name);
+                    igs_debug("publish impulsion %s",iop->name);
                     break;
                 case IGS_DATA_T:
-                    igs_readOutputAsData(output_name, &data, &size);
+                    igs_readOutputAsData(iop->name, &data, &size);
                     //TODO: decide if we should delete the data after use or keep it in memory
                     //suggestion: we might add a clearOutputData function available to the developer
                     //for use when publishing large size data to free memory after publishing.
                     //TODO: document ZMQ high water marks and how to change them
                     zframe_t *frame = zframe_new(data, size);
                     zmsg_append(msg, &frame);
-                    igs_debug("publish data %s",found_iop->name);
+                    igs_debug("publish data %s",iop->name);
                     break;
                 default:
                     break;
             }
             zmsg_t *msgBis = zmsg_dup(msg);
             if (zmsg_send(&msg, agentElements->publisher) != 0){
-                igs_error("Could not publish output %s on the network\n",output_name);
+                igs_error("Could not publish output %s on the network\n",iop->name);
                 zmsg_destroy(&msgBis);
             }else{
                 result = 1;
                 if (zmsg_send(&msgBis, agentElements->ipcPublisher) != 0){
-                    igs_error("Could not publish output %s using IPC\n",output_name);
+                    igs_error("Could not publish output %s using IPC\n",iop->name);
                 }
             }
         }else{
-            if(found_iop == NULL){
-                igs_error("Output %s is unknown", output_name);
+            if(iop == NULL){
+                igs_error("Output %s is unknown", iop->name);
             }
             if (isWholeAgentMuted){
-                igs_debug("Should publish output %s but the agent has been muted",found_iop->name);
+                igs_debug("Should publish output %s but the agent has been muted",iop->name);
             }
-            if(found_iop->is_muted){
-                igs_debug("Should publish output %s but it has been muted",found_iop->name);
+            if(iop->is_muted){
+                igs_debug("Should publish output %s but it has been muted",iop->name);
             }
             if(isFrozen == true){
-                igs_debug("Should publish output %s but the agent has been frozen",found_iop->name);
+                igs_debug("Should publish output %s but the agent has been frozen",iop->name);
             }
         }
     }
@@ -2151,5 +2155,17 @@ void igs_setIpcFolderPath(char *path){
             igs_error("IPC folder path must be absolute");
         }
     }
+}
+
+const char* igs_getIpcFolderPath(void){
+    return ipcFolderPath;
+}
+
+void igs_setAllowIpc(bool allow){
+    allowIpc = allow;
+}
+
+bool igs_getAllowIpc(void){
+    return allowIpc;
 }
 #endif

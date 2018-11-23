@@ -212,7 +212,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop_t *foundInput, agent_iop_t 
 
 // model
 extern bool isWholeAgentMuted;
-int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
+const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
 agent_iop_t* model_findIopByName(const char* name, iop_t type);
 char* model_getIOPValueAsString (agent_iop_t* iop); //returned value must be freed by user
 
@@ -226,7 +226,7 @@ extern bool network_needToUpdateMapping;
 extern subscriber_t *subscribers;
 extern zyreloopElements_t *agentElements;
 extern char *ipcFolderPath;
-int network_publishOutput (const char* output_name);
+int network_publishOutput (const agent_iop_t *iop);
 
 // parser
 definition* parser_loadDefinition (const char* json_str);

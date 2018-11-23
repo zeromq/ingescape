@@ -475,11 +475,11 @@ char* model_getIOPValueAsString (agent_iop_t* iop){
     return str_value;
 }
 
-int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size){
+const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size){
     agent_iop_t *iop = model_findIopByName((char*) iopName, iopType);
     if(iop == NULL){
         igs_error("%s not found for writing", iopName);
-        return 0;
+        return NULL;
     }
     int ret = 1;
     void *outValue = NULL;
@@ -811,7 +811,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
     if (ret){
         model_runObserveCallbacksForIOP(iop, outValue, outSize);
     }
-    return ret;
+    return iop;
 }
 
 agent_iop_t * model_findIopByName(const char *name, iop_t type){
@@ -930,7 +930,8 @@ int igs_writeInputAsBool(const char *name, bool value){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
-    return model_writeIOP(name, IGS_INPUT_T, IGS_BOOL_T, &value, sizeof(bool));
+    const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_BOOL_T, &value, sizeof(bool));
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeInputAsInt(const char *name, int value){
@@ -938,7 +939,8 @@ int igs_writeInputAsInt(const char *name, int value){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
-    return model_writeIOP(name, IGS_INPUT_T, IGS_INTEGER_T, &value, sizeof(int));
+    const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_INTEGER_T, &value, sizeof(int));
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeInputAsDouble(const char *name, double value){
@@ -946,7 +948,8 @@ int igs_writeInputAsDouble(const char *name, double value){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
-    return model_writeIOP(name, IGS_INPUT_T, IGS_DOUBLE_T, &value, sizeof(double));
+    const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_DOUBLE_T, &value, sizeof(double));
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeInputAsString(const char *name, const char *value){
@@ -954,7 +957,8 @@ int igs_writeInputAsString(const char *name, const char *value){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
-    return model_writeIOP(name, IGS_INPUT_T, IGS_STRING_T, (char *)value, strlen(value)+1);
+    const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_STRING_T, (char *)value, strlen(value)+1);
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeInputAsImpulsion(const char *name){
@@ -962,7 +966,8 @@ int igs_writeInputAsImpulsion(const char *name){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
-    return model_writeIOP(name, IGS_INPUT_T, IGS_IMPULSION_T, NULL, 0);
+    const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_IMPULSION_T, NULL, 0);
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeInputAsData(const char *name, void *value, size_t size){
@@ -970,7 +975,8 @@ int igs_writeInputAsData(const char *name, void *value, size_t size){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
-    return model_writeIOP(name, IGS_INPUT_T, IGS_DATA_T, value, size);
+    const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_DATA_T, value, size);
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeOutputAsBool(const char *name, bool value){
@@ -978,10 +984,10 @@ int igs_writeOutputAsBool(const char *name, bool value){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
-    int ret = model_writeIOP(name, IGS_OUTPUT_T, IGS_BOOL_T, &value, sizeof(bool));
-    network_publishOutput(name);
-
-    return ret;
+    const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_BOOL_T, &value, sizeof(bool));
+    network_publishOutput(iop);
+    
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeOutputAsInt(const char *name, int value){
@@ -989,10 +995,10 @@ int igs_writeOutputAsInt(const char *name, int value){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
-    int ret = model_writeIOP(name, IGS_OUTPUT_T, IGS_INTEGER_T, &value, sizeof(int));
-    network_publishOutput(name);
+    const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_INTEGER_T, &value, sizeof(int));
+    network_publishOutput(iop);
 
-    return ret;
+    return (iop == NULL)?0:1;
 
 }
 
@@ -1001,10 +1007,10 @@ int igs_writeOutputAsDouble(const char *name, double value){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
-    int ret = model_writeIOP(name, IGS_OUTPUT_T, IGS_DOUBLE_T, &value, sizeof(double));
-    network_publishOutput(name);
+    const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_DOUBLE_T, &value, sizeof(double));
+    network_publishOutput(iop);
 
-    return ret;
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeOutputAsString(const char *name, const char *value){
@@ -1012,10 +1018,10 @@ int igs_writeOutputAsString(const char *name, const char *value){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
-    int ret = model_writeIOP(name, IGS_OUTPUT_T, IGS_STRING_T, (char *)value, strlen(value)+1);
-    network_publishOutput(name);
+    const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_STRING_T, (char *)value, strlen(value)+1);
+    network_publishOutput(iop);
 
-    return ret;
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeOutputAsImpulsion(const char *name){
@@ -1023,10 +1029,10 @@ int igs_writeOutputAsImpulsion(const char *name){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
-    int ret = model_writeIOP(name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0);
-    network_publishOutput(name);
+    const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0);
+    network_publishOutput(iop);
 
-    return ret;
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeOutputAsData(const char *name, void *value, size_t size){
@@ -1034,10 +1040,10 @@ int igs_writeOutputAsData(const char *name, void *value, size_t size){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
-    int ret = model_writeIOP(name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
-    network_publishOutput(name);
+    const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
+    network_publishOutput(iop);
     
-    return ret;
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
@@ -1048,10 +1054,10 @@ int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
     zframe_t *frame = zmsg_encode(msg);
     void *value = zframe_data(frame);
     size_t size = zframe_size(frame);
-    int ret = model_writeIOP(name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
-    network_publishOutput(name);
+    const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
+    network_publishOutput(iop);
     zframe_destroy(&frame);
-    return ret;
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeParameterAsBool(const char *name, bool value){
@@ -1059,7 +1065,8 @@ int igs_writeParameterAsBool(const char *name, bool value){
         igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
-    return model_writeIOP(name, IGS_PARAMETER_T, IGS_BOOL_T, &value, sizeof(bool));
+    const agent_iop_t *iop = model_writeIOP(name, IGS_PARAMETER_T, IGS_BOOL_T, &value, sizeof(bool));
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeParameterAsInt(const char *name, int value){
@@ -1067,7 +1074,8 @@ int igs_writeParameterAsInt(const char *name, int value){
         igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
-    return model_writeIOP(name, IGS_PARAMETER_T, IGS_INTEGER_T, &value, sizeof(int));
+    const agent_iop_t *iop = model_writeIOP(name, IGS_PARAMETER_T, IGS_INTEGER_T, &value, sizeof(int));
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeParameterAsDouble(const char *name, double value){
@@ -1075,7 +1083,8 @@ int igs_writeParameterAsDouble(const char *name, double value){
         igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
-    return model_writeIOP(name, IGS_PARAMETER_T, IGS_DOUBLE_T, &value, sizeof(double));
+    const agent_iop_t *iop = model_writeIOP(name, IGS_PARAMETER_T, IGS_DOUBLE_T, &value, sizeof(double));
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeParameterAsString(const char *name, const char *value){
@@ -1083,7 +1092,8 @@ int igs_writeParameterAsString(const char *name, const char *value){
         igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
-    return model_writeIOP(name, IGS_PARAMETER_T, IGS_STRING_T, (char *)value, strlen(value)+1);
+    const agent_iop_t *iop = model_writeIOP(name, IGS_PARAMETER_T, IGS_STRING_T, (char *)value, strlen(value)+1);
+    return (iop == NULL)?0:1;
 }
 
 int igs_writeParameterAsData(const char *name, void *value, size_t size){
@@ -1091,7 +1101,8 @@ int igs_writeParameterAsData(const char *name, void *value, size_t size){
         igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
-    return model_writeIOP(name, IGS_PARAMETER_T, IGS_DATA_T, value, size);
+    const agent_iop_t *iop = model_writeIOP(name, IGS_PARAMETER_T, IGS_DATA_T, value, size);
+    return (iop == NULL)?0:1;
 }
 
 // --------------------------------  INTROSPECTION ------------------------------------//
