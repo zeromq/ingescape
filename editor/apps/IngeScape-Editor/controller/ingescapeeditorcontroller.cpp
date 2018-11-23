@@ -231,12 +231,12 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_recordsSupervisionC, &RecordsSupervisionController::startToRecord, this, &IngeScapeEditorController::_onStartToRecord);
 
 
-    /*if (!_platformDefaultFilePath.isEmpty())
+    if (!_platformDefaultFilePath.isEmpty())
     {
         // Load the platform (agents, mappings, actions, palette, timeline actions)
         // from the default file "last.json"
         _loadPlatformFromFile(_platformDefaultFilePath);
-    }*/
+    }
 
 
     // Create a fake launcher for fake agents
@@ -960,8 +960,10 @@ void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
             _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
         }
 
+        // FIXME REPAIR: suite de _loadPlatformFromJSON
+
         // Import the mapping of agents from JSON
-        if ((_agentsMappingC != nullptr) && jsonRoot.contains("mapping"))
+        /*if ((_agentsMappingC != nullptr) && jsonRoot.contains("mapping"))
         {
             _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
         }
@@ -970,7 +972,7 @@ void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
         if ((_scenarioC != nullptr) && jsonRoot.contains("scenario"))
         {
             _scenarioC->importScenarioFromJson(jsonRoot.value("scenario").toObject());
-        }
+        }*/
     }
 }
 
