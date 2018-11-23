@@ -1281,7 +1281,7 @@ void IngeScapeModelManager::_onUselessAgentsGroupedByName()
 
 
 /**
- * @brief Slot called when the network data (of an agent) will be cleared
+ * @brief Slot called when the network data of an agent will be cleared
  * @param peerId
  */
 void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
@@ -1289,7 +1289,7 @@ void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
     /*AgentM* agent = qobject_cast<AgentM*>(sender());
     if (agent != nullptr)
     {
-        qDebug() << "Model Manager: on Network Data of agent" << agent->name() << "will be cleared" << agent->hostname() << "(" << agent->peerId() << ")";
+        qDebug() << "[Model Manager] on Network Data of agent" << agent->name() << "will be Cleared:" << agent->hostname() << "(" << agent->peerId() << ")";
     }*/
 
     if (!peerId.isEmpty()) {

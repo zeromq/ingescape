@@ -113,6 +113,13 @@ public:
 
 
     /**
+     * @brief Remove a model of agent from its host
+     * @param model
+     */
+    void removeAgentModelFromHost(AgentM* model);
+
+
+    /**
      * @brief Get the list of definitions with a specific name
      * @param definitionName
      * @return

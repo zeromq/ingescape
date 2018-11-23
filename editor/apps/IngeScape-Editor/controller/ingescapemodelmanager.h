@@ -461,7 +461,7 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the network data (of an agent) will be cleared
+     * @brief Slot called when the network data of an agent will be cleared
      * @param peerId
      */
     void _onNetworkDataOfAgentWillBeCleared(QString peerId);

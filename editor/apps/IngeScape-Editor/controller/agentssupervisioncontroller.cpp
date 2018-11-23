@@ -93,47 +93,6 @@ void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM*
 
 
 /**
- * @brief Delete the model of agent
- * If it is the last model of a view model, we reset all its network data (only defined by the agent definition)
- * @param agent
- * @return
- */
-/*void AgentsSupervisionController::deleteModelOfAgent(AgentM* agent)
-{
-    // Check that the agent is OFF
-    if ((agent != nullptr) && !agent->isON() && !agent->name().isEmpty() && (_modelManager != nullptr))
-    {
-        // Get the list of view models of agent from a name
-        QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
-
-        for (AgentVM* iterator : agentViewModelsList)
-        {
-            // We found the view model that contains this model
-            if ((iterator != nullptr) && iterator->models()->contains(agent))
-            {
-                // It is the last model of this view model
-                if (iterator->models()->count() == 1)
-                {
-                    // Clear the data about the network
-                    agent->clearNetworkData();
-                }
-                // There are other(s) model(s) in this view model
-                else
-                {
-                    // Remove the model from the list of the view model
-                    iterator->models()->remove(agent);
-
-                    // Delete the model of agent
-                    _modelManager->deleteAgentModel(agent);
-                }
-                break;
-            }
-        }
-    }
-}*/
-
-
-/**
  * @brief Remove (and delete) each UN-active agent (agent with state OFF) from the current list of agents
  */
 void AgentsSupervisionController::removeUNactiveAgents()

@@ -23,8 +23,10 @@
  * @brief Constructor
  * @param parent
  */
-HostsSupervisionController::HostsSupervisionController(QObject *parent) : QObject(parent),
-    _selectedHost(nullptr)
+HostsSupervisionController::HostsSupervisionController(IngeScapeModelManager* modelManager,
+                                                       QObject *parent) : QObject(parent),
+    _selectedHost(nullptr),
+    _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -52,6 +54,35 @@ HostsSupervisionController::~HostsSupervisionController()
 
     // Clear the list of agents
     _allAgents.clear();
+
+    // Reset pointers
+    _modelManager = nullptr;
+}
+
+
+/**
+ * @brief Remove a model of agent from a host
+ * @param agent
+ * @param host
+ */
+void HostsSupervisionController::removeAgentModelFromHost(AgentM* agent, HostVM* host)
+{
+    if ((host != nullptr) && (agent != nullptr) && (_modelManager != nullptr))
+    {
+        if (host->agentsList()->contains(agent))
+        {
+            host->agentsList()->remove(agent);
+
+            qDebug() << "Remove agent" << agent->name() << "from host" << host->name();
+        }
+
+        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agent->name());
+        if (agentsGroupedByName != nullptr)
+        {
+            // Remove a model of agent from its host
+            agentsGroupedByName->removeAgentModelFromHost(agent);
+        }
+    }
 }
 
 
@@ -152,9 +183,6 @@ void HostsSupervisionController::onAgentModelHasBeenCreated(AgentM* agent)
 {
     if (agent != nullptr)
     {
-        // Connect to signals from this new agent
-        connect(agent, &AgentM::networkDataWillBeCleared, this, &HostsSupervisionController::_onNetworkDataOfAgentWillBeCleared);
-
         _allAgents.append(agent);
 
         // Get the view model of host with its name
@@ -179,37 +207,7 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
 {
     if (agent != nullptr)
     {
-        // DIS-connect to signals from the agent
-        disconnect(agent, 0, this, 0);
-
         _allAgents.removeOne(agent);
-
-        // Get the view model of host with its name
-        HostVM* hostVM = _getHostWithName(agent->hostname());
-
-        if ((hostVM != nullptr) && hostVM->agentsList()->contains(agent))
-        {
-            // Remove this agent from the host
-            hostVM->agentsList()->remove(agent);
-
-            qDebug() << "Remove agent" << agent->name() << "from host" << hostVM->name();
-        }
-    }
-}
-
-
-/**
- * @brief Slot called when the network data (of an agent) will be cleared
- * @param peerId
- */
-void HostsSupervisionController::_onNetworkDataOfAgentWillBeCleared(QString peerId)
-{
-    Q_UNUSED(peerId)
-
-    AgentM* agent = qobject_cast<AgentM*>(sender());
-    if (agent != nullptr)
-    {
-        //qDebug() << "Hosts Supervision: on Network Data of agent" << agent->name() << "will be cleared" << agent->hostname() << "(" << agent->peerId() << ")";
 
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
@@ -239,4 +237,3 @@ HostVM* HostsSupervisionController::_getHostWithName(QString hostName)
         return nullptr;
     }
 }
-

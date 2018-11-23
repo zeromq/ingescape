@@ -19,7 +19,7 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
-
+#include <controller/ingescapemodelmanager.h>
 #include <viewModel/hostvm.h>
 
 
@@ -40,15 +40,25 @@ class HostsSupervisionController : public QObject
 public:
     /**
      * @brief Constructor
+     * @param modelManager
      * @param parent
      */
-    explicit HostsSupervisionController(QObject *parent = nullptr);
+    explicit HostsSupervisionController(IngeScapeModelManager* modelManager,
+                                        QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
     ~HostsSupervisionController();
+
+
+    /**
+     * @brief Remove a model of agent from a host
+     * @param agent
+     * @param host
+     */
+    Q_INVOKABLE void removeAgentModelFromHost(AgentM* agent, HostVM* host);
 
 
     /**
@@ -106,15 +116,6 @@ public Q_SLOTS:
     void onAgentModelWillBeDeleted(AgentM* agent);
 
 
-private Q_SLOTS:
-
-    /**
-     * @brief Slot called when the network data (of an agent) will be cleared
-     * @param peerId
-     */
-    void _onNetworkDataOfAgentWillBeCleared(QString peerId);
-
-
 private:
 
     /**
@@ -126,6 +127,9 @@ private:
 
 
 private:
+
+    // Manager for the data model of INGESCAPE
+    IngeScapeModelManager* _modelManager;
 
     // Hash table from "(host)Name" to the "(view model of) Host"
     QHash<QString, HostVM*> _hashFromNameToHost;

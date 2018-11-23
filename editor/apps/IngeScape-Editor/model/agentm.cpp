@@ -151,7 +151,7 @@ void AgentM::setisMutedOfOutput(bool isMuted, QString outputName)
 
 
 /**
- * @brief Clear the data about the network
+ * @brief Clear the data about the network of our agent
  */
 void AgentM::clearNetworkData()
 {
@@ -167,9 +167,9 @@ void AgentM::clearNetworkData()
     // Reset other properties
     setisMuted(false);
     setcanBeFrozen(false);
-    setloggerPort("");
     setisFrozen(false);
     setstate("");
+    setloggerPort("");
     sethasLogInStream(false);
     sethasLogInFile(false);
     setlogFilePath("");

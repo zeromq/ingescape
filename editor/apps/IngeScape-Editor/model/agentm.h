@@ -126,7 +126,7 @@ public:
 
 
     /**
-     * @brief Clear the data about the network
+     * @brief Clear the data about the network of our agent
      */
     void clearNetworkData();
 
@@ -150,7 +150,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief FIXME Usefull ? Signal emitted when the network data (of our agent) will be cleared
+     * @brief Signal emitted when the network data of our agent will be cleared
      * @param peerId
      */
     void networkDataWillBeCleared(QString peerId);

@@ -20,7 +20,6 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
-
 #include <controller/ingescapemodelmanager.h>
 #include <viewModel/agentsgroupedbydefinitionvm.h>
 
@@ -62,15 +61,6 @@ public:
      * @param agent
      */
     Q_INVOKABLE void deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
-
-
-    /**
-     * @brief FIXME REPAIR: Delete the model of agent
-     * If it is the last model of a view model, we reset all its network data (only defined by the agent definition)
-     * @param agent
-     * @return
-     */
-    //Q_INVOKABLE void deleteModelOfAgent(AgentM* agent);
 
 
     /**

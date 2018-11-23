@@ -282,6 +282,46 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
 
 
 /**
+ * @brief Remove a model of agent from its host
+ * @param model
+ */
+void AgentsGroupedByNameVM::removeAgentModelFromHost(AgentM* model)
+{
+    if (model != nullptr)
+    {
+        // The agent is the last model
+        if (_models.count() == 1)
+        {
+            // We do not delete it, we simply clear its data about the network
+            model->clearNetworkData();
+        }
+        // There are other(s) model(s)
+        else
+        {
+            AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = nullptr;
+
+            for (AgentsGroupedByDefinitionVM* iterator : _allAgentsGroupsByDefinition.toList())
+            {
+                if ((iterator != nullptr) && iterator->models()->contains(model))
+                {
+                    agentsGroupedByDefinition = iterator;
+                    break;
+                }
+            }
+
+            if (agentsGroupedByDefinition != nullptr)
+            {
+                agentsGroupedByDefinition->models()->remove(model);
+
+                // Emit the signal to delete the model of agent
+                Q_EMIT agentModelHasToBeDeleted(model);
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Get the list of definitions with a specific name
  * @param definitionName
  * @return
