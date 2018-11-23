@@ -123,28 +123,21 @@ void AgentsGroupedByNameVM::addNewAgentModel(AgentM* model)
 
         if (model->definition() == nullptr)
         {
-            if (_agentsGroupedByDefinitionNULL == nullptr)
-            {
-                // Create the special view model of agents grouped by definition NULL
-                _agentsGroupedByDefinitionNULL = new AgentsGroupedByDefinitionVM(model, nullptr);
-
-                // Save this new view model of agents grouped by definition
-                _saveNewAgentsGroupedByDefinition(_agentsGroupedByDefinitionNULL);
-            }
-            else
+            if (_agentsGroupedByDefinitionNULL != nullptr)
             {
                 // Add the model to the special view model of agents grouped by definition NULL
                 _agentsGroupedByDefinitionNULL->models()->append(model);
             }
+            else
+            {
+                // Create the special view model of agents grouped by definition NULL
+                _createAgentsGroupedByDefinition(nullptr, model);
+            }
         }
         else
         {
-            // FIXME TODO ? Manage a new model of agent that already have a definition. Possible ?
-            qWarning() << "Manage a new model of agent that already have a definition...TODO";
-
-            //Q_EMIT model->definitionChangedWithPreviousAndNewValues(nullptr, model->definition());
-
-            _toRENAME(model);
+            // Manage the agent model which have already a definition
+            _manageJustDefinedAgent(model);
         }
     }
 }
@@ -483,193 +476,8 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
                 _agentsGroupedByDefinitionNULL->models()->remove(model);
             }
 
-            _toRENAME(model);
-
-            /*AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition = nullptr;
-
-            // Traverse the list of each definition
-            for (DefinitionM* iterator : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
-            {
-                // The 2 definitions are strictly identicals
-                if ((iterator != nullptr) && DefinitionM::areIdenticals(iterator, newDefinition))
-                {
-                    qDebug() << "There is exactly the same agent definition for name" << newDefinition->name() << "and version" << newDefinition->version();
-
-                    groupOfAgentsWithSameDefinition = _hashFromDefinitionToAgentsGroupedByDefinition.value(iterator);
-                    break;
-                }
-            }
-
-            // Exactly the same definition
-            if (groupOfAgentsWithSameDefinition != nullptr)
-            {
-                // Manage the new agent model
-                QString hostname = model->hostname();
-
-                // Hostname is not defined
-                // There is already an existing model of agent (in the VM groupOfAgentsWithSameDefinition)
-                if (hostname == HOSTNAME_NOT_DEFINED)
-                {
-                    qDebug() << "Useless Model of agent" << _name << "on" << hostname;
-
-                    // Emit the signal to delete this new (fake) model of agent
-                    Q_EMIT agentModelHasToBeDeleted(model);
-                }
-                // Hostname is a real one
-                else
-                {
-                    // Get the list of agent models on the host
-                    QList<AgentM*> modelsOnHost = groupOfAgentsWithSameDefinition->getModelsOnHost(hostname);
-
-                    // There is NO agent on this host yet
-                    if (modelsOnHost.isEmpty())
-                    {
-                        qDebug() << "Add model of agent" << _name << "on" << hostname;
-
-                        // Add the model of agent to the view model of agents grouped by definition
-                        groupOfAgentsWithSameDefinition->models()->append(model);
-
-                        // Emit the signal to notify that the new model has been added
-                        Q_EMIT agentModelHasBeenAdded(model);
-                    }
-                    // There is already some agent models on this host
-                    else
-                    {
-                        // Peer id is empty (the agent has never appeared on the network)
-                        if (model->peerId().isEmpty())
-                        {
-                            qDebug() << "Add model of agent" << _name << "on" << hostname;
-
-                            // Add the model of agent to the view model of agents grouped by definition
-                            groupOfAgentsWithSameDefinition->models()->append(model);
-
-                            // Emit the signal to notify that the new model has been added
-                            Q_EMIT agentModelHasBeenAdded(model);
-                        }
-                        // Peer id is defined: check if it is an agent that evolve from OFF to ON
-                        else
-                        {
-                            bool hasToDeleteNewModel = false;
-                            AgentM* sameModel = nullptr;
-
-                            QString peerId = model->peerId();
-                            QString commandLine = model->commandLine();
-
-                            // Search a model already added with the same peer id...
-                            for (AgentM* iterator : modelsOnHost)
-                            {
-                                // Same peer id
-                                if ((iterator != nullptr) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId))
-                                {
-                                    // New model is OFF and there is already a model with the same peer id...
-                                    if (!model->isON())
-                                    {
-                                        // the new model is useless, we have to delete it
-                                        hasToDeleteNewModel = true;
-                                        break;
-                                    }
-                                    // New model is ON and there is already a model with the same peer id...
-                                    else
-                                    {
-                                        // The model already added is OFF, we have to replace it by the new one
-                                        if (!iterator->isON())
-                                        {
-                                            sameModel = iterator;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-
-                            // We don't found this peer id
-                            if (!hasToDeleteNewModel && (sameModel == nullptr))
-                            {
-                                // New model is ON
-                                if (model->isON())
-                                {
-                                    for (AgentM* iterator : modelsOnHost)
-                                    {
-                                        // Same command line (peer id is defined) and existing agent is OFF --> we consider that it is the same model that evolve from OFF to ON
-                                        if ((iterator != nullptr) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && !iterator->isON())
-                                        {
-                                            // We have to replace it by the new one
-                                            sameModel = iterator;
-                                            break;
-                                        }
-                                    }
-                                }
-                                // New model is OFF
-                                else
-                                {
-                                    for (AgentM* iterator : modelsOnHost)
-                                    {
-                                        // Same command line (peer id is defined) and existing agent is ON --> we consider that it is the same model but OFF
-                                        if ((iterator != nullptr) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && iterator->isON())
-                                        {
-                                            // The new model is useless, we have to delete it
-                                            hasToDeleteNewModel = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-
-                            // We have to remove the new model
-                            if (hasToDeleteNewModel)
-                            {
-                                qDebug() << "Useless Model of agent" << _name << "on" << hostname;
-
-                                // Emit the signal to delete this new (fake) model of agent
-                                Q_EMIT agentModelHasToBeDeleted(model);
-                            }
-                            // Else if we have to replace an existing (same) model by the new one
-                            else if (sameModel != nullptr)
-                            {
-                                if (groupOfAgentsWithSameDefinition->models()->contains(sameModel))
-                                {
-                                    qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
-
-                                    // First add the new model before remove the previous model
-                                    // (allows to prevent to have 0 model at a given moment and to prevent to emit signal noMoreModelAndUseless that remove the groupOfAgentsWithSameDefinition)
-                                    groupOfAgentsWithSameDefinition->models()->append(model);
-
-                                    // Emit the signal to notify that the new model has been added
-                                    Q_EMIT agentModelHasBeenAdded(model);
-
-                                    groupOfAgentsWithSameDefinition->models()->remove(sameModel);
-
-                                    // Emit the signal to delete the previous model of agent
-                                    Q_EMIT agentModelHasToBeDeleted(sameModel);
-                                }
-                            }
-                            // Else, we add the new model
-                            else
-                            {
-                                qDebug() << "Add model of agent" << _name << "on" << hostname;
-
-                                // Add the model of agent to the view model of agents grouped by definition
-                                groupOfAgentsWithSameDefinition->models()->append(model);
-
-                                // Emit the signal to notify that the new model has been added
-                                Q_EMIT agentModelHasBeenAdded(model);
-                            }
-                        }
-                    }
-                    qDebug() << "There are" << groupOfAgentsWithSameDefinition->models()->count() << "models of agent" << _name << "with the same definition";
-                }
-            }
-            // The definition is a new one
-            else
-            {
-                // Make a copy of the definition
-                DefinitionM* copy = newDefinition->copy();
-
-                // Create a new view model of agents grouped by definition
-                AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = new AgentsGroupedByDefinitionVM(model, copy);
-
-                // Save this new view model of agents grouped by definition
-                _saveNewAgentsGroupedByDefinition(agentsGroupedByDefinition);
-            }*/
+            // Manage the agent model which is just defined (its definition evolve from NULL to a defined one)
+            _manageJustDefinedAgent(model);
 
             // Reset the flag to allow the deletion of our "agents grouped by name" when the list "allAgentsGroupsByDefinition" is empty
             _canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty = true;
@@ -784,8 +592,11 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
 }
 
 
-
-void AgentsGroupedByNameVM::_toRENAME(AgentM* model)
+/**
+ * @brief Manage an agent model which is just defined (its definition evolve from NULL to a defined one)
+ * @param model
+ */
+void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
 {
     if ((model != nullptr) && (model->definition() != nullptr))
     {
@@ -967,14 +778,8 @@ void AgentsGroupedByNameVM::_toRENAME(AgentM* model)
         // The definition is a new one
         else
         {
-            // Make a copy of the definition
-            DefinitionM* copy = definition->copy();
-
-            // Create a new view model of agents grouped by definition
-            AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = new AgentsGroupedByDefinitionVM(model, copy);
-
-            // Save this new view model of agents grouped by definition
-            _saveNewAgentsGroupedByDefinition(agentsGroupedByDefinition);
+            // Create a new view model of agents grouped by definition (with a copy of the definition)
+            _createAgentsGroupedByDefinition(definition->copy(), model);
         }
     }
 }
@@ -1023,53 +828,53 @@ void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
         }
         else
         {
-            // Make a copy of the definition
-            DefinitionM* copy = newDefinition->copy();
-
-            // Create a new view model of agents grouped by definition
-            AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = new AgentsGroupedByDefinitionVM(model, copy);
-
-            // Save this new view model of agents grouped by definition
-            _saveNewAgentsGroupedByDefinition(agentsGroupedByDefinition);
+            // Create a new view model of agents grouped by definition (with a copy of the definition)
+            _createAgentsGroupedByDefinition(newDefinition->copy(), model);
         }
     }
 }
 
 
 /**
- * @brief Save a new view model of agents grouped by definition
- * @param agentsGroupedByDefinition
+ * @brief Create a new view model of agents grouped by definition
+ * @param definition
+ * @param model
  */
-void AgentsGroupedByNameVM::_saveNewAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
+void AgentsGroupedByNameVM::_createAgentsGroupedByDefinition(DefinitionM* definition, AgentM* model)
 {
-    if (agentsGroupedByDefinition != nullptr)
+    // Create a new view model of agents grouped by definition
+    AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = new AgentsGroupedByDefinitionVM(_name, definition);
+
+    // Add the model
+    agentsGroupedByDefinition->models()->append(model);
+
+    // Connect slots to signals from this new view model of agents grouped by definition
+    connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::noMoreModelAndUseless, this, &AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition);
+
+    if (definition != nullptr)
     {
-        // Connect slots to signals from this new view model of agents grouped by definition
-        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::noMoreModelAndUseless, this, &AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition);
+        _hashFromDefinitionToAgentsGroupedByDefinition.insert(definition, agentsGroupedByDefinition);
 
-        if (agentsGroupedByDefinition->definition() != nullptr)
-        {
-            DefinitionM* definition = agentsGroupedByDefinition->definition();
+        // Manage the list of Inputs / Outputs / Parameters of the added definition
+        _manageInputsOfAddedDefinition(definition);
+        _manageOutputsOfAddedDefinition(definition);
+        _manageParametersOfAddedDefinition(definition);
 
-            _hashFromDefinitionToAgentsGroupedByDefinition.insert(definition, agentsGroupedByDefinition);
+        // Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
+        _updateIsDefinedInAllDefinitionsForEachIOP(_hashFromDefinitionToAgentsGroupedByDefinition.count());
 
-            // Manage the list of Inputs / Outputs / Parameters of the added definition
-            _manageInputsOfAddedDefinition(definition);
-            _manageOutputsOfAddedDefinition(definition);
-            _manageParametersOfAddedDefinition(definition);
-
-            // Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
-            _updateIsDefinedInAllDefinitionsForEachIOP(_hashFromDefinitionToAgentsGroupedByDefinition.count());
-
-            // Emit signal "models of Inputs/Outputs/Parameters Changed"
-            //Q_EMIT modelsOfIOPChanged();
-        }
-
-        _allAgentsGroupsByDefinition.append(agentsGroupedByDefinition);
-
-        // Emit the signal "Agents grouped by definition has been created"
-        Q_EMIT agentsGroupedByDefinitionHasBeenCreated(agentsGroupedByDefinition);
+        // Emit signal "models of Inputs/Outputs/Parameters Changed"
+        //Q_EMIT modelsOfIOPChanged();
     }
+    // The definition is NULL
+    else {
+        _agentsGroupedByDefinitionNULL = agentsGroupedByDefinition;
+    }
+
+    _allAgentsGroupsByDefinition.append(agentsGroupedByDefinition);
+
+    // Emit the signal "Agents grouped by definition has been created"
+    Q_EMIT agentsGroupedByDefinitionHasBeenCreated(agentsGroupedByDefinition);
 }
 
 

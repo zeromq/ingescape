@@ -280,7 +280,11 @@ private:
     void _updateWithAllModels();
 
 
-    void _toRENAME(AgentM* model);
+    /**
+     * @brief Manage an agent model which is just defined (its definition evolve from NULL to a defined one)
+     * @param model
+     */
+    void _manageJustDefinedAgent(AgentM* model);
 
 
     /**
@@ -291,10 +295,11 @@ private:
 
 
     /**
-     * @brief Save a new view model of agents grouped by definition
-     * @param agentsGroupedByDefinition
+     * @brief Create a new view model of agents grouped by definition
+     * @param definition
+     * @param model
      */
-    void _saveNewAgentsGroupedByDefinition(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+    void _createAgentsGroupedByDefinition(DefinitionM* definition, AgentM* model);
 
 
     /**

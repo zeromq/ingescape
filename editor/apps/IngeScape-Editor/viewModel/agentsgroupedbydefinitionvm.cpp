@@ -18,13 +18,14 @@
 
 /**
  * @brief Constructor
- * @param model
+ * @param agentName
+ * @param definition
  * @param parent
  */
-AgentsGroupedByDefinitionVM::AgentsGroupedByDefinitionVM(AgentM* model,
+AgentsGroupedByDefinitionVM::AgentsGroupedByDefinitionVM(QString agentName,
                                                          DefinitionM* definition,
                                                          QObject *parent) : QObject(parent),
-    _name(""),
+    _name(agentName),
     _definition(definition),
     _peerIdsList(QStringList()),
     _isON(false),
@@ -45,26 +46,18 @@ AgentsGroupedByDefinitionVM::AgentsGroupedByDefinitionVM(AgentM* model,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (model != nullptr)
-    {
-        // Init the name
-        _name = model->name();
+    if (_definition != nullptr) {
+        qInfo() << "New View Model of Agents grouped by definition" << _definition->name() << "(agent name" << _name << ")";
 
-        if (_definition != nullptr) {
-            qInfo() << "New View Model of Agents grouped by definition" << _definition->name() << "(and name" << _name << ")";
-
-            connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput);
-            connect(_definition, &DefinitionM::openValuesHistoryOfAgent, this, &AgentsGroupedByDefinitionVM::_onOpenValuesHistoryOfAgent);
-        }
-        else {
-            qInfo() << "New View Model of Agents grouped by definition 'NULL'" << "(and name" << _name << ")";
-        }
-
-        // Connect to signal "Count Changed" from the list of models
-        connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByDefinitionVM::_onModelsChanged);
-
-        _models.append(model);
+        connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput);
+        connect(_definition, &DefinitionM::openValuesHistoryOfAgent, this, &AgentsGroupedByDefinitionVM::_onOpenValuesHistoryOfAgent);
     }
+    else {
+        qInfo() << "New View Model of Agents grouped by definition 'NULL'" << "(agent name" << _name << ")";
+    }
+
+    // Connect to signal "Count Changed" from the list of models
+    connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentsGroupedByDefinitionVM::_onModelsChanged);
 }
 
 
