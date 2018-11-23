@@ -202,22 +202,6 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         // DIS-connect to signals from the agent
         disconnect(agent, 0, this, 0);
 
-        // Delete its model of definition if needed
-        if (agent->definition() != nullptr)
-        {
-            DefinitionM* temp = agent->definition();
-            agent->setdefinition(nullptr);
-            delete temp;
-        }
-
-        // Delete its model of mapping if needed
-        if (agent->mapping() != nullptr)
-        {
-            AgentMappingM* temp = agent->mapping();
-            agent->setmapping(nullptr);
-            delete temp;
-        }
-
         if (!agent->peerId().isEmpty()) {
             _hashFromPeerIdToAgent.remove(agent->peerId());
         }
@@ -404,9 +388,7 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
                         if (agentDefinition != nullptr)
                         {
                             // Create a new model of agent with the name of the definition
-                            AgentM* agent = createAgentModel(agentDefinition->name(), agentDefinition);
-
-                            Q_UNUSED(agent)
+                            createAgentModel(agentDefinition->name(), agentDefinition);
                         }
                         // An error occured, the definition is NULL
                         else {
@@ -463,6 +445,7 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                         QJsonValue jsonDefinition = jsonAgentsGroupedByDefinition.value("definition");
                         QJsonValue jsonClones = jsonAgentsGroupedByDefinition.value("clones");
 
+                        // Manage the definition
                         DefinitionM* agentDefinition = nullptr;
 
                         if (jsonDefinition.isObject())
@@ -470,25 +453,27 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                             // Create a model of agent definition from JSON object
                             agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
                         }
-                        else if (jsonDefinition.isNull())
-                        {
-                            qDebug() << agentName << "with def. NULL";
-                        }
+                        /*else if (jsonDefinition.isNull()) {
+                            // Nothing to do
+                        }*/
 
-
+                        // Manage the list of cloness
                         QJsonArray arrayOfClones = jsonClones.toArray();
 
-                        // None clones have a defined hostname (agent is only defined by a definition)
+                        // None clone have a defined hostname (the agent is only defined by a definition)
                         if (arrayOfClones.isEmpty())
                         {
                             qDebug() << "Clone of" << agentName << "without hostname and command line";
 
-                            // FIXME TODO: Clone without hostname and command line !?
+                            // Make a copy of the definition
+                            DefinitionM* copyOfDefinition = nullptr;
+                            if (agentDefinition != nullptr) {
+                                copyOfDefinition = agentDefinition->copy();
+                            }
 
                             // Create a new model of agent
-                            //AgentM* agent = createAgentModel(agentName, agentDefinition);
-
-                            //Q_UNUSED(agent)
+                            createAgentModel(agentName,
+                                             copyOfDefinition);
                         }
                         // There are some clones with a defined hostname
                         else
@@ -523,14 +508,12 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                             }
 
                                             // Create a new model of agent
-                                            AgentM* agent = createAgentModel(agentName,
-                                                                             copyOfDefinition,
-                                                                             peerId,
-                                                                             ipAddress,
-                                                                             hostname,
-                                                                             commandLine);
-
-                                            Q_UNUSED(agent)
+                                            createAgentModel(agentName,
+                                                             copyOfDefinition,
+                                                             peerId,
+                                                             ipAddress,
+                                                             hostname,
+                                                             commandLine);
                                         }
                                     }
                                 }

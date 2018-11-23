@@ -73,20 +73,18 @@ AgentM::~AgentM()
     if (_definition != nullptr) {
         //disconnect(_definition);
 
-        //DefinitionM* temp = _definition;
+        DefinitionM* temp = _definition;
         setdefinition(nullptr);
-        //delete temp;
-        //temp = nullptr;
+        delete temp;
     }
 
     // Delete our agent mapping
     if (_mapping != nullptr) {
         //disconnect(_mapping);
 
-        //AgentMappingM* temp = _mapping;
+        AgentMappingM* temp = _mapping;
         setmapping(nullptr);
-        //delete temp;
-        //temp = nullptr;
+        delete temp;
     }
 }
 
