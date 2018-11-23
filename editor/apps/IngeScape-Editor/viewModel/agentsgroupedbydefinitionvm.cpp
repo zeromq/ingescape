@@ -404,7 +404,7 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
                 //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
                 // Connect to signals of the model
-                //connect(model, &AgentM::hostnameChanged, this, &AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged);
+                connect(model, &AgentM::hostnameChanged, this, &AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged);
                 connect(model, &AgentM::isONChanged, this, &AgentsGroupedByDefinitionVM::_onIsONofModelChanged);
                 connect(model, &AgentM::canBeRestartedChanged, this, &AgentsGroupedByDefinitionVM::_onCanBeRestartedOfModelChanged);
                 connect(model, &AgentM::isMutedChanged, this, &AgentsGroupedByDefinitionVM::_onIsMutedOfModelChanged);
@@ -456,7 +456,7 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
  * @brief Slot called when the hostname of a model changed
  * @param hostname
  */
-/*void AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged(QString hostname)
+void AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged(QString hostname)
 {
     // Note: hostname is never empty (default value is HOSTNAME_NOT_DEFINED)
 
@@ -524,7 +524,7 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
     }
 
     sethostnames(globalHostnames);
-}*/
+}
 
 
 /**

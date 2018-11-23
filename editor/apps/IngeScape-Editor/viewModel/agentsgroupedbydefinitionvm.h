@@ -283,7 +283,7 @@ private Q_SLOTS:
      * @brief Slot called when the hostname of a model changed
      * @param hostname
      */
-    //void _onHostnameOfModelChanged(QString hostname);
+    void _onHostnameOfModelChanged(QString hostname);
 
 
     /**
