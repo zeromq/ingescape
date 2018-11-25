@@ -1105,6 +1105,57 @@ int igs_writeParameterAsData(const char *name, void *value, size_t size){
     return (iop == NULL)?0:1;
 }
 
+void igs_clearDataForInput(const char *name){
+    agent_iop_t *iop = model_findIopByName(name, IGS_INPUT_T);
+    if (iop != NULL && iop->value_type == IGS_DATA_T && iop->value.data != NULL){
+        free(iop->value.data);
+        iop->value.data = NULL;
+        iop->valueSize = 0;
+    }else{
+        if (iop == NULL){
+            igs_error("%s is not a known input", name);
+        }else{
+            if (iop->value_type != IGS_DATA_T){
+                igs_error("%s type is not IGS_DATA_T", name);
+            }
+        }
+    }
+}
+
+void igs_clearDataForOutput(const char *name){
+    agent_iop_t *iop = model_findIopByName(name, IGS_OUTPUT_T);
+    if (iop != NULL && iop->value_type == IGS_DATA_T && iop->value.data != NULL){
+        free(iop->value.data);
+        iop->value.data = NULL;
+        iop->valueSize = 0;
+    }else{
+        if (iop == NULL){
+            igs_error("%s is not a known output", name);
+        }else{
+            if (iop->value_type != IGS_DATA_T){
+                igs_error("%s type is not IGS_DATA_T", name);
+            }
+        }
+    }
+}
+
+void igs_clearDataForParameter(const char *name){
+    agent_iop_t *iop = model_findIopByName(name, IGS_PARAMETER_T);
+    if (iop != NULL && iop->value_type == IGS_DATA_T && iop->value.data != NULL){
+        free(iop->value.data);
+        iop->value.data = NULL;
+        iop->valueSize = 0;
+    }else{
+        if (iop == NULL){
+            igs_error("%s is not a known parameter", name);
+        }else{
+            if (iop->value_type != IGS_DATA_T){
+                igs_error("%s type is not IGS_DATA_T", name);
+            }
+        }
+    }
+}
+
 // --------------------------------  INTROSPECTION ------------------------------------//
 
 iopType_t igs_getTypeForInput(const char *name){

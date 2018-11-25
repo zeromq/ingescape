@@ -151,7 +151,13 @@ PUBLIC int igs_writeParameterAsDouble(const char *name, double value);
 PUBLIC int igs_writeParameterAsString(const char *name, const char *value);
 PUBLIC int igs_writeParameterAsData(const char *name, void *value, size_t size);
 
-//observe writing to IOP
+//clear IOP data in memory without having to write the IOP
+//(relevant for IOPs with IGS_DATA_T type only)
+PUBLIC void igs_clearDataForInput(const char *name);
+PUBLIC void igs_clearDataForOutput(const char *name);
+PUBLIC void igs_clearDataForParameter(const char *name);
+
+//observe writing to an IOP
 typedef void (*igs_observeCallback)(iop_t iopType, const char* name, iopType_t valueType, void* value, size_t valueSize, void* myData);
 PUBLIC int igs_observeInput(const char *name, igs_observeCallback cb, void *myData);
 PUBLIC int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData);
@@ -305,6 +311,7 @@ PUBLIC void igs_writeDefinitionToPath(void);
 PUBLIC void igs_writeMappingToPath(void);
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
+//IPC is supported on UNIX systems only
 //set/get IPC folder path for the agent (default is /tmp/ingesscape/)
 PUBLIC void igs_setIpcFolderPath(char *path);
 PUBLIC const char* igs_getIpcFolderPath(void);
