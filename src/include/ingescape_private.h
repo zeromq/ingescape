@@ -66,7 +66,7 @@ typedef struct agent_iop {
     const char* name;
     iopType_t value_type;
     iop_t type;          //Size of pointer on data
-    struct {
+    union {
         int i;                  //in accordance to type IGS_INTEGER_T ex. '10'
         double d;               //in accordance to type IGS_DOUBLE_T ex. '10.01'
         char* s;                //in accordance to type IGS_STRING_T ex. 'display the image'

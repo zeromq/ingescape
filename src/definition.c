@@ -28,11 +28,17 @@ void definition_freeIOP (agent_iop_t* iop){
     if ((iop)->name != NULL){
         free((char*)(iop)->name);
     }
-    if ((iop)->value.s != NULL){
-        free((char*)(iop)->value.s);
-    }
-    if ((iop)->value.data != NULL){
-        free((iop)->value.data);
+    switch (iop->value_type) {
+        case IGS_STRING_T:
+            if (iop->value.s != NULL)
+                free((char*)(iop)->value.s);
+            break;
+        case IGS_DATA_T:
+            if (iop->value.data != NULL)
+                free((iop)->value.data);
+            break;
+        default:
+            break;
     }
     if ((iop)->callbacks != NULL){
         igs_observe_callback_t *cb, *tmp;
