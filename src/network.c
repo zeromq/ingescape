@@ -1169,9 +1169,10 @@ initLoop (zsock_t *pipe, void *args){
     zsock_t *ipcPublisher = agentElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
     if (ipcPublisher == NULL){
         igs_error("Could not create IPC publishing socket (%s) : Agent will interrupt immediately.", ipcEndpoint);
-        canContinue = false;
+    }else{
+        zyre_set_header(agentElements->node, "ipc", "%s", ipcEndpoint);
     }
-    zyre_set_header(agentElements->node, "ipc", "%s", ipcEndpoint);
+    
 #endif
     
     //start logger stream if needed
@@ -1385,8 +1386,6 @@ int network_publishOutput (const agent_iop_t *iop){
             zmsg_t *msg = zmsg_new();
             zmsg_addstr(msg, iop->name);
             zmsg_addstrf(msg, "%d", iop->value_type);
-            void *data = NULL;
-            size_t size = 0;
             switch (iop->value_type) {
                 case IGS_INTEGER_T:
                     zmsg_addmem(msg, &(iop->value.i), sizeof(int));
@@ -1408,15 +1407,11 @@ int network_publishOutput (const agent_iop_t *iop){
                     zmsg_addmem(msg, NULL, 0);
                     igs_debug("publish impulsion %s",iop->name);
                     break;
-                case IGS_DATA_T:
-                    igs_readOutputAsData(iop->name, &data, &size);
-                    //TODO: decide if we should delete the data after use or keep it in memory
-                    //suggestion: we might add a clearOutputData function available to the developer
-                    //for use when publishing large size data to free memory after publishing.
-                    //TODO: document ZMQ high water marks and how to change them
-                    zframe_t *frame = zframe_new(data, size);
+                case IGS_DATA_T:{
+                    zframe_t *frame = zframe_new(iop->value.data, iop->valueSize);
                     zmsg_append(msg, &frame);
                     igs_debug("publish data %s",iop->name);
+                }
                     break;
                 default:
                     break;
@@ -1427,8 +1422,12 @@ int network_publishOutput (const agent_iop_t *iop){
                 zmsg_destroy(&msgBis);
             }else{
                 result = 1;
-                if (zmsg_send(&msgBis, agentElements->ipcPublisher) != 0){
-                    igs_error("Could not publish output %s using IPC\n",iop->name);
+                if (agentElements->ipcPublisher != NULL){
+                    //publisher can be NULL on IOS or for read/write problems with assigned IPC path
+                    //in both cases, an error message has been issued at start
+                    if (zmsg_send(&msgBis, agentElements->ipcPublisher) != 0){
+                        igs_error("Could not publish output %s using IPC\n",iop->name);
+                    }
                 }
             }
         }else{
