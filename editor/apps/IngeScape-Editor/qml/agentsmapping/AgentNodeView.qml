@@ -92,7 +92,7 @@ Rectangle {
     Component.onCompleted: {
         if (agentMappingVM) {
             // Max number of inputs or outputs
-            var maxIOP = Math.max(agentMappingVM.inputsList.rowCount(), agentMappingVM.outputsList.rowCount())
+            var maxIOP = Math.max(agentMappingVM.inputsList.count, agentMappingVM.outputsList.count)
             if (maxIOP > 150)
             {
                 // I/O > 150 => we force the view to be "reduced".
