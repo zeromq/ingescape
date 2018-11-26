@@ -560,23 +560,26 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
         // The previous definition was already defined (and the new definition is defined)
         else
         {
-            // Search the current agents grouped (by definition) with the previous definition
+            AgentsGroupedByDefinitionVM* previousGroup = nullptr;
+
+            // Search the previous agents grouped (by definition) with the previous definition
             for (DefinitionM* iterator : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
             {
                 // The 2 definitions are strictly identicals
                 if ((iterator != nullptr) && DefinitionM::areIdenticals(iterator, previousDefinition))
                 {
-                    AgentsGroupedByDefinitionVM* currentGroup = _hashFromDefinitionToAgentsGroupedByDefinition.value(iterator);
-                    if (currentGroup != nullptr) {
-                        // Remove the model from the current group
-                        currentGroup->models()->remove(model);
-                    }
+                    previousGroup = _hashFromDefinitionToAgentsGroupedByDefinition.value(iterator);
                     break;
                 }
             }
 
             // Check if we have to merge this model of agent with an existing view model of agents (grouped by definition) that have the same definition
             _checkHaveToMergeAgent(model);
+
+            // Then, remove the model from the previous group (allows our group to not be empty even temporarily)
+            if (previousGroup != nullptr) {
+                previousGroup->models()->remove(model);
+            }
         }
     }
 }
