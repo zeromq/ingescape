@@ -717,13 +717,13 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
                 }
                 case ActionEffectTypes::VALUE:
                 {
-                    IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(actionEffect);
-                    if ((iopEffect != nullptr) && (iopEffect->agent() != nullptr) && (iopEffect->agentIOP() != nullptr) && (iopEffect->agentIOP()->firstModel() != nullptr))
+                    IOPValueEffectM* iopValueEffect = qobject_cast<IOPValueEffectM*>(actionEffect);
+                    if ((iopValueEffect != nullptr) && (iopValueEffect->agent() != nullptr) && (iopValueEffect->agentIOP() != nullptr) && (iopValueEffect->agentIOP()->firstModel() != nullptr))
                     {
-                        jsonEffect.insert("agent_name", iopEffect->agent()->name());
-                        jsonEffect.insert("iop_type", AgentIOPTypes::staticEnumToKey(iopEffect->agentIOP()->firstModel()->agentIOPType()));
-                        jsonEffect.insert("iop_name", iopEffect->agentIOP()->name());
-                        jsonEffect.insert("value", iopEffect->value());
+                        jsonEffect.insert("agent_name", iopValueEffect->agent()->name());
+                        jsonEffect.insert("iop_type", AgentIOPTypes::staticEnumToKey(iopValueEffect->agentIOP()->firstModel()->agentIOPType()));
+                        jsonEffect.insert("iop_name", iopValueEffect->agentIOP()->name());
+                        jsonEffect.insert("value", iopValueEffect->value());
 
                         jsonFilled = true;
                     }
@@ -1149,7 +1149,6 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                     QJsonValue jsonIOPType = jsonEffect.value("iop_type");
                     QJsonValue jsonIOPName = jsonEffect.value("iop_name");
 
-                    // Check agent name and iop name exists
                     if (jsonAgentName.isString() && jsonIOPType.isString() && jsonIOPName.isString())
                     {
                         QString agentName = jsonAgentName.toString();
@@ -1163,9 +1162,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                         QString agentIOPName = jsonIOPName.toString();
 
                         AgentsGroupedByNameVM* agent = nullptr;
-                        AgentIOPM* iopAgentM = nullptr;
-                        //AgentIOPVM* agentIOP = nullptr;
-                        bool found = false;
+                        AgentIOPVM* agentIOP = nullptr;
 
                         for (AgentsGroupedByNameVM* iterator : allAgentsGroupsByName)
                         {
@@ -1173,37 +1170,39 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             {
                                 agent = iterator;
 
-                                // Go through the inputs
-                                for (InputVM* inputVM : iterator->inputsList()->toList())
+                                switch (agentIOPType)
                                 {
-                                    if ((inputVM != nullptr) && (inputVM->firstModel() != nullptr))
-                                    {
-                                        if (!found && (agentIOPType == AgentIOPTypes::INPUT) && (agentIOPName == inputVM->name()))
-                                        {
-                                            iopAgentM = inputVM->firstModel();
-                                            found = true;
-                                        }
-                                    }
-                                }
-
-                                // Go through the outputs
-                                for (OutputVM* outputVM : iterator->outputsList()->toList())
+                                case AgentIOPTypes::INPUT:
                                 {
-                                    if ((outputVM != nullptr) && (outputVM->firstModel() != nullptr))
-                                    {
-                                        if (!found && (agentIOPType == AgentIOPTypes::OUTPUT) && (agentIOPName == outputVM->name()))
-                                        {
-                                            iopAgentM = outputVM->firstModel();
-                                            found = true;
-                                        }
+                                    QList<InputVM*> inputsWithSameName = agent->getInputsListFromName(agentIOPName);
+                                    if (!inputsWithSameName.isEmpty()) {
+                                        agentIOP = inputsWithSameName.at(0);
                                     }
+                                    break;
                                 }
-
-                                break;
+                                case AgentIOPTypes::OUTPUT:
+                                {
+                                    QList<OutputVM*> outputsWithSameName = agent->getOutputsListFromName(agentIOPName);
+                                    if (!outputsWithSameName.isEmpty()) {
+                                        agentIOP = outputsWithSameName.at(0);
+                                    }
+                                    break;
+                                }
+                                case AgentIOPTypes::PARAMETER:
+                                {
+                                    QList<ParameterVM*> parametersWithSameName = agent->getParametersListFromName(agentIOPName);
+                                    if (!parametersWithSameName.isEmpty()) {
+                                        agentIOP = parametersWithSameName.at(0);
+                                    }
+                                    break;
+                                }
+                                default:
+                                    break;
+                                }
                             }
                         }
 
-                        if ((agent != nullptr) && (iopAgentM != nullptr))
+                        if ((agent != nullptr) && (agentIOP != nullptr))
                         {
                             // Create model
                             IOPValueEffectM* iopEffectM = new IOPValueEffectM();
@@ -1220,10 +1219,9 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 iopEffectM->setvalue(jsonValue.toString());
                             }
 
-                            // set agent and I/O/P
+                            // set agent and agent I/O/P
                             iopEffectM->setagent(agent);
-                            // FIXME REPAIR: iopEffectM->setagentIOP(iopAgentM);
-                            //iopEffectM->setagentIOP(agentIOP);
+                            iopEffectM->setagentIOP(agentIOP);
                         }
                     }
 

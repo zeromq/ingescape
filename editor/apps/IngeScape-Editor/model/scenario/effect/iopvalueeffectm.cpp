@@ -105,18 +105,22 @@ void IOPValueEffectM::copyFrom(ActionEffectM* effect)
     // Call our mother class
     ActionEffectM::copyFrom(effect);
 
-    IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(effect);
-    if (iopEffect != nullptr)
+    IOPValueEffectM* iopValueEffect = qobject_cast<IOPValueEffectM*>(effect);
+    if (iopValueEffect != nullptr)
     {
-        setagentIOP(iopEffect->agentIOP());
-        // iopEffect->agentIOP can be NULL, so we have to set agent IOP "Type" and "Name"
-        setagentIOPType(iopEffect->agentIOPType());
-        setagentIOPName(iopEffect->agentIOPName());
+        setagentIOP(iopValueEffect->agentIOP());
+        // iopValueEffect->agentIOP can be NULL, so we have to set agent IOP "Type" and "Name"
+        setagentIOPType(iopValueEffect->agentIOPType());
+        setagentIOPName(iopValueEffect->agentIOPName());
+
+        setvalue(iopValueEffect->value());
 
         _iopMergedList.clear();
-        _iopMergedList.append(iopEffect->iopMergedList()->toList());
+        _iopMergedList.append(iopValueEffect->iopMergedList()->toList());
 
-        setvalue(iopEffect->value());
+        setinputsNumber(iopValueEffect->inputsNumber());
+        setoutputsNumber(iopValueEffect->outputsNumber());
+        setparametersNumber(iopValueEffect->parametersNumber());
     }
 }
 
@@ -136,10 +140,8 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
     // Value of agent changed
     if (previousAgent != _agent)
     {
-        if (previousAgent != nullptr) {
-            // FIXME REPAIR
-            //disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
-
+        if (previousAgent != nullptr)
+        {
             // DIS-connect to signals from the agents grouped by name
             disconnect(_agent, 0, this, 0);
         }
@@ -152,6 +154,10 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
         // Clear the list
         _iopMergedList.clear();
 
+        setinputsNumber(0);
+        setoutputsNumber(0);
+        setparametersNumber(0);
+
         if (_agent != nullptr)
         {
             // Connect to signals from the agents grouped by name
@@ -162,33 +168,6 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
             connect(_agent, &AgentsGroupedByNameVM::inputsWillBeRemoved, this, &IOPValueEffectM::_onInputsWillBeRemoved);
             connect(_agent, &AgentsGroupedByNameVM::outputsWillBeRemoved, this, &IOPValueEffectM::_onOutputsWillBeRemoved);
             connect(_agent, &AgentsGroupedByNameVM::parametersWillBeRemoved, this, &IOPValueEffectM::_onParametersWillBeRemoved);
-
-            /*// Fill with inputs
-            for (InputVM* input : _agent->inputsList()->toList())
-            {
-                if ((input != nullptr) && (input->firstModel() != nullptr))
-                {
-                    _iopMergedList.append(input->firstModel());
-                }
-            }
-
-            // Fill with outputs
-            for (OutputVM* output : _agent->outputsList()->toList())
-            {
-                if ((output != nullptr) && (output->firstModel() != nullptr))
-                {
-                    _iopMergedList.append(output->firstModel());
-                }
-            }
-
-            // Fill with parameters
-            for (ParameterVM* parameter : _agent->parametersList()->toList())
-            {
-                if ((parameter != nullptr) && (parameter->firstModel() != nullptr))
-                {
-                    _iopMergedList.append(parameter->firstModel());
-                }
-            }*/
 
             if (!_agent->inputsList()->isEmpty()) {
                 _onInputsHaveBeenAdded(_agent->inputsList()->toList());
@@ -201,13 +180,11 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
             }
 
             // By default, select the first item
-            if (!_iopMergedList.isEmpty()) {
+            if (!_iopMergedList.isEmpty())
+            {
                 qDebug() << "setagent: setagentIOP(first item by default)";
                 setagentIOP(_iopMergedList.at(0));
             }
-
-            // FIXME REPAIR
-            //connect(_agent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
          }
     }
 }
@@ -336,68 +313,6 @@ QPair<QString, QStringList> IOPValueEffectM::getAgentNameAndReverseCommandWithPa
 
     return pairAgentNameAndReverseCommand;
 }
-
-
-/**
-  * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the agent in mapping
-  */
-/*void IOPValueEffectM::_onModelsOfIOPChanged()
-{
-    AgentIOPM* newAgentIOP = nullptr;
-
-    qDebug() << "_on Models of IOP changed" << AgentIOPTypes::staticEnumToString(_agentIOPType) << _agentIOPName;
-
-    // If we have a selected agent iop
-    if (!_agentIOPName.isEmpty())
-    {
-        _iopMergedList.clear();
-
-        // Add inputs to the merged list
-        for (InputVM* inputVM : _agent->inputsList()->toList())
-        {
-            if ((inputVM != nullptr) && (inputVM->firstModel() != nullptr))
-            {
-                _iopMergedList.append(inputVM->firstModel());
-
-                if ((_agentIOPType == AgentIOPTypes::INPUT) && (inputVM->name() == _agentIOPName)) {
-                    newAgentIOP = inputVM->firstModel();
-                }
-            }
-        }
-
-        // Add outputs to the merged list
-        for (OutputVM* outputVM : _agent->outputsList()->toList())
-        {
-            if ((outputVM != nullptr) && (outputVM->firstModel() != nullptr))
-            {
-                _iopMergedList.append(outputVM->firstModel());
-
-                if ((_agentIOPType == AgentIOPTypes::OUTPUT) && (outputVM->name() == _agentIOPName)) {
-                    newAgentIOP = outputVM->firstModel();
-                }
-            }
-        }
-
-        // Add parameters to the merged list
-        for (ParameterVM* parameterVM : _agent->parametersList()->toList())
-        {
-            if ((parameterVM != nullptr) && (parameterVM->firstModel() != nullptr))
-            {
-                _iopMergedList.append(parameterVM->firstModel());
-
-                if ((_agentIOPType == AgentIOPTypes::PARAMETER) && (parameterVM->name() == _agentIOPName)) {
-                    newAgentIOP = parameterVM->firstModel();
-                }
-            }
-        }
-    }
-
-    // Update the agent IOP
-    if (newAgentIOP != _agentIOP) {
-        qDebug() << "setagent: setagentIOP(newAgentIOP)";
-        setagentIOP(newAgentIOP);
-    }
-}*/
 
 
 /**

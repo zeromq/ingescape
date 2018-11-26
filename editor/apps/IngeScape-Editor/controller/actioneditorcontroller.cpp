@@ -119,7 +119,7 @@ void ActionEditorController::validateModification()
  */
 void ActionEditorController::createNewCondition()
 {
-    ActionConditionVM * conditionVM = new ActionConditionVM();
+    ActionConditionVM* conditionVM = new ActionConditionVM();
 
     // Set a condition model (by default: condition on value)
     conditionVM->setmodelM(new IOPValueConditionM());
@@ -155,7 +155,7 @@ void ActionEditorController::removeCondition(ActionConditionVM* conditionVM)
  */
 void ActionEditorController::createNewEffect()
 {
-    ActionEffectVM * effectVM = new ActionEffectVM();
+    ActionEffectVM* effectVM = new ActionEffectVM();
 
     // Set an effect model
     effectVM->setmodelM(new IOPValueEffectM());
@@ -186,5 +186,4 @@ void ActionEditorController::removeEffect(ActionEffectVM* effectVM)
         _editedAction->effectsList()->remove(effectVM);
     }
 }
-
 

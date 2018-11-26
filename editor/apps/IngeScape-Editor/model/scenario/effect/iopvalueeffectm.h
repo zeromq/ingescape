@@ -103,12 +103,6 @@ Q_SIGNALS:
 protected Q_SLOTS:
 
     /**
-      * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the agent in mapping
-      */
-    //void _onModelsOfIOPChanged();
-
-
-    /**
      * @brief Slot called when some view models of inputs have been added to the agent(s grouped by name)
      * @param newInputs
      */

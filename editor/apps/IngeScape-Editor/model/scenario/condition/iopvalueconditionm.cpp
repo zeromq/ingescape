@@ -426,7 +426,7 @@ void IOPValueConditionM::_onCurrentValueChanged(QVariant currentValue)
 /**
 * @brief Update the selected agent iop
 */
-void IOPValueConditionM::_updateAgentIOPSelected(AgentIOPM * newAgentIOP)
+void IOPValueConditionM::_updateAgentIOPSelected(AgentIOPM* newAgentIOP)
 {
     // Reset the agent IOP
     if (newAgentIOP != _agentIOP)

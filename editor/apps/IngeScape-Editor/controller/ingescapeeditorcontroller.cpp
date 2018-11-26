@@ -954,19 +954,19 @@ void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
             _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
         }
 
-        // FIXME REPAIR: suite de _loadPlatformFromJSON
+        // FIXME REPAIR: suite de _loadPlatformFromJSON (importMappingFromJson)
 
         // Import the mapping of agents from JSON
         /*if ((_agentsMappingC != nullptr) && jsonRoot.contains("mapping"))
         {
             _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
-        }
+        }*/
 
         // Import the scenario from JSON
         if ((_scenarioC != nullptr) && jsonRoot.contains("scenario"))
         {
             _scenarioC->importScenarioFromJson(jsonRoot.value("scenario").toObject());
-        }*/
+        }
     }
 }
 
@@ -994,7 +994,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
             }
         }
 
-        // FIXME REPAIR: suite de _getJsonOfCurrentPlatform
+        // FIXME REPAIR: suite de _getJsonOfCurrentPlatform (exportAllAgentsInMapping)
 
         // Save the mapping
         /*if (_agentsMappingC != nullptr)
@@ -1007,7 +1007,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
         }*/
 
         // Save the scenario
-        /*if (_scenarioC != nullptr)
+        if (_scenarioC != nullptr)
         {
             // actions list
             // actions list in the palette
@@ -1017,7 +1017,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
                                                                    _scenarioC->actionsInTimeLine()->toList());
 
             platformJsonObject.insert("scenario", jsonScenario);
-        }*/
+        }
 
         jsonDocument = QJsonDocument(platformJsonObject);
     }

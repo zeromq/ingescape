@@ -131,11 +131,11 @@ void ActionM::copyFrom(ActionM* actionModel)
                 break;
             }
             case ActionEffectTypes::VALUE: {
-                IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(effectVM->modelM());
-                if (iopEffect != nullptr)
+                IOPValueEffectM* iopValueEffect = qobject_cast<IOPValueEffectM*>(effectVM->modelM());
+                if (iopValueEffect != nullptr)
                 {
                     IOPValueEffectM* copy = new IOPValueEffectM();
-                    copy->copyFrom(iopEffect);
+                    copy->copyFrom(iopValueEffect);
 
                     copiedEffectVM->setmodelM(copy);
                 }
@@ -161,6 +161,7 @@ void ActionM::copyFrom(ActionM* actionModel)
 
 
         _conditionsList.deleteAllItems();
+
         for (ActionConditionVM* reference : actionModel->conditionsList()->toList())
         {
             if ((reference != nullptr) && (reference->modelM() != nullptr))
