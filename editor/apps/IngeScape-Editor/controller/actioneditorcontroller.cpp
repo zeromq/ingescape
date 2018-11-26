@@ -182,7 +182,7 @@ void ActionEditorController::createNewEffect()
  */
 void ActionEditorController::removeEffect(ActionEffectVM* effectVM)
 {
-    if(_editedAction->effectsList()->contains(effectVM)) {
+    if (_editedAction->effectsList()->contains(effectVM)) {
         _editedAction->effectsList()->remove(effectVM);
     }
 }

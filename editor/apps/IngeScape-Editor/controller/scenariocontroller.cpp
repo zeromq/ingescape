@@ -124,7 +124,7 @@ ScenarioController::~ScenarioController()
  */
 void ScenarioController::setisPlaying(bool isPlaying)
 {
-    if(_isPlaying != isPlaying)
+    if (_isPlaying != isPlaying)
     {
         _isPlaying = isPlaying;
 

@@ -539,7 +539,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario, Q
     // Actions in the timeline
     // ------
     QJsonValue jsonActionsInTimelineList = jsonScenario.value("actions_timeline");
-    if(jsonActionsInTimelineList.isArray())
+    if (jsonActionsInTimelineList.isArray())
     {
         for (QJsonValue jsonTmp : jsonActionsInTimelineList.toArray())
         {
@@ -696,7 +696,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
 
             jsonFilled = false;
 
-            if(actionEffect != nullptr)
+            if (actionEffect != nullptr)
             {
                 QJsonObject jsonEffect;
                 jsonEffect.insert("type", ActionEffectTypes::staticEnumToKey(effectVM->effectType()));
@@ -1231,7 +1231,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                 case ActionEffectTypes::AGENT:
                 {
                     QJsonValue jsonAgentName = jsonEffect.value("agent_name");
-                    if(jsonAgentName.isString())
+                    if (jsonAgentName.isString())
                     {
                         // Check agent name and iop name exists
                         QString agentName = jsonAgentName.toString();
@@ -1392,10 +1392,10 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
     ActionConditionVM* actionConditionVM = nullptr;
 
     QJsonValue jsonValue = jsonCondition.value("type");
-    if(jsonValue.isString())
+    if (jsonValue.isString())
     {
         int conditionType = ActionConditionTypes::staticEnumFromKey(jsonValue.toString().toUpper());
-        if(conditionType >= 0)
+        if (conditionType >= 0)
         {
             switch (conditionType)
             {
@@ -1404,7 +1404,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                     QJsonValue jsonAgentName = jsonCondition.value("agent_name");
                     QJsonValue jsonIOPName = jsonCondition.value("iop_name");
 
-                    if(jsonAgentName.isString() && jsonIOPName.isString())
+                    if (jsonAgentName.isString() && jsonIOPName.isString())
                     {
                         // Check agent name and iop name exists
                         QString agentName = jsonAgentName.toString();

@@ -83,7 +83,7 @@ ActionEffectVM::~ActionEffectVM()
  */
 void ActionEffectVM::seteffectType(ActionEffectTypes::Value value)
 {
-    if(_effectType != value)
+    if (_effectType != value)
     {
         _effectType = value;
 

@@ -118,7 +118,7 @@ void ActionVM::setmodelM(ActionM* value)
 {
     if (_modelM != value)
     {
-        if(_modelM != nullptr)
+        if (_modelM != nullptr)
         {
             disconnect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
 
@@ -129,7 +129,7 @@ void ActionVM::setmodelM(ActionM* value)
 
         _modelM = value;
 
-        if(_modelM != nullptr)
+        if (_modelM != nullptr)
         {
             connect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
 

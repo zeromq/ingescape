@@ -124,7 +124,7 @@ void ActionConditionM::_onAgentIsOnChanged(bool isON)
 
 
 /**
- * @brief Called when our agent model is destroyed
+ * @brief FIXME custom event instead: Called when our agent model is destroyed
  * @param sender
  */
 void ActionConditionM::_onAgentDestroyed(QObject* sender)

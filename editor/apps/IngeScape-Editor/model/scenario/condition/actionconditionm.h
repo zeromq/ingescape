@@ -90,7 +90,7 @@ protected Q_SLOTS:
 
 
     /**
-     * @brief Called when our agent is destroyed
+     * @brief FIXME custom event instead: Called when our agent is destroyed
      * @param sender
      */
     void _onAgentDestroyed(QObject* sender);

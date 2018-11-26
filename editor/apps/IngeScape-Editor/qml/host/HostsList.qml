@@ -57,7 +57,7 @@ Item {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            if(controller.selectedHost)
+            if (controller.selectedHost)
             {
                 controller.selectedHost = null;
             }

@@ -63,7 +63,7 @@ void ActionEffectM::copyFrom(ActionEffectM* effect)
 */
 void ActionEffectM::setagent(AgentsGroupedByNameVM* value)
 {
-    if(_agent != value)
+    if (_agent != value)
     {
         if (_agent != nullptr)
         {
@@ -85,7 +85,7 @@ void ActionEffectM::setagent(AgentsGroupedByNameVM* value)
 
 
 /**
- * @brief Called when our agent is destroyed
+ * @brief FIXME custom event instead: Called when our agent is destroyed
  * @param sender
  */
 void ActionEffectM::_onAgentDestroyed(QObject* sender)

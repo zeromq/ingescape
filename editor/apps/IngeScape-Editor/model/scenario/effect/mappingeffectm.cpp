@@ -174,7 +174,7 @@ void MappingEffectM::setinput(AgentIOPM* value)
 {
     if (_input != value)
     {
-        if(_input != nullptr)
+        if (_input != nullptr)
         {
             // UnSubscribe to destruction
             disconnect(_input, &AgentIOPM::destroyed, this, &MappingEffectM::_onInputDestroyed);
@@ -182,7 +182,7 @@ void MappingEffectM::setinput(AgentIOPM* value)
 
         _input = value;
 
-        if(_input != nullptr)
+        if (_input != nullptr)
         {
             setinputName(_input->name());
 
@@ -205,7 +205,7 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
     ActionEffectM::copyFrom(effect);
 
     MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effect);
-    if(mappingEffect != nullptr)
+    if (mappingEffect != nullptr)
     {
         _inputsList.clear();
         _inputsList.append(mappingEffect->inputsList()->toList());

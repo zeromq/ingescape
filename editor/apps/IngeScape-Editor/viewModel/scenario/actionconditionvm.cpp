@@ -77,7 +77,7 @@ ActionConditionVM::~ActionConditionVM()
  */
 void ActionConditionVM::setconditionType(ActionConditionTypes::Value value)
 {
-    if(_conditionType != value)
+    if (_conditionType != value)
     {
         _conditionType = value;
 

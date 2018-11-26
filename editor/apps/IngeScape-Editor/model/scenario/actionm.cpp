@@ -143,7 +143,7 @@ void ActionM::copyFrom(ActionM* actionModel)
             }
             case ActionEffectTypes::MAPPING: {
                 MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effectVM->modelM());
-                if(mappingEffect != nullptr)
+                if (mappingEffect != nullptr)
                 {
                     MappingEffectM* copy = new MappingEffectM();
                     copy->copyFrom(mappingEffect);
@@ -317,7 +317,7 @@ void ActionM::setrearmAfterTimeString(QString value)
  */
 void ActionM::setvalidityDurationString(QString value)
 {
-    if(_validityDurationString != value)
+    if (_validityDurationString != value)
     {
         _validityDurationString = value;
 
