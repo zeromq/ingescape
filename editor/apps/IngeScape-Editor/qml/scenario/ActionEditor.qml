@@ -1473,6 +1473,8 @@ WindowBlockTouches {
 
                                 // my condition
                                 property var myCondition: model.QtObject
+                                property bool myConditionTypeIsValue: myCondition && myCondition.conditionType === ActionConditionTypes.VALUE
+                                property bool myConditionIopIsNotImpulsion: myCondition && myCondition.modelM && myCondition.modelM.agentIOP && (myCondition.modelM.agentIOP.agentIOPValueType !== AgentIOPValueTypes.IMPULSION)
 
                                 anchors {
                                     right : parent.right
@@ -1632,7 +1634,7 @@ WindowBlockTouches {
                                             height : 25
                                             width : 148
 
-                                            visible: (myCondition && (myCondition.conditionType === ActionConditionTypes.VALUE))
+                                            visible: myConditionTypeIsValue
                                             enabled: visible
 
                                             model: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIopList : 0
@@ -1689,7 +1691,7 @@ WindowBlockTouches {
                                             height: 25
                                             width: 44
 
-                                            visible: (myCondition && (myCondition.conditionType === ActionConditionTypes.VALUE))
+                                            visible: myConditionTypeIsValue && myConditionIopIsNotImpulsion
 
                                             model: (controller ? controller.allValueComparisonTypes : 0)
 
@@ -1721,7 +1723,7 @@ WindowBlockTouches {
                                         }
                                         height: 25
 
-                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
+                                        visible: myConditionTypeIsValue && myConditionIopIsNotImpulsion
                                         enabled : visible
 
                                         horizontalAlignment: TextInput.AlignLeft
