@@ -589,9 +589,9 @@ WindowBlockTouches {
 
                                         model: (myEffect && myEffect.modelM) ? myEffect.modelM.iopMergedList : 0
 
-                                        inputsNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.inputsNumber : 0;
-                                        outputsNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.outputsNumber : 0;
-                                        parametersNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.parametersNumber : 0;
+                                        inputsNumber: (myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && myEffect.modelM) ? myEffect.modelM.inputsNumber : 0;
+                                        outputsNumber: (myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && myEffect.modelM) ? myEffect.modelM.outputsNumber : 0;
+                                        parametersNumber: (myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && myEffect.modelM) ? myEffect.modelM.parametersNumber : 0;
 
                                         Binding {
                                             target: iopEffectsCombo
@@ -691,7 +691,8 @@ WindowBlockTouches {
                                             verticalCenter: parent.verticalCenter
                                         }
 
-                                        visible: (myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && myEffect.modelM && (myEffect.modelM.agentIOPType !== AgentIOPTypes.OUTPUT))
+                                        visible: (myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && myEffect.modelM
+                                                  && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPType !== AgentIOPTypes.OUTPUT))
 
                                         activeFocusOnPress: true
                                         checkable: true

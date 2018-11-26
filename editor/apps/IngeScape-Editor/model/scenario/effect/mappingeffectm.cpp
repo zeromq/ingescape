@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -44,7 +44,6 @@ QString MappingEffectValues::enumToString(int value)
 //
 //--------------------------------------------------------------
 
-
 /**
  * @brief Constructor
  * @param parent
@@ -53,9 +52,7 @@ MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
     _mappingEffectValue(MappingEffectValues::MAPPED),
     _outputAgent(nullptr),
     _output(nullptr),
-    _outputName(""),
-    _input(nullptr),
-    _inputName("")
+    _input(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -94,42 +91,36 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
     {
         if (_outputAgent != nullptr)
         {
-            // UN-subscribe to destruction
-            disconnect(_outputAgent, &AgentsGroupedByNameVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
-
-            // FIXME REPAIR
-            //disconnect(_outputAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofOutputAgentChanged);
+            // DIS-connect to signals from the agents grouped by name
+            //disconnect(_outputAgent, &AgentsGroupedByNameVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
+            disconnect(_outputAgent, 0, this, 0);
         }
 
-        // set the new value
+        // Set the new value
         _outputAgent = value;
 
         // Reset the output
         setoutput(nullptr);
 
-        // Clear the list and the selected output
+        // Clear the outputs list
         _outputsList.clear();
 
         if (_outputAgent != nullptr)
         {
-            // Subscribe to destruction
+            // Connect to signals from the agents grouped by name
             connect(_outputAgent, &AgentsGroupedByNameVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
+            connect(_outputAgent, &AgentsGroupedByNameVM::outputsHaveBeenAdded, this, &MappingEffectM::_onOutputsHaveBeenAddedToOutputAgent);
+            connect(_outputAgent, &AgentsGroupedByNameVM::outputsWillBeRemoved, this, &MappingEffectM::_onOutputsWillBeRemovedToOutputAgent);
 
-            // Fill outputs
-            for (OutputVM* output : _outputAgent->outputsList()->toList())
-            {
-                if ((output != nullptr) && (output->firstModel() != nullptr)) {
-                    _outputsList.append(output->firstModel());
-                }
+            if (!_outputAgent->outputsList()->isEmpty()) {
+                _onOutputsHaveBeenAddedToOutputAgent(_outputAgent->outputsList()->toList());
             }
 
-            // Select the first item
-            if (!_outputsList.isEmpty()) {
+            // By default, select the first item
+            if (!_outputsList.isEmpty())
+            {
                 setoutput(_outputsList.at(0));
             }
-
-            // FIXME REPAIR
-            //connect(_outputAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofOutputAgentChanged);
         }
 
         Q_EMIT outputAgentChanged(value);
@@ -141,7 +132,7 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
 * @brief Custom setter for output
 * @param output
 */
-void MappingEffectM::setoutput(AgentIOPM* value)
+/*void MappingEffectM::setoutput(AgentIOPM* value)
 {
     if (_output != value)
     {
@@ -163,14 +154,14 @@ void MappingEffectM::setoutput(AgentIOPM* value)
 
         Q_EMIT outputChanged(value);
     }
-}
+}*/
 
 
 /**
 * @brief Custom setter for input
 * @param input
 */
-void MappingEffectM::setinput(AgentIOPM* value)
+/*void MappingEffectM::setinput(AgentIOPM* value)
 {
     if (_input != value)
     {
@@ -192,7 +183,7 @@ void MappingEffectM::setinput(AgentIOPM* value)
 
         Q_EMIT inputChanged(value);
     }
-}
+}*/
 
 
 /**
@@ -209,11 +200,14 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
     {
         _inputsList.clear();
         _inputsList.append(mappingEffect->inputsList()->toList());
+
         _outputsList.clear();
         _outputsList.append(mappingEffect->outputsList()->toList());
 
         setoutputAgent(mappingEffect->outputAgent());
         setoutput(mappingEffect->output());
+
+        // Input Agent is stored in the base class "ActionEffectM"
         setinput(mappingEffect->input());
 
         setmappingEffectValue(mappingEffect->mappingEffectValue());
@@ -236,9 +230,10 @@ void MappingEffectM::setagent(AgentsGroupedByNameVM* agent)
     // Value of (input) agent changed
     if (previousAgent != _agent)
     {
-        if (previousAgent != nullptr) {
-            // FIXME REPAIR
-            //disconnect(previousAgent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofInputAgentChanged);
+        if (previousAgent != nullptr)
+        {
+            // DIS-connect to signals from the agents grouped by name
+            disconnect(_agent, 0, this, 0);
         }
 
         // Reset the input
@@ -249,21 +244,19 @@ void MappingEffectM::setagent(AgentsGroupedByNameVM* agent)
 
         if (_agent != nullptr)
         {
-            // Fill inputs
-            for (InputVM* input : _agent->inputsList()->toList())
-            {
-                if ((input != nullptr) && (input->firstModel() != nullptr)) {
-                    _inputsList.append(input->firstModel());
-                }
+            // Connect to signals from the agents grouped by name
+            connect(_agent, &AgentsGroupedByNameVM::inputsHaveBeenAdded, this, &MappingEffectM::_onInputsHaveBeenAddedToInputAgent);
+            connect(_agent, &AgentsGroupedByNameVM::inputsWillBeRemoved, this, &MappingEffectM::_onInputsWillBeRemovedToInputAgent);
+
+            if (!_agent->inputsList()->isEmpty()) {
+                _onInputsHaveBeenAddedToInputAgent(_agent->inputsList()->toList());
             }
 
-            // Select the first item
-            if (!_inputsList.isEmpty()) {
+            // By default, select the first item
+            if (!_inputsList.isEmpty())
+            {
                 setinput(_inputsList.at(0));
             }
-
-            // FIXME REPAIR
-            //connect(_agent, &AgentsGroupedByNameVM::modelsOfIOPChanged, this, &MappingEffectM::_onModelsOfIOPofInputAgentChanged);
         }
     }
 }
@@ -352,6 +345,70 @@ void MappingEffectM::_onOutputAgentDestroyed(QObject* sender)
     Q_UNUSED(sender)
 
     setoutputAgent(nullptr);
+
+    //Q_EMIT askForDestruction();
+}
+
+
+/**
+ * @brief Slot called when some view models of inputs have been added to the input agent(s grouped by name)
+ * @param newInputs
+ */
+void MappingEffectM::_onInputsHaveBeenAddedToInputAgent(QList<InputVM*> newInputs)
+{
+    _inputsList.append(newInputs);
+}
+
+
+/**
+ * @brief Slot called when some view models of outputs have been added to the output agent(s grouped by name)
+ * @param newOutputs
+ */
+void MappingEffectM::_onOutputsHaveBeenAddedToOutputAgent(QList<OutputVM*> newOutputs)
+{
+    _outputsList.append(newOutputs);
+}
+
+
+/**
+ * @brief Slot called when some view models of inputs will be removed from the input agent(s grouped by name)
+ * @param oldInputs
+ */
+void MappingEffectM::_onInputsWillBeRemovedToInputAgent(QList<InputVM*> oldInputs)
+{
+    for (InputVM* iterator : oldInputs)
+    {
+        if ((iterator != nullptr) && _inputsList.contains(iterator))
+        {
+            // If this input is selected
+            if (_input == iterator) {
+                setinput(nullptr);
+            }
+
+            _inputsList.remove(iterator);
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when some view models of outputs will be removed from the output agent(s grouped by name)
+ * @param oldOutputs
+ */
+void MappingEffectM::_onOutputsWillBeRemovedToOutputAgent(QList<OutputVM*> oldOutputs)
+{
+    for (OutputVM* iterator : oldOutputs)
+    {
+        if ((iterator != nullptr) && _outputsList.contains(iterator))
+        {
+            // If this output is selected
+            if (_output == iterator) {
+                setoutput(nullptr);
+            }
+
+            _outputsList.remove(iterator);
+        }
+    }
 }
 
 
@@ -359,130 +416,22 @@ void MappingEffectM::_onOutputAgentDestroyed(QObject* sender)
  * @brief Called when our input is destroyed
  * @param sender
  */
-void MappingEffectM::_onInputDestroyed(QObject* sender)
+/*void MappingEffectM::_onInputDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
     setinput(nullptr);
-}
+}*/
+
 
 /**
  * @brief Called when our output is destroyed
  * @param sender
  */
-void MappingEffectM::_onOutputDestroyed(QObject* sender)
+/*void MappingEffectM::_onOutputDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
     setoutput(nullptr);
-}
-
-
-/**
-  * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the "Input agent (in mapping)"
-  */
-void MappingEffectM::_onModelsOfIOPofInputAgentChanged()
-{
-    // If we have a selected agent IOP
-    if ((_agent != nullptr) && !_inputName.isEmpty())
-    {
-        _inputsList.clear();
-
-        for (InputVM* inputVM : _agent->inputsList()->toList())
-        {
-            if ((inputVM != nullptr) && inputVM->firstModel() != nullptr)
-            {
-                _inputsList.append(inputVM->firstModel());
-
-                // Check that our inputs list update concern our selected agent IOP
-                if (inputVM->name() == _inputName)
-                {
-                    _updateInputSelected();
-                }
-            }
-        }
-    }
-}
-
-
-/**
-  * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the "Output agent (in mapping)"
-  */
-void MappingEffectM::_onModelsOfIOPofOutputAgentChanged()
-{
-    // If we have a selected agent IOP
-    if ((_outputAgent != nullptr) && !_outputName.isEmpty())
-    {
-        _outputsList.clear();
-
-        for (OutputVM* outputVM : _outputAgent->outputsList()->toList())
-        {
-            if ((outputVM != nullptr) && outputVM->firstModel() != nullptr)
-            {
-                _outputsList.append(outputVM->firstModel());
-
-                // Check that our outputs list update concern our selected agent IOP
-                if (outputVM->name() == _outputName) {
-                    _updateOutputSelected();
-                }
-            }
-        }
-    }
-}
-
-
-/**
-* @brief Update the selected input
-*/
-void MappingEffectM::_updateInputSelected()
-{
-    if ((_agent != nullptr) && !_inputName.isEmpty())
-    {
-        AgentIOPM* newAgentIOP = nullptr;
-
-        for (InputVM* input : _agent->inputsList()->toList())
-        {
-            if ((input != nullptr) && (input->firstModel() != nullptr))
-            {
-                if (_inputName == input->firstModel()->name()) {
-                    newAgentIOP = input->firstModel();
-                    break;
-                }
-            }
-        }
-
-        // Change the Input
-        if (newAgentIOP != _input) {
-            setinput(newAgentIOP);
-        }
-    }
-}
-
-
-/**
-* @brief Update the selected output
-*/
-void MappingEffectM::_updateOutputSelected()
-{
-    if ((_outputAgent != nullptr) && !_outputName.isEmpty())
-    {
-        AgentIOPM* newAgentIOP = nullptr;
-
-        for (OutputVM* output : _outputAgent->outputsList()->toList())
-        {
-            if ((output != nullptr) && (output->firstModel() != nullptr))
-            {
-                if (_outputName == output->firstModel()->name()) {
-                    newAgentIOP = output->firstModel();
-                    break;
-                }
-            }
-        }
-
-        // Change the Output
-        if (newAgentIOP != _output) {
-            setoutput(newAgentIOP);
-        }
-    }
-}
+}*/
 

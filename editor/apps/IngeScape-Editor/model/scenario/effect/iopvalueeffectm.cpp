@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -29,8 +29,6 @@
  */
 IOPValueEffectM::IOPValueEffectM(QObject *parent) : ActionEffectM(parent),
     _agentIOP(nullptr),
-    _agentIOPType(AgentIOPTypes::INPUT),
-    _agentIOPName(""),
     _value(""),
     _inputsNumber(0),
     _outputsNumber(0),
@@ -50,49 +48,11 @@ IOPValueEffectM::~IOPValueEffectM()
     // Clear our list
     _iopMergedList.clear();
 
-    // reset agent IOP pointer
+    // Reset agent IOP
     setagentIOP(nullptr);
-}
 
-
-/**
-* @brief Custom setter for agent iop model
-* @param value
-*/
-void IOPValueEffectM::setagentIOP(AgentIOPVM* value)
-{
-    if (_agentIOP != value)
-    {
-        if (_agentIOP != nullptr)
-        {
-            // UN-subscribe to destruction
-            disconnect(_agentIOP, &AgentIOPVM::destroyed, this, &IOPValueEffectM::_onAgentIopModelDestroyed);
-        }
-
-        _agentIOP = value;
-
-        if (_agentIOP != nullptr)
-        {
-            // Subscribe to destruction
-            connect(_agentIOP, &AgentIOPVM::destroyed, this, &IOPValueEffectM::_onAgentIopModelDestroyed);
-
-            //qDebug() << "set agent IOP to" << _agentIOP->name();
-
-            if (_agentIOP->firstModel() != nullptr)
-            {
-                setagentIOPType(_agentIOP->firstModel()->agentIOPType());
-                setagentIOPName(_agentIOP->name());
-            }
-        }
-        else {
-            //qDebug() << "set agent IOP to NULL !!!";
-
-            //setagentIOPType(AgentIOPTypes::INPUT);
-            //setagentIOPName("");
-        }
-
-        Q_EMIT agentIOPChanged(value);
-    }
+    // Reset agent
+    setagent(nullptr);
 }
 
 
@@ -108,19 +68,16 @@ void IOPValueEffectM::copyFrom(ActionEffectM* effect)
     IOPValueEffectM* iopValueEffect = qobject_cast<IOPValueEffectM*>(effect);
     if (iopValueEffect != nullptr)
     {
-        setagentIOP(iopValueEffect->agentIOP());
-        // iopValueEffect->agentIOP can be NULL, so we have to set agent IOP "Type" and "Name"
-        setagentIOPType(iopValueEffect->agentIOPType());
-        setagentIOPName(iopValueEffect->agentIOPName());
-
-        setvalue(iopValueEffect->value());
-
         _iopMergedList.clear();
         _iopMergedList.append(iopValueEffect->iopMergedList()->toList());
 
         setinputsNumber(iopValueEffect->inputsNumber());
         setoutputsNumber(iopValueEffect->outputsNumber());
         setparametersNumber(iopValueEffect->parametersNumber());
+
+        setagentIOP(iopValueEffect->agentIOP());
+
+        setvalue(iopValueEffect->value());
     }
 }
 
@@ -146,9 +103,8 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
             disconnect(_agent, 0, this, 0);
         }
 
-        qDebug() << "setagent: setagentIOP(nullptr)";
-
         // Reset the agent IOP
+        qDebug() << "setagent: setagentIOP(nullptr)";
         setagentIOP(nullptr);
 
         // Clear the list
@@ -205,7 +161,7 @@ QPair<AgentsGroupedByNameVM*, QStringList> IOPValueEffectM::getAgentAndCommandWi
         QStringList commandAndParameters;
 
         // SET_INPUT / SET_OUTPUT / SET_PARAMETER
-        QString command = QString("SET_%1").arg(AgentIOPTypes::staticEnumToString(_agentIOPType));
+        QString command = QString("SET_%1").arg(AgentIOPTypes::staticEnumToString(_agentIOP->firstModel()->agentIOPType()));
 
         commandAndParameters << command << _agentIOP->name();
 
@@ -265,7 +221,7 @@ QPair<QString, QStringList> IOPValueEffectM::getAgentNameAndReverseCommandWithPa
         QStringList reverseCommandAndParameters;
 
         // SET_INPUT / SET_OUTPUT / SET_PARAMETER
-        QString command = QString("SET_%1").arg(AgentIOPTypes::staticEnumToString(_agentIOPType));
+        QString command = QString("SET_%1").arg(AgentIOPTypes::staticEnumToString(_agentIOP->firstModel()->agentIOPType()));
 
         reverseCommandAndParameters << command << _agentIOP->name();
 
@@ -297,11 +253,11 @@ QPair<QString, QStringList> IOPValueEffectM::getAgentNameAndReverseCommandWithPa
             break;
         }
         case AgentIOPValueTypes::IMPULSION: {
-            qWarning() << AgentIOPTypes::staticEnumToString(_agentIOPType) << _agentIOP->name() << "has value type 'IMPULSION', thus the effect is irreversible!";
+            qWarning() << AgentIOPTypes::staticEnumToString(_agentIOP->firstModel()->agentIOPType()) << _agentIOP->name() << "has value type 'IMPULSION', thus the effect is irreversible!";
             break;
         }
         case AgentIOPValueTypes::DATA: {
-            qWarning() << AgentIOPTypes::staticEnumToString(_agentIOPType) << _agentIOP->name() << "has value type 'DATA', thus the effect is irreversible!";
+            qWarning() << AgentIOPTypes::staticEnumToString(_agentIOP->firstModel()->agentIOPType()) << _agentIOP->name() << "has value type 'DATA', thus the effect is irreversible!";
             break;
         }
         default:
@@ -327,8 +283,6 @@ void IOPValueEffectM::_onInputsHaveBeenAdded(QList<InputVM*> newInputs)
     {
         if ((input != nullptr) && !input->name().isEmpty())
         {
-            qDebug() << "IOPValueEffectM::_onInputsHaveBeenAdded" << input->name();
-
             _iopMergedList.insert(index, input);
             index++;
         }
@@ -350,8 +304,6 @@ void IOPValueEffectM::_onOutputsHaveBeenAdded(QList<OutputVM*> newOutputs)
     {
         if ((output != nullptr) && !output->name().isEmpty())
         {
-            qDebug() << "IOPValueEffectM::_onOutputsHaveBeenAdded" << output->name();
-
             _iopMergedList.insert(index, output);
             index++;
         }
@@ -373,8 +325,6 @@ void IOPValueEffectM::_onParametersHaveBeenAdded(QList<ParameterVM*> newParamete
     {
         if ((parameter != nullptr) && !parameter->name().isEmpty())
         {
-            qDebug() << "IOPValueEffectM::_onParametersHaveBeenAdded" << parameter->name();
-
             _iopMergedList.insert(index, parameter);
             index++;
         }
@@ -394,7 +344,7 @@ void IOPValueEffectM::_onInputsWillBeRemoved(QList<InputVM*> oldInputs)
     {
         if ((input != nullptr) && !input->name().isEmpty() && _iopMergedList.contains(input))
         {
-            qDebug() << "IOPValueEffectM::_onInputsWillBeRemoved" << input->name();
+            //qDebug() << "IOPValueEffectM::_onInputsWillBeRemoved" << input->name();
 
             // If this input is selected
             if (_agentIOP == input) {
@@ -419,7 +369,7 @@ void IOPValueEffectM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
     {
         if ((output != nullptr) && !output->name().isEmpty() && _iopMergedList.contains(output))
         {
-            qDebug() << "IOPValueEffectM::_onOutputsWillBeRemoved" << output->name();
+            //qDebug() << "IOPValueEffectM::_onOutputsWillBeRemoved" << output->name();
 
             // If this output is selected
             if (_agentIOP == output) {
@@ -444,7 +394,7 @@ void IOPValueEffectM::_onParametersWillBeRemoved(QList<ParameterVM*> oldParamete
     {
         if ((parameter != nullptr) && !parameter->name().isEmpty() && _iopMergedList.contains(parameter))
         {
-            qDebug() << "IOPValueEffectM::_onParametersWillBeRemoved" << parameter->name();
+            //qDebug() << "IOPValueEffectM::_onParametersWillBeRemoved" << parameter->name();
 
             // If this parameter is selected
             if (_agentIOP == parameter) {
@@ -456,18 +406,4 @@ void IOPValueEffectM::_onParametersWillBeRemoved(QList<ParameterVM*> oldParamete
     }
 
     setparametersNumber(_parametersNumber - oldParameters.count());
-}
-
-
-/**
- * @brief Called when our agent iop model is destroyed
- * @param sender
- */
-void IOPValueEffectM::_onAgentIopModelDestroyed(QObject* sender)
-{
-    Q_UNUSED(sender)
-
-    qDebug() << "_on Agent IOP Model Destroyed --> setagentIOP(nullptr)";
-
-    setagentIOP(nullptr);
 }

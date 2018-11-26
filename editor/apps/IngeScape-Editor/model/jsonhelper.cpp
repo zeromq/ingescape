@@ -1287,55 +1287,36 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                         QString inputName = jsonInputName.toString();
 
                         AgentsGroupedByNameVM* inputAgent = nullptr;
-                        AgentIOPM* input = nullptr;
+                        AgentIOPVM* input = nullptr;
                         AgentsGroupedByNameVM* outputAgent = nullptr;
-                        AgentIOPM* output = nullptr;
-                        bool found = false;
+                        AgentIOPVM* output = nullptr;
 
-                        QList<AgentIOPM*> outputsList;
-                        QList<AgentIOPM*> inputsList;
+                        //QList<AgentIOPM*> outputsList;
+                        //QList<AgentIOPM*> inputsList;
 
                         for (AgentsGroupedByNameVM* iterator : allAgentsGroupsByName)
                         {
                             if (iterator != nullptr)
                             {
+                                // Output agent and output
                                 if (iterator->name() == outputAgentName)
                                 {
                                     outputAgent = iterator;
-                                    found = false;
 
-                                    // Go through the outputs
-                                    for (OutputVM* outputVM : iterator->outputsList()->toList())
-                                    {
-                                        if (!found && (outputVM->name() == outputName))
-                                        {
-                                            output = outputVM->firstModel();
-                                            found = true;
-                                        }
-
-                                        if (outputVM->firstModel() != nullptr) {
-                                            outputsList.append(outputVM->firstModel());
-                                        }
+                                    QList<OutputVM*> outputsWithSameName = outputAgent->getOutputsListFromName(outputName);
+                                    if (!outputsWithSameName.isEmpty()) {
+                                        output = outputsWithSameName.at(0);
                                     }
                                 }
 
+                                // Input agent and output
                                 if (iterator->name() == inputAgentName)
                                 {
                                     inputAgent = iterator;
-                                    found = false;
 
-                                    // Go through the inputs
-                                    for (InputVM* inputVM : iterator->inputsList()->toList())
-                                    {
-                                        if (!found && (inputVM->name() == inputName))
-                                        {
-                                            input = inputVM->firstModel();
-                                            found = true;
-                                        }
-
-                                        if (inputVM->firstModel() != nullptr) {
-                                            inputsList.append(inputVM->firstModel());
-                                        }
+                                    QList<InputVM*> inputsWithSameName = inputAgent->getInputsListFromName(inputName);
+                                    if (!inputsWithSameName.isEmpty()) {
+                                        input = inputsWithSameName.at(0);
                                     }
                                 }
                             }
@@ -1363,10 +1344,6 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 int nMappingEffectValue = MappingEffectValues::staticEnumFromKey(jsonValue.toString().toUpper());
                                 mappingEffectM->setmappingEffectValue(static_cast<MappingEffectValues::Value>(nMappingEffectValue));
                             }
-
-                            // Set the list of agent iop
-                            mappingEffectM->outputsList()->append(outputsList);
-                            mappingEffectM->inputsList()->append(inputsList);
                         }
                     }
 

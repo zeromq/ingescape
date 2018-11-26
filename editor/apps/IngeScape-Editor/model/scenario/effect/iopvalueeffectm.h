@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -21,7 +21,6 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-//#include "model/iop/agentiopm.h"
 #include <model/scenario/effect/actioneffectm.h>
 
 
@@ -33,20 +32,12 @@ class IOPValueEffectM : public ActionEffectM
     Q_OBJECT
 
     // Agent Input/Output/Parameter
-    //I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, agentIOP)
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPVM*, agentIOP)
-
-    // Type of our agent IOP
-    I2_QML_PROPERTY(AgentIOPTypes::Value, agentIOPType)
-
-    // Name of our agent IOP
-    I2_QML_PROPERTY(QString, agentIOPName)
+    I2_QML_PROPERTY(AgentIOPVM*, agentIOP)
 
     // Value converted into string
     I2_QML_PROPERTY(QString, value)
 
     // Merged list of Inputs/Outputs/Parameters of the agent
-    //I2_QOBJECT_LISTMODEL(AgentIOPM, iopMergedList)
     I2_QOBJECT_LISTMODEL(AgentIOPVM, iopMergedList)
 
     // Number of Inputs/Outputs/Parameters
@@ -142,13 +133,6 @@ protected Q_SLOTS:
      * @param oldParameters
      */
     void _onParametersWillBeRemoved(QList<ParameterVM*> oldParameters);
-
-
-    /**
-     * @brief Called when our agent iop model is destroyed
-     * @param sender
-     */
-    void _onAgentIopModelDestroyed(QObject* sender);
 
 };
 
