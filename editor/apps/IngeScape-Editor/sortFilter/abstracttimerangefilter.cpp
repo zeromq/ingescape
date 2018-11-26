@@ -1,13 +1,14 @@
 /*
- *	AbstractTimeRangeFilter
+ *	IngeScape Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -18,12 +19,6 @@
 
 #include "model/scenario/timetickm.h"
 #include "viewModel/scenario/actionvm.h"
-
-//--------------------------------------------------------------
-//
-// AbstractTimeRangeFilter
-//
-//--------------------------------------------------------------
 
 
 /**

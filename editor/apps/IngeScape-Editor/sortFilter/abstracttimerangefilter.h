@@ -1,14 +1,14 @@
-
 /*
- *	TimeTickTimeRangeFilter
+ *	IngeScape Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -51,10 +51,12 @@ public:
      */
     void setTimeRange(int startTimeInMilliseconds, int endTimeInMilliseconds);
 
+
     /**
      * @brief Fore update of our filter (invalidateFilter is private, thus we need a function to call it)
      */
     void forceUpdate();
+
 
 Q_SIGNALS:
 
