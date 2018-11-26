@@ -48,7 +48,7 @@ Item {
             width: comboboxDelegate.width
 
             border.width: comboboxStyle.listCellBorderWidth
-            border.color :comboboxStyle.listCellBorderColor
+            border.color: comboboxStyle.listCellBorderColor
             radius: 0;
 
             // Inputs / Outputs separator
@@ -80,18 +80,18 @@ Item {
             }
 
             Rectangle {
-                id : circle
+                id: circle
                 anchors {
-                    left : parent.left
+                    left: parent.left
                     leftMargin: 5
                     verticalCenter: parent.verticalCenter
                 }
 
-                width : 11
-                height : width
-                radius : width/2
+                width: 11
+                height: width
+                radius: width/2
 
-                color : switch (model.agentIOPValueType)
+                color: switch (model.firstModel.agentIOPValueType)
                         {
                         case AgentIOPValueTypes.INTEGER:
                             IngeScapeTheme.yellowColor
@@ -161,7 +161,8 @@ Item {
                     running: mouseArea.containsMouse
 
                     onTriggered: {
-                        Tooltip.showText(mouseArea, Qt.point(mouseArea.mouseX, mouseArea.mouseY), modelToString(model) + " (" + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase() + ")");
+                        var text = modelToString(model) + " (" + AgentIOPValueTypes.enumToString(model.firstModel.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.firstModel.agentIOPType).toLowerCase() + ")";
+                        Tooltip.showText(mouseArea, Qt.point(mouseArea.mouseX, mouseArea.mouseY), text);
                     }
                 }
             }

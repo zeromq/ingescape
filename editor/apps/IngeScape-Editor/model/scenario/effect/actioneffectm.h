@@ -86,7 +86,6 @@ public Q_SLOTS:
      */
     void _onAgentDestroyed(QObject* sender);
 
-
 };
 
 QML_DECLARE_TYPE(ActionEffectM)

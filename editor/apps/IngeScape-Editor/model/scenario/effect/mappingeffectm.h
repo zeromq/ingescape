@@ -34,7 +34,7 @@ I2_ENUM_CUSTOM(MappingEffectValues, MAPPED, UNMAPPED)
 /**
  * @brief The MappingEffectM class defines an action effect on a mapping between two iop value
  */
-class MappingEffectM: public ActionEffectM
+class MappingEffectM : public ActionEffectM
 {
     Q_OBJECT
 

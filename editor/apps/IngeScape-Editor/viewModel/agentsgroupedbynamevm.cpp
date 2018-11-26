@@ -1067,7 +1067,7 @@ void AgentsGroupedByNameVM::_manageParametersOfAddedDefinition(DefinitionM* defi
             _parametersList.append(parametersListToAdd);
 
             // Emit the signal "Parameters have been Added"
-            //Q_EMIT parametersHaveBeenAdded(parametersListToAdd);
+            Q_EMIT parametersHaveBeenAdded(parametersListToAdd);
         }
     }
 }
@@ -1196,7 +1196,7 @@ void AgentsGroupedByNameVM::_manageParametersOfRemovedDefinition(DefinitionM* de
         if (!parametersListToRemove.isEmpty())
         {
             // Emit the signal "Parameters will be Removed"
-            //Q_EMIT parametersWillBeRemoved(parametersListToRemove);
+            Q_EMIT parametersWillBeRemoved(parametersListToRemove);
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_parametersList.remove(parametersListToRemove);

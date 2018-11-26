@@ -589,9 +589,9 @@ WindowBlockTouches {
 
                                         model: (myEffect && myEffect.modelM) ? myEffect.modelM.iopMergedList : 0
 
-                                        inputsNumber: (myEffect && myEffect.modelM && myEffect.modelM.agent) ? myEffect.modelM.agent.inputsList.count : 0;
-                                        outputsNumber: (myEffect && myEffect.modelM && myEffect.modelM.agent) ? myEffect.modelM.agent.outputsList.count : 0;
-                                        parametersNumber: (myEffect && myEffect.modelM && myEffect.modelM.agent) ? myEffect.modelM.agent.parametersList.count : 0;
+                                        inputsNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.inputsNumber : 0;
+                                        outputsNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.outputsNumber : 0;
+                                        parametersNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.parametersNumber : 0;
 
                                         Binding {
                                             target: iopEffectsCombo

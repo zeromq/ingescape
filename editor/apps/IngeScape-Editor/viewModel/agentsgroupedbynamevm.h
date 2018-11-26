@@ -246,6 +246,13 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when some view models of parameters have been added to our agent(s grouped by name)
+     * @param newParameters
+     */
+    void parametersHaveBeenAdded(QList<ParameterVM*> newParameters);
+
+
+    /**
      * @brief Signal emitted when some view models of inputs will be removed from our agent(s grouped by name)
      * @param oldInputs
      */
@@ -257,6 +264,13 @@ Q_SIGNALS:
      * @param oldOutputs
      */
     void outputsWillBeRemoved(QList<OutputVM*> oldOutputs);
+
+
+    /**
+     * @brief Signal emitted when some view models of parameters will be removed from our agent(s grouped by name)
+     * @param oldParameters
+     */
+    void parametersWillBeRemoved(QList<ParameterVM*> oldParameters);
 
 
 public Q_SLOTS:

@@ -718,10 +718,10 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
                 case ActionEffectTypes::VALUE:
                 {
                     IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(actionEffect);
-                    if ((iopEffect != nullptr) && (iopEffect->agent() != nullptr) && (iopEffect->agentIOP() != nullptr))
+                    if ((iopEffect != nullptr) && (iopEffect->agent() != nullptr) && (iopEffect->agentIOP() != nullptr) && (iopEffect->agentIOP()->firstModel() != nullptr))
                     {
                         jsonEffect.insert("agent_name", iopEffect->agent()->name());
-                        jsonEffect.insert("iop_type", AgentIOPTypes::staticEnumToKey(iopEffect->agentIOP()->agentIOPType()));
+                        jsonEffect.insert("iop_type", AgentIOPTypes::staticEnumToKey(iopEffect->agentIOP()->firstModel()->agentIOPType()));
                         jsonEffect.insert("iop_name", iopEffect->agentIOP()->name());
                         jsonEffect.insert("value", iopEffect->value());
 
@@ -1164,6 +1164,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                         AgentsGroupedByNameVM* agent = nullptr;
                         AgentIOPM* iopAgentM = nullptr;
+                        //AgentIOPVM* agentIOP = nullptr;
                         bool found = false;
 
                         for (AgentsGroupedByNameVM* iterator : allAgentsGroupsByName)
@@ -1221,7 +1222,8 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                             // set agent and I/O/P
                             iopEffectM->setagent(agent);
-                            iopEffectM->setagentIOP(iopAgentM);
+                            // FIXME REPAIR: iopEffectM->setagentIOP(iopAgentM);
+                            //iopEffectM->setagentIOP(agentIOP);
                         }
                     }
 
