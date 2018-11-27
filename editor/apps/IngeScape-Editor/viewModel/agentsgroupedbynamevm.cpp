@@ -239,9 +239,6 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
 
             // Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
             _updateIsDefinedInAllDefinitionsForEachIOP(_hashFromDefinitionToAgentsGroupedByDefinition.count());
-
-            // Emit signal "models of Inputs/Outputs/Parameters Changed"
-            //Q_EMIT modelsOfIOPChanged();
         }
         // The definition is NULL
         else if (agentsGroupedByDefinition == _agentsGroupedByDefinitionNULL)
@@ -940,9 +937,6 @@ void AgentsGroupedByNameVM::_createAgentsGroupedByDefinition(DefinitionM* defini
 
         // Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
         _updateIsDefinedInAllDefinitionsForEachIOP(_hashFromDefinitionToAgentsGroupedByDefinition.count());
-
-        // Emit signal "models of Inputs/Outputs/Parameters Changed"
-        //Q_EMIT modelsOfIOPChanged();
     }
     // The definition is NULL
     else {

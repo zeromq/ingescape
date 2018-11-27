@@ -273,31 +273,31 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when some view models of inputs have been added to an agent in mapping
-     * @param inputsListHaveBeenAdded
+     * @brief Slot called when some view models of link inputs have been added to an agent in mapping
+     * @param addedlinkInputs
      */
-    //void _onInputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded);
+    void _onLinkInputsListHaveBeenAdded(QList<LinkInputVM*> addedlinkInputs);
 
 
     /**
-     * @brief Slot called when some view models of outputs have been added to an agent in mapping
-     * @param outputsListHaveBeenAdded
+     * @brief Slot called when some view models of link outputs have been added to an agent in mapping
+     * @param addedlinkOutputs
      */
-    //void _onOutputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded);
+    void _onLinkOutputsListHaveBeenAdded(QList<LinkOutputVM*> addedlinkOutputs);
 
 
     /**
-     * @brief Slot called when some view models of inputs will be removed from an agent in mapping
-     * @param inputsListWillBeRemoved
+     * @brief Slot called when some view models of link inputs will be removed from an agent in mapping
+     * @param removedLinkInputs
      */
-    //void _onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
+    void _onLinkInputsListWillBeRemoved(QList<LinkInputVM*> removedLinkInputs);
 
 
     /**
-     * @brief Slot called when some view models of outputs will be removed from an agent in mapping
-     * @param outputsListWillBeRemoved
+     * @brief Slot called when some view models of link outputs will be removed from an agent in mapping
+     * @param removedLinkOutputs
      */
-    //void _onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+    void _onLinkOutputsListWillBeRemoved(QList<LinkOutputVM*> removedLinkOutputs);
 
 
 private:

@@ -130,37 +130,31 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when some view models of inputs have been added to our agent in mapping
-     * @param inputsListHaveBeenAdded
+     * @brief Signal emitted when some view models of link inputs have been added to our agent in mapping
+     * @param addedlinkInputs
      */
-    //void inputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded);
+    void linkInputsListHaveBeenAdded(QList<LinkInputVM*> addedlinkInputs);
 
 
     /**
-     * @brief Signal emitted when some view models of outputs have been added to our agent in mapping
-     * @param outputsListHaveBeenAdded
+     * @brief Signal emitted when some view models of link outputs have been added to our agent in mapping
+     * @param addedlinkOutputs
      */
-    //void outputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded);
+    void linkOutputsListHaveBeenAdded(QList<LinkOutputVM*> addedlinkOutputs);
 
 
     /**
-     * @brief Signal emitted when some view models of inputs will be removed from our agent in mapping
-     * @param inputsListWillBeRemoved
+     * @brief Signal emitted when some view models of link inputs will be removed from our agent in mapping
+     * @param removedLinkInputs
      */
-    //void inputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
+    void linkInputsListWillBeRemoved(QList<LinkInputVM*> removedLinkInputs);
 
 
     /**
-     * @brief Signal emitted when some view models of outputs will be removed from our agent in mapping
-     * @param outputsListWillBeRemoved
+     * @brief Signal emitted when some view models of link outputs will be removed from our agent in mapping
+     * @param removedLinkOutputs
      */
-    //void outputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
-
-
-    /**
-     * @brief Signal emitted when the models of Inputs/Outputs/Parameters changed
-     */
-    //void modelsOfIOPChanged();
+    void linkOutputsListWillBeRemoved(QList<LinkOutputVM*> removedLinkOutputs);
 
 
 private Q_SLOTS:
@@ -270,12 +264,6 @@ private:
      * @return
      */
     //ParameterVM* _parameterModelRemoved(AgentIOPM* parameter);
-
-
-    /**
-     * @brief Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
-     */
-    //void _updateIsDefinedInAllDefinitionsForEachIOP();
 
 
     /**

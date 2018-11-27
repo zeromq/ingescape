@@ -1022,19 +1022,19 @@ void AgentsMappingController::_onAllAgentsInMappingChanged()
 
 
 /**
- * @brief Slot called when some view models of inputs have been added to an agent in mapping
- * @param inputsListHaveBeenAdded
+ * @brief Slot called when some view models of link inputs have been added to an agent in mapping
+ * @param addedlinkInputs
  */
-/*void AgentsMappingController::_onInputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded)
+void AgentsMappingController::_onLinkInputsListHaveBeenAdded(QList<LinkInputVM*> addedlinkInputs)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != nullptr) && !inputsListHaveBeenAdded.isEmpty())
+    if ((agentInMapping != nullptr) && !addedlinkInputs.isEmpty())
     {
         QStringList namesOfInputs;
-        for (InputVM* input : inputsListHaveBeenAdded)
+        for (LinkInputVM* linkInput : addedlinkInputs)
         {
-            if (input != nullptr) {
-                namesOfInputs.append(input->name());
+            if (linkInput != nullptr) {
+                namesOfInputs.append(linkInput->name());
             }
         }
 
@@ -1050,23 +1050,23 @@ void AgentsMappingController::_onAllAgentsInMappingChanged()
             }
         }
     }
-}*/
+}
 
 
 /**
- * @brief Slot called when some view models of outputs have been added to an agent in mapping
- * @param outputsListHaveBeenAdded
+ * @brief Slot called when some view models of link outputs have been added to an agent in mapping
+ * @param addedlinkOutputs
  */
-/*void AgentsMappingController::_onOutputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded)
+void AgentsMappingController::_onLinkOutputsListHaveBeenAdded(QList<LinkOutputVM*> addedlinkOutputs)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != nullptr) && !outputsListHaveBeenAdded.isEmpty())
+    if ((agentInMapping != nullptr) && !addedlinkOutputs.isEmpty())
     {
         QStringList namesOfOutputs;
-        for (OutputVM* output : outputsListHaveBeenAdded)
+        for (LinkOutputVM* linkOutput : addedlinkOutputs)
         {
-            if (output != nullptr) {
-                namesOfOutputs.append(output->name());
+            if (linkOutput != nullptr) {
+                namesOfOutputs.append(linkOutput->name());
             }
         }
 
@@ -1085,55 +1085,55 @@ void AgentsMappingController::_onAllAgentsInMappingChanged()
             }
         }
     }
-}*/
+}
 
 
 /**
- * @brief Slot when some view models of inputs will be removed from an agent in mapping
- * @param inputsListWillBeRemoved
+ * @brief Slot called when some view models of link inputs will be removed from an agent in mapping
+ * @param removedLinkInputs
  */
-/*void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved)
+void AgentsMappingController::_onLinkInputsListWillBeRemoved(QList<LinkInputVM*> removedLinkInputs)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != nullptr) && !inputsListWillBeRemoved.isEmpty())
+    if ((agentInMapping != nullptr) && !removedLinkInputs.isEmpty())
     {
-        //qDebug() << "_on Intputs List Will Be Removed from agent" << agentInMapping->name() << inputsListWillBeRemoved.count();
+        //qDebug() << "_on Link Intputs List will be Removed from agent" << agentInMapping->name() << removedLinkInputs.count();
 
         for (LinkVM* link : _allLinksInMapping.toList())
         {
             if ((link != nullptr) && (link->inputAgent() != nullptr) && (link->inputAgent() == agentInMapping)
-                    && (link->input() != nullptr) && inputsListWillBeRemoved.contains(link->input()))
+                    && (link->linkInput() != nullptr) && removedLinkInputs.contains(link->linkInput()))
             {
                 // Delete the link between two agents
                 _deleteLinkBetweenTwoAgents(link);
             }
         }
     }
-}*/
+}
 
 
 /**
- * @brief Slot when some view models of outputs will be removed from an agent in mapping
- * @param outputsListWillBeRemoved
+ * @brief Slot called when some view models of link outputs will be removed from an agent in mapping
+ * @param removedLinkOutputs
  */
-/*void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved)
+void AgentsMappingController::_onLinkOutputsListWillBeRemoved(QList<LinkOutputVM*> removedLinkOutputs)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != nullptr) && !outputsListWillBeRemoved.isEmpty())
+    if ((agentInMapping != nullptr) && !removedLinkOutputs.isEmpty())
     {
-        //qDebug() << "_on Outputs List Will Be Removed from agent" << agentInMapping->name() << outputsListWillBeRemoved.count();
+        //qDebug() << "_on Link Outputs List will be Removed from agent" << agentInMapping->name() << removedLinkOutputs.count();
 
         for (LinkVM* link : _allLinksInMapping.toList())
         {
             if ((link != nullptr) && (link->outputAgent() != nullptr) && (link->outputAgent() == agentInMapping)
-                    && (link->output() != nullptr) && outputsListWillBeRemoved.contains(link->output()))
+                    && (link->linkOutput() != nullptr) && removedLinkOutputs.contains(link->linkOutput()))
             {
                 // Delete the link between two agents
                 _deleteLinkBetweenTwoAgents(link);
             }
         }
     }
-}*/
+}
 
 
 /**
@@ -1153,11 +1153,11 @@ void AgentsMappingController::_createAgentInMappingAtPosition(AgentsGroupedByNam
             // Create a new view model of agent in the global Mapping
             agentInMapping = new AgentInMappingVM(agentsGroupedByName, position, this);
 
-            // FIXME REPAIR: Connect to signals from the new agent in mapping
-            /*connect(agentInMapping, &AgentInMappingVM::inputsListHaveBeenAdded, this, &AgentsMappingController::_onInputsListHaveBeenAdded);
-            connect(agentInMapping, &AgentInMappingVM::outputsListHaveBeenAdded, this, &AgentsMappingController::_onOutputsListHaveBeenAdded);
-            connect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
-            connect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);*/
+            // Connect to signals from this new agent in mapping
+            connect(agentInMapping, &AgentInMappingVM::linkInputsListHaveBeenAdded, this, &AgentsMappingController::_onLinkInputsListHaveBeenAdded);
+            connect(agentInMapping, &AgentInMappingVM::linkOutputsListHaveBeenAdded, this, &AgentsMappingController::_onLinkOutputsListHaveBeenAdded);
+            connect(agentInMapping, &AgentInMappingVM::linkInputsListWillBeRemoved, this, &AgentsMappingController::_onLinkInputsListWillBeRemoved);
+            connect(agentInMapping, &AgentInMappingVM::linkOutputsListWillBeRemoved, this, &AgentsMappingController::_onLinkOutputsListWillBeRemoved);
 
             // Add in the hash table
             _hashFromNameToAgentInMapping.insert(agentsGroupedByName->name(), agentInMapping);

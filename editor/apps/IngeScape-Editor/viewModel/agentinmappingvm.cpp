@@ -238,6 +238,8 @@ void AgentInMappingVM::_onInputsHaveBeenAdded(QList<InputVM*> newInputs)
     {
         _linkInputsList.append(tempLinkInputs);
 
+        Q_EMIT linkInputsListHaveBeenAdded(tempLinkInputs);
+
         // Update the group (of value type) of the reduced link inputs of our agent (= brin)
         _updateReducedLinkInputsValueTypeGroup();
     }
@@ -276,6 +278,8 @@ void AgentInMappingVM::_onOutputsHaveBeenAdded(QList<OutputVM*> newOutputs)
     if (!tempLinkOutputs.isEmpty())
     {
         _linkOutputsList.append(tempLinkOutputs);
+
+        Q_EMIT linkOutputsListHaveBeenAdded(tempLinkOutputs);
 
         // Update the group (of value type) of the reduced link outputs of our agent (= brin)
         _updateReducedLinkOutputsValueTypeGroup();
@@ -350,6 +354,8 @@ void AgentInMappingVM::_onInputsWillBeRemoved(QList<InputVM*> oldInputs)
             }
         }
 
+        Q_EMIT linkInputsListWillBeRemoved(tempLinkInputs);
+
         // Update the group (of value type) of the reduced link inputs of our agent (= brin)
         _updateReducedLinkInputsValueTypeGroup();
     }
@@ -422,6 +428,8 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
                 _linkOutputsList.remove(linkOutput);
             }
         }
+
+        Q_EMIT linkOutputsListWillBeRemoved(tempLinkOutputs);
 
         // Update the group (of value type) of the reduced link outputs of our agent (= brin)
         _updateReducedLinkOutputsValueTypeGroup();
@@ -721,14 +729,6 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
             // Emit signal "parameters List Have Been Added"
             //Q_EMIT parametersListHaveBeenAdded(parametersListToAdd);
         }
-
-
-        // Emit signal "models of Inputs/Outputs/Parameters Changed"
-        Q_EMIT modelsOfIOPChanged();
-
-
-        // Update the flag "Are Identicals All Definitions"
-        //_updateIsDefinedInAllDefinitionsForEachIOP();
     }
 }*/
 
@@ -793,12 +793,6 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
         if (!parametersListToAdd.isEmpty()) {
             _parametersList.append(parametersListToAdd);
         }
-
-        // Emit signal "models of Inputs/Outputs/Parameters Changed"
-        Q_EMIT modelsOfIOPChanged();
-
-        // Update the flag "Are Identicals All Definitions"
-        //_updateIsDefinedInAllDefinitionsForEachIOP();
     }
 }*/
 
@@ -893,13 +887,6 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
                 _parametersList.remove(parameterVM);
             }
         }
-
-
-        // Emit signal "models of Inputs/Outputs/Parameters Changed"
-        Q_EMIT modelsOfIOPChanged();
-
-        // Update the flag "Are Identicals All Definitions"
-        //_updateIsDefinedInAllDefinitionsForEachIOP();
     }
 }*/
 
@@ -1262,57 +1249,6 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
     }
 
     return parameterVM;
-}*/
-
-
-/**
- * @brief Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
- */
-/*void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachIOP()
-{
-    int numberOfModels = _models.count();
-
-    // Update the flag "Is Defined in All Definitions" for each input
-    for (InputVM* input : _inputsList.toList())
-    {
-        if (input != nullptr)
-        {
-            if (input->models()->count() == numberOfModels) {
-                input->setisDefinedInAllDefinitions(true);
-            }
-            else {
-                input->setisDefinedInAllDefinitions(false);
-            }
-        }
-    }
-
-    // Update the flag "Is Defined in All Definitions" for each output
-    for (OutputVM* output : _outputsList.toList())
-    {
-        if (output != nullptr)
-        {
-            if (output->models()->count() == numberOfModels) {
-                output->setisDefinedInAllDefinitions(true);
-            }
-            else {
-                output->setisDefinedInAllDefinitions(false);
-            }
-        }
-    }
-
-    // Update the flag "Is Defined in All Definitions" for each parameter
-    for (ParameterVM* parameter : _parametersList.toList())
-    {
-        if (parameter != nullptr)
-        {
-            if (parameter->models()->count() == numberOfModels) {
-                parameter->setisDefinedInAllDefinitions(true);
-            }
-            else {
-                parameter->setisDefinedInAllDefinitions(false);
-            }
-        }
-    }
 }*/
 
 
