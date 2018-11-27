@@ -142,14 +142,6 @@ public:
 
 
     /**
-     * @brief Export the agents in mapping list into json array object
-     * @param agents in mapping list
-     * @return
-     */
-    QJsonArray exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsInMapping);
-
-
-    /**
      * @brief Create a model of record from JSON data
      * @param byteArrayOfJson
      * @return

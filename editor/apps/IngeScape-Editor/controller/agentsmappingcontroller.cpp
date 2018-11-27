@@ -383,6 +383,41 @@ LinkVM* AgentsMappingController::getLinkInMappingFromName(QString name)
 
 
 /**
+ * @brief Export the global mapping into JSON
+ * @return array of all agents and their mapping
+ */
+QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
+{
+    QJsonArray jsonArray;
+
+    if (_jsonHelper != nullptr)
+    {
+        for (AgentInMappingVM* agentInMapping : _allAgentsInMapping)
+        {
+            if ((agentInMapping != nullptr) && (agentInMapping->temporaryMapping() != nullptr))
+            {
+                QJsonObject jsonAgent;
+
+                // Set the agent name
+                jsonAgent.insert("agentName", agentInMapping->name());
+
+                // Set the position
+                QString position = QString("%1, %2").arg(QString::number(agentInMapping->position().x()), QString::number(agentInMapping->position().y()));
+                jsonAgent.insert("position", position);
+
+                // Set the mapping
+                QJsonObject jsonMapping = _jsonHelper->exportAgentMappingToJson(agentInMapping->temporaryMapping());
+                jsonAgent.insert("mapping", jsonMapping);
+
+                jsonArray.append(jsonAgent);
+            }
+        }
+    }
+    return jsonArray;
+}
+
+
+/**
  * @brief Import a mapping of agents from a JSON array
  * @param jsonArrayOfAgentsMapping
  */

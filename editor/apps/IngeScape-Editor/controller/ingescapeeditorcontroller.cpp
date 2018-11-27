@@ -983,28 +983,26 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
     {
         QJsonObject platformJsonObject;
 
-        // Save the agents list
+        // Save the agents
         if (_modelManager != nullptr)
         {
-            // Export the agents list to JSON
-            QJsonArray arrayOfAgents = _modelManager->exportAgentsListToJSON();
+            // Export the agents into JSON
+            QJsonArray arrayOfAgents = _modelManager->exportAgentsToJSON();
 
             if (!arrayOfAgents.isEmpty()) {
                 platformJsonObject.insert("agents", arrayOfAgents);
             }
         }
 
-        // FIXME REPAIR: suite de _getJsonOfCurrentPlatform (exportAllAgentsInMapping)
-
         // Save the mapping
-        /*if (_agentsMappingC != nullptr)
+        if (_agentsMappingC != nullptr)
         {
-            QJsonArray arrayOfMappings = _jsonHelper->exportAllAgentsInMapping(_agentsMappingC->allAgentsInMapping()->toList());
+            QJsonArray arrayOfAgentsInMapping = _agentsMappingC->exportGlobalMappingToJSON();
 
-            if (!arrayOfMappings.isEmpty()) {
-                platformJsonObject.insert("mapping", arrayOfMappings);
+            if (!arrayOfAgentsInMapping.isEmpty()) {
+                platformJsonObject.insert("mapping", arrayOfAgentsInMapping);
             }
-        }*/
+        }
 
         // Save the scenario
         if (_scenarioC != nullptr)

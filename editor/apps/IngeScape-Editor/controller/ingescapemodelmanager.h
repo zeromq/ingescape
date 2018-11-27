@@ -154,10 +154,10 @@ public:
 
 
     /**
-     * @brief Export the agents list to JSON
-     * @return
+     * @brief Export the agents into JSON
+     * @return array of all agents (grouped by name)
      */
-    QJsonArray exportAgentsListToJSON();
+    QJsonArray exportAgentsToJSON();
 
 
     /**

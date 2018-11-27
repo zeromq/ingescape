@@ -808,44 +808,6 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
 
 
 /**
- * @brief Export the agents in mapping list into json array object
- * @param agents in mapping list
- * @return
- */
-QJsonArray JsonHelper::exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsInMapping)
-{
-    QJsonArray jsonArray;
-
-    // FIXME REPAIR: exportAllAgentsInMapping
-    Q_UNUSED(agentsInMapping)
-
-    /*for (AgentInMappingVM* agentInMapping : agentsInMapping)
-    {
-        if ((agentInMapping != nullptr) && (agentInMapping->temporaryMapping() != nullptr) && !agentInMapping->models()->isEmpty())
-        {
-            QJsonObject jsonAgent;
-
-            // Set the agent name
-            jsonAgent.insert("agentName", agentInMapping->name());
-
-            // Set the position
-            QString position = QString("%1, %2").arg(QString::number(agentInMapping->position().x()), QString::number(agentInMapping->position().y()));
-            jsonAgent.insert("position", position);
-
-            // Set the mapping
-            QJsonObject jsonMapping = exportAgentMappingToJson(agentInMapping->temporaryMapping());
-            jsonAgent.insert("mapping", jsonMapping);
-
-            // Append to the list of agents
-            jsonArray.append(jsonAgent);
-        }
-    }*/
-
-    return jsonArray;
-}
-
-
-/**
  * @brief Create a model of record from JSON data
  * @param byteArrayOfJson
  * @return

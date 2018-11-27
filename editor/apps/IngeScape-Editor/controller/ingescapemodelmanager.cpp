@@ -541,10 +541,10 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
 
 
 /**
- * @brief Export the agents list to JSON
- * @return
+ * @brief Export the agents into JSON
+ * @return array of all agents (grouped by name)
  */
-QJsonArray IngeScapeModelManager::exportAgentsListToJSON()
+QJsonArray IngeScapeModelManager::exportAgentsToJSON()
 {
     QJsonArray jsonArrayAgentsGroupedByName = QJsonArray();
 
@@ -630,8 +630,8 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile()
     {
         qInfo() << "Save the agents list to JSON file" << agentsListFilePath;
 
-        // Export the agents list to JSON
-        QJsonArray jsonArrayOfAgents = exportAgentsListToJSON();
+        // Export the agents into JSON
+        QJsonArray jsonArrayOfAgents = exportAgentsToJSON();
 
         QJsonObject jsonRoot = QJsonObject();
         jsonRoot.insert("agents", jsonArrayOfAgents);
