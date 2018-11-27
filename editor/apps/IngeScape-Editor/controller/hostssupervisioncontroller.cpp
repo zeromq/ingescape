@@ -34,7 +34,6 @@ HostsSupervisionController::HostsSupervisionController(IngeScapeModelManager* mo
     // Hosts are sorted on their name (alphabetical order)
     _hostsList.setSortProperty("name");
 
-    // FIXME REPAIR setcanBeRestarted()
 }
 
 
@@ -164,7 +163,7 @@ void HostsSupervisionController::onHostModelWillBeDeleted(HostM* host)
  */
 void HostsSupervisionController::onAgentModelHasBeenCreated(AgentM* agent)
 {
-    if (agent != nullptr)
+    if ((agent != nullptr) && !agent->hostname().isEmpty())
     {
         _allAgents.append(agent);
 
@@ -175,6 +174,9 @@ void HostsSupervisionController::onAgentModelHasBeenCreated(AgentM* agent)
         {
             // Add this agent to the host
             hostVM->agentsList()->append(agent);
+
+            // This agent can be restarted
+            agent->setcanBeRestarted(true);
 
             qDebug() << "Add agent" << agent->name() << "to host" << hostVM->name();
         }
@@ -188,7 +190,7 @@ void HostsSupervisionController::onAgentModelHasBeenCreated(AgentM* agent)
  */
 void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
 {
-    if (agent != nullptr)
+    if ((agent != nullptr) && !agent->hostname().isEmpty())
     {
         _allAgents.removeOne(agent);
 

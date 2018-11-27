@@ -899,18 +899,20 @@ void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostName, 
                 host->setstreamingPort(streamingPort);
             }
         }
-    }
 
-    // Traverse the list of all agents grouped by name
-    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
-    {
-        if (agentsGroupedByName != nullptr)
+        // Traverse the list of all agents grouped by name
+        for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
         {
-            // Traverse the list of its models
-            for (AgentM* agent : agentsGroupedByName->models()->toList())
+            if (agentsGroupedByName != nullptr)
             {
-                if ((agent != nullptr) && (agent->hostname() == hostName) && !agent->commandLine().isEmpty()) {
-                    agent->setcanBeRestarted(true);
+                // Traverse the list of its models
+                for (AgentM* agent : agentsGroupedByName->models()->toList())
+                {
+                    if ((agent != nullptr) && (agent->hostname() == hostName) && !agent->commandLine().isEmpty())
+                    {
+                        // This agent can be restarted
+                        agent->setcanBeRestarted(true);
+                    }
                 }
             }
         }
@@ -940,18 +942,20 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
             // Free memory
             delete host;
         }
-    }
 
-    // Traverse the list of all agents grouped by name
-    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
-    {
-        if (agentsGroupedByName != nullptr)
+        // Traverse the list of all agents grouped by name
+        for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
         {
-            // Traverse the list of all models
-            for (AgentM* agent : agentsGroupedByName->models()->toList())
+            if (agentsGroupedByName != nullptr)
             {
-                if ((agent != nullptr) && (agent->hostname() == hostName)) {
-                    agent->setcanBeRestarted(false);
+                // Traverse the list of all models
+                for (AgentM* agent : agentsGroupedByName->models()->toList())
+                {
+                    if ((agent != nullptr) && (agent->hostname() == hostName))
+                    {
+                        // This agent can NOT be restarted
+                        agent->setcanBeRestarted(false);
+                    }
                 }
             }
         }
