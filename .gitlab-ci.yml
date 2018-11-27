@@ -22,16 +22,24 @@ stages:
       - configure.ac
       - Makefile.am
 
-# Define ingescape installer files
-.build-ingescape-installer: &build-ingescape-installer
+# Define ingescape windows installer files
+.build-ingescape-installer-windows: &build-ingescape-installer-windows
   <<: *default-conditions
   only:
     changes:
       - packaging/windows/*
 
+# Define ingescape redhat installer files
+.build-ingescape-installer-redhat: &build-ingescape-installer-redhat
+  <<: *default-conditions
+  only:
+    changes:
+      - packaging/redhat/*
+
 # Create ingescape library for linux
 linux-x86:
   <<: *build-ingescape-files
+  <<: *build-ingescape-installer-redhat
   stage: linux
   image: fafesty/compile-with-zyre
   script:
@@ -40,15 +48,16 @@ linux-x86:
     - ./configure
     - make
     - mkdir linux-x86
-    - cp src/libingescape.la src/.libs/libingescape.a src/.libs/libingescape.so src/.libs/libingescape.so.0 src/.libs/libingescape.so.0.8.1 linux-x86/
+    - cp -d src/libingescape.la src/.libs/libingescape.a src/.libs/libingescape.so src/.libs/libingescape.so.* linux-x86/
   artifacts:
     paths:
       - linux-x86
+    expire_in: 1 week
 
 # Create ingescape library for windows 64 bits
 win32-x86_64:
   <<: *build-ingescape-files
-  <<: *build-ingescape-installer
+  <<: *build-ingescape-installer-windows
   stage: cross
   image: fafesty/compile-with-zyre
   script:
@@ -68,7 +77,7 @@ win32-x86_64:
 # Create ingescape library for windows 32 bits
 win32-i686:
   <<: *build-ingescape-files
-  <<: *build-ingescape-installer
+  <<: *build-ingescape-installer-windows
   stage: cross
   image: fafesty/compile-with-zyre
   script:
@@ -88,7 +97,7 @@ win32-i686:
 # Create runtime install for windows
 installer-runtime:
   <<: *build-ingescape-files
-  <<: *build-ingescape-installer
+  <<: *build-ingescape-installer-windows
   stage: installer
   image: fafesty/compile-with-zyre
   script:
@@ -106,7 +115,7 @@ installer-runtime:
 # Create sdk install for windows
 installer-sdk:
   <<: *build-ingescape-files
-  <<: *build-ingescape-installer
+  <<: *build-ingescape-installer-windows
   stage: installer
   image: fafesty/compile-with-zyre
   script:
@@ -120,6 +129,26 @@ installer-sdk:
   artifacts:
     paths:
       - Ingescape-Sdk-Installer.exe
+
+installer-redhat:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer-redhat
+  stage: installer
+  image: fafesty/compile-with-zyre
+  script:
+   - apt-get update
+   - apt-get install -y rpm
+   - mkdir -p $HOME/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+   - ln -s packaging/redhat/rpmmacros $HOME/.rpmmacros
+   - touch $HOME/rpmbuild/SOURCES/empty
+   - VERSION=$(builds/m4-scripts/gen-ingescape-version src/admin.c); INGESCAPE_SOURCE=$(pwd); rpmbuild -ba --define "_VERSION_I $VERSION" --define "_INGESCAPE_SOURCE $INGESCAPE_SOURCE" packaging/redhat/libingescape.spec
+   - mkdir redhat-x86_64
+   - mv /root/rpmbuild/RPMS/x86_64/* redhat-x86_64/
+  dependencies:
+    - linux-x86
+  artifacts:
+    paths:
+      - redhat-x86_64
 
 # TODO Add job to package for debian
 # TODO Add job to package for redhat
