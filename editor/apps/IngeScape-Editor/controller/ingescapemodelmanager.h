@@ -134,6 +134,13 @@ public:
 
 
     /**
+     * @brief Get the hash table from a name to the group of agents with this name
+     * @return
+     */
+    QHash<QString, AgentsGroupedByNameVM*> getHashTableFromNameToAgentsGrouped();
+
+
+    /**
      * @brief Import an agent or an agents list from selected file (definition)
      */
     Q_INVOKABLE bool importAgentOrAgentsListFromSelectedFile();

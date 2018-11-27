@@ -149,8 +149,11 @@ void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
 {
     if ((_modelManager != nullptr) && (_jsonHelper != nullptr))
     {
+        // Get the hash table from a name to the group of agents with this name
+        QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped = _modelManager->getHashTableFromNameToAgentsGrouped();
+
         // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
-        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, _modelManager->allAgentsGroupsByName()->toList());
+        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, hashFromNameToAgentsGrouped);
         if (scenarioToImport != nullptr)
         {
             // Append the list of actions

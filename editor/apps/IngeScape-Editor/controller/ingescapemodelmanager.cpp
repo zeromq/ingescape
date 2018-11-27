@@ -315,6 +315,16 @@ AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString na
 
 
 /**
+ * @brief Get the hash table from a name to the group of agents with this name
+ * @return
+ */
+QHash<QString, AgentsGroupedByNameVM*> IngeScapeModelManager::getHashTableFromNameToAgentsGrouped()
+{
+    return _hashFromNameToAgentsGrouped;
+}
+
+
+/**
  * @brief Import an agent or an agents list from selected file (definition)
  */
 bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()

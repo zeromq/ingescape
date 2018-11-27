@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -21,15 +21,9 @@
 #include <QJsonArray>
 
 #include <I2PropertyHelpers.h>
-
 #include <viewModel/agentinmappingvm.h>
 #include <model/recordm.h>
 #include <model/scenario/scenariom.h>
-
-#include "viewModel/scenario/actionvm.h"
-#include "viewModel/scenario/actioneffectvm.h"
-#include "viewModel/scenario/actionconditionvm.h"
-#include "viewModel/scenario/actioninpalettevm.h"
 
 
 /**
@@ -125,10 +119,11 @@ public:
     /**
      * @brief Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
      * @param jsonScenario
-     * @param allAgentsGroupsByName
+     * @param hashFromNameToAgentsGrouped
      * @return
      */
-    ScenarioM* createModelOfScenarioFromJSON(QJsonObject jsonScenario, QList<AgentsGroupedByNameVM*> allAgentsGroupsByName);
+    ScenarioM* createModelOfScenarioFromJSON(QJsonObject jsonScenario,
+                                             QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
 
 
     /**
@@ -151,7 +146,9 @@ public:
 
 Q_SIGNALS:
 
+
 public Q_SLOTS:
+
 
 private:
 
@@ -184,19 +181,21 @@ private:
     /**
      * @brief Create an action effect VM from JSON object
      * @param jsonEffect
-     * @param allAgentsGroupsByName
+     * @param hashFromNameToAgentsGrouped
      * @return
      */
-    ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentsGroupedByNameVM*> allAgentsGroupsByName);
+    ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect,
+                                           QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
 
 
     /**
      * @brief Create an action condition VM from JSON object
      * @param jsonObject
-     * @param allAgentsGroupsByName
+     * @param hashFromNameToAgentsGrouped
      * @return
      */
-    ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentsGroupedByNameVM*> allAgentsGroupsByName);
+    ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition,
+                                                  QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
 
 };
 
