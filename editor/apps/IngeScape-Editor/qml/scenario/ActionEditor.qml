@@ -1550,12 +1550,12 @@ WindowBlockTouches {
                                             visible: (myCondition && (myCondition.conditionType === ActionConditionTypes.VALUE))
                                             enabled: visible
 
-                                            model: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIopList : 0
+                                            model: (myCondition && myCondition.modelM) ? myCondition.modelM.iopMergedList : 0
 
                                             Binding {
                                                 target: ioCombo
                                                 property: "selectedIndex"
-                                                value: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIopList.indexOf(myCondition.modelM.agentIOP)
+                                                value: (myCondition && myCondition.modelM) ? myCondition.modelM.iopMergedList.indexOf(myCondition.modelM.agentIOP)
                                                                                            : -1
                                             }
 
@@ -1642,7 +1642,7 @@ WindowBlockTouches {
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
 
-                                        text : myCondition && myCondition.modelM ? myCondition.modelM.value : ""
+                                        text : myCondition && myCondition.modelM ? myCondition.modelM.comparisonValue : ""
 
                                         style: I2TextFieldStyle {
                                             backgroundColor: IngeScapeTheme.darkBlueGreyColor
@@ -1678,14 +1678,14 @@ WindowBlockTouches {
 
                                         onTextChanged: {
                                             if (activeFocus && (myCondition && myCondition.modelM)) {
-                                                myCondition.modelM.value = text;
+                                                myCondition.modelM.comparisonValue = text;
                                             }
                                         }
 
                                         Binding {
                                             target: textFieldComparisonValue
                                             property: "text"
-                                            value: (myCondition && myCondition.modelM) ? myCondition.modelM.value : ""
+                                            value: (myCondition && myCondition.modelM) ? myCondition.modelM.comparisonValue : ""
                                         }
                                     }
 

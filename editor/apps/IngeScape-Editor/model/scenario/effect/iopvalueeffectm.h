@@ -25,16 +25,17 @@
 
 
 /**
- * @brief The IOPValueEffectM class defines an action effect on iop value
+ * @brief The IOPValueEffectM class defines an action effect on an IOP value
  */
 class IOPValueEffectM : public ActionEffectM
 {
     Q_OBJECT
 
-    // Agent Input/Output/Parameter
+    // View model of agent Input/Output/Parameter
+    //I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPVM*, agentIOP)
     I2_QML_PROPERTY(AgentIOPVM*, agentIOP)
 
-    // Value converted into string
+    // Value (in string format)
     I2_QML_PROPERTY(QString, value)
 
     // Merged list of Inputs/Outputs/Parameters of the agent
@@ -92,6 +93,13 @@ Q_SIGNALS:
 
 
 protected Q_SLOTS:
+
+    /**
+     * @brief Slot called when our agent IOP is destroyed
+     * @param sender
+     */
+    //void _onAgentIOPDestroyed(QObject* sender);
+
 
     /**
      * @brief Slot called when some view models of inputs have been added to the agent(s grouped by name)

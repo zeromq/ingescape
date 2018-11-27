@@ -57,6 +57,33 @@ IOPValueEffectM::~IOPValueEffectM()
 
 
 /**
+* @brief Setter for property "Agent IOP"
+* @param value
+*/
+/*void IOPValueEffectM::setagentIOP(AgentIOPVM* value)
+{
+    if (_agentIOP != value)
+    {
+        if (_agentIOP != nullptr)
+        {
+            // UN-subscribe to destruction
+            disconnect(_agentIOP, &AgentIOPVM::destroyed, this, &IOPValueEffectM::_onAgentIOPDestroyed);
+        }
+
+        _agentIOP = value;
+
+        if (_agentIOP != nullptr)
+        {
+            // Subscribe to destruction
+            connect(_agentIOP, &AgentIOPVM::destroyed, this, &IOPValueEffectM::_onAgentIOPDestroyed);
+        }
+
+        Q_EMIT agentIOPChanged(value);
+    }
+}*/
+
+
+/**
 * @brief Copy from another effect model
 * @param effect to copy
 */
@@ -100,11 +127,11 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
         if (previousAgent != nullptr)
         {
             // DIS-connect to signals from the agents grouped by name
-            disconnect(_agent, 0, this, 0);
+            disconnect(previousAgent, 0, this, 0);
         }
 
         // Reset the agent IOP
-        qDebug() << "setagent: setagentIOP(nullptr)";
+        //qDebug() << "IOPValueEffectM::setagentIOP(nullptr)";
         setagentIOP(nullptr);
 
         // Clear the list
@@ -138,7 +165,7 @@ void IOPValueEffectM::setagent(AgentsGroupedByNameVM* agent)
             // By default, select the first item
             if (!_iopMergedList.isEmpty())
             {
-                qDebug() << "setagent: setagentIOP(first item by default)";
+                //qDebug() << "IOPValueEffectM::setagentIOP(first item by default)";
                 setagentIOP(_iopMergedList.at(0));
             }
          }
@@ -269,6 +296,18 @@ QPair<QString, QStringList> IOPValueEffectM::getAgentNameAndReverseCommandWithPa
 
     return pairAgentNameAndReverseCommand;
 }
+
+
+/**
+ * @brief Slot called when our agent IOP is destroyed
+ * @param sender
+ */
+/*void IOPValueEffectM::_onAgentIOPDestroyed(QObject* sender)
+{
+    Q_UNUSED(sender)
+
+    setagentIOP(nullptr);
+}*/
 
 
 /**

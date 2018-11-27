@@ -34,7 +34,7 @@ ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
  */
 ActionEffectM::~ActionEffectM()
 {
-    // Reset agent to null
+    // Reset agent
     setagent(nullptr);
 }
 

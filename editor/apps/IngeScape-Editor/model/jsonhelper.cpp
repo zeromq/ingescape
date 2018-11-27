@@ -647,12 +647,12 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
                 {
                 case ActionConditionTypes::VALUE:
                 {
-                    IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(actionCondition);
-                    if ((iopCondition != nullptr) && (iopCondition->agentIOP() != nullptr))
+                    IOPValueConditionM* iopValueCondition = qobject_cast<IOPValueConditionM*>(actionCondition);
+                    if ((iopValueCondition != nullptr) && (iopValueCondition->agentIOP() != nullptr))
                     {
-                        jsonCondition.insert("iop_name", iopCondition->agentIOP()->name());
-                        jsonCondition.insert("operator", ValueComparisonTypes::staticEnumToKey(iopCondition->valueComparisonType()));
-                        jsonCondition.insert("value", iopCondition->value());
+                        jsonCondition.insert("iop_name", iopValueCondition->agentIOP()->name());
+                        jsonCondition.insert("operator", ValueComparisonTypes::staticEnumToKey(iopValueCondition->valueComparisonType()));
+                        jsonCondition.insert("value", iopValueCondition->comparisonValue());
 
                         jsonFilled = true;
                     }
@@ -1205,23 +1205,23 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                         if ((agent != nullptr) && (agentIOP != nullptr))
                         {
                             // Create model
-                            IOPValueEffectM* iopEffectM = new IOPValueEffectM();
+                            IOPValueEffectM* iopValueEffect = new IOPValueEffectM();
 
                             // Create view model
                             actionEffectVM = new ActionEffectVM();
                             actionEffectVM->seteffectType(ActionEffectTypes::VALUE);
 
-                            actionEffectVM->setmodelM(iopEffectM);
+                            actionEffectVM->setmodelM(iopValueEffect);
 
                             // set value
                             jsonValue = jsonEffect.value("value");
                             if (jsonValue.isString()) {
-                                iopEffectM->setvalue(jsonValue.toString());
+                                iopValueEffect->setvalue(jsonValue.toString());
                             }
 
                             // set agent and agent I/O/P
-                            iopEffectM->setagent(agent);
-                            iopEffectM->setagentIOP(agentIOP);
+                            iopValueEffect->setagent(agent);
+                            iopValueEffect->setagentIOP(agentIOP);
                         }
                     }
 
@@ -1290,9 +1290,6 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                         AgentIOPVM* input = nullptr;
                         AgentsGroupedByNameVM* outputAgent = nullptr;
                         AgentIOPVM* output = nullptr;
-
-                        //QList<AgentIOPM*> outputsList;
-                        //QList<AgentIOPM*> inputsList;
 
                         for (AgentsGroupedByNameVM* iterator : allAgentsGroupsByName)
                         {
@@ -1383,65 +1380,91 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                     if (jsonAgentName.isString() && jsonIOPName.isString())
                     {
-                        // Check agent name and iop name exists
                         QString agentName = jsonAgentName.toString();
+
+                        /*AgentIOPTypes::Value agentIOPType = AgentIOPTypes::INPUT;
+                        int nAgentIOPType = AgentIOPTypes::staticEnumFromKey(jsonIOPType.toString());
+                        if (nAgentIOPType > -1) {
+                            agentIOPType = static_cast<AgentIOPTypes::Value>(nAgentIOPType);
+                        }*/
+
                         QString agentIOPName = jsonIOPName.toString();
 
                         AgentsGroupedByNameVM* agent = nullptr;
-                        AgentIOPM* iopAgentM = nullptr;
-                        bool found = false;
+                        AgentIOPVM* agentIOP = nullptr;
 
                         for (AgentsGroupedByNameVM* iterator : allAgentsGroupsByName)
                         {
-                            if (iterator->name() == agentName)
+                            if ((iterator != nullptr) && (iterator->name() == agentName))
                             {
                                 agent = iterator;
 
-                                // Go only through outputs
-                                for (OutputVM* outputVM : agent->outputsList()->toList())
+                                /*switch (agentIOPType)
                                 {
-                                    if ((outputVM != nullptr) && (outputVM->firstModel() != nullptr))
-                                    {
-                                        if (!found && (outputVM->name() == agentIOPName))
-                                        {
-                                            iopAgentM = outputVM->firstModel();
-                                            found = true;
-                                        }
+                                case AgentIOPTypes::INPUT:
+                                {
+                                    QList<InputVM*> inputsWithSameName = agent->getInputsListFromName(agentIOPName);
+                                    if (!inputsWithSameName.isEmpty()) {
+                                        agentIOP = inputsWithSameName.at(0);
                                     }
+                                    break;
                                 }
+                                case AgentIOPTypes::OUTPUT:
+                                {
+                                    QList<OutputVM*> outputsWithSameName = agent->getOutputsListFromName(agentIOPName);
+                                    if (!outputsWithSameName.isEmpty()) {
+                                        agentIOP = outputsWithSameName.at(0);
+                                    }
+                                    break;
+                                }
+                                case AgentIOPTypes::PARAMETER:
+                                {
+                                    QList<ParameterVM*> parametersWithSameName = agent->getParametersListFromName(agentIOPName);
+                                    if (!parametersWithSameName.isEmpty()) {
+                                        agentIOP = parametersWithSameName.at(0);
+                                    }
+                                    break;
+                                }
+                                default:
+                                    break;
+                                }*/
 
+                                QList<OutputVM*> outputsWithSameName = agent->getOutputsListFromName(agentIOPName);
+                                if (!outputsWithSameName.isEmpty()) {
+                                    agentIOP = outputsWithSameName.at(0);
+                                }
                                 break;
                             }
                         }
 
-                        if ((agent != nullptr) && (iopAgentM != nullptr))
+                        if ((agent != nullptr) && (agentIOP != nullptr))
                         {
                             // Create model
-                            IOPValueConditionM* iopConditionM = new IOPValueConditionM();
+                            IOPValueConditionM* iopValueCondition = new IOPValueConditionM();
 
                             // Create view model
                             actionConditionVM = new ActionConditionVM();
                             actionConditionVM->setconditionType(ActionConditionTypes::VALUE);
 
-                            actionConditionVM->setmodelM(iopConditionM);
+                            actionConditionVM->setmodelM(iopValueCondition);
 
-                            // set operator
+                            // set the operator (value comparison type)
                             jsonValue = jsonCondition.value("operator");
                             if (jsonValue.isString())
                             {
                                 int nValueComparisonType = ValueComparisonTypes::staticEnumFromKey(jsonValue.toString().toUpper());
-                                iopConditionM->setvalueComparisonType(static_cast<ValueComparisonTypes::Value>(nValueComparisonType));
+                                iopValueCondition->setvalueComparisonType(static_cast<ValueComparisonTypes::Value>(nValueComparisonType));
                             }
 
-                            // set value
+                            // set the comparison value
                             jsonValue = jsonCondition.value("value");
                             if (jsonValue.isString()) {
-                                iopConditionM->setvalue(jsonValue.toString());
+                                iopValueCondition->setcomparisonValue(jsonValue.toString());
                             }
 
-                            // set agent
-                            iopConditionM->setagent(agent);
-                            iopConditionM->setagentIOP(iopAgentM);                            
+                            // set agent and agent I/O/P
+                            iopValueCondition->setagent(agent);
+                            iopValueCondition->setagentIOP(agentIOP);
                         }
                     }
 

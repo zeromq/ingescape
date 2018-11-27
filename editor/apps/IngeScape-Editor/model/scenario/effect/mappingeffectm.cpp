@@ -132,14 +132,14 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
 * @brief Custom setter for output
 * @param output
 */
-/*void MappingEffectM::setoutput(AgentIOPM* value)
+/*void MappingEffectM::setoutput(AgentIOPVM* value)
 {
     if (_output != value)
     {
         if (_output != nullptr)
         {
             // UnSubscribe to destruction
-            disconnect(_output, &AgentIOPM::destroyed, this, &MappingEffectM::_onOutputDestroyed);
+            disconnect(_output, &AgentIOPVM::destroyed, this, &MappingEffectM::_onOutputDestroyed);
         }
 
         _output = value;
@@ -149,7 +149,7 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
             setoutputName(_output->name());
 
             // Subscribe to destruction
-            connect(_output, &AgentIOPM::destroyed, this, &MappingEffectM::_onOutputDestroyed);
+            connect(_output, &AgentIOPVM::destroyed, this, &MappingEffectM::_onOutputDestroyed);
         }
 
         Q_EMIT outputChanged(value);
@@ -161,14 +161,14 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
 * @brief Custom setter for input
 * @param input
 */
-/*void MappingEffectM::setinput(AgentIOPM* value)
+/*void MappingEffectM::setinput(AgentIOPVM* value)
 {
     if (_input != value)
     {
         if (_input != nullptr)
         {
             // UnSubscribe to destruction
-            disconnect(_input, &AgentIOPM::destroyed, this, &MappingEffectM::_onInputDestroyed);
+            disconnect(_input, &AgentIOPVM::destroyed, this, &MappingEffectM::_onInputDestroyed);
         }
 
         _input = value;
@@ -178,7 +178,7 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
             setinputName(_input->name());
 
             // Subscribe to destruction
-            connect(_input, &AgentIOPM::destroyed, this, &MappingEffectM::_onInputDestroyed);
+            connect(_input, &AgentIOPVM::destroyed, this, &MappingEffectM::_onInputDestroyed);
         }
 
         Q_EMIT inputChanged(value);

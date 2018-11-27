@@ -123,7 +123,7 @@ void ConditionOnAgentM::resetConnections()
 
 
 /**
- * @brief Slot called when the flag "is ON" of an agent changed
+ * @brief Slot called when the flag "is ON" of the agent changed
  * @param isON
  */
 void ConditionOnAgentM::_onAgentIsOnChanged(bool isON)
@@ -132,11 +132,12 @@ void ConditionOnAgentM::_onAgentIsOnChanged(bool isON)
          ||
          ((_agentConditionValue == AgentConditionValues::OFF) && !isON) )
     {
-        // Update flag "is Valid"
+        // Update the flag "is Valid"
         setisValid(true);
     }
-    else {
-        // Update flag "is Valid"
+    else
+    {
+        // Update the flag "is Valid"
         setisValid(false);
     }
 }

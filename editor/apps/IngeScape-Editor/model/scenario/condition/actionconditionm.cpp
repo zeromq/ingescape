@@ -34,6 +34,9 @@ ActionConditionM::~ActionConditionM()
 {
     // Reset the agent connections
     resetConnections();
+
+    // Reset agent
+    setagent(nullptr);
 }
 
 
@@ -114,7 +117,7 @@ void ActionConditionM::resetConnections()
 
 
 /**
- * @brief Slot called when the flag "is ON" of an agent changed
+ * @brief Slot called when the flag "is ON" of the agent changed
  * @param isON
  */
 void ActionConditionM::_onAgentIsOnChanged(bool isON)
