@@ -217,7 +217,7 @@ void AgentInMappingVM::_onInputsHaveBeenAdded(QList<InputVM*> newInputs)
     {
         if ((input != nullptr) && !input->name().isEmpty())
         {
-            qDebug() << "_onInputsHaveBeenAdded" << input->name();
+            //qDebug() << "AgentInMappingVM::_onInputsHaveBeenAdded" << input->name();
 
             LinkInputVM* linkInput = new LinkInputVM(input);
 
@@ -256,7 +256,7 @@ void AgentInMappingVM::_onOutputsHaveBeenAdded(QList<OutputVM*> newOutputs)
     {
         if ((output != nullptr) && !output->name().isEmpty())
         {
-            qDebug() << "_onOutputsHaveBeenAdded" << output->name();
+            //qDebug() << "AgentInMappingVM::_onOutputsHaveBeenAdded" << output->name();
 
             LinkOutputVM* linkOutput = new LinkOutputVM(output);
 
@@ -295,7 +295,7 @@ void AgentInMappingVM::_onInputsWillBeRemoved(QList<InputVM*> oldInputs)
     {
         if ((input != nullptr) && !input->name().isEmpty())
         {
-            qDebug() << "_onInputsWillBeRemoved" << input->name();
+            //qDebug() << "AgentInMappingVM::_onInputsWillBeRemoved" << input->name();
 
             // Get the list of view models of link input for this name
             QList<LinkInputVM*> linkInputsWithSameName = getLinkInputsListFromName(input->name());
@@ -368,7 +368,7 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
     {
         if ((output != nullptr) && !output->name().isEmpty())
         {
-            qDebug() << "_onOutputsWillBeRemoved" << output->name();
+            //qDebug() << "AgentInMappingVM::_onOutputsWillBeRemoved" << output->name();
 
             // Get the list of view models of link output for this name
             QList<LinkOutputVM*> linkOutputsWithSameName = getLinkOutputsListFromName(output->name());

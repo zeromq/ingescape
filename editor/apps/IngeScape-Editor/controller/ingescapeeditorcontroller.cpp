@@ -954,13 +954,11 @@ void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
             _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
         }
 
-        // FIXME REPAIR: suite de _loadPlatformFromJSON (importMappingFromJson)
-
-        // Import the mapping of agents from JSON
-        /*if ((_agentsMappingC != nullptr) && jsonRoot.contains("mapping"))
+        // Import the global mapping (of agents) from JSON
+        if ((_agentsMappingC != nullptr) && jsonRoot.contains("mapping"))
         {
             _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
-        }*/
+        }
 
         // Import the scenario from JSON
         if ((_scenarioC != nullptr) && jsonRoot.contains("scenario"))
@@ -997,6 +995,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
         // Save the mapping
         if (_agentsMappingC != nullptr)
         {
+            // Export the global mapping (of agents) into JSON
             QJsonArray arrayOfAgentsInMapping = _agentsMappingC->exportGlobalMappingToJSON();
 
             if (!arrayOfAgentsInMapping.isEmpty()) {

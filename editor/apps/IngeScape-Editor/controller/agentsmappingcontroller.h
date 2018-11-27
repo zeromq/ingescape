@@ -126,17 +126,17 @@ public:
 
 
     /**
-     * @brief Export the global mapping into JSON
+     * @brief Export the global mapping (of agents) into JSON
      * @return array of all agents and their mapping
      */
     QJsonArray exportGlobalMappingToJSON();
 
 
     /**
-     * @brief Import a mapping of agents from a JSON array
-     * @param jsonArrayOfAgentsMapping
+     * @brief Import the global mapping (of agents) from JSON
+     * @param jsonArrayOfAgentsInMapping
      */
-    void importMappingFromJson(QJsonArray jsonArrayOfAgentsMapping);
+    void importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping);
 
 
     /**

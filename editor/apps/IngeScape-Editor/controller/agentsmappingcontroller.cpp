@@ -383,7 +383,7 @@ LinkVM* AgentsMappingController::getLinkInMappingFromName(QString name)
 
 
 /**
- * @brief Export the global mapping into JSON
+ * @brief Export the global mapping (of agents) into JSON
  * @return array of all agents and their mapping
  */
 QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
@@ -418,19 +418,16 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
 
 
 /**
- * @brief Import a mapping of agents from a JSON array
- * @param jsonArrayOfAgentsMapping
+ * @brief Import the global mapping (of agents) from JSON
+ * @param jsonArrayOfAgentsInMapping
  */
-void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgentsMapping)
+void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping)
 {
-    // FIXME REPAIR: importMappingFromJson
-    Q_UNUSED(jsonArrayOfAgentsMapping)
-
-    /*if (_jsonHelper != nullptr)
+    if (_jsonHelper != nullptr)
     {
         QList<ElementMappingM*> mappingElements;
 
-        for (QJsonValue jsonValue : jsonArrayOfAgentsMapping)
+        for (QJsonValue jsonValue : jsonArrayOfAgentsInMapping)
         {
             if (jsonValue.isObject())
             {
@@ -465,14 +462,12 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                     // Get the (view model of) agents grouped for this name
                     AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
 
-                    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->models()->isEmpty() && !position.isNull())
+                    if ((agentsGroupedByName != nullptr) && (agentMapping != nullptr) && !position.isNull())
                     {
                         qDebug() << "Position:" << position.x() << position.y() << "is defined for" << agentName << "with" << agentsGroupedByName->models()->count() << "models";
 
-                        // FIXME TODO: use directly the AgentsGroupedByNameVM instead of agentsGroupedByName->models()->toList()
-
-                        // Create a new Agent In Mapping
-                        _addAgentModelsToMappingAtPosition(agentName, agentsGroupedByName->models()->toList(), position);
+                        // Create a new agent in the global mapping (with the "Agents Grouped by Name") at a specific position
+                        _createAgentInMappingAtPosition(agentsGroupedByName, position);
 
                         // Get the agent in mapping from the name
                         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
@@ -502,7 +497,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                 }
             }
         }
-    }*/
+    }
 }
 
 
