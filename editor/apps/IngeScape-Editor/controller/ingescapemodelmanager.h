@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -131,13 +131,6 @@ public:
      * @return
      */
     AgentsGroupedByNameVM* getAgentsGroupedForName(QString name);
-
-
-    /**
-     * @brief Get the map from agent name to list of active agents
-     * @return
-     */
-    //QHash<QString, QList<AgentM*>> getMapFromAgentNameToActiveAgentsList();
 
 
     /**

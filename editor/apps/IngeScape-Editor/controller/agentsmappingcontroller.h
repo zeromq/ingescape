@@ -180,20 +180,6 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Emitted when a new "Agent in Mapping" is added
-     * @param agent
-     */
-    //void agentInMappingAdded(AgentInMappingVM* addedAgent);
-
-
-    /**
-     * @brief Emitted when an "Agent in Mapping" is removed
-     * @param agent
-     */
-    //void agentInMappingRemoved(AgentInMappingVM* removedAgent);
-
-
-    /**
      * @brief Signal emitted when a command must be sent on the network to an agent
      * @param peerIdsList
      * @param command
@@ -223,14 +209,14 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "is Mapping Activated" changed
+     * @brief Slot called when the flag "is Mapping Activated" changed
      * @param isMappingActivated
      */
     void onIsMappingActivatedChanged(bool isMappingActivated);
 
 
     /**
-     * @brief Slot when the flag "is Mapping Controlled" changed
+     * @brief Slot called when the flag "is Mapping Controlled" changed
      * @param isMappingControlled
      */
     void onIsMappingControlledChanged(bool isMappingControlled);
@@ -325,15 +311,6 @@ private:
 
 
     /**
-     * @brief Add new model(s) of agent to the current mapping at a specific position
-     * @param agentName
-     * @param agentsList
-     * @param position
-     */
-    //void _addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position);
-
-
-    /**
      * @brief Delete a link between two agents
      * @param link
      */
@@ -356,9 +333,9 @@ private:
 
 
     /**
-     * @brief FIXME REPAIR: Update the (global) mapping with all models of agents and links
+     * @brief Update the global mapping with agents ON and their links
      */
-    void _updateMappingWithModelsOfAgentsAndLinks();
+    void _updateMappingWithAgentsONandLinks();
 
 
     /**
@@ -376,9 +353,6 @@ private:
 
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
-
-    // Previous list of agents in mapping
-    QList<AgentInMappingVM*> _previousListOfAgentsInMapping;
 
     // Hash table from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;

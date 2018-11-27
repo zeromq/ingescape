@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -312,36 +312,6 @@ AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString na
         return nullptr;
     }
 }
-
-
-/**
- * @brief Get the map from agent name to list of active agents
- * @return
- */
-/*QHash<QString, QList<AgentM*>> IngeScapeModelManager::getMapFromAgentNameToActiveAgentsList()
-{
-    QHash<QString, QList<AgentM*>> hashFromAgentNameToActiveAgentsList;
-
-    // Traverse the list of all agents grouped by name
-    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
-    {
-        if ((agentsGroupedByName != nullptr) && agentsGroupedByName->isON())
-        {
-            QList<AgentM*> activeAgentsList;
-            for (AgentM* agent : agentsGroupedByName->models()->toList())
-            {
-                if ((agent != nullptr) && agent->isON()) {
-                    activeAgentsList.append(agent);
-                }
-            }
-            if (!activeAgentsList.isEmpty()) {
-                hashFromAgentNameToActiveAgentsList.insert(agentsGroupedByName->name(), activeAgentsList);
-            }
-        }
-    }
-
-    return hashFromAgentNameToActiveAgentsList;
-}*/
 
 
 /**

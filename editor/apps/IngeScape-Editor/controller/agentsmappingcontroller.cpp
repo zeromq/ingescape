@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -43,6 +43,7 @@ AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelMan
 
     // Connect to signal "Count Changed" from the list of all agents in mapping
     connect(&_allAgentsInMapping, &AbstractI2CustomItemListModel::countChanged, this, &AgentsMappingController::_onAllAgentsInMappingChanged);
+
 }
 
 
@@ -58,13 +59,15 @@ AgentsMappingController::~AgentsMappingController()
     // DIS-connect from signal "Count Changed" from the list of agents in mapping
     disconnect(&_allAgentsInMapping, 0, this, 0);
 
+    // Clear the current mapping
+    clearMapping();
+
     // Delete all links
     _hashFromNameToLinkInMapping.clear();
     _hashFromAgentNameToListOfWaitingLinks.clear();
     _allLinksInMapping.deleteAllItems();
 
     // Delete all agents in mapping
-    _previousListOfAgentsInMapping.clear();
     _hashFromNameToAgentInMapping.clear();
     _allAgentsInMapping.deleteAllItems();
 
@@ -114,6 +117,9 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
         if (_selectedAgent == agent) {
             setselectedAgent(nullptr);
         }
+
+        // DIS-connect to signals from this agent in mapping
+        disconnect(agent, 0, this, 0);
 
         // Remove from the hash table
         _hashFromNameToAgentInMapping.remove(agent->name());
@@ -176,7 +182,8 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
                 delete mappingElement;
             }
             // Add this link to the hash
-            else {
+            else
+            {
                 ElementMappingM* mappingElement = new ElementMappingM(link->inputAgent()->name(),
                                                                       link->linkInput()->name(),
                                                                       link->outputAgent()->name(),
@@ -551,8 +558,8 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
     _hashFromLinkNameToRemovedLinkWhileMappingWasUNactivated.clear();
 
 
-    // Update the (global) mapping with all models of agents and links
-    _updateMappingWithModelsOfAgentsAndLinks();
+    // Update the global mapping with agents ON and their links
+    _updateMappingWithAgentsONandLinks();
 }
 
 
@@ -587,7 +594,7 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
 
 
 /**
- * @brief Slot when the flag "is Mapping Activated" changed
+ * @brief Slot called when the flag "is Mapping Activated" changed
  * @param isMappingActivated
  */
 void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivated)
@@ -639,8 +646,8 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
             }
             else
             {
-                // Update the (global) mapping with all models of agents and links
-                _updateMappingWithModelsOfAgentsAndLinks();
+                // Update the global mapping with agents ON and their links
+                _updateMappingWithAgentsONandLinks();
             }
         }
     }
@@ -648,12 +655,12 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
 
 
 /**
- * @brief Slot when the flag "is Mapping Controlled" changed
+ * @brief Slot called when the flag "is Mapping Controlled" changed
  * @param isMappingControlled
  */
 void AgentsMappingController::onIsMappingControlledChanged(bool isMappingControlled)
 {
-    qDebug() << "Mapping Ctrl Is Mapping Controlled Changed to" << isMappingControlled;
+    qDebug() << "AgentsMappingController: Is Mapping Controlled Changed to" << isMappingControlled;
 }
 
 
@@ -1011,52 +1018,6 @@ void AgentsMappingController::_onAllAgentsInMappingChanged()
     else {
         setisEmptyMapping(false);
     }
-
-    QList<AgentInMappingVM*> newListOfAgentsInMapping = _allAgentsInMapping.toList();
-
-    // Agent in Mapping added
-    if (_previousListOfAgentsInMapping.count() < newListOfAgentsInMapping.count())
-    {
-        //qDebug() << _previousListOfAgentsInMapping.count() << "--> Agent in Mapping ADDED --> " << newListOfAgentsInMapping.count();
-
-        for (AgentInMappingVM* agentInMapping : newListOfAgentsInMapping)
-        {
-            if ((agentInMapping != nullptr) && !_previousListOfAgentsInMapping.contains(agentInMapping))
-            {
-                qDebug() << "Agents Mapping Controller: Agent in mapping" << agentInMapping->name() << "ADDED";
-
-                // Emit the signal "Agent in Mapping Added"
-                //Q_EMIT agentInMappingAdded(agentInMapping);
-
-                // FIXME REPAIR: Connect to signals from the new agent in mapping
-                /*connect(agentInMapping, &AgentInMappingVM::inputsListHaveBeenAdded, this, &AgentsMappingController::_onInputsListHaveBeenAdded);
-                connect(agentInMapping, &AgentInMappingVM::outputsListHaveBeenAdded, this, &AgentsMappingController::_onOutputsListHaveBeenAdded);
-                connect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
-                connect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);*/
-            }
-        }
-    }
-    // Agent in Mapping removed
-    else if (_previousListOfAgentsInMapping.count() > newListOfAgentsInMapping.count())
-    {
-        //qDebug() << _previousListOfAgentsInMapping.count() << "--> Agent in Mapping REMOVED --> " << newListOfAgentsInMapping.count();
-
-        for (AgentInMappingVM* agentInMapping : _previousListOfAgentsInMapping)
-        {
-            if ((agentInMapping != nullptr) && !newListOfAgentsInMapping.contains(agentInMapping))
-            {
-                qDebug() << "Agents Mapping Controller: Agent in mapping" << agentInMapping->name() << "REMOVED";
-
-                // Emit the signal "Agent in Mapping Removed"
-                //Q_EMIT agentInMappingRemoved(agentInMapping);
-
-                // DIS-connect to signals from the previous agent in mapping
-                disconnect(agentInMapping, 0, this, 0);
-            }
-        }
-    }
-
-    _previousListOfAgentsInMapping = newListOfAgentsInMapping;
 }
 
 
@@ -1192,6 +1153,12 @@ void AgentsMappingController::_createAgentInMappingAtPosition(AgentsGroupedByNam
             // Create a new view model of agent in the global Mapping
             agentInMapping = new AgentInMappingVM(agentsGroupedByName, position, this);
 
+            // FIXME REPAIR: Connect to signals from the new agent in mapping
+            /*connect(agentInMapping, &AgentInMappingVM::inputsListHaveBeenAdded, this, &AgentsMappingController::_onInputsListHaveBeenAdded);
+            connect(agentInMapping, &AgentInMappingVM::outputsListHaveBeenAdded, this, &AgentsMappingController::_onOutputsListHaveBeenAdded);
+            connect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
+            connect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);*/
+
             // Add in the hash table
             _hashFromNameToAgentInMapping.insert(agentsGroupedByName->name(), agentInMapping);
 
@@ -1205,49 +1172,6 @@ void AgentsMappingController::_createAgentInMappingAtPosition(AgentsGroupedByNam
         }
     }
 }
-
-
-/**
- * @brief Add new model(s) of agent to the current mapping at a specific position
- * @param agentName
- * @param agentsList
- * @param position
- */
-/*void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position)
-{
-    if (!agentName.isEmpty() && !agentsList.isEmpty())
-    {
-        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
-
-        // The agent is defined, only add models of agent in the internal list of the agentInMappingVM
-        if (agentInMapping != nullptr)
-        {   
-            for (AgentM* model : agentsList)
-            {
-                if ((model != nullptr) && !agentInMapping->models()->contains(model))
-                {
-                    agentInMapping->models()->append(model);
-
-                    qInfo() << "The agent in mapping already exist, new agent model added to" << agentName;
-                }
-            }
-        }
-        // Instanciate a new view model of agent in mapping (and add models)
-        else
-        {
-            // Create a new Agent In Mapping
-            agentInMapping = new AgentInMappingVM(agentsList, position, this);
-
-            // Add in the map list
-            _hashFromNameToAgentInMapping.insert(agentName, agentInMapping);
-
-            // Add this new Agent In Mapping VM in the list for the qml
-            _allAgentsInMapping.append(agentInMapping);
-
-            qInfo() << "A new agent mapping has been added:" << agentName;
-        }
-    }
-}*/
 
 
 /**
@@ -1330,82 +1254,68 @@ void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, 
 
 
 /**
- * @brief FIXME REPAIR: Update the (global) mapping with all models of agents and links
+ * @brief Update the global mapping with agents ON and their links
  */
-void AgentsMappingController::_updateMappingWithModelsOfAgentsAndLinks()
+void AgentsMappingController::_updateMappingWithAgentsONandLinks()
 {
     if (_modelManager != nullptr)
     {
-        // FIXME: use AgentsGroupedByNameVM instead of the function "getMapFromAgentNameToActiveAgentsList"
+        double randomMax = (double)RAND_MAX;
 
-        /*// Traverse the list of all "agents grouped by name"
-        for (AgentsGroupedByNameVM* agentsGroupedByName : _modelManager->allAgentsGroupsByName())
+        // Traverse the list of all "agents grouped by name"
+        for (AgentsGroupedByNameVM* agentsGroupedByName : _modelManager->allAgentsGroupsByName()->toList())
         {
             // Only when the agent(s) is ON
-            if ((agentsGroupedByName != nullptr) && agentsGroupedByName->isON())
+            if ((agentsGroupedByName != nullptr) && agentsGroupedByName->isON() && !agentsGroupedByName->name().isEmpty())
             {
+                AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
 
-            }
-        }*/
-
-        // FIXME REPAIR: _updateMappingWithModelsOfAgentsAndLinks
-
-        /*// Get the map from agent name to list of active agents
-        QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
-
-        if (!mapFromAgentNameToActiveAgentsList.isEmpty())
-        {
-            double randomMax = (double)RAND_MAX;
-
-            // For each name of agent, we get all models of active agent (ON) and:
-            // - create the corresponding agent in the mapping (VM) if not yet added
-            // - or add eventually new model to existing agent in the mapping (VM)
-            for (QString agentName : mapFromAgentNameToActiveAgentsList.keys())
-            {
-                QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
-
-                // Get a random position in the current window
-                QPointF position = _getRandomPosition(randomMax);
-
-                //qDebug() << "Random position:" << position << "for agent" << agentName;
-
-                // Add new model(s) of agent to the current mapping
-                _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
-
-                // Add the "Agents Grouped by Name" to the current mapping at a specific position
-                //_addAgentsGroupedByNameToMappingAtPosition(agentsGroupedByName, position);
-            }
-
-            // Create all links between agents in the mapping
-            // By looking the mapping of each (sub) model of the VM
-            for (AgentInMappingVM* agent : _allAgentsInMapping.toList())
-            {
-                if ((agent != nullptr) && (agent->temporaryMapping() != nullptr))
+                // This agent(s) is NOT yet in the global mapping
+                if (agentInMapping == nullptr)
                 {
-                    // First, delete all "mapping elements" in the temporary mapping
-                    agent->temporaryMapping()->mappingElements()->deleteAllItems();
+                    // Get a random position in the current window
+                    QPointF position = _getRandomPosition(randomMax);
 
-                    // Traverse through each model
-                    for (AgentM* model : agent->models()->toList())
+                    //qDebug() << "Random position:" << position << "for agent" << agentsGroupedByName->name();
+
+                    // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
+                    _createAgentInMappingAtPosition(agentsGroupedByName, position);
+                }
+            }
+        }
+
+
+        // FIXME TODO: optimize to not go through the mapping of each model
+
+        // Create all links between agents in the mapping
+        // By looking the mapping of each (sub) model of the VM
+        for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
+        {
+            if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr) && (agentInMapping->temporaryMapping() != nullptr))
+            {
+                // First, delete all "mapping elements" in the temporary mapping
+                agentInMapping->temporaryMapping()->mappingElements()->deleteAllItems();
+
+                // Traverse through each model
+                for (AgentM* model : agentInMapping->agentsGroupedByName()->models()->toList())
+                {
+                    if ((model != nullptr) && (model->mapping() != nullptr))
                     {
-                        if ((model != nullptr) && (model->mapping() != nullptr))
+                        for (ElementMappingM* mappingElement : model->mapping()->mappingElements()->toList())
                         {
-                            for (ElementMappingM* mappingElement : model->mapping()->mappingElements()->toList())
+                            if (mappingElement != nullptr)
                             {
-                                if (mappingElement != nullptr)
-                                {
-                                    // Simulate slot "on Mapped"
-                                    onMapped(mappingElement);
-                                }
+                                // Simulate the slot "on Mapped"
+                                onMapped(mappingElement);
                             }
                         }
                     }
                 }
             }
+        }
 
-            // Notify the QML to fit the view
-            Q_EMIT fitToView();
-        }*/
+        // Notify the QML to fit the view
+        Q_EMIT fitToView();
     }
 }
 
