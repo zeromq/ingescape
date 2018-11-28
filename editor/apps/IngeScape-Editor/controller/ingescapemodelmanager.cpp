@@ -477,24 +477,32 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                         QString peerId = jsonPeerId.toString();
                                         QString ipAddress = jsonAddress.toString();
 
-                                        //if (!hostname.isEmpty() && !commandLine.isEmpty() && !peerId.isEmpty() && !ipAddress.isEmpty())
-                                        if (!hostname.isEmpty() && !commandLine.isEmpty())
+                                        //if (!hostname.isEmpty() && !commandLine.isEmpty())
+                                        if (!hostname.isEmpty() && !commandLine.isEmpty() && !peerId.isEmpty() && !ipAddress.isEmpty())
                                         {
-                                            qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
+                                            // Check that there is not yet an agent with this peer id
+                                            AgentM* agent = getAgentModelFromPeerId(peerId);
+                                            if (agent == nullptr)
+                                            {
+                                                qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
 
-                                            // Make a copy of the definition
-                                            DefinitionM* copyOfDefinition = nullptr;
-                                            if (agentDefinition != nullptr) {
-                                                copyOfDefinition = agentDefinition->copy();
+                                                // Make a copy of the definition
+                                                DefinitionM* copyOfDefinition = nullptr;
+                                                if (agentDefinition != nullptr) {
+                                                    copyOfDefinition = agentDefinition->copy();
+                                                }
+
+                                                // Create a new model of agent
+                                                createAgentModel(agentName,
+                                                                 copyOfDefinition,
+                                                                 peerId,
+                                                                 ipAddress,
+                                                                 hostname,
+                                                                 commandLine);
                                             }
-
-                                            // Create a new model of agent
-                                            createAgentModel(agentName,
-                                                             copyOfDefinition,
-                                                             peerId,
-                                                             ipAddress,
-                                                             hostname,
-                                                             commandLine);
+                                            else {
+                                                qWarning() << "The agent" << agent->name() << "already exists with the peer id" << peerId;
+                                            }
                                         }
                                     }
                                 }
