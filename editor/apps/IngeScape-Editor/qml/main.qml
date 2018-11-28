@@ -61,6 +61,7 @@ ApplicationWindow {
 
         // Platform
         Menu {
+            id: menuPlatform
             title: qsTr("Platform")
 
             MenuItem {
@@ -110,6 +111,16 @@ ApplicationWindow {
 
                 onTriggered: {
                     I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "INGESCAPE");
+                }
+            }
+            MenuItem {
+                id: menuItemModelVisualizer
+
+                text: qsTr("Show Model Visualizer")
+                visible: false
+
+                onTriggered: {
+                    console.log("Show Model Visualizer");
                 }
             }
         }
@@ -410,6 +421,10 @@ ApplicationWindow {
 
                 // Load our QML UI
                 applicationLoader.source = "IngeScapeEditor.qml";
+
+                if (IngeScapeEditorC.isAvailableModelVisualizer) {
+                    menuItemModelVisualizer.visible = true;
+                }
             }
         }
 

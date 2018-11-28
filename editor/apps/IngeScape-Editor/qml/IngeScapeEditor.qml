@@ -134,14 +134,14 @@ Item {
     // Bottom panel
     //
     Scenario.ScenarioTimeLine {
-        id : bottomPanel
+        id: bottomPanel
         anchors {
             left: leftPanel.right
             right: parent.right
             bottom: parent.bottom
         }
         height: 0
-        controller: IngeScapeEditorC.scenarioC;
+        controller: IngeScapeEditorC.scenarioC
     }
 
 
@@ -159,7 +159,7 @@ Item {
             bottom: parent.bottom
         }
 
-        color : IngeScapeTheme.agentsMappingBackgroundColor;
+        color : IngeScapeTheme.agentsMappingBackgroundColor
 
         I2CustomRectangle {
             anchors {
@@ -313,166 +313,21 @@ Item {
     }
 
 
-
-
     //
-    // DEBUG: list of all "Agents Grouped by Name"
+    // Model Visualizer
     //
-    ListView {
-        id: debug
+    Loader {
+        id: loaderOfModelVisualizer
 
         anchors {
-            bottom: parent.bottom
-            bottomMargin: 100
-            left: parent.left
+            top: parent.top
+            left: leftPanel.right
             right: parent.right
         }
-        height: contentHeight
+        height: 200
 
-        model: IngeScapeEditorC.modelManager.allAgentsGroupsByName
-
-        delegate: Rectangle {
-
-            property var groupByNameVM: model.QtObject
-
-            anchors {
-                left: parent.left
-                leftMargin: 10
-                //right: parent.right
-                //rightMargin: 10
-            }
-            width: childrenRect.width + 5
-            height: columnListOfGroupsByDefinition.height + 5
-
-            color: groupByNameVM.isON ? "#22CCCC" : "#227777"
-
-            Row {
-                spacing: 15
-
-                Text {
-                    text: groupByNameVM.name
-                    width: 150
-                    color: groupByNameVM.isON ? "white" : "#888888"
-                    font {
-                        pointSize: 14
-                        weight: Font.Bold
-                    }
-                }
-
-                Text {
-                    text: groupByNameVM.models.count + " M"
-                    color: groupByNameVM.isON ? "white" : "#888888"
-                    font.pointSize: 14
-                }
-
-                Text {
-                    text: groupByNameVM.numberOfAgentsON + " ON"
-                    color: "#00FF00"
-                    font {
-                        pointSize: 14
-                        weight: Font.Bold
-                    }
-                }
-
-                Text {
-                    text: groupByNameVM.numberOfAgentsOFF + " OFF"
-                    color: "#FF0000"
-                    font {
-                        pointSize: 14
-                        weight: Font.Bold
-                    }
-                }
-
-                Column {
-                    id: columnListOfGroupsByDefinition
-
-                    height: childrenRect.height + 5
-
-                    Repeater {
-                        model: groupByNameVM ? groupByNameVM.allAgentsGroupsByDefinition : null
-
-                        Rectangle {
-
-                            property var groupByDefinitionVM: model.QtObject
-
-                            width: childrenRect.width + 5
-                            height: childrenRect.height + 5
-
-                            color: groupByDefinitionVM.isON ? "#22CC22" : "#227722"
-
-                            Row {
-                                spacing: 15
-
-                                Text {
-                                    text: groupByDefinitionVM.definition ? groupByDefinitionVM.definition.name : "Def is NULL"
-                                    color: groupByDefinitionVM.isON ? "white" : "#888888"
-                                    width: 150
-                                    elide: Text.ElideMiddle
-                                    font.pointSize: 14
-                                }
-
-                                Text {
-                                    text: groupByDefinitionVM.models.count + " M"
-                                    color: groupByDefinitionVM.isON ? "white" : "#888888"
-                                    font.pointSize: 14
-                                }
-
-
-                                Column {
-                                    id: columnAgents
-
-                                    height: childrenRect.height + 5
-
-                                    Repeater {
-                                        model: groupByDefinitionVM.models
-
-                                        Rectangle {
-
-                                            property var agentM: model.QtObject
-
-                                            width: childrenRect.width
-                                            height: 25
-
-                                            color: agentM.isON ? "#2222CC" : "#222277"
-
-                                            Row {
-                                                spacing: 15
-
-                                                Text {
-                                                    text: agentM.hostname
-                                                    color: agentM.isON ? "white" : "#888888"
-                                                    font {
-                                                        pointSize: 14
-                                                        weight: Font.Bold
-                                                    }
-                                                }
-
-                                                Text {
-                                                    text: agentM.peerId
-                                                    color: agentM.isON ? "white" : "#888888"
-                                                }
-
-                                                Text {
-                                                    text: agentM.commandLine
-                                                    color: agentM.isON ? "white" : "#888888"
-                                                    width: 400
-                                                    elide: Text.ElideLeft
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        source: IngeScapeEditorC.isAvailableModelVisualizer ? "ModelVisualizer.qml" : ""
     }
-
-
-
-
 
 
     // List of "Agent Definition Editor(s)"

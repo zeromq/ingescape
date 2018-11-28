@@ -284,8 +284,6 @@ Item {
                                 rightMargin: 5
                             }
 
-                            // Usefull to debug to display the peer id
-                            //text: model.name + " (" + model.peerId + ")"
                             text: model.name
 
                             elide: Text.ElideRight

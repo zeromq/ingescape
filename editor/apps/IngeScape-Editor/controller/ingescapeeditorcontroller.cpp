@@ -34,6 +34,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _networkDevice(""),
     _ipAddress(""),
     _port(0),
+    _isAvailableModelVisualizer(false),
     _errorMessageWhenConnectionFailed(""),
     _modelManager(nullptr),
     _agentsSupervisionC(nullptr),
@@ -71,10 +72,16 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // Settings about the "Network"
     settings.beginGroup("network");
-    _networkDevice = settings.value("networkDevice").toString();
-    _ipAddress = settings.value("ipAddress").toString();
-    _port = settings.value("port").toInt();
+    _networkDevice = settings.value("networkDevice", QVariant("")).toString();
+    _ipAddress = settings.value("ipAddress", QVariant("")).toString();
+    _port = settings.value("port", QVariant(0)).toInt();
     qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
+    settings.endGroup();
+
+    // Settings about "Debug"
+    settings.beginGroup("debug");
+    _isAvailableModelVisualizer = settings.value("modelVisualizer", QVariant(false)).toBool();
+    qDebug() << "The Model/View Model Visualizer is available ?" << _isAvailableModelVisualizer;
     settings.endGroup();
 
 

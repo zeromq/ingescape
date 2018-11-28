@@ -188,6 +188,7 @@ void AgentsGroupedByNameVM::updateCurrentValueOfIOP(PublishedValueM* publishedVa
         QVariant currentValue = publishedValue->value();
 
         // FIXME: Is it usefull to store values in the definition of each model ?
+        // Perhaps, when we save the definition to JSON ?
         for (AgentM* agent : _models)
         {
             if ((agent != nullptr) && (agent->definition() != nullptr))
