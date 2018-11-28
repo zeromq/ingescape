@@ -39,6 +39,9 @@ Rectangle {
 
     clip: true
 
+    visible: IngeScapeEditorC.isVisibleModelVisualizer
+
+
     //
     // List of all "Agents Grouped by Name"
     //

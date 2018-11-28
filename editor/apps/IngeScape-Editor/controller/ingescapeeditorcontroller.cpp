@@ -35,6 +35,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _ipAddress(""),
     _port(0),
     _isAvailableModelVisualizer(false),
+    _isVisibleModelVisualizer(false),
     _errorMessageWhenConnectionFailed(""),
     _modelManager(nullptr),
     _agentsSupervisionC(nullptr),

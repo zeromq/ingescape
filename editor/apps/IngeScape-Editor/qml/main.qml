@@ -116,11 +116,18 @@ ApplicationWindow {
             MenuItem {
                 id: menuItemModelVisualizer
 
-                text: qsTr("Show Model Visualizer")
+                text: "" // (IngeScapeEditorC.isVisibleModelVisualizer ? qsTr("Hide the model visualizer") : qsTr("Show the model visualizer"))
                 visible: false
 
                 onTriggered: {
-                    console.log("Show Model Visualizer");
+                    if (IngeScapeEditorC.isVisibleModelVisualizer) {
+                        console.log("Hide the Model and View Model Visualizer");
+                        IngeScapeEditorC.isVisibleModelVisualizer = false;
+                    }
+                    else {
+                        console.log("Show the Model and View Model Visualizer");
+                        IngeScapeEditorC.isVisibleModelVisualizer = true;
+                    }
                 }
             }
         }
@@ -422,8 +429,14 @@ ApplicationWindow {
                 // Load our QML UI
                 applicationLoader.source = "IngeScapeEditor.qml";
 
-                if (IngeScapeEditorC.isAvailableModelVisualizer) {
+                // Model and View Model Visualizer
+                if (IngeScapeEditorC.isAvailableModelVisualizer)
+                {
                     menuItemModelVisualizer.visible = true;
+
+                    menuItemModelVisualizer.text = Qt.binding(function() {
+                        return (IngeScapeEditorC.isVisibleModelVisualizer ? qsTr("Hide the model visualizer") : qsTr("Show the model visualizer"));
+                    });
                 }
             }
         }
