@@ -628,10 +628,29 @@ WindowBlockTouches {
                                             if (visible) {
                                                 if (myEffect && myEffect.modelM) {
                                                     if (myEffect.modelM.agentIOP) {
-                                                        if (myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.INTEGER) {
-                                                            myEffect.modelM.value = Number(myEffect.modelM.value).toFixed(0)
-                                                        } else if (myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.DOUBLE) {
-                                                            myEffect.modelM.value = Number(myEffect.modelM.value)
+                                                        var iopValueType = myEffect.modelM.agentIOP.agentIOPValueType
+                                                        if (iopValueType === AgentIOPValueTypes.INTEGER) {
+                                                            // Checking Number conversion to always show a valid number text (instead of "nan")
+                                                            var integerValue = Number(myEffect.modelM.value).toFixed(0)
+                                                            if (isNaN(integerValue))
+                                                            {
+                                                                myEffect.modelM.value = 0
+                                                            }
+                                                            else
+                                                            {
+                                                                myEffect.modelM.value = integerValue
+                                                            }
+                                                        } else if (iopValueType === AgentIOPValueTypes.DOUBLE) {
+                                                            // Checking Number conversion to always show a valid number text (instead of "nan")
+                                                            var doubleValue = Number(myEffect.modelM.value)
+                                                            if (isNaN(doubleValue))
+                                                            {
+                                                                myEffect.modelM.value = 0
+                                                            }
+                                                            else
+                                                            {
+                                                                myEffect.modelM.value = doubleValue
+                                                            }
                                                         }
                                                     }
                                                     text = myEffect.modelM.value
