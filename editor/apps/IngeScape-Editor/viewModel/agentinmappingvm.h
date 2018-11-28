@@ -51,6 +51,9 @@ class AgentInMappingVM : public QObject
     // Flag indicating if our agent is reduced
     I2_QML_PROPERTY(bool, isReduced)
 
+    // Flag indicating if our agent is locked reduced (prevent to open the list of Inputs/Outputs)
+    I2_QML_PROPERTY_READONLY(bool, isLockedReduced)
+
     // Group of value type of the reduced link inputs of our agent (= brin)
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedLinkInputsValueTypeGroup)
 
@@ -286,6 +289,12 @@ private:
      * @return
      */
     ElementMappingM* _getTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
+
+
+    /**
+     * @brief Check the maximum number of Inputs/Outputs
+     */
+    void _checkMaxNumberOfIO();
 
 
 private:

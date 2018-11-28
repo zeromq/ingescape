@@ -485,7 +485,7 @@ Item {
                         isReduced: true
                         agentName: model.name
                         visible: mouseArea.drag.active
-                        dropEnabled : false
+                        dropEnabled: false
                     }
                 }
             }

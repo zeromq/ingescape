@@ -14,6 +14,10 @@
 
 #include "agentinmappingvm.h"
 
+#define MAX_NUMBER_OF_IO_TO_REDUCE 5
+#define MAX_NUMBER_OF_IO_TO_LOCK_REDUCED 10
+
+
 /**
  * @brief Constructor
  * @param agentsGroupedByName Models of agents grouped by the same name
@@ -27,6 +31,7 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     _agentsGroupedByName(agentsGroupedByName),
     _position(position),
     _isReduced(false),
+    _isLockedReduced(false),
     _reducedLinkInputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
     _reducedLinkOutputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
     _temporaryMapping(nullptr)
@@ -51,13 +56,22 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
         _temporaryMapping = new AgentMappingM(mappingName, "0.0", mappingDescription);
 
 
-        if (!_agentsGroupedByName->inputsList()->isEmpty()) {
+        if (!_agentsGroupedByName->inputsList()->isEmpty())
+        {
             // Some view models of inputs have been added to the agent(s grouped by name)
             _onInputsHaveBeenAdded(_agentsGroupedByName->inputsList()->toList());
         }
-        if (!_agentsGroupedByName->outputsList()->isEmpty()) {
+
+        if (!_agentsGroupedByName->outputsList()->isEmpty())
+        {
             // Some view models of outputs have been added to the agent(s grouped by name)
             _onOutputsHaveBeenAdded(_agentsGroupedByName->outputsList()->toList());
+        }
+
+        // If there are a lot of Inputs/Outputs, reduce the agent (by default)
+        if (qMax(_linkInputsList.count(), _linkOutputsList.count()) > MAX_NUMBER_OF_IO_TO_REDUCE)
+        {
+            _isReduced = true;
         }
     }
 }
@@ -242,6 +256,9 @@ void AgentInMappingVM::_onInputsHaveBeenAdded(QList<InputVM*> newInputs)
 
         // Update the group (of value type) of the reduced link inputs of our agent (= brin)
         _updateReducedLinkInputsValueTypeGroup();
+
+        // Check the maximum number of Inputs/Outputs
+        _checkMaxNumberOfIO();
     }
 }
 
@@ -283,6 +300,9 @@ void AgentInMappingVM::_onOutputsHaveBeenAdded(QList<OutputVM*> newOutputs)
 
         // Update the group (of value type) of the reduced link outputs of our agent (= brin)
         _updateReducedLinkOutputsValueTypeGroup();
+
+        // Check the maximum number of Inputs/Outputs
+        _checkMaxNumberOfIO();
     }
 }
 
@@ -358,6 +378,9 @@ void AgentInMappingVM::_onInputsWillBeRemoved(QList<InputVM*> oldInputs)
 
         // Update the group (of value type) of the reduced link inputs of our agent (= brin)
         _updateReducedLinkInputsValueTypeGroup();
+
+        // Check the maximum number of Inputs/Outputs
+        _checkMaxNumberOfIO();
     }
 }
 
@@ -433,6 +456,9 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
 
         // Update the group (of value type) of the reduced link outputs of our agent (= brin)
         _updateReducedLinkOutputsValueTypeGroup();
+
+        // Check the maximum number of Inputs/Outputs
+        _checkMaxNumberOfIO();
     }
 }
 
@@ -1330,4 +1356,27 @@ ElementMappingM* AgentInMappingVM::_getTemporaryLink(QString inputName, QString 
         }
     }
     return nullptr;
+}
+
+
+/**
+ * @brief Check the maximum number of Inputs/Outputs
+ */
+void AgentInMappingVM::_checkMaxNumberOfIO()
+{
+    int maxNumberOfIO = qMax(_linkInputsList.count(), _linkOutputsList.count());
+
+    if (maxNumberOfIO > MAX_NUMBER_OF_IO_TO_LOCK_REDUCED)
+    {
+        // Force the QML to reduce the list of Inputs/Outputs
+        setisReduced(true);
+
+        // Lock
+        setisLockedReduced(true);
+    }
+    else
+    {
+        // UN-lock
+        setisLockedReduced(false);
+    }
 }

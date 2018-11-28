@@ -39,12 +39,13 @@ Rectangle {
     property var controller : null;
 
     // Model associated to our QML item
-    property var agentMappingVM: null
+    property AgentInMappingVM agentMappingVM: null
 
     property var agentsGroupedByName: agentMappingVM ? agentMappingVM.agentsGroupedByName : null
 
-    property var agentName: agentMappingVM ? agentMappingVM.name : ""
+    property string agentName: agentMappingVM ? agentMappingVM.name : ""
 
+    // Flag indicating if our agent is reduced (List of Inputs/Outputs are hidden)
     property bool isReduced: agentMappingVM && agentMappingVM.isReduced
 
     // Flag indicating if mouse areas over input/output names (to display the tooltip) are enabled
@@ -87,25 +88,6 @@ Rectangle {
     border {
         color: IngeScapeTheme.selectedAgentColor
         width: rootItem._isSelected ? 1 : 0
-    }
-
-
-
-    Component.onCompleted: {
-        if (agentMappingVM) {
-            // Max number of inputs or outputs
-            var maxIOP = Math.max(agentMappingVM.inputsList.count, agentMappingVM.outputsList.count)
-            if (maxIOP > 150)
-            {
-                // I/O > 150 => we force the view to be "reduced".
-                isReduced = true;
-            }
-            else if (maxIOP > 50)
-            {
-                // 150 > I/O > 50 => we set the view to "reduced" but default but the user can still expand it.
-                agentMappingVM.isReduced = true;
-            }
-        }
     }
 
 
@@ -209,7 +191,9 @@ Rectangle {
         }
 
         onDoubleClicked: {
-            if (agentMappingVM) {
+            // Check if our agent is locked reduced (prevent to open the list of Inputs/Outputs)
+            if (agentMappingVM && !agentMappingVM.isLockedReduced)
+            {
                 agentMappingVM.isReduced = !agentMappingVM.isReduced;
             }
         }
