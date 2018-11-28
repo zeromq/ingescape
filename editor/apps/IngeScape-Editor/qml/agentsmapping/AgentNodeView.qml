@@ -91,9 +91,22 @@ Rectangle {
 
 
 
-    /*Component.onCompleted: {
-        console.log(rootItem.agentName + " on Completed");
-    }*/
+    Component.onCompleted: {
+        if (agentMappingVM) {
+            // Max number of inputs or outputs
+            var maxIOP = Math.max(agentMappingVM.inputsList.count, agentMappingVM.outputsList.count)
+            if (maxIOP > 150)
+            {
+                // I/O > 150 => we force the view to be "reduced".
+                isReduced = true;
+            }
+            else if (maxIOP > 50)
+            {
+                // 150 > I/O > 50 => we set the view to "reduced" but default but the user can still expand it.
+                agentMappingVM.isReduced = true;
+            }
+        }
+    }
 
 
     onIsReducedChanged: {

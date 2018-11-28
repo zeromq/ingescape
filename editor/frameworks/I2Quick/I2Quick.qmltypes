@@ -231,8 +231,10 @@ Module {
     }
     Component {
         name: "FilterPatternSyntax"
+        prototype: "I2AbstractQmlEnumClass"
         exports: ["I2Quick/FilterPatternSyntax 1.0"]
         isCreatable: false
+        isSingleton: true
         exportMetaObjectRevisions: [0]
         Enum {
             name: "Value"
@@ -242,6 +244,7 @@ Module {
                 "FixedString": 2
             }
         }
+        Method { name: "allValues"; type: "QList<FilterPatternSyntax::Value>" }
     }
     Component {
         name: "I2AbstractCustomCubicBezierCurve"
@@ -644,6 +647,43 @@ Module {
         }
     }
     Component {
+        name: "I2DynamicTranslator"
+        prototype: "QObject"
+        exports: ["I2Quick/I2DynamicTranslator 1.0"]
+        isCreatable: false
+        isSingleton: true
+        exportMetaObjectRevisions: [0]
+        Property { name: "language"; type: "string" }
+        Property { name: "refreshFlag"; type: "string"; isReadonly: true }
+        Signal {
+            name: "languageChanged"
+            Parameter { name: "value"; type: "string" }
+        }
+        Signal {
+            name: "refreshFlagChanged"
+            Parameter { name: "value"; type: "string" }
+        }
+        Signal {
+            name: "qmlEngineChanged"
+            Parameter { name: "value"; type: "QQmlEngine"; isPointer: true }
+        }
+        Method {
+            name: "loadAllTranslationFiles"
+            Parameter { name: "directory"; type: "string" }
+            Parameter { name: "prefix"; type: "string" }
+        }
+        Method {
+            name: "loadTranslationFile"
+            Parameter { name: "file"; type: "string" }
+            Parameter { name: "language"; type: "string" }
+        }
+        Method {
+            name: "initWithLocale"
+            Parameter { name: "locale"; type: "QLocale" }
+        }
+        Method { name: "clear" }
+    }
+    Component {
         name: "I2EnumListItemData"
         prototype: "QObject"
         exports: ["I2Quick/I2EnumListItemData 1.0"]
@@ -678,9 +718,14 @@ Module {
         exports: ["I2Quick/I2FileWatcher 1.0"]
         exportMetaObjectRevisions: [0]
         Property { name: "fileUrl"; type: "QUrl" }
+        Property { name: "baseName"; type: "string"; isReadonly: true }
         Signal {
             name: "fileUrlChanged"
             Parameter { name: "value"; type: "QUrl" }
+        }
+        Signal {
+            name: "baseNameChanged"
+            Parameter { name: "value"; type: "string" }
         }
         Signal { name: "fileChanged" }
     }
@@ -947,6 +992,24 @@ Module {
         isSingleton: true
         exportMetaObjectRevisions: [0]
         Method { name: "clearCache" }
+    }
+    Component {
+        name: "I2QuickInspector"
+        prototype: "QObject"
+        exports: ["I2Quick/I2QuickInspector 1.0"]
+        isCreatable: false
+        isSingleton: true
+        exportMetaObjectRevisions: [0]
+        Property { name: "currentWindow"; type: "QQuickWindow"; isPointer: true }
+        Property { name: "currentWindowRenderingMode"; type: "I2WindowRenderingMode::Value" }
+        Signal {
+            name: "currentWindowChanged"
+            Parameter { name: "value"; type: "QQuickWindow"; isPointer: true }
+        }
+        Signal {
+            name: "currentWindowRenderingModeChanged"
+            Parameter { name: "value"; type: "I2WindowRenderingMode::Value" }
+        }
     }
     Component {
         name: "I2RectangularBubbleShape"
@@ -1624,8 +1687,13 @@ Module {
         prototype: "QQuickItem"
         exports: ["I2Quick/I2TemporaryFileHandler 1.0"]
         exportMetaObjectRevisions: [0]
+        Property { name: "fileTemplate"; type: "string" }
         Property { name: "fileUrl"; type: "QUrl"; isReadonly: true }
         Property { name: "content"; type: "string"; isReadonly: true }
+        Signal {
+            name: "fileTemplateChanged"
+            Parameter { name: "value"; type: "string" }
+        }
         Signal {
             name: "fileUrlChanged"
             Parameter { name: "value"; type: "QUrl" }
@@ -2104,6 +2172,25 @@ Module {
         }
     }
     Component {
+        name: "I2WindowRenderingMode"
+        prototype: "I2AbstractQmlEnumClass"
+        exports: ["I2Quick/I2WindowRenderingMode 1.0"]
+        isCreatable: false
+        isSingleton: true
+        exportMetaObjectRevisions: [0]
+        Enum {
+            name: "Value"
+            values: {
+                "Normal": 0,
+                "VisualizeBatches": 1,
+                "VisualizeClipping": 2,
+                "VisualizeChanges": 3,
+                "VisualizeOverdraw": 4
+            }
+        }
+        Method { name: "allValues"; type: "QList<I2WindowRenderingMode::Value>" }
+    }
+    Component {
         name: "I2WindowUtils"
         prototype: "QObject"
         exports: ["I2Quick/I2WindowUtils 1.0"]
@@ -2205,7 +2292,7 @@ Module {
         Property { name: "inputMaskSvgY"; type: "double"; isReadonly: true }
         Property { name: "inputMaskSvgWidth"; type: "double"; isReadonly: true }
         Property { name: "inputMaskSvgHeight"; type: "double"; isReadonly: true }
-        Property { name: "action"; type: "QQuickAction"; isPointer: true }
+        Property { name: "action"; type: "QQuickAction1"; isPointer: true }
         Property { name: "activeFocusOnPress"; type: "bool" }
         Property { name: "checkable"; type: "bool" }
         Property { name: "checked"; type: "bool" }
@@ -2214,7 +2301,7 @@ Module {
         Property { name: "iconName"; type: "string" }
         Property { name: "iconSource"; type: "QUrl" }
         Property { name: "isDefault"; type: "bool" }
-        Property { name: "menu"; type: "Menu_QMLTYPE_32"; isPointer: true }
+        Property { name: "menu"; type: "Menu_QMLTYPE_28"; isPointer: true }
         Property { name: "pressed"; type: "bool"; isReadonly: true }
         Property { name: "style"; type: "QQmlComponent"; isPointer: true }
         Property { name: "text"; type: "string" }
@@ -2237,7 +2324,7 @@ Module {
         Property { name: "spacing"; type: "int" }
         Property { name: "indicator"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2265,11 +2352,12 @@ Module {
         Property { name: "textRotation"; type: "int" }
         Property { name: "maskVerticalMargins"; type: "int" }
         Property { name: "maskHorizontalMargins"; type: "int" }
+        Property { name: "elideMode"; type: "int" }
         Property { name: "control"; type: "Button_QMLTYPE_34"; isReadonly: true; isPointer: true }
         Property { name: "background"; type: "QQmlComponent"; isPointer: true }
         Property { name: "label"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2379,6 +2467,8 @@ Module {
         Property { name: "text"; type: "string" }
         Property { name: "buttonText"; type: "string" }
         Property { name: "onlyFileName"; type: "bool" }
+        Property { name: "buttonWidth"; type: "int" }
+        Property { name: "buttonHeight"; type: "int" }
         Property { name: "placeholderText"; type: "string" }
         Property { name: "textFieldStyle"; type: "QQmlComponent"; isPointer: true }
         Property { name: "buttonStyle"; type: "QQmlComponent"; isPointer: true }
@@ -2431,7 +2521,7 @@ Module {
         Property { name: "background"; type: "QQmlComponent"; isPointer: true }
         Property { name: "label"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2476,7 +2566,7 @@ Module {
         Property { name: "background"; type: "QQmlComponent"; isPointer: true }
         Property { name: "label"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2521,7 +2611,7 @@ Module {
         Property { name: "background"; type: "QQmlComponent"; isPointer: true }
         Property { name: "label"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2547,7 +2637,7 @@ Module {
         Property { name: "background"; type: "QQmlComponent"; isPointer: true }
         Property { name: "label"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2569,7 +2659,7 @@ Module {
         Property { name: "spacing"; type: "int" }
         Property { name: "indicator"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2601,7 +2691,7 @@ Module {
         Property { name: "background"; type: "QQmlComponent"; isPointer: true }
         Property { name: "label"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2639,11 +2729,11 @@ Module {
         Signal { name: "longPressCanceled" }
         Method { name: "cancelPressed"; type: "QVariant" }
         Property { name: "isDefault"; type: "bool" }
-        Property { name: "menu"; type: "Menu_QMLTYPE_32"; isPointer: true }
+        Property { name: "menu"; type: "Menu_QMLTYPE_28"; isPointer: true }
         Property { name: "checkable"; type: "bool" }
         Property { name: "checked"; type: "bool" }
         Property { name: "exclusiveGroup"; type: "QQuickExclusiveGroup1"; isPointer: true }
-        Property { name: "action"; type: "QQuickAction"; isPointer: true }
+        Property { name: "action"; type: "QQuickAction1"; isPointer: true }
         Property { name: "activeFocusOnPress"; type: "bool" }
         Property { name: "text"; type: "string" }
         Property { name: "tooltip"; type: "string" }
@@ -2651,8 +2741,8 @@ Module {
         Property { name: "iconName"; type: "string" }
         Property { name: "__position"; type: "string" }
         Property { name: "__iconOverriden"; type: "bool"; isReadonly: true }
-        Property { name: "__action"; type: "QQuickAction"; isPointer: true }
-        Property { name: "__iconAction"; type: "QQuickAction"; isReadonly: true; isPointer: true }
+        Property { name: "__action"; type: "QQuickAction1"; isPointer: true }
+        Property { name: "__iconAction"; type: "QQuickAction1"; isReadonly: true; isPointer: true }
         Property { name: "__behavior"; type: "QVariant" }
         Property { name: "__effectivePressed"; type: "bool" }
         Property { name: "hovered"; type: "bool"; isReadonly: true }
@@ -2731,7 +2821,7 @@ Module {
         Property { name: "spacing"; type: "int" }
         Property { name: "indicator"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2777,7 +2867,7 @@ Module {
         Property { name: "background"; type: "QQmlComponent"; isPointer: true }
         Property { name: "label"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2810,7 +2900,7 @@ Module {
         Property { name: "background"; type: "QQmlComponent"; isPointer: true }
         Property { name: "label"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2845,7 +2935,7 @@ Module {
         Property { name: "background"; type: "QQmlComponent"; isPointer: true }
         Property { name: "label"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2924,7 +3014,7 @@ Module {
         Property { name: "leftCorner"; type: "QQmlComponent"; isPointer: true }
         Property { name: "rightCorner"; type: "QQmlComponent"; isPointer: true }
         Property { name: "tabBar"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -2982,7 +3072,7 @@ Module {
         Property { name: "__scrollBarFadeDelay"; type: "int" }
         Property { name: "__scrollBarFadeDuration"; type: "int" }
         Property { name: "__stickyScrollbars"; type: "bool" }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -3011,7 +3101,7 @@ Module {
         Property { name: "placeholderMarginLeft"; type: "int" }
         Property { name: "isError"; type: "bool" }
         Property { name: "hasFeedbackWhenActiveFocus"; type: "bool" }
-        Property { name: "control"; type: "TextField_QMLTYPE_78"; isReadonly: true; isPointer: true }
+        Property { name: "control"; type: "TextField_QMLTYPE_77"; isReadonly: true; isPointer: true }
         Property { name: "font"; type: "QFont" }
         Property { name: "textColor"; type: "QColor" }
         Property { name: "selectionColor"; type: "QColor" }
@@ -3025,7 +3115,7 @@ Module {
         Property { name: "__selectionHandle"; type: "QQmlComponent"; isPointer: true }
         Property { name: "__cursorDelegate"; type: "QQmlComponent"; isPointer: true }
         Property { name: "__editMenu"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -3063,7 +3153,7 @@ Module {
         Property { name: "background"; type: "QQmlComponent"; isPointer: true }
         Property { name: "label"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
@@ -3106,7 +3196,7 @@ Module {
         Property { name: "background"; type: "QQmlComponent"; isPointer: true }
         Property { name: "label"; type: "QQmlComponent"; isPointer: true }
         Property { name: "panel"; type: "QQmlComponent"; isPointer: true }
-        Property { name: "padding"; type: "QQuickPadding"; isReadonly: true; isPointer: true }
+        Property { name: "padding"; type: "QQuickPadding1"; isReadonly: true; isPointer: true }
         Property { name: "data"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {

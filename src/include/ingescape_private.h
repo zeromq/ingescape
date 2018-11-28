@@ -66,7 +66,7 @@ typedef struct agent_iop {
     const char* name;
     iopType_t value_type;
     iop_t type;          //Size of pointer on data
-    struct {
+    union {
         int i;                  //in accordance to type IGS_INTEGER_T ex. '10'
         double d;               //in accordance to type IGS_DOUBLE_T ex. '10.01'
         char* s;                //in accordance to type IGS_STRING_T ex. 'display the image'
@@ -170,6 +170,7 @@ typedef struct zyreloopElements{
     zactor_t *agentActor;
     zyre_t *node;
     zsock_t *publisher;
+    zsock_t *ipcPublisher;
     zsock_t *logger;
     zloop_t *loop;
 } zyreloopElements_t;
@@ -211,7 +212,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop_t *foundInput, agent_iop_t 
 
 // model
 extern bool isWholeAgentMuted;
-int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
+const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
 agent_iop_t* model_findIopByName(const char* name, iop_t type);
 char* model_getIOPValueAsString (agent_iop_t* iop); //returned value must be freed by user
 
@@ -224,7 +225,8 @@ extern bool network_needToSendDefinitionUpdate;
 extern bool network_needToUpdateMapping;
 extern subscriber_t *subscribers;
 extern zyreloopElements_t *agentElements;
-int network_publishOutput (const char* output_name);
+extern char *ipcFolderPath;
+int network_publishOutput (const agent_iop_t *iop);
 
 // parser
 definition* parser_loadDefinition (const char* json_str);
