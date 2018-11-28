@@ -638,16 +638,10 @@ void IngeScapeModelManager::simulateExitForEachAgentON()
 {
     for (AgentM* agent : _hashFromPeerIdToAgent.values())
     {
-        if (agent != nullptr)
+        if ((agent != nullptr) && agent->isON())
         {
-            if (agent->isON())
-            {
-                // Simulate an exit for each agent
-                onAgentExited(agent->peerId(), agent->name());
-            }
-
-            // FIXME Usefull ? Force the flag indicating that the agent can NOT be restarted (by an INGESCAPE launcher)
-            agent->setcanBeRestarted(false);
+            // Simulate an exit for each agent
+            onAgentExited(agent->peerId(), agent->name());
         }
     }
 }

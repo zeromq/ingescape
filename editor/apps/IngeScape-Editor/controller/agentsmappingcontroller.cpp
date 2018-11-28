@@ -1207,7 +1207,7 @@ void AgentsMappingController::_deleteLinkBetweenTwoAgents(LinkVM* link)
  */
 void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
 {
-    if (agent != nullptr)
+    if ((agent != nullptr) && !_allLinksInMapping.isEmpty())
     {
         for (LinkVM* link : _allLinksInMapping.toList())
         {

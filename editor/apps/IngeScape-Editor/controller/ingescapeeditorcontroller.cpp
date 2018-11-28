@@ -472,21 +472,18 @@ void IngeScapeEditorController::savePlatformToDefaultFile()
  */
 void IngeScapeEditorController::clearCurrentPlatform()
 {
-    if (_agentsMappingC != nullptr)
-    {
-        // Clear the current mapping
+    // Clear the current mapping
+    if (_agentsMappingC != nullptr) {
         _agentsMappingC->clearMapping();
     }
 
-    if (_scenarioC != nullptr)
-    {
-        // Clear the current scenario
+    // Clear the current scenario
+    if (_scenarioC != nullptr) {
         _scenarioC->clearScenario();
     }
 
-    if (_modelManager != nullptr)
-    {
-        // Delete agents OFF
+    // Delete agents OFF
+    if (_modelManager != nullptr) {
         _modelManager->deleteAgentsOFF();
     }
 

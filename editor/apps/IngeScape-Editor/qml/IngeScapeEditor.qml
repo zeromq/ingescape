@@ -389,7 +389,7 @@ Item {
                     height: childrenRect.height + 5
 
                     Repeater {
-                        model: groupByNameVM.allAgentsGroupsByDefinition
+                        model: groupByNameVM ? groupByNameVM.allAgentsGroupsByDefinition : null
 
                         Rectangle {
 
