@@ -14,8 +14,8 @@
 
 #include "agentinmappingvm.h"
 
-#define MAX_NUMBER_OF_IO_TO_REDUCE 5
-#define MAX_NUMBER_OF_IO_TO_LOCK_REDUCED 10
+#define MAX_NUMBER_OF_IO_TO_REDUCE 15
+#define MAX_NUMBER_OF_IO_TO_LOCK_REDUCED 30
 
 
 /**

@@ -511,50 +511,42 @@ void IngeScapeEditorController::processBeforeClosing()
 
 
 /**
-  * @brief Check if we can delete an agent (view model) from the list in supervision
-  *        Check dependencies in the mapping and in the actions (conditions, effects)
-  * @param agentName
+  * @brief Check if an agents grouped by definition is used in the current platform
+  *        In the mapping or/and in the scenario (actions, conditions, effects)
+  * @param agentsGroupedByDefinition
   */
-bool IngeScapeEditorController::canDeleteAgentFromSupervision(QString agentName)
+bool IngeScapeEditorController::isAgentUsedInPlatform(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
 {
-    bool canBeDeleted = true;
+    bool isUsed = false;
 
-    if (!agentName.isEmpty())
+    if ((agentsGroupedByDefinition != nullptr) && !agentsGroupedByDefinition->name().isEmpty()
+            && (_modelManager != nullptr) && (_agentsMappingC != nullptr) && (_scenarioC != nullptr))
     {
-        // Check if the agent is in the curent mapping
-        if (_agentsMappingC != nullptr)
+        QString agentName = agentsGroupedByDefinition->name();
+
+        // Get the (view model of) agents grouped for this name
+        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
+        if (agentsGroupedByName != nullptr)
         {
-            AgentInMappingVM* agentInMapping = _agentsMappingC->getAgentInMappingFromName(agentName);
-            if (agentInMapping != nullptr) {
-                canBeDeleted = false;
+            // It is the last agents grouped by definition
+            if (agentsGroupedByName->allAgentsGroupsByDefinition()->count() == 1)
+            {
+                // Check if the agent is in the curent mapping
+                if (_agentsMappingC->getAgentInMappingFromName(agentName) != nullptr)
+                {
+                    isUsed = true;
+                }
+
+                if (!isUsed)
+                {
+                    // Check if the agent is used in the current scenario (actions, conditions, effects)
+                    isUsed = _scenarioC->isAgentUsedInScenario(agentName);
+                }
             }
         }
-
-        // Check if the agent is in action condition or effect
-        if (canBeDeleted && (_scenarioC != nullptr)) {
-            canBeDeleted = !_scenarioC->isAgentUsedInActions(agentName);
-        }
     }
 
-    return canBeDeleted;
-}
-
-
-/**
- * @brief Check if we can delete an agent (in mapping) from the mapping view
- *        Check dependencies in the actions (conditions, effects)
- * @param agentName
- */
-bool IngeScapeEditorController::canDeleteAgentInMapping(QString agentName)
-{
-    bool canBeDeleted = true;
-
-    // Check if the agent is in action condition or effect
-    if (_scenarioC != nullptr) {
-        canBeDeleted = !_scenarioC->isAgentUsedInActions(agentName);
-    }
-
-    return canBeDeleted;
+    return isUsed;
 }
 
 

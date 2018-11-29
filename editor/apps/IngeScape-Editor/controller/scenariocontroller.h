@@ -150,10 +150,10 @@ public:
 
 
     /**
-      * @brief Check if an agent is used in the actions (conditions and effects)
+      * @brief Check if an agent is used in the current scenario (actions, conditions, effects)
       * @param agent name
       */
-    bool isAgentUsedInActions(QString agentName);
+    bool isAgentUsedInScenario(QString agentName);
 
 
     /**

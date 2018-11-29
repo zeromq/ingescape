@@ -143,9 +143,6 @@ Rectangle {
     //--------------------------------
 
 
-    // signal emitted when the delete confirmation popup is needed because the agent is already used in the platform
-    signal needConfirmationToDeleteAgentInMapping();
-
 
     //--------------------------------
     //
@@ -912,15 +909,8 @@ Rectangle {
             onClicked: {
                 if (controller)
                 {
-                    if (IngeScapeEditorC.canDeleteAgentInMapping(rootItem.agentName))
-                    {
-                        // Delete our agent
-                        controller.deleteAgentInMapping(rootItem.agentMappingVM);
-                    }
-                    else {
-                        // Emit the signal "Need Confirmation to Delete Agent in Mapping"
-                        rootItem.needConfirmationToDeleteAgentInMapping();
-                    }
+                    // Delete our agent
+                    controller.deleteAgentInMapping(rootItem.agentMappingVM);
                 }
             }
         }

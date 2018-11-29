@@ -94,7 +94,7 @@ Rectangle {
 
                 Text {
                     text: groupByNameVM.numberOfAgentsON + " ON"
-                    color: "#00FF00"
+                    color: "green"
                     font {
                         pointSize: 14
                         weight: Font.Bold
@@ -103,7 +103,7 @@ Rectangle {
 
                 Text {
                     text: groupByNameVM.numberOfAgentsOFF + " OFF"
-                    color: "#FF0000"
+                    color: "red"
                     font {
                         pointSize: 14
                         weight: Font.Bold

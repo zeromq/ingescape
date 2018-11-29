@@ -287,42 +287,42 @@ void ScenarioController::importExecutedActionsFromJson(QByteArray byteArrayOfJso
 
 
 /**
-  * @brief Check if an agent is used in the actions (conditions and effects)
-  * @param agent name
+  * @brief Check if an agent is used in the current scenario (actions, conditions, effects)
+  * @param agentName
   */
-bool ScenarioController::isAgentUsedInActions(QString agentName)
+bool ScenarioController::isAgentUsedInScenario(QString agentName)
 {
-    bool exists = false;
+    bool isUsed = false;
 
     for (ActionM* actionM : _actionsList.toList())
     {
         // Check the action conditions
         for (ActionConditionVM* conditionVM : actionM->conditionsList()->toList())
         {
-            if ((conditionVM->modelM() != nullptr) && (conditionVM->modelM()->agent() != nullptr)
+            if ((conditionVM != nullptr) && (conditionVM->modelM() != nullptr) && (conditionVM->modelM()->agent() != nullptr)
                     && (conditionVM->modelM()->agent()->name() == agentName))
             {
-                exists = true;
+                isUsed = true;
                 break;
             }
         }
 
         // Check the action effects
-        if (!exists)
+        if (!isUsed)
         {
             for (ActionEffectVM* effectVM : actionM->effectsList()->toList())
             {
-                if ((effectVM->modelM() != nullptr) && (effectVM->modelM()->agent() != nullptr)
+                if ((effectVM != nullptr) && (effectVM->modelM() != nullptr) && (effectVM->modelM()->agent() != nullptr)
                         && (effectVM->modelM()->agent()->name() == agentName))
                 {
-                    exists = true;
+                    isUsed = true;
                     break;
                 }
             }
         }
     }
 
-    return exists;
+    return isUsed;
 }
 
 

@@ -158,19 +158,11 @@ public:
 
 
     /**
-      * @brief Check if we can delete an agent (view model) from the list in agents supervision
-      *        Check dependencies in the mapping and in the actions (conditions, effects)
-      * @param agentName
+      * @brief Check if an agents grouped by definition is used in the current platform
+      *        In the mapping or/and in the scenario (actions, conditions, effects)
+      * @param agentsGroupedByDefinition
       */
-    Q_INVOKABLE bool canDeleteAgentFromSupervision(QString agentName);
-
-
-    /**
-      * @brief Check if we can delete an agent (in mapping) from the mapping view
-      *        Check dependencies in the actions (conditions, effects)
-      * @param agentName
-      */
-    Q_INVOKABLE bool canDeleteAgentInMapping(QString agentName);
+    Q_INVOKABLE bool isAgentUsedInPlatform(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
 
     /**

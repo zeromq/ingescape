@@ -637,12 +637,12 @@ Item {
                     }
                 }
 
+
                 //
                 // Nodes
                 //
                 Repeater {
                     model: controller ? controller.allAgentsInMapping : 0;
-
 
                     AgentNodeView {
                         id: agent
@@ -651,13 +651,13 @@ Item {
 
                         controller: rootItem.controller
 
-                        onNeedConfirmationToDeleteAgentInMapping: {
+                        /*onNeedConfirmationToDeleteAgentInMapping: {
                             // Set the agent
                             deleteConfirmationPopup.myAgent = agent.agentMappingVM
 
                             // Open the popup
                             deleteConfirmationPopup.open();
-                        }
+                        }*/
                     }
                 }
             }
@@ -702,7 +702,7 @@ Item {
     //
     // Delete Confirmation
     //
-    Editor.DeleteConfirmationPopup {
+    /*Editor.DeleteConfirmationPopup {
         id: deleteConfirmationPopup
 
         property var myAgent: null;
@@ -715,7 +715,7 @@ Item {
                 controller.deleteAgentInMapping(deleteConfirmationPopup.myAgent);
             }
         }
-    }
+    }*/
 
 
     //

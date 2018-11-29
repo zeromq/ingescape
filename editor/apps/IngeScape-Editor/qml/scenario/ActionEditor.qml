@@ -2490,21 +2490,21 @@ WindowBlockTouches {
             }
 
 
-            // Delete Action
+            // Delete Button
             MouseArea {
-                id : actionDeleteBtn
-                enabled: visible
-                visible: (panelController && panelController.originalAction !== null)
+                id: actionDeleteBtn
+
                 anchors {
                     left : parent.left
                     leftMargin: 15
                     verticalCenter: cancelButton.verticalCenter
                     verticalCenterOffset: 2
                 }
-
                 height : actionDelete.height
                 width : actionDelete.width
 
+                enabled: visible
+                visible: (panelController && panelController.originalAction !== null)
                 hoverEnabled: true
 
                 onClicked: {

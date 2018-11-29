@@ -37,7 +37,8 @@ Item {
     // Controller associated to our view
     property var controller : null;
 
-    // my agent
+    // Agents Grouped by Definition
+    //property AgentsGroupedByDefinitionVM agentsGroupedByDefinition: null;
     property var agent: null;
 
     // true if agent Item contains the mouse (rollover)
@@ -130,18 +131,18 @@ Item {
             }
 
             onClicked: {
-
-                if (IngeScapeEditorC.canDeleteAgentFromSupervision(model.name))
+                if (IngeScapeEditorC.isAgentUsedInPlatform(rootItem.agent))
+                {
+                    // Emit the signal "Need Confirmation to Delete Agent in List"
+                    rootItem.needConfirmationToDeleteAgentInList();
+                }
+                else
                 {
                     if (controller)
                     {
-                        // Delete selected agent
+                        // Delete our agent
                         controller.deleteAgentInList(rootItem.agent);
                     }
-                }
-                else {
-                    // Emit the signal "Need Confirmation to Delete Agent in List"
-                    rootItem.needConfirmationToDeleteAgentInList();
                 }
             }
         }
