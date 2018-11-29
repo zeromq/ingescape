@@ -724,12 +724,14 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
             {
                 //qDebug() << "OBSERVE: Model of" << agentName << "is defined. ADD in MAPPING view !" << agent;
 
-                // The agent is not yet in the mapping...
+                // The agent is not in the mapping
                 if (agentInMapping == nullptr)
                 {
                     // Get the (view model of) agents grouped for a name
                     AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
-                    if (agentsGroupedByName != nullptr)
+
+                    // If our model is the first (and only) one, we add the agent to the mapping
+                    if ((agentsGroupedByName != nullptr) && (agentsGroupedByName->models()->count() == 1))
                     {
                         double randomMax = (double)RAND_MAX;
 
