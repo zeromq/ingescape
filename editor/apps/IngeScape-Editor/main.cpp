@@ -30,6 +30,7 @@
 #include <misc/ingescapeeditorutils.h>
 #include <misc/collapsiblecolumn.h>
 #include <misc/qquickwindowblocktouches.h>
+#include <misc/textfielddoublevalidator.h>
 
 
 /**
@@ -151,6 +152,7 @@ void registerCustomQmlTypes()
 
     qmlRegisterType<CollapsibleColumn>("INGESCAPE", 1, 0, "CollapsibleColumn");
     qmlRegisterType<QQuickWindowBlockTouches>("INGESCAPE", 1, 0, "WindowBlockTouches");
+    qmlRegisterType<TextFieldDoubleValidator>("INGESCAPE", 1, 0, "TextFieldDoubleValidator");
 
     // GST not included in master branch
     // qmlRegisterType<GstVideoReceiver>("INGESCAPE", 1, 0, "GstVideoReceiver");

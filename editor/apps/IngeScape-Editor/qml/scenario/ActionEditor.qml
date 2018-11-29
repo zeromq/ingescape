@@ -622,6 +622,12 @@ WindowBlockTouches {
                                         }
                                         height: 25
 
+                                        property int maxIntValue:  2147483647 // maximum 32bit signed integer value
+                                        property int minIntValue: -2147483647 // maximum 32bit signed integer value
+
+                                        property double maxDoubleValue:  Number.MAX_VALUE // maximum 64bit IEEE-754 (double precision) value (~ 1e+308)
+                                        property double minDoubleValue: -Number.MAX_VALUE // (negative) maximum 64bit IEEE-754 (double precision) value (~ -1e+308)
+
                                         // Force the content's format according to the IOP value type.
                                         // e.g. Switching from DOUBLE to INTEGER will truncate the value to its integer part (no decimals).
                                         function revalidateText() {
@@ -630,18 +636,18 @@ WindowBlockTouches {
                                                     if (myEffect.modelM.agentIOP) {
                                                         var iopValueType = myEffect.modelM.agentIOP.agentIOPValueType
                                                         if (iopValueType === AgentIOPValueTypes.INTEGER) {
-                                                            // Checking Number conversion to always show a valid number text (instead of "nan")
-                                                            var integerValue = Number(myEffect.modelM.value).toFixed(0)
+                                                            // Checking Number conversion to always show a valid number (instead of "nan")
+                                                            var integerValue = Number(myEffect.modelM.value)
                                                             if (isNaN(integerValue))
                                                             {
                                                                 myEffect.modelM.value = 0
                                                             }
                                                             else
                                                             {
-                                                                myEffect.modelM.value = integerValue
+                                                                myEffect.modelM.value = Math.max(Math.min(maxIntValue, integerValue), minIntValue).toFixed(0)
                                                             }
                                                         } else if (iopValueType === AgentIOPValueTypes.DOUBLE) {
-                                                            // Checking Number conversion to always show a valid number text (instead of "nan")
+                                                            // Checking Number conversion to always show a valid number (instead of "nan")
                                                             var doubleValue = Number(myEffect.modelM.value)
                                                             if (isNaN(doubleValue))
                                                             {
@@ -649,7 +655,7 @@ WindowBlockTouches {
                                                             }
                                                             else
                                                             {
-                                                                myEffect.modelM.value = doubleValue
+                                                                myEffect.modelM.value = Math.max(Math.min(maxDoubleValue, doubleValue), minDoubleValue).toPrecision()
                                                             }
                                                         }
                                                     }
@@ -668,8 +674,14 @@ WindowBlockTouches {
                                         verticalAlignment: TextInput.AlignVCenter
 
                                         property var stringValidator: RegExpValidator { regExp: /.*/ }
-                                        property var intValidator: IntValidator {}
-                                        property var doubleValidator: DoubleValidator {}
+                                        property var intValidator: IntValidator {
+                                            top:    textFieldTargetValue.maxIntValue
+                                            bottom: textFieldTargetValue.minIntValue
+                                        }
+                                        property var doubleValidator: TextFieldDoubleValidator {
+                                            top:    textFieldTargetValue.maxDoubleValue
+                                            bottom: textFieldTargetValue.minDoubleValue
+                                        }
 
                                         validator: if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.STRING) {
                                                        stringValidator
