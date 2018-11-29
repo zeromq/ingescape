@@ -49,11 +49,16 @@ AgentMappingM::~AgentMappingM()
     // DIS-connect to signal "Count Changed" from the list of mapping elements
     disconnect(&_mappingElements, &AbstractI2CustomItemListModel::countChanged, this, &AgentMappingM::_onMappingElementsListChanged);
 
-    // FIXME: Clear the list (do not delete all)
-    //_mappingElements.deleteAllItems();
-    _mappingElements.clear();
+    // Clear the map
+    //_mapFromNameToMappingElement.clear();
 
     _namesOfMappingElements.clear();
+
+    // Delete all models of mapping elements
+    //_previousListOfMappingElements.clear();
+    // FIXME: Delete all mapping elements
+    //_mappingElements.deleteAllItems();
+    _mappingElements.clear();
 }
 
 
@@ -71,5 +76,34 @@ void AgentMappingM::_onMappingElementsListChanged()
         }
     }
 
-    //qDebug() << "Mapping" << _name << "Names:" << _namesOfMappingElements;
+    /*QList<ElementMappingM*> newMappingElementsList = _mappingElements.toList();
+
+    // Mapping Element added
+    if (_previousListOfMappingElements.count() < newMappingElementsList.count())
+    {
+        for (ElementMappingM* mappingElement : newMappingElementsList)
+        {
+            if ((mappingElement != nullptr) && !_previousListOfMappingElements.contains(mappingElement))
+            {
+                _namesOfMappingElements.append(mappingElement->name());
+                _mapFromNameToMappingElement.insert(mappingElement->name(), mappingElement);
+            }
+        }
+    }
+    // Mapping Element removed
+    else if (_previousListOfMappingElements.count() > newMappingElementsList.count())
+    {
+        for (ElementMappingM* mappingElement : _previousListOfMappingElements)
+        {
+            if ((mappingElement != nullptr) && !newMappingElementsList.contains(mappingElement))
+            {
+                _namesOfMappingElements.removeOne(mappingElement->name());
+                _mapFromNameToMappingElement.remove(mappingElement->name());
+            }
+        }
+    }
+
+    _previousListOfMappingElements = newMappingElementsList;*/
+
+    //qDebug() << "Mapping" << _name << "has elements:" << _namesOfMappingElements;
 }

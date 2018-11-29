@@ -60,8 +60,13 @@ DefinitionM::~DefinitionM()
     _mapFromParameterNameToParameter.clear();
 
     // Delete all models of Inputs, Outputs and Parameters
+    _previousInputsList.clear();
     _inputsList.deleteAllItems();
+
+    _previousOutputsList.clear();
     _outputsList.deleteAllItems();
+
+    _previousParametersList.clear();
     _parametersList.deleteAllItems();
 }
 

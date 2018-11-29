@@ -185,7 +185,7 @@ AgentMappingM* JsonHelper::createModelOfAgentMappingFromJSON(QString inputAgentN
 
         if (jsonMappingOut.isArray())
         {
-            QList<ElementMappingM*> mappingElements;
+            QList<ElementMappingM*> tempMappingElements;
 
             for (QJsonValue jsonMap : jsonMappingOut.toArray())
             {
@@ -193,13 +193,13 @@ AgentMappingM* JsonHelper::createModelOfAgentMappingFromJSON(QString inputAgentN
                 {
                     ElementMappingM* mappingElement = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
                     if (mappingElement != nullptr) {
-                        mappingElements.append(mappingElement);
+                        tempMappingElements.append(mappingElement);
                     }
                 }
             }
 
-            if (!mappingElements.isEmpty()) {
-                agentMapping->mappingElements()->append(mappingElements);
+            if (!tempMappingElements.isEmpty()) {
+                agentMapping->mappingElements()->append(tempMappingElements);
             }
         }
     }

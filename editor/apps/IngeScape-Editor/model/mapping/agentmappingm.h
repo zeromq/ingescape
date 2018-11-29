@@ -63,14 +63,21 @@ public:
     ~AgentMappingM();
 
 
-Q_SIGNALS:
-
 private Q_SLOTS:
 
     /**
      * @brief Slot called when the list of mapping elements changed
      */
     void _onMappingElementsListChanged();
+
+
+private:
+
+    // Previous list of mapping elements
+    //QList<ElementMappingM*> _previousListOfMappingElements;
+
+    // Map from a name to a model of mapping element
+    //QHash<QString, ElementMappingM*> _mapFromNameToMappingElement;
 
 };
 

@@ -432,7 +432,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 {
     if (_jsonHelper != nullptr)
     {
-        QList<ElementMappingM*> mappingElements;
+        QList<ElementMappingM*> listOfMappingElements;
 
         for (QJsonValue jsonValue : jsonArrayOfAgentsInMapping)
         {
@@ -486,7 +486,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                             }
 
                             // Add the link elements
-                            mappingElements.append(agentMapping->mappingElements()->toList());
+                            listOfMappingElements.append(agentMapping->mappingElements()->toList());
                         }
                     }
                 }
@@ -494,10 +494,10 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
         }
 
         // FIXME: Add links ?
-        if (!mappingElements.isEmpty())
+        if (!listOfMappingElements.isEmpty())
         {
             // Create all mapping links
-            for (ElementMappingM* mappingElement : mappingElements)
+            for (ElementMappingM* mappingElement : listOfMappingElements)
             {
                 if (mappingElement != nullptr) {
                     onMapped(mappingElement);
