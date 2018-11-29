@@ -175,8 +175,11 @@ void HostsSupervisionController::onAgentModelHasBeenCreated(AgentM* agent)
             // Add this agent to the host
             hostVM->agentsList()->append(agent);
 
-            // This agent can be restarted
-            agent->setcanBeRestarted(true);
+            if (hostVM->name() != HOSTNAME_NOT_DEFINED)
+            {
+                // This agent can be restarted
+                agent->setcanBeRestarted(true);
+            }
 
             qDebug() << "Add agent" << agent->name() << "to host" << hostVM->name();
         }
