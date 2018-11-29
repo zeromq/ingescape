@@ -967,7 +967,9 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                      // Set this definition to the agent
                      agent->setdefinition(agentDefinition);
 
-                     if (!agentDefinition->outputsList()->isEmpty()) {
+                     if (!agentDefinition->outputsList()->isEmpty())
+                     {
+                         // Emit the signal "Add Inputs to Editor for Outputs"
                          Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
                      }
                  }
@@ -981,12 +983,15 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                          // Check if output(s) have been removed
                          //
                          QList<OutputM*> removedOutputsList;
-                         for (OutputM* output : previousDefinition->outputsList()->toList()) {
+                         for (OutputM* output : previousDefinition->outputsList()->toList())
+                         {
+                             // The new definition does not contain this output id
                              if ((output != nullptr) && !output->id().isEmpty() && !agentDefinition->outputsIdsList().contains(output->id())) {
                                  removedOutputsList.append(output);
                              }
                          }
-                         if (!removedOutputsList.isEmpty()) {
+                         if (!removedOutputsList.isEmpty())
+                         {
                              // Emit the signal "Remove Inputs to Editor for Outputs"
                              Q_EMIT removeInputsToEditorForOutputs(agentName, removedOutputsList);
                          }
@@ -999,12 +1004,15 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                          // Check if output(s) have been added
                          //
                          QList<OutputM*> addedOutputsList;
-                         for (OutputM* output : agentDefinition->outputsList()->toList()) {
+                         for (OutputM* output : agentDefinition->outputsList()->toList())
+                         {
+                             // The previous definition does not contain this output id
                              if ((output != nullptr) && !output->id().isEmpty() && !previousDefinition->outputsIdsList().contains(output->id())) {
                                  addedOutputsList.append(output);
                              }
                          }
-                         if (!addedOutputsList.isEmpty()) {
+                         if (!addedOutputsList.isEmpty())
+                         {
                              // Emit the signal "Add Inputs to Editor for Outputs"
                              Q_EMIT addInputsToEditorForOutputs(agentName, addedOutputsList);
                          }

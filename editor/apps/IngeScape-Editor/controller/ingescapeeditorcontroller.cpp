@@ -15,15 +15,13 @@
 
 #include "controller/ingescapeeditorcontroller.h"
 
-#include "misc/ingescapeeditorsettings.h"
-#include "misc/ingescapeeditorutils.h"
-
 #include <I2Quick.h>
-
 #include <QFileDialog>
 #include <QThread>
 #include <QApplication>
 #include <QCursor>
+#include <misc/ingescapeeditorsettings.h>
+#include <misc/ingescapeeditorutils.h>
 
 
 /**
@@ -945,6 +943,14 @@ void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
     {
         QJsonObject jsonRoot = jsonDocument.object();
 
+        // Version
+        if (jsonRoot.contains("version"))
+        {
+            QString versionJsonPlatform = jsonRoot.value("version").toString();
+            // FIXME TODO: version JSON Platform
+            qDebug() << "Version JSON Platform" << versionJsonPlatform;
+        }
+
         // Import the agents list from JSON
         if ((_modelManager != nullptr) && jsonRoot.contains("agents"))
         {
@@ -977,6 +983,8 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
     if (_jsonHelper != nullptr)
     {
         QJsonObject platformJsonObject;
+
+        platformJsonObject.insert("version", VERSION_JSON_PLATFORM);
 
         // Save the agents
         if (_modelManager != nullptr)
