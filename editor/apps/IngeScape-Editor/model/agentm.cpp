@@ -128,11 +128,32 @@ void AgentM::setdefinition(DefinitionM *value)
             connect(_definition, &DefinitionM::isMutedOutputChanged, this, &AgentM::isMutedOutputChanged);
         }
 
-        // Emit default signal for QML
+        // Emit the default signal for QML
         Q_EMIT definitionChanged(value);
 
-        // Emit the signal "Definition Changed" with previous and new values
+        // Emit the signal "Definition changed" with previous and new values
         Q_EMIT definitionChangedWithPreviousAndNewValues(previousValue, value);
+    }
+}
+
+
+/**
+ * @brief Setter for property "Mapping"
+ * @param value
+ */
+void AgentM::setmapping(AgentMappingM *value)
+{
+    if (_mapping != value)
+    {
+        AgentMappingM* previousValue = _mapping;
+
+        _mapping = value;
+
+        // Emit the default signal for QML
+        Q_EMIT mappingChanged(value);
+
+        // Emit the signal "Mapping changed" with previous and new values
+        Q_EMIT mappingChangedWithPreviousAndNewValues(previousValue, value);
     }
 }
 

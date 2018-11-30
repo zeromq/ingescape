@@ -66,7 +66,7 @@ class AgentM : public QObject
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
 
     // Mapping of our agent
-    I2_QML_PROPERTY_READONLY(AgentMappingM*, mapping)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(AgentMappingM*, mapping)
 
     // State of our agent
     I2_CPP_PROPERTY(QString, state)
@@ -139,6 +139,14 @@ Q_SIGNALS:
      * @param newValue
      */
     void definitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
+
+
+    /**
+     * @brief Signal emitted when the mapping changed (with previous and new values)
+     * @param previousValue
+     * @param newValue
+     */
+    void mappingChangedWithPreviousAndNewValues(AgentMappingM* previousValue, AgentMappingM* newValue);
 
 
     /**
