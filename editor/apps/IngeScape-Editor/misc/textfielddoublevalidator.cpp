@@ -39,16 +39,20 @@ QValidator::State TextFieldDoubleValidator::validate(QString& s, int& /*pos*/) c
         return QValidator::Intermediate;
     }
     // check length of decimal places
-    QChar point = locale().decimalPoint();
+    QChar point = QChar('.');
+
+    s = s.replace(",", point);
+
     if(s.indexOf(point) != -1) {
         int lengthDecimals = s.length() - s.indexOf(point) - 1;
         if (lengthDecimals > decimals()) {
             return QValidator::Invalid;
         }
     }
+
     // check range of value
     bool isNumber;
-    double value = locale().toDouble(s, &isNumber);
+    double value = s.toDouble(&isNumber);
     if (isNumber && bottom() <= value && value <= top()) {
         return QValidator::Acceptable;
     }

@@ -647,7 +647,8 @@ WindowBlockTouches {
                                                 if (myEffect && myEffect.modelM) {
                                                     if (myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel) {
                                                         var iopValueType = myEffect.modelM.agentIOP.firstModel.agentIOPValueType
-                                                        if (iopValueType === AgentIOPValueTypes.INTEGER) {
+                                                        if (iopValueType === AgentIOPValueTypes.INTEGER)
+                                                        {
                                                             // Checking Number conversion to always show a valid number (instead of "nan")
                                                             var integerValue = Number(myEffect.modelM.value)
                                                             if (isNaN(integerValue))
@@ -658,7 +659,9 @@ WindowBlockTouches {
                                                             {
                                                                 myEffect.modelM.value = Math.max(Math.min(maxIntValue, integerValue), minIntValue).toFixed(0)
                                                             }
-                                                        } else if (iopValueType === AgentIOPValueTypes.DOUBLE) {
+                                                        }
+                                                        else if (iopValueType === AgentIOPValueTypes.DOUBLE)
+                                                        {
                                                             // Checking Number conversion to always show a valid number (instead of "nan")
                                                             var doubleValue = Number(myEffect.modelM.value)
                                                             if (isNaN(doubleValue))
@@ -672,7 +675,8 @@ WindowBlockTouches {
                                                         }
                                                     }
                                                     text = myEffect.modelM.value
-                                                } else {
+                                                }
+                                                else {
                                                     text = ""
                                                 }
                                             }
@@ -795,7 +799,8 @@ WindowBlockTouches {
                                                        // Only "1" and "0" values from the TextField update the combobox since its the two values assigned to the model by this combobox
                                                        if (Number(myEffect.modelM.value) === 0) {
                                                            comboboxTargetValue.model.indexOf("FALSE")
-                                                       } else if (Number(myEffect.modelM.value) === 1) {
+                                                       }
+                                                       else if (Number(myEffect.modelM.value) === 1) {
                                                            comboboxTargetValue.model.indexOf("TRUE")
                                                        }
                                                    }
@@ -1786,7 +1791,8 @@ WindowBlockTouches {
                                                             {
                                                                 myCondition.modelM.comparisonValue = Math.max(Math.min(maxIntValue, integerValue), minIntValue).toFixed(0)
                                                             }
-                                                        } else if (iopValueType === AgentIOPValueTypes.DOUBLE) {
+                                                        }
+                                                        else if (iopValueType === AgentIOPValueTypes.DOUBLE) {
                                                             // Checking Number conversion to always show a valid number (instead of "nan")
                                                             var doubleValue = Number(myCondition.modelM.comparisonValue)
                                                             if (isNaN(doubleValue))
@@ -1800,7 +1806,8 @@ WindowBlockTouches {
                                                         }
                                                     }
                                                     text = myCondition.modelM.comparisonValue
-                                                } else {
+                                                }
+                                                else {
                                                     text = ""
                                                 }
                                             }
@@ -1917,7 +1924,8 @@ WindowBlockTouches {
                                                        // Only "1" and "0" values from the TextField update the combobox since its the two values assigned to the model by this combobox
                                                        if (Number(myCondition.modelM.comparisonValue) === 0) {
                                                            comboboxConditionValue.model.indexOf("FALSE")
-                                                       } else if (Number(myCondition.modelM.comparisonValue) === 1) {
+                                                       }
+                                                       else if (Number(myCondition.modelM.comparisonValue) === 1) {
                                                            comboboxConditionValue.model.indexOf("TRUE")
                                                        }
                                                    }
