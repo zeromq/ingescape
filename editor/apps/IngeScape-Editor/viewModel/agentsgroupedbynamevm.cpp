@@ -594,16 +594,60 @@ void AgentsGroupedByNameVM::_onMappingOfModelChangedWithPreviousAndNewValues(Age
     AgentM* model = qobject_cast<AgentM*>(sender());
     if ((model != nullptr) && (newMapping != nullptr))
     {
+        QStringList namesOfRemovedMappingElements;
+        QStringList namesOfAddedMappingElements;
+
+        // FIXME TODO: MappingElementVM qui contient des models de ElementMappingM
+
         // The previous mapping was NULL (and the new mapping is defined)
         if (previousMapping == nullptr)
         {
-            // FIXME TODO
+            namesOfAddedMappingElements.append(newMapping->namesOfMappingElements());
         }
         // The previous mapping was already defined (and the new mapping is defined)
         else
         {
-            // FIXME TODO
+            for (QString namePreviousList : previousMapping->namesOfMappingElements())
+            {
+                if (!newMapping->namesOfMappingElements().contains(namePreviousList)) {
+                    namesOfRemovedMappingElements.append(namePreviousList);
+                }
+            }
+
+            for (QString nameNewList : newMapping->namesOfMappingElements())
+            {
+                if (!previousMapping->namesOfMappingElements().contains(nameNewList)) {
+                    namesOfAddedMappingElements.append(nameNewList);
+                }
+            }
+
+            // If there are some Removed mapping elements
+            if (!namesOfRemovedMappingElements.isEmpty())
+            {
+                for (ElementMappingM* mappingElement : previousMapping->mappingElements()->toList())
+                {
+                    if ((mappingElement != nullptr) && namesOfRemovedMappingElements.contains(mappingElement->name()))
+                    {
+                        // Remove the mappingElement from the list "models" of the MappingElementVM
+                    }
+                }
+            }
         }
+
+        // If there are some Added mapping elements
+        if (!namesOfAddedMappingElements.isEmpty())
+        {
+            for (ElementMappingM* mappingElement : newMapping->mappingElements()->toList())
+            {
+                if ((mappingElement != nullptr) && namesOfAddedMappingElements.contains(mappingElement->name()))
+                {
+                    // Add the mappingElement to the list "models" of the MappingElementVM
+                }
+            }
+        }
+
+        // If the list "models" of the MappingElementVM (0 --> 1) --> Mapped
+        // If the list "models" of the MappingElementVM == 0 --> UNmapped
     }
 }
 

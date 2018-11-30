@@ -915,29 +915,27 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
 {
     Q_UNUSED(agentName)
 
-    if (!definitionJSON.isEmpty() && (_jsonHelper != nullptr))
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+
+    if ((agent != nullptr) && (_jsonHelper != nullptr) && !definitionJSON.isEmpty())
     {
-        AgentM* agent = getAgentModelFromPeerId(peerId);
-        if (agent != nullptr)
+        // Save the previous agent definition
+        DefinitionM* previousDefinition = agent->definition();
+
+        // Create the new agent definition (model of agent definition from JSON)
+        DefinitionM* newDefinition = _jsonHelper->createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
+
+        if (newDefinition != nullptr)
         {
-            // Save the previous agent definition
-            DefinitionM* previousDefinition = agent->definition();
+            // Set this new definition to the agent
+            agent->setdefinition(newDefinition);
 
-            // Create the new agent definition (model of agent definition from JSON)
-            DefinitionM* newDefinition = _jsonHelper->createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
+            // Emit the signal "Active Agent Defined"
+            Q_EMIT activeAgentDefined(agent);
 
-            if (newDefinition != nullptr)
-            {
-                // Set this new definition to the agent
-                agent->setdefinition(newDefinition);
-
-                // Emit the signal "Active Agent Defined"
-                Q_EMIT activeAgentDefined(agent);
-
-                // Free memory
-                if (previousDefinition != nullptr) {
-                    delete previousDefinition;
-                }
+            // Free memory
+            if (previousDefinition != nullptr) {
+                delete previousDefinition;
             }
         }
     }
@@ -953,6 +951,7 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
 void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName, QString mappingJSON)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
+
     if ((agent != nullptr) && (_jsonHelper != nullptr))
     {
         AgentMappingM* agentMapping = nullptr;
