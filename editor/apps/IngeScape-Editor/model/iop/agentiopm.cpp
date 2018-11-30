@@ -121,3 +121,31 @@ void AgentIOPM::setcurrentValue(QVariant value)
     // Emit the signal even if the value has not changed to show the animation
     Q_EMIT currentValueChanged(value);
 }
+
+
+/**
+ * @brief Get the name and the value type of an agent I/O/P from its id
+ * @param id
+ * @return
+ */
+QPair<QString, AgentIOPValueTypes::Value> AgentIOPM::getNameAndValueTypeFromId(QString id)
+{
+    QString name = "";
+    AgentIOPValueTypes::Value valueType = AgentIOPValueTypes::UNKNOWN;
+
+    if (id.contains(SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE))
+    {
+        QStringList nameAndValueType = id.split(SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE);
+        if (nameAndValueType.count() == 2)
+        {
+            name = nameAndValueType.at(0);
+
+            int nValueType = AgentIOPValueTypes::staticEnumFromKey(nameAndValueType.at(1));
+            if (nValueType > -1)
+            {
+                valueType = static_cast<AgentIOPValueTypes::Value>(nValueType);
+            }
+        }
+    }
+    return QPair<QString, AgentIOPValueTypes::Value>(name, valueType);
+}

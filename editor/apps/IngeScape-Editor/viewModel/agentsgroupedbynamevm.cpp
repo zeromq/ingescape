@@ -114,6 +114,7 @@ void AgentsGroupedByNameVM::addNewAgentModel(AgentM* model)
             // Connect to signals from the model
             connect(model, &AgentM::isONChanged, this, &AgentsGroupedByNameVM::_onIsONofModelChanged);
             connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues);
+            connect(model, &AgentM::mappingChangedWithPreviousAndNewValues, this, &AgentsGroupedByNameVM::_onMappingOfModelChangedWithPreviousAndNewValues);
 
             _models.append(model);
 
@@ -578,6 +579,30 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
             if (previousGroup != nullptr) {
                 previousGroup->models()->remove(model);
             }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when the mapping of a model changed (with previous and new values)
+ * @param previousMapping
+ * @param newMapping
+ */
+void AgentsGroupedByNameVM::_onMappingOfModelChangedWithPreviousAndNewValues(AgentMappingM* previousMapping, AgentMappingM* newMapping)
+{
+    AgentM* model = qobject_cast<AgentM*>(sender());
+    if ((model != nullptr) && (newMapping != nullptr))
+    {
+        // The previous mapping was NULL (and the new mapping is defined)
+        if (previousMapping == nullptr)
+        {
+            // FIXME TODO
+        }
+        // The previous mapping was already defined (and the new mapping is defined)
+        else
+        {
+            // FIXME TODO
         }
     }
 }

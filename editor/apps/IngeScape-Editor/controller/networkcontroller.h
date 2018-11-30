@@ -21,7 +21,7 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-#include <model/iop/outputm.h>
+#include <model/agentm.h>
 #include <model/publishedvaluem.h>
 
 
@@ -31,6 +31,9 @@
 class NetworkController: public QObject
 {
     Q_OBJECT
+
+    // Model of our agent "IngeScape Editor"
+    I2_QML_PROPERTY_READONLY(AgentM*, agentEditor)
 
     // List of available network devices
     I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
@@ -369,7 +372,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a command must be sent on the network to an agent
+     * @brief Slot called when a command must be sent on the network to an agent
      * @param peerIdsList
      * @param command
      */
@@ -377,7 +380,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a command must be sent on the network to an agent about one of its output
+     * @brief Slot called when a command must be sent on the network to an agent about one of its output
      * @param peerIdsList
      * @param command
      * @param outputName
@@ -386,7 +389,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
+     * @brief Slot called when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
      * @param peerIdsList
      * @param command
      * @param agentIOPName
@@ -396,7 +399,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a command must be sent on the network to an agent about mapping one of its input
+     * @brief Slot called when a command must be sent on the network to an agent about mapping one of its input
      * @param peerIdsList
      * @param command
      * @param inputName
@@ -407,29 +410,19 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when inputs must be added to our Editor for a list of outputs
+     * @brief Slot called when inputs must be added to our Editor for a list of outputs
      * @param agentName
-     * @param outputsList
+     * @param newOutputsIds
      */
-    void onAddInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+    void onAddInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds);
 
 
     /**
-     * @brief Slot when inputs must be removed to our Editor for a list of outputs
+     * @brief Slot called when inputs must be removed to our Editor for a list of outputs
      * @param agentName
-     * @param outputsList
+     * @param oldOutputsIds
      */
-    void onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
-
-
-private:
-
-    /**
-     * @brief Get the number of agents in state ON with an "Input (on our editor) Name"
-     * @param inputName name of an input on our editor
-     * @return
-     */
-    int _getNumberOfAgentsONwithInputName(QString inputName);
+    void onRemoveInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds);
 
 
 private:
@@ -442,11 +435,6 @@ private:
 
     // Hash table from a peer id to a type of IngeScape elements on the network
     QHash<QString, IngeScapeTypes::Value> _hashFromPeerIdToIngeScapeType;
-
-
-    // Map from "Input (on our editor) Name" to the number of agents in state ON
-    // Variants of an agent can have some outputs with same name and some outputs with different name
-    QHash<QString, int> _mapFromInputNameToNumberOfAgentsON;
 
 };
 

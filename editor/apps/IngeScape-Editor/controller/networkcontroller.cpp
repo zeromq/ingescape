@@ -675,6 +675,8 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
  * @param parent
  */
 NetworkController::NetworkController(QObject *parent) : QObject(parent),
+    _agentEditor(nullptr),
+    _editorAgentName(""),
     _isIngeScapeAgentStarted(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -728,6 +730,17 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     if (result == 0) {
         qCritical() << "The callback on zyre messages has NOT been registered !";
     }
+
+
+    //
+    // Create the model of our agent "IngeScape Editor"
+    //
+    _agentEditor = new AgentM(_editorAgentName);
+
+    QString definitionDescription = QString("Definition of %1 made by %2").arg(_editorAgentName, organizationName);
+    DefinitionM* agentDefinition = new DefinitionM(_editorAgentName, version, definitionDescription);
+
+    _agentEditor->setdefinition(agentDefinition);
 }
 
 
@@ -738,6 +751,14 @@ NetworkController::~NetworkController()
 {
     // Stop our INGESCAPE agent
     stop();
+
+    // Delete the model of our agent "IngeScape Editor"
+    if (_agentEditor != nullptr)
+    {
+        AgentM* temp = _agentEditor;
+        setagentEditor(nullptr);
+        delete temp;
+    }
 }
 
 
@@ -1086,27 +1107,29 @@ void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerI
 
 
 /**
- * @brief Slot when inputs must be added to our Editor for a list of outputs
+ * @brief Slot called when inputs must be added to our Editor for a list of outputs
  * @param agentName
- * @param outputsList
+ * @param newOutputsIds
  */
-void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
+void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds)
 {
-    for (OutputM* output : outputsList)
+    if ((_agentEditor != nullptr) && (_agentEditor->definition() != nullptr) && !newOutputsIds.isEmpty())
     {
-        if ((output != nullptr) && !output->id().isEmpty())
+        for (QString outputId : newOutputsIds)
         {
-            QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, output->id());
+            // Get the name and the value type of the output from its id
+            QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
 
-            // Get the number of agents in state ON with an "Input (on our editor) Name"
-            int numberOfAgentsON = _getNumberOfAgentsONwithInputName(inputName);
-
-            // If there is not yet an agent in state ON for this input name, we create a new input on our agent
-            if (numberOfAgentsON == 0)
+            if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
             {
+                QString outputName = pair.first;
+                AgentIOPValueTypes::Value valueType = pair.second;
+
+                QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, outputId);
+
                 int resultCreateInput = 0;
 
-                switch (output->agentIOPValueType())
+                switch (valueType)
                 {
                 case AgentIOPValueTypes::INTEGER: {
                     resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_INTEGER_T, NULL, 0);
@@ -1133,116 +1156,102 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
                     break;
                 }
                 default: {
-                    qCritical() << "Wrong type for the value of output" << output->name() << "of agent" << agentName;
+                    qCritical() << "Wrong type for the value of output" << outputName << "of agent" << agentName;
                     break;
                 }
                 }
 
                 if (resultCreateInput == 1)
                 {
-                    //qDebug() << "Create input" << inputName << "on agent" << _editorAgentName;
+                    qDebug() << "Input" << inputName << "created on agent" << _editorAgentName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType);
+
+                    // Create a new model of input
+                    AgentIOPM* input = new AgentIOPM(AgentIOPTypes::INPUT, inputName, valueType);
+
+                    // Add the input to the definition of our agent "IngeScape Editor"
+                    _agentEditor->definition()->inputsList()->append(input);
 
                     // Begin the observe of this input
                     int resultObserveInput = igs_observeInput(inputName.toStdString().c_str(), onObserveInputCallback, this);
 
                     if (resultObserveInput == 1) {
-                        //qDebug() << "Observe input" << inputName << "on agent" << _editorAgentName;
+                        qDebug() << "Observe input" << inputName << "on agent" << _editorAgentName;
                     }
                     else {
                         qCritical() << "Can NOT observe input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultObserveInput;
                     }
 
                     // Add mapping between our input and this output
-                    unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
+                    unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
 
                     if (id > 0) {
-                        //qDebug() << "Add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "(id" << id << ")";
+                        qDebug() << "Add mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "(id" << id << ")";
                     }
                     else {
-                        qCritical() << "Can NOT add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << id;
+                        qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << id;
                     }
 
                 }
                 else {
-                    qCritical() << "Can NOT create input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultCreateInput;
+                    qCritical() << "Can NOT create input" << inputName << "on agent" << _editorAgentName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType) << "Error code:" << resultCreateInput;
                 }
             }
-
-            numberOfAgentsON++;
-            qDebug() << "on Add Inputs: There are" << numberOfAgentsON << "agents ON for input name" << inputName;
-
-            _mapFromInputNameToNumberOfAgentsON.insert(inputName, numberOfAgentsON);
         }
     }
 }
 
 
 /**
- * @brief Slot when inputs must be removed to our Editor for a list of outputs
+ * @brief Slot called when inputs must be removed to our Editor for a list of outputs
  * @param agentName
- * @param outputsList
+ * @param oldOutputsIds
  */
-void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
+void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds)
 {
-    for (OutputM* output : outputsList)
+    if ((_agentEditor != nullptr) && (_agentEditor->definition() != nullptr) && !oldOutputsIds.isEmpty())
     {
-        if ((output != nullptr) && !output->id().isEmpty())
+        for (QString outputId : oldOutputsIds)
         {
-            QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, output->id());
+            // Get the name and the value type of the output from its id
+            QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
 
-            // Get the number of agents in state ON with an "Input (on our editor) Name"
-            int numberOfAgentsON = _getNumberOfAgentsONwithInputName(inputName);
-
-            numberOfAgentsON--;
-            _mapFromInputNameToNumberOfAgentsON.insert(inputName, numberOfAgentsON);
-
-            qDebug() << "on Remove Inputs: There are" << numberOfAgentsON << "agents ON for input name" << inputName;
-
-            // FIXME: Debug numberOfAgentsON < 0
-            if (numberOfAgentsON < 0) {
-                qWarning() << "There are" << numberOfAgentsON << "agents ON for input name" << inputName;
-            }
-
-            // If there is no more agent in state ON for this input name, we remove an old input on our agent
-            if (numberOfAgentsON == 0)
+            if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
             {
-                // Remove mapping between our input and this output
-                int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
+                QString outputName = pair.first;
+                AgentIOPValueTypes::Value valueType = pair.second;
 
-                if (resultRemoveMappingEntry == 1) {
-                    qDebug() << "Remove mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName;
+                QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, outputId);
+
+                // Remove mapping between our input and this output
+                int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+                if (resultRemoveMappingEntry == 1)
+                {
+                    qDebug() << "Remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName;
 
                     // Remove our input
                     int resultRemoveInput = igs_removeInput(inputName.toStdString().c_str());
 
-                    if (resultRemoveInput == 1) {
-                        qDebug() << "Remove input" << inputName << "on agent" << _editorAgentName;
+                    if (resultRemoveInput == 1)
+                    {
+                        qDebug() << "Input" << inputName << "removed on agent" << _editorAgentName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType);
+
+                        // Get the Input with its name
+                        AgentIOPM* input = _agentEditor->definition()->getInputWithName(inputName);
+                        if (input != nullptr)
+                        {
+                            // Remove the input from the definition of our agent "IngeScape Editor"
+                            _agentEditor->definition()->inputsList()->remove(input);
+                        }
                     }
                     else {
-                        qCritical() << "Can NOT remove input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultRemoveInput;
+                        qCritical() << "Can NOT remove input" << inputName << "on agent" << _editorAgentName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType) << "Error code:" << resultRemoveInput;
                     }
                 }
                 else {
-                    qCritical() << "Can NOT remove mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << resultRemoveMappingEntry;
+                    qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << resultRemoveMappingEntry;
                 }
             }
         }
     }
 }
-
-
-/**
- * @brief Get the number of agents in state ON with an "Input (on our editor) Name"
- * @param inputName name of an input on our editor
- * @return
- */
-int NetworkController::_getNumberOfAgentsONwithInputName(QString inputName)
-{
-    if (_mapFromInputNameToNumberOfAgentsON.contains(inputName)) {
-        return _mapFromInputNameToNumberOfAgentsON.value(inputName);
-    }
-    else {
-        return 0;
-    }
-}
-

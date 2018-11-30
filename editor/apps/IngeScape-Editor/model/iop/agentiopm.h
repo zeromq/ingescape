@@ -87,6 +87,14 @@ public:
     ~AgentIOPM();
 
 
+    /**
+     * @brief Get the name and the value type of an agent I/O/P from its id
+     * @param id
+     * @return
+     */
+    static QPair<QString, AgentIOPValueTypes::Value> getNameAndValueTypeFromId(QString id);
+
+
 Q_SIGNALS:
 
 

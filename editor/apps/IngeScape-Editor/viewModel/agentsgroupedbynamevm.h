@@ -294,6 +294,14 @@ private Q_SLOTS:
 
 
     /**
+     * @brief Slot called when the mapping of a model changed (with previous and new values)
+     * @param previousMapping
+     * @param newMapping
+     */
+    void _onMappingOfModelChangedWithPreviousAndNewValues(AgentMappingM* previousMapping, AgentMappingM* newMapping);
+
+
+    /**
      * @brief Slot called when a view model of agents grouped by definition has become useless (no more model)
      */
     void _onUselessAgentsGroupedByDefinition();

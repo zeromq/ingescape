@@ -42,6 +42,7 @@ IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
 
     // Agents grouped are sorted on their name (alphabetical order)
     _allAgentsGroupsByName.setSortProperty("name");
+
 }
 
 
@@ -761,15 +762,6 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
 
             // Update the state (flag "is ON")
             agent->setisON(true);
-
-            // When this agent exited, we set its flag to "OFF" and emited "removeInputsToEditorForOutputs"
-            // Now, we just set its flag to ON and we have to emit "addInputsToEditorForOutputs"
-            // Because we consider that its definition will be the same...consequently, when "onDefinitionReceived" will be called,
-            // there will be no change detected and the signal "addInputsToEditorForOutputs" will not be called
-            if ((agent->definition() != nullptr) && !agent->definition()->outputsList()->isEmpty())
-            {
-                Q_EMIT addInputsToEditorForOutputs(agentName, agent->definition()->outputsList()->toList());
-            }
         }
         // New peer id
         else
@@ -807,39 +799,7 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
 
         // Update the state (flag "is ON")
         agent->setisON(false);
-
-        if ((agent->definition() != nullptr) && !agent->definition()->outputsList()->isEmpty()) {
-            Q_EMIT removeInputsToEditorForOutputs(agentName, agent->definition()->outputsList()->toList());
-        }
-
-        // Get the (view model of) agents grouped for this name
-        /*AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agentName);
-        if (agentsGroupedByName != nullptr)
-        {
-        }*/
     }
-}
-
-
-/**
- * @brief Slot called when a model of agent has to be deleted
- * @param model
- */
-void IngeScapeModelManager::onAgentModelHasToBeDeleted(AgentM* model)
-{
-    if (model != nullptr) {
-        deleteAgentModel(model);
-    }
-}
-
-
-/**
- * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
- * @param definitionsList
- */
-void IngeScapeModelManager::onDefinitionsToOpen(QList<DefinitionM*> definitionsList)
-{
-    _openDefinitions(definitionsList);
 }
 
 
@@ -953,78 +913,31 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
  */
 void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON)
 {
+    Q_UNUSED(agentName)
+
     if (!definitionJSON.isEmpty() && (_jsonHelper != nullptr))
     {
         AgentM* agent = getAgentModelFromPeerId(peerId);
         if (agent != nullptr)
         {
-            // Create a model of agent definition from JSON
-            DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
-            if (agentDefinition != nullptr)
+            // Save the previous agent definition
+            DefinitionM* previousDefinition = agent->definition();
+
+            // Create the new agent definition (model of agent definition from JSON)
+            DefinitionM* newDefinition = _jsonHelper->createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
+
+            if (newDefinition != nullptr)
             {
-                 if (agent->definition() == nullptr)
-                 {
-                     // Set this definition to the agent
-                     agent->setdefinition(agentDefinition);
+                // Set this new definition to the agent
+                agent->setdefinition(newDefinition);
 
-                     if (!agentDefinition->outputsList()->isEmpty())
-                     {
-                         // Emit the signal "Add Inputs to Editor for Outputs"
-                         Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
-                     }
-                 }
-                 // Update with the new definition
-                 else
-                 {
-                     DefinitionM* previousDefinition = agent->definition();
-                     if (previousDefinition != nullptr)
-                     {
-                         //
-                         // Check if output(s) have been removed
-                         //
-                         QList<OutputM*> removedOutputsList;
-                         for (OutputM* output : previousDefinition->outputsList()->toList())
-                         {
-                             // The new definition does not contain this output id
-                             if ((output != nullptr) && !output->id().isEmpty() && !agentDefinition->outputsIdsList().contains(output->id())) {
-                                 removedOutputsList.append(output);
-                             }
-                         }
-                         if (!removedOutputsList.isEmpty())
-                         {
-                             // Emit the signal "Remove Inputs to Editor for Outputs"
-                             Q_EMIT removeInputsToEditorForOutputs(agentName, removedOutputsList);
-                         }
+                // Emit the signal "Active Agent Defined"
+                Q_EMIT activeAgentDefined(agent);
 
-                         // Set this definition to the agent
-                         agent->setdefinition(agentDefinition);
-
-
-                         //
-                         // Check if output(s) have been added
-                         //
-                         QList<OutputM*> addedOutputsList;
-                         for (OutputM* output : agentDefinition->outputsList()->toList())
-                         {
-                             // The previous definition does not contain this output id
-                             if ((output != nullptr) && !output->id().isEmpty() && !previousDefinition->outputsIdsList().contains(output->id())) {
-                                 addedOutputsList.append(output);
-                             }
-                         }
-                         if (!addedOutputsList.isEmpty())
-                         {
-                             // Emit the signal "Add Inputs to Editor for Outputs"
-                             Q_EMIT addInputsToEditorForOutputs(agentName, addedOutputsList);
-                         }
-
-
-                         // Delete the previous model of agent definition
-                         delete previousDefinition;
-                     }
-                 }
-
-                 // Emit the signal "Active Agent Defined"
-                 Q_EMIT activeAgentDefined(agent);
+                // Free memory
+                if (previousDefinition != nullptr) {
+                    delete previousDefinition;
+                }
             }
         }
     }
@@ -1288,12 +1201,91 @@ void IngeScapeModelManager::onAgentMappingFilePath(QString peerId, QString mappi
 
 
 /**
+ * @brief Slot called when a model of agent has to be deleted
+ * @param model
+ */
+void IngeScapeModelManager::_onAgentModelHasToBeDeleted(AgentM* model)
+{
+    if (model != nullptr) {
+        deleteAgentModel(model);
+    }
+}
+
+
+/**
+ * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
+ * @param definitionsList
+ */
+void IngeScapeModelManager::_onDefinitionsToOpen(QList<DefinitionM*> definitionsList)
+{
+    _openDefinitions(definitionsList);
+}
+
+
+/**
+ * @brief Slot called when some view models of outputs have been added to an agent(s grouped by name)
+ * @param newOutputs
+ */
+void IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName(QList<OutputVM*> newOutputs)
+{
+    AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
+    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !newOutputs.isEmpty())
+    {
+        QStringList newOutputsIds;
+
+        for (OutputVM* output : newOutputs)
+        {
+            if ((output != nullptr) && !output->id().isEmpty())
+            {
+                newOutputsIds.append(output->id());
+            }
+        }
+
+        if (!newOutputsIds.isEmpty())
+        {
+            // Emit the signal "Add Inputs to Editor for Outputs"
+            Q_EMIT addInputsToEditorForOutputs(agentsGroupedByName->name(), newOutputsIds);
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when some view models of outputs will be removed from an agent(s grouped by name)
+ * @param oldOutputs
+ */
+void IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName(QList<OutputVM*> oldOutputs)
+{
+    AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
+    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !oldOutputs.isEmpty())
+    {
+        QStringList oldOutputsIds;
+
+        for (OutputVM* output : oldOutputs)
+        {
+            if ((output != nullptr) && !output->id().isEmpty())
+            {
+                oldOutputsIds.append(output->id());
+            }
+        }
+
+        if (!oldOutputsIds.isEmpty())
+        {
+            // Emit the signal "Remove Inputs to Editor for Outputs"
+            Q_EMIT removeInputsToEditorForOutputs(agentsGroupedByName->name(), oldOutputsIds);
+        }
+    }
+}
+
+
+/**
  * @brief Slot called when a view model of agents grouped by name has become useless (no more agents grouped by definition)
  */
 void IngeScapeModelManager::_onUselessAgentsGroupedByName()
 {
     AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
-    if (agentsGroupedByName != nullptr) {
+    if (agentsGroupedByName != nullptr)
+    {
         // Delete the view model of agents grouped by name
         deleteAgentsGroupedByName(agentsGroupedByName);
     }
@@ -1334,8 +1326,10 @@ void IngeScapeModelManager::_createAgentsGroupedByName(AgentM* model)
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreAgentsGroupedByDefinitionAndUseless, this, &IngeScapeModelManager::_onUselessAgentsGroupedByName);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::onAgentModelHasToBeDeleted);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &IngeScapeModelManager::onDefinitionsToOpen);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::_onAgentModelHasToBeDeleted);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &IngeScapeModelManager::_onDefinitionsToOpen);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsHaveBeenAdded, this, &IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsWillBeRemoved, this, &IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName);
 
         // Add the new model of agent
         agentsGroupedByName->addNewAgentModel(model);

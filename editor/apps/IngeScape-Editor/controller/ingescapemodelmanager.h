@@ -250,7 +250,7 @@ Q_SIGNALS:
      * @param agentName
      * @param outputsList
      */
-    void addInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+    void addInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds);
 
 
     /**
@@ -258,7 +258,7 @@ Q_SIGNALS:
      * @param agentName
      * @param outputsList
      */
-    void removeInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+    void removeInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds);
 
 
     /**
@@ -318,20 +318,6 @@ public Q_SLOTS:
      * @param agent name
      */
     void onAgentExited(QString peerId, QString agentName);
-
-
-    /**
-     * @brief Slot called when a model of agent has to be deleted
-     * @param model
-     */
-    void onAgentModelHasToBeDeleted(AgentM* model);
-
-
-    /**
-     * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
-     * @param definitionsList
-     */
-    void onDefinitionsToOpen(QList<DefinitionM*> definitionsList);
 
 
     /**
@@ -458,6 +444,34 @@ public Q_SLOTS:
 
 
 private Q_SLOTS:
+
+    /**
+     * @brief Slot called when a model of agent has to be deleted
+     * @param model
+     */
+    void _onAgentModelHasToBeDeleted(AgentM* model);
+
+
+    /**
+     * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
+     * @param definitionsList
+     */
+    void _onDefinitionsToOpen(QList<DefinitionM*> definitionsList);
+
+
+    /**
+     * @brief Slot called when some view models of outputs have been added to an agent(s grouped by name)
+     * @param newOutputs
+     */
+    void _onOutputsHaveBeenAddedToAgentsGroupedByName(QList<OutputVM*> newOutputs);
+
+
+    /**
+     * @brief Slot called when some view models of outputs will be removed from an agent(s grouped by name)
+     * @param oldOutputs
+     */
+    void _onOutputsWillBeRemovedFromAgentsGroupedByName(QList<OutputVM*> oldOutputs);
+
 
     /**
      * @brief Slot called when a view model of agents grouped by name has become useless (no more agents grouped by definition)
