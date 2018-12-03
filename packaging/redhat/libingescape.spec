@@ -38,14 +38,14 @@ developing applications that use %{name}.
 %setup -c -q -T -D
 
 %build
-mkdir -p %{buildroot}/usr/local/lib
-mkdir -p %{buildroot}/usr/local/include/ingescape
+mkdir -p %{buildroot}%{_libdir}
+mkdir -p %{buildroot}%{_includedir}/ingescape
 
 
 %install
-cp -d %{_INGESCAPE_SOURCE}/linux-x86/libingescape.la %{buildroot}/usr/local/lib/
-cp -d %{_INGESCAPE_SOURCE}/linux-x86/libingescape.so* %{buildroot}/usr/local/lib/
-cp -d %{_INGESCAPE_SOURCE}/src/include/ingescape.h %{buildroot}/usr/local/include/ingescape/
+cp -d %{_INGESCAPE_SOURCE}/linux-x86/libingescape.la %{buildroot}%{_libdir}
+cp -d %{_INGESCAPE_SOURCE}/linux-x86/libingescape.so* %{buildroot}%{_libdir}
+cp -d %{_INGESCAPE_SOURCE}/src/include/ingescape.h %{buildroot}%{_includedir}/ingescape/
 
 
 %post -p /sbin/ldconfig
@@ -55,12 +55,13 @@ cp -d %{_INGESCAPE_SOURCE}/src/include/ingescape.h %{buildroot}/usr/local/includ
 
 %files
 %defattr(-,root,root)
-/usr/local/lib/libingescape.la
-/usr/local/lib/libingescape.so*
+%{_libdir}/libingescape.la
+%{_libdir}/libingescape.so.*
 
 %files devel
 %defattr(-,root,root)
-/usr/local/include/*
+%{_includedir}/*
+%{_libdir}/libingescape.so
 
 
 %changelog

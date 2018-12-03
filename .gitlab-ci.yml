@@ -36,10 +36,18 @@ stages:
     changes:
       - packaging/redhat/*
 
+# Define ingescape debian installer files
+.build-ingescape-installer-debian: &build-ingescape-installer-debian
+  <<: *default-conditions
+  only:
+    changes:
+      - packaging/debian/*
+
 # Create ingescape library for linux
 linux-x86:
   <<: *build-ingescape-files
   <<: *build-ingescape-installer-redhat
+  <<: *build-ingescape-installer-debian
   stage: linux
   image: fafesty/compile-with-zyre
   script:
@@ -150,8 +158,23 @@ installer-redhat:
     paths:
       - redhat-x86_64
 
-# TODO Add job to package for debian
-# TODO Add job to package for redhat
+installer-debian:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer-debian
+  stage: installer
+  image: fafesty/compile-with-zyre
+  script:
+   - apt-get update
+   - apt-get install -y devscripts build-essential
+   - cd packaging && debuild -us -uc --build=binary && cd -
+   - mkdir debian-x86_64
+   - mv libingescape*.deb debian-x86_64/
+  dependencies:
+    - linux-x86
+  artifacts:
+    paths:
+      - debian-x86_64
+
 # TODO Add job to compile on cyclone and generate macos installer
 # TODO Add job to deploy ingescape website on commit (Can filter to launch job on doc folder changes and only master git's branche)
 # TODO Add job to compile editor
