@@ -66,23 +66,6 @@ WindowBlockTouches {
 
     property var heightStartTime: (startTimeItem.visible ? (startTimeItem.height + startTimeItem.anchors.topMargin) : 0)
 
-    property int maxIntValue:  2147483647 // maximum 32bit signed integer value
-    property int minIntValue: -2147483647 // maximum 32bit signed integer value
-
-    property double maxDoubleValue:  Number.MAX_VALUE // maximum 64bit IEEE-754 (double precision) value (~ 1e+308)
-    property double minDoubleValue: -Number.MAX_VALUE // (negative) maximum 64bit IEEE-754 (double precision) value (~ -1e+308)
-
-    /* Validators for the different text fields */
-    property var stringValidator: RegExpValidator { regExp: /.*/ }
-    property var intValidator: IntValidator {
-        top:    rootItem.maxIntValue
-        bottom: rootItem.minIntValue
-    }
-    property var doubleValidator: TextFieldDoubleValidator {
-        top:    rootItem.maxDoubleValue
-        bottom: rootItem.minDoubleValue
-    }
-
 
     //--------------------------------
     //
@@ -657,7 +640,7 @@ WindowBlockTouches {
                                                             }
                                                             else
                                                             {
-                                                                myEffect.modelM.value = Math.max(Math.min(maxIntValue, integerValue), minIntValue).toFixed(0)
+                                                                myEffect.modelM.value = Math.max(Math.min(NumberConstants.MAX_INTEGER, integerValue), NumberConstants.MIN_INTEGER).toFixed(0)
                                                             }
                                                         }
                                                         else if (iopValueType === AgentIOPValueTypes.DOUBLE)
@@ -670,7 +653,7 @@ WindowBlockTouches {
                                                             }
                                                             else
                                                             {
-                                                                myEffect.modelM.value = Math.max(Math.min(maxDoubleValue, doubleValue), minDoubleValue).toPrecision()
+                                                                myEffect.modelM.value = Math.max(Math.min(NumberConstants.MAX_DOUBLE, doubleValue), NumberConstants.MIN_DOUBLE).toPrecision()
                                                             }
                                                         }
                                                     }
@@ -694,16 +677,16 @@ WindowBlockTouches {
                                                 var iopValueType = myEffect.modelM.agentIOP.firstModel.agentIOPValueType
                                                 if (iopValueType === AgentIOPValueTypes.DOUBLE)
                                                 {
-                                                    return doubleValidator
+                                                    return BoundsDoubleValidator
                                                 }
                                                 else if (iopValueType === AgentIOPValueTypes.INTEGER)
                                                 {
-                                                    return intValidator
+                                                    return Int32Validator
                                                 }
                                             }
 
-                                            // stringValidator is the default validator
-                                            return stringValidator
+                                            // StringValidator is the default validator
+                                            return StringValidator
                                         }
 
                                         text: (myEffect && myEffect.modelM) ? myEffect.modelM.value : ""
@@ -797,10 +780,12 @@ WindowBlockTouches {
                                             value: if (myEffect && myEffect.modelM && myEffect.modelM.value !== "") { // Empty values from the text field won't change the value of the combobox
 
                                                        // Only "1" and "0" values from the TextField update the combobox since its the two values assigned to the model by this combobox
-                                                       if (Number(myEffect.modelM.value) === 0) {
+                                                       if (Number(myEffect.modelM.value) === 0)
+                                                       {
                                                            comboboxTargetValue.model.indexOf("FALSE")
                                                        }
-                                                       else if (Number(myEffect.modelM.value) === 1) {
+                                                       else if (Number(myEffect.modelM.value) === 1)
+                                                       {
                                                            comboboxTargetValue.model.indexOf("TRUE")
                                                        }
                                                    }
@@ -808,7 +793,8 @@ WindowBlockTouches {
                                         }
 
                                         onSelectedItemChanged: {
-                                            if (selectedIndex >= 0 && myEffect && myEffect.modelM) {
+                                            if (selectedIndex >= 0 && myEffect && myEffect.modelM)
+                                            {
                                                 myEffect.modelM.value = (selectedItem === "TRUE" ? "1" : "0")
                                             }
                                         }
@@ -1789,7 +1775,7 @@ WindowBlockTouches {
                                                             }
                                                             else
                                                             {
-                                                                myCondition.modelM.comparisonValue = Math.max(Math.min(maxIntValue, integerValue), minIntValue).toFixed(0)
+                                                                myCondition.modelM.comparisonValue = Math.max(Math.min(NumberConstants.MAX_INTEGER, integerValue), NumberConstants.MIN_INTEGER).toFixed(0)
                                                             }
                                                         }
                                                         else if (iopValueType === AgentIOPValueTypes.DOUBLE) {
@@ -1801,7 +1787,7 @@ WindowBlockTouches {
                                                             }
                                                             else
                                                             {
-                                                                myCondition.modelM.comparisonValue = Math.max(Math.min(maxDoubleValue, doubleValue), minDoubleValue).toPrecision()
+                                                                myCondition.modelM.comparisonValue = Math.max(Math.min(NumberConstants.MAX_DOUBLE, doubleValue), NumberConstants.MIN_DOUBLE).toPrecision()
                                                             }
                                                         }
                                                     }
@@ -1819,25 +1805,23 @@ WindowBlockTouches {
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
 
-                                        validator:
-                                        {
+                                        validator: {
                                             if (myCondition && myCondition.modelM && myCondition.modelM.agentIOP && myCondition.modelM.agentIOP.firstModel)
                                             {
                                                 var iopValueType = myCondition.modelM.agentIOP.firstModel.agentIOPValueType
                                                 if (iopValueType === AgentIOPValueTypes.DOUBLE)
                                                 {
-                                                    return doubleValidator
+                                                    return BoundsDoubleValidator
                                                 }
                                                 else if (iopValueType === AgentIOPValueTypes.INTEGER)
                                                 {
-                                                    return intValidator
+                                                    return Int32Validator
                                                 }
                                             }
 
-                                            // stringValidator is the default validator
-                                            return stringValidator
+                                            // StringValidator is the default validator
+                                            return StringValidator
                                         }
-
 
                                         text : (myCondition && myCondition.modelM) ? myCondition.modelM.comparisonValue : ""
 
