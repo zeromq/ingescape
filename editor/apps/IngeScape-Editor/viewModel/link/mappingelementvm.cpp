@@ -23,6 +23,8 @@ MappingElementVM::MappingElementVM(QString name,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    qInfo() << "New Mapping Element VM" << _name;
+
     _models.append(modelM);
 }
 
@@ -32,6 +34,8 @@ MappingElementVM::MappingElementVM(QString name,
  */
 MappingElementVM::~MappingElementVM()
 {
+    qInfo() << "Delete Mapping Element VM" << _name;
+
     // Reset the first model
     //setfirstModel(nullptr);
 

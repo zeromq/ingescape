@@ -200,6 +200,22 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         // Emit the signal "Agent Model will be Deleted"
         Q_EMIT agentModelWillBeDeleted(agent);
 
+        // Reset the definition of the agent and free memory
+        if (agent->definition() != nullptr)
+        {
+            DefinitionM* agentDefinition = agent->definition();
+            agent->setdefinition(nullptr);
+            delete agentDefinition;
+        }
+
+        // Reset the mapping of the agent and free memory
+        if (agent->mapping() != nullptr)
+        {
+            AgentMappingM* agentMapping = agent->mapping();
+            agent->setmapping(nullptr);
+            delete agentMapping;
+        }
+
         // DIS-connect to signals from the agent
         disconnect(agent, 0, this, 0);
 
