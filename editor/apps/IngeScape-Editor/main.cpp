@@ -31,6 +31,7 @@
 #include <misc/collapsiblecolumn.h>
 #include <misc/qquickwindowblocktouches.h>
 #include <misc/textfielddoublevalidator.h>
+#include <misc/numberconstants.h>
 
 
 /**
@@ -148,10 +149,11 @@ void registerCustomQmlTypes()
     // Misc.
     //
     //----------------
-
     qmlRegisterType<CollapsibleColumn>("INGESCAPE", 1, 0, "CollapsibleColumn");
     qmlRegisterType<QQuickWindowBlockTouches>("INGESCAPE", 1, 0, "WindowBlockTouches");
     qmlRegisterType<TextFieldDoubleValidator>("INGESCAPE", 1, 0, "TextFieldDoubleValidator");
+    qmlRegisterSingletonType<NumberConstants>("INGESCAPE", 1, 0, "NumberConstants", &NumberConstants::qmlSingleton);
+
 
     // GST not included in master branch
     // qmlRegisterType<GstVideoReceiver>("INGESCAPE", 1, 0, "GstVideoReceiver");
@@ -234,6 +236,15 @@ void registerCustomQmlTypes()
 
     // - Combobox delegate for Agents IOP comboboxes to show the color circles
     qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeToolTipComboboxDelegateAgentsIOP.qml"), "INGESCAPE", 1, 0, "IngeScapeToolTipComboboxDelegateAgentsIOP");
+
+    // - StringValidator for text fields
+    qmlRegisterType(QUrl("qrc:/qml/validator/StringValidator.qml"), "INGESCAPE", 1, 0, "StringValidator");
+
+    // - DoubleValidator for text fields
+    qmlRegisterType(QUrl("qrc:/qml/validator/BoundsDoubleValidator.qml"), "INGESCAPE", 1, 0, "BoundsDoubleValidator");
+
+    // - Int32Validator for text fields
+    qmlRegisterType(QUrl("qrc:/qml/validator/Int32Validator.qml"), "INGESCAPE", 1, 0, "Int32Validator");
 
 }
 

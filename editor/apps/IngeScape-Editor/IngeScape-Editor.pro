@@ -97,6 +97,7 @@ SOURCES += main.cpp \
     viewModel/link/linkvm.cpp \
     viewModel/link/linkconnectorvm.cpp \
     misc/textfielddoublevalidator.cpp \
+    misc/numberconstants.cpp \
     viewModel/link/mappingelementvm.cpp
 
 HEADERS += \
@@ -172,6 +173,7 @@ HEADERS += \
     viewModel/link/linkvm.h \
     viewModel/link/linkconnectorvm.h \
     misc/textfielddoublevalidator.h \
+    misc/numberconstants.h \
     viewModel/link/mappingelementvm.h
 
 

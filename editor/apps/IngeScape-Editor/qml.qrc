@@ -61,5 +61,8 @@
         <file>qml/scenario/IngeScapeToolTipComboboxDelegateAgentsIOP.qml</file>
         <file>qml/agent/DropDownCheckboxes.qml</file>
         <file>qml/ModelVisualizer.qml</file>
+        <file>qml/validator/StringValidator.qml</file>
+        <file>qml/validator/Int32Validator.qml</file>
+        <file>qml/validator/DoubleValidator.qml</file>
     </qresource>
 </RCC>
