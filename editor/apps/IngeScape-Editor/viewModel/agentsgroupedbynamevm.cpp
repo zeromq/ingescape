@@ -74,6 +74,10 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
     _outputsList.deleteAllItems();
     _parametersList.deleteAllItems();
 
+    // Delete all mapping elements
+    _hashFromNameToMappingElement.clear();
+    _mappingElementsList.deleteAllItems();
+
 
     // If the list of groups of agent(s grouped by definition) is not empty
     if (!_allAgentsGroupsByDefinition.isEmpty())
@@ -478,6 +482,22 @@ ParameterVM* AgentsGroupedByNameVM::getParameterFromId(QString parameterId)
 
 
 /**
+ * @brief Return the view model of mapping element from a name
+ * @param name
+ * @return
+ */
+MappingElementVM* AgentsGroupedByNameVM::getMappingElementFromName(QString name)
+{
+    if (_hashFromNameToMappingElement.contains(name)) {
+        return _hashFromNameToMappingElement.value(name);
+    }
+    else {
+        return nullptr;
+    }
+}
+
+
+/**
  * @brief Slot called when the flag "is ON" of a model changed
  * @param isON
  */
@@ -592,62 +612,129 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
 void AgentsGroupedByNameVM::_onMappingOfModelChangedWithPreviousAndNewValues(AgentMappingM* previousMapping, AgentMappingM* newMapping)
 {
     AgentM* model = qobject_cast<AgentM*>(sender());
-    if ((model != nullptr) && (newMapping != nullptr))
+    if (model != nullptr)
     {
-        QStringList namesOfRemovedMappingElements;
-        QStringList namesOfAddedMappingElements;
-
-        // FIXME TODO: MappingElementVM qui contient des models de ElementMappingM
+        // FIXME TO REMOVE
+        /*QStringList namesOfMappingElementsToRemove;
+        QStringList namesOfMappingElementsToAdd;
 
         // The previous mapping was NULL (and the new mapping is defined)
         if (previousMapping == nullptr)
         {
-            namesOfAddedMappingElements.append(newMapping->namesOfMappingElements());
+            namesOfMappingElementsToAdd.append(newMapping->namesOfMappingElements());
         }
         // The previous mapping was already defined (and the new mapping is defined)
         else
         {
-            for (QString namePreviousList : previousMapping->namesOfMappingElements())
-            {
-                if (!newMapping->namesOfMappingElements().contains(namePreviousList)) {
-                    namesOfRemovedMappingElements.append(namePreviousList);
-                }
-            }
-
             for (QString nameNewList : newMapping->namesOfMappingElements())
             {
                 if (!previousMapping->namesOfMappingElements().contains(nameNewList)) {
-                    namesOfAddedMappingElements.append(nameNewList);
+                    namesOfMappingElementsToAdd.append(nameNewList);
                 }
             }
 
-            // If there are some Removed mapping elements
-            if (!namesOfRemovedMappingElements.isEmpty())
+            for (QString namePreviousList : previousMapping->namesOfMappingElements())
             {
-                for (ElementMappingM* mappingElement : previousMapping->mappingElements()->toList())
-                {
-                    if ((mappingElement != nullptr) && namesOfRemovedMappingElements.contains(mappingElement->name()))
-                    {
-                        // Remove the mappingElement from the list "models" of the MappingElementVM
-                    }
+                if (!newMapping->namesOfMappingElements().contains(namePreviousList)) {
+                    namesOfMappingElementsToRemove.append(namePreviousList);
                 }
             }
         }
 
         // If there are some Added mapping elements
-        if (!namesOfAddedMappingElements.isEmpty())
+        if (!namesOfMappingElementsToAdd.isEmpty())
         {
             for (ElementMappingM* mappingElement : newMapping->mappingElements()->toList())
             {
-                if ((mappingElement != nullptr) && namesOfAddedMappingElements.contains(mappingElement->name()))
+                if ((mappingElement != nullptr) && namesOfMappingElementsToAdd.contains(mappingElement->name()))
                 {
                     // Add the mappingElement to the list "models" of the MappingElementVM
                 }
             }
         }
 
-        // If the list "models" of the MappingElementVM (0 --> 1) --> Mapped
-        // If the list "models" of the MappingElementVM == 0 --> UNmapped
+        // If there are some Removed mapping elements
+        if (!namesOfMappingElementsToRemove.isEmpty())
+        {
+            for (ElementMappingM* mappingElement : previousMapping->mappingElements()->toList())
+            {
+                if ((mappingElement != nullptr) && namesOfMappingElementsToRemove.contains(mappingElement->name()))
+                {
+                    // Remove the mappingElement from the list "models" of the MappingElementVM
+                }
+            }
+        }*/
+
+        // First, we manage each new model of element (to prevent to have temporarily an empty list of models for an element)
+        if ((newMapping != nullptr) && !newMapping->mappingElements()->isEmpty())
+        {
+            QList<MappingElementVM*> mappingElementsToAdd;
+
+            for (ElementMappingM* mappingElementM : newMapping->mappingElements()->toList())
+            {
+                if (mappingElementM != nullptr)
+                {
+                    // Manage this new model of mapping element
+                    QPair<bool, MappingElementVM*> pair = _manageNewMappingElementModel(mappingElementM);
+
+                    // We have to add a new view model of mapping element
+                    if (pair.first)
+                    {
+                        MappingElementVM* mappingElementVM = pair.second;
+                        if (mappingElementVM != nullptr) {
+                            mappingElementsToAdd.append(mappingElementVM);
+                        }
+                    }
+                }
+            }
+
+            if (!mappingElementsToAdd.isEmpty())
+            {
+                _mappingElementsList.append(mappingElementsToAdd);
+
+                // Emit the signal "Mapping Elements have been Added"
+                Q_EMIT mappingElementsHaveBeenAdded(mappingElementsToAdd);
+            }
+        }
+
+        // Then, we can manage each old model of element (if the list of models is empty for an element, we can remove it --> UN-map)
+        if ((previousMapping != nullptr) && !previousMapping->mappingElements()->isEmpty())
+        {
+            QList<MappingElementVM*> mappingElementsToRemove;
+
+            for (ElementMappingM* mappingElementM : previousMapping->mappingElements()->toList())
+            {
+                if (mappingElementM != nullptr)
+                {
+                    // Manage this old model of mapping element
+                    QPair<bool, MappingElementVM*> pair = _manageOldMappingElementModel(mappingElementM);
+
+                    // We have to remove an old view model of mapping element
+                    if (pair.first)
+                    {
+                        MappingElementVM* mappingElementVM = pair.second;
+                        if (mappingElementVM != nullptr) {
+                            mappingElementsToRemove.append(mappingElementVM);
+                        }
+                    }
+                }
+            }
+
+            if (!mappingElementsToRemove.isEmpty())
+            {
+                // Emit the signal "Mapping Elements will be Removed"
+                Q_EMIT mappingElementsWillBeRemoved(mappingElementsToRemove);
+
+                // FIXME TODO I2 Quick: Allow to remove a QList
+                //_mappingElementsList.remove(mappingElementsToRemove);
+                for (MappingElementVM* mappingElementVM : mappingElementsToRemove)
+                {
+                    if (mappingElementVM != nullptr) {
+                        _mappingElementsList.remove(mappingElementVM);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1625,5 +1712,81 @@ QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageOldParameterModel(AgentI
     }
 
     return QPair<bool, ParameterVM*>(haveToRemove, parameterVM);
+}
+
+
+/**
+ * @brief Manage a new model of mapping element
+ * @param model
+ * @return TODO
+ */
+QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageNewMappingElementModel(ElementMappingM* model)
+{
+    bool haveToAdd = false;
+    MappingElementVM* mappingElementVM = nullptr;
+
+    if ((model != nullptr) && !model->name().isEmpty())
+    {
+        mappingElementVM = getMappingElementFromName(model->name());
+
+        // There is already a view model for this name
+        if (mappingElementVM != nullptr)
+        {
+            // Add this new model to the list
+            mappingElementVM->models()->append(model);
+        }
+        // There is not yet a view model for this id
+        else
+        {
+            haveToAdd = true;
+
+            // Create a new view model of mapping element
+            mappingElementVM = new MappingElementVM(model->name(),
+                                                    model,
+                                                    this);
+
+            // Don't add to the list here (this mapping element will be added globally via temporary list)
+
+            _hashFromNameToMappingElement.insert(model->name(), mappingElementVM);
+        }
+    }
+
+    return QPair<bool, MappingElementVM*>(haveToAdd, mappingElementVM);
+}
+
+
+/**
+ * @brief Manage an old model of mapping element (just before being deleted)
+ * @param model
+ * @return TODO
+ */
+QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageOldMappingElementModel(ElementMappingM* model)
+{
+    bool haveToRemove = false;
+    MappingElementVM* mappingElementVM = nullptr;
+
+    if ((model != nullptr) && !model->name().isEmpty())
+    {
+        mappingElementVM = getMappingElementFromName(model->name());
+
+        if (mappingElementVM != nullptr)
+        {
+            // Remove this old model from the list
+            mappingElementVM->models()->remove(model);
+
+            // The view model of mapping element is empty !
+            if (mappingElementVM->models()->isEmpty())
+            {
+                haveToRemove = true;
+
+                // Don't remove from the list here (this mapping element will be removed globally via temporary list)
+
+                // Remove from the hash table with the parameter id
+                _hashFromNameToMappingElement.remove(model->name());
+            }
+        }
+    }
+
+    return QPair<bool, MappingElementVM*>(haveToRemove, mappingElementVM);
 }
 

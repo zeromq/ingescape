@@ -96,7 +96,8 @@ SOURCES += main.cpp \
     viewModel/link/linkoutputvm.cpp \
     viewModel/link/linkvm.cpp \
     viewModel/link/linkconnectorvm.cpp \
-    misc/textfielddoublevalidator.cpp
+    misc/textfielddoublevalidator.cpp \
+    viewModel/link/mappingelementvm.cpp
 
 HEADERS += \
     stable.h \
@@ -170,7 +171,8 @@ HEADERS += \
     viewModel/link/linkoutputvm.h \
     viewModel/link/linkvm.h \
     viewModel/link/linkconnectorvm.h \
-    misc/textfielddoublevalidator.h
+    misc/textfielddoublevalidator.h \
+    viewModel/link/mappingelementvm.h
 
 
 RESOURCES += qml.qrc

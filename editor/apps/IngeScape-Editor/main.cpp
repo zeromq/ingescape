@@ -204,6 +204,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<LinkInputVM>("INGESCAPE", 1, 0, "LinkInputVM", "Internal class");
     qmlRegisterUncreatableType<LinkOutputVM>("INGESCAPE", 1, 0, "LinkOutputVM", "Internal class");
     qmlRegisterUncreatableType<LinkVM>("INGESCAPE", 1, 0, "LinkVM", "Internal class");
+    qmlRegisterUncreatableType<MappingElementVM>("INGESCAPE", 1, 0, "MappingElementVM", "Internal class");
     qmlRegisterUncreatableType<OutputVM>("INGESCAPE", 1, 0, "OutputVM", "Internal class");
     qmlRegisterUncreatableType<ParameterVM>("INGESCAPE", 1, 0, "ParameterVM", "Internal class");
 

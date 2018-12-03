@@ -20,10 +20,10 @@
 #include <model/agentm.h>
 #include <model/publishedvaluem.h>
 #include <viewModel/agentsgroupedbydefinitionvm.h>
-
 #include <viewModel/iop/inputvm.h>
 #include <viewModel/iop/outputvm.h>
 #include <viewModel/iop/parametervm.h>
+#include <viewModel/link/mappingelementvm.h>
 
 
 /**
@@ -63,6 +63,9 @@ class AgentsGroupedByNameVM : public QObject
 
     // List of all groups (of agents) grouped by definition
     I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, allAgentsGroupsByDefinition)
+
+    // List of view models of mapping elements
+    I2_QOBJECT_LISTMODEL(MappingElementVM, mappingElementsList)
 
     // Current mapping (real mapping without edition)
     //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, currentMapping)
@@ -182,6 +185,14 @@ public:
     ParameterVM* getParameterFromId(QString parameterId);
 
 
+    /**
+     * @brief Return the view model of mapping element from a name
+     * @param name
+     * @return
+     */
+    MappingElementVM* getMappingElementFromName(QString name);
+
+
 Q_SIGNALS:
 
     /**
@@ -271,6 +282,20 @@ Q_SIGNALS:
      * @param oldParameters
      */
     void parametersWillBeRemoved(QList<ParameterVM*> oldParameters);
+
+
+    /**
+     * @brief Signal emitted when some view models of mapping elements have been added to our agent(s grouped by name)
+     * @param newMappingElements
+     */
+    void mappingElementsHaveBeenAdded(QList<MappingElementVM*> newMappingElements);
+
+
+    /**
+     * @brief Signal emitted when some view models of mapping elements will be removed from our agent(s grouped by name)
+     * @param oldMappingElements
+     */
+    void mappingElementsWillBeRemoved(QList<MappingElementVM*> oldMappingElements);
 
 
 public Q_SLOTS:
@@ -434,6 +459,19 @@ private:
     QPair<bool, ParameterVM*> _manageOldParameterModel(AgentIOPM* parameter);
 
 
+    /**
+     * @brief Manage a new model of mapping element
+     * @param mappingElement
+     */
+    QPair<bool, MappingElementVM*> _manageNewMappingElementModel(ElementMappingM* mappingElement);
+
+
+    /**
+     * @brief Manage an old model of mapping element (just before being deleted)
+     * @param mappingElement
+     */
+    QPair<bool, MappingElementVM*> _manageOldMappingElementModel(ElementMappingM* mappingElement);
+
 
 private:
 
@@ -467,6 +505,9 @@ private:
 
     // Hash table from a (unique) parameter id to a view model of parameter
     QHash<QString, ParameterVM*> _hashFromIdToParameter;
+
+    // Hash table from a name to a view model of mapping element
+    QHash<QString, MappingElementVM*> _hashFromNameToMappingElement;
 
 };
 
