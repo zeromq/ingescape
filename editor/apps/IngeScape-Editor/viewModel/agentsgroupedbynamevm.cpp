@@ -614,57 +614,6 @@ void AgentsGroupedByNameVM::_onMappingOfModelChangedWithPreviousAndNewValues(Age
     AgentM* model = qobject_cast<AgentM*>(sender());
     if (model != nullptr)
     {
-        // FIXME TO REMOVE
-        /*QStringList namesOfMappingElementsToRemove;
-        QStringList namesOfMappingElementsToAdd;
-
-        // The previous mapping was NULL (and the new mapping is defined)
-        if (previousMapping == nullptr)
-        {
-            namesOfMappingElementsToAdd.append(newMapping->namesOfMappingElements());
-        }
-        // The previous mapping was already defined (and the new mapping is defined)
-        else
-        {
-            for (QString nameNewList : newMapping->namesOfMappingElements())
-            {
-                if (!previousMapping->namesOfMappingElements().contains(nameNewList)) {
-                    namesOfMappingElementsToAdd.append(nameNewList);
-                }
-            }
-
-            for (QString namePreviousList : previousMapping->namesOfMappingElements())
-            {
-                if (!newMapping->namesOfMappingElements().contains(namePreviousList)) {
-                    namesOfMappingElementsToRemove.append(namePreviousList);
-                }
-            }
-        }
-
-        // If there are some Added mapping elements
-        if (!namesOfMappingElementsToAdd.isEmpty())
-        {
-            for (ElementMappingM* mappingElement : newMapping->mappingElements()->toList())
-            {
-                if ((mappingElement != nullptr) && namesOfMappingElementsToAdd.contains(mappingElement->name()))
-                {
-                    // Add the mappingElement to the list "models" of the MappingElementVM
-                }
-            }
-        }
-
-        // If there are some Removed mapping elements
-        if (!namesOfMappingElementsToRemove.isEmpty())
-        {
-            for (ElementMappingM* mappingElement : previousMapping->mappingElements()->toList())
-            {
-                if ((mappingElement != nullptr) && namesOfMappingElementsToRemove.contains(mappingElement->name()))
-                {
-                    // Remove the mappingElement from the list "models" of the MappingElementVM
-                }
-            }
-        }*/
-
         // First, we manage each new model of element (to prevent to have temporarily an empty list of models for an element)
         if ((newMapping != nullptr) && !newMapping->mappingElements()->isEmpty())
         {
@@ -1415,7 +1364,7 @@ void AgentsGroupedByNameVM::_updateIsDefinedInAllDefinitionsForEachIOP(int numbe
 /**
  * @brief Manage a new model of input
  * @param input
- * @return
+ * @return Pair<haveToAdd, InputVM> flag indicating if we have to add the view model of input
  */
 QPair<bool, InputVM*> AgentsGroupedByNameVM::_manageNewInputModel(AgentIOPM* input)
 {
@@ -1471,7 +1420,7 @@ QPair<bool, InputVM*> AgentsGroupedByNameVM::_manageNewInputModel(AgentIOPM* inp
 /**
  * @brief Manage a new model of output
  * @param output
- * @return
+ * @return Pair<haveToAdd, OutputVM> flag indicating if we have to add the view model of output
  */
 QPair<bool, OutputVM*> AgentsGroupedByNameVM::_manageNewOutputModel(OutputM* output)
 {
@@ -1527,7 +1476,7 @@ QPair<bool, OutputVM*> AgentsGroupedByNameVM::_manageNewOutputModel(OutputM* out
 /**
  * @brief Manage a new model of parameter
  * @param parameter
- * @return
+ * @return Pair<haveToAdd, ParameterVM> flag indicating if we have to add the view model of parameter
  */
 QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageNewParameterModel(AgentIOPM* parameter)
 {
@@ -1583,7 +1532,7 @@ QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageNewParameterModel(AgentI
 /**
  * @brief Manage an old model of input (just before being deleted)
  * @param input
- * @return
+ * @return Pair<haveToRemove, InputVM> flag indicating if we have to remove the view model of input
  */
 QPair<bool, InputVM*> AgentsGroupedByNameVM::_manageOldInputModel(AgentIOPM* input)
 {
@@ -1628,7 +1577,7 @@ QPair<bool, InputVM*> AgentsGroupedByNameVM::_manageOldInputModel(AgentIOPM* inp
 /**
  * @brief Manage an old model of output (just before being deleted)
  * @param output
- * @return
+ * @return Pair<haveToRemove, OutputVM> flag indicating if we have to remove the view model of output
  */
 QPair<bool, OutputVM*> AgentsGroupedByNameVM::_manageOldOutputModel(OutputM* output)
 {
@@ -1673,7 +1622,7 @@ QPair<bool, OutputVM*> AgentsGroupedByNameVM::_manageOldOutputModel(OutputM* out
 /**
  * @brief Manage an old model of parameter (just before being deleted)
  * @param parameter
- * @return
+ * @return Pair<haveToRemove, ParameterVM> flag indicating if we have to remove the view model of parameter
  */
 QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageOldParameterModel(AgentIOPM* parameter)
 {
@@ -1718,7 +1667,7 @@ QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageOldParameterModel(AgentI
 /**
  * @brief Manage a new model of mapping element
  * @param model
- * @return TODO
+ * @return Pair<haveToAdd, MappingElementVM> flag indicating if we have to add the view model of mapping element
  */
 QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageNewMappingElementModel(ElementMappingM* model)
 {
@@ -1758,7 +1707,7 @@ QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageNewMappingElementMo
 /**
  * @brief Manage an old model of mapping element (just before being deleted)
  * @param model
- * @return TODO
+ * @return Pair<haveToRemove, MappingElementVM> flag indicating if we have to remove the view model of mapping element
  */
 QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageOldMappingElementModel(ElementMappingM* model)
 {

@@ -414,7 +414,7 @@ private:
     /**
      * @brief Manage a new model of input
      * @param input
-     * @return
+     * @return Pair<haveToAdd, InputVM> flag indicating if we have to add the view model of input
      */
     QPair<bool, InputVM*> _manageNewInputModel(AgentIOPM* input);
 
@@ -422,7 +422,7 @@ private:
     /**
      * @brief Manage a new model of output
      * @param output
-     * @return
+     * @return Pair<haveToAdd, OutputVM> flag indicating if we have to add the view model of output
      */
     QPair<bool, OutputVM*> _manageNewOutputModel(OutputM* output);
 
@@ -430,7 +430,7 @@ private:
     /**
      * @brief Manage a new model of parameter
      * @param parameter
-     * @return
+     * @return Pair<haveToAdd, ParameterVM> flag indicating if we have to add the view model of parameter
      */
     QPair<bool, ParameterVM*> _manageNewParameterModel(AgentIOPM* parameter);
 
@@ -438,7 +438,7 @@ private:
     /**
      * @brief Manage an old model of input (just before being deleted)
      * @param input
-     * @return
+     * @return Pair<haveToRemove, InputVM> flag indicating if we have to remove the view model of input
      */
     QPair<bool, InputVM*> _manageOldInputModel(AgentIOPM* input);
 
@@ -446,7 +446,7 @@ private:
     /**
      * @brief Manage an old model of output (just before being deleted)
      * @param output
-     * @return
+     * @return Pair<haveToRemove, OutputVM> flag indicating if we have to remove the view model of output
      */
     QPair<bool, OutputVM*> _manageOldOutputModel(OutputM* output);
 
@@ -454,7 +454,7 @@ private:
     /**
      * @brief Manage an old model of parameter (just before being deleted)
      * @param parameter
-     * @return
+     * @return Pair<haveToRemove, ParameterVM> flag indicating if we have to remove the view model of parameter
      */
     QPair<bool, ParameterVM*> _manageOldParameterModel(AgentIOPM* parameter);
 
@@ -462,6 +462,7 @@ private:
     /**
      * @brief Manage a new model of mapping element
      * @param mappingElement
+     * @return Pair<haveToAdd, MappingElementVM> flag indicating if we have to add the view model of mapping element
      */
     QPair<bool, MappingElementVM*> _manageNewMappingElementModel(ElementMappingM* mappingElement);
 
@@ -469,6 +470,7 @@ private:
     /**
      * @brief Manage an old model of mapping element (just before being deleted)
      * @param mappingElement
+     * @return Pair<haveToRemove, MappingElementVM> flag indicating if we have to remove the view model of mapping element
      */
     QPair<bool, MappingElementVM*> _manageOldMappingElementModel(ElementMappingM* mappingElement);
 
