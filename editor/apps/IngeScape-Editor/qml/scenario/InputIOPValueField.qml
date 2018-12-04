@@ -16,14 +16,32 @@ import INGESCAPE 1.0
 Item {
     id: rootItem
 
-    // IOP model. MUST be set on client side
-    property var model: null
-    // IOP model. MUST be set on client side.
-    property bool modelTypeIsValue: false
+    // IOP view model. MUST be set on client side
+    property var iopVM: undefined
+    // Set this bool to false to force the item to be hidden. MUST be set on client side.
+    property bool forceHide: true
 
     // Utility properties to ease code readability
-    property bool _modelIopIsNotImpulsion: model && modelTypeIsValue && ( model.modelM && model.modelM.agentIOP && model.modelM.agentIOP.firstModel && (model.modelM.agentIOP.firstModel.agentIOPValueType !== AgentIOPValueTypes.IMPULSION) )
-    property bool _modelIopIsBool: model && modelTypeIsValue && ( model.modelM && model.modelM.agentIOP && model.modelM.agentIOP.firstModel && (model.modelM.agentIOP.firstModel.agentIOPValueType === AgentIOPValueTypes.BOOL) )
+    property bool _modelIopIsNotImpulsion: {
+        if (!forceHide && iopVM && iopVM.firstModel)
+        {
+            return (iopVM.firstModel.agentIOPValueType !== AgentIOPValueTypes.IMPULSION)
+        }
+        else
+        {
+            return false
+        }
+    }
+    property bool _modelIopIsBool: {
+        if (!forceHide && iopVM && iopVM.firstModel)
+        {
+            return (iopVM.firstModel.agentIOPValueType === AgentIOPValueTypes.BOOL)
+        }
+        else
+        {
+            return false
+        }
+    }
 
     // Force the text field and the combobox to revalidate themselves when the IOP has been change by the user.
     // This ensure that the input in the text field or the combobox is always valid against the currently selected IOP's type.
@@ -52,7 +70,7 @@ Item {
 
         height: 25
 
-        visible: rootItem._modelIopIsNotImpulsion && !rootItem._modelIopIsBool
+        visible: !forceHide && rootItem._modelIopIsNotImpulsion && !rootItem._modelIopIsBool
         enabled: visible
 
         horizontalAlignment: TextInput.AlignLeft
@@ -63,11 +81,11 @@ Item {
         function revalidateText()
         {
             if (visible) {
-                if (rootItem.model && rootItem.model.modelM)
+                if (iopVM)
                 {
-                    if (rootItem.model.modelM.agentIOP && rootItem.model.modelM.agentIOP.firstModel)
+                    if (iopVM.firstModel)
                     {
-                        var iopValueType = rootItem.model.modelM.agentIOP.firstModel.agentIOPValueType
+                        var iopValueType = iopVM.firstModel.agentIOPValueType
                         if (iopValueType === AgentIOPValueTypes.INTEGER)
                         {
                             // Checking Number conversion to always show a valid number (instead of "nan")
@@ -109,9 +127,9 @@ Item {
         property var stringValidator: StringValidator {}
 
         validator: {
-            if (rootItem.model && rootItem.model.modelM && rootItem.model.modelM.agentIOP && rootItem.model.modelM.agentIOP.firstModel)
+            if (iopVM && iopVM.firstModel)
             {
-                var iopValueType = rootItem.model.modelM.agentIOP.firstModel.agentIOPValueType
+                var iopValueType = iopVM.firstModel.agentIOPValueType
                 if (iopValueType === AgentIOPValueTypes.DOUBLE)
                 {
                     return doubleValidator
@@ -126,7 +144,7 @@ Item {
             return stringValidator
         }
 
-        text: (model && model.modelM) ? getModelValue() : ""
+        text: iopVM ? getModelValue() : ""
 
         style: I2TextFieldStyle {
             backgroundColor: IngeScapeTheme.darkBlueGreyColor
@@ -165,7 +183,7 @@ Item {
         Binding {
             target: textField
             property: "text"
-            value: if (rootItem.model && rootItem.model.modelM)
+            value: if (iopVM)
                    {
                        getModelValue()
                    }
@@ -176,7 +194,7 @@ Item {
         }
 
         onTextChanged: {
-            if (activeFocus && (rootItem.model && rootItem.model.modelM))
+            if (activeFocus && iopVM)
             {
                 setModelValue(text)
             }
@@ -188,7 +206,7 @@ Item {
 
         anchors.fill: parent
 
-        visible: rootItem._modelIopIsBool
+        visible: !forceHide && rootItem._modelIopIsBool
         enabled: visible
 
         // Force the value to "1" (aka. "TRUE") for every value that is not "0" (aka. "FALSE")
@@ -197,7 +215,7 @@ Item {
         {
             if (visible)
             {
-                if (rootItem.model && rootItem.model.modelM)
+                if (iopVM)
                 {
                     if (Number(getModelValue()) !== 0)
                     {
@@ -214,7 +232,7 @@ Item {
         Binding {
             target: comboboxBooleanValue
             property: "selectedIndex"
-            value: if (rootItem.model && rootItem.model.modelM && getModelValue() !== "") // Empty values from the text field won't change the value of the combobox
+            value: if (iopVM && getModelValue() !== "") // Empty values from the text field won't change the value of the combobox
                    {
                        // Only "1" and "0" values from the TextField update the combobox since its the two values assigned to the model by this combobox
                        if (Number(getModelValue()) === 0)
@@ -229,7 +247,7 @@ Item {
         }
 
         onSelectedItemChanged: {
-            if (selectedIndex >= 0 && rootItem.model && rootItem.model.modelM)
+            if (selectedIndex >= 0 && iopVM)
             {
                 setModelValue( (selectedItem === "TRUE") ? "1" : "0" )
             }

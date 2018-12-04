@@ -622,15 +622,26 @@ WindowBlockTouches {
                                             verticalCenter: parent.verticalCenter
                                         }
 
-                                        model: effectListItem.myEffect
-                                        modelTypeIsValue: model && (model.effectType === ActionEffectTypes.VALUE)
+                                        iopVM: (effectListItem.myEffect && effectListItem.myEffect.modelM) ? effectListItem.myEffect.modelM.agentIOP : undefined
+                                        forceHide: !effectListItem.myEffect || (effectListItem.myEffect.effectType !== ActionEffectTypes.VALUE)
 
                                         function getModelValue() {
-                                            return model.modelM.value
+                                            if (effectListItem.myEffect && effectListItem.myEffect.modelM)
+                                            {
+                                                return effectListItem.myEffect.modelM.value
+                                            }
+                                            else
+                                            {
+                                                return ""
+                                            }
+
                                         }
 
                                         function setModelValue(value) {
-                                            model.modelM.value = value
+                                            if (effectListItem.myEffect && effectListItem.myEffect.modelM)
+                                            {
+                                                effectListItem.myEffect.modelM.value = value
+                                            }
                                         }
                                     }
 
@@ -1590,15 +1601,15 @@ WindowBlockTouches {
                                             bottom: parent.bottom
                                         }
 
-                                        model: rectToName.myCondition
-                                        modelTypeIsValue: model && (model.conditionType === ActionEffectTypes.VALUE)
+                                        iopVM: rectToName.myCondition.modelM.agentIOP
+                                        forceHide: !rectToName.myCondition || (rectToName.myCondition.conditionType !== ActionEffectTypes.VALUE)
 
                                         function getModelValue() {
-                                            return model.modelM.comparisonValue
+                                            return rectToName.myCondition.modelM.comparisonValue
                                         }
 
                                         function setModelValue(value) {
-                                            model.modelM.comparisonValue = value
+                                            rectToName.myCondition.modelM.comparisonValue = value
                                         }
                                     }
                                 }
