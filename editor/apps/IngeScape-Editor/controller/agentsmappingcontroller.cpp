@@ -665,6 +665,21 @@ void AgentsMappingController::onIsMappingControlledChanged(bool isMappingControl
 
 
 /**
+ * @brief Slot called when a new view model of agents grouped by name has been created
+ * @param agentsGroupedByName
+ */
+void AgentsMappingController::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName)
+{
+    if (agentsGroupedByName != nullptr)
+    {
+        // Connect to signals from this new agents grouped by name
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsHaveBeenAdded, this, &AgentsMappingController::onMappingElementsHaveBeenAdded);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsWillBeRemoved, this, &AgentsMappingController::onMappingElementsWillBeRemoved);
+    }
+}
+
+
+/**
  * @brief Slot called when a view model of agents grouped by name will be deleted
  * @param agentsGroupedByName
  */
@@ -672,6 +687,9 @@ void AgentsMappingController::onAgentsGroupedByNameWillBeDeleted(AgentsGroupedBy
 {
     if (agentsGroupedByName != nullptr)
     {
+        // DIS-connect to signals from this old agents grouped by name
+        disconnect(agentsGroupedByName, 0, this, 0);
+
         // Get the agent in mapping for the agent name
         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
         if (agentInMapping != nullptr)
@@ -973,6 +991,48 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
 
             // Delete the link between two agents
             _deleteLinkBetweenTwoAgents(link);
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when some view models of mapping elements have been added to an agent(s grouped by name)
+ * @param newMappingElements
+ */
+void AgentsMappingController::onMappingElementsHaveBeenAdded(QList<MappingElementVM*> newMappingElements)
+{
+    AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
+
+    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !newMappingElements.isEmpty())
+    {
+        for (MappingElementVM* mappingElement : newMappingElements)
+        {
+            if (mappingElement != nullptr)
+            {
+                qDebug() << "on Mapping Elements have been Added" << mappingElement->name();
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when some view models of mapping elements will be removed from an agent(s grouped by name)
+ * @param oldMappingElements
+ */
+void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElementVM*> oldMappingElements)
+{
+    AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
+
+    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !oldMappingElements.isEmpty())
+    {
+        for (MappingElementVM* mappingElement : oldMappingElements)
+        {
+            if (mappingElement != nullptr)
+            {
+                qDebug() << "on Mapping Elements will be Removed" << mappingElement->name();
+            }
         }
     }
 }

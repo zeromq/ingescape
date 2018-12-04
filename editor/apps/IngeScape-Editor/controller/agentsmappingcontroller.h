@@ -223,6 +223,13 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot called when a new view model of agents grouped by name has been created
+     * @param agentsGroupedByName
+     */
+    void onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName);
+
+
+    /**
      * @brief Slot called when a view model of agents grouped by name will be deleted
      * @param agentsGroupedByName
      */
@@ -255,6 +262,20 @@ public Q_SLOTS:
      * @param mappingElement
      */
     void onUnmapped(ElementMappingM* mappingElement);
+
+
+    /**
+     * @brief Slot called when some view models of mapping elements have been added to an agent(s grouped by name)
+     * @param newMappingElements
+     */
+    void onMappingElementsHaveBeenAdded(QList<MappingElementVM*> newMappingElements);
+
+
+    /**
+     * @brief Slot called when some view models of mapping elements will be removed from an agent(s grouped by name)
+     * @param oldMappingElements
+     */
+    void onMappingElementsWillBeRemoved(QList<MappingElementVM*> oldMappingElements);
 
 
     /**
