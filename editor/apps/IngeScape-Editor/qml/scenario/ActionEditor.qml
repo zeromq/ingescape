@@ -422,6 +422,7 @@ WindowBlockTouches {
                             model : actionM ? actionM.effectsList : 0
 
                             Rectangle {
+                                id: effectListItem
 
                                 // my effect
                                 property var myEffect: model.QtObject
@@ -602,15 +603,14 @@ WindowBlockTouches {
                                                 myEffect.modelM.agentIOP = iopEffectsCombo.selectedItem;
 
                                                 // Revalidate text field and combo entry regarding which one is visible and the type of the selected IOP.
-                                                textFieldTargetValue.revalidateText()
-                                                comboboxTargetValue.revalidateCombo()
+                                                userInputItem.revalidateInput()
                                             }
                                         }
                                     }
 
                                     // Target Value
-                                    TextField {
-                                        id: textFieldTargetValue
+                                    InputIOPValueField {
+                                        id: userInputItem
 
                                         anchors {
                                             left: iopEffectsCombo.right
@@ -621,185 +621,18 @@ WindowBlockTouches {
 
                                             verticalCenter: parent.verticalCenter
                                         }
-                                        height: 25
 
-                                        // Force the content's format according to the IOP value type.
-                                        // e.g. Switching from DOUBLE to INTEGER will truncate the value to its integer part (no decimals).
-                                        function revalidateText() {
-                                            if (visible) {
-                                                if (myEffect && myEffect.modelM) {
-                                                    if (myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel) {
-                                                        var iopValueType = myEffect.modelM.agentIOP.firstModel.agentIOPValueType
-                                                        if (iopValueType === AgentIOPValueTypes.INTEGER)
-                                                        {
-                                                            // Checking Number conversion to always show a valid number (instead of "nan")
-                                                            var integerValue = Number(myEffect.modelM.value)
-                                                            if (isNaN(integerValue))
-                                                            {
-                                                                myEffect.modelM.value = 0
-                                                            }
-                                                            else
-                                                            {
-                                                                myEffect.modelM.value = Math.max(Math.min(NumberConstants.MAX_INTEGER, integerValue), NumberConstants.MIN_INTEGER).toFixed(0)
-                                                            }
-                                                        }
-                                                        else if (iopValueType === AgentIOPValueTypes.DOUBLE)
-                                                        {
-                                                            // Checking Number conversion to always show a valid number (instead of "nan")
-                                                            var doubleValue = Number(myEffect.modelM.value)
-                                                            if (isNaN(doubleValue))
-                                                            {
-                                                                myEffect.modelM.value = 0
-                                                            }
-                                                            else
-                                                            {
-                                                                myEffect.modelM.value = Math.max(Math.min(NumberConstants.MAX_DOUBLE, doubleValue), NumberConstants.MIN_DOUBLE).toPrecision()
-                                                            }
-                                                        }
-                                                    }
-                                                    text = myEffect.modelM.value
-                                                }
-                                                else {
-                                                    text = ""
-                                                }
-                                            }
+                                        model: effectListItem.myEffect
+                                        modelTypeIsValue: model && (model.effectType === ActionEffectTypes.VALUE)
+
+                                        function getModelValue() {
+                                            return model.modelM.value
                                         }
 
-                                        visible: myEffectIopIsNotImpulsion && !myEffectIopIsBool
-                                        enabled: visible
-
-                                        horizontalAlignment: TextInput.AlignLeft
-                                        verticalAlignment: TextInput.AlignVCenter
-
-                                        validator: {
-                                            if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel)
-                                            {
-                                                var iopValueType = myEffect.modelM.agentIOP.firstModel.agentIOPValueType
-                                                if (iopValueType === AgentIOPValueTypes.DOUBLE)
-                                                {
-                                                    return BoundsDoubleValidator
-                                                }
-                                                else if (iopValueType === AgentIOPValueTypes.INTEGER)
-                                                {
-                                                    return Int32Validator
-                                                }
-                                            }
-
-                                            // StringValidator is the default validator
-                                            return StringValidator
-                                        }
-
-                                        text: (myEffect && myEffect.modelM) ? myEffect.modelM.value : ""
-
-                                        style: I2TextFieldStyle {
-                                            backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                                            borderColor: IngeScapeTheme.whiteColor;
-                                            borderErrorColor: IngeScapeTheme.redColor
-                                            radiusTextBox: 1
-                                            borderWidth: 0;
-                                            borderWidthActive: 1
-                                            textIdleColor: IngeScapeTheme.whiteColor;
-                                            textDisabledColor: IngeScapeTheme.darkGreyColor;
-
-                                            padding.left: 3
-                                            padding.right: 3
-
-                                            font {
-                                                pixelSize:15
-                                                family: IngeScapeTheme.textFontFamily
-                                            }
-
-                                        }
-
-                                        onActiveFocusChanged: {
-                                            if (!activeFocus) {
-                                                // Move cursor to our first character when we lose focus
-                                                // (to always display the beginning or our text instead of
-                                                // an arbitrary part if our text is too long)
-                                                cursorPosition = 0;
-                                            }
-                                            else {
-                                                textFieldTargetValue.selectAll();
-                                            }
-                                        }
-
-                                        onTextChanged: {
-                                            if (activeFocus && (myEffect && myEffect.modelM)) {
-                                                myEffect.modelM.value = text;
-                                            }
-                                        }
-
-                                        Binding {
-                                            target: textFieldTargetValue
-                                            property: "text"
-                                            value: if (myEffect && myEffect.modelM) {
-                                                       myEffect.modelM.value
-                                                   }
-                                                   else {
-                                                       "";
-                                                   }
+                                        function setModelValue(value) {
+                                            model.modelM.value = value
                                         }
                                     }
-
-                                    I2ComboboxStringList {
-                                        id: comboboxTargetValue
-
-                                        anchors {
-                                            left: iopEffectsCombo.right
-                                            leftMargin: 6
-
-                                            right: (btnWarningActionEditor.visible ? btnWarningActionEditor.left : parent.right)
-                                            rightMargin: (btnWarningActionEditor.visible ? 6 : 0)
-
-                                            verticalCenter: parent.verticalCenter
-                                        }
-                                        height: 25
-
-                                        // Force the value to "1" (aka. "TRUE") for every value that is not "0" (aka. "FALSE")
-                                        // e.g. "1337.42" will be transformed to "1" while "0" will stay "0"
-                                        function revalidateCombo() {
-                                            if (visible) {
-                                                if (myEffect && myEffect.modelM) {
-                                                    if (Number(myEffect.modelM.value) !== 0) {
-                                                        myEffect.modelM.value = "1"
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        visible: myEffectIopIsBool
-                                        enabled: visible
-
-                                        model: [ "FALSE", "TRUE" ]
-
-                                        style: IngeScapeComboboxStyle {}
-
-                                        Binding {
-                                            target: comboboxTargetValue
-                                            property: "selectedIndex"
-                                            value: if (myEffect && myEffect.modelM && myEffect.modelM.value !== "") { // Empty values from the text field won't change the value of the combobox
-
-                                                       // Only "1" and "0" values from the TextField update the combobox since its the two values assigned to the model by this combobox
-                                                       if (Number(myEffect.modelM.value) === 0)
-                                                       {
-                                                           comboboxTargetValue.model.indexOf("FALSE")
-                                                       }
-                                                       else if (Number(myEffect.modelM.value) === 1)
-                                                       {
-                                                           comboboxTargetValue.model.indexOf("TRUE")
-                                                       }
-                                                   }
-
-                                        }
-
-                                        onSelectedItemChanged: {
-                                            if (selectedIndex >= 0 && myEffect && myEffect.modelM)
-                                            {
-                                                myEffect.modelM.value = (selectedItem === "TRUE" ? "1" : "0")
-                                            }
-                                        }
-                                    }
-
 
                                     Button {
                                         id: btnWarningActionEditor
@@ -1675,8 +1508,8 @@ WindowBlockTouches {
                                             Binding {
                                                 target: ioCombo
                                                 property: "selectedIndex"
-                                                value: (myCondition && myCondition.modelM) ? myCondition.modelM.iopMergedList.indexOf(myCondition.modelM.agentIOP)
-                                                                                           : -1
+                                                value: (myCondition && myCondition.modelM && myCondition.modelM.iopMergedList) ? myCondition.modelM.iopMergedList.indexOf(myCondition.modelM.agentIOP)
+                                                                                                                               : -1
                                             }
 
                                             onSelectedItemChanged: {
@@ -1684,8 +1517,7 @@ WindowBlockTouches {
                                                 {
                                                     myCondition.modelM.agentIOP = ioCombo.selectedItem;
 
-                                                    textFieldComparisonValue.revalidateText()
-                                                    comboboxConditionValue.revalidateCombo()
+                                                    inputComparisonItem.revalidateInput()
                                                 }
                                             }
                                         }
@@ -1748,8 +1580,8 @@ WindowBlockTouches {
                                     }
 
                                     // Comparison Value
-                                    TextField {
-                                        id: textFieldComparisonValue
+                                    InputIOPValueField {
+                                        id: inputComparisonItem
 
                                         anchors {
                                             right: parent.right
@@ -1757,169 +1589,16 @@ WindowBlockTouches {
                                             left: conditionRowFixeSize.right
                                             bottom: parent.bottom
                                         }
-                                        height: 25
 
-                                        // Force the content's format according to the IOP value type.
-                                        // e.g. Switching from DOUBLE to INTEGER will truncate the value to its integer part (no decimals).
-                                        function revalidateText() {
-                                            if (visible) {
-                                                if (myCondition && myCondition.modelM) {
-                                                    if (myCondition.modelM.agentIOP && myCondition.modelM.agentIOP.firstModel) {
-                                                        var iopValueType = myCondition.modelM.agentIOP.firstModel.agentIOPValueType
-                                                        if (iopValueType === AgentIOPValueTypes.INTEGER) {
-                                                            // Checking Number conversion to always show a valid number (instead of "nan")
-                                                            var integerValue = Number(myCondition.modelM.comparisonValue)
-                                                            if (isNaN(integerValue))
-                                                            {
-                                                                myCondition.modelM.comparisonValue = 0
-                                                            }
-                                                            else
-                                                            {
-                                                                myCondition.modelM.comparisonValue = Math.max(Math.min(NumberConstants.MAX_INTEGER, integerValue), NumberConstants.MIN_INTEGER).toFixed(0)
-                                                            }
-                                                        }
-                                                        else if (iopValueType === AgentIOPValueTypes.DOUBLE) {
-                                                            // Checking Number conversion to always show a valid number (instead of "nan")
-                                                            var doubleValue = Number(myCondition.modelM.comparisonValue)
-                                                            if (isNaN(doubleValue))
-                                                            {
-                                                                myCondition.modelM.comparisonValue = 0
-                                                            }
-                                                            else
-                                                            {
-                                                                myCondition.modelM.comparisonValue = Math.max(Math.min(NumberConstants.MAX_DOUBLE, doubleValue), NumberConstants.MIN_DOUBLE).toPrecision()
-                                                            }
-                                                        }
-                                                    }
-                                                    text = myCondition.modelM.comparisonValue
-                                                }
-                                                else {
-                                                    text = ""
-                                                }
-                                            }
+                                        model: rectToName.myCondition
+                                        modelTypeIsValue: model && (model.conditionType === ActionEffectTypes.VALUE)
+
+                                        function getModelValue() {
+                                            return model.modelM.comparisonValue
                                         }
 
-                                        visible: myConditionIopIsNotImpulsion && !myConditionIopIsBool
-                                        enabled : visible
-
-                                        horizontalAlignment: TextInput.AlignLeft
-                                        verticalAlignment: TextInput.AlignVCenter
-
-                                        validator: {
-                                            if (myCondition && myCondition.modelM && myCondition.modelM.agentIOP && myCondition.modelM.agentIOP.firstModel)
-                                            {
-                                                var iopValueType = myCondition.modelM.agentIOP.firstModel.agentIOPValueType
-                                                if (iopValueType === AgentIOPValueTypes.DOUBLE)
-                                                {
-                                                    return BoundsDoubleValidator
-                                                }
-                                                else if (iopValueType === AgentIOPValueTypes.INTEGER)
-                                                {
-                                                    return Int32Validator
-                                                }
-                                            }
-
-                                            // StringValidator is the default validator
-                                            return StringValidator
-                                        }
-
-                                        text : (myCondition && myCondition.modelM) ? myCondition.modelM.comparisonValue : ""
-
-                                        style: I2TextFieldStyle {
-                                            backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                                            borderColor: IngeScapeTheme.whiteColor;
-                                            borderErrorColor: IngeScapeTheme.redColor
-                                            radiusTextBox: 1
-                                            borderWidth: 0;
-                                            borderWidthActive: 1
-                                            textIdleColor: IngeScapeTheme.whiteColor;
-                                            textDisabledColor: IngeScapeTheme.darkGreyColor;
-
-                                            padding.left: 3
-                                            padding.right: 3
-
-                                            font {
-                                                pixelSize:15
-                                                family: IngeScapeTheme.textFontFamily
-                                            }
-
-                                        }
-
-                                        onActiveFocusChanged: {
-                                            if (!activeFocus) {
-                                                // Move cursor to our first character when we lose focus
-                                                // (to always display the beginning or our text instead of
-                                                // an arbitrary part if our text is too long)
-                                                cursorPosition = 0;
-                                            }
-                                            else {
-                                                textFieldComparisonValue.selectAll();
-                                            }
-                                        }
-
-                                        onTextChanged: {
-                                            if (activeFocus && (myCondition && myCondition.modelM)) {
-                                                myCondition.modelM.comparisonValue = text;
-                                            }
-                                        }
-
-                                        Binding {
-                                            target: textFieldComparisonValue
-                                            property: "text"
-                                            value: (myCondition && myCondition.modelM) ? myCondition.modelM.comparisonValue : ""
-                                        }
-                                    }
-
-                                    I2ComboboxStringList {
-                                        id: comboboxConditionValue
-
-                                        anchors {
-                                            right: parent.right
-                                            leftMargin: 6
-                                            left: conditionRowFixeSize.right
-                                            bottom: parent.bottom
-                                        }
-                                        height: 25
-
-                                        // Force the value to "1" (aka. "TRUE") for every value that is not "0" (aka. "FALSE")
-                                        // e.g. "1337.42" will be transformed to "1" while "0" will stay "0"
-                                        function revalidateCombo() {
-                                            if (visible) {
-                                                if (myCondition && myCondition.modelM) {
-                                                    if (Number(myCondition.modelM.comparisonValue) !== 0) {
-                                                        myCondition.modelM.comparisonValue = "1"
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        visible: myConditionIopIsBool
-                                        enabled: visible
-
-                                        model: [ "FALSE", "TRUE" ]
-
-                                        style: IngeScapeComboboxStyle {}
-
-                                        Binding {
-                                            target: comboboxConditionValue
-                                            property: "selectedIndex"
-                                            value: if (myCondition && myCondition.modelM && myCondition.modelM.comparisonValue !== "") { // Empty values from the text field won't change the value of the combobox
-
-                                                       // Only "1" and "0" values from the TextField update the combobox since its the two values assigned to the model by this combobox
-                                                       if (Number(myCondition.modelM.comparisonValue) === 0) {
-                                                           comboboxConditionValue.model.indexOf("FALSE")
-                                                       }
-                                                       else if (Number(myCondition.modelM.comparisonValue) === 1) {
-                                                           comboboxConditionValue.model.indexOf("TRUE")
-                                                       }
-                                                   }
-
-                                        }
-
-                                        onSelectedItemChanged: {
-                                            if (selectedIndex >= 0 && myCondition && myCondition.modelM) {
-                                                myCondition.modelM.comparisonValue = (selectedItem === "TRUE" ? "1" : "0")
-                                            }
+                                        function setModelValue(value) {
+                                            model.modelM.comparisonValue = value
                                         }
                                     }
                                 }
