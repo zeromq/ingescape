@@ -33,12 +33,12 @@ class AgentIOPVM : public QObject
     // Identifier with name and value type (can be empty when ghost)
     I2_CPP_NOSIGNAL_PROPERTY(QString, id)
 
+    // Models of our agent Input / Output / Parameter
+    I2_QOBJECT_LISTMODEL(AgentIOPM, models)
+
     // First model of our agent Input / Output / Parameter
     //I2_QML_PROPERTY_READONLY_DELETE_PROOF(AgentIOPM*, firstModel)
     I2_QML_PROPERTY_READONLY(AgentIOPM*, firstModel)
-
-    // Models of our agent Input / Output / Parameter
-    I2_QOBJECT_LISTMODEL(AgentIOPM, models)
 
     // Flag indicating if our input/output is defined in all definitions
     I2_QML_PROPERTY_READONLY(bool, isDefinedInAllDefinitions)
@@ -108,7 +108,7 @@ private:
 private:
 
     // Previous list of models
-    QList<AgentIOPM*> _previousModelsList;
+    QList<AgentIOPM*> _previousModels;
 
 };
 

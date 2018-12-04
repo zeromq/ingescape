@@ -33,14 +33,15 @@ class ElementMappingM : public QObject
     // Input agent name
     I2_QML_PROPERTY_READONLY(QString, inputAgent)
 
-    // Input name to connect with
+    // Input name of input agent
     I2_QML_PROPERTY_READONLY(QString, input)
 
-    // Output agent name to connect with
+    // Output agent name
     I2_QML_PROPERTY_READONLY(QString, outputAgent)
 
-    // Output name to connect with
+    // Output name of output agent
     I2_QML_PROPERTY_READONLY(QString, output)
+
 
 public:
 
@@ -63,6 +64,27 @@ public:
      * @brief Destructor
      */
     ~ElementMappingM();
+
+
+    /**
+     * @brief Get the name (with format "outputAgent##output-->inputAgent##input")
+     * of a mapping element from the list of names (of each part)
+     * @param inputAgent
+     * @param input
+     * @param outputAgent
+     * @param output
+     * @return name with format "outputAgent##output-->inputAgent##input"
+     */
+    static QString getNameFromNamesList(QString inputAgent, QString input, QString outputAgent, QString output);
+
+
+    /**
+     * @brief Get the list of names (of each parts) from the name (with format "outputAgent##output-->inputAgent##input")
+     * of a mapping element
+     * @param name with format "outputAgent##output-->inputAgent##input"
+     * @return
+     */
+    static QStringList getNamesListFromName(QString name);
 
 };
 

@@ -247,21 +247,21 @@ public Q_SLOTS:
      * @brief Slot called when the mapping of an active agent has been defined
      * @param agent
      */
-    void onActiveAgentMappingDefined(AgentM* agent);
+    //void onActiveAgentMappingDefined(AgentM* agent);
 
 
     /**
      * @brief Slot when two agents are mapped
      * @param mappingElement
      */
-    void onMapped(ElementMappingM* mappingElement);
+    //void onMapped(ElementMappingM* mappingElement);
 
 
     /**
      * @brief Slot when two agents are unmapped
      * @param mappingElement
      */
-    void onUnmapped(ElementMappingM* mappingElement);
+    //void onUnmapped(ElementMappingM* mappingElement);
 
 
     /**
@@ -367,6 +367,14 @@ private:
     QPointF _getRandomPosition(double randomMax);
 
 
+    /**
+     * @brief Get the list of "Waiting Links" from an (Output) agent name
+     * @param outputAgentName
+     * @return
+     */
+    QList<MappingElementVM*> _getWaitingLinksFromOutputAgentName(QString outputAgentName);
+
+
 private:
 
     // Manager for the data model of INGESCAPE
@@ -381,8 +389,8 @@ private:
     // Hash table from link name to the (view model of) link between agents in mapping
     QHash<QString, LinkVM*> _hashFromNameToLinkInMapping;
 
-    // Hash table from "agent name" to a list of waiting links (where the agent is involved as "Output Agent")
-    QHash<QString, QList<ElementMappingM*>> _hashFromAgentNameToListOfWaitingLinks;
+    // Hash table from "(output) agent name" to a list of waiting links (where the agent is involved as "Output Agent")
+    QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingLinks;
 
     // Hash table from "link name" to added/removed link while the mapping was UN-activated
     QHash<QString, ElementMappingM*> _hashFromLinkNameToAddedLinkWhileMappingWasUNactivated;

@@ -26,18 +26,25 @@ class MappingElementVM : public QObject
 {
     Q_OBJECT
 
-    // Identifier with all names: [outputAgent##output-->inputAgent##input]
+    // Name with all names formatted: "outputAgent##output-->inputAgent##input"
     //I2_CPP_NOSIGNAL_PROPERTY(QString, name)
     I2_QML_PROPERTY_READONLY(QString, name)
-
-    // First model of mapping element
-    //I2_QML_PROPERTY_READONLY(ElementMappingM*, firstModel)
 
     // Models of mapping elements
     I2_QOBJECT_LISTMODEL(ElementMappingM, models)
 
+    // First model of mapping element
+    I2_QML_PROPERTY_READONLY(ElementMappingM*, firstModel)
+
 
 public:
+
+    /**
+     * @brief Constructor
+     * @param name
+     * @param modelM
+     * @param parent
+     */
     explicit MappingElementVM(QString name,
                               ElementMappingM* modelM,
                               QObject *parent = nullptr);
@@ -53,6 +60,13 @@ Q_SIGNALS:
 
 
 public Q_SLOTS:
+
+
+protected Q_SLOTS:
+    /**
+     * @brief Slot called when the list of models changed
+     */
+    void _onModelsChanged();
 
 };
 

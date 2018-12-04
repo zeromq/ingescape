@@ -64,7 +64,7 @@ AgentsMappingController::~AgentsMappingController()
 
     // Delete all links
     _hashFromNameToLinkInMapping.clear();
-    _hashFromAgentNameToListOfWaitingLinks.clear();
+    _hashFromOutputAgentNameToListOfWaitingLinks.clear();
     _allLinksInMapping.deleteAllItems();
 
     // Delete all agents in mapping
@@ -269,8 +269,9 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
         if (linkInput->canLinkWith(linkOutput))
         {
             // If an Input (or an Output) have the same name used for 2 different types --> test pointers instead of names
-            // Name with all names formatted: "outputAgent##output-->inputAgent##input"
-            //QString linkName = QString("%1%2%3-->%4%2%5").arg(outputAgent->name(), SEPARATOR_AGENT_NAME_AND_IOP, linkOutput->name(), inputAgent->name(), linkInput->name());
+            // Get the name (with format "outputAgent##output-->inputAgent##input")
+            // of the link from the list of names (of each part)
+            //QString linkName = ElementMappingM::getNameFromNamesList(outputAgent->name(), linkOutput->name(), inputAgent->name(), linkInput->name());
 
             //LinkVM* link = getLinkInMappingFromName(linkName);
 
@@ -432,7 +433,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 {
     if (_jsonHelper != nullptr)
     {
-        QList<ElementMappingM*> listOfMappingElements;
+        //QList<ElementMappingM*> listOfMappingElements;
 
         for (QJsonValue jsonValue : jsonArrayOfAgentsInMapping)
         {
@@ -476,7 +477,8 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                         // Create a new agent in the global mapping (with the "Agents Grouped by Name") at a specific position
                         _createAgentInMappingAtPosition(agentsGroupedByName, position);
 
-                        // Get the agent in mapping from the name
+                        // FIXME REPAIR
+                        /*// Get the agent in mapping from the name
                         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
                         if (agentInMapping != nullptr)
                         {
@@ -487,14 +489,14 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 
                             // Add the link elements
                             listOfMappingElements.append(agentMapping->mappingElements()->toList());
-                        }
+                        }*/
                     }
                 }
             }
         }
 
         // FIXME: Add links ?
-        if (!listOfMappingElements.isEmpty())
+        /*if (!listOfMappingElements.isEmpty())
         {
             // Create all mapping links
             for (ElementMappingM* mappingElement : listOfMappingElements)
@@ -503,7 +505,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                     onMapped(mappingElement);
                 }
             }
-        }
+        }*/
     }
 }
 
@@ -542,10 +544,13 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
             // Make a copy
             ElementMappingM* copy = new ElementMappingM(mappingElement->inputAgent(), mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
 
-            // Simulate slot "onMapped" to create a link (between two agents) to cancel the remove
-            onMapped(copy);
+            Q_UNUSED(copy)
 
-            // FIXME: we cannot delete this mapping element because it could be added to _hashFromAgentNameToListOfWaitingLinks in the slot "onMapped"
+            // FIXME REPAIR
+            // Simulate slot "onMapped" to create a link (between two agents) to cancel the remove
+            //onMapped(copy);
+
+            // FIXME: we cannot delete this mapping element because it could be added to _hashFromOutputAgentNameToListOfWaitingLinks in the slot "onMapped"
             //delete copy;
         }
     }
@@ -768,18 +773,19 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                     // Nothing to do...already added to AgentsGroupedByName
                 }
 
-                // If there are waiting links (where this agent is involved as "Output Agent")
-                if (_hashFromAgentNameToListOfWaitingLinks.contains(agentName))
+                // FIXME REPAIR
+                /*// If there are waiting links (where this agent is involved as "Output Agent")
+                if (_hashFromOutputAgentNameToListOfWaitingLinks.contains(agentName))
                 {
-                    QList<ElementMappingM*> listOfWaitingLinks = _hashFromAgentNameToListOfWaitingLinks.value(agentName);
+                    QList<ElementMappingM*> listOfWaitingLinks = _hashFromOutputAgentNameToListOfWaitingLinks.value(agentName);
                     for (ElementMappingM* mappingElement : listOfWaitingLinks)
                     {
                         qDebug() << "Create waiting MAP..." << mappingElement->name();
 
                         // Create the link corresponding to the mapping element
-                        onMapped(mappingElement);
+                        //onMapped(mappingElement);
                     }
-                }
+                }*/
             }
         }
         // The mapping is NOT activated
@@ -798,7 +804,7 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
  * @brief Slot called when the mapping of an active agent has been defined
  * @param agent
  */
-void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
+/*void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
 {
     if ((agent != nullptr) && (agent->mapping() != nullptr) && (_modelManager != nullptr) && _modelManager->isMappingActivated())
     {
@@ -849,14 +855,14 @@ void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
             }
         }
     }
-}
+}*/
 
 
 /**
  * @brief Slot when two agents are mapped
  * @param mappingElement
  */
-void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
+/*void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
 {
     if (mappingElement != nullptr)
     {
@@ -914,16 +920,16 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
                     qDebug() << "MAP has been created:" << mappingElement->name();
 
                     // If there is a list of waiting links (where the agent is involved as "Output Agent")
-                    if (_hashFromAgentNameToListOfWaitingLinks.contains(mappingElement->outputAgent()))
+                    if (_hashFromOutputAgentNameToListOfWaitingLinks.contains(mappingElement->outputAgent()))
                     {
-                        QList<ElementMappingM*> listOfWaitingLinks = _hashFromAgentNameToListOfWaitingLinks.value(mappingElement->outputAgent());
+                        QList<ElementMappingM*> listOfWaitingLinks = _hashFromOutputAgentNameToListOfWaitingLinks.value(mappingElement->outputAgent());
                         if (listOfWaitingLinks.contains(mappingElement))
                         {
                             // Remove the mapping element from the list because the corresponding link is really created
                             listOfWaitingLinks.removeOne(mappingElement);
 
                             // Update the hash table
-                            _hashFromAgentNameToListOfWaitingLinks.insert(mappingElement->outputAgent(), listOfWaitingLinks);
+                            _hashFromOutputAgentNameToListOfWaitingLinks.insert(mappingElement->outputAgent(), listOfWaitingLinks);
                         }
                     }
                 }
@@ -933,15 +939,15 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
             {
                 QList<ElementMappingM*> listOfWaitingLinks;
 
-                if (_hashFromAgentNameToListOfWaitingLinks.contains(mappingElement->outputAgent())) {
-                    listOfWaitingLinks = _hashFromAgentNameToListOfWaitingLinks.value(mappingElement->outputAgent());
+                if (_hashFromOutputAgentNameToListOfWaitingLinks.contains(mappingElement->outputAgent())) {
+                    listOfWaitingLinks = _hashFromOutputAgentNameToListOfWaitingLinks.value(mappingElement->outputAgent());
                 }
 
                 // Add the mapping element to the list to create the corresponding link later
                 listOfWaitingLinks.append(mappingElement);
 
                 // Update the hash table
-                _hashFromAgentNameToListOfWaitingLinks.insert(mappingElement->outputAgent(), listOfWaitingLinks);
+                _hashFromOutputAgentNameToListOfWaitingLinks.insert(mappingElement->outputAgent(), listOfWaitingLinks);
 
                 qDebug() << "MAP will be created later:" << mappingElement->name();
             }
@@ -964,14 +970,14 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
             link->inputAgent()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
         }
     }
-}
+}*/
 
 
 /**
  * @brief Slot when two agents are unmapped
  * @param mappingElement
  */
-void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
+/*void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
 {
     if (mappingElement != nullptr)
     {
@@ -993,7 +999,7 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
             _deleteLinkBetweenTwoAgents(link);
         }
     }
-}
+}*/
 
 
 /**
@@ -1008,9 +1014,99 @@ void AgentsMappingController::onMappingElementsHaveBeenAdded(QList<MappingElemen
     {
         for (MappingElementVM* mappingElement : newMappingElements)
         {
-            if (mappingElement != nullptr)
+            if ((mappingElement != nullptr) && !mappingElement->name().isEmpty() && (mappingElement->firstModel() != nullptr))
             {
-                qDebug() << "on Mapping Elements have been Added" << mappingElement->name();
+                //qDebug() << "on Mapping Elements have been Added" << mappingElement->name();
+                qInfo() << mappingElement->name() << "MAPPED";
+
+                // Get the (view model of) link between agents in the global mapping from a link name
+                LinkVM* link = getLinkInMappingFromName(mappingElement->name());
+
+                if (link == nullptr)
+                {
+                    AgentInMappingVM* outputAgent = getAgentInMappingFromName(mappingElement->firstModel()->outputAgent());
+                    AgentInMappingVM* inputAgent = getAgentInMappingFromName(mappingElement->firstModel()->inputAgent());
+
+                    if ((outputAgent != nullptr) && (inputAgent != nullptr))
+                    {
+                        LinkOutputVM* linkOutput = nullptr;
+                        LinkInputVM* linkInput = nullptr;
+
+                        if (outputAgent->agentsGroupedByName() != nullptr)
+                        {
+                            // Get the list of view models of link output from the output name
+                            QList<LinkOutputVM*> linkOutputsWithSameName = outputAgent->getLinkOutputsListFromName(mappingElement->firstModel()->output());
+                            if (linkOutputsWithSameName.count() == 1) {
+                                linkOutput = linkOutputsWithSameName.at(0);
+                            }
+                            else {
+                                qWarning() << "There are" << linkOutputsWithSameName.count() << "link outputs with the same name" << mappingElement->firstModel()->output() << "."
+                                           << "We cannot choose and create the link" << mappingElement->name();
+                            }
+                        }
+
+                        if (inputAgent->agentsGroupedByName() != nullptr)
+                        {
+                            // Get the list of view models of input from the input name
+                            QList<LinkInputVM*> linkInputsWithSameName = inputAgent->getLinkInputsListFromName(mappingElement->firstModel()->input());
+                            if (linkInputsWithSameName.count() == 1) {
+                                linkInput = linkInputsWithSameName.at(0);
+                            }
+                            else {
+                                qWarning() << "There are" << linkInputsWithSameName.count() << "link inputs with the same name" << mappingElement->firstModel()->input() << "."
+                                           << "We cannot choose and create the link" << mappingElement->name();
+                            }
+                        }
+
+                        if ((linkOutput != nullptr) && (linkInput != nullptr))
+                        {
+                            // Create a new map between agents
+                            link = new LinkVM(outputAgent, linkOutput, inputAgent, linkInput, false, this);
+
+                            _allLinksInMapping.append(link);
+                            _hashFromNameToLinkInMapping.insert(link->name(), link);
+
+                            // FIXME REPAIR
+                            /*// If there is a list of waiting links (where the agent is involved as "Output Agent")
+                            if (_hashFromOutputAgentNameToListOfWaitingLinks.contains(mappingElement->outputAgent()))
+                            {
+                                QList<ElementMappingM*> listOfWaitingLinks = _hashFromOutputAgentNameToListOfWaitingLinks.value(mappingElement->outputAgent());
+                                if (listOfWaitingLinks.contains(mappingElement))
+                                {
+                                    // Remove the mapping element from the list because the corresponding link is really created
+                                    listOfWaitingLinks.removeOne(mappingElement);
+
+                                    // Update the hash table
+                                    _hashFromOutputAgentNameToListOfWaitingLinks.insert(mappingElement->outputAgent(), listOfWaitingLinks);
+                                }
+                            }*/
+                        }
+                    }
+                    // Output agent is not yet in the mapping
+                    else if (inputAgent != nullptr) // && (outputAgent == nullptr)
+                    {
+                        QList<MappingElementVM*> listOfWaitingLinks = _getWaitingLinksFromOutputAgentName(mappingElement->firstModel()->outputAgent());
+
+                        // Add the mapping element to the list to create the corresponding link later
+                        listOfWaitingLinks.append(mappingElement);
+
+                        // Update the hash table
+                        _hashFromOutputAgentNameToListOfWaitingLinks.insert(mappingElement->firstModel()->outputAgent(), listOfWaitingLinks);
+
+                        qDebug() << "Link" << mappingElement->name() << "will be created later";
+                    }
+                }
+                else
+                {
+                    // The link is virtual (agents were not linked on the network)
+                    if (link->isVirtual())
+                    {
+                        qDebug() << link->name() << "from VIRTUAL to REAL";
+
+                        // Update the flag
+                        link->setisVirtual(false);
+                    }
+                }
             }
         }
     }
@@ -1051,8 +1147,9 @@ void AgentsMappingController::onHighlightLink(QStringList parameters)
         QString outputAgentName = parameters.at(2);
         QString outputName = parameters.at(3);
 
-        // Name with all names formatted: "outputAgent##output-->inputAgent##input"
-        QString linkName = QString("%1%2%3-->%4%2%5").arg(outputAgentName, SEPARATOR_AGENT_NAME_AND_IOP, outputName, inputAgentName, inputName);
+        // Get the name (with format "outputAgent##output-->inputAgent##input")
+        // of the link from the list of names (of each part)
+        QString linkName = ElementMappingM::getNameFromNamesList(outputAgentName, outputName, inputAgentName, inputName);
 
         // Get the (view model of) link between agents in the global mapping from a link name
         LinkVM* link = getLinkInMappingFromName(linkName);
@@ -1106,8 +1203,9 @@ void AgentsMappingController::_onLinkInputsListHaveBeenAdded(QList<LinkInputVM*>
             {
                 if ((mappingElement != nullptr) && namesOfInputs.contains(mappingElement->input()))
                 {
+                    // FIXME REPAIR
                     // Try to create the link corresponding to the mapping element
-                    onMapped(mappingElement);
+                    //onMapped(mappingElement);
                 }
             }
         }
@@ -1140,8 +1238,9 @@ void AgentsMappingController::_onLinkOutputsListHaveBeenAdded(QList<LinkOutputVM
                 {
                     if ((mappingElement != nullptr) && (mappingElement->outputAgent() == agentInMapping->name()) && namesOfOutputs.contains(mappingElement->output()))
                     {
+                        // FIXME REPAIR
                         // Try to create the link corresponding to the mapping element
-                        onMapped(mappingElement);
+                        //onMapped(mappingElement);
                     }
                 }
             }
@@ -1367,8 +1466,9 @@ void AgentsMappingController::_updateMappingWithAgentsONandLinks()
                         {
                             if (mappingElement != nullptr)
                             {
+                                // FIXME REPAIR
                                 // Simulate the slot "on Mapped"
-                                onMapped(mappingElement);
+                                //onMapped(mappingElement);
                             }
                         }
                     }
@@ -1399,4 +1499,20 @@ QPointF AgentsMappingController::_getRandomPosition(double randomMax)
     double y = 0.05 * _viewHeight + (0.90 * _viewHeight * randomY);
 
     return QPointF(x, y);
+}
+
+
+/**
+ * @brief Get the list of "Waiting Links" from an (Output) agent name
+ * @param outputAgentName
+ * @return
+ */
+QList<MappingElementVM*> AgentsMappingController::_getWaitingLinksFromOutputAgentName(QString outputAgentName)
+{
+    if (_hashFromOutputAgentNameToListOfWaitingLinks.contains(outputAgentName)) {
+        return _hashFromOutputAgentNameToListOfWaitingLinks.value(outputAgentName);
+    }
+    else {
+        return QList<MappingElementVM*>();
+    }
 }

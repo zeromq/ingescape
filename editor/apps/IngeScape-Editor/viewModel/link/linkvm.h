@@ -30,11 +30,14 @@ class LinkVM : public QObject
 {
     Q_OBJECT
 
-    // Identifier with all names: [outputAgent##output-->inputAgent##input]
+    // Name with all names formatted: "outputAgent##output-->inputAgent##input"
     I2_CPP_NOSIGNAL_PROPERTY(QString, name)
 
-    // Identifier with agents names and Input/Output ids: [outputAgent##output::type-->inputAgent##input::type]
+    // Identifier with agents names and Input/Output ids: [outputAgent##output::outputType-->inputAgent##input::inputType]
     //I2_CPP_NOSIGNAL_PROPERTY(QString, id)
+
+    // View model of mapping element
+    //I2_QML_PROPERTY_DELETE_PROOF(MappingElementVM*, mappingElement)
 
     // View model of the output agent of our link (link starts from this agent)
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, outputAgent)
@@ -56,6 +59,7 @@ public:
 
     /**
      * @brief Constructor
+     * @param mappingElement
      * @param outputAgent The link starts from this agent
      * @param linkOutput The link starts from this output of the output agent
      * @param inputAgent The link ends to this agent
@@ -63,7 +67,8 @@ public:
      * @param isVirtual
      * @param parent
      */
-    explicit LinkVM(AgentInMappingVM* outputAgent,
+    explicit LinkVM(//MappingElementVM* mappingElement,
+                    AgentInMappingVM* outputAgent,
                     LinkOutputVM* linkOutput,
                     AgentInMappingVM* inputAgent,
                     LinkInputVM* linkInput,
@@ -76,11 +81,6 @@ public:
      * @brief Destructor
      */
     ~LinkVM();
-
-
-signals:
-
-public slots:
 
 };
 

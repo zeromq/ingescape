@@ -38,7 +38,9 @@ AgentIOPVM::AgentIOPVM(QString name,
     // Connect to signal "Count Changed" from the list of models
     connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentIOPVM::_onModelsChanged);
 
-    _models.append(modelM);
+    if (modelM != nullptr) {
+        _models.append(modelM);
+    }
 }
 
 
@@ -56,7 +58,7 @@ AgentIOPVM::~AgentIOPVM()
     setfirstModel(nullptr);
 
     // Models are deleted elsewhere
-    _previousModelsList.clear();
+    _previousModels.clear();
     _models.clear();
 }
 
@@ -65,18 +67,17 @@ AgentIOPVM::~AgentIOPVM()
  * @brief Slot called when the list of models changed
  */
 void AgentIOPVM::_onModelsChanged()
-{   
-    //
+{
     QList<AgentIOPM*> newModelsList = _models.toList();
 
     // Model of I/O/P added
-    if (_previousModelsList.count() < newModelsList.count())
+    if (_previousModels.count() < newModelsList.count())
     {
-        //qDebug() << _previousModelsList.count() << "--> ADD --> " << newModelsList.count();
+        //qDebug() << _previousModels.count() << "--> ADD --> " << newModelsList.count();
 
         for (AgentIOPM* model : newModelsList)
         {
-            if ((model != nullptr) && !_previousModelsList.contains(model))
+            if ((model != nullptr) && !_previousModels.contains(model))
             {
                 //qDebug() << "Agent IOP VM: New model" << model->name() << "ADDED";
 
@@ -87,11 +88,11 @@ void AgentIOPVM::_onModelsChanged()
         }
     }
     // Model of I/O/P removed
-    else if (_previousModelsList.count() > newModelsList.count())
+    else if (_previousModels.count() > newModelsList.count())
     {
-        //qDebug() << _previousModelsList.count() << "--> REMOVE --> " << newModelsList.count();
+        //qDebug() << _previousModels.count() << "--> REMOVE --> " << newModelsList.count();
 
-        for (AgentIOPM* model : _previousModelsList)
+        for (AgentIOPM* model : _previousModels)
         {
             if ((model != nullptr) && !newModelsList.contains(model))
             {
@@ -104,7 +105,7 @@ void AgentIOPVM::_onModelsChanged()
         }
     }
 
-    _previousModelsList = newModelsList;
+    _previousModels = newModelsList;
 
     // Update the first model
     _updateFirstModel();

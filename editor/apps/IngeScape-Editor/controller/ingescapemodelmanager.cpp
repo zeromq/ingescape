@@ -938,7 +938,7 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
         // Save the previous agent definition
         DefinitionM* previousDefinition = agent->definition();
 
-        // Create the new agent definition (model of agent definition from JSON)
+        // Create the new model of agent definition from JSON
         DefinitionM* newDefinition = _jsonHelper->createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
 
         if (newDefinition != nullptr)
@@ -970,22 +970,33 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
 
     if ((agent != nullptr) && (_jsonHelper != nullptr))
     {
-        AgentMappingM* agentMapping = nullptr;
+        // Save the previous agent mapping
+        AgentMappingM* previousMapping = agent->mapping();
+
+        AgentMappingM* newMapping = nullptr;
 
         if (mappingJSON.isEmpty())
         {
             QString mappingName = QString("EMPTY MAPPING of %1").arg(agentName);
-            agentMapping = new AgentMappingM(mappingName, "", "");
+            newMapping = new AgentMappingM(mappingName, "", "");
         }
         else
         {
-            // Create a model of agent mapping from the JSON
-            agentMapping = _jsonHelper->createModelOfAgentMappingFromBytes(agentName, mappingJSON.toUtf8());
+            // Create the new model of agent mapping from the JSON
+            newMapping = _jsonHelper->createModelOfAgentMappingFromBytes(agentName, mappingJSON.toUtf8());
         }
 
-        if (agentMapping != nullptr)
+        if (newMapping != nullptr)
         {
-            if (agent->mapping() == nullptr)
+            // Set this new mapping to the agent
+            agent->setmapping(newMapping);
+
+            // Free memory
+            if (previousMapping != nullptr) {
+                delete previousMapping;
+            }
+
+            /*if (agent->mapping() == nullptr)
             {
                 // Set this mapping to the agent
                 agent->setmapping(agentMapping);
@@ -997,8 +1008,6 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
             else
             {
                 qWarning() << "Update the mapping of agent" << agentName << "(if this mapping has changed)";
-
-                AgentMappingM* previousMapping = agent->mapping();
 
                 QStringList namesOfRemovedMappingElements;
                 for (QString namePreviousList : previousMapping->namesOfMappingElements())
@@ -1046,7 +1055,7 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
 
                 // Delete the previous model of agent mapping
                 delete previousMapping;
-            }
+            }*/
         }
     }
 }
