@@ -59,13 +59,14 @@ Rectangle {
 
         delegate: Rectangle {
 
-            property var groupByNameVM: model.QtObject
+            property AgentsGroupedByNameVM groupByNameVM: model.QtObject
 
             anchors {
                 left: parent.left
             }
             width: childrenRect.width + 5
-            height: columnListOfGroupsByDefinition.height + 5
+            //height: columnListOfGroupsByDefinition.height + 5
+            height: columnListOfGroupsByDefinition.height + columnMappingElements.height + 5
 
             color: groupByNameVM.isON ? "#22CCCC" : "#227777"
             border {
@@ -74,6 +75,7 @@ Rectangle {
             }
 
             Row {
+                id: rowGroupByName
                 spacing: 15
 
                 Text {
@@ -120,7 +122,7 @@ Rectangle {
 
                         Rectangle {
 
-                            property var groupByDefinitionVM: model.QtObject
+                            property AgentsGroupedByDefinitionVM groupByDefinitionVM: model.QtObject
 
                             width: childrenRect.width + 5
                             height: childrenRect.height + 5
@@ -159,7 +161,7 @@ Rectangle {
 
                                         Rectangle {
 
-                                            property var agentM: model.QtObject
+                                            property AgentM agentM: model.QtObject
 
                                             width: childrenRect.width
                                             height: 25
@@ -195,6 +197,28 @@ Rectangle {
                                 }
                             }
                         }
+                    }
+                }
+            }
+
+            Column {
+                id: columnMappingElements
+
+                anchors {
+                    top: rowGroupByName.bottom
+                }
+                height: childrenRect.height
+
+                Repeater {
+                    model: groupByNameVM ? groupByNameVM.allMappingElements : null
+
+                    Text {
+                        property MappingElementVM mappingElement: model.QtObject
+
+                        text: mappingElement ? qsTr("%1 (%2)").arg(mappingElement.name).arg(mappingElement.models.count)
+                                             : ""
+
+                        font.pointSize: 13
                     }
                 }
             }

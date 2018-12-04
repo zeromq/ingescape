@@ -27,7 +27,8 @@ class MappingElementVM : public QObject
     Q_OBJECT
 
     // Identifier with all names: [outputAgent##output-->inputAgent##input]
-    I2_CPP_NOSIGNAL_PROPERTY(QString, name)
+    //I2_CPP_NOSIGNAL_PROPERTY(QString, name)
+    I2_QML_PROPERTY_READONLY(QString, name)
 
     // First model of mapping element
     //I2_QML_PROPERTY_READONLY(ElementMappingM*, firstModel)

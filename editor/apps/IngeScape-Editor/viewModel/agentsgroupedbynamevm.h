@@ -64,8 +64,8 @@ class AgentsGroupedByNameVM : public QObject
     // List of all groups (of agents) grouped by definition
     I2_QOBJECT_LISTMODEL(AgentsGroupedByDefinitionVM, allAgentsGroupsByDefinition)
 
-    // List of view models of mapping elements
-    I2_QOBJECT_LISTMODEL(MappingElementVM, mappingElementsList)
+    // List of all view models of mapping elements
+    I2_QOBJECT_LISTMODEL(MappingElementVM, allMappingElements)
 
     // Current mapping (real mapping without edition)
     //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, currentMapping)

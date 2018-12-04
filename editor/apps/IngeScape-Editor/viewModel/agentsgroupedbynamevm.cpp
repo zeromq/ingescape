@@ -76,7 +76,7 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 
     // Delete all mapping elements
     _hashFromNameToMappingElement.clear();
-    _mappingElementsList.deleteAllItems();
+    _allMappingElements.deleteAllItems();
 
 
     // If the list of groups of agent(s grouped by definition) is not empty
@@ -639,7 +639,7 @@ void AgentsGroupedByNameVM::_onMappingOfModelChangedWithPreviousAndNewValues(Age
 
             if (!mappingElementsToAdd.isEmpty())
             {
-                _mappingElementsList.append(mappingElementsToAdd);
+                _allMappingElements.append(mappingElementsToAdd);
 
                 // Emit the signal "Mapping Elements have been Added"
                 Q_EMIT mappingElementsHaveBeenAdded(mappingElementsToAdd);
@@ -675,11 +675,11 @@ void AgentsGroupedByNameVM::_onMappingOfModelChangedWithPreviousAndNewValues(Age
                 Q_EMIT mappingElementsWillBeRemoved(mappingElementsToRemove);
 
                 // FIXME TODO I2 Quick: Allow to remove a QList
-                //_mappingElementsList.remove(mappingElementsToRemove);
+                //_allMappingElements.remove(mappingElementsToRemove);
                 for (MappingElementVM* mappingElementVM : mappingElementsToRemove)
                 {
                     if (mappingElementVM != nullptr) {
-                        _mappingElementsList.remove(mappingElementVM);
+                        _allMappingElements.remove(mappingElementVM);
                     }
                 }
             }
