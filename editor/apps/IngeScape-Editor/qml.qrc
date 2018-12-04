@@ -63,6 +63,7 @@
         <file>qml/ModelVisualizer.qml</file>
         <file>qml/validator/StringValidator.qml</file>
         <file>qml/validator/Int32Validator.qml</file>
-        <file>qml/validator/DoubleValidator.qml</file>
+        <file>qml/validator/BoundsDoubleValidator.qml</file>
+        <file>qml/scenario/InputIOPValueField.qml</file>
     </qresource>
 </RCC>
