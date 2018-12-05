@@ -59,7 +59,7 @@ public:
 
     /**
      * @brief Constructor
-     * @param mappingElement
+     * @param name
      * @param outputAgent The link starts from this agent
      * @param linkOutput The link starts from this output of the output agent
      * @param inputAgent The link ends to this agent
@@ -67,7 +67,8 @@ public:
      * @param isVirtual
      * @param parent
      */
-    explicit LinkVM(//MappingElementVM* mappingElement,
+    explicit LinkVM(QString name,
+                    //MappingElementVM* mappingElement,
                     AgentInMappingVM* outputAgent,
                     LinkOutputVM* linkOutput,
                     AgentInMappingVM* inputAgent,
@@ -84,15 +85,14 @@ public:
 
 
     /**
-     * @brief Get the id (with format "outputAgent##output::outputType-->inputAgent##input::inputType")
-     * of a link from agent names and Input/Output ids
+     * @brief Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
      * @param inputAgent
      * @param input
      * @param outputAgent
      * @param output
-     * @return id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
+     * @return link id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
      */
-    static QString getIdFromAgentNamesAndIOids(QString inputAgent, QString inputId, QString outputAgent, QString outputId);
+    static QString getLinkIdFromAgentNamesAndIOids(QString inputAgent, QString inputId, QString outputAgent, QString outputId);
 
 };
 

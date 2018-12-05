@@ -27,7 +27,8 @@ class ElementMappingM : public QObject
 {  
     Q_OBJECT
 
-    // Name with all names formatted: "outputAgent##output-->inputAgent##input"
+    // Link name with names of each part (format: "outputAgent##output-->inputAgent##input")
+    // FIXME TODO rename "name" --> "linkName")
     I2_CPP_NOSIGNAL_PROPERTY(QString, name)
 
     // Input agent name
@@ -67,24 +68,22 @@ public:
 
 
     /**
-     * @brief Get the name (with format "outputAgent##output-->inputAgent##input")
-     * of a mapping element from the list of names (of each part)
+     * @brief Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
      * @param inputAgent
      * @param input
      * @param outputAgent
      * @param output
-     * @return name with format "outputAgent##output-->inputAgent##input"
+     * @return link name with format "outputAgent##output-->inputAgent##input"
      */
-    static QString getNameFromNamesList(QString inputAgent, QString input, QString outputAgent, QString output);
+    static QString getLinkNameFromNamesList(QString inputAgent, QString input, QString outputAgent, QString output);
 
 
     /**
-     * @brief Get the list of names (of each parts) from the name (with format "outputAgent##output-->inputAgent##input")
-     * of a mapping element
-     * @param name with format "outputAgent##output-->inputAgent##input"
+     * @brief Get the list of names (each parts of a mapping element) from the link name (with format "outputAgent##output-->inputAgent##input")
+     * @param link name with format "outputAgent##output-->inputAgent##input"
      * @return
      */
-    static QStringList getNamesListFromName(QString name);
+    static QStringList getNamesListFromLinkName(QString linkName);
 
 };
 

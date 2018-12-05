@@ -37,9 +37,8 @@ ElementMappingM::ElementMappingM(QString inputAgent,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    // Get the name (with format "outputAgent##output-->inputAgent##input")
-    // of our mapping element from the list of names (of each part)
-    _name = ElementMappingM::getNameFromNamesList(_outputAgent, _output, _inputAgent, _input);
+    // Get our link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of our mapping element)
+    _name = ElementMappingM::getLinkNameFromNamesList(_outputAgent, _output, _inputAgent, _input);
 
     //qInfo() << "New Model of Element Mapping" << _name;
 }
@@ -55,15 +54,14 @@ ElementMappingM::~ElementMappingM()
 
 
 /**
- * @brief Get the name (with format "outputAgent##output-->inputAgent##input")
- * of a mapping element from the list of names (of each part)
+ * @brief Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
  * @param inputAgent
  * @param input
  * @param outputAgent
  * @param output
- * @return name with format "outputAgent##output-->inputAgent##input"
+ * @return link name with format "outputAgent##output-->inputAgent##input"
  */
-QString ElementMappingM::getNameFromNamesList(QString inputAgent, QString input, QString outputAgent, QString output)
+QString ElementMappingM::getLinkNameFromNamesList(QString inputAgent, QString input, QString outputAgent, QString output)
 {
     if (!inputAgent.isEmpty() && !input.isEmpty() && !outputAgent.isEmpty() && !output.isEmpty())
     {
@@ -77,18 +75,17 @@ QString ElementMappingM::getNameFromNamesList(QString inputAgent, QString input,
 
 
 /**
- * @brief Get the list of names (of each parts) from the name (with format "outputAgent##output-->inputAgent##input")
- * of a mapping element
- * @param name with format "outputAgent##output-->inputAgent##input"
+ * @brief Get the list of names (each parts of a mapping element) from the link name (with format "outputAgent##output-->inputAgent##input")
+ * @param link name with format "outputAgent##output-->inputAgent##input"
  * @return
  */
-QStringList ElementMappingM::getNamesListFromName(QString name)
+QStringList ElementMappingM::getNamesListFromLinkName(QString linkName)
 {
     QStringList namesList;
 
-    if (name.contains(SEPARATOR_LINK_OUTPUT_AND_LINK_INPUT))
+    if (linkName.contains(SEPARATOR_LINK_OUTPUT_AND_LINK_INPUT))
     {
-        QStringList outputAndInput = name.split(SEPARATOR_LINK_OUTPUT_AND_LINK_INPUT);
+        QStringList outputAndInput = linkName.split(SEPARATOR_LINK_OUTPUT_AND_LINK_INPUT);
         if (outputAndInput.count() == 2)
         {
             QString outputAgentAndOuput = outputAndInput.at(0);

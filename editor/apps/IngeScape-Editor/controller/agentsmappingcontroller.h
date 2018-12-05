@@ -118,11 +118,19 @@ public:
 
 
     /**
-     * @brief Get the (view model of) link between agents in the global mapping from a link id
-     * @param id
+     * @brief Get the list of (view model of) links between agents in the global mapping from a link name
+     * @param linkName
      * @return
      */
-    LinkVM* getLinkInMappingFromId(QString id);
+    QList<LinkVM*> getLinksInMappingFromName(QString linkName);
+
+
+    /**
+     * @brief Get the (view model of) link between agents in the global mapping from a link id
+     * @param linkId
+     * @return
+     */
+    LinkVM* getLinkInMappingFromId(QString linkId);
 
 
     /**
@@ -333,6 +341,7 @@ private:
 
     /**
      * @brief Create a link between two agents
+     * @param linkName
      * @param outputAgent
      * @param linkOutput
      * @param inputAgent
@@ -340,7 +349,7 @@ private:
      * @param isVirtual
      * @return
      */
-    LinkVM* _createLinkBetweenTwoAgents(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput, bool isVirtual);
+    LinkVM* _createLinkBetweenTwoAgents(QString linkName, AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput, bool isVirtual);
 
 
     /**
@@ -414,8 +423,11 @@ private:
     // Hash table from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;
 
+    // Link name as key is not unique (because the value type of the Input/Output can be different)
+    // Hash table from link name to a list of view models of links between agents in mapping
+    QHash<QString, QList<LinkVM*>> _hashFromNameToListOfLinksInMapping;
+
     // Hash table from link id to the (view model of) link between agents in mapping
-    //QHash<QString, LinkVM*> _hashFromNameToLinkInMapping;
     QHash<QString, LinkVM*> _hashFromIdToLinkInMapping;
 
     // Hash table from "(output) agent name" to a list of waiting links (where the agent is involved as "Output Agent")

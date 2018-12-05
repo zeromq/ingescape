@@ -17,7 +17,7 @@
 
 /**
  * @brief Constructor
- * @param mappingElement
+ * @param name
  * @param outputAgent The link starts from this agent
  * @param linkOutput The link starts from this output of the output agent
  * @param inputAgent The link ends to this agent
@@ -25,14 +25,15 @@
  * @param isVirtual
  * @param parent
  */
-LinkVM::LinkVM(//MappingElementVM* mappingElement,
+LinkVM::LinkVM(QString name,
+               //MappingElementVM* mappingElement,
                AgentInMappingVM* outputAgent,
                LinkOutputVM* linkOutput,
                AgentInMappingVM* inputAgent,
                LinkInputVM* linkInput,
                bool isVirtual,
                QObject *parent) : QObject(parent),
-    _name(""),
+    _name(name),
     _id(""),
     //_mappingElement(mappingElement),
     _outputAgent(outputAgent),
@@ -46,15 +47,8 @@ LinkVM::LinkVM(//MappingElementVM* mappingElement,
 
     if ((_outputAgent != nullptr) && (_linkOutput != nullptr) && (_inputAgent != nullptr) && (_linkInput != nullptr))
     {
-        // Get the name (with format "outputAgent##output-->inputAgent##input")
-        // of our link from the list of names (of each part)
-        _name = ElementMappingM::getNameFromNamesList(_outputAgent->name(), _linkOutput->name(), _inputAgent->name(), _linkInput->name());
-
-        // Identifier with agents names and Input/Output ids: "outputAgent##output::outputType-->inputAgent##input::inputType"
-
-        // Get the id (with format "outputAgent##output::outputType-->inputAgent##input::inputType")
-        // of our link from agent names and Input/Output ids
-        _id = LinkVM::getIdFromAgentNamesAndIOids(_outputAgent->name(), _linkOutput->id(), _inputAgent->name(), _linkInput->id());
+        // Get our link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
+        _id = LinkVM::getLinkIdFromAgentNamesAndIOids(_outputAgent->name(), _linkOutput->id(), _inputAgent->name(), _linkInput->id());
 
         qInfo() << "New Link" << _name << "(" << _id << ")";
     }
@@ -78,15 +72,14 @@ LinkVM::~LinkVM()
 
 
 /**
- * @brief Get the id (with format "outputAgent##output::outputType-->inputAgent##input::inputType")
- * of a link from agent names and Input/Output ids
+ * @brief Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
  * @param inputAgent
  * @param input
  * @param outputAgent
  * @param output
- * @return id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
+ * @return link id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
  */
-QString LinkVM::getIdFromAgentNamesAndIOids(QString inputAgent, QString inputId, QString outputAgent, QString outputId)
+QString LinkVM::getLinkIdFromAgentNamesAndIOids(QString inputAgent, QString inputId, QString outputAgent, QString outputId)
 {
     if (!inputAgent.isEmpty() && !inputId.isEmpty() && !outputAgent.isEmpty() && !outputId.isEmpty())
     {
