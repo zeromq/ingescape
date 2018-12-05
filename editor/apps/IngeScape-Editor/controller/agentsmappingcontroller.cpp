@@ -212,6 +212,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(QString agentName
 {
     // Check that there is NOT yet an agent in the current mapping for this name
     AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
+
     if ((agentInMapping == nullptr) && (_modelManager != nullptr))
     {
         // Get the (view model of) agents grouped for this name
@@ -224,7 +225,8 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(QString agentName
             agentInMapping = getAgentInMappingFromName(agentName);
             if (agentInMapping != nullptr)
             {
-                // Get the mapping currently edited (temporary until the user activate the mapping)
+                // FIXME Usefull or Useless ?
+                /*// Get the mapping currently edited (temporary until the user activate the mapping)
                 AgentMappingM* temporaryMapping = agentInMapping->temporaryMapping();
                 if (temporaryMapping != nullptr)
                 {
@@ -243,7 +245,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(QString agentName
                             }
                         }
                     }
-                }
+                }*/
 
                 // Selects this new agent
                 setselectedAgent(agentInMapping);
@@ -337,7 +339,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                 }
             }
             else {
-                qWarning() << "The link" << link->id() << "already exist";
+                qWarning() << "The link" << link->uid() << "already exist";
             }
         }
         else
@@ -715,6 +717,8 @@ void AgentsMappingController::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedB
 
                 // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
                 _createAgentInMappingAtPosition(agentsGroupedByName, position);
+
+                // No need to add links now, because the mapping will be received after the creation of this agent(s grouped by name)
 
                 // FIXME REPAIR
                 /*// If there are waiting links (where this agent is involved as "Output Agent")
@@ -1129,8 +1133,8 @@ void AgentsMappingController::onMappingElementsHaveBeenAdded(QList<MappingElemen
                                                             linkInput,
                                                             false);
 
-
-                                // Get the list of "Waiting Links" from this Output agent name (where the agent is involved as "Output Agent")
+                                // FIXME Usefull or Useless ?
+                                /*// Get the list of "Waiting Links" from this Output agent name (where the agent is involved as "Output Agent")
                                 QList<MappingElementVM*> listOfWaitingLinks = _getWaitingLinksFromOutputAgentName(mappingElement->firstModel()->outputAgent());
 
                                 if (listOfWaitingLinks.contains(mappingElement))
@@ -1140,7 +1144,7 @@ void AgentsMappingController::onMappingElementsHaveBeenAdded(QList<MappingElemen
 
                                     // Update the hash table
                                     _hashFromOutputAgentNameToListOfWaitingLinks.insert(mappingElement->firstModel()->outputAgent(), listOfWaitingLinks);
-                                }
+                                }*/
                             }
                         }
                     }
@@ -1451,7 +1455,7 @@ LinkVM* AgentsMappingController::_createLinkBetweenTwoAgents(QString linkName, A
         _allLinksInMapping.append(link);
 
         // Add to the hash table
-        _hashFromIdToLinkInMapping.insert(link->id(), link);
+        _hashFromIdToLinkInMapping.insert(link->uid(), link);
 
         // Update the list of links between agents in the global mapping for this link name
         QList<LinkVM*> linksWithSameName = getLinksInMappingFromName(linkName);
@@ -1479,7 +1483,7 @@ void AgentsMappingController::_deleteLinkBetweenTwoAgents(LinkVM* link)
         }
 
         // Remove from the hash table
-        _hashFromIdToLinkInMapping.remove(link->id());
+        _hashFromIdToLinkInMapping.remove(link->uid());
 
         // Update the list of links between agents in the global mapping for this link name
         QList<LinkVM*> linksWithSameName = getLinksInMappingFromName(link->name());

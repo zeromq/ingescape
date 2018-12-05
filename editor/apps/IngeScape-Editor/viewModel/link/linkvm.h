@@ -33,8 +33,8 @@ class LinkVM : public QObject
     // Name with all names formatted: "outputAgent##output-->inputAgent##input"
     I2_CPP_NOSIGNAL_PROPERTY(QString, name)
 
-    // Identifier with agents names and Input/Output ids: "outputAgent##output::outputType-->inputAgent##input::inputType"
-    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
+    // Unique identifier with agents names and Input/Output ids: "outputAgent##output::outputType-->inputAgent##input::inputType"
+    I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
 
     // View model of mapping element
     //I2_QML_PROPERTY_DELETE_PROOF(MappingElementVM*, mappingElement)

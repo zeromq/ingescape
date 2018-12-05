@@ -34,7 +34,7 @@ LinkVM::LinkVM(QString name,
                bool isVirtual,
                QObject *parent) : QObject(parent),
     _name(name),
-    _id(""),
+    _uid(""),
     //_mappingElement(mappingElement),
     _outputAgent(outputAgent),
     _linkOutput(linkOutput),
@@ -48,9 +48,9 @@ LinkVM::LinkVM(QString name,
     if ((_outputAgent != nullptr) && (_linkOutput != nullptr) && (_inputAgent != nullptr) && (_linkInput != nullptr))
     {
         // Get our link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-        _id = LinkVM::getLinkIdFromAgentNamesAndIOids(_outputAgent->name(), _linkOutput->id(), _inputAgent->name(), _linkInput->id());
+        _uid = LinkVM::getLinkIdFromAgentNamesAndIOids(_outputAgent->name(), _linkOutput->id(), _inputAgent->name(), _linkInput->id());
 
-        qInfo() << "New Link" << _name << "(" << _id << ")";
+        qInfo() << "New Link" << _name << "(" << _uid << ")";
     }
 }
 
@@ -60,7 +60,7 @@ LinkVM::LinkVM(QString name,
  */
 LinkVM::~LinkVM()
 {
-    qInfo() << "Delete Link" << _name << "(" << _id << ")";
+    qInfo() << "Delete Link" << _name << "(" << _uid << ")";
 
     //setmappingElement(nullptr);
 
