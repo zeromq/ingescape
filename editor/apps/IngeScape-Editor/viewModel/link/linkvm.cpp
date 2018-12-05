@@ -73,13 +73,13 @@ LinkVM::~LinkVM()
 
 /**
  * @brief Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
- * @param inputAgent
- * @param input
  * @param outputAgent
  * @param output
+ * @param inputAgent
+ * @param input
  * @return link id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
  */
-QString LinkVM::getLinkIdFromAgentNamesAndIOids(QString inputAgent, QString inputId, QString outputAgent, QString outputId)
+QString LinkVM::getLinkIdFromAgentNamesAndIOids(QString outputAgent, QString outputId, QString inputAgent, QString inputId)
 {
     if (!inputAgent.isEmpty() && !inputId.isEmpty() && !outputAgent.isEmpty() && !outputId.isEmpty())
     {

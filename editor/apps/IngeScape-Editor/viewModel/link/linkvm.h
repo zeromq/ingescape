@@ -86,13 +86,13 @@ public:
 
     /**
      * @brief Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-     * @param inputAgent
-     * @param input
      * @param outputAgent
      * @param output
+     * @param inputAgent
+     * @param input
      * @return link id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
      */
-    static QString getLinkIdFromAgentNamesAndIOids(QString inputAgent, QString inputId, QString outputAgent, QString outputId);
+    static QString getLinkIdFromAgentNamesAndIOids(QString outputAgent, QString outputId, QString inputAgent, QString inputId);
 
 };
 

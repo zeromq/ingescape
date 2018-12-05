@@ -69,13 +69,13 @@ public:
 
     /**
      * @brief Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
-     * @param inputAgent
-     * @param input
      * @param outputAgent
      * @param output
+     * @param inputAgent
+     * @param input
      * @return link name with format "outputAgent##output-->inputAgent##input"
      */
-    static QString getLinkNameFromNamesList(QString inputAgent, QString input, QString outputAgent, QString output);
+    static QString getLinkNameFromNamesList(QString outputAgent, QString output, QString inputAgent, QString input);
 
 
     /**

@@ -55,13 +55,13 @@ ElementMappingM::~ElementMappingM()
 
 /**
  * @brief Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
- * @param inputAgent
- * @param input
  * @param outputAgent
  * @param output
+ * @param inputAgent
+ * @param input
  * @return link name with format "outputAgent##output-->inputAgent##input"
  */
-QString ElementMappingM::getLinkNameFromNamesList(QString inputAgent, QString input, QString outputAgent, QString output)
+QString ElementMappingM::getLinkNameFromNamesList(QString outputAgent, QString output, QString inputAgent, QString input)
 {
     if (!inputAgent.isEmpty() && !input.isEmpty() && !outputAgent.isEmpty() && !output.isEmpty())
     {
