@@ -682,11 +682,55 @@ void AgentsMappingController::onIsMappingControlledChanged(bool isMappingControl
  */
 void AgentsMappingController::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName)
 {
-    if (agentsGroupedByName != nullptr)
+    if ((agentsGroupedByName != nullptr) && (_modelManager != nullptr))
     {
         // Connect to signals from this new agents grouped by name
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsHaveBeenAdded, this, &AgentsMappingController::onMappingElementsHaveBeenAdded);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsWillBeRemoved, this, &AgentsMappingController::onMappingElementsWillBeRemoved);
+
+        QString agentName = agentsGroupedByName->name();
+
+        // The mapping is activated
+        if (_modelManager->isMappingActivated())
+        {
+            // CONTROL
+            if (_modelManager->isMappingControlled())
+            {
+                qDebug() << "CONTROL:" << agentName << "has been created. CLEAR its MAPPING !";
+
+                // Send the command "Clear Mapping" on the network to this agent(s)
+                Q_EMIT commandAskedToAgent(agentsGroupedByName->peerIdsList(), command_ClearMapping);
+            }
+            // OBSERVE
+            else
+            {
+                qDebug() << "OBSERVE:" << agentName << "has been created. ADD it in the MAPPING view !";
+
+                double randomMax = (double)RAND_MAX;
+
+                // Get a random position in the current window
+                QPointF position = _getRandomPosition(randomMax);
+
+                //qDebug() << "Random position:" << position << "for" << agentName;
+
+                // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
+                _createAgentInMappingAtPosition(agentsGroupedByName, position);
+
+                // FIXME REPAIR
+                /*// If there are waiting links (where this agent is involved as "Output Agent")
+                if (_hashFromOutputAgentNameToListOfWaitingLinks.contains(agentName))
+                {
+                    QList<ElementMappingM*> listOfWaitingLinks = _hashFromOutputAgentNameToListOfWaitingLinks.value(agentName);
+                    for (ElementMappingM* mappingElement : listOfWaitingLinks)
+                    {
+                        qDebug() << "Create waiting MAP..." << mappingElement->name();
+
+                        // Create the link corresponding to the mapping element
+                        //onMapped(mappingElement);
+                    }
+                }*/
+            }
+        }
     }
 }
 
@@ -768,7 +812,7 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                         // Get a random position in the current window
                         QPointF position = _getRandomPosition(randomMax);
 
-                        //qDebug() << "Random position:" << position << "for agent" << agentName;
+                        //qDebug() << "Random position:" << position << "for" << agentName;
 
                         // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
                         _createAgentInMappingAtPosition(agentsGroupedByName, position);
@@ -1526,7 +1570,7 @@ void AgentsMappingController::_updateMappingWithAgentsONandLinks()
                     // Get a random position in the current window
                     QPointF position = _getRandomPosition(randomMax);
 
-                    //qDebug() << "Random position:" << position << "for agent" << agentsGroupedByName->name();
+                    //qDebug() << "Random position:" << position << "for" << agentsGroupedByName->name();
 
                     // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
                     _createAgentInMappingAtPosition(agentsGroupedByName, position);

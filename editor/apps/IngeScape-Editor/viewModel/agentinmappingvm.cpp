@@ -97,13 +97,17 @@ AgentInMappingVM::~AgentInMappingVM()
     _linkInputsList.deleteAllItems();
     _linkOutputsList.deleteAllItems();
 
-    if (_agentsGroupedByName != nullptr) {
+    if (_agentsGroupedByName != nullptr)
+    {
         // Deleted elsewhere
         setagentsGroupedByName(nullptr);
     }
 
-    if (_temporaryMapping != nullptr) {
-        delete _temporaryMapping;
+    if (_temporaryMapping != nullptr)
+    {
+        AgentMappingM* temp = _temporaryMapping;
+        settemporaryMapping(nullptr);
+        delete temp;
     }
 }
 
