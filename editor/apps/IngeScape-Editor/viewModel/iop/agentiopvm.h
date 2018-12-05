@@ -31,7 +31,7 @@ class AgentIOPVM : public QObject
     I2_QML_PROPERTY_READONLY(QString, name)
 
     // Identifier with name and value type (can be empty when ghost)
-    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
+    I2_QML_PROPERTY_READONLY(QString, id)
 
     // Models of our agent Input / Output / Parameter
     I2_QOBJECT_LISTMODEL(AgentIOPM, models)

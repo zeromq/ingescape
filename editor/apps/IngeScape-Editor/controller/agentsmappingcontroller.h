@@ -118,11 +118,11 @@ public:
 
 
     /**
-     * @brief Get the (view model of) link between agents in the global mapping from a link name
-     * @param name
+     * @brief Get the (view model of) link between agents in the global mapping from a link id
+     * @param id
      * @return
      */
-    LinkVM* getLinkInMappingFromName(QString name);
+    LinkVM* getLinkInMappingFromId(QString id);
 
 
     /**
@@ -332,6 +332,18 @@ private:
 
 
     /**
+     * @brief Create a link between two agents
+     * @param outputAgent
+     * @param linkOutput
+     * @param inputAgent
+     * @param linkInput
+     * @param isVirtual
+     * @return
+     */
+    LinkVM* _createLinkBetweenTwoAgents(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput, bool isVirtual);
+
+
+    /**
      * @brief Delete a link between two agents
      * @param link
      */
@@ -375,6 +387,22 @@ private:
     QList<MappingElementVM*> _getWaitingLinksFromOutputAgentName(QString outputAgentName);
 
 
+    /**
+     * @brief Get the added link while the mapping was UN-activated from a link id
+     * @param linkId
+     * @return
+     */
+    LinkVM* _getAddedLinkWhileMappingWasUNactivatedFromLinkId(QString linkId);
+
+
+    /**
+     * @brief Get the removed link while the mapping was UN-activated from a link id
+     * @param linkId
+     * @return
+     */
+    LinkVM* _getRemovedLinkWhileMappingWasUNactivatedFromLinkId(QString linkId);
+
+
 private:
 
     // Manager for the data model of INGESCAPE
@@ -386,15 +414,19 @@ private:
     // Hash table from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;
 
-    // Hash table from link name to the (view model of) link between agents in mapping
-    QHash<QString, LinkVM*> _hashFromNameToLinkInMapping;
+    // Hash table from link id to the (view model of) link between agents in mapping
+    //QHash<QString, LinkVM*> _hashFromNameToLinkInMapping;
+    QHash<QString, LinkVM*> _hashFromIdToLinkInMapping;
 
     // Hash table from "(output) agent name" to a list of waiting links (where the agent is involved as "Output Agent")
     QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingLinks;
 
-    // Hash table from "link name" to added/removed link while the mapping was UN-activated
-    QHash<QString, ElementMappingM*> _hashFromLinkNameToAddedLinkWhileMappingWasUNactivated;
-    QHash<QString, ElementMappingM*> _hashFromLinkNameToRemovedLinkWhileMappingWasUNactivated;
+    // Hash table from "link id" to added link while the mapping was UN-activated
+    QHash<QString, LinkVM*> _hashFromLinkIdToAddedLink_WhileMappingWasUNactivated;
+
+    // Hash table from "link id" to removed link while the mapping was UN-activated
+    QHash<QString, LinkVM*> _hashFromLinkIdToRemovedLink_WhileMappingWasUNactivated;
+
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)

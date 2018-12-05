@@ -33,8 +33,8 @@ class LinkVM : public QObject
     // Name with all names formatted: "outputAgent##output-->inputAgent##input"
     I2_CPP_NOSIGNAL_PROPERTY(QString, name)
 
-    // Identifier with agents names and Input/Output ids: [outputAgent##output::outputType-->inputAgent##input::inputType]
-    //I2_CPP_NOSIGNAL_PROPERTY(QString, id)
+    // Identifier with agents names and Input/Output ids: "outputAgent##output::outputType-->inputAgent##input::inputType"
+    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
 
     // View model of mapping element
     //I2_QML_PROPERTY_DELETE_PROOF(MappingElementVM*, mappingElement)
@@ -81,6 +81,18 @@ public:
      * @brief Destructor
      */
     ~LinkVM();
+
+
+    /**
+     * @brief Get the id (with format "outputAgent##output::outputType-->inputAgent##input::inputType")
+     * of a link from agent names and Input/Output ids
+     * @param inputAgent
+     * @param input
+     * @param outputAgent
+     * @param output
+     * @return id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
+     */
+    static QString getIdFromAgentNamesAndIOids(QString inputAgent, QString inputId, QString outputAgent, QString outputId);
 
 };
 
