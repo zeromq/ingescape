@@ -15,6 +15,6 @@ Description: The Ingescape library
 Package: libingescape-dev
 Architecture: any
 Section: libdevel
-Depends: ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Multi-Arch: same
 Description: The Ingescape library

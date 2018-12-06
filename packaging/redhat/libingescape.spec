@@ -39,10 +39,16 @@ developing applications that use %{name}.
 
 %build
 mkdir -p %{buildroot}%{_libdir}
+mkdir -p %{buildroot}%{_includedir}/yajl
 mkdir -p %{buildroot}%{_includedir}/ingescape
 
 
 %install
+# Copy yajl libraries
+cp -d /usr/local/lib/libyajl.la %{buildroot}%{_libdir}
+cp -d /usr/local/lib/libyajl.so* %{buildroot}%{_libdir}
+cp -d /usr/local/include/yajl/yajl_*.h %{buildroot}%{_includedir}/yajl/
+# Copy ingescape libraries
 cp -d %{_INGESCAPE_SOURCE}/linux-x86/libingescape.la %{buildroot}%{_libdir}
 cp -d %{_INGESCAPE_SOURCE}/linux-x86/libingescape.so* %{buildroot}%{_libdir}
 cp -d %{_INGESCAPE_SOURCE}/src/include/ingescape.h %{buildroot}%{_includedir}/ingescape/
@@ -55,12 +61,15 @@ cp -d %{_INGESCAPE_SOURCE}/src/include/ingescape.h %{buildroot}%{_includedir}/in
 
 %files
 %defattr(-,root,root)
+%{_libdir}/libyajl.la
+%{_libdir}/libyajl.so.*
 %{_libdir}/libingescape.la
 %{_libdir}/libingescape.so.*
 
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
+%{_libdir}/libyajl.so
 %{_libdir}/libingescape.so
 
 
