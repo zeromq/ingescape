@@ -30,8 +30,8 @@ class LinkConnectorVM : public QObject
     // Name of our agent Input / Output
     I2_QML_PROPERTY_READONLY(QString, name)
 
-    // Identifier with name and value type
-    I2_QML_PROPERTY_READONLY(QString, id)
+    // Unique identifier with name and value type
+    I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
 
     // Geometry for the connector in the view
     // Position the center of the connector (Absolute coordinate)

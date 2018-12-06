@@ -130,7 +130,7 @@ void DefinitionM::_onInputsListChanged()
         {
             if ((input != nullptr) && !_previousInputsList.contains(input))
             {
-                _inputsIdsList.append(input->id());
+                _inputsIdsList.append(input->uid());
                 _mapFromInputNameToInput.insert(input->name(), input);
             }
         }
@@ -142,7 +142,7 @@ void DefinitionM::_onInputsListChanged()
         {
             if ((input != nullptr) && !newInputsList.contains(input))
             {
-                _inputsIdsList.removeOne(input->id());
+                _inputsIdsList.removeOne(input->uid());
                 _mapFromInputNameToInput.remove(input->name());
             }
         }
@@ -168,7 +168,7 @@ void DefinitionM::_onOutputsListChanged()
         {
             if ((output != nullptr) && !_previousOutputsList.contains(output))
             {
-                _outputsIdsList.append(output->id());
+                _outputsIdsList.append(output->uid());
                 _mapFromOutputNameToOutput.insert(output->name(), output);
 
                 // Connect to signals from the output
@@ -184,7 +184,7 @@ void DefinitionM::_onOutputsListChanged()
         {
             if ((output != nullptr) && !newOutputsList.contains(output))
             {
-                _outputsIdsList.removeOne(output->id());
+                _outputsIdsList.removeOne(output->uid());
                 _mapFromOutputNameToOutput.remove(output->name());
 
                 // DIS-connect to signals from the output
@@ -213,7 +213,7 @@ void DefinitionM::_onParametersListChanged()
         {
             if ((parameter != nullptr) && !_previousParametersList.contains(parameter))
             {
-                _parametersIdsList.append(parameter->id());
+                _parametersIdsList.append(parameter->uid());
                 _mapFromParameterNameToParameter.insert(parameter->name(), parameter);
             }
         }
@@ -225,7 +225,7 @@ void DefinitionM::_onParametersListChanged()
         {
             if ((parameter != nullptr) && !newParametersList.contains(parameter))
             {
-                _parametersIdsList.removeOne(parameter->id());
+                _parametersIdsList.removeOne(parameter->uid());
                 _mapFromParameterNameToParameter.remove(parameter->name());
             }
         }

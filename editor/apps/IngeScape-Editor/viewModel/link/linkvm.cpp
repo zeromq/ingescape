@@ -48,7 +48,7 @@ LinkVM::LinkVM(QString name,
     if ((_outputAgent != nullptr) && (_linkOutput != nullptr) && (_inputAgent != nullptr) && (_linkInput != nullptr))
     {
         // Get our link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-        _uid = LinkVM::getLinkIdFromAgentNamesAndIOids(_outputAgent->name(), _linkOutput->id(), _inputAgent->name(), _linkInput->id());
+        _uid = LinkVM::getLinkIdFromAgentNamesAndIOids(_outputAgent->name(), _linkOutput->uid(), _inputAgent->name(), _linkInput->uid());
 
         qInfo() << "New Link" << _name << "(" << _uid << ")";
     }

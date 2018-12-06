@@ -21,6 +21,7 @@
  */
 LinkConnectorVM::LinkConnectorVM(QObject *parent) : QObject(parent),
     _name(""),
+    _uid(""),
     _position(QPointF())
 {
     // Force ownership of our object, it will prevent Qml from stealing it

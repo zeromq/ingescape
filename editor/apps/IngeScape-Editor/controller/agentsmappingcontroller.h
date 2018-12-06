@@ -335,8 +335,9 @@ private:
      * @brief Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
      * @param agentsGroupedByName
      * @param position
+     * @return
      */
-    void _createAgentInMappingAtPosition(AgentsGroupedByNameVM* agentsGroupedByName, QPointF position);
+    AgentInMappingVM* _createAgentInMappingAtPosition(AgentsGroupedByNameVM* agentsGroupedByName, QPointF position);
 
 
     /**

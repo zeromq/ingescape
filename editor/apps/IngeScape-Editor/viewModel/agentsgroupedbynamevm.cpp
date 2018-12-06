@@ -1374,9 +1374,9 @@ QPair<bool, InputVM*> AgentsGroupedByNameVM::_manageNewInputModel(AgentIOPM* inp
     if ((input != nullptr) && !input->name().isEmpty())
     {
         // Input id is defined
-        if (!input->id().isEmpty())
+        if (!input->uid().isEmpty())
         {
-            inputVM = getInputFromId(input->id());
+            inputVM = getInputFromId(input->uid());
 
             // There is already a view model for this id
             if (inputVM != nullptr)
@@ -1391,13 +1391,13 @@ QPair<bool, InputVM*> AgentsGroupedByNameVM::_manageNewInputModel(AgentIOPM* inp
 
                 // Create a new view model of input
                 inputVM = new InputVM(input->name(),
-                                      input->id(),
+                                      input->uid(),
                                       input,
                                       this);
 
                 // Don't add to the list here (this input will be added globally via temporary list)
 
-                _hashFromIdToInput.insert(input->id(), inputVM);
+                _hashFromIdToInput.insert(input->uid(), inputVM);
 
                 // Update the list of view models of input for this name
                 QList<InputVM*> inputsWithSameName = getInputsListFromName(input->name());
@@ -1430,9 +1430,9 @@ QPair<bool, OutputVM*> AgentsGroupedByNameVM::_manageNewOutputModel(OutputM* out
     if ((output != nullptr) && !output->name().isEmpty())
     {
         // Output id is defined
-        if (!output->id().isEmpty())
+        if (!output->uid().isEmpty())
         {
-            outputVM = getOutputFromId(output->id());
+            outputVM = getOutputFromId(output->uid());
 
             // There is already a view model for this id
             if (outputVM != nullptr)
@@ -1447,13 +1447,13 @@ QPair<bool, OutputVM*> AgentsGroupedByNameVM::_manageNewOutputModel(OutputM* out
 
                 // Create a new view model of output
                 outputVM = new OutputVM(output->name(),
-                                        output->id(),
+                                        output->uid(),
                                         output,
                                         this);
 
                 // Don't add to the list here (this output will be added globally via temporary list)
 
-                _hashFromIdToOutput.insert(output->id(), outputVM);
+                _hashFromIdToOutput.insert(output->uid(), outputVM);
 
                 // Update the list of view models of output for this name
                 QList<OutputVM*> outputsWithSameName = getOutputsListFromName(output->name());
@@ -1486,9 +1486,9 @@ QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageNewParameterModel(AgentI
     if ((parameter != nullptr) && !parameter->name().isEmpty())
     {
         // Parameter id is defined
-        if (!parameter->id().isEmpty())
+        if (!parameter->uid().isEmpty())
         {
-            parameterVM = getParameterFromId(parameter->id());
+            parameterVM = getParameterFromId(parameter->uid());
 
             // There is already a view model for this id
             if (parameterVM != nullptr)
@@ -1503,13 +1503,13 @@ QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageNewParameterModel(AgentI
 
                 // Create a new view model of parameter
                 parameterVM = new ParameterVM(parameter->name(),
-                                              parameter->id(),
+                                              parameter->uid(),
                                               parameter,
                                               this);
 
                 // Don't add to the list here (this parameter will be added globally via temporary list)
 
-                _hashFromIdToParameter.insert(parameter->id(), parameterVM);
+                _hashFromIdToParameter.insert(parameter->uid(), parameterVM);
 
                 // Update the list of view models of parameter for this name
                 QList<ParameterVM*> parametersWithSameName = getParametersListFromName(parameter->name());
@@ -1542,9 +1542,9 @@ QPair<bool, InputVM*> AgentsGroupedByNameVM::_manageOldInputModel(AgentIOPM* inp
     if ((input != nullptr) && !input->name().isEmpty())
     {
         // Input id is defined
-        if (!input->id().isEmpty())
+        if (!input->uid().isEmpty())
         {
-            inputVM = getInputFromId(input->id());
+            inputVM = getInputFromId(input->uid());
 
             if (inputVM != nullptr)
             {
@@ -1559,7 +1559,7 @@ QPair<bool, InputVM*> AgentsGroupedByNameVM::_manageOldInputModel(AgentIOPM* inp
                     // Don't remove from the list here (this input will be removed globally via temporary list)
 
                     // Remove from the hash table with the input id
-                    _hashFromIdToInput.remove(input->id());
+                    _hashFromIdToInput.remove(input->uid());
 
                     // Update the list of view models of input for this name
                     QList<InputVM*> inputsWithSameName = getInputsListFromName(input->name());
@@ -1587,9 +1587,9 @@ QPair<bool, OutputVM*> AgentsGroupedByNameVM::_manageOldOutputModel(OutputM* out
     if ((output != nullptr) && !output->name().isEmpty())
     {
         // Input id is defined
-        if (!output->id().isEmpty())
+        if (!output->uid().isEmpty())
         {
-            outputVM = getOutputFromId(output->id());
+            outputVM = getOutputFromId(output->uid());
 
             if (outputVM != nullptr)
             {
@@ -1604,7 +1604,7 @@ QPair<bool, OutputVM*> AgentsGroupedByNameVM::_manageOldOutputModel(OutputM* out
                     // Don't remove from the list here (this output will be removed globally via temporary list)
 
                     // Remove from the hash table with the output id
-                    _hashFromIdToOutput.remove(output->id());
+                    _hashFromIdToOutput.remove(output->uid());
 
                     // Update the list of view models of output for this name
                     QList<OutputVM*> outputsWithSameName = getOutputsListFromName(output->name());
@@ -1632,9 +1632,9 @@ QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageOldParameterModel(AgentI
     if ((parameter != nullptr) && !parameter->name().isEmpty())
     {
         // parameter id is defined
-        if (!parameter->id().isEmpty())
+        if (!parameter->uid().isEmpty())
         {
-            parameterVM = getParameterFromId(parameter->id());
+            parameterVM = getParameterFromId(parameter->uid());
 
             if (parameterVM != nullptr)
             {
@@ -1649,7 +1649,7 @@ QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageOldParameterModel(AgentI
                     // Don't remove from the list here (this parameter will be removed globally via temporary list)
 
                     // Remove from the hash table with the parameter id
-                    _hashFromIdToParameter.remove(parameter->id());
+                    _hashFromIdToParameter.remove(parameter->uid());
 
                     // Update the list of view models of parameter for this name
                     QList<ParameterVM*> parametersWithSameName = getParametersListFromName(parameter->name());

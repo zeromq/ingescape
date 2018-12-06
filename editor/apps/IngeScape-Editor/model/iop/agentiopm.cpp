@@ -34,6 +34,7 @@ AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
     _name(name),
     _agentIOPValueType(AgentIOPValueTypes::UNKNOWN),
     _agentIOPValueTypeGroup(AgentIOPValueTypeGroups::UNKNOWN),
+    _uid(""),
     _defaultValue(QVariant()),
     _displayableDefaultValue(""),
     _currentValue(QVariant()),
@@ -46,7 +47,7 @@ AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
     setagentIOPValueType(agentIOPValueType);
 
     // Create the unique identifier with name and value type: "Name::ValueType"
-    _id = QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(_agentIOPValueType));
+    _uid = QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(_agentIOPValueType));
 }
 
 
@@ -125,17 +126,17 @@ void AgentIOPM::setcurrentValue(QVariant value)
 
 /**
  * @brief Get the name and the value type of an agent I/O/P from its id
- * @param id
+ * @param uid
  * @return
  */
-QPair<QString, AgentIOPValueTypes::Value> AgentIOPM::getNameAndValueTypeFromId(QString id)
+QPair<QString, AgentIOPValueTypes::Value> AgentIOPM::getNameAndValueTypeFromId(QString uid)
 {
     QString name = "";
     AgentIOPValueTypes::Value valueType = AgentIOPValueTypes::UNKNOWN;
 
-    if (id.contains(SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE))
+    if (uid.contains(SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE))
     {
-        QStringList nameAndValueType = id.split(SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE);
+        QStringList nameAndValueType = uid.split(SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE);
         if (nameAndValueType.count() == 2)
         {
             name = nameAndValueType.at(0);

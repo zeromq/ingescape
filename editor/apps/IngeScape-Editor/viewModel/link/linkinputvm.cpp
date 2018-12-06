@@ -30,7 +30,7 @@ LinkInputVM::LinkInputVM(InputVM* input,
 
     if (_input != nullptr) {
         setname(_input->name());
-        setid(_input->id());
+        setuid(_input->id());
     }
 }
 
