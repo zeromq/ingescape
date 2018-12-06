@@ -347,10 +347,17 @@ private:
      * @param linkOutput
      * @param inputAgent
      * @param linkInput
+     * @param mappingElement
      * @param isVirtual
      * @return
      */
-    LinkVM* _createLinkBetweenTwoAgents(QString linkName, AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput, bool isVirtual);
+    LinkVM* _createLinkBetweenTwoAgents(QString linkName,
+                                        AgentInMappingVM* outputAgent,
+                                        LinkOutputVM* linkOutput,
+                                        AgentInMappingVM* inputAgent,
+                                        LinkInputVM* linkInput,
+                                        //MappingElementVM* mappingElement,
+                                        bool isVirtual = false);
 
 
     /**
@@ -390,11 +397,19 @@ private:
 
 
     /**
-     * @brief Get the list of "Waiting Links" from an (Output) agent name
+     * @brief Get the list of "Waiting Mapping Elements" on an output agent (name)
      * @param outputAgentName
      * @return
      */
-    QList<MappingElementVM*> _getWaitingLinksFromOutputAgentName(QString outputAgentName);
+    QList<MappingElementVM*> _getWaitingMappingElementsOnOutputAgent(QString outputAgentName);
+
+
+    /**
+     * @brief Remove a "Waiting Mapping Element" on an output agent (name)
+     * @param outputAgentName
+     * @param mappingElement
+     */
+    void _removeWaitingMappingElementOnOutputAgent(QString outputAgentName, MappingElementVM* mappingElement);
 
 
     /**
@@ -453,8 +468,8 @@ private:
     // Hash table from link id to the (view model of) link between agents in mapping
     QHash<QString, LinkVM*> _hashFromIdToLinkInMapping;
 
-    // Hash table from "(output) agent name" to a list of waiting links (where the agent is involved as "Output Agent")
-    QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingLinks;
+    // Hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent")
+    QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingMappingElements;
 
     // Hash table from "link id" to added link while the mapping was UN-activated
     QHash<QString, LinkVM*> _hashFromLinkIdToAddedLink_WhileMappingWasUNactivated;
