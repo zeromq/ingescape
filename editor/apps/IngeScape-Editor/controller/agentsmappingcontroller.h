@@ -412,6 +412,28 @@ private:
     LinkVM* _getRemovedLinkWhileMappingWasUNactivatedFromLinkId(QString linkId);
 
 
+    /**
+     * @brief Helper to get the link input from a name if there is only one input for this name
+     * If there are several inputs with the same name (but different value type), we return NULL
+     * @param agent
+     * @param inputName
+     * @param linkName
+     * @return
+     */
+    LinkInputVM* _getAloneLinkInputFromName(AgentInMappingVM* agent, QString inputName, QString linkName);
+
+
+    /**
+     * @brief Helper to get the link output from a name if there is only one output for this name
+     * If there are several outputs with the same name (but different value type), we return NULL
+     * @param agent
+     * @param outputName
+     * @param linkName
+     * @return
+     */
+    LinkOutputVM* _getAloneLinkOutputFromName(AgentInMappingVM* agent, QString outputName, QString linkName);
+
+
 private:
 
     // Manager for the data model of INGESCAPE
