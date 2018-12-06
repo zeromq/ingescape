@@ -389,6 +389,13 @@ private:
 
 
     /**
+     * @brief Link an agent in the global mapping (add all links to/from this agent)
+     * @param agentInMapping
+     */
+    void _linkAgentInMapping(AgentInMappingVM* agentInMapping);
+
+
+    /**
      * @brief Get a random position in the current window
      * @param randomMax
      * @return
