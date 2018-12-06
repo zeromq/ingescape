@@ -273,6 +273,13 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot called when the flag "is ON" of an agent changed
+     * @param isON
+     */
+    void onAgentIsONChanged(bool isON);
+
+
+    /**
      * @brief Slot called when some view models of mapping elements have been added to an agent(s grouped by name)
      * @param newMappingElements
      */
@@ -389,10 +396,17 @@ private:
 
 
     /**
-     * @brief Link an agent in the global mapping (add all links to/from this agent)
+     * @brief Link an agent in the global mapping on its inputs and on its outputs (add all links to/from an agent)
      * @param agentInMapping
      */
-    void _linkAgentInMapping(AgentInMappingVM* agentInMapping);
+    void _linkAgentInMappingOnInputsAndOutputs(AgentInMappingVM* agentInMapping);
+
+
+    /**
+     * @brief Link an agent in the global mapping on its outputs (add all links from an agent)
+     * @param agentInMapping
+     */
+    void _linkAgentInMappingOnOutputs(AgentInMappingVM* agentInMapping);
 
 
     /**
