@@ -36,8 +36,8 @@ class LinkVM : public QObject
     // Unique identifier with agents names and Input/Output ids: "outputAgent##output::outputType-->inputAgent##input::inputType"
     I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
 
-    // View model of mapping element
-    //I2_QML_PROPERTY_DELETE_PROOF(MappingElementVM*, mappingElement)
+    // View model of the corresponding mapping element
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(MappingElementVM*, mappingElement)
 
     // View model of the output agent of our link (link starts from this agent)
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, outputAgent)
@@ -60,6 +60,7 @@ public:
     /**
      * @brief Constructor
      * @param name
+     * @param mappingElement corresponding mapping element
      * @param outputAgent The link starts from this agent
      * @param linkOutput The link starts from this output of the output agent
      * @param inputAgent The link ends to this agent
@@ -68,7 +69,7 @@ public:
      * @param parent
      */
     explicit LinkVM(QString name,
-                    //MappingElementVM* mappingElement,
+                    MappingElementVM* mappingElement,
                     AgentInMappingVM* outputAgent,
                     LinkOutputVM* linkOutput,
                     AgentInMappingVM* inputAgent,

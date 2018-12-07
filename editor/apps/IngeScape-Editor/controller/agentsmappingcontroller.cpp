@@ -316,6 +316,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                                                        linkOutput,
                                                        inputAgent,
                                                        linkInput,
+                                                       nullptr,
                                                        true);
 
                     // Emit signal "Command asked to agent about Mapping Input"
@@ -339,6 +340,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                                                        linkOutput,
                                                        inputAgent,
                                                        linkInput,
+                                                       nullptr,
                                                        false);
 
                     // FIXME REPAIR _hashFromLinkNameToRemovedLinkWhileMappingWasUNactivated (use the id)
@@ -1302,8 +1304,7 @@ void AgentsMappingController::_onLinkInputsListWillBeRemoved(QList<LinkInputVM*>
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != nullptr) && !removedLinkInputs.isEmpty())
     {
-        //qDebug() << "_on Link Intputs List will be Removed from agent" << agentInMapping->name() << removedLinkInputs.count();
-
+        // Traverse the list of all links
         for (LinkVM* link : _allLinksInMapping.toList())
         {
             if ((link != nullptr) && (link->inputAgent() != nullptr) && (link->inputAgent() == agentInMapping)
@@ -1326,17 +1327,22 @@ void AgentsMappingController::_onLinkOutputsListWillBeRemoved(QList<LinkOutputVM
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != nullptr) && !removedLinkOutputs.isEmpty())
     {
-        //qDebug() << "_on Link Outputs List will be Removed from agent" << agentInMapping->name() << removedLinkOutputs.count();
+        qDebug() << "_on Link Outputs List will be Removed from agent" << agentInMapping->name() << removedLinkOutputs.count();
 
+        // Traverse the list of all links
         for (LinkVM* link : _allLinksInMapping.toList())
         {
             if ((link != nullptr) && (link->outputAgent() != nullptr) && (link->outputAgent() == agentInMapping)
                     && (link->linkOutput() != nullptr) && removedLinkOutputs.contains(link->linkOutput()))
             {
+                if (link->mappingElement() != nullptr)
+                {
+                     // Add a "Waiting Mapping Element" on the output agent (name)
+                    _addWaitingMappingElementOnOutputAgent(link->outputAgent()->name(), link->mappingElement());
+                }
+
                 // Delete the link between two agents
                 _deleteLinkBetweenTwoAgents(link);
-
-                // FIXME: Add to Waiting Links ?
             }
         }
     }
@@ -1399,7 +1405,7 @@ LinkVM* AgentsMappingController::_createLinkBetweenTwoAgents(QString linkName,
                                                              LinkOutputVM* linkOutput,
                                                              AgentInMappingVM* inputAgent,
                                                              LinkInputVM* linkInput,
-                                                             //MappingElementVM* mappingElement,
+                                                             MappingElementVM* mappingElement,
                                                              bool isVirtual)
 {
     LinkVM* link = nullptr;
@@ -1417,7 +1423,7 @@ LinkVM* AgentsMappingController::_createLinkBetweenTwoAgents(QString linkName,
         {
             // Create a new link between two agents
             link = new LinkVM(linkName,
-                              //mappingElement,
+                              mappingElement,
                               outputAgent,
                               linkOutput,
                               inputAgent,
@@ -1658,7 +1664,8 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
                                                         outputAgent,
                                                         linkOutput,
                                                         inputAgent,
-                                                        linkInput);
+                                                        linkInput,
+                                                        mappingElement);
 
                             // Remove eventually the corresponding "Waiting Mapping Element" on the output agent name
                             _removeWaitingMappingElementOnOutputAgent(outputAgent->name(), mappingElement);
@@ -1685,6 +1692,10 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
 
                     // Update the flag
                     link->setisVirtual(false);
+
+                    if (link->mappingElement() == nullptr) {
+                        link->setmappingElement(mappingElement);
+                    }
                 }
                 else {
                     qDebug() << "The link" << link->uid() << "already exist";
@@ -1740,7 +1751,8 @@ void AgentsMappingController::_linkAgentOnOutputs(AgentInMappingVM* agentInMappi
                                                         agentInMapping,
                                                         linkOutput,
                                                         inputAgent,
-                                                        linkInput);
+                                                        linkInput,
+                                                        waitingMappingElement);
 
                             // Remove the corresponding "Waiting Mapping Element" on the output agent name
                             _removeWaitingMappingElementOnOutputAgent(agentName, waitingMappingElement);

@@ -363,7 +363,7 @@ private:
                                         LinkOutputVM* linkOutput,
                                         AgentInMappingVM* inputAgent,
                                         LinkInputVM* linkInput,
-                                        //MappingElementVM* mappingElement,
+                                        MappingElementVM* mappingElement,
                                         bool isVirtual = false);
 
 

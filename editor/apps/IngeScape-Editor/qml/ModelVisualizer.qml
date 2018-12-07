@@ -217,7 +217,7 @@ Rectangle {
 
                         text: mappingElement ? qsTr("%1 (%2)").arg(mappingElement.name).arg(mappingElement.models.count)
                                              : ""
-
+                        color: mappingElement.hasCorrespondingLink ? "white" : "#888888"
                         font.pointSize: 13
                     }
                 }

@@ -18,6 +18,7 @@
 /**
  * @brief Constructor
  * @param name
+ * @param mappingElement corresponding mapping element
  * @param outputAgent The link starts from this agent
  * @param linkOutput The link starts from this output of the output agent
  * @param inputAgent The link ends to this agent
@@ -26,7 +27,7 @@
  * @param parent
  */
 LinkVM::LinkVM(QString name,
-               //MappingElementVM* mappingElement,
+               MappingElementVM* mappingElement,
                AgentInMappingVM* outputAgent,
                LinkOutputVM* linkOutput,
                AgentInMappingVM* inputAgent,
@@ -35,7 +36,7 @@ LinkVM::LinkVM(QString name,
                QObject *parent) : QObject(parent),
     _name(name),
     _uid(""),
-    //_mappingElement(mappingElement),
+    _mappingElement(nullptr),
     _outputAgent(outputAgent),
     _linkOutput(linkOutput),
     _inputAgent(inputAgent),
@@ -52,6 +53,8 @@ LinkVM::LinkVM(QString name,
 
         qInfo() << "New Link" << _uid << "in the global mapping (" << _name << ")";
     }
+
+    setmappingElement(mappingElement);
 }
 
 
@@ -62,12 +65,37 @@ LinkVM::~LinkVM()
 {
     qInfo() << "Delete Link" << _uid << "in the global mapping (" << _name << ")";
 
-    //setmappingElement(nullptr);
+    setmappingElement(nullptr);
 
     setoutputAgent(nullptr);
     setlinkOutput(nullptr);
     setinputAgent(nullptr);
     setlinkInput(nullptr);
+}
+
+
+/**
+ * @brief Setter for property "Mapping Element"
+ * @param value
+ */
+void LinkVM::setmappingElement(MappingElementVM *value)
+{
+    if (_mappingElement != value)
+    {
+        // Previous value
+        if (_mappingElement != nullptr) {
+            _mappingElement->sethasCorrespondingLink(false);
+        }
+
+        _mappingElement = value;
+
+        // New value
+        if (_mappingElement != nullptr) {
+            _mappingElement->sethasCorrespondingLink(true);
+        }
+
+        mappingElementChanged(value);
+    }
 }
 
 
