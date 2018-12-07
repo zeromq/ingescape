@@ -396,17 +396,25 @@ private:
 
 
     /**
-     * @brief Link an agent in the global mapping on its inputs (add all missing links TO an agent)
+     * @brief Link an agent (in the global mapping) on its inputs (add all missing links TO an agent)
      * @param agentInMapping
      */
-    void _linkAgentInMappingOnInputs(AgentInMappingVM* agentInMapping);
+    void _linkAgentOnInputs(AgentInMappingVM* agentInMapping);
 
 
     /**
-     * @brief Link an agent in the global mapping on its outputs (add all missing links FROM an agent)
+     * @brief Link an agent (in the global mapping) on its input from a mapping element (add a missing link TO an agent)
+     * @param inputAgent
+     * @param mappingElement
+     */
+    void _linkAgentOnInputFromMappingElement(AgentInMappingVM* inputAgent, MappingElementVM* mappingElement);
+
+
+    /**
+     * @brief Link an agent (in the global mapping) on its outputs (add all missing links FROM an agent)
      * @param agentInMapping
      */
-    void _linkAgentInMappingOnOutputs(AgentInMappingVM* agentInMapping);
+    void _linkAgentOnOutputs(AgentInMappingVM* agentInMapping);
 
 
     /**
@@ -426,11 +434,19 @@ private:
 
 
     /**
+     * @brief Add a "Waiting Mapping Element" on an output agent (name)
+     * @param outputAgentName
+     * @param waitingMappingElement
+     */
+    void _addWaitingMappingElementOnOutputAgent(QString outputAgentName, MappingElementVM* waitingMappingElement);
+
+
+    /**
      * @brief Remove a "Waiting Mapping Element" on an output agent (name)
      * @param outputAgentName
-     * @param mappingElement
+     * @param waitingMappingElement
      */
-    void _removeWaitingMappingElementOnOutputAgent(QString outputAgentName, MappingElementVM* mappingElement);
+    void _removeWaitingMappingElementOnOutputAgent(QString outputAgentName, MappingElementVM* waitingMappingElement);
 
 
     /**
