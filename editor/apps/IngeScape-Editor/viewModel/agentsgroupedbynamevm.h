@@ -68,7 +68,7 @@ class AgentsGroupedByNameVM : public QObject
     I2_QOBJECT_LISTMODEL(MappingElementVM, allMappingElements)
 
     // Current mapping (real mapping without edition)
-    //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, currentMapping)
+    I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, currentMapping)
 
 
 public:
@@ -77,7 +77,8 @@ public:
      * @param agentName
      * @param parent
      */
-    explicit AgentsGroupedByNameVM(QString agentName, QObject *parent = nullptr);
+    explicit AgentsGroupedByNameVM(QString agentName,
+                                   QObject *parent = nullptr);
 
 
     /**

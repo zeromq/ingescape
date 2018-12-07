@@ -49,16 +49,29 @@ AgentMappingM::~AgentMappingM()
     // DIS-connect to signal "Count Changed" from the list of mapping elements
     disconnect(&_mappingElements, &AbstractI2CustomItemListModel::countChanged, this, &AgentMappingM::_onMappingElementsListChanged);
 
-    // Clear the map
-    //_mapFromNameToMappingElement.clear();
+    //_namesOfMappingElements.clear();
 
-    _namesOfMappingElements.clear();
+    // Clear the hash table
+    _hashFromNameToMappingElement.clear();
 
     // Delete all models of mapping elements
-    //_previousListOfMappingElements.clear();
-    // FIXME: Delete all mapping elements
-    //_mappingElements.deleteAllItems();
-    _mappingElements.clear();
+    _mappingElements.deleteAllItems();
+}
+
+
+/**
+ * @brief Get a mapping element from its name
+ * @param name
+ * @return
+ */
+ElementMappingM* AgentMappingM::getMappingElementFromName(QString name)
+{
+    if (_hashFromNameToMappingElement.contains(name)) {
+        return _hashFromNameToMappingElement.value(name);
+    }
+    else {
+        return nullptr;
+    }
 }
 
 
@@ -67,43 +80,19 @@ AgentMappingM::~AgentMappingM()
  */
 void AgentMappingM::_onMappingElementsListChanged()
 {
-    _namesOfMappingElements.clear();
+    //_namesOfMappingElements.clear();
+    _hashFromNameToMappingElement.clear();
 
     for (ElementMappingM* mappingElement : _mappingElements.toList())
     {
-        if ((mappingElement != nullptr) && !mappingElement->name().isEmpty()) {
-            _namesOfMappingElements.append(mappingElement->name());
-        }
-    }
-
-    /*QList<ElementMappingM*> newMappingElementsList = _mappingElements.toList();
-
-    // Mapping Element added
-    if (_previousListOfMappingElements.count() < newMappingElementsList.count())
-    {
-        for (ElementMappingM* mappingElement : newMappingElementsList)
+        if ((mappingElement != nullptr) && !mappingElement->name().isEmpty())
         {
-            if ((mappingElement != nullptr) && !_previousListOfMappingElements.contains(mappingElement))
-            {
-                _namesOfMappingElements.append(mappingElement->name());
-                _mapFromNameToMappingElement.insert(mappingElement->name(), mappingElement);
-            }
-        }
-    }
-    // Mapping Element removed
-    else if (_previousListOfMappingElements.count() > newMappingElementsList.count())
-    {
-        for (ElementMappingM* mappingElement : _previousListOfMappingElements)
-        {
-            if ((mappingElement != nullptr) && !newMappingElementsList.contains(mappingElement))
-            {
-                _namesOfMappingElements.removeOne(mappingElement->name());
-                _mapFromNameToMappingElement.remove(mappingElement->name());
-            }
-        }
-    }
+            //_namesOfMappingElements.append(mappingElement->name());
 
-    _previousListOfMappingElements = newMappingElementsList;*/
+            _hashFromNameToMappingElement.insert(mappingElement->name(), mappingElement);
+        }
+    }
 
     //qDebug() << "Mapping" << _name << "has elements:" << _namesOfMappingElements;
+    qDebug() << "Mapping" << _name << "has elements:" << _hashFromNameToMappingElement.keys();
 }

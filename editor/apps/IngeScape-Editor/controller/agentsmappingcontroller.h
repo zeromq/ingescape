@@ -209,14 +209,6 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot when a previous agent model is replaced by a new one strictly identical
-     * @param previousModel
-     * @param newModel
-     */
-    //void onIdenticalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
-
-
-    /**
      * @brief Slot called when the flag "is Mapping Activated" changed
      * @param isMappingActivated
      */
@@ -248,7 +240,7 @@ public Q_SLOTS:
      * @brief Slot called when an active agent has been defined
      * @param agent
      */
-    void onActiveAgentDefined(AgentM* agent);
+    //void onActiveAgentDefined(AgentM* agent);
 
 
     /**
@@ -386,7 +378,7 @@ private:
      * @param agentModel
      * @param temporaryMapping
      */
-    void _overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping);
+    //void _overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping);
 
 
     /**

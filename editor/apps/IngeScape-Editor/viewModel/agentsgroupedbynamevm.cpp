@@ -26,6 +26,7 @@ AgentsGroupedByNameVM::AgentsGroupedByNameVM(QString agentName,
     _isON(false),
     _numberOfAgentsON(0),
     _numberOfAgentsOFF(0),
+    _currentMapping(nullptr),
     _canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty(true),
     _agentsGroupedByDefinitionNULL(nullptr)
 
@@ -35,6 +36,10 @@ AgentsGroupedByNameVM::AgentsGroupedByNameVM(QString agentName,
 
     qInfo() << "New View Model of Agents grouped by name" << _name;
 
+    // Create the mapping currently edited
+    QString mappingName = QString("Mapping name of %1 in IngeScape Editor").arg(_name);
+    QString mappingDescription = QString("Mapping description of %1 in IngeScape Editor").arg(_name);
+    _currentMapping = new AgentMappingM(mappingName, "0.0", mappingDescription);
 }
 
 
@@ -77,6 +82,13 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
     // Delete all mapping elements
     _hashFromNameToMappingElement.clear();
     _allMappingElements.deleteAllItems();
+
+    if (_currentMapping != nullptr)
+    {
+        AgentMappingM* temp = _currentMapping;
+        setcurrentMapping(nullptr);
+        delete temp;
+    }
 
 
     // If the list of groups of agent(s grouped by definition) is not empty
@@ -1697,6 +1709,13 @@ QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageNewMappingElementMo
             // Don't add to the list here (this mapping element will be added globally via temporary list)
 
             _hashFromNameToMappingElement.insert(model->name(), mappingElementVM);
+
+            if (_currentMapping != nullptr)
+            {
+                ElementMappingM* copy = new ElementMappingM(model->inputAgent(), model->input(), model->outputAgent(), model->output());
+
+                _currentMapping->mappingElements()->append(copy);
+            }
         }
     }
 
@@ -1730,8 +1749,15 @@ QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageOldMappingElementMo
 
                 // Don't remove from the list here (this mapping element will be removed globally via temporary list)
 
-                // Remove from the hash table with the parameter id
                 _hashFromNameToMappingElement.remove(model->name());
+
+                if (_currentMapping != nullptr)
+                {
+                    ElementMappingM* copy = _currentMapping->getMappingElementFromName(model->name());
+                    if (copy != nullptr) {
+                        _currentMapping->mappingElements()->remove(copy);
+                    }
+                }
             }
         }
     }

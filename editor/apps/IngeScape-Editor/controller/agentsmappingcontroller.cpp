@@ -243,7 +243,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(QString agentName
                     // CONTROL
                     if (_modelManager->isMappingControlled())
                     {
-                        // FIXME TODO ? CONTROL
+                        // FIXME: CONTROL TODO ?
                     }
                     // OBSERVE
                     else
@@ -578,36 +578,6 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
 }
 
 
-// FIXME Usefull to conect to signal "identicalAgentModelWillBeReplaced" from AgentsGroupedByNameVM and to call "_overWriteMappingOfAgentModel" ?
-// Because "_overWriteMappingOfAgentModel" is already called in AgentsMappingController::onActiveAgentDefined
-/**
- * @brief Slot when a previous agent model is replaced by a new one strictly identical
- * @param previousModel
- * @param newModel
- */
-/*void AgentsMappingController::onIdenticalAgentModelReplaced(AgentM* previousModel, AgentM* newModel)
-{
-    if ((previousModel != nullptr) && (newModel != nullptr))
-    {
-        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(newModel->name());
-        if ((agentInMapping != nullptr) && agentInMapping->models()->contains(previousModel))
-        {
-            // First add the new model before remove the previous model
-            // (allows to prevent to have 0 model at a given moment and to prevent to emit signal in/out..putsListWillBeRemoved that remove links)
-            agentInMapping->models()->append(newModel);
-            agentInMapping->models()->remove(previousModel);
-
-            // Our global mapping is activated and controlled
-            if (_modelManager && _modelManager->isMappingActivated() && _modelManager->isMappingControlled())
-            {
-                // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-                _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
-            }
-        }
-    }
-}*/
-
-
 /**
  * @brief Slot called when the flag "is Mapping Activated" changed
  * @param isMappingActivated
@@ -756,7 +726,7 @@ void AgentsMappingController::onAgentsGroupedByNameWillBeDeleted(AgentsGroupedBy
  * @brief Slot when an active agent has been defined
  * @param agent
  */
-void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
+/*void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
 {
     if ((agent != nullptr) && (_modelManager != nullptr))
     {
@@ -817,7 +787,7 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                     // Nothing to do...already added to AgentsGroupedByName
                 }
 
-                /*// If there are waiting links (where this agent is involved as "Output Agent")
+                // If there are waiting links (where this agent is involved as "Output Agent")
                 if (_hashFromOutputAgentNameToListOfWaitingMappingElements.contains(agentName))
                 {
                     QList<ElementMappingM*> listOfWaitingMappingElements = _hashFromOutputAgentNameToListOfWaitingMappingElements.value(agentName);
@@ -828,7 +798,7 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                         // Create the link corresponding to the mapping element
                         //onMapped(mappingElement);
                     }
-                }*/
+                }
             }
         }
         // The mapping is NOT activated
@@ -840,7 +810,7 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
             // What do we do with the mapping (links) of this agent ?
         }
     }
-}
+}*/
 
 
 /**
@@ -1495,7 +1465,7 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
  * @param agentModel
  * @param temporaryMapping
  */
-void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping)
+/*void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping)
 {
     // Model is ON
     // AND
@@ -1513,7 +1483,7 @@ void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, 
         // Emit signal "Command asked to agent"
         Q_EMIT commandAskedToAgent(peerIdsList, command);
     }
-}
+}*/
 
 
 /**

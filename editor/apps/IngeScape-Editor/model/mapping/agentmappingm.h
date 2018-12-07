@@ -42,8 +42,8 @@ class AgentMappingM : public QObject
     // List of (mapping) elements of our agent mapping
     I2_QOBJECT_LISTMODEL(ElementMappingM, mappingElements)
 
-    // List of the names of mapping elements
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, namesOfMappingElements)
+    // List of all names of mapping elements
+    //I2_CPP_NOSIGNAL_PROPERTY(QStringList, namesOfMappingElements)
 
 
 public:
@@ -63,6 +63,14 @@ public:
     ~AgentMappingM();
 
 
+    /**
+     * @brief Get a mapping element from its name
+     * @param name
+     * @return
+     */
+    ElementMappingM* getMappingElementFromName(QString name);
+
+
 private Q_SLOTS:
 
     /**
@@ -73,11 +81,8 @@ private Q_SLOTS:
 
 private:
 
-    // Previous list of mapping elements
-    //QList<ElementMappingM*> _previousListOfMappingElements;
-
-    // Map from a name to a model of mapping element
-    //QHash<QString, ElementMappingM*> _mapFromNameToMappingElement;
+    // Hash table from a name to a model of mapping element
+    QHash<QString, ElementMappingM*> _hashFromNameToMappingElement;
 
 };
 
