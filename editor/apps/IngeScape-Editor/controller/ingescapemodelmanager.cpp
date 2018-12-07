@@ -1259,9 +1259,9 @@ void IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName(QList<O
 
         for (OutputVM* output : newOutputs)
         {
-            if ((output != nullptr) && !output->id().isEmpty())
+            if ((output != nullptr) && !output->uid().isEmpty())
             {
-                newOutputsIds.append(output->id());
+                newOutputsIds.append(output->uid());
             }
         }
 
@@ -1287,9 +1287,9 @@ void IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName(QList
 
         for (OutputVM* output : oldOutputs)
         {
-            if ((output != nullptr) && !output->id().isEmpty())
+            if ((output != nullptr) && !output->uid().isEmpty())
             {
-                oldOutputsIds.append(output->id());
+                oldOutputsIds.append(output->uid());
             }
         }
 

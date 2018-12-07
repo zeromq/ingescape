@@ -31,7 +31,7 @@ class AgentIOPVM : public QObject
     I2_QML_PROPERTY_READONLY(QString, name)
 
     // Identifier with name and value type (can be empty when ghost)
-    I2_QML_PROPERTY_READONLY(QString, id)
+    I2_QML_PROPERTY_READONLY(QString, uid)
 
     // Models of our agent Input / Output / Parameter
     I2_QOBJECT_LISTMODEL(AgentIOPM, models)
@@ -55,12 +55,12 @@ public:
     /**
      * @brief Constructor
      * @param name
-     * @param id
+     * @param uid
      * @param modelM
      * @param parent
      */
     explicit AgentIOPVM(QString name,
-                        QString id,
+                        QString uid,
                         AgentIOPM* modelM,
                         QObject *parent = nullptr);
 

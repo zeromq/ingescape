@@ -32,7 +32,7 @@ LinkOutputVM::LinkOutputVM(OutputVM* output,
     if (_output != nullptr)
     {
         setname(_output->name());
-        setuid(_output->id());
+        setuid(_output->uid());
 
         // Connect to signals from the view model of output
         connect(_output, &OutputVM::currentValueChanged, this, &LinkOutputVM::_oncurrentValueChanged);

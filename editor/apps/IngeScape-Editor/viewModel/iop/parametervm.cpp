@@ -32,7 +32,7 @@ ParameterVM::ParameterVM(QString parameterName,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    //qInfo() << "New Parameter VM" << _name << "(" << _id << ")";
+    //qInfo() << "New Parameter VM" << _name << "(" << _uid << ")";
 
 }
 
@@ -42,6 +42,6 @@ ParameterVM::ParameterVM(QString parameterName,
  */
 ParameterVM::~ParameterVM()
 {
-    //qInfo() << "Delete Parameter VM" << _name << "(" << _id << ")";
+    //qInfo() << "Delete Parameter VM" << _name << "(" << _uid << ")";
 
 }

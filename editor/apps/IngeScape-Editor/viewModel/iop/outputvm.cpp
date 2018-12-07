@@ -33,7 +33,7 @@ OutputVM::OutputVM(QString outputName,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    //qInfo() << "New Output VM" << _name << "(" << _id << ")";
+    //qInfo() << "New Output VM" << _name << "(" << _uid << ")";
 }
 
 
@@ -42,6 +42,6 @@ OutputVM::OutputVM(QString outputName,
  */
 OutputVM::~OutputVM()
 {
-    //qInfo() << "Delete Output VM" << _name << "(" << _id << ")";
+    //qInfo() << "Delete Output VM" << _name << "(" << _uid << ")";
 
 }

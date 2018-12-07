@@ -32,7 +32,7 @@ InputVM::InputVM(QString inputName,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    //qInfo() << "New Input VM" << _name << "(" << _id << ")";
+    //qInfo() << "New Input VM" << _name << "(" << _uid << ")";
 
 }
 
@@ -42,6 +42,6 @@ InputVM::InputVM(QString inputName,
  */
 InputVM::~InputVM()
 {
-    //qInfo() << "Delete Input VM" << _name << "(" << _id << ")";
+    //qInfo() << "Delete Input VM" << _name << "(" << _uid << ")";
 
 }

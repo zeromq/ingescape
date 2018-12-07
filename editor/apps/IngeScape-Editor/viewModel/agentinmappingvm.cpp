@@ -244,8 +244,8 @@ void AgentInMappingVM::_onInputsHaveBeenAdded(QList<InputVM*> newInputs)
 
             tempLinkInputs.append(linkInput);
 
-            if (!input->id().isEmpty()) {
-                _hashFromIdToLinkInput.insert(input->id(), linkInput);
+            if (!input->uid().isEmpty()) {
+                _hashFromIdToLinkInput.insert(input->uid(), linkInput);
             }
 
             // Update the list of view models of link input for this name
@@ -288,8 +288,8 @@ void AgentInMappingVM::_onOutputsHaveBeenAdded(QList<OutputVM*> newOutputs)
 
             tempLinkOutputs.append(linkOutput);
 
-            if (!output->id().isEmpty()) {
-                _hashFromIdToLinkOutput.insert(output->id(), linkOutput);
+            if (!output->uid().isEmpty()) {
+                _hashFromIdToLinkOutput.insert(output->uid(), linkOutput);
             }
 
             // Update the list of view models of link output for this name
@@ -334,14 +334,14 @@ void AgentInMappingVM::_onInputsWillBeRemoved(QList<InputVM*> oldInputs)
             LinkInputVM* linkInput = nullptr;
 
             // Input Id is defined
-            if (!input->id().isEmpty())
+            if (!input->uid().isEmpty())
             {
                 // Get the view model of link input for this input id
-                linkInput = getLinkInputFromId(input->id());
+                linkInput = getLinkInputFromId(input->uid());
                 if (linkInput != nullptr)
                 {
                     // Remove from the hash table with the input id
-                    _hashFromIdToLinkInput.remove(input->id());
+                    _hashFromIdToLinkInput.remove(input->uid());
                 }
             }
             // Input Id is empty...
@@ -412,14 +412,14 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
             LinkOutputVM* linkOutput = nullptr;
 
             // Output Id is defined
-            if (!output->id().isEmpty())
+            if (!output->uid().isEmpty())
             {
                 // Get the view model of link output for this output id
-                linkOutput = getLinkOutputFromId(output->id());
+                linkOutput = getLinkOutputFromId(output->uid());
                 if (linkOutput != nullptr)
                 {
                     // Remove from the hash table with the output id
-                    _hashFromIdToLinkOutput.remove(output->id());
+                    _hashFromIdToLinkOutput.remove(output->uid());
                 }
             }
             // Output Id is empty...

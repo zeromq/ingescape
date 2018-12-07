@@ -1715,7 +1715,7 @@ void AgentsMappingController::_linkAgentInMappingOnInputsAndOutputs(AgentInMappi
             {
                 QString linkName = mappingElement->name();
 
-                qDebug() << "Try to create link" << linkName << "to agent" << agentInMapping->name() << "involved as 'INPUT' agent";
+                //qDebug() << "Try to create link" << linkName << "to agent" << agentInMapping->name() << "involved as 'INPUT' agent";
 
                 // Get the output agent in the global mapping from the input agent name
                 AgentInMappingVM* outputAgent = getAgentInMappingFromName(mappingElement->firstModel()->outputAgent());
@@ -1730,15 +1730,27 @@ void AgentsMappingController::_linkAgentInMappingOnInputsAndOutputs(AgentInMappi
 
                     if ((linkOutput != nullptr) && (linkInput != nullptr))
                     {
-                        // Create a new REAL link between the two agents
-                        _createLinkBetweenTwoAgents(linkName,
-                                                    outputAgent,
-                                                    linkOutput,
-                                                    agentInMapping,
-                                                    linkInput);
+                        // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
+                        QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAgent->name(), linkOutput->uid(), agentInMapping->name(), linkInput->uid());
 
-                        // Remove eventually the corresponding "Waiting Mapping Element" on the output agent name
-                        _removeWaitingMappingElementOnOutputAgent(outputAgent->name(), mappingElement);
+                        LinkVM* link = getLinkInMappingFromId(linkId);
+
+                        // Check that the link does NOT exist
+                        if (link == nullptr)
+                        {
+                            // Create a new REAL link between the two agents
+                            link = _createLinkBetweenTwoAgents(linkName,
+                                                               outputAgent,
+                                                               linkOutput,
+                                                               agentInMapping,
+                                                               linkInput);
+
+                            // Remove eventually the corresponding "Waiting Mapping Element" on the output agent name
+                            _removeWaitingMappingElementOnOutputAgent(outputAgent->name(), mappingElement);
+                        }
+                        else {
+                            qDebug() << "The link" << linkId << "already exist !";
+                        }
                     }
                 }
             }
@@ -1786,15 +1798,27 @@ void AgentsMappingController::_linkAgentInMappingOnOutputs(AgentInMappingVM* age
 
                         if ((linkOutput != nullptr) && (linkInput != nullptr))
                         {
-                            // Create a new REAL link between the two agents
-                            _createLinkBetweenTwoAgents(linkName,
-                                                        agentInMapping,
-                                                        linkOutput,
-                                                        inputAgent,
-                                                        linkInput);
+                            // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
+                            QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(agentInMapping->name(), linkOutput->uid(), inputAgent->name(), linkInput->uid());
 
-                            // Remove the corresponding "Waiting Mapping Element" on the output agent name
-                            _removeWaitingMappingElementOnOutputAgent(agentName, mappingElement);
+                            LinkVM* link = getLinkInMappingFromId(linkId);
+
+                            // Check that the link does NOT exist
+                            if (link == nullptr)
+                            {
+                                // Create a new REAL link between the two agents
+                                link = _createLinkBetweenTwoAgents(linkName,
+                                                                   agentInMapping,
+                                                                   linkOutput,
+                                                                   inputAgent,
+                                                                   linkInput);
+
+                                // Remove the corresponding "Waiting Mapping Element" on the output agent name
+                                _removeWaitingMappingElementOnOutputAgent(agentName, mappingElement);
+                            }
+                            else {
+                                qWarning() << "The 'WAITING' link" << linkId << "already exist !";
+                            }
                         }
                     }
                 }
