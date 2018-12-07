@@ -46,6 +46,8 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     {
         _name = _agentsGroupedByName->name();
 
+        qInfo() << "New Agent" << _name << "in the global mapping";
+
         // Connect to signals from the agents grouped by name
         connect(_agentsGroupedByName, &AgentsGroupedByNameVM::inputsHaveBeenAdded, this, &AgentInMappingVM::_onInputsHaveBeenAdded);
         connect(_agentsGroupedByName, &AgentsGroupedByNameVM::outputsHaveBeenAdded, this, &AgentInMappingVM::_onOutputsHaveBeenAdded);
@@ -85,7 +87,7 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
  */
 AgentInMappingVM::~AgentInMappingVM()
 {
-    qInfo() << "Delete View Model of Agent in Mapping" << _name;
+    qInfo() << "Delete Agent" << _name << "in the global mapping";
 
     // Clear hash tables of Inputs, Outputs and Parameters
     _hashFromNameToLinkInputsList.clear();

@@ -36,6 +36,10 @@ class MappingElementVM : public QObject
     // First model of mapping element
     I2_QML_PROPERTY_READONLY(ElementMappingM*, firstModel)
 
+    // Flag indicating if our mapping element has its corresponding link in the global mapping
+    // Used to improve performances
+    I2_QML_PROPERTY_READONLY(bool, hasCorrespondingLink)
+
 
 public:
 

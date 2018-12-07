@@ -396,14 +396,14 @@ private:
 
 
     /**
-     * @brief Link an agent in the global mapping on its inputs and on its outputs (add all links to/from an agent)
+     * @brief Link an agent in the global mapping on its inputs (add all missing links TO an agent)
      * @param agentInMapping
      */
-    void _linkAgentInMappingOnInputsAndOutputs(AgentInMappingVM* agentInMapping);
+    void _linkAgentInMappingOnInputs(AgentInMappingVM* agentInMapping);
 
 
     /**
-     * @brief Link an agent in the global mapping on its outputs (add all links from an agent)
+     * @brief Link an agent in the global mapping on its outputs (add all missing links FROM an agent)
      * @param agentInMapping
      */
     void _linkAgentInMappingOnOutputs(AgentInMappingVM* agentInMapping);

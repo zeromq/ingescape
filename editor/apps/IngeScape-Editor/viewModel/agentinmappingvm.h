@@ -60,6 +60,7 @@ class AgentInMappingVM : public QObject
     // Group of value type of the reduced link outputs of our agent (= brin)
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedLinkOutputsValueTypeGroup)
 
+    // FIXME TO REMOVE ?
     // Mapping currently edited (temporary until the user activate the mapping)
     I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
 

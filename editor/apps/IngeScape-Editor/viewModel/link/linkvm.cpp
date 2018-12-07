@@ -50,7 +50,7 @@ LinkVM::LinkVM(QString name,
         // Get our link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
         _uid = LinkVM::getLinkIdFromAgentNamesAndIOids(_outputAgent->name(), _linkOutput->uid(), _inputAgent->name(), _linkInput->uid());
 
-        qInfo() << "New Link" << _name << "(" << _uid << ")";
+        qInfo() << "New Link" << _uid << "in the global mapping (" << _name << ")";
     }
 }
 
@@ -60,7 +60,7 @@ LinkVM::LinkVM(QString name,
  */
 LinkVM::~LinkVM()
 {
-    qInfo() << "Delete Link" << _name << "(" << _uid << ")";
+    qInfo() << "Delete Link" << _uid << "in the global mapping (" << _name << ")";
 
     //setmappingElement(nullptr);
 

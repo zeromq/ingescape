@@ -24,7 +24,8 @@ MappingElementVM::MappingElementVM(QString name,
                                    ElementMappingM* modelM,
                                    QObject *parent) : QObject(parent),
     _name(name),
-    _firstModel(nullptr)
+    _firstModel(nullptr),
+    _hasCorrespondingLink(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
