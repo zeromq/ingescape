@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include "ingescape_private.h"
 #include "ingescape_advanced.h"
+#if (defined WIN32 || defined _WIN32)
+#include "unixfunctions.h"
+#endif
 
 serviceHeader_t *serviceHeaders = NULL;
 

@@ -13,6 +13,9 @@
 #include "ingescape_private.h"
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
+#if (defined WIN32 || defined _WIN32)
+#include "unixfunctions.h"
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS

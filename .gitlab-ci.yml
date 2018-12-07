@@ -1,0 +1,182 @@
+# Gitlab ci
+
+# Define job order
+stages:
+  - linux
+  - cross
+  - headers
+  - installer
+
+# Define default condition to launch job
+.default-conditions: &default-conditions
+  only:
+    - /^festeven.*/
+
+# Define ingescape library files
+.build-ingescape-files: &build-ingescape-files
+  <<: *default-conditions
+  only:
+    changes:
+      - src/**/*
+      - autogen.sh
+      - configure.ac
+      - Makefile.am
+
+# Define ingescape windows installer files
+.build-ingescape-installer-windows: &build-ingescape-installer-windows
+  <<: *default-conditions
+  only:
+    changes:
+      - packaging/windows/*
+
+# Define ingescape redhat installer files
+.build-ingescape-installer-redhat: &build-ingescape-installer-redhat
+  <<: *default-conditions
+  only:
+    changes:
+      - packaging/redhat/*
+
+# Define ingescape debian installer files
+.build-ingescape-installer-debian: &build-ingescape-installer-debian
+  <<: *default-conditions
+  only:
+    changes:
+      - packaging/debian/*
+
+# Create ingescape library for linux
+linux-x86:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer-redhat
+  <<: *build-ingescape-installer-debian
+  stage: linux
+  image: fafesty/compile-with-zyre
+  script:
+    - git clean -xfd
+    - ./autogen.sh
+    - ./configure
+    - make
+    - mkdir linux-x86
+    - cp -d src/libingescape.la src/.libs/libingescape.a src/.libs/libingescape.so src/.libs/libingescape.so.* linux-x86/
+  artifacts:
+    paths:
+      - linux-x86
+    expire_in: 1 week
+
+# Create ingescape library for windows 64 bits
+win32-x86_64:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer-windows
+  stage: cross
+  image: fafesty/compile-with-zyre
+  script:
+    - git clean -xfd
+    - ./autogen.sh
+    - ./configure --prefix=/usr/x86_64-w64-mingw32 --exec-prefix=/usr/x86_64-w64-mingw32 --build=x86_64-pc-linux-gnu --host=x86_64-w64-mingw32 LDFLAGS="-L/usr/x86_64-w64-mingw32/lib" PKG_CONFIG_LIBDIR=/usr/x86_64-w64-mingw32/lib/pkgconfig
+    - make
+    - mkdir win32-x86_64
+    - cp src/libingescape.def src/.libs/libingescape.a src/.libs/libingescape.dll src/.libs/libingescape.dll.a win32-x86_64/
+    - cp /usr/lib/gcc/x86_64-w64-mingw32/6.3-win32/libstdc++-6.dll /usr/lib/gcc/x86_64-w64-mingw32/6.3-win32/libgcc_s_seh-1.dll   win32-x86_64/
+    - cp /usr/x86_64-w64-mingw32/bin/libzyre.dll /usr/x86_64-w64-mingw32/bin/libczmq.dll /usr/x86_64-w64-mingw32/bin/libzmq.dll /usr/x86_64-w64-mingw32/bin/libsodium-23.dll /usr/x86_64-w64-mingw32/bin/libyajl.dll  win32-x86_64/
+  artifacts:
+    paths:
+     - win32-x86_64
+    expire_in: 1 week
+
+# Create ingescape library for windows 32 bits
+win32-i686:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer-windows
+  stage: cross
+  image: fafesty/compile-with-zyre
+  script:
+    - git clean -xfd
+    - ./autogen.sh
+    - ./configure --prefix=/usr/i686-w64-mingw32 --exec-prefix=/usr/i686-w64-mingw32 --build=x86_64-pc-linux-gnu --host=i686-w64-mingw32 LDFLAGS="-L/usr/i686-w64-mingw32/lib" PKG_CONFIG_LIBDIR=/usr/i686-w64-mingw32/lib/pkgconfig
+    - make
+    - mkdir win32-i686
+    - cp src/libingescape.def src/.libs/libingescape.a src/.libs/libingescape.dll src/.libs/libingescape.dll.a win32-i686/
+    - cp /usr/lib/gcc/i686-w64-mingw32/6.3-win32/libstdc++-6.dll /usr/lib/gcc/i686-w64-mingw32/6.3-win32/libgcc_s_sjlj-1.dll win32-i686/
+    - cp /usr/i686-w64-mingw32/bin/libzyre.dll /usr/i686-w64-mingw32/bin/libczmq.dll /usr/i686-w64-mingw32/bin/libzmq.dll /usr/i686-w64-mingw32/bin/libsodium-23.dll /usr/i686-w64-mingw32/bin/libyajl.dll  win32-i686/
+  artifacts:
+    paths:
+     - win32-i686
+    expire_in: 1 week
+
+# Create runtime install for windows
+installer-runtime:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer-windows
+  stage: installer
+  image: fafesty/compile-with-zyre
+  script:
+   - apt-get update
+   - apt-get install -y nsis
+   - makensis packaging/windows/ingescape-runtime.nsi
+   - mv packaging/windows/Ingescape-Runtime-Installer.exe ./
+  dependencies:
+   - win32-x86_64
+   - win32-i686
+  artifacts:
+    paths:
+      - Ingescape-Runtime-Installer.exe
+
+# Create sdk install for windows
+installer-sdk:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer-windows
+  stage: installer
+  image: fafesty/compile-with-zyre
+  script:
+   - apt-get update
+   - apt-get install -y nsis
+   - makensis packaging/windows/ingescape-sdk.nsi
+   - mv packaging/windows/Ingescape-Sdk-Installer.exe ./
+  dependencies:
+   - win32-x86_64
+   - win32-i686
+  artifacts:
+    paths:
+      - Ingescape-Sdk-Installer.exe
+
+installer-redhat:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer-redhat
+  stage: installer
+  image: fafesty/compile-with-zyre
+  script:
+   - apt-get update
+   - apt-get install -y rpm
+   - mkdir -p $HOME/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+   - ln -s packaging/redhat/rpmmacros $HOME/.rpmmacros
+   - touch $HOME/rpmbuild/SOURCES/empty
+   - VERSION=$(builds/m4-scripts/gen-ingescape-version src/admin.c); INGESCAPE_SOURCE=$(pwd); rpmbuild -ba --define "_VERSION_I $VERSION" --define "_INGESCAPE_SOURCE $INGESCAPE_SOURCE" packaging/redhat/libingescape.spec
+   - mkdir redhat-x86_64
+   - mv /root/rpmbuild/RPMS/x86_64/* redhat-x86_64/
+  dependencies:
+    - linux-x86
+  artifacts:
+    paths:
+      - redhat-x86_64
+
+installer-debian:
+  <<: *build-ingescape-files
+  <<: *build-ingescape-installer-debian
+  stage: installer
+  image: fafesty/compile-with-zyre
+  script:
+   - apt-get update
+   - apt-get install -y devscripts build-essential
+   - cd packaging && debuild -us -uc --build=binary && cd -
+   - mkdir debian-x86_64
+   - mv libingescape*.deb debian-x86_64/
+  dependencies:
+    - linux-x86
+  artifacts:
+    paths:
+      - debian-x86_64
+
+# TODO Add job to compile on cyclone and generate macos installer
+# TODO Add job to deploy ingescape website on commit (Can filter to launch job on doc folder changes and only master git's branche)
+# TODO Add job to compile editor
+# TODO Add job to compile ingeprob
+# TODO Add job to package bindings

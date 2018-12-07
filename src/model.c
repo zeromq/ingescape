@@ -11,9 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <czmq.h>
-#if (defined WIN32 || defined _WIN32)
-#include "unixfunctions.h"
-#endif
 #include "ingescape_private.h"
 #include "uthash/utlist.h"
 

@@ -1,0 +1,3 @@
+usr/include/*
+usr/lib/libyajl.so
+usr/lib/libingescape.so

@@ -1,0 +1,14 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libingescape
+Description: The Ingescape library
+Version: @VERSION@
+
+Requires:@pkgconfig_name_libzmq@ @pkgconfig_name_libczmq@ @pkgconfig_name_libzyre@
+
+Libs: -L${libdir} -lingescape
+Cflags: -I${includedir} @pkg_config_defines@
+Libs.private: @pkg_config_libs_private@
