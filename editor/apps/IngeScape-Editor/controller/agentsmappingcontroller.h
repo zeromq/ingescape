@@ -450,22 +450,6 @@ private:
 
 
     /**
-     * @brief Get the added link while the mapping was UN-activated from a link id
-     * @param linkId
-     * @return
-     */
-    LinkVM* _getAddedLinkWhileMappingWasUNactivatedFromLinkId(QString linkId);
-
-
-    /**
-     * @brief Get the removed link while the mapping was UN-activated from a link id
-     * @param linkId
-     * @return
-     */
-    LinkVM* _getRemovedLinkWhileMappingWasUNactivatedFromLinkId(QString linkId);
-
-
-    /**
      * @brief Helper to get the link input from a name if there is only one input for this name
      * If there are several inputs with the same name (but different value type), we return NULL
      * @param agent
@@ -508,11 +492,11 @@ private:
     // Hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent")
     QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingMappingElements;
 
-    // Hash table from "link id" to added link while the mapping was UN-activated
-    QHash<QString, LinkVM*> _hashFromLinkIdToAddedLink_WhileMappingWasUNactivated;
+    // List of ids of added links while the mapping was UN-activated
+    QStringList _idsOfAddedLinks_WhileMappingWasUNactivated;
 
-    // Hash table from "link id" to removed link while the mapping was UN-activated
-    QHash<QString, LinkVM*> _hashFromLinkIdToRemovedLink_WhileMappingWasUNactivated;
+    // Hash table from "link id" to removed link (mapping element) while the mapping was UN-activated
+    QHash<QString, MappingElementVM*> _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated;
 
 };
 
