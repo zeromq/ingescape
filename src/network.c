@@ -350,11 +350,11 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
         return 0;
     }
     
-    size_t size = zmsg_size(msg);
+    size_t msgSize = zmsg_size(msg);
     char *output = NULL;
     char *vType = NULL;
     iopType_t valueType = 0;
-    for (unsigned long i = 0; i < size; i += 3){
+    for (unsigned long i = 0; i < msgSize; i += 3){
         // Each message part must contain 3 elements
         // 1 : output name
         // 2 : output ioptType
@@ -893,29 +893,29 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }else if ((strncmp (message, "SET_INPUT ", strlen("SET_INPUT ")) == 0) && (strlen(message) > strlen("SET_INPUT ")+1)){
                     igs_debug("received SET_INPUT command from %s (%s)", name, peer);
                     char *subStr = message + strlen("SET_INPUT") + 1;
-                    char *name, *value;
-                    name = strtok (subStr," ");
+                    char *_name, *value;
+                    _name = strtok (subStr," ");
                     value = strtok (NULL,"\0");
-                    if (name != NULL && value != NULL){
-                        igs_writeInputAsString(name, value);//last parameter is used for DATA only
+                    if (_name != NULL && value != NULL){
+                        igs_writeInputAsString(_name, value);//last parameter is used for DATA only
                     }
                 }else if ((strncmp (message, "SET_OUTPUT ", strlen("SET_OUTPUT ")) == 0) && (strlen(message) > strlen("SET_OUTPUT ")+1)){
                     igs_debug("received SET_OUTPUT command from %s (%s)", name, peer);
                     char *subStr = message + strlen("SET_OUTPUT") + 1;
-                    char *name, *value;
-                    name = strtok (subStr," ");
+                    char *_name, *value;
+                    _name = strtok (subStr," ");
                     value = strtok (NULL,"\0");
-                    if (name != NULL && value != NULL){
-                        igs_writeOutputAsString(name, value);//last paramter is used for DATA only
+                    if (_name != NULL && value != NULL){
+                        igs_writeOutputAsString(_name, value);//last paramter is used for DATA only
                     }
                 }else if ((strncmp (message, "SET_PARAMETER ", strlen("SET_PARAMETER ")) == 0) && (strlen(message) > strlen("SET_PARAMETER ")+1)){
                     igs_debug("received SET_PARAMETER command from %s (%s)", name, peer);
                     char *subStr = message + strlen("SET_PARAMETER") + 1;
-                    char *name, *value;
-                    name = strtok (subStr," ");
+                    char *_name, *value;
+                    _name = strtok (subStr," ");
                     value = strtok (NULL,"\0");
-                    if (name != NULL && value != NULL){
-                        igs_writeParameterAsString(name, value);//last paramter is used for DATA only
+                    if (_name != NULL && value != NULL){
+                        igs_writeParameterAsString(_name, value);//last paramter is used for DATA only
                     }
                 }else if ((strncmp (message, "MAP ", strlen("MAP ")) == 0) && (strlen(message) > strlen("MAP ")+1)){
                     igs_debug("received MAP command from %s (%s)", name, peer);
@@ -989,8 +989,8 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         if (token != NULL ){
                             if (token->cb != NULL){
                                 size_t nbArgs = 0;
-                                igs_tokenArgument_t *arg = NULL;
-                                LL_COUNT(token->arguments, arg, nbArgs);
+                                igs_tokenArgument_t *_arg = NULL;
+                                LL_COUNT(token->arguments, _arg, nbArgs);
                                 if (token_addValuesToArgumentsFromMessage(tokenName, token->arguments, msgDuplicate)){
                                     (token->cb)(name, peer, tokenName, token->arguments, nbArgs, token->cbData);
                                     token_freeValuesInArguments(token->arguments);
@@ -1168,7 +1168,7 @@ initLoop (zsock_t *pipe, void *args){
     
     zsock_t *ipcPublisher = agentElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
     if (ipcPublisher == NULL){
-        igs_error("Could not create IPC publishing socket (%s) : Agent will interrupt immediately.", ipcEndpoint);
+        igs_warn("Could not create IPC publishing socket (%s)", ipcEndpoint);
     }else{
         zyre_set_header(agentElements->node, "ipc", "%s", ipcEndpoint);
     }

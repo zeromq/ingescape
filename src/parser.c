@@ -237,9 +237,9 @@ static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
                     char *n = strndup(name, MAX_IOP_NAME_LENGTH);
                     bool spaceInName = false;
                     size_t lengthOfN = strlen(n);
-                    for (size_t i = 0; i < lengthOfN; i++){
-                        if (n[i] == ' '){
-                            n[i] = '_';
+                    for (size_t _i = 0; _i < lengthOfN; _i++){
+                        if (n[_i] == ' '){
+                            n[_i] = '_';
                             spaceInName = true;
                         }
                     }

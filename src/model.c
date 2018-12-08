@@ -52,7 +52,7 @@ static int model_observe(const char* name, iop_t iopType, igs_observeCallback cb
 
     // Check if the input has been returned.
     if(iop == NULL){
-        char *t = NULL;
+        const char *t = NULL;
         switch (iopType) {
             case IGS_INPUT_T:
                 t = "input";
@@ -230,7 +230,7 @@ bool model_readIopAsBool (const char *name, iop_t type){
                 
             case IGS_DOUBLE_T:
                 igs_warn("Implicit conversion from double to bool for %s", name);
-                return (iop->value.d == 0)?false:true;
+                return (iop->value.d >= 0 && iop->value.d <= 0)?false:true;
                 break;
                 
             case IGS_STRING_T:
@@ -550,19 +550,19 @@ const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t
             switch (iop->value_type) {
                 case IGS_INTEGER_T:
                     outSize = iop->valueSize = sizeof(int);
-                    iop->value.i = (value == NULL)?0:*(double*)(value);
+                    iop->value.i = (value == NULL)?0:(int)(*(double*)(value));
                     outValue = &(iop->value.i);
                     igs_debug("set %s to %i", iopName, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
-                    iop->value.d = (value == NULL)?0:*(double*)(value);
+                    iop->value.d = (value == NULL)?0:(int)(*(double*)(value));
                     outValue = &(iop->value.d);
                     igs_debug("set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
-                    iop->value.b = (value == NULL)?false:((*(double*)(value))?true:false);
+                    iop->value.b = (value == NULL)?false:(((int)(*(double*)(value)))?true:false);
                     outValue = &(iop->value.b);
                     igs_debug("set %s to %i", iopName, iop->value.b);
                     break;
