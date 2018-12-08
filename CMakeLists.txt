@@ -163,6 +163,7 @@ message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
 ########################################################################
 set (ingescape_headers_to_install
     src/include/ingescape.h
+    src/include/ingescape_advanced.h
 )
 
 set (ingescape_headers
@@ -342,6 +343,17 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
               DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 
+# uninstall target
+if(NOT TARGET uninstall)
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/cmake_uninstall.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+        IMMEDIATE @ONLY)
+
+    add_custom_target(uninstall
+        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+endif()
+
 ########################################################################
 # summary
 ########################################################################
@@ -368,4 +380,5 @@ message (STATUS "*************************************************************")
 message (STATUS "Configuration complete! Now procced with:")
 message (STATUS "  'make'                compile the project")
 message (STATUS "  'make install'        install the project to ${CMAKE_INSTALL_PREFIX}")
+message (STATUS "  'make uninstall'      uninstall the project from ${CMAKE_INSTALL_PREFIX}")
 message (STATUS "")
