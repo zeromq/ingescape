@@ -1,10 +1,7 @@
 //
 //  igs_mapping.c
 //
-//  Created by Patxi Berard
-//  Modified by Mathieu Poirier
-//  Modified by Vincent Deliencourt
-//  Modified by Stephane Vales
+//  Created by Patxi Berard & Stephane Vales
 //  Copyright © 2017 Ingenuity i/o. All rights reserved.
 //
 

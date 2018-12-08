@@ -1,10 +1,7 @@
 //
 //  model.c
 //
-//  Created by Patxi Berard
-//  Modified by Vincent Deliencourt
-//  Modified by Mathieu Poirier
-//  Modified by Stephane Vales
+//  Created by Patxi Berard & Stephane Vales
 //  Copyright © 2017 Ingenuity i/o. All rights reserved.
 //
 

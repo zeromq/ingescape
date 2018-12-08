@@ -1,9 +1,7 @@
 //
 //  igs_definition.c
 //
-//  Created by Patxi Berard
-//  Modified by Mathieu Poirier
-//  Modified by Vincent Deliencourt
+//  Created by Patxi Berard & Stephane Vales
 //  Copyright © 2017 Ingenuity i/o. All rights reserved.
 //
 

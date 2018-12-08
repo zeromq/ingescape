@@ -4,8 +4,7 @@
 //  Multi Agent Supervision Transport Integration and Control
 //
 //  Created by Stephane Vales on 22/05/2017.
-//  Modified by Mathieu Poirier
-//  Copyright © 2016 IKKY WP4.8. All rights reserved.
+//  Copyright © 2017 Ingenuity i/o. All rights reserved.
 //
 
 #ifndef ingescape_public_h

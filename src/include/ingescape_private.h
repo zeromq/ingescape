@@ -3,7 +3,6 @@
 //  ingescape
 //
 //  Created by Stephane Vales on 27/04/2017.
-//  Modified by Mathieu Poirier
 //  Copyright © 2017 Ingenuity i/o. All rights reserved.
 //
 

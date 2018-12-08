@@ -1,10 +1,9 @@
 //
 //  igs_parser.c
 //
-//  Created by Mathieu Poirier
+//  Created by Stephane Vales
 //  Modified by Patxi Berard
 //  Modified by Vincent Deliencourt
-//  Modified by Stephane Vales
 //  Copyright © 2017 Ingenuity i/o. All rights reserved.
 //
 
