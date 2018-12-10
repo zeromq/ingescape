@@ -32,8 +32,12 @@ class AgentsMappingController : public QObject
     Q_OBJECT
 
     // Size of the mapping view
-    I2_QML_PROPERTY(double, viewWidth)
-    I2_QML_PROPERTY(double, viewHeight)
+    // [MSO] FIXME /!\ viewWidth et viewHeight ne prennent pas en compte le zoom factor et représentent la taille de la vue en pixel d'un point de vue OS
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, viewWidth)
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, viewHeight)
+
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, scaledViewWidth)
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, scaledViewHeight)
 
     // List of all agents in mapping
     I2_QOBJECT_LISTMODEL(AgentInMappingVM, allAgentsInMapping)

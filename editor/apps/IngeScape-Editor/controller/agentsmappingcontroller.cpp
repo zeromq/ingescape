@@ -32,6 +32,8 @@ AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelMan
                                                  QObject *parent) : QObject(parent),
       _viewWidth(1920 - 320), // Full HD - Width of left panel
       _viewHeight(1080 - 100), // Full HD - Height of top & bottom bars of OS
+      _scaledViewWidth(1920 - 320), // Full HD - Width of left panel
+      _scaledViewHeight(1080 - 100), // Full HD - Height of top & bottom bars of OS
       _isEmptyMapping(true),
       _selectedAgent(nullptr),
       _selectedLink(nullptr),
@@ -43,6 +45,11 @@ AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelMan
 
     // Connect to signal "Count Changed" from the list of all agents in mapping
     connect(&_allAgentsInMapping, &AbstractI2CustomItemListModel::countChanged, this, &AgentsMappingController::_onAllAgentsInMappingChanged);
+
+    //*
+    // [MSO] FIXME
+    connect(this, &AgentsMappingController::scaledViewWidthChanged, this, [=](){ qDebug() << "_scaledViewWidth changed: W: " << _viewWidth << "\tH: " << _viewHeight;});
+    //*/
 
 }
 
@@ -1337,6 +1344,8 @@ AgentInMappingVM* AgentsMappingController::_createAgentInMappingAtPosition(Agent
 {
     AgentInMappingVM* agentInMapping = nullptr;
 
+    //TODO Create an agent in the mapping must reset the scale view to 100%. For now.
+    //TODO If we known the current viewport dimensions, we could zoom out only when needed =) (see [MSO] FIXME)
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
     {
         agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
@@ -1754,14 +1763,15 @@ void AgentsMappingController::_linkAgentOnOutputs(AgentInMappingVM* agentInMappi
  */
 QPointF AgentsMappingController::_getRandomPosition(double randomMax)
 {
-    double randomX = (double)qrand() / randomMax;
-    double randomY = (double)qrand() / randomMax;
+    double randomX = static_cast<double>(qrand()) / randomMax;
+    double randomY = static_cast<double>(qrand()) / randomMax;
 
     // 5% + (random * 90% of the width)
-    double x = 0.05 * _viewWidth + (0.90 * _viewWidth * randomX);
+    qDebug() << "_scaledViewWidth is " << _viewWidth;
+    double x = 0.05 * _scaledViewWidth + (0.90 * _scaledViewWidth * randomX);
 
     // 5% + (random * 90% of the height)
-    double y = 0.05 * _viewHeight + (0.90 * _viewHeight * randomY);
+    double y = 0.05 * _scaledViewHeight + (0.90 * _scaledViewHeight * randomY);
 
     return QPointF(x, y);
 }

@@ -293,6 +293,18 @@ Item {
         }
     }
 
+    Binding {
+        target: controller
+        property: "scaledViewWidth"
+        value: width * workspace.scale
+    }
+
+    Binding {
+        target: controller
+        property: "scaledViewHeight"
+        value: height * workspace.scale
+    }
+
 
     //--------------------------------
     //
@@ -331,7 +343,39 @@ Item {
         }
 
 
+        //* [MSO] FIXME
+        //
+        // Spawn zone
+        //
+        Rectangle {
+            id: spawnZone
 
+            anchors.centerIn: parent
+
+            width: parent.width * workspace.scale
+            height: parent.height * workspace.scale
+
+            property int borderWidth: 10
+
+            border {
+                width: borderWidth
+                color: "#FF0000"
+            }
+
+            Text {
+                anchors {
+                    top: spawnZone.top
+                    topMargin: spawnZone.borderWidth + 5
+                    left: spawnZone.left
+                    leftMargin: spawnZone.borderWidth + 5
+                }
+
+                text: "SPAWN ZONE"
+
+                color: "#FF0000"
+            }
+        }
+        //*/
 
 
         //----------------------------------------------------------------
@@ -579,6 +623,23 @@ Item {
 
                 // Maximum Z-index
                 property int maxZ: 0
+
+                //*
+                // [MSO] FIXME
+                function logPosition() {
+                    console.log(qsTr("Viewport position changed => X: %1\tY: %2").arg(x).arg(y))
+                    console.log(qsTr("New viewport size         => W: %1\tY: %2").arg(width / workspace.scale).arg(height / workspace.scale))
+                    console.log(qsTr("New viewport corners      => BR: %1:%2").arg(x + (width / workspace.scale)).arg(y + (height / workspace.scale)))
+                }
+
+                onXChanged: {
+                    logPosition()
+                }
+
+                onYChanged: {
+                    logPosition()
+                }
+                //*/
 
 
 

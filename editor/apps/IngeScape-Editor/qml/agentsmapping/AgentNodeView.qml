@@ -78,6 +78,25 @@ Rectangle {
     y: (agentMappingVM && agentMappingVM.position) ? agentMappingVM.position.y : 0
 
 
+    //*
+    // [MSO] FIXME
+    function logPosition() {
+        if (agentMappingVM && agentMappingVM.position)
+        {
+            console.log(qsTr(" -- Agent %1 at pos (%2:%3)").arg(agentMappingVM.name).arg(x).arg(y))
+        }
+    }
+
+    onXChanged: {
+        logPosition()
+    }
+
+    onYChanged: {
+        logPosition()
+    }
+    //*/
+
+
     radius: 6
 
     color: (dropEnabled === true) ? (mouseArea.pressed ? IngeScapeTheme.darkGreyColor2
