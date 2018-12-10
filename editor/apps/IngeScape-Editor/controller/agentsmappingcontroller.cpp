@@ -157,7 +157,7 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
         if ((_modelManager != nullptr) && _modelManager->isMappingActivated() && link->inputAgent()->agentsGroupedByName()->isON())
         {
             // Update the flag to give a feedback to the user
-            link->setisDashedLine(true);
+            link->setisTemporary(true);
 
             // Emit signal "Command asked to agent about Mapping Input"
             Q_EMIT commandAskedToAgentAboutMappingInput(link->inputAgent()->agentsGroupedByName()->peerIdsList(),
@@ -986,20 +986,13 @@ void AgentsMappingController::onAgentsGroupedByNameWillBeDeleted(AgentsGroupedBy
         }
         else
         {
-            if (link->isDashedLine())
+            if (link->isTemporary())
             {
                 qInfo() << "MAPPED" << mappingElement->name();
 
                 // Update the flag if needed
-                link->setisDashedLine(false);
+                link->setisTemporary(false);
             }
-        }
-
-        if ((link != nullptr) && (link->inputAgent() != nullptr))
-        {
-            // Add the temporary link that correspond to this real link (if it does not yet exist)
-            //bool hasBeenAdded = link->inputAgent()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
-            link->inputAgent()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
         }
     }
 }*/
@@ -1114,14 +1107,6 @@ void AgentsMappingController::onMappingElementsHaveBeenAdded(QList<MappingElemen
             }
         }
     }
-
-    // FIXME REPAIR addTemporaryLink
-    /*if ((link != nullptr) && (link->inputAgent() != nullptr))
-    {
-        // Add the temporary link that correspond to this real link (if it does not yet exist)
-        //bool hasBeenAdded = link->inputAgent()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
-        link->inputAgent()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
-    }*/
 }
 
 
@@ -1172,14 +1157,6 @@ void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElemen
                     LinkVM* link = linksWithSameName.at(0);
                     if (link != nullptr)
                     {
-                        // FIXME REPAIR removeTemporaryLink
-                        /*if (link->inputAgent() != nullptr)
-                        {
-                            // Remove the temporary link that correspond to this real link
-                            //bool hasBeenRemoved = link->inputAgent()->removeTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
-                            link->inputAgent()->removeTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
-                        }*/
-
                         // Delete the link between two agents
                         _deleteLinkBetweenTwoAgents(link);
                     }
@@ -1375,7 +1352,7 @@ AgentInMappingVM* AgentsMappingController::_createAgentInMappingAtPosition(Agent
  * @param inputAgent
  * @param linkInput
  * @param mappingElement
- * @param isDashedLine
+ * @param isTemporary
  * @return
  */
 LinkVM* AgentsMappingController::_createLinkBetweenTwoAgents(QString linkName,
@@ -1384,7 +1361,7 @@ LinkVM* AgentsMappingController::_createLinkBetweenTwoAgents(QString linkName,
                                                              AgentInMappingVM* inputAgent,
                                                              LinkInputVM* linkInput,
                                                              MappingElementVM* mappingElement,
-                                                             bool isDashedLine)
+                                                             bool isTemporary)
 {
     LinkVM* link = nullptr;
 
@@ -1406,7 +1383,7 @@ LinkVM* AgentsMappingController::_createLinkBetweenTwoAgents(QString linkName,
                               linkOutput,
                               inputAgent,
                               linkInput,
-                              isDashedLine,
+                              isTemporary,
                               this);
 
             // Add to the list to update the view (QML)
@@ -1670,9 +1647,9 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
 
                     link->setmappingElement(mappingElement);
 
-                    if (link->isDashedLine()) {
+                    if (link->isTemporary()) {
                         // Reset the flag
-                        link->setisDashedLine(false);
+                        link->setisTemporary(false);
                     }
 
                     if (link->inputAgent() != nullptr) {

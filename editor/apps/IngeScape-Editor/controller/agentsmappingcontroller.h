@@ -347,7 +347,7 @@ private:
      * @param inputAgent
      * @param linkInput
      * @param mappingElement
-     * @param isDashedLine
+     * @param isTemporary
      * @return
      */
     LinkVM* _createLinkBetweenTwoAgents(QString linkName,
@@ -356,7 +356,7 @@ private:
                                         AgentInMappingVM* inputAgent,
                                         LinkInputVM* linkInput,
                                         MappingElementVM* mappingElement,
-                                        bool isDashedLine = false);
+                                        bool isTemporary = false);
 
 
     /**
