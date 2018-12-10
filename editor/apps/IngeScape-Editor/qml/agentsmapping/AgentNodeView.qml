@@ -81,7 +81,7 @@ Rectangle {
     //*
     // [MSO] FIXME
     function logPosition() {
-        if (agentMappingVM && agentMappingVM.position)
+        if (agentMappingVM)
         {
             console.log(qsTr(" -- Agent %1 at pos (%2:%3)").arg(agentMappingVM.name).arg(x).arg(y))
         }

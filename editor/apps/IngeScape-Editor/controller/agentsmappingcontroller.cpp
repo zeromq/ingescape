@@ -49,6 +49,7 @@ AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelMan
     //*
     // [MSO] FIXME
     connect(this, &AgentsMappingController::scaledViewWidthChanged, this, [=](){ qDebug() << "_scaledViewWidth changed: W: " << _viewWidth << "\tH: " << _viewHeight;});
+    connect(this, &AgentsMappingController::xSpawnZoneOffset, this, [=](){ qDebug() << "spawnZone changed: X: " << _xSpawnZoneOffset << "\tY: " << _ySpawnZoneOffset;});
     //*/
 
 }
@@ -1767,11 +1768,18 @@ QPointF AgentsMappingController::_getRandomPosition(double randomMax)
     double randomY = static_cast<double>(qrand()) / randomMax;
 
     // 5% + (random * 90% of the width)
-    qDebug() << "_scaledViewWidth is " << _viewWidth;
-    double x = 0.05 * _scaledViewWidth + (0.90 * _scaledViewWidth * randomX);
+    double x = 0.05 * _viewWidth + (0.90 * _viewWidth * randomX) + _xSpawnZoneOffset;
+//    double x = 0.05 * _scaledViewWidth + (0.90 * _scaledViewWidth * randomX)/* - _xSpawnZoneOffset*/;
 
     // 5% + (random * 90% of the height)
-    double y = 0.05 * _scaledViewHeight + (0.90 * _scaledViewHeight * randomY);
+    double y = 0.05 * _viewHeight + (0.90 * _viewHeight * randomY) + _ySpawnZoneOffset;
+//    double y = 0.05 * _scaledViewHeight + (0.90 * _scaledViewHeight * randomY)/* - _ySpawnZoneOffset*/;
+
+//    qDebug() << QString("View W: %3  H: %4").arg(_viewWidth).arg(_viewHeight);
+//    qDebug() << QString("Zone de spawn X: %1  Y:%2 // W: %3  H: %4").arg(_xSpawnZoneOffset).arg(_ySpawnZoneOffset).arg(_scaledViewWidth).arg(_scaledViewHeight);
+
+//    qDebug() << "X is " << x;
+//    qDebug() << "Y is " << y;
 
     return QPointF(x, y);
 }

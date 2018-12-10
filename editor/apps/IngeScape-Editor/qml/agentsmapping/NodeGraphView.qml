@@ -296,14 +296,34 @@ Item {
     Binding {
         target: controller
         property: "scaledViewWidth"
-        value: width * workspace.scale
+        value: controller.viewWidth * workspace.scale
     }
 
     Binding {
         target: controller
         property: "scaledViewHeight"
-        value: height * workspace.scale
+        value: controller.viewHeight * workspace.scale
     }
+
+//    Binding {
+//        target: controller
+//        property: "xSpawnZoneOffset"
+//        value: {
+////            console.log(qsTr("ySpawnZoneOffset: %1").arg(workspace.x + spawnZone.x))
+////            console.log(qsTr("xSpawnZoneOffset: %1").arg(workspace.mapFromItem(rootItem, workspace.x + workspace.width/2 - (workspace.width/2 * workspace.scale), workspace.y + workspace.height/2 - (workspace.height/2 * workspace.scale)).x))
+//            workspace.mapFromItem(rootItem, spawnZone.x, spawnZone.y).x
+//        }
+//    }
+
+//    Binding {
+//        target: controller
+//        property: "ySpawnZoneOffset"
+//        value: {
+////            console.log(qsTr("ySpawnZoneOffset: %1").arg(workspace.y + spawnZone.y))
+////            console.log(qsTr("ySpawnZoneOffset: %1").arg(workspace.mapFromItem(rootItem, workspace.x + workspace.width/2 - (workspace.width/2 * workspace.scale), workspace.y + workspace.height/2 - (workspace.height/2 * workspace.scale)).y))
+//            workspace.mapFromItem(rootItem, spawnZone.x, spawnZone.y).y
+//        }
+//    }
 
 
     //--------------------------------
@@ -343,6 +363,8 @@ Item {
         }
 
 
+
+
         //* [MSO] FIXME
         //
         // Spawn zone
@@ -352,14 +374,21 @@ Item {
 
             anchors.centerIn: parent
 
-            width: parent.width * workspace.scale
-            height: parent.height * workspace.scale
+            width: controller.viewWidth * workspace.scale
+            height: controller.viewHeight * workspace.scale
 
             property int borderWidth: 10
 
             border {
                 width: borderWidth
                 color: "#FF0000"
+            }
+
+            Rectangle {
+                anchors.centerIn: parent
+
+                width: parent.width * 0.05
+                height: parent.height * 0.05
             }
 
             Text {
@@ -627,20 +656,29 @@ Item {
                 //*
                 // [MSO] FIXME
                 function logPosition() {
-                    console.log(qsTr("Viewport position changed => X: %1\tY: %2").arg(x).arg(y))
-                    console.log(qsTr("New viewport size         => W: %1\tY: %2").arg(width / workspace.scale).arg(height / workspace.scale))
-                    console.log(qsTr("New viewport corners      => BR: %1:%2").arg(x + (width / workspace.scale)).arg(y + (height / workspace.scale)))
+                    console.log(qsTr("Workspace position changed => X: %1\tY: %2").arg(x).arg(y))
+//                    console.log(qsTr("New viewport size          => W: %1\tH: %2").arg(width / workspace.scale).arg(height / workspace.scale))
+//                    console.log(qsTr("New viewport corners       => BR: %1:%2").arg(x + (width / workspace.scale)).arg(y + (height / workspace.scale)))
+                }
+
+                function updateSpawnZone() {
+                    var offset = workspace.mapFromItem(rootItem, spawnZone.x, spawnZone.y)
+                    console.log(qsTr("Origin: X:%1\tY:%2").arg(spawnZone.x).arg(spawnZone.y))
+                    console.log(qsTr("Mapped: X:%1\tY:%2").arg(offset.x).arg(offset.y))
+                    controller.xSpawnZoneOffset = offset.x
+                    controller.ySpawnZoneOffset = offset.y
                 }
 
                 onXChanged: {
                     logPosition()
+                    updateSpawnZone()
                 }
 
                 onYChanged: {
                     logPosition()
+                    updateSpawnZone()
                 }
                 //*/
-
 
 
                 //------------------------------------------------

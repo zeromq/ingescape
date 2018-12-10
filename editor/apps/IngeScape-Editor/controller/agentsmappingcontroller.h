@@ -39,6 +39,9 @@ class AgentsMappingController : public QObject
     I2_QML_PROPERTY_FUZZY_COMPARE(double, scaledViewWidth)
     I2_QML_PROPERTY_FUZZY_COMPARE(double, scaledViewHeight)
 
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, xSpawnZoneOffset)
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, ySpawnZoneOffset)
+
     // List of all agents in mapping
     I2_QOBJECT_LISTMODEL(AgentInMappingVM, allAgentsInMapping)
 
