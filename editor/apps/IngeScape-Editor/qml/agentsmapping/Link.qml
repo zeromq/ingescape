@@ -106,8 +106,8 @@ I2CubicBezierCurve {
 
     strokeWidth: rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinDefaultWidth : IngeScapeTheme.agentsMappingLinkDefaultWidth
 
-    strokeDashArray: (viewModel && viewModel.isVirtual) ? (rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinVirtualStrokeDashArray : IngeScapeTheme.agentsMappingLinkVirtualStrokeDashArray)
-                                                        : ""
+    strokeDashArray: (viewModel && viewModel.isDashedLine) ? (rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinVirtualStrokeDashArray : IngeScapeTheme.agentsMappingLinkVirtualStrokeDashArray)
+                                                           : ""
 
     // Fuzzy contour
     fuzzyColor: IngeScapeTheme.lightGreyColor

@@ -99,6 +99,15 @@ public:
 
 
     /**
+     * @brief Export the model of agent mapping plus its temporary list of mapping elements into a JSON object
+     * @param agentMapping
+     * @param temporaryMappingElements
+     * @return JSON object
+     */
+    QJsonObject exportAgentTemporaryMappingToJson(AgentMappingM* agentMapping, QList<ElementMappingM*> temporaryMappingElements);
+
+
+    /**
      * @brief Get the JSON of an agent definition
      * @param agentDefinition
      * @param jsonFormat
@@ -114,6 +123,16 @@ public:
      * @return
      */
     QString getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocument::JsonFormat jsonFormat);
+
+
+    /**
+     * @brief Get the JSON of an agent mapping plus its temporary list of mapping elements
+     * @param agentMapping
+     * @param temporaryMappingElements
+     * @param jsonFormat
+     * @return
+     */
+    QString getJsonOfAgentTemporaryMapping(AgentMappingM* agentMapping, QList<ElementMappingM*> temporaryMappingElements, QJsonDocument::JsonFormat jsonFormat);
 
 
     /**

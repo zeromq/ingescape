@@ -62,7 +62,10 @@ class AgentInMappingVM : public QObject
 
     // FIXME TO REMOVE ?
     // Mapping currently edited (temporary until the user activate the mapping)
-    I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
+    //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
+
+    // List of TEMPORARY mapping elements of our agent
+    I2_QOBJECT_LISTMODEL(ElementMappingM, temporaryMappingElements)
 
 
 public:
@@ -112,23 +115,26 @@ public:
 
 
     /**
-     * @brief Add a temporary link (this temporary link will became a real link when the user will activate the mapping)
-     * @param inputName
+     * @brief Add a temporary mapping element
+     * This temporary mapping element will become a real link:
+     * - when the user will activate the mapping
+     * - or when our agent will evolve from OFF to ON
+     * @param linkId
+     * @param inputId
      * @param outputAgentName
-     * @param outputName
-     * @return true if the link has been added
+     * @param outputId
      */
-    bool addTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
+    void addTemporaryMappingElement(QString linkId, QString inputId, QString outputAgentName, QString outputId);
 
 
     /**
-     * @brief Remove temporary link (this temporary link will be removed when the user will activate the mapping)
-     * @param inputName
-     * @param outputAgentName
-     * @param outputName
-     * @return true if the link has been removed
+     * @brief Remove a temporary mapping element
+     * This temporary link mapping element became a real link:
+     * - when the user activated the mapping
+     * - or when our agent evolved from OFF to ON
+     * @param linkId
      */
-    bool removeTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
+    void removeTemporaryMappingElement(QString linkId);
 
 
 Q_SIGNALS:
@@ -283,13 +289,11 @@ private:
 
 
     /**
-     * @brief Get the temporary link with same names
-     * @param inputName
-     * @param outputAgentName
-     * @param outputName
+     * @brief Get the temporary mapping element from a link id
+     * @param linkId
      * @return
      */
-    ElementMappingM* _getTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
+    ElementMappingM* _getTemporaryMappingElementFromLinkId(QString linkId);
 
 
     /**
@@ -313,6 +317,9 @@ private:
 
     // Hash table from a (unique) output id to a view model of link output
     QHash<QString, LinkOutputVM*> _hashFromIdToLinkOutput;
+
+    // Hash table from a (unique) link id to a (model of) temporary mapping element
+    QHash<QString, ElementMappingM*> _hashFromLinkIdToTemporaryMappingElement;
 
 };
 

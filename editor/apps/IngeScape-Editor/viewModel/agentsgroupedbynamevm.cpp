@@ -498,7 +498,7 @@ ParameterVM* AgentsGroupedByNameVM::getParameterFromId(QString parameterId)
  * @param name
  * @return
  */
-MappingElementVM* AgentsGroupedByNameVM::getMappingElementFromName(QString name)
+MappingElementVM* AgentsGroupedByNameVM::getMappingElementVMfromName(QString name)
 {
     if (_hashFromNameToMappingElement.contains(name)) {
         return _hashFromNameToMappingElement.value(name);
@@ -1688,7 +1688,7 @@ QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageNewMappingElementMo
 
     if ((model != nullptr) && !model->name().isEmpty())
     {
-        mappingElementVM = getMappingElementFromName(model->name());
+        mappingElementVM = getMappingElementVMfromName(model->name());
 
         // There is already a view model for this name
         if (mappingElementVM != nullptr)
@@ -1710,8 +1710,10 @@ QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageNewMappingElementMo
 
             _hashFromNameToMappingElement.insert(model->name(), mappingElementVM);
 
+            // Update the current mapping of our agent(s grouped by name)
             if (_currentMapping != nullptr)
             {
+                // Create a copy of the mapping element
                 ElementMappingM* copy = new ElementMappingM(model->inputAgent(), model->input(), model->outputAgent(), model->output());
 
                 _currentMapping->mappingElements()->append(copy);
@@ -1735,7 +1737,7 @@ QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageOldMappingElementMo
 
     if ((model != nullptr) && !model->name().isEmpty())
     {
-        mappingElementVM = getMappingElementFromName(model->name());
+        mappingElementVM = getMappingElementVMfromName(model->name());
 
         if (mappingElementVM != nullptr)
         {
@@ -1751,11 +1753,15 @@ QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageOldMappingElementMo
 
                 _hashFromNameToMappingElement.remove(model->name());
 
+                // Update the current mapping of our agent(s grouped by name)
                 if (_currentMapping != nullptr)
                 {
                     ElementMappingM* copy = _currentMapping->getMappingElementFromName(model->name());
                     if (copy != nullptr) {
                         _currentMapping->mappingElements()->remove(copy);
+
+                        // Free memory
+                        delete copy;
                     }
                 }
             }

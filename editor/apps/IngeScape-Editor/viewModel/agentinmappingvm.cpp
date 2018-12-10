@@ -36,8 +36,8 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     _isReduced(false),
     _isLockedReduced(false),
     _reducedLinkInputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
-    _reducedLinkOutputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
-    _temporaryMapping(nullptr)
+    _reducedLinkOutputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED)
+    //_temporaryMapping(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -55,10 +55,11 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
         connect(_agentsGroupedByName, &AgentsGroupedByNameVM::outputsWillBeRemoved, this, &AgentInMappingVM::_onOutputsWillBeRemoved);
 
 
-        // Create the mapping currently edited
+        // FIXME TO DELETE
+        /*// Create the mapping currently edited
         QString mappingName = QString("Mapping name of %1 in IngeScape Editor").arg(_name);
         QString mappingDescription = QString("Mapping description of %1 in IngeScape Editor").arg(_name);
-        _temporaryMapping = new AgentMappingM(mappingName, "0.0", mappingDescription);
+        _temporaryMapping = new AgentMappingM(mappingName, "0.0", mappingDescription);*/
 
 
         if (!_agentsGroupedByName->inputsList()->isEmpty())
@@ -105,12 +106,16 @@ AgentInMappingVM::~AgentInMappingVM()
         setagentsGroupedByName(nullptr);
     }
 
-    if (_temporaryMapping != nullptr)
+    /*if (_temporaryMapping != nullptr)
     {
         AgentMappingM* temp = _temporaryMapping;
         settemporaryMapping(nullptr);
         delete temp;
-    }
+    }*/
+
+    // Delete all temporary mapping elements
+    _hashFromLinkIdToTemporaryMappingElement.clear();
+    _temporaryMappingElements.deleteAllItems();
 }
 
 
@@ -175,56 +180,51 @@ LinkOutputVM* AgentInMappingVM::getLinkOutputFromId(QString outputId)
 
 
 /**
- * @brief Add a temporary link (this temporary link will became a real link when the user will activate the mapping)
- * @param inputName
+ * @brief Add a temporary mapping element
+ * This temporary mapping element will become a real link:
+ * - when the user will activate the mapping
+ * - or when our agent will evolve from OFF to ON
+ * @param linkId
+ * @param inputId
  * @param outputAgentName
- * @param outputName
- * @return true if the link has been added
+ * @param outputId
  */
-bool AgentInMappingVM::addTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
+void AgentInMappingVM::addTemporaryMappingElement(QString linkId, QString inputId, QString outputAgentName, QString outputId)
 {
-    bool hasBeenAdded = false;
-
-    if (_temporaryMapping != nullptr)
+    // Check that there is not already the same mapping element
+    ElementMappingM* temporaryMappingElement = _getTemporaryMappingElementFromLinkId(linkId);
+    if (temporaryMappingElement == nullptr)
     {
-        // Check that there is not already the same link
-        ElementMappingM* temporaryLink = _getTemporaryLink(inputName, outputAgentName, outputName);
-        if (temporaryLink == nullptr)
-        {
-            temporaryLink = new ElementMappingM(_name, inputName, outputAgentName, outputName);
+        // Create a temporary mapping element
+        temporaryMappingElement = new ElementMappingM(_name, inputId, outputAgentName, outputId);
 
-            _temporaryMapping->mappingElements()->append(temporaryLink);
-
-            hasBeenAdded = true;
-        }
+        // Add to the list and to the hash table
+        _temporaryMappingElements.append(temporaryMappingElement);
+        _hashFromLinkIdToTemporaryMappingElement.insert(linkId, temporaryMappingElement);
     }
-    return hasBeenAdded;
 }
 
 
 /**
- * @brief Remove temporary link (this temporary link will be removed when the user will activate the mapping)
- * @param inputName
- * @param outputAgentName
- * @param outputName
- * @return true if the link has been removed
+ * @brief Remove a temporary mapping element
+ * This temporary link mapping element became a real link:
+ * - when the user activated the mapping
+ * - or when our agent evolved from OFF to ON
+ * @param linkId
  */
-bool AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
+void AgentInMappingVM::removeTemporaryMappingElement(QString linkId)
 {
-    bool hasBeenRemoved = false;
-
-    if (_temporaryMapping != nullptr)
+    // Get the temporary mapping element from the link id
+    ElementMappingM* temporaryMappingElement = _getTemporaryMappingElementFromLinkId(linkId);
+    if (temporaryMappingElement != nullptr)
     {
-        // Get the temporary link with same names
-        ElementMappingM* temporaryLink = _getTemporaryLink(inputName, outputAgentName, outputName);
-        if (temporaryLink != nullptr)
-        {
-            _temporaryMapping->mappingElements()->remove(temporaryLink);
+        // Remove from the list and from the hash table
+        _temporaryMappingElements.remove(temporaryMappingElement);
+        _hashFromLinkIdToTemporaryMappingElement.remove(linkId);
 
-            hasBeenRemoved = true;
-        }
+        // Free memory
+        delete temporaryMappingElement;
     }
-    return hasBeenRemoved;
 }
 
 
@@ -1348,23 +1348,18 @@ void AgentInMappingVM::_updateReducedLinkOutputsValueTypeGroup()
 
 
 /**
- * @brief Get the temporary link with same names
- * @param inputName
- * @param outputAgentName
- * @param outputName
+ * @brief Get the temporary mapping element from a link id
+ * @param linkId
  * @return
  */
-ElementMappingM* AgentInMappingVM::_getTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
+ElementMappingM* AgentInMappingVM::_getTemporaryMappingElementFromLinkId(QString linkId)
 {
-    for (ElementMappingM* iterator : _temporaryMapping->mappingElements()->toList())
-    {
-        if ((iterator != nullptr) && (iterator->inputAgent() == _name)
-                && (iterator->input() == inputName) && (iterator->outputAgent() == outputAgentName) && (iterator->output() == outputName))
-        {
-            return iterator;
-        }
+    if (_hashFromLinkIdToTemporaryMappingElement.contains(linkId)) {
+        return _hashFromLinkIdToTemporaryMappingElement.value(linkId);
     }
-    return nullptr;
+    else {
+        return nullptr;
+    }
 }
 
 

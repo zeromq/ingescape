@@ -301,6 +301,47 @@ QJsonObject JsonHelper::exportAgentMappingToJson(AgentMappingM* agentMapping)
 
 
 /**
+ * @brief Export the model of agent mapping plus its temporary list of mapping elements into a JSON object
+ * @param agentMapping
+ * @param temporaryMappingElements
+ * @return JSON object
+ */
+QJsonObject JsonHelper::exportAgentTemporaryMappingToJson(AgentMappingM* agentMapping, QList<ElementMappingM*> temporaryMappingElements)
+{
+    QJsonObject jsonMapping;
+
+    if (agentMapping != nullptr)
+    {
+        jsonMapping.insert("name", agentMapping->name());
+        jsonMapping.insert("description", agentMapping->description());
+        jsonMapping.insert("version", agentMapping->version());
+
+        QJsonArray jsonArray;
+
+        QList<ElementMappingM*> completeList = agentMapping->mappingElements()->toList();
+        completeList.append(temporaryMappingElements);
+
+        for (ElementMappingM* mappingElement : completeList)
+        {
+            if (mappingElement != nullptr)
+            {
+                QJsonObject jsonMappingElement;
+                jsonMappingElement.insert("input_name", mappingElement->input());
+                jsonMappingElement.insert("agent_name", mappingElement->outputAgent());
+                jsonMappingElement.insert("output_name", mappingElement->output());
+
+                jsonArray.append(jsonMappingElement);
+            }
+        }
+
+        jsonMapping.insert("mapping_out", jsonArray);
+    }
+
+    return jsonMapping;
+}
+
+
+/**
  * @brief Get the JSON of an agent definition
  * @param agentDefinition
  * @return
@@ -335,6 +376,7 @@ QString JsonHelper::getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocu
 
     if (agentMapping != nullptr)
     {
+        // Export the model of agent mapping into a JSON object
         QJsonObject jsonMapping = exportAgentMappingToJson(agentMapping);
 
         QJsonObject jsonObject;
@@ -343,7 +385,32 @@ QString JsonHelper::getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocu
         QJsonDocument jsonDocument(jsonObject);
         jsonOfMapping = QString(jsonDocument.toJson(jsonFormat));
     }
+    return jsonOfMapping;
+}
 
+
+/**
+ * @brief Get the JSON of an agent mapping plus its temporary list of mapping elements
+ * @param agentMapping
+ * @param temporaryMappingElements
+ * @param jsonFormat
+ * @return
+ */
+QString JsonHelper::getJsonOfAgentTemporaryMapping(AgentMappingM* agentMapping, QList<ElementMappingM*> temporaryMappingElements, QJsonDocument::JsonFormat jsonFormat)
+{
+    QString jsonOfMapping = "";
+
+    if (agentMapping != nullptr)
+    {
+        // Export the model of agent mapping plus its temporary list of mapping elements into a JSON object
+        QJsonObject jsonMapping = exportAgentTemporaryMappingToJson(agentMapping, temporaryMappingElements);
+
+        QJsonObject jsonObject;
+        jsonObject.insert("mapping", jsonMapping);
+
+        QJsonDocument jsonDocument(jsonObject);
+        jsonOfMapping = QString(jsonDocument.toJson(jsonFormat));
+    }
     return jsonOfMapping;
 }
 

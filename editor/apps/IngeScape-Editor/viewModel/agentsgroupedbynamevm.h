@@ -191,7 +191,7 @@ public:
      * @param name
      * @return
      */
-    MappingElementVM* getMappingElementFromName(QString name);
+    MappingElementVM* getMappingElementVMfromName(QString name);
 
 
 Q_SIGNALS:

@@ -23,7 +23,7 @@
  * @param linkOutput The link starts from this output of the output agent
  * @param inputAgent The link ends to this agent
  * @param linkInput The link ends to this input of the input agent
- * @param isVirtual
+ * @param isDashedLine
  * @param parent
  */
 LinkVM::LinkVM(QString name,
@@ -32,7 +32,7 @@ LinkVM::LinkVM(QString name,
                LinkOutputVM* linkOutput,
                AgentInMappingVM* inputAgent,
                LinkInputVM* linkInput,
-               bool isVirtual,
+               bool isDashedLine,
                QObject *parent) : QObject(parent),
     _name(name),
     _uid(""),
@@ -41,7 +41,7 @@ LinkVM::LinkVM(QString name,
     _linkOutput(linkOutput),
     _inputAgent(inputAgent),
     _linkInput(linkInput),
-    _isVirtual(isVirtual)
+    _isDashedLine(isDashedLine)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

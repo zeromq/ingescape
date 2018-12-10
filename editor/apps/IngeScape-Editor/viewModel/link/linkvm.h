@@ -51,8 +51,8 @@ class LinkVM : public QObject
     // View model of the input slot associated to our link
     I2_QML_PROPERTY_DELETE_PROOF(LinkInputVM*, linkInput)
 
-    // Flag indicating if our link is virtual (agents are not really linked on the network)
-    I2_QML_PROPERTY_READONLY(bool, isVirtual)
+    // Flag indicating if our link is displayed with a dashed line (during the request to the input agent to link/un-link)
+    I2_QML_PROPERTY_READONLY(bool, isDashedLine)
 
 
 public:
@@ -65,7 +65,7 @@ public:
      * @param linkOutput The link starts from this output of the output agent
      * @param inputAgent The link ends to this agent
      * @param linkInput The link ends to this input of the input agent
-     * @param isVirtual
+     * @param isDashedLine
      * @param parent
      */
     explicit LinkVM(QString name,
@@ -74,7 +74,7 @@ public:
                     LinkOutputVM* linkOutput,
                     AgentInMappingVM* inputAgent,
                     LinkInputVM* linkInput,
-                    bool isVirtual,
+                    bool isDashedLine,
                     QObject *parent = nullptr);
 
 
