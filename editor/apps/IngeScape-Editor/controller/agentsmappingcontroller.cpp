@@ -184,15 +184,25 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
             //link->inputAgent()->removeTemporaryLink(link->linkInput()->name(), link->outputAgent()->name(), link->linkOutput()->name());
 
             // This link has been added while the mapping was UN-activated, just cancel the add
-            if (_idsOfAddedLinks_WhileMappingWasUNactivated.contains(link->uid())) {
+            /*if (_idsOfAddedLinks_WhileMappingWasUNactivated.contains(link->uid())) {
                 _idsOfAddedLinks_WhileMappingWasUNactivated.removeOne(link->uid());
             }
             // Add the corresponding mapping element to the hash
             else {
                 _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.insert(link->uid(), link->mappingElement());
+            }*/
 
-                // FIXME TODO
-                //link->inputAgent()->removedLinks_WhileMappingWasUNactivated()
+
+            ElementMappingM* mappingElement = link->inputAgent()->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid());
+
+            // This link has been added while the mapping was UN-activated, just cancel the add
+            if (mappingElement != nullptr)
+            {
+                link->inputAgent()->cancelAddLink_WhileMappingWasUNactivated(link->uid());
+            }
+            else
+            {
+                link->inputAgent()->removeLink_WhileMappingWasUNactivated(link->uid(), link->mappingElement());
             }
 
             // Delete the link between two agents
@@ -356,7 +366,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                     //inputAgent->addTemporaryMappingElement(link->uid(), linkInput->uid(), outputAgent->name(), linkOutput->uid());
 
                     // This link has been removed while the mapping was UN-activated, just cancel the suppression
-                    if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
+                    /*if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
                     {
                         MappingElementVM* mappingElement = _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.value(linkId);
                         link->setmappingElement(mappingElement);
@@ -366,6 +376,21 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                     // Add the link id to the list
                     else {
                         _idsOfAddedLinks_WhileMappingWasUNactivated.append(linkId);
+                    }*/
+
+
+                    MappingElementVM* mappingElement = inputAgent->getRemovedMappingElementFromLinkId_WhileMappingWasUNactivated(linkId);
+
+                    // This link has been removed while the mapping was UN-activated, just cancel the suppression
+                    if (mappingElement != nullptr)
+                    {
+                        link->setmappingElement(mappingElement);
+
+                        inputAgent->cancelRemoveLink_WhileMappingWasUNactivated(linkId);
+                    }
+                    else
+                    {
+                        inputAgent->addLink_WhileMappingWasUNactivated(link->uid(), linkInput->uid(), outputAgent->name(), linkOutput->uid());
                     }
                 }
             }
@@ -574,7 +599,7 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
 {
     qDebug() << "Reset the modifications made while the mapping was UN-activated";
 
-    for (QString linkId : _idsOfAddedLinks_WhileMappingWasUNactivated)
+    /*for (QString linkId : _idsOfAddedLinks_WhileMappingWasUNactivated)
     {
         qDebug() << "Remove added link" << linkId << "while the mapping was disconnected";
 
@@ -585,9 +610,30 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
             // Delete this link (between two agents) to cancel the add
             _deleteLinkBetweenTwoAgents(link);
         }
+    }*/
+    for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
+    {
+        if ((agentInMapping != nullptr) && agentInMapping->hadLinksAdded_WhileMappingWasUNactivated())
+        {
+            QList<QString> addedLinkIds = agentInMapping->getAllAddedLinkIds_WhileMappingWasUNactivated();
+            for (QString linkId : addedLinkIds)
+            {
+                qDebug() << "Remove added link" << linkId << "while the mapping was disconnected";
+
+                // Get the view model of link which corresponds to a mapping element
+                LinkVM* link = getLinkInMappingFromId(linkId);
+                if (link != nullptr)
+                {
+                    // Delete this link (between two agents) to cancel the add
+                    _deleteLinkBetweenTwoAgents(link);
+                }
+            }
+
+            agentInMapping->cancelAllAddedLinks_WhileMappingWasUNactivated();
+        }
     }
 
-    for (QString linkId : _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.keys())
+    /*for (QString linkId : _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.keys())
     {
         qDebug() << "Add removed link" << linkId << "while the mapping was disconnected";
 
@@ -601,11 +647,31 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
                 _linkAgentOnInputFromMappingElement(inputAgent, mappingElement);
             }
         }
+    }*/
+    for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
+    {
+        if ((agentInMapping != nullptr) && agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
+        {
+            QList<MappingElementVM*> removedMappingElements = agentInMapping->getAllRemovedMappingElements_WhileMappingWasUNactivated();
+            for (MappingElementVM* mappingElement : removedMappingElements)
+            {
+                if (mappingElement != nullptr)
+                {
+                    qDebug() << "Add removed link" << mappingElement->name() << "while the mapping was disconnected";
+
+                    // Link the agent (in the global mapping) on its input from the mapping element (add a missing link TO the agent)
+                    _linkAgentOnInputFromMappingElement(agentInMapping, mappingElement);
+                }
+            }
+
+            agentInMapping->cancelAllRemovedLinks_WhileMappingWasUNactivated();
+        }
     }
 
+
     // Clear modifications made while the mapping was UN-activated
-    _idsOfAddedLinks_WhileMappingWasUNactivated.clear();
-    _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.clear();
+    //_idsOfAddedLinks_WhileMappingWasUNactivated.clear();
+    //_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.clear();
 
 
     // Update the global mapping with agents ON and their links
@@ -627,8 +693,21 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
             qDebug() << "Mapping Activated in mode CONTROL";
 
             // Clear modifications made while the mapping was UN-activated
-            _idsOfAddedLinks_WhileMappingWasUNactivated.clear();
-            _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.clear();
+            //_idsOfAddedLinks_WhileMappingWasUNactivated.clear();
+            //_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.clear();
+
+            for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
+            {
+                if (agentInMapping != nullptr)
+                {
+                    if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated()) {
+                        agentInMapping->cancelAllAddedLinks_WhileMappingWasUNactivated();
+                    }
+                    if (agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated()) {
+                        agentInMapping->cancelAllRemovedLinks_WhileMappingWasUNactivated();
+                    }
+                }
+            }
 
 
             // Apply all temporary mappings
@@ -665,15 +744,24 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
         {
             qDebug() << "Mapping Activated in mode OBSERVE";
 
-            // There were modifications in the mapping while the mapping was UN-activated
-            if (!_idsOfAddedLinks_WhileMappingWasUNactivated.isEmpty() || !_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.isEmpty())
+            bool isAddedOrRemovedLink_WhileMappingWasUNactivated = false;
+            for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
             {
-                qDebug() << "There were modifications in the mapping while the mapping was UN-activated. Force to CONTROL ?\n"
-                         << _idsOfAddedLinks_WhileMappingWasUNactivated << "to ADD\n"
-                         << _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.keys() << "to REMOVE";
+                if ((agentInMapping != nullptr)
+                        && (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated()) )
+                {
+                    isAddedOrRemovedLink_WhileMappingWasUNactivated = true;
+                    break;
+                }
+            }
+
+            // There have been changes in the mapping while the mapping was UN-activated
+            if (isAddedOrRemovedLink_WhileMappingWasUNactivated)
+            {
+                qDebug() << "There have been changes in the mapping while the mapping was UN-activated. Force to CONTROL ?";
 
                 // The mapping has been modified but will be lost if the user stay in mode OBSERVE
-                Q_EMIT modificationsOnLinksWhileMappingUnactivated();
+                Q_EMIT changesOnLinksWhileMappingUnactivated();
             }
             else
             {

@@ -36,8 +36,9 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     _isReduced(false),
     _isLockedReduced(false),
     _reducedLinkInputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
-    _reducedLinkOutputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED)
-    //_temporaryMapping(nullptr)
+    _reducedLinkOutputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
+    _hadLinksAdded_WhileMappingWasUNactivated(false),
+    _hadLinksRemoved_WhileMappingWasUNactivated(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -205,6 +206,87 @@ LinkOutputVM* AgentInMappingVM::getLinkOutputFromId(QString outputId)
     }
 }*/
 
+void AgentInMappingVM::addLink_WhileMappingWasUNactivated(QString linkId, QString inputId, QString outputAgentName, QString outputId)
+{
+    qDebug() << "addLink_WhileMappingWasUNactivated" << linkId;
+
+    if (!_hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.contains(linkId))
+    {
+        // Create a model of mapping element with agent names and with input/output Ids (vs input/output Names) !!!
+        ElementMappingM* mappingElement = new ElementMappingM(_name, inputId, outputAgentName, outputId);
+
+        _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.insert(linkId, mappingElement);
+
+        sethadLinksAdded_WhileMappingWasUNactivated(true);
+    }
+}
+
+void AgentInMappingVM::cancelAddLink_WhileMappingWasUNactivated(QString linkId)
+{
+    qDebug() << "cancelAddLink_WhileMappingWasUNactivated" << linkId;
+
+    ElementMappingM* mappingElement = getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(linkId);
+    if (mappingElement != nullptr)
+    {
+        _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.remove(linkId);
+
+        // Free memory
+        delete mappingElement;
+
+        if (_hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.isEmpty()) {
+            sethadLinksAdded_WhileMappingWasUNactivated(false);
+        }
+    }
+}
+
+void AgentInMappingVM::cancelAllAddedLinks_WhileMappingWasUNactivated()
+{
+    qDebug() << "cancelAllAddedLinks_WhileMappingWasUNactivated";
+
+    QList<ElementMappingM*> addedMappingElements = getAllAddedMappingElements_WhileMappingWasUNactivated();
+
+    _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.clear();
+    sethadLinksAdded_WhileMappingWasUNactivated(false);
+
+    // Free memory
+    qDeleteAll(addedMappingElements);
+}
+
+
+void AgentInMappingVM::removeLink_WhileMappingWasUNactivated(QString linkId, MappingElementVM* mappingElement)
+{
+    qDebug() << "removeLink_WhileMappingWasUNactivated" << linkId;
+
+    if ((mappingElement != nullptr) && !_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
+    {
+        _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.insert(linkId, mappingElement);
+
+        sethadLinksRemoved_WhileMappingWasUNactivated(true);
+    }
+}
+
+void AgentInMappingVM::cancelRemoveLink_WhileMappingWasUNactivated(QString linkId)
+{
+    qDebug() << "cancelRemoveLink_WhileMappingWasUNactivated" << linkId;
+
+    if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
+    {
+        _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.remove(linkId);
+
+        if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.isEmpty()) {
+            sethadLinksRemoved_WhileMappingWasUNactivated(false);
+        }
+    }
+}
+
+void AgentInMappingVM::cancelAllRemovedLinks_WhileMappingWasUNactivated()
+{
+    qDebug() << "cancelAllRemovedLinks_WhileMappingWasUNactivated";
+
+    _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.clear();
+    sethadLinksRemoved_WhileMappingWasUNactivated(false);
+}
+
 
 /**
  * @brief FIXME REMOVE Remove a temporary mapping element
@@ -234,7 +316,22 @@ LinkOutputVM* AgentInMappingVM::getLinkOutputFromId(QString outputId)
  * @param linkId
  * @return
  */
-MappingElementVM* AgentInMappingVM::getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId)
+/*MappingElementVM* AgentInMappingVM::getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId)
+{
+    if (_hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.contains(linkId)) {
+        return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.value(linkId);
+    }
+    else {
+        return nullptr;
+    }
+}*/
+
+/**
+ * @brief Get the model of added mapping element (while the mapping was UN-activated) from a link id
+ * @param linkId
+ * @return
+ */
+ElementMappingM* AgentInMappingVM::getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId)
 {
     if (_hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.contains(linkId)) {
         return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.value(linkId);
@@ -258,6 +355,27 @@ MappingElementVM* AgentInMappingVM::getRemovedMappingElementFromLinkId_WhileMapp
     else {
         return nullptr;
     }
+}
+
+
+QList<QString> AgentInMappingVM::getAllAddedLinkIds_WhileMappingWasUNactivated()
+{
+    return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.keys();
+}
+
+QList<ElementMappingM*> AgentInMappingVM::getAllAddedMappingElements_WhileMappingWasUNactivated()
+{
+    return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.values();
+}
+
+QList<QString> AgentInMappingVM::getAllRemovedLinkIds_WhileMappingWasUNactivated()
+{
+    return _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.keys();
+}
+
+QList<MappingElementVM*> AgentInMappingVM::getAllRemovedMappingElements_WhileMappingWasUNactivated()
+{
+    return _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.values();
 }
 
 

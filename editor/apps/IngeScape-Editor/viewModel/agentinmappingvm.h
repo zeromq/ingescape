@@ -66,10 +66,18 @@ class AgentInMappingVM : public QObject
     //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
 
     // List of (view models of) added mapping elements while the mapping was UN-activated
-    I2_QOBJECT_LISTMODEL(MappingElementVM, addedLinks_WhileMappingWasUNactivated)
+    //I2_QOBJECT_LISTMODEL(MappingElementVM, addedLinks_WhileMappingWasUNactivated)
 
     // List of (view models of) removed mapping elements while the mapping was UN-activated
-    I2_QOBJECT_LISTMODEL(MappingElementVM, removedLinks_WhileMappingWasUNactivated)
+    //I2_QOBJECT_LISTMODEL(MappingElementVM, removedLinks_WhileMappingWasUNactivated)
+
+    // Flag indicating if our agent had links added while the mapping was UN-activated
+    //I2_CPP_NOSIGNAL_PROPERTY(bool, hadLinksAdded_WhileMappingWasUNactivated)
+    I2_QML_PROPERTY_READONLY(bool, hadLinksAdded_WhileMappingWasUNactivated)
+
+    // Flag indicating if our agent had links removed while the mapping was UN-activated
+    //I2_CPP_NOSIGNAL_PROPERTY(bool, hadLinksRemoved_WhileMappingWasUNactivated)
+    I2_QML_PROPERTY_READONLY(bool, hadLinksRemoved_WhileMappingWasUNactivated)
 
 
 public:
@@ -140,13 +148,30 @@ public:
      */
     //void removeTemporaryMappingElement(QString linkId);
 
+    void addLink_WhileMappingWasUNactivated(QString linkId, QString inputId, QString outputAgentName, QString outputId);
+
+    void cancelAddLink_WhileMappingWasUNactivated(QString linkId);
+    void cancelAllAddedLinks_WhileMappingWasUNactivated();
+
+    void removeLink_WhileMappingWasUNactivated(QString linkId, MappingElementVM* mappingElement);
+
+    void cancelRemoveLink_WhileMappingWasUNactivated(QString linkId);
+    void cancelAllRemovedLinks_WhileMappingWasUNactivated();
+
 
     /**
      * @brief Get the view model of added mapping element (while the mapping was UN-activated) from a link id
      * @param linkId
      * @return
      */
-    MappingElementVM* getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId);
+    //MappingElementVM* getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId);
+
+    /**
+     * @brief Get the model of added mapping element (while the mapping was UN-activated) from a link id
+     * @param linkId
+     * @return
+     */
+    ElementMappingM* getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId);
 
 
     /**
@@ -156,6 +181,12 @@ public:
      */
     MappingElementVM* getRemovedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId);
 
+
+    QList<QString> getAllAddedLinkIds_WhileMappingWasUNactivated();
+    QList<ElementMappingM*> getAllAddedMappingElements_WhileMappingWasUNactivated();
+
+    QList<QString> getAllRemovedLinkIds_WhileMappingWasUNactivated();
+    QList<MappingElementVM*> getAllRemovedMappingElements_WhileMappingWasUNactivated();
 
 
 Q_SIGNALS:
@@ -332,10 +363,10 @@ private:
     QHash<QString, LinkOutputVM*> _hashFromIdToLinkOutput;
 
 
-    // Hash table from "(unique) link id" to added link (mapping element VM) while the mapping was UN-activated
-    QHash<QString, MappingElementVM*> _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated;
+    // Hash table from "(unique) link id" to added link (model of mapping element) while the mapping was UN-activated
+    QHash<QString, ElementMappingM*> _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated;
 
-    // Hash table from "(unique) link id" to removed link (mapping element VM) while the mapping was UN-activated
+    // Hash table from "(unique) link id" to removed link (view model of mapping element) while the mapping was UN-activated
     QHash<QString, MappingElementVM*> _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated;
 
 };

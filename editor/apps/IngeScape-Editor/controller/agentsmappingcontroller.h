@@ -181,10 +181,10 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when the user activates the mapping in mode OBSERVE
-     * while he made some modifications on the links betwwen agents.
-     * These modifications will be lost if the user stay in mode OBSERVE
+     * while he made some changes on the links betwwen agents.
+     * These changes will be lost if the user stay in mode OBSERVE
      */
-    void modificationsOnLinksWhileMappingUnactivated();
+    void changesOnLinksWhileMappingUnactivated();
 
 
     /**
@@ -485,10 +485,10 @@ private:
     QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingMappingElements;
 
     // List of ids of added links while the mapping was UN-activated
-    QStringList _idsOfAddedLinks_WhileMappingWasUNactivated;
+    //QStringList _idsOfAddedLinks_WhileMappingWasUNactivated;
 
     // Hash table from "link id" to removed link (mapping element) while the mapping was UN-activated
-    QHash<QString, MappingElementVM*> _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated;
+    //QHash<QString, MappingElementVM*> _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated;
 
     // Hash table from "(unique) link id" to the added link (for which we are waiting a reply to the request "add")
     QHash<QString, LinkVM*> _hashFromLinkIdToAddedLink_WaitingReply;

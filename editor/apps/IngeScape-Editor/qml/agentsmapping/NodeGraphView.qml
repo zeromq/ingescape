@@ -277,8 +277,8 @@ Item {
             rootItem.setZoomLevel(1);
         }
 
-        onModificationsOnLinksWhileMappingUnactivated: {
-            //console.log("QML: on Modifications on Links While Mapping Unactivated");
+        onChangesOnLinksWhileMappingUnactivated: {
+            //console.log("QML: on Changes on Links While Mapping Unactivated");
 
             // Open the popup about mapping modifications
             mappingModificationsPopup.open();
