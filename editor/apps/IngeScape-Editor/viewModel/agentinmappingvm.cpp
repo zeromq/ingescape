@@ -203,24 +203,6 @@ LinkOutputVM* AgentInMappingVM::getLinkOutputFromId(QString outputId)
         _temporaryMappingElements.append(temporaryMappingElement);
         _hashFromLinkIdToTemporaryMappingElement.insert(linkId, temporaryMappingElement);
     }
-}
-void AgentInMappingVM::waitingReplyForAddedMappingElement(QString linkId, ElementMappingM* mappingElement)
-{
-    if (mappingElement != nullptr)
-    {
-        // Add to the list and to the hash table
-        _addedMappingElements_WaitingReply.append(mappingElement);
-        _hashFromLinkIdToAddedMappingElement_WaitingReply.insert(linkId, mappingElement);
-    }
-}
-void AgentInMappingVM::waitingReplyForRemovedMappingElement(QString linkId, ElementMappingM* mappingElement)
-{
-    if (mappingElement != nullptr)
-    {
-        // Add to the list and to the hash table
-        _removedMappingElements_WaitingReply.append(mappingElement);
-        _hashFromLinkIdToRemovedMappingElement_WaitingReply.insert(linkId, mappingElement);
-    }
 }*/
 
 
@@ -243,56 +225,6 @@ void AgentInMappingVM::waitingReplyForRemovedMappingElement(QString linkId, Elem
 
         // Free memory
         delete temporaryMappingElement;
-    }
-}
-void AgentInMappingVM::replyReceivedForAddedMappingElement(QString linkId)
-{
-    ElementMappingM* mappingElement = getAddedMappingElementFromLinkId_WaitingReply(linkId);
-    if (mappingElement != nullptr)
-    {
-        // Remove from the list and from the hash table
-        _addedMappingElements_WaitingReply.remove(mappingElement);
-        _hashFromLinkIdToAddedMappingElement_WaitingReply.remove(linkId);
-    }
-}
-void AgentInMappingVM::replyReceivedForRemovedMappingElement(QString linkId)
-{
-    ElementMappingM* mappingElement = getRemovedMappingElementFromLinkId_WaitingReply(linkId);
-    if (mappingElement != nullptr)
-    {
-        // Remove from the list and from the hash table
-        _removedMappingElements_WaitingReply.remove(mappingElement);
-        _hashFromLinkIdToRemovedMappingElement_WaitingReply.remove(linkId);
-    }
-}*/
-
-
-/**
- * @brief Get the model of added mapping element (for which we are waiting a reply to the request "add") from a link id
- * @param linkId
- * @return
- */
-/*ElementMappingM* AgentInMappingVM::getAddedMappingElementFromLinkId_WaitingReply(QString linkId)
-{
-    if (_hashFromLinkIdToAddedMappingElement_WaitingReply.contains(linkId)) {
-        return _hashFromLinkIdToAddedMappingElement_WaitingReply(linkId);
-    }
-    else {
-        return nullptr;
-    }
-}*/
-/**
- * @brief Get the model of removed mapping element (for which we are waiting a reply to the request "remove") from a link id
- * @param linkId
- * @return
- */
-/*ElementMappingM* AgentInMappingVM::getRemovedMappingElementFromLinkId_WaitingReply(QString linkId)
-{
-    if (_hashFromLinkIdToRemovedMappingElement_WaitingReply.contains(linkId)) {
-        return _hashFromLinkIdToRemovedMappingElement_WaitingReply(linkId);
-    }
-    else {
-        return nullptr;
     }
 }*/
 

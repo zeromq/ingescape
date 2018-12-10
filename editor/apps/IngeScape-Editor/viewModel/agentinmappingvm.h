@@ -65,12 +65,6 @@ class AgentInMappingVM : public QObject
     // Mapping currently edited (temporary until the user activate the mapping)
     //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
 
-    // List of (models of) added mapping elements for which we are waiting a reply (to the request "add")
-    //I2_QOBJECT_LISTMODEL(ElementMappingM, addedMappingElements_WaitingReply)
-
-    // List of (models of) removed mapping elements for which we are waiting a reply (to the request "remove")
-    //I2_QOBJECT_LISTMODEL(ElementMappingM, removedMappingElements_WaitingReply)
-
     // List of (view models of) added mapping elements while the mapping was UN-activated
     I2_QOBJECT_LISTMODEL(MappingElementVM, addedLinks_WhileMappingWasUNactivated)
 
@@ -135,8 +129,6 @@ public:
      * @param outputId
      */
     //void addTemporaryMappingElement(QString linkId, QString inputId, QString outputAgentName, QString outputId);
-    //void waitingReplyForAddedMappingElement(QString linkId, ElementMappingM* mappingElement);
-    //void waitingReplyForRemovedMappingElement(QString linkId, ElementMappingM* mappingElement);
 
 
     /**
@@ -147,24 +139,6 @@ public:
      * @param linkId
      */
     //void removeTemporaryMappingElement(QString linkId);
-    //void replyReceivedForAddedMappingElement(QString linkId);
-    //void replyReceivedForRemovedMappingElement(QString linkId);
-
-
-    /**
-     * @brief Get the model of added mapping element (for which we are waiting a reply to the request "add") from a link id
-     * @param linkId
-     * @return
-     */
-    //ElementMappingM* getAddedMappingElementFromLinkId_WaitingReply(QString linkId);
-
-
-    /**
-     * @brief Get the model of removed mapping element (for which we are waiting a reply to the request "remove") from a link id
-     * @param linkId
-     * @return
-     */
-    //ElementMappingM* getRemovedMappingElementFromLinkId_WaitingReply(QString linkId);
 
 
     /**
@@ -357,12 +331,6 @@ private:
     // Hash table from a (unique) output id to a view model of link output
     QHash<QString, LinkOutputVM*> _hashFromIdToLinkOutput;
 
-
-    // Hash table from "(unique) link id" to added link (mapping element M) for which we are waiting a reply (to the request "add")
-    //QHash<QString, ElementMappingM*> _hashFromLinkIdToAddedMappingElement_WaitingReply;
-
-    // Hash table from "(unique) link id" to removed link (mapping element M) for which we are waiting a reply (to the request "remove")
-    //QHash<QString, ElementMappingM*> _hashFromLinkIdToRemovedMappingElement_WaitingReply;
 
     // Hash table from "(unique) link id" to added link (mapping element VM) while the mapping was UN-activated
     QHash<QString, MappingElementVM*> _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated;
