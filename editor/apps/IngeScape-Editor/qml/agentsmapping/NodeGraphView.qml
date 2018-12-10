@@ -363,8 +363,6 @@ Item {
         }
 
 
-
-
         //* [MSO] FIXME
         //
         // Spawn zone
@@ -377,31 +375,56 @@ Item {
             width: controller.viewWidth * workspace.scale
             height: controller.viewHeight * workspace.scale
 
-            property int borderWidth: 10
+            property int _borderWidth: 10
+            property string _color: "#FF0000"
 
             border {
-                width: borderWidth
-                color: "#FF0000"
+                width: spawnZone._borderWidth
+                color: spawnZone._color
             }
 
             Rectangle {
-                anchors.centerIn: parent
+                id: actualSpawnZone
 
-                width: parent.width * 0.05
-                height: parent.height * 0.05
+                x: parent.width * 0.05
+                y: parent.height * 0.05
+
+                width: parent.width * 0.85
+                height: parent.height * 0.85
+
+                property int _borderWidth: 2
+                property string _color: "#008800"
+
+                border {
+                    width: actualSpawnZone._borderWidth
+                    color: actualSpawnZone._color
+                }
+
+                Text {
+                    anchors {
+                        top: actualSpawnZone.top
+                        topMargin: actualSpawnZone._borderWidth + 5
+                        left: actualSpawnZone.left
+                        leftMargin: actualSpawnZone._borderWidth + 5
+                    }
+
+                    text: "ACTUAL SPAWN ZONE"
+
+                    color: actualSpawnZone._color
+                }
             }
 
             Text {
                 anchors {
                     top: spawnZone.top
-                    topMargin: spawnZone.borderWidth + 5
+                    topMargin: spawnZone._borderWidth + 5
                     left: spawnZone.left
-                    leftMargin: spawnZone.borderWidth + 5
+                    leftMargin: spawnZone._borderWidth + 5
                 }
 
                 text: "SPAWN ZONE"
 
-                color: "#FF0000"
+                color: spawnZone._color
             }
         }
         //*/

@@ -1768,11 +1768,11 @@ QPointF AgentsMappingController::_getRandomPosition(double randomMax)
     double randomY = static_cast<double>(qrand()) / randomMax;
 
     // 5% + (random * 90% of the width)
-    double x = 0.05 * _viewWidth + (0.90 * _viewWidth * randomX) + _xSpawnZoneOffset;
+    double x = 0.05 * _viewWidth + (0.85 * _viewWidth * randomX) + _xSpawnZoneOffset;
 //    double x = 0.05 * _scaledViewWidth + (0.90 * _scaledViewWidth * randomX)/* - _xSpawnZoneOffset*/;
 
     // 5% + (random * 90% of the height)
-    double y = 0.05 * _viewHeight + (0.90 * _viewHeight * randomY) + _ySpawnZoneOffset;
+    double y = 0.05 * _viewHeight + (0.85 * _viewHeight * randomY) + _ySpawnZoneOffset;
 //    double y = 0.05 * _scaledViewHeight + (0.90 * _scaledViewHeight * randomY)/* - _ySpawnZoneOffset*/;
 
 //    qDebug() << QString("View W: %3  H: %4").arg(_viewWidth).arg(_viewHeight);
