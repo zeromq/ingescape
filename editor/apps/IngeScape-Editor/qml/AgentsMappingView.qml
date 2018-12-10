@@ -62,13 +62,11 @@ Item {
 
         onWidthChanged: {
             if (controller) {
-//                console.log(qsTr("Changing width: %1").arg(width))
                 controller.viewWidth = width;
             }
         }
         onHeightChanged: {
             if (controller) {
-//                console.log(qsTr("Changing height: %1").arg(height))
                 controller.viewHeight = height;
             }
         }

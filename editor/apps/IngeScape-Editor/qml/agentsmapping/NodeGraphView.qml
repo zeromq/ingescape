@@ -293,38 +293,6 @@ Item {
         }
     }
 
-    Binding {
-        target: controller
-        property: "scaledViewWidth"
-        value: controller.viewWidth * workspace.scale
-    }
-
-    Binding {
-        target: controller
-        property: "scaledViewHeight"
-        value: controller.viewHeight * workspace.scale
-    }
-
-//    Binding {
-//        target: controller
-//        property: "xSpawnZoneOffset"
-//        value: {
-////            console.log(qsTr("ySpawnZoneOffset: %1").arg(workspace.x + spawnZone.x))
-////            console.log(qsTr("xSpawnZoneOffset: %1").arg(workspace.mapFromItem(rootItem, workspace.x + workspace.width/2 - (workspace.width/2 * workspace.scale), workspace.y + workspace.height/2 - (workspace.height/2 * workspace.scale)).x))
-//            workspace.mapFromItem(rootItem, spawnZone.x, spawnZone.y).x
-//        }
-//    }
-
-//    Binding {
-//        target: controller
-//        property: "ySpawnZoneOffset"
-//        value: {
-////            console.log(qsTr("ySpawnZoneOffset: %1").arg(workspace.y + spawnZone.y))
-////            console.log(qsTr("ySpawnZoneOffset: %1").arg(workspace.mapFromItem(rootItem, workspace.x + workspace.width/2 - (workspace.width/2 * workspace.scale), workspace.y + workspace.height/2 - (workspace.height/2 * workspace.scale)).y))
-//            workspace.mapFromItem(rootItem, spawnZone.x, spawnZone.y).y
-//        }
-//    }
-
 
     //--------------------------------
     //
@@ -363,9 +331,14 @@ Item {
         }
 
 
-        //* [MSO] FIXME
         //
-        // Spawn zone
+        // New agents spawn zone
+        //
+        // Always centered in the viewport.
+        // Used to position the new agents onto the mapping view.
+        // Always invisible but can be make visible for debugging purposes.
+        //
+        // NOTE: These kind of rectangles could be extracted into utility QML items to render specific zones (for debug pruposes)... Just a thought.
         //
         Rectangle {
             id: spawnZone
@@ -375,7 +348,9 @@ Item {
             width: controller.viewWidth * workspace.scale
             height: controller.viewHeight * workspace.scale
 
-            visible: false //TODO [MSO] Invisible and keep it for debug or completely delete it ?
+            // Always invisible because it's only a helper item for positionning new agents onto the mapping view.
+            // May be made visible for debugging needs.
+            visible: false
 
             property int _borderWidth: 10
             property string _color: "#FF0000"
@@ -385,6 +360,8 @@ Item {
                 color: spawnZone._color
             }
 
+            // Actual spawn zone represents the margins insinde the spawning zone into which the agent will actually spawn.
+            // The margins ensures that enough of the agent will be visible once spawn.
             Rectangle {
                 id: actualSpawnZone
 
@@ -429,7 +406,6 @@ Item {
                 color: spawnZone._color
             }
         }
-        //*/
 
 
         //----------------------------------------------------------------
@@ -678,32 +654,25 @@ Item {
                 // Maximum Z-index
                 property int maxZ: 0
 
-                //*
-                // [MSO] FIXME
-                function logPosition() {
-                    console.log(qsTr("Workspace position changed => X: %1\tY: %2").arg(x).arg(y))
-                    console.log(qsTr("New viewport size          => W: %1\tH: %2").arg(width / workspace.scale).arg(height / workspace.scale))
-                    console.log(qsTr("New viewport corners       => BR: %1:%2").arg(x + (width / workspace.scale)).arg(y + (height / workspace.scale)))
-                }
 
-                function updateSpawnZone() {
+                //------------------------------------------------
+                //
+                // Methods and slots
+                //
+                //------------------------------------------------
+                function updateSpawnZoneOffset() {
                     var offset = workspace.mapFromItem(rootItem, spawnZone.x, spawnZone.y)
-//                    console.log(qsTr("Origin: X:%1\tY:%2").arg(spawnZone.x).arg(spawnZone.y))
-//                    console.log(qsTr("Mapped: X:%1\tY:%2").arg(offset.x).arg(offset.y))
                     controller.xSpawnZoneOffset = offset.x
                     controller.ySpawnZoneOffset = offset.y
                 }
 
                 onXChanged: {
-//                    logPosition()
-                    updateSpawnZone()
+                    updateSpawnZoneOffset()
                 }
 
                 onYChanged: {
-//                    logPosition()
-                    updateSpawnZone()
+                    updateSpawnZoneOffset()
                 }
-                //*/
 
 
                 //------------------------------------------------
@@ -761,10 +730,6 @@ Item {
                     }
                 }
 
-                Binding {
-
-                }
-
 
                 //
                 // Nodes
@@ -787,6 +752,8 @@ Item {
                             deleteConfirmationPopup.open();
                         }*/
 
+                        // When the agent is created, the worspace's scale is reset to 100% if it was superior.
+                        // This shows the entire spawn zone, ensuring that the new poped agent is visible.
                         Component.onCompleted: {
                             if (workspace.scale > 1) {
                                 setZoomLevel(1)
