@@ -156,8 +156,17 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
         // AND the input agent is ON
         if ((_modelManager != nullptr) && _modelManager->isMappingActivated() && link->inputAgent()->agentsGroupedByName()->isON())
         {
-            // Update the flag to give a feedback to the user
-            link->setisTemporary(true);
+            if (!_hashFromLinkIdToRemovedLink_WaitingReply.contains(link->uid()))
+            {
+                // Insert in the hash table the "(unique) link id" and the link for which we are waiting a reply to the request "remove"
+                _hashFromLinkIdToRemovedLink_WaitingReply.insert(link->uid(), link);
+
+                // Update the flag to give a feedback to the user
+                link->setisTemporary(true);
+            }
+            else {
+                qWarning() << "The request" << command_UnmapAgents << "has already been sent to remove the link" << link->uid();
+            }
 
             // Emit signal "Command asked to agent about Mapping Input"
             Q_EMIT commandAskedToAgentAboutMappingInput(link->inputAgent()->agentsGroupedByName()->peerIdsList(),
@@ -181,6 +190,9 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
             // Add the corresponding mapping element to the hash
             else {
                 _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.insert(link->uid(), link->mappingElement());
+
+                // FIXME TODO
+                //link->inputAgent()->removedLinks_WhileMappingWasUNactivated()
             }
 
             // Delete the link between two agents
@@ -297,7 +309,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                 // AND the input agent is ON
                 if ((_modelManager != nullptr) && _modelManager->isMappingActivated() && inputAgent->agentsGroupedByName()->isON())
                 {
-                    // Create a new VIRTUAL link between the two agents
+                    // Create a new TEMPORARY link between the two agents
                     link = _createLinkBetweenTwoAgents(linkName,
                                                        outputAgent,
                                                        linkOutput,
@@ -306,8 +318,18 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                                                        nullptr,
                                                        true);
 
+                    // FIXME REPAIR addTemporaryMappingElement
                     // Add a temporary mapping element (will became a real link when the agent will send its mapping update)
-                    inputAgent->addTemporaryMappingElement(link->uid(), linkInput->uid(), outputAgent->name(), linkOutput->uid());
+                    //inputAgent->addTemporaryMappingElement(link->uid(), linkInput->uid(), outputAgent->name(), linkOutput->uid());
+
+                    if ((link != nullptr) && !_hashFromLinkIdToAddedLink_WaitingReply.contains(link->uid()))
+                    {
+                        // Insert in the hash table the "(unique) link id" and the link for which we are waiting a reply to the request "add"
+                        _hashFromLinkIdToAddedLink_WaitingReply.insert(link->uid(), link);
+                    }
+                    else {
+                        qWarning() << "The request" << command_MapAgents << "has already been sent to add the link" << link->uid();
+                    }
 
                     // Emit signal "Command asked to agent about Mapping Input"
                     Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->agentsGroupedByName()->peerIdsList(),
@@ -329,8 +351,9 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                                                        nullptr,
                                                        false);
 
+                    // FIXME REPAIR addTemporaryMappingElement
                     // Add a temporary mapping element (will became a real link when the user will activate the mapping)
-                    inputAgent->addTemporaryMappingElement(link->uid(), linkInput->uid(), outputAgent->name(), linkOutput->uid());
+                    //inputAgent->addTemporaryMappingElement(link->uid(), linkInput->uid(), outputAgent->name(), linkOutput->uid());
 
                     // This link has been removed while the mapping was UN-activated, just cancel the suppression
                     if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
@@ -445,8 +468,9 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
                 // The mapping is NOT activated
                 else
                 {
+                    // FIXME REPAIR temporaryMappingElements
                     // Export the current mapping plus the temporary list of mapping elements
-                    jsonMapping = _jsonHelper->exportAgentTemporaryMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping(), agentInMapping->temporaryMappingElements()->toList());
+                    //jsonMapping = _jsonHelper->exportAgentTemporaryMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping(), agentInMapping->temporaryMappingElements()->toList());
                 }
                 jsonAgent.insert("mapping", jsonMapping);
 
@@ -614,19 +638,20 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
                 {
                     QString jsonOfMapping;
 
-                    if (agentInMapping->temporaryMappingElements()->isEmpty())
-                    {
+                    // FIXME REPAIR temporaryMappingElements
+                    //if (agentInMapping->temporaryMappingElements()->isEmpty())
+                    //{
                         // Get the JSON of the current mapping of the agent
                         jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agentInMapping->agentsGroupedByName()->currentMapping(),
                                                                            QJsonDocument::Compact);
-                    }
+                    /*}
                     else
                     {
                         // Get the JSON of the current mapping of the agent
                         jsonOfMapping = _jsonHelper->getJsonOfAgentTemporaryMapping(agentInMapping->agentsGroupedByName()->currentMapping(),
                                                                                     agentInMapping->temporaryMappingElements()->toList(),
                                                                                     QJsonDocument::Compact);
-                    }
+                    }*/
 
                     QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
@@ -1049,10 +1074,13 @@ void AgentsMappingController::onAgentIsONChanged(bool isON)
                     // CONTROL
                     if (_modelManager->isMappingControlled())
                     {
-                        if (!agentInMapping->temporaryMappingElements()->isEmpty())
+                        // FIXME TODO ? CONTROL
+
+                        // FIXME REPAIR temporaryMappingElements
+                        /*if (!agentInMapping->temporaryMappingElements()->isEmpty())
                         {
-                            // FIXME TODO ? CONTROL
-                        }
+
+                        }*/
                     }
                     // OBSERVE
                     else
@@ -1157,6 +1185,24 @@ void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElemen
                     LinkVM* link = linksWithSameName.at(0);
                     if (link != nullptr)
                     {
+                        // The link was Temporary
+                        if (link->isTemporary())
+                        {
+                            qDebug() << "The link" << link->uid() << "from TEMPORARY to DELETED";
+
+                            // Reset the flag
+                            //link->setisTemporary(false);
+
+                            if (_hashFromLinkIdToRemovedLink_WaitingReply.contains(link->uid()))
+                            {
+                                // Remove from the hash table the "(unique) link id" and the link for which we are waiting a reply to the request "remove"
+                                _hashFromLinkIdToRemovedLink_WaitingReply.remove(link->uid());
+                            }
+                            else {
+                                qCritical() << "The 'Temporary' link" << link->uid() << "was not in the hash table 'Removed Link Waiting Reply'";
+                            }
+                        }
+
                         // Delete the link between two agents
                         _deleteLinkBetweenTwoAgents(link);
                     }
@@ -1647,14 +1693,35 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
 
                     link->setmappingElement(mappingElement);
 
-                    if (link->isTemporary()) {
+                    // The link was Temporary
+                    if (link->isTemporary())
+                    {
+                        qDebug() << "The link" << link->uid() << "from TEMPORARY to REAL";
+
                         // Reset the flag
                         link->setisTemporary(false);
+
+                        if (_hashFromLinkIdToAddedLink_WaitingReply.contains(link->uid()))
+                        {
+                            // Remove from the hash table the "(unique) link id" and the link for which we are waiting a reply to the request "add"
+                            _hashFromLinkIdToAddedLink_WaitingReply.remove(link->uid());
+                        }
+                        else {
+                            qCritical() << "The 'Temporary' link" << link->uid() << "was not in the hash table 'Added Link Waiting Reply'";
+                        }
+                    }
+                    else
+                    {
+                        if (link->inputAgent() != nullptr)
+                        {
+                            // FIXME TODO: WhileMappingWasUNactivated
+                        }
                     }
 
-                    if (link->inputAgent() != nullptr) {
+                    // FIXME REPAIR removeTemporaryMappingElement
+                    /*if (link->inputAgent() != nullptr) {
                         link->inputAgent()->removeTemporaryMappingElement(link->uid());
-                    }
+                    }*/
                 }
                 else {
                     qWarning() << "The link" << link->uid() << "already exist";

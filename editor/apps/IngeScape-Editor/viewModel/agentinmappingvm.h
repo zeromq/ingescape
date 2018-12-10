@@ -60,12 +60,22 @@ class AgentInMappingVM : public QObject
     // Group of value type of the reduced link outputs of our agent (= brin)
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedLinkOutputsValueTypeGroup)
 
+
     // FIXME TO REMOVE ?
     // Mapping currently edited (temporary until the user activate the mapping)
     //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
 
-    // List of TEMPORARY mapping elements of our agent
-    I2_QOBJECT_LISTMODEL(ElementMappingM, temporaryMappingElements)
+    // List of (models of) added mapping elements for which we are waiting a reply (to the request "add")
+    //I2_QOBJECT_LISTMODEL(ElementMappingM, addedMappingElements_WaitingReply)
+
+    // List of (models of) removed mapping elements for which we are waiting a reply (to the request "remove")
+    //I2_QOBJECT_LISTMODEL(ElementMappingM, removedMappingElements_WaitingReply)
+
+    // List of (view models of) added mapping elements while the mapping was UN-activated
+    I2_QOBJECT_LISTMODEL(MappingElementVM, addedLinks_WhileMappingWasUNactivated)
+
+    // List of (view models of) removed mapping elements while the mapping was UN-activated
+    I2_QOBJECT_LISTMODEL(MappingElementVM, removedLinks_WhileMappingWasUNactivated)
 
 
 public:
@@ -115,7 +125,7 @@ public:
 
 
     /**
-     * @brief Add a temporary mapping element
+     * @brief FIXME REMOVE Add a temporary mapping element
      * This temporary mapping element will become a real link:
      * - when the user will activate the mapping
      * - or when our agent will evolve from OFF to ON
@@ -124,17 +134,54 @@ public:
      * @param outputAgentName
      * @param outputId
      */
-    void addTemporaryMappingElement(QString linkId, QString inputId, QString outputAgentName, QString outputId);
+    //void addTemporaryMappingElement(QString linkId, QString inputId, QString outputAgentName, QString outputId);
+    //void waitingReplyForAddedMappingElement(QString linkId, ElementMappingM* mappingElement);
+    //void waitingReplyForRemovedMappingElement(QString linkId, ElementMappingM* mappingElement);
 
 
     /**
-     * @brief Remove a temporary mapping element
+     * @brief FIXME REMOVE Remove a temporary mapping element
      * This temporary link mapping element became a real link:
      * - when the user activated the mapping
      * - or when our agent evolved from OFF to ON
      * @param linkId
      */
-    void removeTemporaryMappingElement(QString linkId);
+    //void removeTemporaryMappingElement(QString linkId);
+    //void replyReceivedForAddedMappingElement(QString linkId);
+    //void replyReceivedForRemovedMappingElement(QString linkId);
+
+
+    /**
+     * @brief Get the model of added mapping element (for which we are waiting a reply to the request "add") from a link id
+     * @param linkId
+     * @return
+     */
+    //ElementMappingM* getAddedMappingElementFromLinkId_WaitingReply(QString linkId);
+
+
+    /**
+     * @brief Get the model of removed mapping element (for which we are waiting a reply to the request "remove") from a link id
+     * @param linkId
+     * @return
+     */
+    //ElementMappingM* getRemovedMappingElementFromLinkId_WaitingReply(QString linkId);
+
+
+    /**
+     * @brief Get the view model of added mapping element (while the mapping was UN-activated) from a link id
+     * @param linkId
+     * @return
+     */
+    MappingElementVM* getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId);
+
+
+    /**
+     * @brief Get the view model of removed mapping element (while the mapping was UN-activated) from a link id
+     * @param linkId
+     * @return
+     */
+    MappingElementVM* getRemovedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId);
+
 
 
 Q_SIGNALS:
@@ -289,14 +336,6 @@ private:
 
 
     /**
-     * @brief Get the temporary mapping element from a link id
-     * @param linkId
-     * @return
-     */
-    ElementMappingM* _getTemporaryMappingElementFromLinkId(QString linkId);
-
-
-    /**
      * @brief Check the maximum number of Inputs/Outputs
      */
     void _checkMaxNumberOfIO();
@@ -318,8 +357,18 @@ private:
     // Hash table from a (unique) output id to a view model of link output
     QHash<QString, LinkOutputVM*> _hashFromIdToLinkOutput;
 
-    // Hash table from a (unique) link id to a (model of) temporary mapping element
-    QHash<QString, ElementMappingM*> _hashFromLinkIdToTemporaryMappingElement;
+
+    // Hash table from "(unique) link id" to added link (mapping element M) for which we are waiting a reply (to the request "add")
+    //QHash<QString, ElementMappingM*> _hashFromLinkIdToAddedMappingElement_WaitingReply;
+
+    // Hash table from "(unique) link id" to removed link (mapping element M) for which we are waiting a reply (to the request "remove")
+    //QHash<QString, ElementMappingM*> _hashFromLinkIdToRemovedMappingElement_WaitingReply;
+
+    // Hash table from "(unique) link id" to added link (mapping element VM) while the mapping was UN-activated
+    QHash<QString, MappingElementVM*> _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated;
+
+    // Hash table from "(unique) link id" to removed link (mapping element VM) while the mapping was UN-activated
+    QHash<QString, MappingElementVM*> _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated;
 
 };
 

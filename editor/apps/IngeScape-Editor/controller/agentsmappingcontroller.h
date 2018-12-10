@@ -490,6 +490,12 @@ private:
     // Hash table from "link id" to removed link (mapping element) while the mapping was UN-activated
     QHash<QString, MappingElementVM*> _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated;
 
+    // Hash table from "(unique) link id" to the added link (for which we are waiting a reply to the request "add")
+    QHash<QString, LinkVM*> _hashFromLinkIdToAddedLink_WaitingReply;
+
+    // Hash table from "(unique) link id" to the removed link (for which we are waiting a reply to the request "remove")
+    QHash<QString, LinkVM*> _hashFromLinkIdToRemovedLink_WaitingReply;
+
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)

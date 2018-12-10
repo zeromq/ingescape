@@ -106,16 +106,17 @@ AgentInMappingVM::~AgentInMappingVM()
         setagentsGroupedByName(nullptr);
     }
 
+
+    // FIXME REPAIR
     /*if (_temporaryMapping != nullptr)
     {
         AgentMappingM* temp = _temporaryMapping;
         settemporaryMapping(nullptr);
         delete temp;
     }*/
-
     // Delete all temporary mapping elements
-    _hashFromLinkIdToTemporaryMappingElement.clear();
-    _temporaryMappingElements.deleteAllItems();
+    //_hashFromLinkIdToTemporaryMappingElement.clear();
+    //_temporaryMappingElements.deleteAllItems();
 }
 
 
@@ -180,7 +181,7 @@ LinkOutputVM* AgentInMappingVM::getLinkOutputFromId(QString outputId)
 
 
 /**
- * @brief Add a temporary mapping element
+ * @brief FIXME REMOVE Add a temporary mapping element
  * This temporary mapping element will become a real link:
  * - when the user will activate the mapping
  * - or when our agent will evolve from OFF to ON
@@ -189,7 +190,7 @@ LinkOutputVM* AgentInMappingVM::getLinkOutputFromId(QString outputId)
  * @param outputAgentName
  * @param outputId
  */
-void AgentInMappingVM::addTemporaryMappingElement(QString linkId, QString inputId, QString outputAgentName, QString outputId)
+/*void AgentInMappingVM::addTemporaryMappingElement(QString linkId, QString inputId, QString outputAgentName, QString outputId)
 {
     // Check that there is not already the same mapping element
     ElementMappingM* temporaryMappingElement = _getTemporaryMappingElementFromLinkId(linkId);
@@ -203,16 +204,34 @@ void AgentInMappingVM::addTemporaryMappingElement(QString linkId, QString inputI
         _hashFromLinkIdToTemporaryMappingElement.insert(linkId, temporaryMappingElement);
     }
 }
+void AgentInMappingVM::waitingReplyForAddedMappingElement(QString linkId, ElementMappingM* mappingElement)
+{
+    if (mappingElement != nullptr)
+    {
+        // Add to the list and to the hash table
+        _addedMappingElements_WaitingReply.append(mappingElement);
+        _hashFromLinkIdToAddedMappingElement_WaitingReply.insert(linkId, mappingElement);
+    }
+}
+void AgentInMappingVM::waitingReplyForRemovedMappingElement(QString linkId, ElementMappingM* mappingElement)
+{
+    if (mappingElement != nullptr)
+    {
+        // Add to the list and to the hash table
+        _removedMappingElements_WaitingReply.append(mappingElement);
+        _hashFromLinkIdToRemovedMappingElement_WaitingReply.insert(linkId, mappingElement);
+    }
+}*/
 
 
 /**
- * @brief Remove a temporary mapping element
+ * @brief FIXME REMOVE Remove a temporary mapping element
  * This temporary link mapping element became a real link:
  * - when the user activated the mapping
  * - or when our agent evolved from OFF to ON
  * @param linkId
  */
-void AgentInMappingVM::removeTemporaryMappingElement(QString linkId)
+/*void AgentInMappingVM::removeTemporaryMappingElement(QString linkId)
 {
     // Get the temporary mapping element from the link id
     ElementMappingM* temporaryMappingElement = _getTemporaryMappingElementFromLinkId(linkId);
@@ -224,6 +243,88 @@ void AgentInMappingVM::removeTemporaryMappingElement(QString linkId)
 
         // Free memory
         delete temporaryMappingElement;
+    }
+}
+void AgentInMappingVM::replyReceivedForAddedMappingElement(QString linkId)
+{
+    ElementMappingM* mappingElement = getAddedMappingElementFromLinkId_WaitingReply(linkId);
+    if (mappingElement != nullptr)
+    {
+        // Remove from the list and from the hash table
+        _addedMappingElements_WaitingReply.remove(mappingElement);
+        _hashFromLinkIdToAddedMappingElement_WaitingReply.remove(linkId);
+    }
+}
+void AgentInMappingVM::replyReceivedForRemovedMappingElement(QString linkId)
+{
+    ElementMappingM* mappingElement = getRemovedMappingElementFromLinkId_WaitingReply(linkId);
+    if (mappingElement != nullptr)
+    {
+        // Remove from the list and from the hash table
+        _removedMappingElements_WaitingReply.remove(mappingElement);
+        _hashFromLinkIdToRemovedMappingElement_WaitingReply.remove(linkId);
+    }
+}*/
+
+
+/**
+ * @brief Get the model of added mapping element (for which we are waiting a reply to the request "add") from a link id
+ * @param linkId
+ * @return
+ */
+/*ElementMappingM* AgentInMappingVM::getAddedMappingElementFromLinkId_WaitingReply(QString linkId)
+{
+    if (_hashFromLinkIdToAddedMappingElement_WaitingReply.contains(linkId)) {
+        return _hashFromLinkIdToAddedMappingElement_WaitingReply(linkId);
+    }
+    else {
+        return nullptr;
+    }
+}*/
+/**
+ * @brief Get the model of removed mapping element (for which we are waiting a reply to the request "remove") from a link id
+ * @param linkId
+ * @return
+ */
+/*ElementMappingM* AgentInMappingVM::getRemovedMappingElementFromLinkId_WaitingReply(QString linkId)
+{
+    if (_hashFromLinkIdToRemovedMappingElement_WaitingReply.contains(linkId)) {
+        return _hashFromLinkIdToRemovedMappingElement_WaitingReply(linkId);
+    }
+    else {
+        return nullptr;
+    }
+}*/
+
+
+/**
+ * @brief Get the view model of added mapping element (while the mapping was UN-activated) from a link id
+ * @param linkId
+ * @return
+ */
+MappingElementVM* AgentInMappingVM::getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId)
+{
+    if (_hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.contains(linkId)) {
+        return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.value(linkId);
+    }
+    else {
+        return nullptr;
+    }
+}
+
+
+/**
+ * @brief Get the view model of removed mapping element (while the mapping was UN-activated) from a link id
+ * @param linkId
+ * @return
+ */
+MappingElementVM* AgentInMappingVM::getRemovedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId)
+{
+    if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId)) {
+        return _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.value(linkId);
+    }
+    else {
+        return nullptr;
     }
 }
 
@@ -1344,22 +1445,6 @@ void AgentInMappingVM::_updateReducedLinkOutputsValueTypeGroup()
         }
     }
     setreducedLinkOutputsValueTypeGroup(globalReducedLinkOutputsValueTypeGroup);
-}
-
-
-/**
- * @brief Get the temporary mapping element from a link id
- * @param linkId
- * @return
- */
-ElementMappingM* AgentInMappingVM::_getTemporaryMappingElementFromLinkId(QString linkId)
-{
-    if (_hashFromLinkIdToTemporaryMappingElement.contains(linkId)) {
-        return _hashFromLinkIdToTemporaryMappingElement.value(linkId);
-    }
-    else {
-        return nullptr;
-    }
 }
 
 
