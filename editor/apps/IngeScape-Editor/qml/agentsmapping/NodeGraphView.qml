@@ -657,25 +657,25 @@ Item {
                 // [MSO] FIXME
                 function logPosition() {
                     console.log(qsTr("Workspace position changed => X: %1\tY: %2").arg(x).arg(y))
-//                    console.log(qsTr("New viewport size          => W: %1\tH: %2").arg(width / workspace.scale).arg(height / workspace.scale))
-//                    console.log(qsTr("New viewport corners       => BR: %1:%2").arg(x + (width / workspace.scale)).arg(y + (height / workspace.scale)))
+                    console.log(qsTr("New viewport size          => W: %1\tH: %2").arg(width / workspace.scale).arg(height / workspace.scale))
+                    console.log(qsTr("New viewport corners       => BR: %1:%2").arg(x + (width / workspace.scale)).arg(y + (height / workspace.scale)))
                 }
 
                 function updateSpawnZone() {
                     var offset = workspace.mapFromItem(rootItem, spawnZone.x, spawnZone.y)
-                    console.log(qsTr("Origin: X:%1\tY:%2").arg(spawnZone.x).arg(spawnZone.y))
-                    console.log(qsTr("Mapped: X:%1\tY:%2").arg(offset.x).arg(offset.y))
+//                    console.log(qsTr("Origin: X:%1\tY:%2").arg(spawnZone.x).arg(spawnZone.y))
+//                    console.log(qsTr("Mapped: X:%1\tY:%2").arg(offset.x).arg(offset.y))
                     controller.xSpawnZoneOffset = offset.x
                     controller.ySpawnZoneOffset = offset.y
                 }
 
                 onXChanged: {
-                    logPosition()
+//                    logPosition()
                     updateSpawnZone()
                 }
 
                 onYChanged: {
-                    logPosition()
+//                    logPosition()
                     updateSpawnZone()
                 }
                 //*/
@@ -736,6 +736,10 @@ Item {
                     }
                 }
 
+                Binding {
+
+                }
+
 
                 //
                 // Nodes
@@ -757,6 +761,12 @@ Item {
                             // Open the popup
                             deleteConfirmationPopup.open();
                         }*/
+
+                        Component.onCompleted: {
+                            if (workspace.scale > 1) {
+                                setZoomLevel(1)
+                            }
+                        }
                     }
                 }
             }

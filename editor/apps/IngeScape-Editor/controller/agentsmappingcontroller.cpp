@@ -48,8 +48,8 @@ AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelMan
 
     //*
     // [MSO] FIXME
-    connect(this, &AgentsMappingController::scaledViewWidthChanged, this, [=](){ qDebug() << "_scaledViewWidth changed: W: " << _viewWidth << "\tH: " << _viewHeight;});
-    connect(this, &AgentsMappingController::xSpawnZoneOffset, this, [=](){ qDebug() << "spawnZone changed: X: " << _xSpawnZoneOffset << "\tY: " << _ySpawnZoneOffset;});
+//    connect(this, &AgentsMappingController::scaledViewWidthChanged, this, [=](){ qDebug() << "_scaledViewWidth changed: W: " << _viewWidth << "\tH: " << _viewHeight;});
+//    connect(this, &AgentsMappingController::xSpawnZoneOffset, this, [=](){ qDebug() << "spawnZone changed: X: " << _xSpawnZoneOffset << "\tY: " << _ySpawnZoneOffset;});
     //*/
 
 }
