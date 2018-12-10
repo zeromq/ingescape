@@ -375,6 +375,8 @@ Item {
             width: controller.viewWidth * workspace.scale
             height: controller.viewHeight * workspace.scale
 
+            visible: false //TODO [MSO] Invisible and keep it for debug or completely delete it ?
+
             property int _borderWidth: 10
             property string _color: "#FF0000"
 
