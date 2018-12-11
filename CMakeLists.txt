@@ -20,60 +20,26 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 SET(CMAKE_C_FLAGS_RELEASE "-O3")
 # Will be used to add flags to pkg-config useful when apps want to statically link
 set(pkg_config_libs_private "")
+# Add path to custom macro
+set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/builds/cmake/modules")
+set(INGESCAPE_CMAKE_FINDERS_DIR "${SOURCE_DIR}/builds/cmake/dependencies")
+list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR})
+list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_FINDERS_DIR})
+include(IngescapeHelper)
 
 ########################################################################
 # options
 ########################################################################
-# If build in git directory, debug build will be launch
+# Default build mode is debug
 if (NOT CMAKE_BUILD_TYPE)
-    if (EXISTS "${SOURCE_DIR}/.git")
-        set (CMAKE_BUILD_TYPE Debug)
-    else ()
-# http://xit0.org/2013/04/cmake-use-git-branch-and-commit-details-in-project/
-# http://stackoverflow.com/questions/6797395/cmake-execute-process-always-fails-with-no-such-file-or-directory-when-i-cal
-        execute_process(
-            COMMAND git rev-parse --show-toplevel
-            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            RESULT_VARIABLE git_result
-            OUTPUT_VARIABLE git_root
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-        message(STATUS "git workspace root [${git_result}]: ${git_root}")
-        if ( "${git_result}" STREQUAL "0" )
-            set (CMAKE_BUILD_TYPE Debug)
-        else ()
-            set (CMAKE_BUILD_TYPE Release)
-        endif ()
-    endif ()
+    set (CMAKE_BUILD_TYPE Debug)
 endif ()
+
+add_definitions(-DINGESCAPE=1)
 
 ########################################################################
 # plateform specific
 ########################################################################
-#The MSVC C compiler is too out of date,
-#so the sources have to be compiled as c++
-if (MSVC)
-    enable_language(CXX)
-    file(GLOB sources "${SOURCE_DIR}/src/*.c")
-    set_source_files_properties(
-        ${sources}
-        PROPERTIES LANGUAGE CXX
-    )
-    set(MORE_LIBRARIES ws2_32)
-endif()
-# required libraries for mingw
-if (MINGW)
-    set(MORE_LIBRARIES -lws2_32)
-endif()
-
-# required libraries for cygwin
-if (CYGWIN)
-    set(MORE_LIBRARIES)
-endif()
-
-list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/builds/cmake/dependencies")
-set(OPTIONAL_LIBRARIES)
-
 include(CheckCCompilerFlag)
 foreach(_CCOPT -pedantic -Wall -Wextra -W -Wpointer-arith -Wwrite-strings -Wunused -Wshadow -Winline -Wnested-externs -Wno-long-long -Wfloat-equal -Wno-multichar -Wsign-compare -Wundef -Wno-format-nonliteral -Wendif-labels -Wstrict-prototypes -Wstrict-aliasing=3 -Wcast-align -Wtype-limits -Wold-style-declaration -Wmissing-parameter-type -Wempty-body -Wclobbered -Wignored-qualifiers -Wconversion -Wno-sign-conversion -Wvla -Wdouble-promotion -Wno-system-headers -Wno-pedantic-ms-format)
     # surprisingly, CHECK_C_COMPILER_FLAG needs a new variable to store each new
@@ -85,75 +51,14 @@ foreach(_CCOPT -pedantic -Wall -Wextra -W -Wpointer-arith -Wwrite-strings -Wunus
 endforeach()
 
 ########################################################################
-# LIBSODIUM dependency
+# dependency
 ########################################################################
-find_package(libsodium REQUIRED)
-IF (LIBSODIUM_FOUND)
-    include_directories(${LIBSODIUM_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${LIBSODIUM_LIBRARIES})
-    set(pkg_config_libs_private "${pkg_config_libs_private} -lsodium")
-ELSE (LIBSODIUM_FOUND)
-    message( FATAL_ERROR "libsodium not found." )
-ENDIF (LIBSODIUM_FOUND)
-
-########################################################################
-# LIBZMQ dependency
-########################################################################
-find_package(libzmq REQUIRED)
-IF (LIBZMQ_FOUND)
-    include_directories(${LIBZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
-    set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
-ELSE (LIBZMQ_FOUND)
-    message( FATAL_ERROR "libzmq not found." )
-ENDIF (LIBZMQ_FOUND)
-
-########################################################################
-# CZMQ dependency
-########################################################################
-find_package(czmq REQUIRED)
-IF (CZMQ_FOUND)
-    include_directories(${CZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
-    set(pkg_config_libs_private "${pkg_config_libs_private} -lczmq")
-ELSE (CZMQ_FOUND)
-    message( FATAL_ERROR "czmq not found." )
-ENDIF (CZMQ_FOUND)
-
-########################################################################
-# ZYRE dependency
-########################################################################
-find_package(zyre REQUIRED)
-IF (ZYRE_FOUND)
-    include_directories(${ZYRE_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${ZYRE_LIBRARIES})
-    set(pkg_config_libs_private "${pkg_config_libs_private} -lzyre")
-ELSE (ZYRE_FOUND)
-    message( FATAL_ERROR "zyre not found." )
-ENDIF (ZYRE_FOUND)
-
-########################################################################
-# YAJL dependency
-########################################################################
-find_package(yajl REQUIRED)
-IF (YAJL_FOUND)
-    include_directories(${YAJL_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${YAJL_LIBRARIES})
-    set(pkg_config_libs_private "${pkg_config_libs_private} -lyajl")
-ELSE (YAJL_FOUND)
-    message( FATAL_ERROR "yajl not found." )
-ENDIF (YAJL_FOUND)
+add_ingescape_libraries_dependencies(MORE_LIBRARIES pkg_config_libs_private)
 
 ########################################################################
 # version
 ########################################################################
-file(READ ${SOURCE_DIR}/src/admin.c ADMIN_C_CONTENT)
-string(REGEX MATCH "#define INGESCAPE_MAJOR ([0-9]*)" _ ${ADMIN_C_CONTENT})
-set(INGESCAPE_VERSION_MAJOR ${CMAKE_MATCH_1})
-string(REGEX MATCH "#define INGESCAPE_MINOR ([0-9]*)" _ ${ADMIN_C_CONTENT})
-set(INGESCAPE_VERSION_MINOR ${CMAKE_MATCH_1})
-string(REGEX MATCH "#define INGESCAPE_MICRO ([0-9]*)" _ ${ADMIN_C_CONTENT})
-set(INGESCAPE_VERSION_PATCH ${CMAKE_MATCH_1})
+get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR INGESCAPE_VERSION_PATCH)
 
 set(INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
 message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
@@ -191,22 +96,11 @@ install(FILES ${ingescape_headers_to_install} DESTINATION include/ingescape)
 ########################################################################
 # library
 ########################################################################
-add_definitions(-DINGESCAPE=1)
-include_directories("${SOURCE_DIR}/src/include")
-set (ingescape_sources
-    src/admin.c
-    src/bus.c
-    src/definition.c
-    src/mapping.c
-    src/model.c
-    src/network.c
-    src/parser.c
-    src/token.c
-)
 
-IF (WIN32)
-    list(APPEND ingescape_sources dependencies/windows/unix/unixfunctions.c)
-ENDIF (WIN32)
+add_ingescape_include_directory(_INCLUDES_DIRECTORY)
+include_directories(${_INCLUDES_DIRECTORY})
+
+add_ingescape_sources(ingescape_sources)
 
 source_group("Source Files" FILES ${ingescape_sources})
 
@@ -242,9 +136,7 @@ if (INGESCAPE_BUILD_SHARED)
     PREFIX "lib"
   )
 
-  target_link_libraries(ingescape
-    PRIVATE ${MORE_LIBRARIES}
-  )
+  target_link_libraries(ingescape PRIVATE ${MORE_LIBRARIES})
 
   install(TARGETS ingescape
     EXPORT ingescape-targets
@@ -275,9 +167,7 @@ if (INGESCAPE_BUILD_STATIC)
     PREFIX "lib"
   )
 
-  target_link_libraries(ingescape-static
-    PRIVATE ${MORE_LIBRARIES}
-  )
+  target_link_libraries(ingescape-static PRIVATE ${MORE_LIBRARIES})
 
   install(TARGETS ingescape-static
     EXPORT ingescape-targets
