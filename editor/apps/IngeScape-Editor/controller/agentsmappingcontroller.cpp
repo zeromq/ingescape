@@ -154,8 +154,7 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
     {
         qInfo() << "Remove the link between agents" << link->outputAgent()->name() << "and" << link->inputAgent()->name();
 
-        // Mapping is activated
-        // AND the input agent is ON
+        // The global mapping is activated AND the input agent is ON
         if ((_modelManager != nullptr) && _modelManager->isMappingActivated() && link->inputAgent()->agentsGroupedByName()->isON())
         {
             if (!_hashFromLinkIdToRemovedLink_WaitingReply.contains(link->uid()))
@@ -177,8 +176,7 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
                                                         link->outputAgent()->name(),
                                                         link->linkOutput()->name());
         }
-        // Mapping is NOT activated
-        // OR the input agent is OFF
+        // The global mapping is NOT activated OR the input agent is OFF
         else
         {
             ElementMappingM* mappingElement = link->inputAgent()->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid());
@@ -305,8 +303,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
 
                 qInfo() << "QML asked to create the link" << linkId;
 
-                // Mapping is activated
-                // AND the input agent is ON
+                // The global mapping is activated AND the input agent is ON
                 if ((_modelManager != nullptr) && _modelManager->isMappingActivated() && inputAgent->agentsGroupedByName()->isON())
                 {
                     // Create a new TEMPORARY link between the two agents
@@ -334,8 +331,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                                                                 outputAgent->name(),
                                                                 linkOutput->name());
                 }
-                // Mapping is NOT activated
-                // OR the input agent is OFF
+                // The global mapping is NOT activated OR the input agent is OFF
                 else
                 {
                     // Create a new (REAL) link between the two agents
@@ -459,13 +455,13 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
                 // Set the mapping
                 QJsonObject jsonMapping = QJsonObject();
 
-                // The mapping is activated
-                if (_modelManager->isMappingActivated())
+                // The global mapping is activated AND the agent is ON
+                if (_modelManager->isMappingActivated() && agentInMapping->agentsGroupedByName()->isON())
                 {
                     // Export the current mapping
                     jsonMapping = _jsonHelper->exportAgentMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping());
                 }
-                // The mapping is NOT activated
+                // The global mapping is NOT activated OR the agent is OFF
                 else
                 {
                     if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
@@ -588,7 +584,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 
                             if ((linkInput != nullptr) && (linkOutput != nullptr))
                             {
-                                // Simulate a drop
+                                // Simulate a drop of the link
                                 dropLinkBetweenAgents(outputAgent, linkOutput, inputAgent, linkInput);
                             }
                         }
