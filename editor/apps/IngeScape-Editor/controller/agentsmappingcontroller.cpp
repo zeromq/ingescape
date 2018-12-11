@@ -672,7 +672,9 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
             // Apply all current mappings with changes applied while the mapping was UN-activated
             for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
             {
-                if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr) && (agentInMapping->agentsGroupedByName()->currentMapping() != nullptr))
+                // Usefull only for agents ON
+                if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr) && agentInMapping->agentsGroupedByName()->isON()
+                        && (agentInMapping->agentsGroupedByName()->currentMapping() != nullptr))
                 {
                     QString jsonOfMapping;
 
@@ -702,6 +704,7 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
                     // Emit signal "Command asked to agent"
                     Q_EMIT commandAskedToAgent(agentInMapping->agentsGroupedByName()->peerIdsList(), command);
                 }
+                // FIXME TODO: What do we have to do with agents OFF ?
             }
 
             // FIXME Usefull ?
@@ -1243,8 +1246,22 @@ void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElemen
                     {
                         QString outputAgentName = namesList.at(0);
                         //QString outputName = namesList.at(1);
-                        //QString inputAgentName = namesList.at(2);
+                        QString inputAgentName = namesList.at(2);
                         //QString inputName = namesList.at(3);
+
+                        AgentInMappingVM* inputAgent = getAgentInMappingFromName(inputAgentName);
+                        if (inputAgent != nullptr)
+                        {
+                            // Get the list of all names of removed mapping elements while the global mapping was UN-activated
+                            QStringList namesOfRemovedMappingElements = inputAgent->getNamesOfRemovedMappingElements_WhileMappingWasUNactivated();
+                            if (namesOfRemovedMappingElements.contains(linkName))
+                            {
+                                // The link has been removed when the global mapping was UN-activated
+                                // Or when our input agent was OFF
+                                qDebug() << "There is still the corresponding removed Mapping Element" << linkName << "while the Mapping was UN-activated";
+                                inputAgent->mappingElementRemoved_CorrespondingLinkRemovedWhileMappingWasUNactivated(mappingElement);
+                            }
+                        }
 
                         // Remove the "Waiting Mapping Element" on the output agent name
                         _removeWaitingMappingElementOnOutputAgent(outputAgentName, mappingElement);
@@ -1791,7 +1808,7 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
                             if (link->inputAgent()->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid()))
                             {
                                 qDebug() << "There is still the corresponding added Mapping Element" << link->uid() << "while the Mapping was UN-activated";
-                                link->inputAgent()->cancelAddLink_WhileMappingWasUNactivated(link->uid());
+                                link->inputAgent()->mappingElementAdded_CorrespondingLinkAddedWhileMappingWasUNactivated(link->uid());
                             }
                         }
                     }

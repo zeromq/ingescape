@@ -164,6 +164,13 @@ public:
 
 
     /**
+     * @brief A mapping element has just been added and correspond to a link added while the global mapping was UN-activated
+     * @param linkId
+     */
+    void mappingElementAdded_CorrespondingLinkAddedWhileMappingWasUNactivated(QString linkId);
+
+
+    /**
      * @brief Remove a link while the global mapping is UN-activated
      * @param linkId
      * @param mappingElement
@@ -211,6 +218,13 @@ public:
      * @return
      */
     QStringList getNamesOfRemovedMappingElements_WhileMappingWasUNactivated();
+
+
+    /**
+     * @brief A mapping element has just been removed and correspond to a link removed while the global mapping was UN-activated
+     * @param mappingElement
+     */
+    void mappingElementRemoved_CorrespondingLinkRemovedWhileMappingWasUNactivated(MappingElementVM* mappingElement);
 
 
 Q_SIGNALS:

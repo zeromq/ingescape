@@ -281,6 +281,16 @@ QList<ElementMappingM*> AgentInMappingVM::getAddedMappingElements_WhileMappingWa
 
 
 /**
+ * @brief A mapping element has just been added and correspond to a link added while the global mapping was UN-activated
+ * @param linkId
+ */
+void AgentInMappingVM::mappingElementAdded_CorrespondingLinkAddedWhileMappingWasUNactivated(QString linkId)
+{
+    cancelAddLink_WhileMappingWasUNactivated(linkId);
+}
+
+
+/**
  * @brief Remove a link while the global mapping is UN-activated
  * @param linkId
  * @param mappingElement
@@ -382,6 +392,33 @@ QStringList AgentInMappingVM::getNamesOfRemovedMappingElements_WhileMappingWasUN
         }
     }
     return namesOfRemovedMappingElements;
+}
+
+
+/**
+ * @brief A mapping element has just been removed and correspond to a link removed while the global mapping was UN-activated
+ * @param mappingElement
+ */
+void AgentInMappingVM::mappingElementRemoved_CorrespondingLinkRemovedWhileMappingWasUNactivated(MappingElementVM* mappingElement)
+{
+    if (mappingElement != nullptr)
+    {
+        QString linkId = "";
+
+        for (QString iterator : _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.keys())
+        {
+            if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.value(iterator) == mappingElement)
+            {
+                linkId = iterator;
+                break;
+            }
+        }
+
+        if (!linkId.isEmpty())
+        {
+            cancelRemoveLink_WhileMappingWasUNactivated(linkId);
+        }
+    }
 }
 
 
