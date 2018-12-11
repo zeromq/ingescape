@@ -1,0 +1,352 @@
+# CMake build script for IngeScape-Editor
+
+# TODO Add stable.h precompile header ?
+
+########################################################################
+# Project setup
+########################################################################
+cmake_minimum_required(VERSION 3.1.0)
+project(IngeScape-Editor)
+
+enable_language(CXX)
+set(CMAKE_CXX_STANDARD 11)
+
+set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+# Select flags
+SET(CMAKE_CXX_FLAGS_RELEASE "-O3")
+# Find includes in corresponding build directories
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# Instruct CMake to run moc automatically when needed
+set(CMAKE_AUTOMOC ON)
+# Instruct CMake to run rcc automatically when needed
+set(CMAKE_AUTORCC ON)
+# Add path to custom macro
+set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/../../../builds/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR})
+include(IngescapeHelper)
+
+########################################################################
+# options
+########################################################################
+# Default build will be debug
+if (NOT CMAKE_BUILD_TYPE)
+    set (CMAKE_BUILD_TYPE Debug)
+endif ()
+
+add_definitions(-DQT_DEPRECATED_WARNINGS=1)
+add_definitions(-DINGESCAPE=1)
+
+########################################################################
+# plateform specific
+########################################################################
+#The MSVC C compiler is too out of date,
+#so the sources have to be compiled as c++
+if (MSVC)
+    set(MORE_LIBRARIES ws2_32)
+endif()
+# required libraries for mingw
+if (MINGW)
+    set(MORE_LIBRARIES -lws2_32)
+endif()
+
+# required libraries for cygwin
+if (CYGWIN)
+    set(MORE_LIBRARIES)
+endif()
+
+include(CheckCXXCompilerFlag)
+foreach(_CXXOPT -pedantic -Wall -Wextra -W -Wpointer-arith -Wwrite-strings -Wunused -Wshadow -Winline -Wnested-externs -Wno-long-long -Wfloat-equal -Wno-multichar -Wsign-compare -Wundef -Wno-format-nonliteral -Wendif-labels -Wstrict-prototypes -Wstrict-aliasing=3 -Wcast-align -Wtype-limits -Wold-style-declaration -Wmissing-parameter-type -Wempty-body -Wclobbered -Wignored-qualifiers -Wconversion -Wno-sign-conversion -Wvla -Wdouble-promotion -Wno-system-headers -Wno-pedantic-ms-format)
+    # surprisingly, CHECK_C_COMPILER_FLAG needs a new variable to store each new
+    # test result in.
+    check_cxx_compiler_flag(${_CXXOPT} OPT${_CXXOPT})
+    if(OPT${_CXXOPT})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_CXXOPT}")
+    endif()
+endforeach()
+
+########################################################################
+# version
+########################################################################
+get_ingescape_version(INGESCAPE_EDITOR_VERSION_MAJOR INGESCAPE_EDITOR_VERSION_MINOR INGESCAPE_EDITOR_VERSION_PATCH)
+
+set(INGESCAPE_EDITOR_VERSION "${INGESCAPE_EDITOR_VERSION_MAJOR}.${INGESCAPE_EDITOR_VERSION_MINOR}.${INGESCAPE_EDITOR_VERSION_PATCH}")
+message(STATUS "Detected INGESCAPE Editor Version - ${INGESCAPE_EDITOR_VERSION}")
+
+########################################################################
+# includes
+########################################################################
+set (ingescape_editor_headers
+    stable.h
+    uthash/libut.h
+    uthash/ringbuf.h
+    uthash/utarray.h
+    uthash/uthash.h
+    uthash/utlist.h
+    uthash/utmm.h
+    uthash/utringbuffer.h
+    uthash/utstring.h
+    uthash/utvector.h
+    controller/agentssupervisioncontroller.h
+    controller/agentsmappingcontroller.h
+    controller/ingescapeeditorcontroller.h
+    controller/ingescapemodelmanager.h
+    controller/networkcontroller.h
+    controller/scenariocontroller.h
+    controller/actioneditorcontroller.h
+    controller/valueshistorycontroller.h
+    controller/abstracttimeactionslinescenarioviewcontroller.h
+    controller/ingescapelaunchermanager.h
+    misc/ingescapeeditorsettings.h
+    misc/ingescapeeditorutils.h
+    misc/terminationsignalwatcher.h
+    misc/collapsiblecolumn.h
+    model/agentm.h
+    model/iop/agentiopm.h
+    model/iop/outputm.h
+    model/jsonhelper.h
+    model/definitionm.h
+    model/mapping/agentmappingm.h
+    model/mapping/elementmappingm.h
+    model/scenario/condition/actionconditionm.h
+    model/scenario/actionm.h
+    model/scenario/scenariom.h
+    model/scenario/scenariomarkerm.h
+    model/scenario/condition/iopvalueconditionm.h
+    model/enums.h
+    model/publishedvaluem.h
+    model/scenario/timetickm.h
+    model/scenario/effect/actioneffectm.h
+    model/scenario/effect/iopvalueeffectm.h
+    model/scenario/effect/mappingeffectm.h
+    model/scenario/effect/effectonagentm.h
+    sortFilter/valueshistorysortfilter.h
+    viewModel/agentvm.h
+    viewModel/pointmapvm.h
+    viewModel/agentinmappingvm.h
+    viewModel/mapbetweeniopvm.h
+    viewModel/scenario/actionvm.h
+    viewModel/iop/inputvm.h
+    viewModel/iop/outputvm.h
+    viewModel/scenario/actionconditionvm.h
+    viewModel/scenario/actioneffectvm.h
+    viewModel/scenario/actioninpalettevm.h
+    viewModel/scenario/actionexecutionvm.h
+    viewModel/iop/parametervm.h
+    model/hostm.h
+    viewModel/iop/agentiopvm.h
+    sortFilter/abstracttimerangefilter.h
+    controller/hostssupervisioncontroller.h
+    viewModel/hostvm.h
+    model/recordm.h
+    controller/recordssupervisioncontroller.h
+    viewModel/recordvm.h
+    controller/logstreamcontroller.h
+    model/logm.h
+    sortFilter/logssortfilter.h
+    model/scenario/condition/conditiononagentm.h
+    misc/qquickwindowblocktouches.h
+    misc/textfielddoublevalidator.h
+)
+
+source_group ("Header Files" FILES ${ingescape_editor_headers})
+
+########################################################################
+# Sources files
+########################################################################
+set(_INCLUDES_DIRECTORY 
+    "${SOURCE_DIR}"
+    "${SOURCE_DIR}/../../frameworks/I2Quick/include"
+)
+
+add_ingescape_include_directory(_INCLUDES_DIRECTORY)
+
+include_directories(${_INCLUDES_DIRECTORY})
+
+set (ingescape_editor_sources
+    main.cpp
+    controller/agentssupervisioncontroller.cpp
+    controller/agentsmappingcontroller.cpp
+    controller/ingescapeeditorcontroller.cpp
+    controller/ingescapemodelmanager.cpp
+    controller/networkcontroller.cpp
+    controller/scenariocontroller.cpp
+    controller/actioneditorcontroller.cpp
+    controller/valueshistorycontroller.cpp
+    controller/abstracttimeactionslinescenarioviewcontroller.cpp
+    controller/ingescapelaunchermanager.cpp
+    misc/ingescapeeditorsettings.cpp
+    misc/ingescapeeditorutils.cpp
+    misc/terminationsignalwatcher.cpp
+    misc/collapsiblecolumn.cpp
+    model/agentm.cpp
+    model/iop/agentiopm.cpp
+    model/iop/outputm.cpp
+    model/jsonhelper.cpp
+    model/definitionm.cpp
+    model/mapping/agentmappingm.cpp
+    model/mapping/elementmappingm.cpp
+    model/scenario/condition/actionconditionm.cpp
+    model/scenario/actionm.cpp
+    model/scenario/scenariom.cpp
+    model/scenario/scenariomarkerm.cpp
+    model/scenario/condition/iopvalueconditionm.cpp
+    model/enums.cpp
+    model/publishedvaluem.cpp
+    model/scenario/timetickm.cpp
+    model/scenario/effect/actioneffectm.cpp
+    model/scenario/effect/iopvalueeffectm.cpp
+    model/scenario/effect/mappingeffectm.cpp
+    model/scenario/effect/effectonagentm.cpp
+    sortFilter/valueshistorysortfilter.cpp
+    viewModel/agentvm.cpp
+    viewModel/pointmapvm.cpp
+    viewModel/agentinmappingvm.cpp
+    viewModel/mapbetweeniopvm.cpp
+    viewModel/scenario/actionvm.cpp
+    viewModel/iop/inputvm.cpp
+    viewModel/iop/outputvm.cpp
+    viewModel/scenario/actionconditionvm.cpp
+    viewModel/scenario/actioneffectvm.cpp
+    viewModel/scenario/actioninpalettevm.cpp
+    viewModel/scenario/actionexecutionvm.cpp
+    viewModel/iop/parametervm.cpp
+    model/hostm.cpp
+    viewModel/iop/agentiopvm.cpp
+    sortFilter/abstracttimerangefilter.cpp
+    controller/hostssupervisioncontroller.cpp
+    viewModel/hostvm.cpp
+    model/recordm.cpp
+    controller/recordssupervisioncontroller.cpp
+    viewModel/recordvm.cpp
+    controller/logstreamcontroller.cpp
+    model/logm.cpp
+    sortFilter/logssortfilter.cpp
+    model/scenario/condition/conditiononagentm.cpp
+    misc/qquickwindowblocktouches.cpp
+    misc/textfielddoublevalidator.cpp
+)
+
+add_ingescape_sources(ingescape_editor_sources)
+
+source_group("Source Files" FILES ${ingescape_editor_sources})
+
+set (ingescape_editor_ressources qml.qrc)
+
+########################################################################
+# dependencies
+########################################################################
+# Find QT dependencies
+find_package(Qt5 NO_MODULE COMPONENTS 
+    Qml
+    Quick
+    Svg
+    Xml
+    Concurrent
+    Sql
+    Core
+    Gui 
+    REQUIRED
+)
+
+# Find ingescape dependencies
+set(pkg_config_libs_private "")
+add_ingescape_libraries_dependencies(_INDESCAPE_LIBS pkg_config_libs_private)
+
+# Find I2 Quick dependencies
+add_library(I2Quick SHARED IMPORTED)
+if (APPLE)
+    set(I2QUICK_LIB "${SOURCE_DIR}/../../frameworks/I2Quick/Mac/libI2Quick.dylib")
+    set_source_files_properties("${I2QUICK_LIB}" PROPERTIES MACOSX_PACKAGE_LOCATION Frameworks)
+    set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${I2QUICK_LIB}")
+elseif (WIN32)
+    set(I2QUICK_LIB)
+    set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.lib")
+else ()
+    #TODO Add so for unix
+endif ()
+
+########################################################################
+# executable
+########################################################################
+set(INGESCAPE_EDITOR_ICON "${SOURCE_DIR}/icon_IGS.icns")
+if (APPLE)
+    set(OS_BUNDLE MACOSX_BUNDLE)
+    set_source_files_properties("${INGESCAPE_EDITOR_ICON}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+else ()
+    set(OS_BUNDLE)
+    #TODO ADD win32 target
+    #TODO Add unix target
+endif ()
+
+# Create target
+add_executable(${PROJECT_NAME} ${OS_BUNDLE}
+    ${ingescape_editor_sources}
+    ${ingescape_editor_ressources}
+    ${I2QUICK_LIB}
+    ${INGESCAPE_EDITOR_ICON}
+)
+
+if (APPLE)
+    # Mac OS X bundle specific settings
+    set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+    set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${INGESCAPE_EDITOR_VERSION}")
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING "${INGESCAPE_EDITOR_VERSION}")
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${INGESCAPE_EDITOR_VERSION_MAJOR}")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "${INGESCAPE_EDITOR_VERSION}")
+    set(MACOSX_BUNDLE_ICON_FILE "icon_IGS")
+
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change libI2Quick.dylib "@loader_path/../Frameworks/libI2Quick.dylib" $<TARGET_FILE:${PROJECT_NAME}>
+    )
+else ()
+    #TODO ADD win32 target
+    #TODO Add unix target
+endif ()
+
+target_link_libraries(
+    ${PROJECT_NAME}
+    Qt5::Qml
+    Qt5::Quick
+    Qt5::Svg
+    Qt5::Xml
+    Qt5::Concurrent
+    Qt5::Sql
+    Qt5::Core
+    Qt5::Gui
+    ${_INDESCAPE_LIBS}
+    I2Quick
+    )
+
+########################################################################
+# installer
+########################################################################
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
+########################################################################
+# summary
+########################################################################
+message ("")
+message (STATUS "******************* Configuration Summary *******************")
+message (STATUS "General:")
+message (STATUS "  Version           :   ${VERSION}")
+message (STATUS "  System            :   ${CMAKE_SYSTEM_NAME}")
+message (STATUS "  CXX compiler      :   ${CMAKE_CXX_COMPILER}")
+message (STATUS "  Debug CXX flags   :   ${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS}")
+message (STATUS "  Release CXX flags :   ${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS}")
+message (STATUS "  Build type        :   ${CMAKE_BUILD_TYPE}")
+message (STATUS "")
+message (STATUS "Dependencies:")
+include(FeatureSummary)
+feature_summary (WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
+message (STATUS "")
+message (STATUS "Install:")
+message (STATUS "  Install prefix    :" "${CMAKE_INSTALL_PREFIX}")
+message (STATUS "")
+message (STATUS "*************************************************************")
+message (STATUS "Configuration complete! Now procced with:")
+message (STATUS "  'make'                compile the project")
+message (STATUS "  'make install'        install the project to ${CMAKE_INSTALL_PREFIX}")
+message (STATUS "")
