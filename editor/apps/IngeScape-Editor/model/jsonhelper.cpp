@@ -265,7 +265,7 @@ QJsonObject JsonHelper::exportAgentDefinitionToJson(DefinitionM* agentDefinition
 
 
 /**
- * @brief Export the model of agent mapping into a JSON object
+ * @brief Export the model of an agent mapping into a JSON object
  * @param agentMapping
  * @return JSON object
  */
@@ -301,12 +301,15 @@ QJsonObject JsonHelper::exportAgentMappingToJson(AgentMappingM* agentMapping)
 
 
 /**
- * @brief Export the model of agent mapping plus its temporary list of mapping elements into a JSON object
+ * @brief Export the model of an agent mapping with changes (applied while the global mapping was UN-activated) into a JSON object
  * @param agentMapping
- * @param temporaryMappingElements
+ * @param addedMappingElements
+ * @param namesOfRemovedMappingElements
  * @return JSON object
  */
-QJsonObject JsonHelper::exportAgentTemporaryMappingToJson(AgentMappingM* agentMapping, QList<ElementMappingM*> temporaryMappingElements)
+QJsonObject JsonHelper::exportAgentMappingWithChangesToJson(AgentMappingM* agentMapping,
+                                                            QList<ElementMappingM*> addedMappingElements,
+                                                            QStringList namesOfRemovedMappingElements)
 {
     QJsonObject jsonMapping;
 
@@ -318,12 +321,14 @@ QJsonObject JsonHelper::exportAgentTemporaryMappingToJson(AgentMappingM* agentMa
 
         QJsonArray jsonArray;
 
-        QList<ElementMappingM*> completeList = agentMapping->mappingElements()->toList();
-        completeList.append(temporaryMappingElements);
+        QList<ElementMappingM*> tempList = agentMapping->mappingElements()->toList();
+        tempList.append(addedMappingElements);
 
-        for (ElementMappingM* mappingElement : completeList)
+        for (ElementMappingM* mappingElement : tempList)
         {
-            if (mappingElement != nullptr)
+            if ((mappingElement != nullptr) && !mappingElement->name().isEmpty()
+                    // Check that the name of this mapping element is NOT part of the names of removed mapping elements
+                    && !namesOfRemovedMappingElements.contains(mappingElement->name()))
             {
                 QJsonObject jsonMappingElement;
                 jsonMappingElement.insert("input_name", mappingElement->input());
@@ -390,20 +395,26 @@ QString JsonHelper::getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocu
 
 
 /**
- * @brief Get the JSON of an agent mapping plus its temporary list of mapping elements
+ * @brief Get the JSON of an agent mapping with changes (applied while the global mapping was UN-activated)
  * @param agentMapping
- * @param temporaryMappingElements
+ * @param addedMappingElements
+ * @param namesOfRemovedMappingElements
  * @param jsonFormat
  * @return
  */
-QString JsonHelper::getJsonOfAgentTemporaryMapping(AgentMappingM* agentMapping, QList<ElementMappingM*> temporaryMappingElements, QJsonDocument::JsonFormat jsonFormat)
+QString JsonHelper::getJsonOfAgentMappingWithChanges(AgentMappingM* agentMapping,
+                                                     QList<ElementMappingM*> addedMappingElements,
+                                                     QStringList namesOfRemovedMappingElements,
+                                                     QJsonDocument::JsonFormat jsonFormat)
 {
     QString jsonOfMapping = "";
 
     if (agentMapping != nullptr)
     {
-        // Export the model of agent mapping plus its temporary list of mapping elements into a JSON object
-        QJsonObject jsonMapping = exportAgentTemporaryMappingToJson(agentMapping, temporaryMappingElements);
+        // Export the model of the agent mapping with changes (applied while the global mapping was UN-activated) into a JSON object
+        QJsonObject jsonMapping = exportAgentMappingWithChangesToJson(agentMapping,
+                                                                      addedMappingElements,
+                                                                      namesOfRemovedMappingElements);
 
         QJsonObject jsonObject;
         jsonObject.insert("mapping", jsonMapping);

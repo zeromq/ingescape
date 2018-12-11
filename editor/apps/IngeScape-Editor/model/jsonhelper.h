@@ -91,7 +91,7 @@ public:
 
 
     /**
-     * @brief Export the model of agent mapping into a JSON object
+     * @brief Export the model of an agent mapping into a JSON object
      * @param agentMapping
      * @return JSON object
      */
@@ -99,12 +99,15 @@ public:
 
 
     /**
-     * @brief Export the model of agent mapping plus its temporary list of mapping elements into a JSON object
+     * @brief Export the model of an agent mapping with changes (applied while the global mapping was UN-activated) into a JSON object
      * @param agentMapping
-     * @param temporaryMappingElements
+     * @param addedMappingElements
+     * @param namesOfRemovedMappingElements
      * @return JSON object
      */
-    QJsonObject exportAgentTemporaryMappingToJson(AgentMappingM* agentMapping, QList<ElementMappingM*> temporaryMappingElements);
+    QJsonObject exportAgentMappingWithChangesToJson(AgentMappingM* agentMapping,
+                                                    QList<ElementMappingM*> addedMappingElements,
+                                                    QStringList namesOfRemovedMappingElements);
 
 
     /**
@@ -126,13 +129,17 @@ public:
 
 
     /**
-     * @brief Get the JSON of an agent mapping plus its temporary list of mapping elements
+     * @brief Get the JSON of an agent mapping with changes (applied while the global mapping was UN-activated)
      * @param agentMapping
-     * @param temporaryMappingElements
+     * @param addedMappingElements
+     * @param namesOfRemovedMappingElements
      * @param jsonFormat
      * @return
      */
-    QString getJsonOfAgentTemporaryMapping(AgentMappingM* agentMapping, QList<ElementMappingM*> temporaryMappingElements, QJsonDocument::JsonFormat jsonFormat);
+    QString getJsonOfAgentMappingWithChanges(AgentMappingM* agentMapping,
+                                             QList<ElementMappingM*> addedMappingElements,
+                                             QStringList namesOfRemovedMappingElements,
+                                             QJsonDocument::JsonFormat jsonFormat);
 
 
     /**

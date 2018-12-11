@@ -179,27 +179,15 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
         // OR the input agent is OFF
         else
         {
-            // FIXME REPAIR removeTemporaryLink
-            // Remove temporary link (this temporary link will be removed when the user will activate the mapping)
-            //link->inputAgent()->removeTemporaryLink(link->linkInput()->name(), link->outputAgent()->name(), link->linkOutput()->name());
-
-            // This link has been added while the mapping was UN-activated, just cancel the add
-            /*if (_idsOfAddedLinks_WhileMappingWasUNactivated.contains(link->uid())) {
-                _idsOfAddedLinks_WhileMappingWasUNactivated.removeOne(link->uid());
-            }
-            // Add the corresponding mapping element to the hash
-            else {
-                _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.insert(link->uid(), link->mappingElement());
-            }*/
-
-
             ElementMappingM* mappingElement = link->inputAgent()->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid());
 
-            // This link has been added while the mapping was UN-activated, just cancel the add
+            // This link has been added while the mapping was UN-activated...
             if (mappingElement != nullptr)
             {
+                // ...just cancel the add of the link while the global mapping is UN-activated
                 link->inputAgent()->cancelAddLink_WhileMappingWasUNactivated(link->uid());
             }
+            // Remove the link while the global mapping is UN-activated
             else
             {
                 link->inputAgent()->removeLink_WhileMappingWasUNactivated(link->uid(), link->mappingElement());
@@ -328,10 +316,6 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                                                        nullptr,
                                                        true);
 
-                    // FIXME REPAIR addTemporaryMappingElement
-                    // Add a temporary mapping element (will became a real link when the agent will send its mapping update)
-                    //inputAgent->addTemporaryMappingElement(link->uid(), linkInput->uid(), outputAgent->name(), linkOutput->uid());
-
                     if ((link != nullptr) && !_hashFromLinkIdToAddedLink_WaitingReply.contains(link->uid()))
                     {
                         // Insert in the hash table the "(unique) link id" and the link for which we are waiting a reply to the request "add"
@@ -361,36 +345,25 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                                                        nullptr,
                                                        false);
 
-                    // FIXME REPAIR addTemporaryMappingElement
-                    // Add a temporary mapping element (will became a real link when the user will activate the mapping)
-                    //inputAgent->addTemporaryMappingElement(link->uid(), linkInput->uid(), outputAgent->name(), linkOutput->uid());
-
-                    // This link has been removed while the mapping was UN-activated, just cancel the suppression
-                    /*if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
+                    if (link != nullptr)
                     {
-                        MappingElementVM* mappingElement = _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.value(linkId);
-                        link->setmappingElement(mappingElement);
+                        MappingElementVM* mappingElement = inputAgent->getRemovedMappingElementFromLinkId_WhileMappingWasUNactivated(linkId);
 
-                        _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.remove(linkId);
-                    }
-                    // Add the link id to the list
-                    else {
-                        _idsOfAddedLinks_WhileMappingWasUNactivated.append(linkId);
-                    }*/
+                        // This link has been removed while the mapping was UN-activated...
+                        if (mappingElement != nullptr)
+                        {
+                            // Update the view model of mapping element which have been cleared
+                            link->setmappingElement(mappingElement);
 
-
-                    MappingElementVM* mappingElement = inputAgent->getRemovedMappingElementFromLinkId_WhileMappingWasUNactivated(linkId);
-
-                    // This link has been removed while the mapping was UN-activated, just cancel the suppression
-                    if (mappingElement != nullptr)
-                    {
-                        link->setmappingElement(mappingElement);
-
-                        inputAgent->cancelRemoveLink_WhileMappingWasUNactivated(linkId);
-                    }
-                    else
-                    {
-                        inputAgent->addLink_WhileMappingWasUNactivated(link->uid(), linkInput->uid(), outputAgent->name(), linkOutput->uid());
+                            // ...just cancel the remove of the link while the global mapping is UN-activated
+                            inputAgent->cancelRemoveLink_WhileMappingWasUNactivated(linkId);
+                        }
+                        // Add the link while the global mapping is UN-activated
+                        else
+                        {
+                            //inputAgent->addLink_WhileMappingWasUNactivated(link->uid(), linkInput->uid(), outputAgent->name(), linkOutput->uid());
+                            inputAgent->addLink_WhileMappingWasUNactivated(link->uid(), linkInput->name(), outputAgent->name(), linkOutput->name());
+                        }
                     }
                 }
             }
@@ -493,9 +466,24 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
                 // The mapping is NOT activated
                 else
                 {
-                    // FIXME REPAIR temporaryMappingElements
-                    // Export the current mapping plus the temporary list of mapping elements
-                    //jsonMapping = _jsonHelper->exportAgentTemporaryMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping(), agentInMapping->temporaryMappingElements()->toList());
+                    if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
+                    {
+                        // Get the list of all added mapping elements while the global mapping was UN-activated
+                        QList<ElementMappingM*> addedMappingElements = agentInMapping->getAddedMappingElements_WhileMappingWasUNactivated();
+
+                        // Get the list of all names of removed mapping elements while the global mapping was UN-activated
+                        QStringList namesOfRemovedMappingElements = agentInMapping->getNamesOfRemovedMappingElements_WhileMappingWasUNactivated();
+
+                        // Export the current mapping with changes (applied while the global mapping was UN-activated) into a JSON objec
+                        jsonMapping = _jsonHelper->exportAgentMappingWithChangesToJson(agentInMapping->agentsGroupedByName()->currentMapping(),
+                                                                                       addedMappingElements,
+                                                                                       namesOfRemovedMappingElements);
+                    }
+                    else
+                    {
+                        // Export the current mapping
+                        jsonMapping = _jsonHelper->exportAgentMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping());
+                    }
                 }
                 jsonAgent.insert("mapping", jsonMapping);
 
@@ -599,23 +587,12 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
 {
     qDebug() << "Reset the modifications made while the mapping was UN-activated";
 
-    /*for (QString linkId : _idsOfAddedLinks_WhileMappingWasUNactivated)
-    {
-        qDebug() << "Remove added link" << linkId << "while the mapping was disconnected";
-
-        // Get the view model of link which corresponds to a mapping element
-        LinkVM* link = getLinkInMappingFromId(linkId);
-        if (link != nullptr)
-        {
-            // Delete this link (between two agents) to cancel the add
-            _deleteLinkBetweenTwoAgents(link);
-        }
-    }*/
     for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
     {
         if ((agentInMapping != nullptr) && agentInMapping->hadLinksAdded_WhileMappingWasUNactivated())
         {
-            QList<QString> addedLinkIds = agentInMapping->getAllAddedLinkIds_WhileMappingWasUNactivated();
+            // Get the list of all added link Ids while the global mapping was UN-activated
+            QList<QString> addedLinkIds = agentInMapping->getAddedLinkIds_WhileMappingWasUNactivated();
             for (QString linkId : addedLinkIds)
             {
                 qDebug() << "Remove added link" << linkId << "while the mapping was disconnected";
@@ -629,30 +606,18 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
                 }
             }
 
+            // Cancel all added links while the global mapping was UN-activated
             agentInMapping->cancelAllAddedLinks_WhileMappingWasUNactivated();
         }
     }
 
-    /*for (QString linkId : _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.keys())
-    {
-        qDebug() << "Add removed link" << linkId << "while the mapping was disconnected";
 
-        MappingElementVM* mappingElement = _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.value(linkId);
-        if ((mappingElement != nullptr) && (mappingElement->firstModel() != nullptr))
-        {
-            AgentInMappingVM* inputAgent = getAgentInMappingFromName(mappingElement->firstModel()->inputAgent());
-            if (inputAgent != nullptr)
-            {
-                // Link the agent (in the global mapping) on its input from the mapping element (add a missing link TO the agent)
-                _linkAgentOnInputFromMappingElement(inputAgent, mappingElement);
-            }
-        }
-    }*/
     for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
     {
         if ((agentInMapping != nullptr) && agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
         {
-            QList<MappingElementVM*> removedMappingElements = agentInMapping->getAllRemovedMappingElements_WhileMappingWasUNactivated();
+            // Get the list of all (view models of) removed mapping elements while the global mapping was UN-activated
+            QList<MappingElementVM*> removedMappingElements = agentInMapping->getRemovedMappingElements_WhileMappingWasUNactivated();
             for (MappingElementVM* mappingElement : removedMappingElements)
             {
                 if (mappingElement != nullptr)
@@ -664,14 +629,10 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
                 }
             }
 
+            // Cancel all removed links while the global mapping was UN-activated
             agentInMapping->cancelAllRemovedLinks_WhileMappingWasUNactivated();
         }
     }
-
-
-    // Clear modifications made while the mapping was UN-activated
-    //_idsOfAddedLinks_WhileMappingWasUNactivated.clear();
-    //_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.clear();
 
 
     // Update the global mapping with agents ON and their links
@@ -692,18 +653,19 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
         {
             qDebug() << "Mapping Activated in mode CONTROL";
 
-            // Clear modifications made while the mapping was UN-activated
-            //_idsOfAddedLinks_WhileMappingWasUNactivated.clear();
-            //_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.clear();
-
+            // Cancel all changes made while the mapping was UN-activated
             for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
             {
                 if (agentInMapping != nullptr)
                 {
-                    if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated()) {
+                    if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated())
+                    {
+                        // Cancel all added links while the global mapping was UN-activated
                         agentInMapping->cancelAllAddedLinks_WhileMappingWasUNactivated();
                     }
-                    if (agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated()) {
+                    if (agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
+                    {
+                        // Cancel all removed links while the global mapping was UN-activated
                         agentInMapping->cancelAllRemovedLinks_WhileMappingWasUNactivated();
                     }
                 }
@@ -717,20 +679,26 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
                 {
                     QString jsonOfMapping;
 
-                    // FIXME REPAIR temporaryMappingElements
-                    //if (agentInMapping->temporaryMappingElements()->isEmpty())
-                    //{
-                        // Get the JSON of the current mapping of the agent
-                        jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agentInMapping->agentsGroupedByName()->currentMapping(),
-                                                                           QJsonDocument::Compact);
-                    /*}
+                    if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
+                    {
+                        // Get the list of all added mapping elements while the global mapping was UN-activated
+                        QList<ElementMappingM*> addedMappingElements = agentInMapping->getAddedMappingElements_WhileMappingWasUNactivated();
+
+                        // Get the list of all names of removed mapping elements while the global mapping was UN-activated
+                        QStringList namesOfRemovedMappingElements = agentInMapping->getNamesOfRemovedMappingElements_WhileMappingWasUNactivated();
+
+                        // Get the JSON of the current mapping of the agent with changes applied while the mapping was UN-activated
+                        jsonOfMapping = _jsonHelper->getJsonOfAgentMappingWithChanges(agentInMapping->agentsGroupedByName()->currentMapping(),
+                                                                                      addedMappingElements,
+                                                                                      namesOfRemovedMappingElements,
+                                                                                      QJsonDocument::Compact);
+                    }
                     else
                     {
                         // Get the JSON of the current mapping of the agent
-                        jsonOfMapping = _jsonHelper->getJsonOfAgentTemporaryMapping(agentInMapping->agentsGroupedByName()->currentMapping(),
-                                                                                    agentInMapping->temporaryMappingElements()->toList(),
-                                                                                    QJsonDocument::Compact);
-                    }*/
+                        jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agentInMapping->agentsGroupedByName()->currentMapping(),
+                                                                           QJsonDocument::Compact);
+                    }
 
                     QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
@@ -1128,8 +1096,8 @@ void AgentsMappingController::onAgentsGroupedByNameWillBeDeleted(AgentsGroupedBy
         {
             if (link->inputAgent() != nullptr)
             {
+                // FIXME REPAIR removeTemporaryLink
                 // Remove the temporary link that correspond to this real link
-                //bool hasBeenRemoved = link->inputAgent()->removeTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
                 link->inputAgent()->removeTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
             }
 
@@ -1164,8 +1132,8 @@ void AgentsMappingController::onAgentIsONChanged(bool isON)
                     {
                         // FIXME TODO ? CONTROL
 
-                        // FIXME REPAIR temporaryMappingElements
-                        /*if (!agentInMapping->temporaryMappingElements()->isEmpty())
+                        // FIXME REPAIR WhileMappingWasUNactivated
+                        /*if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
                         {
 
                         }*/
@@ -1802,7 +1770,13 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
                     {
                         if (link->inputAgent() != nullptr)
                         {
-                            // FIXME TODO: WhileMappingWasUNactivated
+                            if (link->inputAgent()->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid()))
+                            {
+                                qWarning() << "There is still the corresponding added Mapping Element" << link->uid() << "while the Mapping was UN-activated";
+                            }
+
+                            // Useless ?
+                            //link->inputAgent()->cancelAddLink_WhileMappingWasUNactivated(link->uid());
                         }
                     }
 
@@ -2016,7 +1990,7 @@ LinkOutputVM* AgentsMappingController::_getAloneLinkOutputFromName(AgentInMappin
         if (linkOutputsWithSameName.count() == 1) {
             linkOutput = linkOutputsWithSameName.at(0);
         }
-        else {
+        else if (linkOutputsWithSameName.count() > 1) {
             qWarning() << "There are" << linkOutputsWithSameName.count() << "link outputs with the same name" << outputName << "."
                        << "We cannot choose and create the link" << linkName;
         }
