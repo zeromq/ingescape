@@ -32,6 +32,8 @@ AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelMan
                                                  QObject *parent) : QObject(parent),
       _viewWidth(1920 - 320), // Full HD - Width of left panel
       _viewHeight(1080 - 100), // Full HD - Height of top & bottom bars of OS
+      _xSpawnZoneOffset(0),
+      _ySpawnZoneOffset(0),
       _isEmptyMapping(true),
       _selectedAgent(nullptr),
       _selectedLink(nullptr),
