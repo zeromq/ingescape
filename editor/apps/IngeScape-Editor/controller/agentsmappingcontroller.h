@@ -32,8 +32,14 @@ class AgentsMappingController : public QObject
     Q_OBJECT
 
     // Size of the mapping view
-    I2_QML_PROPERTY(double, viewWidth)
-    I2_QML_PROPERTY(double, viewHeight)
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, viewWidth)
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, viewHeight)
+
+    // Offset between the viewport's current position and the view's origin position
+    // These values are updated when the mapping is dragged.
+    // The spawn zone must follow the viewport and not stay at the view's origin position.
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, xSpawnZoneOffset)
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, ySpawnZoneOffset)
 
     // List of all agents in mapping
     I2_QOBJECT_LISTMODEL(AgentInMappingVM, allAgentsInMapping)
@@ -95,7 +101,7 @@ public:
      * @param agentName
      * @param position
      */
-    Q_INVOKABLE void dropAgentNameToMappingAtPosition(QString agentName, QPointF position);
+    Q_INVOKABLE void dropAgentNameToMappingAtPosition(const QString& agentName, QPointF position);
 
 
     /**
@@ -114,7 +120,7 @@ public:
      * @param name
      * @return
      */
-    Q_INVOKABLE AgentInMappingVM* getAgentInMappingFromName(QString name);
+    Q_INVOKABLE AgentInMappingVM* getAgentInMappingFromName(const QString& name);
 
 
     /**
@@ -122,7 +128,7 @@ public:
      * @param linkName
      * @return
      */
-    QList<LinkVM*> getLinksInMappingFromName(QString linkName);
+    QList<LinkVM*> getLinksInMappingFromName(const QString& linkName);
 
 
     /**
@@ -130,7 +136,7 @@ public:
      * @param linkId
      * @return
      */
-    LinkVM* getLinkInMappingFromId(QString linkId);
+    LinkVM* getLinkInMappingFromId(const QString& linkId);
 
 
     /**
@@ -289,7 +295,7 @@ public Q_SLOTS:
      * @brief Slot called when we receive the command highlight link from a recorder
      * @param parameters
      */
-    void onHighlightLink(QStringList parameters);
+    void onHighlightLink(const QStringList& parameters);
 
 
 private Q_SLOTS:
@@ -304,28 +310,28 @@ private Q_SLOTS:
      * @brief Slot called when some view models of link inputs have been added to an agent in mapping
      * @param addedlinkInputs
      */
-    void _onLinkInputsListHaveBeenAdded(QList<LinkInputVM*> addedlinkInputs);
+    void _onLinkInputsListHaveBeenAdded(const QList<LinkInputVM*>& addedlinkInputs);
 
 
     /**
      * @brief Slot called when some view models of link outputs have been added to an agent in mapping
      * @param addedlinkOutputs
      */
-    void _onLinkOutputsListHaveBeenAdded(QList<LinkOutputVM*> addedlinkOutputs);
+    void _onLinkOutputsListHaveBeenAdded(const QList<LinkOutputVM*>& addedlinkOutputs);
 
 
     /**
      * @brief Slot called when some view models of link inputs will be removed from an agent in mapping
      * @param removedLinkInputs
      */
-    void _onLinkInputsListWillBeRemoved(QList<LinkInputVM*> removedLinkInputs);
+    void _onLinkInputsListWillBeRemoved(const QList<LinkInputVM*>& removedLinkInputs);
 
 
     /**
      * @brief Slot called when some view models of link outputs will be removed from an agent in mapping
      * @param removedLinkOutputs
      */
-    void _onLinkOutputsListWillBeRemoved(QList<LinkOutputVM*> removedLinkOutputs);
+    void _onLinkOutputsListWillBeRemoved(const QList<LinkOutputVM*>& removedLinkOutputs);
 
 
 private:
@@ -350,7 +356,7 @@ private:
      * @param isDashedLine
      * @return
      */
-    LinkVM* _createLinkBetweenTwoAgents(QString linkName,
+    LinkVM* _createLinkBetweenTwoAgents(const QString& linkName,
                                         AgentInMappingVM* outputAgent,
                                         LinkOutputVM* linkOutput,
                                         AgentInMappingVM* inputAgent,
@@ -422,7 +428,7 @@ private:
      * @param outputAgentName
      * @return
      */
-    QList<MappingElementVM*> _getWaitingMappingElementsOnOutputAgent(QString outputAgentName);
+    QList<MappingElementVM*> _getWaitingMappingElementsOnOutputAgent(const QString& outputAgentName);
 
 
     /**
@@ -430,7 +436,7 @@ private:
      * @param outputAgentName
      * @param waitingMappingElement
      */
-    void _addWaitingMappingElementOnOutputAgent(QString outputAgentName, MappingElementVM* waitingMappingElement);
+    void _addWaitingMappingElementOnOutputAgent(const QString& outputAgentName, MappingElementVM* waitingMappingElement);
 
 
     /**
@@ -438,7 +444,7 @@ private:
      * @param outputAgentName
      * @param waitingMappingElement
      */
-    void _removeWaitingMappingElementOnOutputAgent(QString outputAgentName, MappingElementVM* waitingMappingElement);
+    void _removeWaitingMappingElementOnOutputAgent(const QString& outputAgentName, MappingElementVM* waitingMappingElement);
 
 
     /**
@@ -449,7 +455,7 @@ private:
      * @param linkName
      * @return
      */
-    LinkInputVM* _getAloneLinkInputFromName(AgentInMappingVM* agent, QString inputName, QString linkName);
+    LinkInputVM* _getAloneLinkInputFromName(AgentInMappingVM* agent, const QString& inputName, const QString& linkName);
 
 
     /**
@@ -460,7 +466,7 @@ private:
      * @param linkName
      * @return
      */
-    LinkOutputVM* _getAloneLinkOutputFromName(AgentInMappingVM* agent, QString outputName, QString linkName);
+    LinkOutputVM* _getAloneLinkOutputFromName(AgentInMappingVM* agent, const QString& outputName, const QString& linkName);
 
 
 private:
