@@ -10,7 +10,7 @@ stages:
 # Define default condition to launch job
 .default-conditions: &default-conditions
   only:
-    - /^festeven.*/
+    - master
 
 # Define ingescape library files
 .build-ingescape-files: &build-ingescape-files
