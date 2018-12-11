@@ -503,7 +503,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 {
     if (_jsonHelper != nullptr)
     {
-        //QList<ElementMappingM*> listOfMappingElements;
+        QList<QPair<AgentInMappingVM*, AgentMappingM*>> listOfAgentsAndMappings;
 
         for (QJsonValue jsonValue : jsonArrayOfAgentsInMapping)
         {
@@ -540,42 +540,60 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                     // Get the (view model of) agents grouped for this name
                     AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
 
-                    if ((agentsGroupedByName != nullptr) && (agentMapping != nullptr) && !position.isNull())
+                    if ((agentsGroupedByName != nullptr) && !position.isNull())
                     {
                         qDebug() << "Position:" << position.x() << position.y() << "is defined for" << agentName << "with" << agentsGroupedByName->models()->count() << "models";
 
                         // Create a new agent in the global mapping (with the "Agents Grouped by Name") at a specific position
-                        _createAgentInMappingAtPosition(agentsGroupedByName, position);
+                        AgentInMappingVM* agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position);
 
-                        // FIXME REPAIR settemporaryMapping
-                        /*// Get the agent in mapping from the name
-                        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
-                        if (agentInMapping != nullptr)
+
+                        // If there are some mapping elements, save the pair [agent, its mapping] in the list
+                        // We will create the corresponding links when all agents would have been added to the global mapping
+                        if ((agentInMapping != nullptr) && (agentMapping != nullptr) && !agentMapping->mappingElements()->isEmpty())
                         {
-                            // Set the temporary mapping
-                            if (agentMapping != nullptr) {
-                                agentInMapping->settemporaryMapping(agentMapping);
-                            }
+                            QPair<AgentInMappingVM*, AgentMappingM*> pair = QPair<AgentInMappingVM*, AgentMappingM*>(agentInMapping, agentMapping);
 
-                            // Add the link elements
-                            listOfMappingElements.append(agentMapping->mappingElements()->toList());
-                        }*/
+                            listOfAgentsAndMappings.append(pair);
+                        }
                     }
                 }
             }
         }
 
-        // FIXME: Add links ?
-        /*if (!listOfMappingElements.isEmpty())
+
+        //
+        // All agents have been been added to the global mapping, we can create their links...
+        //
+        for (QPair<AgentInMappingVM*, AgentMappingM*> pair : listOfAgentsAndMappings)
         {
-            // Create all mapping links
-            for (ElementMappingM* mappingElement : listOfMappingElements)
+            AgentInMappingVM* inputAgent = pair.first;
+            AgentMappingM* agentMapping = pair.second;
+
+            if ((agentMapping != nullptr) && (inputAgent != nullptr))
             {
-                if (mappingElement != nullptr) {
-                    onMapped(mappingElement);
+                for (ElementMappingM* mappingElement : agentMapping->mappingElements()->toList())
+                {
+                    if (mappingElement != nullptr)
+                    {
+                        // Get the output agent in the global mapping from the output agent name
+                        AgentInMappingVM* outputAgent = getAgentInMappingFromName(mappingElement->outputAgent());
+                        if (outputAgent != nullptr)
+                        {
+                            // Get the link input and the link output
+                            LinkInputVM* linkInput = _getAloneLinkInputFromName(inputAgent, mappingElement->input(), mappingElement->name());
+                            LinkOutputVM* linkOutput = _getAloneLinkOutputFromName(outputAgent, mappingElement->output(), mappingElement->name());
+
+                            if ((linkInput != nullptr) && (linkOutput != nullptr))
+                            {
+                                // Simulate a drop
+                                dropLinkBetweenAgents(outputAgent, linkOutput, inputAgent, linkInput);
+                            }
+                        }
+                    }
                 }
             }
-        }*/
+        }
     }
 }
 

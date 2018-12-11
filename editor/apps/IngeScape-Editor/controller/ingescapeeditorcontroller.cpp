@@ -962,8 +962,7 @@ void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
         // Import the global mapping (of agents) from JSON
         if ((_agentsMappingC != nullptr) && jsonRoot.contains("mapping"))
         {
-            // FIXME REPAIR
-            //_agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
+            _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
         }
 
         // Import the scenario from JSON
