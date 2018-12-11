@@ -1855,14 +1855,14 @@ void AgentsMappingController::_linkAgentOnOutputs(AgentInMappingVM* agentInMappi
  */
 QPointF AgentsMappingController::_getRandomPosition(double randomMax)
 {
-    double randomX = (double)qrand() / randomMax;
-    double randomY = (double)qrand() / randomMax;
+    double randomX = static_cast<double>(qrand()) / randomMax;
+    double randomY = static_cast<double>(qrand()) / randomMax;
 
-    // 5% + (random * 90% of the width)
-    double x = 0.05 * _viewWidth + (0.90 * _viewWidth * randomX);
+    // 5% + (random * 90% of the width) + the spawn zone's offset to follow the viewport
+    double x = _xSpawnZoneOffset + (0.05 * _viewWidth) + (0.85 * _viewWidth * randomX);
 
-    // 5% + (random * 90% of the height)
-    double y = 0.05 * _viewHeight + (0.90 * _viewHeight * randomY);
+    // 5% + (random * 90% of the height) + the spawn zone's offset to follow the viewport
+    double y = _ySpawnZoneOffset + (0.05 * _viewHeight) + (0.85 * _viewHeight * randomY);
 
     return QPointF(x, y);
 }
