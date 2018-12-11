@@ -209,7 +209,7 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
  * @param agentName
  * @param position
  */
-void AgentsMappingController::dropAgentNameToMappingAtPosition(QString agentName, QPointF position)
+void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& agentName, QPointF position)
 {
     // Check that there is NOT yet an agent in the current mapping for this name
     AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
@@ -388,7 +388,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
  * @param name
  * @return
  */
-AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(QString name)
+AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(const QString& name)
 {
     if (_hashFromNameToAgentInMapping.contains(name)) {
         return _hashFromNameToAgentInMapping.value(name);
@@ -404,7 +404,7 @@ AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(QString nam
  * @param linkName
  * @return
  */
-QList<LinkVM*> AgentsMappingController::getLinksInMappingFromName(QString linkName)
+QList<LinkVM*> AgentsMappingController::getLinksInMappingFromName(const QString& linkName)
 {
     if (_hashFromNameToListOfLinksInMapping.contains(linkName)) {
         return _hashFromNameToListOfLinksInMapping.value(linkName);
@@ -420,7 +420,7 @@ QList<LinkVM*> AgentsMappingController::getLinksInMappingFromName(QString linkNa
  * @param linkId
  * @return
  */
-LinkVM* AgentsMappingController::getLinkInMappingFromId(QString linkId)
+LinkVM* AgentsMappingController::getLinkInMappingFromId(const QString& linkId)
 {
     if (_hashFromIdToLinkInMapping.contains(linkId)) {
         return _hashFromIdToLinkInMapping.value(linkId);
@@ -1277,7 +1277,7 @@ void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElemen
  * @brief Slot called when we receive the command highlight link from a recorder
  * @param parameters
  */
-void AgentsMappingController::onHighlightLink(QStringList parameters)
+void AgentsMappingController::onHighlightLink(const QStringList& parameters)
 {
     if (parameters.count() == 4)
     {
@@ -1326,7 +1326,7 @@ void AgentsMappingController::_onAllAgentsInMappingChanged()
  * @brief Slot called when some view models of link inputs have been added to an agent in mapping
  * @param addedlinkInputs
  */
-void AgentsMappingController::_onLinkInputsListHaveBeenAdded(QList<LinkInputVM*> addedlinkInputs)
+void AgentsMappingController::_onLinkInputsListHaveBeenAdded(const QList<LinkInputVM*>& addedlinkInputs)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != nullptr) && !addedlinkInputs.isEmpty())
@@ -1341,7 +1341,7 @@ void AgentsMappingController::_onLinkInputsListHaveBeenAdded(QList<LinkInputVM*>
  * @brief Slot called when some view models of link outputs have been added to an agent in mapping
  * @param addedlinkOutputs
  */
-void AgentsMappingController::_onLinkOutputsListHaveBeenAdded(QList<LinkOutputVM*> addedlinkOutputs)
+void AgentsMappingController::_onLinkOutputsListHaveBeenAdded(const QList<LinkOutputVM*>& addedlinkOutputs)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != nullptr) && !addedlinkOutputs.isEmpty())
@@ -1356,7 +1356,7 @@ void AgentsMappingController::_onLinkOutputsListHaveBeenAdded(QList<LinkOutputVM
  * @brief Slot called when some view models of link inputs will be removed from an agent in mapping
  * @param removedLinkInputs
  */
-void AgentsMappingController::_onLinkInputsListWillBeRemoved(QList<LinkInputVM*> removedLinkInputs)
+void AgentsMappingController::_onLinkInputsListWillBeRemoved(const QList<LinkInputVM*>& removedLinkInputs)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != nullptr) && !removedLinkInputs.isEmpty())
@@ -1379,7 +1379,7 @@ void AgentsMappingController::_onLinkInputsListWillBeRemoved(QList<LinkInputVM*>
  * @brief Slot called when some view models of link outputs will be removed from an agent in mapping
  * @param removedLinkOutputs
  */
-void AgentsMappingController::_onLinkOutputsListWillBeRemoved(QList<LinkOutputVM*> removedLinkOutputs)
+void AgentsMappingController::_onLinkOutputsListWillBeRemoved(const QList<LinkOutputVM*>& removedLinkOutputs)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != nullptr) && !removedLinkOutputs.isEmpty())
@@ -1457,7 +1457,7 @@ AgentInMappingVM* AgentsMappingController::_createAgentInMappingAtPosition(Agent
  * @param isTemporary
  * @return
  */
-LinkVM* AgentsMappingController::_createLinkBetweenTwoAgents(QString linkName,
+LinkVM* AgentsMappingController::_createLinkBetweenTwoAgents(const QString& linkName,
                                                              AgentInMappingVM* outputAgent,
                                                              LinkOutputVM* linkOutput,
                                                              AgentInMappingVM* inputAgent,
@@ -1878,7 +1878,7 @@ QPointF AgentsMappingController::_getRandomPosition(double randomMax)
  * @param outputAgentName
  * @return
  */
-QList<MappingElementVM*> AgentsMappingController::_getWaitingMappingElementsOnOutputAgent(QString outputAgentName)
+QList<MappingElementVM*> AgentsMappingController::_getWaitingMappingElementsOnOutputAgent(const QString& outputAgentName)
 {
     if (_hashFromOutputAgentNameToListOfWaitingMappingElements.contains(outputAgentName)) {
         return _hashFromOutputAgentNameToListOfWaitingMappingElements.value(outputAgentName);
@@ -1894,7 +1894,7 @@ QList<MappingElementVM*> AgentsMappingController::_getWaitingMappingElementsOnOu
  * @param outputAgentName
  * @param waitingMappingElement
  */
-void AgentsMappingController::_addWaitingMappingElementOnOutputAgent(QString outputAgentName, MappingElementVM* waitingMappingElement)
+void AgentsMappingController::_addWaitingMappingElementOnOutputAgent(const QString& outputAgentName, MappingElementVM* waitingMappingElement)
 {
     if (!outputAgentName.isEmpty() && (waitingMappingElement != nullptr))
     {
@@ -1920,7 +1920,7 @@ void AgentsMappingController::_addWaitingMappingElementOnOutputAgent(QString out
  * @param outputAgentName
  * @param waitingMappingElement
  */
-void AgentsMappingController::_removeWaitingMappingElementOnOutputAgent(QString outputAgentName, MappingElementVM* waitingMappingElement)
+void AgentsMappingController::_removeWaitingMappingElementOnOutputAgent(const QString& outputAgentName, MappingElementVM* waitingMappingElement)
 {
     if (!outputAgentName.isEmpty() && (waitingMappingElement != nullptr))
     {
@@ -1949,7 +1949,7 @@ void AgentsMappingController::_removeWaitingMappingElementOnOutputAgent(QString 
  * @param linkName
  * @return
  */
-LinkInputVM* AgentsMappingController::_getAloneLinkInputFromName(AgentInMappingVM* agent, QString inputName, QString linkName)
+LinkInputVM* AgentsMappingController::_getAloneLinkInputFromName(AgentInMappingVM* agent, const QString& inputName, const QString& linkName)
 {
     LinkInputVM* linkInput = nullptr;
 
@@ -1978,7 +1978,7 @@ LinkInputVM* AgentsMappingController::_getAloneLinkInputFromName(AgentInMappingV
  * @param linkName
  * @return
  */
-LinkOutputVM* AgentsMappingController::_getAloneLinkOutputFromName(AgentInMappingVM* agent, QString outputName, QString linkName)
+LinkOutputVM* AgentsMappingController::_getAloneLinkOutputFromName(AgentInMappingVM* agent, const QString& outputName, const QString& linkName)
 {
     LinkOutputVM* linkOutput = nullptr;
 
