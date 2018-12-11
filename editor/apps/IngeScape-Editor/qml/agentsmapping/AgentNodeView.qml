@@ -875,6 +875,36 @@ Rectangle {
                                           : IngeScapeTheme.lightGreyColor
         }
 
+        // FIXME DEBUG
+        Row {
+            anchors {
+                top: parent.top
+                right: parent.right
+            }
+            Rectangle {
+                visible: agentMappingVM.hadLinksAdded_WhileMappingWasUNactivated
+                color: "red"
+                width: 8
+                height: 8
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "+"
+                }
+            }
+            Rectangle {
+                visible: agentMappingVM.hadLinksRemoved_WhileMappingWasUNactivated
+                color: "red"
+                width: 8
+                height: 8
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "-"
+                }
+            }
+        }
+
 
         // Remove button
         Button {

@@ -60,11 +60,6 @@ class AgentInMappingVM : public QObject
     // Group of value type of the reduced link outputs of our agent (= brin)
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedLinkOutputsValueTypeGroup)
 
-
-    // FIXME TO REMOVE temporaryMapping
-    // Mapping currently edited (temporary until the user activate the mapping)
-    //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
-
     // Flag indicating if our agent had links added while the mapping was UN-activated
     //I2_CPP_NOSIGNAL_PROPERTY(bool, hadLinksAdded_WhileMappingWasUNactivated)
     I2_QML_PROPERTY_READONLY(bool, hadLinksAdded_WhileMappingWasUNactivated)
@@ -72,6 +67,9 @@ class AgentInMappingVM : public QObject
     // Flag indicating if our agent had links removed while the mapping was UN-activated
     //I2_CPP_NOSIGNAL_PROPERTY(bool, hadLinksRemoved_WhileMappingWasUNactivated)
     I2_QML_PROPERTY_READONLY(bool, hadLinksRemoved_WhileMappingWasUNactivated)
+
+    // Mapping currently edited (temporary until the user activate the mapping)
+    //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
 
 
 public:

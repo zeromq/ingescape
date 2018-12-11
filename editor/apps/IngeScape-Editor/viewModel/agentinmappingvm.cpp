@@ -107,9 +107,8 @@ AgentInMappingVM::~AgentInMappingVM()
         setagentsGroupedByName(nullptr);
     }
 
-
-    // FIXME REPAIR
-    /*if (_temporaryMapping != nullptr)
+    /*// Delete the temporary mapping
+    if (_temporaryMapping != nullptr)
     {
         AgentMappingM* temp = _temporaryMapping;
         settemporaryMapping(nullptr);

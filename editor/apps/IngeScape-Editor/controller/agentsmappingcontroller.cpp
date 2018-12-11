@@ -1775,15 +1775,10 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
                                 qWarning() << "There is still the corresponding added Mapping Element" << link->uid() << "while the Mapping was UN-activated";
                             }
 
-                            // Useless ?
+                            // Useless ? (because when the mapping is activated in mode "Control", all links added/removed while the Mapping was UN-activated must have been used and then, canceled)
                             //link->inputAgent()->cancelAddLink_WhileMappingWasUNactivated(link->uid());
                         }
                     }
-
-                    // FIXME REPAIR removeTemporaryMappingElement
-                    /*if (link->inputAgent() != nullptr) {
-                        link->inputAgent()->removeTemporaryMappingElement(link->uid());
-                    }*/
                 }
                 else {
                     qWarning() << "The link" << link->uid() << "already exist";
@@ -1961,7 +1956,7 @@ LinkInputVM* AgentsMappingController::_getAloneLinkInputFromName(AgentInMappingV
         if (linkInputsWithSameName.count() == 1) {
             linkInput = linkInputsWithSameName.at(0);
         }
-        else {
+        else if (linkInputsWithSameName.count() > 1) {
             qWarning() << "There are" << linkInputsWithSameName.count() << "link inputs with the same name" << inputName << "."
                        << "We cannot choose and create the link" << linkName;
         }
