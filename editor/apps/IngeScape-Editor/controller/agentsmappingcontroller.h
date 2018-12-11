@@ -243,34 +243,6 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when an active agent has been defined
-     * @param agent
-     */
-    //void onActiveAgentDefined(AgentM* agent);
-
-
-    /**
-     * @brief Slot called when the mapping of an active agent has been defined
-     * @param agent
-     */
-    //void onActiveAgentMappingDefined(AgentM* agent);
-
-
-    /**
-     * @brief Slot when two agents are mapped
-     * @param mappingElement
-     */
-    //void onMapped(ElementMappingM* mappingElement);
-
-
-    /**
-     * @brief Slot when two agents are unmapped
-     * @param mappingElement
-     */
-    //void onUnmapped(ElementMappingM* mappingElement);
-
-
-    /**
      * @brief Slot called when the flag "is ON" of an agent changed
      * @param isON
      */

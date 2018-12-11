@@ -946,9 +946,6 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
             // Set this new definition to the agent
             agent->setdefinition(newDefinition);
 
-            // Emit the signal "Active Agent Defined"
-            Q_EMIT activeAgentDefined(agent);
-
             // Free memory
             if (previousDefinition != nullptr) {
                 delete previousDefinition;
@@ -995,67 +992,6 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
             if (previousMapping != nullptr) {
                 delete previousMapping;
             }
-
-            /*if (agent->mapping() == nullptr)
-            {
-                // Set this mapping to the agent
-                agent->setmapping(agentMapping);
-
-                // Emit the signal "Active Agent Mapping Defined"
-                Q_EMIT activeAgentMappingDefined(agent);
-            }
-            // There is already a mapping for this agent
-            else
-            {
-                qWarning() << "Update the mapping of agent" << agentName << "(if this mapping has changed)";
-
-                QStringList namesOfRemovedMappingElements;
-                for (QString namePreviousList : previousMapping->namesOfMappingElements())
-                {
-                    if (!agentMapping->namesOfMappingElements().contains(namePreviousList)) {
-                        namesOfRemovedMappingElements.append(namePreviousList);
-                    }
-                }
-
-                QStringList namesOfAddedMappingElements;
-                for (QString nameNewList : agentMapping->namesOfMappingElements())
-                {
-                    if (!previousMapping->namesOfMappingElements().contains(nameNewList)) {
-                        namesOfAddedMappingElements.append(nameNewList);
-                    }
-                }
-
-                // If there are some Removed mapping elements
-                if (!namesOfRemovedMappingElements.isEmpty())
-                {
-                    for (ElementMappingM* mappingElement : previousMapping->mappingElements()->toList())
-                    {
-                        if ((mappingElement != nullptr) && namesOfRemovedMappingElements.contains(mappingElement->name()))
-                        {
-                            // Emit the signal "UN-mapped"
-                            Q_EMIT unmapped(mappingElement);
-                        }
-                    }
-                }
-                // If there are some Added mapping elements
-                if (!namesOfAddedMappingElements.isEmpty())
-                {
-                    for (ElementMappingM* mappingElement : agentMapping->mappingElements()->toList())
-                    {
-                        if ((mappingElement != nullptr) && namesOfAddedMappingElements.contains(mappingElement->name()))
-                        {
-                            // Emit the signal "Mapped"
-                            Q_EMIT mapped(mappingElement);
-                        }
-                    }
-                }
-
-                // Set this new mapping to the agent
-                agent->setmapping(agentMapping);
-
-                // Delete the previous model of agent mapping
-                delete previousMapping;
-            }*/
         }
     }
 }

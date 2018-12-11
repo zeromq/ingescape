@@ -262,34 +262,6 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when an active agent has been defined
-     * @param agent
-     */
-    void activeAgentDefined(AgentM* agent);
-
-
-    /**
-     * @brief Signal emitted when the mapping of an active agent has been defined
-     * @param agent
-     */
-    void activeAgentMappingDefined(AgentM* agent);
-
-
-    /**
-     * @brief Emitted when two agents are mapped
-     * @param mappingElement
-     */
-    void mapped(ElementMappingM* mappingElement);
-
-
-    /**
-     * @brief Emitted when two agents are unmapped
-     * @param mappingElement
-     */
-    void unmapped(ElementMappingM* mappingElement);
-
-
-    /**
      * @brief Signal emitted when a command must be sent on the network to an agent
      * @param peerIdsList
      * @param command
