@@ -669,26 +669,7 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
         {
             qDebug() << "Mapping Activated in mode CONTROL";
 
-            // Cancel all changes made while the mapping was UN-activated
-            for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
-            {
-                if (agentInMapping != nullptr)
-                {
-                    if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated())
-                    {
-                        // Cancel all added links while the global mapping was UN-activated
-                        agentInMapping->cancelAllAddedLinks_WhileMappingWasUNactivated();
-                    }
-                    if (agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
-                    {
-                        // Cancel all removed links while the global mapping was UN-activated
-                        agentInMapping->cancelAllRemovedLinks_WhileMappingWasUNactivated();
-                    }
-                }
-            }
-
-
-            // Apply all temporary mappings
+            // Apply all current mappings with changes applied while the mapping was UN-activated
             for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
             {
                 if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr) && (agentInMapping->agentsGroupedByName()->currentMapping() != nullptr))
@@ -722,6 +703,25 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
                     Q_EMIT commandAskedToAgent(agentInMapping->agentsGroupedByName()->peerIdsList(), command);
                 }
             }
+
+            // FIXME Usefull ?
+            /*// Cancel all changes made while the mapping was UN-activated
+            for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
+            {
+                if (agentInMapping != nullptr)
+                {
+                    if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated())
+                    {
+                        // Cancel all added links while the global mapping was UN-activated
+                        agentInMapping->cancelAllAddedLinks_WhileMappingWasUNactivated();
+                    }
+                    if (agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
+                    {
+                        // Cancel all removed links while the global mapping was UN-activated
+                        agentInMapping->cancelAllRemovedLinks_WhileMappingWasUNactivated();
+                    }
+                }
+            }*/
         }
         // OBSERVE
         else
@@ -1782,17 +1782,17 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
                             qCritical() << "The 'Temporary' link" << link->uid() << "was not in the hash table 'Added Link Waiting Reply'";
                         }
                     }
+                    // The link has been added when the global mapping was UN-activated
+                    // Or when our input agent was OFF
                     else
                     {
                         if (link->inputAgent() != nullptr)
                         {
                             if (link->inputAgent()->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid()))
                             {
-                                qWarning() << "There is still the corresponding added Mapping Element" << link->uid() << "while the Mapping was UN-activated";
+                                qDebug() << "There is still the corresponding added Mapping Element" << link->uid() << "while the Mapping was UN-activated";
+                                link->inputAgent()->cancelAddLink_WhileMappingWasUNactivated(link->uid());
                             }
-
-                            // Useless ? (because when the mapping is activated in mode "Control", all links added/removed while the Mapping was UN-activated must have been used and then, canceled)
-                            //link->inputAgent()->cancelAddLink_WhileMappingWasUNactivated(link->uid());
                         }
                     }
                 }
