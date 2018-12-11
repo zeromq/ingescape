@@ -223,10 +223,10 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a model of agent has been added to our group
+     * @brief Signal emitted when a model of agent "ON" has been added to our group
      * @param model
      */
-    void agentModelHasBeenAdded(AgentM* model);
+    void agentModelONhasBeenAdded(AgentM* model);
 
 
     /**

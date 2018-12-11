@@ -243,10 +243,17 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the flag "is ON" of an agent changed
+     * @brief Slot called when the flag "is ON" of an agent(s grouped by name) changed
      * @param isON
      */
-    void onAgentIsONChanged(bool isON);
+    void _onAgentIsONChanged(bool isON);
+
+
+    /**
+     * @brief Slot called when a model of agent "ON" has been added to an agent(s grouped by name)
+     * @param model
+     */
+    void _onAgentModelONhasBeenAdded(AgentM* model);
 
 
     /**

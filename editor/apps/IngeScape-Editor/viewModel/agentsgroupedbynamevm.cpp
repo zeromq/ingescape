@@ -134,6 +134,12 @@ void AgentsGroupedByNameVM::addNewAgentModel(AgentM* model)
 
             _models.append(model);
 
+            if (model->isON())
+            {
+                // Emit the signal to notify that a new model of agent "ON" has been added
+                Q_EMIT agentModelONhasBeenAdded(model);
+            }
+
             // Update with all models
             _updateWithAllModels();
         }
@@ -838,9 +844,6 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
 
                     // Add the model of agent to the view model of agents grouped by definition
                     groupOfAgentsWithSameDefinition->models()->append(model);
-
-                    // Emit the signal to notify that the new model has been added
-                    Q_EMIT agentModelHasBeenAdded(model);
                 }
                 // There is already some agent models on this host
                 else
@@ -852,9 +855,6 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
 
                         // Add the model of agent to the view model of agents grouped by definition
                         groupOfAgentsWithSameDefinition->models()->append(model);
-
-                        // Emit the signal to notify that the new model has been added
-                        Q_EMIT agentModelHasBeenAdded(model);
                     }
                     // Peer id is defined: check if it is an agent that evolve from OFF to ON
                     else
@@ -943,9 +943,6 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
                                 // (allows to prevent to have 0 model at a given moment and to prevent to emit signal noMoreModelAndUseless that remove the groupOfAgentsWithSameDefinition)
                                 groupOfAgentsWithSameDefinition->models()->append(model);
 
-                                // Emit the signal to notify that the new model has been added
-                                Q_EMIT agentModelHasBeenAdded(model);
-
                                 groupOfAgentsWithSameDefinition->models()->remove(sameModel);
 
                                 // Emit the signal to delete the previous model of agent
@@ -959,9 +956,6 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
 
                             // Add the model of agent to the view model of agents grouped by definition
                             groupOfAgentsWithSameDefinition->models()->append(model);
-
-                            // Emit the signal to notify that the new model has been added
-                            Q_EMIT agentModelHasBeenAdded(model);
                         }
                     }
                 }
@@ -1015,9 +1009,6 @@ void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
 
             // Add the model of agent to the view model of agents grouped by definition
             groupOfAgentsWithSameDefinition->models()->append(model);
-
-            // Emit the signal to notify that the new model has been added
-            Q_EMIT agentModelHasBeenAdded(model);
         }
         else
         {

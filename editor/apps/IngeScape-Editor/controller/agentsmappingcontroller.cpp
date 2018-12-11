@@ -779,7 +779,8 @@ void AgentsMappingController::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedB
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && (_modelManager != nullptr))
     {
         // Connect to signals from this new agents grouped by name
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::isONChanged, this, &AgentsMappingController::onAgentIsONChanged);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::isONChanged, this, &AgentsMappingController::_onAgentIsONChanged);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelONhasBeenAdded, this, &AgentsMappingController::_onAgentModelONhasBeenAdded);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsHaveBeenAdded, this, &AgentsMappingController::onMappingElementsHaveBeenAdded);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsWillBeRemoved, this, &AgentsMappingController::onMappingElementsWillBeRemoved);
 
@@ -847,10 +848,10 @@ void AgentsMappingController::onAgentsGroupedByNameWillBeDeleted(AgentsGroupedBy
 
 
 /**
- * @brief Slot called when the flag "is ON" of an agent changed
+ * @brief Slot called when the flag "is ON" of an agent(s grouped by name) changed
  * @param isON
  */
-void AgentsMappingController::onAgentIsONChanged(bool isON)
+void AgentsMappingController::_onAgentIsONChanged(bool isON)
 {
     if (isON)
     {
@@ -900,6 +901,19 @@ void AgentsMappingController::onAgentIsONChanged(bool isON)
                 }
             }
         }
+    }
+}
+
+
+/**
+ * @brief Slot called when a model of agent "ON" has been added to an agent(s grouped by name)
+ * @param model
+ */
+void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
+{
+    if ((model != nullptr) && model->isON())
+    {
+        // FIXME TODO: CONTROL over-write...
     }
 }
 
