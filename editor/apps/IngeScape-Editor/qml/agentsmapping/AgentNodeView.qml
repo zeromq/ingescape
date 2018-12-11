@@ -882,7 +882,7 @@ Rectangle {
                 right: parent.right
             }
             Rectangle {
-                visible: agentMappingVM.hadLinksAdded_WhileMappingWasUNactivated
+                visible: agentMappingVM ? agentMappingVM.hadLinksAdded_WhileMappingWasUNactivated : false
                 color: "red"
                 width: 8
                 height: 8
@@ -893,7 +893,7 @@ Rectangle {
                 }
             }
             Rectangle {
-                visible: agentMappingVM.hadLinksRemoved_WhileMappingWasUNactivated
+                visible: agentMappingVM ? agentMappingVM.hadLinksRemoved_WhileMappingWasUNactivated : false
                 color: "red"
                 width: 8
                 height: 8
