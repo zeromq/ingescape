@@ -758,12 +758,12 @@ void AgentsMappingController::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedB
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && (_modelManager != nullptr))
     {
         // Connect to signals from this new agents grouped by name
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::isONChanged, this, &AgentsMappingController::_onAgentIsONChanged);
+        //connect(agentsGroupedByName, &AgentsGroupedByNameVM::isONChanged, this, &AgentsMappingController::_onAgentIsONChanged);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelONhasBeenAdded, this, &AgentsMappingController::_onAgentModelONhasBeenAdded);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsHaveBeenAdded, this, &AgentsMappingController::onMappingElementsHaveBeenAdded);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsWillBeRemoved, this, &AgentsMappingController::onMappingElementsWillBeRemoved);
 
-        QString agentName = agentsGroupedByName->name();
+        /*QString agentName = agentsGroupedByName->name();
 
         // The mapping is activated
         if (_modelManager->isMappingActivated())
@@ -799,7 +799,7 @@ void AgentsMappingController::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedB
                     _linkAgentOnOutputs(agentInMapping);
                 }
             }
-        }
+        }*/
     }
 }
 
@@ -830,7 +830,7 @@ void AgentsMappingController::onAgentsGroupedByNameWillBeDeleted(AgentsGroupedBy
  * @brief Slot called when the flag "is ON" of an agent(s grouped by name) changed
  * @param isON
  */
-void AgentsMappingController::_onAgentIsONChanged(bool isON)
+/*void AgentsMappingController::_onAgentIsONChanged(bool isON)
 {
     if (isON)
     {
@@ -851,10 +851,7 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
                         // FIXME TODO ? CONTROL
 
                         // FIXME REPAIR WhileMappingWasUNactivated
-                        /*if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
-                        {
-
-                        }*/
+                        //if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
                     }
                     // OBSERVE
                     else
@@ -881,7 +878,7 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
             }
         }
     }
-}
+}*/
 
 
 /**
@@ -891,23 +888,79 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
 void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
 {
     // Model of Agent ON
-    if ((model != nullptr) && model->isON()
-            // Global mapping is activated and controlled !
-            && (_modelManager != nullptr) && _modelManager->isMappingActivated() && _modelManager->isMappingControlled())
+    if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty()
+            // The global mapping is activated
+            && (_modelManager != nullptr) && _modelManager->isMappingActivated())
     {
+        QString agentName = model->name();
+
         // Get the (view model of) agent in the global mapping from the agent name
-        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(model->name());
-        if (agentInMapping != nullptr)
+        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
+
+        QStringList peerIdsList = QStringList(model->peerId());
+
+        // CONTROL
+        if (_modelManager->isMappingControlled())
         {
-            QStringList peerIdsList = QStringList(model->peerId());
+            // The agent is already in the global mapping
+            if (agentInMapping != nullptr)
+            {
+                qDebug() << "CONTROL:" << agentName << "is ON and in the global mapping --> LOAD the MAPPING !";
 
-            // Get the JSON of the mapping of the agent as displayed in the global mapping
-            QString jsonOfMapping = _getJSONofMappingOfAgentInGlobalMapping(agentInMapping);
+                // Get the JSON of the mapping of the agent as displayed in the global mapping
+                QString jsonOfMapping = _getJSONofMappingOfAgentInGlobalMapping(agentInMapping);
 
-            QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
+                QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
-            // Emit signal "Command asked to agent"
-            Q_EMIT commandAskedToAgent(peerIdsList, command);
+                // Emit signal "Command asked to agent"
+                Q_EMIT commandAskedToAgent(peerIdsList, command);
+            }
+            // The agent is NOT in the global mapping
+            else
+            {
+                qDebug() << "CONTROL:" << agentName << "is ON but NOT in the global mapping --> CLEAR its MAPPING !";
+
+                // Send the command "Clear Mapping" on the network to this agent(s)
+                Q_EMIT commandAskedToAgent(peerIdsList, command_ClearMapping);
+            }
+        }
+        // OBSERVE
+        else
+        {
+            // The agent is already in the global mapping
+            if (agentInMapping != nullptr)
+            {
+                qDebug() << "OBSERVE:" << agentName << "is ON and in the global mapping --> do something ?";
+
+                // FIXME TODO ?
+            }
+            // The agent is NOT in the global mapping
+            else
+            {
+                qDebug() << "OBSERVE:" << agentName << "is ON but NOT in the global mapping --> ADD to the global mapping !";
+
+                double randomMax = (double)RAND_MAX;
+
+                // Get a random position in the current window
+                QPointF position = _getRandomPosition(randomMax);
+
+                // Get the (view model of) agents grouped for the name
+                AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
+                if (agentsGroupedByName != nullptr)
+                {
+                    // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
+                    agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position);
+                    if (agentInMapping != nullptr)
+                    {
+                        // No need to add links on inputs now, because the mapping will be received after the creation of this agent(s grouped by name)
+                        // Link the agent in the global mapping on its inputs (add all missing links TO the agent)
+                        _linkAgentOnInputs(agentInMapping);
+
+                        // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)
+                        _linkAgentOnOutputs(agentInMapping);
+                    }
+                }
+            }
         }
     }
 }

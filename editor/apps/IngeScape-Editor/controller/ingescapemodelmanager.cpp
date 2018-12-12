@@ -1291,15 +1291,15 @@ void IngeScapeModelManager::_createAgentsGroupedByName(AgentM* model)
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsHaveBeenAdded, this, &IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsWillBeRemoved, this, &IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName);
 
-        // Add the new model of agent
-        agentsGroupedByName->addNewAgentModel(model);
-
         _hashFromNameToAgentsGrouped.insert(agentsGroupedByName->name(), agentsGroupedByName);
 
         _allAgentsGroupsByName.append(agentsGroupedByName);
 
         // Emit the signal "Agents grouped by name has been created"
         Q_EMIT agentsGroupedByNameHasBeenCreated(agentsGroupedByName);
+
+        // Add the new model of agent
+        agentsGroupedByName->addNewAgentModel(model);
     }
 }
 
