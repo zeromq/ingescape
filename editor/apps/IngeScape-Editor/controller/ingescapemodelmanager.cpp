@@ -304,12 +304,12 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                 }
                             }
                         }
-                    }
 
-                    if (agentDefinition != NULL)
-                    {
-                        // Free memory
-                        delete agentDefinition;
+                        if (agentDefinition != NULL)
+                        {
+                            // Free memory
+                            delete agentDefinition;
+                        }
                     }
                 }
                 else {
