@@ -8,14 +8,23 @@
 /**
   * \file ../../src/include/ingescape.h
   */
+
+#if (defined WIN32 || defined _WIN32)
+// Define UNICODE before includes for cross compile
+// Because GetModuleFileName with UNICODE is  GetModuleFileNameW(void*, wchar*, size_t)
+// And GetModuleFileName without UNICODE is  GetModuleFileNameW(void*, char*, size_t)
+// Call GetModuleFileName without UNICODE but with wchar as parameter result of NULL string
+#ifndef UNICODE
+#define UNICODE
+#endif
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <signal.h>
 
-#if (defined WIN32 || defined _WIN32)
-#endif
 #ifdef __linux__
 #include <unistd.h>
 #endif
@@ -1230,6 +1239,7 @@ initLoop (zsock_t *pipe, void *args){
         //command line was not set manually : we try to get exec path instead
 
         //Use GetModuleFileName() to get exec path
+        // See comment on define UNICODE in the top of this file, without define UNICODE This lines return NULL String
         WCHAR temp[MAX_PATH];
         GetModuleFileName(NULL,temp,MAX_PATH);
         
