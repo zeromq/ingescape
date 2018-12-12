@@ -448,6 +448,14 @@ private:
     LinkOutputVM* _getAloneLinkOutputFromName(AgentInMappingVM* agent, const QString& outputName, const QString& linkName);
 
 
+    /**
+     * @brief Get the JSON of the mapping of an agent as displayed in the global mapping
+     * @param agentInMapping
+     * @return
+     */
+    QString _getJSONofMappingOfAgentInGlobalMapping(AgentInMappingVM* agentInMapping);
+
+
 private:
 
     // Manager for the data model of INGESCAPE

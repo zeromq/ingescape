@@ -673,31 +673,10 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
             for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
             {
                 // Usefull only for agents ON
-                if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr) && agentInMapping->agentsGroupedByName()->isON()
-                        && (agentInMapping->agentsGroupedByName()->currentMapping() != nullptr))
+                if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr) && agentInMapping->agentsGroupedByName()->isON())
                 {
-                    QString jsonOfMapping;
-
-                    if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
-                    {
-                        // Get the list of all added mapping elements while the global mapping was UN-activated
-                        QList<ElementMappingM*> addedMappingElements = agentInMapping->getAddedMappingElements_WhileMappingWasUNactivated();
-
-                        // Get the list of all names of removed mapping elements while the global mapping was UN-activated
-                        QStringList namesOfRemovedMappingElements = agentInMapping->getNamesOfRemovedMappingElements_WhileMappingWasUNactivated();
-
-                        // Get the JSON of the current mapping of the agent with changes applied while the mapping was UN-activated
-                        jsonOfMapping = _jsonHelper->getJsonOfAgentMappingWithChanges(agentInMapping->agentsGroupedByName()->currentMapping(),
-                                                                                      addedMappingElements,
-                                                                                      namesOfRemovedMappingElements,
-                                                                                      QJsonDocument::Compact);
-                    }
-                    else
-                    {
-                        // Get the JSON of the current mapping of the agent
-                        jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agentInMapping->agentsGroupedByName()->currentMapping(),
-                                                                           QJsonDocument::Compact);
-                    }
+                    // Get the JSON of the mapping of the agent as displayed in the global mapping
+                    QString jsonOfMapping = _getJSONofMappingOfAgentInGlobalMapping(agentInMapping);
 
                     QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
@@ -911,9 +890,25 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
  */
 void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
 {
-    if ((model != nullptr) && model->isON())
+    // Model of Agent ON
+    if ((model != nullptr) && model->isON()
+            // Global mapping is activated and controlled !
+            && (_modelManager != nullptr) && _modelManager->isMappingActivated() && _modelManager->isMappingControlled())
     {
-        // FIXME TODO: CONTROL over-write...
+        // Get the (view model of) agent in the global mapping from the agent name
+        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(model->name());
+        if (agentInMapping != nullptr)
+        {
+            QStringList peerIdsList = QStringList(model->peerId());
+
+            // Get the JSON of the mapping of the agent as displayed in the global mapping
+            QString jsonOfMapping = _getJSONofMappingOfAgentInGlobalMapping(agentInMapping);
+
+            QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
+
+            // Emit signal "Command asked to agent"
+            Q_EMIT commandAskedToAgent(peerIdsList, command);
+        }
     }
 }
 
@@ -1757,4 +1752,41 @@ LinkOutputVM* AgentsMappingController::_getAloneLinkOutputFromName(AgentInMappin
         }
     }
     return linkOutput;
+}
+
+
+/**
+ * @brief Get the JSON of the mapping of an agent as displayed in the global mapping
+ * @param agentInMapping
+ * @return
+ */
+QString AgentsMappingController::_getJSONofMappingOfAgentInGlobalMapping(AgentInMappingVM* agentInMapping)
+{
+    QString jsonOfMapping;
+
+    if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr) && (agentInMapping->agentsGroupedByName()->currentMapping() != nullptr)
+            && (_jsonHelper != nullptr))
+    {
+        if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
+        {
+            // Get the list of all added mapping elements while the global mapping was UN-activated
+            QList<ElementMappingM*> addedMappingElements = agentInMapping->getAddedMappingElements_WhileMappingWasUNactivated();
+
+            // Get the list of all names of removed mapping elements while the global mapping was UN-activated
+            QStringList namesOfRemovedMappingElements = agentInMapping->getNamesOfRemovedMappingElements_WhileMappingWasUNactivated();
+
+            // Get the JSON of the current mapping of the agent with changes applied while the mapping was UN-activated
+            jsonOfMapping = _jsonHelper->getJsonOfAgentMappingWithChanges(agentInMapping->agentsGroupedByName()->currentMapping(),
+                                                                          addedMappingElements,
+                                                                          namesOfRemovedMappingElements,
+                                                                          QJsonDocument::Compact);
+        }
+        else
+        {
+            // Get the JSON of the current mapping of the agent
+            jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agentInMapping->agentsGroupedByName()->currentMapping(),
+                                                               QJsonDocument::Compact);
+        }
+    }
+    return jsonOfMapping;
 }
