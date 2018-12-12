@@ -459,7 +459,7 @@ Rectangle {
                                         linkPoint.scale = 1
 
                                         //console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
-                                        controller.dropLinkBetweenAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
+                                        controller.dropLinkBetweenTwoAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
                                     }
                                 }
                             }
@@ -720,7 +720,7 @@ Rectangle {
                                         linkPointOut.scale = 1
 
                                         //console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
-                                        controller.dropLinkBetweenAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
+                                        controller.dropLinkBetweenTwoAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
                                     }
                                 }
                             }

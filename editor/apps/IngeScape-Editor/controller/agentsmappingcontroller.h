@@ -82,7 +82,7 @@ public:
 
 
     /**
-     * @brief Remove the agent from the mapping and delete it
+     * @brief Remove the agent from the mapping and delete the view model
      * @param agent
      */
     Q_INVOKABLE void deleteAgentInMapping(AgentInMappingVM* agent);
@@ -112,7 +112,7 @@ public:
      * @param inputAgent
      * @param linkInput
      */
-    Q_INVOKABLE void dropLinkBetweenAgents(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput);
+    Q_INVOKABLE void dropLinkBetweenTwoAgents(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput);
 
 
     /**
@@ -356,14 +356,6 @@ private:
      * @param agent
      */
     void _removeAllLinksWithAgent(AgentInMappingVM* agent);
-
-
-    /**
-     * @brief OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-     * @param agentModel
-     * @param temporaryMapping
-     */
-    //void _overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping);
 
 
     /**

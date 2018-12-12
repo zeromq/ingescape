@@ -107,7 +107,7 @@ void AgentsMappingController::clearMapping()
 
 
 /**
- * @brief Remove the agent from the mapping and delete it
+ * @brief Remove the agent from the mapping and delete the view model
  * @param agent
  */
 void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
@@ -282,7 +282,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
  * @param inputAgent
  * @param linkInput
  */
-void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput)
+void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput)
 {
     if ((outputAgent != nullptr) && (outputAgent->agentsGroupedByName() != nullptr) && (linkOutput != nullptr) && (linkOutput->output() != nullptr)
             && (inputAgent != nullptr) && (inputAgent->agentsGroupedByName() != nullptr) && (linkInput != nullptr) && (linkInput->input() != nullptr))
@@ -584,8 +584,8 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 
                             if ((linkInput != nullptr) && (linkOutput != nullptr))
                             {
-                                // Simulate a drop of the link
-                                dropLinkBetweenAgents(outputAgent, linkOutput, inputAgent, linkInput);
+                                // Simulate a drop of the link between the two agents
+                                dropLinkBetweenTwoAgents(outputAgent, linkOutput, inputAgent, linkInput);
                             }
                         }
                     }
@@ -1378,32 +1378,6 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
         }
     }
 }
-
-
-/**
- * @brief OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
- * @param agentModel
- * @param temporaryMapping
- */
-/*void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping)
-{
-    // Model is ON
-    // AND
-    // Global mapping is activated and controlled !
-    if ((agentModel != nullptr) && agentModel->isON() && (temporaryMapping != nullptr) && (_jsonHelper != nullptr)
-            && (_modelManager != nullptr) && _modelManager->isMappingActivated() && _modelManager->isMappingControlled())
-    {
-        QStringList peerIdsList = QStringList(agentModel->peerId());
-
-        // Get the JSON of the agent mapping
-        QString jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(temporaryMapping, QJsonDocument::Compact);
-
-        QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
-
-        // Emit signal "Command asked to agent"
-        Q_EMIT commandAskedToAgent(peerIdsList, command);
-    }
-}*/
 
 
 /**
