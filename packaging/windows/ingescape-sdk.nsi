@@ -211,6 +211,8 @@ Function ExportZmqHeader
     SetOutPath $INSTDIR\include
     File "/usr/i686-w64-mingw32/include/zmq.h"
     File "/usr/i686-w64-mingw32/include/zmq_utils.h"
+    File "/usr/i686-w64-mingw32/include/sodium.h"
+    File /r "/usr/i686-w64-mingw32/include/sodium"
 FunctionEnd
 
 Function ExportZyreHeader
@@ -219,6 +221,12 @@ Function ExportZyreHeader
     File "/usr/i686-w64-mingw32/include/zyre.h"
     File "/usr/i686-w64-mingw32/include/zyre_event.h"
     File "/usr/i686-w64-mingw32/include/zyre_library.h"
+FunctionEnd
+
+Function ExportYajlHeader
+    ; Even for x86_64 do not need to search header in x86 folder because header are the same
+    SetOutPath $INSTDIR\include
+    File /r "/usr/i686-w64-mingw32/include/yajl"
 FunctionEnd
 
 SectionGroup "64 bits SDK" Group64Bits
@@ -242,6 +250,7 @@ SectionGroup "64 bits SDK" Group64Bits
 
         SetOutPath $INSTDIR\x86_64
         File "/usr/x86_64-w64-mingw32/lib/libzmq.dll.a"
+        File "/usr/x86_64-w64-mingw32/lib/libsodium.dll.a"
     SectionEnd
 
     Section "SDK Zyre" SecZyreSdk64
@@ -249,6 +258,13 @@ SectionGroup "64 bits SDK" Group64Bits
 
         SetOutPath $INSTDIR\x86_64
         File "/usr/x86_64-w64-mingw32/lib/libzyre.dll.a"
+    SectionEnd
+
+    Section "SDK Yajl" SecYajlSdk64
+        Call ExportYajlHeader
+
+        SetOutPath $INSTDIR\x86_64
+        File "/usr/x86_64-w64-mingw32/lib/libyajl.dll.a"
     SectionEnd
 SectionGroupEnd
 
@@ -273,6 +289,7 @@ SectionGroup "32 bits SDK" Group32Bits
 
         SetOutPath $INSTDIR\i686
         File "/usr/i686-w64-mingw32/lib/libzmq.dll.a"
+        File "/usr/i686-w64-mingw32/lib/libsodium.dll.a"
     SectionEnd
 
     Section "SDK Zyre" SecZyreSdk32
@@ -280,6 +297,13 @@ SectionGroup "32 bits SDK" Group32Bits
 
         SetOutPath $INSTDIR\i686
         File "/usr/i686-w64-mingw32/lib/libzyre.dll.a"
+    SectionEnd
+
+    Section "SDK Yajl" SecYajlSdk32
+        Call ExportYajlHeader
+
+        SetOutPath $INSTDIR\i686
+        File "/usr/i686-w64-mingw32/lib/libyajl.dll.a"
     SectionEnd
 SectionGroupEnd
 
@@ -313,9 +337,6 @@ Function un.onInit
 	!insertmacro VerifyUserIsAdmin
 FunctionEnd
 
-; TODO Export sodium ?
-; TODO Add 64 and 32 bits group
-
 ##############################################
 # Descriptions
 ##############################################
@@ -333,6 +354,8 @@ LangString DESC_SecZmqSdk64 ${LANG_ENGLISH} "Zmq header and linkable library for
 LangString DESC_SecZmqSdk32 ${LANG_ENGLISH} "Zmq header and linkable library for 32 bits OS"
 LangString DESC_SecZyreSdk64 ${LANG_ENGLISH} "Zyre header and linkable library for 64 bits OS"
 LangString DESC_SecZyreSdk32 ${LANG_ENGLISH} "Zyre header and linkable library for 32 bits OS"
+LangString DESC_SecYajlSdk64 ${LANG_ENGLISH} "Yajl header and linkable library for 64 bits OS"
+LangString DESC_SecYajlSdk32 ${LANG_ENGLISH} "Yajl header and linkable library for 32 bits OS"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -348,6 +371,8 @@ LangString DESC_SecZyreSdk32 ${LANG_ENGLISH} "Zyre header and linkable library f
 !insertmacro MUI_DESCRIPTION_TEXT ${SecZmqSdk32} $(DESC_SecZmqSdk32)
 !insertmacro MUI_DESCRIPTION_TEXT ${SecZyreSdk64} $(DESC_SecZyreSdk64)
 !insertmacro MUI_DESCRIPTION_TEXT ${SecZyreSdk32} $(DESC_SecZyreSdk32)
+!insertmacro MUI_DESCRIPTION_TEXT ${SecYajlSdk64} $(DESC_SecYajlSdk64)
+!insertmacro MUI_DESCRIPTION_TEXT ${SecYajlSdk32} $(DESC_SecYajlSdk32)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ##############################################
