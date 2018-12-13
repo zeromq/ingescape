@@ -17,23 +17,17 @@ macro(add_ingescape_sources _SOURCES)
     )
 
     IF (WIN32)
-        list(APPEND ${_SOURCES} dependencies/windows/unix/unixfunctions.c)
+        list(APPEND ${_SOURCES} ${macro_current_dir}/../../../dependencies/windows/unix/unixfunctions.c)
     ENDIF (WIN32)
-    
-    #The MSVC C compiler is too out of date,
-    #so the sources have to be compiled as c++
-    if (MSVC)
-        enable_language(CXX)
-        set_source_files_properties(
-            ${${_SOURCES}}
-            PROPERTIES LANGUAGE CXX
-        )
-    endif()
 endmacro()
 
 # Macro to add ingescape header directory in given var
 macro(add_ingescape_include_directory _HEADERS)
     list(APPEND ${_HEADERS} "${macro_current_dir}/../../../src/include")
+	
+    IF (WIN32)
+		list(APPEND ${_HEADERS} "${macro_current_dir}/../../../dependencies/windows/unix")
+    ENDIF (WIN32)
 endmacro()
 
 # Macro to add ingescape libs dependencies in given var
@@ -102,13 +96,12 @@ macro(add_ingescape_libraries_dependencies _LIBS _pkg_config_libs_private)
     
     if (MSVC)
         # required libraries for msvc
-        set(MORE_LIBRARIES ws2_32)
+        list(APPEND ${_LIBS} ws2_32)
     elseif (MINGW)
         # required libraries for mingw
-        set(MORE_LIBRARIES -lws2_32)
+        list(APPEND ${_LIBS} -lws2_32)
     elseif (CYGWIN)
         # required libraries for cygwin
-        set(MORE_LIBRARIES)
     endif()
 endmacro()
 
