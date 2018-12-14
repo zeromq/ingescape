@@ -81,7 +81,7 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when the timer time out
+     * @brief Slot called when the timer times out
      */
     void _onTimeout();
 

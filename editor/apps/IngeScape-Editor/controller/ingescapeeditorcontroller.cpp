@@ -258,6 +258,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     if (isStarted)
     {
+        // Start a (single shot) timer
+        QTimer::singleShot(1000, _agentsMappingC, &AgentsMappingController::onNetworkStartedSince1sec);
+
         // Initialize platform from online mapping
         _modelManager->setisMappingActivated(true);
     }

@@ -94,5 +94,5 @@ void AgentMappingM::_onMappingElementsListChanged()
     }
 
     //qDebug() << "Mapping" << _name << "has elements:" << _namesOfMappingElements;
-    qDebug() << "Mapping" << _name << "has elements:" << _hashFromNameToMappingElement.keys();
+    //qDebug() << "Mapping" << _name << "has elements:" << _hashFromNameToMappingElement.keys();
 }

@@ -750,6 +750,57 @@ void AgentsMappingController::onIsMappingControlledChanged(bool isMappingControl
 
 
 /**
+ * @brief Slot called when the network is started since 1 second
+ */
+void AgentsMappingController::onNetworkStartedSince1sec()
+{
+    qDebug() << "on Network Started Since 1 sec";
+
+    if (_modelManager != nullptr)
+    {
+        bool allAgentsOFF = true;
+        bool isAddedOrRemovedLink_WhileMappingWasUNactivated = false;
+
+        if (!_allAgentsInMapping.isEmpty())
+        {
+            for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
+            {
+                if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr))
+                {
+                    if (agentInMapping->agentsGroupedByName()->isON())
+                    {
+                        allAgentsOFF = false;
+                        //break;
+                    }
+
+                    if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
+                    {
+                        isAddedOrRemovedLink_WhileMappingWasUNactivated = true;
+                        //break;
+                    }
+                }
+            }
+        }
+
+        // All agents are OFF
+        if (allAgentsOFF)
+        {
+            // DE-activate the mapping
+            _modelManager->setisMappingActivated(false);
+        }
+        // There have been changes in the mapping while the mapping was UN-activated
+        else if (isAddedOrRemovedLink_WhileMappingWasUNactivated)
+        {
+            qDebug() << "There have been changes in the mapping while the mapping was UN-activated. Force to CONTROL ?";
+
+            // The mapping has been modified but will be lost if the user stay in mode OBSERVE
+            Q_EMIT changesOnLinksWhileMappingUnactivated();
+        }
+    }
+}
+
+
+/**
  * @brief Slot called when a new view model of agents grouped by name has been created
  * @param agentsGroupedByName
  */
@@ -1469,7 +1520,7 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
         // The link is NOT in the global mapping
         if (linksWithSameName.isEmpty())
         {
-            qDebug() << "Try to create link" << linkName << "TO agent" << inputAgent->name() << "involved as 'INPUT' agent";
+            //qDebug() << "Try to create link" << linkName << "TO agent" << inputAgent->name() << "involved as 'INPUT' agent";
 
             // Get the (view model of) agent in the global mapping from the output agent name
             AgentInMappingVM* outputAgent = getAgentInMappingFromName(mappingElement->firstModel()->outputAgent());
@@ -1817,3 +1868,4 @@ QString AgentsMappingController::_getJSONofMappingOfAgentInGlobalMapping(AgentIn
     }
     return jsonOfMapping;
 }
+

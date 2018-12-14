@@ -120,7 +120,7 @@ void LinkOutputVM::_oncurrentValueChanged(QVariant value)
 
 
 /**
- * @brief Slot when the timer time out
+ * @brief Slot called when the timer times out
  */
 void LinkOutputVM::_onTimeout()
 {
