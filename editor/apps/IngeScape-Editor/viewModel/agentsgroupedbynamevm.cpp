@@ -52,6 +52,79 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 
     // Set the flag to prevent the deletion of our "agents grouped by name" because the list "allAgentsGroupsByDefinition"
     // will be empty during the execution of this destructor (prevent several call to this destructor)
+    //_canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty = false;
+
+    // Models are managed by agents grouped by definition (do not manage them here)
+    /*if (!_models.isEmpty())
+    {
+        QList<AgentM*> copy = _models.toList();
+        for (AgentM* model : copy)
+        {
+            if (model != nullptr) {
+                Q_EMIT agentModelHasToBeDeleted(model);
+            }
+        }
+    }*/
+
+    /*// Clear hash tables of Inputs, Outputs and Parameters
+    _hashFromNameToInputsList.clear();
+    _hashFromIdToInput.clear();
+    _hashFromNameToOutputsList.clear();
+    _hashFromIdToOutput.clear();
+    _hashFromNameToParametersList.clear();
+    _hashFromIdToParameter.clear();
+
+    // Delete all view models of Inputs, Outputs and Parameters
+    _inputsList.deleteAllItems();
+    _outputsList.deleteAllItems();
+    _parametersList.deleteAllItems();
+
+    // Delete all mapping elements
+    _hashFromNameToMappingElement.clear();
+    _allMappingElements.deleteAllItems();
+
+    if (_currentMapping != nullptr)
+    {
+        AgentMappingM* temp = _currentMapping;
+        setcurrentMapping(nullptr);
+        delete temp;
+    }
+
+
+    // If the list of groups of agent(s grouped by definition) is not empty
+    if (!_allAgentsGroupsByDefinition.isEmpty())
+    {
+        // Delete all view models of agents grouped by definition
+        for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : _allAgentsGroupsByDefinition.toList())
+        {
+            // Delete the view model of agents grouped by definition
+            // And emit the signal "agentModelHasToBeDeleted" for each of its model of agent
+            deleteAgentsGroupedByDefinition(agentsGroupedByDefinition);
+        }
+
+        //_agentsGroupedByDefinitionNULL = nullptr;
+        //_hashFromDefinitionToAgentsGroupedByDefinition.clear();
+        //_allAgentsGroupsByDefinition.clear();
+    }
+
+
+    // All models have already been deleted (the signal "agentModelHasToBeDeleted" is emitted for each of them
+    // in the method "AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition" just before)
+    //_models.deleteAllItems();
+    _models.clear();*/
+
+    // Clear our agent just before its deletion
+    clearBeforeDeletion();
+}
+
+
+/**
+ * @brief Clear our agent just before its deletion
+ */
+void AgentsGroupedByNameVM::clearBeforeDeletion()
+{
+    // Set the flag to prevent the deletion of our "agents grouped by name" because the list "allAgentsGroupsByDefinition"
+    // will be empty during the execution of this destructor (prevent several call to this destructor)
     _canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty = false;
 
     // Models are managed by agents grouped by definition (do not manage them here)
@@ -89,7 +162,6 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
         setcurrentMapping(nullptr);
         delete temp;
     }
-
 
     // If the list of groups of agent(s grouped by definition) is not empty
     if (!_allAgentsGroupsByDefinition.isEmpty())

@@ -88,6 +88,12 @@ public:
 
 
     /**
+     * @brief Clear our agent just before its deletion
+     */
+    void clearBeforeDeletion();
+
+
+    /**
      * @brief Add a new model of agent
      * @param model
      */

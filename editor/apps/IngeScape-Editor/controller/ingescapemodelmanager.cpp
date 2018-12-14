@@ -245,9 +245,12 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
 {
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
     {
+        // Clear our agent just before its deletion
+        agentsGroupedByName->clearBeforeDeletion();
+
         // FIXME: agentsGroupedByDefinitionWillBeDeleted and agentModelHasToBeDeleted
         // DIS-connect to its signals
-        //disconnect(agentsGroupedByName, 0, this, 0);
+        disconnect(agentsGroupedByName, 0, this, 0);
 
         // Remove from the hash table
         _hashFromNameToAgentsGrouped.remove(agentsGroupedByName->name());
