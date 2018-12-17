@@ -272,9 +272,9 @@ if (APPLE)
     set_source_files_properties("${I2QUICK_LIB}" PROPERTIES MACOSX_PACKAGE_LOCATION Frameworks)
     set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${I2QUICK_LIB}")
 elseif (WIN32)
-    set(I2QUICK_LIB "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick")
-    set_target_properties(I2Quick PROPERTIES IMPORTED_IMPLIB "${I2QUICK_LIB}.lib")
-    set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${I2QUICK_LIB}.dll")
+    set(I2QUICK_LIB "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.lib")
+    set_target_properties(I2Quick PROPERTIES IMPORTED_IMPLIB "${I2QUICK_LIB}")
+    set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.dll")
 else ()
     #TODO Add so for unix
 endif ()
@@ -298,6 +298,7 @@ add_executable(${PROJECT_NAME} ${OS_BUNDLE}
     ${ingescape_editor_sources}
     ${ingescape_editor_ressources}
     ${INGESCAPE_EDITOR_ICON}
+    ${I2QUICK_LIB}
 )
 
 if (APPLE)
@@ -319,7 +320,7 @@ elseif (WIN32)
     add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${I2QUICK_LIB}.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
 	
 	# Copy Ingescape dependencies
