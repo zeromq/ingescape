@@ -9,7 +9,7 @@
 ########################################################################
 # Project setup
 ########################################################################
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1.0)
 project(Ingescape)
 
 enable_language(C)
@@ -22,9 +22,7 @@ SET(CMAKE_C_FLAGS_RELEASE "-O2")
 set(pkg_config_libs_private "")
 # Add path to custom macro
 set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/builds/cmake/modules")
-set(INGESCAPE_CMAKE_FINDERS_DIR "${SOURCE_DIR}/builds/cmake/dependencies")
 list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR})
-list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_FINDERS_DIR})
 include(IngescapeHelper)
 
 ########################################################################

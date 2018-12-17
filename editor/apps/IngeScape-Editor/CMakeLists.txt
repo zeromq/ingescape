@@ -1,6 +1,22 @@
 # CMake build script for IngeScape-Editor
 
-# TODO Add stable.h precompile header ?
+# Macro for windows precompiled header
+MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
+  IF(MSVC)
+    GET_FILENAME_COMPONENT(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
+    SET(PrecompiledBinary "${CMAKE_CURRENT_BINARY_DIR}/${PrecompiledBasename}.pch")
+    SET(Sources ${${SourcesVar}})
+
+    SET_SOURCE_FILES_PROPERTIES(${PrecompiledSource}
+                                PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+                                           OBJECT_OUTPUTS "${PrecompiledBinary}")
+    SET_SOURCE_FILES_PROPERTIES(${Sources}
+                                PROPERTIES COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+                                           OBJECT_DEPENDS "${PrecompiledBinary}")  
+    # Add precompiled header to SourcesVar
+    LIST(APPEND ${SourcesVar} ${PrecompiledSource})
+  ENDIF(MSVC)
+ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
 
 ########################################################################
 # Project setup
@@ -14,7 +30,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # Select flags
-SET(CMAKE_CXX_FLAGS_RELEASE "-O3")
+SET(CMAKE_CXX_FLAGS_RELEASE "-O2")
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed
@@ -36,34 +52,22 @@ endif ()
 
 add_definitions(-DQT_DEPRECATED_WARNINGS=1)
 add_definitions(-DINGESCAPE=1)
+add_definitions(-DWIN32_LEAN_AND_MEAN) # To avoid include of winsock.h by windows.h
 
 ########################################################################
 # plateform specific
 ########################################################################
-#The MSVC C compiler is too out of date,
-#so the sources have to be compiled as c++
-if (MSVC)
-    set(MORE_LIBRARIES ws2_32)
+if (NOT MSVC)
+	include(CheckCXXCompilerFlag)
+	foreach(_CXXOPT -pedantic -Wall -Wextra -W -Wpointer-arith -Wwrite-strings -Wunused -Wshadow -Winline -Wnested-externs -Wno-long-long -Wfloat-equal -Wno-multichar -Wsign-compare -Wundef -Wno-format-nonliteral -Wendif-labels -Wstrict-prototypes -Wstrict-aliasing=3 -Wcast-align -Wtype-limits -Wold-style-declaration -Wmissing-parameter-type -Wempty-body -Wclobbered -Wignored-qualifiers -Wconversion -Wno-sign-conversion -Wvla -Wdouble-promotion -Wno-system-headers -Wno-pedantic-ms-format)
+		# surprisingly, CHECK_C_COMPILER_FLAG needs a new variable to store each new
+		# test result in.
+		check_cxx_compiler_flag(${_CXXOPT} OPT${_CXXOPT})
+		if(OPT${_CXXOPT})
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_CXXOPT}")
+		endif()
+	endforeach()
 endif()
-# required libraries for mingw
-if (MINGW)
-    set(MORE_LIBRARIES -lws2_32)
-endif()
-
-# required libraries for cygwin
-if (CYGWIN)
-    set(MORE_LIBRARIES)
-endif()
-
-include(CheckCXXCompilerFlag)
-foreach(_CXXOPT -pedantic -Wall -Wextra -W -Wpointer-arith -Wwrite-strings -Wunused -Wshadow -Winline -Wnested-externs -Wno-long-long -Wfloat-equal -Wno-multichar -Wsign-compare -Wundef -Wno-format-nonliteral -Wendif-labels -Wstrict-prototypes -Wstrict-aliasing=3 -Wcast-align -Wtype-limits -Wold-style-declaration -Wmissing-parameter-type -Wempty-body -Wclobbered -Wignored-qualifiers -Wconversion -Wno-sign-conversion -Wvla -Wdouble-promotion -Wno-system-headers -Wno-pedantic-ms-format)
-    # surprisingly, CHECK_C_COMPILER_FLAG needs a new variable to store each new
-    # test result in.
-    check_cxx_compiler_flag(${_CXXOPT} OPT${_CXXOPT})
-    if(OPT${_CXXOPT})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_CXXOPT}")
-    endif()
-endforeach()
 
 ########################################################################
 # version
@@ -154,12 +158,13 @@ source_group ("Header Files" FILES ${ingescape_editor_headers})
 ########################################################################
 # Sources files
 ########################################################################
-set(_INCLUDES_DIRECTORY 
+
+add_ingescape_include_directory(_INCLUDES_DIRECTORY)
+
+list(APPEND _INCLUDES_DIRECTORY 
     "${SOURCE_DIR}"
     "${SOURCE_DIR}/../../frameworks/I2Quick/include"
 )
-
-add_ingescape_include_directory(_INCLUDES_DIRECTORY)
 
 include_directories(${_INCLUDES_DIRECTORY})
 
@@ -224,8 +229,10 @@ set (ingescape_editor_sources
     sortFilter/logssortfilter.cpp
     model/scenario/condition/conditiononagentm.cpp
     misc/qquickwindowblocktouches.cpp
-    misc/textfielddoublevalidator.cpp
-)
+    misc/textfielddoublevalidator.cpp)
+
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp "#include <stable.h>")
+ADD_MSVC_PRECOMPILED_HEADER("stable.h" ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp ingescape_editor_sources)
 
 add_ingescape_sources(ingescape_editor_sources)
 
@@ -236,6 +243,11 @@ set (ingescape_editor_ressources qml.qrc)
 ########################################################################
 # dependencies
 ########################################################################
+# Define Qt cmake modules path if not already done
+if (WIN32 AND DEFINED ENV{Qt5_DIR} AND NOT DEFINED Qt5_DIR)
+    STRING(REPLACE "\"" "" Qt5_DIR $ENV{Qt5_DIR})
+endif ()
+
 # Find QT dependencies
 find_package(Qt5 NO_MODULE COMPONENTS 
     Qml
@@ -260,8 +272,9 @@ if (APPLE)
     set_source_files_properties("${I2QUICK_LIB}" PROPERTIES MACOSX_PACKAGE_LOCATION Frameworks)
     set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${I2QUICK_LIB}")
 elseif (WIN32)
-    set(I2QUICK_LIB)
-    set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.lib")
+    set(I2QUICK_LIB "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick")
+    set_target_properties(I2Quick PROPERTIES IMPORTED_IMPLIB "${I2QUICK_LIB}.lib")
+    set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${I2QUICK_LIB}.dll")
 else ()
     #TODO Add so for unix
 endif ()
@@ -273,9 +286,10 @@ set(INGESCAPE_EDITOR_ICON "${SOURCE_DIR}/icon_IGS.icns")
 if (APPLE)
     set(OS_BUNDLE MACOSX_BUNDLE)
     set_source_files_properties("${INGESCAPE_EDITOR_ICON}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+elseif (WIN32)
+    set(OS_BUNDLE)
 else ()
     set(OS_BUNDLE)
-    #TODO ADD win32 target
     #TODO Add unix target
 endif ()
 
@@ -283,7 +297,6 @@ endif ()
 add_executable(${PROJECT_NAME} ${OS_BUNDLE}
     ${ingescape_editor_sources}
     ${ingescape_editor_ressources}
-    ${I2QUICK_LIB}
     ${INGESCAPE_EDITOR_ICON}
 )
 
@@ -301,8 +314,37 @@ if (APPLE)
         POST_BUILD
         COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change libI2Quick.dylib "@loader_path/../Frameworks/libI2Quick.dylib" $<TARGET_FILE:${PROJECT_NAME}>
     )
+elseif (WIN32)
+    # Copy I2Quick dependency
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${I2QUICK_LIB}.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    )
+	
+	# Copy Ingescape dependencies
+	if (DEFINED ENV{IGS_LIBRARY_DIRECTORY})
+		STRING(REPLACE "\"" "" IGS_DLL_DIR $ENV{IGS_LIBRARY_DIRECTORY})
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libzmq.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libczmq.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libzyre.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libsodium-23.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libyajl.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libgcc_s_sjlj-1.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libstdc++-6.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+	endif ()
+	
+	
+	# Copy Qt dependencies
+	get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
+	get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+	find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
+	add_custom_command(TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND "${CMAKE_COMMAND}" -E env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}" \"$<TARGET_FILE:${PROJECT_NAME}>\" -xml -concurrent -printsupport -sql -qmldir="${SOURCE_DIR}"
+		COMMENT "Deploying Qt..."
+	)
 else ()
-    #TODO ADD win32 target
     #TODO Add unix target
 endif ()
 
@@ -323,7 +365,7 @@ target_link_libraries(
 ########################################################################
 # installer
 ########################################################################
-install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+#install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 
 ########################################################################
 # summary
@@ -343,10 +385,12 @@ include(FeatureSummary)
 feature_summary (WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 message (STATUS "")
 message (STATUS "Install:")
-message (STATUS "  Install prefix    :" "${CMAKE_INSTALL_PREFIX}")
+message (STATUS "  Install prefix    :   ${CMAKE_INSTALL_PREFIX}")
 message (STATUS "")
+if (NOT MSVC)
 message (STATUS "*************************************************************")
 message (STATUS "Configuration complete! Now procced with:")
 message (STATUS "  'make'                compile the project")
 message (STATUS "  'make install'        install the project to ${CMAKE_INSTALL_PREFIX}")
 message (STATUS "")
+endif ()

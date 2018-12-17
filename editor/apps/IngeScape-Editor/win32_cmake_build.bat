@@ -1,13 +1,15 @@
 @echo off
 rem Batch to compile ingescape on windows
-rem To compile ingescape with windows juste edit next 3 PATHS
+rem To compile ingescape with windows juste edit next 4 PATHS
+rem Qt5_DIR is the path to cmake qt dir
 rem IGS_*_DIRECTORY is the path to czmq, sodium, zmq, yajl and zyre includes and libraries
 rem CMAKE_EXE is the path to cmake exe
-rem Project is configured for 64bits system. Remove Win64 in -G"Visual Studio 14 2015 Win64" for 32bits
+rem TODO Add 64bits build, need I2Quick dll in 64 bits
 
 rem Define configurables path
+set Qt5_DIR="D:/Qt/Qt5.9.6/5.9.6/msvc2015/lib/cmake/Qt5"
 set IGS_INCLUDE_DIRECTORY="C:\Program Files\Common Files\Ingescape\include\"
-set IGS_LIBRARY_DIRECTORY="C:\Program Files\Common Files\Ingescape\x86_64\"
+set IGS_LIBRARY_DIRECTORY="C:\Program Files\Common Files\Ingescape\i686\"
 set CMAKE_EXE="c:\Program Files\CMake\bin\cmake.exe"
 
 rem Keep current location and script location
@@ -27,7 +29,7 @@ rem Move in build folder
 cd "%batchpath%\build"
 
 rem Launch cmake command
-%CMAKE_EXE% -G"Visual Studio 14 2015 Win64" ..
+%CMAKE_EXE% -G"Visual Studio 14 2015" ..
 rem Compile ingescape
 %CMAKE_EXE% --build . --target ALL_BUILD --config Release
 
