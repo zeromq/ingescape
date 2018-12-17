@@ -38,15 +38,17 @@ add_definitions(-DINGESCAPE=1)
 ########################################################################
 # plateform specific
 ########################################################################
-include(CheckCCompilerFlag)
-foreach(_CCOPT -pedantic -Wall -Wextra -W -Wpointer-arith -Wwrite-strings -Wunused -Wshadow -Winline -Wnested-externs -Wno-long-long -Wfloat-equal -Wno-multichar -Wsign-compare -Wundef -Wno-format-nonliteral -Wendif-labels -Wstrict-prototypes -Wstrict-aliasing=3 -Wcast-align -Wtype-limits -Wold-style-declaration -Wmissing-parameter-type -Wempty-body -Wclobbered -Wignored-qualifiers -Wconversion -Wno-sign-conversion -Wvla -Wdouble-promotion -Wno-system-headers -Wno-pedantic-ms-format)
-	# surprisingly, CHECK_C_COMPILER_FLAG needs a new variable to store each new
-	# test result in.
-	check_c_compiler_flag(${_CCOPT} OPT${_CCOPT})
-	if(OPT${_CCOPT})
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_CCOPT}")
-	endif()
-endforeach()
+if (NOT MSVC)
+  include(CheckCCompilerFlag)
+  foreach(_CCOPT -pedantic -Wall -Wextra -W -Wpointer-arith -Wwrite-strings -Wunused -Wshadow -Winline -Wnested-externs -Wno-long-long -Wfloat-equal -Wno-multichar -Wsign-compare -Wundef -Wno-format-nonliteral -Wendif-labels -Wstrict-prototypes -Wstrict-aliasing=3 -Wcast-align -Wtype-limits -Wold-style-declaration -Wmissing-parameter-type -Wempty-body -Wclobbered -Wignored-qualifiers -Wconversion -Wno-sign-conversion -Wvla -Wdouble-promotion -Wno-system-headers -Wno-pedantic-ms-format)
+    # surprisingly, CHECK_C_COMPILER_FLAG needs a new variable to store each new
+    # test result in.
+    check_c_compiler_flag(${_CCOPT} OPT${_CCOPT})
+    if(OPT${_CCOPT})
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_CCOPT}")
+    endif()
+  endforeach()
+endif()
 
 ########################################################################
 # dependency
