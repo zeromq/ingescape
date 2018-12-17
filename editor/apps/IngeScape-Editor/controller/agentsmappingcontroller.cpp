@@ -225,45 +225,29 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
 
             if (agentInMapping != nullptr)
             {
-                // FIXME Usefull or Useless ?
-                /*// Get the mapping currently edited (temporary until the user activate the mapping)
-                AgentMappingM* temporaryMapping = agentInMapping->temporaryMapping();
-                if (temporaryMapping != nullptr)
-                {
-                    // Delete all "mapping elements" in this temporary mapping
-                    temporaryMapping->mappingElements()->deleteAllItems();
-
-                    // Mapping is already activated
-                    if ((_modelManager != nullptr) && _modelManager->isMappingActivated())
-                    {
-                        for (AgentM* model : agentsGroupedByName->models()->toList())
-                        {
-                            if (model != nullptr)
-                            {
-                                // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-                                _overWriteMappingOfAgentModel(model, temporaryMapping);
-                            }
-                        }
-                    }
-                }*/
-
-                // The mapping is activated
+                // The global mapping is activated
                 if (_modelManager->isMappingActivated())
                 {
                     // CONTROL
-                    if (_modelManager->isMappingControlled())
+                    /*if (_modelManager->isMappingControlled())
                     {
-                        // FIXME: CONTROL TODO ?
                     }
                     // OBSERVE
                     else
                     {
-                        // Link the agent in the global mapping on its inputs (add all missing links TO the agent)
-                        _linkAgentOnInputs(agentInMapping);
+                    }*/
 
-                        // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)
-                        _linkAgentOnOutputs(agentInMapping);
-                    }
+                    // Link the agent in the global mapping on its inputs (add all missing links TO the agent)
+                    _linkAgentOnInputs(agentInMapping);
+
+                    // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)
+                    _linkAgentOnOutputs(agentInMapping);
+                }
+                // The global mapping is NOT activated
+                else
+                {
+                    // FIXME TODO dropAgentNameToMappingAtPosition
+                    qDebug() << "TODO dropAgentNameToMappingAtPosition" << agentName << "but global mapping is NOT activated";
                 }
 
                 // Selects this new agent
@@ -1411,20 +1395,47 @@ void AgentsMappingController::_deleteLinkBetweenTwoAgents(LinkVM* link)
  */
 void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
 {
-    if ((agent != nullptr) && !_allLinksInMapping.isEmpty())
+    if ((agent != nullptr) && (agent->agentsGroupedByName() != nullptr) && (_modelManager != nullptr))
     {
+        qDebug() << "Remove all Links with agent" << agent->name();
+
+        // The global mapping is activated AND the agent is ON
+        if (_modelManager->isMappingActivated() && agent->agentsGroupedByName()->isON())
+        {
+            // Send the command "Clear Mapping" on the network to this agent(s)
+            Q_EMIT commandAskedToAgent(agent->agentsGroupedByName()->peerIdsList(), command_ClearMapping);
+        }
+        // The global mapping is NOT activated OR the agent is OFF
+        else
+        {
+            // Useless because the agent will be deleted
+            /*for (LinkVM* link : _allLinksInMapping.toList())
+            {
+                if ((link != nullptr) && (link->inputAgent() == agent))
+                {
+                    ElementMappingM* mappingElement = link->inputAgent()->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid());
+
+                    // This link has been added while the mapping was UN-activated...
+                    if (mappingElement != nullptr)
+                    {
+                        // ...just cancel the add of the link while the global mapping is UN-activated
+                        link->inputAgent()->cancelAddLink_WhileMappingWasUNactivated(link->uid());
+                    }
+                    // Remove the link while the global mapping is UN-activated
+                    else
+                    {
+                        link->inputAgent()->removeLink_WhileMappingWasUNactivated(link->uid(), link->mappingElement());
+                    }
+                }
+            }*/
+        }
+
+        // We have to delete the link to clean our HMI
         for (LinkVM* link : _allLinksInMapping.toList())
         {
             if ( (link != nullptr) && ((link->outputAgent() == agent) || (link->inputAgent() == agent)) )
             {
-                // Remove a link between two agents from the mapping
-                bool linkHasBeenDeleted = removeLinkBetweenTwoAgents(link);
-
-                if (!linkHasBeenDeleted)
-                {
-                    // We have to delete the link to clean our HMI (even if we do not have yet received the message "UNMAPPED")
-                    _deleteLinkBetweenTwoAgents(link);
-                }
+                _deleteLinkBetweenTwoAgents(link);
             }
         }
     }

@@ -50,6 +50,8 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 {
     qInfo() << "Delete View Model of Agents grouped by name" << _name;
 
+    // FIXME REMOVE code commente
+
     // Set the flag to prevent the deletion of our "agents grouped by name" because the list "allAgentsGroupsByDefinition"
     // will be empty during the execution of this destructor (prevent several call to this destructor)
     //_canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty = false;
