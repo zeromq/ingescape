@@ -239,19 +239,16 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
 
                     // Link the agent in the global mapping on its inputs (add all missing links TO the agent)
                     _linkAgentOnInputs(agentInMapping);
-
-                    // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)
-                    _linkAgentOnOutputs(agentInMapping);
                 }
                 // The global mapping is NOT activated
                 else
                 {
-                    // FIXME TODO dropAgentNameToMappingAtPosition
-                    qDebug() << "TODO dropAgentNameToMappingAtPosition" << agentName << "but global mapping is NOT activated";
-
-                    // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)
-                    //_linkAgentOnOutputs(agentInMapping);
+                    // FIXME Something TODO ? in dropAgentNameToMappingAtPosition
+                    qDebug() << "Something TODO ? in dropAgentNameToMappingAtPosition" << agentName << "but global mapping is NOT activated";
                 }
+
+                // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)
+                _linkAgentOnOutputs(agentInMapping);
 
                 // Selects this new agent
                 setselectedAgent(agentInMapping);
@@ -1443,6 +1440,12 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
         {
             if ( (link != nullptr) && ((link->outputAgent() == agent) || (link->inputAgent() == agent)) )
             {
+                if (link->outputAgent() == agent)
+                {
+                    // Add a "Waiting Mapping Element" on the output agent (name)
+                   _addWaitingMappingElementOnOutputAgent(link->outputAgent()->name(), link->mappingElement());
+                }
+
                 _deleteLinkBetweenTwoAgents(link);
             }
         }
