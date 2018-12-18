@@ -475,6 +475,9 @@ private:
     // Hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent")
     QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingMappingElements;
 
+    // Hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent") while the mapping was UN-activated
+    //QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingMappingElements_WhileMappingWasUNactivated;
+
     // Hash table from "(unique) link id" to the added link (for which we are waiting a reply to the request "add")
     QHash<QString, LinkVM*> _hashFromLinkIdToAddedLink_WaitingReply;
 
