@@ -9,8 +9,8 @@
 ########################################################################
 # Project setup
 ########################################################################
-cmake_minimum_required(VERSION 3.1.0)
-project(Ingescape)
+cmake_minimum_required(VERSION 3.13.1)
+project(Ingescape HOMEPAGE_URL https://ingescape.com)
 
 enable_language(C)
 
@@ -121,33 +121,32 @@ ENDIF (NOT MSVC)
 # shared
 if (INGESCAPE_BUILD_SHARED)
   IF (MSVC)
-    add_library(ingescape SHARED ${ingescape_sources})
+    add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
   ELSE (MSVC)
-    add_library(ingescape SHARED $<TARGET_OBJECTS:ingescape_objects>)
+    add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:ingescape_objects>)
   ENDIF (MSVC)
 
-  set_target_properties (ingescape PROPERTIES
+  set_target_properties (${PROJECT_NAME} PROPERTIES
     PUBLIC_HEADER "${public_headers}"
     DEFINE_SYMBOL "INGESCAPE_EXPORTS"
     SOVERSION "0"
     VERSION "${INGESCAPE_VERSION}"
-    COMPILE_DEFINITIONS "DLL_EXPORT"
     OUTPUT_NAME "ingescape"
     PREFIX "lib"
   )
 
-  target_link_libraries(ingescape PRIVATE ${MORE_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${MORE_LIBRARIES})
 
-  install(TARGETS ingescape
-    EXPORT ingescape-targets
+  install(TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
     RUNTIME DESTINATION bin                # .dll file
   )
 
-  target_include_directories(ingescape
+  target_include_directories(${PROJECT_NAME}
     PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      $<BUILD_INTERFACE:${SOURCE_DIR}/include>
       $<INSTALL_INTERFACE:include>
   )
 endif()
@@ -155,33 +154,33 @@ endif()
 # static
 if (INGESCAPE_BUILD_STATIC)
   IF (MSVC)
-    add_library(ingescape-static STATIC ${ingescape_sources})
+    add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
   ELSE (MSVC)
-    add_library(ingescape-static STATIC $<TARGET_OBJECTS:ingescape_objects>)
+    add_library(${PROJECT_NAME}-static STATIC $<TARGET_OBJECTS:ingescape_objects>)
   ENDIF (MSVC)
 
-  set_target_properties(ingescape-static PROPERTIES
+  set_target_properties(${PROJECT_NAME}-static PROPERTIES
     PUBLIC_HEADER "${public_headers}"
     COMPILE_DEFINITIONS "INGESCAPE_STATIC"
     OUTPUT_NAME "ingescape"
     PREFIX "lib"
   )
 
-  target_link_libraries(ingescape-static PRIVATE ${MORE_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME}-static PRIVATE ${MORE_LIBRARIES})
 
-  install(TARGETS ingescape-static
-    EXPORT ingescape-targets
+  install(TARGETS ${PROJECT_NAME}-static
+    EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
     RUNTIME DESTINATION bin                # .dll file
   )
 
-  target_include_directories(ingescape-static
+  target_include_directories(${PROJECT_NAME}-static
     PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      $<BUILD_INTERFACE:${SOURCE_DIR}/include>
       $<INSTALL_INTERFACE:include>
   )
-  target_compile_definitions(ingescape-static
+  target_compile_definitions(${PROJECT_NAME}-static
     PUBLIC INGESCAPE__STATIC
   )
 endif()
@@ -217,7 +216,7 @@ else()
 endif()
 
 if (NOT CMAKE_VERSION VERSION_LESS 3.0)
-  export(EXPORT ingescape-targets
+  export(EXPORT ${PROJECT_NAME}-targets
          FILE "${CMAKE_CURRENT_BINARY_DIR}/ingescapeTargets.cmake")
 endif()
 configure_package_config_file(builds/cmake/Config.cmake.in
@@ -226,7 +225,7 @@ configure_package_config_file(builds/cmake/Config.cmake.in
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
                                  VERSION ${INGESCAPE_VERSION}
                                  COMPATIBILITY AnyNewerVersion)
-install(EXPORT ingescape-targets
+install(EXPORT ${PROJECT_NAME}-targets
         FILE ingescapeTargets.cmake
         DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake
@@ -236,13 +235,45 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake
 # uninstall target
 if(NOT TARGET uninstall)
     configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/cmake_uninstall.cmake.in"
+        "${SOURCE_DIR}/builds/cmake/cmake_uninstall.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
         IMMEDIATE @ONLY)
 
     add_custom_target(uninstall
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif()
+
+########################################################################
+# installer
+########################################################################
+#include (InstallRequiredSystemLibraries)
+set(CPACK_MONOLITHIC_INSTALL ON)
+set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME} library")
+set(CPACK_PACKAGE_VENDOR "Ingenuity IO")
+set(CPACK_PACKAGE_CONTACT "contact@ingenuity.io")
+set(CPACK_PACKAGE_VERSION ${INGESCAPE_VERSION})
+set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_VERSION_PATCH}")
+
+set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/editor/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/")
+
+if (WIN32)
+    set(CPACK_GENERATOR "NSIS;ZIP")
+    set(CPACK_SOURCE_GENERATOR "ZIP")
+    # set(CPACK_WIX_UPGRADE_GUID "D809598A-B513-4752-B268-0BAC403B00E4") Check this !!
+elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+    set(CPACK_GENERATOR "STGZ")
+    set(CPACK_SOURCE_GENERATOR "TGZ")
+    list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
+else ()
+    set(CPACK_GENERATOR "DEB;RPM")
+    set(CPACK_SOURCE_GENERATOR "TGZ")
+    list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
+endif ()
+
+include (CPack)
 
 ########################################################################
 # summary
