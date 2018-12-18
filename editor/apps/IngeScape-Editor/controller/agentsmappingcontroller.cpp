@@ -1063,9 +1063,7 @@ void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElemen
 {
     //AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
     //if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !oldMappingElements.isEmpty())
-    if (!oldMappingElements.isEmpty()
-            // The global mapping is activated
-            && (_modelManager != nullptr) && _modelManager->isMappingActivated())
+    if (!oldMappingElements.isEmpty() && (_modelManager != nullptr))
     {
         for (MappingElementVM* mappingElement : oldMappingElements)
         {
@@ -1118,26 +1116,39 @@ void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElemen
                     LinkVM* link = linksWithSameName.at(0);
                     if (link != nullptr)
                     {
-                        // The link was Temporary
-                        if (link->isTemporary())
+                        // The global mapping is activated
+                        if (_modelManager->isMappingActivated())
                         {
-                            qDebug() << "The link" << link->uid() << "from TEMPORARY to DELETED";
-
-                            // Reset the flag
-                            //link->setisTemporary(false);
-
-                            if (_hashFromLinkIdToRemovedLink_WaitingReply.contains(link->uid()))
+                            // The link was Temporary
+                            if (link->isTemporary())
                             {
-                                // Remove from the hash table the "(unique) link id" and the link for which we are waiting a reply to the request "remove"
-                                _hashFromLinkIdToRemovedLink_WaitingReply.remove(link->uid());
+                                qDebug() << "The link" << link->uid() << "from TEMPORARY to DELETED";
+
+                                // Reset the flag
+                                //link->setisTemporary(false);
+
+                                if (_hashFromLinkIdToRemovedLink_WaitingReply.contains(link->uid()))
+                                {
+                                    // Remove from the hash table the "(unique) link id" and the link for which we are waiting a reply to the request "remove"
+                                    _hashFromLinkIdToRemovedLink_WaitingReply.remove(link->uid());
+                                }
+                                else {
+                                    qCritical() << "The 'Temporary' link" << link->uid() << "was not in the hash table 'Removed Link Waiting Reply'";
+                                }
                             }
-                            else {
-                                qCritical() << "The 'Temporary' link" << link->uid() << "was not in the hash table 'Removed Link Waiting Reply'";
+
+                            // Delete the link between two agents
+                            _deleteLinkBetweenTwoAgents(link);
+                        }
+                        // The global mapping is NOT activated
+                        else
+                        {
+                            if ((link->inputAgent() != nullptr) && (link->linkInput() != nullptr) && (link->outputAgent() != nullptr) && (link->linkOutput() != nullptr))
+                            {
+                                // Simulate that the user add this link while the global mapping is UN-activated
+                                link->inputAgent()->addLink_WhileMappingWasUNactivated(link->uid(), link->linkInput()->name(), link->outputAgent()->name(), link->linkOutput()->name());
                             }
                         }
-
-                        // Delete the link between two agents
-                        _deleteLinkBetweenTwoAgents(link);
                     }
                 }
                 // There are several links with this name in the global mapping
