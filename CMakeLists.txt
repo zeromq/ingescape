@@ -273,6 +273,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CPACK_NSIS_MODIFY_PATH ON)
   set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
 
+  set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/editor/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/")
+  
   if (WIN32)
       set(CPACK_GENERATOR "NSIS;ZIP")
       set(CPACK_SOURCE_GENERATOR "ZIP")
@@ -297,8 +299,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
       set(CPACK_SOURCE_GENERATOR "TGZ")
       list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
   endif ()
-
-  set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/editor/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/")
 
   include (CPack)
 endif()

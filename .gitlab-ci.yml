@@ -3,15 +3,14 @@
 # Define job order
 stages:
   - linux
+  - osx
   - windows
   - installer
 
 # Define default condition to launch job
 .default-conditions: &default-conditions
   only:
-    #- master # Remove now to test build on windows vm with gitlab
-    changes:
-      - CMakeLists.txt
+    - master
 
 # Define ingescape library files
 .build-ingescape-files: &build-ingescape-files
@@ -22,6 +21,7 @@ stages:
       - autogen.sh
       - configure.ac
       - Makefile.am
+      - CMakeLists.txt
 
 # Define ingescape windows installer files
 .build-ingescape-installer-windows: &build-ingescape-installer-windows
@@ -63,6 +63,23 @@ linux-release-x64:
   artifacts:
     paths:
       - linux-release-x64
+    expire_in: 1 week
+
+# Create ingescape library for osx
+osx-release-x64:
+  <<: *build-ingescape-files
+  stage: osx
+  tags:
+    - osx
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "osx-release-x64"
     expire_in: 1 week
 
 # Create ingescape library for windows 64 bits release
@@ -162,7 +179,6 @@ installer-runtime-win32-x86:
   dependencies:
     - win32-release-x86
 
-
 # Create runtime install for windows 64 bits
 installer-runtime-win32-x64:
   <<: *build-ingescape-files
@@ -179,6 +195,21 @@ installer-runtime-win32-x64:
       - build\ReleaseX64\Ingescape-*.zip
   dependencies:
     - win32-release-x64
+
+# Create runtime install for osx 64 bits
+installer-runtime-osx-x64:
+  <<: *build-ingescape-files
+  stage: installer
+  tags:
+    - osx
+  script:
+    - make -C build package
+    - make -C build package_source
+  artifacts:
+    paths:
+      - build\ReleaseX64\Ingescape-*
+  dependencies:
+    - osx-release-x64
 
 # # Create sdk install for windows
 # installer-sdk:
@@ -235,7 +266,7 @@ installer-runtime-win32-x64:
 #     paths:
 #       - debian-x86_64
 
-# TODO Add job to compile on cyclone and generate macos installer
+# TODO Add yajl in unix and osx installer (or see to create yajl installer)
 # TODO Add job to deploy ingescape website on commit (Can filter to launch job on doc folder changes and only master git's branche)
 # TODO Add job to compile editor
 # TODO Add job to compile ingeprob
