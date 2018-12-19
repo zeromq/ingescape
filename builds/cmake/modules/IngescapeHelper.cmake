@@ -115,3 +115,30 @@ macro(get_ingescape_version _MAJOR _MINOR _PATCH)
     string(REGEX MATCH "#define INGESCAPE_MICRO ([0-9]*)" _ ${_ADMIN_C_CONTENT})
     set(${_PATCH} ${CMAKE_MATCH_1})
 endmacro()
+
+# Function to install dependencies on windows
+macro(install_ingescape_dependencies _LIB _HEADERS_PATH)
+    # Get path and file name from lib file
+    get_filename_component(_PATH_TO_FILE ${${_LIB}} DIRECTORY)
+    get_filename_component(_FILE_NAME ${${_LIB}} NAME)
+    string(REGEX REPLACE "\\.[^.]*$" "" _FILE_WITHOUT_EXT ${_FILE_NAME})
+    # Check if file exist
+    find_file(${_FILE_WITHOUT_EXT}_DLL_FILE "${_FILE_WITHOUT_EXT}.dll" PATHS ${_PATH_TO_FILE} NO_DEFAULT_PATH)
+    if (${${_FILE_WITHOUT_EXT}_DLL_FILE} STREQUAL ${_FILE_WITHOUT_EXT}_DLL_FILE-NOTFOUND)
+        message("File ${_PATH_TO_FILE}/${_FILE_WITHOUT_EXT}.dll not found")
+        find_file(${_FILE_WITHOUT_EXT}_DLL_FILE "lib${_FILE_WITHOUT_EXT}.dll" PATHS ${_PATH_TO_FILE} NO_DEFAULT_PATH)
+
+        if (${${_FILE_WITHOUT_EXT}_DLL_FILE} STREQUAL ${_FILE_WITHOUT_EXT}_DLL_FILE-NOTFOUND)
+            message("File ${_PATH_TO_FILE}/lib${_FILE_WITHOUT_EXT}.dll not found")
+        endif()
+    endif()
+
+
+    if (NOT ${${_FILE_WITHOUT_EXT}_DLL_FILE} STREQUAL ${_FILE_WITHOUT_EXT}_DLL_FILE-NOTFOUND)
+        message("Add file ${${_FILE_WITHOUT_EXT}_DLL_FILE} to installed dependency")
+
+        install(FILES ${${_LIB}} DESTINATION "lib${LIB_SUFFIX}")
+        install(FILES ${${_FILE_WITHOUT_EXT}_DLL_FILE} DESTINATION "bin")
+        install(DIRECTORY ${${_HEADERS_PATH}}/ DESTINATION include)
+    endif()
+endmacro()

@@ -1,9 +1,6 @@
 # CMake build script for Ingescape
 
 #TODO Add NSIS management (CPACK)
-#TODO Read version from admin.c file
-#TODO Fix install in ingescape subfolder
-#TODO Add yajl dependency
 #TODO Add clean target (see czmq)
 
 ########################################################################
@@ -246,34 +243,41 @@ endif()
 ########################################################################
 # installer
 ########################################################################
-#include (InstallRequiredSystemLibraries)
-set(CPACK_MONOLITHIC_INSTALL ON)
-set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME} library")
-set(CPACK_PACKAGE_VENDOR "Ingenuity IO")
-set(CPACK_PACKAGE_CONTACT "contact@ingenuity.io")
-set(CPACK_PACKAGE_VERSION ${INGESCAPE_VERSION})
-set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_VERSION_PATCH}")
+# Package installer just for release build
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(CPACK_MONOLITHIC_INSTALL ON)
+  set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME} library")
+  set(CPACK_PACKAGE_VENDOR "Ingenuity IO")
+  set(CPACK_PACKAGE_CONTACT "contact@ingenuity.io")
+  set(CPACK_PACKAGE_VERSION ${INGESCAPE_VERSION})
+  set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_VERSION_MAJOR}")
+  set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_VERSION_MINOR}")
+  set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_VERSION_PATCH}")
 
-set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/editor/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/")
+  set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/editor/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/")
 
-if (WIN32)
-    set(CPACK_GENERATOR "NSIS;ZIP")
-    set(CPACK_SOURCE_GENERATOR "ZIP")
-    # set(CPACK_WIX_UPGRADE_GUID "D809598A-B513-4752-B268-0BAC403B00E4") Check this !!
-elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-    set(CPACK_GENERATOR "STGZ")
-    set(CPACK_SOURCE_GENERATOR "TGZ")
-    list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
-else ()
-    set(CPACK_GENERATOR "DEB;RPM")
-    set(CPACK_SOURCE_GENERATOR "TGZ")
-    list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
-endif ()
+  if (WIN32)
+      set(CPACK_GENERATOR "NSIS;ZIP")
+      set(CPACK_SOURCE_GENERATOR "ZIP")
+      # On windows we want to package dependencies with this library
+      install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS)
+      install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS)
+      install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS)
+      install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS)
+      install_ingescape_dependencies(YAJL_LIBRARIES YAJL_INCLUDE_DIRS)
+  elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+      set(CPACK_GENERATOR "STGZ")
+      set(CPACK_SOURCE_GENERATOR "TGZ")
+      list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
+  else ()
+      set(CPACK_GENERATOR "DEB;RPM")
+      set(CPACK_SOURCE_GENERATOR "TGZ")
+      list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
+  endif ()
 
-include (CPack)
+  include (CPack)
+endif()
 
 ########################################################################
 # summary
@@ -295,7 +299,7 @@ include(FeatureSummary)
 feature_summary (WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 message (STATUS "")
 message (STATUS "Install:")
-message (STATUS "  Install prefix    :" "${CMAKE_INSTALL_PREFIX}")
+message (STATUS "  Install prefix    :   ${CMAKE_INSTALL_PREFIX}")
 message (STATUS "")
 if (NOT MSVC)
 message (STATUS "*************************************************************")
@@ -303,5 +307,9 @@ message (STATUS "Configuration complete! Now procced with:")
 message (STATUS "  'make'                compile the project")
 message (STATUS "  'make install'        install the project to ${CMAKE_INSTALL_PREFIX}")
 message (STATUS "  'make uninstall'      uninstall the project from ${CMAKE_INSTALL_PREFIX}")
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+message (STATUS "  'make package'        Create library installer")
+message (STATUS "  'make package_source' Create source installer")
+endif ()
 endif ()
 message (STATUS "")
