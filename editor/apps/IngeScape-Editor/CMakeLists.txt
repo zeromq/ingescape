@@ -323,19 +323,6 @@ elseif (WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
 	
-	# Copy Ingescape dependencies
-	if (DEFINED ENV{IGS_LIBRARY_DIRECTORY})
-		STRING(REPLACE "\"" "" IGS_DLL_DIR $ENV{IGS_LIBRARY_DIRECTORY})
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libzmq.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libczmq.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libzyre.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libsodium-23.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libyajl.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libgcc_s_sjlj-1.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${IGS_DLL_DIR}/libstdc++-6.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-	endif ()
-	
-	
 	# Copy Qt dependencies
 	get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
 	get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)

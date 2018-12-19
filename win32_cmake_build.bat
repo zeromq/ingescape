@@ -6,8 +6,8 @@ rem CMAKE_EXE is the path to cmake exe
 rem Project is configured for 64bits system. Remove Win64 in -G"Visual Studio 14 2015 Win64" for 32bits
 
 rem Define configurables path
-set IGS_INCLUDE_DIRECTORY=C:\Program Files\Common Files\Ingescape\include
-set IGS_LIBRARY_DIRECTORY=C:\Program Files\Common Files\Ingescape\x86_64\
+set IGS_INCLUDE_DIRECTORY=C:\Program Files (x86)\Ingescape\include
+set IGS_LIBRARY_DIRECTORY=C:\Program Files (x86)\Ingescape\lib\
 set CMAKE_EXE="c:\Program Files\CMake\bin\cmake.exe"
 
 rem Keep current location and script location
@@ -27,7 +27,7 @@ rem Move in build folder
 cd "%batchpath%\build"
 
 rem Launch cmake command
-%CMAKE_EXE% -G"Visual Studio 14 2015 Win64" .. -DZYRE_LIBRARIES="%IGS_LIBRARY_DIRECTORY%libzyre.dll.a" -DZYRE_INCLUDE_DIRS="%IGS_INCLUDE_DIRECTORY%" -DCZMQ_LIBRARIES="%IGS_LIBRARY_DIRECTORY%libczmq.dll.a" -DCZMQ_INCLUDE_DIRS="%IGS_INCLUDE_DIRECTORY%" -DLIBSODIUM_LIBRARIES="%IGS_LIBRARY_DIRECTORY%libsodium.dll.a" -DLIBSODIUM_INCLUDE_DIRS="%IGS_INCLUDE_DIRECTORY%" -DLIBZMQ_LIBRARIES="%IGS_LIBRARY_DIRECTORY%libzmq.dll.a" -DLIBZMQ_INCLUDE_DIRS="%IGS_INCLUDE_DIRECTORY%" -DYAJL_LIBRARIES="%IGS_LIBRARY_DIRECTORY%libyajl.dll.a" -DYAJL_INCLUDE_DIRS="%IGS_INCLUDE_DIRECTORY%"
+%CMAKE_EXE% -G"Visual Studio 14 2015" ..  -DZYRE_LIBRARIES="%IGS_LIBRARY_DIRECTORY%zyre.lib" -DZYRE_INCLUDE_DIRS="%IGS_INCLUDE_DIRECTORY%" -DCZMQ_LIBRARIES="%IGS_LIBRARY_DIRECTORY%czmq.lib" -DCZMQ_INCLUDE_DIRS="%IGS_INCLUDE_DIRECTORY%" -DLIBSODIUM_LIBRARIES="%IGS_LIBRARY_DIRECTORY%libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%IGS_INCLUDE_DIRECTORY%" -DLIBZMQ_LIBRARIES="%IGS_LIBRARY_DIRECTORY%libzmq-v140-mt-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%IGS_INCLUDE_DIRECTORY%" -DYAJL_LIBRARIES="%IGS_LIBRARY_DIRECTORY%yajl.lib" -DYAJL_INCLUDE_DIRS="%IGS_INCLUDE_DIRECTORY%"
 rem Compile ingescape
 %CMAKE_EXE% --build . --target ALL_BUILD --config Release
 
