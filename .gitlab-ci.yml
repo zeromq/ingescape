@@ -79,11 +79,10 @@ win32-release-x64:
     - mkdir build\ReleaseX64
     - cmake -S . -B build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libzmq-v140-mt-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
-    - mkdir win32-release-x64
-    - copy build\ReleaseX64\Release\* win32-release-x64\
   artifacts:
     paths:
-     - win32-release-x64
+     - build
+    name: "win32-release-x64"
     expire_in: 1 week
 
 # Create ingescape library for windows 32 bits release
@@ -100,11 +99,10 @@ win32-release-x86:
     - mkdir build\ReleaseX86
     - cmake -S . -B build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
-    - mkdir win32-release-x86
-    - copy build\ReleaseX86\Release\* win32-release-x86\
   artifacts:
     paths:
-     - win32-release-x86
+     - build
+    name: "win32-release-x86"
     expire_in: 1 week
 
 # Create ingescape library for windows 64 bits debug
@@ -121,14 +119,10 @@ win32-debug-x64:
     - mkdir build\DebugX64
     - cmake -S . -B build\DebugX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Debug -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\libzmq-v140-mt-gd-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
-    - mkdir win32-debug-x64
-    - copy build\DebugX64\Debug\*.exp win32-debug-x64\
-    - copy build\DebugX64\Debug\*.lib win32-debug-x64\
-    - copy build\DebugX64\Debug\*.dll win32-debug-x64\
-    - copy build\DebugX64\Debug\*.pdb win32-debug-x64\
   artifacts:
     paths:
-     - win32-debug-x64
+     - build
+    name: "win32-debug-x64"
     expire_in: 1 week
 
 # Create ingescape library for windows 32 bits debug
@@ -145,14 +139,10 @@ win32-debug-x86:
     - mkdir build\DebugX86
     - cmake -S . -B build\DebugX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Debug -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\libzmq-v140-mt-gd-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
-    - mkdir win32-debug-x86
-    - copy build\DebugX86\Debug\*.exp win32-debug-x86\
-    - copy build\DebugX86\Debug\*.lib win32-debug-x86\
-    - copy build\DebugX86\Debug\*.dll win32-debug-x86\
-    - copy build\DebugX86\Debug\*.pdb win32-debug-x86\
   artifacts:
     paths:
-     - win32-debug-x86
+     - build
+    name: "win32-debug-x86"
     expire_in: 1 week
 
 # Create runtime install for windows 32 bits
@@ -162,19 +152,16 @@ installer-runtime-win32-x86:
   stage: installer
   tags:
     - windows
-  variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
   script:
-    - git clean -xfd
-    - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
-    - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
     - cd build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..
     - cd build\ReleaseX86 && cpack --config CPackSourceConfig.cmake && cd ..\..
   artifacts:
     paths:
       - build\ReleaseX86\Ingescape-*.exe
       - build\ReleaseX86\Ingescape-*.zip
+  dependencies:
+    - win32-release-x86
+
 
 # Create runtime install for windows 64 bits
 installer-runtime-win32-x64:
@@ -183,19 +170,15 @@ installer-runtime-win32-x64:
   stage: installer
   tags:
     - windows
-  variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
   script:
-    - git clean -xfd
-    - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libzmq-v140-mt-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
-    - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
     - cd build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..
     - cd build\ReleaseX64 && cpack --config CPackSourceConfig.cmake && cd ..\..
   artifacts:
     paths:
       - build\ReleaseX64\Ingescape-*.exe
       - build\ReleaseX64\Ingescape-*.zip
+  dependencies:
+    - win32-release-x64
 
 # # Create sdk install for windows
 # installer-sdk:
