@@ -943,17 +943,21 @@ void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
         QJsonObject jsonRoot = jsonDocument.object();
 
         // Version
+        QString versionJsonPlatform = "";
         if (jsonRoot.contains("version"))
         {
-            QString versionJsonPlatform = jsonRoot.value("version").toString();
-            // FIXME TODO: version JSON Platform
-            qDebug() << "Version JSON Platform" << versionJsonPlatform;
+            versionJsonPlatform = jsonRoot.value("version").toString();
+
+            qDebug() << "Version of JSON platform is" << versionJsonPlatform;
+        }
+        else {
+            qDebug() << "UNDEFINED version of JSON platform";
         }
 
         // Import the agents list from JSON
         if ((_modelManager != nullptr) && jsonRoot.contains("agents"))
         {
-            _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
+            _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
         }
 
         // Import the global mapping (of agents) from JSON

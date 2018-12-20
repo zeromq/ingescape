@@ -68,7 +68,7 @@ Rectangle {
             //height: columnListOfGroupsByDefinition.height + 5
             height: columnListOfGroupsByDefinition.height + columnMappingElements.height + 5
 
-            color: groupByNameVM.isON ? "#22CCCC" : "#227777"
+            color: groupByNameVM && groupByNameVM.isON ? "#22CCCC" : "#227777"
             border {
                 width: 1
                 color: IngeScapeTheme.editorsBackgroundBorderColor
@@ -79,9 +79,9 @@ Rectangle {
                 spacing: 15
 
                 Text {
-                    text: groupByNameVM.name
+                    text: groupByNameVM ? groupByNameVM.name : ""
                     width: 150
-                    color: groupByNameVM.isON ? "white" : "#888888"
+                    color: groupByNameVM && groupByNameVM.isON ? "white" : "#888888"
                     font {
                         pointSize: 14
                         weight: Font.Bold
@@ -89,13 +89,15 @@ Rectangle {
                 }
 
                 Text {
-                    text: groupByNameVM.models.count + " M"
-                    color: groupByNameVM.isON ? "white" : "#888888"
+                    text: groupByNameVM ? groupByNameVM.models.count + " M"
+                                        : "0 M"
+                    color: groupByNameVM && groupByNameVM.isON ? "white" : "#888888"
                     font.pointSize: 14
                 }
 
                 Text {
-                    text: groupByNameVM.numberOfAgentsON + " ON"
+                    text: groupByNameVM ? groupByNameVM.numberOfAgentsON + " ON"
+                                        : "0 ON"
                     color: "green"
                     font {
                         pointSize: 14
@@ -104,7 +106,8 @@ Rectangle {
                 }
 
                 Text {
-                    text: groupByNameVM.numberOfAgentsOFF + " OFF"
+                    text: groupByNameVM ? groupByNameVM.numberOfAgentsOFF + " OFF"
+                                        : "0 OFF"
                     color: "red"
                     font {
                         pointSize: 14

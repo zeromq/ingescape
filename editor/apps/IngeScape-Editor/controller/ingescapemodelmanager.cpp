@@ -375,8 +375,20 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
                 // List of agents
                 if (jsonRoot.contains("agents"))
                 {
+                    // Version
+                    QString versionJsonPlatform = "";
+                    if (jsonRoot.contains("version"))
+                    {
+                        versionJsonPlatform = jsonRoot.value("version").toString();
+
+                        qDebug() << "Version of JSON platform is" << versionJsonPlatform;
+                    }
+                    else {
+                        qDebug() << "UNDEFINED version of JSON platform";
+                    }
+
                     // Import the agents list from a json byte content
-                    success = importAgentsListFromJson(jsonRoot.value("agents").toArray());
+                    success = importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
                 }
                 // One agent
                 else if (jsonRoot.contains("definition"))
@@ -419,8 +431,9 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
 /**
  * @brief Import an agents list from a JSON array
  * @param jsonArrayOfAgents
+ * @param versionJsonPlatform
  */
-bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgents)
+bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgents, QString versionJsonPlatform)
 {
     bool success = true;
 
@@ -433,13 +446,41 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                 QJsonObject jsonAgentsGroupedByName = jsonIteratorAgent.toObject();
 
                 QJsonValue jsonName = jsonAgentsGroupedByName.value("agentName");
-                QJsonValue jsonDefinitions = jsonAgentsGroupedByName.value("definitions");
+                QJsonArray jsonArrayOfDefinitions;
 
-                if (jsonName.isString() && jsonDefinitions.isArray())
+                // The version is the current one, use directly the array of definitions
+                if (versionJsonPlatform == VERSION_JSON_PLATFORM)
+                {
+                    QJsonValue jsonDefinitions = jsonAgentsGroupedByName.value("definitions");
+                    if (jsonDefinitions.isArray()) {
+                        jsonArrayOfDefinitions = jsonDefinitions.toArray();
+                    }
+                }
+                // Convert the previous format of JSON into the new format of JSON
+                else
+                {
+                    jsonArrayOfDefinitions = QJsonArray();
+                    QJsonValue jsonDefinition = jsonAgentsGroupedByName.value("definition");
+                    QJsonValue jsonClones = jsonAgentsGroupedByName.value("clones");
+
+                    // The definition can be NULL
+                    if ((jsonDefinition.isObject() || jsonDefinition.isNull())
+                            && jsonClones.isArray())
+                    {
+                        // Create a temporary json object and add it to the array of definitions
+                        QJsonObject jsonObject = QJsonObject();
+                        jsonObject.insert("definition", jsonDefinition);
+                        jsonObject.insert("clones", jsonClones);
+
+                        jsonArrayOfDefinitions.append(jsonObject);
+                    }
+                }
+
+                if (jsonName.isString() && !jsonArrayOfDefinitions.isEmpty())
                 {
                     QString agentName = jsonName.toString();
 
-                    for (QJsonValue jsonIteratorDefinition : jsonDefinitions.toArray())
+                    for (QJsonValue jsonIteratorDefinition : jsonArrayOfDefinitions)
                     {
                         QJsonObject jsonAgentsGroupedByDefinition = jsonIteratorDefinition.toObject();
 
@@ -454,11 +495,12 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                             // Create a model of agent definition from JSON object
                             agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
                         }
+                        // The definition can be NULL
                         /*else if (jsonDefinition.isNull()) {
                             // Nothing to do
                         }*/
 
-                        // Manage the list of cloness
+                        // Manage the list of clones
                         QJsonArray arrayOfClones = jsonClones.toArray();
 
                         // None clone have a defined hostname (the agent is only defined by a definition)

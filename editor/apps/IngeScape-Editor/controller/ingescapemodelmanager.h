@@ -25,6 +25,8 @@
 #include <model/publishedvaluem.h>
 #include <viewModel/agentsgroupedbynamevm.h>
 
+static const QString VERSION_JSON_PLATFORM = QString("1.0");
+
 
 /**
  * @brief The IngeScapeModelManager class defines the manager for the data model of INGESCAPE
@@ -149,8 +151,9 @@ public:
     /**
      * @brief Import an agents list from a JSON array
      * @param jsonArrayOfAgents
+     * @param versionJsonPlatform
      */
-    bool importAgentsListFromJson(QJsonArray jsonArrayOfAgents);
+    bool importAgentsListFromJson(QJsonArray jsonArrayOfAgents, QString versionJsonPlatform);
 
 
     /**

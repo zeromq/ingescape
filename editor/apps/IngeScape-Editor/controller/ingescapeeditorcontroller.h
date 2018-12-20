@@ -35,8 +35,6 @@
 #include <controller/valueshistorycontroller.h>
 #include <misc/terminationsignalwatcher.h>
 
-static const QString VERSION_JSON_PLATFORM = QString("1.0");
-
 
 /**
  * @brief The IngeScapeEditorController class defines the main controller of the INGESCAPE editor

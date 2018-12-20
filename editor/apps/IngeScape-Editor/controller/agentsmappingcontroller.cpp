@@ -885,7 +885,7 @@ void AgentsMappingController::onAgentsGroupedByNameWillBeDeleted(AgentsGroupedBy
                     {
                         // FIXME TODO ? CONTROL
 
-                        // FIXME REPAIR WhileMappingWasUNactivated
+                        // FIXME WhileMappingWasUNactivated
                         //if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
                     }
                     // OBSERVE
