@@ -1,5 +1,11 @@
 # Gitlab ci
 
+# TODO Add yajl in unix and osx installer (or see to create yajl installer)
+# TODO Add job to deploy ingescape website on commit (Can filter to launch job on doc folder changes and only master git's branche)
+# TODO Add job to compile editor
+# TODO Add job to compile ingeprob
+# TODO Add job to package bindings
+
 # Define job order
 stages:
   - linux
@@ -7,14 +13,8 @@ stages:
   - windows
   - installer
 
-# Define default condition to launch job
-.default-conditions: &default-conditions
-  only:
-    - master
-
 # Define ingescape library files
-.build-ingescape-files: &build-ingescape-files
-  <<: *default-conditions
+.build-ingescape-lib: &build-ingescape-lib
   only:
     changes:
       - src/**/*
@@ -22,33 +22,13 @@ stages:
       - configure.ac
       - Makefile.am
       - CMakeLists.txt
-
-# Define ingescape windows installer files
-.build-ingescape-installer-windows: &build-ingescape-installer-windows
-  <<: *default-conditions
-  only:
-    changes:
-      - packaging/windows/*
-
-# Define ingescape redhat installer files
-.build-ingescape-installer-redhat: &build-ingescape-installer-redhat
-  <<: *default-conditions
-  only:
-    changes:
-      - packaging/redhat/*
-
-# Define ingescape debian installer files
-.build-ingescape-installer-debian: &build-ingescape-installer-debian
-  <<: *default-conditions
-  only:
-    changes:
-      - packaging/debian/*
+      - build/cmake/**/*
+    refs:
+      - master
 
 # Create ingescape library for linux
 linux-release-x64:
-  <<: *build-ingescape-files
-  <<: *build-ingescape-installer-redhat
-  <<: *build-ingescape-installer-debian
+  <<: *build-ingescape-lib
   stage: linux
   tags:
     - docker
@@ -58,16 +38,15 @@ linux-release-x64:
     - mkdir build
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
     - make -C build
-    - mkdir linux-release-x64
-    - cp -d build/libingescape.* linux-release-x64/
   artifacts:
     paths:
-      - linux-release-x64
+      - build
+    name: "linux-release-x64"
     expire_in: 1 week
 
 # Create ingescape library for osx
 osx-release-x64:
-  <<: *build-ingescape-files
+  <<: *build-ingescape-lib
   stage: osx
   tags:
     - osx
@@ -84,8 +63,7 @@ osx-release-x64:
 
 # Create ingescape library for windows 64 bits release
 win32-release-x64:
-  <<: *build-ingescape-files
-  <<: *build-ingescape-installer-windows
+  <<: *build-ingescape-lib
   stage: windows
   tags:
     - windows
@@ -104,8 +82,7 @@ win32-release-x64:
 
 # Create ingescape library for windows 32 bits release
 win32-release-x86:
-  <<: *build-ingescape-files
-  <<: *build-ingescape-installer-windows
+  <<: *build-ingescape-lib
   stage: windows
   tags:
     - windows
@@ -124,8 +101,7 @@ win32-release-x86:
 
 # Create ingescape library for windows 64 bits debug
 win32-debug-x64:
-  <<: *build-ingescape-files
-  <<: *build-ingescape-installer-windows
+  <<: *build-ingescape-lib
   stage: windows
   tags:
     - windows
@@ -144,8 +120,7 @@ win32-debug-x64:
 
 # Create ingescape library for windows 32 bits debug
 win32-debug-x86:
-  <<: *build-ingescape-files
-  <<: *build-ingescape-installer-windows
+  <<: *build-ingescape-lib
   stage: windows
   tags:
     - windows
@@ -164,8 +139,7 @@ win32-debug-x86:
 
 # Create runtime install for windows 32 bits
 installer-runtime-win32-x86:
-  <<: *build-ingescape-files
-  <<: *build-ingescape-installer-windows
+  <<: *build-ingescape-lib
   stage: installer
   tags:
     - windows
@@ -181,8 +155,7 @@ installer-runtime-win32-x86:
 
 # Create runtime install for windows 64 bits
 installer-runtime-win32-x64:
-  <<: *build-ingescape-files
-  <<: *build-ingescape-installer-windows
+  <<: *build-ingescape-lib
   stage: installer
   tags:
     - windows
@@ -198,7 +171,7 @@ installer-runtime-win32-x64:
 
 # Create runtime install for osx 64 bits
 installer-runtime-osx-x64:
-  <<: *build-ingescape-files
+  <<: *build-ingescape-lib
   stage: installer
   tags:
     - osx
@@ -207,67 +180,22 @@ installer-runtime-osx-x64:
     - make -C build package_source
   artifacts:
     paths:
-      - build\ReleaseX64\Ingescape-*
+      - build/Ingescape-*
   dependencies:
     - osx-release-x64
 
-# # Create sdk install for windows
-# installer-sdk:
-#   <<: *build-ingescape-files
-#   <<: *build-ingescape-installer-windows
-#   stage: installer
-#   image: fafesty/compile-with-zyre
-#   script:
-#    - apt-get update
-#    - apt-get install -y nsis
-#    - makensis packaging/windows/ingescape-sdk.nsi
-#    - mv packaging/windows/Ingescape-Sdk-Installer.exe ./
-#   dependencies:
-#    - win32-x86_64
-#    - win32-i686
-#   artifacts:
-#     paths:
-#       - Ingescape-Sdk-Installer.exe
-
-# installer-redhat:
-#   <<: *build-ingescape-files
-#   <<: *build-ingescape-installer-redhat
-#   stage: installer
-#   image: fafesty/compile-with-zyre
-#   script:
-#    - apt-get update
-#    - apt-get install -y rpm
-#    - mkdir -p $HOME/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-#    - ln -s packaging/redhat/rpmmacros $HOME/.rpmmacros
-#    - touch $HOME/rpmbuild/SOURCES/empty
-#    - VERSION=$(builds/m4-scripts/gen-ingescape-version src/admin.c); INGESCAPE_SOURCE=$(pwd); rpmbuild -ba --define "_VERSION_I $VERSION" --define "_INGESCAPE_SOURCE $INGESCAPE_SOURCE" packaging/redhat/libingescape.spec
-#    - mkdir redhat-x86_64
-#    - mv /root/rpmbuild/RPMS/x86_64/* redhat-x86_64/
-#   dependencies:
-#     - linux-x86
-#   artifacts:
-#     paths:
-#       - redhat-x86_64
-
-# installer-debian:
-#   <<: *build-ingescape-files
-#   <<: *build-ingescape-installer-debian
-#   stage: installer
-#   image: fafesty/compile-with-zyre
-#   script:
-#    - apt-get update
-#    - apt-get install -y devscripts build-essential
-#    - cd packaging && debuild -us -uc --build=binary && cd -
-#    - mkdir debian-x86_64
-#    - mv libingescape*.deb debian-x86_64/
-#   dependencies:
-#     - linux-x86
-#   artifacts:
-#     paths:
-#       - debian-x86_64
-
-# TODO Add yajl in unix and osx installer (or see to create yajl installer)
-# TODO Add job to deploy ingescape website on commit (Can filter to launch job on doc folder changes and only master git's branche)
-# TODO Add job to compile editor
-# TODO Add job to compile ingeprob
-# TODO Add job to package bindings
+# Create runtime install for linux 64 bits
+installer-runtime-osx-x64:
+  <<: *build-ingescape-lib
+  stage: installer
+  tags:
+    - docker
+  image: fafesty/debian-with-zyre
+  script:
+    - make -C build package
+    - make -C build package_source
+  artifacts:
+    paths:
+      - build/Ingescape-*
+  dependencies:
+    - linux-release-x64

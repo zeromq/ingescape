@@ -297,6 +297,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   else ()
       set(CPACK_GENERATOR "DEB;RPM")
       set(CPACK_SOURCE_GENERATOR "TGZ")
+      set(CPACK_DEBIAN_PACKAGE_DEPENDS "libczmq4, libsodium23 (>= 0.6.0), libzmq5, libzyre2, yajl")
+      set(CPACK_RPM_PACKAGE_REQUIRES "libczmq4, libsodium23 >= 0.6.0, libzmq5, libzyre2, yajl")
       list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
   endif ()
 
