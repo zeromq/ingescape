@@ -185,7 +185,7 @@ installer-runtime-osx-x64:
     - osx-release-x64
 
 # Create runtime install for linux 64 bits
-installer-runtime-osx-x64:
+installer-runtime-linux-x64:
   <<: *build-ingescape-lib
   stage: installer
   tags:
