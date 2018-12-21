@@ -15,8 +15,6 @@ set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # Select flags
 SET(CMAKE_C_FLAGS_RELEASE "-O2")
-# Will be used to add flags to pkg-config useful when apps want to statically link
-set(pkg_config_libs_private "")
 # Add path to custom macro
 set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/builds/cmake/modules")
 list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR})
@@ -46,11 +44,6 @@ if (NOT MSVC)
     endif()
   endforeach()
 endif()
-
-########################################################################
-# dependency
-########################################################################
-add_ingescape_libraries_dependencies(MORE_LIBRARIES pkg_config_libs_private)
 
 ########################################################################
 # version
@@ -83,23 +76,30 @@ set (ingescape_headers
     src/include/uthash/utvector.h
 )
 
-IF (WIN32)
-    list(APPEND ingescape_headers dependencies/windows/unix/)
-ENDIF (WIN32)
-
 source_group ("Header Files" FILES ${ingescape_headers})
 install(FILES ${ingescape_headers_to_install} DESTINATION include/ingescape)
-
-########################################################################
-# library
-########################################################################
 
 add_ingescape_include_directory(_INCLUDES_DIRECTORY)
 include_directories(${_INCLUDES_DIRECTORY})
 
+########################################################################
+# Sources files
+########################################################################
 add_ingescape_sources(ingescape_sources)
 
 source_group("Source Files" FILES ${ingescape_sources})
+
+
+########################################################################
+# dependencies
+########################################################################
+# Will be used to add flags to pkg-config useful when apps want to statically link
+set(pkg_config_libs_private "")
+add_ingescape_libraries_dependencies(MORE_LIBRARIES pkg_config_libs_private)
+
+########################################################################
+# library
+########################################################################
 
 option(INGESCAPE_BUILD_SHARED "Whether or not to build the shared object" ON)
 option(INGESCAPE_BUILD_STATIC "Whether or not to build the static archive" ON)
