@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -19,10 +19,13 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
-
 #include <model/jsonhelper.h>
+#include <model/hostm.h>
 #include <model/agentm.h>
 #include <model/publishedvaluem.h>
+#include <viewModel/agentsgroupedbynamevm.h>
+
+static const QString VERSION_JSON_PLATFORM = QString("1.0");
 
 
 /**
@@ -32,14 +35,17 @@ class IngeScapeModelManager : public QObject
 {
     Q_OBJECT
 
-    // List of opened definitions
-    I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
+    // List of all groups (of agents) grouped by name
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentsGroupedByNameVM, allAgentsGroupsByName)
 
     // Flag indicating if our global mapping is activated
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingActivated)
 
     // Flag indicating if our global mapping is controlled (or passive)
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingControlled)
+
+    // List of opened definitions
+    I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
 
     // List of all published values
     I2_QOBJECT_LISTMODEL(PublishedValueM, publishedValues)
@@ -54,7 +60,6 @@ public:
      */
     explicit IngeScapeModelManager(JsonHelper* jsonHelper,
                                    QString rootDirectoryPath,
-                                   //QString agentsListDirectoryPath,
                                    QObject *parent = nullptr);
 
 
@@ -62,13 +67,56 @@ public:
      * @brief Destructor
      */
     ~IngeScapeModelManager();
-    
+
 
     /**
-     * @brief Add a model of agent
+     * @brief Create a new model of agent with a name, a definition (can be NULL) and some properties
+     * @param agentName
+     * @param definition optional (NULL by default)
+     * @param peerId optional (empty by default)
+     * @param ipAddress optional (empty by default)
+     * @param hostname optional (default value)
+     * @param commandLine optional (empty by default)
+     * @param isON optional (false by default)
+     * @return
+     */
+    AgentM* createAgentModel(QString agentName,
+                             DefinitionM* definition = nullptr,
+                             QString peerId = "",
+                             QString ipAddress = "",
+                             QString hostname = HOSTNAME_NOT_DEFINED,
+                             QString commandLine = "",
+                             bool isON = false);
+
+
+    /**
+     * @brief Delete a model of agent
      * @param agent
      */
-    void addAgentModel(AgentM* agent);
+    void deleteAgentModel(AgentM* agent);
+
+
+    /**
+     * @brief Delete a view model of agents grouped by name
+     * @param agentsGroupedByName
+     */
+    void deleteAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName);
+
+
+    /**
+     * @brief Get the model of host with a name
+     * @param hostName
+     * @return
+     */
+    HostM* getHostModelWithName(QString hostName);
+
+
+    /**
+     * @brief Get the peer id of the Launcher on a host
+     * @param hostName
+     * @return
+     */
+    QString getPeerIdOfLauncherOnHost(QString hostName);
 
 
     /**
@@ -80,71 +128,18 @@ public:
 
 
     /**
-     * @brief Get the list of models of agent from a name
+     * @brief Get the (view model of) agents grouped for a name
      * @param name
      * @return
      */
-    QList<AgentM*> getAgentModelsListFromName(QString name);
+    AgentsGroupedByNameVM* getAgentsGroupedForName(QString name);
 
 
     /**
-     * @brief Get the map from agent name to list of active agents
+     * @brief Get the hash table from a name to the group of agents with this name
      * @return
      */
-    QHash<QString, QList<AgentM*>> getMapFromAgentNameToActiveAgentsList();
-
-
-    /**
-     * @brief Delete a model of agent
-     * @param agent
-     */
-    void deleteAgentModel(AgentM* agent);
-
-
-    /**
-     * @brief Add a model of agent definition for an agent name
-     * @param agentDefinition
-     * @param agentName
-     */
-    void addAgentDefinitionForAgentName(DefinitionM* agentDefinition, QString agentName);
-
-
-    /**
-     * @brief Get the list (of models) of agent definition from a definition name
-     * @param definitionName
-     * @return
-     */
-    QList<DefinitionM*> getAgentDefinitionsListFromDefinitionName(QString definitionName);
-
-
-    /**
-     * @brief Delete a model of agent definition
-     * @param definition
-     */
-    void deleteAgentDefinition(DefinitionM* definition);
-
-
-    /**
-     * @brief Add a model of agent mapping for an agent name
-     * @param agentMapping
-     * @param agentName
-     */
-    void addAgentMappingForAgentName(AgentMappingM* agentMapping, QString agentName);
-
-
-    /**
-     * @brief Get the list (of models) of agent mapping from a mapping name
-     * @param name
-     * @return
-     */
-    QList<AgentMappingM*> getAgentMappingsListFromMappingName(QString mappingName);
-
-
-    /**
-     * @brief Delete a model of agent mapping
-     * @param agentMapping
-     */
-    void deleteAgentMapping(AgentMappingM* agentMapping);
+    QHash<QString, AgentsGroupedByNameVM*> getHashTableFromNameToAgentsGrouped();
 
 
     /**
@@ -156,29 +151,34 @@ public:
     /**
      * @brief Import an agents list from a JSON array
      * @param jsonArrayOfAgents
+     * @param versionJsonPlatform
      */
-    bool importAgentsListFromJson(QJsonArray jsonArrayOfAgents);
+    bool importAgentsListFromJson(QJsonArray jsonArrayOfAgents, QString versionJsonPlatform);
+
+
+    /**
+     * @brief Export the agents into JSON
+     * @return array of all agents (grouped by name)
+     */
+    QJsonArray exportAgentsToJSON();
 
 
     /**
      * @brief Export the agents list to selected file
-     * @param jsonArrayOfAgents
      */
-    void exportAgentsListToSelectedFile(QJsonArray jsonArrayOfAgents);
+    Q_INVOKABLE void exportAgentsListToSelectedFile();
 
 
     /**
-     * @brief Simulate an exit for each active agent
-     * an active agent has its flag "isON" equal to true
+     * @brief Simulate an exit for each agent ON
      */
-    void simulateExitForEachActiveAgent();
+    void simulateExitForEachAgentON();
 
 
     /**
-     * @brief Open the definition with an agent name
-     * @param agentName
+     * @brief Delete agents OFF
      */
-    Q_INVOKABLE void openDefinitionWithAgentName(QString agentName);
+    void deleteAgentsOFF();
 
 
     /**
@@ -191,11 +191,12 @@ public:
 
 Q_SIGNALS:
 
+
     /**
      * @brief Signal emitted when a new model of agent has been created
      * @param agent
      */
-    void agentModelCreated(AgentM* agent);
+    void agentModelHasBeenCreated(AgentM* agent);
 
 
     /**
@@ -206,11 +207,53 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when a new view model of agents grouped by name has been created
+     * @param agentsGroupedByName
+     */
+    void agentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName);
+
+
+    /**
+     * @brief Signal emitted when a view model of agents grouped by name will be deleted
+     * @param agentsGroupedByName
+     */
+    void agentsGroupedByNameWillBeDeleted(AgentsGroupedByNameVM* agentsGroupedByName);
+
+
+    /**
+     * @brief Signal emitted when a new view model of agents grouped by definition has been created
+     * @param agentsGroupedByDefinition
+     */
+    void agentsGroupedByDefinitionHasBeenCreated(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+
+
+    /**
+     * @brief Signal emitted when a view model of agents grouped by definition will be deleted
+     * @param agentsGroupedByDefinition
+     */
+    void agentsGroupedByDefinitionWillBeDeleted(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+
+
+    /**
+     * @brief Signal emitted when a model of host has been created
+     * @param host
+     */
+    void hostModelHasBeenCreated(HostM* host);
+
+
+    /**
+     * @brief Signal emitted when a model of host will be deleted
+     * @param host
+     */
+    void hostModelWillBeDeleted(HostM* host);
+
+
+    /**
      * @brief Emitted when inputs must be added to our Editor for a list of outputs
      * @param agentName
      * @param outputsList
      */
-    void addInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+    void addInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds);
 
 
     /**
@@ -218,35 +261,7 @@ Q_SIGNALS:
      * @param agentName
      * @param outputsList
      */
-    void removeInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
-
-
-    /**
-     * @brief Signal emitted when an active agent has been defined
-     * @param agent
-     */
-    void activeAgentDefined(AgentM* agent);
-
-
-    /**
-     * @brief Signal emitted when the mapping of an active agent has been defined
-     * @param agent
-     */
-    void activeAgentMappingDefined(AgentM* agent);
-
-
-    /**
-     * @brief Emitted when two agents are mapped
-     * @param mappingElement
-     */
-    void mapped(ElementMappingM* mappingElement);
-
-
-    /**
-     * @brief Emitted when two agents are unmapped
-     * @param mappingElement
-     */
-    void unmapped(ElementMappingM* mappingElement);
+    void removeInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds);
 
 
     /**
@@ -283,18 +298,18 @@ public Q_SLOTS:
     /**
      * @brief Slot called when a launcher enter the network
      * @param peerId
-     * @param hostname
+     * @param hostName
      * @param ipAddress
      */
-    void onLauncherEntered(QString peerId, QString hostname, QString ipAddress, QString streamingPort);
+    void onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort);
 
 
     /**
      * @brief Slot called when a launcher quit the network
      * @param peerId
-     * @param hostname
+     * @param hostName
      */
-    void onLauncherExited(QString peerId, QString hostname);
+    void onLauncherExited(QString peerId, QString hostName);
     
 
     /**
@@ -328,6 +343,14 @@ public Q_SLOTS:
      * @param isMuted
      */
     void onisMutedFromAgentUpdated(QString peerId, bool isMuted);
+
+
+    /**
+     * @brief Slot called when the flag "can be Frozen" from an agent updated
+     * @param peerId
+     * @param canBeFrozen
+     */
+    void onCanBeFrozenFromAgentUpdated(QString peerId, bool canBeFrozen);
 
 
     /**
@@ -398,7 +421,41 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     /**
-     * @brief Slot called when the network data (of an agent) will be cleared
+     * @brief Slot called when a model of agent has to be deleted
+     * @param model
+     */
+    void _onAgentModelHasToBeDeleted(AgentM* model);
+
+
+    /**
+     * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
+     * @param definitionsList
+     */
+    void _onDefinitionsToOpen(QList<DefinitionM*> definitionsList);
+
+
+    /**
+     * @brief Slot called when some view models of outputs have been added to an agent(s grouped by name)
+     * @param newOutputs
+     */
+    void _onOutputsHaveBeenAddedToAgentsGroupedByName(QList<OutputVM*> newOutputs);
+
+
+    /**
+     * @brief Slot called when some view models of outputs will be removed from an agent(s grouped by name)
+     * @param oldOutputs
+     */
+    void _onOutputsWillBeRemovedFromAgentsGroupedByName(QList<OutputVM*> oldOutputs);
+
+
+    /**
+     * @brief Slot called when a view model of agents grouped by name has become useless (no more agents grouped by definition)
+     */
+    void _onUselessAgentsGroupedByName();
+
+
+    /**
+     * @brief Slot called when the network data of an agent will be cleared
      * @param peerId
      */
     void _onNetworkDataOfAgentWillBeCleared(QString peerId);
@@ -407,28 +464,17 @@ private Q_SLOTS:
 private:
 
     /**
-     * @brief Update definition variants of the list of definitions with the same name
-     * @param definitionName
+     * @brief Create a new view model of agents grouped by name
+     * @param model
      */
-    void _updateDefinitionVariants(QString definitionName);
+    void _createAgentsGroupedByName(AgentM* model);
 
 
     /**
-     * @brief Print all models of agents (for Debug)
+     * @brief Open a list of definitions (if the definition is already opened, we bring it to front)
+     * @param definitionsToOpen
      */
-    void _printAgents();
-
-
-    /**
-     * @brief Print all models of agent definitions (for Debug)
-     */
-    void _printDefinitions();
-
-
-    /**
-     * @brief Print all models of agent mappings (for Debug)
-     */
-    void _printMappings();
+    void _openDefinitions(QList<DefinitionM*> definitionsToOpen);
 
 
 private:
@@ -440,16 +486,13 @@ private:
     QString _rootDirectoryPath;
 
     // Map from "peer id" to a model of agent
-    QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
+    QHash<QString, AgentM*> _hashFromPeerIdToAgent;
 
-    // Map from "agent name" to a list of models of agent
-    QHash<QString, QList<AgentM*>> _mapFromNameToAgentModelsList;
+    // Hash table from a name to the group of agents with this name
+    QHash<QString, AgentsGroupedByNameVM*> _hashFromNameToAgentsGrouped;
 
-    // Map from "definition name" to a list (of models) of agent definition
-    QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
-
-    // Map from "mapping name" to a list (of models) of agent mapping
-    QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
+    // Hash table from name to a model of host (corresponding to an INGESCAPE launcher)
+    QHash<QString, HostM*> _hashFromNameToHost;
 
 };
 

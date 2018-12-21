@@ -41,10 +41,10 @@ class HostVM : public QObject
     // Sorted list of associated agents
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentM, agentsList)
 
-    // Flag indicating if our agent can be frozen
+    // Flag indicating if our host can provide stream
     I2_QML_PROPERTY_READONLY(bool, canProvideStream)
 
-    // Falg indicating if the host is streaming or not
+    // Flag indicating if the host is streaming or not
     I2_QML_PROPERTY(bool, isStreaming)
 
 
@@ -95,11 +95,11 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param peerIdOfLauncher
      * @param command
-     * @param hostname
      * @param commandLine
      */
-    void commandAskedToLauncher(QString command, QString hostname, QString commandLine);
+    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
 
 };
 

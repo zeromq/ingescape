@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -21,16 +21,9 @@
 #include <QJsonArray>
 
 #include <I2PropertyHelpers.h>
-
-#include <model/definitionm.h>
-#include <model/mapping/agentmappingm.h>
+#include <viewModel/agentinmappingvm.h>
 #include <model/recordm.h>
 #include <model/scenario/scenariom.h>
-
-#include "viewModel/scenario/actionvm.h"
-#include "viewModel/scenario/actioneffectvm.h"
-#include "viewModel/scenario/actionconditionvm.h"
-#include "viewModel/scenario/actioninpalettevm.h"
 
 
 /**
@@ -98,11 +91,23 @@ public:
 
 
     /**
-     * @brief Export the model of agent mapping into a JSON object
+     * @brief Export the model of an agent mapping into a JSON object
      * @param agentMapping
      * @return JSON object
      */
     QJsonObject exportAgentMappingToJson(AgentMappingM* agentMapping);
+
+
+    /**
+     * @brief Export the model of an agent mapping with changes (applied while the global mapping was UN-activated) into a JSON object
+     * @param agentMapping
+     * @param addedMappingElements
+     * @param namesOfRemovedMappingElements
+     * @return JSON object
+     */
+    QJsonObject exportAgentMappingWithChangesToJson(AgentMappingM* agentMapping,
+                                                    QList<ElementMappingM*> addedMappingElements,
+                                                    QStringList namesOfRemovedMappingElements);
 
 
     /**
@@ -124,12 +129,27 @@ public:
 
 
     /**
-     * @brief Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
-     * @param jsonScenario
-     * @param listAgentsInMapping
+     * @brief Get the JSON of an agent mapping with changes (applied while the global mapping was UN-activated)
+     * @param agentMapping
+     * @param addedMappingElements
+     * @param namesOfRemovedMappingElements
+     * @param jsonFormat
      * @return
      */
-    ScenarioM* createModelOfScenarioFromJSON(QJsonObject jsonScenario, QList<AgentInMappingVM*> listAgentsInMapping);
+    QString getJsonOfAgentMappingWithChanges(AgentMappingM* agentMapping,
+                                             QList<ElementMappingM*> addedMappingElements,
+                                             QStringList namesOfRemovedMappingElements,
+                                             QJsonDocument::JsonFormat jsonFormat);
+
+
+    /**
+     * @brief Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
+     * @param jsonScenario
+     * @param hashFromNameToAgentsGrouped
+     * @return
+     */
+    ScenarioM* createModelOfScenarioFromJSON(QJsonObject jsonScenario,
+                                             QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
 
 
     /**
@@ -143,14 +163,6 @@ public:
 
 
     /**
-     * @brief Export the agents in mapping list into json array object
-     * @param agents in mapping list
-     * @return
-     */
-    QJsonArray exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsInMapping);
-
-
-    /**
      * @brief Create a model of record from JSON data
      * @param byteArrayOfJson
      * @return
@@ -160,7 +172,9 @@ public:
 
 Q_SIGNALS:
 
+
 public Q_SLOTS:
+
 
 private:
 
@@ -191,20 +205,23 @@ private:
 
 
     /**
-     * @brief Create a model of agent mapping with JSON and the input agent name corresponding
-     * @param inputAgentName, byteArrayOfJson
+     * @brief Create an action effect VM from JSON object
+     * @param jsonEffect
+     * @param hashFromNameToAgentsGrouped
      * @return
      */
-    ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentInMappingVM *> listAgentsInMapping);
+    ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect,
+                                           QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
 
 
     /**
      * @brief Create an action condition VM from JSON object
      * @param jsonObject
-     * @param list of agents in mapping
+     * @param hashFromNameToAgentsGrouped
      * @return
      */
-    ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentInMappingVM*> listAgentsInMapping);
+    ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition,
+                                                  QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
 
 };
 

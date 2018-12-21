@@ -19,7 +19,7 @@
  * @param parent
  */
 ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
-    _agent(NULL),
+    _agent(nullptr),
     _isValid(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -34,6 +34,9 @@ ActionConditionM::~ActionConditionM()
 {
     // Reset the agent connections
     resetConnections();
+
+    // Reset agent
+    setagent(nullptr);
 }
 
 
@@ -41,14 +44,14 @@ ActionConditionM::~ActionConditionM()
 * @brief Custom setter for agent
 * @param agent
 */
-void ActionConditionM::setagent(AgentInMappingVM* value)
+void ActionConditionM::setagent(AgentsGroupedByNameVM* value)
 {
     if (_agent != value)
     {
-        if (_agent != NULL)
+        if (_agent != nullptr)
         {
-            // UnSubscribe to destruction
-            disconnect(_agent, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
+            // UN-subscribe to destruction
+            disconnect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
         }
 
         // Reset
@@ -56,10 +59,10 @@ void ActionConditionM::setagent(AgentInMappingVM* value)
 
         _agent = value;
 
-        if (_agent != NULL)
+        if (_agent != nullptr)
         {
             // Subscribe to destruction
-            connect(_agent, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
+            connect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
         }
 
         Q_EMIT agentChanged(value);
@@ -73,7 +76,7 @@ void ActionConditionM::setagent(AgentInMappingVM* value)
 */
 void ActionConditionM::copyFrom(ActionConditionM* condition)
 {
-    if (condition != NULL)
+    if (condition != nullptr)
     {
         setagent(condition->agent());
         setisValid(condition->isValid());
@@ -86,13 +89,13 @@ void ActionConditionM::copyFrom(ActionConditionM* condition)
   */
 void ActionConditionM::initializeConnections()
 {
-    if (_agent != NULL)
+    if (_agent != nullptr)
     {
         // Reset the agent connections
         resetConnections();
 
         // Connect to signal emitted when the flag "is ON" changed
-        connect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentIsOnChanged);
+        connect(_agent, &AgentsGroupedByNameVM::isONChanged, this, &ActionConditionM::_onAgentIsOnChanged);
 
         // Force the call of the slot
         _onAgentIsOnChanged(_agent->isON());
@@ -105,16 +108,16 @@ void ActionConditionM::initializeConnections()
   */
 void ActionConditionM::resetConnections()
 {
-    if (_agent != NULL)
+    if (_agent != nullptr)
     {
         // DIS-connect to signal emitted when the flag "is ON" changed
-        disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentIsOnChanged);
+        disconnect(_agent, &AgentsGroupedByNameVM::isONChanged, this, &ActionConditionM::_onAgentIsOnChanged);
     }
 }
 
 
 /**
- * @brief Slot called when the flag "is ON" of an agent changed
+ * @brief Slot called when the flag "is ON" of the agent changed
  * @param isON
  */
 void ActionConditionM::_onAgentIsOnChanged(bool isON)
@@ -124,7 +127,7 @@ void ActionConditionM::_onAgentIsOnChanged(bool isON)
 
 
 /**
- * @brief Called when our agent model is destroyed
+ * @brief FIXME custom event instead: Called when our agent model is destroyed
  * @param sender
  */
 void ActionConditionM::_onAgentDestroyed(QObject* sender)
@@ -132,7 +135,7 @@ void ActionConditionM::_onAgentDestroyed(QObject* sender)
     Q_UNUSED(sender)
 
     // Reset our agent
-    setagent(NULL);
+    setagent(nullptr);
 
     Q_EMIT askForDestruction();
 }

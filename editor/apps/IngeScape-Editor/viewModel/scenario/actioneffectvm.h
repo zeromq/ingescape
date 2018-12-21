@@ -47,8 +47,8 @@ class ActionEffectVM : public QObject
     I2_QML_PROPERTY_CUSTOM_SETTER(ActionEffectTypes::Value, effectType)
 
     // FIXME Vincent P: très moche, est ce que je peux supprimer ce cas très particulier
-    // [Optional] second agent in mapping to initalize the combobox
-    I2_QML_PROPERTY(AgentInMappingVM*, secondAgentInMapping)
+    // [Optional] second agent for mapping to initalize the combobox
+    I2_QML_PROPERTY(AgentsGroupedByNameVM*, secondAgentForMapping)
 
 
 public:

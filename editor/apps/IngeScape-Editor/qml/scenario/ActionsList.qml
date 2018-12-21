@@ -191,7 +191,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                enabled: controller && controller.agentsInMappingList.count > 0
+                enabled: (IngeScapeEditorC.modelManager && (IngeScapeEditorC.modelManager.allAgentsGroupsByName.count > 0))
+
                 style : Theme.LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 

@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -36,7 +36,6 @@ class AgentM : public QObject
     I2_QML_PROPERTY(QString, name)
 
     // Peer ID of our agent (unique identifier)
-    //I2_CPP_NOSIGNAL_PROPERTY(QString, peerId)
     I2_QML_PROPERTY_READONLY(QString, peerId)
 
     // IP address of our agent
@@ -67,7 +66,7 @@ class AgentM : public QObject
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
 
     // Mapping of our agent
-    I2_QML_PROPERTY_READONLY(AgentMappingM*, mapping)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(AgentMappingM*, mapping)
 
     // State of our agent
     I2_CPP_PROPERTY(QString, state)
@@ -94,25 +93,22 @@ class AgentM : public QObject
 public:
 
     /**
-     * @brief Constructor without peer id and address
+     * @brief Constructor
      * @param name
+     * @param peerId optional (empty by default)
+     * @param ipAddress optional (empty by default)
+     * @param hostname optional (default value)
+     * @param commandLine optional (empty by default)
+     * @param isON optional (false by default)
      * @param parent
      */
     explicit AgentM(QString name,
+                    QString peerId = "",
+                    QString ipAddress = "",
+                    QString hostname = HOSTNAME_NOT_DEFINED,
+                    QString commandLine = "",
+                    bool isON = false,
                     QObject *parent = nullptr);
-
-
-    /**
-     * @brief Constructor with peer id and address
-     * @param name
-     * @param peerId
-     * @param ipAddress
-     * @param parent
-     */
-    AgentM(QString name,
-           QString peerId,
-           QString ipAddress,
-           QObject *parent = nullptr);
 
 
     /**
@@ -130,7 +126,7 @@ public:
 
 
     /**
-     * @brief Clear the data about the network
+     * @brief Clear the data about the network of our agent
      */
     void clearNetworkData();
 
@@ -146,7 +142,23 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when the network data (of our agent) will be cleared
+     * @brief Signal emitted when the mapping changed (with previous and new values)
+     * @param previousValue
+     * @param newValue
+     */
+    void mappingChangedWithPreviousAndNewValues(AgentMappingM* previousValue, AgentMappingM* newValue);
+
+
+    /**
+     * @brief Signal emitted when the flag "is Muted Output" of an output changed
+     * @param isMutedOutput
+     * @param outputName
+     */
+    void isMutedOutputChanged(bool isMutedOutput, QString outputName);
+
+
+    /**
+     * @brief Signal emitted when the network data of our agent will be cleared
      * @param peerId
      */
     void networkDataWillBeCleared(QString peerId);

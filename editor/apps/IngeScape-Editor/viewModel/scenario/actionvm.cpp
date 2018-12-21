@@ -26,18 +26,18 @@
 ActionVM::ActionVM(ActionM* model,
                    int startTime,
                    QObject *parent) : QObject(parent),
-    _modelM(NULL),
+    _modelM(nullptr),
     _startTime(startTime),
     _startTimeString("00:00:00.000"),
     _lineInTimeLine(-1),
     _areAllConditionsValid(false),
-    _currentExecution(NULL),
+    _currentExecution(nullptr),
     _endTime(startTime)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (model != NULL)
+    if (model != nullptr)
     {
         if (startTime >= 0)
         {
@@ -82,30 +82,30 @@ ActionVM::ActionVM(ActionM* model,
 ActionVM::~ActionVM()
 {
     // Reset current execution
-    setcurrentExecution(NULL);
+    setcurrentExecution(nullptr);
 
     // Delete all executions
     _executionsList.deleteAllItems();
 
     // Reset model of action
-    setmodelM(NULL);
+    setmodelM(nullptr);
 
     // Remove revert timer
-    if (_timerToReverse != NULL)
+    if (_timerToReverse != nullptr)
     {
         disconnect(_timerToReverse, 0, this, 0);
         _timerToReverse->stop();
         delete _timerToReverse;
-        _timerToReverse = NULL;
+        _timerToReverse = nullptr;
     }
 
     // Remove rearm timer
-    if (_timerToRearm != NULL)
+    if (_timerToRearm != nullptr)
     {
         disconnect(_timerToRearm, 0, this, 0);
         _timerToRearm->stop();
         delete _timerToRearm;
-        _timerToRearm = NULL;
+        _timerToRearm = nullptr;
     }
 }
 
@@ -118,7 +118,7 @@ void ActionVM::setmodelM(ActionM* value)
 {
     if (_modelM != value)
     {
-        if(_modelM != NULL)
+        if (_modelM != nullptr)
         {
             disconnect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
 
@@ -129,7 +129,7 @@ void ActionVM::setmodelM(ActionM* value)
 
         _modelM = value;
 
-        if(_modelM != NULL)
+        if (_modelM != nullptr)
         {
             connect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
 
@@ -198,21 +198,21 @@ void ActionVM::setstartTimeString(QString value)
                 }
                 else {
                     setstartTime(-1);
-                    if (_modelM != NULL) {
+                    if (_modelM != nullptr) {
                         qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _modelM->name();
                     }
                 }
             }
             else {
                 setstartTime(-1);
-                if (_modelM != NULL) {
+                if (_modelM != nullptr) {
                     qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _modelM->name();
                 }
             }
         }
         else {
             setstartTime(-1);
-            if (_modelM != NULL) {
+            if (_modelM != nullptr) {
                 qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _modelM->name();
             }
         }
@@ -231,7 +231,7 @@ void ActionVM::setstartTimeString(QString value)
  */
 void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
 {
-    if (_currentExecution != NULL)
+    if (_currentExecution != nullptr)
     {
         _currentExecution->setisExecuted(true);
 
@@ -249,7 +249,7 @@ void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
         // No reverse
         else
         {
-            setcurrentExecution(NULL);
+            setcurrentExecution(nullptr);
 
             // Shall rearm
             if (_modelM->shallRearm())
@@ -267,9 +267,9 @@ void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
  */
 void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
 {
-    if (_currentExecution != NULL)
+    if (_currentExecution != nullptr)
     {
-        setcurrentExecution(NULL);
+        setcurrentExecution(nullptr);
 
         // Shall rearm
         if (_modelM->shallRearm() && ((currentTimeInMilliSeconds < _endTime) || (_endTime == -1)) )
@@ -299,12 +299,12 @@ void ActionVM::rearmCurrentActionExecution(int currentTimeInMilliSeconds)
  */
 void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
 {
-    if (_currentExecution != NULL)
+    if (_currentExecution != nullptr)
     {
         // Add 1 ms
         _currentExecution->setexecutionTime(currentTimeInMilliSeconds - _startTime + 1);
 
-        if ((_modelM != NULL) && _modelM->shallRevert() && _modelM->shallRevertAfterTime())
+        if ((_modelM != nullptr) && _modelM->shallRevert() && _modelM->shallRevertAfterTime())
         {
             // FIXME TODO: check reverseTime is not after validityDuration
 
@@ -326,7 +326,7 @@ void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
   */
 void ActionVM::resetDataFrom(int time)
 {
-    if (_modelM != NULL)
+    if (_modelM != nullptr)
     {
         // Update the conditions validation flag
         if (_modelM->isConnected())
@@ -338,7 +338,7 @@ void ActionVM::resetDataFrom(int time)
         }
 
         // Reset the current action execution
-        setcurrentExecution(NULL);
+        setcurrentExecution(nullptr);
 
         // Get the relative time to the action view model
         int relativeTime = time - _startTime;
@@ -347,7 +347,7 @@ void ActionVM::resetDataFrom(int time)
         for (ActionExecutionVM* actionExecution : _executionsList.toList())
         {
             // This action execution is in the future
-            if ((actionExecution != NULL)
+            if ((actionExecution != nullptr)
                     && ( (actionExecution->executionTime() >= relativeTime) || (actionExecution->shallRevert() && (actionExecution->reverseTime() >= relativeTime)) ))
             {
                 _executionsList.remove(actionExecution);
@@ -401,7 +401,7 @@ void ActionVM::_onValidityDurationChanged()
  */
 void ActionVM::_onTimeout_ReserseAction()
 {
-    if (_currentExecution != NULL)
+    if (_currentExecution != nullptr)
     {
         //qDebug() << "Timeout: emit 'Revert Action'";
 
@@ -429,7 +429,7 @@ void ActionVM::_onTimeout_RearmAction()
 void ActionVM::_computeEndTime()
 {
     int endTime = _startTime;
-    if (_modelM != NULL)
+    if (_modelM != nullptr)
     {
         int itemDurationTime = 0;
         if (_modelM->validityDurationType() == ValidationDurationTypes::FOREVER) {
@@ -461,7 +461,7 @@ void ActionVM::_computeEndTime()
  */
 void ActionVM::_createActionExecution(int startTime)
 {
-    if (_modelM != NULL)
+    if (_modelM != nullptr)
     {
         // No revert by default: reverse time = start time
         int reverseTime = startTime;
@@ -493,7 +493,6 @@ void ActionVM::_createActionExecution(int startTime)
         // Create a new (view model of) action execution
         ActionExecutionVM* actionExecution = new ActionExecutionVM(_modelM->shallRevert(), startTime, reverseTime, this);
 
-        // Add to the list
         _executionsList.append(actionExecution);
 
         //qDebug() << "_createActionExecution: action" << _modelM->name() << "has" << _executionsList.count() << "executions";

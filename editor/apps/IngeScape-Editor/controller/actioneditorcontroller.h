@@ -23,7 +23,7 @@
 #include "I2PropertyHelpers.h"
 
 #include "model/scenario/actionm.h"
-#include "viewModel/agentinmappingvm.h"
+#include <viewModel/agentsgroupedbynamevm.h>
 #include "viewModel/scenario/actionvm.h"
 #include "viewModel/scenario/actionconditionvm.h"
 #include "viewModel/scenario/actioneffectvm.h"
@@ -48,9 +48,6 @@ class ActionEditorController: public QObject
     // Temporary view model of action
     I2_QML_PROPERTY(ActionVM*, editedViewModel)
 
-    // List of all agents in mapping
-    I2_CPP_NOSIGNAL_PROPERTY(I2CustomItemSortFilterListModel<AgentInMappingVM> *, listAgentsInMapping)
-
 
 public:
 
@@ -58,12 +55,12 @@ public:
      * @brief Constructor
      * @param actionName
      * @param originalAction
-     * @param listAgentsInMapping
+     * @param allAgentsGroupsByName
      * @param parent
      */
     explicit ActionEditorController(QString actionName,
-                                    ActionM * originalAction,
-                                    I2CustomItemSortFilterListModel<AgentInMappingVM>* listAgentsInMapping,
+                                    ActionM* originalAction,
+                                    QList<AgentsGroupedByNameVM*> allAgentsGroupsByName,
                                     QObject *parent = 0);
 
 
@@ -114,8 +111,10 @@ Q_SIGNALS:
 public Q_SLOTS:
 
 
-protected:
-
+private:
+    // FIXME: if the list of agents change, this list is not updated
+    // List of all agents grouped by name
+    QList<AgentsGroupedByNameVM*> _allAgentsGroupsByName;
 
 
 };

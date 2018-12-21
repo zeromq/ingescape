@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -9,58 +9,53 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
-#ifndef AGENTVM_H
-#define AGENTVM_H
+#ifndef AGENTSGROUPEDBYDEFINITIONVM_H
+#define AGENTSGROUPEDBYDEFINITIONVM_H
 
 #include <QObject>
-#include <QtQml>
-#include <QColor>
-
 #include <I2PropertyHelpers.h>
-
-#include "model/agentm.h"
-#include "model/definitionm.h"
-
+#include <model/agentm.h>
 
 /**
- * @brief The AgentVM class defines a view model of agent in the list
- * Allows to manage when several agents have exactly the same name and the same definition
- * Only Peer ID is different (and HostName can also be different)
+ * @brief The AgentsGroupedByDefinitionVM class defines a view model of group of agents who have the same name and the same definition
+ * Allows to manage several models of agents who have the same name and the same definition
  */
-class AgentVM : public QObject
+class AgentsGroupedByDefinitionVM : public QObject
 {
     Q_OBJECT
 
-    // Name of our agent
+    // Name of our agent(s)
     I2_QML_PROPERTY_READONLY(QString, name)
+
+    // Definition of our agent(s)
+    I2_QML_PROPERTY_READONLY(DefinitionM*, definition)
 
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
 
+    // List of peer ids of models
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdsList)
+
+    // Flag indicating if our agent(s) is ON (vs OFF)
+    I2_QML_PROPERTY_READONLY(bool, isON)
+
     // Hostname(s) on the network of our agent(s)
     I2_QML_PROPERTY_READONLY(QString, hostnames)
-
-    // Flag indicating if our agent is ON (vs OFF)
-    I2_QML_PROPERTY_READONLY(bool, isON)
 
     // Flag indicating if our agent can be restarted (by an INGESCAPE launcher)
     I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
 
     // Flag indicating if our agent is muted
-    I2_QML_PROPERTY_READONLY(bool, isMuted)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(bool, isMuted)
 
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
 
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY_READONLY(bool, isFrozen)
-
-    // Definition of our agent
-    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
 
     // Number of clones
     I2_QML_PROPERTY_READONLY(int, clonesNumber)
@@ -90,16 +85,19 @@ class AgentVM : public QObject
 public:
     /**
      * @brief Constructor
-     * @param model
+     * @param agentName
+     * @param definition
      * @param parent
      */
-    explicit AgentVM(AgentM* model, QObject *parent = nullptr);
+    explicit AgentsGroupedByDefinitionVM(QString agentName,
+                                         DefinitionM* definition,
+                                         QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~AgentVM();
+    ~AgentsGroupedByDefinitionVM();
 
 
     /**
@@ -194,24 +192,22 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when the definition changed (with previous and new values)
-     * @param previousValue
-     * @param newValue
+     * @brief Signal emitted when our view model has become useless (no more model)
      */
-    void definitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
+    void noMoreModelAndUseless();
 
 
     /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
-     * @param command
      * @param hostname
+     * @param command
      * @param commandLine
      */
-    void commandAskedToLauncher(QString command, QString hostname, QString commandLine);
+    void commandAskedToLauncher(QString hostname, QString command, QString commandLine);
 
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to an agent
+     * @brief Signal emitted when a command must be sent on the network to agent(s)
      * @param peerIdsList
      * @param command
      */
@@ -219,7 +215,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to an agent about one of its output
+     * @brief Signal emitted when a command must be sent on the network to agent(s) about one of its output
      * @param peerIdsList
      * @param command
      * @param outputName
@@ -235,15 +231,14 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a different definition is detected on a model of agent
-     * (compared to the definition of our view model)
-     * @param agent
+     * @brief Signal emitted when we have to open the "Log Stream" of a list of agents
+     * @param models
      */
-    void differentDefinitionDetectedOnModelOfAgent(AgentM* agent);
+    void openLogStreamOfAgents(QList<AgentM*> models);
 
 
     /**
-     * @brief Signal emitted when we have to load an agent definition from a JSON file (path)
+     * @brief Signal emitted when we have to load agent(s) definition from a JSON file (path)
      * @param peerIdsList
      * @param definitionFilePath
      */
@@ -251,7 +246,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when we have to load an agent mapping from a JSON file (path)
+     * @brief Signal emitted when we have to load agent(s) mapping from a JSON file (path)
      * @param mappingFilePath
      */
     void loadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath);
@@ -273,17 +268,13 @@ Q_SIGNALS:
     void downloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath);
 
 
-    /**
-     * @brief Signal emitted when we have to open the "Log Stream" of a list of agents
-     * @param models
-     */
-    void openLogStreamOfAgents(QList<AgentM*> models);
+public Q_SLOTS:
 
 
 private Q_SLOTS:
 
     /**
-     * @brief Slot when the list of models changed
+     * @brief Slot called when the list of models changed
      */
     void _onModelsChanged();
 
@@ -317,7 +308,7 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the flag "can Be Frozen" of a model changed
+     * @brief Slot called when the flag "can be Frozen" of a model changed
      * @param canBeFrozen
      */
     void _onCanBeFrozenOfModelChanged(bool canBeFrozen);
@@ -328,13 +319,6 @@ private Q_SLOTS:
      * @param isMuted
      */
     void _onIsFrozenOfModelChanged(bool isFrozen);
-
-
-    /**
-     * @brief Slot called when the definition of a model changed
-     * @param definition
-     */
-    void _onDefinitionOfModelChanged(DefinitionM* definition);
 
 
     /**
@@ -387,7 +371,15 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when a command must be sent on the network to an agent about one of its output
+     * @brief Slot called when the flag "is Muted Output" of an output (of a model) changed
+     * @param isMutedOutput
+     * @param outputName
+     */
+    void _onIsMutedOutputOfModelChanged(bool isMutedOutput, QString outputName);
+
+
+    /**
+     * @brief Slot called when a command must be sent on the network to agent(s) about one of its output
      * @param command
      * @param outputName
      */
@@ -395,7 +387,7 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when we have to open the values history of our agent
+     * @brief Slot called when we have to open the values history of our agent
      */
     void _onOpenValuesHistoryOfAgent();
 
@@ -407,96 +399,15 @@ private:
     void _updateWithAllModels();
 
 
-    /**
-     * @brief Update the flag "is ON" in function of flags of models
-     */
-    void _updateIsON();
-
-
-    /**
-     * @brief Update the flag "can be Restarted" in function of flags of models
-     */
-    void _updateCanBeRestarted();
-
-
-    /**
-     * @brief Update the flag "is Muted" in function of flags of models
-     */
-    void _updateIsMuted();
-
-
-    /**
-     * @brief Update the flag "can be Frozen" in function of flags of models
-     */
-    void _updateCanBeFrozen();
-
-
-    /**
-     * @brief Update the flag "is Frozen" in function of flags of models
-     */
-    void _updateIsFrozen();
-
-
-    /**
-     * @brief Update the flag "has Log in Stram" in function of flags of models
-     */
-    void _updateHasLogInStream();
-
-
-    /**
-     * @brief Update the flag "is Enabled View Log Stram" in function of flags of models
-     */
-    void _updateIsEnabledViewLogStream();
-
-
-    /**
-     * @brief Update the flag "has Log in File" in function of flags of models
-     */
-    void _updateHasLogInFile();
-
-
-    /**
-     * @brief Update with the definition of the first model
-     */
-    void _updateWithDefinitionOfFirstModel();
-
-
-    /**
-     * @brief Update with the state of the first model
-     */
-    void _updateWithStateOfFirstModel();
-
-
-    /**
-     * @brief Update with the log file path of the first model
-     */
-    void _updateWithLogFilePathOfFirstModel();
-
-
-    /**
-     * @brief Update with the definition file path of the first model
-     */
-    void _updateWithDefinitionFilePathOfFirstModel();
-
-
-    /**
-     * @brief Update with the mapping file path of the first model
-     */
-    void _updateWithMappingFilePathOfFirstModel();
-
-
 private:
     // Previous list of models of agents
     QList<AgentM*> _previousAgentsList;
-
-    // List of peer ids of our models
-    QStringList _peerIdsList;
 
     // Hash table from a hostname to a list of models of agents
     QHash<QString, QList<AgentM*>> _hashFromHostnameToModels;
 
 };
 
-QML_DECLARE_TYPE(AgentVM)
+QML_DECLARE_TYPE(AgentsGroupedByDefinitionVM)
 
-#endif // AGENTVM_H
+#endif // AGENTSGROUPEDBYDEFINITIONVM_H

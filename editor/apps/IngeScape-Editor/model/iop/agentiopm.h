@@ -42,8 +42,8 @@ class AgentIOPM : public QObject
     // Group of the value type of our Input / Output / Parameter
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, agentIOPValueTypeGroup)
 
-    // Identifier with name and value type
-    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
+    // Unique identifier with name and value type
+    I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
 
     // ######################################################
     // Value of our Input / Output / Parameter
@@ -87,10 +87,14 @@ public:
     ~AgentIOPM();
 
 
-Q_SIGNALS:
+    /**
+     * @brief Get the name and the value type of an agent I/O/P from its id
+     * @param uid
+     * @return
+     */
+    static QPair<QString, AgentIOPValueTypes::Value> getNameAndValueTypeFromId(QString uid);
 
 
-public Q_SLOTS:
 };
 
 QML_DECLARE_TYPE(AgentIOPM)

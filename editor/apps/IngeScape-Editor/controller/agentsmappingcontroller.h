@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -18,12 +18,10 @@
 
 #include <QObject>
 #include <QtQml>
-
 #include <I2PropertyHelpers.h>
-
 #include <controller/ingescapemodelmanager.h>
 #include <viewModel/agentinmappingvm.h>
-#include <viewModel/mapbetweeniopvm.h>
+#include <viewModel/link/linkvm.h>
 
 
 /**
@@ -34,14 +32,20 @@ class AgentsMappingController : public QObject
     Q_OBJECT
 
     // Size of the mapping view
-    I2_QML_PROPERTY(double, viewWidth)
-    I2_QML_PROPERTY(double, viewHeight)
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, viewWidth)
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, viewHeight)
+
+    // Offset between the viewport's current position and the view's origin position
+    // These values are updated when the mapping is dragged.
+    // The spawn zone must follow the viewport and not stay at the view's origin position.
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, xSpawnZoneOffset)
+    I2_QML_PROPERTY_FUZZY_COMPARE(double, ySpawnZoneOffset)
 
     // List of all agents in mapping
     I2_QOBJECT_LISTMODEL(AgentInMappingVM, allAgentsInMapping)
 
-    // List of all links between agents in mapping
-    I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allLinksInMapping)
+    // List of all links between agents in the global mapping
+    I2_QOBJECT_LISTMODEL(LinkVM, allLinksInMapping)
 
     // Flag indicating if our mapping is empty
     I2_QML_PROPERTY_READONLY(bool, isEmptyMapping)
@@ -50,7 +54,10 @@ class AgentsMappingController : public QObject
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
 
     // Selected link between agents in the mapping
-    I2_QML_PROPERTY_DELETE_PROOF(MapBetweenIOPVM*, selectedLink)
+    I2_QML_PROPERTY_DELETE_PROOF(LinkVM*, selectedLink)
+
+    // Flag indicating if the corresponding view is loaded
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isLoadedView)
 
 
 public:
@@ -58,12 +65,10 @@ public:
      * @brief Constructor
      * @param modelManager
      * @param jsonHelper
-     * @param directoryPath
      * @param parent
      */
     explicit AgentsMappingController(IngeScapeModelManager* modelManager,
                                      JsonHelper* jsonHelper,
-                                     QString directoryPath,
                                      QObject *parent = nullptr);
 
 
@@ -80,7 +85,7 @@ public:
 
 
     /**
-     * @brief Remove the agent from the mapping and delete it
+     * @brief Remove the agent from the mapping and delete the view model
      * @param agent
      */
     Q_INVOKABLE void deleteAgentInMapping(AgentInMappingVM* agent);
@@ -91,41 +96,64 @@ public:
      * @param link
      * @return true if the link has been deleted during the call of our method
      */
-    Q_INVOKABLE bool removeLinkBetweenTwoAgents(MapBetweenIOPVM* link);
+    Q_INVOKABLE bool removeLinkBetweenTwoAgents(LinkVM* link);
 
 
     /**
      * @brief Called when an agent from the list is dropped on the current mapping at a position
      * @param agentName
-     * @param models
      * @param position
      */
-    Q_INVOKABLE void dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* models, QPointF position);
+    Q_INVOKABLE void dropAgentNameToMappingAtPosition(const QString& agentName, QPointF position);
 
 
     /**
-     * @brief Slot when a link from an output is dropped over an input on the current mapping (or when a link to an input is dropped over an output)
+     * @brief Slot called when a link from an output is dropped over an input on the current mapping
+     * Or when a link to an input is dropped over an output
      * @param outputAgent
-     * @param output
+     * @param linkOutput
      * @param inputAgent
-     * @param input
+     * @param linkInput
      */
-    Q_INVOKABLE void dropLinkBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input);
+    Q_INVOKABLE void dropLinkBetweenTwoAgents(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput);
 
 
     /**
-     * @brief Get the agent in mapping from an agent name
+     * @brief Get the (view model of) agent in the global mapping from an agent name
      * @param name
      * @return
      */
-    Q_INVOKABLE AgentInMappingVM* getAgentInMappingFromName(QString name);
+    Q_INVOKABLE AgentInMappingVM* getAgentInMappingFromName(const QString& name);
 
 
     /**
-     * @brief Import a mapping of agents from a JSON array
-     * @param jsonArrayOfAgentsMapping
+     * @brief Get the list of (view model of) links between agents in the global mapping from a link name
+     * @param linkName
+     * @return
      */
-    void importMappingFromJson(QJsonArray jsonArrayOfAgentsMapping);
+    QList<LinkVM*> getLinksInMappingFromName(const QString& linkName);
+
+
+    /**
+     * @brief Get the (view model of) link between agents in the global mapping from a link id
+     * @param linkId
+     * @return
+     */
+    LinkVM* getLinkInMappingFromId(const QString& linkId);
+
+
+    /**
+     * @brief Export the global mapping (of agents) into JSON
+     * @return array of all agents and their mapping
+     */
+    QJsonArray exportGlobalMappingToJSON();
+
+
+    /**
+     * @brief Import the global mapping (of agents) from JSON
+     * @param jsonArrayOfAgentsInMapping
+     */
+    void importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping);
 
 
     /**
@@ -162,24 +190,10 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when the user activates the mapping in mode OBSERVE
-     * while he made some modifications on the links betwwen agents.
-     * These modifications will be lost if the user stay in mode OBSERVE
+     * while he made some changes on the links betwwen agents.
+     * These changes will be lost if the user stay in mode OBSERVE
      */
-    void modificationsOnLinksWhileMappingUnactivated();
-
-
-    /**
-     * @brief Emitted when a new "Agent in Mapping" is added
-     * @param agent
-     */
-    void agentInMappingAdded(AgentInMappingVM* addedAgent);
-
-
-    /**
-     * @brief Emitted when an "Agent in Mapping" is removed
-     * @param agent
-     */
-    void agentInMappingRemoved(AgentInMappingVM* removedAgent);
+    void changesOnLinksWhileMappingUnactivated();
 
 
     /**
@@ -204,160 +218,175 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot when a previous agent model is replaced by a new one strictly identical
-     * @param previousModel
-     * @param newModel
-     */
-    void onIdenticalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
-
-
-    /**
-     * @brief Slot when the flag "is Mapping Activated" changed
+     * @brief Slot called when the flag "is Mapping Activated" changed
      * @param isMappingActivated
      */
     void onIsMappingActivatedChanged(bool isMappingActivated);
 
 
     /**
-     * @brief Slot when the flag "is Mapping Controlled" changed
+     * @brief Slot called when the flag "is Mapping Controlled" changed
      * @param isMappingControlled
      */
     void onIsMappingControlledChanged(bool isMappingControlled);
 
 
     /**
-     * @brief Slot when a model of agent will be deleted
-     * @param agent
+     * @brief Slot called when a new view model of agents grouped by name has been created
+     * @param agentsGroupedByName
      */
-    void onAgentModelWillBeDeleted(AgentM* agent);
+    void onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName);
 
 
     /**
-     * @brief Slot when an active agent has been defined
-     * @param agent
+     * @brief Slot called when a view model of agents grouped by name will be deleted
+     * @param agentsGroupedByName
      */
-    void onActiveAgentDefined(AgentM* agent);
+    void onAgentsGroupedByNameWillBeDeleted(AgentsGroupedByNameVM* agentsGroupedByName);
 
 
     /**
-     * @brief Slot called when the mapping of an active agent has been defined
-     * @param agent
+     * @brief Slot called when the flag "is ON" of an agent(s grouped by name) changed
+     * @param isON
      */
-    void onActiveAgentMappingDefined(AgentM* agent);
+    //void _onAgentIsONChanged(bool isON);
 
 
     /**
-     * @brief Slot when two agents are mapped
-     * @param mappingElement
+     * @brief Slot called when a model of agent "ON" has been added to an agent(s grouped by name)
+     * @param model
      */
-    void onMapped(ElementMappingM* mappingElement);
+    void _onAgentModelONhasBeenAdded(AgentM* model);
 
 
     /**
-     * @brief Slot when two agents are unmapped
-     * @param mappingElement
+     * @brief Slot called when some view models of mapping elements have been added to an agent(s grouped by name)
+     * @param newMappingElements
      */
-    void onUnmapped(ElementMappingM* mappingElement);
+    void onMappingElementsHaveBeenAdded(QList<MappingElementVM*> newMappingElements);
+
+
+    /**
+     * @brief Slot called when some view models of mapping elements will be removed from an agent(s grouped by name)
+     * @param oldMappingElements
+     */
+    void onMappingElementsWillBeRemoved(QList<MappingElementVM*> oldMappingElements);
 
 
     /**
      * @brief Slot called when we receive the command highlight link from a recorder
      * @param parameters
      */
-    void onHighlightLink(QStringList parameters);
+    void onHighlightLink(const QStringList& parameters);
 
 
 private Q_SLOTS:
 
     /**
-     * @brief Slot when the list of "Agents in Mapping" changed
+     * @brief Slot called when the list of all "Agents in Mapping" changed
      */
-    void _onAgentsInMappingChanged();
+    void _onAllAgentsInMappingChanged();
 
 
     /**
-     * @brief Slot called when some view models of inputs have been added to an agent in mapping
-     * @param inputsListHaveBeenAdded
+     * @brief Slot called when some view models of link inputs have been added to an agent in mapping
+     * @param addedlinkInputs
      */
-    void _onInputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded);
+    void _onLinkInputsListHaveBeenAdded(const QList<LinkInputVM*>& addedlinkInputs);
 
 
     /**
-     * @brief Slot called when some view models of outputs have been added to an agent in mapping
-     * @param outputsListHaveBeenAdded
+     * @brief Slot called when some view models of link outputs have been added to an agent in mapping
+     * @param addedlinkOutputs
      */
-    void _onOutputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded);
+    void _onLinkOutputsListHaveBeenAdded(const QList<LinkOutputVM*>& addedlinkOutputs);
 
 
     /**
-     * @brief Slot called when some view models of inputs will be removed from an agent in mapping
-     * @param inputsListWillBeRemoved
+     * @brief Slot called when some view models of link inputs will be removed from an agent in mapping
+     * @param removedLinkInputs
      */
-    void _onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
+    void _onLinkInputsListWillBeRemoved(const QList<LinkInputVM*>& removedLinkInputs);
 
 
     /**
-     * @brief Slot called when some view models of outputs will be removed from an agent in mapping
-     * @param outputsListWillBeRemoved
+     * @brief Slot called when some view models of link outputs will be removed from an agent in mapping
+     * @param removedLinkOutputs
      */
-    void _onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+    void _onLinkOutputsListWillBeRemoved(const QList<LinkOutputVM*>& removedLinkOutputs);
 
 
 private:
+
     /**
-     * @brief Add new model(s) of agent to the current mapping at a specific position
-     * @param agentName
-     * @param agentsList
+     * @brief Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
+     * @param agentsGroupedByName
      * @param position
+     * @return
      */
-    void _addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position);
+    AgentInMappingVM* _createAgentInMappingAtPosition(AgentsGroupedByNameVM* agentsGroupedByName, QPointF position);
+
+
+    /**
+     * @brief Create a link between two agents
+     * @param linkName
+     * @param outputAgent
+     * @param linkOutput
+     * @param inputAgent
+     * @param linkInput
+     * @param mappingElement
+     * @param isTemporary
+     * @return
+     */
+    LinkVM* _createLinkBetweenTwoAgents(const QString& linkName,
+                                        AgentInMappingVM* outputAgent,
+                                        LinkOutputVM* linkOutput,
+                                        AgentInMappingVM* inputAgent,
+                                        LinkInputVM* linkInput,
+                                        MappingElementVM* mappingElement,
+                                        bool isTemporary = false);
 
 
     /**
      * @brief Delete a link between two agents
      * @param link
      */
-    void _deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link);
+    void _deleteLinkBetweenTwoAgents(LinkVM* link);
 
 
     /**
-     * @brief Get the view model of link which corresponds to a mapping element
-     * @param mappingElement
-     * @return
-     */
-    MapBetweenIOPVM* _getLinkFromMappingElement(ElementMappingM* mappingElement);
-
-
-    /**
-     * @brief Get the view model of link which corresponds to names
-     * @param outputAgentName
-     * @param outputName
-     * @param inputAgentName
-     * @param inputName
-     * @return
-     */
-    MapBetweenIOPVM* _getLinkFromNames(QString outputAgentName, QString outputName, QString inputAgentName, QString inputName);
-
-
-    /**
-     * @brief Remove all the links with this agent
+     * @brief Remove all the links with an agent
      * @param agent
      */
     void _removeAllLinksWithAgent(AgentInMappingVM* agent);
 
 
     /**
-     * @brief OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-     * @param agentModel
-     * @param temporaryMapping
+     * @brief Update the global mapping with agents ON and their links
      */
-    void _overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping);
+    void _updateMappingWithAgentsONandLinks();
 
 
     /**
-     * @brief Update the (global) mapping with all models of agents and links
+     * @brief Link an agent (in the global mapping) on its inputs (add all missing links TO an agent)
+     * @param agentInMapping
      */
-    void _updateMappingWithModelsOfAgentsAndLinks();
+    void _linkAgentOnInputs(AgentInMappingVM* agentInMapping);
+
+
+    /**
+     * @brief Link an agent (in the global mapping) on its input from a mapping element (add a missing link TO an agent)
+     * @param inputAgent
+     * @param mappingElement
+     */
+    void _linkAgentOnInputFromMappingElement(AgentInMappingVM* inputAgent, MappingElementVM* mappingElement);
+
+
+    /**
+     * @brief Link an agent (in the global mapping) on its outputs (add all missing links FROM an agent)
+     * @param agentInMapping
+     */
+    void _linkAgentOnOutputs(AgentInMappingVM* agentInMapping);
 
 
     /**
@@ -368,6 +397,60 @@ private:
     QPointF _getRandomPosition(double randomMax);
 
 
+    /**
+     * @brief Get the list of "Waiting Mapping Elements" on an output agent (name)
+     * @param outputAgentName
+     * @return
+     */
+    QList<MappingElementVM*> _getWaitingMappingElementsOnOutputAgent(const QString& outputAgentName);
+
+
+    /**
+     * @brief Add a "Waiting Mapping Element" on an output agent (name)
+     * @param outputAgentName
+     * @param waitingMappingElement
+     */
+    void _addWaitingMappingElementOnOutputAgent(const QString& outputAgentName, MappingElementVM* waitingMappingElement);
+
+
+    /**
+     * @brief Remove a "Waiting Mapping Element" on an output agent (name)
+     * @param outputAgentName
+     * @param waitingMappingElement
+     */
+    void _removeWaitingMappingElementOnOutputAgent(const QString& outputAgentName, MappingElementVM* waitingMappingElement);
+
+
+    /**
+     * @brief Helper to get the link input from a name if there is only one input for this name
+     * If there are several inputs with the same name (but different value type), we return NULL
+     * @param agent
+     * @param inputName
+     * @param linkName
+     * @return
+     */
+    LinkInputVM* _getAloneLinkInputFromName(AgentInMappingVM* agent, const QString& inputName, const QString& linkName);
+
+
+    /**
+     * @brief Helper to get the link output from a name if there is only one output for this name
+     * If there are several outputs with the same name (but different value type), we return NULL
+     * @param agent
+     * @param outputName
+     * @param linkName
+     * @return
+     */
+    LinkOutputVM* _getAloneLinkOutputFromName(AgentInMappingVM* agent, const QString& outputName, const QString& linkName);
+
+
+    /**
+     * @brief Get the JSON of the mapping of an agent as displayed in the global mapping
+     * @param agentInMapping
+     * @return
+     */
+    QString _getJSONofMappingOfAgentInGlobalMapping(AgentInMappingVM* agentInMapping);
+
+
 private:
 
     // Manager for the data model of INGESCAPE
@@ -376,21 +459,28 @@ private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 
-    // Path to the directory to load/save files
-    QString _directoryPath;
+    // Hash table from agent name to the (view model of) agent in mapping
+    QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;
 
-    // Map from agent name to the (view model of) agent in mapping
-    QHash<QString, AgentInMappingVM*> _mapFromNameToAgentInMapping;
+    // Link name as key is not unique (because the value type of the Input/Output can be different)
+    // Hash table from link name to a list of view models of links between agents in mapping
+    QHash<QString, QList<LinkVM*>> _hashFromNameToListOfLinksInMapping;
 
-    // Previous list of agents in mapping
-    QList<AgentInMappingVM*> _previousListOfAgentsInMapping;
+    // Hash table from link id to the (view model of) link between agents in mapping
+    QHash<QString, LinkVM*> _hashFromIdToLinkInMapping;
 
-    // Hash table from "agent name" to a list of waiting links (where the agent is involved as "Output Agent")
-    QHash<QString, QList<ElementMappingM*>> _hashFromAgentNameToListOfWaitingLinks;
+    // Hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent")
+    QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingMappingElements;
 
-    // Hash table from "link id" to added/removed link while the mapping was UN-activated
-    QHash<QString, ElementMappingM*> _hashFromLinkIdToAddedLinkWhileMappingWasUNactivated;
-    QHash<QString, ElementMappingM*> _hashFromLinkIdToRemovedLinkWhileMappingWasUNactivated;
+    // Hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent") while the mapping was UN-activated
+    //QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingMappingElements_WhileMappingWasUNactivated;
+
+    // Hash table from "(unique) link id" to the added link (for which we are waiting a reply to the request "add")
+    QHash<QString, LinkVM*> _hashFromLinkIdToAddedLink_WaitingReply;
+
+    // Hash table from "(unique) link id" to the removed link (for which we are waiting a reply to the request "remove")
+    QHash<QString, LinkVM*> _hashFromLinkIdToRemovedLink_WaitingReply;
+
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)

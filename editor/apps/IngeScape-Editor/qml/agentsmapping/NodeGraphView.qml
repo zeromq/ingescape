@@ -277,8 +277,8 @@ Item {
             rootItem.setZoomLevel(1);
         }
 
-        onModificationsOnLinksWhileMappingUnactivated: {
-            //console.log("QML: on Modifications on Links While Mapping Unactivated");
+        onChangesOnLinksWhileMappingUnactivated: {
+            //console.log("QML: on Changes on Links While Mapping Unactivated");
 
             // Open the popup about mapping modifications
             mappingModificationsPopup.open();
@@ -290,6 +290,14 @@ Item {
 
         onResetMappindAndTimeLineViews: {
             rootItem.showAll();
+        }
+    }
+
+    Component.onCompleted: {
+        if (controller) {
+            //console.log("QML: Graph View completed !");
+            // Update the flag
+            controller.isLoadedView = true;
         }
     }
 
@@ -331,7 +339,81 @@ Item {
         }
 
 
+        //
+        // New agents spawn zone
+        //
+        // Always centered in the viewport.
+        // Used to position the new agents onto the mapping view.
+        // Always invisible but can be make visible for debugging purposes.
+        //
+        // NOTE: These kind of rectangles could be extracted into utility QML items to render specific zones (for debug pruposes)... Just a thought.
+        //
+        Rectangle {
+            id: spawnZone
 
+            anchors.centerIn: parent
+
+            width: controller.viewWidth * workspace.scale
+            height: controller.viewHeight * workspace.scale
+
+            // Always invisible because it's only a helper item for positionning new agents onto the mapping view.
+            // May be made visible for debugging needs.
+            visible: false
+
+            property int _borderWidth: 10
+            property string _color: "#FF0000"
+
+            border {
+                width: spawnZone._borderWidth
+                color: spawnZone._color
+            }
+
+            // Actual spawn zone represents the margins insinde the spawning zone into which the agent will actually spawn.
+            // The margins ensures that enough of the agent will be visible once spawn.
+            Rectangle {
+                id: actualSpawnZone
+
+                x: parent.width * 0.05
+                y: parent.height * 0.05
+
+                width: parent.width * 0.85
+                height: parent.height * 0.85
+
+                property int _borderWidth: 2
+                property string _color: "#008800"
+
+                border {
+                    width: actualSpawnZone._borderWidth
+                    color: actualSpawnZone._color
+                }
+
+                Text {
+                    anchors {
+                        top: actualSpawnZone.top
+                        topMargin: actualSpawnZone._borderWidth + 5
+                        left: actualSpawnZone.left
+                        leftMargin: actualSpawnZone._borderWidth + 5
+                    }
+
+                    text: "ACTUAL SPAWN ZONE"
+
+                    color: actualSpawnZone._color
+                }
+            }
+
+            Text {
+                anchors {
+                    top: spawnZone.top
+                    topMargin: spawnZone._borderWidth + 5
+                    left: spawnZone.left
+                    leftMargin: spawnZone._borderWidth + 5
+                }
+
+                text: "SPAWN ZONE"
+
+                color: spawnZone._color
+            }
+        }
 
 
         //----------------------------------------------------------------
@@ -414,7 +496,7 @@ Item {
 
                     if (IngeScapeEditorC.agentsMappingC)
                     {
-                        IngeScapeEditorC.agentsMappingC.dropAgentToMappingAtPosition(dragItem.agent.name, dragItem.agent.models, dropPosition);
+                        IngeScapeEditorC.agentsMappingC.dropAgentNameToMappingAtPosition(dragItem.agent.name, dropPosition);
                     }
 
                     // Restore opacity of our source
@@ -581,6 +663,25 @@ Item {
                 property int maxZ: 0
 
 
+                //------------------------------------------------
+                //
+                // Methods and slots
+                //
+                //------------------------------------------------
+                function updateSpawnZoneOffset() {
+                    var offset = workspace.mapFromItem(rootItem, spawnZone.x, spawnZone.y)
+                    controller.xSpawnZoneOffset = offset.x
+                    controller.ySpawnZoneOffset = offset.y
+                }
+
+                onXChanged: {
+                    updateSpawnZoneOffset()
+                }
+
+                onYChanged: {
+                    updateSpawnZoneOffset()
+                }
+
 
                 //------------------------------------------------
                 //
@@ -633,16 +734,16 @@ Item {
                     Link {
                         id: link
                         controller: rootItem.controller
-                        mapBetweenIOPVM: model.QtObject
+                        viewModel: model.QtObject
                     }
                 }
+
 
                 //
                 // Nodes
                 //
                 Repeater {
                     model: controller ? controller.allAgentsInMapping : 0;
-
 
                     AgentNodeView {
                         id: agent
@@ -651,12 +752,20 @@ Item {
 
                         controller: rootItem.controller
 
-                        onNeedConfirmationToDeleteAgentInMapping: {
+                        /*onNeedConfirmationToDeleteAgentInMapping: {
                             // Set the agent
                             deleteConfirmationPopup.myAgent = agent.agentMappingVM
 
                             // Open the popup
                             deleteConfirmationPopup.open();
+                        }*/
+
+                        // When the agent is created, the worspace's scale is reset to 100% if it was superior.
+                        // This shows the entire spawn zone, ensuring that the new poped agent is visible.
+                        Component.onCompleted: {
+                            if (workspace.scale > 1) {
+                                setZoomLevel(1)
+                            }
                         }
                     }
                 }
@@ -702,7 +811,7 @@ Item {
     //
     // Delete Confirmation
     //
-    Editor.DeleteConfirmationPopup {
+    /*Editor.DeleteConfirmationPopup {
         id: deleteConfirmationPopup
 
         property var myAgent: null;
@@ -715,7 +824,7 @@ Item {
                 controller.deleteAgentInMapping(deleteConfirmationPopup.myAgent);
             }
         }
-    }
+    }*/
 
 
     //

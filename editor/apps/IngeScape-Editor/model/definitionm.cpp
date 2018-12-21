@@ -60,22 +60,43 @@ DefinitionM::~DefinitionM()
     _mapFromParameterNameToParameter.clear();
 
     // Delete all models of Inputs, Outputs and Parameters
+    _previousInputsList.clear();
     _inputsList.deleteAllItems();
+
+    _previousOutputsList.clear();
     _outputsList.deleteAllItems();
+
+    _previousParametersList.clear();
     _parametersList.deleteAllItems();
 }
 
 
 /**
- * @brief Set the flag "is Muted" of an Output of our agent definition
+ * @brief Set the flag "is Muted Output" of an output of our agent definition
  * @param isMuted
  * @param outputName
  */
-void DefinitionM::setisMutedOfOutput(bool isMuted, QString outputName)
+void DefinitionM::setisMutedOutput(bool isMuted, QString outputName)
 {
     OutputM* output = getOutputWithName(outputName);
-    if (output != NULL) {
+    if (output != nullptr) {
         output->setisMutedOutput(isMuted);
+    }
+}
+
+
+/**
+ * @brief Get the flag "is Muted Output" of an output of our agent definition
+ * @param outputName
+ */
+bool DefinitionM::getIsMutedOutput(QString outputName)
+{
+    OutputM* output = getOutputWithName(outputName);
+    if (output != nullptr) {
+        return output->isMutedOutput();
+    }
+    else {
+        return false;
     }
 }
 
@@ -88,7 +109,7 @@ void DefinitionM::setisMutedOfAllOutputs(bool isMuted)
 {
     for (OutputM* output : _outputsList.toList())
     {
-        if (output != NULL) {
+        if (output != nullptr) {
             output->setisMutedAllOutputs(isMuted);
         }
     }
@@ -107,9 +128,9 @@ void DefinitionM::_onInputsListChanged()
     {
         for (AgentIOPM* input : newInputsList)
         {
-            if ((input != NULL) && !_previousInputsList.contains(input))
+            if ((input != nullptr) && !_previousInputsList.contains(input))
             {
-                _inputsIdsList.append(input->id());
+                _inputsIdsList.append(input->uid());
                 _mapFromInputNameToInput.insert(input->name(), input);
             }
         }
@@ -119,9 +140,9 @@ void DefinitionM::_onInputsListChanged()
     {
         for (AgentIOPM* input : _previousInputsList)
         {
-            if ((input != NULL) && !newInputsList.contains(input))
+            if ((input != nullptr) && !newInputsList.contains(input))
             {
-                _inputsIdsList.removeOne(input->id());
+                _inputsIdsList.removeOne(input->uid());
                 _mapFromInputNameToInput.remove(input->name());
             }
         }
@@ -145,14 +166,14 @@ void DefinitionM::_onOutputsListChanged()
     {
         for (OutputM* output : newOutputsList)
         {
-            if ((output != NULL) && !_previousOutputsList.contains(output))
+            if ((output != nullptr) && !_previousOutputsList.contains(output))
             {
-                _outputsIdsList.append(output->id());
+                _outputsIdsList.append(output->uid());
                 _mapFromOutputNameToOutput.insert(output->name(), output);
 
                 // Connect to signals from the output
                 connect(output, &OutputM::commandAsked, this, &DefinitionM::commandAskedForOutput);
-                //connect(output, &OutputM::isMutedChanged, this, &DefinitionM::_onIsMutedChanged);
+                connect(output, &OutputM::isMutedOutputChanged, this, &DefinitionM::_onIsMutedOutputChanged);
             }
         }
     }
@@ -161,14 +182,13 @@ void DefinitionM::_onOutputsListChanged()
     {
         for (OutputM* output : _previousOutputsList)
         {
-            if ((output != NULL) && !newOutputsList.contains(output))
+            if ((output != nullptr) && !newOutputsList.contains(output))
             {
-                _outputsIdsList.removeOne(output->id());
+                _outputsIdsList.removeOne(output->uid());
                 _mapFromOutputNameToOutput.remove(output->name());
 
-                // DIS-connect from signals from the output
-                disconnect(output, &OutputM::commandAsked, this, &DefinitionM::commandAskedForOutput);
-                //disconnect(output, &OutputM::isMutedChanged, this, &DefinitionM::_onIsMutedChanged);
+                // DIS-connect to signals from the output
+                disconnect(output, 0, this, 0);
             }
         }
     }
@@ -191,9 +211,9 @@ void DefinitionM::_onParametersListChanged()
     {
         for (AgentIOPM* parameter : newParametersList)
         {
-            if ((parameter != NULL) && !_previousParametersList.contains(parameter))
+            if ((parameter != nullptr) && !_previousParametersList.contains(parameter))
             {
-                _parametersIdsList.append(parameter->id());
+                _parametersIdsList.append(parameter->uid());
                 _mapFromParameterNameToParameter.insert(parameter->name(), parameter);
             }
         }
@@ -203,9 +223,9 @@ void DefinitionM::_onParametersListChanged()
     {
         for (AgentIOPM* parameter : _previousParametersList)
         {
-            if ((parameter != NULL) && !newParametersList.contains(parameter))
+            if ((parameter != nullptr) && !newParametersList.contains(parameter))
             {
-                _parametersIdsList.removeOne(parameter->id());
+                _parametersIdsList.removeOne(parameter->uid());
                 _mapFromParameterNameToParameter.remove(parameter->name());
             }
         }
@@ -218,12 +238,16 @@ void DefinitionM::_onParametersListChanged()
 
 
 /**
- * @brief Slot when the flag "is Muted" of an output changed
- * @param isMuted
+ * @brief Slot called when the flag "is Muted Output" of an output changed
+ * @param isMutedOutput
  */
-/*void DefinitionM::_onIsMutedChanged(bool isMuted)
+void DefinitionM::_onIsMutedOutputChanged(bool isMutedOutput)
 {
-}*/
+    OutputM* output = qobject_cast<OutputM*>(sender());
+    if (output != nullptr) {
+        Q_EMIT isMutedOutputChanged(isMutedOutput, output->name());
+    }
+}
 
 
 /**
@@ -236,7 +260,7 @@ bool DefinitionM::areIdenticals(DefinitionM* definition1, DefinitionM* definitio
 {
     bool areIdenticals = false;
 
-    if ((definition1 != NULL) && (definition2 != NULL))
+    if ((definition1 != nullptr) && (definition2 != nullptr))
     {
         // Same name and same version
         if ((definition1->name() == definition2->name())
@@ -273,7 +297,7 @@ AgentIOPM* DefinitionM::getInputWithName(QString inputName)
         return _mapFromInputNameToInput.value(inputName);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -289,7 +313,7 @@ OutputM* DefinitionM::getOutputWithName(QString outputName)
         return _mapFromOutputNameToOutput.value(outputName);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -305,7 +329,44 @@ AgentIOPM* DefinitionM::getParameterWithName(QString parameterName)
         return _mapFromParameterNameToParameter.value(parameterName);
     }
     else {
-        return NULL;
+        return nullptr;
+    }
+}
+
+
+/**
+ * @brief Update the current value of an I/O/P of our agent definition
+ * @param iopType
+ * @param iopName
+ * @param value
+ */
+void DefinitionM::updateCurrentValueOfIOP(AgentIOPTypes::Value iopType, QString iopName, QVariant value)
+{
+    switch (iopType)
+    {
+    case AgentIOPTypes::OUTPUT: {
+        OutputM* output = getOutputWithName(iopName);
+        if (output != nullptr) {
+            output->setcurrentValue(value);
+        }
+        break;
+    }
+    case AgentIOPTypes::INPUT: {
+        AgentIOPM* input = getInputWithName(iopName);
+        if (input != nullptr) {
+            input->setcurrentValue(value);
+        }
+        break;
+    }
+    case AgentIOPTypes::PARAMETER: {
+        AgentIOPM* parameter = getParameterWithName(iopName);
+        if (parameter != nullptr) {
+            parameter->setcurrentValue(value);
+        }
+        break;
+    }
+    default:
+        break;
     }
 }
 
@@ -324,7 +385,7 @@ DefinitionM* DefinitionM::copy()
     QList<AgentIOPM*> copiesOfInputs;
     for (AgentIOPM* iterator : _inputsList)
     {
-        if (iterator != NULL)
+        if (iterator != nullptr)
         {
             AgentIOPM* copyOfInput = new AgentIOPM(iterator->agentIOPType(),
                                                    iterator->name(),
@@ -344,7 +405,7 @@ DefinitionM* DefinitionM::copy()
     QList<OutputM*> copiesOfOutputs;
     for (OutputM* iterator : _outputsList)
     {
-        if (iterator != NULL)
+        if (iterator != nullptr)
         {
             OutputM* copyOfOutput = new OutputM(iterator->name(),
                                                 iterator->agentIOPValueType());
@@ -363,7 +424,7 @@ DefinitionM* DefinitionM::copy()
     QList<AgentIOPM*> copiesOfParameters;
     for (AgentIOPM* iterator : _parametersList)
     {
-        if (iterator != NULL)
+        if (iterator != nullptr)
         {
             AgentIOPM* copyOfParameter = new AgentIOPM(iterator->agentIOPType(),
                                                        iterator->name(),

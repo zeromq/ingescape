@@ -10,7 +10,6 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort <lemort@ingenuity.io>
- *      Bruno Lemenicier <lemenicier@ingenuity.io>
  *
  */
 
@@ -28,14 +27,12 @@
 #include <controller/agentsmappingcontroller.h>
 #include <controller/agentssupervisioncontroller.h>
 #include <controller/hostssupervisioncontroller.h>
-#include <controller/ingescapelaunchermanager.h>
 #include <controller/ingescapemodelmanager.h>
 #include <controller/logstreamcontroller.h>
 #include <controller/networkcontroller.h>
 #include <controller/recordssupervisioncontroller.h>
 #include <controller/scenariocontroller.h>
 #include <controller/valueshistorycontroller.h>
-
 #include <misc/terminationsignalwatcher.h>
 
 
@@ -54,6 +51,12 @@ class IngeScapeEditorController : public QObject
 
     // Network settings - port
     I2_QML_PROPERTY_READONLY(int, port)
+
+    // Flag indicating if the Model/View Model Visualizer is available
+    I2_QML_PROPERTY_READONLY(bool, isAvailableModelVisualizer)
+
+    // Flag indicating if the Model/View Model Visualizer is visible
+    I2_QML_PROPERTY(bool, isVisibleModelVisualizer)
 
     // Error message when a connection attempt fails
     I2_QML_PROPERTY_READONLY(QString, errorMessageWhenConnectionFailed)
@@ -87,9 +90,6 @@ class IngeScapeEditorController : public QObject
 
     // Controller for the time line
     I2_QML_PROPERTY_READONLY(AbstractTimeActionslineScenarioViewController*, timeLineC)
-
-    // Manager for launchers of INGESCAPE agents
-    I2_QML_PROPERTY_READONLY(IngeScapeLauncherManager*, launcherManager)
 
     // Opened log stream viewers
     I2_QOBJECT_LISTMODEL(LogStreamController, openedLogStreamControllers)
@@ -157,19 +157,11 @@ public:
 
 
     /**
-      * @brief Check if we can delete an agent (view model) from the list in agents supervision
-      *        Check dependencies in the mapping and in the actions (conditions, effects)
-      * @param agentName
+      * @brief Check if an agents grouped by definition is used in the current platform
+      *        In the mapping or/and in the scenario (actions, conditions, effects)
+      * @param agentsGroupedByDefinition
       */
-    Q_INVOKABLE bool canDeleteAgentFromSupervision(QString agentName);
-
-
-    /**
-      * @brief Check if we can delete an agent (in mapping) from the mapping view
-      *        Check dependencies in the actions (conditions, effects)
-      * @param agentName
-      */
-    Q_INVOKABLE bool canDeleteAgentInMapping(QString agentName);
+    Q_INVOKABLE bool isAgentUsedInPlatform(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
 
     /**
@@ -265,6 +257,13 @@ private Q_SLOTS:
      * @param jsonExecutedActions
      */
     void _onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions);
+
+
+    /**
+     * @brief Slot called when a command must be sent on the network to a recorder
+     * @param commandAndParameters
+     */
+    void _onCommandAskedToRecorder(QString commandAndParameters);
 
 
 private:

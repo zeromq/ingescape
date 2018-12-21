@@ -57,7 +57,7 @@ Item {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            if(controller.selectedHost)
+            if (controller.selectedHost)
             {
                 controller.selectedHost = null;
             }
@@ -284,8 +284,6 @@ Item {
                                 rightMargin: 5
                             }
 
-                            // Usefull to debug to display the peer id
-                            //text: model.name + " (" + model.peerId + ")"
                             text: model.name
 
                             elide: Text.ElideRight
@@ -350,11 +348,12 @@ Item {
 
 
                             onClicked: {
-                                if (IngeScapeEditorC.agentsSupervisionC)
+                                if (controller)
                                 {
-                                    console.log("QML: Remove agent model " + model.name + " on " + hostItem.model_host.name);
+                                    //console.log("QML: Remove agent model " + model.name + " on " + hostItem.model_host.name);
 
-                                    IngeScapeEditorC.agentsSupervisionC.deleteModelOfAgent(model.QtObject);
+                                    // Remove the model of agent from our host
+                                    controller.removeAgentModelFromHost(model.QtObject, hostItem.model_host);
                                 }
                             }
                         }

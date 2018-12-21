@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -27,20 +27,22 @@ class ElementMappingM : public QObject
 {  
     Q_OBJECT
 
-    // Identifier with all names: [outputAgent##output-->inputAgent##input]
-    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
+    // Link name with names of each part (format: "outputAgent##output-->inputAgent##input")
+    // FIXME TODO rename "name" --> "linkName")
+    I2_CPP_NOSIGNAL_PROPERTY(QString, name)
 
     // Input agent name
     I2_QML_PROPERTY_READONLY(QString, inputAgent)
 
-    // Input name to connect with
+    // Input name of input agent
     I2_QML_PROPERTY_READONLY(QString, input)
 
-    // Output agent name to connect with
+    // Output agent name
     I2_QML_PROPERTY_READONLY(QString, outputAgent)
 
-    // Output name to connect with
+    // Output name of output agent
     I2_QML_PROPERTY_READONLY(QString, output)
+
 
 public:
 
@@ -63,6 +65,25 @@ public:
      * @brief Destructor
      */
     ~ElementMappingM();
+
+
+    /**
+     * @brief Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
+     * @param outputAgent
+     * @param output
+     * @param inputAgent
+     * @param input
+     * @return link name with format "outputAgent##output-->inputAgent##input"
+     */
+    static QString getLinkNameFromNamesList(QString outputAgent, QString output, QString inputAgent, QString input);
+
+
+    /**
+     * @brief Get the list of names (each parts of a mapping element) from the link name (with format "outputAgent##output-->inputAgent##input")
+     * @param link name with format "outputAgent##output-->inputAgent##input"
+     * @return
+     */
+    static QStringList getNamesListFromLinkName(QString linkName);
 
 };
 

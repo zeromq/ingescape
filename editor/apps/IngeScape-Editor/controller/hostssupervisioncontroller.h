@@ -9,7 +9,6 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *      Bruno Lemenicier   <lemenicier@ingenuity.io>
  *
  */
 
@@ -20,7 +19,7 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
-
+#include <controller/ingescapemodelmanager.h>
 #include <viewModel/hostvm.h>
 
 
@@ -41,9 +40,11 @@ class HostsSupervisionController : public QObject
 public:
     /**
      * @brief Constructor
+     * @param modelManager
      * @param parent
      */
-    explicit HostsSupervisionController(QObject *parent = nullptr);
+    explicit HostsSupervisionController(IngeScapeModelManager* modelManager,
+                                        QObject *parent = nullptr);
 
 
     /**
@@ -53,9 +54,11 @@ public:
 
 
     /**
-     * @brief Remove each UN-active agent (agent with state OFF) from the global list with all agents
+     * @brief Remove a model of agent from a host
+     * @param agent
+     * @param host
      */
-    void removeUNactiveAgents();
+    Q_INVOKABLE void removeAgentModelFromHost(AgentM* agent, HostVM* host);
 
 
 Q_SIGNALS:
@@ -70,11 +73,11 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param peerIdOfLauncher
      * @param command
-     * @param hostname
      * @param commandLine
      */
-    void commandAskedToLauncher(QString command, QString hostname, QString commandLine);
+    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
 
 
 public Q_SLOTS:
@@ -83,21 +86,21 @@ public Q_SLOTS:
      * @brief Slot called when a new model of host has been created
      * @param host
      */
-    void onHostModelCreated(HostM* host);
+    void onHostModelHasBeenCreated(HostM* host);
 
 
     /**
-     * @brief Slot called when a model of host will be removed
+     * @brief Slot called when a model of host will be deleted
      * @param host
      */
-    void onHostModelWillBeRemoved(HostM* host);
+    void onHostModelWillBeDeleted(HostM* host);
 
 
     /**
      * @brief Slot called when a new model of agent has been created
      * @param agent
      */
-    void onAgentModelCreated(AgentM* agent);
+    void onAgentModelHasBeenCreated(AgentM* agent);
 
 
     /**
@@ -105,15 +108,6 @@ public Q_SLOTS:
      * @param agent
      */
     void onAgentModelWillBeDeleted(AgentM* agent);
-
-
-private Q_SLOTS:
-
-    /**
-     * @brief Slot called when the network data (of an agent) will be cleared
-     * @param peerId
-     */
-    void _onNetworkDataOfAgentWillBeCleared(QString peerId);
 
 
 private:
@@ -127,6 +121,9 @@ private:
 
 
 private:
+
+    // Manager for the data model of INGESCAPE
+    IngeScapeModelManager* _modelManager;
 
     // Hash table from "(host)Name" to the "(view model of) Host"
     QHash<QString, HostVM*> _hashFromNameToHost;

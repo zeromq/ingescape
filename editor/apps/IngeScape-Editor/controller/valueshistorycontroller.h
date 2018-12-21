@@ -106,10 +106,10 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot called when a new model of agent has been created
-     * @param agent
+     * @brief Slot called when a new view model of agents grouped by name has been created
+     * @param agentsGroupedByName
      */
-    void onAgentModelCreated(AgentM* agent);
+    void onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName);
 
 
     /**

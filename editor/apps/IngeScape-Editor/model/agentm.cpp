@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -18,43 +18,35 @@
 #include <QQmlEngine>
 #include <QDebug>
 
-/**
- * @brief Constructor without peer id and address
- * @param name
- * @param parent
- */
-AgentM::AgentM(QString name,
-               QObject *parent) : AgentM(name,
-                                         "",
-                                         "",
-                                         parent)
-{
-}
-
 
 /**
- * @brief Constructor with peer id and address
+ * @brief Constructor
  * @param name
  * @param peerId
  * @param ipAddress
+ * @param hostname
+ * @param commandLine
  * @param parent
  */
 AgentM::AgentM(QString name,
                QString peerId,
                QString ipAddress,
+               QString hostname,
+               QString commandLine,
+               bool isON,
                QObject *parent) : QObject(parent),
     _name(name),
     _peerId(peerId),
     _address(ipAddress),
-    _hostname(HOSTNAME_NOT_DEFINED),
-    _commandLine(""),
-    _isON(false),
+    _hostname(hostname),
+    _commandLine(commandLine),
+    _isON(isON),
     _canBeRestarted(false),
     _isMuted(false),
     _canBeFrozen(false),
     _isFrozen(false),
-    _definition(NULL),
-    _mapping(NULL),
+    _definition(nullptr),
+    _mapping(nullptr),
     _state(""),
     _loggerPort(""),
     _hasLogInStream(false),
@@ -66,7 +58,7 @@ AgentM::AgentM(QString name,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Agent" << _name << "(" << _peerId << ") at" << _address;
+    qInfo() << "New Model of Agent" << _name << "(" << _peerId << ") on" << _hostname << "(" << _address << ") and command" << _commandLine;
 }
 
 
@@ -75,26 +67,24 @@ AgentM::AgentM(QString name,
  */
 AgentM::~AgentM()
 {
-    qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") on" << _hostname << "(" << _address << ")";
+    qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") on" << _hostname << "(" << _address << ") and command" << _commandLine;
 
     // Delete our agent definition
-    if (_definition != NULL) {
+    if (_definition != nullptr) {
         //disconnect(_definition);
 
-        //DefinitionM* temp = _definition;
-        setdefinition(NULL);
-        //delete temp;
-        //temp = NULL;
+        DefinitionM* temp = _definition;
+        setdefinition(nullptr);
+        delete temp;
     }
 
     // Delete our agent mapping
-    if (_mapping != NULL) {
+    if (_mapping != nullptr) {
         //disconnect(_mapping);
 
-        //AgentMappingM* temp = _mapping;
-        setmapping(NULL);
-        //delete temp;
-        //temp = NULL;
+        AgentMappingM* temp = _mapping;
+        setmapping(nullptr);
+        delete temp;
     }
 }
 
@@ -109,7 +99,7 @@ void AgentM::setisMuted(bool value)
     {
         _isMuted = value;
 
-        if (_definition != NULL) {
+        if (_definition != nullptr) {
             _definition->setisMutedOfAllOutputs(_isMuted);
         }
 
@@ -128,13 +118,42 @@ void AgentM::setdefinition(DefinitionM *value)
     {
         DefinitionM* previousValue = _definition;
 
+        if (previousValue != nullptr) {
+            disconnect(previousValue, &DefinitionM::isMutedOutputChanged, this, &AgentM::isMutedOutputChanged);
+        }
+
         _definition = value;
 
-        // Emit default signal for QML
+        if (_definition != nullptr) {
+            connect(_definition, &DefinitionM::isMutedOutputChanged, this, &AgentM::isMutedOutputChanged);
+        }
+
+        // Emit the default signal for QML
         Q_EMIT definitionChanged(value);
 
-        // Emit the signal "Definition Changed" with previous and new values
+        // Emit the signal "Definition changed" with previous and new values
         Q_EMIT definitionChangedWithPreviousAndNewValues(previousValue, value);
+    }
+}
+
+
+/**
+ * @brief Setter for property "Mapping"
+ * @param value
+ */
+void AgentM::setmapping(AgentMappingM *value)
+{
+    if (_mapping != value)
+    {
+        AgentMappingM* previousValue = _mapping;
+
+        _mapping = value;
+
+        // Emit the default signal for QML
+        Q_EMIT mappingChanged(value);
+
+        // Emit the signal "Mapping changed" with previous and new values
+        Q_EMIT mappingChangedWithPreviousAndNewValues(previousValue, value);
     }
 }
 
@@ -146,14 +165,14 @@ void AgentM::setdefinition(DefinitionM *value)
  */
 void AgentM::setisMutedOfOutput(bool isMuted, QString outputName)
 {
-    if (_definition != NULL) {
-        _definition->setisMutedOfOutput(isMuted, outputName);
+    if (_definition != nullptr) {
+        _definition->setisMutedOutput(isMuted, outputName);
     }
 }
 
 
 /**
- * @brief Clear the data about the network
+ * @brief Clear the data about the network of our agent
  */
 void AgentM::clearNetworkData()
 {
@@ -169,9 +188,9 @@ void AgentM::clearNetworkData()
     // Reset other properties
     setisMuted(false);
     setcanBeFrozen(false);
-    setloggerPort("");
     setisFrozen(false);
     setstate("");
+    setloggerPort("");
     sethasLogInStream(false);
     sethasLogInFile(false);
     setlogFilePath("");
@@ -179,6 +198,6 @@ void AgentM::clearNetworkData()
     setmappingFilePath("");
 
     // Keep only the definition and the mapping
-    //setdefinition(NULL);
-    //setmapping(NULL);
+    //setdefinition(nullptr);
+    //setmapping(nullptr);
 }

@@ -56,6 +56,8 @@ WindowBlockTouches {
     // action view model
     property var actionVM: panelController ? panelController.editedViewModel : null;
 
+    property var allAgentsGroupsByName: IngeScapeEditorC.modelManager ? IngeScapeEditorC.modelManager.allAgentsGroupsByName : null;
+
     // our scenario controller
     property var controller: null;
 
@@ -63,12 +65,6 @@ WindowBlockTouches {
     property var panelController: null;
 
     property var heightStartTime: (startTimeItem.visible ? (startTimeItem.height + startTimeItem.anchors.topMargin) : 0)
-
-    property int maxIntValue:  2147483647 // maximum 32bit signed integer value
-    property int minIntValue: -2147483647 // maximum 32bit signed integer value
-
-    property double maxDoubleValue:  Number.MAX_VALUE // maximum 64bit IEEE-754 (double precision) value (~ 1e+308)
-    property double minDoubleValue: -Number.MAX_VALUE // (negative) maximum 64bit IEEE-754 (double precision) value (~ -1e+308)
 
 
     //--------------------------------
@@ -426,12 +422,14 @@ WindowBlockTouches {
                             model : actionM ? actionM.effectsList : 0
 
                             Rectangle {
+                                id: effectListItem
 
                                 // my effect
                                 property var myEffect: model.QtObject
-                                property bool myEffectTypeIsValue: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE)
-                                property bool myEffectIopIsNotImpulsion: myEffect && myEffect.modelM && myEffect.modelM.agentIOP && (myEffect.modelM.agentIOP.agentIOPValueType !== AgentIOPValueTypes.IMPULSION)
-                                property bool myEffectIopIsBool:  myEffect && myEffect.modelM && myEffect.modelM.agentIOP && (myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.BOOL)
+
+                                property var myEffectIopIsNotImpulsion: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && ( myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPValueType !== AgentIOPValueTypes.IMPULSION) )
+                                property var myEffectIopIsBool: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && ( myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPValueType === AgentIOPValueTypes.BOOL) )
+
                                 height: (myEffect && (myEffect.effectType === ActionEffectTypes.MAPPING)) ? 90 : 62
                                 anchors {
                                     left: parent.left
@@ -557,13 +555,13 @@ WindowBlockTouches {
                                         height: parent.height
                                         width: 148
 
-                                        model: controller ? controller.agentsInMappingList : 0
+                                        model: rootItem.allAgentsGroupsByName
 
                                         Binding {
                                             target: agentEffectCombo
                                             property: "selectedIndex"
-                                            value: (myEffect && myEffect.modelM) ? controller.agentsInMappingList.indexOf(myEffect.modelM.agent)
-                                                                                 : -1
+                                            value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myEffect.modelM.agent)
+                                                                                                                    : -1
                                         }
 
                                         onSelectedItemChanged: {
@@ -587,7 +585,7 @@ WindowBlockTouches {
                                         height: 25
                                         width: 148
 
-                                        visible: myEffectTypeIsValue
+                                        visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE)
                                         enabled: visible
 
                                         model: (myEffect && myEffect.modelM) ? myEffect.modelM.iopMergedList : 0
@@ -605,15 +603,14 @@ WindowBlockTouches {
                                                 myEffect.modelM.agentIOP = iopEffectsCombo.selectedItem;
 
                                                 // Revalidate text field and combo entry regarding which one is visible and the type of the selected IOP.
-                                                textFieldTargetValue.revalidateText()
-                                                comboboxTargetValue.revalidateCombo()
+                                                userInputItem.revalidateInput()
                                             }
                                         }
                                     }
 
                                     // Target Value
-                                    TextField {
-                                        id: textFieldTargetValue
+                                    InputIOPValueField {
+                                        id: userInputItem
 
                                         anchors {
                                             left: iopEffectsCombo.right
@@ -624,177 +621,29 @@ WindowBlockTouches {
 
                                             verticalCenter: parent.verticalCenter
                                         }
-                                        height: 25
 
-                                        // Force the content's format according to the IOP value type.
-                                        // e.g. Switching from DOUBLE to INTEGER will truncate the value to its integer part (no decimals).
-                                        function revalidateText() {
-                                            if (visible) {
-                                                if (myEffect && myEffect.modelM) {
-                                                    if (myEffect.modelM.agentIOP) {
-                                                        var iopValueType = myEffect.modelM.agentIOP.agentIOPValueType
-                                                        if (iopValueType === AgentIOPValueTypes.INTEGER) {
-                                                            // Checking Number conversion to always show a valid number (instead of "nan")
-                                                            var integerValue = Number(myEffect.modelM.value)
-                                                            if (isNaN(integerValue))
-                                                            {
-                                                                myEffect.modelM.value = 0
-                                                            }
-                                                            else
-                                                            {
-                                                                myEffect.modelM.value = Math.max(Math.min(maxIntValue, integerValue), minIntValue).toFixed(0)
-                                                            }
-                                                        } else if (iopValueType === AgentIOPValueTypes.DOUBLE) {
-                                                            // Checking Number conversion to always show a valid number (instead of "nan")
-                                                            var doubleValue = Number(myEffect.modelM.value)
-                                                            if (isNaN(doubleValue))
-                                                            {
-                                                                myEffect.modelM.value = 0
-                                                            }
-                                                            else
-                                                            {
-                                                                myEffect.modelM.value = Math.max(Math.min(maxDoubleValue, doubleValue), minDoubleValue).toPrecision()
-                                                            }
-                                                        }
-                                                    }
-                                                    text = myEffect.modelM.value
-                                                } else {
-                                                    text = ""
-                                                }
+                                        iopVM: (effectListItem.myEffect && effectListItem.myEffect.modelM) ? effectListItem.myEffect.modelM.agentIOP : undefined
+                                        forceHide: !effectListItem.myEffect || (effectListItem.myEffect.effectType !== ActionEffectTypes.VALUE)
+
+                                        function getModelValue() {
+                                            if (effectListItem.myEffect && effectListItem.myEffect.modelM)
+                                            {
+                                                return effectListItem.myEffect.modelM.value
                                             }
-                                        }
-
-                                        visible: myEffectTypeIsValue && myEffectIopIsNotImpulsion && !myEffectIopIsBool
-                                        enabled: visible
-
-                                        horizontalAlignment: TextInput.AlignLeft
-                                        verticalAlignment: TextInput.AlignVCenter
-
-                                        property var stringValidator: RegExpValidator { regExp: /.*/ }
-                                        property var intValidator: IntValidator {
-                                            top:    rootItem.maxIntValue
-                                            bottom: rootItem.minIntValue
-                                        }
-                                        property var doubleValidator: TextFieldDoubleValidator {
-                                            top:    rootItem.maxDoubleValue
-                                            bottom: rootItem.minDoubleValue
-                                        }
-
-                                        validator: if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.STRING) {
-                                                       stringValidator
-                                                   } else if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.INTEGER) {
-                                                       intValidator
-                                                   } else {
-                                                       doubleValidator
-                                                   }
-
-                                        text: (myEffect && myEffect.modelM) ? myEffect.modelM.value : ""
-
-                                        style: I2TextFieldStyle {
-                                            backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                                            borderColor: IngeScapeTheme.whiteColor;
-                                            borderErrorColor: IngeScapeTheme.redColor
-                                            radiusTextBox: 1
-                                            borderWidth: 0;
-                                            borderWidthActive: 1
-                                            textIdleColor: IngeScapeTheme.whiteColor;
-                                            textDisabledColor: IngeScapeTheme.darkGreyColor;
-
-                                            padding.left: 3
-                                            padding.right: 3
-
-                                            font {
-                                                pixelSize:15
-                                                family: IngeScapeTheme.textFontFamily
+                                            else
+                                            {
+                                                return ""
                                             }
 
                                         }
 
-                                        onActiveFocusChanged: {
-                                            if (!activeFocus) {
-                                                // Move cursor to our first character when we lose focus
-                                                // (to always display the beginning or our text instead of
-                                                // an arbitrary part if our text is too long)
-                                                cursorPosition = 0;
-                                            }
-                                            else {
-                                                textFieldTargetValue.selectAll();
-                                            }
-                                        }
-
-                                        onTextChanged: {
-                                            if (activeFocus && (myEffect && myEffect.modelM)) {
-                                                myEffect.modelM.value = text;
-                                            }
-                                        }
-
-                                        Binding {
-                                            target: textFieldTargetValue
-                                            property: "text"
-                                            value: if (myEffect && myEffect.modelM) {
-                                                       myEffect.modelM.value
-                                                   }
-                                                   else {
-                                                       "";
-                                                   }
-                                        }
-                                    }
-
-                                    I2ComboboxStringList {
-                                        id: comboboxTargetValue
-
-                                        anchors {
-                                            left: iopEffectsCombo.right
-                                            leftMargin: 6
-
-                                            right: (btnWarningActionEditor.visible ? btnWarningActionEditor.left : parent.right)
-                                            rightMargin: (btnWarningActionEditor.visible ? 6 : 0)
-
-                                            verticalCenter: parent.verticalCenter
-                                        }
-                                        height: 25
-
-                                        // Force the value to "1" (aka. "TRUE") for every value that is not "0" (aka. "FALSE")
-                                        // e.g. "1337.42" will be transformed to "1" while "0" will stay "0"
-                                        function revalidateCombo() {
-                                            if (visible) {
-                                                if (myEffect && myEffect.modelM) {
-                                                    if (Number(myEffect.modelM.value) !== 0) {
-                                                        myEffect.modelM.value = "1"
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        visible: myEffectTypeIsValue && myEffectIopIsBool
-                                        enabled: visible
-
-                                        model: [ "FALSE", "TRUE" ]
-
-                                        style: IngeScapeComboboxStyle {}
-
-                                        Binding {
-                                            target: comboboxTargetValue
-                                            property: "selectedIndex"
-                                            value: if (myEffect && myEffect.modelM && myEffect.modelM.value !== "") { // Empty values from the text field won't change the value of the combobox
-
-                                                       // Only "1" and "0" values from the TextField update the combobox since its the two values assigned to the model by this combobox
-                                                       if (Number(myEffect.modelM.value) === 0) {
-                                                           comboboxTargetValue.model.indexOf("FALSE")
-                                                       } else if (Number(myEffect.modelM.value) === 1) {
-                                                           comboboxTargetValue.model.indexOf("TRUE")
-                                                       }
-                                                   }
-
-                                        }
-
-                                        onSelectedItemChanged: {
-                                            if (selectedIndex >= 0 && myEffect && myEffect.modelM) {
-                                                myEffect.modelM.value = (selectedItem === "TRUE" ? "1" : "0")
+                                        function setModelValue(value) {
+                                            if (effectListItem.myEffect && effectListItem.myEffect.modelM)
+                                            {
+                                                effectListItem.myEffect.modelM.value = value
                                             }
                                         }
                                     }
-
 
                                     Button {
                                         id: btnWarningActionEditor
@@ -805,7 +654,7 @@ WindowBlockTouches {
                                             verticalCenter: parent.verticalCenter
                                         }
 
-                                        visible: (myEffectTypeIsValue && myEffect.modelM && (myEffect.modelM.agentIOPType !== AgentIOPTypes.OUTPUT))
+                                        visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPType !== AgentIOPTypes.OUTPUT)
 
                                         activeFocusOnPress: true
                                         checkable: true
@@ -928,16 +777,17 @@ WindowBlockTouches {
                                         height : 25
                                         width : 148
 
-                                        model: controller ? controller.agentsInMappingList : 0
+                                        model: rootItem.allAgentsGroupsByName
 
-                                        enabled: controller && (controller.agentsInMappingList.count !== 0)
-                                        placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
-                                                                                                                     : "- Select an item -")
+                                        enabled: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count > 0))
+                                        placeholderText: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count === 0) ? "- No Item -"
+                                                                                                                                           : "- Select an item -")
+
                                         Binding {
                                             target: comboEffectOnMapping_OutputAgent
                                             property: "selectedIndex"
-                                            value: (myEffect && myEffect.modelM) ? controller.agentsInMappingList.indexOf(myEffect.modelM.outputAgent)
-                                                                                 : -1
+                                            value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myEffect.modelM.outputAgent)
+                                                                                                                    : -1
                                         }
 
                                         onSelectedItemChanged: {
@@ -1103,17 +953,17 @@ WindowBlockTouches {
                                         height : 25
                                         width : 148
 
-                                        model : controller ? controller.agentsInMappingList : 0
+                                        model : rootItem.allAgentsGroupsByName
 
-                                        enabled: (controller && (controller.agentsInMappingList.count !== 0))
-                                        placeholderText: (controller && controller.agentsInMappingList.count === 0 ? "- No Item -"
-                                                                                                                   : "- Select an item -")
+                                        enabled: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count > 0))
+                                        placeholderText: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count === 0) ? "- No Item -"
+                                                                                                                                           : "- Select an item -")
 
                                         Binding {
                                             target: comboEffectOnMapping_InputAgent
                                             property: "selectedIndex"
-                                            value: (myEffect && myEffect.modelM) ? controller.agentsInMappingList.indexOf(myEffect.modelM.agent)
-                                                                                 : -1
+                                            value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myEffect.modelM.agent)
+                                                                                                                    : -1
                                         }
 
                                         onSelectedItemChanged: {
@@ -1501,8 +1351,8 @@ WindowBlockTouches {
                                 // my condition
                                 property var myCondition: model.QtObject
                                 property bool myConditionTypeIsValue: myCondition && (myCondition.conditionType === ActionConditionTypes.VALUE)
-                                property bool myConditionIopIsNotImpulsion: myCondition && myCondition.modelM && myCondition.modelM.agentIOP && (myCondition.modelM.agentIOP.agentIOPValueType !== AgentIOPValueTypes.IMPULSION)
-                                property bool myConditionIopIsBool: myCondition && myCondition.modelM && myCondition.modelM.agentIOP && (myCondition.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.BOOL)
+                                property bool myConditionIopIsNotImpulsion: myConditionTypeIsValue && myCondition.modelM && myCondition.modelM.agentIOP && myCondition.modelM.agentIOP.firstModel && (myCondition.modelM.agentIOP.firstModel.agentIOPValueType !== AgentIOPValueTypes.IMPULSION)
+                                property bool myConditionIopIsBool: myConditionTypeIsValue && myCondition.modelM && myCondition.modelM.agentIOP && myCondition.modelM.agentIOP.firstModel && (myCondition.modelM.agentIOP.firstModel.agentIOPValueType === AgentIOPValueTypes.BOOL)
                                 anchors {
                                     right : parent.right
                                     left : parent.left
@@ -1632,17 +1482,17 @@ WindowBlockTouches {
                                             height : 25
                                             width : 148
 
-                                            model: controller ? controller.agentsInMappingList : 0
+                                            model: rootItem.allAgentsGroupsByName
 
-                                            enabled: (controller && (controller.agentsInMappingList.count !== 0))
-                                            placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
-                                                                                                                         : "- Select an item -")
+                                            enabled: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count > 0))
+                                            placeholderText: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count === 0) ? "- No Item -"
+                                                                                                                                               : "- Select an item -")
 
                                             Binding {
                                                 target: agentCombo
                                                 property: "selectedIndex"
-                                                value: (myCondition && myCondition.modelM) ? controller.agentsInMappingList.indexOf(myCondition.modelM.agent)
-                                                                                           : -1
+                                                value: (myCondition && myCondition.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myCondition.modelM.agent)
+                                                                                                                              : -1
                                             }
 
                                             onSelectedItemChanged: {
@@ -1664,13 +1514,13 @@ WindowBlockTouches {
                                             visible: myConditionTypeIsValue
                                             enabled: visible
 
-                                            model: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIopList : 0
+                                            model: (myCondition && myCondition.modelM) ? myCondition.modelM.iopMergedList : 0
 
                                             Binding {
                                                 target: ioCombo
                                                 property: "selectedIndex"
-                                                value: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIopList.indexOf(myCondition.modelM.agentIOP)
-                                                                                           : -1
+                                                value: (myCondition && myCondition.modelM && myCondition.modelM.iopMergedList) ? myCondition.modelM.iopMergedList.indexOf(myCondition.modelM.agentIOP)
+                                                                                                                               : -1
                                             }
 
                                             onSelectedItemChanged: {
@@ -1678,8 +1528,7 @@ WindowBlockTouches {
                                                 {
                                                     myCondition.modelM.agentIOP = ioCombo.selectedItem;
 
-                                                    textFieldComparisonValue.revalidateText()
-                                                    comboboxConditionValue.revalidateCombo()
+                                                    inputComparisonItem.revalidateInput()
                                                 }
                                             }
                                         }
@@ -1721,7 +1570,7 @@ WindowBlockTouches {
                                             height: 25
                                             width: 44
 
-                                            visible: myConditionTypeIsValue && myConditionIopIsNotImpulsion
+                                            visible: myConditionIopIsNotImpulsion
 
                                             model: (controller ? controller.allValueComparisonTypes : 0)
 
@@ -1742,8 +1591,8 @@ WindowBlockTouches {
                                     }
 
                                     // Comparison Value
-                                    TextField {
-                                        id: textFieldComparisonValue
+                                    InputIOPValueField {
+                                        id: inputComparisonItem
 
                                         anchors {
                                             right: parent.right
@@ -1751,166 +1600,16 @@ WindowBlockTouches {
                                             left: conditionRowFixeSize.right
                                             bottom: parent.bottom
                                         }
-                                        height: 25
 
-                                        // Force the content's format according to the IOP value type.
-                                        // e.g. Switching from DOUBLE to INTEGER will truncate the value to its integer part (no decimals).
-                                        function revalidateText() {
-                                            if (visible) {
-                                                if (myCondition && myCondition.modelM) {
-                                                    if (myCondition.modelM.agentIOP) {
-                                                        var iopValueType = myCondition.modelM.agentIOP.agentIOPValueType
-                                                        if (iopValueType === AgentIOPValueTypes.INTEGER) {
-                                                            // Checking Number conversion to always show a valid number (instead of "nan")
-                                                            var integerValue = Number(myCondition.modelM.value)
-                                                            if (isNaN(integerValue))
-                                                            {
-                                                                myCondition.modelM.value = 0
-                                                            }
-                                                            else
-                                                            {
-                                                                myCondition.modelM.value = Math.max(Math.min(maxIntValue, integerValue), minIntValue).toFixed(0)
-                                                            }
-                                                        } else if (iopValueType === AgentIOPValueTypes.DOUBLE) {
-                                                            // Checking Number conversion to always show a valid number (instead of "nan")
-                                                            var doubleValue = Number(myCondition.modelM.value)
-                                                            if (isNaN(doubleValue))
-                                                            {
-                                                                myCondition.modelM.value = 0
-                                                            }
-                                                            else
-                                                            {
-                                                                myCondition.modelM.value = Math.max(Math.min(maxDoubleValue, doubleValue), minDoubleValue).toPrecision()
-                                                            }
-                                                        }
-                                                    }
-                                                    text = myCondition.modelM.value
-                                                } else {
-                                                    text = ""
-                                                }
-                                            }
+                                        iopVM: rectToName.myCondition.modelM.agentIOP
+                                        forceHide: !rectToName.myCondition || (rectToName.myCondition.conditionType !== ActionEffectTypes.VALUE)
+
+                                        function getModelValue() {
+                                            return rectToName.myCondition.modelM.comparisonValue
                                         }
 
-                                        visible: myConditionTypeIsValue && myConditionIopIsNotImpulsion && !myConditionIopIsBool
-                                        enabled : visible
-
-                                        horizontalAlignment: TextInput.AlignLeft
-                                        verticalAlignment: TextInput.AlignVCenter
-
-                                        property var stringValidator: RegExpValidator { regExp: /.*/ }
-                                        property var intValidator: IntValidator {
-                                            top:    rootItem.maxIntValue
-                                            bottom: rootItem.minIntValue
-                                        }
-                                        property var doubleValidator: TextFieldDoubleValidator {
-                                            top:    rootItem.maxDoubleValue
-                                            bottom: rootItem.minDoubleValue
-                                        }
-
-                                        validator: if (myCondition && myCondition.modelM && myCondition.modelM.agentIOP && myCondition.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.STRING) {
-                                                       stringValidator
-                                                   } else if (myCondition && myCondition.modelM && myCondition.modelM.agentIOP && myCondition.modelM.agentIOP.agentIOPValueType === AgentIOPValueTypes.INTEGER) {
-                                                       intValidator
-                                                   } else {
-                                                       doubleValidator
-                                                   }
-
-                                        text : (myCondition && myCondition.modelM) ? myCondition.modelM.value : ""
-
-                                        style: I2TextFieldStyle {
-                                            backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                                            borderColor: IngeScapeTheme.whiteColor;
-                                            borderErrorColor: IngeScapeTheme.redColor
-                                            radiusTextBox: 1
-                                            borderWidth: 0;
-                                            borderWidthActive: 1
-                                            textIdleColor: IngeScapeTheme.whiteColor;
-                                            textDisabledColor: IngeScapeTheme.darkGreyColor;
-
-                                            padding.left: 3
-                                            padding.right: 3
-
-                                            font {
-                                                pixelSize:15
-                                                family: IngeScapeTheme.textFontFamily
-                                            }
-
-                                        }
-
-                                        onActiveFocusChanged: {
-                                            if (!activeFocus) {
-                                                // Move cursor to our first character when we lose focus
-                                                // (to always display the beginning or our text instead of
-                                                // an arbitrary part if our text is too long)
-                                                cursorPosition = 0;
-                                            }
-                                            else {
-                                                textFieldComparisonValue.selectAll();
-                                            }
-                                        }
-
-                                        onTextChanged: {
-                                            if (activeFocus && (myCondition && myCondition.modelM)) {
-                                                myCondition.modelM.value = text;
-                                            }
-                                        }
-
-                                        Binding {
-                                            target: textFieldComparisonValue
-                                            property: "text"
-                                            value: (myCondition && myCondition.modelM) ? myCondition.modelM.value : ""
-                                        }
-                                    }
-
-                                    I2ComboboxStringList {
-                                        id: comboboxConditionValue
-
-                                        anchors {
-                                            right: parent.right
-                                            leftMargin: 6
-                                            left: conditionRowFixeSize.right
-                                            bottom: parent.bottom
-                                        }
-                                        height: 25
-
-                                        // Force the value to "1" (aka. "TRUE") for every value that is not "0" (aka. "FALSE")
-                                        // e.g. "1337.42" will be transformed to "1" while "0" will stay "0"
-                                        function revalidateCombo() {
-                                            if (visible) {
-                                                if (myCondition && myCondition.modelM) {
-                                                    if (Number(myCondition.modelM.value) !== 0) {
-                                                        myCondition.modelM.value = "1"
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        visible: myConditionTypeIsValue && myConditionIopIsBool
-                                        enabled: visible
-
-                                        model: [ "FALSE", "TRUE" ]
-
-                                        style: IngeScapeComboboxStyle {}
-
-                                        Binding {
-                                            target: comboboxConditionValue
-                                            property: "selectedIndex"
-                                            value: if (myCondition && myCondition.modelM && myCondition.modelM.value !== "") { // Empty values from the text field won't change the value of the combobox
-
-                                                       // Only "1" and "0" values from the TextField update the combobox since its the two values assigned to the model by this combobox
-                                                       if (Number(myCondition.modelM.value) === 0) {
-                                                           comboboxConditionValue.model.indexOf("FALSE")
-                                                       } else if (Number(myCondition.modelM.value) === 1) {
-                                                           comboboxConditionValue.model.indexOf("TRUE")
-                                                       }
-                                                   }
-
-                                        }
-
-                                        onSelectedItemChanged: {
-                                            if (selectedIndex >= 0 && myCondition && myCondition.modelM) {
-                                                myCondition.modelM.value = (selectedItem === "TRUE" ? "1" : "0")
-                                            }
+                                        function setModelValue(value) {
+                                            rectToName.myCondition.modelM.comparisonValue = value
                                         }
                                     }
                                 }
@@ -2623,21 +2322,21 @@ WindowBlockTouches {
             }
 
 
-            // Delete Action
+            // Delete Button
             MouseArea {
-                id : actionDeleteBtn
-                enabled: visible
-                visible: (panelController && panelController.originalAction !== null)
+                id: actionDeleteBtn
+
                 anchors {
                     left : parent.left
                     leftMargin: 15
                     verticalCenter: cancelButton.verticalCenter
                     verticalCenterOffset: 2
                 }
-
                 height : actionDelete.height
                 width : actionDelete.width
 
+                enabled: visible
+                visible: (panelController && panelController.originalAction !== null)
                 hoverEnabled: true
 
                 onClicked: {

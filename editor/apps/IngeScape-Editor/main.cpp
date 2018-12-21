@@ -31,6 +31,7 @@
 #include <misc/collapsiblecolumn.h>
 #include <misc/qquickwindowblocktouches.h>
 #include <misc/textfielddoublevalidator.h>
+#include <misc/numberconstants.h>
 
 
 /**
@@ -128,7 +129,6 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<AgentsMappingController>("INGESCAPE", 1, 0, "AgentsMappingController", "Internal Class");
     qmlRegisterUncreatableType<AgentsSupervisionController>("INGESCAPE", 1, 0, "AgentsSupervisionController", "Internal Class");
     qmlRegisterUncreatableType<HostsSupervisionController>("INGESCAPE", 1, 0, "HostsSupervisionController", "Internal Class");
-    qmlRegisterUncreatableType<IngeScapeLauncherManager>("INGESCAPE", 1, 0, "IngeScapeLauncherManager", "Internal Class");
     qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal Class");
     qmlRegisterUncreatableType<LogStreamController>("INGESCAPE", 1, 0, "LogStreamController", "Internal Class");
     qmlRegisterUncreatableType<ScenarioController>("INGESCAPE", 1, 0, "ScenarioController", "Internal Class");
@@ -149,10 +149,11 @@ void registerCustomQmlTypes()
     // Misc.
     //
     //----------------
-
     qmlRegisterType<CollapsibleColumn>("INGESCAPE", 1, 0, "CollapsibleColumn");
     qmlRegisterType<QQuickWindowBlockTouches>("INGESCAPE", 1, 0, "WindowBlockTouches");
     qmlRegisterType<TextFieldDoubleValidator>("INGESCAPE", 1, 0, "TextFieldDoubleValidator");
+    qmlRegisterSingletonType<NumberConstants>("INGESCAPE", 1, 0, "NumberConstants", &NumberConstants::qmlSingleton);
+
 
     // GST not included in master branch
     // qmlRegisterType<GstVideoReceiver>("INGESCAPE", 1, 0, "GstVideoReceiver");
@@ -198,12 +199,16 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<ActionVM>("INGESCAPE", 1, 0, "ActionVM", "Internal class");
     qmlRegisterUncreatableType<AgentInMappingVM>("INGESCAPE", 1, 0, "AgentInMappingVM", "Internal class");
     qmlRegisterUncreatableType<AgentIOPVM>("INGESCAPE", 1, 0, "AgentIOPVM", "Internal class");
-    qmlRegisterUncreatableType<AgentVM>("INGESCAPE", 1, 0, "AgentVM", "Internal class");
+    qmlRegisterUncreatableType<AgentsGroupedByDefinitionVM>("INGESCAPE", 1, 0, "AgentsGroupedByDefinitionVM", "Internal class");
+    qmlRegisterUncreatableType<AgentsGroupedByNameVM>("INGESCAPE", 1, 0, "AgentsGroupedByNameVM", "Internal class");
     qmlRegisterUncreatableType<InputVM>("INGESCAPE", 1, 0, "InputVM", "Internal class");
-    qmlRegisterUncreatableType<MapBetweenIOPVM>("INGESCAPE", 1, 0, "MapBetweenIOPVM", "Internal class");
+    qmlRegisterUncreatableType<LinkConnectorVM>("INGESCAPE", 1, 0, "LinkConnectorVM", "Internal class");
+    qmlRegisterUncreatableType<LinkInputVM>("INGESCAPE", 1, 0, "LinkInputVM", "Internal class");
+    qmlRegisterUncreatableType<LinkOutputVM>("INGESCAPE", 1, 0, "LinkOutputVM", "Internal class");
+    qmlRegisterUncreatableType<LinkVM>("INGESCAPE", 1, 0, "LinkVM", "Internal class");
+    qmlRegisterUncreatableType<MappingElementVM>("INGESCAPE", 1, 0, "MappingElementVM", "Internal class");
     qmlRegisterUncreatableType<OutputVM>("INGESCAPE", 1, 0, "OutputVM", "Internal class");
     qmlRegisterUncreatableType<ParameterVM>("INGESCAPE", 1, 0, "ParameterVM", "Internal class");
-    qmlRegisterUncreatableType<PointMapVM>("INGESCAPE", 1, 0, "PointMapVM", "Internal class");
 
 
     //------------------
@@ -231,6 +236,15 @@ void registerCustomQmlTypes()
 
     // - Combobox delegate for Agents IOP comboboxes to show the color circles
     qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeToolTipComboboxDelegateAgentsIOP.qml"), "INGESCAPE", 1, 0, "IngeScapeToolTipComboboxDelegateAgentsIOP");
+
+    // - StringValidator for text fields
+    qmlRegisterType(QUrl("qrc:/qml/validator/StringValidator.qml"), "INGESCAPE", 1, 0, "StringValidator");
+
+    // - DoubleValidator for text fields
+    qmlRegisterType(QUrl("qrc:/qml/validator/BoundsDoubleValidator.qml"), "INGESCAPE", 1, 0, "BoundsDoubleValidator");
+
+    // - Int32Validator for text fields
+    qmlRegisterType(QUrl("qrc:/qml/validator/Int32Validator.qml"), "INGESCAPE", 1, 0, "Int32Validator");
 
 }
 
@@ -275,7 +289,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName("Ingenuity i/o");
     app.setOrganizationDomain("ingenuity.io");
     app.setApplicationName("IngeScape-Editor");
-    app.setApplicationVersion("0.8.1");
+    app.setApplicationVersion("0.9.0");
 
     // - behavior when our last window is closed
     app.setQuitOnLastWindowClosed(true);
@@ -306,8 +320,13 @@ int main(int argc, char *argv[])
         igs_setLogPath(logFilePath.toStdString().c_str());
         igs_setLogInFile(true);
 
+#ifdef QT_DEBUG
+        // Use a custom message format
+        qSetMessagePattern("%{time hh:mm:ss.zzz} %{type} %{if-category}%{category} %{endif}file://%{file}:%{line} %{message}");
+#else
         // Replace the default message handler with our own logger
         qInstallMessageHandler(LogMessageHandler);
+#endif
 
         qInfo() << "Application" << app.applicationName() << "is running with version" << app.applicationVersion();
 

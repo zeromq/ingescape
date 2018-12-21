@@ -24,10 +24,10 @@
 
 #include <controller/ingescapemodelmanager.h>
 #include <controller/actioneditorcontroller.h>
-#include "viewModel/agentinmappingvm.h"
-#include "viewModel/scenario/actionvm.h"
-#include "viewModel/scenario/actioninpalettevm.h"
-#include "sortFilter/abstracttimerangefilter.h"
+#include <viewModel/agentsgroupedbynamevm.h>
+#include <viewModel/scenario/actionvm.h>
+#include <viewModel/scenario/actioninpalettevm.h>
+#include <sortFilter/abstracttimerangefilter.h>
 
 
 // Margin in milliseconds to insert an action following another
@@ -74,9 +74,6 @@ class ScenarioController: public QObject
     I2_ENUM_LISTMODEL(ActionConditionTypes, conditionsTypesList)
     // --- List of effects type
     I2_ENUM_LISTMODEL(ActionEffectTypes, effectsTypesList)
-
-    // --- agents list in mapping
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentInMappingVM, agentsInMappingList)
 
     // List of actions in palette
     I2_QOBJECT_LISTMODEL(ActionInPaletteVM, actionsInPaletteList)
@@ -153,10 +150,10 @@ public:
 
 
     /**
-      * @brief Check if an agent is used in the actions (conditions and effects)
+      * @brief Check if an agent is used in the current scenario (actions, conditions, effects)
       * @param agent name
       */
-    bool isAgentUsedInActions(QString agentName);
+    bool isAgentUsedInScenario(QString agentName);
 
 
     /**
@@ -243,7 +240,7 @@ public:
      * @param line index
      * @param optional dragged action VM when already in the time-line
      */
-    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineIndex, ActionVM* draggedActionVM = NULL);
+    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineIndex, ActionVM* draggedActionVM = nullptr);
 
 
     /**
@@ -281,11 +278,11 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param peerIdOfLauncher
      * @param command
-     * @param hostname
      * @param commandLine
      */
-    void commandAskedToLauncher(QString command, QString hostname, QString commandLine);
+    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
 
 
     /**
@@ -325,18 +322,6 @@ Q_SIGNALS:
 
 
 public Q_SLOTS:
-
-    /**
-      * @brief Slot called when an agent is added in the mapping
-      */
-    void onAgentInMappingAdded(AgentInMappingVM* agentAdded);
-
-
-    /**
-      * @brief Slot called when an agent is removed from the mapping
-      */
-    void onAgentInMappingRemoved(AgentInMappingVM* agentRemoved);
-
 
     /**
      * @brief Slot called when an action must be reverted
@@ -407,14 +392,6 @@ private:
 
 
     /**
-     * @brief Get the agent in mapping from an agent name
-     * @param agentName
-     * @return
-     */
-    AgentInMappingVM* _getAgentInMappingFromName(QString agentName);
-
-
-    /**
      * @brief Execute reverse effects of an action
      * @param actionExecution
      */
@@ -423,10 +400,10 @@ private:
 
     /**
      * @brief Execute a command for an agent
-     * @param agent
+     * @param agentsGroupedByName
      * @param commandAndParameters
      */
-    void _executeCommandForAgent(AgentInMappingVM* agent, QStringList commandAndParameters);
+    void _executeCommandForAgent(AgentsGroupedByNameVM* agentsGroupedByName, QStringList commandAndParameters);
 
 
     /**
@@ -513,9 +490,6 @@ private:
 
     // List of actionVM in timeline filtered with a given time range in milliseconds
     AbstractTimeRangeFilter _filteredListActionsInTimeLine;
-
-    // Map from agent name to the (view model of) agent in mapping
-    QHash<QString, AgentInMappingVM*> _mapFromNameToAgentInMapping;
 
 };
 

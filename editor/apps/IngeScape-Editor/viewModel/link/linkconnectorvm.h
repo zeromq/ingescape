@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -12,60 +12,58 @@
  *
  */
 
-#ifndef POINTMAPVM_H
-#define POINTMAPVM_H
+#ifndef LINKCONNECTORVM_H
+#define LINKCONNECTORVM_H
 
 #include <QObject>
-
 #include <I2PropertyHelpers.h>
-
 #include <viewModel/iop/agentiopvm.h>
 
 
 /**
- * @brief The PointMapVM class is the base class derived to create InputVM and OutputVM.
+ * @brief The LinkConnectorVM is the base class for derived class of view model of link Input / Output
  */
-class PointMapVM : public AgentIOPVM
+class LinkConnectorVM : public QObject
 {
     Q_OBJECT
+
+    // Name of our agent Input / Output
+    I2_QML_PROPERTY_READONLY(QString, name)
+
+    // Unique identifier with name and value type
+    I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
 
     // Geometry for the connector in the view
     // Position the center of the connector (Absolute coordinate)
     I2_QML_PROPERTY(QPointF, position)
-
-    // Flag indicating if our input/output is defined in all definitions
-    I2_QML_PROPERTY_READONLY(bool, isDefinedInAllDefinitions)
 
 
 public:
 
     /**
      * @brief Constructor
-     * @param name
-     * @param id
      * @param parent
      */
-    explicit PointMapVM(QString name,
-                        QString id,
-                        QObject *parent = nullptr);
+    explicit LinkConnectorVM(QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~PointMapVM();
+    ~LinkConnectorVM();
 
 
 Q_SIGNALS:
 
+
 public Q_SLOTS:
 
     /**
-     * @brief Return true if our point can link with the point (types are compatible)
-     * @param pointMap
+     * @brief Return true if our connector can link with the other connector (types are compatible)
+     * @param linkConnector
      * @return
      */
-    virtual bool canLinkWith(PointMapVM* pointMap) = 0;
+    virtual bool canLinkWith(LinkConnectorVM* linkConnector) = 0;
 
 
 protected:
@@ -77,8 +75,9 @@ protected:
      */
     bool _canLinkOutputToInput(AgentIOPValueTypes::Value outputValueType, AgentIOPValueTypes::Value inputValueType);
 
+
 };
 
-QML_DECLARE_TYPE(PointMapVM)
+QML_DECLARE_TYPE(LinkConnectorVM)
 
-#endif // POINTMAPVM_H
+#endif // LINKCONNECTORVM_H

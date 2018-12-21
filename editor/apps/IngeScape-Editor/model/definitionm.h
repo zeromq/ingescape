@@ -80,11 +80,18 @@ public:
 
 
     /**
-     * @brief Set the flag "is Muted" of an Output of our agent definition
+     * @brief Set the flag "is Muted Output" of an output of our agent definition
      * @param isMuted
      * @param outputName
      */
-    void setisMutedOfOutput(bool isMuted, QString outputName);
+    void setisMutedOutput(bool isMuted, QString outputName);
+
+
+    /**
+     * @brief Get the flag "is Muted Output" of an output of our agent definition
+     * @param outputName
+     */
+    bool getIsMutedOutput(QString outputName);
 
 
     /**
@@ -128,6 +135,15 @@ public:
 
 
     /**
+     * @brief Update the current value of an I/O/P of our agent definition
+     * @param iopType
+     * @param iopName
+     * @param value
+     */
+    void updateCurrentValueOfIOP(AgentIOPTypes::Value iopType, QString iopName, QVariant value);
+
+
+    /**
      * @brief Make a copy of our definition
      * @return
      */
@@ -142,6 +158,14 @@ Q_SIGNALS:
      * @param outputName
      */
     void commandAskedForOutput(QString command, QString outputName);
+
+
+    /**
+     * @brief Signal emitted when the flag "is Muted Output" of an output changed
+     * @param isMutedOutput
+     * @param outputName
+     */
+    void isMutedOutputChanged(bool isMutedOutput, QString outputName);
 
 
     /**
@@ -180,10 +204,10 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "is Muted" of an output changed
-     * @param isMuted
+     * @brief Slot called when the flag "is Muted Output" of an output changed
+     * @param isMutedOutput
      */
-    //void _onIsMutedChanged(bool isMuted);
+    void _onIsMutedOutputChanged(bool isMutedOutput);
 
 
     /**

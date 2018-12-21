@@ -38,13 +38,13 @@ HostVM::HostVM(HostM* model, QObject *parent) : QObject(parent),
     _agentsList.setSortProperty("isON");
     _agentsList.setSortOrder(Qt::DescendingOrder);
 
-    if (_modelM != NULL)
+    if (_modelM != nullptr)
     {
         _name = _modelM->name();
 
         qInfo() << "New View Model of Host" << _name;
 
-        if (_modelM->streamingPort().length() > 0)
+        if (!_modelM->streamingPort().isEmpty())
         {
             _canProvideStream = true;
         }
@@ -59,8 +59,8 @@ HostVM::~HostVM()
 {
     qInfo() << "Delete View Model of Host" << _name;
 
-    if (_modelM != NULL) {
-        setmodelM(NULL);
+    if (_modelM != nullptr) {
+        setmodelM(nullptr);
     }
 
     // Clear the list of agents
@@ -94,9 +94,9 @@ void HostVM::changeState()
  */
 void HostVM::startAgent(AgentM* agent)
 {
-    if (agent != NULL)
+    if ((agent != nullptr) && (_modelM != nullptr))
     {
-         Q_EMIT commandAskedToLauncher(command_StartAgent, agent->hostname(), agent->commandLine());
+         Q_EMIT commandAskedToLauncher(_modelM->peerId(), command_StartAgent, agent->commandLine());
     }
 }
 
@@ -107,7 +107,7 @@ void HostVM::startAgent(AgentM* agent)
  */
 void HostVM::stopAgent(AgentM* agent)
 {
-    if (agent != NULL)
+    if (agent != nullptr)
     {
         QStringList peerIdsList = QStringList(agent->peerId());
 

@@ -146,6 +146,7 @@ Item {
     //--------------------------------
     Connections {
         target: IngeScapeEditorC
+
         onResetMappindAndTimeLineViews : {
             contentArea.contentX = 0;
             contentArea.contentY = 0;

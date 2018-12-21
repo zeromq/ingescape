@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -49,9 +49,29 @@ AgentMappingM::~AgentMappingM()
     // DIS-connect to signal "Count Changed" from the list of mapping elements
     disconnect(&_mappingElements, &AbstractI2CustomItemListModel::countChanged, this, &AgentMappingM::_onMappingElementsListChanged);
 
-    // Clear the list (do not delete all)
-    _mappingElements.clear();
-    _idsOfMappingElements.clear();
+    //_namesOfMappingElements.clear();
+
+    // Clear the hash table
+    _hashFromNameToMappingElement.clear();
+
+    // Delete all models of mapping elements
+    _mappingElements.deleteAllItems();
+}
+
+
+/**
+ * @brief Get a mapping element from its name
+ * @param name
+ * @return
+ */
+ElementMappingM* AgentMappingM::getMappingElementFromName(QString name)
+{
+    if (_hashFromNameToMappingElement.contains(name)) {
+        return _hashFromNameToMappingElement.value(name);
+    }
+    else {
+        return nullptr;
+    }
 }
 
 
@@ -60,14 +80,19 @@ AgentMappingM::~AgentMappingM()
  */
 void AgentMappingM::_onMappingElementsListChanged()
 {
-    _idsOfMappingElements.clear();
+    //_namesOfMappingElements.clear();
+    _hashFromNameToMappingElement.clear();
 
     for (ElementMappingM* mappingElement : _mappingElements.toList())
     {
-        if ((mappingElement != NULL) && !mappingElement->id().isEmpty()) {
-            _idsOfMappingElements.append(mappingElement->id());
+        if ((mappingElement != nullptr) && !mappingElement->name().isEmpty())
+        {
+            //_namesOfMappingElements.append(mappingElement->name());
+
+            _hashFromNameToMappingElement.insert(mappingElement->name(), mappingElement);
         }
     }
 
-    //qDebug() << "Mapping" << _name << "IDs:" << _idsOfMappingElements;
+    //qDebug() << "Mapping" << _name << "has elements:" << _namesOfMappingElements;
+    //qDebug() << "Mapping" << _name << "has elements:" << _hashFromNameToMappingElement.keys();
 }

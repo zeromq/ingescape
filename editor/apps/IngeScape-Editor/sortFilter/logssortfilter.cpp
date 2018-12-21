@@ -66,7 +66,7 @@ bool LogsSortFilter::filterAccepts(QObject* item, int index) const
     // Try to cast our item as a model of "Log"
     LogM* log = qobject_cast<LogM*>(item);
 
-    if (log != NULL) {
+    if (log != nullptr) {
         result = _selectedLogTypes.contains(log->logType());
     }
 

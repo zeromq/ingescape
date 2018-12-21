@@ -26,7 +26,7 @@ ValuesHistoryController::ValuesHistoryController(IngeScapeModelManager* modelMan
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_modelManager != NULL)
+    if (_modelManager != nullptr)
     {
         //
         // Link our list to the list of the model manager
@@ -41,7 +41,7 @@ ValuesHistoryController::ValuesHistoryController(IngeScapeModelManager* modelMan
  */
 ValuesHistoryController::~ValuesHistoryController()
 {
-    _modelManager = NULL;
+    _modelManager = nullptr;
 }
 
 
@@ -119,14 +119,14 @@ bool ValuesHistoryController::areShownValuesOfAgent(QString agentName)
 
 
 /**
- * @brief Slot called when a new model of agent has been created
- * @param agent
+ * @brief Slot called when a new view model of agents grouped by name has been created
+ * @param agentsGroupedByName
  */
-void ValuesHistoryController::onAgentModelCreated(AgentM* agent)
+void ValuesHistoryController::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName)
 {
-    if ((agent != NULL) && !agent->name().isEmpty())
+    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
     {
-        QString agentName = agent->name();
+        QString agentName = agentsGroupedByName->name();
 
         if (!_allAgentNamesList.contains(agentName))
         {

@@ -73,7 +73,7 @@ void ConditionOnAgentM::copyFrom(ActionConditionM* condition)
     ActionConditionM::copyFrom(condition);
 
     ConditionOnAgentM* conditionOnAgent = qobject_cast<ConditionOnAgentM*>(condition);
-    if (conditionOnAgent != NULL)
+    if (conditionOnAgent != nullptr)
     {
         setagentConditionValue(conditionOnAgent->agentConditionValue());
     }
@@ -84,10 +84,10 @@ void ConditionOnAgentM::copyFrom(ActionConditionM* condition)
  * @brief Setter for property "Agent"
  * @param agent
  */
-void ConditionOnAgentM::setagent(AgentInMappingVM* agent)
+void ConditionOnAgentM::setagent(AgentsGroupedByNameVM* agent)
 {
     // Save the previous agent before the call to the setter of our mother class
-    AgentInMappingVM* previousAgent = _agent;
+    AgentsGroupedByNameVM* previousAgent = _agent;
 
     // Call the setter of our mother class
     ActionConditionM::setagent(agent);
@@ -95,7 +95,7 @@ void ConditionOnAgentM::setagent(AgentInMappingVM* agent)
     // Value of agent changed
     if (previousAgent != _agent)
     {
-        if (_agent != NULL) {
+        if (_agent != nullptr) {
             _onAgentIsOnChanged(_agent->isON());
         }
     }
@@ -123,7 +123,7 @@ void ConditionOnAgentM::resetConnections()
 
 
 /**
- * @brief Slot called when the flag "is ON" of an agent changed
+ * @brief Slot called when the flag "is ON" of the agent changed
  * @param isON
  */
 void ConditionOnAgentM::_onAgentIsOnChanged(bool isON)
@@ -132,11 +132,12 @@ void ConditionOnAgentM::_onAgentIsOnChanged(bool isON)
          ||
          ((_agentConditionValue == AgentConditionValues::OFF) && !isON) )
     {
-        // Update flag "is Valid"
+        // Update the flag "is Valid"
         setisValid(true);
     }
-    else {
-        // Update flag "is Valid"
+    else
+    {
+        // Update the flag "is Valid"
         setisValid(false);
     }
 }

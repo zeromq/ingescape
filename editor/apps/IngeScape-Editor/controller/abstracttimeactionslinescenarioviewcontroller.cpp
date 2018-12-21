@@ -344,7 +344,7 @@ void AbstractTimeActionslineScenarioViewController::_updateCoordinateSystemAbsci
   */
 void AbstractTimeActionslineScenarioViewController::setviewportX(int value)
 {
-    if(_viewportX != value)
+    if (_viewportX != value)
     {
         _viewportX = value;
 
@@ -360,7 +360,7 @@ void AbstractTimeActionslineScenarioViewController::setviewportX(int value)
   */
 void AbstractTimeActionslineScenarioViewController::setviewportWidth(int value)
 {
-    if(_viewportWidth != value)
+    if (_viewportWidth != value)
     {
         _viewportWidth = value;
 

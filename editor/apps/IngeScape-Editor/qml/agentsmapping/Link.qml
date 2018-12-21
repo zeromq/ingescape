@@ -30,14 +30,17 @@ I2CubicBezierCurve {
     //
     //--------------------------------
 
-    property var mapBetweenIOPVM : null
-    property var controller : null
-    property var inputModel : mapBetweenIOPVM ? mapBetweenIOPVM.input : null
-    property var outputModel : mapBetweenIOPVM ? mapBetweenIOPVM.output : null
+    property var controller: null;
+
+    property var viewModel: null;
+    property var linkInput: viewModel ? viewModel.linkInput : null;
+    property var linkOutput: viewModel ? viewModel.linkOutput : null;
+    //property var inputModel: (linkInput && linkInput.input) ? linkInput.input.firstModel : null;
+    property var outputModel: (linkOutput && linkOutput.output) ? linkOutput.output.firstModel : null;
 
 
-    secondPoint: inputModel ? inputModel.position : Qt.point(0,0)
-    firstPoint: outputModel ? outputModel.position : Qt.point(0,0)
+    secondPoint: linkInput ? linkInput.position : Qt.point(0,0)
+    firstPoint: linkOutput ? linkOutput.position : Qt.point(0,0)
 
 
     // Minimum offset of control points
@@ -62,11 +65,9 @@ I2CubicBezierCurve {
 
 
     // Check if we represent a link or a "brin"
-    property bool _isBrin: (
-                            mapBetweenIOPVM
-                            && mapBetweenIOPVM.inputAgent && mapBetweenIOPVM.inputAgent.isReduced
-                            && mapBetweenIOPVM.outputAgent && mapBetweenIOPVM.outputAgent.isReduced
-                            )
+    property bool _isBrin: (viewModel
+                            && viewModel.inputAgent && viewModel.inputAgent.isReduced
+                            && viewModel.outputAgent && viewModel.outputAgent.isReduced)
 
 
     // NB: Clip MUST be true to clip our mouse area
@@ -76,15 +77,26 @@ I2CubicBezierCurve {
     hitTestAreaMargin : 3
 
     // if the inputAgent and outputAgent are reduced : global type of its outputs
-    stroke: if (rootItem._isBrin && outputModel)
+    stroke: if (rootItem._isBrin && linkOutput && viewModel && viewModel.outputAgent)
             {
-                IngeScapeTheme.colorOfIOPTypeWithConditions(mapBetweenIOPVM.outputAgent.reducedMapValueTypeGroupInOutput, (outputModel.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingActivated));
+                if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingActivated) {
+                    IngeScapeTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, true);
+                }
+                else {
+                    IngeScapeTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, false);
+                }
             }
-            else {
+            else
+            {
                 // if the inputAgent is not reduced : type of its output
-                if (outputModel && outputModel.firstModel)
+                if (linkOutput && outputModel)
                 {
-                    IngeScapeTheme.colorOfIOPTypeWithConditions(outputModel.firstModel.agentIOPValueTypeGroup, (outputModel.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingActivated));
+                    if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingActivated) {
+                        IngeScapeTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, true);
+                    }
+                    else {
+                        IngeScapeTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, false);
+                    }
                 }
                 else {
                     defaultColor;
@@ -92,17 +104,18 @@ I2CubicBezierCurve {
             }
 
 
-    strokeWidth: (rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinDefaultWidth : IngeScapeTheme.agentsMappingLinkDefaultWidth)
+    strokeWidth: rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinDefaultWidth : IngeScapeTheme.agentsMappingLinkDefaultWidth
 
-    strokeDashArray: (mapBetweenIOPVM && mapBetweenIOPVM.isVirtual) ? (rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinVirtualStrokeDashArray : IngeScapeTheme.agentsMappingLinkVirtualStrokeDashArray)
-                                                                    : ""
+    strokeDashArray: (viewModel && viewModel.isTemporary) ? (rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinVirtualStrokeDashArray : IngeScapeTheme.agentsMappingLinkVirtualStrokeDashArray)
+                                                           : ""
 
     // Fuzzy contour
     fuzzyColor: IngeScapeTheme.lightGreyColor
-    fuzzyRadius: (mapBetweenIOPVM && controller && (controller.selectedLink === mapBetweenIOPVM)) ? 2 : 0
+    fuzzyRadius: (viewModel && controller && (controller.selectedLink === viewModel)) ? 2 : 0
 
-    opacity: mouseArea.pressed ? 0.8 : 1;
+    opacity: mouseArea.pressed ? 0.8 : 1
 
+    z: (linkOutput && linkOutput.isPublishedNewValue) ? 1 : 0
 
 
     //--------------------------------

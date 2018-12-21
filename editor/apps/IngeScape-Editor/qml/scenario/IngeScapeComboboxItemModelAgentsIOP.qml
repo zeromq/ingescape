@@ -26,15 +26,21 @@ I2ComboboxItemModel {
 
     function modelToString(entry)
     {
-        return entry.name;
+        if (entry) {
+            return entry.name;
+        }
+        else {
+            return "";
+        }
     }
 
     function _updateCurrentSelection() {
         if (selectedIndex >= 0) {
             selectedItem = model.get(selectedIndex);
             text = modelToString(selectedItem);
-            tooltip.text = text + " (" + AgentIOPValueTypes.enumToString(selectedItem.agentIOPValueType) + " " + AgentIOPTypes.enumToString(selectedItem.agentIOPType).toLowerCase() + ")";
-        } else {
+            tooltip.text = text + " (" + AgentIOPValueTypes.enumToString(selectedItem.firstModel.agentIOPValueType) + " " + AgentIOPTypes.enumToString(selectedItem.firstModel.agentIOPType).toLowerCase() + ")";
+        }
+        else {
             selectedItem = undefined;
             text = "";
             tooltip.text = "";
@@ -61,8 +67,8 @@ I2ComboboxItemModel {
         height : width
         radius : width/2
 
-        color : if (selectedItem) {
-                    switch (selectedItem.agentIOPValueType)
+        color : if (selectedItem && selectedItem.firstModel) {
+                    switch (selectedItem.firstModel.agentIOPValueType)
                     {
                     case AgentIOPValueTypes.INTEGER:
                         IngeScapeTheme.yellowColor

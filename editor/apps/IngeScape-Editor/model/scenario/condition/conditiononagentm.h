@@ -64,7 +64,7 @@ public:
     * @brief Setter for property "Agent"
     * @param agent
     */
-    void setagent(AgentInMappingVM* agent) Q_DECL_OVERRIDE;
+    void setagent(AgentsGroupedByNameVM* agent) Q_DECL_OVERRIDE;
 
 
     /**
@@ -85,7 +85,7 @@ Q_SIGNALS:
 protected Q_SLOTS:
 
     /**
-     * @brief Slot called when the flag "is ON" of an agent changed
+     * @brief Slot called when the flag "is ON" of the agent changed
      * @param isON
      */
     void _onAgentIsOnChanged(bool isON) Q_DECL_OVERRIDE;

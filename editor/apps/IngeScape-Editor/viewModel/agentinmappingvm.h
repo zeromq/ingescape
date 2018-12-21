@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -20,16 +20,14 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <viewModel/iop/inputvm.h>
-#include <viewModel/iop/outputvm.h>
-#include <viewModel/iop/parametervm.h>
-
-#include <model/agentm.h>
+#include <viewModel/agentsgroupedbynamevm.h>
+#include <viewModel/link/linkinputvm.h>
+#include <viewModel/link/linkoutputvm.h>
 
 
 /**
- * @brief The AgentInMappingVM class a view model of agent in the mapping
- * Allows to manage when several agents have the same name
+ * @brief The AgentInMappingVM class a view model of agent in the global mapping
+ * Allows to manage agents and links graphically
  */
 class AgentInMappingVM : public QObject
 {
@@ -38,55 +36,50 @@ class AgentInMappingVM : public QObject
     // Name of our agent
     I2_QML_PROPERTY_READONLY(QString, name)
 
-    // List of models of agents
-    I2_QOBJECT_LISTMODEL(AgentM, models)
+    // Agents grouped by name
+    I2_QML_PROPERTY_READONLY(AgentsGroupedByNameVM*, agentsGroupedByName)
 
-    // List of peer ids of models
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdsList)
+    // List of view models of link inputs
+    I2_QOBJECT_LISTMODEL(LinkInputVM, linkInputsList)
 
-    // List of view models of inputs
-    I2_QOBJECT_LISTMODEL(InputVM, inputsList)
-
-    // List of view models of outputs
-    I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
-
-    // List of view models of parameters
-    I2_QOBJECT_LISTMODEL(ParameterVM, parametersList)
+    // List of view models of link outputs
+    I2_QOBJECT_LISTMODEL(LinkOutputVM, linkOutputsList)
 
     // The position corresponds to the corner Top-Left of the box
     I2_QML_PROPERTY(QPointF, position)
 
-    // Flag indicating if our agent is ON (vs OFF)
-    I2_QML_PROPERTY_READONLY(bool, isON)
-
     // Flag indicating if our agent is reduced
     I2_QML_PROPERTY(bool, isReduced)
 
-    // Group of value type of the reduced map (= brin) in input of the agent
-    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedMapValueTypeGroupInInput)
+    // Flag indicating if our agent is locked reduced (prevent to open the list of Inputs/Outputs)
+    I2_QML_PROPERTY_READONLY(bool, isLockedReduced)
 
-    // Group of value type of the reduced map (= brin) in output of the agent
-    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedMapValueTypeGroupInOutput)
+    // Group of value type of the reduced link inputs of our agent (= brin)
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedLinkInputsValueTypeGroup)
 
-    // Flag indicating if all definitions are strictly identicals
-    I2_QML_PROPERTY_READONLY(bool, areIdenticalsAllDefinitions)
+    // Group of value type of the reduced link outputs of our agent (= brin)
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedLinkOutputsValueTypeGroup)
 
-    // Number of active agents
-    I2_QML_PROPERTY_READONLY(int, activeAgentsNumber)
+    // Flag indicating if our agent had links added while the mapping was UN-activated
+    //I2_CPP_NOSIGNAL_PROPERTY(bool, hadLinksAdded_WhileMappingWasUNactivated)
+    I2_QML_PROPERTY_READONLY(bool, hadLinksAdded_WhileMappingWasUNactivated)
+
+    // Flag indicating if our agent had links removed while the mapping was UN-activated
+    //I2_CPP_NOSIGNAL_PROPERTY(bool, hadLinksRemoved_WhileMappingWasUNactivated)
+    I2_QML_PROPERTY_READONLY(bool, hadLinksRemoved_WhileMappingWasUNactivated)
 
     // Mapping currently edited (temporary until the user activate the mapping)
-    I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
+    //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
 
 
 public:
     /**
-     * @brief Default constructor
-     * @param models The first agent is needed to instanciate an agent mapping VM.
-     * Typically passing during the drag-drop from the list of agents on the left side.
+     * @brief Constructor
+     * @param agentsGroupedByName Models of agents grouped by the same name
      * @param position Position of the top left corner
      * @param parent
      */
-    explicit AgentInMappingVM(QList<AgentM*> models,
+    explicit AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
                               QPointF position,
                               QObject* parent = nullptr);
 
@@ -98,276 +91,244 @@ public:
 
 
     /**
-     * @brief Add a temporary link (this temporary link will became a real link when the user will activate the mapping)
+     * @brief Return the list of view models of link input from an input name
      * @param inputName
-     * @param outputAgentName
-     * @param outputName
-     * @return true if the link has been added
      */
-    bool addTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
+    QList<LinkInputVM*> getLinkInputsListFromName(QString inputName);
 
 
     /**
-     * @brief Remove temporary link (this temporary link will be removed when the user will activate the mapping)
+     * @brief Return the view model of link input from an input id
+     * @param inputId
+     */
+    LinkInputVM* getLinkInputFromId(QString inputId);
+
+
+    /**
+     * @brief Return the list of view models of link output from an output name
+     * @param outputName
+     */
+    QList<LinkOutputVM*> getLinkOutputsListFromName(QString outputName);
+
+
+    /**
+     * @brief Return the view model of link output from an output id
+     * @param outputId
+     */
+    LinkOutputVM* getLinkOutputFromId(QString outputId);
+
+
+    /**
+     * @brief Add a link while the global mapping is UN-activated
+     * @param linkId
      * @param inputName
      * @param outputAgentName
      * @param outputName
-     * @return true if the link has been removed
      */
-    bool removeTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
+    void addLink_WhileMappingWasUNactivated(QString linkId, QString inputName, QString outputAgentName, QString outputName);
+
+
+    /**
+     * @brief Cancel the add of the link while the global mapping is UN-activated
+     * @param linkId
+     */
+    void cancelAddLink_WhileMappingWasUNactivated(QString linkId);
+
+
+    /**
+     * @brief Cancel all added links while the global mapping was UN-activated
+     */
+    void cancelAllAddedLinks_WhileMappingWasUNactivated();
+
+
+    /**
+     * @brief Get the model of added mapping element (while the global mapping was UN-activated) from a link id
+     * @param linkId
+     * @return
+     */
+    ElementMappingM* getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId);
+
+
+    /**
+     * @brief Get the list of all added link Ids while the global mapping was UN-activated
+     * @return
+     */
+    QList<QString> getAddedLinkIds_WhileMappingWasUNactivated();
+
+
+    /**
+     * @brief Get the list of all (models of) added mapping elements while the global mapping was UN-activated
+     * @return
+     */
+    QList<ElementMappingM*> getAddedMappingElements_WhileMappingWasUNactivated();
+
+
+    /**
+     * @brief A mapping element has just been added and correspond to a link added while the global mapping was UN-activated
+     * @param linkId
+     */
+    void mappingElementAdded_CorrespondingLinkAddedWhileMappingWasUNactivated(QString linkId);
+
+
+    /**
+     * @brief Remove a link while the global mapping is UN-activated
+     * @param linkId
+     * @param mappingElement
+     */
+    void removeLink_WhileMappingWasUNactivated(QString linkId, MappingElementVM* mappingElement);
+
+
+    /**
+     * @brief Cancel the remove of the link while the global mapping is UN-activated
+     * @param linkId
+     */
+    void cancelRemoveLink_WhileMappingWasUNactivated(QString linkId);
+
+
+    /**
+     * @brief Cancel all removed links while the global mapping was UN-activated
+     */
+    void cancelAllRemovedLinks_WhileMappingWasUNactivated();
+
+
+    /**
+     * @brief Get the view model of removed mapping element (while the mapping was UN-activated) from a link id
+     * @param linkId
+     * @return
+     */
+    MappingElementVM* getRemovedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId);
+
+
+    /**
+     * @brief Get the list of all removed link Ids while the global mapping was UN-activated
+     * @return
+     */
+    QList<QString> getRemovedLinkIds_WhileMappingWasUNactivated();
+
+
+    /**
+     * @brief Get the list of all (view models of) removed mapping elements while the global mapping was UN-activated
+     * @return
+     */
+    QList<MappingElementVM*> getRemovedMappingElements_WhileMappingWasUNactivated();
+
+
+    /**
+     * @brief Get the list of all names of removed mapping elements while the global mapping was UN-activated
+     * @return
+     */
+    QStringList getNamesOfRemovedMappingElements_WhileMappingWasUNactivated();
+
+
+    /**
+     * @brief A mapping element has just been removed and correspond to a link removed while the global mapping was UN-activated
+     * @param mappingElement
+     */
+    void mappingElementRemoved_CorrespondingLinkRemovedWhileMappingWasUNactivated(MappingElementVM* mappingElement);
 
 
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when some view models of inputs have been added to our agent in mapping
-     * @param inputsListHaveBeenAdded
+     * @brief Signal emitted when some view models of link inputs have been added to our agent in mapping
+     * @param addedlinkInputs
      */
-    void inputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded);
+    void linkInputsListHaveBeenAdded(QList<LinkInputVM*> addedlinkInputs);
 
 
     /**
-     * @brief Signal emitted when some view models of outputs have been added to our agent in mapping
-     * @param outputsListHaveBeenAdded
+     * @brief Signal emitted when some view models of link outputs have been added to our agent in mapping
+     * @param addedlinkOutputs
      */
-    void outputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded);
+    void linkOutputsListHaveBeenAdded(QList<LinkOutputVM*> addedlinkOutputs);
 
 
     /**
-     * @brief Signal emitted when some view models of inputs will be removed from our agent in mapping
-     * @param inputsListWillBeRemoved
+     * @brief Signal emitted when some view models of link inputs will be removed from our agent in mapping
+     * @param removedLinkInputs
      */
-    void inputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
+    void linkInputsListWillBeRemoved(QList<LinkInputVM*> removedLinkInputs);
 
 
     /**
-     * @brief Signal emitted when some view models of outputs will be removed from our agent in mapping
-     * @param outputsListWillBeRemoved
+     * @brief Signal emitted when some view models of link outputs will be removed from our agent in mapping
+     * @param removedLinkOutputs
      */
-    void outputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
-
-
-    /**
-     * @brief Signal emitted when the models of Inputs/Outputs/Parameters changed
-     */
-    void modelsOfIOPChanged();
-
-
-public Q_SLOTS:
-
-    /**
-     * @brief Return the list of view models of input from the input name
-     * @param inputName
-     */
-    QList<InputVM*> getInputsListFromName(QString inputName);
-
-
-    /**
-     * @brief Return the view model of input from the input id
-     * @param inputId
-     */
-    InputVM* getInputFromId(QString inputId);
-
-
-    /**
-     * @brief Return the list of view models of output from the output name
-     * @param outputName
-     */
-    QList<OutputVM*> getOutputsListFromName(QString outputName);
-
-
-    /**
-     * @brief Return the view model of output from the output id
-     * @param outputId
-     */
-    OutputVM* getOutputFromId(QString outputId);
-
-
-    /**
-     * @brief Return the list of view models of parameter from the parameter name
-     * @param parameterName
-     */
-    QList<ParameterVM*> getParametersListFromName(QString parameterName);
-
-
-    /**
-     * @brief Return the view model of parameter from the parameter id
-     * @param parameterId
-     */
-    ParameterVM* getParameterFromId(QString parameterId);
+    void linkOutputsListWillBeRemoved(QList<LinkOutputVM*> removedLinkOutputs);
 
 
 private Q_SLOTS:
 
     /**
-     * @brief Slot when the list of models changed
+     * @brief Slot called when some view models of inputs have been added to the agent(s grouped by name)
+     * @param newInputs
      */
-    void _onModelsChanged();
+    void _onInputsHaveBeenAdded(QList<InputVM*> newInputs);
 
 
     /**
-     * @brief Slot when the list of (view models of) inputs changed
+     * @brief Slot called when some view models of outputs have been added to the agent(s grouped by name)
+     * @param newOutputs
      */
-    //void _onInputsListChanged();
+    void _onOutputsHaveBeenAdded(QList<OutputVM*> newOutputs);
 
 
     /**
-     * @brief Slot when the list of (view models of) outputs changed
+     * @brief Slot called when some view models of inputs will be removed from the agent(s grouped by name)
+     * @param oldInputs
      */
-    //void _onOutputsListChanged();
+    void _onInputsWillBeRemoved(QList<InputVM*> oldInputs);
 
 
     /**
-     * @brief Slot when the flag "is ON" of a model changed
-     * @param isON
+     * @brief Slot called when some view models of outputs will be removed from the agent(s grouped by name)
+     * @param oldOutputs
      */
-    void _onIsONofModelChanged(bool isON);
-
-
-    /**
-     * @brief Slot called when the definition of a model changed (with previous and new values)
-     * @param previousValue
-     * @param newValue
-     */
-    void _onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
+    void _onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs);
 
 
 private:
 
     /**
-     * @brief A model of agent has been added to our list
-     * @param model
+     * @brief Update the group (of value type) of the reduced link inputs of our agent (= brin)
      */
-    void _agentModelAdded(AgentM* model);
+    void _updateReducedLinkInputsValueTypeGroup();
 
 
     /**
-     * @brief A model of agent has been removed from our list
-     * @param model
+     * @brief Update the group (of value type) of the reduced link outputs of our agent (= brin)
      */
-    void _agentModelRemoved(AgentM* model);
+    void _updateReducedLinkOutputsValueTypeGroup();
 
 
     /**
-     * @brief A model of input has been added
-     * @param input
-     * @return
+     * @brief Check the maximum number of Inputs/Outputs
      */
-    InputVM* _inputModelAdded(AgentIOPM* input);
-
-
-    /**
-     * @brief A model of input has been removed
-     * @param input
-     * @return
-     */
-    InputVM* _inputModelRemoved(AgentIOPM* input);
-
-
-    /**
-     * @brief A model of output has been added
-     * @param output
-     * @return
-     */
-    OutputVM* _outputModelAdded(OutputM* output);
-
-
-    /**
-     * @brief A model of output has been removed
-     * @param output
-     * @return
-     */
-    OutputVM* _outputModelRemoved(OutputM* output);
-
-
-
-    /**
-     * @brief A model of parameter has been added
-     * @param parameter
-     * @return
-     */
-    ParameterVM* _parameterModelAdded(AgentIOPM* parameter);
-
-
-    /**
-     * @brief A model of parameter has been removed
-     * @param parameter
-     * @return
-     */
-    ParameterVM* _parameterModelRemoved(AgentIOPM* parameter);
-
-
-    /**
-     * @brief Update with all models of agents
-     */
-    void _updateWithAllModels();
-
-
-    /**
-     * @brief Update the flag "is ON" in function of flags of models
-     */
-    void _updateIsON();
-
-
-    /**
-     * @brief Update the flag "Are Identicals All Definitions"
-     */
-    void _updateAreIdenticalsAllDefinitions();
-
-
-    /**
-     * @brief Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
-     */
-    void _updateIsDefinedInAllDefinitionsForEachIOP();
-
-
-    /**
-     * @brief Update the group (of value type) of the reduced map (= brin) in input of our agent
-     */
-    void _updateReducedMapValueTypeGroupInInput();
-
-
-    /**
-     * @brief Update the group (of value type) of the reduced map (= brin) in output of our agent
-     */
-    void _updateReducedMapValueTypeGroupInOutput();
-
-
-    /**
-     * @brief Get the temporary link with same names
-     * @param inputName
-     * @param outputAgentName
-     * @param outputName
-     * @return
-     */
-    ElementMappingM* _getTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
+    void _checkMaxNumberOfIO();
 
 
 private:
-
-    // Previous list of models of agents
-    QList<AgentM*> _previousAgentsList;
 
     // Input name as key is not unique (value type can be different)
-    // Map from an input name to a list of view models of inputs
-    QHash<QString, QList<InputVM*>> _mapFromNameToInputsList;
+    // Hash table from an input name to a list of view models of link inputs
+    QHash<QString, QList<LinkInputVM*>> _hashFromNameToLinkInputsList;
 
-    // Map from a (unique) input id to a view model of input
-    QHash<QString, InputVM*> _mapFromUniqueIdToInput;
+    // Hash table from a (unique) input id to a view model of link input
+    QHash<QString, LinkInputVM*> _hashFromIdToLinkInput;
 
     // Output name as key is not unique (value type can be different)
-    // Map from an output name to a list of view models of outputs
-    QHash<QString, QList<OutputVM*>> _mapFromNameToOutputsList;
+    // Hash table from an output name to a list of view models of link outputs
+    QHash<QString, QList<LinkOutputVM*>> _hashFromNameToLinkOutputsList;
 
-    // Map from a (unique) output id to a view model of output
-    QHash<QString, OutputVM*> _mapFromUniqueIdToOutput;
+    // Hash table from a (unique) output id to a view model of link output
+    QHash<QString, LinkOutputVM*> _hashFromIdToLinkOutput;
 
-    // Parameter name as key is not unique (value type can be different)
-    // Map from a parameter name to a list of view models of parameters
-    QHash<QString, QList<ParameterVM*>> _mapFromNameToParametersList;
+    // Hash table from "(unique) link id" to added link (model of mapping element) while the mapping was UN-activated
+    QHash<QString, ElementMappingM*> _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated;
 
-    // Map from a (unique) parameter id to a view model of parameter
-    QHash<QString, ParameterVM*> _mapFromUniqueIdToParameter;
+    // Hash table from "(unique) link id" to removed link (view model of mapping element) while the mapping was UN-activated
+    QHash<QString, MappingElementVM*> _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated;
+
 };
 
 QML_DECLARE_TYPE(AgentInMappingVM)

@@ -93,7 +93,7 @@ ActionM::~ActionM()
  */
 void ActionM::copyFrom(ActionM* actionModel)
 {
-    if (actionModel != NULL)
+    if (actionModel != nullptr)
     {
         setuid(actionModel->uid());
         setname(actionModel->name());
@@ -121,7 +121,7 @@ void ActionM::copyFrom(ActionM* actionModel)
             {
             case ActionEffectTypes::AGENT: {
                 EffectOnAgentM* effectOnAgent = qobject_cast<EffectOnAgentM*>(effectVM->modelM());
-                if (effectOnAgent != NULL)
+                if (effectOnAgent != nullptr)
                 {
                     EffectOnAgentM* copy = new EffectOnAgentM();
                     copy->copyFrom(effectOnAgent);
@@ -131,11 +131,11 @@ void ActionM::copyFrom(ActionM* actionModel)
                 break;
             }
             case ActionEffectTypes::VALUE: {
-                IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(effectVM->modelM());
-                if (iopEffect != NULL)
+                IOPValueEffectM* iopValueEffect = qobject_cast<IOPValueEffectM*>(effectVM->modelM());
+                if (iopValueEffect != nullptr)
                 {
                     IOPValueEffectM* copy = new IOPValueEffectM();
-                    copy->copyFrom(iopEffect);
+                    copy->copyFrom(iopValueEffect);
 
                     copiedEffectVM->setmodelM(copy);
                 }
@@ -143,7 +143,7 @@ void ActionM::copyFrom(ActionM* actionModel)
             }
             case ActionEffectTypes::MAPPING: {
                 MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effectVM->modelM());
-                if(mappingEffect != NULL)
+                if (mappingEffect != nullptr)
                 {
                     MappingEffectM* copy = new MappingEffectM();
                     copy->copyFrom(mappingEffect);
@@ -161,9 +161,10 @@ void ActionM::copyFrom(ActionM* actionModel)
 
 
         _conditionsList.deleteAllItems();
+
         for (ActionConditionVM* reference : actionModel->conditionsList()->toList())
         {
-            if ((reference != NULL) && (reference->modelM() != NULL))
+            if ((reference != nullptr) && (reference->modelM() != nullptr))
             {
                 ActionConditionVM* copyVM = new ActionConditionVM();
                 copyVM->setconditionType(reference->conditionType());
@@ -173,7 +174,7 @@ void ActionM::copyFrom(ActionM* actionModel)
                 case ActionConditionTypes::VALUE:
                 {
                     IOPValueConditionM* iopValueCondition = qobject_cast<IOPValueConditionM*>(reference->modelM());
-                    if (iopValueCondition != NULL)
+                    if (iopValueCondition != nullptr)
                     {
                         IOPValueConditionM* copyM = new IOPValueConditionM();
                         copyM->copyFrom(iopValueCondition);
@@ -186,7 +187,7 @@ void ActionM::copyFrom(ActionM* actionModel)
                 case ActionConditionTypes::AGENT:
                 {
                     ConditionOnAgentM* conditionOnAgent = qobject_cast<ConditionOnAgentM*>(reference->modelM());
-                    if (conditionOnAgent != NULL)
+                    if (conditionOnAgent != nullptr)
                     {
                         ConditionOnAgentM* copyM = new ConditionOnAgentM();
                         copyM->copyFrom(conditionOnAgent);
@@ -317,7 +318,7 @@ void ActionM::setrearmAfterTimeString(QString value)
  */
 void ActionM::setvalidityDurationString(QString value)
 {
-    if(_validityDurationString != value)
+    if (_validityDurationString != value)
     {
         _validityDurationString = value;
 
@@ -397,7 +398,7 @@ void ActionM::initializeConditionsConnections()
     {
         for (ActionConditionVM* conditionVM : _conditionsList.toList())
         {
-            if ((conditionVM != NULL) && (conditionVM->modelM() != NULL))
+            if ((conditionVM != nullptr) && (conditionVM->modelM() != nullptr))
             {
                 // Connect to changes on flag "is valid"
                 connect(conditionVM->modelM(), &ActionConditionM::isValidChanged, this, &ActionM::_onIsValidConditionChanged);
@@ -424,7 +425,7 @@ void ActionM::resetConditionsConnections()
     {
         for (ActionConditionVM* conditionVM : _conditionsList.toList())
         {
-            if ((conditionVM != NULL) && (conditionVM->modelM() != NULL))
+            if ((conditionVM != nullptr) && (conditionVM->modelM() != nullptr))
             {
                 // DIS-connect from changes on flag "is valid"
                 disconnect(conditionVM->modelM(), &ActionConditionM::isValidChanged, this, &ActionM::_onIsValidConditionChanged);
@@ -444,7 +445,7 @@ void ActionM::resetConditionsConnections()
  */
 void ActionM::addEffectToList(ActionEffectVM* effectVM)
 {
-    if ((effectVM != NULL) && (effectVM->modelM() != NULL)) {
+    if ((effectVM != nullptr) && (effectVM->modelM() != nullptr)) {
         connect(effectVM->modelM(), &ActionEffectM::askForDestruction, this, &ActionM::_onEffectDestructionAsked);
     }
 
@@ -458,7 +459,7 @@ void ActionM::addEffectToList(ActionEffectVM* effectVM)
  */
 void ActionM::addConditionToList(ActionConditionVM* conditionVM)
 {
-    if ((conditionVM != NULL) && (conditionVM->modelM() != NULL)) {
+    if ((conditionVM != nullptr) && (conditionVM->modelM() != nullptr)) {
         connect(conditionVM->modelM(), &ActionConditionM::askForDestruction, this, &ActionM::_onConditionDestructionAsked);
     }
 
@@ -478,7 +479,7 @@ void ActionM::_onIsValidConditionChanged(bool isValid)
 
     for (ActionConditionVM* condition : _conditionsList.toList())
     {
-        if ((condition != NULL) && (condition->modelM() != NULL))
+        if ((condition != nullptr) && (condition->modelM() != nullptr))
         {
             // Logic AND
             //globalIsValid = condition->modelM()->isValid() && globalIsValid;
@@ -504,18 +505,18 @@ void ActionM::_onIsValidConditionChanged(bool isValid)
 void ActionM::_onEffectDestructionAsked()
 {
     ActionEffectM* actionEffect = qobject_cast<ActionEffectM*>(sender());
-    if (actionEffect != NULL)
+    if (actionEffect != nullptr)
     {
         disconnect(actionEffect, &ActionEffectM::askForDestruction, this, &ActionM::_onEffectDestructionAsked);
 
         for (ActionEffectVM* effectVM : _effectsList.toList())
         {
-            if ((effectVM != NULL) && (effectVM->modelM() == actionEffect))
+            if ((effectVM != nullptr) && (effectVM->modelM() == actionEffect))
             {
                 _effectsList.remove(effectVM);
 
                 delete effectVM;
-                effectVM = NULL;
+                effectVM = nullptr;
             }
         }
     }
@@ -529,18 +530,18 @@ void ActionM::_onEffectDestructionAsked()
 void ActionM::_onConditionDestructionAsked()
 {
     ActionConditionM* actionCondition = qobject_cast<ActionConditionM*>(sender());
-    if (actionCondition != NULL)
+    if (actionCondition != nullptr)
     {
         disconnect(actionCondition, &ActionConditionM::askForDestruction, this, &ActionM::_onConditionDestructionAsked);
 
         for (ActionConditionVM* conditionVM : _conditionsList.toList())
         {
-            if ((conditionVM != NULL) && (conditionVM->modelM() == actionCondition))
+            if ((conditionVM != nullptr) && (conditionVM->modelM() == actionCondition))
             {
                 _conditionsList.remove(conditionVM);
 
                 delete conditionVM;
-                conditionVM = NULL;
+                conditionVM = nullptr;
             }
         }
     }

@@ -44,7 +44,6 @@ SOURCES += main.cpp \
     controller/actioneditorcontroller.cpp \
     controller/valueshistorycontroller.cpp \
     controller/abstracttimeactionslinescenarioviewcontroller.cpp \
-    controller/ingescapelaunchermanager.cpp \
     misc/ingescapeeditorsettings.cpp \
     misc/ingescapeeditorutils.cpp \
     misc/terminationsignalwatcher.cpp \
@@ -69,10 +68,7 @@ SOURCES += main.cpp \
     model/scenario/effect/mappingeffectm.cpp \
     model/scenario/effect/effectonagentm.cpp \
     sortFilter/valueshistorysortfilter.cpp \
-    viewModel/agentvm.cpp \
-    viewModel/pointmapvm.cpp \
     viewModel/agentinmappingvm.cpp \
-    viewModel/mapbetweeniopvm.cpp \
     viewModel/scenario/actionvm.cpp \
     viewModel/iop/inputvm.cpp \
     viewModel/iop/outputvm.cpp \
@@ -94,7 +90,15 @@ SOURCES += main.cpp \
     sortFilter/logssortfilter.cpp \
     model/scenario/condition/conditiononagentm.cpp \
     misc/qquickwindowblocktouches.cpp \
-    misc/textfielddoublevalidator.cpp
+    viewModel/agentsgroupedbynamevm.cpp \
+    viewModel/agentsgroupedbydefinitionvm.cpp \
+    viewModel/link/linkinputvm.cpp \
+    viewModel/link/linkoutputvm.cpp \
+    viewModel/link/linkvm.cpp \
+    viewModel/link/linkconnectorvm.cpp \
+    misc/textfielddoublevalidator.cpp \
+    misc/numberconstants.cpp \
+    viewModel/link/mappingelementvm.cpp
 
 HEADERS += \
     stable.h \
@@ -116,7 +120,6 @@ HEADERS += \
     controller/actioneditorcontroller.h \
     controller/valueshistorycontroller.h \
     controller/abstracttimeactionslinescenarioviewcontroller.h \
-    controller/ingescapelaunchermanager.h \
     misc/ingescapeeditorsettings.h \
     misc/ingescapeeditorutils.h \
     misc/terminationsignalwatcher.h \
@@ -141,10 +144,7 @@ HEADERS += \
     model/scenario/effect/mappingeffectm.h \
     model/scenario/effect/effectonagentm.h \
     sortFilter/valueshistorysortfilter.h \
-    viewModel/agentvm.h \
-    viewModel/pointmapvm.h \
     viewModel/agentinmappingvm.h \
-    viewModel/mapbetweeniopvm.h \
     viewModel/scenario/actionvm.h \
     viewModel/iop/inputvm.h \
     viewModel/iop/outputvm.h \
@@ -166,7 +166,15 @@ HEADERS += \
     sortFilter/logssortfilter.h \
     model/scenario/condition/conditiononagentm.h \
     misc/qquickwindowblocktouches.h \
-    misc/textfielddoublevalidator.h
+    viewModel/agentsgroupedbynamevm.h \
+    viewModel/agentsgroupedbydefinitionvm.h \
+    viewModel/link/linkinputvm.h \
+    viewModel/link/linkoutputvm.h \
+    viewModel/link/linkvm.h \
+    viewModel/link/linkconnectorvm.h \
+    misc/textfielddoublevalidator.h \
+    misc/numberconstants.h \
+    viewModel/link/mappingelementvm.h
 
 
 RESOURCES += qml.qrc

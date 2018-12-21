@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -19,6 +19,12 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
+
+
+/**
+  * Types of IngeScape elements on the network
+  */
+I2_ENUM(IngeScapeTypes, UNKNOWN, AGENT, LAUNCHER, RECORDER, EDITOR)
 
 
 /**
@@ -50,6 +56,7 @@ I2_ENUM_CUSTOM(LogTypes, IGS_LOG_TRACE, IGS_LOG_DEBUG, IGS_LOG_INFO, IGS_LOG_WAR
 
 static const QString SEPARATOR_AGENT_NAME_AND_IOP = QString("##");
 static const QString SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE = QString("::");
+static const QString SEPARATOR_LINK_OUTPUT_AND_LINK_INPUT = QString("-->");
 static const QString HOSTNAME_NOT_DEFINED = QString("HOSTNAME NOT DEFINED");
 
 
@@ -65,6 +72,9 @@ static const QString command_MuteAgentOutput = "MUTE";
 static const QString command_UnmuteAgentOutput = "UNMUTE";
 static const QString command_FreezeAgent = "FREEZE";
 static const QString command_UnfreezeAgent = "UNFREEZE";
+
+static const QString command_MapAgents = "MAP";
+static const QString command_UnmapAgents = "UNMAP";
 
 static const QString command_EnableLogStream = "ENABLE_LOG_STREAM";
 static const QString command_DisableLogStream = "DISABLE_LOG_STREAM";

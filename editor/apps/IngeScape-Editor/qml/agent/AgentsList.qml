@@ -290,9 +290,9 @@ Item {
                 }
 
                 onClicked: {
-                    if (IngeScapeEditorC.agentsSupervisionC) {
+                    if (IngeScapeEditorC.modelManager) {
                         //console.log("Export Agent(s)")
-                        IngeScapeEditorC.agentsSupervisionC.exportAgentsListToSelectedFile();
+                        IngeScapeEditorC.modelManager.exportAgentsListToSelectedFile();
                     }
                 }
             }
@@ -351,7 +351,6 @@ Item {
 
         height: 1
     }
-
 
 
     //
@@ -486,7 +485,7 @@ Item {
                         isReduced: true
                         agentName: model.name
                         visible: mouseArea.drag.active
-                        dropEnabled : false
+                        dropEnabled: false
                     }
                 }
             }

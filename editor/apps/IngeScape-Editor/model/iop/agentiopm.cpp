@@ -34,6 +34,7 @@ AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
     _name(name),
     _agentIOPValueType(AgentIOPValueTypes::UNKNOWN),
     _agentIOPValueTypeGroup(AgentIOPValueTypeGroups::UNKNOWN),
+    _uid(""),
     _defaultValue(QVariant()),
     _displayableDefaultValue(""),
     _currentValue(QVariant()),
@@ -45,8 +46,8 @@ AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
     // Call the setter to update the corresponding group
     setagentIOPValueType(agentIOPValueType);
 
-    // Create the unique identifier with name and value type
-    _id = QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(_agentIOPValueType));
+    // Create the unique identifier with name and value type: "Name::ValueType"
+    _uid = QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(_agentIOPValueType));
 }
 
 
@@ -59,6 +60,10 @@ AgentIOPM::~AgentIOPM()
 }
 
 
+/**
+ * @brief Setter for property "Agent IOP Value Type"
+ * @param value
+ */
 void AgentIOPM::setagentIOPValueType(AgentIOPValueTypes::Value value)
 {
     if (_agentIOPValueType != value)
@@ -86,13 +91,15 @@ void AgentIOPM::setdefaultValue(QVariant value)
     {
         _defaultValue = value;
 
+        Q_EMIT defaultValueChanged(value);
+
         // Get a displayable value: convert a variant into a string (in function of the value type)
-        setdisplayableDefaultValue(Enums::getDisplayableValue(_agentIOPValueType, _defaultValue));
+        //setdisplayableDefaultValue(Enums::getDisplayableValue(_agentIOPValueType, _defaultValue));
+
+        setdisplayableDefaultValue(_defaultValue.toString());
 
         // Set the current value
         setcurrentValue(_defaultValue);
-
-        Q_EMIT defaultValueChanged(value);
     }
 }
 
@@ -107,9 +114,39 @@ void AgentIOPM::setcurrentValue(QVariant value)
         _currentValue = value;
 
         // Get a displayable value: convert a variant into a string (in function of the value type)
-        setdisplayableCurrentValue(Enums::getDisplayableValue(_agentIOPValueType, _currentValue));
+        //setdisplayableCurrentValue(Enums::getDisplayableValue(_agentIOPValueType, _currentValue));
+
+        setdisplayableCurrentValue(_currentValue.toString());
     }
 
     // Emit the signal even if the value has not changed to show the animation
     Q_EMIT currentValueChanged(value);
+}
+
+
+/**
+ * @brief Get the name and the value type of an agent I/O/P from its id
+ * @param uid
+ * @return
+ */
+QPair<QString, AgentIOPValueTypes::Value> AgentIOPM::getNameAndValueTypeFromId(QString uid)
+{
+    QString name = "";
+    AgentIOPValueTypes::Value valueType = AgentIOPValueTypes::UNKNOWN;
+
+    if (uid.contains(SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE))
+    {
+        QStringList nameAndValueType = uid.split(SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE);
+        if (nameAndValueType.count() == 2)
+        {
+            name = nameAndValueType.at(0);
+
+            int nValueType = AgentIOPValueTypes::staticEnumFromKey(nameAndValueType.at(1));
+            if (nValueType > -1)
+            {
+                valueType = static_cast<AgentIOPValueTypes::Value>(nValueType);
+            }
+        }
+    }
+    return QPair<QString, AgentIOPValueTypes::Value>(name, valueType);
 }

@@ -1,13 +1,14 @@
 /*
- *	AbstractTimeRangeFilter
+ *	IngeScape Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -18,12 +19,6 @@
 
 #include "model/scenario/timetickm.h"
 #include "viewModel/scenario/actionvm.h"
-
-//--------------------------------------------------------------
-//
-// AbstractTimeRangeFilter
-//
-//--------------------------------------------------------------
 
 
 /**
@@ -88,7 +83,7 @@ bool AbstractTimeRangeFilter::filterAccepts(QObject* item, int index) const
 
     // Try to cast our item as an TimeTickM
     TimeTickM * timeTickItem = dynamic_cast<TimeTickM*>(item);
-    if (timeTickItem != NULL)
+    if (timeTickItem != nullptr)
     {
         //
         // We have an TimeTickM item
@@ -103,7 +98,7 @@ bool AbstractTimeRangeFilter::filterAccepts(QObject* item, int index) const
     }
     else {
         ActionVM * actionVMItem = dynamic_cast<ActionVM*>(item);
-        if (actionVMItem != NULL)
+        if (actionVMItem != nullptr)
         {
             // Check if our time is valid
             if (actionVMItem->startTime() > 0)

@@ -39,7 +39,7 @@ TerminationSignalWatcher::TerminationSignalWatcher(QObject *parent) : QObject(pa
     // Create a socket notifier
     _socketNotifier = new QSocketNotifier(_sockpair[1], QSocketNotifier::Read, this);
     // - subscribe and enable
-    if (_socketNotifier != NULL)
+    if (_socketNotifier != nullptr)
     {
         QObject::connect(_socketNotifier, &QSocketNotifier::activated, this, &TerminationSignalWatcher::_onSocketNotifierActivated);
         _socketNotifier->setEnabled(true);
@@ -88,7 +88,7 @@ TerminationSignalWatcher::~TerminationSignalWatcher()
     _defaultHandlerSIGTERM.sa_handler = NULL;
 
     // Clean-up our socket notifier
-    if (_socketNotifier != NULL)
+    if (_socketNotifier != nullptr)
     {
         disconnect(_socketNotifier, 0, this, 0);
         delete _socketNotifier;

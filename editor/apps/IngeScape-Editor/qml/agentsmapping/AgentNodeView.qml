@@ -39,10 +39,13 @@ Rectangle {
     property var controller : null;
 
     // Model associated to our QML item
-    property var agentMappingVM: null
+    property AgentInMappingVM agentMappingVM: null
 
-    property var agentName: agentMappingVM ? agentMappingVM.name : ""
+    property var agentsGroupedByName: agentMappingVM ? agentMappingVM.agentsGroupedByName : null
 
+    property string agentName: agentMappingVM ? agentMappingVM.name : ""
+
+    // Flag indicating if our agent is reduced (List of Inputs/Outputs are hidden)
     property bool isReduced: agentMappingVM && agentMappingVM.isReduced
 
     // Flag indicating if mouse areas over input/output names (to display the tooltip) are enabled
@@ -66,7 +69,7 @@ Rectangle {
 
     width: 258
 
-    height: (rootItem.agentMappingVM && !rootItem.isReduced) ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count, rootItem.agentMappingVM.outputsList.count))
+    height: (rootItem.agentMappingVM && !rootItem.isReduced) ? (54 + 22 * Math.max(rootItem.agentMappingVM.linkInputsList.count, rootItem.agentMappingVM.linkOutputsList.count))
                                                              : 42
 
 
@@ -78,32 +81,13 @@ Rectangle {
     radius: 6
 
     color: (dropEnabled === true) ? (mouseArea.pressed ? IngeScapeTheme.darkGreyColor2
-                                                       : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.veryDarkGreyColor)
+                                                       : (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON) ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.veryDarkGreyColor)
                                   : IngeScapeTheme.darkGreyColor2
 
 
     border {
         color: IngeScapeTheme.selectedAgentColor
         width: rootItem._isSelected ? 1 : 0
-    }
-
-
-
-    Component.onCompleted: {
-        if (agentMappingVM) {
-            // Max number of inputs or outputs
-            var maxIOP = Math.max(agentMappingVM.inputsList.count, agentMappingVM.outputsList.count)
-            if (maxIOP > 150)
-            {
-                // I/O > 150 => we force the view to be "reduced".
-                isReduced = true;
-            }
-            else if (maxIOP > 50)
-            {
-                // 150 > I/O > 50 => we set the view to "reduced" but default but the user can still expand it.
-                agentMappingVM.isReduced = true;
-            }
-        }
     }
 
 
@@ -159,9 +143,6 @@ Rectangle {
     //--------------------------------
 
 
-    // signal emitted when the delete confirmation popup is needed because the agent is already used in the platform
-    signal needConfirmationToDeleteAgentInMapping();
-
 
     //--------------------------------
     //
@@ -207,7 +188,9 @@ Rectangle {
         }
 
         onDoubleClicked: {
-            if (agentMappingVM) {
+            // Check if our agent is locked reduced (prevent to open the list of Inputs/Outputs)
+            if (agentMappingVM && !agentMappingVM.isLockedReduced)
+            {
                 agentMappingVM.isReduced = !agentMappingVM.isReduced;
             }
         }
@@ -272,7 +255,7 @@ Rectangle {
 
                 Repeater {
                     // List of intput slots VM
-                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.inputsList : 0)
+                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.linkInputsList : 0)
 
                     delegate: Item {
                         id: inputSlotItem
@@ -299,8 +282,8 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            color: (myModel && myModel.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
-                                                                                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
+                            color: (myModel && myModel.input && myModel.input.isDefinedInAllDefinitions) ? (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
+                                                                                                         : (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
 
                             font: IngeScapeTheme.heading2Font
 
@@ -315,7 +298,7 @@ Rectangle {
                             Controls2.ToolTip {
                                 delay: 400
                                 visible: rootTooltipInput.containsMouse
-                                text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")": "")
+                                text: ((myModel && myModel.input && myModel.input.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.input.firstModel.agentIOPValueType) + ")": "")
                             }
                         }
 
@@ -407,8 +390,8 @@ Rectangle {
                                 color : IngeScapeTheme.whiteColor
                             }
 
-                            color: if (agentMappingVM && myModel && myModel.firstModel) {
-                                       IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.firstModel.agentIOPValueTypeGroup, true);
+                            color: if (myModel && myModel.input && myModel.input.firstModel) {
+                                       IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.input.firstModel.agentIOPValueTypeGroup, true);
                                    }
                                    else {
                                        IngeScapeTheme.whiteColor
@@ -476,7 +459,7 @@ Rectangle {
                                         linkPoint.scale = 1
 
                                         //console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
-                                        controller.dropLinkBetweenAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
+                                        controller.dropLinkBetweenTwoAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
                                     }
                                 }
                             }
@@ -525,7 +508,7 @@ Rectangle {
 
                 Repeater {
                     // List of output slots VM
-                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.outputsList : 0)
+                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.linkOutputsList : 0)
 
                     delegate: Item {
                         id: outputSlotItem
@@ -553,9 +536,8 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            //color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor
-                            color: (myModel && myModel.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
-                                                                                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
+                            color: (myModel && myModel.output && myModel.output.isDefinedInAllDefinitions) ? (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
+                                                                                                           : (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
                             font: IngeScapeTheme.heading2Font
 
                             MouseArea {
@@ -569,7 +551,7 @@ Rectangle {
                             Controls2.ToolTip {
                                 delay: 400
                                 visible: rootTooltipOutput.containsMouse
-                                text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")": "")
+                                text: ((myModel && myModel.output && myModel.output.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.output.firstModel.agentIOPValueType) + ")": "")
                             }
                         }
 
@@ -658,12 +640,12 @@ Rectangle {
                             radius: height/2
 
                             border {
-                                width : 0
-                                color : IngeScapeTheme.whiteColor
+                                width: 0
+                                color: IngeScapeTheme.whiteColor
                             }
 
-                            color: if (agentMappingVM && myModel && myModel.firstModel) {
-                                       IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.firstModel.agentIOPValueTypeGroup, (!myModel.firstModel.isMuted));
+                            color: if (myModel && myModel.output && myModel.output.firstModel) {
+                                       IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.output.firstModel.agentIOPValueTypeGroup, !myModel.output.firstModel.isMuted);
                                    }
                                    else {
                                        IngeScapeTheme.whiteColor
@@ -677,7 +659,7 @@ Rectangle {
                                 svgFileCache: IngeScapeTheme.svgFileINGESCAPE
                                 svgElementId: "outputIsMuted"
 
-                                visible : myModel.firstModel && myModel.firstModel.isMuted
+                                visible: (myModel.output && myModel.output.firstModel && myModel.output.firstModel.isMuted)
                             }
                         }
 
@@ -738,7 +720,7 @@ Rectangle {
                                         linkPointOut.scale = 1
 
                                         //console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
-                                        controller.dropLinkBetweenAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
+                                        controller.dropLinkBetweenTwoAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
                                     }
                                 }
                             }
@@ -867,9 +849,8 @@ Rectangle {
             }
 
             onClicked: {
-                if (IngeScapeEditorC.modelManager) {
-                    IngeScapeEditorC.modelManager.openDefinitionWithAgentName(rootItem.agentName);
-                }
+                // Open the definition(s)
+                rootItem.agentsGroupedByName.openDefinition();
             }
         }
 
@@ -881,9 +862,7 @@ Rectangle {
             anchors {
                 left: parent.left
                 leftMargin: 30
-                //right: btnRemoveFromMapping.left
                 right: agentWithSameName.visible ? agentWithSameName.left : btnRemoveFromMapping.left
-                //rightMargin: 20
                 top: parent.top
                 topMargin: 10
             }
@@ -892,8 +871,40 @@ Rectangle {
             text: rootItem.agentName
             font: IngeScapeTheme.headingFont
 
-            color: (dropEnabled === true) ? ((rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONNameMappingColor : IngeScapeTheme.agentsOFFNameMappingColor)
+            color: (dropEnabled === true) ? ((rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON) ? IngeScapeTheme.agentsONNameMappingColor : IngeScapeTheme.agentsOFFNameMappingColor)
                                           : IngeScapeTheme.lightGreyColor
+        }
+
+        // FIXME DEBUG
+        Row {
+            anchors {
+                top: parent.top
+                right: parent.right
+            }
+            visible: IngeScapeEditorC.isAvailableModelVisualizer
+
+            Rectangle {
+                visible: agentMappingVM ? agentMappingVM.hadLinksAdded_WhileMappingWasUNactivated : false
+                color: "red"
+                width: 8
+                height: 8
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "+"
+                }
+            }
+            Rectangle {
+                visible: agentMappingVM ? agentMappingVM.hadLinksRemoved_WhileMappingWasUNactivated : false
+                color: "red"
+                width: 8
+                height: 8
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "-"
+                }
+            }
         }
 
 
@@ -930,15 +941,8 @@ Rectangle {
             onClicked: {
                 if (controller)
                 {
-                    if (IngeScapeEditorC.canDeleteAgentInMapping(rootItem.agentName))
-                    {
-                        // Delete our agent
-                        controller.deleteAgentInMapping(rootItem.agentMappingVM);
-                    }
-                    else {
-                        // Emit the signal "Need Confirmation to Delete Agent in Mapping"
-                        rootItem.needConfirmationToDeleteAgentInMapping();
-                    }
+                    // Delete our agent
+                    controller.deleteAgentInMapping(rootItem.agentMappingVM);
                 }
             }
         }
@@ -962,14 +966,14 @@ Rectangle {
             width: height
             radius: height / 2
 
-            visible: (rootItem.agentMappingVM && (rootItem.agentMappingVM.activeAgentsNumber > 1))
+            visible: (rootItem.agentsGroupedByName && (rootItem.agentsGroupedByName.numberOfAgentsON > 1))
 
             color: IngeScapeTheme.redColor
 
             Text {
                 anchors.centerIn: parent
 
-                text: agentMappingVM ? agentMappingVM.activeAgentsNumber : ""
+                text: (rootItem.agentsGroupedByName ? rootItem.agentsGroupedByName.numberOfAgentsON : "")
 
                 color: IngeScapeTheme.whiteColor
 
@@ -1016,13 +1020,13 @@ Rectangle {
             radius : height/2
 
             color : if (agentMappingVM) {
-                        IngeScapeTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedMapValueTypeGroupInInput, true);
+                        IngeScapeTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedLinkInputsValueTypeGroup, true);
                     }
                     else {
                         IngeScapeTheme.whiteColor
                     }
 
-            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.inputsList.count > 0)) ? 1 : 0
+            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.linkInputsList.count > 0)) ? 1 : 0
             visible: (opacity !== 0)
 
             Behavior on opacity {
@@ -1045,13 +1049,13 @@ Rectangle {
             radius : height/2
 
             color : if (agentMappingVM) {
-                        IngeScapeTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedMapValueTypeGroupInOutput, true);
+                        IngeScapeTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedLinkOutputsValueTypeGroup, true);
                     }
                     else {
                         IngeScapeTheme.whiteColor
                     }
 
-            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.outputsList.count > 0)) ? 1 : 0
+            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.linkOutputsList.count > 0)) ? 1 : 0
             visible: (opacity !== 0)
 
             Behavior on opacity {

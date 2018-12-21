@@ -1,13 +1,14 @@
 /*
- *	ActionEffectM
+ *	IngeScape Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -15,19 +16,12 @@
 
 #include <QDebug>
 
-
-//--------------------------------------------------------------
-//
-// ActionEffectM
-//
-//--------------------------------------------------------------
-
 /**
  * @brief Default constructor
  * @param parent
  */
 ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
-    _agent(NULL)
+    _agent(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -40,8 +34,8 @@ ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
  */
 ActionEffectM::~ActionEffectM()
 {
-    // Reset agent to null
-    setagent(NULL);
+    // Reset agent
+    setagent(nullptr);
 }
 
 
@@ -51,7 +45,7 @@ ActionEffectM::~ActionEffectM()
 */
 void ActionEffectM::copyFrom(ActionEffectM* effect)
 {
-    if (effect != NULL) {
+    if (effect != nullptr) {
         setagent(effect->agent());
     }
 }
@@ -61,22 +55,22 @@ void ActionEffectM::copyFrom(ActionEffectM* effect)
 * @brief Custom setter for agent
 * @param value
 */
-void ActionEffectM::setagent(AgentInMappingVM* value)
+void ActionEffectM::setagent(AgentsGroupedByNameVM* value)
 {
-    if(_agent != value)
+    if (_agent != value)
     {
-        if (_agent != NULL)
+        if (_agent != nullptr)
         {
             // UN-subscribe to destruction
-            disconnect(_agent, &AgentInMappingVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
+            disconnect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
         }
 
         _agent = value;
 
-        if (_agent != NULL)
+        if (_agent != nullptr)
         {
             // Subscribe to destruction
-            connect(_agent, &AgentInMappingVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
+            connect(_agent, &AgentsGroupedByNameVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
         }
 
         Q_EMIT agentChanged(value);
@@ -85,14 +79,14 @@ void ActionEffectM::setagent(AgentInMappingVM* value)
 
 
 /**
- * @brief Called when our agent is destroyed
+ * @brief FIXME custom event instead: Called when our agent is destroyed
  * @param sender
  */
 void ActionEffectM::_onAgentDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
-    setagent(NULL);
+    setagent(nullptr);
 
     Q_EMIT askForDestruction();
 }

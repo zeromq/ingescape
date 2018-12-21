@@ -21,18 +21,18 @@
  * @brief Constructor
  * @param actionName
  * @param originalAction
- * @param listAgentsInMapping
+ * @param allAgentsGroupsByName
  * @param parent
  */
 ActionEditorController::ActionEditorController(QString actionName,
-                                               ActionM *originalAction,
-                                               I2CustomItemSortFilterListModel<AgentInMappingVM> *listAgentsInMapping,
+                                               ActionM* originalAction,
+                                               QList<AgentsGroupedByNameVM*> allAgentsGroupsByName,
                                                QObject *parent) : QObject(parent),
     _originalAction(originalAction),
-    _editedAction(NULL),
-    _originalViewModel(NULL),
-    _editedViewModel(NULL),
-    _listAgentsInMapping(listAgentsInMapping)
+    _editedAction(nullptr),
+    _originalViewModel(nullptr),
+    _editedViewModel(nullptr),
+    _allAgentsGroupsByName(allAgentsGroupsByName)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -42,7 +42,7 @@ ActionEditorController::ActionEditorController(QString actionName,
 
     _editedAction = new ActionM(uid, actionName);
 
-    if (_originalAction != NULL)
+    if (_originalAction != nullptr)
     {
         _editedAction->copyFrom(_originalAction);
 
@@ -58,26 +58,24 @@ ActionEditorController::ActionEditorController(QString actionName,
  */
 ActionEditorController::~ActionEditorController()
 {
-    //_listAgentsInMapping->clear();
+    _allAgentsGroupsByName.clear();
 
-    setoriginalAction(NULL);
+    setoriginalAction(nullptr);
 
-    if (_editedAction != NULL)
+    if (_editedAction != nullptr)
     {
         ActionM* tmp = _editedAction;
-        seteditedAction(NULL);
+        seteditedAction(nullptr);
         delete tmp;
-        tmp = NULL;
     }
 
-    setoriginalViewModel(NULL);
+    setoriginalViewModel(nullptr);
 
-    if (_editedViewModel != NULL)
+    if (_editedViewModel != nullptr)
     {
         ActionVM* tmp = _editedViewModel;
-        seteditedViewModel(NULL);
+        seteditedViewModel(nullptr);
         delete tmp;
-        tmp = NULL;
     }
 }
 
@@ -88,17 +86,17 @@ ActionEditorController::~ActionEditorController()
 void ActionEditorController::validateModification()
 {
     // Save action model changes
-    if (_originalAction == NULL)
+    if (_originalAction == nullptr)
     {
         setoriginalAction(_editedAction);
-        seteditedAction(NULL);
+        seteditedAction(nullptr);
     }
     else {
         _originalAction->copyFrom(_editedAction);
     }
 
     // Save action view model changes if it's an action editor from a view model
-    if ((_editedViewModel != NULL) && (_originalViewModel != NULL))
+    if ((_editedViewModel != nullptr) && (_originalViewModel != nullptr))
     {
         _originalViewModel->setcolor(_editedViewModel->color());
         _originalViewModel->setstartTimeString(_editedViewModel->startTimeString());
@@ -121,15 +119,15 @@ void ActionEditorController::validateModification()
  */
 void ActionEditorController::createNewCondition()
 {
-    ActionConditionVM * conditionVM = new ActionConditionVM();
+    ActionConditionVM* conditionVM = new ActionConditionVM();
 
     // Set a condition model (by default: condition on value)
     conditionVM->setmodelM(new IOPValueConditionM());
     //conditionVM->setmodelM(new ConditionOnAgentM());
 
     // List of agents is NOT empty
-    if ((_listAgentsInMapping != NULL) && !_listAgentsInMapping->isEmpty()) {
-        conditionVM->modelM()->setagent(_listAgentsInMapping->at(0));
+    if (!_allAgentsGroupsByName.isEmpty()) {
+        conditionVM->modelM()->setagent(_allAgentsGroupsByName.at(0));
     }
 
     _editedAction->addConditionToList(conditionVM);
@@ -157,18 +155,18 @@ void ActionEditorController::removeCondition(ActionConditionVM* conditionVM)
  */
 void ActionEditorController::createNewEffect()
 {
-    ActionEffectVM * effectVM = new ActionEffectVM();
+    ActionEffectVM* effectVM = new ActionEffectVM();
 
     // Set an effect model
     effectVM->setmodelM(new IOPValueEffectM());
 
     // List of agents is NOT empty
-    if ((_listAgentsInMapping != NULL) && !_listAgentsInMapping->isEmpty())
+    if (!_allAgentsGroupsByName.isEmpty())
     {
-        effectVM->modelM()->setagent(_listAgentsInMapping->at(0));
+        effectVM->modelM()->setagent(_allAgentsGroupsByName.at(0));
 
-        if (_listAgentsInMapping->count() > 1) {
-            effectVM->setsecondAgentInMapping(_listAgentsInMapping->at(1));
+        if (_allAgentsGroupsByName.count() > 1) {
+            effectVM->setsecondAgentForMapping(_allAgentsGroupsByName.at(1));
         }
     }
 
@@ -184,9 +182,8 @@ void ActionEditorController::createNewEffect()
  */
 void ActionEditorController::removeEffect(ActionEffectVM* effectVM)
 {
-    if(_editedAction->effectsList()->contains(effectVM)) {
+    if (_editedAction->effectsList()->contains(effectVM)) {
         _editedAction->effectsList()->remove(effectVM);
     }
 }
-
 

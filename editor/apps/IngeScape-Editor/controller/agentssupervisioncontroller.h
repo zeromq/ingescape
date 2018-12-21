@@ -20,9 +20,8 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
-
 #include <controller/ingescapemodelmanager.h>
-#include <viewModel/agentvm.h>
+#include <viewModel/agentsgroupedbydefinitionvm.h>
 
 
 /**
@@ -33,10 +32,10 @@ class AgentsSupervisionController : public QObject
     Q_OBJECT
 
     // Sorted list of agents
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentVM, agentsList)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentsGroupedByDefinitionVM, agentsList)
 
     // Selected agent in the agents list
-    I2_QML_PROPERTY_DELETE_PROOF(AgentVM*, selectedAgent)
+    I2_QML_PROPERTY_DELETE_PROOF(AgentsGroupedByDefinitionVM*, selectedAgent)
 
 
 public:
@@ -58,61 +57,25 @@ public:
 
 
     /**
-     * @brief Get the list of view models of agent from a name
-     * @param name
-     * @return
-     */
-    QList<AgentVM*> getAgentViewModelsListFromName(QString name);
-
-
-    /**
      * @brief Remove the agent from the list and delete it
      * @param agent
      */
-    Q_INVOKABLE void deleteAgentInList(AgentVM* agent);
-
-
-    /**
-     * @brief Delete the model of agent
-     * If it is the last model of a view model, we reset all its network data (only defined by the agent definition)
-     * @param agent
-     * @return
-     */
-    Q_INVOKABLE void deleteModelOfAgent(AgentM* agent);
-
-
-    /**
-     * @brief Export the agents list to selected file
-     */
-    Q_INVOKABLE void exportAgentsListToSelectedFile();
-
-
-    /**
-     * @brief Export the agents list to JSON
-     * @return
-     */
-    QJsonArray exportAgentsListToJSON();
-
-
-    /**
-     * @brief Remove (and delete) each UN-active agent (agent with state OFF) from the current list of agents
-     */
-    void removeUNactiveAgents();
+    Q_INVOKABLE void deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
 
 Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param peerIdOfLauncher
      * @param command
-     * @param hostname
      * @param commandLine
      */
-    void commandAskedToLauncher(QString command, QString hostname, QString commandLine);
+    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
 
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to an agent
+     * @brief Signal emitted when a command must be sent on the network to agent(s)
      * @param peerIdsList
      * @param command
      */
@@ -120,7 +83,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to an agent about one of its output
+     * @brief Signal emitted when a command must be sent on the network to agent(s) about one of its output
      * @param peerIdsList
      * @param command
      * @param outputName
@@ -142,39 +105,31 @@ Q_SIGNALS:
     void openLogStreamOfAgents(QList<AgentM*> models);
 
 
-    /**
-     * @brief Signal emitted when a previous agent model is replaced by a new one strictly identical
-     * @param previousModel
-     * @param newModel
-     */
-    void identicalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
-
-
 public Q_SLOTS:
 
     /**
-     * @brief Slot when a new model of agent has been created
-     * @param agent
+     * @brief Slot called when a new view model of agents grouped by definition has been created
+     * @param agentsGroupedByDefinition
      */
-    void onAgentModelCreated(AgentM* agent);
+    void onAgentsGroupedByDefinitionHasBeenCreated(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
+
+
+    /**
+     * @brief Slot called when a view model of agents grouped by definition will be deleted
+     * @param agentsGroupedByDefinition
+     */
+    void onAgentsGroupedByDefinitionWillBeDeleted(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
 
 private Q_SLOTS:
 
     /**
-     * @brief Slot called when the definition of a view model of agent changed (with previous and new values)
-     * @param previousValue
-     * @param newValue
+     * @brief Slot called when a command must be sent on the network to a launcher
+     * @param hostname
+     * @param command
+     * @param commandLine
      */
-    void _onAgentDefinitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
-
-
-    /**
-     * @brief Slot called when a different definition is detected on a model of agent
-     * (compared to the definition of our view model)
-     * @param model
-     */
-    void _onDifferentDefinitionDetectedOnModelOfAgent(AgentM* model);
+    void _onCommandAskedToLauncher(QString hostname, QString command, QString commandLine);
 
 
     /**
@@ -210,26 +165,20 @@ private Q_SLOTS:
 
 private:
 
-
     /**
-     * @brief Manage a new model inside an existing view model
-     * @param model
-     * @param agentVM
+     * @brief Get the list of definitions with a name
+     * @param definitionName
+     * @return
      */
-    void _manageNewModelInsideExistingVM(AgentM* model, AgentVM* agentVM);
-
-    /**
-     * @brief Check if we have to merge an agent with another one that have the same definition
-     * @param agent
-     */
-    void _checkHaveToMergeAgent(AgentVM* agent);
+    QList<DefinitionM*> _getDefinitionsListWithName(QString definitionName);
 
 
     /**
-     * @brief Delete the view model of agent
-     * @param agent
+     * @brief Update the definition variants (same name, same version but the lists of I/O/P are differents)
+     * @param definitionName
+     * @param definitionsList
      */
-    void _deleteAgentViewModel(AgentVM* agent);
+    void _updateDefinitionVariants(QString definitionName, QList<DefinitionM*> definitionsList);
 
 
 private:
@@ -240,8 +189,8 @@ private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 
-    // Map from agent name to a list of view models of agent
-    QHash<QString, QList<AgentVM*>> _mapFromNameToAgentViewModelsList;
+    // Hash table from a definition name to a list of definitions with this name
+    QHash<QString, QList<DefinitionM*>> _hashFromDefinitionNameToDefinitionsList;
 };
 
 QML_DECLARE_TYPE(AgentsSupervisionController)

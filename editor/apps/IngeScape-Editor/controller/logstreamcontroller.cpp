@@ -27,7 +27,7 @@ int incomingEventFromParentThread(zloop_t *loop, zmq_pollitem_t *item, void *arg
     Q_UNUSED(loop)
     Q_UNUSED(args)
 
-    if ((item != NULL) && (item->revents & ZMQ_POLLIN))
+    if ((item != nullptr) && (item->revents & ZMQ_POLLIN))
     {
         zmsg_t *msg = zmsg_recv((zsock_t *)item->socket);
 
@@ -67,10 +67,10 @@ int incomingEventCallback(zloop_t *loop, zmq_pollitem_t *item, void *args)
 {
     Q_UNUSED(loop)
 
-    if ((item != NULL) && (args != NULL) && (item->revents & ZMQ_POLLIN))
+    if ((item != nullptr) && (args != nullptr) && (item->revents & ZMQ_POLLIN))
     {
         LogStreamController* logStreamC = (LogStreamController*)args;
-        if (logStreamC != NULL)
+        if (logStreamC != nullptr)
         {
             zmsg_t *msg = zmsg_recv((zsock_t *)item->socket);
 
@@ -107,10 +107,10 @@ int incomingEventCallback(zloop_t *loop, zmq_pollitem_t *item, void *args)
  */
 static void zactorCallback(zsock_t *pipe, void *args)
 {
-    if (args != NULL)
+    if (args != nullptr)
     {
         LogStreamController* logStreamC = (LogStreamController*)args;
-        if (logStreamC != NULL)
+        if (logStreamC != nullptr)
         {
             // Make a copy of the "char*"
             char *subscriberAddress = strdup(logStreamC->subscriberAddress().toStdString().c_str());
@@ -133,7 +133,7 @@ static void zactorCallback(zsock_t *pipe, void *args)
             // Init zpipe poll item
             zmq_pollitem_t zpipePollItem;
             void *zpipe = zsock_resolve(pipe);
-            if (zpipe == NULL) {
+            if (zpipe == nullptr) {
                 printf("Error: could not get the pipe descriptor for polling... exiting.\n");
                 exit(EXIT_FAILURE);
             }
@@ -165,11 +165,11 @@ static void zactorCallback(zsock_t *pipe, void *args)
             zloop_poller_end(loop, &zyrePollItem);
 
             zsock_destroy(&zSocket);
-            zSocket = NULL;
+            zSocket = nullptr;
 
             // Clean
             zloop_destroy(&loop);
-            assert(loop == NULL);
+            assert(loop == nullptr);
 
             //free(subscriberAddress);
         }
@@ -190,7 +190,7 @@ LogStreamController::LogStreamController(QString agentName,
     _agentName(agentName),
     _agentHostname(agentHostname),
     _subscriberAddress(subscriberAddress),
-    _zActor(NULL)
+    _zActor(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -227,12 +227,12 @@ LogStreamController::~LogStreamController()
 
     _allLogs.deleteAllItems();
 
-    if (_zActor != NULL)
+    if (_zActor != nullptr)
     {
         zstr_send(_zActor, "STOP");
 
         //zactor_destroy(&_zActor);
-        //_zActor = NULL;
+        //_zActor = nullptr;
     }
 }
 

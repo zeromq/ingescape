@@ -27,12 +27,12 @@
 ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
                                        JsonHelper* jsonHelper,
                                        QObject *parent) : QObject(parent),
-    _selectedAction(NULL),
-    _selectedActionVMInTimeline(NULL),
+    _selectedAction(nullptr),
+    _selectedActionVMInTimeline(nullptr),
     _linesNumberInTimeLine(MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE),
     _isPlaying(false),
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
-    _nextActionToActivate(NULL),
+    _nextActionToActivate(nullptr),
     _modelManager(modelManager),
     _jsonHelper(jsonHelper),
     _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut(0)
@@ -40,11 +40,10 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+
     // Configure our filtered list of "actionVM in timeline"
     _filteredListActionsInTimeLine.setSourceModel(&_actionsInTimeLine);
 
-    // Set the agent in mapping list sort by name property
-    _agentsInMappingList.setSortProperty("name");
 
     // Fill the list of all values of condition on agent (state)
     _allAgentConditionValues.fillWithAllEnumValues();
@@ -66,7 +65,7 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     // Initialize the 9 items of the palette with NULL action
     for (int i = 0; i < 9; i++)
     {
-        _actionsInPaletteList.append(new ActionInPaletteVM(NULL, i));
+        _actionsInPaletteList.append(new ActionInPaletteVM(nullptr, i));
     }
 
     // Add the first timeline line
@@ -107,10 +106,6 @@ ScenarioController::~ScenarioController()
     disconnect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayOrExecuteActions);
     _timerToRegularlyDelayActions.stop();
 
-    // Clear list and hash table of agents in mapping
-    _agentsInMappingList.clear();
-    _mapFromNameToAgentInMapping.clear();
-
     // Clear the current scenario
     clearScenario();
 
@@ -118,8 +113,8 @@ ScenarioController::~ScenarioController()
     _actionsInPaletteList.deleteAllItems();
 
     // Reset pointers
-    _modelManager = NULL;
-    _jsonHelper = NULL;
+    _modelManager = nullptr;
+    _jsonHelper = nullptr;
 }
 
 
@@ -129,7 +124,7 @@ ScenarioController::~ScenarioController()
  */
 void ScenarioController::setisPlaying(bool isPlaying)
 {
-    if(_isPlaying != isPlaying)
+    if (_isPlaying != isPlaying)
     {
         _isPlaying = isPlaying;
 
@@ -152,11 +147,14 @@ void ScenarioController::setisPlaying(bool isPlaying)
   */
 void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
 {
-    if (_jsonHelper != NULL)
+    if ((_modelManager != nullptr) && (_jsonHelper != nullptr))
     {
+        // Get the hash table from a name to the group of agents with this name
+        QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped = _modelManager->getHashTableFromNameToAgentsGrouped();
+
         // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
-        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, _agentsInMappingList.toList());
-        if (scenarioToImport != NULL)
+        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, hashFromNameToAgentsGrouped);
+        if (scenarioToImport != nullptr)
         {
             // Append the list of actions
             if (!scenarioToImport->actionsList()->isEmpty())
@@ -164,7 +162,7 @@ void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
                 // Add each action to our list
                 for (ActionM* actionM : scenarioToImport->actionsList()->toList())
                 {
-                    if (actionM != NULL)
+                    if (actionM != nullptr)
                     {
                         // Add action into the list
                         _actionsList.append(actionM);
@@ -184,7 +182,7 @@ void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
             {
                 for (ActionInPaletteVM* actionInPalette : scenarioToImport->actionsInPaletteList()->toList())
                 {
-                    if ((actionInPalette != NULL) && (actionInPalette->modelM() != NULL)) {
+                    if ((actionInPalette != nullptr) && (actionInPalette->modelM() != nullptr)) {
                         setActionInPalette(actionInPalette->indexInPanel(), actionInPalette->modelM());
                     }
                 }
@@ -196,7 +194,7 @@ void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
                 // Add each actionVM in to the right line of our timeline
                 for (ActionVM* actionVM : scenarioToImport->actionsInTimelineList()->toList())
                 {
-                    if ((actionVM != NULL) && (actionVM->modelM() != NULL))
+                    if ((actionVM != nullptr) && (actionVM->modelM() != nullptr))
                     {
                         int actionId = actionVM->modelM()->uid();
                         int lineIndexInTimeLine = actionVM->lineInTimeLine();
@@ -210,7 +208,7 @@ void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
                         I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndexInTimeLine);
 
                         // Add the action VM to the line
-                        if (sortedListOfActionVM != NULL) {
+                        if (sortedListOfActionVM != nullptr) {
                             sortedListOfActionVM->append(actionVM);
                         }
                         else
@@ -276,7 +274,7 @@ void ScenarioController::importExecutedActionsFromJson(QByteArray byteArrayOfJso
 
                         // Get the "Sorted" list of view models of action with the index of the line (in the time line)
                         I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndexInTimeLine);
-                        if (sortedListOfActionVM != NULL)
+                        if (sortedListOfActionVM != nullptr)
                         {
                             // FIXME TODO importExecutedActionsFromJson
                         }
@@ -289,42 +287,42 @@ void ScenarioController::importExecutedActionsFromJson(QByteArray byteArrayOfJso
 
 
 /**
-  * @brief Check if an agent is used in the actions (conditions and effects)
-  * @param agent name
+  * @brief Check if an agent is used in the current scenario (actions, conditions, effects)
+  * @param agentName
   */
-bool ScenarioController::isAgentUsedInActions(QString agentName)
+bool ScenarioController::isAgentUsedInScenario(QString agentName)
 {
-    bool exists = false;
+    bool isUsed = false;
 
-    foreach (ActionM* actionM, _actionsList.toList())
+    for (ActionM* actionM : _actionsList.toList())
     {
         // Check the action conditions
-        foreach (ActionConditionVM* conditionVM, actionM->conditionsList()->toList())
+        for (ActionConditionVM* conditionVM : actionM->conditionsList()->toList())
         {
-            if ((conditionVM->modelM() != NULL) && (conditionVM->modelM()->agent() != NULL)
+            if ((conditionVM != nullptr) && (conditionVM->modelM() != nullptr) && (conditionVM->modelM()->agent() != nullptr)
                     && (conditionVM->modelM()->agent()->name() == agentName))
             {
-                exists = true;
+                isUsed = true;
                 break;
             }
         }
 
         // Check the action effects
-        if (!exists)
+        if (!isUsed)
         {
-            foreach (ActionEffectVM* effectVM, actionM->effectsList()->toList())
+            for (ActionEffectVM* effectVM : actionM->effectsList()->toList())
             {
-                if ((effectVM->modelM() != NULL) && (effectVM->modelM()->agent() != NULL)
+                if ((effectVM != nullptr) && (effectVM->modelM() != nullptr) && (effectVM->modelM()->agent() != nullptr)
                         && (effectVM->modelM()->agent()->name() == agentName))
                 {
-                    exists = true;
+                    isUsed = true;
                     break;
                 }
             }
         }
     }
 
-    return exists;
+    return isUsed;
 }
 
 
@@ -334,40 +332,43 @@ bool ScenarioController::isAgentUsedInActions(QString agentName)
   */
 void ScenarioController::openActionEditorWithModel(ActionM* action)
 {
-    if (action != NULL)
+    if (_modelManager != nullptr)
     {
-        ActionEditorController* actionEditorC = _getActionEditorFromModelOfAction(action);
-
-        // The corresponding editor is already opened
-        if (actionEditorC != NULL)
+        if (action != nullptr)
         {
-            qDebug() << "The 'Action Editor' of" << action->name() << "is already opened...bring to front !";
+            ActionEditorController* actionEditorC = _getActionEditorFromModelOfAction(action);
 
-            Q_EMIT actionEditorC->bringToFront();
+            // The corresponding editor is already opened
+            if (actionEditorC != nullptr)
+            {
+                qDebug() << "The 'Action Editor' of" << action->name() << "is already opened...bring to front !";
+
+                Q_EMIT actionEditorC->bringToFront();
+            }
+            else
+            {
+                // Set selected action
+                setselectedAction(action);
+
+                // Create an action editor
+                ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), action, _modelManager->allAgentsGroupsByName()->toList());
+
+                _hashActionEditorControllerFromModelOfAction.insert(action, actionEditorC);
+
+                // Add to the list of opened action editors
+                _openedActionsEditorsControllers.append(actionEditorC);
+            }
         }
         else
         {
-            // Set selected action
-            setselectedAction(action);
+            // Create an action editor
+            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), nullptr, _modelManager->allAgentsGroupsByName()->toList());
 
-            // Create action editor controller
-            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), action, agentsInMappingList());
-
-            _hashActionEditorControllerFromModelOfAction.insert(action, actionEditorC);
+            _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
 
             // Add to the list of opened action editors
             _openedActionsEditorsControllers.append(actionEditorC);
         }
-    }
-    else
-    {
-        // Create action editor controller
-        ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), NULL, agentsInMappingList());
-
-        _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
-
-        // Add to the list of opened action editors
-        _openedActionsEditorsControllers.append(actionEditorC);
     }
 }
 
@@ -378,12 +379,12 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
   */
 void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
 {
-    if ((action != NULL) && (action->modelM() != NULL))
+    if ((_modelManager != nullptr) && (action != nullptr) && (action->modelM() != nullptr))
     {
         ActionEditorController* actionEditorC = _getActionEditorFromViewModelOfAction(action);
 
         // The corresponding editor is already opened
-        if (actionEditorC != NULL)
+        if (actionEditorC != nullptr)
         {
             qDebug() << "The 'Action Editor' of" << action->modelM()->name() << "is already opened...bring to front !";
 
@@ -393,8 +394,8 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
         {
             setselectedAction(action->modelM());
 
-            // Create action editor controller
-            actionEditorC = new ActionEditorController(_buildNewActionName(), action->modelM(), agentsInMappingList());
+            // Create an action editor
+            actionEditorC = new ActionEditorController(_buildNewActionName(), action->modelM(), _modelManager->allAgentsGroupsByName()->toList());
 
             _hashActionEditorControllerFromViewModelOfAction.insert(action, actionEditorC);
 
@@ -402,7 +403,7 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
             actionEditorC->setoriginalViewModel(action);
 
             // Create the temporary edited action view model
-            ActionVM* temporaryActionVM = new ActionVM(NULL, -1);
+            ActionVM* temporaryActionVM = new ActionVM(nullptr, -1);
             temporaryActionVM->setstartTimeString(action->startTimeString());
             temporaryActionVM->setcolor(action->color());
 
@@ -421,13 +422,13 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
   */
 void ScenarioController::deleteAction(ActionM* action)
 {
-    if (action != NULL)
+    if (action != nullptr)
     {
         int actionId = action->uid();
 
         // Delete the popup if necessary
         ActionEditorController* actionEditorC = _getActionEditorFromModelOfAction(action);
-        if (actionEditorC != NULL)
+        if (actionEditorC != nullptr)
         {
             _hashActionEditorControllerFromModelOfAction.remove(action);
 
@@ -439,15 +440,16 @@ void ScenarioController::deleteAction(ActionM* action)
 
         // Unselect our action if needed
         if (_selectedAction == action) {
-            setselectedAction(NULL);
+            setselectedAction(nullptr);
         }
 
         // Remove action from the palette if exists
         for (int index = 0; index < _actionsInPaletteList.count(); index++)
         {
             ActionInPaletteVM* actionInPaletteVM = _actionsInPaletteList.at(index);
-            if ((actionInPaletteVM->modelM() != NULL) && (actionInPaletteVM->modelM() == action)) {
-                setActionInPalette(index, NULL);
+
+            if ((actionInPaletteVM != nullptr) && (actionInPaletteVM->modelM() != nullptr) && (actionInPaletteVM->modelM() == action)) {
+                setActionInPalette(index, nullptr);
             }
         }
 
@@ -457,7 +459,7 @@ void ScenarioController::deleteAction(ActionM* action)
         {
             for (ActionVM* actionVM : listOfActionVM)
             {
-                if (actionVM != NULL) {
+                if (actionVM != nullptr) {
                     removeActionVMfromTimeLine(actionVM);
                 }
             }
@@ -488,13 +490,13 @@ void ScenarioController::deleteAction(ActionM* action)
   */
 void ScenarioController::validateActionEditor(ActionEditorController* actionEditorC)
 {
-    if (actionEditorC != NULL)
+    if (actionEditorC != nullptr)
     {
         // Validate modification
         actionEditorC->validateModification();
 
         ActionM* originalAction = actionEditorC->originalAction();
-        if ((originalAction != NULL) && !_actionsList.contains(originalAction))
+        if ((originalAction != nullptr) && !_actionsList.contains(originalAction))
         {
             // Insert into the list
             _actionsList.append(originalAction);
@@ -518,13 +520,13 @@ void ScenarioController::validateActionEditor(ActionEditorController* actionEdit
   */
 void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC)
 {
-    if (actionEditorC != NULL)
+    if (actionEditorC != nullptr)
     {
         // Remove action editor from view model of action
-        if (actionEditorC->originalViewModel() != NULL)
+        if (actionEditorC->originalViewModel() != nullptr)
         {
             ActionEditorController* actionEditorToRemove = _getActionEditorFromViewModelOfAction(actionEditorC->originalViewModel());
-            if (actionEditorToRemove != NULL)
+            if (actionEditorToRemove != nullptr)
             {
                 _hashActionEditorControllerFromViewModelOfAction.remove(actionEditorC->originalViewModel());
 
@@ -537,17 +539,17 @@ void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC
         // Remove action editor from model of action
         else
         {
-            ActionM* action = NULL;
-            if (actionEditorC->originalAction() != NULL) {
+            ActionM* action = nullptr;
+            if (actionEditorC->originalAction() != nullptr) {
                 action = actionEditorC->originalAction();
             }
             else {
                 action = actionEditorC->editedAction();
             }
-            if (action != NULL)
+            if (action != nullptr)
             {
                 ActionEditorController* actionEditorToRemove = _getActionEditorFromModelOfAction(action);
-                if (actionEditorToRemove != NULL)
+                if (actionEditorToRemove != nullptr)
                 {
                     _hashActionEditorControllerFromModelOfAction.remove(action);
 
@@ -572,7 +574,7 @@ void ScenarioController::setActionInPalette(int index, ActionM* actionM)
     if (index < _actionsInPaletteList.count())
     {
         ActionInPaletteVM* actionInPalette = _actionsInPaletteList.at(index);
-        if (actionInPalette != NULL) {
+        if (actionInPalette != nullptr) {
             actionInPalette->setmodelM(actionM);
         }
     }
@@ -586,7 +588,7 @@ void ScenarioController::setActionInPalette(int index, ActionM* actionM)
  */
 void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int lineIndex)
 {
-    if (actionM != NULL)
+    if (actionM != nullptr)
     {
         int actionId = actionM->uid();
 
@@ -620,8 +622,8 @@ void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int l
                 _listOfActionsToEvaluate.append(actionVM);
 
                 // The new action VM is the next one to activate, we change the next timer trigger
-                if ( ((_nextActionToActivate == NULL) && (timeInMs >= _currentTime.msecsSinceStartOfDay()))
-                     || ((_nextActionToActivate != NULL) && (timeInMs < _nextActionToActivate->startTime())) )
+                if ( ((_nextActionToActivate == nullptr) && (timeInMs >= _currentTime.msecsSinceStartOfDay()))
+                     || ((_nextActionToActivate != nullptr) && (timeInMs < _nextActionToActivate->startTime())) )
                 {
                     // Stop the timer if necessary
                     if (_timerToExecuteActions.isActive()) {
@@ -635,7 +637,7 @@ void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int l
         }
         else {
             delete actionVM;
-            actionVM = NULL;
+            actionVM = nullptr;
         }
     }
 }
@@ -647,7 +649,7 @@ void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int l
  */
 void ScenarioController::addActionVMAtCurrentTime(ActionM* actionM)
 {
-    if (actionM != NULL) {
+    if (actionM != nullptr) {
         addActionVMAtTime(actionM, _currentTime.msecsSinceStartOfDay(), 0);
     }
 }
@@ -659,7 +661,7 @@ void ScenarioController::addActionVMAtCurrentTime(ActionM* actionM)
  */
 void ScenarioController::removeActionVMfromTimeLine(ActionVM* actionVM)
 {
-    if ((actionVM != NULL) && (actionVM->modelM() != NULL) && _actionsInTimeLine.contains(actionVM))
+    if ((actionVM != nullptr) && (actionVM->modelM() != nullptr) && _actionsInTimeLine.contains(actionVM))
     {
         _actionsInTimeLine.remove(actionVM);
 
@@ -685,7 +687,7 @@ void ScenarioController::removeActionVMfromTimeLine(ActionVM* actionVM)
 
                 // Get the "Sorted" list of view models of action with the index of the line (in the time line)
                 I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndex);
-                if ((sortedListOfActionVM != NULL) && sortedListOfActionVM->contains(actionVM))
+                if ((sortedListOfActionVM != nullptr) && sortedListOfActionVM->contains(actionVM))
                 {
                     // Remove the view model of action
                     sortedListOfActionVM->remove(actionVM);
@@ -728,7 +730,7 @@ void ScenarioController::removeActionVMfromTimeLine(ActionVM* actionVM)
 
         // Delete the action editor if necessary
         ActionEditorController* actionEditorC = _getActionEditorFromViewModelOfAction(actionVM);
-        if (actionEditorC != NULL)
+        if (actionEditorC != nullptr)
         {
             _hashActionEditorControllerFromViewModelOfAction.remove(actionVM);
 
@@ -752,7 +754,7 @@ void ScenarioController::initializeConditionsConnectionsOfAllActions()
 {
     for (ActionM* actionM : _actionsList.toList())
     {
-        if (actionM != NULL) {
+        if (actionM != nullptr) {
             actionM->initializeConditionsConnections();
         }
     }
@@ -766,7 +768,7 @@ void ScenarioController::resetConditionsConnectionsOfAllActions()
 {
     for (ActionM* actionM : _actionsList.toList())
     {
-        if (actionM != NULL) {
+        if (actionM != nullptr) {
             actionM->resetConditionsConnections();
         }
     }
@@ -783,7 +785,7 @@ void ScenarioController::resetConditionsConnectionsOfAllActions()
 bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time, int lineIndex, ActionVM* draggedActionVM)
 {
     // The dragged action is defined and is currently on the first line
-    if ((draggedActionVM != NULL) && (draggedActionVM->lineInTimeLine() == 0))
+    if ((draggedActionVM != nullptr) && (draggedActionVM->lineInTimeLine() == 0))
     {
         // Prevent modification on the first line because it is reserved for live insertions from the palette
         return false;
@@ -796,7 +798,7 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
 
     // Get the "Sorted" list of view models of action with the index of the line (in the time line)
     I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndex);
-    if (sortedListOfActionVM != NULL)
+    if (sortedListOfActionVM != nullptr)
     {
         int insertionStartTime = time;
         int insertionEndTime = time;
@@ -828,8 +830,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
         {
             ActionVM* actionVM = sortedListOfActionVM->at(indexAction);
 
-            if ((actionVM != NULL) && (actionVM->modelM() != NULL)
-                    && ((draggedActionVM == NULL) || (draggedActionVM != actionVM)) )
+            if ((actionVM != nullptr) && (actionVM->modelM() != nullptr)
+                    && ((draggedActionVM == nullptr) || (draggedActionVM != actionVM)) )
             {
                 //qDebug() << "Insert" << insertionStartTime << insertionEndTime << "inside" << actionVM->startTime() << actionVM->endTime();
 
@@ -877,20 +879,20 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
  */
 void ScenarioController::executeEffectsOfAction(ActionM* action)
 {
-    if ((action != NULL) && !action->effectsList()->isEmpty())
+    if ((action != nullptr) && !action->effectsList()->isEmpty())
     {
         // Active the mapping if needed
-        if ((_modelManager != NULL) && !_modelManager->isMappingActivated()) {
+        if ((_modelManager != nullptr) && !_modelManager->isMappingActivated()) {
             _modelManager->setisMappingActivated(true);
         }
 
         // Execute the actions effects
-        foreach (ActionEffectVM* effectVM, action->effectsList()->toList())
+        for (ActionEffectVM* effectVM : action->effectsList()->toList())
         {
-            if ((effectVM != NULL) && (effectVM->modelM() != NULL))
+            if ((effectVM != nullptr) && (effectVM->modelM() != nullptr))
             {
                 // Get the pair with the agent and the command (with parameters) of the effect
-                QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters = effectVM->modelM()->getAgentAndCommandWithParameters();
+                QPair<AgentsGroupedByNameVM*, QStringList> pairAgentAndCommandWithParameters = effectVM->modelM()->getAgentAndCommandWithParameters();
 
                 // Execute the command for the agent
                 _executeCommandForAgent(pairAgentAndCommandWithParameters.first, pairAgentAndCommandWithParameters.second);
@@ -911,13 +913,13 @@ void ScenarioController::clearScenario()
     _stopScenario();
 
     // Clean-up current selection
-    setselectedAction(NULL);
+    setselectedAction(nullptr);
 
     // Delete actions VM from the timeline
     _actionsInTimeLine.deleteAllItems();
 
     // Clean-up current selection
-    setselectedActionVMInTimeline(NULL);
+    setselectedActionVMInTimeline(nullptr);
 
     // Clear the lists of action editors
     _hashActionEditorControllerFromModelOfAction.clear();
@@ -934,8 +936,8 @@ void ScenarioController::clearScenario()
     // Reset actions in palette
     for (ActionInPaletteVM* actionInPalette : _actionsInPaletteList.toList())
     {
-        if (actionInPalette != NULL) {
-            actionInPalette->setmodelM(NULL);
+        if (actionInPalette != nullptr) {
+            actionInPalette->setmodelM(nullptr);
         }
     }
 
@@ -952,7 +954,7 @@ void ScenarioController::clearScenario()
  */
 void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineIndex)
 {
-    if ((actionVM != NULL) && (actionVM->modelM() != NULL) && (timeInMilliseconds >= 0) && (lineIndex >= 0))
+    if ((actionVM != nullptr) && (actionVM->modelM() != nullptr) && (timeInMilliseconds >= 0) && (lineIndex >= 0))
     {
         bool canInsert = canInsertActionVMTo(actionVM->modelM(), timeInMilliseconds, lineIndex, actionVM);
 
@@ -995,7 +997,7 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
             {
                 // Remove the actionVM from the previous line if different
                 I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(actionVM->lineInTimeLine());
-                if (sortedListOfActionVM != NULL)
+                if (sortedListOfActionVM != nullptr)
                 {
                     sortedListOfActionVM->remove(actionVM);
                 }
@@ -1010,7 +1012,7 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
 
                 // Insert in the new line
                 sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndex);
-                if (sortedListOfActionVM != NULL)
+                if (sortedListOfActionVM != nullptr)
                 {
                     // Insert the action
                     sortedListOfActionVM->append(actionVM);
@@ -1037,38 +1039,12 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
  */
 bool ScenarioController::isInsertedInTimeLine(ActionM* actionM)
 {
-    if ((actionM != NULL) && _hashFromUidToViewModelsOfAction.contains(actionM->uid()))
+    if ((actionM != nullptr) && _hashFromUidToViewModelsOfAction.contains(actionM->uid()))
     {
         return true;
     }
     else {
         return false;
-    }
-}
-
-
-/**
-  * @brief Slot called when an agent is added in the mapping
-  */
-void ScenarioController::onAgentInMappingAdded(AgentInMappingVM* agentAdded)
-{
-    if ((agentAdded != NULL) && !_mapFromNameToAgentInMapping.contains(agentAdded->name()))
-    {
-        _mapFromNameToAgentInMapping.insert(agentAdded->name(), agentAdded);
-        _agentsInMappingList.append(agentAdded);
-    }
-}
-
-
-/**
-  * @brief Slot called when an agent is removed from the mapping
-  */
-void ScenarioController::onAgentInMappingRemoved(AgentInMappingVM* agentRemoved)
-{
-    if ((agentRemoved != NULL) && _mapFromNameToAgentInMapping.contains(agentRemoved->name()))
-    {
-        _mapFromNameToAgentInMapping.remove(agentRemoved->name());
-        _agentsInMappingList.remove(agentRemoved);
     }
 }
 
@@ -1080,7 +1056,7 @@ void ScenarioController::onAgentInMappingRemoved(AgentInMappingVM* agentRemoved)
 void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
 {
     ActionVM* actionVM = qobject_cast<ActionVM*>(sender());
-    if ((actionVM != NULL) && (actionExecution != NULL))
+    if ((actionVM != nullptr) && (actionExecution != nullptr))
     {
         int currentTimeInMilliSeconds = actionVM->startTime() + actionExecution->reverseTime();
 
@@ -1094,7 +1070,7 @@ void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
         if ((actionVM->endTime() >= 0) && (currentTimeInMilliSeconds >= actionVM->endTime()))
         {
             // ...we remove the current execution
-            actionVM->setcurrentExecution(NULL);
+            actionVM->setcurrentExecution(nullptr);
 
             // Remove from the list of "active" actions
             disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
@@ -1110,7 +1086,7 @@ void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
 void ScenarioController::onRearmAction()
 {
     ActionVM* actionVM = qobject_cast<ActionVM*>(sender());
-    if (actionVM != NULL)
+    if (actionVM != nullptr)
     {
         // Initialize the start time
         int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay() - actionVM->startTime();
@@ -1119,7 +1095,7 @@ void ScenarioController::onRearmAction()
         if (!actionVM->executionsList()->isEmpty())
         {
             ActionExecutionVM* lastActionExecution = actionVM->executionsList()->at(actionVM->executionsList()->count() -1);
-            if (lastActionExecution != NULL)
+            if (lastActionExecution != nullptr)
             {
                 currentTimeInMilliSeconds = lastActionExecution->executionTime();
 
@@ -1139,7 +1115,7 @@ void ScenarioController::onRearmAction()
         if ((actionVM->endTime() >= 0) && (currentTimeInMilliSeconds >= actionVM->endTime()))
         {
             // ...we remove the current execution
-            actionVM->setcurrentExecution(NULL);
+            actionVM->setcurrentExecution(nullptr);
 
             // Remove from the list of "active" actions
             disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
@@ -1170,16 +1146,16 @@ void ScenarioController::_onTimeout_ExecuteActions()
         //ActionVM* actionToExecute = _listOfActionsToEvaluate.at(0);
 
         int currentTimeInMilliSeconds = 0;
-        if (_nextActionToActivate != NULL) {
+        if (_nextActionToActivate != nullptr) {
             currentTimeInMilliSeconds = _nextActionToActivate->startTime();
         }
-        ActionVM* tmpNextActionToActivate = NULL;
+        ActionVM* tmpNextActionToActivate = nullptr;
 
 
         // Traverse the list of actions to evaluate
         for (ActionVM* actionVM : _listOfActionsToEvaluate.toList())
         {
-            if ((actionVM != NULL) && (actionVM->modelM() != NULL))
+            if ((actionVM != nullptr) && (actionVM->modelM() != nullptr))
             {
                 // Current time is after the start time of the action
                 if (actionVM->startTime() <= currentTimeInMilliSeconds)
@@ -1187,7 +1163,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
                     ActionExecutionVM* actionExecution = actionVM->currentExecution();
 
                     // Check if an action execution exists and has not already been executed
-                    if ((actionExecution != NULL) && !actionExecution->isExecuted())
+                    if ((actionExecution != nullptr) && !actionExecution->isExecuted())
                     {
                         if (actionVM->modelM()->isValid()) {
                             // Execute action
@@ -1225,7 +1201,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
             }
         }
 
-        if (tmpNextActionToActivate != NULL)
+        if (tmpNextActionToActivate != nullptr)
         {
             // Set the next action to activate
             setnextActionToActivate(tmpNextActionToActivate);
@@ -1235,7 +1211,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
         }
         else {
             // Reset the next action to activate
-            setnextActionToActivate(NULL);
+            setnextActionToActivate(nullptr);
         }
     }
 }
@@ -1259,10 +1235,10 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
     // Traverse the list of active actions (the current time (is) was between start time and end time of these actions)
     for (ActionVM* actionVM : _listOfActiveActions.toList())
     {
-        if ((actionVM != NULL) && (actionVM->modelM() != NULL))
+        if ((actionVM != nullptr) && (actionVM->modelM() != nullptr))
         {
             ActionExecutionVM* actionExecution = actionVM->currentExecution();
-            if (actionExecution != NULL)
+            if (actionExecution != nullptr)
             {
                 // Current time is after the start time of the action
                 // the action has not finished or is forever
@@ -1305,14 +1281,14 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
                              || (actionExecution->neverExecuted() && (actionVM->modelM()->validityDurationType() == ValidationDurationTypes::CUSTOM)) )
                         {
                             // ...we remove the current execution
-                            actionVM->setcurrentExecution(NULL);
+                            actionVM->setcurrentExecution(nullptr);
 
                             // only if the execution has not be done
                             if (!actionExecution->isExecuted())
                             {
                                 actionVM->executionsList()->remove(actionExecution);
 
-                                // FIXME: print for DEBUG
+                                // Print for DEBUG
                                 //qDebug() << "_onTimeout_DelayOrExecuteActions: execution removed in" << actionVM->modelM()->name() << "(" << actionVM->executionsList()->count() << ")";
 
                                 // Free memory
@@ -1380,7 +1356,7 @@ QString ScenarioController::_buildNewActionName()
  */
 void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert, int lineNumberRef)
 {
-    if ((actionVMToInsert != NULL) && (actionVMToInsert->modelM() != NULL))
+    if ((actionVMToInsert != nullptr) && (actionVMToInsert->modelM() != nullptr))
     {
         int insertionStartTime = actionVMToInsert->startTime();
 
@@ -1412,7 +1388,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
 
                 // Get the "Sorted" list of view models of action with the index of the line (in the time line)
                 I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineNumber);
-                if (sortedListOfActionVM != NULL)
+                if (sortedListOfActionVM != nullptr)
                 {
                     // Insert the action
                     sortedListOfActionVM->append(actionVMToInsert);
@@ -1472,12 +1448,12 @@ void ScenarioController::_startScenario()
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
     // Active the mapping if needed
-    if ((_modelManager != NULL) && !_modelManager->isMappingActivated()) {
+    if ((_modelManager != nullptr) && !_modelManager->isMappingActivated()) {
         _modelManager->setisMappingActivated(true);
     }
 
     // Disconnect from signals
-    foreach (ActionVM* actionVM, _listOfActionsToEvaluate.toList())
+    for (ActionVM* actionVM : _listOfActionsToEvaluate.toList())
     {
         disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
         disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
@@ -1486,18 +1462,18 @@ void ScenarioController::_startScenario()
     // Reset lists and next action to activate
     _listOfActionsToEvaluate.clear();
     _listOfActiveActions.clear();
-    setnextActionToActivate(NULL);
+    setnextActionToActivate(nullptr);
 
     // "Future" actions previously added to the time line (on the first line) from the "palette" must be removed
     QList<ActionVM*> futureActionsOnFirstLineToRemove;
 
-    ActionVM* tmpNextActionToActivate = NULL;
+    ActionVM* tmpNextActionToActivate = nullptr;
 
     // Look for the current and futures actions
     for (ActionVM* actionVM : _actionsInTimeLine.toList())
     {
         // Ends in the future
-        if ((actionVM != NULL) && ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1)) )
+        if ((actionVM != nullptr) && ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1)) )
         {
             // First line is reserved for live insertions from the palette
             if (actionVM->lineInTimeLine() == 0)
@@ -1523,8 +1499,8 @@ void ScenarioController::_startScenario()
                 else
                 {
                     // Check the next action to activate
-                    if ( (tmpNextActionToActivate == NULL)
-                         || ((tmpNextActionToActivate != NULL) && (tmpNextActionToActivate->startTime() > actionVM->startTime())) )
+                    if ( (tmpNextActionToActivate == nullptr)
+                         || ((tmpNextActionToActivate != nullptr) && (tmpNextActionToActivate->startTime() > actionVM->startTime())) )
                     {
                         tmpNextActionToActivate = actionVM;
                     }
@@ -1544,7 +1520,7 @@ void ScenarioController::_startScenario()
         }
     }
 
-    if (tmpNextActionToActivate != NULL) {
+    if (tmpNextActionToActivate != nullptr) {
         setnextActionToActivate(tmpNextActionToActivate);
     }
 
@@ -1558,7 +1534,7 @@ void ScenarioController::_startScenario()
 
     // Start timers
     // init the timer with the time of the next action execution
-    if (_nextActionToActivate != NULL) {
+    if (_nextActionToActivate != nullptr) {
         _timerToExecuteActions.start(_nextActionToActivate->startTime() - currentTimeInMilliSeconds);
     }
 
@@ -1584,7 +1560,7 @@ void ScenarioController::_stopScenario()
     // De-active timers for revert and rearm
     for (ActionVM* actionVM : _listOfActiveActions.toList())
     {
-        if (actionVM != NULL)
+        if (actionVM != nullptr)
         {
             // Disconnect revert action
             if (actionVM->timerToReverse()->isActive()) {
@@ -1601,26 +1577,10 @@ void ScenarioController::_stopScenario()
     }
 
     // Reset the next action VM to activate
-    setnextActionToActivate(NULL);
+    setnextActionToActivate(nullptr);
 
     // Reset the connections for conditions of all actions
     resetConditionsConnectionsOfAllActions();
-}
-
-
-/**
- * @brief Get the agent in mapping from an agent name
- * @param agentName
- * @return
- */
-AgentInMappingVM* ScenarioController::_getAgentInMappingFromName(QString agentName)
-{
-    if (_mapFromNameToAgentInMapping.contains(agentName)) {
-        return _mapFromNameToAgentInMapping.value(agentName);
-    }
-    else {
-        return NULL;
-    }
 }
 
 
@@ -1630,7 +1590,7 @@ AgentInMappingVM* ScenarioController::_getAgentInMappingFromName(QString agentNa
  */
 void ScenarioController::_executeReverseEffectsOfAction(ActionExecutionVM* actionExecution)
 {
-    if ((actionExecution != NULL) && actionExecution->shallRevert())
+    if ((_modelManager != nullptr) && (actionExecution != nullptr) && actionExecution->shallRevert())
     {
         // Get the list of pairs <agent name, reverse command (and parameters)>
         QList<QPair<QString, QStringList>> reverseCommandsForAgents = actionExecution->getReverseCommands();
@@ -1639,11 +1599,11 @@ void ScenarioController::_executeReverseEffectsOfAction(ActionExecutionVM* actio
         {
             QPair<QString, QStringList> pairAgentNameAndReverseCommand = reverseCommandsForAgents.at(i);
 
-            AgentInMappingVM* agent = _getAgentInMappingFromName(pairAgentNameAndReverseCommand.first);
-            if (agent != NULL)
+            AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(pairAgentNameAndReverseCommand.first);
+            if (agentsGroupedByName != nullptr)
             {
                 // Execute the (reverse) command for the agent
-                _executeCommandForAgent(agent, pairAgentNameAndReverseCommand.second);
+                _executeCommandForAgent(agentsGroupedByName, pairAgentNameAndReverseCommand.second);
             }
         }
     }
@@ -1652,27 +1612,34 @@ void ScenarioController::_executeReverseEffectsOfAction(ActionExecutionVM* actio
 
 /**
  * @brief Execute a command for an agent
- * @param agent
+ * @param agentsGroupedByName
  * @param commandAndParameters
  */
-void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStringList commandAndParameters)
+void ScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* agentsGroupedByName, QStringList commandAndParameters)
 {
-    if ((agent != NULL) && (commandAndParameters.count() > 0))
+    if ((agentsGroupedByName != nullptr) && !commandAndParameters.isEmpty())
     {
-        qInfo() << "Execute command" << commandAndParameters << "for agent" << agent->name() << "(" << agent->peerIdsList().count() << "peer ids)";
+        qInfo() << "Execute command" << commandAndParameters << "for agent" << agentsGroupedByName->name() << "(" << agentsGroupedByName->peerIdsList().count() << "peer ids)";
 
         QString command = commandAndParameters.at(0);
 
         // START
         if (command == command_StartAgent)
         {
-            foreach (AgentM* model, agent->models()->toList())
+            if (_modelManager != nullptr)
             {
-                // Check if the model has a hostname
-                if ((model != NULL) && !model->hostname().isEmpty())
+                for (AgentM* model : agentsGroupedByName->models()->toList())
                 {
-                    // Emit signal "Command asked to launcher"
-                    Q_EMIT commandAskedToLauncher(command, model->hostname(), model->commandLine());
+                    // Check if the model has a hostname
+                    if ((model != nullptr) && !model->hostname().isEmpty())
+                    {
+                        // Get the peer id of the Launcher on this host
+                        QString peerIdOfLauncher = _modelManager->getPeerIdOfLauncherOnHost(model->hostname());
+                        if (!peerIdOfLauncher.isEmpty())
+                        {
+                            Q_EMIT commandAskedToLauncher(peerIdOfLauncher, command, model->commandLine());
+                        }
+                    }
                 }
             }
         }
@@ -1682,10 +1649,10 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                   || (command == command_FreezeAgent) || (command == command_UnfreezeAgent) )
         {
             // Emit signal "Command asked to agent"
-            Q_EMIT commandAskedToAgent(agent->peerIdsList(), command);
+            Q_EMIT commandAskedToAgent(agentsGroupedByName->peerIdsList(), command);
         }
         // MAP or UNMAP
-        else if ((command == "MAP") || (command == "UNMAP"))
+        else if ((command == command_MapAgents) || (command == command_UnmapAgents))
         {
             if (commandAndParameters.count() == 4)
             {
@@ -1694,10 +1661,10 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                 QString outputName = commandAndParameters.at(3);
 
                 // Emit signal "Command asked to agent about Mapping Input"
-                Q_EMIT commandAskedToAgentAboutMappingInput(agent->peerIdsList(), command, inputName, outputAgentName, outputName);
+                Q_EMIT commandAskedToAgentAboutMappingInput(agentsGroupedByName->peerIdsList(), command, inputName, outputAgentName, outputName);
             }
             else {
-                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to map an input of agent" << agent->name();
+                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to map an input of agent" << agentsGroupedByName->name();
             }
         }
         // SET_INPUT / SET_OUTPUT / SET_PARAMETER
@@ -1709,10 +1676,10 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                 QString value = commandAndParameters.at(2);
 
                 // Emit signal "Command asked to agent about Setting Value"
-                Q_EMIT commandAskedToAgentAboutSettingValue(agent->peerIdsList(), command, agentIOPName, value);
+                Q_EMIT commandAskedToAgentAboutSettingValue(agentsGroupedByName->peerIdsList(), command, agentIOPName, value);
             }
             else {
-                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to set a value to agent" << agent->name();
+                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to set a value to agent" << agentsGroupedByName->name();
             }
         }
     }
@@ -1727,7 +1694,7 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
  */
 void ScenarioController::_executeAction(ActionVM* actionVM, ActionExecutionVM* actionExecution, int currentTimeInMilliSeconds)
 {
-    if ((actionVM != NULL) && (actionVM->modelM() != NULL) && (actionExecution != NULL))
+    if ((actionVM != nullptr) && (actionVM->modelM() != nullptr) && (actionExecution != nullptr))
     {
         if (actionExecution->shallRevert()) {
             // Initialize the reverse command (and parameters) for each effect
@@ -1762,7 +1729,7 @@ ActionM* ScenarioController::_getModelOfActionWithId(int actionId)
         return _hashFromUidToModelOfAction.value(actionId);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1794,7 +1761,7 @@ I2CustomItemSortFilterListModel<ActionVM>* ScenarioController::_getSortedListOfA
         return _hashFromLineIndexToSortedViewModelsOfAction.value(index);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1809,7 +1776,7 @@ ActionEditorController* ScenarioController::_getActionEditorFromModelOfAction(Ac
         return _hashActionEditorControllerFromModelOfAction.value(action);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1824,6 +1791,6 @@ ActionEditorController* ScenarioController::_getActionEditorFromViewModelOfActio
         return _hashActionEditorControllerFromViewModelOfAction.value(action);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }

@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -42,8 +42,8 @@ class AgentMappingM : public QObject
     // List of (mapping) elements of our agent mapping
     I2_QOBJECT_LISTMODEL(ElementMappingM, mappingElements)
 
-    // List of the ids of mapping elements
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, idsOfMappingElements)
+    // List of all names of mapping elements
+    //I2_CPP_NOSIGNAL_PROPERTY(QStringList, namesOfMappingElements)
 
 
 public:
@@ -63,7 +63,13 @@ public:
     ~AgentMappingM();
 
 
-Q_SIGNALS:
+    /**
+     * @brief Get a mapping element from its name
+     * @param name
+     * @return
+     */
+    ElementMappingM* getMappingElementFromName(QString name);
+
 
 private Q_SLOTS:
 
@@ -71,6 +77,12 @@ private Q_SLOTS:
      * @brief Slot called when the list of mapping elements changed
      */
     void _onMappingElementsListChanged();
+
+
+private:
+
+    // Hash table from a name to a model of mapping element
+    QHash<QString, ElementMappingM*> _hashFromNameToMappingElement;
 
 };
 

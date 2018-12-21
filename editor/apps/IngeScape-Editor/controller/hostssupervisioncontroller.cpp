@@ -9,7 +9,6 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *      Bruno Lemenicier   <lemenicier@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
@@ -24,14 +23,17 @@
  * @brief Constructor
  * @param parent
  */
-HostsSupervisionController::HostsSupervisionController(QObject *parent) : QObject(parent),
-    _selectedHost(NULL)
+HostsSupervisionController::HostsSupervisionController(IngeScapeModelManager* modelManager,
+                                                       QObject *parent) : QObject(parent),
+    _selectedHost(nullptr),
+    _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Hosts are sorted on their name (alphabetical order)
     _hostsList.setSortProperty("name");
+
 }
 
 
@@ -41,7 +43,7 @@ HostsSupervisionController::HostsSupervisionController(QObject *parent) : QObjec
 HostsSupervisionController::~HostsSupervisionController()
 {
     // Clean-up current selection
-    setselectedHost(NULL);
+    setselectedHost(nullptr);
 
     // Clear the hash table
     _hashFromNameToHost.clear();
@@ -51,21 +53,33 @@ HostsSupervisionController::~HostsSupervisionController()
 
     // Clear the list of agents
     _allAgents.clear();
+
+    // Reset pointers
+    _modelManager = nullptr;
 }
 
 
 /**
- * @brief Remove each UN-active agent (agent with state OFF) from the global list with all agents
+ * @brief Remove a model of agent from a host
+ * @param agent
+ * @param host
  */
-void HostsSupervisionController::removeUNactiveAgents()
+void HostsSupervisionController::removeAgentModelFromHost(AgentM* agent, HostVM* host)
 {
-    QList<AgentM*> copy = QList<AgentM*>(_allAgents);
-
-    // Remove each model with state OFF
-    for (AgentM* model : copy)
+    if ((host != nullptr) && (agent != nullptr) && (_modelManager != nullptr))
     {
-        if ((model != NULL) && !model->isON()) {
-            _allAgents.removeOne(model);
+        if (host->agentsList()->contains(agent))
+        {
+            host->agentsList()->remove(agent);
+
+            qDebug() << "Remove agent" << agent->name() << "from host" << host->name();
+        }
+
+        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agent->name());
+        if (agentsGroupedByName != nullptr)
+        {
+            // Remove a model of agent from its host
+            agentsGroupedByName->removeAgentModelFromHost(agent);
         }
     }
 }
@@ -75,15 +89,15 @@ void HostsSupervisionController::removeUNactiveAgents()
  * @brief Slot called when a new model of host has been created
  * @param host
  */
-void HostsSupervisionController::onHostModelCreated(HostM* host)
+void HostsSupervisionController::onHostModelHasBeenCreated(HostM* host)
 {
-    if (host != NULL)
+    if (host != nullptr)
     {
-        QString hostname = host->name();
+        QString hostName = host->name();
 
         // Get the view model of host with its name
-        HostVM* hostVM = _getHostWithName(hostname);
-        if (hostVM == NULL)
+        HostVM* hostVM = _getHostWithName(hostName);
+        if (hostVM == nullptr)
         {
             // Create a view model for this model of host
             hostVM = new HostVM(host, this);
@@ -91,17 +105,16 @@ void HostsSupervisionController::onHostModelCreated(HostM* host)
             connect(hostVM, &HostVM::commandAskedToAgent, this, &HostsSupervisionController::commandAskedToAgent);
             connect(hostVM, &HostVM::commandAskedToLauncher, this, &HostsSupervisionController::commandAskedToLauncher);
 
-            _hashFromNameToHost.insert(hostname, hostVM);
+            _hashFromNameToHost.insert(hostName, hostVM);
 
-            // Add to the sorted list of hosts
             _hostsList.append(hostVM);
 
             // Associate host with existing agents if necessary
             for (AgentM* agent : _allAgents)
             {
-                if ((agent != NULL) && (agent->hostname() == hostname) && !hostVM->agentsList()->contains(agent))
+                if ((agent != nullptr) && (agent->hostname() == hostName) && !hostVM->agentsList()->contains(agent))
                 {
-                    qDebug() << "Add (existing) agent" << agent->name() << "to new host" << hostname;
+                    qDebug() << "Add (existing) agent" << agent->name() << "to new host" << hostName;
 
                     hostVM->agentsList()->append(agent);
                 }
@@ -112,26 +125,26 @@ void HostsSupervisionController::onHostModelCreated(HostM* host)
 
 
 /**
- * @brief Slot called when a model of host will be removed
+ * @brief Slot called when a model of host will be deleted
  * @param host
  */
-void HostsSupervisionController::onHostModelWillBeRemoved(HostM* host)
+void HostsSupervisionController::onHostModelWillBeDeleted(HostM* host)
 {
-    if (host != NULL)
+    if (host != nullptr)
     {
-        QString hostname = host->name();
+        QString hostName = host->name();
 
         // Get the view model of host with its name
-        HostVM* hostVM = _getHostWithName(hostname);
-        if (hostVM != NULL)
+        HostVM* hostVM = _getHostWithName(hostName);
+        if (hostVM != nullptr)
         {
             disconnect(hostVM, 0, this, 0);
 
-            _hashFromNameToHost.remove(hostname);
+            _hashFromNameToHost.remove(hostName);
 
             if (_selectedHost == hostVM) {
                 // Clean-up current selection
-                setselectedHost(NULL);
+                setselectedHost(nullptr);
             }
 
             // Remove from the sorted list of hosts
@@ -148,22 +161,25 @@ void HostsSupervisionController::onHostModelWillBeRemoved(HostM* host)
  * @brief Slot called when a new model of agent has been created
  * @param agent
  */
-void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
+void HostsSupervisionController::onAgentModelHasBeenCreated(AgentM* agent)
 {
-    if (agent != NULL)
+    if ((agent != nullptr) && !agent->hostname().isEmpty())
     {
-        // Connect to signals from this new agent
-        connect(agent, &AgentM::networkDataWillBeCleared, this, &HostsSupervisionController::_onNetworkDataOfAgentWillBeCleared);
-
         _allAgents.append(agent);
 
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
 
-        if ((hostVM != NULL) && !hostVM->agentsList()->contains(agent))
+        if ((hostVM != nullptr) && !hostVM->agentsList()->contains(agent))
         {
             // Add this agent to the host
             hostVM->agentsList()->append(agent);
+
+            if (hostVM->name() != HOSTNAME_NOT_DEFINED)
+            {
+                // This agent can be restarted
+                agent->setcanBeRestarted(true);
+            }
 
             qDebug() << "Add agent" << agent->name() << "to host" << hostVM->name();
         }
@@ -177,44 +193,14 @@ void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
  */
 void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
 {
-    if (agent != NULL)
+    if ((agent != nullptr) && !agent->hostname().isEmpty())
     {
-        // DIS-connect to signals from the agent
-        disconnect(agent, 0, this, 0);
-
         _allAgents.removeOne(agent);
 
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
 
-        if ((hostVM != NULL) && hostVM->agentsList()->contains(agent))
-        {
-            // Remove this agent from the host
-            hostVM->agentsList()->remove(agent);
-
-            qDebug() << "Remove agent" << agent->name() << "from host" << hostVM->name();
-        }
-    }
-}
-
-
-/**
- * @brief Slot called when the network data (of an agent) will be cleared
- * @param peerId
- */
-void HostsSupervisionController::_onNetworkDataOfAgentWillBeCleared(QString peerId)
-{
-    Q_UNUSED(peerId)
-
-    AgentM* agent = qobject_cast<AgentM*>(sender());
-    if (agent != NULL)
-    {
-        //qDebug() << "Hosts Supervision: on Network Data of agent" << agent->name() << "will be cleared" << agent->hostname() << "(" << agent->peerId() << ")";
-
-        // Get the view model of host with its name
-        HostVM* hostVM = _getHostWithName(agent->hostname());
-
-        if ((hostVM != NULL) && hostVM->agentsList()->contains(agent))
+        if ((hostVM != nullptr) && hostVM->agentsList()->contains(agent))
         {
             // Remove this agent from the host
             hostVM->agentsList()->remove(agent);
@@ -236,7 +222,6 @@ HostVM* HostsSupervisionController::_getHostWithName(QString hostName)
         return _hashFromNameToHost.value(hostName);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
-

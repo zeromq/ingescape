@@ -134,14 +134,14 @@ Item {
     // Bottom panel
     //
     Scenario.ScenarioTimeLine {
-        id : bottomPanel
+        id: bottomPanel
         anchors {
             left: leftPanel.right
             right: parent.right
             bottom: parent.bottom
         }
         height: 0
-        controller: IngeScapeEditorC.scenarioC;
+        controller: IngeScapeEditorC.scenarioC
     }
 
 
@@ -159,7 +159,7 @@ Item {
             bottom: parent.bottom
         }
 
-        color : IngeScapeTheme.agentsMappingBackgroundColor;
+        color : IngeScapeTheme.agentsMappingBackgroundColor
 
         I2CustomRectangle {
             anchors {
@@ -310,6 +310,23 @@ Item {
                 }
             }
         }
+    }
+
+
+    //
+    // Model Visualizer
+    //
+    Loader {
+        id: loaderOfModelVisualizer
+
+        anchors {
+            top: parent.top
+            left: leftPanel.right
+            right: parent.right
+        }
+        height: 200
+
+        source: IngeScapeEditorC.isAvailableModelVisualizer ? "ModelVisualizer.qml" : ""
     }
 
 

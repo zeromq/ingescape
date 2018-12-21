@@ -42,7 +42,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit CollapsibleColumn(QQuickItem *parent = NULL);
+    explicit CollapsibleColumn(QQuickItem *parent = nullptr);
 
 
     /**

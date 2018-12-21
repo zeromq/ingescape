@@ -1,14 +1,13 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
- *      Vincent Deliencourt <deliencourt@ingenuity.io>
  *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
  *
  */
@@ -22,9 +21,7 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-
-#include "controller/ingescapelaunchermanager.h"
-#include <model/iop/outputm.h>
+#include <model/agentm.h>
 #include <model/publishedvaluem.h>
 
 
@@ -35,14 +32,11 @@ class NetworkController: public QObject
 {
     Q_OBJECT
 
+    // Model of our agent "IngeScape Editor"
+    I2_QML_PROPERTY_READONLY(AgentM*, agentEditor)
+
     // List of available network devices
     I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
-
-    // List of peer id of IngeScape Launchers
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdOfLaunchers)
-
-    // List of peer id of IngeScape Recorders
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdOfRecorders)
 
 
 public:
@@ -77,11 +71,42 @@ public:
 
 
     /**
+     * @brief Get the IngeScape type of a peer id
+     * @param peerId
+     * @return
+     */
+    IngeScapeTypes::Value getIngeScapeTypeOfPeerId(QString peerId);
+
+
+    /**
+     * @brief Manage a peer id which entered the network
+     * @param peerId
+     * @param ingeScapeType
+     */
+    void manageEnteredPeerId(QString peerId, IngeScapeTypes::Value ingeScapeType);
+
+
+    /**
+     * @brief Manage a peer id which exited the network
+     * @param peerId
+     */
+    void manageExitedPeerId(QString peerId);
+
+
+    /**
      * @brief Manage the message "MUTED / UN-MUTED"
      * @param peerId
      * @param message
      */
     void manageMessageMutedUnmuted(QString peerId, QString message);
+
+
+    /**
+     * @brief Manage the message "CAN BE FROZEN / CAN NOT BE FROZEN"
+     * @param peerId
+     * @param message
+     */
+    void manageMessageCanBeFrozenOrNot(QString peerId, QString message);
 
 
     /**
@@ -108,9 +133,10 @@ public:
 
     /**
      * @brief Send a command, parameters and the content of a JSON file to the recorder
+     * @param peerIdOfRecorder
      * @param commandAndParameters
      */
-    void sendCommandWithJsonToRecorder(QStringList commandAndParameters);
+    void sendCommandWithJsonToRecorder(QString peerIdOfRecorder, QStringList commandAndParameters);
 
 
 Q_SIGNALS:
@@ -247,6 +273,14 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when the flag "can be Frozen" from an agent updated
+     * @param peerId
+     * @param canBeFrozen
+     */
+    void canBeFrozenFromAgentUpdated(QString peerId, bool canBeFrozen);
+
+
+    /**
      * @brief Signal emitted when the flag "is Frozen" from an agent updated
      * @param peerId
      * @param isFrozen
@@ -322,22 +356,23 @@ public Q_SLOTS:
 
     /**
      * @brief Slot called when a command must be sent on the network to a launcher
+     * @param peerIdOfLauncher
      * @param command
-     * @param hostname
      * @param commandLine
      */
-    void onCommandAskedToLauncher(QString command, QString hostname, QString commandLine);
+    void onCommandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
 
 
     /**
      * @brief Slot called when a command must be sent on the network to a recorder
+     * @param peerIdOfRecorder
      * @param commandAndParameters
      */
-    void onCommandAskedToRecorder(QString commandAndParameters);
+    void onCommandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters);
 
 
     /**
-     * @brief Slot when a command must be sent on the network to an agent
+     * @brief Slot called when a command must be sent on the network to an agent
      * @param peerIdsList
      * @param command
      */
@@ -345,7 +380,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a command must be sent on the network to an agent about one of its output
+     * @brief Slot called when a command must be sent on the network to an agent about one of its output
      * @param peerIdsList
      * @param command
      * @param outputName
@@ -354,7 +389,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
+     * @brief Slot called when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
      * @param peerIdsList
      * @param command
      * @param agentIOPName
@@ -364,7 +399,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a command must be sent on the network to an agent about mapping one of its input
+     * @brief Slot called when a command must be sent on the network to an agent about mapping one of its input
      * @param peerIdsList
      * @param command
      * @param inputName
@@ -375,29 +410,19 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when inputs must be added to our Editor for a list of outputs
+     * @brief Slot called when inputs must be added to our Editor for a list of outputs
      * @param agentName
-     * @param outputsList
+     * @param newOutputsIds
      */
-    void onAddInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+    void onAddInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds);
 
 
     /**
-     * @brief Slot when inputs must be removed to our Editor for a list of outputs
+     * @brief Slot called when inputs must be removed to our Editor for a list of outputs
      * @param agentName
-     * @param outputsList
+     * @param oldOutputsIds
      */
-    void onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
-
-
-private:
-
-    /**
-     * @brief Get the number of agents in state ON with an "Input (on our editor) Name"
-     * @param inputName name of an input on our editor
-     * @return
-     */
-    int _getNumberOfAgentsONwithInputName(QString inputName);
+    void onRemoveInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds);
 
 
 private:
@@ -408,10 +433,8 @@ private:
     // Our IngeScape agent is successfully started if the result of igs_startWithDevice / igs_startWithIP is 1 (O otherwise)
     int _isIngeScapeAgentStarted;
 
-
-    // Map from "Input (on our editor) Name" to the number of agents in state ON
-    // Variants of an agent can have some outputs with same name and some outputs with different name
-    QHash<QString, int> _mapFromInputNameToNumberOfAgentsON;
+    // Hash table from a peer id to a type of IngeScape elements on the network
+    QHash<QString, IngeScapeTypes::Value> _hashFromPeerIdToIngeScapeType;
 
 };
 

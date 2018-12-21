@@ -61,7 +61,7 @@ bool ValuesHistorySortFilter::filterAccepts(QObject* item, int index) const
 
     // Try to cast our item as a model of "Published Value"
     PublishedValueM* publishedValue = qobject_cast<PublishedValueM*>(item);
-    if (publishedValue != NULL)
+    if (publishedValue != nullptr)
     {
         result = _selectedAgentNamesList.contains(publishedValue->agentName());
     }

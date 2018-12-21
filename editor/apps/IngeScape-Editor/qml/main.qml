@@ -61,6 +61,7 @@ ApplicationWindow {
 
         // Platform
         Menu {
+            id: menuPlatform
             title: qsTr("Platform")
 
             MenuItem {
@@ -110,6 +111,23 @@ ApplicationWindow {
 
                 onTriggered: {
                     I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "INGESCAPE");
+                }
+            }
+            MenuItem {
+                id: menuItemModelVisualizer
+
+                text: "" // (IngeScapeEditorC.isVisibleModelVisualizer ? qsTr("Hide the model visualizer") : qsTr("Show the model visualizer"))
+                visible: false
+
+                onTriggered: {
+                    if (IngeScapeEditorC.isVisibleModelVisualizer) {
+                        console.log("Hide the Model and View Model Visualizer");
+                        IngeScapeEditorC.isVisibleModelVisualizer = false;
+                    }
+                    else {
+                        console.log("Show the Model and View Model Visualizer");
+                        IngeScapeEditorC.isVisibleModelVisualizer = true;
+                    }
                 }
             }
         }
@@ -218,8 +236,8 @@ ApplicationWindow {
                 text: qsTr("Export agents...")
 
                 onTriggered: {
-                    if (IngeScapeEditorC.agentsSupervisionC) {
-                        IngeScapeEditorC.agentsSupervisionC.exportAgentsListToSelectedFile();
+                    if (IngeScapeEditorC.modelManager) {
+                        IngeScapeEditorC.modelManager.exportAgentsListToSelectedFile();
                     }
                 }
             }
@@ -410,6 +428,16 @@ ApplicationWindow {
 
                 // Load our QML UI
                 applicationLoader.source = "IngeScapeEditor.qml";
+
+                // Model and View Model Visualizer
+                if (IngeScapeEditorC.isAvailableModelVisualizer)
+                {
+                    menuItemModelVisualizer.visible = true;
+
+                    menuItemModelVisualizer.text = Qt.binding(function() {
+                        return (IngeScapeEditorC.isVisibleModelVisualizer ? qsTr("Hide the model visualizer") : qsTr("Show the model visualizer"));
+                    });
+                }
             }
         }
 

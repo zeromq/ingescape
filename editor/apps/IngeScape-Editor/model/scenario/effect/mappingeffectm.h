@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -21,7 +21,6 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-
 #include <model/scenario/effect/actioneffectm.h>
 
 
@@ -34,7 +33,7 @@ I2_ENUM_CUSTOM(MappingEffectValues, MAPPED, UNMAPPED)
 /**
  * @brief The MappingEffectM class defines an action effect on a mapping between two iop value
  */
-class MappingEffectM: public ActionEffectM
+class MappingEffectM : public ActionEffectM
 {
     Q_OBJECT
 
@@ -42,25 +41,23 @@ class MappingEffectM: public ActionEffectM
     I2_QML_PROPERTY(MappingEffectValues::Value, mappingEffectValue)
 
     // Output Agent
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, outputAgent)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentsGroupedByNameVM*, outputAgent)
 
     // Output of the output agent
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, output)
+    I2_QML_PROPERTY(AgentIOPVM*, output)
 
-    // Output name of the output agent
-    I2_QML_PROPERTY(QString, outputName)
+    // Input Agent is stored in the base class "ActionEffectM"
 
     // Input of the input agent
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, input)
-
-    // Input name of the input agent
-    I2_QML_PROPERTY(QString, inputName)
+    I2_QML_PROPERTY(AgentIOPVM*, input)
 
     // List of outputs
-    I2_QOBJECT_LISTMODEL(AgentIOPM, outputsList)
+    //I2_QOBJECT_LISTMODEL(AgentIOPVM, outputsList)
+    I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
 
     // List of inputs
-    I2_QOBJECT_LISTMODEL(AgentIOPM, inputsList)
+    //I2_QOBJECT_LISTMODEL(AgentIOPVM, inputsList)
+    I2_QOBJECT_LISTMODEL(InputVM, inputsList)
 
 
 public:
@@ -88,14 +85,14 @@ public:
     * @brief Setter for property "Agent"
     * @param agent
     */
-    void setagent(AgentInMappingVM* agent) Q_DECL_OVERRIDE;
+    void setagent(AgentsGroupedByNameVM* agent) Q_DECL_OVERRIDE;
 
 
     /**
      * @brief Get a pair with the agent and the command (with parameters) of our effect
      * @return
      */
-    QPair<AgentInMappingVM*, QStringList> getAgentAndCommandWithParameters() Q_DECL_OVERRIDE;
+    QPair<AgentsGroupedByNameVM*, QStringList> getAgentAndCommandWithParameters() Q_DECL_OVERRIDE;
 
 
     /**
@@ -118,44 +115,45 @@ protected Q_SLOTS:
 
 
     /**
+     * @brief Slot called when some view models of inputs have been added to the input agent(s grouped by name)
+     * @param newInputs
+     */
+    void _onInputsHaveBeenAddedToInputAgent(QList<InputVM*> newInputs);
+
+
+    /**
+     * @brief Slot called when some view models of outputs have been added to the output agent(s grouped by name)
+     * @param newOutputs
+     */
+    void _onOutputsHaveBeenAddedToOutputAgent(QList<OutputVM*> newOutputs);
+
+
+    /**
+     * @brief Slot called when some view models of inputs will be removed from the input agent(s grouped by name)
+     * @param oldInputs
+     */
+    void _onInputsWillBeRemovedToInputAgent(QList<InputVM*> oldInputs);
+
+
+    /**
+     * @brief Slot called when some view models of outputs will be removed from the output agent(s grouped by name)
+     * @param oldOutputs
+     */
+    void _onOutputsWillBeRemovedToOutputAgent(QList<OutputVM*> oldOutputs);
+
+
+    /**
      * @brief Called when our input is destroyed
      * @param sender
      */
-    void _onInputDestroyed(QObject* sender);
+    //void _onInputDestroyed(QObject* sender);
 
 
     /**
      * @brief Called when our output is destroyed
      * @param sender
      */
-    void _onOutputDestroyed(QObject* sender);
-
-
-    /**
-      * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the "Input agent (in mapping)"
-      */
-    void _onModelsOfIOPofInputAgentChanged();
-
-
-    /**
-      * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the "Output agent (in mapping)"
-      */
-    void _onModelsOfIOPofOutputAgentChanged();
-
-
-private:
-
-    /**
-    * @brief Update the selected input
-    */
-    void _updateInputSelected();
-
-
-    /**
-    * @brief Update the selected output
-    */
-    void _updateOutputSelected();
-
+    //void _onOutputDestroyed(QObject* sender);
 
 };
 

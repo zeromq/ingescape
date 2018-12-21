@@ -49,7 +49,7 @@ QString ActionConditionTypes::enumToString(int value)
  * @param parent
  */
 ActionConditionVM::ActionConditionVM(QObject *parent) : QObject(parent),
-    _modelM(NULL),
+    _modelM(nullptr),
     _conditionType(ActionConditionTypes::VALUE)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -62,12 +62,12 @@ ActionConditionVM::ActionConditionVM(QObject *parent) : QObject(parent),
  */
 ActionConditionVM::~ActionConditionVM()
 {
-    if (_modelM != NULL)
+    if (_modelM != nullptr)
     {
         ActionConditionM* tmp = _modelM;
-        setmodelM(NULL);
+        setmodelM(nullptr);
         delete tmp;
-        tmp = NULL;
+        tmp = nullptr;
     }
 }
 
@@ -77,7 +77,7 @@ ActionConditionVM::~ActionConditionVM()
  */
 void ActionConditionVM::setconditionType(ActionConditionTypes::Value value)
 {
-    if(_conditionType != value)
+    if (_conditionType != value)
     {
         _conditionType = value;
 
@@ -94,18 +94,17 @@ void ActionConditionVM::setconditionType(ActionConditionTypes::Value value)
  */
 void ActionConditionVM::_configureToType(ActionConditionTypes::Value value)
 {
-    AgentInMappingVM* agent = NULL;
+    AgentsGroupedByNameVM* agent = nullptr;
 
     // Delete the old condition if exists
-    if (_modelM != NULL)
+    if (_modelM != nullptr)
     {
         // Save the agent
         agent = _modelM->agent();
 
         ActionConditionM* tmp = _modelM;
-        setmodelM(NULL);
+        setmodelM(nullptr);
         delete tmp;
-        tmp = NULL;
     }
 
     // Create the new model of condition

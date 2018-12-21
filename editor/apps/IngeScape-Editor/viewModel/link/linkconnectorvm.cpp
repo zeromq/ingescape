@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -12,35 +12,30 @@
  *
  */
 
-#include "pointmapvm.h"
+#include "linkconnectorvm.h"
+
 
 /**
  * @brief Constructor
- * @param name
- * @param id
  * @param parent
  */
-PointMapVM::PointMapVM(QString name,
-                       QString id,
-                       QObject *parent) : AgentIOPVM(name,
-                                                     id,
-                                                     parent),
-    _position(QPointF()),
-    _isDefinedInAllDefinitions(true)
+LinkConnectorVM::LinkConnectorVM(QObject *parent) : QObject(parent),
+    _name(""),
+    _uid(""),
+    _position(QPointF())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    //qInfo() << "New Point Map VM" << _name << "(" << _id << ")";
 }
 
 
 /**
  * @brief Destructor
  */
-PointMapVM::~PointMapVM()
+LinkConnectorVM::~LinkConnectorVM()
 {
-   //qInfo() << "Delete Point Map VM" << _name << "(" << _id << ")";
+
 }
 
 
@@ -50,7 +45,7 @@ PointMapVM::~PointMapVM()
  * @param inputValueType
  * @return
  */
-bool PointMapVM::_canLinkOutputToInput(AgentIOPValueTypes::Value outputValueType, AgentIOPValueTypes::Value inputValueType)
+bool LinkConnectorVM::_canLinkOutputToInput(AgentIOPValueTypes::Value outputValueType, AgentIOPValueTypes::Value inputValueType)
 {
     bool result = false;
 
@@ -108,3 +103,4 @@ bool PointMapVM::_canLinkOutputToInput(AgentIOPValueTypes::Value outputValueType
     }
     return result;
 }
+

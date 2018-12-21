@@ -1,13 +1,14 @@
 /*
- *	ActionEffectM
+ *	IngeScape Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -20,7 +21,7 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-#include "viewModel/agentinmappingvm.h"
+#include <viewModel/agentsgroupedbynamevm.h>
 
 
 /**
@@ -30,8 +31,8 @@ class ActionEffectM : public QObject
 {
     Q_OBJECT
 
-    // View model of agent in mapping
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agent)
+    // View model of agents grouped by name
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentsGroupedByNameVM*, agent)
 
 
 public:
@@ -60,7 +61,7 @@ public:
      * @brief Get a pair with the agent and the command (with parameters) of our effect
      * @return
      */
-    virtual QPair<AgentInMappingVM*, QStringList> getAgentAndCommandWithParameters() = 0;
+    virtual QPair<AgentsGroupedByNameVM*, QStringList> getAgentAndCommandWithParameters() = 0;
 
 
     /**
@@ -81,11 +82,10 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Called when our agent is destroyed
+     * @brief FIXME custom event instead: Called when our agent is destroyed
      * @param sender
      */
     void _onAgentDestroyed(QObject* sender);
-
 
 };
 

@@ -21,7 +21,7 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-#include "viewModel/agentinmappingvm.h"
+#include <viewModel/agentsgroupedbynamevm.h>
 
 
 /**
@@ -31,8 +31,8 @@ class ActionConditionM: public QObject
 {
     Q_OBJECT
 
-    // Agent
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agent)
+    // View model of agents grouped by name
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentsGroupedByNameVM*, agent)
 
     // Flag indicating if our condition is valid
     I2_QML_PROPERTY(bool, isValid)
@@ -83,14 +83,14 @@ Q_SIGNALS:
 protected Q_SLOTS:
 
     /**
-     * @brief Slot called when the flag "is ON" of an agent changed
+     * @brief Slot called when the flag "is ON" of the agent changed
      * @param isON
      */
     virtual void _onAgentIsOnChanged(bool isON);
 
 
     /**
-     * @brief Called when our agent is destroyed
+     * @brief FIXME custom event instead: Called when our agent is destroyed
      * @param sender
      */
     void _onAgentDestroyed(QObject* sender);
