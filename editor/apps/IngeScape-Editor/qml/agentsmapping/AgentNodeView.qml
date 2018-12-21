@@ -881,6 +881,8 @@ Rectangle {
                 top: parent.top
                 right: parent.right
             }
+            visible: IngeScapeEditorC.isAvailableModelVisualizer
+
             Rectangle {
                 visible: agentMappingVM ? agentMappingVM.hadLinksAdded_WhileMappingWasUNactivated : false
                 color: "red"

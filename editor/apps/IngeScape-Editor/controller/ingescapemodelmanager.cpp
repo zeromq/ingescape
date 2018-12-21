@@ -248,7 +248,8 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
         // Clear our agent just before its deletion
         agentsGroupedByName->clearBeforeDeletion();
 
-        // FIXME: agentsGroupedByDefinitionWillBeDeleted and agentModelHasToBeDeleted
+        // Else, signals "agentsGroupedByDefinitionWillBeDeleted" and "agentModelHasToBeDeleted" will not be catched (after "disconnect")
+
         // DIS-connect to its signals
         disconnect(agentsGroupedByName, 0, this, 0);
 

@@ -92,6 +92,9 @@ void AgentsMappingController::clearMapping()
         _modelManager->setisMappingActivated(false);
     }
 
+    // Clear the hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent")
+    _hashFromOutputAgentNameToListOfWaitingMappingElements.clear();
+
     // 2- Delete all links
     for (LinkVM* link : _allLinksInMapping.toList()) {
         _deleteLinkBetweenTwoAgents(link);
@@ -883,9 +886,8 @@ void AgentsMappingController::onAgentsGroupedByNameWillBeDeleted(AgentsGroupedBy
                     // CONTROL
                     if (_modelManager->isMappingControlled())
                     {
-                        // FIXME TODO ? CONTROL
+                        // FIXME TODO in _onAgentIsONChanged (Mode CONTROL) ?
 
-                        // FIXME WhileMappingWasUNactivated
                         //if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
                     }
                     // OBSERVE
