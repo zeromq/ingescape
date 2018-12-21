@@ -293,6 +293,14 @@ Item {
         }
     }
 
+    Component.onCompleted: {
+        if (controller) {
+            //console.log("QML: Graph View completed !");
+            // Update the flag
+            controller.isLoadedView = true;
+        }
+    }
+
 
     //--------------------------------
     //

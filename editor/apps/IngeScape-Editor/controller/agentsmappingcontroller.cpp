@@ -37,6 +37,7 @@ AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelMan
       _isEmptyMapping(true),
       _selectedAgent(nullptr),
       _selectedLink(nullptr),
+      _isLoadedView(false),
       _modelManager(modelManager),
       _jsonHelper(jsonHelper)
 {
@@ -77,6 +78,67 @@ AgentsMappingController::~AgentsMappingController()
     // Reset pointers
     _modelManager = nullptr;
     _jsonHelper = nullptr;
+}
+
+
+/**
+ * @brief Setter for property "is Loaded View"
+ * @param value
+ */
+void AgentsMappingController::setisLoadedView(bool value)
+{
+    if (_isLoadedView != value)
+    {
+        _isLoadedView = value;
+
+        // The view of the global mapping is loaded
+        if ((_isLoadedView) && (_modelManager != nullptr))
+        {
+            bool allAgentsOFF = true;
+            bool isAddedOrRemovedLink_WhileMappingWasUNactivated = false;
+
+            if (!_allAgentsInMapping.isEmpty())
+            {
+                // For each agent in the global mapping
+                for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
+                {
+                    if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr))
+                    {
+                        // If the agent is ON
+                        if (agentInMapping->agentsGroupedByName()->isON())
+                        {
+                            allAgentsOFF = false;
+                            //break;
+                        }
+
+                        // If the agent had links added/removed while the mapping was UN-activated (loaded from JSON)
+                        if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
+                        {
+                            isAddedOrRemovedLink_WhileMappingWasUNactivated = true;
+                            //break;
+                        }
+                    }
+                }
+            }
+
+            // All agents are OFF
+            if (allAgentsOFF)
+            {
+                // DE-activate the mapping
+                _modelManager->setisMappingActivated(false);
+            }
+            // There have been changes in the mapping while the mapping was UN-activated
+            else if (isAddedOrRemovedLink_WhileMappingWasUNactivated)
+            {
+                qDebug() << "There have been changes in the mapping while the mapping was UN-activated (loaded from JSON). Force to CONTROL ?";
+
+                // The mapping has been modified but will be lost if the user stay in mode OBSERVE
+                Q_EMIT changesOnLinksWhileMappingUnactivated();
+            }
+        }
+
+        Q_EMIT isLoadedViewChanged(value);
+    }
 }
 
 
@@ -733,57 +795,6 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
 void AgentsMappingController::onIsMappingControlledChanged(bool isMappingControlled)
 {
     qDebug() << "AgentsMappingController: Is Mapping Controlled Changed to" << isMappingControlled;
-}
-
-
-/**
- * @brief Slot called when the network is started since 1 second
- */
-void AgentsMappingController::onNetworkStartedSince1sec()
-{
-    qDebug() << "on Network Started Since 1 sec";
-
-    if (_modelManager != nullptr)
-    {
-        bool allAgentsOFF = true;
-        bool isAddedOrRemovedLink_WhileMappingWasUNactivated = false;
-
-        if (!_allAgentsInMapping.isEmpty())
-        {
-            for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
-            {
-                if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr))
-                {
-                    if (agentInMapping->agentsGroupedByName()->isON())
-                    {
-                        allAgentsOFF = false;
-                        //break;
-                    }
-
-                    if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
-                    {
-                        isAddedOrRemovedLink_WhileMappingWasUNactivated = true;
-                        //break;
-                    }
-                }
-            }
-        }
-
-        // All agents are OFF
-        if (allAgentsOFF)
-        {
-            // DE-activate the mapping
-            _modelManager->setisMappingActivated(false);
-        }
-        // There have been changes in the mapping while the mapping was UN-activated
-        else if (isAddedOrRemovedLink_WhileMappingWasUNactivated)
-        {
-            qDebug() << "There have been changes in the mapping while the mapping was UN-activated. Force to CONTROL ?";
-
-            // The mapping has been modified but will be lost if the user stay in mode OBSERVE
-            Q_EMIT changesOnLinksWhileMappingUnactivated();
-        }
-    }
 }
 
 

@@ -56,6 +56,9 @@ class AgentsMappingController : public QObject
     // Selected link between agents in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(LinkVM*, selectedLink)
 
+    // Flag indicating if the corresponding view is loaded
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isLoadedView)
+
 
 public:
     /**
@@ -226,12 +229,6 @@ public Q_SLOTS:
      * @param isMappingControlled
      */
     void onIsMappingControlledChanged(bool isMappingControlled);
-
-
-    /**
-     * @brief Slot called when the network is started since 1 second
-     */
-    void onNetworkStartedSince1sec();
 
 
     /**
