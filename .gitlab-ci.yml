@@ -222,7 +222,7 @@ installer-editor-osx-x64:
   #  - make -C editor/apps/IngeScape-Editor/build package_source
   artifacts:
     paths:
-      - editor/apps/IngeScape-Editor/build/Ingescape-Editor-*
+      - editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
   dependencies:
     - osx-editor-release-x64
 
