@@ -350,6 +350,19 @@ if (APPLE)
     )
 
     if (CMAKE_BUILD_TYPE STREQUAL "Release")
+        # Fix yajl library, because it's installed
+        get_filename_component(_YAJL_FILE_NAME ${YAJL_LIBRARIES} NAME)
+        add_custom_command(TARGET ${PROJECT_NAME}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy "${YAJL_LIBRARIES}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/"
+            COMMENT "Deploying Yajl ..."
+        )
+        add_custom_command(
+            TARGET ${PROJECT_NAME}
+            POST_BUILD
+            COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change "@rpath/libyajl.0.dylib" "@executable_path/../Frameworks/${_YAJL_FILE_NAME}" $<TARGET_FILE:${PROJECT_NAME}>
+        )
+
         find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
 
         # NB: macdeployqt only runs qmlimportscanner correctly when run from Qt bin directory
