@@ -262,7 +262,7 @@ set (ingescape_editor_ressources qml.qrc)
 # dependencies
 ########################################################################
 # Define Qt cmake modules path if not already done
-if (WIN32 AND DEFINED ENV{Qt5_DIR} AND NOT DEFINED Qt5_DIR)
+if (DEFINED ENV{Qt5_DIR} AND NOT DEFINED Qt5_DIR)
     STRING(REPLACE "\"" "" Qt5_DIR $ENV{Qt5_DIR})
 endif ()
 

@@ -73,6 +73,8 @@ osx-release-x64:
 osx-editor-release-x64:
   <<: *build-ingescape-editor
   stage: osx
+  variables:
+    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
   tags:
     - osx
   script:
