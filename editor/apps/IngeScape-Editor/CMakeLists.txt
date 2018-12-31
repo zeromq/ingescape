@@ -293,6 +293,7 @@ elseif (WIN32)
     set(I2QUICK_LIB "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.lib")
     set_target_properties(I2Quick PROPERTIES IMPORTED_IMPLIB "${I2QUICK_LIB}")
     set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.dll")
+    install(FILES "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.dll" DESTINATION .)
 else ()
     #TODO Add so for unix
 endif ()
@@ -306,7 +307,7 @@ if (APPLE)
 endif ()
 
 # Create target
-add_executable(${PROJECT_NAME} MACOSX_BUNDLE
+add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
     ${ingescape_editor_sources}
     ${ingescape_editor_ressources}
     ${INGESCAPE_EDITOR_ICON}
@@ -354,7 +355,7 @@ if (APPLE)
         get_filename_component(_YAJL_FILE_NAME ${YAJL_LIBRARIES} NAME)
         add_custom_command(TARGET ${PROJECT_NAME}
             POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy "${YAJL_LIBRARIES}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${YAJL_LIBRARIES}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/"
             COMMENT "Deploying Yajl ..."
         )
         add_custom_command(
@@ -375,9 +376,6 @@ if (APPLE)
         set(CMAKE_SKIP_INSTALL_RPATH TRUE)
     endif ()
 elseif (WIN32)
-    #TODO Is needed ?
-    #include(InstallRequiredSystemLibraries)
-
     if(MSVC) # Check if we are using the Visual Studio compiler
         # This line avoid console windows that appears along with the GUI program
         set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE YES LINK_FLAGS "/ENTRY:mainCRTStartup")
@@ -387,16 +385,13 @@ elseif (WIN32)
     add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
-	
-	# Copy Qt dependencies
-	find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
-	add_custom_command(TARGET ${PROJECT_NAME}
-		POST_BUILD
-		COMMAND "${CMAKE_COMMAND}" -E env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}" \"$<TARGET_FILE:${PROJECT_NAME}>\" -xml -concurrent -printsupport -sql -qmldir="${SOURCE_DIR}"
-		COMMENT "Deploying Qt..."
-	)
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Release")
+        include(Windeploy)
+        windeployqt(${PROJECT_NAME} ${SOURCE_DIR})
+    endif ()
 else ()
     #TODO Add unix target
 endif ()
@@ -406,7 +401,7 @@ endif ()
 ########################################################################
 # Package installer just for release build
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)
+    install(TARGETS ${PROJECT_NAME} DESTINATION .)
 
     set(CPACK_MONOLITHIC_INSTALL ON)
     set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
@@ -442,11 +437,12 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         set(CPACK_GENERATOR "NSIS;ZIP")
         set(CPACK_SOURCE_GENERATOR "ZIP")
         # On windows we want to package dependencies with this library
-        install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS)
-        install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS)
-        install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS)
-        install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS)
-        install_ingescape_dependencies(YAJL_LIBRARIES YAJL_INCLUDE_DIRS)
+        set(IS_EDITOR TRUE)
+        install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
+        install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
+        install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
+        install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+        install_ingescape_dependencies(YAJL_LIBRARIES YAJL_INCLUDE_DIRS IS_EDITOR)
     elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
         set(CPACK_GENERATOR "DragNDrop")
         set(CPACK_SOURCE_GENERATOR "TGZ")

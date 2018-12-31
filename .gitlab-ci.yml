@@ -1,5 +1,7 @@
 # Gitlab ci
 
+# TODO Check why with install target windows api are in bin subfolder
+# TODO Check why with compile target zmq, ... are not copied in Release folder on windows
 # TODO Add yajl in unix and osx installer (or see to create yajl installer)
 # TODO Add job to deploy ingescape website on commit (Can filter to launch job on doc folder changes and only master git's branche)
 # TODO Add job to compile editor
@@ -69,7 +71,7 @@ osx-release-x64:
     name: "osx-release-x64"
     expire_in: 1 week
 
-# Create ingescape library for osx
+# Create ingescape editor for osx
 osx-editor-release-x64:
   <<: *build-ingescape-editor
   stage: osx
@@ -164,6 +166,26 @@ win32-debug-x86:
     name: "win32-debug-x86"
     expire_in: 1 week
 
+# Create ingescape editor for windows
+windows-editor-release-x86:
+  <<: *build-ingescape-editor
+  stage: windows
+  variables:
+    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+  tags:
+    - windows
+  script:
+    - git clean -xfd
+    - mkdir editor\apps\IngeScape-Editor\build\ReleaseX86
+    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\libzmq-v140-mt-gd-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
+    - cmake --build editor\apps\IngeScape-Editor\build\ReleaseX86 --target ALL_BUILD --config Release
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Editor\build
+    name: "windows-editor-release-x86"
+    expire_in: 1 week
+
 # Create runtime install for windows 32 bits
 installer-runtime-win32-x86:
   <<: *build-ingescape-lib
@@ -225,6 +247,20 @@ installer-editor-osx-x64:
       - editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
   dependencies:
     - osx-editor-release-x64
+
+# Create editor install for windows 32 bits
+installer-editor-windows-x64:
+  <<: *build-ingescape-editor
+  stage: installer
+  tags:
+    - windows
+  script:
+    - cd editor\apps\IngeScape-Editor\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Editor\build\ReleaseX86\IngeScape-Editor-*
+  dependencies:
+    - windows-editor-release-x86
 
 # Create runtime install for linux 64 bits
 installer-runtime-linux-x64:
