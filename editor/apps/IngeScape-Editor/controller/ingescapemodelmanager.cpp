@@ -711,8 +711,24 @@ void IngeScapeModelManager::simulateExitForEachAgentON()
     {
         if ((agent != nullptr) && agent->isON())
         {
-            // Simulate an exit for each agent
+            // Simulate an exit for this agent
             onAgentExited(agent->peerId(), agent->name());
+        }
+    }
+}
+
+
+/**
+ * @brief Simulate an exit for each launcher
+ */
+void IngeScapeModelManager::simulateExitForEachLauncher()
+{
+    for (QString hostName : _hashFromNameToHost.keys())
+    {
+        if (hostName != HOSTNAME_NOT_DEFINED)
+        {
+            // Simulate an exit for this host (name)
+            onLauncherExited("", hostName);
         }
     }
 }

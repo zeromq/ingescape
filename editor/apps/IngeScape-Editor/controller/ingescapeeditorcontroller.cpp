@@ -601,8 +601,11 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 settings.sync();
 
 
-                // Simulate an exit for agent ON
+                // Simulate an exit for each agent ON
                 _modelManager->simulateExitForEachAgentON();
+
+                // Simulate an exit for each launcher
+                _modelManager->simulateExitForEachLauncher();
 
                 // Has to clear the current platform
                 if (hasToClearPlatform)

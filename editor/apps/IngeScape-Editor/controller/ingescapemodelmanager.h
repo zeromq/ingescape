@@ -176,6 +176,12 @@ public:
 
 
     /**
+     * @brief Simulate an exit for each launcher
+     */
+    void simulateExitForEachLauncher();
+
+
+    /**
      * @brief Delete agents OFF
      */
     void deleteAgentsOFF();
