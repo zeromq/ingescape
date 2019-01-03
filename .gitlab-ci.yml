@@ -10,10 +10,10 @@
 
 # Define job order
 stages:
-  - linux
-  - osx
-  - windows
-  - installer
+  - ingescape-build
+  - editor-build
+  - ingescape-installer
+  - editor-installer
 
 # Define ingescape library files
 .build-ingescape-lib: &build-ingescape-lib
@@ -39,7 +39,7 @@ stages:
 # Create ingescape library for linux
 linux-release-x64:
   <<: *build-ingescape-lib
-  stage: linux
+  stage: ingescape-build
   tags:
     - docker
   image: fafesty/debian-with-zyre
@@ -57,7 +57,7 @@ linux-release-x64:
 # Create ingescape library for osx
 osx-release-x64:
   <<: *build-ingescape-lib
-  stage: osx
+  stage: ingescape-build
   tags:
     - osx
   script:
@@ -74,7 +74,7 @@ osx-release-x64:
 # Create ingescape editor for osx
 osx-editor-release-x64:
   <<: *build-ingescape-editor
-  stage: osx
+  stage: editor-build
   variables:
     Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
   tags:
@@ -91,9 +91,9 @@ osx-editor-release-x64:
     expire_in: 1 week
 
 # Create ingescape library for windows 64 bits release
-win32-release-x64:
+windows-release-x64:
   <<: *build-ingescape-lib
-  stage: windows
+  stage: ingescape-build
   tags:
     - windows
   variables:
@@ -106,13 +106,13 @@ win32-release-x64:
   artifacts:
     paths:
      - build
-    name: "win32-release-x64"
+    name: "windows-release-x64"
     expire_in: 1 week
 
 # Create ingescape library for windows 32 bits release
-win32-release-x86:
+windows-release-x86:
   <<: *build-ingescape-lib
-  stage: windows
+  stage: ingescape-build
   tags:
     - windows
   variables:
@@ -125,13 +125,13 @@ win32-release-x86:
   artifacts:
     paths:
      - build
-    name: "win32-release-x86"
+    name: "windows-release-x86"
     expire_in: 1 week
 
 # Create ingescape library for windows 64 bits debug
-win32-debug-x64:
+windows-debug-x64:
   <<: *build-ingescape-lib
-  stage: windows
+  stage: ingescape-build
   tags:
     - windows
   variables:
@@ -144,13 +144,13 @@ win32-debug-x64:
   artifacts:
     paths:
      - build
-    name: "win32-debug-x64"
+    name: "windows-debug-x64"
     expire_in: 1 week
 
 # Create ingescape library for windows 32 bits debug
-win32-debug-x86:
+windows-debug-x86:
   <<: *build-ingescape-lib
-  stage: windows
+  stage: ingescape-build
   tags:
     - windows
   variables:
@@ -163,13 +163,13 @@ win32-debug-x86:
   artifacts:
     paths:
      - build
-    name: "win32-debug-x86"
+    name: "windows-debug-x86"
     expire_in: 1 week
 
 # Create ingescape editor for windows
 windows-editor-release-x86:
   <<: *build-ingescape-editor
-  stage: windows
+  stage: editor-build
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
@@ -187,9 +187,9 @@ windows-editor-release-x86:
     expire_in: 1 week
 
 # Create runtime install for windows 32 bits
-installer-runtime-win32-x86:
+installer-runtime-windows-x86:
   <<: *build-ingescape-lib
-  stage: installer
+  stage: ingescape-installer
   tags:
     - windows
   script:
@@ -200,12 +200,12 @@ installer-runtime-win32-x86:
       - build\ReleaseX86\Ingescape-*.exe
       - build\ReleaseX86\Ingescape-*.zip
   dependencies:
-    - win32-release-x86
+    - windows-release-x86
 
 # Create runtime install for windows 64 bits
-installer-runtime-win32-x64:
+installer-runtime-windows-x64:
   <<: *build-ingescape-lib
-  stage: installer
+  stage: ingescape-installer
   tags:
     - windows
   script:
@@ -216,12 +216,12 @@ installer-runtime-win32-x64:
       - build\ReleaseX64\Ingescape-*.exe
       - build\ReleaseX64\Ingescape-*.zip
   dependencies:
-    - win32-release-x64
+    - windows-release-x64
 
 # Create runtime install for osx 64 bits
 installer-runtime-osx-x64:
   <<: *build-ingescape-lib
-  stage: installer
+  stage: ingescape-installer
   tags:
     - osx
   script:
@@ -236,7 +236,7 @@ installer-runtime-osx-x64:
 # Create editor install for osx 64 bits
 installer-editor-osx-x64:
   <<: *build-ingescape-editor
-  stage: installer
+  stage: editor-installer
   tags:
     - osx
   script:
@@ -249,9 +249,9 @@ installer-editor-osx-x64:
     - osx-editor-release-x64
 
 # Create editor install for windows 32 bits
-installer-editor-windows-x64:
+installer-editor-windows-x86:
   <<: *build-ingescape-editor
-  stage: installer
+  stage: editor-installer
   tags:
     - windows
   script:
@@ -265,7 +265,7 @@ installer-editor-windows-x64:
 # Create runtime install for linux 64 bits
 installer-runtime-linux-x64:
   <<: *build-ingescape-lib
-  stage: installer
+  stage: ingescape-installer
   tags:
     - docker
   image: fafesty/debian-with-zyre
