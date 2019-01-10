@@ -301,9 +301,13 @@ endif ()
 ########################################################################
 # executable
 ########################################################################
-set(INGESCAPE_EDITOR_ICON "${SOURCE_DIR}/icon_IGS.icns")
+set(INGESCAPE_EDITOR_ICON)
 if (APPLE)
+    set(INGESCAPE_EDITOR_ICON "${SOURCE_DIR}/icon_IGS.icns")
     set_source_files_properties("${INGESCAPE_EDITOR_ICON}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+elseif (WIN32)
+    set(INGESCAPE_EDITOR_ICON "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc")
+    file(WRITE ${INGESCAPE_EDITOR_ICON} "IDI_ICON1               ICON    DISCARDABLE     \"icon_IGS.ico\"")
 endif ()
 
 # Create target
@@ -413,6 +417,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_EDITOR_VERSION_MINOR}")
     set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_EDITOR_VERSION_PATCH}")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
+    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY ${PROJECT_NAME})
 
     # Installers for 32- vs. 64-bit CMake:
     #  - Root install directory (displayed to end user at installer-run time)
@@ -430,6 +435,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
     set(CPACK_NSIS_MODIFY_PATH ON)
     set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
+    set(CPACK_NSIS_EXECUTABLES_DIRECTORY .)
 
     set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/build/;${SOURCE_DIR}/IngeScape-Editor.pro.user")
 
@@ -449,6 +455,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     else ()
         #TODO Add unix target
     endif ()
+
+	set(CPACK_PACKAGE_EXECUTABLES "${PROJECT_NAME}" "${PROJECT_NAME}")
+	set(CPACK_CREATE_DESKTOP_LINKS "${PROJECT_NAME}" "${PROJECT_NAME}")
 
     include (CPack)
 endif()
