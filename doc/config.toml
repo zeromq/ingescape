@@ -47,7 +47,7 @@ weight = 4
 [[menu.topbar]]
     weight = 1
     name = "Email"
-    url = "mailto:contact@ingescape.com"
+    url = "mailto:contact@ingenuity.io"
     pre = "<i class='fa fa-2x fa-envelope'></i>"
 
 [params]
@@ -75,7 +75,7 @@ weight = 4
     # - you're done. Happy mailing!
     #
     # Enable the contact form by entering your Formspree.io email
-    email = "contact@ingescape.com"
+    email = "contact@ingenuity.io"
 
 about_us = "<p>ingeScape is developped by <a href=\"https://ingenuity.io\">Ingenuity i/o</a> based in Toulouse, France and by the <a href=\"http://www.estia.fr/entreprises/plateformes-techniques.html\">PEPSS</a> platform at <a href=\"http://www.estia.fr\">ESTIA</a> in Bidart, France.</p>"
     copyright = "Copyright (c) 2018, Ingenuity i/o; all rights reserved."
@@ -99,9 +99,9 @@ longitude = "1.490556"
 # Enable or disable top bar with social icons
 [params.topbar]
     enable = true
-text = """<p class="hidden-sm hidden-xs">Contact us on <a href=\"tel:+33 9 72 63 38 50\">+33 9 72 63 38 50</a> or <a href=\"mailto:contact@ingescape.com\">contact@ingescape.com</a></p>
+text = """<p class="hidden-sm hidden-xs">Contact us on <a href=\"tel:+33 9 72 63 38 50\">+33 9 72 63 38 50</a> or <a href=\"mailto:contact@ingenuity.io\">contact@ingenuity.io</a></p>
 <p class="hidden-md hidden-lg"><a href="tel:+33 9 72 63 38 50" data-animate-hover="pulse"><i class="fa fa-phone"></i></a>
-<a href="mailto:contact@ingescape.com" data-animate-hover="pulse"><i class="fa fa-envelope"></i></a>
+<a href="mailto:contact@ingenuity.io" data-animate-hover="pulse"><i class="fa fa-envelope"></i></a>
       </p>
       """
 
