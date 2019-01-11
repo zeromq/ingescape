@@ -37,11 +37,86 @@ I2PopupBase {
     // our main controller
     //property var controller: null;
 
+
+    //--------------------------------------------------------
+    //
+    //
+    // Functions
+    //
+    //
+    //--------------------------------------------------------
+
+    //
+    // function allowing to validate the form
+    //
+    function validate() {
+        //console.log("QML: function validate()");
+
+        var selectedNetworkDevice = "";
+
+        if (typeof combobox.selectedItem === "string") {
+            selectedNetworkDevice = combobox.selectedItem;
+        }
+        else {
+            selectedNetworkDevice = combobox.selectedItem.modelData;
+        }
+
+        if (IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.isAvailableNetworkDevice(selectedNetworkDevice))
+        {
+            // Re-Start the Network
+            var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked);
+            if (success === true)
+            {
+                rootItem.close();
+            }
+            else {
+                console.error("Network cannot be (re)started on device " + combobox.selectedItem.modelData + " and port " + txtPort.text);
+            }
+        }
+    }
+
+
+    //--------------------------------------------------------
+    //
+    //
+    // Callbacks
+    //
+    //
+    //--------------------------------------------------------
+
     onOpened: {
         txtPort.text = IngeScapeEditorC.port;
         combobox.selectedIndex = IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices.indexOf(IngeScapeEditorC.networkDevice) : -1;
         clearPlatform.checked = true;
+
+        // Set the focus to catch keyboard press on Return/Escape
+        rootItem.focus = true;
     }
+
+    Keys.onEscapePressed: {
+        //console.log("QML: Escape Pressed");
+
+        rootItem.close();
+    }
+
+    Keys.onReturnPressed: {
+        //console.log("QML: Return Pressed");
+
+        rootItem.validate();
+    }
+
+    Keys.onEnterPressed: {
+        console.log("QML: Enter Pressed --> TODO...");
+    }
+
+
+    //--------------------------------------------------------
+    //
+    //
+    // Content
+    //
+    //
+    //--------------------------------------------------------
 
     Rectangle {
         anchors.fill: parent
@@ -338,7 +413,8 @@ I2PopupBase {
             }
 
             onClicked: {
-                //console.log("Cancel")
+                //console.log("QML: Cancel")
+
                 rootItem.close();
             }
         }
@@ -377,26 +453,9 @@ I2PopupBase {
             }
 
             onClicked: {
-                //console.log("OK")
+                //console.log("QML: OK")
 
-                var selectedNetworkDevice = "";
-
-                if (typeof combobox.selectedItem === "string") {
-                    selectedNetworkDevice = combobox.selectedItem;
-                }
-                else {
-                    selectedNetworkDevice = combobox.selectedItem.modelData;
-                }
-
-                // Re-Start the Network
-                var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked);
-                if (success === true)
-                {
-                    rootItem.close();
-                }
-                else {
-                    console.error("Network cannot be (re)started on device " + combobox.selectedItem.modelData + " and port " + txtPort.text);
-                }
+                rootItem.validate();
             }
         }
     }
