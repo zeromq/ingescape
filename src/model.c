@@ -553,7 +553,7 @@ const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
-                    iop->value.d = (value == NULL)?0:(int)(*(double*)(value));
+                    iop->value.d = (value == NULL)?0:(double)(*(double*)(value));
                     outValue = &(iop->value.d);
                     igs_debug("set %s to %lf", iopName, iop->value.d);
                     break;
