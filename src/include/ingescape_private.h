@@ -11,12 +11,12 @@
 
 #if (defined WIN32 || defined _WIN32)
 #if defined INGESCAPE
-#define INGESCAPEAPI_COMMON_DLLSPEC __declspec(dllexport)
+#define PUBLIC __declspec(dllexport)
 #else
-#define INGESCAPEAPI_COMMON_DLLSPEC __declspec(dllimport)
+#define PUBLIC __declspec(dllimport)
 #endif
 #else
-#define INGESCAPEAPI_COMMON_DLLSPEC
+#define PUBLIC
 #endif
 
 #include <stdbool.h>
