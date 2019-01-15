@@ -39,7 +39,7 @@ class IngeScapeMeasuringController : public QObject
     I2_QML_PROPERTY_READONLY(int, port)
 
     // Error message when a connection attempt fails
-    //I2_QML_PROPERTY_READONLY(QString, errorMessageWhenConnectionFailed)
+    I2_QML_PROPERTY_READONLY(QString, errorMessageWhenConnectionFailed)
 
     // Snapshot Directory
     //I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)

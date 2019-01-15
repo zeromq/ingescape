@@ -91,6 +91,11 @@ DEFINES += INGESCAPE
     error(Could not load ingescape.pri)
 }
 
+# Include IngeScape-Common library
+#!include(../IngeScape-Common/IngeScape-Common.pro) {
+#    error(Could not load IngeScape-Common.pro)
+#}
+
 
 #####################################################################
 #

@@ -28,7 +28,7 @@ class NetworkController : public QObject
     Q_OBJECT
 
     // List of available network devices
-    //I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
+    I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
 
 
 public:
@@ -60,6 +60,12 @@ public:
      * @brief Stop our INGESCAPE agent
      */
     void stop();
+
+
+    /**
+     * @brief Update the list of available network devices
+     */
+    Q_INVOKABLE void updateAvailableNetworkDevices();
 
 
 Q_SIGNALS:

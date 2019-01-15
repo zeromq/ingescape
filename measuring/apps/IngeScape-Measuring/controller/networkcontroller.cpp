@@ -69,7 +69,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             bool isIngeScapeLauncher = false;
             bool isIngeScapeRecorder = false;
             bool isIngeScapePlayer = false;
-            bool isIngeScapeMeasuring = false;
+            //bool isIngeScapeMeasuring = false;
             QString hostname = "";
             bool canBeFrozen = false;
             QString commandLine = "";
@@ -385,4 +385,28 @@ void NetworkController::stop()
 
         _isIngeScapeAgentStarted = 0;
     }
+}
+
+
+/**
+ * @brief Update the list of available network devices
+ */
+void NetworkController::updateAvailableNetworkDevices()
+{
+    QStringList networkDevices;
+
+    char **devices = NULL;
+    int nb = 0;
+    igs_getNetdevicesList(&devices, &nb);
+
+    for (int i = 0; i < nb; i++)
+    {
+        QString availableNetworkDevice = QString(devices[i]);
+        networkDevices.append(availableNetworkDevice);
+    }
+    igs_freeNetdevicesList(devices, nb);
+
+    setavailableNetworkDevices(networkDevices);
+
+    qInfo() << "Update available Network Devices:" << _availableNetworkDevices;
 }

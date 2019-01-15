@@ -14,6 +14,9 @@
 
 #include "ingescapemeasuringcontroller.h"
 
+//#include <misc/terminationsignalwatcher.h>
+//#include <settings/ingescapesettings.h>
+
 
 /**
  * @brief Constructor
@@ -23,7 +26,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   _networkDevice(""),
   _ipAddress(""),
   _port(0),
-  //_errorMessageWhenConnectionFailed(""),
+  _errorMessageWhenConnectionFailed(""),
   //_modelManager(nullptr),
   _networkC(nullptr)
   //_terminationSignalWatcher(nullptr),
@@ -51,7 +54,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   //
   // Settings
   //
-  IngeScapeEditorSettings& settings = IngeScapeEditorSettings::Instance();
+  /*IngeScapeSettings& settings = IngeScapeSettings::Instance();
 
   // Settings about the "Network"
   settings.beginGroup("network");
@@ -59,15 +62,15 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   _ipAddress = settings.value("ipAddress", QVariant("")).toString();
   _port = settings.value("port", QVariant(0)).toInt();
   qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
-  settings.endGroup();
+  settings.endGroup();*/
 
 
   // Root directory
-  QString rootPath = IngeScapeEditorUtils::getRootPath();
+  /*QString rootPath = IngeScapeEditorUtils::getRootPath();
   QDir rootDir(rootPath);
   if (!rootDir.exists()) {
       qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
-  }
+  }*/
 
 
   /*// Directory for platform files
@@ -109,7 +112,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
 
 
   // Update the list of available network devices
-  //_networkC->updateAvailableNetworkDevices();
+  _networkC->updateAvailableNetworkDevices();
 
   // There is only one available network device, we use it !
   if (_networkC->availableNetworkDevices().count() == 1) {
@@ -119,14 +122,14 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   // Start our INGESCAPE agent with a network device (or an IP address) and a port
   bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
-  /*if (isStarted)
+  if (isStarted)
   {
       // Initialize platform from online mapping
-      _modelManager->setisMappingActivated(true);
+      //_modelManager->setisMappingActivated(true);
   }
   else {
       seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
-  }*/
+  }
 
 
   //
@@ -209,4 +212,22 @@ QObject* IngeScapeMeasuringController::qmlSingleton(QQmlEngine* engine, QJSEngin
   // NOTE: A QObject singleton type instance returned from a singleton type provider is owned by the QML engine.
   // For this reason, the singleton type provider function should not be implemented as a singleton factory.
   return new IngeScapeMeasuringController();
+}
+
+
+/**
+ * @brief Actions to perform before the application closing
+ */
+void IngeScapeMeasuringController::processBeforeClosing()
+{
+    // TODO...
+}
+
+
+/**
+ * @brief Method used to force the creation of our singleton from QML
+ */
+void IngeScapeMeasuringController::forceCreation()
+{
+    qDebug() << "Force the creation of our singleton from QML";
 }
