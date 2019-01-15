@@ -35,6 +35,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _isAvailableModelVisualizer(false),
     _isVisibleModelVisualizer(false),
     _errorMessageWhenConnectionFailed(""),
+    _snapshotDirectory(""),
     _modelManager(nullptr),
     _agentsSupervisionC(nullptr),
     _agentsMappingC(nullptr),

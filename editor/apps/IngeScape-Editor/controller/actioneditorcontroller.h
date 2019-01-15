@@ -61,7 +61,7 @@ public:
     explicit ActionEditorController(QString actionName,
                                     ActionM* originalAction,
                                     QList<AgentsGroupedByNameVM*> allAgentsGroupsByName,
-                                    QObject *parent = 0);
+                                    QObject *parent = nullptr);
 
 
     /**

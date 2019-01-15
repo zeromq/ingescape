@@ -76,7 +76,7 @@ public:
          * @param currentReferenceDate
          * @param parent
          */
-        explicit AbstractTimeActionslineScenarioViewController(QObject *parent = 0);
+        explicit AbstractTimeActionslineScenarioViewController(QObject *parent = nullptr);
 
 
         /**

@@ -96,6 +96,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             bool isIngeScapeLauncher = false;
             bool isIngeScapeRecorder = false;
             bool isIngeScapePlayer = false;
+            //bool isIngeScapeMeasuring = false;
             QString hostname = "";
             bool canBeFrozen = false;
             QString commandLine = "";
@@ -490,7 +491,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
         {
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
 
-            //Get the IngeScape type of a peer id
+            // Get the IngeScape type of a peer id
             IngeScapeTypes::Value ingeScapeType = networkController->getIngeScapeTypeOfPeerId(peerId);
 
             switch (ingeScapeType)

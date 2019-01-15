@@ -57,7 +57,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit ActionEffectVM(QObject *parent = 0);
+    explicit ActionEffectVM(QObject *parent = nullptr);
 
 
     /**

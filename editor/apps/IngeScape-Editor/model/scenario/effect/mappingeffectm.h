@@ -66,7 +66,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit MappingEffectM(QObject *parent = 0);
+    explicit MappingEffectM(QObject *parent = nullptr);
 
 
     /**

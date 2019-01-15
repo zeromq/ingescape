@@ -116,7 +116,7 @@ public:
      */
     explicit ScenarioController(IngeScapeModelManager* modelManager,
                                 JsonHelper* jsonHelper,
-                                QObject *parent = 0);
+                                QObject *parent = nullptr);
 
 
     /**

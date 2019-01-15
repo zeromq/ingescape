@@ -65,7 +65,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit IOPValueConditionM(QObject *parent = 0);
+    explicit IOPValueConditionM(QObject *parent = nullptr);
 
 
     /**

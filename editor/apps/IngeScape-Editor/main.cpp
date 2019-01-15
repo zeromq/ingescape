@@ -409,7 +409,7 @@ int main(int argc, char *argv[])
     // Defines context properties
     //
     QQmlContext* qmlContext = engine.rootContext();
-    if (qmlContext != NULL)
+    if (qmlContext != nullptr)
     {
         // Build date
         qmlContext->setContextProperty("BUILD_DATE", QLocale(QLocale::C).toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy")));

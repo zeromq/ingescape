@@ -83,7 +83,7 @@ public:
      */
     explicit ActionVM(ActionM* model,
                       int startTime,
-                      QObject *parent = 0);
+                      QObject *parent = nullptr);
 
 
     /**
