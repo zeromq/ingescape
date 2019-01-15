@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -395,7 +395,7 @@ int main(int argc, char *argv[])
     I2SVGImageProvider::showErrorsAsImage = true;
 
     // Init streaming capability
-    // GST not included ins master branch
+    // GST not included in master branch
     // gst_init (NULL, NULL);
 
     //
