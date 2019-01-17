@@ -88,7 +88,7 @@ Item {
             bottom: parent.bottom
         }
 
-        color: IngeScapeTheme.agentsMappingBackgroundColor
+        color: IngeScapeTheme.blackColor
 
         I2CustomRectangle {
             anchors {

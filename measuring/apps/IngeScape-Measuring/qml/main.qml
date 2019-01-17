@@ -268,7 +268,7 @@ ApplicationWindow {
                 IngeScapeMeasuringC.forceCreation();
 
                 // Set the directory used to store snasphots of our application
-                I2SnapshotHelper.directory = IngeScapeMeasuringC.snapshotDirectory;
+                //I2SnapshotHelper.directory = IngeScapeMeasuringC.snapshotDirectory;
 
                 // Binding to display our application loader
                 applicationLoader.visible = Qt.binding(function() {

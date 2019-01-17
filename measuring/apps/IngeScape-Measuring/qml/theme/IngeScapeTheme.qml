@@ -102,6 +102,70 @@ Item {
     //
     //-----------------------------------------
 
+    // Default font family
+    readonly property string defaultFontFamily: "Arial"
+
+
+    property alias labelFontFamily: fontAkrobat.name
+    property alias textFontFamily: fontBloggerSans.name
+    property alias loadingFontFamily: fontTitillium.name
+
+    FontLoader {
+        id: fontAkrobat
+        source: "qrc:/resources/fonts/akrobat/Akrobat.ttf"
+    }
+
+    FontLoader {
+        source: "qrc:/resources/fonts/akrobat/Akrobat-Black.ttf"
+    }
+
+    FontLoader {
+        source: "qrc:/resources/fonts/akrobat/Akrobat-ExtraBold.ttf"
+    }
+
+    FontLoader {
+        id: fontBloggerSans
+        source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans.ttf"
+    }
+
+    FontLoader {
+        source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans-Medium.ttf"
+    }
+
+    FontLoader {
+        source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans-Light.ttf"
+    }
+
+    FontLoader {
+        id: fontTitillium
+        source: "qrc:/resources/fonts/titillium/Titillium-Regular.otf"
+    }
+
+
+    // Heading font (level1)
+    readonly property font headingFont: Qt.font({
+                                                    family: labelFontFamily,
+                                                    pixelSize: 20,
+                                                    weight: Font.Black
+                                                });
+
+
+    // Heading font (level2)
+    readonly property font heading2Font: Qt.font({
+                                                     family: textFontFamily,
+                                                     pixelSize: 16
+                                                 });
+
+    // Normal font
+    readonly property font normalFont: Qt.font({
+                                                   family: textFontFamily,
+                                                   pixelSize: 14
+                                               });
+
+
+
+    readonly property color disabledTextColor: "#3C3C3C"
+
 
     //-----------------------------------------
     //

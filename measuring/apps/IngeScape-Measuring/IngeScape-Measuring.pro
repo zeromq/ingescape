@@ -37,13 +37,15 @@ RCC_DIR = tmp
 SOURCES += \
         main.cpp \
     controller/ingescapemeasuringcontroller.cpp \
-    controller/networkcontroller.cpp
+    controller/networkcontroller.cpp \
+    controller/ingescapemodelmanager.cpp
 
 
 HEADERS += \
     controller/ingescapemeasuringcontroller.h \
     stable.h \
-    controller/networkcontroller.h
+    controller/networkcontroller.h \
+    controller/ingescapemodelmanager.h
 
 
 RESOURCES += qml.qrc
@@ -102,6 +104,10 @@ DEFINES += INGESCAPE
 # OS specific rules
 #
 #####################################################################
+
+
+#DISTFILES += \
+#    icon_IGS.icns
 
 
 #------------------------
@@ -225,5 +231,3 @@ unix:!mac {
     # TODO if needed
 }
 
-DISTFILES += \
-    icon_IGS.icns

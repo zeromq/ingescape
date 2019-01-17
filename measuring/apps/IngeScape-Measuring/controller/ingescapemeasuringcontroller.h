@@ -20,6 +20,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <controller/networkcontroller.h>
+#include <controller/ingescapemodelmanager.h>
 
 
 /**
@@ -45,7 +46,7 @@ class IngeScapeMeasuringController : public QObject
     //I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 
     // Manager for the data model of our IngeScape measuring application
-    //I2_QML_PROPERTY_READONLY(IngeScapeModelManager*, modelManager)
+    I2_QML_PROPERTY_READONLY(IngeScapeModelManager*, modelManager)
 
     // Controller for network communication
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)

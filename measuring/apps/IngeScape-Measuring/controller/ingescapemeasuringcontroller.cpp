@@ -27,7 +27,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   _ipAddress(""),
   _port(0),
   _errorMessageWhenConnectionFailed(""),
-  //_modelManager(nullptr),
+  _modelManager(nullptr),
   _networkC(nullptr)
   //_terminationSignalWatcher(nullptr),
   //_jsonHelper(nullptr),
@@ -96,8 +96,8 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   // Create sub-controllers
   //
 
-  // Create the manager for the data model of INGESCAPE
-  //_modelManager = new IngeScapeModelManager(_jsonHelper, rootPath, this);
+  // Create the manager for the data model of our IngeScape measuring application
+  _modelManager = new IngeScapeModelManager(this);
 
   // Create the controller for network communications
   _networkC = new NetworkController(this);
@@ -120,7 +120,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   }
 
   // Start our INGESCAPE agent with a network device (or an IP address) and a port
-  bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
+  /*bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
   if (isStarted)
   {
@@ -129,7 +129,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   }
   else {
       seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
-  }
+  }*/
 
 
   //
@@ -148,7 +148,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
 
 
   // Sleep to display our loading screen
-  //QThread::msleep(2000);
+  QThread::msleep(2000);
 }
 
 
@@ -167,7 +167,7 @@ IngeScapeMeasuringController::~IngeScapeMeasuringController()
       _terminationSignalWatcher = nullptr;
   }*/
 
-  /*if (_modelManager != nullptr)
+  if (_modelManager != nullptr)
   {
       disconnect(_modelManager);
 
@@ -175,7 +175,7 @@ IngeScapeMeasuringController::~IngeScapeMeasuringController()
       setmodelManager(nullptr);
       delete temp;
       temp = nullptr;
-  }*/
+  }
 
   if (_networkC != nullptr)
   {
