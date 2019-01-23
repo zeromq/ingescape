@@ -384,6 +384,7 @@ unsigned long igs_addMappingEntry(const char *fromOurInput,
     //toAgent
     if(toAgent == NULL || strlen(toAgent) == 0){
         igs_error("Agent name to be mapped cannot be NULL or empty");
+        free(reviewedFromOurInput);
         return 0;
     }
     char *reviewedToAgent = strndup(toAgent, MAX_IOP_NAME_LENGTH);
@@ -402,6 +403,7 @@ unsigned long igs_addMappingEntry(const char *fromOurInput,
     //withOutput
     if((withOutput == NULL) || (strlen(withOutput) == 0)){
         igs_error("Agent output name to be mapped cannot be NULL or empty");
+        free(reviewedToAgent);
         return 0;
     }
     char *reviewedWithOutput = strndup(withOutput, MAX_IOP_NAME_LENGTH);
