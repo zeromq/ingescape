@@ -47,30 +47,33 @@ char definitionPath[MAX_PATH] = "";
 
 iopType_t string_to_value_type(const char* str) {
     
-    if (!strcmp(str, "INTEGER"))
-        return IGS_INTEGER_T;
-    if (!strcmp(str, "DOUBLE"))
-        return IGS_DOUBLE_T;
-    if (!strcmp(str, "STRING"))
-        return IGS_STRING_T;
-    if (!strcmp(str, "BOOL"))
-        return IGS_BOOL_T;
-    if (!strcmp(str, "IMPULSION"))
-        return IGS_IMPULSION_T;
-    if (!strcmp(str, "DATA"))
-        return IGS_DATA_T;
+    if (str != NULL){
+        if (!strcmp(str, "INTEGER"))
+            return IGS_INTEGER_T;
+        if (!strcmp(str, "DOUBLE"))
+            return IGS_DOUBLE_T;
+        if (!strcmp(str, "STRING"))
+            return IGS_STRING_T;
+        if (!strcmp(str, "BOOL"))
+            return IGS_BOOL_T;
+        if (!strcmp(str, "IMPULSION"))
+            return IGS_IMPULSION_T;
+        if (!strcmp(str, "DATA"))
+            return IGS_DATA_T;
+    }
     
     igs_error("unknown value type \"%s\" to convert", str);
     return IGS_UNKNOWN_T;
 }
 
 bool string_to_boolean(const char* str) {
-    
-    if (!strcmp(str, "true"))
-        return true;
-    
-    if (!strcmp(str, "false"))
-        return false;
+    if(str != NULL){
+        if (!strcmp(str, "true"))
+            return true;
+        
+        if (!strcmp(str, "false"))
+            return false;
+    }
     
     igs_warn("unknown string \"%s\" to convert", str);
     return false;
@@ -250,6 +253,8 @@ static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
                         tokenArg->name = n;
                         tokenArg->type = valType;
                         LL_APPEND(token->arguments, tokenArg);
+                    }else{
+                        free(n);
                     }
                 }
             }else{
