@@ -872,6 +872,7 @@ int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg){
     size_t size = 0;
     int ret = model_readIopAsData(name, IGS_INPUT_T, &data, &size);
     zframe_t *frame = zframe_new(data, size);
+    free(data);
     *msg = zmsg_decode(frame);
     zframe_destroy(&frame);
     return ret;
