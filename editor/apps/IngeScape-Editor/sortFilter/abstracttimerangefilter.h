@@ -41,7 +41,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit AbstractTimeRangeFilter(QObject *parent = 0);
+    explicit AbstractTimeRangeFilter(QObject *parent = nullptr);
 
 
     /**

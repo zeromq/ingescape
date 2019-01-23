@@ -101,7 +101,7 @@ public:
      * @param name
      * @param parent
      */
-    explicit ActionM(int uid, QString name, QObject *parent = 0);
+    explicit ActionM(int uid, QString name, QObject *parent = nullptr);
 
 
     /**

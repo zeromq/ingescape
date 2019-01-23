@@ -105,7 +105,7 @@ I2PopupBase {
 
                 //horizontalAlignment: Text.AlignHCenter
 
-                text: qsTr("Mapping has changed while disconnected. You can")
+                text: qsTr("Platform has changed while disconnected.\nYou can:")
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -139,7 +139,7 @@ I2PopupBase {
                         color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
                                                : IngeScapeTheme.disabledTextColor
 
-                        text: qsTr("Apply modified mapping to the platform")
+                        text: qsTr("Apply this mapping to the platform")
 
                         font {
                             family: IngeScapeTheme.textFontFamily
@@ -188,7 +188,7 @@ I2PopupBase {
                         color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
                                                : IngeScapeTheme.disabledTextColor
 
-                        text: qsTr("Go back to the current mapping")
+                        text: qsTr("Use the current platform mapping")
 
                         font {
                             family: IngeScapeTheme.textFontFamily

@@ -39,7 +39,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit ScenarioMarkerM(QObject *parent = 0);
+    explicit ScenarioMarkerM(QObject *parent = nullptr);
 
 
     /**

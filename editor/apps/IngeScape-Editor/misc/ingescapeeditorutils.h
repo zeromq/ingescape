@@ -35,7 +35,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit IngeScapeEditorUtils(QObject *parent = 0);
+    explicit IngeScapeEditorUtils(QObject *parent = nullptr);
 
 
     /**

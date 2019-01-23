@@ -27,7 +27,7 @@ TerminationSignalWatcher::TerminationSignalWatcher(QObject *parent) : QObject(pa
     // Unix
     //
 #ifdef Q_OS_UNIX
-    _socketNotifier = NULL;
+    _socketNotifier = nullptr;
 
     // Create socket pair
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, _sockpair))
