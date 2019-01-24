@@ -1330,8 +1330,9 @@ void igs_freeIOPList(char ***list, long nbOfElements){
     //FIXME: secure this function if nbOfElements exceeds allocated value
     if (list != NULL && *list != NULL){
         if (nbOfElements < 1)
-        return;
-        for (int i = 0; i < nbOfElements; i++){
+            return;
+        int i = 0;
+        for (i = 0; i < nbOfElements; i++){
             if ((*list)[i] != NULL){
                 free((*list)[i]);
             }
