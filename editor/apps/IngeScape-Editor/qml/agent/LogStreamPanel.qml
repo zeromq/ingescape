@@ -470,7 +470,7 @@ WindowBlockTouches {
 
                             // Date and time
                             Text {
-                                text: model.logDateTime.toLocaleString(Qt.locale(), "dd/MM hh:mm:ss.zzz")
+                                text: model.logDateTime.toLocaleString(Qt.locale(), "dd/MM HH:mm:ss.zzz")
 
                                 anchors {
                                     verticalCenter: parent.verticalCenter

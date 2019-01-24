@@ -60,7 +60,7 @@ AgentsMappingController::~AgentsMappingController()
     setselectedLink(nullptr);
 
     // DIS-connect from signal "Count Changed" from the list of agents in mapping
-    disconnect(&_allAgentsInMapping, 0, this, 0);
+    disconnect(&_allAgentsInMapping, nullptr, this, nullptr);
 
     // Clear the current mapping
     clearMapping();
@@ -187,7 +187,7 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
         }
 
         // DIS-connect to signals from this agent in mapping
-        disconnect(agent, 0, this, 0);
+        disconnect(agent, nullptr, this, nullptr);
 
         // Remove from the hash table
         _hashFromNameToAgentInMapping.remove(agent->name());
@@ -862,7 +862,7 @@ void AgentsMappingController::onAgentsGroupedByNameWillBeDeleted(AgentsGroupedBy
     if (agentsGroupedByName != nullptr)
     {
         // DIS-connect to signals from this old agents grouped by name
-        disconnect(agentsGroupedByName, 0, this, 0);
+        disconnect(agentsGroupedByName, nullptr, this, nullptr);
 
         // Get the agent in mapping for the agent name
         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
