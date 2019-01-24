@@ -438,7 +438,8 @@ char** igs_getTokensList(size_t *nbOfElements){
 void igs_freeTokensList(char **list, size_t nbOfTokens){
     if (list == NULL)
         return;
-    for (size_t i = 0; i < nbOfTokens; i++){
+    size_t i = 0;
+    for (i = 0; i < nbOfTokens; i++){
         if (list[i] != NULL)
             free(list[i]);
     }

@@ -370,8 +370,9 @@ unsigned long igs_addMappingEntry(const char *fromOurInput,
     }
     char *reviewedFromOurInput = strndup(fromOurInput, MAX_IOP_NAME_LENGTH);
     bool spaceInName = false;
+    size_t i = 0;
     size_t lengthOfReviewedFromOurInput = strlen(reviewedFromOurInput);
-    for (size_t i = 0; i < lengthOfReviewedFromOurInput; i++){
+    for (i = 0; i < lengthOfReviewedFromOurInput; i++){
         if (reviewedFromOurInput[i] == ' '){
             reviewedFromOurInput[i] = '_';
             spaceInName = true;
@@ -390,7 +391,7 @@ unsigned long igs_addMappingEntry(const char *fromOurInput,
     char *reviewedToAgent = strndup(toAgent, MAX_IOP_NAME_LENGTH);
     size_t lengthOfReviewedToAgent = strlen(reviewedToAgent);
     spaceInName = false;
-    for (size_t i = 0; i < lengthOfReviewedToAgent; i++){
+    for (i = 0; i < lengthOfReviewedToAgent; i++){
         if (reviewedToAgent[i] == ' '){
             reviewedToAgent[i] = '_';
             spaceInName = true;
@@ -409,7 +410,7 @@ unsigned long igs_addMappingEntry(const char *fromOurInput,
     char *reviewedWithOutput = strndup(withOutput, MAX_IOP_NAME_LENGTH);
     size_t lengthOfReviewedWithOutput = strlen(reviewedWithOutput);
     spaceInName = false;
-    for (size_t i = 0; i < lengthOfReviewedWithOutput; i++){
+    for (i = 0; i < lengthOfReviewedWithOutput; i++){
         if (reviewedWithOutput[i] == ' '){
             reviewedWithOutput[i] = '_';
             spaceInName = true;
