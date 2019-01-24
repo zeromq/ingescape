@@ -11,6 +11,8 @@
 #include "ingescape_private.h"
 #include "uthash/utlist.h"
 
+static pthread_mutex_t readWriteMutex = PTHREAD_MUTEX_INITIALIZER;
+
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
@@ -196,9 +198,11 @@ void* model_getValueFor(const char *name, iop_t type){
 }
 
 int igs_readIOP(const char *name, iop_t type, void **value, size_t *size){
+    pthread_mutex_lock(&readWriteMutex);
     agent_iop_t *iop = model_findIopByName((char*) name, type);
     if(iop == NULL){
         igs_error("%s not found", name);
+        pthread_mutex_unlock(&readWriteMutex);
         return 0;
     }
     if (iop->value_type == IGS_IMPULSION_T){
@@ -209,81 +213,108 @@ int igs_readIOP(const char *name, iop_t type, void **value, size_t *size){
         memcpy(*value, model_getValueFor(name, type), iop->valueSize);
         *size = iop->valueSize;
     }
+    pthread_mutex_unlock(&readWriteMutex);
     return 1;
 }
 
 bool model_readIopAsBool (const char *name, iop_t type){
+    pthread_mutex_lock(&readWriteMutex);
+    bool res = false;
     agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
         switch(iop->value_type){
             case IGS_BOOL_T:
-                return iop->value.b;
+                res = iop->value.b;
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             case IGS_INTEGER_T:
                 igs_warn("Implicit conversion from int to bool for %s", name);
-                return (iop->value.i == 0)?false:true;
+                res = (iop->value.i == 0)?false:true;
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             case IGS_DOUBLE_T:
                 igs_warn("Implicit conversion from double to bool for %s", name);
-                return (iop->value.d >= 0 && iop->value.d <= 0)?false:true;
+                res = (iop->value.d >= 0 && iop->value.d <= 0)?false:true;
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             case IGS_STRING_T:
                 if (strcmp(iop->value.s, "true") == 0){
                     igs_warn("Implicit conversion from string to bool for %s", name);
+                    pthread_mutex_unlock(&readWriteMutex);
                     return true;
                 }
                 else if (strcmp(iop->value.s, "false") == 0){
                     igs_warn("Implicit conversion from string to bool for %s", name);
+                    pthread_mutex_unlock(&readWriteMutex);
                     return false;
                 }else{
                     igs_warn("Implicit conversion from double to bool for %s (string value is %s and false was returned)", name, iop->value.s);
+                    pthread_mutex_unlock(&readWriteMutex);
                     return false;
                 }
                 break;
                 
             default:
                 igs_error("No implicit conversion possible for %s (false was returned)", name);
+                pthread_mutex_unlock(&readWriteMutex);
                 return false;
                 break;
         }
     }else{
         igs_error("%s not found", name);
+        pthread_mutex_unlock(&readWriteMutex);
         return false;
     }
 }
 
 int model_readIopAsInt (const char *name, iop_t type){
+    pthread_mutex_lock(&readWriteMutex);
+    int res = 0;
     agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
         switch(iop->value_type){
             case IGS_BOOL_T:
                 igs_warn("Implicit conversion from bool to int for %s", name);
-                return (iop->value.b)?1:0;
+                res =  (iop->value.b)?1:0;
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             case IGS_INTEGER_T:
-                return iop->value.i;
+                res = iop->value.i;
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             case IGS_DOUBLE_T:
                 igs_warn("Implicit conversion from double to int for %s", name);
                 if(iop->value.d < 0) {
-                    return (int) (iop->value.d - 0.5);
+                    res = (int) (iop->value.d - 0.5);
+                    pthread_mutex_unlock(&readWriteMutex);
+                    return res;
                 }else {
-                    return (int) (iop->value.d + 0.5);
+                    res = (int) (iop->value.d + 0.5);
+                    pthread_mutex_unlock(&readWriteMutex);
+                    return res;
                 }
                 break;
                 
             case IGS_STRING_T:
                 igs_warn("Implicit conversion from string %s to int for %s", iop->value.s, name);
-                return atoi(iop->value.s);
+                res = atoi(iop->value.s);
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             default:
                 igs_error("No implicit conversion possible for %s (0 was returned)", name);
+                pthread_mutex_unlock(&readWriteMutex);
                 return 0;
                 break;
         }
@@ -294,90 +325,118 @@ int model_readIopAsInt (const char *name, iop_t type){
 }
 
 double model_readIopAsDouble (const char *name, iop_t type){
+    pthread_mutex_lock(&readWriteMutex);
+    double res = 0;
     agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
         switch(iop->value_type){
             case IGS_BOOL_T:
                 igs_warn("Implicit conversion from bool to double for %s", name);
-                return (iop->value.b)?1:0;
+                res = (iop->value.b)?1:0;
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             case IGS_INTEGER_T:
                 igs_warn("Implicit conversion from int to double for %s", name);
-                return iop->value.i;
+                res = iop->value.i;
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             case IGS_DOUBLE_T:
-                return iop->value.d;
+                res = iop->value.d;
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             case IGS_STRING_T:
                 igs_warn("Implicit conversion from string %s to double for %s", iop->value.s, name);
-                return atof(iop->value.s);
+                res = atof(iop->value.s);
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             default:
                 igs_error("No implicit conversion possible for %s (0 was returned)", name);
+                pthread_mutex_unlock(&readWriteMutex);
                 return 0;
                 break;
         }
     }else{
         igs_error("%s not found", name);
+        pthread_mutex_unlock(&readWriteMutex);
         return 0;
     }
 }
 
 char *model_readIopAsString (const char *name, iop_t type){
+    pthread_mutex_lock(&readWriteMutex);
+    char *res = NULL;
     agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
         switch(iop->value_type){
             case IGS_STRING_T:
-                return strdup(iop->value.s);
+                res = strdup(iop->value.s);
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             case IGS_BOOL_T:
                 igs_warn("Implicit conversion from bool to string for %s", name);
-                return iop->value.b ? strdup("true") : strdup("false");
+                res = iop->value.b ? strdup("true") : strdup("false");
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             case IGS_INTEGER_T:
                 igs_warn("Implicit conversion from int to string for %s", name);
-                return model_intToString(iop->value.i);
+                res = model_intToString(iop->value.i);
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             case IGS_DOUBLE_T:
                 igs_warn("Implicit conversion from double to string for %s", name);
-                return model_doubleToString(iop->value.d);
+                res = model_doubleToString(iop->value.d);
+                pthread_mutex_unlock(&readWriteMutex);
+                return res;
                 break;
                 
             default:
                 igs_error("No implicit conversion possible for %s (NULL was returned)", name);
+                pthread_mutex_unlock(&readWriteMutex);
                 return NULL;
                 break;
         }
     }else{
         igs_error("%s not found", name);
+        pthread_mutex_unlock(&readWriteMutex);
         return NULL;
     }
 }
 
 int model_readIopAsData (const char *name, iop_t type, void **value, size_t *size){
+    pthread_mutex_lock(&readWriteMutex);
     agent_iop_t *iop = model_findIopByName((char*) name, type);
     if(iop == NULL){
         igs_error("%s not found", name);
         *value = NULL;
         *size = 0;
+        pthread_mutex_unlock(&readWriteMutex);
         return 0;
     }
     if(iop->value_type != IGS_DATA_T){
         igs_error("No implicit conversion possible for %s (NULL was returned)", name);
         *value = NULL;
         *size = 0;
+        pthread_mutex_unlock(&readWriteMutex);
         return 0;
     }
     *size = iop->valueSize;
     *value = calloc(1, iop->valueSize);
     memcpy(*value, model_getValueFor(name, type), *size);
+    pthread_mutex_unlock(&readWriteMutex);
     return 1;
 }
 
@@ -470,6 +529,7 @@ char* model_getIOPValueAsString (agent_iop_t* iop){
 }
 
 const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size){
+    igs_debug("starting");
     agent_iop_t *iop = model_findIopByName((char*) iopName, iopType);
     if(iop == NULL){
         igs_error("%s not found for writing", iopName);
@@ -872,6 +932,7 @@ int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg){
     size_t size = 0;
     int ret = model_readIopAsData(name, IGS_INPUT_T, &data, &size);
     zframe_t *frame = zframe_new(data, size);
+    free(data);
     *msg = zmsg_decode(frame);
     zframe_destroy(&frame);
     return ret;
@@ -924,8 +985,11 @@ int igs_writeInputAsBool(const char *name, bool value){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_BOOL_T, &value, sizeof(bool));
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeInputAsInt(const char *name, int value){
@@ -933,8 +997,11 @@ int igs_writeInputAsInt(const char *name, int value){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_INTEGER_T, &value, sizeof(int));
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeInputAsDouble(const char *name, double value){
@@ -942,8 +1009,11 @@ int igs_writeInputAsDouble(const char *name, double value){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_DOUBLE_T, &value, sizeof(double));
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeInputAsString(const char *name, const char *value){
@@ -951,8 +1021,11 @@ int igs_writeInputAsString(const char *name, const char *value){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_STRING_T, (char *)value, strlen(value)+1);
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeInputAsImpulsion(const char *name){
@@ -960,8 +1033,11 @@ int igs_writeInputAsImpulsion(const char *name){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_IMPULSION_T, NULL, 0);
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeInputAsData(const char *name, void *value, size_t size){
@@ -969,8 +1045,11 @@ int igs_writeInputAsData(const char *name, void *value, size_t size){
         igs_error("Input name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_INPUT_T, IGS_DATA_T, value, size);
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeOutputAsBool(const char *name, bool value){
@@ -978,10 +1057,13 @@ int igs_writeOutputAsBool(const char *name, bool value){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_BOOL_T, &value, sizeof(bool));
     network_publishOutput(iop);
     
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeOutputAsInt(const char *name, int value){
@@ -989,11 +1071,13 @@ int igs_writeOutputAsInt(const char *name, int value){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_INTEGER_T, &value, sizeof(int));
     network_publishOutput(iop);
 
-    return (iop == NULL)?0:1;
-
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeOutputAsDouble(const char *name, double value){
@@ -1001,10 +1085,13 @@ int igs_writeOutputAsDouble(const char *name, double value){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_DOUBLE_T, &value, sizeof(double));
     network_publishOutput(iop);
 
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeOutputAsString(const char *name, const char *value){
@@ -1012,10 +1099,13 @@ int igs_writeOutputAsString(const char *name, const char *value){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_STRING_T, (char *)value, strlen(value)+1);
     network_publishOutput(iop);
 
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeOutputAsImpulsion(const char *name){
@@ -1023,10 +1113,13 @@ int igs_writeOutputAsImpulsion(const char *name){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0);
     network_publishOutput(iop);
 
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeOutputAsData(const char *name, void *value, size_t size){
@@ -1034,10 +1127,13 @@ int igs_writeOutputAsData(const char *name, void *value, size_t size){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
     network_publishOutput(iop);
     
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
@@ -1045,13 +1141,16 @@ int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     zframe_t *frame = zmsg_encode(msg);
     void *value = zframe_data(frame);
     size_t size = zframe_size(frame);
     const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
     network_publishOutput(iop);
     zframe_destroy(&frame);
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeParameterAsBool(const char *name, bool value){
@@ -1059,8 +1158,11 @@ int igs_writeParameterAsBool(const char *name, bool value){
         igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_PARAMETER_T, IGS_BOOL_T, &value, sizeof(bool));
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeParameterAsInt(const char *name, int value){
@@ -1068,8 +1170,11 @@ int igs_writeParameterAsInt(const char *name, int value){
         igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_PARAMETER_T, IGS_INTEGER_T, &value, sizeof(int));
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeParameterAsDouble(const char *name, double value){
@@ -1077,8 +1182,11 @@ int igs_writeParameterAsDouble(const char *name, double value){
         igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_PARAMETER_T, IGS_DOUBLE_T, &value, sizeof(double));
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeParameterAsString(const char *name, const char *value){
@@ -1086,8 +1194,11 @@ int igs_writeParameterAsString(const char *name, const char *value){
         igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_PARAMETER_T, IGS_STRING_T, (char *)value, strlen(value)+1);
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 int igs_writeParameterAsData(const char *name, void *value, size_t size){
@@ -1095,8 +1206,11 @@ int igs_writeParameterAsData(const char *name, void *value, size_t size){
         igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
+    pthread_mutex_lock(&readWriteMutex);
     const agent_iop_t *iop = model_writeIOP(name, IGS_PARAMETER_T, IGS_DATA_T, value, size);
-    return (iop == NULL)?0:1;
+    int res = (iop == NULL)?0:1;
+    pthread_mutex_unlock(&readWriteMutex);
+    return res;
 }
 
 void igs_clearDataForInput(const char *name){
