@@ -475,7 +475,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             // HIGHLIGHT LINK
             else if (message.startsWith(prefix_HighlightLink))
             {
-                qDebug() << "Manage" << message;
+                qDebug() << message;
 
                 message.remove(0, prefix_HighlightLink.length());
 
@@ -961,8 +961,10 @@ void NetworkController::sendCommandWithJsonToRecorder(QString peerIdOfRecorder, 
         for (QString string : commandAndParameters)
         {
             // Add a frame with STRING
-            zframe_t* frameString = zframe_new(string.toStdString().c_str(), string.length());
-            zmsg_append(msg, &frameString);
+            //zframe_t* frameString = zframe_new(string.toStdString().c_str(), string.length() + 1);
+            //zmsg_append(msg, &frameString);
+
+            zmsg_addstr(msg, string.toStdString().c_str());
         }
 
         //int framesNumber = zmsg_size(msg);
