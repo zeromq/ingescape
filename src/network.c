@@ -2104,7 +2104,8 @@ void igs_getNetdevicesList(char ***devices, int *nb){
 }
 
 void igs_freeNetdevicesList(char **devices, int nb){
-    for (int i=0; i < nb; i++){
+    int i = 0;
+    for (i = 0; i < nb; i++){
         if (devices[i] != NULL && strlen(devices[i]) > 0){
             free(devices[i]);
         }
