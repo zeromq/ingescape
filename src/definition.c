@@ -97,7 +97,8 @@ agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_
     char *n = strndup(name, MAX_IOP_NAME_LENGTH);
     bool spaceInName = false;
     size_t lengthOfN = strlen(n);
-    for (size_t i = 0; i < lengthOfN; i++){
+    size_t i = 0;
+    for (i = 0; i < lengthOfN; i++){
         if (n[i] == ' '){
             n[i] = '_';
             spaceInName = true;
