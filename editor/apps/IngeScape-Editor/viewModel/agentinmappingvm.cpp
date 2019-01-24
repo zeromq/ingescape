@@ -15,10 +15,10 @@
 #include "agentinmappingvm.h"
 
 // Maximum number of Inputs/Outputs to reduce an agent (by default)
-#define MAX_NUMBER_OF_IO_TO_REDUCE 15
+#define MAX_NUMBER_OF_IO_TO_REDUCE 30
 
 // Maximum number of Inputs/Outputs to lock reduced (prevent to open the list of Inputs/Outputs)
-#define MAX_NUMBER_OF_IO_TO_LOCK_REDUCED 30
+#define MAX_NUMBER_OF_IO_TO_LOCK_REDUCED 100
 
 
 /**

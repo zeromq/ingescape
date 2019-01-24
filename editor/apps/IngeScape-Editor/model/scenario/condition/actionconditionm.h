@@ -44,7 +44,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit ActionConditionM(QObject *parent = 0);
+    explicit ActionConditionM(QObject *parent = nullptr);
 
 
     /**

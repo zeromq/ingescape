@@ -60,7 +60,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit ScenarioM(QObject *parent = 0);
+    explicit ScenarioM(QObject *parent = nullptr);
 
 
     /**

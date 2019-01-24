@@ -60,7 +60,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit TerminationSignalWatcher(QObject *parent = 0);
+    explicit TerminationSignalWatcher(QObject *parent = nullptr);
 
 
     /**

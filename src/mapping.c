@@ -370,8 +370,9 @@ unsigned long igs_addMappingEntry(const char *fromOurInput,
     }
     char *reviewedFromOurInput = strndup(fromOurInput, MAX_IOP_NAME_LENGTH);
     bool spaceInName = false;
+    size_t i = 0;
     size_t lengthOfReviewedFromOurInput = strlen(reviewedFromOurInput);
-    for (size_t i = 0; i < lengthOfReviewedFromOurInput; i++){
+    for (i = 0; i < lengthOfReviewedFromOurInput; i++){
         if (reviewedFromOurInput[i] == ' '){
             reviewedFromOurInput[i] = '_';
             spaceInName = true;
@@ -384,12 +385,13 @@ unsigned long igs_addMappingEntry(const char *fromOurInput,
     //toAgent
     if(toAgent == NULL || strlen(toAgent) == 0){
         igs_error("Agent name to be mapped cannot be NULL or empty");
+        free(reviewedFromOurInput);
         return 0;
     }
     char *reviewedToAgent = strndup(toAgent, MAX_IOP_NAME_LENGTH);
     size_t lengthOfReviewedToAgent = strlen(reviewedToAgent);
     spaceInName = false;
-    for (size_t i = 0; i < lengthOfReviewedToAgent; i++){
+    for (i = 0; i < lengthOfReviewedToAgent; i++){
         if (reviewedToAgent[i] == ' '){
             reviewedToAgent[i] = '_';
             spaceInName = true;
@@ -402,12 +404,13 @@ unsigned long igs_addMappingEntry(const char *fromOurInput,
     //withOutput
     if((withOutput == NULL) || (strlen(withOutput) == 0)){
         igs_error("Agent output name to be mapped cannot be NULL or empty");
+        free(reviewedToAgent);
         return 0;
     }
     char *reviewedWithOutput = strndup(withOutput, MAX_IOP_NAME_LENGTH);
     size_t lengthOfReviewedWithOutput = strlen(reviewedWithOutput);
     spaceInName = false;
-    for (size_t i = 0; i < lengthOfReviewedWithOutput; i++){
+    for (i = 0; i < lengthOfReviewedWithOutput; i++){
         if (reviewedWithOutput[i] == ' '){
             reviewedWithOutput[i] = '_';
             spaceInName = true;

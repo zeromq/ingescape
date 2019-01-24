@@ -10,6 +10,8 @@ cmake_minimum_required(VERSION 3.13.1)
 project(Ingescape HOMEPAGE_URL https://ingescape.com)
 
 enable_language(C)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)

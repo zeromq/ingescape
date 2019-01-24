@@ -56,7 +56,7 @@ public:
     ActionExecutionVM(bool shallRevert,
                       int executionTime,
                       int reverseTime,
-                      QObject *parent = 0);
+                      QObject *parent = nullptr);
 
 
     /**

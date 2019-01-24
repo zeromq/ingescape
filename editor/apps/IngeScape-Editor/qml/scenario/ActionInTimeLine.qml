@@ -425,7 +425,7 @@ Item {
                 visible: (text !== "")
                 color: IngeScapeTheme.lightGreyColor
 
-                text: actionVMItem.temporaryStartTime ? actionVMItem.temporaryStartTime.toLocaleString(Qt.locale(), "hh:mm:ss.zzz")
+                text: actionVMItem.temporaryStartTime ? actionVMItem.temporaryStartTime.toLocaleString(Qt.locale(), "HH:mm:ss.zzz")
                                                       : "";
 
                 font {

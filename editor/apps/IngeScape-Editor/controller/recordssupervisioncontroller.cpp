@@ -40,7 +40,7 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     _isRecordingTimeLine(false),
     _isLoadingRecord(false),
     _playingRecord(nullptr),
-    _currentRecordTime(QTime::fromMSecsSinceStartOfDay(0)),
+    _currentRecordTime(QDateTime(QDate::currentDate())),
     _modelManager(modelManager),
     _jsonHelper(jsonHelper)
 {
@@ -109,7 +109,7 @@ void RecordsSupervisionController::startOrStopToRecord(bool isStart, bool withTi
 
                 // Stop the timer for feedback
                 _timerToDisplayTime.stop();
-                setcurrentRecordTime(QTime(0, 0, 0, 0));
+                setcurrentRecordTime(QDateTime(QDate::currentDate()));
 
                 Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, command_StopToRecord);
             }

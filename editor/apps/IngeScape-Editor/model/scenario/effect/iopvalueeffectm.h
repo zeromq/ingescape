@@ -53,7 +53,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit IOPValueEffectM(QObject *parent = 0);
+    explicit IOPValueEffectM(QObject *parent = nullptr);
 
 
     /**

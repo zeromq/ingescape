@@ -78,7 +78,7 @@ public:
      * @param type
      * @param parent
      */
-    explicit TimeTickM(int milliseconds, TimeTickTypes::Value type, QObject *parent = 0);
+    explicit TimeTickM(int milliseconds, TimeTickTypes::Value type, QObject *parent = nullptr);
 };
 
 QML_DECLARE_TYPE(TimeTickM)

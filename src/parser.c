@@ -47,30 +47,33 @@ char definitionPath[MAX_PATH] = "";
 
 iopType_t string_to_value_type(const char* str) {
     
-    if (!strcmp(str, "INTEGER"))
-        return IGS_INTEGER_T;
-    if (!strcmp(str, "DOUBLE"))
-        return IGS_DOUBLE_T;
-    if (!strcmp(str, "STRING"))
-        return IGS_STRING_T;
-    if (!strcmp(str, "BOOL"))
-        return IGS_BOOL_T;
-    if (!strcmp(str, "IMPULSION"))
-        return IGS_IMPULSION_T;
-    if (!strcmp(str, "DATA"))
-        return IGS_DATA_T;
+    if (str != NULL){
+        if (!strcmp(str, "INTEGER"))
+            return IGS_INTEGER_T;
+        if (!strcmp(str, "DOUBLE"))
+            return IGS_DOUBLE_T;
+        if (!strcmp(str, "STRING"))
+            return IGS_STRING_T;
+        if (!strcmp(str, "BOOL"))
+            return IGS_BOOL_T;
+        if (!strcmp(str, "IMPULSION"))
+            return IGS_IMPULSION_T;
+        if (!strcmp(str, "DATA"))
+            return IGS_DATA_T;
+    }
     
     igs_error("unknown value type \"%s\" to convert", str);
     return IGS_UNKNOWN_T;
 }
 
 bool string_to_boolean(const char* str) {
-    
-    if (!strcmp(str, "true"))
-        return true;
-    
-    if (!strcmp(str, "false"))
-        return false;
+    if(str != NULL){
+        if (!strcmp(str, "true"))
+            return true;
+        
+        if (!strcmp(str, "false"))
+            return false;
+    }
     
     igs_warn("unknown string \"%s\" to convert", str);
     return false;
@@ -123,7 +126,8 @@ static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
 
     if (YAJL_IS_OBJECT(obj)){
         size_t nb = obj->u.object.len;
-        for (size_t i = 0; i < nb; i++){
+        size_t i = 0;
+        for (i = 0; i < nb; i++){
             const char *key = obj->u.object.keys[i];
             if (strcmp("name", key) == 0){
                 name = YAJL_GET_STRING(obj->u.object.values[i]);
@@ -144,7 +148,8 @@ static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
         char *n = strndup(name, MAX_IOP_NAME_LENGTH);
         bool spaceInName = false;
         size_t lengthOfN = strlen(n);
-        for (size_t i = 0; i < lengthOfN; i++){
+        size_t i = 0;
+        for (i = 0; i < lengthOfN; i++){
             if (n[i] == ' '){
                 n[i] = '_';
                 spaceInName = true;
@@ -213,7 +218,8 @@ static void json_add_iops (yajl_val node, const char** path, iop_t type,
 static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
     if (YAJL_IS_ARRAY(arguments)){
         size_t nbArgs = arguments->u.array.len;
-        for (size_t i = 0; i < nbArgs; i++){
+        size_t i = 0;
+        for (i = 0; i < nbArgs; i++){
             //iterate on arguments
             yajl_val arg = arguments->u.array.values[i];
             
@@ -221,8 +227,8 @@ static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
                 size_t nbKeys = arg->u.object.len;
                 const char *name = NULL;
                 iopType_t valType = IGS_UNKNOWN_T;
-                
-                for (size_t j = 0; j < nbKeys; j++){
+                size_t j = 0;
+                for (j = 0; j < nbKeys; j++){
                     //iterate on keys for this argument
                     const char *key = arg->u.object.keys[j];
                     if (strcmp("name", key) == 0){
@@ -236,7 +242,8 @@ static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
                     char *n = strndup(name, MAX_IOP_NAME_LENGTH);
                     bool spaceInName = false;
                     size_t lengthOfN = strlen(n);
-                    for (size_t _i = 0; _i < lengthOfN; _i++){
+                    size_t _i = 0;
+                    for (_i = 0; _i < lengthOfN; _i++){
                         if (n[_i] == ' '){
                             n[_i] = '_';
                             spaceInName = true;
@@ -250,6 +257,8 @@ static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
                         tokenArg->name = n;
                         tokenArg->type = valType;
                         LL_APPEND(token->arguments, tokenArg);
+                    }else{
+                        free(n);
                     }
                 }
             }else{
@@ -271,7 +280,8 @@ static void json_add_token_to_hash (igs_token_t **hasht, yajl_val obj){
     
     if (YAJL_IS_OBJECT(obj)){
         size_t nb = obj->u.object.len;
-        for (size_t i = 0; i < nb; i++){
+        size_t i = 0;
+        for (i = 0; i < nb; i++){
             const char *key = obj->u.object.keys[i];
             if (strcmp("name", key) == 0){
                 name = YAJL_GET_STRING(obj->u.object.values[i]);
@@ -289,7 +299,8 @@ static void json_add_token_to_hash (igs_token_t **hasht, yajl_val obj){
         n = strndup(name, MAX_IOP_NAME_LENGTH);
         bool spaceInName = false;
         size_t lengthOfN = strlen(n);
-        for (size_t i = 0; i < lengthOfN; i++){
+        size_t i = 0;
+        for (i = 0; i < lengthOfN; i++){
             if (n[i] == ' '){
                 n[i] = '_';
                 spaceInName = true;
@@ -465,7 +476,8 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     char *reviewedFromOurInput = strndup(input_name, MAX_IOP_NAME_LENGTH);
     bool spaceInName = false;
     size_t lengthOfReviewedFromOurInput = strlen(reviewedFromOurInput);
-    for (size_t i = 0; i < lengthOfReviewedFromOurInput; i++){
+    size_t i = 0;
+    for (i = 0; i < lengthOfReviewedFromOurInput; i++){
         if (reviewedFromOurInput[i] == ' '){
             reviewedFromOurInput[i] = '_';
             spaceInName = true;
@@ -484,7 +496,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     char *reviewedToAgent = strndup(agent_name, MAX_IOP_NAME_LENGTH);
     size_t lengthOfReviewedToAgent = strlen(reviewedToAgent);
     spaceInName = false;
-    for (size_t i = 0; i < lengthOfReviewedToAgent; i++){
+    for (i = 0; i < lengthOfReviewedToAgent; i++){
         if (reviewedToAgent[i] == ' '){
             reviewedToAgent[i] = '_';
             spaceInName = true;
@@ -503,7 +515,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     char *reviewedWithOutput = strndup(output_name, MAX_IOP_NAME_LENGTH);
     size_t lengthOfReviewedWithOutput = strlen(reviewedWithOutput);
     spaceInName = false;
-    for (size_t i = 0; i < lengthOfReviewedWithOutput; i++){
+    for (i = 0; i < lengthOfReviewedWithOutput; i++){
         if (reviewedWithOutput[i] == ' '){
             reviewedWithOutput[i] = '_';
             spaceInName = true;

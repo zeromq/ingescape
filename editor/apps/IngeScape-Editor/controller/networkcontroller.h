@@ -45,7 +45,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit NetworkController(QObject *parent = 0);
+    explicit NetworkController(QObject *parent = nullptr);
 
 
     /**

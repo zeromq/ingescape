@@ -46,7 +46,7 @@ public:
      * @param indexInPanel
      * @param parent
      */
-    explicit ActionInPaletteVM(ActionM* actionM, int indexInPanel, QObject *parent = 0);
+    explicit ActionInPaletteVM(ActionM* actionM, int indexInPanel, QObject *parent = nullptr);
 
 
     /**

@@ -52,7 +52,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit ActionConditionVM(QObject *parent = 0);
+    explicit ActionConditionVM(QObject *parent = nullptr);
 
 
     /**

@@ -61,7 +61,8 @@ class RecordsSupervisionController : public QObject
     I2_QML_PROPERTY(RecordVM*, playingRecord)
 
     // Current elapsed time of our record
-    I2_QML_PROPERTY(QTime, currentRecordTime)
+    //I2_QML_PROPERTY(QTime, currentRecordTime)
+    I2_QML_PROPERTY(QDateTime, currentRecordTime)
 
 
 public:

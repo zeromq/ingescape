@@ -363,7 +363,8 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
     char *output = NULL;
     char *vType = NULL;
     iopType_t valueType = 0;
-    for (unsigned long i = 0; i < msgSize; i += 3){
+    unsigned long i = 0;
+    for (i = 0; i < msgSize; i += 3){
         // Each message part must contain 3 elements
         // 1 : output name
         // 2 : output ioptType
@@ -1731,7 +1732,8 @@ int igs_setAgentName(const char *name){
     }
     bool spaceInName = false;
     size_t lengthOfN = strlen(n);
-    for (size_t i = 0; i < lengthOfN; i++){
+    size_t i = 0;
+    for (i = 0; i < lengthOfN; i++){
         if (n[i] == ' '){
             n[i] = '_';
             spaceInName = true;
@@ -2104,7 +2106,8 @@ void igs_getNetdevicesList(char ***devices, int *nb){
 }
 
 void igs_freeNetdevicesList(char **devices, int nb){
-    for (int i=0; i < nb; i++){
+    int i = 0;
+    for (i = 0; i < nb; i++){
         if (devices[i] != NULL && strlen(devices[i]) > 0){
             free(devices[i]);
         }

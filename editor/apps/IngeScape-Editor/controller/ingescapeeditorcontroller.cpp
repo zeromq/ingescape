@@ -35,6 +35,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _isAvailableModelVisualizer(false),
     _isVisibleModelVisualizer(false),
     _errorMessageWhenConnectionFailed(""),
+    _snapshotDirectory(""),
     _modelManager(nullptr),
     _agentsSupervisionC(nullptr),
     _agentsMappingC(nullptr),
@@ -241,8 +242,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
 
 
-    // Create a fake launcher for fake agents
-    _modelManager->onLauncherEntered("0", HOSTNAME_NOT_DEFINED, "0.0.0.0", "");
+    if (_isAvailableModelVisualizer) {
+        // Create a fake launcher for fake agents
+        _modelManager->onLauncherEntered("0", HOSTNAME_NOT_DEFINED, "0.0.0.0", "");
+    }
 
 
     // Update the list of available network devices
