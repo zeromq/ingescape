@@ -218,22 +218,6 @@ installer-runtime-windows-x64:
   dependencies:
     - windows-release-x64
 
-# Create runtime install for windows 64 bits debug
-installer-runtime-windows-x64-debug:
-  <<: *build-ingescape-lib
-  stage: ingescape-installer
-  tags:
-    - windows
-  script:
-    - cd build\DebugX64 && cpack --config CPackConfig.cmake && cd ..\..
-    - cd build\DebugX64 && cpack --config CPackSourceConfig.cmake && cd ..\..
-  artifacts:
-    paths:
-      - build\DebugX64\Ingescape-*.exe
-      - build\DebugX64\Ingescape-*.zip
-  dependencies:
-    - windows-debug-x64
-
 # Create runtime install for osx 64 bits
 installer-runtime-osx-x64:
   <<: *build-ingescape-lib
