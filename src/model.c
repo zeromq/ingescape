@@ -39,8 +39,7 @@ void model_readWriteLock(void)   {
             return;
         }
     }
-    pthread_mutex_lock(readWriteMutex);
-#else
+#elif (defined WIN32 || defined _WIN32)
     if (readWriteMutex == NULL){
         if (pthread_mutex_init(readWriteMutex) != 0){
             igs_error("mutex init failed");
@@ -48,6 +47,7 @@ void model_readWriteLock(void)   {
         }
     }
 #endif
+    pthread_mutex_lock(readWriteMutex);
 }
 
 void model_readWriteUnlock(void) {

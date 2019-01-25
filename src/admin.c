@@ -146,8 +146,7 @@ void admin_lock(void)   {
             return;
         }
     }
-    pthread_mutex_lock(lock);
-#else
+#elif (defined WIN32 || defined _WIN32)
     if (lock == NULL){
         if (pthread_mutex_init(lock) != 0){
             printf("error: mutex init failed\n");
@@ -155,6 +154,7 @@ void admin_lock(void)   {
         }
     }
 #endif
+    pthread_mutex_lock(lock);
 }
 
 void admin_unlock(void) {
