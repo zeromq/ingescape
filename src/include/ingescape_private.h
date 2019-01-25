@@ -201,12 +201,12 @@ typedef struct serviceHeader {
 //  definition
 extern char definitionPath[MAX_PATH];
 extern definition* igs_internal_definition;
-void definition_freeDefinition (definition* definition);
+PUBLIC void definition_freeDefinition (definition* definition);
 
 //  mapping
 extern char mappingPath[MAX_PATH];
 extern mapping_t *igs_internal_mapping;
-void mapping_freeMapping (mapping_t* map);
+PUBLIC void mapping_freeMapping (mapping_t* map);
 mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name);
@@ -232,8 +232,8 @@ extern char *ipcFolderPath;
 int network_publishOutput (const agent_iop_t *iop);
 
 // parser
-definition* parser_loadDefinition (const char* json_str);
-definition* parser_loadDefinitionFromPath (const char* file_path);
+PUBLIC definition* parser_loadDefinition (const char* json_str);
+PUBLIC definition* parser_loadDefinitionFromPath (const char* file_path);
 char* parser_export_definition (definition* def);
 char* parser_export_mapping(mapping_t* mapp);
 mapping_t* parser_LoadMap (const char* json_str);

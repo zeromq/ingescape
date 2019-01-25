@@ -152,6 +152,8 @@
     <ClCompile Include="..\..\..\src\token.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\dependencies\windows\unix\getopt.h" />
+    <ClInclude Include="..\..\..\dependencies\windows\unix\unixfunctions.h" />
     <ClInclude Include="..\..\..\src\include\ingescape.h" />
     <ClInclude Include="..\..\..\src\include\ingescape_advanced.h" />
     <ClInclude Include="..\..\..\src\include\ingescape_private.h" />

@@ -53,5 +53,11 @@
     <ClInclude Include="..\..\..\src\include\ingescape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\dependencies\windows\unix\getopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\dependencies\windows\unix\unixfunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
