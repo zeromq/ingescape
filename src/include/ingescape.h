@@ -315,7 +315,7 @@ PUBLIC void igs_writeMappingToPath(void);
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
 //IPC is supported on UNIX systems only
-//set/get IPC folder path for the agent (default is /tmp/ingesscape/)
+//set/get IPC folder path for the agent (default is /tmp/)
 PUBLIC void igs_setIpcFolderPath(char *path);
 PUBLIC const char* igs_getIpcFolderPath(void);
 

@@ -139,7 +139,7 @@ unsigned int network_discoveryInterval = 1000;
 unsigned int network_agentTimeout = 30000;
 unsigned int network_publishingPort = 0;
 char *ipcFolderPath = NULL;
-#define DEFAULT_IPC_PATH "/tmp/ingescape"
+#define DEFAULT_IPC_PATH "/tmp/"
 
 //we manage agent data as a global variables inside the network module for now
 zyreloopElements_t *agentElements = NULL;
@@ -1170,6 +1170,10 @@ initLoop (zsock_t *pipe, void *args){
     char *ipcFullPath = NULL;
     if (ipcFolderPath == NULL){
         ipcFolderPath = strdup(DEFAULT_IPC_PATH);
+    }
+    struct stat st;
+    if(stat(ipcFolderPath,&st) != 0){
+        igs_warn("Expected IPC directory %s does not exist : create it to remove this warning", ipcFolderPath);
     }
     ipcFullPath = calloc(1, strlen(ipcFolderPath)+strlen(zyre_uuid(node))+2);
     sprintf(ipcFullPath, "%s/%s", ipcFolderPath, zyre_uuid(node));
