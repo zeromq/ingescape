@@ -662,21 +662,25 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     zframe_t *frame = NULL;
                     void *data = NULL;
                     size_t size = 0;
-                    char * value = NULL;
                     if (inputType == IGS_STRING_T){
+                        char * value = NULL;
                         value = zmsg_popstr(msgDuplicate);
+                        igs_debug("replaying %s (%s)", input, value);
                         igs_writeInputAsString(input, value);
+                        if (value != NULL){
+                            free(value);
+                        }
                     }else{
+                        igs_debug("replaying %s", input);
                         frame = zmsg_pop(msgDuplicate);
                         data = zframe_data(frame);
                         size = zframe_size(frame);
+                        model_readWriteLock();
                         model_writeIOP(input, IGS_INPUT_T, inputType, data, size);
-                    }
-                    if (frame != NULL){
-                        zframe_destroy(&frame);
-                    }
-                    if (value != NULL){
-                        free(value);
+                        model_readWriteUnlock();
+                        if (frame != NULL){
+                            zframe_destroy(&frame);
+                        }
                     }
                 }else{
                     igs_warn("replay message for input %s is not correct and was ignored", input);
