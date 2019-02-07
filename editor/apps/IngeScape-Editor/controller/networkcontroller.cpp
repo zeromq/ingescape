@@ -43,11 +43,11 @@ static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
 static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH=";
 
 static const QString prefix_AllRecords = "RECORDS_LIST=";
-static const QString prefix_AddedRecord = "ADDED_RECORD=";
+static const QString prefix_AddedRecord = "ADD_RECORD=";
 static const QString prefix_DeletedRecord = "DELETED_RECORD=";
-static const QString prefix_LoadingRecord = "RECORD_LOADING=";
-static const QString prefix_LoadedRecord = "RECORD_LOADED";
-static const QString prefix_EndedRecord = "RECORD_ENDED";
+static const QString prefix_LoadingRecord = "REPLAY_LOADING=";
+static const QString prefix_LoadedRecord = "REPLAY_LOADED";
+static const QString prefix_EndedRecord = "REPLAY_ENDED";
 static const QString prefix_HighlightLink = "HIGHLIGHT_LINK=";
 
 
