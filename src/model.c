@@ -239,11 +239,9 @@ void* model_getValueFor(const char *name, iop_t type){
 }
 
 int igs_readIOP(const char *name, iop_t type, void **value, size_t *size){
-    model_readWriteLock();
     agent_iop_t *iop = model_findIopByName((char*) name, type);
     if(iop == NULL){
         igs_error("%s not found", name);
-        model_readWriteUnlock();
         return 0;
     }
     if (iop->value_type == IGS_IMPULSION_T){
@@ -254,68 +252,57 @@ int igs_readIOP(const char *name, iop_t type, void **value, size_t *size){
         memcpy(*value, model_getValueFor(name, type), iop->valueSize);
         *size = iop->valueSize;
     }
-    model_readWriteUnlock();
     return 1;
 }
 
 bool model_readIopAsBool (const char *name, iop_t type){
-    model_readWriteLock();
     bool res = false;
     agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
         switch(iop->value_type){
             case IGS_BOOL_T:
                 res = iop->value.b;
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             case IGS_INTEGER_T:
                 igs_warn("Implicit conversion from int to bool for %s", name);
                 res = (iop->value.i == 0)?false:true;
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             case IGS_DOUBLE_T:
                 igs_warn("Implicit conversion from double to bool for %s", name);
                 res = (iop->value.d >= 0 && iop->value.d <= 0)?false:true;
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             case IGS_STRING_T:
                 if (strcmp(iop->value.s, "true") == 0){
                     igs_warn("Implicit conversion from string to bool for %s", name);
-                    model_readWriteUnlock();
                     return true;
                 }
                 else if (strcmp(iop->value.s, "false") == 0){
                     igs_warn("Implicit conversion from string to bool for %s", name);
-                    model_readWriteUnlock();
                     return false;
                 }else{
                     igs_warn("Implicit conversion from double to bool for %s (string value is %s and false was returned)", name, iop->value.s);
-                    model_readWriteUnlock();
                     return false;
                 }
                 break;
                 
             default:
                 igs_error("No implicit conversion possible for %s (false was returned)", name);
-                model_readWriteUnlock();
                 return false;
                 break;
         }
     }else{
         igs_error("%s not found", name);
-        model_readWriteUnlock();
         return false;
     }
 }
 
 int model_readIopAsInt (const char *name, iop_t type){
-    model_readWriteLock();
     int res = 0;
     agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
@@ -323,13 +310,11 @@ int model_readIopAsInt (const char *name, iop_t type){
             case IGS_BOOL_T:
                 igs_warn("Implicit conversion from bool to int for %s", name);
                 res =  (iop->value.b)?1:0;
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             case IGS_INTEGER_T:
                 res = iop->value.i;
-                model_readWriteUnlock();
                 return res;
                 break;
                 
@@ -337,11 +322,9 @@ int model_readIopAsInt (const char *name, iop_t type){
                 igs_warn("Implicit conversion from double to int for %s", name);
                 if(iop->value.d < 0) {
                     res = (int) (iop->value.d - 0.5);
-                    model_readWriteUnlock();
                     return res;
                 }else {
                     res = (int) (iop->value.d + 0.5);
-                    model_readWriteUnlock();
                     return res;
                 }
                 break;
@@ -349,13 +332,11 @@ int model_readIopAsInt (const char *name, iop_t type){
             case IGS_STRING_T:
                 igs_warn("Implicit conversion from string %s to int for %s", iop->value.s, name);
                 res = atoi(iop->value.s);
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             default:
                 igs_error("No implicit conversion possible for %s (0 was returned)", name);
-                model_readWriteUnlock();
                 return 0;
                 break;
         }
@@ -366,7 +347,6 @@ int model_readIopAsInt (const char *name, iop_t type){
 }
 
 double model_readIopAsDouble (const char *name, iop_t type){
-    model_readWriteLock();
     double res = 0;
     agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
@@ -374,110 +354,93 @@ double model_readIopAsDouble (const char *name, iop_t type){
             case IGS_BOOL_T:
                 igs_warn("Implicit conversion from bool to double for %s", name);
                 res = (iop->value.b)?1:0;
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             case IGS_INTEGER_T:
                 igs_warn("Implicit conversion from int to double for %s", name);
                 res = iop->value.i;
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             case IGS_DOUBLE_T:
                 res = iop->value.d;
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             case IGS_STRING_T:
                 igs_warn("Implicit conversion from string %s to double for %s", iop->value.s, name);
                 res = atof(iop->value.s);
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             default:
                 igs_error("No implicit conversion possible for %s (0 was returned)", name);
-                model_readWriteUnlock();
                 return 0;
                 break;
         }
     }else{
         igs_error("%s not found", name);
-        model_readWriteUnlock();
         return 0;
     }
 }
 
 char *model_readIopAsString (const char *name, iop_t type){
-    model_readWriteLock();
     char *res = NULL;
     agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
         switch(iop->value_type){
             case IGS_STRING_T:
                 res = strdup(iop->value.s);
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             case IGS_BOOL_T:
                 igs_warn("Implicit conversion from bool to string for %s", name);
                 res = iop->value.b ? strdup("true") : strdup("false");
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             case IGS_INTEGER_T:
                 igs_warn("Implicit conversion from int to string for %s", name);
                 res = model_intToString(iop->value.i);
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             case IGS_DOUBLE_T:
                 igs_warn("Implicit conversion from double to string for %s", name);
                 res = model_doubleToString(iop->value.d);
-                model_readWriteUnlock();
                 return res;
                 break;
                 
             default:
                 igs_error("No implicit conversion possible for %s (NULL was returned)", name);
-                model_readWriteUnlock();
                 return NULL;
                 break;
         }
     }else{
         igs_error("%s not found", name);
-        model_readWriteUnlock();
         return NULL;
     }
 }
 
 int model_readIopAsData (const char *name, iop_t type, void **value, size_t *size){
-    model_readWriteLock();
     agent_iop_t *iop = model_findIopByName((char*) name, type);
     if(iop == NULL){
         igs_error("%s not found", name);
         *value = NULL;
         *size = 0;
-        model_readWriteUnlock();
         return 0;
     }
     if(iop->value_type != IGS_DATA_T){
         igs_error("No implicit conversion possible for %s (NULL was returned)", name);
         *value = NULL;
         *size = 0;
-        model_readWriteUnlock();
         return 0;
     }
     *size = iop->valueSize;
     *value = calloc(1, iop->valueSize);
     memcpy(*value, model_getValueFor(name, type), *size);
-    model_readWriteUnlock();
     return 1;
 }
 
@@ -570,7 +533,6 @@ char* model_getIOPValueAsString (agent_iop_t* iop){
 }
 
 const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size){
-    igs_debug("starting");
     agent_iop_t *iop = model_findIopByName((char*) iopName, iopType);
     if(iop == NULL){
         igs_error("%s not found for writing", iopName);
@@ -1386,6 +1348,9 @@ void igs_freeIOPList(char ***list, long nbOfElements){
 bool igs_checkInputExistence(const char *name){
     if((name == NULL) || (strlen(name) == 0)){
         igs_error("Input name cannot be NULL or empty\n");
+        return false;
+    }
+    if (igs_internal_definition == NULL){
         return false;
     }
     return model_checkIOPExistence(name, igs_internal_definition->inputs_table);
