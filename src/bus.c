@@ -35,6 +35,10 @@ void igs_busLeaveChannel(const char *channel){
 }
 
 int igs_busSendStringToChannel(const char *channel, const char *msg, ...){
+    if (channel == NULL){
+        igs_debug("channel is NULL");
+        return 0;
+    }
     if (strcmp(CHANNEL, channel) == 0){
         igs_error("channel name %s is reserved and cannot be used", channel);
         return -1;
@@ -55,6 +59,10 @@ int igs_busSendStringToChannel(const char *channel, const char *msg, ...){
 }
 
 int igs_busSendDataToChannel(const char *channel, void *data, size_t size){
+    if (channel == NULL){
+        igs_debug("channel is NULL");
+        return 0;
+    }
     if (strcmp(CHANNEL, channel) == 0){
         igs_error("channel name %s is reserved and cannot be used", channel);
         return -1;
@@ -73,6 +81,10 @@ int igs_busSendDataToChannel(const char *channel, void *data, size_t size){
 }
 
 int igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p){
+    if (channel == NULL){
+        igs_debug("channel is NULL");
+        return 0;
+    }
     if (strcmp(CHANNEL, channel) == 0){
         igs_error("channel name %s is reserved and cannot be used", channel);
         return -1;
@@ -91,6 +103,10 @@ int igs_busSendStringToAgent(const char *agentNameOrPeerID, const char *msg, ...
     if (agentElements == NULL || agentElements->node == NULL){
         igs_error("igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
+    }
+    if (agentNameOrPeerID == NULL){
+        igs_debug("agentNameOrPeerID is NULL");
+        return 0;
     }
     zyreAgent_t *el, *tmp;
     int res = 1;
@@ -113,6 +129,10 @@ int igs_busSendDataToAgent(const char *agentNameOrPeerID, void *data, size_t siz
         igs_error("igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
     }
+    if (agentNameOrPeerID == NULL){
+        igs_debug("agentNameOrPeerID is NULL");
+        return 0;
+    }
     zyreAgent_t *el, *tmp;
     int res = 1;
     HASH_ITER(hh, zyreAgents, el, tmp){
@@ -131,6 +151,10 @@ int igs_busSendZMQMsgToAgent(const char *agentNameOrPeerID, zmsg_t **msg_p){
     if (agentElements == NULL || agentElements->node == NULL){
         igs_error("igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
+    }
+    if (agentNameOrPeerID == NULL){
+        igs_debug("agentNameOrPeerID is NULL");
+        return 0;
     }
     zyreAgent_t *el, *tmp;
     int res = 1;
