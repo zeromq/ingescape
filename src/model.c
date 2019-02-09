@@ -1346,17 +1346,20 @@ void igs_freeIOPList(char ***list, long nbOfElements){
 }
 
 bool igs_checkInputExistence(const char *name){
-    if((name == NULL) || (strlen(name) == 0)){
-        igs_error("Input name cannot be NULL or empty\n");
+    if (igs_internal_definition == NULL){
         return false;
     }
-    if (igs_internal_definition == NULL){
+    if((name == NULL) || (strlen(name) == 0)){
+        igs_error("Input name cannot be NULL or empty\n");
         return false;
     }
     return model_checkIOPExistence(name, igs_internal_definition->inputs_table);
 }
 
 bool igs_checkOutputExistence(const char *name){
+    if (igs_internal_definition == NULL){
+        return false;
+    }
     if((name == NULL) || (strlen(name) == 0)){
         igs_warn("Output name cannot be NULL or empty");
         return false;
@@ -1365,6 +1368,9 @@ bool igs_checkOutputExistence(const char *name){
 }
 
 bool igs_checkParameterExistence(const char *name){
+    if (igs_internal_definition == NULL){
+        return false;
+    }
     if((name == NULL) || (strlen(name) == 0)){
         igs_warn("Parameter name cannot be NULL or empty");
         return false;
