@@ -252,8 +252,7 @@ PUBLIC void igs_getNetdevicesList(char ***devices, int *nb);
 PUBLIC void igs_freeNetdevicesList(char **devices, int nb);
 
 
-//Agent command line can be passed here for inclusion in the
-//agent's headers and to be used by ingescapeLauncher. If not set,
+//Agent command line can be passed here to be used by ingescapeLauncher. If not set,
 //command line is initialized with exec path without any parameter.
 PUBLIC void igs_setCommandLine(const char *line);
 PUBLIC void igs_setCommandLineFromArgs(int argc, const char * argv[]); //first element is replaced by absolute exec path on UNIX
