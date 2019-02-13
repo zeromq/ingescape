@@ -91,9 +91,10 @@ static const QString command_ExecutedAction = "EXECUTED_ACTION";
 static const QString command_StartToRecord = "START_RECORD";
 static const QString command_StopToRecord = "STOP_RECORD";
 static const QString command_DeleteRecord = "DELETE_RECORD";
-static const QString command_PlayTheRecord = "START_REPLAY";
-static const QString command_StopTheRecord = "STOP_REPLAY";
-static const QString command_PauseTheRecord = "PAUSE_REPLAY";
+static const QString command_LoadReplay = "LOAD_REPLAY";
+static const QString command_StartReplay = "START_REPLAY"; //TODO: implement this command
+static const QString command_StopTheReplay = "STOP_REPLAY";
+static const QString command_PauseTheReplay = "PAUSE_REPLAY"; //TODO: implement this command
 
 
 /**

@@ -155,12 +155,12 @@ void RecordsSupervisionController::controlRecord(QString recordId, bool startPla
 
             if (startPlaying)
             {
-                commandAndParameters = QString("%1=%2").arg(command_PlayTheRecord, recordId);
+                commandAndParameters = QString("%1=%2").arg(command_LoadReplay, recordId);
                 setplayingRecord(recordVM);
             }
             else
             {
-                commandAndParameters = QString("%1=%2").arg(command_StopTheRecord, recordId);
+                commandAndParameters = QString("%1=%2").arg(command_StopTheReplay, recordId);
                 setplayingRecord(nullptr);
             }
 
