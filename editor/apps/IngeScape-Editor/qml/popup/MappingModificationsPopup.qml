@@ -139,7 +139,7 @@ I2PopupBase {
                         color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
                                                : IngeScapeTheme.disabledTextColor
 
-                        text: qsTr("Apply this mapping to the platform")
+                        text: qsTr("Apply your mapping to the network")
 
                         font {
                             family: IngeScapeTheme.textFontFamily
@@ -188,7 +188,7 @@ I2PopupBase {
                         color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
                                                : IngeScapeTheme.disabledTextColor
 
-                        text: qsTr("Use the current platform mapping")
+                        text: qsTr("Use the mapping from the network")
 
                         font {
                             family: IngeScapeTheme.textFontFamily
@@ -216,7 +216,7 @@ I2PopupBase {
                 }
             }
 
-            CheckBox {
+            /*CheckBox {
                 id: checkCancel
 
                 anchors {
@@ -263,11 +263,57 @@ I2PopupBase {
                         }
                     }
                 }
+            }*/
+        }
+
+        Button {
+            id: btnCancel
+
+            anchors {
+                bottom: parent.bottom
+                bottomMargin: 20
+                right: btnOK.left
+                rightMargin: 20
+            }
+
+            property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+            height: boundingBox.height
+            width: boundingBox.width
+
+            text: "Cancel"
+            enabled: true
+
+            activeFocusOnPress: true
+
+            style: I2SvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "button"
+                disabledID: releasedID + "-disabled"
+
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Medium
+                    pixelSize: 16
+                }
+                labelColorPressed: IngeScapeTheme.blackColor
+                labelColorReleased: IngeScapeTheme.whiteColor
+                labelColorDisabled: IngeScapeTheme.disabledTextColor
+
+            }
+
+            onClicked: {
+                // Close our popup
+                rootItem.close();
+
+                // Emit the signal "Cancel Mapping Activation"
+                rootItem.cancelMappingActivation();
             }
         }
 
         Button {
-            id: btnControl
+            id: btnOK
 
             anchors {
                 bottom: parent.bottom
@@ -281,7 +327,8 @@ I2PopupBase {
             width: boundingBox.width
 
             text: "OK"
-            enabled: checkControl.checked || checkObserve.checked || checkCancel.checked
+            //enabled: checkControl.checked || checkObserve.checked || checkCancel.checked
+            enabled: checkControl.checked || checkObserve.checked
 
             activeFocusOnPress: true
 
