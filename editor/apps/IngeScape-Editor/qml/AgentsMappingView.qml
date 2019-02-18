@@ -157,9 +157,9 @@ Item {
             }
 
             Binding {
-                target : activeMappingBtn
-                property : "checked"
-                value : IngeScapeEditorC.modelManager.isMappingActivated
+                target: activeMappingBtn
+                property: "checked"
+                value: IngeScapeEditorC.modelManager.isMappingActivated
             }
         }
 
@@ -222,9 +222,10 @@ Item {
             }
 
             CheckBox {
-                exclusiveGroup: typeMappingGroup
+                id: checkBoxObserve
 
-                checked: !IngeScapeEditorC.modelManager.isMappingControlled
+                exclusiveGroup: typeMappingGroup
+                //checked: !IngeScapeEditorC.modelManager.isMappingControlled
 
                 style: CheckBoxStyle {
                     label: Text {
@@ -252,7 +253,7 @@ Item {
                         color: "transparent"
 
                         I2SvgItem {
-                            anchors.centerIn: parent;
+                            anchors.centerIn: parent
                             svgFileCache: IngeScapeTheme.svgFileINGESCAPE
 
                             svgElementId: control.checked ? (control.pressed ? "radio-observe-on" : "radio-observe-white")
@@ -274,12 +275,19 @@ Item {
 
                     closeAnimation.running = true;
                 }
+
+                Binding {
+                    target: checkBoxObserve
+                    property: "checked"
+                    value: !IngeScapeEditorC.modelManager.isMappingControlled
+                }
             }
 
             CheckBox {
-                exclusiveGroup: typeMappingGroup
+                id: checkBoxControl
 
-                checked: IngeScapeEditorC.modelManager.isMappingControlled
+                exclusiveGroup: typeMappingGroup
+                //checked: IngeScapeEditorC.modelManager.isMappingControlled
 
                 style: CheckBoxStyle {
                     label: Text {
@@ -307,7 +315,7 @@ Item {
                         color: "transparent"
 
                         I2SvgItem {
-                            anchors.centerIn: parent;
+                            anchors.centerIn: parent
                             svgFileCache: IngeScapeTheme.svgFileINGESCAPE
 
                             svgElementId: control.checked ? (control.pressed ? "radio-control-on" : "radio-control-white")
@@ -328,6 +336,12 @@ Item {
                     chooseMappingType.visible = false;
 
                     closeAnimation.running = true;
+                }
+
+                Binding {
+                    target: checkBoxControl
+                    property: "checked"
+                    value: IngeScapeEditorC.modelManager.isMappingControlled
                 }
             }
         }
