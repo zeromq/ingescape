@@ -59,7 +59,7 @@ lib-macos-release-x64:
   <<: *build-lib-files
   stage: build-lib
   tags:
-    - macos
+    - osx
   script:
     - git clean -xfd
     - mkdir build
@@ -78,7 +78,7 @@ editor-macos-release-x64:
   variables:
     Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
   tags:
-    - macos
+    - osx
   script:
     - git clean -xfd
     - mkdir editor/apps/IngeScape-Editor/build
@@ -223,7 +223,7 @@ lib-installer-runtime-macos-x64:
   <<: *build-lib-files
   stage: installer-lib
   tags:
-    - macos
+    - osx
   script:
     - make -C build package
     - make -C build package_source
@@ -238,7 +238,7 @@ editor-installer-macos-x64:
   <<: *build-editor-files
   stage: installer-editor
   tags:
-    - macos
+    - osx
   script:
     - make -C editor/apps/IngeScape-Editor/build package
   #  - make -C editor/apps/IngeScape-Editor/build package_source
