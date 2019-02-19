@@ -308,8 +308,8 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
                 // The global mapping is NOT activated
                 else
                 {
-                    // FIXME Something TODO ? in dropAgentNameToMappingAtPosition
-                    qDebug() << "Something TODO ? in dropAgentNameToMappingAtPosition" << agentName << "but global mapping is NOT activated";
+                    // Remove all links while the global mapping is UN-activated
+                    agentInMapping->removeAllLinks_WhileMappingWasUNactivated();
                 }
 
                 // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)

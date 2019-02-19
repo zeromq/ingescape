@@ -297,13 +297,34 @@ void AgentInMappingVM::mappingElementAdded_CorrespondingLinkAddedWhileMappingWas
  */
 void AgentInMappingVM::removeLink_WhileMappingWasUNactivated(QString linkId, MappingElementVM* mappingElement)
 {
-    qDebug() << "removeLink_WhileMappingWasUNactivated" << linkId;
+    qDebug() << "Remove the link" << linkId << "while the global mapping is UN-activated";
 
     if ((mappingElement != nullptr) && !_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
     {
         _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.insert(linkId, mappingElement);
 
         sethadLinksRemoved_WhileMappingWasUNactivated(true);
+    }
+}
+
+
+/**
+ * @brief Remove all links while the global mapping is UN-activated
+ */
+void AgentInMappingVM::removeAllLinks_WhileMappingWasUNactivated()
+{
+    qDebug() << "Remove all links while the global mapping is UN-activated";
+
+    if ((_agentsGroupedByName != nullptr) && !_agentsGroupedByName->allMappingElements()->isEmpty())
+    {
+        for (MappingElementVM* mappingElement : _agentsGroupedByName->allMappingElements()->toList())
+        {
+            if (mappingElement != nullptr)
+            {
+                // FIXME: Use "Link Id" instead of "Mapping Element Name"
+                removeLink_WhileMappingWasUNactivated(mappingElement->name(), mappingElement);
+            }
+        }
     }
 }
 
