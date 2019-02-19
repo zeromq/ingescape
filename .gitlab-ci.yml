@@ -260,7 +260,7 @@ editor-installer-windows-x86:
     paths:
       - editor\apps\IngeScape-Editor\build\ReleaseX86\IngeScape-Editor-*
   dependencies:
-    - windows-editor-release-x86
+    - editor-windows-release-x86
 
 # Create runtime install for linux 64 bits
 lib-installer-runtime-linux-x64:
