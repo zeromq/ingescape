@@ -2,21 +2,21 @@
 
 # TODO Check why with install target windows api are in bin subfolder
 # TODO Check why with compile target zmq, ... are not copied in Release folder on windows
-# TODO Add yajl in unix and osx installer (or see to create yajl installer)
+# TODO Add yajl in unix and macos installer (or see to create yajl installer)
 # TODO Add job to deploy ingescape website on commit (Can filter to launch job on doc folder changes and only master git's branche)
 # TODO Add job to compile editor
-# TODO Add job to compile ingeprob
+# TODO Add job to compile ingeprobe
 # TODO Add job to package bindings
 
 # Define job order
 stages:
-  - ingescape-build
-  - editor-build
-  - ingescape-installer
-  - editor-installer
+  - build-lib
+  - build-editor
+  - installer-lib
+  - installer-editor
 
 # Define ingescape library files
-.build-ingescape-lib: &build-ingescape-lib
+.build-lib-files: &build-lib-files
   only:
     changes:
       - src/**/*
@@ -29,7 +29,7 @@ stages:
       - master
 
 # Define ingescape editor files
-.build-ingescape-editor: &build-ingescape-editor
+.build-editor-files: &build-editor-files
   only:
     changes:
       - editor/**/*
@@ -37,9 +37,9 @@ stages:
       - master
 
 # Create ingescape library for linux
-linux-release-x64:
-  <<: *build-ingescape-lib
-  stage: ingescape-build
+lib-linux-release-x64:
+  <<: *build-lib-files
+  stage: build-lib
   tags:
     - docker
   image: fafesty/debian-with-zyre
@@ -51,15 +51,15 @@ linux-release-x64:
   artifacts:
     paths:
       - build
-    name: "linux-release-x64"
+    name: "lib-linux-release-x64"
     expire_in: 1 week
 
-# Create ingescape library for osx
-osx-release-x64:
-  <<: *build-ingescape-lib
-  stage: ingescape-build
+# Create ingescape library for macos
+lib-macos-release-x64:
+  <<: *build-lib-files
+  stage: build-lib
   tags:
-    - osx
+    - macos
   script:
     - git clean -xfd
     - mkdir build
@@ -68,17 +68,17 @@ osx-release-x64:
   artifacts:
     paths:
       - build
-    name: "osx-release-x64"
+    name: "lib-macos-release-x64"
     expire_in: 1 week
 
-# Create ingescape editor for osx
-osx-editor-release-x64:
-  <<: *build-ingescape-editor
-  stage: editor-build
+# Create ingescape editor for macos
+editor-macos-release-x64:
+  <<: *build-editor-files
+  stage: build-editor
   variables:
     Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
   tags:
-    - osx
+    - macos
   script:
     - git clean -xfd
     - mkdir editor/apps/IngeScape-Editor/build
@@ -87,13 +87,13 @@ osx-editor-release-x64:
   artifacts:
     paths:
       - editor/apps/IngeScape-Editor/build
-    name: "osx-editor-release-x64"
+    name: "editor-macos-release-x64"
     expire_in: 1 week
 
 # Create ingescape library for windows 64 bits release
-windows-release-x64:
-  <<: *build-ingescape-lib
-  stage: ingescape-build
+lib-windows-release-x64:
+  <<: *build-lib-files
+  stage: build-lib
   tags:
     - windows
   variables:
@@ -106,13 +106,13 @@ windows-release-x64:
   artifacts:
     paths:
      - build
-    name: "windows-release-x64"
+    name: "lib-windows-release-x64"
     expire_in: 1 week
 
 # Create ingescape library for windows 32 bits release
-windows-release-x86:
-  <<: *build-ingescape-lib
-  stage: ingescape-build
+lib-windows-release-x86:
+  <<: *build-lib-files
+  stage: build-lib
   tags:
     - windows
   variables:
@@ -125,13 +125,13 @@ windows-release-x86:
   artifacts:
     paths:
      - build
-    name: "windows-release-x86"
+    name: "lib-windows-release-x86"
     expire_in: 1 week
 
 # Create ingescape library for windows 64 bits debug
-windows-debug-x64:
-  <<: *build-ingescape-lib
-  stage: ingescape-build
+lib-windows-debug-x64:
+  <<: *build-lib-files
+  stage: build-lib
   tags:
     - windows
   variables:
@@ -144,13 +144,13 @@ windows-debug-x64:
   artifacts:
     paths:
      - build
-    name: "windows-debug-x64"
+    name: "lib-windows-debug-x64"
     expire_in: 1 week
 
 # Create ingescape library for windows 32 bits debug
-windows-debug-x86:
-  <<: *build-ingescape-lib
-  stage: ingescape-build
+lib-windows-debug-x86:
+  <<: *build-lib-files
+  stage: build-lib
   tags:
     - windows
   variables:
@@ -163,13 +163,13 @@ windows-debug-x86:
   artifacts:
     paths:
      - build
-    name: "windows-debug-x86"
+    name: "lib-windows-debug-x86"
     expire_in: 1 week
 
 # Create ingescape editor for windows
 windows-editor-release-x86:
-  <<: *build-ingescape-editor
-  stage: editor-build
+  <<: *build-editor-files
+  stage: build-editor
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
@@ -187,9 +187,9 @@ windows-editor-release-x86:
     expire_in: 1 week
 
 # Create runtime install for windows 32 bits
-installer-runtime-windows-x86:
-  <<: *build-ingescape-lib
-  stage: ingescape-installer
+lib-installer-runtime-windows-x86:
+  <<: *build-lib-files
+  stage: installer-lib
   tags:
     - windows
   script:
@@ -200,12 +200,12 @@ installer-runtime-windows-x86:
       - build\ReleaseX86\Ingescape-*.exe
       - build\ReleaseX86\Ingescape-*.zip
   dependencies:
-    - windows-release-x86
+    - lib-windows-release-x86
 
 # Create runtime install for windows 64 bits
-installer-runtime-windows-x64:
-  <<: *build-ingescape-lib
-  stage: ingescape-installer
+lib-installer-runtime-windows-x64:
+  <<: *build-lib-files
+  stage: installer-lib
   tags:
     - windows
   script:
@@ -216,14 +216,14 @@ installer-runtime-windows-x64:
       - build\ReleaseX64\Ingescape-*.exe
       - build\ReleaseX64\Ingescape-*.zip
   dependencies:
-    - windows-release-x64
+    - lib-windows-release-x64
 
-# Create runtime install for osx 64 bits
-installer-runtime-osx-x64:
-  <<: *build-ingescape-lib
-  stage: ingescape-installer
+# Create runtime install for macos 64 bits
+lib-installer-runtime-macos-x64:
+  <<: *build-lib-files
+  stage: installer-lib
   tags:
-    - osx
+    - macos
   script:
     - make -C build package
     - make -C build package_source
@@ -231,14 +231,14 @@ installer-runtime-osx-x64:
     paths:
       - build/Ingescape-*
   dependencies:
-    - osx-release-x64
+    - lib-macos-release-x64
 
-# Create editor install for osx 64 bits
-installer-editor-osx-x64:
-  <<: *build-ingescape-editor
-  stage: editor-installer
+# Create editor install for macos 64 bits
+editor-installer-macos-x64:
+  <<: *build-editor-files
+  stage: installer-editor
   tags:
-    - osx
+    - macos
   script:
     - make -C editor/apps/IngeScape-Editor/build package
   #  - make -C editor/apps/IngeScape-Editor/build package_source
@@ -246,12 +246,12 @@ installer-editor-osx-x64:
     paths:
       - editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
   dependencies:
-    - osx-editor-release-x64
+    - editor-macos-release-x64
 
 # Create editor install for windows 32 bits
-installer-editor-windows-x86:
-  <<: *build-ingescape-editor
-  stage: editor-installer
+editor-installer-windows-x86:
+  <<: *build-editor-files
+  stage: installer-editor
   tags:
     - windows
   script:
@@ -263,9 +263,9 @@ installer-editor-windows-x86:
     - windows-editor-release-x86
 
 # Create runtime install for linux 64 bits
-installer-runtime-linux-x64:
-  <<: *build-ingescape-lib
-  stage: ingescape-installer
+lib-installer-runtime-linux-x64:
+  <<: *build-lib-files
+  stage: installer-lib
   tags:
     - docker
   image: fafesty/debian-with-zyre
@@ -276,4 +276,4 @@ installer-runtime-linux-x64:
     paths:
       - build/Ingescape-*
   dependencies:
-    - linux-release-x64
+    - lib-linux-release-x64
