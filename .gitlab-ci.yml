@@ -167,7 +167,7 @@ lib-windows-debug-x86:
     expire_in: 1 week
 
 # Create ingescape editor for windows
-windows-editor-release-x86:
+editor-windows-release-x86:
   <<: *build-editor-files
   stage: build-editor
   variables:
