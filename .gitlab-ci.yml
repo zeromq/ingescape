@@ -183,7 +183,7 @@ editor-windows-release-x86:
   artifacts:
     paths:
       - editor\apps\IngeScape-Editor\build
-    name: "windows-editor-release-x86"
+    name: "editor-windows-release-x86"
     expire_in: 1 week
 
 # Create runtime install for windows 32 bits
