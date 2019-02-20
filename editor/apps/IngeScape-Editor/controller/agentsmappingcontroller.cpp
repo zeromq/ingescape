@@ -309,7 +309,65 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
                 else
                 {
                     // Remove all links while the global mapping is UN-activated
-                    agentInMapping->removeAllLinks_WhileMappingWasUNactivated();
+                    //agentInMapping->removeAllLinks_WhileMappingWasUNactivated();
+
+                    // Traverse the list of all view models of mapping elements (which our agent is the input agent)
+                    for (MappingElementVM* mappingElement : agentsGroupedByName->allMappingElements()->toList())
+                    {
+                        if ((mappingElement != nullptr) && (mappingElement->firstModel() != nullptr)
+                                && !mappingElement->firstModel()->outputAgent().isEmpty()
+                                && !mappingElement->firstModel()->output().isEmpty()
+                                //&& !mappingElement->firstModel()->inputAgent().isEmpty()
+                                && !mappingElement->firstModel()->input().isEmpty())
+                        {
+                            // Get the link input
+                            LinkInputVM* linkInput = _getAloneLinkInputFromName(agentInMapping, mappingElement->firstModel()->input(), mappingElement->name());
+                            if (linkInput != nullptr)
+                            {
+                                QString linkId = "";
+
+                                qDebug() << "Try to remove the 'link'" << mappingElement->name();
+
+                                // Get the output agent in the global mapping from the output agent name
+                                AgentInMappingVM* outputAgentInMapping = getAgentInMappingFromName(mappingElement->firstModel()->outputAgent());
+                                if (outputAgentInMapping != nullptr)
+                                {
+                                    // Get the link output
+                                    LinkOutputVM* linkOutput = _getAloneLinkOutputFromName(outputAgentInMapping, mappingElement->firstModel()->output(), mappingElement->name());
+                                    if (linkOutput != nullptr)
+                                    {
+                                        // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
+                                        linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAgentInMapping->name(), linkOutput->uid(), agentInMapping->name(), linkInput->uid());
+                                    }
+                                }
+                                // The output agent is NOT yet in the global mapping
+                                else
+                                {
+                                    // Get the (view model of) agents grouped for the output agent name
+                                    AgentsGroupedByNameVM* outputAgent = _modelManager->getAgentsGroupedForName(mappingElement->firstModel()->outputAgent());
+                                    if (outputAgent != nullptr)
+                                    {
+                                        QList<OutputVM*> outputsWithSameName = outputAgent->getOutputsListFromName(mappingElement->firstModel()->output());
+                                        if (outputsWithSameName.count() == 1)
+                                        {
+                                            OutputVM* output = outputsWithSameName.at(0);
+                                            if (output != nullptr)
+                                            {
+                                                // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
+                                                linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAgent->name(), output->uid(), agentInMapping->name(), linkInput->uid());
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!linkId.isEmpty())
+                                {
+                                    // Remove the link while the global mapping is UN-activated
+                                    agentInMapping->removeLink_WhileMappingWasUNactivated(linkId, mappingElement);
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)
@@ -402,7 +460,7 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
                             // Update the view model of mapping element which have been cleared
                             link->setmappingElement(mappingElement);
 
-                            // ...just cancel the remove of the link while the global mapping is UN-activated
+                            // ...just cancel the remove of the link while the global mapping was UN-activated
                             inputAgent->cancelRemoveLink_WhileMappingWasUNactivated(linkId);
                         }
                         // Add the link while the global mapping is UN-activated

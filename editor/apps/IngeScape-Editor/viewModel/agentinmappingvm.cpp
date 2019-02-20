@@ -330,12 +330,12 @@ void AgentInMappingVM::removeAllLinks_WhileMappingWasUNactivated()
 
 
 /**
- * @brief Cancel the remove of the link while the global mapping is UN-activated
+ * @brief Cancel the remove of the link while the global mapping was UN-activated
  * @param linkId
  */
 void AgentInMappingVM::cancelRemoveLink_WhileMappingWasUNactivated(QString linkId)
 {
-    qDebug() << "cancelRemoveLink_WhileMappingWasUNactivated" << linkId;
+    qDebug() << "Cancel the remove of the link" << linkId << "while the global mapping was UN-activated";
 
     if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
     {
@@ -353,7 +353,7 @@ void AgentInMappingVM::cancelRemoveLink_WhileMappingWasUNactivated(QString linkI
  */
 void AgentInMappingVM::cancelAllRemovedLinks_WhileMappingWasUNactivated()
 {
-    qDebug() << "cancelAllRemovedLinks_WhileMappingWasUNactivated";
+    qDebug() << "Cancel all removed links while the global mapping was UN-activated";
 
     // View models of mapping elements are stored and deleted else where
     _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.clear();
@@ -437,6 +437,7 @@ void AgentInMappingVM::mappingElementRemoved_CorrespondingLinkRemovedWhileMappin
 
         if (!linkId.isEmpty())
         {
+            // Cancel the remove of the link while the global mapping was UN-activated
             cancelRemoveLink_WhileMappingWasUNactivated(linkId);
         }
     }
