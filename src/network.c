@@ -675,9 +675,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         frame = zmsg_pop(msgDuplicate);
                         data = zframe_data(frame);
                         size = zframe_size(frame);
-                        model_readWriteLock();
                         model_writeIOP(input, IGS_INPUT_T, inputType, data, size);
-                        model_readWriteUnlock();
                         if (frame != NULL){
                             zframe_destroy(&frame);
                         }
@@ -1066,6 +1064,7 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(arg)
 
     if (network_needToSendDefinitionUpdate){
+        model_readWriteLock();
         char * definitionStr = NULL;
         definitionStr = parser_export_definition(igs_internal_definition);
         if (definitionStr != NULL){
@@ -1080,6 +1079,7 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
         network_needToSendDefinitionUpdate = false;
         //when definition changes, mapping may need to be updated as well
         network_needToUpdateMapping = true;
+        model_readWriteUnlock();
     }
     return 0;
 }
@@ -1398,6 +1398,7 @@ int network_publishOutput (const agent_iop_t *iop){
         return 0;
     }
     
+    model_readWriteLock();
     if(agentElements != NULL && agentElements->publisher != NULL && iop != NULL)
     {
         if(!isWholeAgentMuted && !iop->is_muted && iop->name != NULL && !isFrozen)
@@ -1464,6 +1465,7 @@ int network_publishOutput (const agent_iop_t *iop){
             }
         }
     }
+    model_readWriteUnlock();
     return result;
 }
 
