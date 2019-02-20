@@ -15,14 +15,16 @@
 (defined(__APPLE__) && defined(__MACH__))
 #include <pthread.h>
 #endif
+#if (defined WIN32 || defined _WIN32)
+#include "unixfunctions.h"
+#endif
 
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
 pthread_mutex_t *model_readWriteMutex = NULL;
 #else
 #define W_OK 02
-#define pthread_mutex_t HANDLE
-pthread_mutex_t *model_readWriteMutex = NULL;
+pthread_mutex_t model_readWriteMutex = NULL;
 #endif
 
 ////////////////////////////////////////////////////////////////////////
@@ -40,8 +42,8 @@ void model_readWriteLock(void)   {
         }
     }
 #elif (defined WIN32 || defined _WIN32)
-    if (model_readWriteMutex == NULL){
-        if (pthread_mutex_init(model_readWriteMutex) != 0){
+    if (readWriteMutex == NULL){
+        if (pthread_mutex_init(&model_readWriteMutex) != 0){
             igs_error("mutex init failed");
             return;
         }

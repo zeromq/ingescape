@@ -297,7 +297,7 @@ void AgentInMappingVM::mappingElementAdded_CorrespondingLinkAddedWhileMappingWas
  */
 void AgentInMappingVM::removeLink_WhileMappingWasUNactivated(QString linkId, MappingElementVM* mappingElement)
 {
-    qDebug() << "removeLink_WhileMappingWasUNactivated" << linkId;
+    qDebug() << "Remove the link" << linkId << "while the global mapping is UN-activated";
 
     if ((mappingElement != nullptr) && !_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
     {
@@ -309,12 +309,33 @@ void AgentInMappingVM::removeLink_WhileMappingWasUNactivated(QString linkId, Map
 
 
 /**
- * @brief Cancel the remove of the link while the global mapping is UN-activated
+ * @brief Remove all links while the global mapping is UN-activated
+ */
+void AgentInMappingVM::removeAllLinks_WhileMappingWasUNactivated()
+{
+    qDebug() << "Remove all links while the global mapping is UN-activated";
+
+    if ((_agentsGroupedByName != nullptr) && !_agentsGroupedByName->allMappingElements()->isEmpty())
+    {
+        for (MappingElementVM* mappingElement : _agentsGroupedByName->allMappingElements()->toList())
+        {
+            if (mappingElement != nullptr)
+            {
+                // FIXME: Use "Link Id" instead of "Mapping Element Name"
+                removeLink_WhileMappingWasUNactivated(mappingElement->name(), mappingElement);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Cancel the remove of the link while the global mapping was UN-activated
  * @param linkId
  */
 void AgentInMappingVM::cancelRemoveLink_WhileMappingWasUNactivated(QString linkId)
 {
-    qDebug() << "cancelRemoveLink_WhileMappingWasUNactivated" << linkId;
+    qDebug() << "Cancel the remove of the link" << linkId << "while the global mapping was UN-activated";
 
     if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
     {
@@ -332,7 +353,7 @@ void AgentInMappingVM::cancelRemoveLink_WhileMappingWasUNactivated(QString linkI
  */
 void AgentInMappingVM::cancelAllRemovedLinks_WhileMappingWasUNactivated()
 {
-    qDebug() << "cancelAllRemovedLinks_WhileMappingWasUNactivated";
+    qDebug() << "Cancel all removed links while the global mapping was UN-activated";
 
     // View models of mapping elements are stored and deleted else where
     _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.clear();
@@ -416,6 +437,7 @@ void AgentInMappingVM::mappingElementRemoved_CorrespondingLinkRemovedWhileMappin
 
         if (!linkId.isEmpty())
         {
+            // Cancel the remove of the link while the global mapping was UN-activated
             cancelRemoveLink_WhileMappingWasUNactivated(linkId);
         }
     }

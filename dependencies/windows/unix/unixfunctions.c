@@ -1,13 +1,7 @@
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-
-#define NOMINMAX
-#include <windows.h>
-#include <winsock2.h>
-
 #include <unixfunctions.h>
+
+#include <malloc.h>
 
 char *strndup(const char *str, size_t chars)
 {
@@ -51,20 +45,26 @@ int gettimeofday(struct timeval* p, void* tz) {
 
 int pthread_mutex_init(pthread_mutex_t *mutex)
 {
-	mutex = CreateMutex(NULL, FALSE, NULL);
-	if (mutex == NULL) return 1; else return 0;
+    *mutex = CreateMutex(NULL, FALSE, NULL);
+    return (*mutex == NULL);
 }
 
-int pthread_mutex_lock(pthread_mutex_t *mutex)
+
+int pthread_mutex_lock(pthread_mutex_t mutex)
 {
-	while (OpenMutex(MUTEX_ALL_ACCESS, FALSE, NULL) == NULL) {
-		WaitForSingleObject(mutex, INFINITE);
-	}
+    if (mutex != NULL) {
+        WaitForSingleObject(mutex, INFINITE);
 	return 0;
+    }
+    return 1;
 }
 
-int pthread_mutex_unlock(pthread_mutex_t *mutex)
+
+int pthread_mutex_unlock(pthread_mutex_t mutex)
 {
-	ReleaseMutex(*mutex);
-	return 0;
+    if (mutex != NULL) {
+        ReleaseMutex(mutex);
+        return 0;
+    }
+    return 1;
 }

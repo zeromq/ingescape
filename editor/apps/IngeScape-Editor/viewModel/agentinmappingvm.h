@@ -179,7 +179,13 @@ public:
 
 
     /**
-     * @brief Cancel the remove of the link while the global mapping is UN-activated
+     * @brief Remove all links while the global mapping is UN-activated
+     */
+    void removeAllLinks_WhileMappingWasUNactivated();
+
+
+    /**
+     * @brief Cancel the remove of the link while the global mapping was UN-activated
      * @param linkId
      */
     void cancelRemoveLink_WhileMappingWasUNactivated(QString linkId);
