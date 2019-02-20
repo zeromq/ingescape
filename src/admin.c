@@ -16,6 +16,9 @@
 (defined(__APPLE__) && defined(__MACH__))
 #include <pthread.h>
 #endif
+#if (defined WIN32 || defined _WIN32)
+#include "unixfunctions.h"
+#endif
 
 #include "ingescape.h"
 #include "ingescape_private.h"
@@ -42,8 +45,7 @@ static int nb_of_entries = 0; //for fflush rotation
 pthread_mutex_t *lock = NULL;
 #else
 #define W_OK 02
-#define pthread_mutex_t HANDLE
-pthread_mutex_t *lock = NULL;
+pthread_mutex_t lock = NULL;
 #endif
 
 static const char *log_levels[] = {
@@ -93,7 +95,6 @@ void admin_makeFilePath(const char *from, char *to, size_t size_of_to)
 }
 
 void admin_lock(void)   {
-    //TODO: see what to do for Windows
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
     if (lock == NULL){
@@ -105,7 +106,7 @@ void admin_lock(void)   {
     }
 #elif (defined WIN32 || defined _WIN32)
     if (lock == NULL){
-        if (pthread_mutex_init(lock) != 0){
+        if (pthread_mutex_init(&lock) != 0){
             printf("error: mutex init failed\n");
             return;
         }
