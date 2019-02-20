@@ -23,6 +23,7 @@ void definition_freeIOP (agent_iop_t* iop){
     if (iop == NULL){
         return;
     }
+    model_readWriteLock();
     if ((iop)->name != NULL){
         free((char*)(iop)->name);
     }
@@ -46,6 +47,7 @@ void definition_freeIOP (agent_iop_t* iop){
         }
     }
     free(iop);
+    model_readWriteUnlock();
 }
 
 int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *def){
@@ -53,6 +55,7 @@ int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *
         igs_error("Cannot add IOP %s to NULL definition", iop->name);
         return 0;
     }
+    model_readWriteLock();
     agent_iop_t *previousIOP = NULL;
     switch (iop_type) {
         case IGS_INPUT_T:
@@ -84,6 +87,7 @@ int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *
         default:
             break;
     }
+    model_readWriteUnlock();
     return 1;
 }
 
@@ -105,7 +109,7 @@ agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_
         }
     }
     if (spaceInName){
-        igs_warn("Spaces are not allowed in IOP: %s has been renamed to %s", name, n);
+        igs_warn("Spaces are not allowed in IOP name: %s has been renamed to %s", name, n);
     }
     iop->name = n;
     iop->type = type;
@@ -141,7 +145,6 @@ agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 void definition_freeDefinition (definition* def) {
-    agent_iop_t *current_iop, *tmp_iop;
     if (def->name != NULL){
         free((char*)def->name);
         def->name = NULL;
@@ -154,6 +157,7 @@ void definition_freeDefinition (definition* def) {
         free((char*)def->version);
         def->version = NULL;
     }
+    agent_iop_t *current_iop, *tmp_iop;
     HASH_ITER(hh, def->params_table, current_iop, tmp_iop) {
         HASH_DEL(def->params_table,current_iop);
         definition_freeIOP(current_iop);
