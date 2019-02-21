@@ -47,7 +47,7 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    // init display timer
+    // Init the timer
     _timerToDisplayTime.setInterval(INTERVAL_ELAPSED_TIME);
     connect(&_timerToDisplayTime, &QTimer::timeout, this, &RecordsSupervisionController::_onTimeout_DisplayTime);
 }

@@ -1021,7 +1021,7 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
             {
                 qDebug() << "OBSERVE:" << agentName << "is ON but NOT in the global mapping --> ADD to the global mapping !";
 
-                double randomMax = (double)RAND_MAX;
+                double randomMax = static_cast<double>(RAND_MAX);
 
                 // Get a random position in the current window
                 QPointF position = _getRandomPosition(randomMax);
@@ -1540,7 +1540,7 @@ void AgentsMappingController::_updateMappingWithAgentsONandLinks()
 {
     if (_modelManager != nullptr)
     {
-        double randomMax = (double)RAND_MAX;
+        double randomMax = static_cast<double>(RAND_MAX);
 
         // Traverse the list of all "agents grouped by name"
         for (AgentsGroupedByNameVM* agentsGroupedByName : _modelManager->allAgentsGroupsByName()->toList())

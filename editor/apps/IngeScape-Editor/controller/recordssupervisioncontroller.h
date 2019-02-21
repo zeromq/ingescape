@@ -222,7 +222,7 @@ private:
     // Hash table from record id to a view model of record
     QHash<QString, RecordVM*> _hashFromRecordIdToViewModel;
 
-    // Timer to rdisplay elapsed time on current record
+    // Timer to display elapsed time on current record
     QTimer _timerToDisplayTime;
 
 };
