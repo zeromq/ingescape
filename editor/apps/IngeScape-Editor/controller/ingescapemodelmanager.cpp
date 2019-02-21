@@ -775,7 +775,7 @@ void IngeScapeModelManager::openDefinition(DefinitionM* definition)
 
         QList<DefinitionM*> definitionsToOpen;
 
-        // Variant --> we have to open each variants of this definition
+        /*// Variant --> we have to open each variants of this definition
         if (definition->isVariant())
         {
             for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
@@ -798,10 +798,14 @@ void IngeScapeModelManager::openDefinition(DefinitionM* definition)
                 }
             }
         }
-        else {
+        else
+        {
             // Simply add the definition
             definitionsToOpen.append(definition);
-        }
+        }*/
+
+        // Simply add the definition
+        definitionsToOpen.append(definition);
 
         // Open the list of definitions
         _openDefinitions(definitionsToOpen);
