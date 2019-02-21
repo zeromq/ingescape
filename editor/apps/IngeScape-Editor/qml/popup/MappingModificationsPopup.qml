@@ -64,7 +64,7 @@ I2PopupBase {
         // Reset check-boxes
         checkControl.checked = false;
         checkObserve.checked = false;
-        checkCancel.checked = false;
+        //checkCancel.checked = false;
     }
 
 
@@ -366,11 +366,11 @@ I2PopupBase {
                     // Emit the signal "Stay to Observe"
                     rootItem.stayToObserve();
                 }
-                else if (checkCancel.checked)
+                /*else if (checkCancel.checked)
                 {
                     // Emit the signal "Cancel Mapping Activation"
                     rootItem.cancelMappingActivation();
-                }
+                }*/
             }
         }
     }
