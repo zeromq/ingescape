@@ -21,6 +21,10 @@
 #include <I2Quick.h>
 
 
+// Threshold beyond which we consider that there are too many values
+#define TOO_MANY_VALUES 2000
+
+
 /**
  * @brief Constructor
  * @param jsonHelper
@@ -42,7 +46,6 @@ IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
 
     // Agents grouped are sorted on their name (alphabetical order)
     _allAgentsGroupsByName.setSortProperty("name");
-
 }
 
 
@@ -217,7 +220,7 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         }
 
         // DIS-connect to signals from the agent
-        disconnect(agent, 0, this, 0);
+        disconnect(agent, nullptr, this, nullptr);
 
         if (!agent->peerId().isEmpty()) {
             _hashFromPeerIdToAgent.remove(agent->peerId());
@@ -251,7 +254,7 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
         // Else, signals "agentsGroupedByDefinitionWillBeDeleted" and "agentModelHasToBeDeleted" will not be catched (after "disconnect")
 
         // DIS-connect to its signals
-        disconnect(agentsGroupedByName, 0, this, 0);
+        disconnect(agentsGroupedByName, nullptr, this, nullptr);
 
         // Remove from the hash table
         _hashFromNameToAgentsGrouped.remove(agentsGroupedByName->name());
@@ -738,7 +741,7 @@ void IngeScapeModelManager::simulateExitForEachLauncher()
  * @brief Delete agents OFF
  */
 void IngeScapeModelManager::deleteAgentsOFF()
-{
+{   
     for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
     {
         if (agentsGroupedByName != nullptr)
@@ -1073,6 +1076,28 @@ void IngeScapeModelManager::onValuePublished(PublishedValueM* publishedValue)
     {
         // Add to the list at the first position
         _publishedValues.prepend(publishedValue);
+
+        // Check if there are too many values
+        if (_publishedValues.count() > TOO_MANY_VALUES)
+        {
+            // We kept 80% of the values
+            int numberOfKeptValues = static_cast<int>(0.8 * TOO_MANY_VALUES);
+
+            int numberOfDeletedValues = _publishedValues.count() - numberOfKeptValues;
+
+            qDebug() << _publishedValues.count() << "values: we delete the" << numberOfDeletedValues << "oldest values and kept the" << numberOfKeptValues << "newest values";
+
+            // FIXME: More efficient ?
+            //_publishedValues.removeRows()
+            //_publishedValues.removeColumns()
+
+            while (_publishedValues.count() > numberOfKeptValues)
+            {
+                PublishedValueM* publishedValue = _publishedValues.takeAt(_publishedValues.count() - 1);
+                delete publishedValue;
+            }
+        }
+
 
         // Get the (view model of) agents grouped for the name
         AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(publishedValue->agentName());
