@@ -1295,7 +1295,7 @@ void IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName(QList<O
         if (!newOutputsIds.isEmpty())
         {
             // Emit the signal "Add Inputs to Editor for Outputs"
-            Q_EMIT addInputsToEditorForOutputs(agentsGroupedByName->name(), newOutputsIds);
+            Q_EMIT addInputsToEditorForOutputs(agentsGroupedByName->name(), newOutputsIds, _isMappingActivated);
         }
     }
 }
@@ -1323,7 +1323,7 @@ void IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName(QList
         if (!oldOutputsIds.isEmpty())
         {
             // Emit the signal "Remove Inputs to Editor for Outputs"
-            Q_EMIT removeInputsToEditorForOutputs(agentsGroupedByName->name(), oldOutputsIds);
+            Q_EMIT removeInputsToEditorForOutputs(agentsGroupedByName->name(), oldOutputsIds, _isMappingActivated);
         }
     }
 }
