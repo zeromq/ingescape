@@ -8,7 +8,8 @@
  *
  *
  *	Contributors:
- *      Bruno Lemenicier <lemenicier@ingenuity.io>
+ *      Bruno Lemenicier    <lemenicier@ingenuity.io>
+ *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
  *
  */
 
@@ -37,9 +38,20 @@ class RecordM : public QObject
     // Date of the end of the record
     I2_QML_PROPERTY_READONLY(QDateTime, endDateTime)
 
+    // Duration of the record
+    I2_QML_PROPERTY_READONLY(QDateTime, duration)
+
 
 
 public:
+    /**
+     * @brief Constructor
+     * @param id
+     * @param name
+     * @param begin
+     * @param end
+     * @param parent
+     */
     explicit RecordM(QString id,
                      QString name,
                      QDateTime begin,
