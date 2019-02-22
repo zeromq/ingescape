@@ -913,7 +913,7 @@ void NetworkController::updateAvailableNetworkDevices()
 {
     QStringList networkDevices;
 
-    char **devices = NULL;
+    char **devices = nullptr;
     int nb = 0;
     igs_getNetdevicesList(&devices, &nb);
 
@@ -1119,30 +1119,29 @@ void NetworkController::onIsMappingActivatedChanged(bool isMappingActivated)
 {
     if ((_agentEditor != nullptr) && (_agentEditor->definition() != nullptr))
     {
-        if (isMappingActivated)
+        for (AgentIOPM* input : _agentEditor->definition()->inputsList()->toList())
         {
-            for (AgentIOPM* input : _agentEditor->definition()->inputsList()->toList())
+            if (input != nullptr)
             {
-                if (input != nullptr)
+                QString inputName = input->name();
+
+                QStringList agentNameAndIOP = inputName.split(SEPARATOR_AGENT_NAME_AND_IOP);
+                if (agentNameAndIOP.count() == 2)
                 {
-                    QString inputName = input->name();
+                    QString outputAgentName = agentNameAndIOP.at(0);
+                    QString outputId = agentNameAndIOP.at(1);
 
-                    qDebug() << "igs_addMappingEntry input" << inputName;
+                    // Get the name and the value type of the output from its id
+                    QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
 
-                    QStringList agentNameAndIOP = inputName.split(SEPARATOR_AGENT_NAME_AND_IOP);
-                    if (agentNameAndIOP.count() == 2)
+                    if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
                     {
-                        QString outputAgentName = agentNameAndIOP.at(0);
-                        QString outputId = agentNameAndIOP.at(1);
+                        QString outputName = pair.first;
+                        //AgentIOPValueTypes::Value valueType = pair.second;
 
-                        // Get the name and the value type of the output from its id
-                        QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
-
-                        if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
+                        // Mapping Activated (Connected)
+                        if (isMappingActivated)
                         {
-                            QString outputName = pair.first;
-                            //AgentIOPValueTypes::Value valueType = pair.second;
-
                             // Add mapping between our input and this output
                             unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
 
@@ -1153,34 +1152,9 @@ void NetworkController::onIsMappingActivatedChanged(bool isMappingActivated)
                                 qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << id;
                             }
                         }
-                    }
-                }
-            }
-        }
-        else
-        {
-            for (AgentIOPM* input : _agentEditor->definition()->inputsList()->toList())
-            {
-                if (input != nullptr)
-                {
-                    QString inputName = input->name();
-
-                    qDebug() << "igs_removeMappingEntryWithName input" << inputName;
-
-                    QStringList agentNameAndIOP = inputName.split(SEPARATOR_AGENT_NAME_AND_IOP);
-                    if (agentNameAndIOP.count() == 2)
-                    {
-                        QString outputAgentName = agentNameAndIOP.at(0);
-                        QString outputId = agentNameAndIOP.at(1);
-
-                        // Get the name and the value type of the output from its id
-                        QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
-
-                        if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
+                        // Mapping DE-activated (DIS-connected)
+                        else
                         {
-                            QString outputName = pair.first;
-                            //AgentIOPValueTypes::Value valueType = pair.second;
-
                             // Remove mapping between our input and this output
                             int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
 

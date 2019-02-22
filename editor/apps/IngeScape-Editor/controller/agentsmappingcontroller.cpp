@@ -636,7 +636,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                         QString strY = positionStringList.at(1);
 
                         if (!strX.isEmpty() && !strY.isEmpty()) {
-                            position = QPointF(strX.toFloat(), strY.toFloat());
+                            position = QPointF(static_cast<qreal>(strX.toFloat()), static_cast<qreal>(strY.toFloat()));
                         }
                     }
 
