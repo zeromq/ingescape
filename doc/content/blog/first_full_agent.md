@@ -335,29 +335,75 @@ Here is how to configure and use logs:
     igs_fatal("this is a fatale %s", example);
 {{< / highlight >}}
 
-### Compile on Linux
-As a prerequisite, you need to have the ingeScape library installed on your computer. We suppose the ingeScape header is installed in */usr/local/include/* and the library in */usr/local/lib/*, which is pretty standard on most Linux environments. 
+### Compile your agent
+You can download the source code for this agent [here](/code/firstFullAgent.zip).
 
-The example can be downloaded [here](/code/firstFullAgent.zip). It provides a Makefile to compile the example and install it on your system if you want to.
+With this source code, you will be able to compile the agent for:
 
-Here is what to type in your terminal once your are in the same directory as the provided Makefile to run and stop the agent:
+- Linux with
+  - cmake
+  - Qt
+- Microsoft Windows with
+  - Visual Studio 2017
+  - Qt
+  - cmake
+- macos with
+  - Xcode
+  - cmake
+
+In all cases, as a prerequisite, you need to have the ingeScape library installed on your computer. We provide installers and packages to to so.
+
+With Microsoft Windows, depending on your system, you will be able to choose between 32-bit and 64-bit architectures.
+
+TODO: definition & mapping + config device
+
+#### cmake
+In a terminal, once the source code has been extracted, just go inside the extracted folder and type the following commands:
 
 {{< highlight shell "linenos=inline" >}}
+cd src
+mkdir build
+cd build
+cmake ..
 make
 ./firstFullAgent --help
-./firstFullAgent --verbose
+./firstFullAgent --verbose --interactiveloop
 /quit
 {{< / highlight >}}
 
-### Compile on macOS (two methods)
-The first compilation method is the same as the one for Linux, exactly with the same assumptions for header and library location.
+Go to [https://cmake.org/download/](https://cmake.org/download/) to know hot to install cmake for your system.
 
-The other method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code above, is available [here](/code/firstFullAgent.zip).
+#### Qt
+Qt and Qt Creator need to be installed properly on your system. Then, once the source code has been extracted:
 
-### Compile on Microsoft Windows
-The easiest way to compile and run your first agent on Microsoft Windows is to use one of the following projects:
+- go inside the builds/qt subfolder and open *firstFullAgent.pro* with Qt Creator
+- configure the kit or kits for your environment
+- build and run the agent
 
-- [Qt project](/code/firstFullAgent_Qt.zip)
-- [Visual Studio 2015 project](/code/firstFullAgent_VS.zip)
+On macos, in some cases, if you are using Homebrew to install third-party libraries, there might be an incompatibility between the JPEG, TIFF, etc. libraries embedded in CoreImage and the ones installed in */usr/local/lib* by Homebrew. This has nothing to do with ingeScape but might block the execution of the example.
 
-For both projects, the ingeScape library and its dependencies have to be deployed next to the project file (.pro or .sln).
+The following error message is then displayed at runtime:
+{{< highlight shell "linenos=inline" >}}
+dyld: Symbol not found: __cg_jpeg_resync_to_restart
+  Referenced from: /System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO
+  Expected in: /usr/local/lib/libJPEG.dylib
+ in /System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO
+{{< / highlight >}}
+
+If this happens, you need to edit the Run properties for your Qt project by editing the DYLD_LIBRARY_PATH environment variable and adding */System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/* as the first path to be checked, generally followed by your local project path and */usr/local/lib/*.
+
+#### Xcode
+Xcode needs to be installed properly on your system. It can be downloaded from the App Store. Then, once the source code has been extracted:
+
+- go inside the builds/macos subfolder and open *firstFullAgent.xcodeproj* with Xcode
+- build and run the agent
+
+#### Visual Studio  2017
+Visual Studio 2017 needs to be installed properly on your system. It can be downloaded from [here](https://visualstudio.microsoft.com/fr/vs/features/cplusplus/). The Community version will be enough for this first agent.
+
+ Then, once the source code has been extracted:
+ 
+- go inside the builds/windows/project subfolder and open *firstFullAgent.sln* with Visual Studio
+- pick your platform (32 or 64-bit) and mode (Debug or Release)
+- build and run the agent
+

@@ -133,8 +133,20 @@ int main(int argc, const char * argv[]) {
 }
 {{< / highlight >}}
 
-### Compile on Linux
-As a prerequisite, you need to have the ingeScape library and its dependencies installed on your computer. We suppose the ingeScape headers are installed in */usr/local/include/* and the libraries in */usr/local/lib/*, which is pretty standard on most Linux environments.
+<br>You can download the file [here](/code/firstAgent/main.c).
+
+For a more thorough example, including compilation projects for various platforms, go to our [first complete agent](/blog/first_full_agent) example.
+
+### Compile on UNIX systems
+As a prerequisite, you need to have the ingeScape library and its dependencies installed on your computer. We suppose the ingeScape headers are installed in */usr/local/include/* and the libraries in */usr/local/lib/*, which is pretty standard on most Linux and macos environments.
+
+In case you are doing this on macos and you do not have Xcode installed, open the Terminal app, found in /Applications/Utilities/ and type the following command:
+
+{{< highlight shell "linenos=inline" >}}
+xcode-select --install
+{{< / highlight >}}
+
+Then, simply follow the instructions on the screen.
 
 When ready, copy the code in a *main.c* file and type the following commands in a terminal where your *main.c* file is located:
 
@@ -143,36 +155,24 @@ gcc -W -Wall -g -I/usr/local/include/ -std=gnu99 -o main.o -c main.c
 gcc -o myFirstAgent main.o -L/usr/local/lib -lingescape
 {{< / highlight >}}
 
-You can also use an example [Qt project](/code/firstAgent_Qt.zip) embedding ingeScape in a simple graphical Qt application with an empty UI.
+In case you are doing this on macos and you do not have Xcode installed, open the Terminal app, found in /Applications/Utilities/ and type the following command:
 
-### Compile on macOS (three methods)
-#### GCC/Clang
-The first compilation method is the same as the one for Linux, exactly with the same assumptions for headers and libraries location.
-
-*NB: on macOS gcc is an alias for clang. Both can be used indifferently.*
-
-#### Xcode
-Another method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code, is available [here](/code/firstAgent.zip).
-
-#### Qt
-You can also use an example [Qt project](/code/firstAgent_Qt.zip) embedding ingeScape in a simple graphical Qt application with an empty UI.
-
-In some cases, if you are using Homebrew to install third-party libraries, there might be an incompatibility between the JPEG, TIFF, etc. libraries embedded in CoreImage and the ones installed in */usr/local/lib* by Homebrew. This has nothing to do with ingeScape but might block the execution of the example.
-
-The following error message is then displayed at runtime:
 {{< highlight shell "linenos=inline" >}}
-dyld: Symbol not found: __cg_jpeg_resync_to_restart
-  Referenced from: /System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO
-  Expected in: /usr/local/lib/libJPEG.dylib
- in /System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO
+xcode-select --install
 {{< / highlight >}}
 
-If this happens, you need to edit the Run properties for your Qt project by editing the DYLD_LIBRARY_PATH environment variable and adding */System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/* as the first path to be checked, generally followed by your local project path and */usr/local/lib/*.
+Then, simply follow the instructions on the screen.
+
 
 ### Compile on Microsoft Windows
-The easiest way to compile and run your first agent on Microsoft Windows is to use one of the following projects:
+You can download Visual Studio Community 2017 C++ [here](https://visualstudio.microsoft.com/fr/vs/features/cplusplus/).
 
-- [Qt project](/code/firstAgent_Qt.zip)
-- [Visual Studio 2015 project](/code/firstAgent_VS.zip)
+Depending on your Windows platform, IngeScape is installed either in C:\Program Files\Ingescape or in C:\Program Files (x86)\Ingescape. In any case this folder contains an include and a lib subfolders which will be included in your project.
 
-For both projects, the ingeScape library and its dependencies have to be deployed next to the project file (.pro or .sln).
+Using Visual Studio, you will need to follow these steps:
+
+- Create a new C++ project
+- Add the IngeScape\include folder to the include folders of your project
+- Add the Ingescape\lib folder to the libraries folders of your project
+- Include ingescape.lib as a library to be linked by your project
+
