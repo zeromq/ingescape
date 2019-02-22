@@ -232,7 +232,7 @@ void AgentInMappingVM::cancelAddLink_WhileMappingWasUNactivated(QString linkId)
  */
 void AgentInMappingVM::cancelAllAddedLinks_WhileMappingWasUNactivated()
 {
-    qDebug() << "cancelAllAddedLinks_WhileMappingWasUNactivated";
+    qDebug() << "Cancel all added links while the global mapping was UN-activated";
 
     QList<ElementMappingM*> addedMappingElements = _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.values();
 

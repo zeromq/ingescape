@@ -257,17 +257,19 @@ Q_SIGNALS:
     /**
      * @brief Emitted when inputs must be added to our Editor for a list of outputs
      * @param agentName
-     * @param outputsList
+     * @param newOutputsIds
+     * @param isMappingActivated
      */
-    void addInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds);
+    void addInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds, bool isMappingActivated);
 
 
     /**
-     * @brief Emitted when inputs must be removed to our Editor for a list of outputs
+     * @brief Emitted when inputs must be removed from our Editor for a list of outputs
      * @param agentName
-     * @param outputsList
+     * @param oldOutputsIds
+     * @param isMappingActivated
      */
-    void removeInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds);
+    void removeInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingActivated);
 
 
     /**

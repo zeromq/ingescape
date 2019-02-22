@@ -913,7 +913,7 @@ void NetworkController::updateAvailableNetworkDevices()
 {
     QStringList networkDevices;
 
-    char **devices = NULL;
+    char **devices = nullptr;
     int nb = 0;
     igs_getNetdevicesList(&devices, &nb);
 
@@ -1112,11 +1112,75 @@ void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerI
 
 
 /**
+ * @brief Slot called when the flag "is Mapping Activated" changed
+ * @param isMappingActivated
+ */
+void NetworkController::onIsMappingActivatedChanged(bool isMappingActivated)
+{
+    if ((_agentEditor != nullptr) && (_agentEditor->definition() != nullptr))
+    {
+        for (AgentIOPM* input : _agentEditor->definition()->inputsList()->toList())
+        {
+            if (input != nullptr)
+            {
+                QString inputName = input->name();
+
+                QStringList agentNameAndIOP = inputName.split(SEPARATOR_AGENT_NAME_AND_IOP);
+                if (agentNameAndIOP.count() == 2)
+                {
+                    QString outputAgentName = agentNameAndIOP.at(0);
+                    QString outputId = agentNameAndIOP.at(1);
+
+                    // Get the name and the value type of the output from its id
+                    QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
+
+                    if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
+                    {
+                        QString outputName = pair.first;
+                        //AgentIOPValueTypes::Value valueType = pair.second;
+
+                        // Mapping Activated (Connected)
+                        if (isMappingActivated)
+                        {
+                            // Add mapping between our input and this output
+                            unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+                            if (id > 0) {
+                                qDebug() << "Mapping added between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _editorAgentName << "(id" << id << ")";
+                            }
+                            else {
+                                qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << id;
+                            }
+                        }
+                        // Mapping DE-activated (DIS-connected)
+                        else
+                        {
+                            // Remove mapping between our input and this output
+                            int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+                            if (resultRemoveMappingEntry == 1)
+                            {
+                                qDebug() << "Mapping removed between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _editorAgentName;
+                            }
+                            else {
+                                qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << resultRemoveMappingEntry;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Slot called when inputs must be added to our Editor for a list of outputs
  * @param agentName
  * @param newOutputsIds
+ * @param isMappingActivated
  */
-void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds)
+void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds, bool isMappingActivated)
 {
     if ((_agentEditor != nullptr) && (_agentEditor->definition() != nullptr) && !newOutputsIds.isEmpty())
     {
@@ -1137,27 +1201,27 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QString
                 switch (valueType)
                 {
                 case AgentIOPValueTypes::INTEGER: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_INTEGER_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_INTEGER_T, nullptr, 0);
                     break;
                 }
                 case AgentIOPValueTypes::DOUBLE: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_DOUBLE_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_DOUBLE_T, nullptr, 0);
                     break;
                 }
                 case AgentIOPValueTypes::STRING: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_STRING_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_STRING_T, nullptr, 0);
                     break;
                 }
                 case AgentIOPValueTypes::BOOL: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_BOOL_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_BOOL_T, nullptr, 0);
                     break;
                 }
                 case AgentIOPValueTypes::IMPULSION: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_IMPULSION_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_IMPULSION_T, nullptr, 0);
                     break;
                 }
                 case AgentIOPValueTypes::DATA: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_DATA_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_DATA_T, nullptr, 0);
                     break;
                 }
                 default: {
@@ -1186,16 +1250,19 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QString
                         qCritical() << "Can NOT observe input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultObserveInput;
                     }
 
-                    // Add mapping between our input and this output
-                    unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
+                    // The mapping is activated (connected)
+                    if (isMappingActivated)
+                    {
+                        // Add mapping between our input and this output
+                        unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
 
-                    if (id > 0) {
-                        qDebug() << "Add mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "(id" << id << ")";
+                        if (id > 0) {
+                            qDebug() << "Mapping added between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "(id" << id << ")";
+                        }
+                        else {
+                            qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << id;
+                        }
                     }
-                    else {
-                        qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << id;
-                    }
-
                 }
                 else {
                     qCritical() << "Can NOT create input" << inputName << "on agent" << _editorAgentName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType) << "Error code:" << resultCreateInput;
@@ -1207,12 +1274,15 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QString
 
 
 /**
- * @brief Slot called when inputs must be removed to our Editor for a list of outputs
+ * @brief Slot called when inputs must be removed from our Editor for a list of outputs
  * @param agentName
  * @param oldOutputsIds
+ * @param isMappingActivated
  */
-void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds)
+void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingActivated)
 {
+    Q_UNUSED(isMappingActivated)
+
     if ((_agentEditor != nullptr) && (_agentEditor->definition() != nullptr) && !oldOutputsIds.isEmpty())
     {
         for (QString outputId : oldOutputsIds)
@@ -1227,34 +1297,38 @@ void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QStr
 
                 QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, outputId);
 
+                // The mapping is activated (connected)
+                //if (isMappingActivated)
+                //{
                 // Remove mapping between our input and this output
                 int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
 
                 if (resultRemoveMappingEntry == 1)
                 {
-                    qDebug() << "Remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName;
-
-                    // Remove our input
-                    int resultRemoveInput = igs_removeInput(inputName.toStdString().c_str());
-
-                    if (resultRemoveInput == 1)
-                    {
-                        qDebug() << "Input" << inputName << "removed on agent" << _editorAgentName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType);
-
-                        // Get the Input with its name
-                        AgentIOPM* input = _agentEditor->definition()->getInputWithName(inputName);
-                        if (input != nullptr)
-                        {
-                            // Remove the input from the definition of our agent "IngeScape Editor"
-                            _agentEditor->definition()->inputsList()->remove(input);
-                        }
-                    }
-                    else {
-                        qCritical() << "Can NOT remove input" << inputName << "on agent" << _editorAgentName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType) << "Error code:" << resultRemoveInput;
-                    }
+                    qDebug() << "Mapping removed between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName;
                 }
                 else {
                     qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << resultRemoveMappingEntry;
+                }
+                //}
+
+                // Remove our input
+                int resultRemoveInput = igs_removeInput(inputName.toStdString().c_str());
+
+                if (resultRemoveInput == 1)
+                {
+                    qDebug() << "Input" << inputName << "removed on agent" << _editorAgentName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType);
+
+                    // Get the Input with its name
+                    AgentIOPM* input = _agentEditor->definition()->getInputWithName(inputName);
+                    if (input != nullptr)
+                    {
+                        // Remove the input from the definition of our agent "IngeScape Editor"
+                        _agentEditor->definition()->inputsList()->remove(input);
+                    }
+                }
+                else {
+                    qCritical() << "Can NOT remove input" << inputName << "on agent" << _editorAgentName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType) << "Error code:" << resultRemoveInput;
                 }
             }
         }

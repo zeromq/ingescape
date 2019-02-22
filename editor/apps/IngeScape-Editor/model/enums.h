@@ -97,6 +97,14 @@ static const QString command_StopTheReplay = "STOP_REPLAY";
 static const QString command_PauseTheReplay = "PAUSE_REPLAY"; //TODO: implement this command
 
 
+// myDateTime.setMSecsSinceEpoch(0) does not work completely
+// if we specify myDateTime.setTimeSpec(Qt::UTC) --> qDebug of it is good but QML has the jet lag
+// if we specify myDateTime.setTimeSpec(Qt::LocalTime) --> qDebug of it has the jet lag
+
+// EPOCH: 1970-01-01T00:00:00.000
+static const QDateTime EPOCH = QDateTime(QDate(1970, 1, 1));
+
+
 /**
  * @brief The Enums class is a helper for general enumerations
  */

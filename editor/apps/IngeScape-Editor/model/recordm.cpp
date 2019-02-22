@@ -13,12 +13,14 @@
  */
 
 #include "recordm.h"
+#include <model/enums.h>
 
 /**
  * @brief Constructor
+ * @param id
  * @param name
- * @param peerId
- * @param ipAddress
+ * @param beginDate
+ * @param endDate
  * @param parent
  */
 RecordM::RecordM(QString id,
@@ -29,11 +31,16 @@ RecordM::RecordM(QString id,
     _id(id),
     _name(name),
     _beginDateTime(beginDate),
-    _endDateTime(endDate)
+    _endDateTime(endDate),
+    _duration(QDateTime())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    qint64 ms = _beginDateTime.msecsTo(_endDateTime);
+    _duration = EPOCH.addMSecs(ms);
+
+    qInfo() << "New Model of Record" << _name << "(" << _id << ") with duration" << _duration.toString("dd/MM/yyyy HH:mm:ss");
 }
 
 

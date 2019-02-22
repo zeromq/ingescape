@@ -207,11 +207,13 @@ WindowBlockTouches {
             model: rootItem.controller ? rootItem.controller.allAgentNamesList : 0
 
             placeholderText: enabled ? "- Select an agent -" : "- No agent -"
+
             text: (enabled && rootItem.controller && rootItem.controller.selectedAgentNamesList.length > 0) ?
                       (rootItem.controller.selectedAgentNamesList.length < rootItem.controller.allAgentNamesList.length) ?
                           (rootItem.controller.selectedAgentNamesList.length === 1 ? "- " + rootItem.controller.selectedAgentNamesList.length + " agent selected -" : "- " + rootItem.controller.selectedAgentNamesList.length + " agents selected -")
                         : "- All agents selected -"
             : "";
+
             checkAllText: " All agents"
 
             onCheckAll: {

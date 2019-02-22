@@ -181,7 +181,7 @@ Item {
 
             contentItem: Item {
                 width: _scrollView.width
-                height: _scrollView.height
+                height: (1 + _combolist.count) * _comboButton.height
 
                 CheckBox {
                     id: checkAllBox
@@ -278,7 +278,7 @@ Item {
                     interactive: false
 
                     anchors {
-                        top : checkAllBox.bottom
+                        top: checkAllBox.bottom
                         left: parent.left
                         right: parent.right
                     }
