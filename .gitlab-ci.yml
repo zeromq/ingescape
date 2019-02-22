@@ -14,6 +14,7 @@ stages:
   - build-editor
   - installer-lib
   - installer-editor
+  - deploy-lib
 
 # Define ingescape library files
 .build-lib-files: &build-lib-files
@@ -25,6 +26,7 @@ stages:
       - Makefile.am
       - CMakeLists.txt
       - build/cmake/**/*
+      - dependencies/windows/unix/*
     refs:
       - master
 
@@ -275,5 +277,28 @@ lib-installer-runtime-linux-x64:
   artifacts:
     paths:
       - build/Ingescape-*
+  dependencies:
+    - lib-linux-release-x64
+
+# Deploy ingescape in mac os X use to compile to be able to compile agents
+lib-deploy-macos-release-x64:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - osx
+  script:
+    - make -C build install DESTDIR=~/builds/release/x64
+  dependencies:
+    - lib-macos-release-x64
+
+# Deploy ingescape in linux use to compile to be able to compile agents
+lib-deploy-linux-release-x64:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - docker
+  image: fafesty/debian-with-zyre
+  script:
+    - make -C build install DESTDIR=~/builds/release/x64
   dependencies:
     - lib-linux-release-x64
