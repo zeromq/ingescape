@@ -7,24 +7,18 @@ banner = "img/banners/first_full_agent.png"
 genre = "article"
 +++
 
-***ingeScape*** is designed to support both industrial and experimental environments. [Your first ingeScape agent](/blog/your_first_agent) illustrates the basics for both worlds. In this article, we provide a more advanced example that can serve as a boiler plate for any real-world agent to be used with command lines in a terminal and developed in C without any other dependency.
+***ingeScape*** is designed to support both industrial and experimental environments. [Your first ingeScape agent](/blog/your_first_agent) illustrates the basics for both worlds. In this article, we provide a more advanced example that can serve as a boiler plate for any real-world agent to be used with command lines in a terminal on Windows, Linux or macos and developed in C with or without any other dependency.
 
-This agent can receive parameters when started and commands when running. It is composed of three files:
-
-- *main.c* contains the agent logic
-- *regexp.h* is a utility header to handle commands entered when the agent is running
-- *regexp.c* provides the implementations for the functions in *regex.h*
-
-*regexp.h* and *regexp.c* are provided for your convenience.
+This agent can receive parameters when started and commands through the command line when running. It is composed of a single  *main.c* file.
 
 The full code for the agent is provided and downloadable below. Before giving the full picture, we will describe the most significant parts of the code.
 
 
-### Observe IOPs of various types
+### Handle the various types of IOPs 
 
-ingeScape supports different types for the inputs, outputs and parameters of the agents. Dedicated functions are available to read these types and even convert them. These dedicated functions are duplicated between inputs, outputs and parameters because a same name can be used independently in each of them.
+ingeScape supports different types for the inputs, outputs and parameters of the agents. Dedicated functions are available to read these types and even convert them. These dedicated functions are common to inputs, outputs and parameters. A same name can be used independently in each of them.
 
-To simply print an IOP value, the easiest way is to read it as a string and to use the ***igs_read{Input,Output,Parameter}AsString*** functions. In an ***observe*** callback, this looks like :
+To simply print an IOP value, the easiest way is to read it as a string and to use the ***igs_read{Input,Output,Parameter}AsString*** functions. In an ***observe*** callback as demonstrated in [your first ingeScape agent](/blog/your_first_agent), this looks like that:
 
 {{< highlight c "linenos=table,linenostart=1" >}}
 void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
@@ -59,7 +53,7 @@ void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
     }
 {{< / highlight >}}
 <br>
-If the IOP is an ***Input***, functions for each specific type can be used. They also support implicit conversions when it is possible. This gives the end of our callback:
+Functions for each specific type can be used. They  support implicit conversions when permitted by the C language. Here is the corresponding code:
 
 {{< highlight c "linenos=table,linenostart=1" >}}
     if (iopType == IGS_INPUT_T){
@@ -102,29 +96,102 @@ There is nothing specific to ingeScape here but it is important for the communit
 Here is what a function describing the arguments looks like:
 
 {{< highlight c "linenos=table,linenostart=1" >}}
-void print_usage(){
-    printf("Usage example: firstFullAgent --verbose --port 5670 --name firstFullAgent\n");
-    printf("\nthese parameters have default value (indicated here above):\n");
-    printf("--definition : optional path to the definition file (default: %s)\n", DEFAULTDEFINITIONPATH);
-    printf("--mapping : optional path to the mapping file (default: %s)\n", DEFAULTMAPPINGPATH);
-    printf("--verbose : enable verbose mode in the application (default is disabled)\n");
-    printf("--port port_number : port used for autodiscovery between agents (default: %d)\n", port);
-    printf("--device device_name : name of the network device to be used (useful if several devices available)\n");
-    printf("--name agent_name : published name of this agent (default: %s)\n", agentName);
-    printf("--noninteractiveloop : non-interactive loop for use as a deamon (default is false)\n");
+void print_usage() {
+	printf("Usage example: firstFullAgent --verbose --port %d --device device_name --name firstFullAgent\n", port);
+	printf("\nthese parameters have default value (indicated here above):\n");
+	printf("--definition : path to the definition file (default: %s)\n", DEFAULTDEFINITIONPATH);
+	printf("--mapping : path to the mapping file (default: %s)\n", DEFAULTMAPPINGPATH);
+	printf("--verbose : enable verbose mode in the application (default is disabled)\n");
+	printf("--port port_number : port used for autodiscovery between agents (default: %d)\n", port);
+	printf("--device device_name : name of the network device to be used (useful if several devices available)\n");
+	printf("--name agent_name : published name for this agent (default: %s)\n", agentName);
+	printf("--interactiveloop : enables interactive loop to pass commands in CLI (default: false)\n");
 }
 {{< / highlight >}}
 <br>
 The arguments here above should be the minimal ones provided by each real agent, as they cover all the mandatory aspects of an agent from its name to the network parameters it will use. 
 
-When relevant, agents can also load external ***definition*** and/or ***mapping***, as illustrated in this example. They are expressed in JSON format as illustrated in [The editor tour](/blog/editor_tour). As an exercise, you can copy them on your disk and try to load them into this agent.
+### Set the network device
 
+ingeScape makes network simple and requires only two parameters to configure an agent:
 
-### Introspection of agent's IOPs
+- the port to be used to connect on a platform (all agents running on the same port will automatically see each other),
+- the network device (or IP address) to be used.
 
-When loading an external definition, an agent does not know its IOPs. That is why ingeScape provides introspection functions to list and display them.
+It is not possible to provide a default network device name that would fit with all operating systems supported by ingeScape. However, we provide a small code snippet enabling to list available devices on your computer. Available devices are ones with a proper IP address and UDP broadcast capabilities. Note that ingeScape also supports advanced network configurations  for secured or specifically constrained networks.
 
-Here is the code to do so:
+The code snippet below not only lists compatible devices but also implements the following behavior:
+
+- If only one compatible network device exists, the agent uses it as default.
+- If several network devices are available, the agent stops and devices are listed in the console so that one can be selected and passed as ***--device*** parameter in the command line running the agent.
+- If no device is found, agent notifies an error and stops.
+
+{{< highlight c "linenos=table,linenostart=1" >}}
+    if (networkDevice == NULL){
+        //we have no device to start with: try to find one
+        char **devices = NULL;
+        int nb = 0;
+        igs_getNetdevicesList(&devices, &nb);
+        if (nb == 1){
+            //we have exactly one compliant network device available: we use it
+            networkDevice = strdup(devices[0]);
+            igs_info("using %s as default network device (this is the only one available)", networkDevice);
+        }else{
+            if (nb == 0){
+                igs_error("No network device found: aborting.");
+                exit(1);
+            }else{
+                igs_error("No network device passed as command line parameter and several are available.");
+                printf("Please use one of these network devices:\n");
+                for (int i = 0; i < nb; i++){
+                    printf("\t%s\n", devices[i]);
+                }
+                printf("\n");
+                print_usage();
+                exit(1);
+            }
+        }
+        igs_freeNetdevicesList(devices, nb);
+    }
+{{< / highlight >}}
+
+### Handle definition and mapping
+
+The definition and mapping of an agent, as illustrated in the [editor tour](/blog/editor_tour), are managed with three complementary methods:
+
+- They can be hardcoded in an agent, using the ingeScape API.
+- They can be loaded from external files.
+- They can be loaded from the ingeScape Editor.
+
+This example is designed to use external files. You can  create such files, based on the examples in the [editor tour](/blog/editor_tour), as ***definition.json*** and ***mapping.json***, in your *Documents/IngeScape/examples* folder, set as the default locations using this code:
+
+{{< highlight c "linenos=table,linenostart=1" >}}
+//definition and mapping as external resources
+#define BUFFER_SIZE 1024
+#define DEFAULTDEFINITIONPATH "~/Documents/IngeScape/examples/definition.json"
+static char definitionFile[BUFFER_SIZE];
+#define DEFAULTMAPPINGPATH "~/Documents/IngeScape/examples/mapping.json"
+static char mappingFile[BUFFER_SIZE];
+{{< / highlight >}}
+
+If you want to hardcode your agent definition and/or mapping, you can comment this code and use the ingeScape API instead (check the *Definitions* section of the ingeScape header file):
+
+{{< highlight c "linenos=table,linenostart=1" >}}
+	//load definition
+	igs_loadDefinitionFromPath(definitionFile);
+	//    char *definition = igs_getDefinition();
+	//    printf("%s\n", definition);
+	//    free(definition);
+
+	//load mapping
+	igs_loadMappingFromPath(mappingFile);
+	//    char *mapping = igs_getMapping();
+	//    printf("%s\n", mapping);
+	//    free(mapping);
+{{< / highlight >}}
+
+### Use introspection on an agent's IOPs
+ingeScape provides introspection functions to list and display them. Here is the code to do so:
 
 {{< highlight c "linenos=table,linenostart=1" >}}
     long numberOfEntries;
@@ -151,6 +218,10 @@ Here is the code to do so:
     igs_freeIOPList(&myEntries, numberOfEntries);
 {{< / highlight >}}
 
+Introspection might be useful in the following situations:
+
+- Agent needs to configure itself based on the loaded definition or requires to verify it.
+- Agent's definition is dynamic depending on external events or internal behavior and needs to verify and/or adapt its current definition or mapping.
 
 ### About main loops
 
@@ -158,9 +229,9 @@ Agents are interactive software. As such, they need to continue their execution 
 
 Should you need more sophisticated or customized mainloops, we advise you to use the ***select*** function available in ***\<sys/select.h\>*** or the mainloop extension capabilities of the industrial framework you are using. Please note that ingeScape uses its own mainloop and threads that will not interfere with the one you are using. With some frameworks though, it will be necessary  to wrap the code in your callbacks to execute it into your frameworks's main thread or main queue. Check the ingeScape documentation for more details about this.
 
-In this example, depending on the use of the *- - noninteractiveloop* command line parameter, two different loops can be activated.
+In this example, depending on the use of the *--interactiveloop* command line parameter, two different loops can be activated.
 
-By default, the interactive loop mode is activated, i.e. the one enabling the use of commands inside the terminal once the agent is running. This loop is based on ***fgets*** function from ***\<stdio.h\>***, which has the capability to wait until some text is input in the terminal. In the case where the user uses the *Ctrl + c* key combination, this function returns *false*, which we use to break the infinite loop we have created. Here is the code for this loop:
+When *--interactiveloop* is passed as a command line argument, the interactive loop mode is activated, i.e. the one enabling the use of commands inside the terminal once the agent is running. This loop is based on ***fgets*** function from ***\<stdio.h\>***, which has the capability to wait until some text is input in the terminal. In the case where the user uses the *Ctrl + c* key combination, this function returns *false*, which we use to break the infinite loop we created. Here is the code for this loop:
 
 {{< highlight c "linenos=table,linenostart=1" >}}
 while (1) {
@@ -182,9 +253,9 @@ zloop_start(loop); //this function is blocking until SIGINT is received
 zloop_destroy(&loop);
 {{< / highlight >}}
 
-### How to properly stop an agent
+### How to properly stop an agent ?
 
-When an agent has to stop, it shall call the *igs_stop* function in order for the ingeScape thread to close properly. This also informs other agents on the platform that your agent is leaving. If an agent stops abruptly, other agents will detect it but it might take some time (up to 30 seconds).
+When an agent has to stop, it shall call the *igs_stop* function in order for the ingeScape threads to terminate properly. This call also informs other agents on the platform that your agent is leaving. If an agent stops abruptly, other agents will detect it but it might take some time (up to 30 seconds).
 
 The problem is how and when to call the *igs_stop* function, as there are many causes for an agent to stop :
 
@@ -192,7 +263,7 @@ The problem is how and when to call the *igs_stop* function, as there are many c
 - The ingeScape editor and some special agents have the ability to stop other agents remotely,
 - An interruption signal is received by the agent from the operating system.
 
-For each of these cases, there are good practices to follow in order to avoid any dead lock between your application's threads and the ingeScape thread.
+For each of these cases, there are good practices to follow in order to avoid any dead lock between your application's threads and the ingeScape threads.
 
 <br>
 #### Which thread am i in ?
@@ -233,7 +304,7 @@ signal(SIGINT, interruptionReceived);
 **It is important that the *igs_stop* function is never called from an ingeScape callback.** This can be avoided by using a global flag that is set to true in the callback and induces the stop of the main thread's loop, and/or a function call in the main thread that actually executes a call to the *igs_stop* function.
 
 <br>
-#### Register to stop requests from other agents
+#### Register to "stop" requests from other agents
 
 Some special agents can remotely stop any other agent. This has the effect to stop the ingeScape loop and threads and to trigger SIGINT to your application process. But sometimes additional code is required for your application to stop properly even when forced to stop.
 
@@ -244,81 +315,63 @@ It is possible to observe forced stop requests and attach callbacks to them. Thi
 
 In addition to command line parameters, it may be useful to pass commands to an agent when it is running into a terminal. Such commands can be helpful to get various informations from the agent or to configure it on the fly. Commands can be atomic or be composed of one or more parameters.
 
-This is where we will use our *regexp.h* and *regexp.c* files to handle and parse what is typed into the terminal. In this example, it is necessary to end any keyboard input by the entry key. And we try to interpret commands only if they start by '/' and provide at least one additional character.
+In this example, it is necessary to end any keyboard input by the entry key. And we will interpret commands only if they start by '/' and provide at least one additional character.
 
-This example uses three different regular expressions, respectively capturing a command with :
+This example supports three different types of command patterns :
 
-- zero parameter, 
-- one parameter,
-- one parameter followed by a string of characters. 
+- command with zero parameter, 
+- command with one parameter,
+- command with one parameter, followed by a string of characters. 
 
 Feel free to extend them according to your needs and improve their reliability if needed.
 
-{{< highlight c "linenos=table,linenostart=1" >}}
-//single command
-const char *reg1 = "/([[:alnum:]]+)"; 
-//command + parameter (single word)
-const char *reg2 = "/([[:alnum:]]+)[[:space:]]{1}([^ ]+)";
-//command + parameter + string
-const char *reg3 = "/([[:alnum:]]+)[[:space:]]{1}([^ ]+)[[:space:]]{1}([[:print:]]+)"; 
-{{< / highlight >}}
-<br>
-In the code, regular expressions are checked from the most complex to the simplest one, as checking the simplest one first would never allow more complex ones to be matched. Here is the code checking and handling the three regular expressions:
+In the code, commands are checked from the most complex to the simplest one, as checking the simplest one first would never allow more complex ones to be matched. Here is the code checking and handling the three types of patterns:
 
 {{< highlight c "linenos=table,linenostart=1" >}}
-                //command + parameter + string
-                compile_regex(&r, reg3);
-                match_regex(&r, message, &my_matches);
-                regfree (&r);
-                if (my_matches.nb > 0){
-                    char *command = my_matches.results[0];
-                    char *parameter = my_matches.results[1];
-                    char *message = my_matches.results[2];
-                    printf("command: %s\nparameter: %s\nmessage: %s\n",command,parameter,message);
-                    clean_matches(&my_matches);
-                    continue;
-                }
-                //command + parameter (single word)
-                compile_regex(&r, reg2);
-                match_regex(&r, message, &my_matches);
-                regfree (&r);
-                if (my_matches.nb > 0){
-                    char *command = my_matches.results[0];
-                    char *parameter = my_matches.results[1];
-                    printf("command: %s\nparameter: %s\n",command,parameter);
-                    clean_matches(&my_matches);
-                    continue;
-                }
-                //single command
-                compile_regex(&r, reg1);
-                match_regex(&r, message, &my_matches);
-                regfree (&r);
-                if (my_matches.nb > 0){
-                    char *command = my_matches.results[0];
-                    //printf("command: %s\n",command);
-                    if (strcmp(command, "quit") == 0){
-                        break; //simply stops the main loop
-                    }
-                    clean_matches(&my_matches);
-                    continue;
-                }
+			if ((message[0] == '/') && (strlen(message) > 2)) {
+				int matches = sscanf(message + 1, "%s %s%n%s", command, param1, &usedChar, param2);
+				if (matches > 2) {
+					// copy the remaining of the message in param 2
+					strncpy(param2, message + usedChar + 2, BUFFER_SIZE);
+					// remove '\n' at the end
+					param2[strnlen(param2, BUFFER_SIZE) - 1] = '\0';
+				}
+				// Process command
+				if (matches == -1) {
+					//printf("Error: could not interpret message %s\n", message + 1);
+				}else if (matches == 1) {
+					if (strncmp(command, "quit", BUFFER_SIZE) == 0){
+						break;
+                    }else if(strncmp(command, "help", BUFFER_SIZE) == 0){
+                        print_cli_usage();
+                    }else {
+						printf("Received command: %s\n", command);
+					}
+				}else if (matches == 2) {
+					printf("Received command: %s + %s\n", command, param1);
+				}else if (matches == 3) {
+					printf("Received command: %s + %s + %s\n", command, param1, param2);
+				}else{
+					printf("Error: message returned %d matches (%s)\n", matches, message);
+				}
+			}
 {{< / highlight >}}
 
 <br>
-*NB:* in this example we only have one actually implemented command which is **/quit**.
+*NB:* in this example we only have two actually implemented commands which are **/quit** and **/help**.
 
 ### ingeScape logging support
 
 ingeScape supports a versatile logging mechanism that can display and store logs into the terminal console, log files and a log stream available in the ingeScape editor.
 
-Logs contain priority levels, from *trace* to *fatal* that are common with most other logging systems. Logging functions work like the famous *printf* function with a variable number of parameters and the same matching syntax.
+Logs contain priority levels, from *trace* to *fatal* that are usual to most logging systems. Logging functions work like the famous *printf* function with a variable number of parameters and the same matching syntax.
 
 When displayed in the console, logs can use colors if *igs_setUseColorVerbose* is passed *true*.
 
 Here is how to configure and use logs:
 
 {{< highlight c "linenos=table,linenostart=1" >}}
-    //NB: file log and stream log are enabled optionnaly
+    //NB: file log and stream log are enabled optionaly
     igs_setLogLevel(IGS_LOG_TRACE); //set log level to TRACE (default is INFO)
     igs_setVerbose(verbose);
     igs_setUseColorVerbose(verbose);
@@ -351,11 +404,9 @@ With this source code, you will be able to compile the agent for:
   - Xcode
   - cmake
 
-In all cases, as a prerequisite, you need to have the ingeScape library installed on your computer. We provide installers and packages to to so.
+In all cases, as a prerequisite, you need to have the ingeScape library installed on your computer. We provide installers and packages to do so.
 
 With Microsoft Windows, depending on your system, you will be able to choose between 32-bit and 64-bit architectures.
-
-TODO: definition & mapping + config device
 
 #### cmake
 In a terminal, once the source code has been extracted, just go inside the extracted folder and type the following commands:
