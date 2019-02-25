@@ -7,7 +7,7 @@
 # Project setup
 ########################################################################
 cmake_minimum_required(VERSION 3.13.1)
-project(ingeScape HOMEPAGE_URL https://ingescape.com)
+project(ingescape HOMEPAGE_URL https://ingescape.com)
 
 enable_language(C)
 set(CMAKE_C_STANDARD 11)
@@ -147,7 +147,7 @@ if (INGESCAPE_BUILD_SHARED)
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-    RUNTIME DESTINATION bin                # .dll file
+    RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
   )
 
   target_include_directories(${PROJECT_NAME}
@@ -178,7 +178,7 @@ if (INGESCAPE_BUILD_STATIC)
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-    RUNTIME DESTINATION bin                # .dll file
+    RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
   )
 
   target_include_directories(${PROJECT_NAME}-static
@@ -258,6 +258,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_VERSION_MINOR}")
   set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_VERSION_PATCH}")
   set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
+  set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 
   # Installers for 32- vs. 64-bit CMake:
   #  - Root install directory (displayed to end user at installer-run time)
@@ -275,8 +276,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   # NSIS configuration for Windows
   #see https://cmake.org/cmake/help/v3.14/cpack_gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
   #set(CPACK_NSIS_INSTALL_ROOT )
-  #set(CPACK_NSIS_MUI_ICON )
-  #set(CPACK_NSIS_MUI_UNIICON )
+  #set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}\\\\InstallIcon.bmp") #https://docs.microsoft.com/fr-fr/windows/desktop/shell/desktop-app-tiles-on-the-start-screen
+  #set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}\\\\InstallIcon.bmp")
   #set(CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP )
   #set(CPACK_NSIS_MUI_UNWELCOMEFINISHPAGE_BITMAP )
   #set(CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS )
@@ -285,7 +286,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   #set(CPACK_NSIS_COMPRESSOR )
   set(CPACK_NSIS_DISPLAY_NAME "IngeScape library")
   set(CPACK_NSIS_PACKAGE_NAME ${PROJECT_NAME})
-  #set(CPACK_NSIS_INSTALLED_ICON_NAME )
+  #set(CPACK_NSIS_INSTALLED_ICON_NAME "${CMAKE_CURRENT_SOURCE_DIR}\\\\InstallIcon.bmp")
   set(CPACK_NSIS_HELP_LINK "https://ingescape.com")
   set(CPACK_NSIS_CONTACT "contact@ingescape.com")
   #set(CPACK_NSIS_<compName>_INSTALL_DIRECTORY )
@@ -297,7 +298,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
 
 
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-  set(CPACK_NSIS_MODIFY_PATH OFF)
+  set(CPACK_NSIS_MODIFY_PATH ON)
   set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
 
   set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/editor/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/")

@@ -196,8 +196,8 @@ lib-installer-runtime-windows-x86:
     - cd build\ReleaseX86 && cpack --config CPackSourceConfig.cmake && cd ..\..
   artifacts:
     paths:
-      - build\ReleaseX86\ingeScape-*.exe
-      - build\ReleaseX86\ingeScape-*.zip
+      - build\ReleaseX86\ingescape-*.exe
+      - build\ReleaseX86\ingescape-*.zip
   dependencies:
     - lib-windows-release-x86
 
@@ -212,8 +212,8 @@ lib-installer-runtime-windows-x64:
     - cd build\ReleaseX64 && cpack --config CPackSourceConfig.cmake && cd ..\..
   artifacts:
     paths:
-      - build\ReleaseX64\ingeScape-*.exe
-      - build\ReleaseX64\ingeScape-*.zip
+      - build\ReleaseX64\ingescape-*.exe
+      - build\ReleaseX64\ingescape-*.zip
   dependencies:
     - lib-windows-release-x64
 
@@ -227,7 +227,7 @@ lib-installer-runtime-macos-x64:
     - make -C build package
   artifacts:
     paths:
-      - build/ingeScape-*
+      - build/ingescape-*
   dependencies:
     - lib-macos-release-x64
 
@@ -271,7 +271,7 @@ lib-installer-runtime-linux-x64:
     - make -C build package
   artifacts:
     paths:
-      - build/ingeScape-*
+      - build/ingescape-*
   dependencies:
     - lib-linux-release-x64
 
