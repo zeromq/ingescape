@@ -9,10 +9,11 @@
  *
  *	Contributors:
  *      Alexandre Lemort    <lemort@ingenuity.io>
+ *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
  *
  */
 
-#include "ingescapeeditorutils.h"
+#include "ingescapeutils.h"
 
 #include <QQmlEngine>
 #include <QDebug>
@@ -24,7 +25,7 @@ static int BIGGEST_UID_OF_ACTION_MODEL = -1;
 
 //--------------------------------------------------------------
 //
-// IngeScapeEditorUtils
+// IngeScapeUtils
 //
 //--------------------------------------------------------------
 
@@ -32,7 +33,7 @@ static int BIGGEST_UID_OF_ACTION_MODEL = -1;
  * @brief Default constructor
  * @param parent
  */
-IngeScapeEditorUtils::IngeScapeEditorUtils(QObject *parent) : QObject(parent)
+IngeScapeUtils::IngeScapeUtils(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -42,7 +43,7 @@ IngeScapeEditorUtils::IngeScapeEditorUtils(QObject *parent) : QObject(parent)
 /**
  * @brief Destructor
  */
-IngeScapeEditorUtils::~IngeScapeEditorUtils()
+IngeScapeUtils::~IngeScapeUtils()
 {
 }
 
@@ -51,7 +52,7 @@ IngeScapeEditorUtils::~IngeScapeEditorUtils()
   * @brief Create a directory if it does not exist
   * @param directoryPath
   */
-void IngeScapeEditorUtils::createDirectoryIfNotExist(QString directoryPath)
+void IngeScapeUtils::createDirectoryIfNotExist(QString directoryPath)
 {
     // Check if the directory path is not empty
     if (!directoryPath.isEmpty())
@@ -79,7 +80,7 @@ void IngeScapeEditorUtils::createDirectoryIfNotExist(QString directoryPath)
  * "[DocumentsLocation]/IngeScape/"
  * @return
  */
-QString IngeScapeEditorUtils::getRootPath()
+QString IngeScapeUtils::getRootPath()
 {
     static QString rootDirectoryPath;
 
@@ -93,7 +94,7 @@ QString IngeScapeEditorUtils::getRootPath()
             rootDirectoryPath = QString("%1%2IngeScape%2").arg(documentsDirectoryPath, QDir::separator());
 
             // Create a directory if it does not exist
-            IngeScapeEditorUtils::createDirectoryIfNotExist(rootDirectoryPath);
+            IngeScapeUtils::createDirectoryIfNotExist(rootDirectoryPath);
         }
     }
 
@@ -106,9 +107,9 @@ QString IngeScapeEditorUtils::getRootPath()
  * "[DocumentsLocation]/IngeScape/Settings/"
  * @return
  */
-QString IngeScapeEditorUtils::getSettingsPath()
+QString IngeScapeUtils::getSettingsPath()
 {
-    return IngeScapeEditorUtils::_getSubDirectoryPath("settings");
+    return IngeScapeUtils::_getSubDirectoryPath("settings");
 }
 
 
@@ -117,21 +118,10 @@ QString IngeScapeEditorUtils::getSettingsPath()
  * "[DocumentsLocation]/IngeScape/Snapshots/"
  * @return
  */
-QString IngeScapeEditorUtils::getSnapshotsPath()
+QString IngeScapeUtils::getSnapshotsPath()
 {
-    return IngeScapeEditorUtils::_getSubDirectoryPath("snapshots");
+    return IngeScapeUtils::_getSubDirectoryPath("snapshots");
 }
-
-
-/**
- * @brief Get (and create if needed) the path with files about agents list
- * "[DocumentsLocation]/IngeScape/agents_list/"
- * @return
- */
-/*QString IngeScapeEditorUtils::getAgentsListPath()
-{
-    return IngeScapeEditorUtils::_getSubDirectoryPath("agents_list");
-}*/
 
 
 /**
@@ -139,9 +129,9 @@ QString IngeScapeEditorUtils::getSnapshotsPath()
  * "[DocumentsLocation]/IngeScape/platforms/"
  * @return
  */
-QString IngeScapeEditorUtils::getPlatformsPath()
+QString IngeScapeUtils::getPlatformsPath()
 {
-    return IngeScapeEditorUtils::_getSubDirectoryPath("platforms");
+    return IngeScapeUtils::_getSubDirectoryPath("platforms");
 }
 
 
@@ -149,7 +139,7 @@ QString IngeScapeEditorUtils::getPlatformsPath()
  * @brief Get an UID for a new model of action
  * @return
  */
-int IngeScapeEditorUtils::getUIDforNewActionM()
+int IngeScapeUtils::getUIDforNewActionM()
 {
     BIGGEST_UID_OF_ACTION_MODEL++;
 
@@ -161,7 +151,7 @@ int IngeScapeEditorUtils::getUIDforNewActionM()
  * @brief Free an UID of a model of action
  * @param uid
  */
-void IngeScapeEditorUtils::freeUIDofActionM(int uid)
+void IngeScapeUtils::freeUIDofActionM(int uid)
 {
     // Decrement only if the uid correspond to the biggest one
     if (uid == BIGGEST_UID_OF_ACTION_MODEL)
@@ -175,7 +165,7 @@ void IngeScapeEditorUtils::freeUIDofActionM(int uid)
  * @brief Book an UID for a new model of action
  * @param uid
  */
-void IngeScapeEditorUtils::bookUIDforActionM(int uid)
+void IngeScapeUtils::bookUIDforActionM(int uid)
 {
     if (uid > BIGGEST_UID_OF_ACTION_MODEL) {
         BIGGEST_UID_OF_ACTION_MODEL = uid;
@@ -188,12 +178,12 @@ void IngeScapeEditorUtils::bookUIDforActionM(int uid)
  * @param subDirectory
  * @return
  */
-QString IngeScapeEditorUtils::_getSubDirectoryPath(QString subDirectory)
+QString IngeScapeUtils::_getSubDirectoryPath(QString subDirectory)
 {
-    QString subDirectoryPath = QString("%1%3%2").arg(IngeScapeEditorUtils::getRootPath(), QDir::separator(), subDirectory);
+    QString subDirectoryPath = QString("%1%3%2").arg(IngeScapeUtils::getRootPath(), QDir::separator(), subDirectory);
 
     // Create this directory if it does not exist
-    IngeScapeEditorUtils::createDirectoryIfNotExist(subDirectoryPath);
+    IngeScapeUtils::createDirectoryIfNotExist(subDirectoryPath);
 
     return subDirectoryPath;
 }

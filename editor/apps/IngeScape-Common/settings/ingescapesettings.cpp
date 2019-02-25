@@ -1,39 +1,39 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Alexandre Lemort    <lemort@ingenuity.io>
  *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
  *
  */
 
-#include "ingescapeeditorsettings.h"
+#include "ingescapesettings.h"
 
 #include <QDebug>
-
 
 /**
  * @brief Get our instance
  * @param settingsFilePath File path of our settings. It will only be use once to set up our instance
  * @return
  */
-IngeScapeEditorSettings& IngeScapeEditorSettings::Instance(QString settingsFilePath)
+IngeScapeSettings& IngeScapeSettings::Instance(QString settingsFilePath)
 {
-    static IngeScapeEditorSettings instance(settingsFilePath);
+    static IngeScapeSettings instance(settingsFilePath);
     return instance;
 }
 
 
 /**
- * @brief Default constructor
+ * @brief Constructor
  * @param settingsFilePath File path of our settings
  */
-IngeScapeEditorSettings::IngeScapeEditorSettings(QString settingsFilePath) : QSettings(settingsFilePath, QSettings::IniFormat)
+IngeScapeSettings::IngeScapeSettings(QString settingsFilePath) : QSettings(settingsFilePath, QSettings::IniFormat)
 {
     if (!settingsFilePath.isEmpty())
     {
@@ -41,8 +41,6 @@ IngeScapeEditorSettings::IngeScapeEditorSettings(QString settingsFilePath) : QSe
     }
     else
     {
-        qFatal("Erreur Fatale: La première instance de IngeScapeEditorSettings::Instance() doit pointer vers un chemin de fichier valide !");
+        qFatal("Erreur Fatale: La première instance de IngeScapeSettings::Instance() doit pointer vers un chemin de fichier valide !");
     }
 }
-
-

@@ -1,33 +1,31 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Alexandre Lemort    <lemort@ingenuity.io>
  *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
  *
  */
 
-#ifndef INGESCAPEEDITORSETTINGS_H
-#define INGESCAPEEDITORSETTINGS_H
+#ifndef INGESCAPESETTINGS_H
+#define INGESCAPESETTINGS_H
 
 #include <QObject>
-#include <QtQml>
 #include <QSettings>
-
 #include <I2PropertyHelpers.h>
 
 
-
 /**
- * @brief The IngeScapeEditorSettings class is a custom QSettings class that is used as a Meyer's singleton
+ * @brief The IngeScapeSettings class is a custom QSettings class that is used as a Meyer's singleton
  *        to share a single settings object in our files
  */
-class IngeScapeEditorSettings: public QSettings
+class IngeScapeSettings : public QSettings
 {
 
 public:
@@ -37,32 +35,31 @@ public:
      * @param settingsFilePath File path of our settings. It will only be use once to set up our instance
      * @return
      */
-    static IngeScapeEditorSettings& Instance(QString settingsFilePath = "");
+    static IngeScapeSettings& Instance(QString settingsFilePath = "");
 
 
 private:
-
     /**
      * @brief Default constructor
      * @param settingsFilePath File path of our settings
      */
-    explicit IngeScapeEditorSettings(QString settingsFilePath = "");
+    explicit IngeScapeSettings(QString settingsFilePath = "");
 
 
     /**
      * @brief Copy constructor
      */
-    IngeScapeEditorSettings(IngeScapeEditorSettings const&);
+    IngeScapeSettings(IngeScapeSettings const&);
 
 
     /**
      * @brief Assign operator
      * @return
      */
-    IngeScapeEditorSettings& operator=(IngeScapeEditorSettings const&);
+    IngeScapeSettings& operator=(IngeScapeSettings const&);
 
 };
 
-QML_DECLARE_TYPE(IngeScapeEditorSettings)
+QML_DECLARE_TYPE(IngeScapeSettings)
 
-#endif // INGESCAPEEDITORSETTINGS_H
+#endif // INGESCAPESETTINGS_H

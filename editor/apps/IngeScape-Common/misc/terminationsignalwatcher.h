@@ -1,7 +1,7 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
- *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -9,11 +9,12 @@
  *
  *	Contributors:
  *      Alexandre Lemort    <lemort@ingenuity.io>
+ *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
  *
  */
 
-#ifndef SYSTEMSIGNALWATCHER_H
-#define SYSTEMSIGNALWATCHER_H
+#ifndef TERMINATIONSIGNALWATCHER_H
+#define TERMINATIONSIGNALWATCHER_H
 
 #include <QObject>
 #include <QSocketNotifier>
@@ -43,8 +44,6 @@
 #include <errno.h>
 
 #endif
-
-
 
 
 /**
@@ -130,4 +129,4 @@ private:
 
 };
 
-#endif // SYSTEMSIGNALWATCHER_H
+#endif // TERMINATIONSIGNALWATCHER_H

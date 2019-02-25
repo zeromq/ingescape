@@ -1,7 +1,7 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
- *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -9,13 +9,11 @@
  *
  *	Contributors:
  *      Alexandre Lemort    <lemort@ingenuity.io>
+ *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
  *
  */
 
 #include "terminationsignalwatcher.h"
-
-
-
 
 /**
  * @brief Constructor
@@ -163,3 +161,4 @@ void TerminationSignalWatcher::_onSocketNotifierActivated(int sockfd)
 #ifdef Q_OS_WIN
 // TODO
 #endif
+

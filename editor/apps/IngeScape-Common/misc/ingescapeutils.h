@@ -9,22 +9,21 @@
  *
  *	Contributors:
  *      Alexandre Lemort    <lemort@ingenuity.io>
+ *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
  *
  */
 
-#ifndef INGESCAPEEDITORUTILS_H
-#define INGESCAPEEDITORUTILS_H
+#ifndef INGESCAPEUTILS_H
+#define INGESCAPEUTILS_H
 
 #include <QObject>
 #include <QtQml>
 
 
-
-
 /**
- * @brief The IngeScapeEditorUtils class defines the ingescape editor utils
+ * @brief The IngeScapeUtils class defines the IngeScape utils
  */
-class IngeScapeEditorUtils: public QObject
+class IngeScapeUtils: public QObject
 {
     Q_OBJECT
 
@@ -35,13 +34,13 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit IngeScapeEditorUtils(QObject *parent = nullptr);
+    explicit IngeScapeUtils(QObject *parent = nullptr);
 
 
     /**
       * @brief Destructor
       */
-    ~IngeScapeEditorUtils();
+    ~IngeScapeUtils();
 
 
     /**
@@ -73,14 +72,6 @@ public:
      * @return
      */
     static QString getSnapshotsPath();
-
-
-    /**
-     * @brief Get (and create if needed) the path with files about agents list
-     * "[DocumentsLocation]/INGESCAPE/agents_list/"
-     * @return
-     */
-    //static QString getAgentsListPath();
 
 
     /**
@@ -121,6 +112,6 @@ protected:
     static QString _getSubDirectoryPath(QString subDirectory);
 };
 
-QML_DECLARE_TYPE(IngeScapeEditorUtils)
+QML_DECLARE_TYPE(IngeScapeUtils)
 
-#endif // INGESCAPEEDITORUTILS_H
+#endif // INGESCAPEUTILS_H
