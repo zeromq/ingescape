@@ -147,7 +147,7 @@ if (INGESCAPE_BUILD_SHARED)
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-    RUNTIME DESTINATION bin                # .dll file
+    RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
   )
 
   target_include_directories(${PROJECT_NAME}
@@ -178,7 +178,7 @@ if (INGESCAPE_BUILD_STATIC)
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-    RUNTIME DESTINATION bin                # .dll file
+    RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
   )
 
   target_include_directories(${PROJECT_NAME}-static
