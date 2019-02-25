@@ -21,11 +21,8 @@ stages:
   only:
     changes:
       - src/**/*
-      - autogen.sh
-      - configure.ac
-      - Makefile.am
       - CMakeLists.txt
-      - build/cmake/**/*
+      - builds/cmake/**/*
       - dependencies/windows/unix/*
     refs:
       - master
@@ -199,8 +196,8 @@ lib-installer-runtime-windows-x86:
     - cd build\ReleaseX86 && cpack --config CPackSourceConfig.cmake && cd ..\..
   artifacts:
     paths:
-      - build\ReleaseX86\Ingescape-*.exe
-      - build\ReleaseX86\Ingescape-*.zip
+      - build\ReleaseX86\ingeScape-*.exe
+      - build\ReleaseX86\ingeScape-*.zip
   dependencies:
     - lib-windows-release-x86
 
@@ -215,8 +212,8 @@ lib-installer-runtime-windows-x64:
     - cd build\ReleaseX64 && cpack --config CPackSourceConfig.cmake && cd ..\..
   artifacts:
     paths:
-      - build\ReleaseX64\Ingescape-*.exe
-      - build\ReleaseX64\Ingescape-*.zip
+      - build\ReleaseX64\ingeScape-*.exe
+      - build\ReleaseX64\ingeScape-*.zip
   dependencies:
     - lib-windows-release-x64
 
@@ -231,7 +228,7 @@ lib-installer-runtime-macos-x64:
     - make -C build package_source
   artifacts:
     paths:
-      - build/Ingescape-*
+      - build/ingeScape-*
   dependencies:
     - lib-macos-release-x64
 
@@ -276,7 +273,7 @@ lib-installer-runtime-linux-x64:
     - make -C build package_source
   artifacts:
     paths:
-      - build/Ingescape-*
+      - build/ingeScape-*
   dependencies:
     - lib-linux-release-x64
 
