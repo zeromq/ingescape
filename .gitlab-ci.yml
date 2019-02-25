@@ -225,7 +225,6 @@ lib-installer-runtime-macos-x64:
     - osx
   script:
     - make -C build package
-    - make -C build package_source
   artifacts:
     paths:
       - build/ingeScape-*
@@ -270,7 +269,6 @@ lib-installer-runtime-linux-x64:
   image: fafesty/debian-with-zyre
   script:
     - make -C build package
-    - make -C build package_source
   artifacts:
     paths:
       - build/ingeScape-*
