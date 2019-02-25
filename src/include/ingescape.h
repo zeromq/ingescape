@@ -1,7 +1,6 @@
 //
-//  ingescape_public.h
-//
-//  Multi Agent Supervision Transport Integration and Control
+//  ingescape.h
+//  ingescape - https://ingescape.com
 //
 //  Created by Stephane Vales on 22/05/2017.
 //  Copyright © 2017 Ingenuity i/o. All rights reserved.

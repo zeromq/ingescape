@@ -1,6 +1,6 @@
 //
 //  ingescape_advanced.h
-//  ingescape
+//  ingescape - https://ingescape.com
 //
 //  Created by Stephane Vales on 07/04/2018.
 //  Copyright © 2018 Ingenuity i/o. All rights reserved.
