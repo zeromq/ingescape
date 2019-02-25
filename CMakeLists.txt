@@ -316,7 +316,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
       #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/raspberry)
       #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/unix)
 
-      set(CPACK_GENERATOR "WIX;NSIS;ZIP")
+      set(CPACK_GENERATOR "NSIS;ZIP")
       # On windows we want to package these libraries
       set(IS_EDITOR FALSE)
       install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
@@ -326,7 +326,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
       install_ingescape_dependencies(YAJL_LIBRARIES YAJL_INCLUDE_DIRS IS_EDITOR)
 
   elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-      set(CPACK_GENERATOR "PackageMaker;STGZ;ZIP")
+      set(CPACK_GENERATOR "STGZ;ZIP")
       #set(CPACK_SOURCE_GENERATOR "TGZ")
       #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
   else ()
