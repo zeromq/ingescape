@@ -44,9 +44,6 @@ SOURCES += main.cpp \
     controller/actioneditorcontroller.cpp \
     controller/valueshistorycontroller.cpp \
     controller/abstracttimeactionslinescenarioviewcontroller.cpp \
-    misc/ingescapeeditorsettings.cpp \
-    misc/ingescapeeditorutils.cpp \
-    misc/terminationsignalwatcher.cpp \
     misc/collapsiblecolumn.cpp \
     model/agentm.cpp \
     model/iop/agentiopm.cpp \
@@ -120,9 +117,6 @@ HEADERS += \
     controller/actioneditorcontroller.h \
     controller/valueshistorycontroller.h \
     controller/abstracttimeactionslinescenarioviewcontroller.h \
-    misc/ingescapeeditorsettings.h \
-    misc/ingescapeeditorutils.h \
-    misc/terminationsignalwatcher.h \
     misc/collapsiblecolumn.h \
     model/agentm.h \
     model/iop/agentiopm.h \
@@ -224,6 +218,12 @@ DEFINES += INGESCAPE
 # Include ingescape library
 !include(../../../builds/ingescape.pri) {
     error(Could not load ingescape.pri)
+}
+
+
+# Include PGIMCommon library
+!include(../Ingescape-Common/Ingescape-Common.pri) {
+    error(Could not load Ingescape-Common.pri)
 }
 
 

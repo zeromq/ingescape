@@ -267,6 +267,8 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
  */
 void RecordsSupervisionController::onAddedRecord(QString recordJSON)
 {
+    qDebug() << "onAddedRecord" << recordJSON;
+
     if (!recordJSON.isEmpty() && (_jsonHelper != nullptr))
     {
         QByteArray byteArrayOfJson = recordJSON.toUtf8();

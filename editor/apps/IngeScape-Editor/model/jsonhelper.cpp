@@ -15,7 +15,7 @@
 #include "jsonhelper.h"
 
 #include <QDebug>
-#include <misc/ingescapeeditorutils.h>
+#include <misc/ingescapeutils.h>
 
 /**
  * @brief Constructor
@@ -466,7 +466,7 @@ ScenarioM* JsonHelper::createModelOfScenarioFromJSON(QJsonObject jsonScenario,
                         int uid = jsonUID.toInt();
 
                         // Book the UID of the new model of action
-                        IngeScapeEditorUtils::bookUIDforActionM(uid);
+                        IngeScapeUtils::bookUIDforActionM(uid);
 
                         // Create the model of action
                         actionM = new ActionM(uid, jsonName.toString());

@@ -26,12 +26,17 @@
 #include <I2Quick.h>
 
 #include <controller/ingescapeeditorcontroller.h>
-#include <misc/ingescapeeditorsettings.h>
-#include <misc/ingescapeeditorutils.h>
 #include <misc/collapsiblecolumn.h>
 #include <misc/qquickwindowblocktouches.h>
 #include <misc/textfielddoublevalidator.h>
 #include <misc/numberconstants.h>
+
+
+//
+// IngeScape Common
+//
+#include <settings/ingescapesettings.h>
+#include <misc/ingescapeutils.h>
 
 
 /**
@@ -302,7 +307,7 @@ int main(int argc, char *argv[])
     //------------------------------
 
     // Get (and create if needed) the root path of our application ([DocumentsLocation]/IngeScape/)
-    QString rootDirectoryPath = IngeScapeEditorUtils::getRootPath();
+    QString rootDirectoryPath = IngeScapeUtils::getRootPath();
     if (!rootDirectoryPath.isEmpty())
     {
         //------------------------------
@@ -338,7 +343,7 @@ int main(int argc, char *argv[])
         //------------------------------
 
         // Get (and create if needed) the settings path of our application ([DocumentsLocation]/IngeScape/Settings/)
-        QString settingsDirectoryPath = IngeScapeEditorUtils::getSettingsPath();
+        QString settingsDirectoryPath = IngeScapeUtils::getSettingsPath();
         QString settingsFilePath = QString("%1IngeScape-Editor.ini").arg(settingsDirectoryPath);
 
         QFile settingsFile(settingsFilePath);
@@ -364,7 +369,7 @@ int main(int argc, char *argv[])
         // Récupération des différentes configurations
         if (settingsFile.exists()) {
             // Load our settings
-            IngeScapeEditorSettings& settings = IngeScapeEditorSettings::Instance(settingsFilePath);
+            IngeScapeSettings& settings = IngeScapeSettings::Instance(settingsFilePath);
 
             qDebug() << "Settings" << settings.fileName();
         }

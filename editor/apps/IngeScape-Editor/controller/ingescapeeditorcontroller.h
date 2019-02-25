@@ -33,6 +33,7 @@
 #include <controller/recordssupervisioncontroller.h>
 #include <controller/scenariocontroller.h>
 #include <controller/valueshistorycontroller.h>
+
 #include <misc/terminationsignalwatcher.h>
 
 

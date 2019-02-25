@@ -15,7 +15,7 @@
 #include "actioneditorcontroller.h"
 
 #include <QDebug>
-#include <misc/ingescapeeditorutils.h>
+#include <misc/ingescapeutils.h>
 
 /**
  * @brief Constructor
@@ -38,7 +38,7 @@ ActionEditorController::ActionEditorController(QString actionName,
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Get an UID for our new model of action
-    int uid = IngeScapeEditorUtils::getUIDforNewActionM();
+    int uid = IngeScapeUtils::getUIDforNewActionM();
 
     _editedAction = new ActionM(uid, actionName);
 
@@ -48,7 +48,7 @@ ActionEditorController::ActionEditorController(QString actionName,
 
         // Cancel the increment because the edited action uses now (after the call to "copyFrom") the uid of the original action
         // Free the UID of the action model
-        IngeScapeEditorUtils::freeUIDofActionM(uid);
+        IngeScapeUtils::freeUIDofActionM(uid);
     }
 }
 

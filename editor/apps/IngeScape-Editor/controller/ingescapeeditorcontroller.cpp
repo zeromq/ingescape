@@ -20,8 +20,9 @@
 #include <QThread>
 #include <QApplication>
 #include <QCursor>
-#include <misc/ingescapeeditorsettings.h>
-#include <misc/ingescapeeditorutils.h>
+#include <misc/ingescapeutils.h>
+
+#include <settings/ingescapesettings.h>
 
 
 /**
@@ -53,7 +54,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
     // Snapshots directory
     //
-    QString snapshotsDirectoryPath = IngeScapeEditorUtils::getSnapshotsPath();
+    QString snapshotsDirectoryPath = IngeScapeUtils::getSnapshotsPath();
     QDir snapshotsDirectory(snapshotsDirectoryPath);
     if (snapshotsDirectory.exists())
     {
@@ -68,7 +69,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
     // Settings
     //
-    IngeScapeEditorSettings& settings = IngeScapeEditorSettings::Instance();
+    IngeScapeSettings &settings = IngeScapeSettings::Instance();
 
     // Settings about the "Network"
     settings.beginGroup("network");
@@ -86,21 +87,15 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Root directory
-    QString rootPath = IngeScapeEditorUtils::getRootPath();
+    QString rootPath = IngeScapeUtils::getRootPath();
     QDir rootDir(rootPath);
     if (!rootDir.exists()) {
         qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
     }
 
-    // Directory for agents lists
-    /*QString agentsListPath = IngeScapeEditorUtils::getAgentsListPath();
-    QDir agentsListDir(agentsListPath);
-    if (!agentsListDir.exists()) {
-        qCritical() << "ERROR: could not create directory at '" << agentsListPath << "' !";
-    }*/
 
     // Directory for platform files
-    QString platformPath = IngeScapeEditorUtils::getPlatformsPath();
+    QString platformPath = IngeScapeUtils::getPlatformsPath();
 
     QDir platformDir(platformPath);
     if (!platformDir.exists()) {
@@ -305,7 +300,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
     //
     if (_terminationSignalWatcher != nullptr)
     {
-        disconnect(_terminationSignalWatcher, 0);
+        disconnect(_terminationSignalWatcher, nullptr);
         delete _terminationSignalWatcher;
         _terminationSignalWatcher = nullptr;
     }
@@ -596,7 +591,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 setport(nPort);
 
                 // Update settings file
-                IngeScapeEditorSettings& settings = IngeScapeEditorSettings::Instance();
+                IngeScapeSettings &settings = IngeScapeSettings::Instance();
                 settings.beginGroup("network");
                 settings.setValue("networkDevice", networkDevice);
                 settings.setValue("port", nPort);
