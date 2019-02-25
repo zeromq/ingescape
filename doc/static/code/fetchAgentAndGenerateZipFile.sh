@@ -1,6 +1,8 @@
 #!/bin/sh
 cp -R ../../../../agents/learning/firstFullAgent .
 find . -name ".DS_Store" -type f -delete
+find . -name ".vc" -type d -delete
+find . -name "firstFullAgent.pro.user" -type f -delete
 rm -f *.zip
 zip -r -X firstFullAgent.zip firstFullAgent
 rm -Rf firstFullAgent
