@@ -26,6 +26,7 @@
 #include <I2Quick.h>
 
 #include <controller/ingescapeeditorcontroller.h>
+
 #include <misc/collapsiblecolumn.h>
 #include <misc/qquickwindowblocktouches.h>
 #include <misc/textfielddoublevalidator.h>
@@ -52,7 +53,7 @@ void LogMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
 
     // "context.function" can be null
     QString function = "Undefined function";
-    if (context.function != NULL) {
+    if (context.function != nullptr) {
         function = QString(context.function);
     }
 
@@ -369,7 +370,7 @@ int main(int argc, char *argv[])
         // Récupération des différentes configurations
         if (settingsFile.exists()) {
             // Load our settings
-            IngeScapeSettings& settings = IngeScapeSettings::Instance(settingsFilePath);
+            IngeScapeSettings &settings = IngeScapeSettings::Instance(settingsFilePath);
 
             qDebug() << "Settings" << settings.fileName();
         }

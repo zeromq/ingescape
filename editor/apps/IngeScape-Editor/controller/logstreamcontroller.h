@@ -24,9 +24,7 @@
 
 
 extern "C" {
-//#include <ingescape_advanced.h>
 #include <ingescape_private.h>
-//#include <czmq.h>
 }
 
 

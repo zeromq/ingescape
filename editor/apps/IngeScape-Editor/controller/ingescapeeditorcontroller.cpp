@@ -20,8 +20,8 @@
 #include <QThread>
 #include <QApplication>
 #include <QCursor>
-#include <misc/ingescapeutils.h>
 
+#include <misc/ingescapeutils.h>
 #include <settings/ingescapesettings.h>
 
 

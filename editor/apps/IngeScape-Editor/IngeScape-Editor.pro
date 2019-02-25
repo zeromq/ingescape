@@ -197,7 +197,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 #####################################################################
 #
-# Additionnal code to use frameworks (I2Quick, etc.)
+# Additionnal code to use frameworks (I2Quick, IngeScape-Common, etc.)
 #
 #####################################################################
 
@@ -353,7 +353,7 @@ win32 {
     QMAKE_TARGET_COMPANY = Ingenuity i/o
     QMAKE_TARGET_PRODUCT = $${TARGET}
     QMAKE_TARGET_DESCRIPTION = IngeScape-Editor
-    QMAKE_TARGET_COPYRIGHT = Copyright (c) 2017-2018, Ingenuity i/o
+    QMAKE_TARGET_COPYRIGHT = Copyright (c) 2017-2019, Ingenuity i/o
 }
 
 
