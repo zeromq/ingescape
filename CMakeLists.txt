@@ -295,9 +295,21 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   #set(CPACK_NSIS_MUI_FINISHPAGE_RUN )
   #set(CPACK_NSIS_MENU_LINKS )
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+  set (CPACK_NSIS_EXTRA_INSTALL_COMMANDS "Push \\\"PATH\\\"
+   Push \\\"A\\\"
+   Push \\\"HKCU\\\"
+   Push \\\"$INSTDIR\\\\lib\\\"
+   Call EnvVarUpdate
+   Pop  \\\$0" )
+  set (CPACK_NSIS_EXTRA_INSTALL_COMMANDS "Push \\\"PATH\\\"
+   Push \\\"R\\\"
+   Push \\\"HKCU\\\"
+   Push \\\"$INSTDIR\\\\lib\\\"
+   Call un.EnvVarUpdate
+   Pop  \\\$0" )
   set(CPACK_NSIS_MODIFY_PATH ON)
-  set(CPACK_NSIS_EXECUTABLES_DIRECTORY "lib")
   set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
+
 
   # see: https://cmake.org/cmake/help/v3.13/cpack_gen/wix.html?highlight=wix
   #set(CPACK_WIX_PRODUCT_ICON "${CMAKE_CURRENT_SOURCE_DIR}\\\\InstallIcon.bmp")
