@@ -24,6 +24,14 @@
 
 #include <controller/ingescapemeasuringcontroller.h>
 
+//
+// IngeScape Common
+//
+#include <settings/ingescapesettings.h>
+#include <misc/ingescapeutils.h>
+
+
+// FIXME: Why this include is not needed in the IngeScape Editor ?
 extern "C" {
 #include <ingescape.h>
 }
@@ -42,7 +50,7 @@ void LogMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
 
     // "context.function" can be null
     QString function = "Undefined function";
-    if (context.function != NULL) {
+    if (context.function != nullptr) {
         function = QString(context.function);
     }
 
@@ -219,7 +227,7 @@ int main(int argc, char *argv[])
     //------------------------------
 
     // Get (and create if needed) the root path of our application ([DocumentsLocation]/IngeScape/)
-    /*QString rootDirectoryPath = IngeScapeEditorUtils::getRootPath();
+    QString rootDirectoryPath = IngeScapeUtils::getRootPath();
     if (!rootDirectoryPath.isEmpty())
     {
         //------------------------------
@@ -255,7 +263,7 @@ int main(int argc, char *argv[])
         //------------------------------
 
         // Get (and create if needed) the settings path of our application ([DocumentsLocation]/IngeScape/Settings/)
-        QString settingsDirectoryPath = IngeScapeEditorUtils::getSettingsPath();
+        QString settingsDirectoryPath = IngeScapeUtils::getSettingsPath();
         QString settingsFilePath = QString("%1IngeScape-Measuring.ini").arg(settingsDirectoryPath);
 
         QFile settingsFile(settingsFilePath);
@@ -281,7 +289,7 @@ int main(int argc, char *argv[])
         // Récupération des différentes configurations
         if (settingsFile.exists()) {
             // Load our settings
-            IngeScapeEditorSettings& settings = IngeScapeEditorSettings::Instance(settingsFilePath);
+            IngeScapeSettings &settings = IngeScapeSettings::Instance(settingsFilePath);
 
             qDebug() << "Settings" << settings.fileName();
         }
@@ -289,7 +297,7 @@ int main(int argc, char *argv[])
     else
     {
         qFatal("ERROR: There is no special directory 'Documents' !");
-    }*/
+    }
 
 
     //------------------------------

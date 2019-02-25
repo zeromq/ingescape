@@ -34,16 +34,15 @@ MOC_DIR = tmp
 RCC_DIR = tmp
 
 
-SOURCES += \
-        main.cpp \
+SOURCES += main.cpp \
     controller/ingescapemeasuringcontroller.cpp \
     controller/networkcontroller.cpp \
     controller/ingescapemodelmanager.cpp
 
 
 HEADERS += \
-    controller/ingescapemeasuringcontroller.h \
     stable.h \
+    controller/ingescapemeasuringcontroller.h \
     controller/networkcontroller.h \
     controller/ingescapemodelmanager.h
 
@@ -72,7 +71,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 #####################################################################
 #
-# Additionnal code to use frameworks (I2Quick, etc.)
+# Additionnal code to use frameworks (I2Quick, IngeScape-Common, etc.)
 #
 #####################################################################
 
@@ -94,9 +93,9 @@ DEFINES += INGESCAPE
 }
 
 # Include IngeScape-Common library
-#!include(../IngeScape-Common/IngeScape-Common.pro) {
-#    error(Could not load IngeScape-Common.pro)
-#}
+!include(../IngeScape-Common/IngeScape-Common.pri) {
+    error(Could not load IngeScape-Common.pri)
+}
 
 
 #####################################################################

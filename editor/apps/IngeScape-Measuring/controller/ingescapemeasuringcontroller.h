@@ -16,11 +16,16 @@
 #define INGESCAPEMEASURINGCONTROLLER_H
 
 #include <QObject>
+#include <QtQml>
+#include <QQmlEngine>
+#include <QJSEngine>
 
 #include <I2PropertyHelpers.h>
 
 #include <controller/networkcontroller.h>
 #include <controller/ingescapemodelmanager.h>
+
+#include <misc/terminationsignalwatcher.h>
 
 
 /**
@@ -43,7 +48,7 @@ class IngeScapeMeasuringController : public QObject
     I2_QML_PROPERTY_READONLY(QString, errorMessageWhenConnectionFailed)
 
     // Snapshot Directory
-    //I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
+    I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 
     // Manager for the data model of our IngeScape measuring application
     I2_QML_PROPERTY_READONLY(IngeScapeModelManager*, modelManager)
@@ -92,7 +97,7 @@ public Q_SLOTS:
 private:
 
     // To subscribe to termination signals
-    //TerminationSignalWatcher *_terminationSignalWatcher;
+    TerminationSignalWatcher *_terminationSignalWatcher;
 
     // Helper to manage JSON files
     //JsonHelper* _jsonHelper;

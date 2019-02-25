@@ -14,8 +14,10 @@
 
 #include "ingescapemeasuringcontroller.h"
 
-//#include <misc/terminationsignalwatcher.h>
-//#include <settings/ingescapesettings.h>
+#include <QApplication>
+
+#include <misc/ingescapeutils.h>
+#include <settings/ingescapesettings.h>
 
 
 /**
@@ -27,6 +29,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   _ipAddress(""),
   _port(0),
   _errorMessageWhenConnectionFailed(""),
+  _snapshotDirectory(""),
   _modelManager(nullptr),
   _networkC(nullptr)
   //_terminationSignalWatcher(nullptr),
@@ -39,7 +42,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   //
   // Snapshots directory
   //
-  /*QString snapshotsDirectoryPath = IngeScapeEditorUtils::getSnapshotsPath();
+  QString snapshotsDirectoryPath = IngeScapeUtils::getSnapshotsPath();
   QDir snapshotsDirectory(snapshotsDirectoryPath);
   if (snapshotsDirectory.exists())
   {
@@ -48,13 +51,13 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   else
   {
       qCritical() << "ERROR: could not create directory at '" << snapshotsDirectoryPath << "' !";
-  }*/
+  }
 
 
   //
   // Settings
   //
-  /*IngeScapeSettings& settings = IngeScapeSettings::Instance();
+  IngeScapeSettings& settings = IngeScapeSettings::Instance();
 
   // Settings about the "Network"
   settings.beginGroup("network");
@@ -62,15 +65,15 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   _ipAddress = settings.value("ipAddress", QVariant("")).toString();
   _port = settings.value("port", QVariant(0)).toInt();
   qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
-  settings.endGroup();*/
+  settings.endGroup();
 
 
   // Root directory
-  /*QString rootPath = IngeScapeEditorUtils::getRootPath();
+  QString rootPath = IngeScapeUtils::getRootPath();
   QDir rootDir(rootPath);
   if (!rootDir.exists()) {
       qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
-  }*/
+  }
 
 
   /*// Directory for platform files
@@ -120,7 +123,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   }
 
   // Start our INGESCAPE agent with a network device (or an IP address) and a port
-  /*bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
+  bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
   if (isStarted)
   {
@@ -129,13 +132,13 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   }
   else {
       seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
-  }*/
+  }
 
 
   //
   // Subscribe to system signals to interceipt interruption and termination signals
   //
-  /*_terminationSignalWatcher = new TerminationSignalWatcher(this);
+  _terminationSignalWatcher = new TerminationSignalWatcher(this);
   connect(_terminationSignalWatcher, &TerminationSignalWatcher::terminationSignal,
                    [=] () {
                       qDebug() << "\n\n\n CATCH Termination Signal \n\n\n";
@@ -144,7 +147,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
                       {
                           QApplication::instance()->quit();
                       }
-                   });*/
+                   });
 
 
   // Sleep to display our loading screen
@@ -160,12 +163,12 @@ IngeScapeMeasuringController::~IngeScapeMeasuringController()
   //
   // Clean-up our TerminationSignalWatcher first
   //
-  /*if (_terminationSignalWatcher != nullptr)
+  if (_terminationSignalWatcher != nullptr)
   {
-      disconnect(_terminationSignalWatcher, 0);
+      disconnect(_terminationSignalWatcher, nullptr);
       delete _terminationSignalWatcher;
       _terminationSignalWatcher = nullptr;
-  }*/
+  }
 
   if (_modelManager != nullptr)
   {

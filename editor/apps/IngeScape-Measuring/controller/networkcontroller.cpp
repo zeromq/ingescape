@@ -20,7 +20,7 @@
 extern "C" {
 #include <ingescape_advanced.h>
 #include <ingescape_private.h>
-//#include <czmq.h>
+#include <czmq.h>
 }
 
 
@@ -395,7 +395,7 @@ void NetworkController::updateAvailableNetworkDevices()
 {
     QStringList networkDevices;
 
-    char **devices = NULL;
+    char **devices = nullptr;
     int nb = 0;
     igs_getNetdevicesList(&devices, &nb);
 
