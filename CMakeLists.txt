@@ -7,7 +7,7 @@
 # Project setup
 ########################################################################
 cmake_minimum_required(VERSION 3.13.1)
-project(Ingescape HOMEPAGE_URL https://ingescape.com)
+project(ingeScape HOMEPAGE_URL https://ingescape.com)
 
 enable_language(C)
 set(CMAKE_C_STANDARD 11)
@@ -22,6 +22,7 @@ set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/builds/cmake/modules")
 list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR})
 include(IngescapeHelper)
 
+
 ########################################################################
 # options
 ########################################################################
@@ -29,8 +30,8 @@ include(IngescapeHelper)
 if (NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE Debug)
 endif ()
-
 add_definitions(-DINGESCAPE=1)
+
 
 ########################################################################
 # plateform specific
@@ -47,13 +48,15 @@ if (NOT MSVC)
   endforeach()
 endif()
 
+
 ########################################################################
 # version
 ########################################################################
+#gets version from admin.c file
 get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR INGESCAPE_VERSION_PATCH)
-
 set(INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
 message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
+
 
 ########################################################################
 # includes
@@ -65,7 +68,6 @@ set (ingescape_headers_to_install
 
 set (ingescape_headers
     ${ingescape_headers_to_install}
-    src/include/ingescape_advanced.h
     src/include/ingescape_private.h
     src/include/uthash/libut.h
     src/include/uthash/ringbuf.h
@@ -84,11 +86,11 @@ install(FILES ${ingescape_headers_to_install} DESTINATION include/ingescape)
 add_ingescape_include_directory(_INCLUDES_DIRECTORY)
 include_directories(${_INCLUDES_DIRECTORY})
 
+
 ########################################################################
 # Sources files
 ########################################################################
 add_ingescape_sources(ingescape_sources)
-
 source_group("Source Files" FILES ${ingescape_sources})
 
 
@@ -98,11 +100,16 @@ source_group("Source Files" FILES ${ingescape_sources})
 # Will be used to add flags to pkg-config useful when apps want to statically link
 set(pkg_config_libs_private "")
 add_ingescape_libraries_dependencies(MORE_LIBRARIES pkg_config_libs_private)
+set (pkgconfig_name_libzmq "libzmq >= 4")
+set (pkgconfig_name_libczmq "libczmq >= 4")
+set (pkgconfig_name_libzyre "libzyre >= 2")
+set (pkgconfig_name_libyajl "libyajl >= 2")
+set (pkgconfig_name_libsodium "libsodium")
+
 
 ########################################################################
 # library
 ########################################################################
-
 option(INGESCAPE_BUILD_SHARED "Whether or not to build the shared object" ON)
 option(INGESCAPE_BUILD_STATIC "Whether or not to build the static archive" ON)
 
@@ -128,7 +135,7 @@ if (INGESCAPE_BUILD_SHARED)
   set_target_properties (${PROJECT_NAME} PROPERTIES
     PUBLIC_HEADER "${public_headers}"
     DEFINE_SYMBOL "INGESCAPE_EXPORTS"
-    SOVERSION "0"
+    SOVERSION "${INGESCAPE_VERSION_MAJOR}"
     VERSION "${INGESCAPE_VERSION}"
     OUTPUT_NAME "ingescape"
     PREFIX "lib"
@@ -187,7 +194,7 @@ endif()
 ########################################################################
 # pkgconfig
 ########################################################################
-set (VERSION "0.8.1")
+set (VERSION "${INGESCAPE_VERSION}")
 set (prefix "${CMAKE_INSTALL_PREFIX}")
 set (exec_prefix "\${prefix}")
 set (libdir "\${prefix}/lib${LIB_SUFFIX}")
@@ -204,7 +211,7 @@ install(
 )
 
 ########################################################################
-# installer
+# installation
 ########################################################################
 include(CMakePackageConfigHelpers)
 if (WIN32)
@@ -224,12 +231,6 @@ configure_package_config_file(builds/cmake/Config.cmake.in
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
                                  VERSION ${INGESCAPE_VERSION}
                                  COMPATIBILITY AnyNewerVersion)
-install(EXPORT ${PROJECT_NAME}-targets
-        FILE ingescapeTargets.cmake
-        DESTINATION ${CMAKECONFIG_INSTALL_DIR})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake
-              ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
-              DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 
 # uninstall target
 if(NOT TARGET uninstall)
@@ -245,13 +246,13 @@ endif()
 ########################################################################
 # installer
 ########################################################################
-# Package installer just for release build
+# Package installer for release build only
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CPACK_MONOLITHIC_INSTALL ON)
   set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME} library")
-  set(CPACK_PACKAGE_VENDOR "Ingenuity IO")
-  set(CPACK_PACKAGE_CONTACT "contact@ingenuity.io")
+  set(CPACK_PACKAGE_VENDOR "Ingescape")
+  set(CPACK_PACKAGE_CONTACT "contact@ingescape.com")
   set(CPACK_PACKAGE_VERSION ${INGESCAPE_VERSION})
   set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_VERSION_MAJOR}")
   set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_VERSION_MINOR}")
@@ -271,16 +272,46 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   endif()
   set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_NSIS_PACKAGE_NAME}")
 
+  # NSIS configuration for Windows
+  #see https://cmake.org/cmake/help/v3.14/cpack_gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
+  #set(CPACK_NSIS_INSTALL_ROOT )
+  #set(CPACK_NSIS_MUI_ICON )
+  #set(CPACK_NSIS_MUI_UNIICON )
+  #set(CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP )
+  #set(CPACK_NSIS_MUI_UNWELCOMEFINISHPAGE_BITMAP )
+  #set(CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS )
+  #set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS )
+  #set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS )
+  #set(CPACK_NSIS_COMPRESSOR )
+  set(CPACK_NSIS_DISPLAY_NAME "IngeScape library")
+  set(CPACK_NSIS_PACKAGE_NAME ${PROJECT_NAME})
+  #set(CPACK_NSIS_INSTALLED_ICON_NAME )
+  set(CPACK_NSIS_HELP_LINK "https://ingescape.com")
+  set(CPACK_NSIS_CONTACT "contact@ingescape.com")
+  #set(CPACK_NSIS_<compName>_INSTALL_DIRECTORY )
+  #set(CPACK_NSIS_CREATE_ICONS_EXTRA )
+  #set(CPACK_NSIS_DELETE_ICONS_EXTRA )
+  #set(CPACK_NSIS_EXECUTABLES_DIRECTORY )
+  #set(CPACK_NSIS_MUI_FINISHPAGE_RUN )
+  #set(CPACK_NSIS_MENU_LINKS )
+
+
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-  set(CPACK_NSIS_MODIFY_PATH ON)
+  set(CPACK_NSIS_MODIFY_PATH OFF)
   set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
 
   set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/editor/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/")
   
   if (WIN32)
+      #set(CPACK_SOURCE_GENERATOR "ZIP") #sources are useless for Windows
+      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/android)
+      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/ios)
+      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/macos)
+      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/raspberry)
+      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/unix)
+
       set(CPACK_GENERATOR "NSIS;ZIP")
-      set(CPACK_SOURCE_GENERATOR "ZIP")
-      # On windows we want to package dependencies with this library
+      # On windows we want to package these libraries
       set(IS_EDITOR FALSE)
       install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
       install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
@@ -288,21 +319,16 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
       install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
       install_ingescape_dependencies(YAJL_LIBRARIES YAJL_INCLUDE_DIRS IS_EDITOR)
 
-      list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/android)
-      list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/ios)
-      list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/macos)
-      list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/raspberry)
-      list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/unix)
   elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-      set(CPACK_GENERATOR "STGZ")
-      set(CPACK_SOURCE_GENERATOR "TGZ")
-      list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
+      set(CPACK_GENERATOR "STGZ;ZIP")
+      #set(CPACK_SOURCE_GENERATOR "TGZ")
+      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
   else ()
-      set(CPACK_GENERATOR "DEB;RPM")
-      set(CPACK_SOURCE_GENERATOR "TGZ")
+      set(CPACK_GENERATOR "DEB;RPM;ZIP")
       set(CPACK_DEBIAN_PACKAGE_DEPENDS "libczmq4, libsodium23 (>= 0.6.0), libzmq5, libzyre2, yajl")
       set(CPACK_RPM_PACKAGE_REQUIRES "libczmq4, libsodium23 >= 0.6.0, libzmq5, libzyre2, yajl")
-      list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
+      #set(CPACK_SOURCE_GENERATOR "TGZ")
+      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
   endif ()
 
   include (CPack)

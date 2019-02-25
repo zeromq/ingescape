@@ -4,10 +4,10 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: libingescape
-Description: The Ingescape library
+Description: The ingeScape library - https://ingescape.com
 Version: @VERSION@
 
-Requires:@pkgconfig_name_libzmq@ @pkgconfig_name_libczmq@ @pkgconfig_name_libzyre@
+Requires: @pkgconfig_name_libzmq@, @pkgconfig_name_libczmq@, @pkgconfig_name_libzyre@, @pkgconfig_name_libyajl@, @pkgconfig_name_libsodium@
 
 Libs: -L${libdir} -lingescape
 Cflags: -I${includedir} @pkg_config_defines@
