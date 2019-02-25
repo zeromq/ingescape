@@ -2,6 +2,8 @@
 cp -R ../../../../agents/learning/firstFullAgent .
 find . -name ".DS_Store" -type f -delete
 find . -name ".vc" -type d -delete
+find . -name ".git" -type f -delete
+find . -name ".gitignore" -type f -delete
 find . -name "firstFullAgent.pro.user" -type f -delete
 rm -f *.zip
 zip -r -X firstFullAgent.zip firstFullAgent
