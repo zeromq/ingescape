@@ -225,7 +225,7 @@ void model_readWriteUnlock(void);
 #define CHANNEL "INGESCAPE_PRIVATE"
 #define AGENT_NAME_DEFAULT "igs_noname"
 
-extern zyreAgent_t *zyreAgents;
+PUBLIC extern zyreAgent_t *zyreAgents;
 extern bool network_needToSendDefinitionUpdate;
 extern bool network_needToUpdateMapping;
 extern subscriber_t *subscribers;
