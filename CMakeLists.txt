@@ -147,7 +147,7 @@ if (INGESCAPE_BUILD_SHARED)
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-    RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
+    RUNTIME DESTINATION "bin" # .dll file
   )
 
   target_include_directories(${PROJECT_NAME}
@@ -178,7 +178,7 @@ if (INGESCAPE_BUILD_STATIC)
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-    RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
+    RUNTIME DESTINATION "bin" # .dll file
   )
 
   target_include_directories(${PROJECT_NAME}-static
@@ -294,20 +294,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   #set(CPACK_NSIS_DELETE_ICONS_EXTRA )
   #set(CPACK_NSIS_MUI_FINISHPAGE_RUN )
   #set(CPACK_NSIS_MENU_LINKS )
-  set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-  set (CPACK_NSIS_EXTRA_INSTALL_COMMANDS "Push \\\"PATH\\\"
-   Push \\\"A\\\"
-   Push \\\"HKLM\\\"
-   Push \\\"$INSTDIR\\\\lib\\\"
-   Call EnvVarUpdate
-   Pop  \\\$0" )
-  set (CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "Push \\\"PATH\\\"
-   Push \\\"R\\\"
-   Push \\\"HKLM\\\"
-   Push \\\"$INSTDIR\\\\lib\\\"
-   Call un.EnvVarUpdate
-   Pop  \\\$0" )
-  set(CPACK_NSIS_MODIFY_PATH ON)
+  set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)  set(CPACK_NSIS_MODIFY_PATH ON)
   set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
 
 
