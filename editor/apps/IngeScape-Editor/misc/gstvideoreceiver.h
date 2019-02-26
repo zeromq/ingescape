@@ -1,6 +1,8 @@
 #ifndef GSTVIDEORECEIVER_H
 #define GSTVIDEORECEIVER_H
 
+#if defined KEEP_FOR_FUTUR_IMPROVEMENT
+
 #include <gst/gst.h>
 
 #include <QQuickPaintedItem>
@@ -78,4 +80,5 @@ private:
 
 };
 
+#endif
 #endif // GSTVIDEORECEIVER_H

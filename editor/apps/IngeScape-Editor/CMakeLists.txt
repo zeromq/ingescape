@@ -44,6 +44,7 @@ set(CMAKE_AUTORCC ON)
 set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/../../../builds/cmake/modules")
 list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR})
 include(IngescapeHelper)
+include(IngescapeEditorHelper)
 
 ########################################################################
 # options
@@ -90,82 +91,13 @@ message(STATUS "Detected INGESCAPE Editor Version - ${INGESCAPE_EDITOR_VERSION}"
 ########################################################################
 # includes
 ########################################################################
-set (ingescape_editor_headers
-    stable.h
-    uthash/libut.h
-    uthash/ringbuf.h
-    uthash/utarray.h
-    uthash/uthash.h
-    uthash/utlist.h
-    uthash/utmm.h
-    uthash/utringbuffer.h
-    uthash/utstring.h
-    uthash/utvector.h
-    controller/agentssupervisioncontroller.h
-    controller/agentsmappingcontroller.h
-    controller/ingescapeeditorcontroller.h
-    controller/ingescapemodelmanager.h
-    controller/networkcontroller.h
-    controller/scenariocontroller.h
-    controller/actioneditorcontroller.h
-    controller/valueshistorycontroller.h
-    controller/abstracttimeactionslinescenarioviewcontroller.h
-    controller/ingescapelaunchermanager.h
-    misc/ingescapeeditorsettings.h
-    misc/ingescapeeditorutils.h
-    misc/terminationsignalwatcher.h
-    misc/collapsiblecolumn.h
-    model/agentm.h
-    model/iop/agentiopm.h
-    model/iop/outputm.h
-    model/jsonhelper.h
-    model/definitionm.h
-    model/mapping/agentmappingm.h
-    model/mapping/elementmappingm.h
-    model/scenario/condition/actionconditionm.h
-    model/scenario/actionm.h
-    model/scenario/scenariom.h
-    model/scenario/scenariomarkerm.h
-    model/scenario/condition/iopvalueconditionm.h
-    model/enums.h
-    model/publishedvaluem.h
-    model/scenario/timetickm.h
-    model/scenario/effect/actioneffectm.h
-    model/scenario/effect/iopvalueeffectm.h
-    model/scenario/effect/mappingeffectm.h
-    model/scenario/effect/effectonagentm.h
-    sortFilter/valueshistorysortfilter.h
-    viewModel/agentvm.h
-    viewModel/pointmapvm.h
-    viewModel/agentinmappingvm.h
-    viewModel/mapbetweeniopvm.h
-    viewModel/scenario/actionvm.h
-    viewModel/iop/inputvm.h
-    viewModel/iop/outputvm.h
-    viewModel/scenario/actionconditionvm.h
-    viewModel/scenario/actioneffectvm.h
-    viewModel/scenario/actioninpalettevm.h
-    viewModel/scenario/actionexecutionvm.h
-    viewModel/iop/parametervm.h
-    model/hostm.h
-    viewModel/iop/agentiopvm.h
-    sortFilter/abstracttimerangefilter.h
-    controller/hostssupervisioncontroller.h
-    viewModel/hostvm.h
-    model/recordm.h
-    controller/recordssupervisioncontroller.h
-    viewModel/recordvm.h
-    controller/logstreamcontroller.h
-    model/logm.h
-    sortFilter/logssortfilter.h
-    model/scenario/condition/conditiononagentm.h
-    misc/qquickwindowblocktouches.h
-    misc/textfielddoublevalidator.h
-)
+file(GLOB_RECURSE ingescape_editor_headers "${SOURCE_DIR}/*.h")
+add_ingescape_common_headers(ingescape_editor_headers)
 
 source_group ("Header Files" FILES ${ingescape_editor_headers})
 
 add_ingescape_include_directory(_INCLUDES_DIRECTORY)
+add_ingescape_common_include_directory(_INCLUDES_DIRECTORY)
 
 list(APPEND _INCLUDES_DIRECTORY 
     "${SOURCE_DIR}"
@@ -178,76 +110,29 @@ include_directories(${_INCLUDES_DIRECTORY})
 # Sources files
 ########################################################################
 
-# To have the list of files just run next command in editor/apps/IngeScape-Editor folder:
-# find . -name "*.cpp"
-set (ingescape_editor_sources
-    ${SOURCE_DIR}/misc/terminationsignalwatcher.cpp
-    ${SOURCE_DIR}/misc/ingescapeeditorsettings.cpp
-    ${SOURCE_DIR}/misc/textfielddoublevalidator.cpp
-    ${SOURCE_DIR}/misc/collapsiblecolumn.cpp
-    # ${SOURCE_DIR}/misc/gstvideoreceiver.cpp
-    ${SOURCE_DIR}/misc/ingescapeeditorutils.cpp
-    ${SOURCE_DIR}/misc/numberconstants.cpp
-    ${SOURCE_DIR}/misc/qquickwindowblocktouches.cpp
-    ${SOURCE_DIR}/viewModel/hostvm.cpp
-    ${SOURCE_DIR}/viewModel/agentsgroupedbydefinitionvm.cpp
-    ${SOURCE_DIR}/viewModel/recordvm.cpp
-    ${SOURCE_DIR}/viewModel/scenario/actionvm.cpp
-    ${SOURCE_DIR}/viewModel/scenario/actioninpalettevm.cpp
-    ${SOURCE_DIR}/viewModel/scenario/actionconditionvm.cpp
-    ${SOURCE_DIR}/viewModel/scenario/actioneffectvm.cpp
-    ${SOURCE_DIR}/viewModel/scenario/actionexecutionvm.cpp
-    ${SOURCE_DIR}/viewModel/link/linkconnectorvm.cpp
-    ${SOURCE_DIR}/viewModel/link/linkinputvm.cpp
-    ${SOURCE_DIR}/viewModel/link/linkoutputvm.cpp
-    ${SOURCE_DIR}/viewModel/link/mappingelementvm.cpp
-    ${SOURCE_DIR}/viewModel/link/linkvm.cpp
-    ${SOURCE_DIR}/viewModel/agentinmappingvm.cpp
-    ${SOURCE_DIR}/viewModel/agentsgroupedbynamevm.cpp
-    ${SOURCE_DIR}/viewModel/iop/inputvm.cpp
-    ${SOURCE_DIR}/viewModel/iop/agentiopvm.cpp
-    ${SOURCE_DIR}/viewModel/iop/parametervm.cpp
-    ${SOURCE_DIR}/viewModel/iop/outputvm.cpp
-    ${SOURCE_DIR}/sortFilter/logssortfilter.cpp
-    ${SOURCE_DIR}/sortFilter/abstracttimerangefilter.cpp
-    ${SOURCE_DIR}/sortFilter/valueshistorysortfilter.cpp
-    ${SOURCE_DIR}/controller/networkcontroller.cpp
-    ${SOURCE_DIR}/controller/recordssupervisioncontroller.cpp
-    ${SOURCE_DIR}/controller/agentssupervisioncontroller.cpp
-    ${SOURCE_DIR}/controller/actioneditorcontroller.cpp
-    ${SOURCE_DIR}/controller/ingescapemodelmanager.cpp
-    ${SOURCE_DIR}/controller/logstreamcontroller.cpp
-    ${SOURCE_DIR}/controller/agentsmappingcontroller.cpp
-    ${SOURCE_DIR}/controller/abstracttimeactionslinescenarioviewcontroller.cpp
-    ${SOURCE_DIR}/controller/valueshistorycontroller.cpp
-    ${SOURCE_DIR}/controller/hostssupervisioncontroller.cpp
-    ${SOURCE_DIR}/controller/scenariocontroller.cpp
-    ${SOURCE_DIR}/controller/ingescapeeditorcontroller.cpp
-    ${SOURCE_DIR}/model/mapping/elementmappingm.cpp
-    ${SOURCE_DIR}/model/mapping/agentmappingm.cpp
-    ${SOURCE_DIR}/model/recordm.cpp
-    ${SOURCE_DIR}/model/hostm.cpp
-    ${SOURCE_DIR}/model/logm.cpp
-    ${SOURCE_DIR}/model/agentm.cpp
-    ${SOURCE_DIR}/model/scenario/actionm.cpp
-    ${SOURCE_DIR}/model/scenario/timetickm.cpp
-    ${SOURCE_DIR}/model/scenario/scenariomarkerm.cpp
-    ${SOURCE_DIR}/model/scenario/effect/effectonagentm.cpp
-    ${SOURCE_DIR}/model/scenario/effect/actioneffectm.cpp
-    ${SOURCE_DIR}/model/scenario/effect/mappingeffectm.cpp
-    ${SOURCE_DIR}/model/scenario/effect/iopvalueeffectm.cpp
-    ${SOURCE_DIR}/model/scenario/condition/conditiononagentm.cpp
-    ${SOURCE_DIR}/model/scenario/condition/iopvalueconditionm.cpp
-    ${SOURCE_DIR}/model/scenario/condition/actionconditionm.cpp
-    ${SOURCE_DIR}/model/scenario/scenariom.cpp
-    ${SOURCE_DIR}/model/enums.cpp
-    ${SOURCE_DIR}/model/publishedvaluem.cpp
-    ${SOURCE_DIR}/model/jsonhelper.cpp
-    ${SOURCE_DIR}/model/iop/outputm.cpp
-    ${SOURCE_DIR}/model/iop/agentiopm.cpp
-    ${SOURCE_DIR}/model/definitionm.cpp
-    ${SOURCE_DIR}/main.cpp
-)
+# One glob by folder because cmake add cpp file in build folder to check compiler flags
+# And linker is not happy because he find two main
+file(GLOB_RECURSE ingescape_editor_sources_controller "${SOURCE_DIR}/controller/*.cpp")
+list(APPEND ingescape_editor_sources ${ingescape_editor_sources_controller})
+
+file(GLOB_RECURSE ingescape_editor_sources_misc "${SOURCE_DIR}/misc/*.cpp")
+list(APPEND ingescape_editor_sources ${ingescape_editor_sources_misc})
+
+file(GLOB_RECURSE ingescape_editor_sources_model "${SOURCE_DIR}/model/*.cpp")
+list(APPEND ingescape_editor_sources ${ingescape_editor_sources_model})
+
+file(GLOB_RECURSE ingescape_editor_sources_sort_filter "${SOURCE_DIR}/sortFilter/*.cpp")
+list(APPEND ingescape_editor_sources ${ingescape_editor_sources_sort_filter})
+
+file(GLOB_RECURSE ingescape_editor_sources_uthash "${SOURCE_DIR}/uthash/*.cpp")
+list(APPEND ingescape_editor_sources ${ingescape_editor_sources_uthash})
+
+file(GLOB_RECURSE ingescape_editor_sources_view_model "${SOURCE_DIR}/viewModel/*.cpp")
+list(APPEND ingescape_editor_sources ${ingescape_editor_sources_view_model})
+
+list(APPEND ingescape_editor_sources "${SOURCE_DIR}/main.cpp")
+
+add_ingescape_common_sources(ingescape_editor_sources)
 
 if(MSVC)
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp "#include <stable.h>")

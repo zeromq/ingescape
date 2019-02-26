@@ -1,5 +1,6 @@
 #include "GstVideoReceiver.h"
 
+#if defined KEEP_FOR_FUTUR_IMPROVEMENT
 #include <QApplication>
 #include <QImage>
 #include <QDebug>
@@ -230,3 +231,5 @@ void GstVideoReceiver::stop()
         _isStart = 0;
     }
 }
+
+#endif
