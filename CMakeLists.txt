@@ -301,12 +301,12 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
    Push \\\"$INSTDIR\\\\lib\\\"
    Call EnvVarUpdate
    Pop  \\\$0" )
-  set (CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "Push \\\"PATH\\\"
-   Push \\\"R\\\"
-   Push \\\"HKLM\\\"
-   Push \\\"$INSTDIR\\\\lib\\\"
-   Call un.EnvVarUpdate
-   Pop  \\\$0" )
+#set (CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "Push \\\"PATH\\\"
+#   Push \\\"R\\\"
+#   Push \\\"HKLM\\\"
+#   Push \\\"$INSTDIR\\\\lib\\\"
+#   Call un.EnvVarUpdate
+#   Pop  \\\$0" )
   set(CPACK_NSIS_MODIFY_PATH ON)
   set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
 
