@@ -11,8 +11,8 @@
 # Define job order
 stages:
   - build-lib
-  - build-editor
   - installer-lib
+  - build-editor
   - installer-editor
   - deploy-lib
 
