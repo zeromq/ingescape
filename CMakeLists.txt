@@ -297,13 +297,13 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
   set (CPACK_NSIS_EXTRA_INSTALL_COMMANDS "Push \\\"PATH\\\"
    Push \\\"A\\\"
-   Push \\\"HKCU\\\"
+   Push \\\"HKLM\\\"
    Push \\\"$INSTDIR\\\\lib\\\"
    Call EnvVarUpdate
    Pop  \\\$0" )
-  set (CPACK_NSIS_EXTRA_INSTALL_COMMANDS "Push \\\"PATH\\\"
+  set (CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "Push \\\"PATH\\\"
    Push \\\"R\\\"
-   Push \\\"HKCU\\\"
+   Push \\\"HKLM\\\"
    Push \\\"$INSTDIR\\\\lib\\\"
    Call un.EnvVarUpdate
    Pop  \\\$0" )
