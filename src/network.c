@@ -147,7 +147,7 @@ subscriber_t *subscribers = NULL;
 muteCallback_t *muteCallbacks = NULL;
 freezeCallback_t *freezeCallbacks = NULL;
 zyreCallback_t *zyreCallbacks = NULL;
-zyreAgent_t *zyreAgents = NULL;
+PUBLIC zyreAgent_t *zyreAgents = NULL;
 forcedStopCalback_t *forcedStopCalbacks = NULL;
 
 ////////////////////////////////////////////////////////////////////////
