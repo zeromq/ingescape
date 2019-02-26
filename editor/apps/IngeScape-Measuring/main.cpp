@@ -145,8 +145,14 @@ void registerCustomQmlTypes()
     // Models
     //
     //----------------
-    //qmlRegisterUncreatableType<ActionConditionM>("INGESCAPE", 1, 0, "ActionConditionM", "Internal class");
-    //qmlRegisterUncreatableType<ActionEffectM>("INGESCAPE", 1, 0, "ActionEffectM", "Internal class");
+    qmlRegisterUncreatableType<CharacteristicEnumM>("INGESCAPE", 1, 0, "CharacteristicEnumM", "Internal class");
+    qmlRegisterUncreatableType<CharacteristicM>("INGESCAPE", 1, 0, "CharacteristicM", "Internal class");
+    qmlRegisterUncreatableType<DependentVariableM>("INGESCAPE", 1, 0, "DependentVariableM", "Internal class");
+    qmlRegisterUncreatableType<ExperimentationM>("INGESCAPE", 1, 0, "ExperimentationM", "Internal class");
+    qmlRegisterUncreatableType<IndependentVariableEnumM>("INGESCAPE", 1, 0, "IndependentVariableEnumM", "Internal class");
+    qmlRegisterUncreatableType<IndependentVariableM>("INGESCAPE", 1, 0, "IndependentVariableM", "Internal class");
+    qmlRegisterUncreatableType<SubjectM>("INGESCAPE", 1, 0, "SubjectM", "Internal class");
+    qmlRegisterUncreatableType<TaskM>("INGESCAPE", 1, 0, "TaskM", "Internal class");
 
 
     //---------------

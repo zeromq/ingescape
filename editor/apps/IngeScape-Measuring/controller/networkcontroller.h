@@ -16,7 +16,6 @@
 #define NETWORKCONTROLLER_H
 
 #include <QObject>
-
 #include "I2PropertyHelpers.h"
 
 

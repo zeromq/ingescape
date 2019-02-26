@@ -37,14 +37,30 @@ RCC_DIR = tmp
 SOURCES += main.cpp \
     controller/ingescapemeasuringcontroller.cpp \
     controller/networkcontroller.cpp \
-    controller/ingescapemodelmanager.cpp
+    controller/ingescapemodelmanager.cpp \
+    model/subject/subjectm.cpp \
+    model/subject/characteristicm.cpp \
+    model/subject/characteristicenumm.cpp \
+    model/task/taskm.cpp \
+    model/experimentationm.cpp \
+    model/task/independentvariablem.cpp \
+    model/task/independentvariableenumm.cpp \
+    model/task/dependentvariablem.cpp
 
 
 HEADERS += \
     stable.h \
     controller/ingescapemeasuringcontroller.h \
     controller/networkcontroller.h \
-    controller/ingescapemodelmanager.h
+    controller/ingescapemodelmanager.h \
+    model/subject/subjectm.h \
+    model/subject/characteristicm.h \
+    model/subject/characteristicenumm.h \
+    model/task/taskm.h \
+    model/experimentationm.h \
+    model/task/independentvariablem.h \
+    model/task/independentvariableenumm.h \
+    model/task/dependentvariablem.h
 
 
 RESOURCES += qml.qrc
