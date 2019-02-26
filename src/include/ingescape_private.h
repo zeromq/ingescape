@@ -237,7 +237,7 @@ int network_publishOutput (const agent_iop_t *iop);
 PUBLIC definition* parser_loadDefinition (const char* json_str);
 PUBLIC definition* parser_loadDefinitionFromPath (const char* file_path);
 char* parser_export_definition (definition* def);
-char* parser_export_mapping(mapping_t* mapp);
+PUBLIC char* parser_export_mapping(mapping_t* mapp);
 mapping_t* parser_LoadMap (const char* json_str);
 mapping_t* parser_LoadMapFromPath (const char* load_file);
 
