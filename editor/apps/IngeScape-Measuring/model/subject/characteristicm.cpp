@@ -19,7 +19,9 @@
  * @param parent
  */
 CharacteristicM::CharacteristicM(QObject *parent) : QObject(parent),
-    _name("")
+    _name(""),
+    _valueType(CharacteristicValueTypes::UNKNOWN),
+    _enumValues(QStringList())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

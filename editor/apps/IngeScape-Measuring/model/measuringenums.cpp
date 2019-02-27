@@ -12,30 +12,22 @@
  *
  */
 
-#include "independentvariablem.h"
+#include "measuringenums.h"
+
+
+
+//--------------------------------------------------------------
+//
+//  Measuring Enums
+//
+//--------------------------------------------------------------
 
 /**
  * @brief Constructor
  * @param parent
  */
-IndependentVariableM::IndependentVariableM(QObject *parent) : QObject(parent),
-    _name(""),
-    _description(""),
-    _valueType(IndependentVariableValueTypes::UNKNOWN),
-    _enumValues(QStringList())
+MeasuringEnums::MeasuringEnums(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    qInfo() << "New Model of Independent Variable" << _name;
-}
-
-
-/**
- * @brief Destructor
- */
-IndependentVariableM::~IndependentVariableM()
-{
-    qInfo() << "Delete Model of Independent Variable" << _name;
-
 }

@@ -105,8 +105,8 @@ void registerCustomQmlTypes()
     // Enums
     //
     //---------------
-    //qmlRegisterSingletonType<ActionConditionTypes>("INGESCAPE", 1, 0, "ActionConditionTypes", &ActionConditionTypes::qmlSingleton);
-    //qmlRegisterSingletonType<ActionEffectTypes>("INGESCAPE", 1, 0, "ActionEffectTypes", &ActionEffectTypes::qmlSingleton);
+    qmlRegisterSingletonType<CharacteristicValueTypes>("INGESCAPE", 1, 0, "CharacteristicValueTypes", &CharacteristicValueTypes::qmlSingleton);
+    qmlRegisterSingletonType<IndependentVariableValueTypes>("INGESCAPE", 1, 0, "IndependentVariableValueTypes", &IndependentVariableValueTypes::qmlSingleton);
 
 
     //----------------
@@ -118,7 +118,7 @@ void registerCustomQmlTypes()
     qmlRegisterSingletonType<IngeScapeMeasuringController>("INGESCAPE", 1, 0, "IngeScapeMeasuringC", &IngeScapeMeasuringController::qmlSingleton);
 
     // sub-controllers
-    //qmlRegisterUncreatableType<ActionEditorController>("INGESCAPE", 1, 0, "ActionEditorController", "Internal Class");
+    qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal Class");
     //qmlRegisterUncreatableType<AgentsMappingController>("INGESCAPE", 1, 0, "AgentsMappingController", "Internal Class");
 
 
@@ -151,6 +151,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<ExperimentationM>("INGESCAPE", 1, 0, "ExperimentationM", "Internal class");
     qmlRegisterUncreatableType<IndependentVariableEnumM>("INGESCAPE", 1, 0, "IndependentVariableEnumM", "Internal class");
     qmlRegisterUncreatableType<IndependentVariableM>("INGESCAPE", 1, 0, "IndependentVariableM", "Internal class");
+    qmlRegisterUncreatableType<RecordM>("INGESCAPE", 1, 0, "RecordM", "Internal class");
     qmlRegisterUncreatableType<SubjectM>("INGESCAPE", 1, 0, "SubjectM", "Internal class");
     qmlRegisterUncreatableType<TaskM>("INGESCAPE", 1, 0, "TaskM", "Internal class");
 

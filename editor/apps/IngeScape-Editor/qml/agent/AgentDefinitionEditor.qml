@@ -27,7 +27,8 @@ import "../theme" as Theme;
 Window {
     id: rootItem
 
-    title: (model.QtObject ? model.QtObject.name : qsTr("Definition"))
+    title: model.QtObject ? model.QtObject.name
+                          : qsTr("Definition")
 
     height: minimumHeight
     width: minimumWidth
@@ -565,13 +566,13 @@ Window {
                                             anchors {
                                                 verticalCenter: parent.verticalCenter
                                             }
-                                            width : rootItem.widthsOfColumns[4]
+                                            width: rootItem.widthsOfColumns[4]
                                             height: parent.height
 
                                             Button {
                                                 id: btnMuteOutput
                                                 visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
-                                                enabled : visible
+                                                enabled: visible
                                                 activeFocusOnPress: true
 
                                                 anchors {
