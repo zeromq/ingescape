@@ -35,11 +35,19 @@ class SubjectM : public QObject
     // Last name of our subject
     //I2_QML_PROPERTY(QString, lastName)
 
-    // liste des valeurs des caractéristiques du sujet
-    //CharacteristicValues (Table de Hash [UID caractéristique - Valeur de la caractéristique])
+    // Values of the characteristics of our subject
+    // Hash table from a (unique) id of characteristic to the characteristic value
+    //I2_QOBJECT_HASHMODEL(QVariant, mapFromCharacteristicIdToValue)
+
+    //I2_QML_PROPERTY(QHash<QString, QVariant>, mapFromCharacteristicIdToValue)
+
+    // FIXME for tests
+    //I2_QML_PROPERTY(QList<QObject*>, temp)
+    //I2_QML_PROPERTY(QHash<QString, QObject*>, temp)
 
 
 public:
+
     /**
      * @brief Constructor
      * @param parent
@@ -60,6 +68,11 @@ public Q_SLOTS:
 
 
 private:
+
+    // FIXME accessible for QML
+    // Values of the characteristics of our subject
+    // Hash table from a (unique) id of characteristic to the characteristic value
+    QHash<QString, QVariant> _mapFromCharacteristicIdToValue;
 
 };
 

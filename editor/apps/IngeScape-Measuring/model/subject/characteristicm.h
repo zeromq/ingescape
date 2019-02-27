@@ -41,6 +41,9 @@ class CharacteristicM : public QObject
     // Details if valueType == CHARACTERISTIC_ENUM ?
     // Link with CharacteristicEnumM ?
 
+    // List of possible values if the value type is "CHARACTERISTIC_ENUM"
+    I2_QML_PROPERTY(QStringList, enumValues)
+
 
 public:
 
@@ -49,6 +52,9 @@ public:
      * @param parent
      */
     explicit CharacteristicM(QObject *parent = nullptr);
+
+
+    //CharacteristicM(QString name, CharacteristicValueTypes::Value valueType, QObject *parent = nullptr);
 
 
     /**

@@ -12,30 +12,32 @@
  *
  */
 
-#include "independentvariablem.h"
+#include "recordm.h"
 
 /**
  * @brief Constructor
  * @param parent
  */
-IndependentVariableM::IndependentVariableM(QObject *parent) : QObject(parent),
-    _name(""),
-    _description(""),
-    _valueType(IndependentVariableValueTypes::UNKNOWN),
-    _enumValues(QStringList())
+RecordM::RecordM(QObject *parent) : QObject(parent),
+    _name(),
+    _subject(nullptr),
+    _task(nullptr),
+    _startDateTime(QDateTime()),
+    _endDateTime(QDateTime())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Independent Variable" << _name;
+    qInfo() << "New Model of Record" << _name;
+
 }
 
 
 /**
  * @brief Destructor
  */
-IndependentVariableM::~IndependentVariableM()
+RecordM::~RecordM()
 {
-    qInfo() << "Delete Model of Independent Variable" << _name;
+    qInfo() << "Delete Model of Record" << _name;
 
 }

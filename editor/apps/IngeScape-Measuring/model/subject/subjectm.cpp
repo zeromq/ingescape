@@ -25,6 +25,9 @@ SubjectM::SubjectM(QObject *parent) : QObject(parent),
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New Model of Subject" << _name;
+
+    _mapFromCharacteristicIdToValue.insert("age", QVariant(35));
+    _mapFromCharacteristicIdToValue.insert("type", QVariant("HOMME"));
 }
 
 

@@ -42,6 +42,9 @@ class IndependentVariableM : public QObject
     // Details if valueType == INDEPENDENT_VARIABLE_ENUM ?
     // Link with IndependentVariableEnumM ?
 
+    // List of possible values if the value type is "INDEPENDENT_VARIABLE_ENUM"
+    I2_QML_PROPERTY(QStringList, enumValues)
+
 
 public:
     /**
