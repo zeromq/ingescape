@@ -283,6 +283,7 @@ lib-deploy-macos-release-x64:
     - osx
   script:
     - make -C build install DESTDIR=~/builds/release/x64
+    - cp src/include/ingescape_private.h ~/builds/release/x64/usr/local/include/
   dependencies:
     - lib-macos-release-x64
 
@@ -295,5 +296,6 @@ lib-deploy-linux-release-x64:
   image: fafesty/debian-with-zyre
   script:
     - make -C build install DESTDIR=~/builds/release/x64
+    - cp src/include/ingescape_private.h ~/builds/release/x64/usr/local/include/
   dependencies:
     - lib-linux-release-x64
