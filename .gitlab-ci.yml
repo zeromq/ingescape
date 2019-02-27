@@ -299,3 +299,27 @@ lib-deploy-linux-release-x64:
     - cp src/include/ingescape_private.h ~/builds/release/x64/usr/local/include/ingescape/
   dependencies:
     - lib-linux-release-x64
+
+# Deploy ingescape in windows use to compile to be able to compile agents
+lib-deploy-windows-release-x64:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - windows
+  script:
+    - copy src\\include\\*.h C:\\Users\\admin\\dev\\Builds\\include\\ingescape\\
+    - copy build\\ReleaseX64\\Release\\* C:\\Users\\admin\\dev\\Builds\\Release\\x64\\
+  dependencies:
+    - lib-windows-release-x64
+
+# Deploy ingescape in windows use to compile to be able to compile agents
+lib-deploy-windows-release-x86:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - windows
+  script:
+    - copy src\\include\\*.h C:\\Users\\admin\\dev\\Builds\\include\\ingescape\\
+    - copy build\\ReleaseX86\\Release\\* C:\\Users\\admin\\dev\\Builds\\Release\\x86\\
+  dependencies:
+    - lib-windows-release-x86
