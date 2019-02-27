@@ -17,6 +17,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
+#include <model/measuringenums.h>
 
 /**
  * @brief The CharacteristicM class defines a model of characteristic
@@ -25,17 +26,24 @@ class CharacteristicM : public QObject
 {
     Q_OBJECT
 
+    // Unique identifier of our characteristic
+    //I2_QML_PROPERTY(QString, uid)
+
     // Name of our characteristic
     I2_QML_PROPERTY(QString, name)
 
     // Description of our characteristic
     //I2_QML_PROPERTY(QString, description)
 
-    //Type (enum [TEXT, INT, DOUBLE, ENUM]):
+    // Type of our characteristic value
+    I2_QML_PROPERTY_READONLY(CharacteristicValueTypes::Value, valueType)
 
+    // Details if valueType == CHARACTERISTIC_ENUM ?
+    // Link with CharacteristicEnumM ?
 
 
 public:
+
     /**
      * @brief Constructor
      * @param parent

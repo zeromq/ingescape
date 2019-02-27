@@ -45,7 +45,8 @@ SOURCES += main.cpp \
     model/experimentationm.cpp \
     model/task/independentvariablem.cpp \
     model/task/independentvariableenumm.cpp \
-    model/task/dependentvariablem.cpp
+    model/task/dependentvariablem.cpp \
+    model/measuringenums.cpp
 
 
 HEADERS += \
@@ -60,7 +61,8 @@ HEADERS += \
     model/experimentationm.h \
     model/task/independentvariablem.h \
     model/task/independentvariableenumm.h \
-    model/task/dependentvariablem.h
+    model/task/dependentvariablem.h \
+    model/measuringenums.h
 
 
 RESOURCES += qml.qrc

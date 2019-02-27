@@ -18,6 +18,7 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
+#include <model/measuringenums.h>
 #include <model/experimentationm.h>
 #include <model/subject/subjectm.h>
 #include <model/subject/characteristicm.h>

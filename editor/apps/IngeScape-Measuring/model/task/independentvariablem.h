@@ -17,6 +17,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
+#include <model/measuringenums.h>
 
 
 /**
@@ -35,7 +36,11 @@ class IndependentVariableM : public QObject
     // Unit of our independent variable
     //I2_QML_PROPERTY(QString, unit)
 
-    //Type (enum [TEXT, INT, DOUBLE, ENUM]):
+    // Type of our independent variable value
+    I2_QML_PROPERTY_READONLY(IndependentVariableValueTypes::Value, valueType)
+
+    // Details if valueType == INDEPENDENT_VARIABLE_ENUM ?
+    // Link with IndependentVariableEnumM ?
 
 
 public:
