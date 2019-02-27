@@ -24,18 +24,18 @@
 
 #include "api/yajl_common.h"
 
-#define YAJL_BS_INC 128
+#define IGSYAJL_BS_INC 128
 
-typedef struct yajl_bytestack_t
+typedef struct igsyajl_bytestack_t
 {
     unsigned char * stack;
     size_t size;
     size_t used;
-    yajl_alloc_funcs * yaf;
-} yajl_bytestack;
+    igsyajl_alloc_funcs * yaf;
+} igsyajl_bytestack;
 
 /* initialize a bytestack */
-#define yajl_bs_init(obs, _yaf) {               \
+#define igsyajl_bs_init(obs, _yaf) {               \
         (obs).stack = NULL;                     \
         (obs).size = 0;                         \
         (obs).used = 0;                         \
@@ -44,15 +44,15 @@ typedef struct yajl_bytestack_t
 
 
 /* initialize a bytestack */
-#define yajl_bs_free(obs)                 \
+#define igsyajl_bs_free(obs)                 \
     if ((obs).stack) (obs).yaf->free((obs).yaf->ctx, (obs).stack);
 
-#define yajl_bs_current(obs)               \
+#define igsyajl_bs_current(obs)               \
     (assert((obs).used > 0), (obs).stack[(obs).used - 1])
 
-#define yajl_bs_push(obs, byte) {                       \
+#define igsyajl_bs_push(obs, byte) {                       \
     if (((obs).size - (obs).used) == 0) {               \
-        (obs).size += YAJL_BS_INC;                      \
+        (obs).size += IGSYAJL_BS_INC;                      \
         (obs).stack = (obs).yaf->realloc((obs).yaf->ctx,\
                                          (void *) (obs).stack, (obs).size);\
     }                                                   \
@@ -60,9 +60,9 @@ typedef struct yajl_bytestack_t
 }
 
 /* removes the top item of the stack, returns nothing */
-#define yajl_bs_pop(obs) { ((obs).used)--; }
+#define igsyajl_bs_pop(obs) { ((obs).used)--; }
 
-#define yajl_bs_set(obs, byte)                          \
+#define igsyajl_bs_set(obs, byte)                          \
     (obs).stack[((obs).used) - 1] = (byte);
 
 

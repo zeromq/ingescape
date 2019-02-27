@@ -15,9 +15,9 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdocumentation"
-#include "yajl/yajl_tree.h"
+#include "yajl_tree.h"
 #pragma clang diagnostic pop
-#include "yajl/yajl_gen.h"
+#include "yajl_gen.h"
 #include "ingescape_private.h"
 
 #define STR_CATEGORY "category"
@@ -119,20 +119,20 @@ const char* boolean_to_string (bool boolean) {
 
 //parse an agent_iop_t data and add it to the corresponding hash table
 static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
-                                   yajl_val obj){
+                                   igsyajl_val obj){
     const char *name = NULL;
     iopType_t valType = IGS_UNKNOWN_T;
-    yajl_val value = NULL;
+    igsyajl_val value = NULL;
 
-    if (YAJL_IS_OBJECT(obj)){
+    if (IGSYAJL_IS_OBJECT(obj)){
         size_t nb = obj->u.object.len;
         size_t i = 0;
         for (i = 0; i < nb; i++){
             const char *key = obj->u.object.keys[i];
             if (strcmp("name", key) == 0){
-                name = YAJL_GET_STRING(obj->u.object.values[i]);
+                name = IGSYAJL_GET_STRING(obj->u.object.values[i]);
             }else if (strcmp("type", key) == 0){
-                valType = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[i]));
+                valType = string_to_value_type (IGSYAJL_GET_STRING(obj->u.object.values[i]));
                 if (valType == IGS_UNKNOWN_T){
                     return;
                 }
@@ -165,23 +165,23 @@ static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
             iop->value_type = valType;
             switch (iop->value_type) {
                 case IGS_INTEGER_T:
-                    iop->value.i =(int) YAJL_GET_INTEGER (value);
+                    iop->value.i =(int) IGSYAJL_GET_INTEGER (value);
                     break;
                 case IGS_DOUBLE_T:
-                    iop->value.d = YAJL_GET_DOUBLE (value);
+                    iop->value.d = IGSYAJL_GET_DOUBLE (value);
                     break;
                 case IGS_BOOL_T:
-                    iop->value.b = string_to_boolean (YAJL_GET_STRING(value));
+                    iop->value.b = string_to_boolean (IGSYAJL_GET_STRING(value));
                     break;
                 case IGS_STRING_T:
-                    iop->value.s = strdup (YAJL_IS_STRING(value) ? value->u.string : NULL);
+                    iop->value.s = strdup (IGSYAJL_IS_STRING(value) ? value->u.string : NULL);
                     break;
                 case IGS_IMPULSION_T:
                     //IMPULSION has no value
                     break;
                 case IGS_DATA_T:
                     //FIXME : we store data as string but we should check it convert it to hexa
-                    //data->value.s = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
+                    //data->value.s = strdup (IGSYAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
                     break;
                 default:
                     igs_warn("unknown data type to load from json for %s", n);
@@ -197,16 +197,16 @@ static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
 }
 
 //parse a tab of agent_iop_t data and add them into the corresponding hash table
-static void json_add_iops (yajl_val node, const char** path, iop_t type,
+static void json_add_iops (igsyajl_val node, const char** path, iop_t type,
                            agent_iop_t **hasht) {
-    yajl_val v;
-    v = yajl_tree_get(node, path, yajl_t_array);
+    igsyajl_val v;
+    v = igsyajl_tree_get(node, path, igsyajl_t_array);
 
-    if (v && YAJL_IS_ARRAY(v)){
+    if (v && IGSYAJL_IS_ARRAY(v)){
         unsigned int  i;
         for (i = 0; i < v->u.array.len; i++ ){
-            yajl_val obj = v->u.array.values[i];
-            if( obj && YAJL_IS_OBJECT(obj))
+            igsyajl_val obj = v->u.array.values[i];
+            if( obj && IGSYAJL_IS_OBJECT(obj))
                 json_add_iop_to_hash (hasht, type, obj);
         }
     }
@@ -215,15 +215,15 @@ static void json_add_iops (yajl_val node, const char** path, iop_t type,
 ////////////////////////////////////////
 // tokens parsing
 
-static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
-    if (YAJL_IS_ARRAY(arguments)){
+static void json_parse_token_arguments (igs_token_t *token, igsyajl_val arguments){
+    if (IGSYAJL_IS_ARRAY(arguments)){
         size_t nbArgs = arguments->u.array.len;
         size_t i = 0;
         for (i = 0; i < nbArgs; i++){
             //iterate on arguments
-            yajl_val arg = arguments->u.array.values[i];
+            igsyajl_val arg = arguments->u.array.values[i];
             
-            if (YAJL_IS_OBJECT(arg)){
+            if (IGSYAJL_IS_OBJECT(arg)){
                 size_t nbKeys = arg->u.object.len;
                 const char *name = NULL;
                 iopType_t valType = IGS_UNKNOWN_T;
@@ -232,9 +232,9 @@ static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
                     //iterate on keys for this argument
                     const char *key = arg->u.object.keys[j];
                     if (strcmp("name", key) == 0){
-                        name = YAJL_GET_STRING(arg->u.object.values[j]);
+                        name = IGSYAJL_GET_STRING(arg->u.object.values[j]);
                     }else if (strcmp("type", key) == 0){
-                        valType = string_to_value_type (YAJL_GET_STRING(arg->u.object.values[j]));
+                        valType = string_to_value_type (IGSYAJL_GET_STRING(arg->u.object.values[j]));
                     }
                 }
                 
@@ -271,22 +271,22 @@ static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
 }
 
 //parse a token and add it to the corresponding hash table
-static void json_add_token_to_hash (igs_token_t **hasht, yajl_val obj){
+static void json_add_token_to_hash (igs_token_t **hasht, igsyajl_val obj){
     
     const char *name = NULL;
     const char *description = NULL;
-    yajl_val arguments = NULL;
-    yajl_val reply = NULL;
+    igsyajl_val arguments = NULL;
+    igsyajl_val reply = NULL;
     
-    if (YAJL_IS_OBJECT(obj)){
+    if (IGSYAJL_IS_OBJECT(obj)){
         size_t nb = obj->u.object.len;
         size_t i = 0;
         for (i = 0; i < nb; i++){
             const char *key = obj->u.object.keys[i];
             if (strcmp("name", key) == 0){
-                name = YAJL_GET_STRING(obj->u.object.values[i]);
+                name = IGSYAJL_GET_STRING(obj->u.object.values[i]);
             }else if (strcmp("description", key) == 0){
-                description = YAJL_GET_STRING(obj->u.object.values[i]);
+                description = IGSYAJL_GET_STRING(obj->u.object.values[i]);
             }else if (strcmp("arguments", key) == 0){
                 arguments = obj->u.object.values[i];
             }else if (strcmp("reply", key) == 0){
@@ -331,15 +331,15 @@ static void json_add_token_to_hash (igs_token_t **hasht, yajl_val obj){
 }
 
 //parse a tab of tokens and add them into the corresponding hash table
-static void json_add_tokens (yajl_val node, const char **path, igs_token_t **hasht){
-    yajl_val v;
-    v = yajl_tree_get(node, path, yajl_t_array);
+static void json_add_tokens (igsyajl_val node, const char **path, igs_token_t **hasht){
+    igsyajl_val v;
+    v = igsyajl_tree_get(node, path, igsyajl_t_array);
     
-    if (v && YAJL_IS_ARRAY(v)){
+    if (v && IGSYAJL_IS_ARRAY(v)){
         unsigned int  i;
         for (i = 0; i < v->u.array.len; i++ ){
-            yajl_val obj = v->u.array.values[i];
-            if( obj && YAJL_IS_OBJECT(obj))
+            igsyajl_val obj = v->u.array.values[i];
+            if( obj && IGSYAJL_IS_OBJECT(obj))
                 json_add_token_to_hash (hasht, obj);
         }
     }
@@ -391,11 +391,11 @@ static char* json_fetch (const char* path) {
 }
 
 // convert JSON string into DOM
-static int json_tokenize (const char* json_str, yajl_val *node) {
+static int json_tokenize (const char* json_str, igsyajl_val *node) {
 
     char errbuf[BUFSIZ] = "unknown error";
     /* we have the whole config file in memory.  let's parse it ... */
-    *node = yajl_tree_parse(json_str, errbuf, sizeof(errbuf));
+    *node = igsyajl_tree_parse(json_str, errbuf, sizeof(errbuf));
 
     /* parse error handling */
     if (!node || strlen(errbuf) > 0) {
@@ -407,28 +407,28 @@ static int json_tokenize (const char* json_str, yajl_val *node) {
 }
 
 // convert a definition json file into a definition structure
-static definition* json_parse_definition (yajl_val node) {
+static definition* json_parse_definition (igsyajl_val node) {
     definition *def;
-    yajl_val v;
+    igsyajl_val v;
     def = (definition*) calloc(1, sizeof(definition));
     const char * path[] = { STR_DEFINITION, "", (const char *) 0 };
 
     path[1] = STR_NAME;
-    v = yajl_tree_get(node, path, yajl_t_any);
+    v = igsyajl_tree_get(node, path, igsyajl_t_any);
     if (v){
-        def->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : NULL);
+        def->name = strdup (IGSYAJL_IS_STRING(v) ? (v)->u.string : NULL);
     }
 
     path[1] = STR_DESCRIPTION;
-    v = yajl_tree_get(node, path, yajl_t_any);
+    v = igsyajl_tree_get(node, path, igsyajl_t_any);
     if (v){
-        def->description = strdup (YAJL_IS_STRING(v) ? (v)->u.string : NULL);
+        def->description = strdup (IGSYAJL_IS_STRING(v) ? (v)->u.string : NULL);
     }
 
     path[1] = STR_VERSION;
-    v = yajl_tree_get(node, path, yajl_t_any);
+    v = igsyajl_tree_get(node, path, igsyajl_t_any);
     if (v){
-        def->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : NULL);
+        def->version = strdup (IGSYAJL_IS_STRING(v) ? (v)->u.string : NULL);
     }
 
     path[1] = STR_INPUTS;
@@ -444,12 +444,12 @@ static definition* json_parse_definition (yajl_val node) {
     json_add_tokens (node, path, &def->tokens_table);
 
 //    path[1] = STR_CATEGORIES;
-//    v = yajl_tree_get(node, path, yajl_t_array);
-//    if (v && YAJL_IS_ARRAY(v)){
+//    v = igsyajl_tree_get(node, path, igsyajl_t_array);
+//    if (v && IGSYAJL_IS_ARRAY(v)){
 //        unsigned int  i;
 //        for (i = 0; i < v->u.array.len; i++ ){
-//            yajl_val obj = v->u.array.values[i];
-//            if( obj && YAJL_IS_OBJECT(obj))
+//            igsyajl_val obj = v->u.array.values[i];
+//            if( obj && IGSYAJL_IS_OBJECT(obj))
 //                json_add_category_to_hash (&def->categories, obj);
 //        }
 //    }
@@ -459,19 +459,19 @@ static definition* json_parse_definition (yajl_val node) {
 
 // parse a tab of mapping output type and add them into the corresponding hash table
 static void json_add_map_out_to_hash (mapping_element_t** hasht,
-                                       yajl_val current_map_out){
+                                       igsyajl_val current_map_out){
 
     const char* input_name = NULL;
     const char* agent_name = NULL;
     const char* output_name = NULL;
-    yajl_val v;
+    igsyajl_val v;
     const char * path_in_current[] = { "", (const char *) 0 };
 
     //input_name
     path_in_current[0] = "input_name";
-    v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+    v = igsyajl_tree_get(current_map_out, path_in_current, igsyajl_t_any);
     if (v){
-        input_name = YAJL_GET_STRING(v);
+        input_name = IGSYAJL_GET_STRING(v);
     }
     char *reviewedFromOurInput = strndup(input_name, MAX_IOP_NAME_LENGTH);
     bool spaceInName = false;
@@ -489,9 +489,9 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     
     //agent_name
     path_in_current[0] = "agent_name";
-    v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+    v = igsyajl_tree_get(current_map_out, path_in_current, igsyajl_t_any);
     if (v){
-        agent_name = YAJL_GET_STRING(v);
+        agent_name = IGSYAJL_GET_STRING(v);
     }
     char *reviewedToAgent = strndup(agent_name, MAX_IOP_NAME_LENGTH);
     size_t lengthOfReviewedToAgent = strlen(reviewedToAgent);
@@ -508,9 +508,9 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     
     //output_name
     path_in_current[0] = "output_name";
-    v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+    v = igsyajl_tree_get(current_map_out, path_in_current, igsyajl_t_any);
     if (v){
-        output_name = YAJL_GET_STRING(v);
+        output_name = IGSYAJL_GET_STRING(v);
     }
     char *reviewedWithOutput = strndup(output_name, MAX_IOP_NAME_LENGTH);
     size_t lengthOfReviewedWithOutput = strlen(reviewedWithOutput);
@@ -553,7 +553,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
 
 // parse a tab of mapping category type and add them into the corresponding hash table
 static void json_add_map_cat_to_hash (mapping_element_t** hasht,
-                                       yajl_val current_map_out){
+                                       igsyajl_val current_map_out){
     IGS_UNUSED(hasht)
     IGS_UNUSED(current_map_out)
 
@@ -561,14 +561,14 @@ static void json_add_map_cat_to_hash (mapping_element_t** hasht,
 //    const char* agent_name;
 //    const char* category_name;
 //    struct mapping_cat *map_cat = NULL;
-//    yajl_val v;
+//    igsyajl_val v;
 //    const char * path_in_current[] = { "", (const char *) 0 };
 //
 //    path_in_current[0] = "map_cat_id";
-//    v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+//    v = igsyajl_tree_get(current_map_out, path_in_current, igsyajl_t_any);
 //    if (v) {
 //        /* check if the key already exist */
-//        int map_cat_id = (int) YAJL_GET_INTEGER(v);
+//        int map_cat_id = (int) IGSYAJL_GET_INTEGER(v);
 //
 //        HASH_FIND_INT(*hasht, &map_cat_id , map_cat);
 //
@@ -579,17 +579,17 @@ static void json_add_map_cat_to_hash (mapping_element_t** hasht,
 //
 //            //agent_name
 //            path_in_current[0] = "agent_name";
-//            v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+//            v = igsyajl_tree_get(current_map_out, path_in_current, igsyajl_t_any);
 //            if (v){
-//                agent_name = YAJL_GET_STRING(v);
+//                agent_name = IGSYAJL_GET_STRING(v);
 //                map_cat->agent_name = strdup (agent_name);
 //            }
 //
 //            //category_name
 //            path_in_current[0] = "category_name";
-//            v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+//            v = igsyajl_tree_get(current_map_out, path_in_current, igsyajl_t_any);
 //            if (v){
-//                category_name = YAJL_GET_STRING(v);
+//                category_name = IGSYAJL_GET_STRING(v);
 //                map_cat->category_name = strdup (category_name);
 //            }
 //
@@ -599,53 +599,53 @@ static void json_add_map_cat_to_hash (mapping_element_t** hasht,
 }
 
 // convert a map.json file into a mapping (output & category) structure
-static mapping_t* json_parse_mapping (yajl_val node) {
+static mapping_t* json_parse_mapping (igsyajl_val node) {
 
     mapping_t* mapp;
-    yajl_val v;
+    igsyajl_val v;
     mapp = (mapping_t*) calloc(1, sizeof(mapping_t));
     const char * path[] = { "mapping", "", (const char *) 0 };
 
     path[1] = STR_NAME;
-    v = yajl_tree_get(node, path, yajl_t_any);
+    v = igsyajl_tree_get(node, path, igsyajl_t_any);
     if (v){
-        const char* name = YAJL_GET_STRING(v);
+        const char* name = IGSYAJL_GET_STRING(v);
         mapp->name = strdup (name);
     }
 
 
     path[1] = STR_DESCRIPTION;
-    v = yajl_tree_get(node, path, yajl_t_any);
+    v = igsyajl_tree_get(node, path, igsyajl_t_any);
     if (v){
-        const char* description = YAJL_GET_STRING(v);
+        const char* description = IGSYAJL_GET_STRING(v);
         mapp->description = strdup (description);
     }
 
     path[1] = STR_VERSION;
-    v = yajl_tree_get(node, path, yajl_t_any);
+    v = igsyajl_tree_get(node, path, igsyajl_t_any);
     if (v){
-        const char* version = YAJL_GET_STRING(v);
+        const char* version = IGSYAJL_GET_STRING(v);
         mapp->version = strdup (version);
     }
 
     path[1] = "mapping_out";
-    v = yajl_tree_get(node, path, yajl_t_array);
-    if (v && YAJL_IS_ARRAY(v)){
+    v = igsyajl_tree_get(node, path, igsyajl_t_array);
+    if (v && IGSYAJL_IS_ARRAY(v)){
         unsigned int  i;
         for (i = 0; i < v->u.array.len; i++ ){
-            yajl_val obj = v->u.array.values[i];
-            if( obj && YAJL_IS_OBJECT(obj))
+            igsyajl_val obj = v->u.array.values[i];
+            if( obj && IGSYAJL_IS_OBJECT(obj))
                 json_add_map_out_to_hash (&mapp->map_elements, obj);
         }
     }
 
     path[1] = "mapping_cat";
-    v = yajl_tree_get(node, path, yajl_t_array);
-    if (v && YAJL_IS_ARRAY(v)){
+    v = igsyajl_tree_get(node, path, igsyajl_t_array);
+    if (v && IGSYAJL_IS_ARRAY(v)){
         unsigned int  i;
         for (i = 0; i < v->u.array.len; i++ ){
-            yajl_val obj = v->u.array.values[i];
-            if( obj && YAJL_IS_OBJECT(obj))
+            igsyajl_val obj = v->u.array.values[i];
+            if( obj && IGSYAJL_IS_OBJECT(obj))
                 json_add_map_cat_to_hash (&mapp->map_elements, obj);
         }
     }
@@ -658,195 +658,195 @@ static mapping_t* json_parse_mapping (yajl_val node) {
 
 
 // convert a token into json string
-static void json_dump_token (yajl_gen *g, igs_token_t *token) {
+static void json_dump_token (igsyajl_gen *g, igs_token_t *token) {
     
-    yajl_gen_map_open(*g);
+    igsyajl_gen_map_open(*g);
     
-    yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-    yajl_gen_string(*g, (const unsigned char *) token->name, strlen (token->name));
+    igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+    igsyajl_gen_string(*g, (const unsigned char *) token->name, strlen (token->name));
     
     if (token->description != NULL){
-        yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
-        yajl_gen_string(*g, (const unsigned char *) token->description, strlen (token->description));
+        igsyajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
+        igsyajl_gen_string(*g, (const unsigned char *) token->description, strlen (token->description));
     }
     
     igs_tokenArgument_t *arg = NULL;
     int nbArgs = 0;
     DL_COUNT(token->arguments, arg, nbArgs);
     if ((token->arguments != NULL) && (nbArgs > 0)){
-        yajl_gen_string(*g, (const unsigned char *) STR_ARGUMENTS, strlen(STR_ARGUMENTS));
-        yajl_gen_array_open(*g);
+        igsyajl_gen_string(*g, (const unsigned char *) STR_ARGUMENTS, strlen(STR_ARGUMENTS));
+        igsyajl_gen_array_open(*g);
         DL_FOREACH(token->arguments, arg){
-            yajl_gen_map_open(*g);
-            yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-            yajl_gen_string(*g, (const unsigned char *) arg->name, strlen(arg->name));
-            yajl_gen_string(*g, (const unsigned char *) STR_TYPE, strlen(STR_TYPE));
+            igsyajl_gen_map_open(*g);
+            igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+            igsyajl_gen_string(*g, (const unsigned char *) arg->name, strlen(arg->name));
+            igsyajl_gen_string(*g, (const unsigned char *) STR_TYPE, strlen(STR_TYPE));
             const char *type = value_type_to_string(arg->type);
-            yajl_gen_string(*g, (const unsigned char *) type, strlen(type));
-            yajl_gen_map_close(*g);
+            igsyajl_gen_string(*g, (const unsigned char *) type, strlen(type));
+            igsyajl_gen_map_close(*g);
         }
-        yajl_gen_array_close(*g);
+        igsyajl_gen_array_close(*g);
     }
     //TODO: dump reply
     
-    yajl_gen_map_close(*g);
+    igsyajl_gen_map_close(*g);
 }
 
 // convert an agent_iop_t structure into json string
-static void json_dump_iop (yajl_gen *g, agent_iop_t* aiop) {
+static void json_dump_iop (igsyajl_gen *g, agent_iop_t* aiop) {
     
-    yajl_gen_map_open(*g);
+    igsyajl_gen_map_open(*g);
     
-    yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-    yajl_gen_string(*g, (const unsigned char *) aiop->name, strlen (aiop->name));
+    igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+    igsyajl_gen_string(*g, (const unsigned char *) aiop->name, strlen (aiop->name));
     
-    yajl_gen_string(*g, (const unsigned char *) STR_TYPE, strlen(STR_TYPE));
-    yajl_gen_string(*g, (const unsigned char *) value_type_to_string(aiop->value_type), strlen(value_type_to_string(aiop->value_type)));
+    igsyajl_gen_string(*g, (const unsigned char *) STR_TYPE, strlen(STR_TYPE));
+    igsyajl_gen_string(*g, (const unsigned char *) value_type_to_string(aiop->value_type), strlen(value_type_to_string(aiop->value_type)));
     
-    yajl_gen_string(*g, (const unsigned char *) STR_VALUE, strlen(STR_VALUE));
+    igsyajl_gen_string(*g, (const unsigned char *) STR_VALUE, strlen(STR_VALUE));
     
     switch (aiop->value_type) {
         case IGS_INTEGER_T:
-            yajl_gen_integer(*g, aiop->value.i);
+            igsyajl_gen_integer(*g, aiop->value.i);
             break;
 
         case IGS_DOUBLE_T:
-            yajl_gen_double(*g, aiop->value.d);
+            igsyajl_gen_double(*g, aiop->value.d);
             break;
 
         case IGS_BOOL_T:
-            yajl_gen_string(*g, (const unsigned char *) boolean_to_string(aiop->value.b), strlen(boolean_to_string(aiop->value.b)));
+            igsyajl_gen_string(*g, (const unsigned char *) boolean_to_string(aiop->value.b), strlen(boolean_to_string(aiop->value.b)));
             break;
 
         case IGS_STRING_T:
             {
-                if (yajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s)) == yajl_gen_invalid_string)
+                if (igsyajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s)) == igsyajl_gen_invalid_string)
                 {
                     igs_warn("Mapping parser : json_dump_iop failed to dump a string value - it may not be a valid UTF8 string - %s\n", aiop->value.s);
-                    yajl_gen_string(*g, (const unsigned char *) "", 0);
+                    igsyajl_gen_string(*g, (const unsigned char *) "", 0);
                 }
             }
             break;
 
         case IGS_IMPULSION_T:
-            yajl_gen_string(*g, (const unsigned char *) "", 0);
+            igsyajl_gen_string(*g, (const unsigned char *) "", 0);
             break;
 
         case IGS_DATA_T:
-            yajl_gen_string(*g, (const unsigned char *) "", 0);
+            igsyajl_gen_string(*g, (const unsigned char *) "", 0);
             break;
 
         default:
             {
                 igs_warn("unknown data type to convert in string (%d)", aiop->value_type);
-                yajl_gen_string(*g, (const unsigned char *) "", 0);
+                igsyajl_gen_string(*g, (const unsigned char *) "", 0);
             }
             break;
     }
-    yajl_gen_map_close(*g);
+    igsyajl_gen_map_close(*g);
 }
 
 // convert a definition structure into definition.json string
-static void json_dump_definition (yajl_gen *g, definition* def) {
+static void json_dump_definition (igsyajl_gen *g, definition* def) {
     
     unsigned int hashCount = 0;
     agent_iop_t *d;
     
-    yajl_gen_map_open(*g);
+    igsyajl_gen_map_open(*g);
     
-    yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+    igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
     //Get the agent name from the network layer
     if (def->name == NULL){
-        yajl_gen_string(*g, (const unsigned char *) DEF_NO_NAME, strlen (DEF_NO_NAME));
+        igsyajl_gen_string(*g, (const unsigned char *) DEF_NO_NAME, strlen (DEF_NO_NAME));
     }else{
-        yajl_gen_string(*g, (const unsigned char *) def->name, strlen (def->name));
+        igsyajl_gen_string(*g, (const unsigned char *) def->name, strlen (def->name));
     }
     
     
-    yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
+    igsyajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
     if(def->description != NULL){
-        yajl_gen_string(*g, (const unsigned char *) def->description, strlen (def->description));
+        igsyajl_gen_string(*g, (const unsigned char *) def->description, strlen (def->description));
     } else {
-        yajl_gen_string(*g, (const unsigned char *) DEF_NO_DESCRIPTION, strlen(DEF_NO_DESCRIPTION));
+        igsyajl_gen_string(*g, (const unsigned char *) DEF_NO_DESCRIPTION, strlen(DEF_NO_DESCRIPTION));
     }
     
-    yajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
+    igsyajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
     if(def->version != NULL){
-        yajl_gen_string(*g, (const unsigned char *) def->version, strlen(def->version));
+        igsyajl_gen_string(*g, (const unsigned char *) def->version, strlen(def->version));
     } else {
-        yajl_gen_string(*g, (const unsigned char *) DEF_NO_VERSION, strlen(DEF_NO_VERSION));
+        igsyajl_gen_string(*g, (const unsigned char *) DEF_NO_VERSION, strlen(DEF_NO_VERSION));
     }
     
     hashCount = HASH_COUNT(def->params_table);
     if (hashCount) {
-        yajl_gen_string(*g, (const unsigned char *) STR_PARAMETERS, strlen(STR_PARAMETERS));
-        yajl_gen_array_open(*g);
+        igsyajl_gen_string(*g, (const unsigned char *) STR_PARAMETERS, strlen(STR_PARAMETERS));
+        igsyajl_gen_array_open(*g);
         for(d=def->params_table; d != NULL; d=d->hh.next) {
             json_dump_iop (g, d);
         }
-        yajl_gen_array_close(*g);
+        igsyajl_gen_array_close(*g);
     }
     
     hashCount = HASH_COUNT(def->inputs_table);
     if (hashCount) {
-        yajl_gen_string(*g, (const unsigned char *) STR_INPUTS, strlen(STR_INPUTS));
-        yajl_gen_array_open(*g);
+        igsyajl_gen_string(*g, (const unsigned char *) STR_INPUTS, strlen(STR_INPUTS));
+        igsyajl_gen_array_open(*g);
         for(d=def->inputs_table; d != NULL; d=d->hh.next) {
             json_dump_iop (g, d);
         }
-        yajl_gen_array_close(*g);
+        igsyajl_gen_array_close(*g);
     }
     
     hashCount = HASH_COUNT(def->outputs_table);
     if (hashCount) {
-        yajl_gen_string(*g, (const unsigned char *) STR_OUTPUTS, strlen(STR_OUTPUTS));
-        yajl_gen_array_open(*g);
+        igsyajl_gen_string(*g, (const unsigned char *) STR_OUTPUTS, strlen(STR_OUTPUTS));
+        igsyajl_gen_array_open(*g);
         for(d=def->outputs_table; d != NULL; d=d->hh.next) {
             json_dump_iop (g, d);
         }
-        yajl_gen_array_close(*g);
+        igsyajl_gen_array_close(*g);
     }
     
     hashCount = HASH_COUNT(def->tokens_table);
     if (hashCount) {
-        yajl_gen_string(*g, (const unsigned char *) STR_TOKENS, strlen(STR_TOKENS));
-        yajl_gen_array_open(*g);
+        igsyajl_gen_string(*g, (const unsigned char *) STR_TOKENS, strlen(STR_TOKENS));
+        igsyajl_gen_array_open(*g);
         igs_token_t *t = NULL, *tmp = NULL;
         HASH_ITER(hh, def->tokens_table, t, tmp){
             json_dump_token (g, t);
         }
-        yajl_gen_array_close(*g);
+        igsyajl_gen_array_close(*g);
     }
     
 //    struct category *cat;
 //    hashCount = HASH_COUNT(def->categories);
 //    if (hashCount) {
-//        yajl_gen_string(*g, (const unsigned char *) STR_CATEGORIES, strlen(STR_CATEGORIES));
-//        yajl_gen_array_open(*g);
+//        igsyajl_gen_string(*g, (const unsigned char *) STR_CATEGORIES, strlen(STR_CATEGORIES));
+//        igsyajl_gen_array_open(*g);
 //        for(cat=def->categories; cat != NULL; cat=cat->hh.next) {
 //            json_dump_category(g, cat);
 //        }
-//        yajl_gen_array_close(*g);
+//        igsyajl_gen_array_close(*g);
 //    }
 
-    yajl_gen_map_close(*g);
+    igsyajl_gen_map_close(*g);
 }
 
 //convert a mapping_out structure into json string
-static void json_dump_mapping_out (yajl_gen *g, mapping_element_t* mapp_out) {
+static void json_dump_mapping_out (igsyajl_gen *g, mapping_element_t* mapp_out) {
 
-    yajl_gen_map_open(*g);
+    igsyajl_gen_map_open(*g);
 
-    yajl_gen_string(*g, (const unsigned char *) "input_name", strlen("input_name"));
-    yajl_gen_string(*g, (const unsigned char *) mapp_out->input_name, strlen (mapp_out->input_name));
+    igsyajl_gen_string(*g, (const unsigned char *) "input_name", strlen("input_name"));
+    igsyajl_gen_string(*g, (const unsigned char *) mapp_out->input_name, strlen (mapp_out->input_name));
 
-    yajl_gen_string(*g, (const unsigned char *) "agent_name", strlen("agent_name"));
-    yajl_gen_string(*g, (const unsigned char *) mapp_out->agent_name, strlen(mapp_out->agent_name));
+    igsyajl_gen_string(*g, (const unsigned char *) "agent_name", strlen("agent_name"));
+    igsyajl_gen_string(*g, (const unsigned char *) mapp_out->agent_name, strlen(mapp_out->agent_name));
 
-    yajl_gen_string(*g, (const unsigned char *) "output_name", strlen("output_name"));
-    yajl_gen_string(*g, (const unsigned char *) mapp_out->output_name, strlen(mapp_out->output_name));
+    igsyajl_gen_string(*g, (const unsigned char *) "output_name", strlen("output_name"));
+    igsyajl_gen_string(*g, (const unsigned char *) mapp_out->output_name, strlen(mapp_out->output_name));
 
-    yajl_gen_map_close(*g);
+    igsyajl_gen_map_close(*g);
 }
 
 /*
@@ -855,21 +855,21 @@ static void json_dump_mapping_out (yajl_gen *g, mapping_element_t* mapp_out) {
  *   convert a mapping_cat structure into json string
  */
 
-//static void json_dump_mapping_cat (yajl_gen *g, mapping_cat* mapp_cat) {
+//static void json_dump_mapping_cat (igsyajl_gen *g, mapping_cat* mapp_cat) {
 //
-//    yajl_gen_map_open(*g);
+//    igsyajl_gen_map_open(*g);
 //
-//    yajl_gen_string(*g, (const unsigned char *) "agent_name", strlen("agent_name"));
-//    yajl_gen_string(*g, (const unsigned char *) mapp_cat->agent_name, strlen (mapp_cat->agent_name));
+//    igsyajl_gen_string(*g, (const unsigned char *) "agent_name", strlen("agent_name"));
+//    igsyajl_gen_string(*g, (const unsigned char *) mapp_cat->agent_name, strlen (mapp_cat->agent_name));
 //
-//    yajl_gen_string(*g, (const unsigned char *) "category_name", strlen("category_name"));
-//    yajl_gen_string(*g, (const unsigned char *) mapp_cat->category_name, strlen(mapp_cat->category_name));
+//    igsyajl_gen_string(*g, (const unsigned char *) "category_name", strlen("category_name"));
+//    igsyajl_gen_string(*g, (const unsigned char *) mapp_cat->category_name, strlen(mapp_cat->category_name));
 //
-//    yajl_gen_map_close(*g);
+//    igsyajl_gen_map_close(*g);
 //}
 
 //convert a mapping structure into mapping.json string
-static void json_dump_mapping (yajl_gen *g, mapping_t* mapp) {
+static void json_dump_mapping (igsyajl_gen *g, mapping_t* mapp) {
 
     unsigned int hashCount = 0;
     mapping_element_t *currentMapOut = NULL;
@@ -878,49 +878,49 @@ static void json_dump_mapping (yajl_gen *g, mapping_t* mapp) {
     {
         //    struct mapping_cat *currentMapCat = NULL;
 
-        yajl_gen_map_open(*g);
+        igsyajl_gen_map_open(*g);
 
-        yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+        igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
         if(mapp->name != NULL)
-            yajl_gen_string(*g, (const unsigned char *) mapp->name, strlen (mapp->name));
+            igsyajl_gen_string(*g, (const unsigned char *) mapp->name, strlen (mapp->name));
         else
-            yajl_gen_string(*g, (const unsigned char *) MAP_NO_NAME, strlen(MAP_NO_NAME));
+            igsyajl_gen_string(*g, (const unsigned char *) MAP_NO_NAME, strlen(MAP_NO_NAME));
 
-        yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
+        igsyajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
         if(mapp->description != NULL)
-            yajl_gen_string(*g, (const unsigned char *) mapp->description, strlen (mapp->description));
+            igsyajl_gen_string(*g, (const unsigned char *) mapp->description, strlen (mapp->description));
         else
-            yajl_gen_string(*g, (const unsigned char *) MAP_NO_DESCRIPTION, strlen(MAP_NO_DESCRIPTION));
+            igsyajl_gen_string(*g, (const unsigned char *) MAP_NO_DESCRIPTION, strlen(MAP_NO_DESCRIPTION));
 
-        yajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
+        igsyajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
         if(mapp->version != NULL)
-            yajl_gen_string(*g, (const unsigned char *) mapp->version, strlen(mapp->version));
+            igsyajl_gen_string(*g, (const unsigned char *) mapp->version, strlen(mapp->version));
         else
-            yajl_gen_string(*g, (const unsigned char *) MAP_NO_VERSION, strlen(MAP_NO_VERSION));
+            igsyajl_gen_string(*g, (const unsigned char *) MAP_NO_VERSION, strlen(MAP_NO_VERSION));
 
         //Mapping_out
         hashCount = HASH_COUNT(mapp->map_elements);
         if (hashCount) {
-            yajl_gen_string(*g, (const unsigned char *) "mapping_out", strlen("mapping_out"));
-            yajl_gen_array_open(*g);
+            igsyajl_gen_string(*g, (const unsigned char *) "mapping_out", strlen("mapping_out"));
+            igsyajl_gen_array_open(*g);
             for(currentMapOut = mapp->map_elements; currentMapOut != NULL; currentMapOut=currentMapOut->hh.next) {
                 json_dump_mapping_out(g, currentMapOut);
             }
-            yajl_gen_array_close(*g);
+            igsyajl_gen_array_close(*g);
         }
 
     //    //Mapping_cat
     //    hashCount = HASH_COUNT(mapp->map_cat);
     //    if (hashCount) {
-    //        yajl_gen_string(*g, (const unsigned char *) "mapping_cat", strlen("mapping_cat"));
-    //        yajl_gen_array_open(*g);
+    //        igsyajl_gen_string(*g, (const unsigned char *) "mapping_cat", strlen("mapping_cat"));
+    //        igsyajl_gen_array_open(*g);
     //        for(currentMapCat=mapp->map_cat; currentMapCat != NULL; currentMapCat=currentMapOut->hh.next) {
     //            json_dump_mapping_cat(g, currentMapCat);
     //        }
-    //        yajl_gen_array_close(*g);
+    //        igsyajl_gen_array_close(*g);
     //    }
 
-        yajl_gen_map_close(*g);
+        igsyajl_gen_map_close(*g);
     }
 }
 
@@ -941,12 +941,12 @@ static void json_dump_mapping (yajl_gen *g, mapping_t* mapp) {
 definition* parser_loadDefinition (const char* json_str) {
     
     definition *def = NULL;
-    yajl_val node;
+    igsyajl_val node;
     
     json_tokenize(json_str, &node);
     def = json_parse_definition(node);
     
-    yajl_tree_free(node);
+    igsyajl_tree_free(node);
     node = NULL;
     
     return def;
@@ -996,26 +996,26 @@ char* parser_export_definition (definition* def) {
     if (def != NULL){
         const unsigned char * json_str = NULL;
         size_t len;
-        yajl_gen g;
+        igsyajl_gen g;
         
-        g = yajl_gen_alloc(NULL);
-        yajl_gen_config(g, yajl_gen_beautify, 1);
-        yajl_gen_config(g, yajl_gen_validate_utf8, 1);
+        g = igsyajl_gen_alloc(NULL);
+        igsyajl_gen_config(g, igsyajl_gen_beautify, 1);
+        igsyajl_gen_config(g, igsyajl_gen_validate_utf8, 1);
         
-        yajl_gen_map_open(g);
-        yajl_gen_string(g, (const unsigned char *) STR_DEFINITION, strlen(STR_DEFINITION));
+        igsyajl_gen_map_open(g);
+        igsyajl_gen_string(g, (const unsigned char *) STR_DEFINITION, strlen(STR_DEFINITION));
         
         if(def != NULL){
             json_dump_definition(&g, def);
         }
-        yajl_gen_map_close(g);
+        igsyajl_gen_map_close(g);
         
         // try to get our dumping result
-        if (yajl_gen_get_buf(g, &json_str, &len) == yajl_gen_status_ok){
+        if (igsyajl_gen_get_buf(g, &json_str, &len) == igsyajl_gen_status_ok){
             result = strdup((const char*) json_str);
         }
         
-        yajl_gen_free(g);
+        igsyajl_gen_free(g);
     }
     return result;
 }
@@ -1035,24 +1035,24 @@ char* parser_export_mapping(mapping_t *mapp){
     if (mapp != NULL){
         const unsigned char * json_str = NULL;
         size_t len;
-        yajl_gen g;
+        igsyajl_gen g;
         
-        g = yajl_gen_alloc(NULL);
-        yajl_gen_config(g, yajl_gen_beautify, 1);
-        yajl_gen_config(g, yajl_gen_validate_utf8, 1);
+        g = igsyajl_gen_alloc(NULL);
+        igsyajl_gen_config(g, igsyajl_gen_beautify, 1);
+        igsyajl_gen_config(g, igsyajl_gen_validate_utf8, 1);
         
-        yajl_gen_map_open(g);
-        yajl_gen_string(g, (const unsigned char *) "mapping", strlen("mapping"));
+        igsyajl_gen_map_open(g);
+        igsyajl_gen_string(g, (const unsigned char *) "mapping", strlen("mapping"));
         json_dump_mapping(&g, mapp);
-        yajl_gen_map_close(g);
+        igsyajl_gen_map_close(g);
         
         // try to get our dumping result
-        if (yajl_gen_get_buf(g, &json_str, &len) == yajl_gen_status_ok)
+        if (igsyajl_gen_get_buf(g, &json_str, &len) == igsyajl_gen_status_ok)
         {
             result = strdup((const char*) json_str);
         }
         
-        yajl_gen_free(g);
+        igsyajl_gen_free(g);
     }
     return result;
 }
@@ -1071,7 +1071,7 @@ char* parser_export_mapping(mapping_t *mapp){
 mapping_t* parser_LoadMap(const char* json_str){
     
     mapping_t *mapp = NULL;
-    yajl_val node;
+    igsyajl_val node;
     
     json_tokenize(json_str, &node);
     mapp = json_parse_mapping (node);
@@ -1079,7 +1079,7 @@ mapping_t* parser_LoadMap(const char* json_str){
     //Copy the mapp structure to the global variable map
     //copy_to_map_global(mapp);
     
-    yajl_tree_free(node);
+    igsyajl_tree_free(node);
     node = NULL;
     
     return mapp;

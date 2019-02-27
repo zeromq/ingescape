@@ -29,7 +29,7 @@ static void CharToHex(unsigned char c, char * hexBuf)
 }
 
 void
-yajl_string_encode(const yajl_print_t print,
+igsyajl_string_encode(const igsyajl_print_t print,
                    void * ctx,
                    const unsigned char * str,
                    size_t len,
@@ -113,7 +113,7 @@ static void Utf32toUtf8(unsigned int codepoint, char * utf8Buf)
     }
 }
 
-void yajl_string_decode(yajl_buf buf, const unsigned char * str,
+void igsyajl_string_decode(igsyajl_buf buf, const unsigned char * str,
                         size_t len)
 {
     size_t beg = 0;
@@ -123,7 +123,7 @@ void yajl_string_decode(yajl_buf buf, const unsigned char * str,
         if (str[end] == '\\') {
             char utf8Buf[5];
             const char * unescaped = "?";
-            yajl_buf_append(buf, str + beg, end - beg);
+            igsyajl_buf_append(buf, str + beg, end - beg);
             switch (str[++end]) {
                 case 'r': unescaped = "\r"; break;
                 case 'n': unescaped = "\n"; break;
@@ -158,7 +158,7 @@ void yajl_string_decode(yajl_buf buf, const unsigned char * str,
                     unescaped = utf8Buf;
 
                     if (codepoint == 0) {
-                        yajl_buf_append(buf, unescaped, 1);
+                        igsyajl_buf_append(buf, unescaped, 1);
                         beg = ++end;
                         continue;
                     }
@@ -168,18 +168,18 @@ void yajl_string_decode(yajl_buf buf, const unsigned char * str,
                 default:
                     assert("this should never happen" == NULL);
             }
-            yajl_buf_append(buf, unescaped, (unsigned int)strlen(unescaped));
+            igsyajl_buf_append(buf, unescaped, (unsigned int)strlen(unescaped));
             beg = ++end;
         } else {
             end++;
         }
     }
-    yajl_buf_append(buf, str + beg, end - beg);
+    igsyajl_buf_append(buf, str + beg, end - beg);
 }
 
 #define ADV_PTR s++; if (!(len--)) return 0;
 
-int yajl_string_validate_utf8(const unsigned char * s, size_t len)
+int igsyajl_string_validate_utf8(const unsigned char * s, size_t len)
 {
     if (!len) return 1;
     if (!s) return 0;

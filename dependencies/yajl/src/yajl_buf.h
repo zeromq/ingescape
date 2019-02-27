@@ -28,30 +28,30 @@
  */
 
 /**
- * yajl_buf is a buffer with exponential growth.  the buffer ensures that
+ * igsyajl_buf is a buffer with exponential growth.  the buffer ensures that
  * you are always null padded.
  */
-typedef struct yajl_buf_t * yajl_buf;
+typedef struct igsyajl_buf_t * igsyajl_buf;
 
 /* allocate a new buffer */
-yajl_buf yajl_buf_alloc(yajl_alloc_funcs * alloc);
+igsyajl_buf igsyajl_buf_alloc(igsyajl_alloc_funcs * alloc);
 
 /* free the buffer */
-void yajl_buf_free(yajl_buf buf);
+void igsyajl_buf_free(igsyajl_buf buf);
 
 /* append a number of bytes to the buffer */
-void yajl_buf_append(yajl_buf buf, const void * data, size_t len);
+void igsyajl_buf_append(igsyajl_buf buf, const void * data, size_t len);
 
 /* empty the buffer */
-void yajl_buf_clear(yajl_buf buf);
+void igsyajl_buf_clear(igsyajl_buf buf);
 
 /* get a pointer to the beginning of the buffer */
-const unsigned char * yajl_buf_data(yajl_buf buf);
+const unsigned char * igsyajl_buf_data(igsyajl_buf buf);
 
 /* get the length of the buffer */
-size_t yajl_buf_len(yajl_buf buf);
+size_t igsyajl_buf_len(igsyajl_buf buf);
 
 /* truncate the buffer */
-void yajl_buf_truncate(yajl_buf buf, size_t len);
+void igsyajl_buf_truncate(igsyajl_buf buf, size_t len);
 
 #endif

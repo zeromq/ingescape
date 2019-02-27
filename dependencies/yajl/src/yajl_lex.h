@@ -20,38 +20,38 @@
 #include "api/yajl_common.h"
 
 typedef enum {
-    yajl_tok_bool,
-    yajl_tok_colon,
-    yajl_tok_comma,
-    yajl_tok_eof,
-    yajl_tok_error,
-    yajl_tok_left_brace,
-    yajl_tok_left_bracket,
-    yajl_tok_null,
-    yajl_tok_right_brace,
-    yajl_tok_right_bracket,
+    igsyajl_tok_bool,
+    igsyajl_tok_colon,
+    igsyajl_tok_comma,
+    igsyajl_tok_eof,
+    igsyajl_tok_error,
+    igsyajl_tok_left_brace,
+    igsyajl_tok_left_bracket,
+    igsyajl_tok_null,
+    igsyajl_tok_right_brace,
+    igsyajl_tok_right_bracket,
 
     /* we differentiate between integers and doubles to allow the
      * parser to interpret the number without re-scanning */
-    yajl_tok_integer,
-    yajl_tok_double,
+    igsyajl_tok_integer,
+    igsyajl_tok_double,
 
     /* we differentiate between strings which require further processing,
      * and strings that do not */
-    yajl_tok_string,
-    yajl_tok_string_with_escapes,
+    igsyajl_tok_string,
+    igsyajl_tok_string_with_escapes,
 
     /* comment tokens are not currently returned to the parser, ever */
-    yajl_tok_comment
-} yajl_tok;
+    igsyajl_tok_comment
+} igsyajl_tok;
 
-typedef struct yajl_lexer_t * yajl_lexer;
+typedef struct igsyajl_lexer_t * igsyajl_lexer;
 
-yajl_lexer yajl_lex_alloc(yajl_alloc_funcs * alloc,
+igsyajl_lexer igsyajl_lex_alloc(igsyajl_alloc_funcs * alloc,
                           unsigned int allowComments,
                           unsigned int validateUTF8);
 
-void yajl_lex_free(yajl_lexer lexer);
+void igsyajl_lex_free(igsyajl_lexer lexer);
 
 /**
  * run/continue a lex. "offset" is an input/output parameter.
@@ -75,43 +75,43 @@ void yajl_lex_free(yajl_lexer lexer);
  * implications which require that the client choose a reasonable chunk
  * size to get adequate performance.
  */
-yajl_tok yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
+igsyajl_tok igsyajl_lex_lex(igsyajl_lexer lexer, const unsigned char * jsonText,
                       size_t jsonTextLen, size_t * offset,
                       const unsigned char ** outBuf, size_t * outLen);
 
 /** have a peek at the next token, but don't move the lexer forward */
-yajl_tok yajl_lex_peek(yajl_lexer lexer, const unsigned char * jsonText,
+igsyajl_tok igsyajl_lex_peek(igsyajl_lexer lexer, const unsigned char * jsonText,
                        size_t jsonTextLen, size_t offset);
 
 
 typedef enum {
-    yajl_lex_e_ok = 0,
-    yajl_lex_string_invalid_utf8,
-    yajl_lex_string_invalid_escaped_char,
-    yajl_lex_string_invalid_json_char,
-    yajl_lex_string_invalid_hex_char,
-    yajl_lex_invalid_char,
-    yajl_lex_invalid_string,
-    yajl_lex_missing_integer_after_decimal,
-    yajl_lex_missing_integer_after_exponent,
-    yajl_lex_missing_integer_after_minus,
-    yajl_lex_unallowed_comment
-} yajl_lex_error;
+    igsyajl_lex_e_ok = 0,
+    igsyajl_lex_string_invalid_utf8,
+    igsyajl_lex_string_invalid_escaped_char,
+    igsyajl_lex_string_invalid_json_char,
+    igsyajl_lex_string_invalid_hex_char,
+    igsyajl_lex_invalid_char,
+    igsyajl_lex_invalid_string,
+    igsyajl_lex_missing_integer_after_decimal,
+    igsyajl_lex_missing_integer_after_exponent,
+    igsyajl_lex_missing_integer_after_minus,
+    igsyajl_lex_unallowed_comment
+} igsyajl_lex_error;
 
-const char * yajl_lex_error_to_string(yajl_lex_error error);
+const char * igsyajl_lex_error_to_string(igsyajl_lex_error error);
 
 /** allows access to more specific information about the lexical
- *  error when yajl_lex_lex returns yajl_tok_error. */
-yajl_lex_error yajl_lex_get_error(yajl_lexer lexer);
+ *  error when igsyajl_lex_lex returns igsyajl_tok_error. */
+igsyajl_lex_error igsyajl_lex_get_error(igsyajl_lexer lexer);
 
 /** get the current offset into the most recently lexed json string. */
-size_t yajl_lex_current_offset(yajl_lexer lexer);
+size_t igsyajl_lex_current_offset(igsyajl_lexer lexer);
 
 /** get the number of lines lexed by this lexer instance */
-size_t yajl_lex_current_line(yajl_lexer lexer);
+size_t igsyajl_lex_current_line(igsyajl_lexer lexer);
 
 /** get the number of chars lexed by this lexer instance since the last
  *  \n or \r */
-size_t yajl_lex_current_char(yajl_lexer lexer);
+size_t igsyajl_lex_current_char(igsyajl_lexer lexer);
 
 #endif
