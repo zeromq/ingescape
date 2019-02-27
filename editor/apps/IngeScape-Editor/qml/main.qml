@@ -110,7 +110,7 @@ ApplicationWindow {
                 shortcut: StandardKey.AddTab
 
                 onTriggered: {
-                    I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "INGESCAPE");
+                    I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "IngeScape-Editor");
                 }
             }
             MenuItem {
