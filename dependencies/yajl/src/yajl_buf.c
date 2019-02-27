@@ -20,17 +20,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define YAJL_BUF_INIT_SIZE 2048
+#define IGSYAJL_BUF_INIT_SIZE 2048
 
-struct yajl_buf_t {
+struct igsyajl_buf_t {
     size_t len;
     size_t used;
     unsigned char * data;
-    yajl_alloc_funcs * alloc;
+    igsyajl_alloc_funcs * alloc;
 };
 
 static
-void yajl_buf_ensure_available(yajl_buf buf, size_t want)
+void igsyajl_buf_ensure_available(igsyajl_buf buf, size_t want)
 {
     size_t need;
     
@@ -38,7 +38,7 @@ void yajl_buf_ensure_available(yajl_buf buf, size_t want)
 
     /* first call */
     if (buf->data == NULL) {
-        buf->len = YAJL_BUF_INIT_SIZE;
+        buf->len = IGSYAJL_BUF_INIT_SIZE;
         buf->data = (unsigned char *) YA_MALLOC(buf->alloc, buf->len);
         buf->data[0] = 0;
     }
@@ -53,24 +53,24 @@ void yajl_buf_ensure_available(yajl_buf buf, size_t want)
     }
 }
 
-yajl_buf yajl_buf_alloc(yajl_alloc_funcs * alloc)
+igsyajl_buf igsyajl_buf_alloc(igsyajl_alloc_funcs * alloc)
 {
-    yajl_buf b = YA_MALLOC(alloc, sizeof(struct yajl_buf_t));
-    memset((void *) b, 0, sizeof(struct yajl_buf_t));
+    igsyajl_buf b = YA_MALLOC(alloc, sizeof(struct igsyajl_buf_t));
+    memset((void *) b, 0, sizeof(struct igsyajl_buf_t));
     b->alloc = alloc;
     return b;
 }
 
-void yajl_buf_free(yajl_buf buf)
+void igsyajl_buf_free(igsyajl_buf buf)
 {
     assert(buf != NULL);
     if (buf->data) YA_FREE(buf->alloc, buf->data);
     YA_FREE(buf->alloc, buf);
 }
 
-void yajl_buf_append(yajl_buf buf, const void * data, size_t len)
+void igsyajl_buf_append(igsyajl_buf buf, const void * data, size_t len)
 {
-    yajl_buf_ensure_available(buf, len);
+    igsyajl_buf_ensure_available(buf, len);
     if (len > 0) {
         assert(data != NULL);
         memcpy(buf->data + buf->used, data, len);
@@ -79,24 +79,24 @@ void yajl_buf_append(yajl_buf buf, const void * data, size_t len)
     }
 }
 
-void yajl_buf_clear(yajl_buf buf)
+void igsyajl_buf_clear(igsyajl_buf buf)
 {
     buf->used = 0;
     if (buf->data) buf->data[buf->used] = 0;
 }
 
-const unsigned char * yajl_buf_data(yajl_buf buf)
+const unsigned char * igsyajl_buf_data(igsyajl_buf buf)
 {
     return buf->data;
 }
 
-size_t yajl_buf_len(yajl_buf buf)
+size_t igsyajl_buf_len(igsyajl_buf buf)
 {
     return buf->used;
 }
 
 void
-yajl_buf_truncate(yajl_buf buf, size_t len)
+igsyajl_buf_truncate(igsyajl_buf buf, size_t len)
 {
     assert(len <= buf->used);
     buf->used = len;

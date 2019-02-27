@@ -11,6 +11,8 @@
 		970670DF1EDC187900CCDFDC /* ingescape_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 97C926AB1EB23ED100D2B0CE /* ingescape_private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		972A52641FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
 		972A52651FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
+		973D1BB32226920700D363BF /* yajl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 973D1BB22226916D00D363BF /* yajl.framework */; };
+		973D1BC62226958500D363BF /* libyajl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 973D1BB02226916D00D363BF /* libyajl.a */; };
 		973DC283207A479F004C1D80 /* ingescape_advanced.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 975512902078EF1900720931 /* ingescape_advanced.h */; };
 		973DC288207A93E6004C1D80 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = 973DC287207A93E6004C1D80 /* bus.c */; };
 		973DC289207A93E6004C1D80 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = 973DC287207A93E6004C1D80 /* bus.c */; };
@@ -143,38 +145,21 @@
 		979A7D911EA8A9CB003153EF /* runtime.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F81EA8A86F003153EF /* runtime.h */; };
 		979A7D921EA8A9CB003153EF /* utils.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F91EA8A86F003153EF /* utils.h */; };
 		979A7D931EA8A9CB003153EF /* version.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79FA1EA8A86F003153EF /* version.h */; };
-		97C927271EB38FE800D2B0CE /* libyajl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97C927221EB38FD900D2B0CE /* libyajl.a */; };
-		97C9272A1EB38FF300D2B0CE /* yajl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97C927241EB38FD900D2B0CE /* yajl.framework */; };
-		97D978B2207761240097E027 /* yajl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97C927241EB38FD900D2B0CE /* yajl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		97C927211EB38FD900D2B0CE /* PBXContainerItemProxy */ = {
+		973D1BAF2226916D00D363BF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */;
+			containerPortal = 973D1BAA2226916D00D363BF /* yajl.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 9716CA461EA21C6A004F0AC0;
 			remoteInfo = "yajl-ios";
 		};
-		97C927231EB38FD900D2B0CE /* PBXContainerItemProxy */ = {
+		973D1BB12226916D00D363BF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */;
+			containerPortal = 973D1BAA2226916D00D363BF /* yajl.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 9762EDB21EAE530B002062A1;
-			remoteInfo = "yajl-macos";
-		};
-		97C927251EB38FE300D2B0CE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 9716CA451EA21C6A004F0AC0;
-			remoteInfo = "yajl-ios";
-		};
-		97C927281EB38FEF00D2B0CE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 9762EDB11EAE530B002062A1;
 			remoteInfo = "yajl-macos";
 		};
 /* End PBXContainerItemProxy section */
@@ -332,7 +317,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				97D978B2207761240097E027 /* yajl.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,6 +325,7 @@
 /* Begin PBXFileReference section */
 		15326AAA20C683F70020BA75 /* libsodium.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.dylib; path = ../../../../../usr/local/lib/libsodium.dylib; sourceTree = "<group>"; };
 		972A52631FD1733E00711352 /* admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = admin.c; sourceTree = "<group>"; };
+		973D1BAA2226916D00D363BF /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = yajl.xcodeproj; path = ../dependencies/yajl/yajl.xcodeproj; sourceTree = "<group>"; };
 		973DC287207A93E6004C1D80 /* bus.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bus.c; sourceTree = "<group>"; };
 		975512902078EF1900720931 /* ingescape_advanced.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_advanced.h; sourceTree = "<group>"; };
 		9762EDCD1EAE5414002062A1 /* ingescape.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ingescape.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1194,7 +1179,6 @@
 		979A7D281EA8A86F003153EF /* zyre.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zyre.api; sourceTree = "<group>"; };
 		979A7D291EA8A86F003153EF /* zyre_event.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zyre_event.api; sourceTree = "<group>"; };
 		97C926AB1EB23ED100D2B0CE /* ingescape_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_private.h; sourceTree = "<group>"; };
-		97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = yajl.xcodeproj; path = ../dependencies/ios/yajl/yajl.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1202,9 +1186,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				973D1BB32226920700D363BF /* yajl.framework in Frameworks */,
 				9766A8C72088DC8C0046C63F /* libczmq.dylib in Frameworks */,
 				9766A8C82088DC8C0046C63F /* libzyre.dylib in Frameworks */,
-				97C9272A1EB38FF300D2B0CE /* yajl.framework in Frameworks */,
 				15326AAB20C683F70020BA75 /* libsodium.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1213,7 +1197,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				97C927271EB38FE800D2B0CE /* libyajl.a in Frameworks */,
+				973D1BC62226958500D363BF /* libyajl.a in Frameworks */,
 				979A7D2A1EA8A919003153EF /* libczmq.a in Frameworks */,
 				979A7D2B1EA8A919003153EF /* libsodium.a in Frameworks */,
 				979A7D2C1EA8A919003153EF /* libzmq.a in Frameworks */,
@@ -1224,6 +1208,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		973D1BAB2226916D00D363BF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				973D1BB02226916D00D363BF /* libyajl.a */,
+				973D1BB22226916D00D363BF /* yajl.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		9762EDCE1EAE5414002062A1 /* ingescape-macos */ = {
 			isa = PBXGroup;
 			children = (
@@ -1258,7 +1251,7 @@
 		979A796F1EA7B0D6003153EF = {
 			isa = PBXGroup;
 			children = (
-				97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */,
+				973D1BAA2226916D00D363BF /* yajl.xcodeproj */,
 				979A79BC1EA8A86F003153EF /* ios */,
 				979A79841EA7B112003153EF /* src */,
 				9762EDCE1EAE5414002062A1 /* ingescape-macos */,
@@ -2584,15 +2577,6 @@
 			path = zyre;
 			sourceTree = "<group>";
 		};
-		97C9271D1EB38FD900D2B0CE /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				97C927221EB38FD900D2B0CE /* libyajl.a */,
-				97C927241EB38FD900D2B0CE /* yajl.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -2621,7 +2605,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				97C927291EB38FEF00D2B0CE /* PBXTargetDependency */,
 			);
 			name = "ingscape-macos";
 			productName = "ingescape-macos";
@@ -2642,7 +2625,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				97C927261EB38FE300D2B0CE /* PBXTargetDependency */,
 			);
 			name = "ingescape-ios";
 			productName = ingescape;
@@ -2682,8 +2664,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 97C9271D1EB38FD900D2B0CE /* Products */;
-					ProjectRef = 97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */;
+					ProductGroup = 973D1BAB2226916D00D363BF /* Products */;
+					ProjectRef = 973D1BAA2226916D00D363BF /* yajl.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -2695,18 +2677,18 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		97C927221EB38FD900D2B0CE /* libyajl.a */ = {
+		973D1BB02226916D00D363BF /* libyajl.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libyajl.a;
-			remoteRef = 97C927211EB38FD900D2B0CE /* PBXContainerItemProxy */;
+			remoteRef = 973D1BAF2226916D00D363BF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		97C927241EB38FD900D2B0CE /* yajl.framework */ = {
+		973D1BB22226916D00D363BF /* yajl.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = yajl.framework;
-			remoteRef = 97C927231EB38FD900D2B0CE /* PBXContainerItemProxy */;
+			remoteRef = 973D1BB12226916D00D363BF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -2744,19 +2726,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		97C927261EB38FE300D2B0CE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "yajl-ios";
-			targetProxy = 97C927251EB38FE300D2B0CE /* PBXContainerItemProxy */;
-		};
-		97C927291EB38FEF00D2B0CE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "yajl-macos";
-			targetProxy = 97C927281EB38FEF00D2B0CE /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin XCBuildConfiguration section */
 		9762EDD21EAE5414002062A1 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2772,6 +2741,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../dependencies/yajl/src/api",
 					"$(SRCROOT)/../src/include/",
 					/usr/local/include,
 				);
@@ -2803,6 +2773,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../dependencies/yajl/src/api",
 					"$(SRCROOT)/../src/include/",
 					/usr/local/include,
 				);
@@ -2934,6 +2905,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../dependencies/ios/ios/include/",
 					"$(SRCROOT)/../src/include/",
+					"$(SRCROOT)/../dependencies/yajl/src/api",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../dependencies/ios/ios/lib/";

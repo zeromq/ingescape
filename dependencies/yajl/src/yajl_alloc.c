@@ -15,7 +15,7 @@
  */
 
 /**
- * \file yajl_alloc.h
+ * \file igsyajl_alloc.h
  * default memory allocation routines for yajl which use malloc/realloc and
  * free
  */
@@ -23,30 +23,30 @@
 #include "yajl_alloc.h"
 #include <stdlib.h>
 
-static void * yajl_internal_malloc(void *ctx, size_t sz)
+static void * igsyajl_internal_malloc(void *ctx, size_t sz)
 {
     (void)ctx;
     return malloc(sz);
 }
 
-static void * yajl_internal_realloc(void *ctx, void * previous,
+static void * igsyajl_internal_realloc(void *ctx, void * previous,
                                     size_t sz)
 {
     (void)ctx;
     return realloc(previous, sz);
 }
 
-static void yajl_internal_free(void *ctx, void * ptr)
+static void igsyajl_internal_free(void *ctx, void * ptr)
 {
     (void)ctx;
     free(ptr);
 }
 
-void yajl_set_default_alloc_funcs(yajl_alloc_funcs * yaf)
+void igsyajl_set_default_alloc_funcs(igsyajl_alloc_funcs * yaf)
 {
-    yaf->malloc = yajl_internal_malloc;
-    yaf->free = yajl_internal_free;
-    yaf->realloc = yajl_internal_realloc;
+    yaf->malloc = igsyajl_internal_malloc;
+    yaf->free = igsyajl_internal_free;
+    yaf->realloc = igsyajl_internal_realloc;
     yaf->ctx = NULL;
 }
 

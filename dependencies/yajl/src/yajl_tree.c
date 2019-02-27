@@ -37,14 +37,14 @@ typedef struct stack_elem_s stack_elem_t;
 struct stack_elem_s
 {
     char * key;
-    yajl_val value;
+    igsyajl_val value;
     stack_elem_t *next;
 };
 
 struct context_s
 {
     stack_elem_t *stack;
-    yajl_val root;
+    igsyajl_val root;
     char *errbuf;
     size_t errbuf_size;
 };
@@ -56,9 +56,9 @@ typedef struct context_s context_t;
         return (retval);                                                \
     }
 
-static yajl_val value_alloc (yajl_type type)
+static igsyajl_val value_alloc (igsyajl_type type)
 {
-    yajl_val v;
+    igsyajl_val v;
 
     v = malloc (sizeof (*v));
     if (v == NULL) return (NULL);
@@ -68,17 +68,17 @@ static yajl_val value_alloc (yajl_type type)
     return (v);
 }
 
-static void yajl_object_free (yajl_val v)
+static void igsyajl_object_free (igsyajl_val v)
 {
     size_t i;
 
-    if (!YAJL_IS_OBJECT(v)) return;
+    if (!IGSYAJL_IS_OBJECT(v)) return;
 
     for (i = 0; i < v->u.object.len; i++)
     {
         free((char *) v->u.object.keys[i]);
         v->u.object.keys[i] = NULL;
-        yajl_tree_free (v->u.object.values[i]);
+        igsyajl_tree_free (v->u.object.values[i]);
         v->u.object.values[i] = NULL;
     }
 
@@ -87,15 +87,15 @@ static void yajl_object_free (yajl_val v)
     free(v);
 }
 
-static void yajl_array_free (yajl_val v)
+static void igsyajl_array_free (igsyajl_val v)
 {
     size_t i;
 
-    if (!YAJL_IS_ARRAY(v)) return;
+    if (!IGSYAJL_IS_ARRAY(v)) return;
 
     for (i = 0; i < v->u.array.len; i++)
     {
-        yajl_tree_free (v->u.array.values[i]);
+        igsyajl_tree_free (v->u.array.values[i]);
         v->u.array.values[i] = NULL;
     }
 
@@ -110,7 +110,7 @@ static void yajl_array_free (yajl_val v)
  * reached (an appropriate closing bracket has been read), the value is popped
  * off the stack and added to the enclosing object using "context_add_value".
  */
-static int context_push(context_t *ctx, yajl_val v)
+static int context_push(context_t *ctx, igsyajl_val v)
 {
     stack_elem_t *stack;
 
@@ -120,8 +120,8 @@ static int context_push(context_t *ctx, yajl_val v)
     memset (stack, 0, sizeof (*stack));
 
     assert ((ctx->stack == NULL)
-            || YAJL_IS_OBJECT (v)
-            || YAJL_IS_ARRAY (v));
+            || IGSYAJL_IS_OBJECT (v)
+            || IGSYAJL_IS_ARRAY (v));
 
     stack->value = v;
     stack->next = ctx->stack;
@@ -130,10 +130,10 @@ static int context_push(context_t *ctx, yajl_val v)
     return (0);
 }
 
-static yajl_val context_pop(context_t *ctx)
+static igsyajl_val context_pop(context_t *ctx)
 {
     stack_elem_t *stack;
-    yajl_val v;
+    igsyajl_val v;
 
     if (ctx->stack == NULL)
         RETURN_ERROR (ctx, NULL, "context_pop: "
@@ -150,10 +150,10 @@ static yajl_val context_pop(context_t *ctx)
 }
 
 static int object_add_keyval(context_t *ctx,
-                             yajl_val obj, char *key, yajl_val value)
+                             igsyajl_val obj, char *key, igsyajl_val value)
 {
     const char **tmpk;
-    yajl_val *tmpv;
+    igsyajl_val *tmpv;
 
     /* We're checking for NULL in "context_add_value" or its callers. */
     assert (ctx != NULL);
@@ -162,7 +162,7 @@ static int object_add_keyval(context_t *ctx,
     assert (value != NULL);
 
     /* We're assuring that "obj" is an object in "context_add_value". */
-    assert(YAJL_IS_OBJECT(obj));
+    assert(IGSYAJL_IS_OBJECT(obj));
 
     tmpk = realloc((void *) obj->u.object.keys, sizeof(*(obj->u.object.keys)) * (obj->u.object.len + 1));
     if (tmpk == NULL)
@@ -182,9 +182,9 @@ static int object_add_keyval(context_t *ctx,
 }
 
 static int array_add_value (context_t *ctx,
-                            yajl_val array, yajl_val value)
+                            igsyajl_val array, igsyajl_val value)
 {
-    yajl_val *tmp;
+    igsyajl_val *tmp;
 
     /* We're checking for NULL pointers in "context_add_value" or its
      * callers. */
@@ -193,7 +193,7 @@ static int array_add_value (context_t *ctx,
     assert (value != NULL);
 
     /* "context_add_value" will only call us with array values. */
-    assert(YAJL_IS_ARRAY(array));
+    assert(IGSYAJL_IS_ARRAY(array));
 
     tmp = realloc(array->u.array.values,
                   sizeof(*(array->u.array.values)) * (array->u.array.len + 1));
@@ -210,7 +210,7 @@ static int array_add_value (context_t *ctx,
  * Add a value to the value on top of the stack or the "root" member in the
  * context if the end of the parsing process is reached.
  */
-static int context_add_value (context_t *ctx, yajl_val v)
+static int context_add_value (context_t *ctx, igsyajl_val v)
 {
     /* We're checking for NULL values in all the calling functions. */
     assert (ctx != NULL);
@@ -233,11 +233,11 @@ static int context_add_value (context_t *ctx, yajl_val v)
         ctx->root = v;
         return (0);
     }
-    else if (YAJL_IS_OBJECT (ctx->stack->value))
+    else if (IGSYAJL_IS_OBJECT (ctx->stack->value))
     {
         if (ctx->stack->key == NULL)
         {
-            if (!YAJL_IS_STRING (v))
+            if (!IGSYAJL_IS_STRING (v))
                 RETURN_ERROR (ctx, EINVAL, "context_add_value: "
                               "Object key is not a string (%#04x)",
                               v->type);
@@ -256,7 +256,7 @@ static int context_add_value (context_t *ctx, yajl_val v)
             return (object_add_keyval (ctx, ctx->stack->value, key, v));
         }
     }
-    else if (YAJL_IS_ARRAY (ctx->stack->value))
+    else if (IGSYAJL_IS_ARRAY (ctx->stack->value))
     {
         return (array_add_value (ctx, ctx->stack->value, v));
     }
@@ -271,9 +271,9 @@ static int context_add_value (context_t *ctx, yajl_val v)
 static int handle_string (void *ctx,
                           const unsigned char *string, size_t string_length)
 {
-    yajl_val v;
+    igsyajl_val v;
 
-    v = value_alloc (yajl_t_string);
+    v = value_alloc (igsyajl_t_string);
     if (v == NULL)
         RETURN_ERROR ((context_t *) ctx, STATUS_ABORT, "Out of memory");
 
@@ -291,10 +291,10 @@ static int handle_string (void *ctx,
 
 static int handle_number (void *ctx, const char *string, size_t string_length)
 {
-    yajl_val v;
+    igsyajl_val v;
     char *endptr;
 
-    v = value_alloc(yajl_t_number);
+    v = value_alloc(igsyajl_t_number);
     if (v == NULL)
         RETURN_ERROR((context_t *) ctx, STATUS_ABORT, "Out of memory");
 
@@ -310,25 +310,25 @@ static int handle_number (void *ctx, const char *string, size_t string_length)
     v->u.number.flags = 0;
 
     errno = 0;
-    v->u.number.i = yajl_parse_integer((const unsigned char *) v->u.number.r,
+    v->u.number.i = igsyajl_parse_integer((const unsigned char *) v->u.number.r,
                                        strlen(v->u.number.r));
     if (errno == 0)
-        v->u.number.flags |= YAJL_NUMBER_INT_VALID;
+        v->u.number.flags |= IGSYAJL_NUMBER_INT_VALID;
 
     endptr = NULL;
     errno = 0;
     v->u.number.d = strtod(v->u.number.r, &endptr);
     if ((errno == 0) && (endptr != NULL) && (*endptr == 0))
-        v->u.number.flags |= YAJL_NUMBER_DOUBLE_VALID;
+        v->u.number.flags |= IGSYAJL_NUMBER_DOUBLE_VALID;
 
     return ((context_add_value(ctx, v) == 0) ? STATUS_CONTINUE : STATUS_ABORT);
 }
 
 static int handle_start_map (void *ctx)
 {
-    yajl_val v;
+    igsyajl_val v;
 
-    v = value_alloc(yajl_t_object);
+    v = value_alloc(igsyajl_t_object);
     if (v == NULL)
         RETURN_ERROR ((context_t *) ctx, STATUS_ABORT, "Out of memory");
 
@@ -341,7 +341,7 @@ static int handle_start_map (void *ctx)
 
 static int handle_end_map (void *ctx)
 {
-    yajl_val v;
+    igsyajl_val v;
 
     v = context_pop (ctx);
     if (v == NULL)
@@ -352,9 +352,9 @@ static int handle_end_map (void *ctx)
 
 static int handle_start_array (void *ctx)
 {
-    yajl_val v;
+    igsyajl_val v;
 
-    v = value_alloc(yajl_t_array);
+    v = value_alloc(igsyajl_t_array);
     if (v == NULL)
         RETURN_ERROR ((context_t *) ctx, STATUS_ABORT, "Out of memory");
 
@@ -366,7 +366,7 @@ static int handle_start_array (void *ctx)
 
 static int handle_end_array (void *ctx)
 {
-    yajl_val v;
+    igsyajl_val v;
 
     v = context_pop (ctx);
     if (v == NULL)
@@ -377,9 +377,9 @@ static int handle_end_array (void *ctx)
 
 static int handle_boolean (void *ctx, int boolean_value)
 {
-    yajl_val v;
+    igsyajl_val v;
 
-    v = value_alloc (boolean_value ? yajl_t_true : yajl_t_false);
+    v = value_alloc (boolean_value ? igsyajl_t_true : igsyajl_t_false);
     if (v == NULL)
         RETURN_ERROR ((context_t *) ctx, STATUS_ABORT, "Out of memory");
 
@@ -388,9 +388,9 @@ static int handle_boolean (void *ctx, int boolean_value)
 
 static int handle_null (void *ctx)
 {
-    yajl_val v;
+    igsyajl_val v;
 
-    v = value_alloc (yajl_t_null);
+    v = value_alloc (igsyajl_t_null);
     if (v == NULL)
         RETURN_ERROR ((context_t *) ctx, STATUS_ABORT, "Out of memory");
 
@@ -400,10 +400,10 @@ static int handle_null (void *ctx)
 /*
  * Public functions
  */
-yajl_val yajl_tree_parse (const char *input,
+igsyajl_val igsyajl_tree_parse (const char *input,
                           char *error_buffer, size_t error_buffer_size)
 {
-    static const yajl_callbacks callbacks =
+    static const igsyajl_callbacks callbacks =
         {
             /* null        = */ handle_null,
             /* boolean     = */ handle_boolean,
@@ -418,8 +418,8 @@ yajl_val yajl_tree_parse (const char *input,
             /* end array   = */ handle_end_array
         };
 
-    yajl_handle handle;
-    yajl_status status;
+    igsyajl_handle handle;
+    igsyajl_status status;
     char * internal_err_str;
 	context_t ctx = { NULL, NULL, NULL, 0 };
 
@@ -429,38 +429,38 @@ yajl_val yajl_tree_parse (const char *input,
     if (error_buffer != NULL)
         memset (error_buffer, 0, error_buffer_size);
 
-    handle = yajl_alloc (&callbacks, NULL, &ctx);
-    yajl_config(handle, yajl_allow_comments, 1);
-    yajl_config(handle, yajl_allow_trailing_garbage, 1);
+    handle = igsyajl_alloc (&callbacks, NULL, &ctx);
+    igsyajl_config(handle, igsyajl_allow_comments, 1);
+    igsyajl_config(handle, igsyajl_allow_trailing_garbage, 1);
 
-    status = yajl_parse(handle,
+    status = igsyajl_parse(handle,
                         (unsigned char *) input,
                         strlen (input));
-    status = yajl_complete_parse (handle);
-    if (status != yajl_status_ok) {
+    status = igsyajl_complete_parse (handle);
+    if (status != igsyajl_status_ok) {
         if (error_buffer != NULL && error_buffer_size > 0) {
-               internal_err_str = (char *) yajl_get_error(handle, 1,
+               internal_err_str = (char *) igsyajl_get_error(handle, 1,
                      (const unsigned char *) input,
                      strlen(input));
              snprintf(error_buffer, error_buffer_size, "%s", internal_err_str);
              YA_FREE(&(handle->alloc), internal_err_str);
         }
-        yajl_free (handle);
+        igsyajl_free (handle);
         return NULL;
     }
 
-    yajl_free (handle);
+    igsyajl_free (handle);
     return (ctx.root);
 }
 
-yajl_val yajl_tree_get(yajl_val n, const char ** path, yajl_type type)
+igsyajl_val igsyajl_tree_get(igsyajl_val n, const char ** path, igsyajl_type type)
 {
     if (!path) return NULL;
     while (n && *path) {
         size_t i;
         size_t len;
 
-        if (n->type != yajl_t_object) return NULL;
+        if (n->type != igsyajl_t_object) return NULL;
         len = n->u.object.len;
         for (i = 0; i < len; i++) {
             if (!strcmp(*path, n->u.object.keys[i])) {
@@ -471,33 +471,33 @@ yajl_val yajl_tree_get(yajl_val n, const char ** path, yajl_type type)
         if (i == len) return NULL;
         path++;
     }
-    if (n && type != yajl_t_any && type != n->type) n = NULL;
+    if (n && type != igsyajl_t_any && type != n->type) n = NULL;
     return n;
 }
 
-void yajl_tree_free (yajl_val v)
+void igsyajl_tree_free (igsyajl_val v)
 {
     if (v == NULL) return;
 
-    if (YAJL_IS_STRING(v))
+    if (IGSYAJL_IS_STRING(v))
     {
         free(v->u.string);
         free(v);
     }
-    else if (YAJL_IS_NUMBER(v))
+    else if (IGSYAJL_IS_NUMBER(v))
     {
         free(v->u.number.r);
         free(v);
     }
-    else if (YAJL_GET_OBJECT(v))
+    else if (IGSYAJL_GET_OBJECT(v))
     {
-        yajl_object_free(v);
+        igsyajl_object_free(v);
     }
-    else if (YAJL_GET_ARRAY(v))
+    else if (IGSYAJL_GET_ARRAY(v))
     {
-        yajl_array_free(v);
+        igsyajl_array_free(v);
     }
-    else /* if (yajl_t_true or yajl_t_false or yajl_t_null) */
+    else /* if (igsyajl_t_true or igsyajl_t_false or igsyajl_t_null) */
     {
         free(v);
     }

@@ -1,7 +1,7 @@
-#include <yajl/yajl_version.h>
+#include "yajl_version.h"
 
-int yajl_version(void)
+int igsyajl_version(void)
 {
-	return YAJL_VERSION;
+	return IGSYAJL_VERSION;
 }
 

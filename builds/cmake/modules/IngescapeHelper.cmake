@@ -14,6 +14,15 @@ macro(add_ingescape_sources _SOURCES)
         ${macro_current_dir}/../../../src/admin.c
         ${macro_current_dir}/../../../src/bus.c
         ${macro_current_dir}/../../../src/token.c
+        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_alloc.c
+        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_buf.c
+        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_encode.c
+        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_gen.c
+        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_lex.c
+        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_parser.c
+        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_tree.c
+        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_version.c
+        ${macro_current_dir}/../../../dependencies/yajl/src/yajl.c
     )
 
     IF (WIN32)
@@ -24,6 +33,7 @@ endmacro()
 # Macro to add ingescape header directory in given var
 macro(add_ingescape_include_directory _HEADERS)
     list(APPEND ${_HEADERS} "${macro_current_dir}/../../../src/include")
+    list(APPEND ${_HEADERS} "${macro_current_dir}/../../../dependencies/yajl/src/api")
 	
     IF (WIN32)
 		list(APPEND ${_HEADERS} "${macro_current_dir}/../../../dependencies/windows/unix")
@@ -81,18 +91,6 @@ macro(add_ingescape_libraries_dependencies _LIBS _pkg_config_libs_private)
     ELSE (ZYRE_FOUND)
         message( FATAL_ERROR "zyre not found." )
     ENDIF (ZYRE_FOUND)
-
-    ########################################################################
-    # YAJL dependency
-    ########################################################################
-    find_package(yajl REQUIRED)
-    IF (YAJL_FOUND)
-        include_directories(${YAJL_INCLUDE_DIRS})
-        list(APPEND ${_LIBS} ${YAJL_LIBRARIES})
-        set(${_pkg_config_libs_private} "${${_pkg_config_libs_private}} -lyajl")
-    ELSE (YAJL_FOUND)
-        message( FATAL_ERROR "yajl not found." )
-    ENDIF (YAJL_FOUND)
     
     if (MSVC)
         # required libraries for msvc

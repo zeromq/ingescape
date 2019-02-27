@@ -22,25 +22,25 @@
 #include <assert.h>
 #include <string.h>
 
-#ifdef YAJL_LEXER_DEBUG
+#ifdef IGSYAJL_LEXER_DEBUG
 static const char *
-tokToStr(yajl_tok tok)
+tokToStr(igsyajl_tok tok)
 {
     switch (tok) {
-        case yajl_tok_bool: return "bool";
-        case yajl_tok_colon: return "colon";
-        case yajl_tok_comma: return "comma";
-        case yajl_tok_eof: return "eof";
-        case yajl_tok_error: return "error";
-        case yajl_tok_left_brace: return "brace";
-        case yajl_tok_left_bracket: return "bracket";
-        case yajl_tok_null: return "null";
-        case yajl_tok_integer: return "integer";
-        case yajl_tok_double: return "double";
-        case yajl_tok_right_brace: return "brace";
-        case yajl_tok_right_bracket: return "bracket";
-        case yajl_tok_string: return "string";
-        case yajl_tok_string_with_escapes: return "string_with_escapes";
+        case igsyajl_tok_bool: return "bool";
+        case igsyajl_tok_colon: return "colon";
+        case igsyajl_tok_comma: return "comma";
+        case igsyajl_tok_eof: return "eof";
+        case igsyajl_tok_error: return "error";
+        case igsyajl_tok_left_brace: return "brace";
+        case igsyajl_tok_left_bracket: return "bracket";
+        case igsyajl_tok_null: return "null";
+        case igsyajl_tok_integer: return "integer";
+        case igsyajl_tok_double: return "double";
+        case igsyajl_tok_right_brace: return "brace";
+        case igsyajl_tok_right_bracket: return "bracket";
+        case igsyajl_tok_string: return "string";
+        case igsyajl_tok_string_with_escapes: return "string_with_escapes";
     }
     return "unknown";
 }
@@ -65,17 +65,17 @@ tokToStr(yajl_tok tok)
  * before pulling chars from input text
  */
 
-struct yajl_lexer_t {
+struct igsyajl_lexer_t {
     /* the overal line and char offset into the data */
     size_t lineOff;
     size_t charOff;
 
     /* error */
-    yajl_lex_error error;
+    igsyajl_lex_error error;
 
     /* a input buffer to handle the case where a token is spread over
      * multiple chunks */
-    yajl_buf buf;
+    igsyajl_buf buf;
 
     /* in the case where we have data in the lexBuf, bufOff holds
      * the current offset into the lexBuf. */
@@ -90,23 +90,23 @@ struct yajl_lexer_t {
     /* shall we validate utf8 inside strings? */
     unsigned int validateUTF8;
 
-    yajl_alloc_funcs * alloc;
+    igsyajl_alloc_funcs * alloc;
 };
 
 #define readChar(lxr, txt, off)                      \
-    (((lxr)->bufInUse && yajl_buf_len((lxr)->buf) && lxr->bufOff < yajl_buf_len((lxr)->buf)) ? \
-     (*((const unsigned char *) yajl_buf_data((lxr)->buf) + ((lxr)->bufOff)++)) : \
+    (((lxr)->bufInUse && igsyajl_buf_len((lxr)->buf) && lxr->bufOff < igsyajl_buf_len((lxr)->buf)) ? \
+     (*((const unsigned char *) igsyajl_buf_data((lxr)->buf) + ((lxr)->bufOff)++)) : \
      ((txt)[(*(off))++]))
 
 #define unreadChar(lxr, off) ((*(off) > 0) ? (*(off))-- : ((lxr)->bufOff--))
 
-yajl_lexer
-yajl_lex_alloc(yajl_alloc_funcs * alloc,
+igsyajl_lexer
+igsyajl_lex_alloc(igsyajl_alloc_funcs * alloc,
                unsigned int allowComments, unsigned int validateUTF8)
 {
-    yajl_lexer lxr = (yajl_lexer) YA_MALLOC(alloc, sizeof(struct yajl_lexer_t));
-    memset((void *) lxr, 0, sizeof(struct yajl_lexer_t));
-    lxr->buf = yajl_buf_alloc(alloc);
+    igsyajl_lexer lxr = (igsyajl_lexer) YA_MALLOC(alloc, sizeof(struct igsyajl_lexer_t));
+    memset((void *) lxr, 0, sizeof(struct igsyajl_lexer_t));
+    lxr->buf = igsyajl_buf_alloc(alloc);
     lxr->allowComments = allowComments;
     lxr->validateUTF8 = validateUTF8;
     lxr->alloc = alloc;
@@ -114,9 +114,9 @@ yajl_lex_alloc(yajl_alloc_funcs * alloc,
 }
 
 void
-yajl_lex_free(yajl_lexer lxr)
+igsyajl_lex_free(igsyajl_lexer lxr)
 {
-    yajl_buf_free(lxr->buf);
+    igsyajl_buf_free(lxr->buf);
     YA_FREE(lxr->alloc, lxr);
     return;
 }
@@ -181,29 +181,29 @@ static const char charLookupTable[256] =
 /** process a variable length utf8 encoded codepoint.
  *
  *  returns:
- *    yajl_tok_string - if valid utf8 char was parsed and offset was
+ *    igsyajl_tok_string - if valid utf8 char was parsed and offset was
  *                      advanced
- *    yajl_tok_eof - if end of input was hit before validation could
+ *    igsyajl_tok_eof - if end of input was hit before validation could
  *                   complete
- *    yajl_tok_error - if invalid utf8 was encountered
+ *    igsyajl_tok_error - if invalid utf8 was encountered
  *
  *  NOTE: on error the offset will point to the first char of the
  *  invalid utf8 */
-#define UTF8_CHECK_EOF if (*offset >= jsonTextLen) { return yajl_tok_eof; }
+#define UTF8_CHECK_EOF if (*offset >= jsonTextLen) { return igsyajl_tok_eof; }
 
-static yajl_tok
-yajl_lex_utf8_char(yajl_lexer lexer, const unsigned char * jsonText,
+static igsyajl_tok
+igsyajl_lex_utf8_char(igsyajl_lexer lexer, const unsigned char * jsonText,
                    size_t jsonTextLen, size_t * offset,
                    unsigned char curChar)
 {
     if (curChar <= 0x7f) {
         /* single byte */
-        return yajl_tok_string;
+        return igsyajl_tok_string;
     } else if ((curChar >> 5) == 0x6) {
         /* two byte */
         UTF8_CHECK_EOF;
         curChar = readChar(lexer, jsonText, offset);
-        if ((curChar >> 6) == 0x2) return yajl_tok_string;
+        if ((curChar >> 6) == 0x2) return igsyajl_tok_string;
     } else if ((curChar >> 4) == 0x0e) {
         /* three byte */
         UTF8_CHECK_EOF;
@@ -211,7 +211,7 @@ yajl_lex_utf8_char(yajl_lexer lexer, const unsigned char * jsonText,
         if ((curChar >> 6) == 0x2) {
             UTF8_CHECK_EOF;
             curChar = readChar(lexer, jsonText, offset);
-            if ((curChar >> 6) == 0x2) return yajl_tok_string;
+            if ((curChar >> 6) == 0x2) return igsyajl_tok_string;
         }
     } else if ((curChar >> 3) == 0x1e) {
         /* four byte */
@@ -223,27 +223,27 @@ yajl_lex_utf8_char(yajl_lexer lexer, const unsigned char * jsonText,
             if ((curChar >> 6) == 0x2) {
                 UTF8_CHECK_EOF;
                 curChar = readChar(lexer, jsonText, offset);
-                if ((curChar >> 6) == 0x2) return yajl_tok_string;
+                if ((curChar >> 6) == 0x2) return igsyajl_tok_string;
             }
         }
     }
 
-    return yajl_tok_error;
+    return igsyajl_tok_error;
 }
 
 /* lex a string.  input is the lexer, pointer to beginning of
  * json text, and start of string (offset).
  * a token is returned which has the following meanings:
- * yajl_tok_string: lex of string was successful.  offset points to
+ * igsyajl_tok_string: lex of string was successful.  offset points to
  *                  terminating '"'.
- * yajl_tok_eof: end of text was encountered before we could complete
+ * igsyajl_tok_eof: end of text was encountered before we could complete
  *               the lex.
- * yajl_tok_error: embedded in the string were unallowable chars.  offset
+ * igsyajl_tok_error: embedded in the string were unallowable chars.  offset
  *               points to the offending char
  */
 #define STR_CHECK_EOF \
 if (*offset >= jsonTextLen) { \
-   tok = yajl_tok_eof; \
+   tok = igsyajl_tok_eof; \
    goto finish_string_lex; \
 }
 
@@ -252,7 +252,7 @@ if (*offset >= jsonTextLen) { \
  *  be skipped.
  * (lth) hi world, any thoughts on how to make this routine faster? */
 static size_t
-yajl_string_scan(const unsigned char * buf, size_t len, int utf8check)
+igsyajl_string_scan(const unsigned char * buf, size_t len, int utf8check)
 {
     unsigned char mask = IJC|NFP|(utf8check ? NUC : 0);
     size_t skip = 0;
@@ -264,11 +264,11 @@ yajl_string_scan(const unsigned char * buf, size_t len, int utf8check)
     return skip;
 }
 
-static yajl_tok
-yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
+static igsyajl_tok
+igsyajl_lex_string(igsyajl_lexer lexer, const unsigned char * jsonText,
                 size_t jsonTextLen, size_t * offset)
 {
-    yajl_tok tok = yajl_tok_error;
+    igsyajl_tok tok = igsyajl_tok_error;
     int hasEscapes = 0;
 
     for (;;) {
@@ -280,19 +280,19 @@ yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
             const unsigned char * p;
             size_t len;
 
-            if ((lexer->bufInUse && yajl_buf_len(lexer->buf) &&
-                 lexer->bufOff < yajl_buf_len(lexer->buf)))
+            if ((lexer->bufInUse && igsyajl_buf_len(lexer->buf) &&
+                 lexer->bufOff < igsyajl_buf_len(lexer->buf)))
             {
-                p = ((const unsigned char *) yajl_buf_data(lexer->buf) +
+                p = ((const unsigned char *) igsyajl_buf_data(lexer->buf) +
                      (lexer->bufOff));
-                len = yajl_buf_len(lexer->buf) - lexer->bufOff;
-                lexer->bufOff += yajl_string_scan(p, len, lexer->validateUTF8);
+                len = igsyajl_buf_len(lexer->buf) - lexer->bufOff;
+                lexer->bufOff += igsyajl_string_scan(p, len, lexer->validateUTF8);
             }
             else if (*offset < jsonTextLen)
             {
                 p = jsonText + *offset;
                 len = jsonTextLen - *offset;
-                *offset += yajl_string_scan(p, len, lexer->validateUTF8);
+                *offset += igsyajl_string_scan(p, len, lexer->validateUTF8);
             }
         }
 
@@ -302,7 +302,7 @@ yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
 
         /* quote terminates */
         if (curChar == '"') {
-            tok = yajl_tok_string;
+            tok = igsyajl_tok_string;
             break;
         }
         /* backslash escapes a set of control chars, */
@@ -321,14 +321,14 @@ yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
                     if (!(charLookupTable[curChar] & VHC)) {
                         /* back up to offending char */
                         unreadChar(lexer, offset);
-                        lexer->error = yajl_lex_string_invalid_hex_char;
+                        lexer->error = igsyajl_lex_string_invalid_hex_char;
                         goto finish_string_lex;
                     }
                 }
             } else if (!(charLookupTable[curChar] & VEC)) {
                 /* back up to offending char */
                 unreadChar(lexer, offset);
-                lexer->error = yajl_lex_string_invalid_escaped_char;
+                lexer->error = igsyajl_lex_string_invalid_escaped_char;
                 goto finish_string_lex;
             }
         }
@@ -337,19 +337,19 @@ yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
         else if(charLookupTable[curChar] & IJC) {
             /* back up to offending char */
             unreadChar(lexer, offset);
-            lexer->error = yajl_lex_string_invalid_json_char;
+            lexer->error = igsyajl_lex_string_invalid_json_char;
             goto finish_string_lex;
         }
         /* when in validate UTF8 mode we need to do some extra work */
         else if (lexer->validateUTF8) {
-            yajl_tok t = yajl_lex_utf8_char(lexer, jsonText, jsonTextLen,
+            igsyajl_tok t = igsyajl_lex_utf8_char(lexer, jsonText, jsonTextLen,
                                             offset, curChar);
 
-            if (t == yajl_tok_eof) {
-                tok = yajl_tok_eof;
+            if (t == igsyajl_tok_eof) {
+                tok = igsyajl_tok_eof;
                 goto finish_string_lex;
-            } else if (t == yajl_tok_error) {
-                lexer->error = yajl_lex_string_invalid_utf8;
+            } else if (t == igsyajl_tok_error) {
+                lexer->error = igsyajl_lex_string_invalid_utf8;
                 goto finish_string_lex;
             }
         }
@@ -358,17 +358,17 @@ yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
   finish_string_lex:
     /* tell our buddy, the parser, wether he needs to process this string
      * again */
-    if (hasEscapes && tok == yajl_tok_string) {
-        tok = yajl_tok_string_with_escapes;
+    if (hasEscapes && tok == igsyajl_tok_string) {
+        tok = igsyajl_tok_string_with_escapes;
     }
 
     return tok;
 }
 
-#define RETURN_IF_EOF if (*offset >= jsonTextLen) return yajl_tok_eof;
+#define RETURN_IF_EOF if (*offset >= jsonTextLen) return igsyajl_tok_eof;
 
-static yajl_tok
-yajl_lex_number(yajl_lexer lexer, const unsigned char * jsonText,
+static igsyajl_tok
+igsyajl_lex_number(igsyajl_lexer lexer, const unsigned char * jsonText,
                 size_t jsonTextLen, size_t * offset)
 {
     /** XXX: numbers are the only entities in json that we must lex
@@ -377,7 +377,7 @@ yajl_lex_number(yajl_lexer lexer, const unsigned char * jsonText,
 
     unsigned char c;
 
-    yajl_tok tok = yajl_tok_integer;
+    igsyajl_tok tok = igsyajl_tok_integer;
 
     RETURN_IF_EOF;
     c = readChar(lexer, jsonText, offset);
@@ -399,8 +399,8 @@ yajl_lex_number(yajl_lexer lexer, const unsigned char * jsonText,
         } while (c >= '0' && c <= '9');
     } else {
         unreadChar(lexer, offset);
-        lexer->error = yajl_lex_missing_integer_after_minus;
-        return yajl_tok_error;
+        lexer->error = igsyajl_lex_missing_integer_after_minus;
+        return igsyajl_tok_error;
     }
 
     /* optional fraction (indicates this is floating point) */
@@ -418,10 +418,10 @@ yajl_lex_number(yajl_lexer lexer, const unsigned char * jsonText,
 
         if (!numRd) {
             unreadChar(lexer, offset);
-            lexer->error = yajl_lex_missing_integer_after_decimal;
-            return yajl_tok_error;
+            lexer->error = igsyajl_lex_missing_integer_after_decimal;
+            return igsyajl_tok_error;
         }
-        tok = yajl_tok_double;
+        tok = igsyajl_tok_double;
     }
 
     /* optional exponent (indicates this is floating point) */
@@ -442,10 +442,10 @@ yajl_lex_number(yajl_lexer lexer, const unsigned char * jsonText,
             } while (c >= '0' && c <= '9');
         } else {
             unreadChar(lexer, offset);
-            lexer->error = yajl_lex_missing_integer_after_exponent;
-            return yajl_tok_error;
+            lexer->error = igsyajl_lex_missing_integer_after_exponent;
+            return igsyajl_tok_error;
         }
-        tok = yajl_tok_double;
+        tok = igsyajl_tok_double;
     }
 
     /* we always go "one too far" */
@@ -454,13 +454,13 @@ yajl_lex_number(yajl_lexer lexer, const unsigned char * jsonText,
     return tok;
 }
 
-static yajl_tok
-yajl_lex_comment(yajl_lexer lexer, const unsigned char * jsonText,
+static igsyajl_tok
+igsyajl_lex_comment(igsyajl_lexer lexer, const unsigned char * jsonText,
                  size_t jsonTextLen, size_t * offset)
 {
     unsigned char c;
 
-    yajl_tok tok = yajl_tok_comment;
+    igsyajl_tok tok = igsyajl_tok_comment;
 
     RETURN_IF_EOF;
     c = readChar(lexer, jsonText, offset);
@@ -488,19 +488,19 @@ yajl_lex_comment(yajl_lexer lexer, const unsigned char * jsonText,
             }
         }
     } else {
-        lexer->error = yajl_lex_invalid_char;
-        tok = yajl_tok_error;
+        lexer->error = igsyajl_lex_invalid_char;
+        tok = igsyajl_tok_error;
     }
 
     return tok;
 }
 
-yajl_tok
-yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
+igsyajl_tok
+igsyajl_lex_lex(igsyajl_lexer lexer, const unsigned char * jsonText,
              size_t jsonTextLen, size_t * offset,
              const unsigned char ** outBuf, size_t * outLen)
 {
-    yajl_tok tok = yajl_tok_error;
+    igsyajl_tok tok = igsyajl_tok_error;
     unsigned char c;
     size_t startOffset = *offset;
 
@@ -511,7 +511,7 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
         assert(*offset <= jsonTextLen);
 
         if (*offset >= jsonTextLen) {
-            tok = yajl_tok_eof;
+            tok = igsyajl_tok_eof;
             goto lexed;
         }
 
@@ -519,22 +519,22 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
 
         switch (c) {
             case '{':
-                tok = yajl_tok_left_bracket;
+                tok = igsyajl_tok_left_bracket;
                 goto lexed;
             case '}':
-                tok = yajl_tok_right_bracket;
+                tok = igsyajl_tok_right_bracket;
                 goto lexed;
             case '[':
-                tok = yajl_tok_left_brace;
+                tok = igsyajl_tok_left_brace;
                 goto lexed;
             case ']':
-                tok = yajl_tok_right_brace;
+                tok = igsyajl_tok_right_brace;
                 goto lexed;
             case ',':
-                tok = yajl_tok_comma;
+                tok = igsyajl_tok_comma;
                 goto lexed;
             case ':':
-                tok = yajl_tok_colon;
+                tok = igsyajl_tok_colon;
                 goto lexed;
             case '\t': case '\n': case '\v': case '\f': case '\r': case ' ':
                 startOffset++;
@@ -543,58 +543,58 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
                 const char * want = "rue";
                 do {
                     if (*offset >= jsonTextLen) {
-                        tok = yajl_tok_eof;
+                        tok = igsyajl_tok_eof;
                         goto lexed;
                     }
                     c = readChar(lexer, jsonText, offset);
                     if (c != *want) {
                         unreadChar(lexer, offset);
-                        lexer->error = yajl_lex_invalid_string;
-                        tok = yajl_tok_error;
+                        lexer->error = igsyajl_lex_invalid_string;
+                        tok = igsyajl_tok_error;
                         goto lexed;
                     }
                 } while (*(++want));
-                tok = yajl_tok_bool;
+                tok = igsyajl_tok_bool;
                 goto lexed;
             }
             case 'f': {
                 const char * want = "alse";
                 do {
                     if (*offset >= jsonTextLen) {
-                        tok = yajl_tok_eof;
+                        tok = igsyajl_tok_eof;
                         goto lexed;
                     }
                     c = readChar(lexer, jsonText, offset);
                     if (c != *want) {
                         unreadChar(lexer, offset);
-                        lexer->error = yajl_lex_invalid_string;
-                        tok = yajl_tok_error;
+                        lexer->error = igsyajl_lex_invalid_string;
+                        tok = igsyajl_tok_error;
                         goto lexed;
                     }
                 } while (*(++want));
-                tok = yajl_tok_bool;
+                tok = igsyajl_tok_bool;
                 goto lexed;
             }
             case 'n': {
                 const char * want = "ull";
                 do {
                     if (*offset >= jsonTextLen) {
-                        tok = yajl_tok_eof;
+                        tok = igsyajl_tok_eof;
                         goto lexed;
                     }
                     c = readChar(lexer, jsonText, offset);
                     if (c != *want) {
                         unreadChar(lexer, offset);
-                        lexer->error = yajl_lex_invalid_string;
-                        tok = yajl_tok_error;
+                        lexer->error = igsyajl_lex_invalid_string;
+                        tok = igsyajl_tok_error;
                         goto lexed;
                     }
                 } while (*(++want));
-                tok = yajl_tok_null;
+                tok = igsyajl_tok_null;
                 goto lexed;
             }
             case '"': {
-                tok = yajl_lex_string(lexer, (const unsigned char *) jsonText,
+                tok = igsyajl_lex_string(lexer, (const unsigned char *) jsonText,
                                       jsonTextLen, offset);
                 goto lexed;
             }
@@ -603,7 +603,7 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
             case '5': case '6': case '7': case '8': case '9': {
                 /* integer parsing wants to start from the beginning */
                 unreadChar(lexer, offset);
-                tok = yajl_lex_number(lexer, (const unsigned char *) jsonText,
+                tok = igsyajl_lex_number(lexer, (const unsigned char *) jsonText,
                                       jsonTextLen, offset);
                 goto lexed;
             }
@@ -612,8 +612,8 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
                  * it's an error. */
                 if (!lexer->allowComments) {
                     unreadChar(lexer, offset);
-                    lexer->error = yajl_lex_unallowed_comment;
-                    tok = yajl_tok_error;
+                    lexer->error = igsyajl_lex_unallowed_comment;
+                    tok = igsyajl_tok_error;
                     goto lexed;
                 }
                 /* if comments are enabled, then we should try to lex
@@ -622,13 +622,13 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
                  * - malformed comment opening (slash not followed by
                  *   '*' or '/') (tok_error)
                  * - eof hit. (tok_eof) */
-                tok = yajl_lex_comment(lexer, (const unsigned char *) jsonText,
+                tok = igsyajl_lex_comment(lexer, (const unsigned char *) jsonText,
                                        jsonTextLen, offset);
-                if (tok == yajl_tok_comment) {
+                if (tok == igsyajl_tok_comment) {
                     /* "error" is silly, but that's the initial
                      * state of tok.  guilty until proven innocent. */
-                    tok = yajl_tok_error;
-                    yajl_buf_clear(lexer->buf);
+                    tok = igsyajl_tok_error;
+                    igsyajl_buf_clear(lexer->buf);
                     lexer->bufInUse = 0;
                     startOffset = *offset;
                     break;
@@ -636,8 +636,8 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
                 /* hit error or eof, bail */
                 goto lexed;
             default:
-                lexer->error = yajl_lex_invalid_char;
-                tok = yajl_tok_error;
+                lexer->error = igsyajl_lex_invalid_char;
+                tok = igsyajl_tok_error;
                 goto lexed;
         }
     }
@@ -646,24 +646,24 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
   lexed:
     /* need to append to buffer if the buffer is in use or
      * if it's an EOF token */
-    if (tok == yajl_tok_eof || lexer->bufInUse) {
-        if (!lexer->bufInUse) yajl_buf_clear(lexer->buf);
+    if (tok == igsyajl_tok_eof || lexer->bufInUse) {
+        if (!lexer->bufInUse) igsyajl_buf_clear(lexer->buf);
         lexer->bufInUse = 1;
-        yajl_buf_append(lexer->buf, jsonText + startOffset, *offset - startOffset);
+        igsyajl_buf_append(lexer->buf, jsonText + startOffset, *offset - startOffset);
         lexer->bufOff = 0;
 
-        if (tok != yajl_tok_eof) {
-            *outBuf = yajl_buf_data(lexer->buf);
-            *outLen = yajl_buf_len(lexer->buf);
+        if (tok != igsyajl_tok_eof) {
+            *outBuf = igsyajl_buf_data(lexer->buf);
+            *outLen = igsyajl_buf_len(lexer->buf);
             lexer->bufInUse = 0;
         }
-    } else if (tok != yajl_tok_error) {
+    } else if (tok != igsyajl_tok_error) {
         *outBuf = jsonText + startOffset;
         *outLen = *offset - startOffset;
     }
 
     /* special case for strings. skip the quotes. */
-    if (tok == yajl_tok_string || tok == yajl_tok_string_with_escapes)
+    if (tok == igsyajl_tok_string || tok == igsyajl_tok_string_with_escapes)
     {
         assert(*outLen >= 2);
         (*outBuf)++;
@@ -671,11 +671,11 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
     }
 
 
-#ifdef YAJL_LEXER_DEBUG
-    if (tok == yajl_tok_error) {
+#ifdef IGSYAJL_LEXER_DEBUG
+    if (tok == igsyajl_tok_error) {
         printf("lexical error: %s\n",
-               yajl_lex_error_to_string(yajl_lex_get_error(lexer)));
-    } else if (tok == yajl_tok_eof) {
+               igsyajl_lex_error_to_string(igsyajl_lex_get_error(lexer)));
+    } else if (tok == igsyajl_tok_eof) {
         printf("EOF hit\n");
     } else {
         printf("lexed %s: '", tokToStr(tok));
@@ -688,34 +688,34 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
 }
 
 const char *
-yajl_lex_error_to_string(yajl_lex_error error)
+igsyajl_lex_error_to_string(igsyajl_lex_error error)
 {
     switch (error) {
-        case yajl_lex_e_ok:
+        case igsyajl_lex_e_ok:
             return "ok, no error";
-        case yajl_lex_string_invalid_utf8:
+        case igsyajl_lex_string_invalid_utf8:
             return "invalid bytes in UTF8 string.";
-        case yajl_lex_string_invalid_escaped_char:
+        case igsyajl_lex_string_invalid_escaped_char:
             return "inside a string, '\\' occurs before a character "
                    "which it may not.";
-        case yajl_lex_string_invalid_json_char:
+        case igsyajl_lex_string_invalid_json_char:
             return "invalid character inside string.";
-        case yajl_lex_string_invalid_hex_char:
+        case igsyajl_lex_string_invalid_hex_char:
             return "invalid (non-hex) character occurs after '\\u' inside "
                    "string.";
-        case yajl_lex_invalid_char:
+        case igsyajl_lex_invalid_char:
             return "invalid char in json text.";
-        case yajl_lex_invalid_string:
+        case igsyajl_lex_invalid_string:
             return "invalid string in json text.";
-        case yajl_lex_missing_integer_after_exponent:
+        case igsyajl_lex_missing_integer_after_exponent:
             return "malformed number, a digit is required after the exponent.";
-        case yajl_lex_missing_integer_after_decimal:
+        case igsyajl_lex_missing_integer_after_decimal:
             return "malformed number, a digit is required after the "
                    "decimal point.";
-        case yajl_lex_missing_integer_after_minus:
+        case igsyajl_lex_missing_integer_after_minus:
             return "malformed number, a digit is required after the "
                    "minus sign.";
-        case yajl_lex_unallowed_comment:
+        case igsyajl_lex_unallowed_comment:
             return "probable comment found in input text, comments are "
                    "not enabled.";
     }
@@ -724,40 +724,40 @@ yajl_lex_error_to_string(yajl_lex_error error)
 
 
 /** allows access to more specific information about the lexical
- *  error when yajl_lex_lex returns yajl_tok_error. */
-yajl_lex_error
-yajl_lex_get_error(yajl_lexer lexer)
+ *  error when igsyajl_lex_lex returns igsyajl_tok_error. */
+igsyajl_lex_error
+igsyajl_lex_get_error(igsyajl_lexer lexer)
 {
-    if (lexer == NULL) return (yajl_lex_error) -1;
+    if (lexer == NULL) return (igsyajl_lex_error) -1;
     return lexer->error;
 }
 
-size_t yajl_lex_current_line(yajl_lexer lexer)
+size_t igsyajl_lex_current_line(igsyajl_lexer lexer)
 {
     return lexer->lineOff;
 }
 
-size_t yajl_lex_current_char(yajl_lexer lexer)
+size_t igsyajl_lex_current_char(igsyajl_lexer lexer)
 {
     return lexer->charOff;
 }
 
-yajl_tok yajl_lex_peek(yajl_lexer lexer, const unsigned char * jsonText,
+igsyajl_tok igsyajl_lex_peek(igsyajl_lexer lexer, const unsigned char * jsonText,
                        size_t jsonTextLen, size_t offset)
 {
     const unsigned char * outBuf;
     size_t outLen;
-    size_t bufLen = yajl_buf_len(lexer->buf);
+    size_t bufLen = igsyajl_buf_len(lexer->buf);
     size_t bufOff = lexer->bufOff;
     unsigned int bufInUse = lexer->bufInUse;
-    yajl_tok tok;
+    igsyajl_tok tok;
 
-    tok = yajl_lex_lex(lexer, jsonText, jsonTextLen, &offset,
+    tok = igsyajl_lex_lex(lexer, jsonText, jsonTextLen, &offset,
                        &outBuf, &outLen);
 
     lexer->bufOff = bufOff;
     lexer->bufInUse = bufInUse;
-    yajl_buf_truncate(lexer->buf, bufLen);
+    igsyajl_buf_truncate(lexer->buf, bufLen);
 
     return tok;
 }

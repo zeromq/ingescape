@@ -23,50 +23,50 @@
 extern "C" {
 #endif
 
-#define YAJL_MAX_DEPTH 128
+#define IGSYAJL_MAX_DEPTH 128
 
 /* msft dll export gunk.  To build a DLL on windows, you
- * must define WIN32, YAJL_SHARED, and YAJL_BUILD.  To use a shared
- * DLL, you must define YAJL_SHARED and WIN32 */
-#if (defined(_WIN32) || defined(WIN32)) && defined(YAJL_SHARED)
-#  ifdef YAJL_BUILD
-#    define YAJL_API __declspec(dllexport)
+ * must define WIN32, IGSYAJL_SHARED, and IGSYAJL_BUILD.  To use a shared
+ * DLL, you must define IGSYAJL_SHARED and WIN32 */
+#if (defined(_WIN32) || defined(WIN32)) && defined(IGSYAJL_SHARED)
+#  ifdef IGSYAJL_BUILD
+#    define IGSYAJL_API __declspec(dllexport)
 #  else
-#    define YAJL_API __declspec(dllimport)
+#    define IGSYAJL_API __declspec(dllimport)
 #  endif
 #else
 #  if defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__) >= 303
-#    define YAJL_API __attribute__ ((visibility("default")))
+#    define IGSYAJL_API __attribute__ ((visibility("default")))
 #  else
-#    define YAJL_API
+#    define IGSYAJL_API
 #  endif
 #endif
 
 /** pointer to a malloc function, supporting client overriding memory
  *  allocation routines */
-typedef void * (*yajl_malloc_func)(void *ctx, size_t sz);
+typedef void * (*igsyajl_malloc_func)(void *ctx, size_t sz);
 
 /** pointer to a free function, supporting client overriding memory
  *  allocation routines */
-typedef void (*yajl_free_func)(void *ctx, void * ptr);
+typedef void (*igsyajl_free_func)(void *ctx, void * ptr);
 
 /** pointer to a realloc function which can resize an allocation. */
-typedef void * (*yajl_realloc_func)(void *ctx, void * ptr, size_t sz);
+typedef void * (*igsyajl_realloc_func)(void *ctx, void * ptr, size_t sz);
 
-/** A structure which can be passed to yajl_*_alloc routines to allow the
+/** A structure which can be passed to igsyajl_*_alloc routines to allow the
  *  client to specify memory allocation functions to be used. */
 typedef struct
 {
     /** pointer to a function that can allocate uninitialized memory */
-    yajl_malloc_func malloc;
+    igsyajl_malloc_func malloc;
     /** pointer to a function that can resize memory allocations */
-    yajl_realloc_func realloc;
+    igsyajl_realloc_func realloc;
     /** pointer to a function that can free memory allocated using
      *  reallocFunction or mallocFunction */
-    yajl_free_func free;
+    igsyajl_free_func free;
     /** a context pointer that will be passed to above allocation routines */
     void * ctx;
-} yajl_alloc_funcs;
+} igsyajl_alloc_funcs;
 
 #ifdef __cplusplus
 }
