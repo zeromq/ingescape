@@ -242,19 +242,6 @@ if (APPLE)
     )
 
     if (CMAKE_BUILD_TYPE STREQUAL "Release")
-        # Fix yajl library, because it's installed
-        get_filename_component(_YAJL_FILE_NAME ${YAJL_LIBRARIES} NAME)
-        add_custom_command(TARGET ${PROJECT_NAME}
-            POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${YAJL_LIBRARIES}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/"
-            COMMENT "Deploying Yajl ..."
-        )
-        add_custom_command(
-            TARGET ${PROJECT_NAME}
-            POST_BUILD
-            COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change "@rpath/libyajl.0.dylib" "@executable_path/../Frameworks/${_YAJL_FILE_NAME}" $<TARGET_FILE:${PROJECT_NAME}>
-        )
-
         find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
 
         # NB: macdeployqt only runs qmlimportscanner correctly when run from Qt bin directory
@@ -335,7 +322,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
-        install_ingescape_dependencies(YAJL_LIBRARIES YAJL_INCLUDE_DIRS IS_EDITOR)
     elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
         set(CPACK_GENERATOR "DragNDrop")
         set(CPACK_SOURCE_GENERATOR "TGZ")

@@ -265,7 +265,7 @@ mac {
     librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB}
     librariesToCopy.path = Contents/Frameworks
     QMAKE_BUNDLE_DATA += librariesToCopy
-    # NB: libzyre, libzmq, libczmq, libsodium, libyajl will be copied by macdeployqt
+    # NB: libzyre, libzmq, libczmq, libsodium, will be copied by macdeployqt
     #     because they are installed in a standard directory (/usr/local/lib)
 
 
