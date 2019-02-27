@@ -307,8 +307,8 @@ lib-deploy-windows-release-x64:
   tags:
     - windows
   script:
-    - copy src\\include\\*.h C:\\Users\\admin\\dev\\Builds\\include\\ingescape\\
-    - copy build\\ReleaseX64\\Release\\* C:\\Users\\admin\\dev\\Builds\\Release\\x64\\
+    - copy src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
+    - copy build\ReleaseX64\Release\* C:\Users\admin\dev\Builds\Release\x64\
   dependencies:
     - lib-windows-release-x64
 
@@ -319,7 +319,7 @@ lib-deploy-windows-release-x86:
   tags:
     - windows
   script:
-    - copy src\\include\\*.h C:\\Users\\admin\\dev\\Builds\\include\\ingescape\\
-    - copy build\\ReleaseX86\\Release\\* C:\\Users\\admin\\dev\\Builds\\Release\\x86\\
+    - copy src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
+    - copy build\ReleaseX86\Release\* C:\Users\admin\dev\Builds\Release\x86\
   dependencies:
     - lib-windows-release-x86
