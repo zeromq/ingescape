@@ -1,7 +1,0 @@
-%_topdir      %(echo $HOME)/rpmbuild
-%_smp_mflags %([ -z "$RPM_BUILD_NCPUS" ] \\\
-       && RPM_BUILD_NCPUS="`/usr/bin/getconf _NPROCESSORS_ONLN`"; \\\
-       if [ "$RPM_BUILD_NCPUS" -gt 16 ]; then echo "-j16"; \\\
-       elif [ "$RPM_BUILD_NCPUS" -gt 3 ]; then echo "-j$RPM_BUILD_NCPUS"; \\\
-       else echo "-j3"; fi)
-%__arch_install_post   /usr/lib/rpm/check-rpaths   /usr/lib/rpm/check-buildroot

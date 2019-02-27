@@ -12,17 +12,31 @@ SOURCES += \
     $$PWD/../src/parser.c \
     $$PWD/../src/admin.c \
     $$PWD/../src/bus.c \
-    $$PWD/../src/token.c
+    $$PWD/../src/token.c \
+    $$PWD/../dependencies/yajl/src/yajl_alloc.c \
+    $$PWD/../dependencies/yajl/src/yajl_buf.c \
+    $$PWD/../dependencies/yajl/src/yajl_encode.c \
+    $$PWD/../dependencies/yajl/src/yajl_gen.c \
+    $$PWD/../dependencies/yajl/src/yajl_lex.c \
+    $$PWD/../dependencies/yajl/src/yajl_parser.c \
+    $$PWD/../dependencies/yajl/src/yajl_tree.c \
+    $$PWD/../dependencies/yajl/src/yajl_version.c \
+    $$PWD/../dependencies/yajl/src/yajl.c
 
 HEADERS += \
     $$PWD/../src/include/uthash/uthash.h \
     $$PWD/../src/include/ingescape.h \
     $$PWD/../src/include/ingescape_advanced.h \
-    $$PWD/../src/include/ingescape_private.h
+    $$PWD/../src/include/ingescape_private.h \
+    $$PWD/../dependencies/yajl/src/yajl_alloc.h\
+    $$PWD/../dependencies/yajl/src/yajl_buf.h \
+    $$PWD/../dependencies/yajl/src/yajl_bytestack.h \
+    $$PWD/../dependencies/yajl/src/yajl_encode.h \
+    $$PWD/../dependencies/yajl/src/yajl_lex.h \
+    $$PWD/../dependencies/yajl/src/yajl_parser.h
 
-INCLUDEPATH += $$PWD/../src/include
-
-
+INCLUDEPATH += $$PWD/../src/include \
+               $$PWD/../dependencies/yajl/src/api
 
 
 #####################################################################
@@ -32,7 +46,7 @@ INCLUDEPATH += $$PWD/../src/include
 #####################################################################
 
 
-#add librairies zyre, czmq, zmq + yajl and configurate only for VS 2015 x86 (32 bits)
+#add librairies zyre, czmq, zmq and configurate only for VS 2015 x86 (32 bits)
 win32:{
     message("Compilation win32 scope ...")
 
@@ -52,21 +66,18 @@ win32:{
     HEADERS += $$PWD/../dependencies/windows/unix/unixfunctions.h
 
     #Add librairies
-    LIBS += -L$$libs_path -llibzyre -llibczmq -lyajl
+    LIBS += -L$$libs_path -llibzyre -llibczmq
 
     #To get the Ip address into the network.c
     LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
 
     ##Add headers from dependencies
     zyre_include_path = $$PWD/../dependencies/windows/headers/zyre_suite
-    yajl_include_path = $$PWD/../dependencies/windows/headers/
 
     INCLUDEPATH += $$zyre_include_path \
-                   $$yajl_include_path \
                    $$PWD/../dependencies/windows/unix \
 
-    DEPENDPATH += $$zyre_include_path \
-                  $$yajl_include_path \
+    DEPENDPATH += $$zyre_include_path
 
     #include the pri to copy files to C:\
     equals(TEMPLATE, "lib"){
