@@ -873,6 +873,34 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }else if (strlen("OUTPUTS") == strlen(message) && strncmp (message, "OUTPUTS", strlen("OUTPUTS")) == 0){
                     handleSubscriptionMessage(msgDuplicate, peer);
                     igs_debug("privately received output values from %s (%s)", name, peer);
+                }else if (strlen("GET_CURRENT_INPUTS") == strlen(message) && strncmp (message, "GET_CURRENT_INPUTS", strlen("GET_CURRENT_INPUTS")) == 0){
+                    zmsg_t *resp = zmsg_new();
+                    agent_iop_t *inputs = igs_internal_definition->inputs_table;
+                    agent_iop_t *current = NULL;
+                    zmsg_addstr(resp, "CURRENT_INPUTS");
+                    model_readWriteLock();
+                    for (current = inputs; current != NULL; current = current->hh.next){
+                        zmsg_addstr(resp, current->name);
+                        zmsg_addmem(resp, &current->type, sizeof(iop_t));
+                        zmsg_addmem(resp, &current->value, current->valueSize);
+                    }
+                    model_readWriteUnlock();
+                    zyre_whisper(node, peer, &resp);
+                    igs_debug("send input values to %s", peer);
+                }else if (strlen("GET_CURRENT_PARAMETERS") == strlen(message) && strncmp (message, "GET_CURRENT_PARAMETERS", strlen("GET_CURRENT_PARAMETERS")) == 0){
+                    zmsg_t *resp = zmsg_new();
+                    agent_iop_t *inputs = igs_internal_definition->params_table;
+                    agent_iop_t *current = NULL;
+                    zmsg_addstr(resp, "CURRENT_PARAMETERS");
+                    model_readWriteLock();
+                    for (current = inputs; current != NULL; current = current->hh.next){
+                        zmsg_addstr(resp, current->name);
+                        zmsg_addmem(resp, &current->type, sizeof(iop_t));
+                        zmsg_addmem(resp, &current->value, current->valueSize);
+                    }
+                    model_readWriteUnlock();
+                    zyre_whisper(node, peer, &resp);
+                    igs_debug("send parameters values to %s", peer);
                 }else if (strlen("STOP") == strlen(message) && strncmp (message, "STOP", strlen("STOP")) == 0){
                     free(message);
                     forcedStop = true;
