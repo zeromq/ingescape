@@ -142,8 +142,7 @@
 				973D1B6F22268EB100D363BF /* yajl_version.c */,
 				973D1B7122268EB100D363BF /* yajl.c */,
 			);
-			name = src;
-			path = "New Group";
+			path = src;
 			sourceTree = "<group>";
 		};
 		973D1BB42226935400D363BF /* api */ = {
