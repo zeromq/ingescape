@@ -207,9 +207,9 @@
 			productReference = 9716CA461EA21C6A004F0AC0 /* libyajl.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		9762EDB11EAE530B002062A1 /* yajl-macos */ = {
+		9762EDB11EAE530B002062A1 /* yajl-xcode */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9762EDB71EAE530B002062A1 /* Build configuration list for PBXNativeTarget "yajl-macos" */;
+			buildConfigurationList = 9762EDB71EAE530B002062A1 /* Build configuration list for PBXNativeTarget "yajl-xcode" */;
 			buildPhases = (
 				9762EDAD1EAE530B002062A1 /* Sources */,
 				9762EDAE1EAE530B002062A1 /* Frameworks */,
@@ -220,8 +220,8 @@
 			);
 			dependencies = (
 			);
-			name = "yajl-macos";
-			productName = "yajl-macos";
+			name = "yajl-xcode";
+			productName = "yajl-xcode";
 			productReference = 9762EDB21EAE530B002062A1 /* yajl.framework */;
 			productType = "com.apple.product-type.framework";
 		};
@@ -259,7 +259,7 @@
 			projectRoot = "";
 			targets = (
 				9716CA451EA21C6A004F0AC0 /* yajl-ios */,
-				9762EDB11EAE530B002062A1 /* yajl-macos */,
+				9762EDB11EAE530B002062A1 /* yajl-xcode */,
 			);
 		};
 /* End PBXProject section */
@@ -455,7 +455,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/src";
-				INFOPLIST_FILE = "yajl-macos/Info.plist";
+				INFOPLIST_FILE = "yajl-xcode/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
@@ -481,7 +481,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/src";
-				INFOPLIST_FILE = "yajl-macos/Info.plist";
+				INFOPLIST_FILE = "yajl-xcode/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
@@ -515,7 +515,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9762EDB71EAE530B002062A1 /* Build configuration list for PBXNativeTarget "yajl-macos" */ = {
+		9762EDB71EAE530B002062A1 /* Build configuration list for PBXNativeTarget "yajl-xcode" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9762EDB81EAE530B002062A1 /* Debug */,
