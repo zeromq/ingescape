@@ -7,6 +7,8 @@ banner = "img/banners/first_full_agent.png"
 genre = "article"
 +++
 
+**The source code for this first full agent is [available for download](/code/firstFullAgent.zip).**
+
 ***ingeScape*** is designed to support both industrial and experimental environments. [Your first ingeScape agent](/blog/your_first_agent) illustrates the basics for both worlds. In this article, we provide a more advanced example that can serve as a boiler plate for any real-world agent to be used with command lines in a terminal on Windows, Linux or macos and developed in C with or without any other dependency.
 
 This agent can receive parameters when started and commands through the command line when running. It is composed of a single  *main.c* file.
@@ -389,7 +391,7 @@ Here is how to configure and use logs:
 {{< / highlight >}}
 
 ### Compile your agent
-You can download the source code for this agent [here](/code/firstFullAgent.zip).
+You can download the source code for this agent **[HERE](/code/firstFullAgent.zip)**.
 
 With this source code, you will be able to compile the agent for:
 
@@ -408,7 +410,7 @@ In all cases, as a prerequisite, you need to have the ingeScape library installe
 
 With Microsoft Windows, depending on your system, you will be able to choose between 32-bit and 64-bit architectures.
 
-#### cmake
+#### cmake and Makefile
 In a terminal, once the source code has been extracted, just go inside the extracted folder and type the following commands:
 
 {{< highlight shell "linenos=inline" >}}
@@ -419,6 +421,7 @@ cmake ..
 make
 ./firstFullAgent --help
 ./firstFullAgent --verbose --interactiveloop
+./firstFullAgent --verbose --interactiveloop --device #add device name here
 /quit
 {{< / highlight >}}
 
@@ -446,7 +449,7 @@ If this happens, you need to edit the Run properties for your Qt project by edit
 #### Xcode
 Xcode needs to be installed properly on your system. It can be downloaded from the App Store. Then, once the source code has been extracted:
 
-- go inside the builds/macos subfolder and open *firstFullAgent.xcodeproj* with Xcode
+- go inside the builds/xcode subfolder and open *firstFullAgent.xcodeproj* with Xcode
 - build and run the agent
 
 #### Visual Studio  2017
@@ -454,7 +457,8 @@ Visual Studio 2017 needs to be installed properly on your system. It can be down
 
  Then, once the source code has been extracted:
  
-- go inside the builds/windows/project subfolder and open *firstFullAgent.sln* with Visual Studio
+- go inside the builds/visualstudio subfolder and open *firstFullAgent.sln* with Visual Studio
 - pick your platform (32 or 64-bit) and mode (Debug or Release)
 - build and run the agent
+- adjust the code to use a proper network device on your computer
 
