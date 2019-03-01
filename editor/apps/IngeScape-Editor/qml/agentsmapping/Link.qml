@@ -79,7 +79,8 @@ I2CubicBezierCurve {
     // if the inputAgent and outputAgent are reduced : global type of its outputs
     stroke: if (rootItem._isBrin && linkOutput && viewModel && viewModel.outputAgent)
             {
-                if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingActivated) {
+                //if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingActivated) {
+                if (linkOutput.isPublishedNewValue) {
                     IngeScapeTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, true);
                 }
                 else {
@@ -91,7 +92,8 @@ I2CubicBezierCurve {
                 // if the inputAgent is not reduced : type of its output
                 if (linkOutput && outputModel)
                 {
-                    if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingActivated) {
+                    //if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingActivated) {
+                    if (linkOutput.isPublishedNewValue) {
                         IngeScapeTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, true);
                     }
                     else {
