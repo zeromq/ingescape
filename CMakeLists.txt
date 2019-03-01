@@ -329,8 +329,14 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
       #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
   else ()
       set(CPACK_GENERATOR "DEB;RPM;ZIP")
+
+      # Debian 10 (buster/testing)
+      #TODO Debian dependencies need to be different between stretch and buster
       #set(CPACK_DEBIAN_PACKAGE_DEPENDS "libczmq4, libsodium23 (>= 0.6.0), libzmq5, libzyre2")
-      set(CPACK_RPM_PACKAGE_REQUIRES "libczmq4, libsodium23 >= 0.6.0, libzmq5, libzyre2")
+
+      # Debian 9 (stretch/stable)
+      set(CPACK_DEBIAN_PACKAGE_DEPENDS "libczmq4, libsodium18 (>= 0.6.0), libzmq5, libzyre2")
+      set(CPACK_RPM_PACKAGE_REQUIRES "libczmq4, libsodium18 >= 0.6.0, libzmq5, libzyre2")
       #set(CPACK_SOURCE_GENERATOR "TGZ")
       #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
   endif ()
