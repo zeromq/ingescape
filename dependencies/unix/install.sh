@@ -24,7 +24,13 @@ function discover_os {
         # freedesktop.org and systemd
         . /etc/os-release
         OS=$NAME
-        VER=$VERSION_ID
+        # As of March 1st 2019, there is no VERSION_ID in os-release for buster (testing). The following condition checks that
+        if [[ -z ${VERSION_ID+x} ]]
+        then
+            VER="10"
+        else
+            VER=$VERSION_ID
+        fi
     elif type lsb_release >/dev/null 2>&1; then
         # linuxbase.org
         OS=$(lsb_release -si)
@@ -71,15 +77,18 @@ function discover_arch {
 }
 
 function install_libsodium {
-    if [ "$OS"=~"*Debian*" ]
+    if [[ "$OS" =~ "Debian" ]]
     then
-        if [ "$VER"=~"*9*" ]
+        if [[ "$VER" =~ "9" ]]
         then
             apt install -y libsodium18
-        elif [ "$VER"=~"*10*" ]
+        elif [[ "$VER" =~ "10" ]]
         then
             apt install -y libsodium23
         fi
+    elif [[ "$OS" =~ "CentOS" ]]
+    then
+        yum install -y libsodium18
     else
         git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
         cd libsodium
@@ -90,9 +99,12 @@ function install_libsodium {
 }
 
 function install_libzmq {
-    if [ "$OS"=~"*Debian*" ]
+    if [[ "$OS" =~ "Debian" ]]
     then
         apt install -y libzmq5
+    elif [[ "$OS" =~ "CentOS" ]]
+    then
+        yum install -y libzmq5
     else
         git clone git://github.com/zeromq/libzmq.git
         cd libzmq
@@ -101,35 +113,41 @@ function install_libzmq {
         # security implementation (recommended for development)
         ./configure
         make check
-        _check_sudo make install
+        _check_sudo "make install"
         _check_sudo ldconfig
         cd ..
     fi
 }
 
 function install_czmq {
-    if [ "$OS"=~"*Debian*" ]
+    if [[ "$OS" =~ "Debian" ]]
     then
         apt install -y czmq
+    elif [[ "$OS" =~ "CentOS" ]]
+    then
+        yum install -y czmq
     else
         git clone git://github.com/zeromq/czmq.git
         cd czmq
         ./autogen.sh && ./configure && make check
-        _check_sudo make install
+        _check_sudo "make install"
         _check_sudo ldconfig
         cd ..
     fi
 }
 
 function install_zyre {
-    if [ "$OS"=~"*Debian*" ]
+    if [[ "$OS" =~ "Debian" ]]
     then
         apt install -y zyre
+    elif [[ "$OS" =~ "CentOS" ]]
+    then
+        yum install -y zyre
     else
         git clone git://github.com/zeromq/zyre.git
         cd zyre
         ./autogen.sh && ./configure && make check
-        _check_sudo make install
+        _check_sudo "make install"
         _check_sudo ldconfig
         cd ..
     fi
@@ -142,8 +160,8 @@ function setup_repos {
             then
                 echo "ZeroMQ package repository already present in /etc/apt/sources.list"
             else
-                case $VERSION in
-                    *buster/sid*|*10*) #FIXME Check those values
+                case $VER in
+                    *10*)
                         ## Debian buster
                         echo "" >> /etc/apt/sources.list
                         echo "# ZeroMQ repository (added by ingescape)" >> /etc/apt/sources.list
@@ -151,7 +169,7 @@ function setup_repos {
                         wget ${ZEROMQ_REPO_URL_DEBIAN_10}Release.key -O- | apt-key add
                         ;;
 
-                    *stretch*|*9*)
+                    *9*)
                         ## Debian stretch
                         echo "" >> /etc/apt/sources.list
                         echo "# ZeroMQ repository (added by ingescape)" >> /etc/apt/sources.list
@@ -166,7 +184,7 @@ function setup_repos {
 
             ;;
         *CentOS*)
-            case $VERSION in
+            case $VER in
                 *6*)
                     ## CentOS 6
                     yum-config-manager --add-repo https://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/CentOS_6/network:messaging:zeromq:release-stable.repo
@@ -196,13 +214,21 @@ function install_deps {
     install_libzmq
     install_czmq
     install_zyre
-
+}
 
 function install_ingescape {
-    #FIXME Need other distros
-    # Debian
-    dpkg -i ingescape-0.9.0-Linux.deb
-    apt install -fy
+    if [[ "$OS" =~ "Debian" ]]
+    then
+        # Debian
+        dpkg -i ingescape-0.9.0-Linux.deb
+        apt install -fy
+    elif [[ "$OS" =~ "CentOS" ]]
+    then
+        rpm -Uvh ingescape-0.9.0-Linux.rpm
+    #else
+        #TODO install from ZIP
+    fi
+
 }
 
 #init
