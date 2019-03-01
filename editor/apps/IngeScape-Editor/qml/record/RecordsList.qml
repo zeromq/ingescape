@@ -328,7 +328,7 @@ Item {
                     .arg(Qt.formatTime(model.modelM.endDateTime, "HH:mm"))*/
 
                     text: qsTr("%1 %2 - %3").arg(Qt.formatDate(model.modelM.beginDateTime, "dd/MM/yyyy"))
-                    .arg(Qt.formatTime(model.modelM.beginDateTime, "HH:mm"))
+                    .arg(Qt.formatTime(model.modelM.beginDateTime, "HH:mm:ss"))
                     .arg(Qt.formatDateTime(model.modelM.duration, "hh:mm:ss"))
 
                     color: playPauseRecordButton.checked ? IngeScapeTheme.agentsListItemBackgroundColor :IngeScapeTheme.agentsListTextColor
