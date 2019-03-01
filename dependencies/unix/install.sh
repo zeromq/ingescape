@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 
+# Constants
+#FIXME The OS names and versions could be constants to have cleaners conditions and avoid =~ operations
 ZEROMQ_REPO_BASE_URL_DEBIAN="http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-stable/Debian"
 ZEROMQ_REPO_URL_DEBIAN_9="${ZEROMQ_REPO_BASE_URL_DEBIAN}_9.0/"
 ZEROMQ_REPO_URL_DEBIAN_10="${ZEROMQ_REPO_BASE_URL_DEBIAN}_Next/"
 
-
+# Current OS name. Set by discover_os.
 OS=""
+# OS version. Set by discover_os.
 VER=""
+# Current architecture. Set by discover_arch.
 ARCH=""
 
-
+# Checks whether the current user is root or not and amke use of 'sudo' if needed.
+#FIXME What if the user does not have sudo access rights ?
 function _check_sudo {
     if [[ $EUID = 0 ]]
     then
@@ -19,12 +24,13 @@ function _check_sudo {
     fi
 }
 
+# Tries to discover the current Linux flavor and sets the OS and VER variables.
 function discover_os {
     if [ -f /etc/os-release ]; then
         # freedesktop.org and systemd
         . /etc/os-release
         OS=$NAME
-        # As of March 1st 2019, there is no VERSION_ID in os-release for buster (testing). The following condition checks that
+        # NOTE As of March 1st 2019, there is no VERSION_ID in os-release for buster (testing). The following condition checks that
         if [[ -z ${VERSION_ID+x} ]]
         then
             VER="10"
@@ -59,6 +65,7 @@ function discover_os {
     fi
 }
 
+# Tries to discover the current machine architecture (x86 or x64)
 function discover_arch {
     case $(uname -m) in
     x86_64)
@@ -68,7 +75,7 @@ function discover_arch {
         ARCH=x86  # x86
         ;;
     armv7)
-        ARCH=x86  # ARMv7 (armhf)
+        ARCH=armhf  # ARMv7 (armhf)
         ;;
     *)
         # leave ARCH as-is
@@ -76,6 +83,7 @@ function discover_arch {
     esac
 }
 
+# libsodium installation
 function install_libsodium {
     if [[ "$OS" =~ "Debian" ]]
     then
@@ -98,6 +106,8 @@ function install_libsodium {
     fi
 }
 
+
+# libzmq installation
 function install_libzmq {
     if [[ "$OS" =~ "Debian" ]]
     then
@@ -119,6 +129,7 @@ function install_libzmq {
     fi
 }
 
+# czmq installation
 function install_czmq {
     if [[ "$OS" =~ "Debian" ]]
     then
@@ -136,6 +147,7 @@ function install_czmq {
     fi
 }
 
+# zyre installation
 function install_zyre {
     if [[ "$OS" =~ "Debian" ]]
     then
@@ -153,6 +165,7 @@ function install_zyre {
     fi
 }
 
+# Installs the ZeroMQ repository for Debian or CentOS based on the values of OS and VER variables.
 function setup_repos {
     case $OS in
         *Debian*)
@@ -207,6 +220,7 @@ function setup_repos {
     esac
 }
 
+# Installs all the required dependencies dor ingescape. MUST be called before installing the library itself.
 function install_deps {
     setup_repos
 
@@ -216,6 +230,7 @@ function install_deps {
     install_zyre
 }
 
+# Installs the ingescape library itself. Which process to used is determined by OS and VER variables.
 function install_ingescape {
     if [[ "$OS" =~ "Debian" ]]
     then
@@ -231,15 +246,29 @@ function install_ingescape {
 
 }
 
-#init
+
+## Initialisation
+
+# Exit on error
 set -o errexit
+
+# Exit on unknown variable used
 set -o nounset
-set -o xtrace
+
+# Return code for piped sequences is the last command that returned non-zero (we don't have pipes for now)
 set -o pipefail
+
+# Print out every command executed (debug)
+set -o xtrace
+
+
+## Actual script
 
 discover_os
 discover_arch
 install_deps
 install_ingescape
 
+
+## EOF ##
 
