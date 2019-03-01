@@ -267,7 +267,7 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
  */
 void RecordsSupervisionController::onAddedRecord(QString recordJSON)
 {
-    qDebug() << "onAddedRecord" << recordJSON;
+    //qDebug() << "onAddedRecord" << recordJSON;
 
     if (!recordJSON.isEmpty() && (_jsonHelper != nullptr))
     {
@@ -296,7 +296,7 @@ void RecordsSupervisionController::onAddedRecord(QString recordJSON)
  */
 void RecordsSupervisionController::onDeletedRecord(QString recordId)
 {
-    qDebug() << "on Deleted Record" << recordId;
+    qInfo() << "Deleted Record" << recordId;
 
     if (_hashFromRecordIdToModel.contains(recordId))
     {

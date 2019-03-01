@@ -24,7 +24,7 @@
 /**
   * Types of IngeScape elements on the network
   */
-I2_ENUM(IngeScapeTypes, UNKNOWN, AGENT, LAUNCHER, RECORDER, EDITOR)
+I2_ENUM(IngeScapeTypes, UNKNOWN, AGENT, LAUNCHER, RECORDER, EDITOR, MEASURING)
 
 
 /**
@@ -106,7 +106,7 @@ static const QDateTime EPOCH = QDateTime(QDate(1970, 1, 1));
 
 
 /**
- * @brief The Enums class is a helper for general enumerations
+ * @brief The Enums class is a helper for general enumerations and constants
  */
 class Enums : public QObject
 {
@@ -158,5 +158,7 @@ public:
     static QByteArray getDataFromValue(QVariant value);*/
 
 };
+
+QML_DECLARE_TYPE(Enums)
 
 #endif // ENUMS_H

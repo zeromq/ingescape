@@ -841,7 +841,7 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
             _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLine));
 
             // FIXME TODO jsonExecutedActions
-            qDebug() << "jsonExecutedActions" << jsonExecutedActions;
+            //qDebug() << "jsonExecutedActions" << jsonExecutedActions;
 
             // Import the executed actions for this scenario from JSON
             _scenarioC->importExecutedActionsFromJson(jsonExecutedActions.toUtf8());

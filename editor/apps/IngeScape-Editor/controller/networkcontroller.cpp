@@ -49,6 +49,7 @@ static const QString prefix_LoadingRecord = "REPLAY_LOADING=";
 static const QString prefix_LoadedRecord = "REPLAY_LOADED";
 static const QString prefix_EndedRecord = "REPLAY_ENDED";
 static const QString prefix_HighlightLink = "HIGHLIGHT_LINK=";
+static const QString prefix_RunAction = "RUN_THIS_ACTION#";
 
 
 /**

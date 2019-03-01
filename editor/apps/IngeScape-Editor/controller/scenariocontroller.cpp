@@ -264,7 +264,7 @@ void ScenarioController::importExecutedActionsFromJson(QByteArray byteArrayOfJso
                         int lineIndexInTimeLine = jsonExecutedAction.value("line_action").toInt();
                         int executionTime = jsonExecutedAction.value("time_action").toInt();
 
-                        qDebug() << actionId << lineIndexInTimeLine << executionTime;
+                        qDebug() << "Executed action" << actionId << "on line" << lineIndexInTimeLine << "at" << executionTime << "ms";
 
                         // Get the model of action with its (unique) id
                         //ActionM* action = _getModelOfActionWithId(actionId);
