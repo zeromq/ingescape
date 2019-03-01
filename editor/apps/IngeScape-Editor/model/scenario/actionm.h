@@ -40,7 +40,8 @@ class ActionM: public QObject
     Q_OBJECT
 
     // Unique identifier of our action
-    I2_CPP_NOSIGNAL_PROPERTY(int, uid)
+    //I2_CPP_NOSIGNAL_PROPERTY(int, uid)
+    I2_QML_PROPERTY_READONLY(int, uid)
 
     // Action name
     I2_QML_PROPERTY(QString, name)

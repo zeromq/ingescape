@@ -480,6 +480,13 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 Q_EMIT networkController->highlightLink(message.split('|'));
             }
+            // RUN (THIS) ACTION
+            else if (message.startsWith(prefix_RunAction))
+            {
+                message.remove(0, prefix_RunAction.length());
+
+                Q_EMIT networkController->runAction(message);
+            }
             else
             {
                 qWarning() << "Not yet managed (WHISPER) message '" << message << "' for agent" << peerName << "(" << peerId << ")";

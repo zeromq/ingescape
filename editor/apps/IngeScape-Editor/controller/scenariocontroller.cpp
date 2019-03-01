@@ -266,18 +266,49 @@ void ScenarioController::importExecutedActionsFromJson(QByteArray byteArrayOfJso
 
                         qDebug() << "Executed action" << actionId << "on line" << lineIndexInTimeLine << "at" << executionTime << "ms";
 
-                        // Get the model of action with its (unique) id
-                        //ActionM* action = _getModelOfActionWithId(actionId);
+                        /*// Get the model of action with its (unique) id
+                        ActionM* action = _getModelOfActionWithId(actionId);
+                        if (action != nullptr)
+                        {
+
+                        }*/
 
                         // Get the list of view models of action with its (unique) id
-                        //QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
+                        QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
+                        if (!listOfActionVM.isEmpty())
+                        {
+                            for (ActionVM* actionVM : listOfActionVM)
+                            {
+                                if ((actionVM != nullptr) && (actionVM->lineInTimeLine() == lineIndexInTimeLine))
+                                {
+                                    qDebug() << "Action VM found !";
+
+                                    // FIXME TODO
+                                    // Compare actionVM->startTime() and executionTime
+
+                                    /*if (actionVM->executionsList()->count() == 1)
+                                    {
+                                        actionVM->executionsList()->at(0);
+                                    }
+                                    else
+                                    {
+
+                                    }*/
+
+                                    // Create a new (view model of) action execution
+                                    // startTime relative to our view model of action
+                                    //void createActionExecution(int startTime);
+                                    break;
+                                }
+                            }
+                        }
 
                         // Get the "Sorted" list of view models of action with the index of the line (in the time line)
-                        I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndexInTimeLine);
+                        /*I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndexInTimeLine);
                         if (sortedListOfActionVM != nullptr)
                         {
                             // FIXME TODO importExecutedActionsFromJson
-                        }
+                        }*/
                     }
                 }
             }
@@ -875,6 +906,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
 
 /**
  * @brief Execute all effects of the action
+ * Activate (connect) the mapping if necessary
+ * Notify the recorder that the action has been executed
  * @param action
  * @param lineInTimeLine
  */
@@ -894,18 +927,8 @@ void ScenarioController::executeEffectsOfAction(ActionM* action, int lineInTimeL
         // Emit the signal "Command asked to Recorder"
         Q_EMIT commandAskedToRecorder(commandAndParameters);
 
-        // Execute the actions effects
-        for (ActionEffectVM* effectVM : action->effectsList()->toList())
-        {
-            if ((effectVM != nullptr) && (effectVM->modelM() != nullptr))
-            {
-                // Get the pair with the agent and the command (with parameters) of the effect
-                QPair<AgentsGroupedByNameVM*, QStringList> pairAgentAndCommandWithParameters = effectVM->modelM()->getAgentAndCommandWithParameters();
-
-                // Execute the command for the agent
-                _executeCommandForAgent(pairAgentAndCommandWithParameters.first, pairAgentAndCommandWithParameters.second);
-            }
-        }
+        // Execute all effects of the action
+        _executeEffectsOfAction(action);
     }
 }
 
@@ -1141,6 +1164,28 @@ void ScenarioController::onRearmAction()
 void ScenarioController::onTimeRangeChanged(int startTimeInMilliseconds, int endTimeInMilliseconds)
 {
     _filteredListActionsInTimeLine.setTimeRange(startTimeInMilliseconds, endTimeInMilliseconds);
+}
+
+
+/**
+ * @brief Slot called when we receive the command "run action" from a recorder
+ * @param actionID
+ */
+void ScenarioController::onRunAction(QString actionID)
+{
+    bool success = false;
+    int id = actionID.toInt(&success);
+
+    if (success)
+    {
+        // Get the model of action with this (unique) id
+        ActionM* action = _getModelOfActionWithId(id);
+        if (action != nullptr)
+        {
+            // Execute all effects of the action
+            _executeEffectsOfAction(action);
+        }
+    }
 }
 
 
@@ -1589,6 +1634,30 @@ void ScenarioController::_stopScenario()
 
     // Reset the connections for conditions of all actions
     resetConditionsConnectionsOfAllActions();
+}
+
+
+/**
+ * @brief Execute all effects of an action
+ * @param action
+ */
+void ScenarioController::_executeEffectsOfAction(ActionM* action)
+{
+    if ((action != nullptr) && !action->effectsList()->isEmpty())
+    {
+        // Execute the actions effects
+        for (ActionEffectVM* effectVM : action->effectsList()->toList())
+        {
+            if ((effectVM != nullptr) && (effectVM->modelM() != nullptr))
+            {
+                // Get the pair with the agent and the command (with parameters) of the effect
+                QPair<AgentsGroupedByNameVM*, QStringList> pairAgentAndCommandWithParameters = effectVM->modelM()->getAgentAndCommandWithParameters();
+
+                // Execute the command for the agent
+                _executeCommandForAgent(pairAgentAndCommandWithParameters.first, pairAgentAndCommandWithParameters.second);
+            }
+        }
+    }
 }
 
 

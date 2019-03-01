@@ -1208,7 +1208,7 @@ void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElemen
 
 
 /**
- * @brief Slot called when we receive the command highlight link from a recorder
+ * @brief Slot called when we receive the command "highlight link" from a recorder
  * @param parameters
  */
 void AgentsMappingController::onHighlightLink(const QStringList& parameters)

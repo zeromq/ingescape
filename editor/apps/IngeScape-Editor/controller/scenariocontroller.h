@@ -245,6 +245,8 @@ public:
 
     /**
      * @brief Execute all effects of the action
+     * Activate (connect) the mapping if necessary
+     * Notify the recorder that the action has been executed
      * @param action
      * @param lineInTimeLine
      */
@@ -345,6 +347,12 @@ public Q_SLOTS:
     void onTimeRangeChanged(int startTimeInMilliseconds, int endTimeInMilliseconds);
 
 
+    /**
+     * @brief Slot called when we receive the command "run action" from a recorder
+     * @param actionID
+     */
+    void onRunAction(QString actionID);
+
 
 private Q_SLOTS:
 
@@ -390,6 +398,13 @@ private:
      *        stoping the action evaluation timer
      */
     void _stopScenario();
+
+
+    /**
+     * @brief Execute all effects of an action
+     * @param action
+     */
+    void _executeEffectsOfAction(ActionM* action);
 
 
     /**

@@ -346,10 +346,17 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when we receive the command highlight link from a recorder
+     * @brief Signal emitted when we receive the command "highlight link" from a recorder
      * @param parameters
      */
     void highlightLink(QStringList parameters);
+
+
+    /**
+     * @brief Signal emitted when we receive the command "run action" from a recorder
+     * @param actionID
+     */
+    void runAction(QString actionID);
 
 
 public Q_SLOTS:

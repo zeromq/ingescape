@@ -274,7 +274,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when we receive the command highlight link from a recorder
+     * @brief Slot called when we receive the command "highlight link" from a recorder
      * @param parameters
      */
     void onHighlightLink(const QStringList& parameters);
