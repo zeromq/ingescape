@@ -246,8 +246,9 @@ public:
     /**
      * @brief Execute all effects of the action
      * @param action
+     * @param lineInTimeLine
      */
-    Q_INVOKABLE void executeEffectsOfAction(ActionM* action);
+    Q_INVOKABLE void executeEffectsOfAction(ActionM* action, int lineInTimeLine = 0);
 
 
     /**

@@ -876,8 +876,9 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
 /**
  * @brief Execute all effects of the action
  * @param action
+ * @param lineInTimeLine
  */
-void ScenarioController::executeEffectsOfAction(ActionM* action)
+void ScenarioController::executeEffectsOfAction(ActionM* action, int lineInTimeLine)
 {
     if ((action != nullptr) && !action->effectsList()->isEmpty())
     {
@@ -885,6 +886,13 @@ void ScenarioController::executeEffectsOfAction(ActionM* action)
         if ((_modelManager != nullptr) && !_modelManager->isMappingActivated()) {
             _modelManager->setisMappingActivated(true);
         }
+
+        QString commandAndParameters = QString("%1=%2|%3").arg(command_ExecutedAction,
+                                                               QString::number(action->uid()),
+                                                               QString::number(lineInTimeLine));
+
+        // Emit the signal "Command asked to Recorder"
+        Q_EMIT commandAskedToRecorder(commandAndParameters);
 
         // Execute the actions effects
         for (ActionEffectVM* effectVM : action->effectsList()->toList())
@@ -1701,16 +1709,8 @@ void ScenarioController::_executeAction(ActionVM* actionVM, ActionExecutionVM* a
             actionExecution->initReverseCommandsForEffects(actionVM->modelM()->effectsList()->toList());
         }
 
-        //actionVM->modelM()->name()
-        QString commandAndParameters = QString("%1=%2|%3").arg(command_ExecutedAction,
-                                                               QString::number(actionVM->modelM()->uid()),
-                                                               QString::number(actionVM->lineInTimeLine()));
-
-        // Emit the signal "Command asked to Recorder"
-        Q_EMIT commandAskedToRecorder(commandAndParameters);
-
         // Execute all effects of the action
-        executeEffectsOfAction(actionVM->modelM());
+        executeEffectsOfAction(actionVM->modelM(), actionVM->lineInTimeLine());
 
         // Notify the action that its effects has been executed
         actionVM->effectsExecuted(currentTimeInMilliSeconds);
