@@ -123,15 +123,15 @@ WindowBlockTouches {
             }
 
             Text {
-                id : titleTxt
+                id: txtTitle
 
                 anchors {
-                    left : parent.left
-                    top : parent.top
-                    right : parent.right
+                    left: parent.left
+                    top: parent.top
+                    right: parent.right
                 }
 
-                text: (actionVM ? qsTr("Action in timeline") : qsTr("Action"))
+                text: actionVM ? qsTr("Action in timeline") : qsTr("Action")
 
                 elide: Text.ElideRight
                 color: IngeScapeTheme.whiteColor
@@ -142,12 +142,33 @@ WindowBlockTouches {
                 }
             }
 
+            // Only for DEBUG: display action UID
+            Text {
+                id: txtUID
+
+                anchors {
+                    right: btnCloseEditor.left
+                    rightMargin: 20
+                    top: parent.top
+                }
+
+                visible: IngeScapeEditorC.isAvailableModelVisualizer
+
+                text: "(uid=" + rootItem.actionM.uid + ")"
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    pixelSize: 16
+                }
+            }
+
             Button {
                 id: btnCloseEditor
 
                 anchors {
                     top: parent.top
-                    right : parent.right
+                    right: parent.right
                 }
 
                 activeFocusOnPress: true
@@ -173,7 +194,7 @@ WindowBlockTouches {
                 anchors {
                     left : parent.left
                     right : parent.right
-                    top : titleTxt.bottom
+                    top: txtTitle.bottom
                     topMargin : 25
                 }
 
@@ -352,7 +373,7 @@ WindowBlockTouches {
                     topMargin: 15
                 }
                 height: Math.min(titleEffects.height + 6 + scrollView.anchors.topMargin + scrollView.contentItem.height,
-                                 mainItem.height - (titleTxt.height + nameItem.height + nameItem.anchors.topMargin + heightStartTime + effectsListItem.anchors.topMargin + conditionsItem.height + conditionsItem.anchors.topMargin + advancedModesItem.height + advancedModesItem.anchors.topMargin + 10 + okButton.height))
+                                 mainItem.height - (txtTitle.height + nameItem.height + nameItem.anchors.topMargin + heightStartTime + effectsListItem.anchors.topMargin + conditionsItem.height + conditionsItem.anchors.topMargin + advancedModesItem.height + advancedModesItem.anchors.topMargin + 10 + okButton.height))
 
                 Behavior on height {
                     NumberAnimation {}

@@ -169,11 +169,11 @@ WindowBlockTouches {
                 rightMargin: 18
             }
 
-            height: titleTxt.height
+            height: txtTitle.height
 
 
             Text {
-                id: titleTxt
+                id: txtTitle
 
                 anchors {
                     left : parent.left

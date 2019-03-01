@@ -476,8 +476,6 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             // HIGHLIGHT LINK
             else if (message.startsWith(prefix_HighlightLink))
             {
-                qDebug() << message;
-
                 message.remove(0, prefix_HighlightLink.length());
 
                 Q_EMIT networkController->highlightLink(message.split('|'));
