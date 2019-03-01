@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+ZEROMQ_REPO_BASE_URL_DEBIAN="http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-stable/Debian"
+ZEROMQ_REPO_URL_DEBIAN_9="${ZEROMQ_REPO_BASE_URL_DEBIAN}_9.0/"
+ZEROMQ_REPO_URL_DEBIAN_10="${ZEROMQ_REPO_BASE_URL_DEBIAN}_Next/"
+
+
 OS=""
 VER=""
 ARCH=""
@@ -133,20 +138,28 @@ function install_zyre {
 function setup_repos {
     case $OS in
         *Debian*)
-            case $VERSION in
-                *buster/sid*|*10*) #FIXME Check those values
-		    #FIXME Do not add it if it is already there
-                    ## Debian buster
-                    echo "deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-stable/Debian_Next/ ./" >> /etc/apt/sources.list
-                    wget https://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-stable/Debian_Next/Release.key -O- | apt-key add
-                    ;;
+            if grep -Fq "${ZEROMQ_REPO_BASE_URL_DEBIAN}" /etc/apt/sources.list
+            then
+                echo "ZeroMQ package repository already present in /etc/apt/sources.list"
+            else
+                case $VERSION in
+                    *buster/sid*|*10*) #FIXME Check those values
+                        ## Debian buster
+                        echo "" >> /etc/apt/sources.list
+                        echo "# ZeroMQ repository (added by ingescape)" >> /etc/apt/sources.list
+                        echo "deb ${ZEROMQ_REPO_URL_DEBIAN_10} ./" >> /etc/apt/sources.list
+                        wget ${ZEROMQ_REPO_URL_DEBIAN_10}Release.key -O- | apt-key add
+                        ;;
 
-                *stretch*|*9*) #FIXME Do not add it if it is already there
-                    ## Debian stretch
-                    echo "deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/Debian_9.0/ ./" >> /etc/apt/sources.list
-                    wget https://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/Debian_9.0/Release.key -O- | apt-key add
-                    ;;
-            esac
+                    *stretch*|*9*)
+                        ## Debian stretch
+                        echo "" >> /etc/apt/sources.list
+                        echo "# ZeroMQ repository (added by ingescape)" >> /etc/apt/sources.list
+                        echo "deb ${ZEROMQ_REPO_URL_DEBIAN_9} ./" >> /etc/apt/sources.list
+                        wget ${ZEROMQ_REPO_URL_DEBIAN_9}Release.key -O- | apt-key add
+                        ;;
+                esac
+            fi
 
             # Update package index
             apt update
@@ -183,7 +196,7 @@ function install_deps {
     install_libzmq
     install_czmq
     install_zyre
-}
+
 
 function install_ingescape {
     #FIXME Need other distros
