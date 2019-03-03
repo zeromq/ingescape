@@ -13,7 +13,7 @@ VER=""
 # Current architecture. Set by discover_arch.
 ARCH=""
 
-# Checks whether the current user is root or not and amke use of 'sudo' if needed.
+# Checks whether the current user is root or not and make use of 'sudo' if needed.
 #FIXME What if the user does not have sudo access rights ?
 function _check_sudo {
     if [[ $EUID = 0 ]]
@@ -97,6 +97,9 @@ function install_libsodium {
     elif [[ "$OS" =~ "CentOS" ]]
     then
         yum install -y libsodium18
+    elif [[ "$OS" =~ "Darwin" ]]
+    then
+        brew install libsodium
     else
         git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
         cd libsodium
@@ -115,6 +118,9 @@ function install_libzmq {
     elif [[ "$OS" =~ "CentOS" ]]
     then
         yum install -y libzmq5
+    elif [[ "$OS" =~ "Darwin" ]]
+    then
+        brew install zeromq
     else
         git clone git://github.com/zeromq/libzmq.git
         cd libzmq
@@ -137,6 +143,9 @@ function install_czmq {
     elif [[ "$OS" =~ "CentOS" ]]
     then
         yum install -y czmq
+    elif [[ "$OS" =~ "Darwin" ]]
+    then
+        brew install czmq
     else
         git clone git://github.com/zeromq/czmq.git
         cd czmq
@@ -155,6 +164,9 @@ function install_zyre {
     elif [[ "$OS" =~ "CentOS" ]]
     then
         yum install -y zyre
+    elif [[ "$OS" =~ "Darwin" ]]
+    then
+        brew install zyre
     else
         git clone git://github.com/zeromq/zyre.git
         cd zyre
@@ -214,6 +226,15 @@ function setup_repos {
             # No need to update index for YUM
 
             ;;
+        *Darwin*)
+            if [ -f "/usr/local/bin/brew" ];
+            then
+                echo "Homebrew is available"
+            else
+                echo "Homebrew is not available : install it"
+                /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+            fi
+            ;;
         *)
             # No repository to add
             ;;
@@ -240,6 +261,9 @@ function install_ingescape {
     elif [[ "$OS" =~ "CentOS" ]]
     then
         rpm -Uvh ingescape-0.9.0-Linux.rpm
+    elif [[ "$OS" =~ "Darwin" ]]
+    then
+        ./ingescape-0.9.0-Darwin.sh
     #else
         #TODO install from ZIP
     fi
