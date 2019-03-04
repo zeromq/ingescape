@@ -87,45 +87,48 @@ function discover_arch {
     esac
 }
 
-# libsodium installation
-function install_libsodium {
-    if [[ "$OS" =~ "Debian" ]]
+function install_deps_debian {
+    lib_list="libzmq5 czmq zyre"
+    if [[ "$VER" =~ "9" ]]
     then
-        if [[ "$VER" =~ "9" ]]
-        then
-            apt install -y libsodium18
-        elif [[ "$VER" =~ "10" ]]
-        then
-            apt install -y libsodium23
-        fi
-    elif [[ "$OS" =~ "CentOS" ]]
+        lib_list="${lib_list} libsodium18"
+    elif [[ "$VER" =~ "10" ]]
     then
-        yum install -y libsodium18
-    elif [[ "$OS" =~ "Darwin" ]]
+        lib_list="${lib_list} libsodium23"
+    fi
+
+    if [[ "$DEVEL_LIBS" == "YES" ]]
     then
-        brew install libsodium
-    else
+        lib_list="${lib_list} libzmq3-dev libzyre-dev libczmq-dev libsodium-dev"
+    fi
+
+    apt install -y $lib_list
+}
+
+function install_deps_centos {
+    lib_list="libzmq5 czmq zyre libsodium18"
+
+    if [[ "$DEVEL_LIBS" == "YES" ]]
+    then
+        lib_list="${lib_list} zeromq-devel zyre-devel czmq-devel libsodium-devel"
+    fi
+
+    yum install -y ${lib_list}
+}
+
+function install_deps_darwin {
+    brew install libsodium zeromq czmq zyre
+    #FIXME Is there a distinction between 'regular' and 'development' libs for osx ?
+}
+
+function install_deps_from_git {
+    ( # libsodium
         git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
         cd libsodium
         ./autogen.sh && ./configure && make check
         _check_sudo "make install"
-        cd ..
-    fi
-}
-
-
-# libzmq installation
-function install_libzmq {
-    if [[ "$OS" =~ "Debian" ]]
-    then
-        apt install -y libzmq5
-    elif [[ "$OS" =~ "CentOS" ]]
-    then
-        yum install -y libzmq5
-    elif [[ "$OS" =~ "Darwin" ]]
-    then
-        brew install zeromq
-    else
+    )
+    ( # libzmq
         git clone git://github.com/zeromq/libzmq.git
         cd libzmq
         ./autogen.sh
@@ -135,50 +138,21 @@ function install_libzmq {
         make check
         _check_sudo "make install"
         _check_sudo ldconfig
-        cd ..
-    fi
-}
-
-# czmq installation
-function install_czmq {
-    if [[ "$OS" =~ "Debian" ]]
-    then
-        apt install -y czmq
-    elif [[ "$OS" =~ "CentOS" ]]
-    then
-        yum install -y czmq
-    elif [[ "$OS" =~ "Darwin" ]]
-    then
-        brew install czmq
-    else
+    )
+    ( # czmq
         git clone git://github.com/zeromq/czmq.git
         cd czmq
         ./autogen.sh && ./configure && make check
         _check_sudo "make install"
         _check_sudo ldconfig
-        cd ..
-    fi
-}
-
-# zyre installation
-function install_zyre {
-    if [[ "$OS" =~ "Debian" ]]
-    then
-        apt install -y zyre
-    elif [[ "$OS" =~ "CentOS" ]]
-    then
-        yum install -y zyre
-    elif [[ "$OS" =~ "Darwin" ]]
-    then
-        brew install zyre
-    else
+    )
+    ( # zyre
         git clone git://github.com/zeromq/zyre.git
         cd zyre
         ./autogen.sh && ./configure && make check
         _check_sudo "make install"
         _check_sudo ldconfig
-        cd ..
-    fi
+    )
 }
 
 # Installs the ZeroMQ repository for Debian or CentOS based on the values of OS and VER variables.
@@ -247,12 +221,24 @@ function setup_repos {
 
 # Installs all the required dependencies dor ingescape. MUST be called before installing the library itself.
 function install_deps {
-    setup_repos
-
-    install_libsodium
-    install_libzmq
-    install_czmq
-    install_zyre
+    if [[ "$FORCE_GIT" == "YES" ]]
+    then
+        install_deps_from_git
+    else
+        setup_repos
+        if [[ "$OS" =~ "Debian" ]]
+        then
+            install_deps_debian
+        elif [[ "$OS" =~ "CentOS" ]]
+        then
+            install_deps_centos
+        elif [[ "$OS" =~ "Darwin" ]]
+        then
+            install_deps_darwin
+        else
+            install_deps_from_git
+        fi
+    fi
 }
 
 # Installs the ingescape library itself. Which process to used is determined by OS and VER variables.
@@ -271,7 +257,6 @@ function install_ingescape {
     #else
         #TODO install from ZIP
     fi
-
 }
 
 function print_usage {
@@ -281,6 +266,7 @@ Options: [defaults in brackets after descriptions]
   -h, --help       print this message
   --only-deps      only install dependencies, not ingescape
   --devel          install the development versions of the dependencies
+  --force-git      force install from git repositories (instead of using the distribution's packages)
 EOF
 }
 
@@ -304,6 +290,7 @@ set -o xtrace
 
 ONLY_DEPS=NO
 DEVEL_LIBS=NO
+FORCE_GIT=NO
 
 # Parse arguments
 for arg in "$@"
@@ -314,6 +301,9 @@ do
             ;;
         --devel)
             DEVEL_LIBS=YES
+            ;;
+        --force-git)
+            FORCE_GIT=YES
             ;;
         -h|--help)
             print_usage
@@ -329,12 +319,16 @@ done
 
 echo ONLY_DEPS  = ${ONLY_DEPS}
 echo DEVEL_LIBS = ${DEVEL_LIBS}
+echo FORCE_GIT  = ${FORCE_GIT}
 
 discover_os
 discover_arch
-install_deps
-install_ingescape
 
+install_deps
+
+if [[ "$ONLY_DEPS" == "NO" ]]
+then
+    install_ingescape
+fi
 
 ## EOF ##
-
