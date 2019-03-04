@@ -226,7 +226,7 @@ lib-installer-runtime-macos-x64:
   script:
     - make -C build package
     - cp dependencies/unix/install.sh build/install.sh
-    - sed -i 's/DARWIN_PACKAGE_FILE_NAME=.*/DARWIN_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/install.sh
+    - sed -i '' 's/DARWIN_PACKAGE_FILE_NAME=.*/DARWIN_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/install.sh
   artifacts:
     paths:
       - build/ingescape-*
