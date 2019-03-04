@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Constants
-#FIXME The OS names and versions could be constants to have cleaners conditions and avoid =~ operations
+#FIXME The OS names and versions could also be constants to have cleaners conditions and avoid =~ operations
 ZEROMQ_REPO_BASE_URL_DEBIAN="http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-stable/Debian"
 ZEROMQ_REPO_URL_DEBIAN_9="${ZEROMQ_REPO_BASE_URL_DEBIAN}_9.0/"
 ZEROMQ_REPO_URL_DEBIAN_10="${ZEROMQ_REPO_BASE_URL_DEBIAN}_Next/"
@@ -274,6 +274,16 @@ function install_ingescape {
 
 }
 
+function print_usage {
+  cat <<EOF
+Usage: $0 [options]
+Options: [defaults in brackets after descriptions]
+  -h, --help       print this message
+  --only-deps      only install dependencies, not ingescape
+  --devel          install the development versions of the dependencies
+EOF
+}
+
 
 ## Initialisation
 
@@ -291,6 +301,34 @@ set -o xtrace
 
 
 ## Actual script
+
+ONLY_DEPS=NO
+DEVEL_LIBS=NO
+
+# Parse arguments
+for arg in "$@"
+do
+    case ${arg} in
+        --only-deps)
+            ONLY_DEPS=YES
+            ;;
+        --devel)
+            DEVEL_LIBS=YES
+            ;;
+        -h|--help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            echo Unknown parameter ${arg}
+            print_usage
+            exit 1
+            ;;
+    esac
+done
+
+echo ONLY_DEPS  = ${ONLY_DEPS}
+echo DEVEL_LIBS = ${DEVEL_LIBS}
 
 discover_os
 discover_arch
