@@ -323,3 +323,27 @@ lib-deploy-windows-release-x86:
     - copy /y build\ReleaseX86\Release\* C:\Users\admin\dev\Builds\Release\x86\
   dependencies:
     - lib-windows-release-x86
+
+# Deploy ingescape in windows use to compile to be able to compile agents
+lib-deploy-windows-debug-x64:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - windows
+  script:
+    - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
+    - copy /y build\DebugX64\Debug\* C:\Users\admin\dev\Builds\Debug\x64\
+  dependencies:
+    - lib-windows-debug-x64
+
+# Deploy ingescape in windows use to compile to be able to compile agents
+lib-deploy-windows-debug-x86:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - windows
+  script:
+    - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
+    - copy /y build\DebugX86\Debug\* C:\Users\admin\dev\Builds\Debug\x86\
+  dependencies:
+    - lib-windows-debug-x86
