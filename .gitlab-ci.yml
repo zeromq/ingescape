@@ -18,10 +18,12 @@ stages:
 .build-lib-files: &build-lib-files
   only:
     changes:
+      - .gitlab-ci.yml
       - src/**/*
       - CMakeLists.txt
       - builds/cmake/**/*
       - dependencies/windows/unix/*
+      - dependencies/yajl/**/*
     refs:
       - master
 
@@ -29,7 +31,14 @@ stages:
 .build-editor-files: &build-editor-files
   only:
     changes:
-      - editor/**/*
+      - .gitlab-ci.yml
+      - src/**/*
+      - builds/cmake/**/*
+      - dependencies/windows/unix/*
+      - dependencies/yajl/**/*
+      - editor/frameworks/**/*
+      - editor/IngeScape-Common/**/*
+      - editor/IngeScape-Editor/**/*
     refs:
       - master
 
