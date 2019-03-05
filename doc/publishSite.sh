@@ -13,9 +13,9 @@ rsync -avzh -e ssh --progress --delete ./public/ root@ingenuity.io:/home/ingesca
 scp htaccess root@ingenuity.io:/home/ingescape/www/.htaccess
 ssh root@ingenuity.io 'chown -R ingescape.users /home/ingescape/www'
 
-rsync -avzh -e ssh --progress --delete ./public/ root@94.23.25.84:/home/ingescape/public_html/ --exclude=/stats
-scp htaccess root@94.23.25.84:/home/ingescape/public_html/.htaccess
-ssh root@94.23.25.84 'chown -R ingescape.ingescape /home/ingescape/public_html'
+rsync -avzh -e ssh --progress --delete ./public/ ingescape@ingescape.com:/home/ingescape/public_html/ --exclude=/stats
+scp htaccess ingescape@ingescape.com:/home/ingescape/public_html/.htaccess
+ssh ingescape@ingescape.com 'chown -R ingescape.ingescape /home/ingescape/public_html'
 
 rm -Rf public
 
