@@ -203,7 +203,7 @@ editor-windows-release-x64:
   stage: build-editor
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
   tags:
     - windows
   script:
