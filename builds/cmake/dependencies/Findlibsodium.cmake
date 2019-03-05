@@ -21,7 +21,7 @@ find_path (
 
 find_library (
     LIBSODIUM_LIBRARIES
-    NAMES libsodium
+    NAMES sodium libsodium
     HINTS ${PC_LIBSODIUM_LIBRARY_HINTS}
 )
 

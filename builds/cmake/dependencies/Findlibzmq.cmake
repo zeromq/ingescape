@@ -23,7 +23,7 @@ find_path (
 
 find_library (
     LIBZMQ_LIBRARIES
-    NAMES zmq
+    NAMES zmq libzmq
     HINTS ${PC_LIBZMQ_LIBRARY_HINTS}
 )
 
