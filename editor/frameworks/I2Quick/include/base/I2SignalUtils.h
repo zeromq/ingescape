@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2015-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2015-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -31,7 +31,7 @@ class I2QUICK_EXPORT I2SignalUtils : public QObject
     Q_OBJECT
 
 public:
-    explicit I2SignalUtils(QObject *parent = 0);
+    explicit I2SignalUtils(QObject *parent = nullptr);
 
     /**
      * @brief Subscribe to all properties of a given source object

@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -37,7 +37,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit I2MathUtils(QObject *parent = 0);
+    explicit I2MathUtils(QObject *parent = nullptr);
 
 
     /**

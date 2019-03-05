@@ -104,7 +104,7 @@
     class name : public I2AbstractQmlEnumClass { \
         Q_OBJECT \
     public: \
-        explicit name(QObject* parent = 0) : I2AbstractQmlEnumClass(parent) { \
+        explicit name(QObject* parent = nullptr) : I2AbstractQmlEnumClass(parent) { \
         } \
         enum Value { __VA_ARGS__ }; \
         Q_ENUM (Value) \
@@ -254,7 +254,7 @@ class I2QUICK_EXPORT I2AbstractQmlEnumClass: public QObject {
     Q_OBJECT
 
 public:
-    I2AbstractQmlEnumClass(QObject *parent = 0);
+    I2AbstractQmlEnumClass(QObject *parent = nullptr);
 
 
     /**

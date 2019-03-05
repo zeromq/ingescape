@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2016-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -27,6 +27,8 @@
 // To export symbols
 #include "i2quick_global.h"
 
+
+
 /**
  * i2_qlist_cast cast a Qlist<T> to a QList<T2>
  * (cast each element)
@@ -48,6 +50,8 @@
        return listAnyClass;
 }
 
+
+
 /**
  * @brief The I2Utils class defines a set of utility functions
  */
@@ -64,7 +68,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit I2Utils(QObject *parent = 0);
+    explicit I2Utils(QObject *parent = nullptr);
 
 
     /**

@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2015-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2015-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -51,7 +51,7 @@ public:
      * @param name
      * @param parent
      */
-    explicit I2EnumListItemData (QString key, int value, QString name, QObject* parent = 0);
+    explicit I2EnumListItemData (QString key, int value, QString name, QObject* parent = nullptr);
 
 
    /**
@@ -112,7 +112,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit AbstractI2EnumListModel (QObject* parent = 0);
+    explicit AbstractI2EnumListModel (QObject* parent = nullptr);
 
 
     /**
@@ -460,7 +460,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit I2EnumListModel(QObject *parent = 0): AbstractI2EnumListModel(parent)
+    explicit I2EnumListModel(QObject *parent = nullptr): AbstractI2EnumListModel(parent)
     {
         //
         // Use introspection mecanisms to associate a role to each property of our QmlEnumListItemData
@@ -557,7 +557,7 @@ public: // QAbstractListModel API
         if (index.isValid() && (index.row() >= 0) && (index.row() < _list.size()))
         {
             I2EnumListItemData *item = _list.at(index.row());
-            if (item != NULL)
+            if (item != nullptr)
             {
               if (role != Qt::DisplayRole)
               {
@@ -633,7 +633,7 @@ public: // QAbstractListModel API
      */
     void appendRow(I2EnumListItemData *item)
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             // Insert item in our list
             beginInsertRows (QModelIndex(), rowCount(), rowCount());
@@ -688,7 +688,7 @@ public: // QAbstractListModel API
               // Remove item
               beginRemoveRows(QModelIndex(), row, row);
               I2EnumListItemData* item = _list.takeAt(row);
-              if (item != NULL)
+              if (item != nullptr)
               {
                   _unsubscribeToItem(item);
               }
@@ -730,7 +730,7 @@ public: // QAbstractListModel API
               for(int index = 0; index < count; index++)
               {
                   I2EnumListItemData* item = _list.takeAt(row);
-                  if (item != NULL)
+                  if (item != nullptr)
                   {
                       _unsubscribeToItem(item);
                   }
@@ -765,7 +765,7 @@ public: // List API
         {
               // Check if we have a valid enum value
               const char *key = _enumType.valueToKey(enumValue);
-              if (key != NULL)
+              if (key != nullptr)
               {
                 CustomEnumType myTempEnumObject;
                 QString currentEnumItemKey = QString::fromLatin1(key);
@@ -824,7 +824,7 @@ public: // List API
             removeRow(index);
 
             // Delete our item
-            if (item != NULL)
+            if (item != nullptr)
             {
                 delete item;
             }
@@ -852,7 +852,7 @@ public: // List API
             {
                   // Check if we have a valid enum value
                   const char *key = _enumType.valueToKey(enumValue);
-                  if (key != NULL)
+                  if (key != nullptr)
                   {
                     QString enumKey = QString::fromLatin1(key);
                     QString enumName = myTempEnumObject.enumToString(enumValue);
@@ -900,7 +900,7 @@ public: // List API
         while ((index < _list.count()) && (result == -1))
         {
             I2EnumListItemData* item = _list.at(index);
-            if ((item != NULL) && (item->key() == enumKey))
+            if ((item != nullptr) && (item->key() == enumKey))
             {
                 result = index;
             }
@@ -982,7 +982,7 @@ public: // List API
             removeRow(index);
 
             // Delete our item
-            if (item != NULL)
+            if (item != nullptr)
             {
                 delete item;
             }
@@ -1014,7 +1014,6 @@ public: // List API
                 int enumValue = _enumType.keyToValue(enumKey.toLatin1(), &ok);
                 if (ok)
                 {
-                  CustomEnumType myTempEnumObject;
                   QString currentEnumItemName = myTempEnumObject.enumToString(enumValue);
 
                   I2EnumListItemData* item = new I2EnumListItemData(enumKey, enumValue, currentEnumItemName);

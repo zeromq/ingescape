@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2015-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2015-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -80,7 +80,7 @@ public:
      *
      * @param parent
      */
-    explicit AbstractI2CustomItemSortFilterProxyModel(QObject *parent = 0);
+    explicit AbstractI2CustomItemSortFilterProxyModel(QObject *parent = nullptr);
 
 
     /**
@@ -455,9 +455,9 @@ public:
      * @param sourceModel
      * @param parent
      */
-    explicit I2CustomItemSortFilterProxyModel(QObject *parent = 0) : AbstractI2CustomItemSortFilterProxyModel(parent),
+    explicit I2CustomItemSortFilterProxyModel(QObject *parent = nullptr) : AbstractI2CustomItemSortFilterProxyModel(parent),
         _lastResultCount(0),
-        _originalList(NULL)
+        _originalList(nullptr)
     {
         // Enable the dynamic sort&filter which will automatically update
         // our list when items are appended/removed
@@ -478,7 +478,7 @@ public:
     ~I2CustomItemSortFilterProxyModel()
     {
         // Unsubscribe to our original list (source model) if needed
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             // Unsubscribe to destruction
             disconnect(_originalList, SIGNAL(destroyed(QObject*)), this, SLOT(_onSourceModelDestroyed(QObject *)));
@@ -493,7 +493,7 @@ public:
             // Unsubscribe to its allowDuplicateItems property
             disconnect(_originalList, SIGNAL(allowDuplicateItemsChanged(bool)), this, SLOT(_onSourceModelAllowDuplicateItemsChanged(bool)));
 
-            _originalList = NULL;
+            _originalList = nullptr;
         }
     }
 
@@ -504,13 +504,13 @@ public:
     */
     void setSourceModelFromSortFilterList(AbstractI2CustomItemSortFilterProxyModel* sortFilterList) Q_DECL_OVERRIDE
     {
-      if (sortFilterList != NULL)
+      if (sortFilterList != nullptr)
       {
         setSourceModel(sortFilterList->sourceModel());
       }
       else
       {
-        setSourceModel(NULL);
+        setSourceModel(nullptr);
       }
     }
 
@@ -523,10 +523,10 @@ public:
     {
         // Check if we have a valid source
         I2CustomItemListModel<CustomItemType>* validSourceModel = dynamic_cast<I2CustomItemListModel<CustomItemType> *>(sourceModel);
-        if ((validSourceModel != NULL) || (sourceModel == NULL))
+        if ((validSourceModel != nullptr) || (sourceModel == nullptr))
         {
             // Unsubscribe to previous source model
-            if (_originalList != NULL)
+            if (_originalList != nullptr)
             {
                 // Unsubscribe to destruction
                 disconnect(_originalList, SIGNAL(destroyed(QObject*)), this, SLOT(_onSourceModelDestroyed(QObject *)));
@@ -547,7 +547,7 @@ public:
             QSortFilterProxyModel::setSourceModel(sourceModel);
 
             // Subscribe to our new source model if needed
-            if (_originalList != NULL)
+            if (_originalList != nullptr)
             {
                 // Subscribe to destruction
                 connect(_originalList, SIGNAL(destroyed(QObject*)), this, SLOT(_onSourceModelDestroyed(QObject *)));
@@ -570,7 +570,7 @@ public:
         else
         {
             qWarning() << "I2CustomItemSortFilterProxyModel warning: sourceModel " << sourceModel << " does not inherit I2CustomItemListModel class";
-            _originalList = NULL;
+            _originalList = nullptr;
         }
     }
 
@@ -585,7 +585,7 @@ public:
         if (role != sortRole())
         {
             QSortFilterProxyModel::setSortRole(role);
-            if (_originalList != NULL)
+            if (_originalList != nullptr)
             {
                 Q_EMIT sortPropertyChanged(_originalList->nameForRole(role));
             }
@@ -617,7 +617,7 @@ public:
      */
     void setSortProperty(const QString &propertyName) Q_DECL_OVERRIDE
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             // try to find the role associated to this property name
             int newRole = _originalList->roleForName(propertyName.toUtf8());
@@ -665,7 +665,7 @@ public:
         if (role != filterRole())
         {
             QSortFilterProxyModel::setFilterRole(role);
-            if (_originalList != NULL)
+            if (_originalList != nullptr)
             {
                 Q_EMIT filterPropertyChanged(_originalList->nameForRole(role));
             }
@@ -683,7 +683,7 @@ public:
      */
     void setFilterProperty(const QString &propertyName) Q_DECL_OVERRIDE
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             int newRole = _originalList->roleForName(propertyName.toUtf8());
             if (newRole == -1)
@@ -707,7 +707,7 @@ public:
     {
         QString result;
 
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             result = _originalList->nameForRole(filterRole());
         }
@@ -908,10 +908,12 @@ public: // List API
     int sourceModelSize() const Q_DECL_OVERRIDE
     {
         int size = 0;
-        if (_originalList != NULL)
+
+        if (_originalList != nullptr)
         {
             size = _originalList->size();
         }
+
         return size;
     }
 
@@ -964,7 +966,7 @@ public: // List API
     {
         bool result = true;
 
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             result = _originalList->allowDuplicateItems();
         }
@@ -979,7 +981,7 @@ public: // List API
      */
     void setSourceModelAllowDuplicateItems(bool value) Q_DECL_OVERRIDE
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->setAllowDuplicateItems(value);
         }
@@ -993,7 +995,7 @@ public: // List API
      */
     void append(QObject* item) Q_DECL_OVERRIDE
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->append(item);
         }
@@ -1006,7 +1008,7 @@ public: // List API
      */
     void prepend(QObject* item) Q_DECL_OVERRIDE
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->prepend(item);
         }
@@ -1021,7 +1023,7 @@ public: // List API
      */
     void remove(QObject* item) Q_DECL_OVERRIDE
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->remove(item);
         }
@@ -1036,7 +1038,7 @@ public: // List API
      */
     void remove(int itemIndex) Q_DECL_OVERRIDE
     {
-       if ((_originalList != NULL) && (itemIndex >= 0) && (itemIndex < count()))
+       if ((_originalList != nullptr) && (itemIndex >= 0) && (itemIndex < count()))
        {
          // Convert index from resulting list to source list
          QModelIndex itemModelIndex = index(itemIndex, 0);
@@ -1055,7 +1057,7 @@ public: // List API
      */
     void sourceModelRemove(int index) Q_DECL_OVERRIDE
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->remove(index);
         }
@@ -1071,13 +1073,14 @@ public: // List API
     {
       bool result = false;
 
-      if (item != NULL)
+      if (item != nullptr)
       {
         CustomItemType* customItem = qobject_cast<CustomItemType *>(item);
-        if (customItem != NULL)
+
+        if (customItem != nullptr)
         {
-          QList<CustomItemType *> resultsList = toList();
-          result = resultsList.contains(customItem);
+            QList<CustomItemType *> resultsList = toList();
+            result = resultsList.contains(customItem);
         }
       }
 
@@ -1093,10 +1096,12 @@ public: // List API
     Q_INVOKABLE bool sourceModelContains(QObject* item) const Q_DECL_OVERRIDE
     {
         bool result = false;
-        if (_originalList != NULL)
+
+        if (_originalList != nullptr)
         {
             result = _originalList->contains(item);
         }
+
         return result;
     }
 
@@ -1110,10 +1115,10 @@ public: // List API
     {
       int index = -1;
 
-      if (item != NULL)
+      if (item != nullptr)
       {
         CustomItemType* customItem = qobject_cast<CustomItemType *>(item);
-        if (customItem != NULL)
+        if (customItem != nullptr)
         {
           QList<CustomItemType *> resultsList = toList();
           index = resultsList.indexOf(customItem);
@@ -1132,10 +1137,12 @@ public: // List API
     int sourceModelIndexOf(QObject* item) const Q_DECL_OVERRIDE
     {
         int index = -1;
-        if (_originalList != NULL)
+
+        if (_originalList != nullptr)
         {
             index = _originalList->indexOf(item);
         }
+
         return index;
     }
 
@@ -1147,7 +1154,7 @@ public: // List API
      */
     void clear() Q_DECL_OVERRIDE
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->clear();
         }
@@ -1159,7 +1166,7 @@ public: // List API
      */
     void deleteAllItems() Q_DECL_OVERRIDE
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->deleteAllItems();
         }
@@ -1177,7 +1184,7 @@ public: // List API
         for (int index = 0; index < count(); index++)
         {
             QObject* item = get(index);
-            if (item != NULL)
+            if (item != nullptr)
             {
                 objectList.append(item);
             }
@@ -1194,9 +1201,9 @@ public: // List API
      */
     Q_INVOKABLE QObject* get(int itemIndex) Q_DECL_OVERRIDE
     {
-      QObject* item = NULL;
+      QObject* item = nullptr;
 
-      if ((_originalList != NULL) && (itemIndex >= 0) && (itemIndex < count()))
+      if ((_originalList != nullptr) && (itemIndex >= 0) && (itemIndex < count()))
       {
         // Convert index from resulting list to source list
         QModelIndex itemModelIndex = index(itemIndex, 0);
@@ -1228,7 +1235,7 @@ public: // Extra list API
      */
     void append(const QList<CustomItemType *> &items)
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->appendRows(items);
         }
@@ -1242,8 +1249,8 @@ public: // Extra list API
      */
     CustomItemType* sourceModelAt(int index)
     {
-        CustomItemType* result = NULL;
-        if (_originalList != NULL)
+        CustomItemType* result = nullptr;
+        if (_originalList != nullptr)
         {
             result = _originalList->at(index);
         }
@@ -1257,9 +1264,9 @@ public: // Extra list API
      */
     CustomItemType* at(int itemIndex)
     {
-      CustomItemType* item = NULL;
+      CustomItemType* item = nullptr;
 
-      if ((_originalList != NULL) && (itemIndex >= 0) && (itemIndex < count()))
+      if ((_originalList != nullptr) && (itemIndex >= 0) && (itemIndex < count()))
       {
         // Convert index from resulting list to source list
         QModelIndex itemModelIndex = index(itemIndex, 0);
@@ -1279,8 +1286,8 @@ public: // Extra list API
      */
     CustomItemType* sourceModelTakeAt(int index)
     {
-        CustomItemType* result = NULL;
-        if (_originalList != NULL)
+        CustomItemType* result = nullptr;
+        if (_originalList != nullptr)
         {
             result = _originalList->takeAt(index);
         }
@@ -1294,9 +1301,9 @@ public: // Extra list API
      */
     CustomItemType* takeAt(int itemIndex)
     {
-      CustomItemType* item = NULL;
+      CustomItemType* item = nullptr;
 
-      if ((_originalList != NULL) && (itemIndex >= 0) && (itemIndex < count()))
+      if ((_originalList != nullptr) && (itemIndex >= 0) && (itemIndex < count()))
       {
         // Convert index from resulting list to source list
         QModelIndex itemModelIndex = index(itemIndex, 0);
@@ -1317,7 +1324,7 @@ public: // Extra list API
     {
         QList<CustomItemType *> result;
 
-        if ((_originalList != NULL) && (_originalList->count() != 0))
+        if ((_originalList != nullptr) && (_originalList->count() != 0))
         {
             result = _originalList->toList();
         }
@@ -1334,7 +1341,7 @@ public: // Extra list API
     {
         QList<CustomItemType *> result;
 
-        if ((rowCount() != 0) && (_originalList != NULL))
+        if ((rowCount() != 0) && (_originalList != nullptr))
         {
           for (int itemIndex = 0; itemIndex < rowCount(); itemIndex++)
           {
@@ -1343,7 +1350,7 @@ public: // Extra list API
             QModelIndex mappedItemModelIndex = mapToSource(itemModelIndex);
 
             CustomItemType* item = _originalList->at(mappedItemModelIndex.row());
-            if (item != NULL)
+            if (item != nullptr)
             {
               result.append(item);
             }
@@ -1365,7 +1372,7 @@ public:
      */
     I2CustomItemSortFilterProxyModel& operator+= (CustomItemType* item)
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->appendRow(item);
         }
@@ -1385,7 +1392,7 @@ public:
      */
     I2CustomItemSortFilterProxyModel& operator<< (CustomItemType* item)
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->appendRow(item);
         }
@@ -1403,7 +1410,7 @@ public:
      */
     I2CustomItemSortFilterProxyModel& operator+= (const QList<CustomItemType*> &list)
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->append(list);
         }
@@ -1421,7 +1428,7 @@ public:
      */
     I2CustomItemSortFilterProxyModel& operator<< (const QList<CustomItemType*> &list)
     {
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             _originalList->append(list);
         }
@@ -1448,11 +1455,10 @@ public:
      */
     void _onSourceModelDestroyed(QObject* sender) Q_DECL_OVERRIDE
     {
-        if (sender != NULL)
+        if (sender != nullptr)
         {
             // Remove references to our source model
-            _originalList = NULL;
-            QSortFilterProxyModel::setSourceModel(NULL);
+            _originalList = nullptr;
 
             // Notify changes
             sourceModelCountChanged();
@@ -1511,7 +1517,7 @@ protected:
     void _cleanUpOriginalListReference()
     {
         // Unsubscribe to our original list (source model) if needed
-        if (_originalList != NULL)
+        if (_originalList != nullptr)
         {
             // Unsubscribe to destruction
             disconnect(_originalList, SIGNAL(destroyed(QObject*)), this, SLOT(_onSourceModelDestroyed(QObject *)));
@@ -1526,7 +1532,7 @@ protected:
             // Unsubscribe to its allowDuplicateItems property
             disconnect(_originalList, SIGNAL(allowDuplicateItemsChanged(bool)), this, SLOT(_onSourceModelAllowDuplicateItemsChanged(bool)));
 
-            _originalList = NULL;
+            _originalList = nullptr;
         }
     }
 

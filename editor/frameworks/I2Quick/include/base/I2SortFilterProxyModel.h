@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2016-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2016-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -53,7 +53,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit I2SortFilterProxyModel(QObject *parent = 0);
+    explicit I2SortFilterProxyModel(QObject *parent = nullptr);
 
 
     /**
@@ -385,6 +385,9 @@ protected:
 
     // Used to store our sourceModel if it is an AbstractI2CustomItemSortFilterProxyModel
     AbstractI2CustomItemSortFilterProxyModel* _sourceModelAsSortFilterProxyModel;
+
+    // Used to store our sourceModel if it is an I2SortFilterProxyModel
+    I2SortFilterProxyModel* _sourceModelAsI2SortFilterProxyModel;
 
     // Previous number of items (after filtering) in our sort-filter proxy model
     int _lastResultCount;

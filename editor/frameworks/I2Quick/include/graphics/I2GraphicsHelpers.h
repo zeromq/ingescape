@@ -158,7 +158,7 @@ public:
     }
 
 
-    static qreal toDouble(const QString &str, bool *ok = NULL)
+    static qreal toDouble(const QString &str, bool *ok = nullptr)
     {
         const QChar *c = str.constData();
         qreal res = toDouble(c);
@@ -169,7 +169,7 @@ public:
     }
 
 
-    static qreal toDouble(const QStringRef &str, bool *ok = NULL)
+    static qreal toDouble(const QStringRef &str, bool *ok = nullptr)
     {
         const QChar *c = str.constData();
         qreal res = toDouble(c);

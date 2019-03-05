@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2015-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2015-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -45,7 +45,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit AbstractI2CustomItemListModel (QObject * parent = 0);
+    explicit AbstractI2CustomItemListModel (QObject * parent = nullptr);
 
 
 public: // Helpers to switch between role and property name
@@ -296,7 +296,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit I2CustomItemListModel(QObject *parent = 0): AbstractI2CustomItemListModel(parent),
+    explicit I2CustomItemListModel(QObject *parent = nullptr): AbstractI2CustomItemListModel(parent),
         _allowDuplicateItems(true),
         _lastItemCount(0)
     {
@@ -402,7 +402,7 @@ public: // QAbstractListModel API
         if (index.isValid() && (index.row() >= 0) && (index.row() < _list.size()))
         {
             CustomItemType *item = _list.at(index.row());
-            if (item != NULL)
+            if (item != nullptr)
             {
               if (role != Qt::DisplayRole)
               {
@@ -457,7 +457,7 @@ public: // QAbstractListModel API
         if (index.isValid() && (index.row() >= 0) && (index.row() < _list.size()))
         {
             CustomItemType *item = _list.at(index.row ());
-            if (item != NULL)
+            if (item != nullptr)
             {
               if ((role != Qt::DisplayRole) && (role != QtObjectRole()))
               {
@@ -508,7 +508,7 @@ public: // QAbstractListModel API
      */
     void appendRow(CustomItemType *item)
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             // Check if we can add this item
             // Option 1: our list allows duplicate items
@@ -601,7 +601,7 @@ public: // QAbstractListModel API
      */
     void insertRow(int row, CustomItemType *item)
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             // Check if we can add this item
             if ( _allowDuplicateItems || !_list.contains(item))
@@ -634,7 +634,7 @@ public: // QAbstractListModel API
      */
     void prependRow(CustomItemType *item)
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             // Check if we can add this item
             if ( _allowDuplicateItems || !_list.contains(item))
@@ -674,7 +674,7 @@ public: // QAbstractListModel API
             beginRemoveRows(QModelIndex(), row, row);
 
             CustomItemType* item = _list.takeAt(row);
-            if (item != NULL)
+            if (item != nullptr)
             {
                 // Check if we can unsubscribe
                 if (!_allowDuplicateItems || !_list.contains(item))
@@ -717,7 +717,7 @@ public: // QAbstractListModel API
             for (int index = 0; index < count; index++)
             {
                 CustomItemType* item = _list.takeAt(row);
-                if (item != NULL)
+                if (item != nullptr)
                 {
                     // Check if we can unsubscribe
                     if (!_allowDuplicateItems || !_list.contains(item))
@@ -847,7 +847,7 @@ public: // QAbstractListModel API
      */
     CustomItemType *takeRow(int row)
     {
-        CustomItemType *item = NULL;
+        CustomItemType *item = nullptr;
 
         if ((row >= 0) && (row < _list.size()))
         {
@@ -855,7 +855,7 @@ public: // QAbstractListModel API
             beginRemoveRows(QModelIndex(), row, row);
 
             item = _list.takeAt(row);
-            if (item != NULL)
+            if (item != nullptr)
             {
                 // Check if we can unsubscribe
                 if (!_allowDuplicateItems || !_list.contains(item))
@@ -883,7 +883,7 @@ public: // QAbstractListModel API
      */
     CustomItemType *itemAtRow(int row)
     {
-        CustomItemType *item = NULL;
+        CustomItemType *item = nullptr;
 
         if ((row >= 0) && (row < _list.size()))
         {
@@ -903,7 +903,7 @@ public: // QAbstractListModel API
     {
         int index = -1;
 
-        if (item != NULL)
+        if (item != nullptr)
         {
             index = _list.indexOf(item);
         }
@@ -921,7 +921,7 @@ public: // QAbstractListModel API
     {
         bool result = false;
 
-        if (item != NULL)
+        if (item != nullptr)
         {
             result = _list.contains(item);
         }
@@ -940,7 +940,7 @@ public: // QAbstractListModel API
     {
         QModelIndex result;
 
-        if (item != NULL)
+        if (item != nullptr)
         {
             int itemIndex = _list.indexOf(item);
             if (itemIndex >= 0)
@@ -1053,10 +1053,10 @@ public: // List API
      */
     void append(QObject *item) Q_DECL_OVERRIDE
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             CustomItemType *customItem = qobject_cast<CustomItemType *>(item);
-            if (customItem != NULL)
+            if (customItem != nullptr)
             {
                 appendRow(customItem);
             }
@@ -1074,10 +1074,10 @@ public: // List API
      */
     void prepend(QObject *item) Q_DECL_OVERRIDE
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             CustomItemType *customItem = qobject_cast<CustomItemType *>(item);
-            if (customItem != NULL)
+            if (customItem != nullptr)
             {
                 prependRow(customItem);
             }
@@ -1096,10 +1096,10 @@ public: // List API
      */
     Q_INVOKABLE void insert(int index, QObject *item) Q_DECL_OVERRIDE
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             CustomItemType *customItem = qobject_cast<CustomItemType *>(item);
-            if (customItem != NULL)
+            if (customItem != nullptr)
             {
                 insertRow(index, customItem);
             }
@@ -1121,16 +1121,16 @@ public: // List API
      */
     Q_INVOKABLE virtual QObject* replace(int index, QObject* newItem) Q_DECL_OVERRIDE
     {
-        QObject* previousItem = NULL;
+        QObject* previousItem = nullptr;
 
         // Check if we have a valid index position
         if ((index >= 0) && (index < _list.size()))
         {
-            if (newItem != NULL)
+            if (newItem != nullptr)
             {
                 // try to cast our item
                 CustomItemType *customItem = qobject_cast<CustomItemType *>(newItem);
-                if (customItem != NULL)
+                if (customItem != nullptr)
                 {
                     // Remove previous item
                     previousItem = takeAt(index);
@@ -1168,10 +1168,10 @@ public: // List API
      */
     void remove(QObject *item) Q_DECL_OVERRIDE
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             CustomItemType *customItem = qobject_cast<CustomItemType *>(item);
-            if (customItem != NULL)
+            if (customItem != nullptr)
             {
                 int itemIndex = _list.indexOf(customItem);
                 if  (itemIndex >= 0)
@@ -1223,10 +1223,10 @@ public: // List API
     {
         bool result = false;
 
-        if (item != NULL)
+        if (item != nullptr)
         {
             CustomItemType *customItem = qobject_cast<CustomItemType *>(item);
-            if (customItem != NULL)
+            if (customItem != nullptr)
             {
                 result = containsItem(customItem);
             }
@@ -1245,10 +1245,10 @@ public: // List API
     {
         int index = -1;
 
-        if (item != NULL)
+        if (item != nullptr)
         {
             CustomItemType *customItem = qobject_cast<CustomItemType *>(item);
-            if (customItem != NULL)
+            if (customItem != nullptr)
             {
                 index = indexOfItem(customItem);
             }
@@ -1493,10 +1493,10 @@ public:
     {
         // get information about our sender
         QObject *sourceObject = sender();
-        if (sourceObject != NULL)
+        if (sourceObject != nullptr)
         {
             CustomItemType *item = dynamic_cast<CustomItemType *>(sourceObject);
-            if (item != NULL)
+            if (item != nullptr)
             {
                 // Check if this item is in our list
                 if (_list.contains(item))
@@ -1587,7 +1587,7 @@ public:
      */
     void _onListItemExternalDeletion(QObject* deletedItem) Q_DECL_OVERRIDE
     {
-        if (deletedItem != NULL)
+        if (deletedItem != nullptr)
         {
             //qWarning() << "I2CustomItemListModel<" << CustomItemType::staticMetaObject.className() << "> warning: item deleted outside of our list model!\n==> Are you sure that you have coded your deletion code right?";
 
@@ -1669,7 +1669,7 @@ private:
      */
     void _subscribeToItem(CustomItemType *item)
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             // Subscribe to each notify signal associated to a property of our item class
             for (auto notifySignalIndex: _propertyNotifySignals)
@@ -1692,7 +1692,7 @@ private:
      */
     void _unsubscribeToItem(CustomItemType *item)
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             // Remove all subscriptions to signals of our item
             disconnect(item, 0, this, 0);

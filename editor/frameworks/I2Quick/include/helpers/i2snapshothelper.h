@@ -43,7 +43,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit I2SnapshotHelper(QObject *parent = 0);
+    explicit I2SnapshotHelper(QObject *parent = nullptr);
 
 
     /**

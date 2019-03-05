@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2016-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -47,7 +47,7 @@ public:
      * @param value
      * @param parent
      */
-    explicit I2CustomItemHashPair (QString key, QObject* value, QObject* parent = 0);
+    explicit I2CustomItemHashPair (QString key, QObject* value, QObject* parent = nullptr);
 
     /**
       * @brief Destructor
@@ -125,7 +125,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit AbstractI2CustomItemHashModel (QObject* parent = 0);
+    explicit AbstractI2CustomItemHashModel (QObject* parent = nullptr);
 
 
 public: // Helpers to switch between role and property name
@@ -404,7 +404,7 @@ public: // QAbstractListModel API
         if (index.isValid() && (index.row() >= 0) && (index.row() < _list.size()))
         {
             I2CustomItemHashPair* item = _list.at(index.row());
-            if (item != NULL)
+            if (item != nullptr)
             {
                 if (role != Qt::DisplayRole)
                 {
@@ -459,7 +459,7 @@ public: // QAbstractListModel API
         if (index.isValid() && (index.row() >= 0) && (index.row() < _list.size()))
         {
             I2CustomItemHashPair* item = _list.at(index.row ());
-            if (item != NULL)
+            if (item != nullptr)
             {
                 if ((role != Qt::DisplayRole) && (role != QtObjectRole()))
                 {
@@ -521,7 +521,7 @@ public: // QAbstractListModel API
      */
     void appendRow(I2CustomItemHashPair* item)
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             QString key = item->key();
 
@@ -603,7 +603,7 @@ public: // QAbstractListModel API
 
             // - get our item
             I2CustomItemHashPair* item = _list.takeAt(row);
-            if (item != NULL)
+            if (item != nullptr)
             {
                 // Remove connections
                 _unsubscribeToItem(item);
@@ -612,7 +612,7 @@ public: // QAbstractListModel API
                 _hash.remove(item->key());
 
                 // Clean-up property (notify QML, remove connections, etc.)
-                item->setValue(NULL);
+                item->setValue(nullptr);
 
                 // Delete our item
                 delete item;
@@ -661,7 +661,7 @@ public: // QAbstractListModel API
             for(int index = 0; index < count; index++)
             {
                 I2CustomItemHashPair* item = _list.takeAt(row);
-                if (item != NULL)
+                if (item != nullptr)
                 {
                     // Remove connections
                     _unsubscribeToItem(item);
@@ -670,7 +670,7 @@ public: // QAbstractListModel API
                     _hash.remove(item->key());
 
                     // Clean-up property (notify QML, remove connections, etc.)
-                    item->setValue(NULL);
+                    item->setValue(nullptr);
 
                     // Add item to our list
                     itemsToDelete.append(item);
@@ -774,7 +774,7 @@ public: // Hash API
      */
     QObject* get(int index) Q_DECL_OVERRIDE
     {
-        QObject* item = NULL;
+        QObject* item = nullptr;
 
         if ((index >= 0) && (index < _list.size()))
         {
@@ -803,13 +803,13 @@ public: // Hash API
      */
     Q_INVOKABLE QObject* value(QString key) Q_DECL_OVERRIDE
     {
-        QObject* result = NULL;
+        QObject* result = nullptr;
 
         // Check if we have a key
         if (!key.isEmpty())
         {
             I2CustomItemHashPair* pair = _hash.value(key);
-            if (pair != NULL)
+            if (pair != nullptr)
             {
                 result = pair->value();
             }
@@ -831,13 +831,13 @@ public: // Hash API
      */
     Q_INVOKABLE CustomItemType* castedValue(QString key)
     {
-        CustomItemType* result = NULL;
+        CustomItemType* result = nullptr;
 
         // Check if we have a key
         if (!key.isEmpty())
         {
             I2CustomItemHashPair* pair = _hash.value(key);
-            if (pair != NULL)
+            if (pair != nullptr)
             {
                 result = dynamic_cast<CustomItemType*>(pair->value());
             }
@@ -865,10 +865,10 @@ public: // Hash API
         {
             for (auto item: _list)
             {
-                if (item != NULL)
+                if (item != nullptr)
                 {
                     QObject* value = item->value();
-                    if (value != NULL)
+                    if (value != nullptr)
                     {
                         result.append(value);
                     }
@@ -896,10 +896,10 @@ public: // Hash API
         {
             for (auto item: _list)
             {
-                if (item != NULL)
+                if (item != nullptr)
                 {
                     CustomItemType* value = dynamic_cast<CustomItemType *>(item->value());
-                    if (value != NULL)
+                    if (value != nullptr)
                     {
                         result.append(value);
                     }
@@ -921,7 +921,7 @@ public: // Hash API
     void insert(QString key, QObject* item) Q_DECL_OVERRIDE
     {
         // Check if key and value are defined
-        if (!key.isEmpty() && (item != NULL))
+        if (!key.isEmpty() && (item != nullptr))
         {
             // Check if key does not exist
             if (!_hash.contains(key))
@@ -950,11 +950,11 @@ public: // Hash API
      */
     void insertContentOfCustomHashModel(AbstractI2CustomItemHashModel* hashModel) Q_DECL_OVERRIDE
     {
-        if (hashModel != NULL)
+        if (hashModel != nullptr)
         {
             // Try to cast our hashmodel
             I2CustomItemHashModel<CustomItemType>* castedHashModel = dynamic_cast<I2CustomItemHashModel<CustomItemType> *>(hashModel);
-            if (castedHashModel != NULL)
+            if (castedHashModel != nullptr)
             {
                 // Check if we have at least one item in this hash
                 if (castedHashModel->count())
@@ -969,7 +969,7 @@ public: // Hash API
                         if (!key.isEmpty() && !(_hash.contains(key)) && !(validNewkeys.contains(key)))
                         {
                             CustomItemType* value = castedHashModel->castedValue(key);
-                            if (value != NULL)
+                            if (value != nullptr)
                             {
                                 I2CustomItemHashPair* pair = new I2CustomItemHashPair(key, value);
                                 validItems.append(pair);
@@ -1018,7 +1018,7 @@ public: // Hash API
                 if (!key.isEmpty() && !(_hash.contains(key)) && !(validNewkeys.contains(key)))
                 {
                     CustomItemType* value = hash.value(key);
-                    if (value != NULL)
+                    if (value != nullptr)
                     {
                         I2CustomItemHashPair* pair = new I2CustomItemHashPair(key, value);
                         validItems.append(pair);
@@ -1053,7 +1053,7 @@ public: // Hash API
         if (!key.isEmpty())
         {
             I2CustomItemHashPair* pair = _hash.value(key);
-            if (pair != NULL)
+            if (pair != nullptr)
             {
                 int index = _list.indexOf(pair);
                 removeRow(index);
@@ -1111,7 +1111,7 @@ public: // Hash API
                 _hash.remove(item->key());
 
                 // Clean-up property (to remove internal connections, notify QML, etc.)
-                item->setValue(NULL);
+                item->setValue(nullptr);
             }
 
             // Delete all items of our list (I2CustomItemHashPair)
@@ -1156,10 +1156,10 @@ public: // Hash API
 
                 // Delete our item value
                 QObject* value = item->value();
-                if (value != NULL)
+                if (value != nullptr)
                 {
                     // Clean-up property (to remove internal connections, notify QML, etc.)
-                    item->setValue(NULL);
+                    item->setValue(nullptr);
 
                     // Delete our value
                     delete value;
@@ -1191,7 +1191,7 @@ public: // Hash API
     void _onHashItemExternalDeletion(I2CustomItemHashPair* pair) Q_DECL_OVERRIDE
     {
         // Ensure that we have an I2CustomItemHashPair
-        if (pair != NULL)
+        if (pair != nullptr)
         {
             // Try to find the index of our pair
             int indexOfPair = _list.indexOf(pair);
@@ -1237,11 +1237,11 @@ public: // Hash API
     {
         // Check if we have a sender
         QObject *sourceObject = sender();
-        if (sourceObject != NULL)
+        if (sourceObject != nullptr)
         {
             // Try to cast our sender
             I2CustomItemHashPair *item = dynamic_cast<I2CustomItemHashPair *>(sourceObject);
-            if (item != NULL)
+            if (item != nullptr)
             {
                 // Check if this item is in our list
                 QModelIndex index = _modelIndexFromItem(item);
@@ -1280,7 +1280,7 @@ public: // Hash API
     {
         QModelIndex result;
 
-        if (item != NULL)
+        if (item != nullptr)
         {
             int itemIndex = _list.indexOf(item);
             if (itemIndex >= 0)
@@ -1322,7 +1322,7 @@ public: // Hash API
         {
             QString key = hashKeys.at(tempIndex);
             I2CustomItemHashPair* hashItem = _hash.value(key);
-            if (hashItem != NULL)
+            if (hashItem != nullptr)
             {
                 // NB: comparison of pointer addresses
                 if (hashItem == deletedItem)
@@ -1397,7 +1397,7 @@ private:
      */
     void _addItem(I2CustomItemHashPair* item)
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             _subscribeToItem(item);
 
@@ -1417,7 +1417,7 @@ private:
      */
     void _subscribeToItem(I2CustomItemHashPair* item)
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             // Subscribe to each notify signal associated to a property of our item class
             for(auto notifySignalIndex: _propertyNotifySignals)
@@ -1442,7 +1442,7 @@ private:
      */
     void _unsubscribeToItem(I2CustomItemHashPair *item)
     {
-        if (item != NULL)
+        if (item != nullptr)
         {
             // Remove all subscriptions to signals of our item
             disconnect(item, 0, this, 0);

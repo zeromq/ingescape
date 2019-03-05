@@ -54,7 +54,7 @@ class I2QUICK_EXPORT I2SimpleSvgItemModel : public QObject
     I2_CPP_PROPERTY(I2SimpleSvgItemType::Value, type)
 
     // Opacity of our SVG item
-    I2_CPP_PROPERTY(qreal, opacity)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, opacity)
 
     // Transformation of our SVG item
     I2_CPP_PROPERTY(QTransform, transform)
@@ -69,7 +69,7 @@ public:
      * @param type
      * @param parent
      */
-    explicit I2SimpleSvgItemModel(QString uid, I2SimpleSvgItemType::Value type, QObject* parent = 0);
+    explicit I2SimpleSvgItemModel(QString uid, I2SimpleSvgItemType::Value type, QObject* parent = nullptr);
 
 
     /**
@@ -106,7 +106,7 @@ public:
      * @param uid
      * @param parent
      */
-    explicit I2SimpleSvgGroupModel(QString uid, QObject* parent = 0);
+    explicit I2SimpleSvgGroupModel(QString uid, QObject* parent = nullptr);
 
     /**
      * @brief Destructor
@@ -129,23 +129,23 @@ class I2QUICK_EXPORT I2SimpleSvgRootModel : public I2SimpleSvgGroupModel
     Q_OBJECT
 
     // Abscissa of the top-left corner of the bounding box of our SVG
-    I2_CPP_PROPERTY(qreal, x)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, x)
 
     // Ordinate of the top-left corner of the bounding box of our SVG
-    I2_CPP_PROPERTY(qreal, y)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, y)
 
     // Width of the bounding box of our SVG
-    I2_CPP_PROPERTY(qreal, width)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, width)
 
     // Height of the bounding box of our SVG
-    I2_CPP_PROPERTY(qreal, height)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, height)
 
 public:
     /**
      * @brief Default constructor
      * @param parent
      */
-    explicit I2SimpleSvgRootModel(QObject* parent = 0);
+    explicit I2SimpleSvgRootModel(QObject* parent = nullptr);
 
 
     /**
@@ -173,16 +173,16 @@ class I2QUICK_EXPORT I2SimpleSvgImageModel : public I2SimpleSvgItemModel
     I2_CPP_PROPERTY(QUrl, source)
 
     // Abscissa of the top-left corner of our image
-    I2_CPP_PROPERTY(qreal, x)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, x)
 
     // Ordinate of the top-left corner of our image
-    I2_CPP_PROPERTY(qreal, y)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, y)
 
     // Width of our image
-    I2_CPP_PROPERTY(qreal, width)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, width)
 
     // Height of our image
-    I2_CPP_PROPERTY(qreal, height)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, height)
 
 public:
     /**
@@ -190,7 +190,7 @@ public:
      * @param uid
      * @param parent
      */
-    explicit I2SimpleSvgImageModel(QString uid, QObject* parent = 0);
+    explicit I2SimpleSvgImageModel(QString uid, QObject* parent = nullptr);
 
 
     /**
@@ -224,16 +224,16 @@ class I2QUICK_EXPORT I2SimpleSvgTextModel : public I2SimpleSvgItemModel
     I2_CPP_PROPERTY(QString, text)
 
     // Abscissa of our anchor point
-    I2_CPP_PROPERTY(qreal, x)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, x)
 
     // Ordinate of our anchor point
-    I2_CPP_PROPERTY(qreal, y)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, y)
 
     // Fill
     I2_CPP_PROPERTY(QColor, fill)
 
     // Fill-opacity
-    I2_CPP_PROPERTY(qreal, fillOpacity)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, fillOpacity)
 
     // Font
     I2_CPP_PROPERTY(QFont, font)
@@ -244,7 +244,7 @@ public:
      * @param uid
      * @param parent
      */
-    explicit I2SimpleSvgTextModel(QString uid, QObject* parent = 0);
+    explicit I2SimpleSvgTextModel(QString uid, QObject* parent = nullptr);
 
 
     /**
@@ -278,7 +278,7 @@ class I2QUICK_EXPORT I2SimpleSvgShapeModel : public I2SimpleSvgItemModel
     I2_CPP_PROPERTY(QColor, fill)
 
     // Fill opacity
-    I2_CPP_PROPERTY(qreal, fillOpacity)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, fillOpacity)
 
     // Fill rule
     I2_CPP_PROPERTY(I2FillRule::Value, fillRule)
@@ -287,10 +287,10 @@ class I2QUICK_EXPORT I2SimpleSvgShapeModel : public I2SimpleSvgItemModel
     I2_CPP_PROPERTY(QColor, stroke)
 
     // Stroke opacity
-    I2_CPP_PROPERTY(qreal, strokeOpacity)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, strokeOpacity)
 
     // Stroke width
-    I2_CPP_PROPERTY(qreal, strokeWidth)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, strokeWidth)
 
     // Stroke linecap - the shape to be used at the end of open subpaths when they are stroked
     I2_CPP_PROPERTY(I2LineCap::Value, strokeLineCap)
@@ -299,13 +299,13 @@ class I2QUICK_EXPORT I2SimpleSvgShapeModel : public I2SimpleSvgItemModel
     I2_CPP_PROPERTY(I2LineJoin::Value, strokeLineJoin)
 
     // Stroke miter limit - to configure the 'miter' linejoin
-    I2_CPP_PROPERTY(qreal, strokeMiterLimit)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, strokeMiterLimit)
 
     // Stroke dash array - the pattern of dashes and gaps used to stroke paths
     I2_CPP_PROPERTY(QString, strokeDashArray)
 
     // Stroke dash offset - the distance into the dash pattern to start the dash
-    I2_CPP_PROPERTY(qreal, strokeDashOffset)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, strokeDashOffset)
 
 public:
     /**
@@ -314,7 +314,7 @@ public:
      * @param shapeType
      * @param parent
      */
-    explicit I2SimpleSvgShapeModel(QString uid, I2SimpleSvgShapeType::Value shapeType, QObject* parent = 0);
+    explicit I2SimpleSvgShapeModel(QString uid, I2SimpleSvgShapeType::Value shapeType, QObject* parent = nullptr);
 
 
     /**
@@ -345,22 +345,22 @@ class I2QUICK_EXPORT I2SimpleSvgRectangleModel : public I2SimpleSvgShapeModel
     Q_OBJECT
 
     // Abscissa of the top-left corner of our rectangle
-    I2_CPP_PROPERTY(qreal, x)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, x)
 
     // Ordinate of the top-left corner of our rectangle
-    I2_CPP_PROPERTY(qreal, y)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, y)
 
     // Width of our rectangle
-    I2_CPP_PROPERTY(qreal, width)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, width)
 
     // Height of our rectangle
-    I2_CPP_PROPERTY(qreal, height)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, height)
 
     // x-axis radius of the ellipse used to round off the corners of our rectangle
-    I2_CPP_PROPERTY(qreal, radiusX)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, radiusX)
 
     // y-axis radius of the ellipse used to round off the corners of our rectangle
-    I2_CPP_PROPERTY(qreal, radiusY)
+    I2_CPP_PROPERTY_FUZZY_COMPARE(qreal, radiusY)
 
 public:
     /**
@@ -368,7 +368,7 @@ public:
      * @param uid
      * @param parent
      */
-    explicit I2SimpleSvgRectangleModel(QString uid, QObject* parent = 0);
+    explicit I2SimpleSvgRectangleModel(QString uid, QObject* parent = nullptr);
 
 
     /**
@@ -399,13 +399,13 @@ class I2QUICK_EXPORT I2SimpleSvgCircleModel : public I2SimpleSvgShapeModel
     Q_OBJECT
 
     // Abscissa of our center
-    I2_CPP_PROPERTY (qreal, centerX)
+    I2_CPP_PROPERTY_FUZZY_COMPARE (qreal, centerX)
 
     // Ordinate of our center
-    I2_CPP_PROPERTY (qreal, centerY)
+    I2_CPP_PROPERTY_FUZZY_COMPARE (qreal, centerY)
 
     // Radius of our circle
-    I2_CPP_PROPERTY (qreal, radius)
+    I2_CPP_PROPERTY_FUZZY_COMPARE (qreal, radius)
 
 public:
     /**
@@ -413,7 +413,7 @@ public:
      * @param uid
      * @param parent
      */
-    explicit I2SimpleSvgCircleModel(QString uid, QObject* parent = 0);
+    explicit I2SimpleSvgCircleModel(QString uid, QObject* parent = nullptr);
 
     /**
      * @brief Destructor
@@ -442,16 +442,16 @@ class I2QUICK_EXPORT I2SimpleSvgEllipseModel : public I2SimpleSvgShapeModel
     Q_OBJECT
 
     // Abscissa of our center
-    I2_CPP_PROPERTY (qreal, centerX)
+    I2_CPP_PROPERTY_FUZZY_COMPARE (qreal, centerX)
 
     // Ordinate of our center
-    I2_CPP_PROPERTY (qreal, centerY)
+    I2_CPP_PROPERTY_FUZZY_COMPARE (qreal, centerY)
 
     // x-axis radius of the ellipse
-    I2_CPP_PROPERTY (qreal, radiusX)
+    I2_CPP_PROPERTY_FUZZY_COMPARE (qreal, radiusX)
 
     // y-axis radius of the ellipse
-    I2_CPP_PROPERTY (qreal, radiusY)
+    I2_CPP_PROPERTY_FUZZY_COMPARE (qreal, radiusY)
 
 public:
     /**
@@ -459,7 +459,7 @@ public:
      * @param uid
      * @param parent
      */
-    explicit I2SimpleSvgEllipseModel(QString uid, QObject* parent = 0);
+    explicit I2SimpleSvgEllipseModel(QString uid, QObject* parent = nullptr);
 
     /**
      * @brief Destructor
@@ -488,16 +488,16 @@ class I2QUICK_EXPORT I2SimpleSvgLineModel : public I2SimpleSvgShapeModel
     Q_OBJECT
 
     // Abscissa of our first point
-    I2_CPP_PROPERTY (qreal, x1)
+    I2_CPP_PROPERTY_FUZZY_COMPARE (qreal, x1)
 
     // Ordinate of our first point
-    I2_CPP_PROPERTY (qreal, y1)
+    I2_CPP_PROPERTY_FUZZY_COMPARE (qreal, y1)
 
     // Abscissa of our second point
-    I2_CPP_PROPERTY (qreal, x2)
+    I2_CPP_PROPERTY_FUZZY_COMPARE (qreal, x2)
 
     // Ordinate of our second point
-    I2_CPP_PROPERTY (qreal, y2)
+    I2_CPP_PROPERTY_FUZZY_COMPARE (qreal, y2)
 
 public:
     /**
@@ -505,7 +505,7 @@ public:
      * @param uid
      * @param parent
      */
-    explicit I2SimpleSvgLineModel(QString uid, QObject* parent = 0);
+    explicit I2SimpleSvgLineModel(QString uid, QObject* parent = nullptr);
 
     /**
      * @brief Destructor
@@ -548,7 +548,7 @@ public:
      * @param uid
      * @param parent
      */
-    explicit I2SimpleSvgPathModel(QString uid, QObject* parent = 0);
+    explicit I2SimpleSvgPathModel(QString uid, QObject* parent = nullptr);
 
 
     /**
@@ -605,7 +605,7 @@ public:
      * @param uid
      * @param parent
      */
-    explicit I2SimpleSvgPolylineModel(QString uid, QObject* parent = 0);
+    explicit I2SimpleSvgPolylineModel(QString uid, QObject* parent = nullptr);
 
     /**
      * @brief Destructor

@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2015-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2015-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -193,11 +193,11 @@
         virtual bool setx (QObject* value) {
             bool hasChanged = false;
             if (_x != value) {
-                if (_x != NULL) {
+                if (_x != nullptr) {
                     disconnect(_x, SIGNAL(destroyed(QObject *)), this, 0);
                 }
                 _x = value;
-                if (_x != 0) {
+                if (_x != nullptr) {
                     connect(_x, SIGNAL(destroyed(QObject *)), this, SLOT(_onxDestroyed(QObject *)));
                 }
                 hasChanged = true;
@@ -209,8 +209,8 @@
         void xChanged (QObject* value);
     private slots:
         void onxDestroyed(QObject*) {
-            _x = NULL;
-            Q_EMIT xChanged(NULL);
+            _x = nullptr;
+            Q_EMIT xChanged(nullptr);
         }
     protected:
         QObject* _x;
@@ -225,11 +225,11 @@
         virtual bool set##name (type value) { \
             bool hasChanged = false; \
             if (_##name != value) { \
-                if (_##name != NULL) { \
+                if (_##name != nullptr) { \
                     disconnect(_##name, SIGNAL(destroyed(QObject *)), this, 0); \
                 } \
                 _##name = value; \
-                if (_##name != NULL) { \
+                if (_##name != nullptr) { \
                     connect(_##name, SIGNAL(destroyed(QObject *)), this, SLOT(_on##name##Destroyed(QObject *))); \
                 } \
                 hasChanged = true; \
@@ -241,8 +241,8 @@
         void name##Changed (type value); \
     private Q_SLOTS: \
         void _on##name##Destroyed(QObject*) { \
-            _##name = NULL; \
-            Q_EMIT name##Changed(NULL); \
+            _##name = nullptr; \
+            Q_EMIT name##Changed(nullptr); \
         } \
     protected: \
         type _##name;
@@ -491,11 +491,11 @@
         virtual bool setx (QObject* value) {
             bool hasChanged = false;
             if (_x != value) {
-                if (_x != NULL) {
+                if (_x != nullptr) {
                     disconnect(_x, SIGNAL(destroyed(QObject *)), this, 0);
                 }
                 _x = value;
-                if (_x != 0) {
+                if (_x != nullptr) {
                     connect(_x, SIGNAL(destroyed(QObject *)), this, SLOT(_onxDestroyed(QObject *)));
                 }
                 hasChanged = true;
@@ -507,8 +507,8 @@
         void xChanged (QObject* value);
     private slots:
         void onxDestroyed(QObject*) {
-            _x = NULL;
-            Q_EMIT xChanged(NULL);
+            _x = nullptr;
+            Q_EMIT xChanged(nullptr);
         }
     protected:
         QObject* _x;
@@ -523,11 +523,11 @@
         virtual bool set##name (type value) { \
             bool hasChanged = false; \
             if (_##name != value) { \
-                if (_##name != NULL) {\
+                if (_##name != nullptr) {\
                     disconnect(_##name, SIGNAL(destroyed(QObject *)), this, 0); \
                 } \
                 _##name = value; \
-                if (_##name != NULL) { \
+                if (_##name != nullptr) { \
                     connect(_##name, SIGNAL(destroyed(QObject *)), this, SLOT(_on##name##Destroyed(QObject *))); \
                 } \
                 hasChanged = true; \
@@ -539,8 +539,8 @@
         void name##Changed (type value); \
     private Q_SLOTS: \
         void _on##name##Destroyed(QObject*) { \
-            _##name = NULL; \
-            Q_EMIT name##Changed(NULL); \
+            _##name = nullptr; \
+            Q_EMIT name##Changed(nullptr); \
         } \
     protected: \
         type _##name;
