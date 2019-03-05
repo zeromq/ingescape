@@ -179,6 +179,26 @@ editor-windows-release-x86:
     name: "editor-windows-release-x86"
     expire_in: 1 week
 
+# Create ingescape editor for windows
+editor-windows-release-x64:
+  <<: *build-editor-files
+  stage: build-editor
+  variables:
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+  tags:
+    - windows
+  script:
+    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - git clean -xfd
+    - mkdir editor\apps\IngeScape-Editor\build\ReleaseX64
+    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build editor\apps\IngeScape-Editor\build\ReleaseX64 --target ALL_BUILD --config Release
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Editor\build
+    name: "editor-windows-release-x64"
+    expire_in: 1 week
+
 # Create runtime install for windows 32 bits
 lib-installer-runtime-windows-x86:
   <<: *build-lib-files
@@ -256,6 +276,20 @@ editor-installer-windows-x86:
       - editor\apps\IngeScape-Editor\build\ReleaseX86\IngeScape-Editor-*
   dependencies:
     - editor-windows-release-x86
+
+# Create editor install for windows 64 bits
+editor-installer-windows-x64:
+  <<: *build-editor-files
+  stage: installer-editor
+  tags:
+    - windows
+  script:
+    - cd editor\apps\IngeScape-Editor\build\Release64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Editor\build\ReleaseX64\IngeScape-Editor-*
+  dependencies:
+    - editor-windows-release-x64
 
 # Create runtime install for linux 64 bits
 lib-installer-runtime-linux-x64:

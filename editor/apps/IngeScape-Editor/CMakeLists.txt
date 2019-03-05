@@ -182,10 +182,19 @@ if (APPLE)
     set_source_files_properties("${I2QUICK_LIB}" PROPERTIES MACOSX_PACKAGE_LOCATION Frameworks)
     set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${I2QUICK_LIB}")
 elseif (WIN32)
-    set(I2QUICK_LIB "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.lib")
+    # Check 32 or 64 bit
+    # CMAKE_SIZEOF_VOID_P EQUAL 8 and CMAKE_CL_64 check current platform and no target
+    if ("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+        # target is 64 bit
+        set(_MY_LIB_FOLDER "Win64")
+    else ("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+        # target is 32 bit
+        set(_MY_LIB_FOLDER "Win32")
+    endif ("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+    set(I2QUICK_LIB "${SOURCE_DIR}/../../frameworks/I2Quick/${_MY_LIB_FOLDER}/I2Quick.lib")
     set_target_properties(I2Quick PROPERTIES IMPORTED_IMPLIB "${I2QUICK_LIB}")
-    set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.dll")
-    install(FILES "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.dll" DESTINATION .)
+    set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../frameworks/I2Quick/${_MY_LIB_FOLDER}/I2Quick.dll")
+    install(FILES "${SOURCE_DIR}/../../frameworks/I2Quick/${_MY_LIB_FOLDER}/I2Quick.dll" DESTINATION .)
 else ()
     #TODO Add so for unix
 endif ()
@@ -268,7 +277,7 @@ elseif (WIN32)
     add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SOURCE_DIR}/../../frameworks/I2Quick/Win32/I2Quick.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SOURCE_DIR}/../../frameworks/I2Quick/${_MY_LIB_FOLDER}/I2Quick.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
 
     if (CMAKE_BUILD_TYPE STREQUAL "Release")
