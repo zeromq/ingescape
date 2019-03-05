@@ -225,9 +225,12 @@ lib-installer-runtime-macos-x64:
     - osx
   script:
     - make -C build package
+    - cp dependencies/unix/install.sh build/install.sh
+    - sed -i '' 's/DARWIN_PACKAGE_FILE_NAME=.*/DARWIN_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/install.sh
   artifacts:
     paths:
       - build/ingescape-*
+      - build/install.sh
   dependencies:
     - lib-macos-release-x64
 
@@ -269,9 +272,12 @@ lib-installer-runtime-linux-x64:
   image: fafesty/debian-with-zyre
   script:
     - make -C build package
+    - cp dependencies/unix/install.sh build/install.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/install.sh
   artifacts:
     paths:
       - build/ingescape-*
+      - build/install.sh
   dependencies:
     - lib-linux-release-x64
 
@@ -323,3 +329,27 @@ lib-deploy-windows-release-x86:
     - copy /y build\ReleaseX86\Release\* C:\Users\admin\dev\Builds\Release\x86\
   dependencies:
     - lib-windows-release-x86
+
+# Deploy ingescape in windows use to compile to be able to compile agents
+lib-deploy-windows-debug-x64:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - windows
+  script:
+    - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
+    - copy /y build\DebugX64\Debug\* C:\Users\admin\dev\Builds\Debug\x64\
+  dependencies:
+    - lib-windows-debug-x64
+
+# Deploy ingescape in windows use to compile to be able to compile agents
+lib-deploy-windows-debug-x86:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - windows
+  script:
+    - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
+    - copy /y build\DebugX86\Debug\* C:\Users\admin\dev\Builds\Debug\x86\
+  dependencies:
+    - lib-windows-debug-x86
