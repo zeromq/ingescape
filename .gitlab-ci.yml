@@ -2,7 +2,6 @@
 
 # TODO Check why with install target windows api are in bin subfolder
 # TODO Check why with compile target zmq, ... are not copied in Release folder on windows
-# TODO Add yajl in unix and macos installer (or see to create yajl installer)
 # TODO Add job to deploy ingescape website on commit (Can filter to launch job on doc folder changes and only master git's branche)
 # TODO Add job to compile editor
 # TODO Add job to compile ingeprobe
@@ -100,7 +99,7 @@ lib-windows-release-x64:
   script:
     - git clean -xfd
     - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libzmq-v140-mt-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
+    - cmake -S . -B build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libzmq-v140-mt-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -119,7 +118,7 @@ lib-windows-release-x86:
   script:
     - git clean -xfd
     - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
+    - cmake -S . -B build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -138,7 +137,7 @@ lib-windows-debug-x64:
   script:
     - git clean -xfd
     - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Debug -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\libzmq-v140-mt-gd-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
+    - cmake -S . -B build\DebugX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Debug -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\libzmq-v140-mt-gd-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -157,7 +156,7 @@ lib-windows-debug-x86:
   script:
     - git clean -xfd
     - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Debug -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\libzmq-v140-mt-gd-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
+    - cmake -S . -B build\DebugX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Debug -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\libzmq-v140-mt-gd-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -177,7 +176,7 @@ editor-windows-release-x86:
   script:
     - git clean -xfd
     - mkdir editor\apps\IngeScape-Editor\build\ReleaseX86
-    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DYAJL_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\yajl.lib" -DYAJL_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
+    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release -DLIBSODIUM_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libsodium.lib" -DLIBSODIUM_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib" -DLIBZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DCZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\czmq.lib" -DCZMQ_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include" -DZYRE_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\zyre.lib" -DZYRE_INCLUDE_DIRS="%DEPENDENCIES_BUILDS_ROOT%\include"
     - cmake --build editor\apps\IngeScape-Editor\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
