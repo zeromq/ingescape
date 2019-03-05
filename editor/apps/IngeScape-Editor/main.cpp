@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName("Ingenuity i/o");
     app.setOrganizationDomain("ingenuity.io");
     app.setApplicationName("IngeScape-Editor");
-    app.setApplicationVersion("0.9.0.0");
+    app.setApplicationVersion(VERSION);
 
     // - behavior when our last window is closed
     app.setQuitOnLastWindowClosed(true);
@@ -425,6 +425,9 @@ int main(int argc, char *argv[])
 
         // Runtime version of Qt. This may be a different version than the version the application was compiled against
         qmlContext->setContextProperty("QT_RUNTIME_VERSION", QString(qVersion()));
+        
+        // Version of our application
+        qmlContext->setContextProperty("VERSION", app.applicationVersion());
     }
 
 
