@@ -303,7 +303,7 @@ editor-installer-windows-x64:
   tags:
     - windows
   script:
-    - cd editor\apps\IngeScape-Editor\build\Release64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd editor\apps\IngeScape-Editor\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
       - editor\apps\IngeScape-Editor\build\ReleaseX64\IngeScape-Editor-*
