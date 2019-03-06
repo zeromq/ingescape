@@ -37,12 +37,12 @@ class I2QUICK_EXPORT I2MouseEvent : public QObject
     /**
       * The abscissa of the position supplied by the mouse
       */
-    I2_QML_PROPERTY (qreal, x)
+    I2_QML_PROPERTY_FUZZY_COMPARE(qreal, x)
 
     /**
       * The ordinate of the position supplied by the mouse
       */
-    I2_QML_PROPERTY (qreal, y)
+    I2_QML_PROPERTY_FUZZY_COMPARE(qreal, y)
 
     /**
      * This property holds the button that caused the event

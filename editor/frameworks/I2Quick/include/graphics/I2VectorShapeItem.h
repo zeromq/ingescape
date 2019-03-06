@@ -88,7 +88,7 @@ class I2QUICK_EXPORT I2VectorShapeItem : public QQuickItem
     /**
      * Length of our shape
      */
-    I2_QML_PROPERTY_READONLY(qreal, length)
+    I2_QML_PROPERTY_READONLY_FUZZY_COMPARE(qreal, length)
 
     /**
      * Defines whether mouse events are handled or not
