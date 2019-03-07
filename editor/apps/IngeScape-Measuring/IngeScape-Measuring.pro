@@ -52,7 +52,8 @@ SOURCES += main.cpp \
     controller/subject/subjectscontroller.cpp \
     controller/task/taskscontroller.cpp \
     controller/experimentationcontroller.cpp \
-    controller/record/recordcontroller.cpp
+    controller/record/recordcontroller.cpp \
+    viewModel/experimentationsgroupvm.cpp
 
 
 HEADERS += \
@@ -74,7 +75,8 @@ HEADERS += \
     controller/subject/subjectscontroller.h \
     controller/task/taskscontroller.h \
     controller/experimentationcontroller.h \
-    controller/record/recordcontroller.h
+    controller/record/recordcontroller.h \
+    viewModel/experimentationsgroupvm.h
 
 
 RESOURCES += qml.qrc

@@ -165,8 +165,7 @@ void registerCustomQmlTypes()
     // View Models
     //
     //---------------
-    //qmlRegisterUncreatableType<ActionConditionVM>("INGESCAPE", 1, 0, "ActionConditionVM", "Internal class");
-    //qmlRegisterUncreatableType<ActionEffectVM>("INGESCAPE", 1, 0, "ActionEffectVM", "Internal class");
+    qmlRegisterUncreatableType<ExperimentationsGroupVM>("INGESCAPE", 1, 0, "ExperimentationsGroupVM", "Internal class");
 
 
     //------------------

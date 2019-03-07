@@ -24,6 +24,16 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New Experimentations List Controller";
+
+    // Groups are sorted on their name (alphabetical order)
+    _allExperimentationsGroups.setSortProperty("name");
+
+
+    // FIXME for tests
+
+    ExperimentationsGroupVM *experimentationsGroup = new ExperimentationsGroupVM("Other", nullptr);
+
+    _allExperimentationsGroups.append(experimentationsGroup);
 }
 
 

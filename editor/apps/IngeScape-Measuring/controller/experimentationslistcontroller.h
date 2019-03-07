@@ -18,12 +18,18 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
+#include <viewModel/experimentationsgroupvm.h>
+
+
 /**
  * @brief The ExperimentationsListController class defines the controller to manage the list of experimentations
  */
 class ExperimentationsListController : public QObject
 {
     Q_OBJECT
+
+    // List of all groups of experimentations
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ExperimentationsGroupVM, allExperimentationsGroups)
 
 
 public:
@@ -38,6 +44,10 @@ public:
      * @brief Destructor
      */
     ~ExperimentationsListController();
+
+
+
+    //Q_INVOKABLE void createNewExperimentation();
 
 
 Q_SIGNALS:
