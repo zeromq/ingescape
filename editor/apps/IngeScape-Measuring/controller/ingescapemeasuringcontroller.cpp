@@ -31,8 +31,13 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   _errorMessageWhenConnectionFailed(""),
   _snapshotDirectory(""),
   _modelManager(nullptr),
-  _networkC(nullptr)
-  //_terminationSignalWatcher(nullptr),
+  _networkC(nullptr),
+  _experimentationsListC(nullptr),
+  _experimentationC(nullptr),
+  _subjectsC(nullptr),
+  _tasksC(nullptr),
+  _recordC(nullptr),
+  _terminationSignalWatcher(nullptr)
   //_jsonHelper(nullptr),
   //_platformDirectoryPath(""),
   //_platformDefaultFilePath("")
@@ -105,6 +110,22 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   // Create the controller for network communications
   _networkC = new NetworkController(this);
 
+  // Create the controller to manage the list of experimentations
+  _experimentationsListC = new ExperimentationsListController(this);
+
+  // Create the controller to manage the current experimentation
+  _experimentationC = new ExperimentationController(this);
+
+  // Create the controller to manage the subjects of the current experimentation
+  _subjectsC = new SubjectsController(this);
+
+  // Create the controller to manage the tasks of the current experimentation
+  _tasksC = new TasksController(this);
+
+  // Create the controller to manage a record of the current experimentation
+  _recordC = new RecordController(this);
+
+
   // Connect to signals from the network controller
   /*connect(_networkC, &NetworkController::agentEntered, _modelManager, &IngeScapeModelManager::onAgentEntered);
   connect(_networkC, &NetworkController::agentExited, _modelManager, &IngeScapeModelManager::onAgentExited);
@@ -168,6 +189,61 @@ IngeScapeMeasuringController::~IngeScapeMeasuringController()
       disconnect(_terminationSignalWatcher, nullptr);
       delete _terminationSignalWatcher;
       _terminationSignalWatcher = nullptr;
+  }
+
+
+  //
+  // Clean-up sub-controllers
+  //
+
+  if (_experimentationsListC != nullptr)
+  {
+      disconnect(_experimentationsListC);
+
+      ExperimentationsListController* temp = _experimentationsListC;
+      setexperimentationsListC(nullptr);
+      delete temp;
+      temp = nullptr;
+  }
+
+  if (_experimentationC != nullptr)
+  {
+      disconnect(_experimentationC);
+
+      ExperimentationController* temp = _experimentationC;
+      setexperimentationC(nullptr);
+      delete temp;
+      temp = nullptr;
+  }
+
+  if (_subjectsC != nullptr)
+  {
+      disconnect(_subjectsC);
+
+      SubjectsController* temp = _subjectsC;
+      setsubjectsC(nullptr);
+      delete temp;
+      temp = nullptr;
+  }
+
+  if (_tasksC != nullptr)
+  {
+      disconnect(_tasksC);
+
+      TasksController* temp = _tasksC;
+      settasksC(nullptr);
+      delete temp;
+      temp = nullptr;
+  }
+
+  if (_recordC != nullptr)
+  {
+      disconnect(_recordC);
+
+      RecordController* temp = _recordC;
+      setrecordC(nullptr);
+      delete temp;
+      temp = nullptr;
   }
 
   if (_modelManager != nullptr)

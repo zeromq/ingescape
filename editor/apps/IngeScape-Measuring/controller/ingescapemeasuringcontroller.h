@@ -24,6 +24,11 @@
 
 #include <controller/networkcontroller.h>
 #include <controller/ingescapemodelmanager.h>
+#include <controller/experimentationslistcontroller.h>
+#include <controller/experimentationcontroller.h>
+#include <controller/subject/subjectscontroller.h>
+#include <controller/task/taskscontroller.h>
+#include <controller/record/recordcontroller.h>
 
 #include <misc/terminationsignalwatcher.h>
 
@@ -55,6 +60,21 @@ class IngeScapeMeasuringController : public QObject
 
     // Controller for network communication
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
+
+    // Controller to manage the list of experimentations
+    I2_QML_PROPERTY_READONLY(ExperimentationsListController*, experimentationsListC)
+
+    // Controller to manage the current experimentation
+    I2_QML_PROPERTY_READONLY(ExperimentationController*, experimentationC)
+
+    // Controller to manage the subjects of the current experimentation
+    I2_QML_PROPERTY_READONLY(SubjectsController*, subjectsC)
+
+    // Controller to manage the tasks of the current experimentation
+    I2_QML_PROPERTY_READONLY(TasksController*, tasksC)
+
+    // Controller to manage a record of the current experimentation
+    I2_QML_PROPERTY_READONLY(RecordController*, recordC)
 
 
 public:

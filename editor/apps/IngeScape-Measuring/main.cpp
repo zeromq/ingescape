@@ -118,8 +118,12 @@ void registerCustomQmlTypes()
     qmlRegisterSingletonType<IngeScapeMeasuringController>("INGESCAPE", 1, 0, "IngeScapeMeasuringC", &IngeScapeMeasuringController::qmlSingleton);
 
     // sub-controllers
+    qmlRegisterUncreatableType<ExperimentationController>("INGESCAPE", 1, 0, "ExperimentationController", "Internal Class");
+    qmlRegisterUncreatableType<ExperimentationsListController>("INGESCAPE", 1, 0, "ExperimentationsListController", "Internal Class");
     qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal Class");
-    //qmlRegisterUncreatableType<AgentsMappingController>("INGESCAPE", 1, 0, "AgentsMappingController", "Internal Class");
+    qmlRegisterUncreatableType<RecordController>("INGESCAPE", 1, 0, "RecordController", "Internal Class");
+    qmlRegisterUncreatableType<SubjectsController>("INGESCAPE", 1, 0, "SubjectsController", "Internal Class");
+    qmlRegisterUncreatableType<TasksController>("INGESCAPE", 1, 0, "TasksController", "Internal Class");
 
 
     //----------------

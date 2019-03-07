@@ -47,7 +47,12 @@ SOURCES += main.cpp \
     model/task/independentvariableenumm.cpp \
     model/task/dependentvariablem.cpp \
     model/measuringenums.cpp \
-    model/recordm.cpp
+    model/recordm.cpp \
+    controller/experimentationslistcontroller.cpp \
+    controller/subject/subjectscontroller.cpp \
+    controller/task/taskscontroller.cpp \
+    controller/experimentationcontroller.cpp \
+    controller/record/recordcontroller.cpp
 
 
 HEADERS += \
@@ -64,7 +69,12 @@ HEADERS += \
     model/task/independentvariableenumm.h \
     model/task/dependentvariablem.h \
     model/measuringenums.h \
-    model/recordm.h
+    model/recordm.h \
+    controller/experimentationslistcontroller.h \
+    controller/subject/subjectscontroller.h \
+    controller/task/taskscontroller.h \
+    controller/experimentationcontroller.h \
+    controller/record/recordcontroller.h
 
 
 RESOURCES += qml.qrc

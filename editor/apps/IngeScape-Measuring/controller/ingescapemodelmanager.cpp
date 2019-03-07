@@ -69,6 +69,6 @@ IngeScapeModelManager::IngeScapeModelManager(QObject *parent) : QObject(parent)
  */
 IngeScapeModelManager::~IngeScapeModelManager()
 {
-    qInfo() << "Delete INGESCAPE Model Manager";
+    qInfo() << "Delete IngeScape Model Manager";
 
 }
