@@ -42,7 +42,7 @@ stages:
     refs:
       - master
 
-# Create ingescape library for linux
+# Create ingescape library for linux (x86_64)
 lib-linux-release-x64:
   <<: *build-lib-files
   stage: build-lib
@@ -58,6 +58,25 @@ lib-linux-release-x64:
     paths:
       - build
     name: "lib-linux-release-x64"
+    expire_in: 1 week
+  dependencies: []
+  
+# Create ingescape library for linux (armv7/armhf)
+lib-linux-release-armhf:
+  <<: *build-lib-files
+  stage: build-lib
+  tags:
+    - docker
+  image: ingescape/raspbian:stretch
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-linux-release-armhf"
     expire_in: 1 week
   dependencies: []
 
@@ -336,6 +355,24 @@ lib-installer-runtime-linux-x64:
       - build/install.sh
   dependencies:
     - lib-linux-release-x64
+
+# Create runtime install for linux ARMv7 (armhf)
+lib-installer-runtime-linux-armhf:
+  <<: *build-lib-files
+  stage: installer-lib
+  tags:
+    - docker
+  image: ingescape/raspbian:stretch
+  script:
+    - make -C build package
+    - cp dependencies/unix/install.sh build/install.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/install.sh
+  artifacts:
+    paths:
+      - build/ingescape-*
+      - build/install.sh
+  dependencies:
+    - lib-linux-release-armhf
 
 # Deploy ingescape in mac os X use to compile to be able to compile agents
 lib-deploy-macos-release-x64:
