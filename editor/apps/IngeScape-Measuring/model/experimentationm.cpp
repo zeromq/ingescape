@@ -25,6 +25,10 @@ ExperimentationM::ExperimentationM(QObject *parent) : QObject(parent),
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New Model of Experimentation" << _name;
+
+
+    // Records are sorted on their start date/time (chronological order)
+    _allRecords.setSortProperty("startDateTime");
 }
 
 

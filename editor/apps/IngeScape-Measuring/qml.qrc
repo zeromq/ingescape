@@ -22,5 +22,9 @@
         <file>resources/fonts/blogger-sans/Blogger_Sans-Medium.ttf</file>
         <file>resources/fonts/blogger-sans/Blogger_Sans.ttf</file>
         <file>resources/fonts/titillium/Titillium-Regular.otf</file>
+        <file>qml/ExperimentationsListView.qml</file>
+        <file>qml/ExperimentationView.qml</file>
+        <file>qml/subject/SubjectsView.qml</file>
+        <file>qml/task/TasksView.qml</file>
     </qresource>
 </RCC>

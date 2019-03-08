@@ -18,6 +18,11 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
+#include <model/subject/characteristicm.h>
+#include <model/subject/subjectm.h>
+#include <model/task/taskm.h>
+#include <model/recordm.h>
+
 
 /**
  * @brief The ExperimentationM class defines a model of experimentation
@@ -29,7 +34,20 @@ class ExperimentationM : public QObject
     // Name of our experimentation
     I2_QML_PROPERTY(QString, name)
 
-    //Records (): liste des enregistrements
+    // Date of the creation of our experimentation
+    I2_QML_PROPERTY(QDateTime, creationDate)
+
+    // List of all characteristics of our experimentation
+    I2_QOBJECT_LISTMODEL(CharacteristicM, allCharacteristics)
+
+    // List of all subjects of our experimentation
+    I2_QOBJECT_LISTMODEL(SubjectM, allSubjects)
+
+    // List of all tasks of our experimentation
+    I2_QOBJECT_LISTMODEL(TaskM, allTasks)
+
+    // List of all records of our experimentation
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(RecordM, allRecords)
 
 
 public:

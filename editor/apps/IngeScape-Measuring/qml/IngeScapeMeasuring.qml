@@ -1,11 +1,28 @@
-import QtQuick 2.8
-import QtQuick.Controls 1.4
+/*
+ *	IngeScape Measuring
+ *
+ *  Copyright © 2019 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *
+ */
+
+import QtQuick 2.9
+import QtQuick.Controls 2.2
 import QtQuick.Controls.Styles 1.4
 
 import I2Quick 1.0
 import QtQuick.Window 2.3
 
 import INGESCAPE 1.0
+
+import "subject" as Subject
+import "task" as Task
 
 Item {
     id: rootItem
@@ -41,43 +58,78 @@ Item {
     //--------------------------------------------------------
 
 
-    //
-    // Center panel
-    //
-    Item {
-        id: centerPanel
+    SwipeView {
+        id: swipeView
 
-        anchors {
-            left: leftPanel.right
-            right: parent.right
-            top: parent.top
-            bottom: bottomPanel.top
+        anchors.fill: parent
+
+        currentIndex: 0
+
+
+        //
+        // Experimentations List View
+        //
+        ExperimentationsListView {
+            id: experimentationsListView
         }
 
+
+        //
+        // Experimentations View
+        //
+        ExperimentationView {
+            id: experimentationView
+        }
+
+
+        //
+        // Subjects View
+        //
+        Subject.SubjectsView {
+            id: subjectsView
+        }
+
+
+        //
+        // Experimentations View
+        //
+        Task.TasksView {
+            id: tasksView
+        }
 
     }
 
-
-    //
-    // Bottom panel
-    //
-    Rectangle {
-        id: bottomPanel
-
+    Row {
         anchors {
-            left: leftPanel.right
-            right: parent.right
-            bottom: parent.bottom
+            top: parent.top
+            left: parent.left
         }
-        height: 0
-        color: "red"
+        Button {
+            text: "PREVIOUS"
+
+            onClicked: {
+                console.log("PREVIOUS");
+
+                swipeView.currentIndex--;
+            }
+        }
+
+        Button {
+            text: "NEXT"
+
+            onClicked: {
+                console.log("NEXT");
+
+                swipeView.currentIndex++;
+            }
+        }
     }
 
 
     //
     // Left panel
     //
-    Rectangle {
+    /*Rectangle {
         id: leftPanel
 
         width: IngeScapeTheme.leftPanelWidth
@@ -104,7 +156,7 @@ Item {
             borderColor: IngeScapeTheme.selectedTabsBackgroundColor
 
         }
-    }
+    }*/
 
 
 
