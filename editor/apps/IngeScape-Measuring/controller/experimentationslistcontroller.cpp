@@ -29,11 +29,23 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
     _allExperimentationsGroups.setSortProperty("name");
 
 
+    //
     // FIXME for tests
-
+    //
     ExperimentationsGroupVM *experimentationsGroup = new ExperimentationsGroupVM("Other", nullptr);
 
     _allExperimentationsGroups.append(experimentationsGroup);
+
+
+    for (int i = 1; i < 4; i++)
+    {
+        QString groupName = QString("Group %1").arg(i);
+
+        ExperimentationsGroupVM *group = new ExperimentationsGroupVM(groupName, nullptr);
+
+        _allExperimentationsGroups.append(group);
+    }
+
 }
 
 

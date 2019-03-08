@@ -29,6 +29,8 @@
 #include <model/task/dependentvariablem.h>
 #include <model/recordm.h>
 
+#include <viewModel/experimentationsgroupvm.h>
+
 
 /**
  * @brief The IngeScapeModelManager class defines the manager for the data model of our IngeScape measuring application
@@ -36,6 +38,14 @@
 class IngeScapeModelManager : public QObject
 {
     Q_OBJECT
+
+    // The experimentations group currently selected
+    I2_QML_PROPERTY(ExperimentationsGroupVM*, selectedExperimentationsGroup)
+
+    // The experimentation currently selected
+    I2_QML_PROPERTY(ExperimentationM*, selectedExperimentation)
+
+
 
 
 public:

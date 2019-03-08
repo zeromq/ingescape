@@ -71,6 +71,8 @@ Item {
         //
         ExperimentationsListView {
             id: experimentationsListView
+
+            controller: IngeScapeMeasuringC.experimentationsListC
         }
 
 
@@ -91,7 +93,7 @@ Item {
 
 
         //
-        // Experimentations View
+        // Tasks View
         //
         Task.TasksView {
             id: tasksView

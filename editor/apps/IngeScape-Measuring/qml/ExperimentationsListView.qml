@@ -38,8 +38,7 @@ Item {
     //
     //--------------------------------------------------------
 
-    //property type name: value
-
+    property ExperimentationsListController controller: null;
 
 
     //--------------------------------------------------------
@@ -83,14 +82,22 @@ Item {
 
     ListView {
 
-
         anchors {
             top: btnNewExpe.bottom
             topMargin: 20
             left: parent.left
             right: parent.right
+            bottom: parent.bottom
         }
+        spacing: 10
 
-        //model:
+        model: controller.allExperimentationsGroups
+
+        delegate: Text {
+            //height: 40
+            //width: 200
+
+            text: model.name
+        }
     }
 }
