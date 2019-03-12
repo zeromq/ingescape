@@ -88,7 +88,7 @@ function discover_arch {
 }
 
 function install_deps_debian {
-    lib_list="libzmq5 czmq zyre"
+    local lib_list="libzmq5 czmq zyre"
     if [[ "$VER" =~ "9" ]]
     then
         lib_list="${lib_list} libsodium18"
@@ -106,7 +106,7 @@ function install_deps_debian {
 }
 
 function install_deps_centos {
-    lib_list="libzmq5 czmq zyre libsodium18"
+    local lib_list="libzmq5 czmq zyre libsodium18"
 
     if [[ "$DEVEL_LIBS" == "YES" ]]
     then
@@ -127,15 +127,21 @@ function _clone_and_build {
 
     if [[ -d $dirname ]]
     then
-        echo -n "Directory '$dirname' already exists. Overwrite it (Y/N) ? [N] "
-        read erase
-        if [[ "$erase" =~ [yY] ]]
+        if [[ "$FORCE_ERASE" ]]
         then
-            echo "Cleaning previous '$dirname' directory"
+            echo "Cleaning previous '$dirname' directory (--force-erase)"
             rm -rf $dirname
         else
-            echo "Skipping '$dirname'..."
-            exit 0
+            echo -n "Directory '$dirname' already exists. Overwrite it (Y/N) ? [N] "
+            read erase
+            if [[ "$erase" =~ [yY] ]]
+            then
+                echo "Cleaning previous '$dirname' directory"
+                rm -rf $dirname
+            else
+                echo "Skipping '$dirname'..."
+                exit 0
+            fi
         fi
     fi
 
@@ -274,10 +280,34 @@ Options:
   --deps-only      only install dependencies, not ingescape
   --devel          install the development versions of the dependencies
   --force-git      force install from git repositories (instead of using the distribution's packages)
+  --force-erase    force erasure of any existing dependency local directory (user input needed otherwise)
   --jobs=<num>     run 'make' commands with <num> parallel jobs
   --no-deps        do not install dependencies, just ingescape
-  --v, --verbose   show debug trace during execution
+  -v, --verbose    show debug trace during execution
 EOF
+}
+
+function _check_opt_validity {
+    if [[ "$NO_DEPS" == "YES" && "$DEPS_ONLY" == "YES" ]]
+    then
+        echo Option --deps-only incompatible with --no-deps. Exiting.
+        print_usage
+        exit 1
+    fi
+
+    if [[ "$NO_DEPS" == "YES" && "$FORCE_GIT" == "YES" ]]
+    then
+        echo Option --no-only incompatible with --force-git. Exiting.
+        print_usage
+        exit 1
+    fi
+
+    if [[ "$NO_DEPS" == "YES" && "$FORCE_ERASE" == "YES" ]]
+    then
+        echo Option --no-deps incompatible with --force-erase. Exiting.
+        print_usage
+        exit 1
+    fi
 }
 
 
@@ -294,25 +324,29 @@ set -o pipefail
 
 ## Actual script
 
-DEBUG=NO
+DEPS_ONLY=NO
 DEVEL_LIBS=NO
+FORCE_ERASE=NO
 FORCE_GIT=NO
 JOBS=1
-ONLY_DEPS=NO
 NO_DEPS=NO
+VERBOSE=NO
 
 # Parse arguments
 for arg in "$@"
 do
     case ${arg} in
         --deps-only)
-            ONLY_DEPS=YES
+            DEPS_ONLY=YES
             ;;
         --no-deps)
             NO_DEPS=YES
             ;;
         --devel)
             DEVEL_LIBS=YES
+            ;;
+        --force-erase)
+            FORCE_ERASE=YES
             ;;
         --force-git)
             FORCE_GIT=YES
@@ -321,7 +355,7 @@ do
             JOBS=${arg#*=}
             ;;
         -v|--verbose)
-            DEBUG=YES
+            VERBOSE=YES
             ;;
         -h|--help)
             print_usage
@@ -336,27 +370,22 @@ do
 done
 
 
-if [[ "$DEBUG" == "YES" ]]
+if [[ "$VERBOSE" == "YES" ]]
 then
 
     # Print out every command executed (debug)
     set -o xtrace
 
-    echo DEPS_ONLY  = ${ONLY_DEPS}
-    echo NO_DEPS    = ${ONLY_DEPS}
-    echo DEVEL_LIBS = ${DEVEL_LIBS}
-    echo FORCE_GIT  = ${FORCE_GIT}
-    echo JOBS       = ${JOBS}
+    echo DEPS_ONLY   = ${DEPS_ONLY}
+    echo DEVEL_LIBS  = ${DEVEL_LIBS}
+    echo FORCE_ERASE = ${FORCE_ERASE}
+    echo FORCE_GIT   = ${FORCE_GIT}
+    echo JOBS        = ${JOBS}
+    echo NO_DEPS     = ${DEPS_ONLY}
+    echo VERBOSE     = ${VERBOSE}
 fi
 
-if [[ "$NO_DEPS" == "YES" && "$ONLY_DEPS" == "YES" ]]
-then
-    cat <<EOF
-Option --deps-only incompatible with --no-deps. Exiting.
-EOF
-    print_usage
-    exit 1
-fi
+_check_opt_validity
 
 discover_os
 discover_arch
@@ -366,7 +395,7 @@ then
     install_deps
 fi
 
-if [[ "$ONLY_DEPS" == "NO" ]]
+if [[ "$DEPS_ONLY" == "NO" ]]
 then
     install_ingescape
 fi
