@@ -22,8 +22,9 @@ stages:
       - src/**/*
       - CMakeLists.txt
       - builds/cmake/**/*
-      - dependencies/windows/unix/*
       - dependencies/yajl/**/*
+      - dependencies/unix/*
+      - dependencies/windows/unix/*
     refs:
       - master
 
@@ -34,8 +35,9 @@ stages:
       - .gitlab-ci.yml
       - src/**/*
       - builds/cmake/**/*
-      - dependencies/windows/unix/*
       - dependencies/yajl/**/*
+      - dependencies/unix/*
+      - dependencies/windows/unix/*
       - editor/frameworks/**/*
       - editor/IngeScape-Common/**/*
       - editor/IngeScape-Editor/**/*
