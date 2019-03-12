@@ -121,37 +121,34 @@ function install_deps_darwin {
     #FIXME Is there a distinction between 'regular' and 'development' libs for osx ?
 }
 
+function _clone_and_build {
+    local git_cmd=$1
+    local dirname=$2
+
+    if [[ -d $dirname ]]
+    then
+        echo "Cleaning previous '$dirname' directory"
+        rm -rf $dirname
+    fi
+    $git_cmd
+    cd $dirname
+    ./autogen.sh && ./configure && make --jobs=${JOBS}
+    _check_sudo "make --jobs=${JOBS} install"
+    _check_sudo ldconfig
+}
+
 function install_deps_from_git {
     ( # libsodium
-        git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
-        cd libsodium
-        ./autogen.sh && ./configure && make --jobs=${JOBS} check
-        _check_sudo "make --jobs=${JOBS} install"
+        _clone_and_build "git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git" libsodium
     )
     ( # libzmq
-        git clone git://github.com/zeromq/libzmq.git
-        cd libzmq
-        ./autogen.sh
-        # do not specify "--with-libsodium" if you prefer to use internal tweetnacl
-        # security implementation (recommended for development)
-        ./configure
-        make --jobs=${JOBS} check
-        _check_sudo "make --jobs=${JOBS} install"
-        _check_sudo ldconfig
+        _clone_and_build "git clone git://github.com/zeromq/libzmq.git" libzmq
     )
     ( # czmq
-        git clone git://github.com/zeromq/czmq.git
-        cd czmq
-        ./autogen.sh && ./configure && make --jobs=${JOBS} check
-        _check_sudo "make --jobs=${JOBS} install"
-        _check_sudo ldconfig
+        _clone_and_build "git clone git://github.com/zeromq/czmq.git" czmq
     )
     ( # zyre
-        git clone git://github.com/zeromq/zyre.git
-        cd zyre
-        ./autogen.sh && ./configure && make --jobs=${JOBS} check
-        _check_sudo "make --jobs=${JOBS} install"
-        _check_sudo ldconfig
+        _clone_and_build "git clone git://github.com/zeromq/zyre.git" zyre
     )
 }
 
