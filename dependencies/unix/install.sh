@@ -254,20 +254,22 @@ function install_ingescape {
     elif [[ "$OS" =~ "Darwin" ]]
     then
         ./${DARWIN_PACKAGE_FILE_NAME}.sh
-    #else
-        #TODO install from ZIP
+    else # Falling back to ZIP installation
+        unzip ${LINUX_PACKAGE_FILE_NAME}.zip
+        _check_sudo "cp -rv ${LINUX_PACKAGE_FILE_NAME}/* /usr/local/"
     fi
 }
 
 function print_usage {
   cat <<EOF
 Usage: $0 [options]
-Options: [defaults in brackets after descriptions]
+Options:
   -h, --help       print this message
-  --jobs=<num>     run 'make' commands with <num> parallel jobs
   --deps-only      only install dependencies, not ingescape
   --devel          install the development versions of the dependencies
   --force-git      force install from git repositories (instead of using the distribution's packages)
+  --jobs=<num>     run 'make' commands with <num> parallel jobs
+  --no-deps        do not install dependencies, just ingescape
 EOF
 }
 
@@ -291,6 +293,7 @@ set -o xtrace
 
 ONLY_DEPS=NO
 DEVEL_LIBS=NO
+NO_DEPS=NO
 FORCE_GIT=NO
 JOBS=1
 
@@ -300,6 +303,9 @@ do
     case ${arg} in
         --deps-only)
             ONLY_DEPS=YES
+            ;;
+        --no-deps)
+            NO_DEPS=YES
             ;;
         --devel)
             DEVEL_LIBS=YES
@@ -322,15 +328,28 @@ do
     esac
 done
 
-echo ONLY_DEPS  = ${ONLY_DEPS}
+echo DEPS_ONLY  = ${ONLY_DEPS}
+echo NO_DEPS    = ${ONLY_DEPS}
 echo DEVEL_LIBS = ${DEVEL_LIBS}
 echo FORCE_GIT  = ${FORCE_GIT}
 echo JOBS       = ${JOBS}
 
+if [[ "$NO_DEPS" == "YES" && "$ONLY_DEPS" == "YES" ]]
+then
+    cat <<EOF
+Option --deps-only incompatible with --no-deps. Exiting.
+EOF
+    print_usage
+    exit 1
+fi
+
 discover_os
 discover_arch
 
-install_deps
+if [[ "$NO_DEPS" == "NO" ]]
+then
+    install_deps
+fi
 
 if [[ "$ONLY_DEPS" == "NO" ]]
 then
