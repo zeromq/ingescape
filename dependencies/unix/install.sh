@@ -270,6 +270,7 @@ Options:
   --force-git      force install from git repositories (instead of using the distribution's packages)
   --jobs=<num>     run 'make' commands with <num> parallel jobs
   --no-deps        do not install dependencies, just ingescape
+  --v, --verbose   show debug trace during execution
 EOF
 }
 
@@ -285,17 +286,14 @@ set -o nounset
 # Return code for piped sequences is the last command that returned non-zero (we don't have pipes for now)
 set -o pipefail
 
-# Print out every command executed (debug)
-set -o xtrace
-
-
 ## Actual script
 
-ONLY_DEPS=NO
+DEBUG=NO
 DEVEL_LIBS=NO
-NO_DEPS=NO
 FORCE_GIT=NO
 JOBS=1
+ONLY_DEPS=NO
+NO_DEPS=NO
 
 # Parse arguments
 for arg in "$@"
@@ -316,6 +314,9 @@ do
         --jobs=*)
             JOBS=${arg#*=}
             ;;
+        -v|--verbose)
+            DEBUG=YES
+            ;;
         -h|--help)
             print_usage
             exit 0
@@ -328,11 +329,19 @@ do
     esac
 done
 
-echo DEPS_ONLY  = ${ONLY_DEPS}
-echo NO_DEPS    = ${ONLY_DEPS}
-echo DEVEL_LIBS = ${DEVEL_LIBS}
-echo FORCE_GIT  = ${FORCE_GIT}
-echo JOBS       = ${JOBS}
+
+if [[ "$DEBUG" == "YES" ]]
+then
+
+    # Print out every command executed (debug)
+    set -o xtrace
+
+    echo DEPS_ONLY  = ${ONLY_DEPS}
+    echo NO_DEPS    = ${ONLY_DEPS}
+    echo DEVEL_LIBS = ${DEVEL_LIBS}
+    echo FORCE_GIT  = ${FORCE_GIT}
+    echo JOBS       = ${JOBS}
+fi
 
 if [[ "$NO_DEPS" == "YES" && "$ONLY_DEPS" == "YES" ]]
 then
