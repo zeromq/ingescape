@@ -127,9 +127,18 @@ function _clone_and_build {
 
     if [[ -d $dirname ]]
     then
-        echo "Cleaning previous '$dirname' directory"
-        rm -rf $dirname
+        echo -n "Directory '$dirname' already exists. Overwrite it (Y/N) ? [N] "
+        read erase
+        if [[ "$erase" =~ [yY] ]]
+        then
+            echo "Cleaning previous '$dirname' directory"
+            rm -rf $dirname
+        else
+            echo "Skipping '$dirname'..."
+            exit 0
+        fi
     fi
+
     $git_cmd
     cd $dirname
     ./autogen.sh && ./configure && make --jobs=${JOBS}
