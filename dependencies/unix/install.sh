@@ -265,7 +265,7 @@ Usage: $0 [options]
 Options: [defaults in brackets after descriptions]
   -h, --help       print this message
   --jobs=<num>     run 'make' commands with <num> parallel jobs
-  --only-deps      only install dependencies, not ingescape
+  --deps-only      only install dependencies, not ingescape
   --devel          install the development versions of the dependencies
   --force-git      force install from git repositories (instead of using the distribution's packages)
 EOF
@@ -298,7 +298,7 @@ JOBS=1
 for arg in "$@"
 do
     case ${arg} in
-        --only-deps)
+        --deps-only)
             ONLY_DEPS=YES
             ;;
         --devel)
