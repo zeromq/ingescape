@@ -125,8 +125,8 @@ function install_deps_from_git {
     ( # libsodium
         git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
         cd libsodium
-        ./autogen.sh && ./configure && make check
-        _check_sudo "make install"
+        ./autogen.sh && ./configure && make --jobs=${JOBS} check
+        _check_sudo "make --jobs=${JOBS} install"
     )
     ( # libzmq
         git clone git://github.com/zeromq/libzmq.git
@@ -135,22 +135,22 @@ function install_deps_from_git {
         # do not specify "--with-libsodium" if you prefer to use internal tweetnacl
         # security implementation (recommended for development)
         ./configure
-        make check
-        _check_sudo "make install"
+        make --jobs=${JOBS} check
+        _check_sudo "make --jobs=${JOBS} install"
         _check_sudo ldconfig
     )
     ( # czmq
         git clone git://github.com/zeromq/czmq.git
         cd czmq
-        ./autogen.sh && ./configure && make check
-        _check_sudo "make install"
+        ./autogen.sh && ./configure && make --jobs=${JOBS} check
+        _check_sudo "make --jobs=${JOBS} install"
         _check_sudo ldconfig
     )
     ( # zyre
         git clone git://github.com/zeromq/zyre.git
         cd zyre
-        ./autogen.sh && ./configure && make check
-        _check_sudo "make install"
+        ./autogen.sh && ./configure && make --jobs=${JOBS} check
+        _check_sudo "make --jobs=${JOBS} install"
         _check_sudo ldconfig
     )
 }
@@ -264,6 +264,7 @@ function print_usage {
 Usage: $0 [options]
 Options: [defaults in brackets after descriptions]
   -h, --help       print this message
+  --jobs=<num>     run 'make' commands with <num> parallel jobs
   --only-deps      only install dependencies, not ingescape
   --devel          install the development versions of the dependencies
   --force-git      force install from git repositories (instead of using the distribution's packages)
@@ -291,6 +292,7 @@ set -o xtrace
 ONLY_DEPS=NO
 DEVEL_LIBS=NO
 FORCE_GIT=NO
+JOBS=1
 
 # Parse arguments
 for arg in "$@"
@@ -304,6 +306,9 @@ do
             ;;
         --force-git)
             FORCE_GIT=YES
+            ;;
+        --jobs=*)
+            JOBS=${arg#*=}
             ;;
         -h|--help)
             print_usage
@@ -320,6 +325,7 @@ done
 echo ONLY_DEPS  = ${ONLY_DEPS}
 echo DEVEL_LIBS = ${DEVEL_LIBS}
 echo FORCE_GIT  = ${FORCE_GIT}
+echo JOBS       = ${JOBS}
 
 discover_os
 discover_arch
