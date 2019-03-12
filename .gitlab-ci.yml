@@ -67,7 +67,7 @@ lib-linux-release-armhf:
   stage: build-lib
   tags:
     - docker
-  image: ingescape/raspbian:stretch
+  image: ingescape/raspbian-stretch-armhf
   script:
     - git clean -xfd
     - mkdir build
@@ -362,7 +362,7 @@ lib-installer-runtime-linux-armhf:
   stage: installer-lib
   tags:
     - docker
-  image: ingescape/raspbian:stretch
+  image: ingescape/raspbian-stretch-armhf
   script:
     - make -C build package
     - cp dependencies/unix/install.sh build/install.sh
