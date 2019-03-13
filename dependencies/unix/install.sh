@@ -36,6 +36,9 @@ function _clone_and_build {
     shift
     local git_cmd=$@
 
+    echo ""
+    echo "Installation of '$dirname' through git..."
+
     if [[ -d $dirname ]]
     then
         if [[ "$FORCE_ERASE" == "YES" ]]
@@ -440,14 +443,27 @@ _check_opt_validity
 discover_os
 discover_arch
 
-if [[ "$NO_DEPS" == "NO" ]]
+if [[ "$NO_DEPS" == "YES" ]]
 then
+    echo "Option --no-deps provided. Skipping dependencies installation."
+else
+    echo "Installing dependencies..."
+    echo "--------------------------"
     install_deps
 fi
 
-if [[ "$DEPS_ONLY" == "NO" ]]
+echo ""
+
+if [[ "$DEPS_ONLY" == "YES" ]]
 then
+    echo "Option --deps-only provided. Skipping ingescape installation."
+else
+    echo "Installing ingescape..."
+    echo "-----------------------"
     install_ingescape
 fi
+
+echo ""
+echo "Installation completed with success!"
 
 ## EOF ##
