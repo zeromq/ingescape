@@ -215,8 +215,6 @@ QML_DESIGNER_IMPORT_PATH =
 # Add the include directory of I2Quick
 INCLUDEPATH += ../../frameworks/I2Quick/include
 
-# Ingescape is not use as library, source code are build like part of editor source code
-DEFINES += INGESCAPE
 # Include ingescape library
 !include(../../../builds/ingescape.pri) {
     error(Could not load ingescape.pri)
@@ -310,18 +308,24 @@ win32 {
     # Custom DESTDIR to avoid useless files (pch, etc.)
     DESTDIR = $${OUT_PWD}/bin
 
+    # Detect 32 or 64 bits
+    contains(QMAKE_HOST.arch, x86_64) {
+        ARCHITECTURE = 64
+    } else {
+        ARCHITECTURE = 32
+    }
 
     # Compute the LFLAG associated to our frameworks
     CONFIG(debug, debug|release) {
-       LIBS += -L../../frameworks/I2Quick/Win32 -lI2Quickd
+       LIBS += -L../../frameworks/I2Quick/Win$${ARCHITECTURE} -lI2Quickd
 
-       librariesToCopy.files += ../../frameworks/I2Quick/Win32/I2Quickd.$${QMAKE_EXTENSION_SHLIB}
+       librariesToCopy.files += ../../frameworks/I2Quick/Win$${ARCHITECTURE}/I2Quickd.$${QMAKE_EXTENSION_SHLIB}
     }
     else {
        # Compute the LFLAG associated to our I2Quick library
-       LIBS += -L../../frameworks/I2Quick/Win32 -lI2Quick
+       LIBS += -L../../frameworks/I2Quick/Win$${ARCHITECTURE} -lI2Quick
 
-       librariesToCopy.files += ../../frameworks/I2Quick/Win32/I2Quick.$${QMAKE_EXTENSION_SHLIB}
+       librariesToCopy.files += ../../frameworks/I2Quick/Win$${ARCHITECTURE}/I2Quick.$${QMAKE_EXTENSION_SHLIB}
     }
 
 
@@ -333,18 +337,30 @@ win32 {
     # Release only: copy Qt libs and plugins next to our application to create a standalone application
     CONFIG(release, debug|release) {
         # copy I2Quick (if we don't call make install)
-        QMAKE_POST_LINK += $$QMAKE_COPY $$quote($$shell_path(../../frameworks/I2Quick/Win32/I2Quick.$${QMAKE_EXTENSION_SHLIB})) $$quote($$shell_path($${DESTDIR})) $$escape_expand(\n\t)
+        QMAKE_POST_LINK += $$QMAKE_COPY $$shell_quote($$shell_path(../../frameworks/I2Quick/Win$${ARCHITECTURE}/I2Quick.$${QMAKE_EXTENSION_SHLIB})) $$shell_quote($$shell_path($${DESTDIR})) $$escape_expand(\n\t)
+
+        IS64BITSYSTEM = $$(ProgramW6432)
+        # Get Program Files folder, given x86/x64 architecture
+        isEmpty(IS64BITSYSTEM) {
+            PROGRAM_FILES_SYS = $$(ProgramFiles)
+        } else {
+            contains(QMAKE_HOST.arch, x86_64) {
+                PROGRAM_FILES_SYS = $$(ProgramW6432)
+            } else {
+                PROGRAM_FILES_SYS = $$(ProgramFiles)
+            }
+        }
 
         #copy ingescape, zyre and friends to make a real standalone .exe
-        QMAKE_POST_LINK += $$QMAKE_COPY $$quote($$shell_path(C:\ingescape\libs\release\*.dll)) $$quote($$shell_path($${DESTDIR})) $$escape_expand(\n\t)
+        QMAKE_POST_LINK += $$QMAKE_COPY $$shell_quote($$shell_path($${PROGRAM_FILES_SYS}\ingescape\lib\*.dll)) $$shell_quote($$shell_path($${DESTDIR})) $$escape_expand(\n\t)
 
         # Copy Qt dlls
         # NB: Some Qt libs must be explictly referenced because their are used by I2Quick.dll and not our .exe
-        QMAKE_POST_LINK += windeployqt $${DESTDIR}/$${TARGET}.exe -xml -concurrent -printsupport -sql -qmldir=$${PWD} $$escape_expand(\n\t)
+        QMAKE_POST_LINK += $$shell_quote($$shell_path($$[QT_INSTALL_BINS]/windeployqt)) $${DESTDIR}/$${TARGET}.exe -xml -concurrent -printsupport -sql -qmldir=$${PWD} $$escape_expand(\n\t)
     }
     else {
         # copy I2Quick (if we don't call make install)
-        QMAKE_POST_LINK += $$QMAKE_COPY $$quote($$shell_path(../../frameworks/I2Quick/Win32/I2Quickd.$${QMAKE_EXTENSION_SHLIB})) $$quote($$shell_path($${DESTDIR})) $$escape_expand(\n\t)
+        QMAKE_POST_LINK += $$QMAKE_COPY $$shell_quote($$shell_path(../../frameworks/I2Quick/Win$${ARCHITECTURE}/I2Quickd.$${QMAKE_EXTENSION_SHLIB})) $$shell_quote($$shell_path($${DESTDIR})) $$escape_expand(\n\t)
     }
 
 

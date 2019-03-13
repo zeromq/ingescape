@@ -4,6 +4,8 @@
 #
 #####################################################################
 
+DEFINES += INGESCAPE_FROM_PRI
+
 SOURCES += \
     $$PWD/../src/definition.c \
     $$PWD/../src/mapping.c \
@@ -64,7 +66,7 @@ win32:{
     HEADERS += $$PWD/../dependencies/windows/unix/unixfunctions.h
 
     #Add librairies
-    LIBS += -llibzyre -llibczmq
+    LIBS += -L$$(ProgramFiles)/ingescape/lib/ -lzyre -lczmq
 
     #To get the Ip address into the network.c
     LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
