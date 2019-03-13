@@ -109,7 +109,7 @@ agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_
         }
     }
     if (spaceInName){
-        igs_warn("Spaces are not allowed in IOP name: %s has been renamed to %s", name, n);
+        igs_error("Spaces are not allowed in IOP name: %s has been renamed to %s", name, n);
     }
     iop->name = n;
     iop->type = type;
