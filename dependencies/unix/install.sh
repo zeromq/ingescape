@@ -28,6 +28,40 @@ function _check_sudo {
     fi
 }
 
+# Use git to retrieve dependency sources and build them using autogen + configure + make
+# param $1 the git command to clone the repository
+# param $2 the directory in which the git repository will be cloned
+function _clone_and_build {
+    local git_cmd=$1
+    local dirname=$2
+
+    if [[ -d $dirname ]]
+    then
+        if [[ "$FORCE_ERASE" == "YES" ]]
+        then
+            echo "Cleaning previous '$dirname' directory (--force-erase)"
+            rm -rf $dirname
+        else
+            echo -n "Directory '$dirname' already exists. Overwrite it (Y/N) ? [N] "
+            read erase
+            if [[ "$erase" =~ [yY] ]]
+            then
+                echo "Cleaning previous '$dirname' directory"
+                rm -rf $dirname
+            else
+                echo "Skipping '$dirname'..."
+                exit 0
+            fi
+        fi
+    fi
+
+    $git_cmd
+    cd $dirname
+    ./autogen.sh && ./configure && make --jobs=${JOBS}
+    _check_sudo "make --jobs=${JOBS} install"
+    _check_sudo ldconfig
+}
+
 # Tries to discover the current Linux flavor and sets the OS and VER variables.
 function discover_os {
     if [ -f /etc/os-release ]; then
@@ -78,7 +112,7 @@ function discover_arch {
     i*86)
         ARCH=x86  # x86
         ;;
-    armv7)
+    armv7*)
         ARCH=armhf  # ARMv7 (armhf)
         ;;
     *)
@@ -88,7 +122,17 @@ function discover_arch {
 }
 
 function install_deps_debian {
-    local lib_list="libzmq5 czmq zyre"
+    local lib_list=""
+
+    # ZeroMQ reposirory does not provide packages for armv7l (aka. armhf). Hence the build-dependencies required for armv7.
+    if [[ "$ARCH" == "armhf" ]]
+    then
+        lib_list="build-essential git autoconf automake libtool pkg-config unzip"
+    else
+        lib_list="libzmq5 czmq zyre"
+    fi
+
+    # libsodium is provided by the official debian repository so it is available for every arch
     if [[ "$VER" =~ "9" ]]
     then
         lib_list="${lib_list} libsodium18"
@@ -97,12 +141,34 @@ function install_deps_debian {
         lib_list="${lib_list} libsodium23"
     fi
 
+    # Check if development libs are requested by user
     if [[ "$DEVEL_LIBS" == "YES" ]]
     then
-        lib_list="${lib_list} libzmq3-dev libzyre-dev libczmq-dev libsodium-dev"
+        # Again, only libsodium is available through the official repository
+        if [[ "$ARCH" == "armhf" ]]
+        then
+            lib_list="${lib_list} libsodium-dev"
+        else
+            lib_list="${lib_list} libzmq3-dev libzyre-dev libczmq-dev libsodium-dev"
+        fi
     fi
 
+    # Install available packages
     apt install -y $lib_list
+
+    # Installing missing packages for armv7l (aka. armhf)
+    if [[ "$ARCH" == "armhf" ]]
+    then
+        ( # libzmq
+            _clone_and_build "git clone git://github.com/zeromq/libzmq.git" libzmq
+        )
+        ( # czmq
+            _clone_and_build "git clone git://github.com/zeromq/czmq.git" czmq
+        )
+        ( # zyre
+            _clone_and_build "git clone git://github.com/zeromq/zyre.git" zyre
+        )
+    fi
 }
 
 function install_deps_centos {
@@ -119,37 +185,6 @@ function install_deps_centos {
 function install_deps_darwin {
     brew install libsodium zeromq czmq zyre
     #FIXME Is there a distinction between 'regular' and 'development' libs for osx ?
-}
-
-function _clone_and_build {
-    local git_cmd=$1
-    local dirname=$2
-
-    if [[ -d $dirname ]]
-    then
-        if [[ "$FORCE_ERASE" == "YES" ]]
-        then
-            echo "Cleaning previous '$dirname' directory (--force-erase)"
-            rm -rf $dirname
-        else
-            echo -n "Directory '$dirname' already exists. Overwrite it (Y/N) ? [N] "
-            read erase
-            if [[ "$erase" =~ [yY] ]]
-            then
-                echo "Cleaning previous '$dirname' directory"
-                rm -rf $dirname
-            else
-                echo "Skipping '$dirname'..."
-                exit 0
-            fi
-        fi
-    fi
-
-    $git_cmd
-    cd $dirname
-    ./autogen.sh && ./configure && make --jobs=${JOBS}
-    _check_sudo "make --jobs=${JOBS} install"
-    _check_sudo ldconfig
 }
 
 function install_deps_from_git {
@@ -255,11 +290,17 @@ function install_deps {
 
 # Installs the ingescape library itself. Which process to used is determined by OS and VER variables.
 function install_ingescape {
-    if [[ "$OS" =~ "Debian" ]]
+    if [[ "$OS" =~ "Debian" || "$OS" =~ "Raspbian" ]]
     then
-        # Debian
-        dpkg -i ${LINUX_PACKAGE_FILE_NAME}.deb
-        apt install -fy
+        # We do not yet build a package for Debian armv7. Falling back to a ZIP installtion.
+        if [[ $ARCH == "armhf" ]]
+        then
+            unzip ${LINUX_PACKAGE_FILE_NAME}.zip
+            _check_sudo "cp -rv ${LINUX_PACKAGE_FILE_NAME}/* /usr/local/"
+        else
+            dpkg -i ${LINUX_PACKAGE_FILE_NAME}.deb
+            apt install -fy
+        fi
     elif [[ "$OS" =~ "CentOS" ]]
     then
         rpm -Uvh ${LINUX_PACKAGE_FILE_NAME}.rpm
