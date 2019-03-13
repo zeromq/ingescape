@@ -127,7 +127,7 @@ function _clone_and_build {
 
     if [[ -d $dirname ]]
     then
-        if [[ "$FORCE_ERASE" ]]
+        if [[ "$FORCE_ERASE" == "YES" ]]
         then
             echo "Cleaning previous '$dirname' directory (--force-erase)"
             rm -rf $dirname
