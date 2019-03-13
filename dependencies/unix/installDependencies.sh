@@ -22,10 +22,48 @@ ARCH=""
 function _check_sudo {
     if [[ $EUID = 0 ]]
     then
-        $1
+        $@
     else
-        sudo $1
+        sudo $@
     fi
+}
+
+# Use git to retrieve dependency sources and build them using autogen + configure + make
+# param $1 the directory in which the git repository will be cloned
+# param $2+ the git command to clone the repository
+function _clone_and_build {
+    local dirname=$1
+    shift
+    local git_cmd=$@
+
+    echo ""
+    echo "Installation of '$dirname' through git..."
+
+    if [[ -d $dirname ]]
+    then
+        if [[ "$FORCE_ERASE" == "YES" ]]
+        then
+            echo "Cleaning previous '$dirname' directory (--force-erase)"
+            rm -rf $dirname
+        else
+            echo -n "Directory '$dirname' already exists. Overwrite it (Y/N) ? [N] "
+            read erase
+            if [[ "$erase" =~ [yY] ]]
+            then
+                echo "Cleaning previous '$dirname' directory"
+                rm -rf $dirname
+            else
+                echo "Skipping '$dirname'..."
+                exit 0
+            fi
+        fi
+    fi
+
+    $git_cmd
+    cd $dirname
+    ./autogen.sh && ./configure && make --jobs=${JOBS}
+    _check_sudo make --jobs=${JOBS} install
+    _check_sudo ldconfig
 }
 
 # Tries to discover the current Linux flavor and sets the OS and VER variables.
@@ -78,7 +116,7 @@ function discover_arch {
     i*86)
         ARCH=x86  # x86
         ;;
-    armv7)
+    armv7*)
         ARCH=armhf  # ARMv7 (armhf)
         ;;
     *)
@@ -87,8 +125,23 @@ function discover_arch {
     esac
 }
 
+function install_deps_raspbian {
+    # Same as Debian
+    install_deps_debian $@
+}
+
 function install_deps_debian {
-    lib_list="libzmq5 czmq zyre"
+    local lib_list=""
+
+    # ZeroMQ reposirory does not provide packages for armv7l (aka. armhf). Hence the build-dependencies required for armv7.
+    if [[ "$ARCH" == "armhf" ]]
+    then
+        lib_list="build-essential git autoconf automake libtool pkg-config unzip"
+    else
+        lib_list="libzmq5 czmq zyre"
+    fi
+
+    # libsodium is provided by the official debian repository so it is available for every arch
     if [[ "$VER" =~ "9" ]]
     then
         lib_list="${lib_list} libsodium18"
@@ -97,16 +150,38 @@ function install_deps_debian {
         lib_list="${lib_list} libsodium23"
     fi
 
+    # Check if development libs are requested by user
     if [[ "$DEVEL_LIBS" == "YES" ]]
     then
-        lib_list="${lib_list} libzmq3-dev libzyre-dev libczmq-dev libsodium-dev"
+        # Again, only libsodium is available through the official repository
+        if [[ "$ARCH" == "armhf" ]]
+        then
+            lib_list="${lib_list} libsodium-dev"
+        else
+            lib_list="${lib_list} libzmq3-dev libzyre-dev libczmq-dev libsodium-dev"
+        fi
     fi
 
-    apt install -y $lib_list
+    # Install available packages
+    _check_sudo apt install -y $lib_list
+
+    # Installing missing packages for armv7l (aka. armhf)
+    if [[ "$ARCH" == "armhf" ]]
+    then
+        ( # libzmq
+            _clone_and_build libzmq git clone git://github.com/zeromq/libzmq.git
+        )
+        ( # czmq
+            _clone_and_build czmq git clone git://github.com/zeromq/czmq.git
+        )
+        ( # zyre
+            _clone_and_build zyre git clone git://github.com/zeromq/zyre.git
+        )
+    fi
 }
 
 function install_deps_centos {
-    lib_list="libzmq5 czmq zyre libsodium18"
+    local lib_list="libzmq5 czmq zyre libsodium18"
 
     if [[ "$DEVEL_LIBS" == "YES" ]]
     then
@@ -123,35 +198,16 @@ function install_deps_darwin {
 
 function install_deps_from_git {
     ( # libsodium
-        git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
-        cd libsodium
-        ./autogen.sh && ./configure && make check
-        _check_sudo "make install"
+        _clone_and_build libsodium git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
     )
     ( # libzmq
-        git clone git://github.com/zeromq/libzmq.git
-        cd libzmq
-        ./autogen.sh
-        # do not specify "--with-libsodium" if you prefer to use internal tweetnacl
-        # security implementation (recommended for development)
-        ./configure
-        make check
-        _check_sudo "make install"
-        _check_sudo ldconfig
+        _clone_and_build libzmq git clone git://github.com/zeromq/libzmq.git
     )
     ( # czmq
-        git clone git://github.com/zeromq/czmq.git
-        cd czmq
-        ./autogen.sh && ./configure && make check
-        _check_sudo "make install"
-        _check_sudo ldconfig
+        _clone_and_build czmq git clone git://github.com/zeromq/czmq.git
     )
     ( # zyre
-        git clone git://github.com/zeromq/zyre.git
-        cd zyre
-        ./autogen.sh && ./configure && make check
-        _check_sudo "make install"
-        _check_sudo ldconfig
+        _clone_and_build zyre git clone git://github.com/zeromq/zyre.git
     )
 }
 
@@ -229,6 +285,9 @@ function install_deps {
         if [[ "$OS" =~ "Debian" ]]
         then
             install_deps_debian
+        elif [[ "$OS" =~ "Raspbian" ]]
+        then
+            install_deps_raspbian
         elif [[ "$OS" =~ "CentOS" ]]
         then
             install_deps_centos
@@ -243,31 +302,65 @@ function install_deps {
 
 # Installs the ingescape library itself. Which process to used is determined by OS and VER variables.
 function install_ingescape {
-    if [[ "$OS" =~ "Debian" ]]
+    if [[ "$OS" =~ "Debian" || "$OS" =~ "Raspbian" ]]
     then
-        # Debian
-        dpkg -i ${LINUX_PACKAGE_FILE_NAME}.deb
-        apt install -fy
+        # We do not yet build a package for Debian armv7. Falling back to a ZIP installtion.
+        if [[ $ARCH == "armhf" ]]
+        then
+            unzip ${LINUX_PACKAGE_FILE_NAME}.zip
+            _check_sudo cp -rv ${LINUX_PACKAGE_FILE_NAME}/* /usr/local/
+        else
+            _check_sudo dpkg -i ${LINUX_PACKAGE_FILE_NAME}.deb
+            _check_sudo apt install -fy
+        fi
     elif [[ "$OS" =~ "CentOS" ]]
     then
-        rpm -Uvh ${LINUX_PACKAGE_FILE_NAME}.rpm
+        _check_sudo rpm -Uvh ${LINUX_PACKAGE_FILE_NAME}.rpm
     elif [[ "$OS" =~ "Darwin" ]]
     then
         ./${DARWIN_PACKAGE_FILE_NAME}.sh
-    #else
-        #TODO install from ZIP
+    else # Falling back to ZIP installation
+        unzip ${LINUX_PACKAGE_FILE_NAME}.zip
+        _check_sudo cp -rv ${LINUX_PACKAGE_FILE_NAME}/* /usr/local/
     fi
 }
 
 function print_usage {
   cat <<EOF
 Usage: $0 [options]
-Options: [defaults in brackets after descriptions]
+Options:
   -h, --help       print this message
-  --only-deps      only install dependencies, not ingescape
+  --deps-only      only install dependencies, not ingescape
   --devel          install the development versions of the dependencies
   --force-git      force install from git repositories (instead of using the distribution's packages)
+  --force-erase    force erasure of any existing dependency local directory (user input needed otherwise)
+  --jobs=<num>     run 'make' commands with <num> parallel jobs
+  --no-deps        do not install dependencies, just ingescape
+  -v, --verbose    show debug trace during execution
 EOF
+}
+
+function _check_opt_validity {
+    if [[ "$NO_DEPS" == "YES" && "$DEPS_ONLY" == "YES" ]]
+    then
+        echo Option --deps-only incompatible with --no-deps. Exiting.
+        print_usage
+        exit 1
+    fi
+
+    if [[ "$NO_DEPS" == "YES" && "$FORCE_GIT" == "YES" ]]
+    then
+        echo Option --no-only incompatible with --force-git. Exiting.
+        print_usage
+        exit 1
+    fi
+
+    if [[ "$NO_DEPS" == "YES" && "$FORCE_ERASE" == "YES" ]]
+    then
+        echo Option --no-deps incompatible with --force-erase. Exiting.
+        print_usage
+        exit 1
+    fi
 }
 
 
@@ -282,28 +375,40 @@ set -o nounset
 # Return code for piped sequences is the last command that returned non-zero (we don't have pipes for now)
 set -o pipefail
 
-# Print out every command executed (debug)
-set -o xtrace
-
-
 ## Actual script
 
-ONLY_DEPS=NO
+DEPS_ONLY=NO
 DEVEL_LIBS=NO
+FORCE_ERASE=NO
 FORCE_GIT=NO
+JOBS=1
+NO_DEPS=NO
+VERBOSE=NO
 
 # Parse arguments
 for arg in "$@"
 do
     case ${arg} in
-        --only-deps)
-            ONLY_DEPS=YES
+        --deps-only)
+            DEPS_ONLY=YES
+            ;;
+        --no-deps)
+            NO_DEPS=YES
             ;;
         --devel)
             DEVEL_LIBS=YES
             ;;
+        --force-erase)
+            FORCE_ERASE=YES
+            ;;
         --force-git)
             FORCE_GIT=YES
+            ;;
+        --jobs=*)
+            JOBS=${arg#*=}
+            ;;
+        -v|--verbose)
+            VERBOSE=YES
             ;;
         -h|--help)
             print_usage
@@ -317,18 +422,48 @@ do
     esac
 done
 
-echo ONLY_DEPS  = ${ONLY_DEPS}
-echo DEVEL_LIBS = ${DEVEL_LIBS}
-echo FORCE_GIT  = ${FORCE_GIT}
+
+if [[ "$VERBOSE" == "YES" ]]
+then
+
+    # Print out every command executed (debug)
+    set -o xtrace
+
+    echo DEPS_ONLY   = ${DEPS_ONLY}
+    echo DEVEL_LIBS  = ${DEVEL_LIBS}
+    echo FORCE_ERASE = ${FORCE_ERASE}
+    echo FORCE_GIT   = ${FORCE_GIT}
+    echo JOBS        = ${JOBS}
+    echo NO_DEPS     = ${DEPS_ONLY}
+    echo VERBOSE     = ${VERBOSE}
+fi
+
+_check_opt_validity
 
 discover_os
 discover_arch
 
-install_deps
-
-if [[ "$ONLY_DEPS" == "NO" ]]
+if [[ "$NO_DEPS" == "YES" ]]
 then
+    echo "Option --no-deps provided. Skipping dependencies installation."
+else
+    echo "Installing dependencies..."
+    echo "--------------------------"
+    install_deps
+fi
+
+echo ""
+
+if [[ "$DEPS_ONLY" == "YES" ]]
+then
+    echo "Option --deps-only provided. Skipping ingescape installation."
+else
+    echo "Installing ingescape..."
+    echo "-----------------------"
     install_ingescape
 fi
+
+echo ""
+echo "Installation completed with success!"
 
 ## EOF ##
