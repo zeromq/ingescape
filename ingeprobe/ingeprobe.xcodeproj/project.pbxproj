@@ -8,11 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		9709EE1E2094B2270056023F /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9709EE1A2094B2270056023F /* libczmq.a */; };
-		9709EE1F2094B2270056023F /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9709EE1B2094B2270056023F /* libsodium.a */; };
-		9709EE202094B2270056023F /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9709EE1C2094B2270056023F /* libzmq.a */; };
 		9709EE212094B2270056023F /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9709EE1D2094B2270056023F /* libzyre.a */; };
 		978D6DF11CB26F9B0082016E /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 978D6DF01CB26F9B0082016E /* main.c */; };
-		97D1AF321CD3B4DA00C6B742 /* zregex.c in Sources */ = {isa = PBXBuildFile; fileRef = 97D1AF301CD3B4DA00C6B742 /* zregex.c */; };
+		97A2128522383DD000ACCFB0 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A2128422383DD000ACCFB0 /* libsodium.a */; };
+		97A2128722383DE200ACCFB0 /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A2128622383DE200ACCFB0 /* libzmq.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,8 +42,8 @@
 		972F6B0D1CDBA1BF00CF2CF4 /* utvector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utvector.h; sourceTree = "<group>"; };
 		978D6DED1CB26F9B0082016E /* ingeprobe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ingeprobe; sourceTree = BUILT_PRODUCTS_DIR; };
 		978D6DF01CB26F9B0082016E /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		97D1AF301CD3B4DA00C6B742 /* zregex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zregex.c; sourceTree = "<group>"; };
-		97D1AF311CD3B4DA00C6B742 /* zregex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zregex.h; sourceTree = "<group>"; };
+		97A2128422383DD000ACCFB0 /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ../../../../../../../../usr/local/Cellar/libsodium/1.0.17/lib/libsodium.a; sourceTree = "<group>"; };
+		97A2128622383DE200ACCFB0 /* libzmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzmq.a; path = ../../../../../../../../usr/local/Cellar/zeromq/4.3.1_1/lib/libzmq.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,9 +51,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97A2128722383DE200ACCFB0 /* libzmq.a in Frameworks */,
+				97A2128522383DD000ACCFB0 /* libsodium.a in Frameworks */,
 				9709EE1E2094B2270056023F /* libczmq.a in Frameworks */,
-				9709EE1F2094B2270056023F /* libsodium.a in Frameworks */,
-				9709EE202094B2270056023F /* libzmq.a in Frameworks */,
 				9709EE212094B2270056023F /* libzyre.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -65,6 +64,8 @@
 		9709EE192094B2270056023F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				97A2128622383DE200ACCFB0 /* libzmq.a */,
+				97A2128422383DD000ACCFB0 /* libsodium.a */,
 				9709EE1A2094B2270056023F /* libczmq.a */,
 				9709EE1B2094B2270056023F /* libsodium.a */,
 				9709EE1C2094B2270056023F /* libzmq.a */,
@@ -92,7 +93,7 @@
 		978D6DE41CB26F9B0082016E = {
 			isa = PBXGroup;
 			children = (
-				978D6DEF1CB26F9B0082016E /* ingeprobe */,
+				978D6DEF1CB26F9B0082016E /* src */,
 				978D6DEE1CB26F9B0082016E /* Products */,
 				9709EE192094B2270056023F /* Frameworks */,
 			);
@@ -106,15 +107,13 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		978D6DEF1CB26F9B0082016E /* ingeprobe */ = {
+		978D6DEF1CB26F9B0082016E /* src */ = {
 			isa = PBXGroup;
 			children = (
 				972F6B041CDBA1BF00CF2CF4 /* uthash */,
-				97D1AF301CD3B4DA00C6B742 /* zregex.c */,
-				97D1AF311CD3B4DA00C6B742 /* zregex.h */,
 				978D6DF01CB26F9B0082016E /* main.c */,
 			);
-			path = ingeprobe;
+			path = src;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,7 +142,7 @@
 		978D6DE51CB26F9B0082016E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
 					978D6DEC1CB26F9B0082016E = {
@@ -173,7 +172,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				97D1AF321CD3B4DA00C6B742 /* zregex.c in Sources */,
 				978D6DF11CB26F9B0082016E /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -194,12 +192,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -246,12 +246,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -282,14 +284,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = /usr/local/include/;
-				LIBRARY_SEARCH_PATHS = (
-					/usr/local/lib/,
-					"$(PROJECT_DIR)",
-					/usr/local/Cellar/czmq/4.1.1/lib,
-					/usr/local/Cellar/libsodium/1.0.16/lib,
-					/usr/local/Cellar/zeromq/4.2.5/lib,
-					/usr/local/Cellar/zyre/2.0.0/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -298,14 +293,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = /usr/local/include/;
-				LIBRARY_SEARCH_PATHS = (
-					/usr/local/lib/,
-					"$(PROJECT_DIR)",
-					/usr/local/Cellar/czmq/4.1.1/lib,
-					/usr/local/Cellar/libsodium/1.0.16/lib,
-					/usr/local/Cellar/zeromq/4.2.5/lib,
-					/usr/local/Cellar/zyre/2.0.0/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
