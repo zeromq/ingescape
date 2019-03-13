@@ -22,18 +22,19 @@ ARCH=""
 function _check_sudo {
     if [[ $EUID = 0 ]]
     then
-        $1
+        $@
     else
-        sudo $1
+        sudo $@
     fi
 }
 
 # Use git to retrieve dependency sources and build them using autogen + configure + make
-# param $1 the git command to clone the repository
-# param $2 the directory in which the git repository will be cloned
+# param $1 the directory in which the git repository will be cloned
+# param $2+ the git command to clone the repository
 function _clone_and_build {
-    local git_cmd=$1
-    local dirname=$2
+    local dirname=$1
+    shift
+    local git_cmd=$@
 
     if [[ -d $dirname ]]
     then
@@ -58,7 +59,7 @@ function _clone_and_build {
     $git_cmd
     cd $dirname
     ./autogen.sh && ./configure && make --jobs=${JOBS}
-    _check_sudo "make --jobs=${JOBS} install"
+    _check_sudo make --jobs=${JOBS} install
     _check_sudo ldconfig
 }
 
@@ -121,6 +122,11 @@ function discover_arch {
     esac
 }
 
+function install_deps_raspbian {
+    # Same as Debian
+    install_deps_debian $@
+}
+
 function install_deps_debian {
     local lib_list=""
 
@@ -154,19 +160,19 @@ function install_deps_debian {
     fi
 
     # Install available packages
-    apt install -y $lib_list
+    _check_sudo apt install -y $lib_list
 
     # Installing missing packages for armv7l (aka. armhf)
     if [[ "$ARCH" == "armhf" ]]
     then
         ( # libzmq
-            _clone_and_build "git clone git://github.com/zeromq/libzmq.git" libzmq
+            _clone_and_build libzmq git clone git://github.com/zeromq/libzmq.git
         )
         ( # czmq
-            _clone_and_build "git clone git://github.com/zeromq/czmq.git" czmq
+            _clone_and_build czmq git clone git://github.com/zeromq/czmq.git
         )
         ( # zyre
-            _clone_and_build "git clone git://github.com/zeromq/zyre.git" zyre
+            _clone_and_build zyre git clone git://github.com/zeromq/zyre.git
         )
     fi
 }
@@ -189,16 +195,16 @@ function install_deps_darwin {
 
 function install_deps_from_git {
     ( # libsodium
-        _clone_and_build "git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git" libsodium
+        _clone_and_build libsodium git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
     )
     ( # libzmq
-        _clone_and_build "git clone git://github.com/zeromq/libzmq.git" libzmq
+        _clone_and_build libzmq git clone git://github.com/zeromq/libzmq.git
     )
     ( # czmq
-        _clone_and_build "git clone git://github.com/zeromq/czmq.git" czmq
+        _clone_and_build czmq git clone git://github.com/zeromq/czmq.git
     )
     ( # zyre
-        _clone_and_build "git clone git://github.com/zeromq/zyre.git" zyre
+        _clone_and_build zyre git clone git://github.com/zeromq/zyre.git
     )
 }
 
@@ -276,6 +282,9 @@ function install_deps {
         if [[ "$OS" =~ "Debian" ]]
         then
             install_deps_debian
+        elif [[ "$OS" =~ "Raspbian" ]]
+        then
+            install_deps_raspbian
         elif [[ "$OS" =~ "CentOS" ]]
         then
             install_deps_centos
@@ -296,20 +305,20 @@ function install_ingescape {
         if [[ $ARCH == "armhf" ]]
         then
             unzip ${LINUX_PACKAGE_FILE_NAME}.zip
-            _check_sudo "cp -rv ${LINUX_PACKAGE_FILE_NAME}/* /usr/local/"
+            _check_sudo cp -rv ${LINUX_PACKAGE_FILE_NAME}/* /usr/local/
         else
-            dpkg -i ${LINUX_PACKAGE_FILE_NAME}.deb
-            apt install -fy
+            _check_sudo dpkg -i ${LINUX_PACKAGE_FILE_NAME}.deb
+            _check_sudo apt install -fy
         fi
     elif [[ "$OS" =~ "CentOS" ]]
     then
-        rpm -Uvh ${LINUX_PACKAGE_FILE_NAME}.rpm
+        _check_sudo rpm -Uvh ${LINUX_PACKAGE_FILE_NAME}.rpm
     elif [[ "$OS" =~ "Darwin" ]]
     then
         ./${DARWIN_PACKAGE_FILE_NAME}.sh
     else # Falling back to ZIP installation
         unzip ${LINUX_PACKAGE_FILE_NAME}.zip
-        _check_sudo "cp -rv ${LINUX_PACKAGE_FILE_NAME}/* /usr/local/"
+        _check_sudo cp -rv ${LINUX_PACKAGE_FILE_NAME}/* /usr/local/
     fi
 }
 
