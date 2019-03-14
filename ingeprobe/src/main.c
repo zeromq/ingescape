@@ -110,35 +110,51 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             type = atoi(string);
             free(string);
             printf(" %s", outputTypes[type-1]);
-            frame = zmsg_pop(msg);
-            data = zframe_data(frame);
-            size = zframe_size(frame);
             switch (type) {
                 case IGS_INTEGER_T:
+                    frame = zmsg_pop(msg);
+                    data = zframe_data(frame);
+                    size = zframe_size(frame);
                     printf(" %d\n", *((int *)data));
                     break;
                 case IGS_DOUBLE_T:
+                    frame = zmsg_pop(msg);
+                    data = zframe_data(frame);
+                    size = zframe_size(frame);
                     printf(" %f\n", *((double *)data));
                     break;
                 case IGS_BOOL_T:
+                    frame = zmsg_pop(msg);
+                    data = zframe_data(frame);
+                    size = zframe_size(frame);
                     printf(" %d\n", *((bool *)data));
                     break;
-                case IGS_STRING_T:
-                    printf(" %s\n", (char *)data);
+                case IGS_STRING_T:{
+                    char *str = zmsg_popstr(msg);
+                    printf(" %s\n", str);
+                    free(str);
                     break;
+                }
                 case IGS_IMPULSION_T:
+                    frame = zmsg_pop(msg);
+                    data = zframe_data(frame);
+                    size = zframe_size(frame);
                     printf("\n");
                     break;
                 case IGS_DATA_T:
+                    frame = zmsg_pop(msg);
+                    data = zframe_data(frame);
+                    size = zframe_size(frame);
                     string = zframe_strhex(frame);
-                    printf(" (%lu bytes) %.64s\n", strlen(string), string);
+                    printf(" (%lu bytes) %.64s\n", size, string);
                     free(string);
                     break;
                     
                 default:
                     break;
             }
-            zframe_destroy(&frame);
+            if (frame != NULL)
+                zframe_destroy(&frame);
         }else{
             for (unsigned long i = 0; i < s; i++){
                 char *part = zmsg_popstr(msg);
@@ -306,7 +322,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
                 char *peer = zmsg_popstr (msg);
                 agent *a = NULL;
                 for(a = zEl->agents; a != NULL; a = a->hh.next) {
-                    //NB: no break here beacause we allow subscribing to several agents
+                    //NB: no break here because we allow subscribing to several agents
                     //having the same name
                     if (strcmp(a->name, peer) == 0 || strcmp(a->uuid, peer) == 0){
                         if (a->publisherPort == NULL){
@@ -1040,7 +1056,7 @@ int main (int argc, char *argv [])
                         break;
                     }
                 }else if (matches == 2) {
-                    printf("Received command: %s + %s\n", command, param1);
+                    //printf("Received command: %s + %s\n", command, param1);
                     if (strcmp(command, "join") == 0){
                         if (beaconActor != NULL){
                             zstr_sendx (beaconActor, "JOIN", param1, NULL);
@@ -1092,7 +1108,7 @@ int main (int argc, char *argv [])
                         }
                     }
                 }else if (matches == 3) {
-                    printf("Received command: %s + %s + %s\n", command, param1, param2);
+                    //printf("Received command: %s + %s + %s\n", command, param1, param2);
                     if (strcmp(command, "whisper") == 0){
                         //FIXME: check to which actor UUID belongs
                         if (beaconActor != NULL){
