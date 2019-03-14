@@ -126,7 +126,7 @@ win32 {
         DESTDIR = $${OUT_PWD}/bin
 
         # Copy Qt DLLs and required files
-        QMAKE_POST_LINK += windeployqt $${DESTDIR}/$${TARGET}.exe -qmldir=$${PWD}
+        QMAKE_POST_LINK += $$shell_quote($$shell_path($$[QT_INSTALL_BINS]/windeployqt)) $${DESTDIR}/$${TARGET}.exe -qmldir=$${PWD}
 
         # TODO: copy ingeScape dependencies
     }

@@ -19,6 +19,8 @@ extern "C" {
 #if (defined WIN32 || defined _WIN32)
 #if defined INGESCAPE
 #define PUBLIC __declspec(dllexport)
+#elif defined INGESCAPE_FROM_PRI
+#define PUBLIC
 #else
 #define PUBLIC __declspec(dllimport)
 #endif
