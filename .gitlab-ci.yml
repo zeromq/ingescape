@@ -50,7 +50,7 @@ lib-linux-release-x64:
   stage: build-lib
   tags:
     - docker
-  image: fafesty/debian-with-zyre
+  image: ingescape/debian-with-zyre
   script:
     - git clean -xfd
     - mkdir build
@@ -346,7 +346,7 @@ lib-installer-runtime-linux-x64:
   stage: installer-lib
   tags:
     - docker
-  image: fafesty/debian-with-zyre
+  image: ingescape/debian-with-zyre
   script:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
@@ -394,7 +394,7 @@ lib-deploy-linux-release-x64:
   stage: deploy-lib
   tags:
     - docker
-  image: fafesty/debian-with-zyre
+  image: ingescape/debian-with-zyre
   script:
     - make -C build install DESTDIR=~/builds/release/x64
     - cp src/include/ingescape_private.h ~/builds/release/x64/usr/local/include/ingescape/
