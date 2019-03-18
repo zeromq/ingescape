@@ -340,7 +340,7 @@ editor-installer-windows-x64:
   dependencies:
     - editor-windows-release-x64
 
-# Create runtime install for linux 64 bits
+# Create runtime install for linux 64 bits - Generic ZIP
 lib-installer-runtime-linux-x64:
   <<: *build-lib-files
   stage: installer-lib
@@ -358,7 +358,64 @@ lib-installer-runtime-linux-x64:
   dependencies:
     - lib-linux-release-x64
 
-# Create runtime install for linux ARMv7 (armhf)
+# Create runtime install for linux 64 bits - Debian 9 (stretch)
+lib-installer-runtime-debian-9-x64:
+  <<: *build-lib-files
+  stage: installer-lib
+  tags:
+    - docker
+  image: ingescape/debian-with-zyre
+  script:
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Debian 9 (stretch)"
+    - make -C build package
+    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+  artifacts:
+    paths:
+      - build/ingescape-*
+      - build/installIngescapeAndDependencies.sh
+  dependencies:
+    - lib-linux-release-x64
+
+# Create runtime install for linux 64 bits - Debian 10 (buster)
+lib-installer-runtime-debian-10-x64:
+  <<: *build-lib-files
+  stage: installer-lib
+  tags:
+    - docker
+  image: ingescape/debian-with-zyre
+  script:
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Debian 10 (buster)"
+    - make -C build package
+    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+  artifacts:
+    paths:
+      - build/ingescape-*
+      - build/installIngescapeAndDependencies.sh
+  dependencies:
+    - lib-linux-release-x64
+
+# Create runtime install for linux 64 bits - CentOS
+lib-installer-runtime-centos-x64:
+  <<: *build-lib-files
+  stage: installer-lib
+  tags:
+    - docker
+  image: ingescape/debian-with-zyre
+  script:
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="CentOS"
+    - make -C build package
+    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+  artifacts:
+    paths:
+      - build/ingescape-*
+      - build/installIngescapeAndDependencies.sh
+  dependencies:
+    - lib-linux-release-x64
+
+# Create runtime install for linux ARMv7 (armhf) - Generic ZIP
 lib-installer-runtime-linux-armhf:
   <<: *build-lib-files
   stage: installer-lib
@@ -366,6 +423,25 @@ lib-installer-runtime-linux-armhf:
     - docker
   image: ingescape/raspbian-stretch-armhf
   script:
+    - make -C build package
+    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+  artifacts:
+    paths:
+      - build/ingescape-*
+      - build/installIngescapeAndDependencies.sh
+  dependencies:
+    - lib-linux-release-armhf
+
+# Create runtime install for linux ARMv7 (armhf) - Raspbian 9 (stretch)
+lib-installer-runtime-raspbian-9-armhf:
+  <<: *build-lib-files
+  stage: installer-lib
+  tags:
+    - docker
+  image: ingescape/raspbian-stretch-armhf
+  script:
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Raspbian 9 (stretch)"
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
