@@ -452,7 +452,7 @@ lib-installer-runtime-raspbian-9-armhf:
   dependencies:
     - lib-linux-release-armhf
 
-# Deploy ingescape in mac os X use to compile to be able to compile agents
+# Deploy ingescape in mac os X to be able to compile agents
 lib-deploy-macos-release-x64:
   <<: *build-lib-files
   stage: deploy-lib
@@ -464,7 +464,7 @@ lib-deploy-macos-release-x64:
   dependencies:
     - lib-macos-release-x64
 
-# Deploy ingescape in linux use to compile to be able to compile agents
+# Deploy ingescape in linux to be able to compile agents
 lib-deploy-linux-release-x64:
   <<: *build-lib-files
   stage: deploy-lib
@@ -477,7 +477,20 @@ lib-deploy-linux-release-x64:
   dependencies:
     - lib-linux-release-x64
 
-# Deploy ingescape in windows use to compile to be able to compile agents
+# Deploy ingescape in linux to be able to compile agents
+lib-deploy-linux-release-armhf:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - docker
+  image: ingescape/raspbian-9-stretch
+  script:
+    - make -C build install DESTDIR=~/builds/release/armhf
+    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
+  dependencies:
+    - lib-linux-release-armhf
+
+# Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-release-x64:
   <<: *build-lib-files
   stage: deploy-lib
@@ -489,7 +502,7 @@ lib-deploy-windows-release-x64:
   dependencies:
     - lib-windows-release-x64
 
-# Deploy ingescape in windows use to compile to be able to compile agents
+# Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-release-x86:
   <<: *build-lib-files
   stage: deploy-lib
@@ -501,7 +514,7 @@ lib-deploy-windows-release-x86:
   dependencies:
     - lib-windows-release-x86
 
-# Deploy ingescape in windows use to compile to be able to compile agents
+# Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-debug-x64:
   <<: *build-lib-files
   stage: deploy-lib
@@ -513,7 +526,7 @@ lib-deploy-windows-debug-x64:
   dependencies:
     - lib-windows-debug-x64
 
-# Deploy ingescape in windows use to compile to be able to compile agents
+# Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-debug-x86:
   <<: *build-lib-files
   stage: deploy-lib
