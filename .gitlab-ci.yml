@@ -495,7 +495,7 @@ lib-deploy-linux-release-armhf:
   stage: deploy-lib
   tags:
     - docker
-  image: ingescape/raspbian-9-stretch
+  image: ingescape/raspbian-stretch-armhf
   script:
     - make -C build install DESTDIR=~/builds/release/armhf
     - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
