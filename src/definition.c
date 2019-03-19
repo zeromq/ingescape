@@ -72,6 +72,7 @@ int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *
     }
     if(previousIOP != NULL){
         igs_error("%s already exists and cannot be overwritten", iop->name);
+        model_readWriteUnlock();
         return 0;
     }
     switch (iop_type) {
@@ -109,7 +110,7 @@ agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_
         }
     }
     if (spaceInName){
-        igs_warn("Spaces are not allowed in IOP name: %s has been renamed to %s", name, n);
+        igs_error("Spaces are not allowed in IOP name: %s has been renamed to %s", name, n);
     }
     iop->name = n;
     iop->type = type;

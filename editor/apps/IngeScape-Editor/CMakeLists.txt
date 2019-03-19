@@ -55,7 +55,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 add_definitions(-DQT_DEPRECATED_WARNINGS=1)
-add_definitions(-DINGESCAPE=1)
+add_definitions(-DINGESCAPE_FROM_PRI=1)
 add_definitions(-DWIN32_LEAN_AND_MEAN) # To avoid include of winsock.h by windows.h
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")

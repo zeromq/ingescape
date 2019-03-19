@@ -22,8 +22,9 @@ stages:
       - src/**/*
       - CMakeLists.txt
       - builds/cmake/**/*
-      - dependencies/windows/unix/*
       - dependencies/yajl/**/*
+      - dependencies/unix/*
+      - dependencies/windows/unix/*
     refs:
       - master
 
@@ -34,8 +35,9 @@ stages:
       - .gitlab-ci.yml
       - src/**/*
       - builds/cmake/**/*
-      - dependencies/windows/unix/*
       - dependencies/yajl/**/*
+      - dependencies/unix/*
+      - dependencies/windows/unix/*
       - editor/frameworks/**/*
       - editor/IngeScape-Common/**/*
       - editor/IngeScape-Editor/**/*
@@ -48,7 +50,7 @@ lib-linux-release-x64:
   stage: build-lib
   tags:
     - docker
-  image: fafesty/debian-with-zyre
+  image: ingescape/debian-with-zyre
   script:
     - git clean -xfd
     - mkdir build
@@ -67,7 +69,7 @@ lib-linux-release-armhf:
   stage: build-lib
   tags:
     - docker
-  image: ingescape/raspbian:stretch
+  image: ingescape/raspbian-stretch-armhf
   script:
     - git clean -xfd
     - mkdir build
@@ -286,12 +288,12 @@ lib-installer-runtime-macos-x64:
     - osx
   script:
     - make -C build package
-    - cp dependencies/unix/install.sh build/install.sh
-    - sed -i '' 's/DARWIN_PACKAGE_FILE_NAME=.*/DARWIN_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/install.sh
+    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+    - sed -i '' 's/DARWIN_PACKAGE_FILE_NAME=.*/DARWIN_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
   artifacts:
     paths:
       - build/ingescape-*
-      - build/install.sh
+      - build/installIngescapeAndDependencies.sh
   dependencies:
     - lib-macos-release-x64
 
@@ -338,39 +340,115 @@ editor-installer-windows-x64:
   dependencies:
     - editor-windows-release-x64
 
-# Create runtime install for linux 64 bits
+# Create runtime install for linux 64 bits - Generic ZIP
 lib-installer-runtime-linux-x64:
   <<: *build-lib-files
   stage: installer-lib
   tags:
     - docker
-  image: fafesty/debian-with-zyre
+  image: ingescape/debian-with-zyre
   script:
     - make -C build package
-    - cp dependencies/unix/install.sh build/install.sh
-    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/install.sh
+    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
   artifacts:
     paths:
       - build/ingescape-*
-      - build/install.sh
+      - build/installIngescapeAndDependencies.sh
   dependencies:
     - lib-linux-release-x64
 
-# Create runtime install for linux ARMv7 (armhf)
+# Create runtime install for linux 64 bits - Debian 9 (stretch)
+lib-installer-runtime-debian-9-x64:
+  <<: *build-lib-files
+  stage: installer-lib
+  tags:
+    - docker
+  image: ingescape/debian-with-zyre
+  script:
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Debian 9 (stretch)"
+    - make -C build package
+    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+  artifacts:
+    paths:
+      - build/ingescape-*
+      - build/installIngescapeAndDependencies.sh
+  dependencies:
+    - lib-linux-release-x64
+
+# Create runtime install for linux 64 bits - Debian 10 (buster)
+lib-installer-runtime-debian-10-x64:
+  <<: *build-lib-files
+  stage: installer-lib
+  tags:
+    - docker
+  image: ingescape/debian-with-zyre
+  script:
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Debian 10 (buster)"
+    - make -C build package
+    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+  artifacts:
+    paths:
+      - build/ingescape-*
+      - build/installIngescapeAndDependencies.sh
+  dependencies:
+    - lib-linux-release-x64
+
+# Create runtime install for linux 64 bits - CentOS
+lib-installer-runtime-centos-x64:
+  <<: *build-lib-files
+  stage: installer-lib
+  tags:
+    - docker
+  image: ingescape/debian-with-zyre
+  script:
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="CentOS"
+    - make -C build package
+    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+  artifacts:
+    paths:
+      - build/ingescape-*
+      - build/installIngescapeAndDependencies.sh
+  dependencies:
+    - lib-linux-release-x64
+
+# Create runtime install for linux ARMv7 (armhf) - Generic ZIP
 lib-installer-runtime-linux-armhf:
   <<: *build-lib-files
   stage: installer-lib
   tags:
     - docker
-  image: ingescape/raspbian:stretch
+  image: ingescape/raspbian-stretch-armhf
   script:
     - make -C build package
-    - cp dependencies/unix/install.sh build/install.sh
-    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/install.sh
+    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
   artifacts:
     paths:
       - build/ingescape-*
-      - build/install.sh
+      - build/installIngescapeAndDependencies.sh
+  dependencies:
+    - lib-linux-release-armhf
+
+# Create runtime install for linux ARMv7 (armhf) - Raspbian 9 (stretch)
+lib-installer-runtime-raspbian-9-armhf:
+  <<: *build-lib-files
+  stage: installer-lib
+  tags:
+    - docker
+  image: ingescape/raspbian-stretch-armhf
+  script:
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Raspbian 9 (stretch)"
+    - make -C build package
+    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+  artifacts:
+    paths:
+      - build/ingescape-*
+      - build/installIngescapeAndDependencies.sh
   dependencies:
     - lib-linux-release-armhf
 
@@ -392,7 +470,7 @@ lib-deploy-linux-release-x64:
   stage: deploy-lib
   tags:
     - docker
-  image: fafesty/debian-with-zyre
+  image: ingescape/debian-with-zyre
   script:
     - make -C build install DESTDIR=~/builds/release/x64
     - cp src/include/ingescape_private.h ~/builds/release/x64/usr/local/include/ingescape/
