@@ -21,6 +21,8 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
+//import QtQml.StateMachine 1.0
+
 
 ApplicationWindow {
     id: mainWindow
@@ -286,35 +288,26 @@ ApplicationWindow {
 
 
         // Overlay layer used to display popups above the content of our window
-        /*I2Layer {
+        I2Layer {
             id: overlayLayer
 
             objectName: "overlayLayer"
 
             anchors.fill: parent
-
-
-            //
-            // Popup for Error messages
-            //
-            Popups.MessagePopup {
-                id: popupErrorMessage
-
-                anchors.centerIn: parent
-            }
-        }*/
+        }
 
         // Overlay layer used to display draggable agent item above the content of our window and the popups
-        I2Layer {
+        /*I2Layer {
             id: overlayLayerDraggableItem
             objectName: "overlayLayerDraggableItem"
 
             anchors.fill: parent
-        }
+        }*/
 
         // Overlay layer used by comboboxes
         I2Layer {
             id: overlayLayerComboBox
+
             objectName: "overlayLayerComboBox"
 
             anchors.fill: parent

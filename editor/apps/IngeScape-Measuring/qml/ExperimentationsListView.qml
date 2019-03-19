@@ -21,6 +21,7 @@ import I2Quick 1.0
 import INGESCAPE 1.0
 
 //import "theme" as Theme
+import "popup" as Popup
 
 
 Item {
@@ -99,5 +100,11 @@ Item {
 
             text: model.name
         }
+    }
+
+
+    Popup.CreateExperimentationPopup {
+        id: createExperimentationPopup
+
     }
 }

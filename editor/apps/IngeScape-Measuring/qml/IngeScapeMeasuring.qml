@@ -57,8 +57,48 @@ Item {
     //
     //--------------------------------------------------------
 
+    StackView {
+        id: stackview
+        anchors.fill: parent
 
-    SwipeView {
+        /*pushEnter: Transition {
+            PropertyAnimation {
+                property: "opacity"
+                from: 0
+                to:1
+                duration: 200
+            }
+        }
+        pushExit: Transition {
+            PropertyAnimation {
+                property: "opacity"
+                from: 1
+                to:0
+                duration: 200
+            }
+        }
+        popEnter: Transition {
+            PropertyAnimation {
+                property: "opacity"
+                from: 0
+                to:1
+                duration: 200
+            }
+        }
+        popExit: Transition {
+            PropertyAnimation {
+                property: "opacity"
+                from: 1
+                to:0
+                duration: 200
+            }
+        }*/
+
+        initialItem: componentExperimentationsListView
+    }
+
+
+    /*SwipeView {
         id: swipeView
 
         anchors.fill: parent
@@ -99,7 +139,35 @@ Item {
             id: tasksView
         }
 
+    }*/
+
+
+    //
+    // Experimentations List View
+    //
+    Component {
+        id: componentExperimentationsListView
+
+        ExperimentationsListView {
+            id: experimentationsListView
+
+            controller: IngeScapeMeasuringC.experimentationsListC
+        }
     }
+
+
+    //
+    // Experimentations View
+    //
+    Component {
+        id: componentExperimentationView
+
+        ExperimentationView {
+            id: experimentationView
+        }
+    }
+
+
 
     Row {
         anchors {
@@ -112,7 +180,9 @@ Item {
             onClicked: {
                 console.log("PREVIOUS");
 
-                swipeView.currentIndex--;
+                //swipeView.currentIndex--;
+
+                stackview.pop();
             }
         }
 
@@ -122,7 +192,9 @@ Item {
             onClicked: {
                 console.log("NEXT");
 
-                swipeView.currentIndex++;
+                //swipeView.currentIndex++;
+
+                stackview.push(componentExperimentationView);
             }
         }
     }
