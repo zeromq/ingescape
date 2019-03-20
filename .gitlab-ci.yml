@@ -261,6 +261,7 @@ lib-installer-runtime-windows-x86:
     paths:
       - build\ReleaseX86\ingescape-*.exe
       - build\ReleaseX86\ingescape-*.zip
+    name: "lib-installer-runtime-windows-x86"
   dependencies:
     - lib-windows-release-x86
 
@@ -277,6 +278,7 @@ lib-installer-runtime-windows-x64:
     paths:
       - build\ReleaseX64\ingescape-*.exe
       - build\ReleaseX64\ingescape-*.zip
+    name: "lib-installer-runtime-windows-x64"
   dependencies:
     - lib-windows-release-x64
 
@@ -294,6 +296,7 @@ lib-installer-runtime-macos-x64:
     paths:
       - build/ingescape-*
       - build/installIngescapeAndDependencies.sh
+    name: "lib-installer-runtime-macos-x64"
   dependencies:
     - lib-macos-release-x64
 
@@ -309,6 +312,7 @@ editor-installer-macos-x64:
   artifacts:
     paths:
       - editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
+    name: "editor-installer-macos-x64"
   dependencies:
     - editor-macos-release-x64
 
@@ -323,6 +327,7 @@ editor-installer-windows-x86:
   artifacts:
     paths:
       - editor\apps\IngeScape-Editor\build\ReleaseX86\IngeScape-Editor-*
+    name: "editor-installer-windows-x86"
   dependencies:
     - editor-windows-release-x86
 
@@ -337,6 +342,7 @@ editor-installer-windows-x64:
   artifacts:
     paths:
       - editor\apps\IngeScape-Editor\build\ReleaseX64\IngeScape-Editor-*
+    name: "editor-installer-windows-x64"
   dependencies:
     - editor-windows-release-x64
 
@@ -355,6 +361,7 @@ lib-installer-runtime-linux-x64:
     paths:
       - build/ingescape-*
       - build/installIngescapeAndDependencies.sh
+    name: "lib-installer-runtime-linux-x64"
   dependencies:
     - lib-linux-release-x64
 
@@ -374,6 +381,7 @@ lib-installer-runtime-debian-9-x64:
     paths:
       - build/ingescape-*
       - build/installIngescapeAndDependencies.sh
+    name: "lib-installer-runtime-debian-9-x64"
   dependencies:
     - lib-linux-release-x64
 
@@ -393,6 +401,7 @@ lib-installer-runtime-debian-10-x64:
     paths:
       - build/ingescape-*
       - build/installIngescapeAndDependencies.sh
+    name: "lib-installer-runtime-debian-10-x64"
   dependencies:
     - lib-linux-release-x64
 
@@ -412,6 +421,7 @@ lib-installer-runtime-centos-x64:
     paths:
       - build/ingescape-*
       - build/installIngescapeAndDependencies.sh
+    name: "lib-installer-runtime-centos-x64"
   dependencies:
     - lib-linux-release-x64
 
@@ -430,6 +440,7 @@ lib-installer-runtime-linux-armhf:
     paths:
       - build/ingescape-*
       - build/installIngescapeAndDependencies.sh
+    name: "lib-installer-runtime-linux-armhf"
   dependencies:
     - lib-linux-release-armhf
 
@@ -449,10 +460,11 @@ lib-installer-runtime-raspbian-9-armhf:
     paths:
       - build/ingescape-*
       - build/installIngescapeAndDependencies.sh
+    name: "lib-installer-runtime-raspbian-9-armhf"
   dependencies:
     - lib-linux-release-armhf
 
-# Deploy ingescape in mac os X use to compile to be able to compile agents
+# Deploy ingescape in mac os X to be able to compile agents
 lib-deploy-macos-release-x64:
   <<: *build-lib-files
   stage: deploy-lib
@@ -464,7 +476,7 @@ lib-deploy-macos-release-x64:
   dependencies:
     - lib-macos-release-x64
 
-# Deploy ingescape in linux use to compile to be able to compile agents
+# Deploy ingescape in linux to be able to compile agents
 lib-deploy-linux-release-x64:
   <<: *build-lib-files
   stage: deploy-lib
@@ -477,7 +489,20 @@ lib-deploy-linux-release-x64:
   dependencies:
     - lib-linux-release-x64
 
-# Deploy ingescape in windows use to compile to be able to compile agents
+# Deploy ingescape in linux to be able to compile agents
+lib-deploy-linux-release-armhf:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - docker
+  image: ingescape/raspbian-stretch-armhf
+  script:
+    - make -C build install DESTDIR=~/builds/release/armhf
+    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
+  dependencies:
+    - lib-linux-release-armhf
+
+# Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-release-x64:
   <<: *build-lib-files
   stage: deploy-lib
@@ -489,7 +514,7 @@ lib-deploy-windows-release-x64:
   dependencies:
     - lib-windows-release-x64
 
-# Deploy ingescape in windows use to compile to be able to compile agents
+# Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-release-x86:
   <<: *build-lib-files
   stage: deploy-lib
@@ -501,7 +526,7 @@ lib-deploy-windows-release-x86:
   dependencies:
     - lib-windows-release-x86
 
-# Deploy ingescape in windows use to compile to be able to compile agents
+# Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-debug-x64:
   <<: *build-lib-files
   stage: deploy-lib
@@ -513,7 +538,7 @@ lib-deploy-windows-debug-x64:
   dependencies:
     - lib-windows-debug-x64
 
-# Deploy ingescape in windows use to compile to be able to compile agents
+# Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-debug-x86:
   <<: *build-lib-files
   stage: deploy-lib
