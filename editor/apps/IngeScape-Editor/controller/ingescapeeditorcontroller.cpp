@@ -306,6 +306,11 @@ IngeScapeEditorController::~IngeScapeEditorController()
         _terminationSignalWatcher = nullptr;
     }
 
+
+    //
+    // Clean-up sub-controllers
+    //
+
     if (_timeLineC != nullptr)
     {
         disconnect(_timeLineC);

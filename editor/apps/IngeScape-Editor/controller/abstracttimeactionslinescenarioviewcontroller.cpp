@@ -1,3 +1,24 @@
+/*
+ *	IngeScape Editor
+ *
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort    <lemort@ingenuity.io>
+ *
+ */
+
+#include "abstracttimeactionslinescenarioviewcontroller.h"
+
+#include <QQmlEngine>
+#include <QtGlobal>
+#include <QtMath>
+#include <model/enums.h>
 
 // Margin in minutes (left and right side of our view) to ensure that labels are not truncated
 #define TIME_MARGIN_IN_PIXELS 40
@@ -21,14 +42,6 @@
 // time ranges for time ticks
 int TIME_RANGES[TIME_RANGES_COUNT] = {1, 2, 5, 10, 30, 60, 120, 300};
 
-
-
-#include "abstracttimeactionslinescenarioviewcontroller.h"
-
-#include <QQmlEngine>
-#include <QtGlobal>
-#include <QDate>
-#include <QtMath>
 
 /**
  * @brief Default constructor
@@ -288,11 +301,11 @@ int AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordinateSy
  *
  * @return
  */
-QTime AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordinateSystemToQTime(qreal xValue, qreal extraQmlUpdateField)
+QDateTime AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordinateSystemToQDateTime(qreal xValue, qreal extraQmlUpdateField)
 {
     int millisecondsTime = convertAbscissaInCoordinateSystemToTimeInMilliseconds(xValue, extraQmlUpdateField);
 
-    return QTime::fromMSecsSinceStartOfDay(millisecondsTime);
+    return QDateTime(APPLICATION_START_DATE, QTime::fromMSecsSinceStartOfDay(millisecondsTime));
 }
 
 

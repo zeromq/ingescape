@@ -493,7 +493,7 @@ Item {
                                 onPositionChanged: {
                                     var dragItem = drag.source;
 
-                                    var startInQTime = viewController.convertAbscissaInCoordinateSystemToQTime(drag.x, viewController.pixelsPerMinute)
+                                    var startInDateTime = viewController.convertAbscissaInCoordinateSystemToQDateTime(drag.x, viewController.pixelsPerMinute);
                                     var starttimeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
 
                                     var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
@@ -509,11 +509,11 @@ Item {
                                             ghostDropImpossible.visible = false;
                                             // move ghost
                                             ghostAction.actionModelGhost = dragItem.action;
-                                            ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
+                                            ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, viewController.pixelsPerMinute);
                                             ghostAction.y = lineNumber * rootItem.lineHeight;
-                                            ghostAction.startTime = startInQTime;
+                                            ghostAction.startTime = startInDateTime;
                                             if  (typeof dragItem.temporaryStartTime !== 'undefined') {
-                                                dragItem.temporaryStartTime = startInQTime;
+                                                dragItem.temporaryStartTime = startInDateTime;
                                             }
                                         }
                                         else {
@@ -521,7 +521,7 @@ Item {
                                             ghostAction.actionModelGhost = null;
 
                                             // ghost drop impossible
-                                            ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
+                                            ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, viewController.pixelsPerMinute);
                                             ghostDropImpossible.y = lineNumber * rootItem.lineHeight + (rootItem.lineHeight/2 - ghostDropImpossible.width/2);
                                             ghostDropImpossible.visible = true;
                                         }
@@ -538,11 +538,11 @@ Item {
                                             ghostDropImpossible.visible = false;
                                             // move ghost
                                             ghostAction.actionModelGhost = dragItem.myActionVM.modelM;
-                                            ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
+                                            ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, viewController.pixelsPerMinute);
                                             ghostAction.y = lineNumber * rootItem.lineHeight;
-                                            ghostAction.startTime = startInQTime;
+                                            ghostAction.startTime = startInDateTime;
                                             if  (typeof dragItem.temporaryStartTime !== 'undefined') {
-                                                dragItem.temporaryStartTime = startInQTime;
+                                                dragItem.temporaryStartTime = startInDateTime;
                                             }
                                         }
                                         else {
@@ -550,7 +550,7 @@ Item {
                                             ghostAction.actionModelGhost = null;
 
                                             // ghost drop impossible
-                                            ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
+                                            ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, viewController.pixelsPerMinute);
                                             ghostDropImpossible.y = lineNumber * rootItem.lineHeight + (rootItem.lineHeight/2 - ghostDropImpossible.width/2);
                                             ghostDropImpossible.visible = true;
                                         }
@@ -1048,7 +1048,7 @@ Item {
                             target: controller
                             property: "currentTime"
                             value: if (viewController) {
-                                       viewController.convertAbscissaInCoordinateSystemToQTime(currentTimeItem.x, viewController.pixelsPerMinute)
+                                       viewController.convertAbscissaInCoordinateSystemToQDateTime(currentTimeItem.x, viewController.pixelsPerMinute)
                                    }
                                    else {
                                        0

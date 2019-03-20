@@ -94,7 +94,8 @@ class ScenarioController: public QObject
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isPlaying)
 
     // Current time (from the beginning of our scenario)
-    I2_QML_PROPERTY(QTime, currentTime)
+    // Define a QTime and a QDateTime: Manage a date in addition to the time to prevent a delta in hours between JS (QML) and C++
+    I2_QML_PROPERTY_QTime(currentTime)
 
     // List of (future) actions to evaluate at each timeout of our timer
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, listOfActionsToEvaluate)

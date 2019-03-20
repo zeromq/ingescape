@@ -1,9 +1,25 @@
+/*
+ *	IngeScape Editor
+ *
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort    <lemort@ingenuity.io>
+ *
+ */
+
 #ifndef ABSTRACTTIMEACTIONSLINESCENARIOVIEWCONTROLLER_H
 #define ABSTRACTTIMEACTIONSLINESCENARIOVIEWCONTROLLER_H
 
 #include <QObject>
 #include <QtQml>
 
+#include <QDate>
 #include <QTime>
 #include <QDateTime>
 
@@ -131,7 +147,7 @@ public:
          *
          * @return
          */
-        QTime convertAbscissaInCoordinateSystemToQTime(qreal xValue, qreal extraQmlUpdateField);
+        QDateTime convertAbscissaInCoordinateSystemToQDateTime(qreal xValue, qreal extraQmlUpdateField);
 
 
         /**

@@ -38,7 +38,8 @@ RecordM::RecordM(QString id,
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qint64 ms = _beginDateTime.msecsTo(_endDateTime);
-    _duration = EPOCH.addMSecs(ms);
+
+    _duration = QDateTime(APPLICATION_START_DATE).addMSecs(ms);
 
     qInfo() << "New Model of Record" << _name << "(" << _id << ") with duration" << _duration.toString("dd/MM/yyyy HH:mm:ss");
 }
