@@ -293,6 +293,7 @@ int AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordinateSy
     return ((timeSeconds + _startRelativeTimeInSeconds) * 1000.0);
 }
 
+
 /**
  * @brief Convert a given X value (abscissa) of our coordinate system into a QTime object
  *
@@ -307,7 +308,6 @@ QDateTime AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordi
 
     return QDateTime(APPLICATION_START_DATE, QTime::fromMSecsSinceStartOfDay(millisecondsTime));
 }
-
 
 
 /**
