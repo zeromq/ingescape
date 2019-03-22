@@ -144,6 +144,7 @@
 		979A7D931EA8A9CB003153EF /* version.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79FA1EA8A86F003153EF /* version.h */; };
 		97A2128D22391A0D00ACCFB0 /* libzyre.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A2128B22391A0D00ACCFB0 /* libzyre.2.dylib */; };
 		97A2128E22391A0D00ACCFB0 /* libczmq.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A2128C22391A0D00ACCFB0 /* libczmq.4.dylib */; };
+		97FAC32B2244C88A0036293B /* yajl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 973D1BB22226916D00D363BF /* yajl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -316,6 +317,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				97FAC32B2244C88A0036293B /* yajl.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1148,7 +1148,7 @@ initLoop (zsock_t *pipe, void *args){
 
     bool canContinue = true;
     //prepare zyre
-    zyre_t *node =  agentElements->node = zyre_new (igsAgentName);
+    agentElements->node = zyre_new (igsAgentName);
     if (strlen(agentElements->brokerEndPoint) > 0){
         zyre_gossip_connect(agentElements->node,
                             "%s", agentElements->brokerEndPoint);
@@ -1183,7 +1183,7 @@ initLoop (zsock_t *pipe, void *args){
     }else{
         snprintf(endpoint, 255, "tcp://%s:%d", agentElements->ipAddress, network_publishingPort);
     }
-    zsock_t *publisher = agentElements->publisher = zsock_new_pub(endpoint);
+    agentElements->publisher = zsock_new_pub(endpoint);
     if (agentElements->publisher == NULL){
         igs_error("Could not create publishing socket : Agent will interrupt immediately.");
         canContinue = false;
@@ -1207,10 +1207,10 @@ initLoop (zsock_t *pipe, void *args){
     if(stat(ipcFolderPath,&st) != 0){
         igs_warn("Expected IPC directory %s does not exist : create it to remove this warning", ipcFolderPath);
     }
-    ipcFullPath = calloc(1, strlen(ipcFolderPath)+strlen(zyre_uuid(node))+2);
-    sprintf(ipcFullPath, "%s/%s", ipcFolderPath, zyre_uuid(node));
-    ipcEndpoint = calloc(1, strlen(ipcFolderPath)+strlen(zyre_uuid(node))+8);
-    sprintf(ipcEndpoint, "ipc://%s/%s", ipcFolderPath, zyre_uuid(node));
+    ipcFullPath = calloc(1, strlen(ipcFolderPath)+strlen(zyre_uuid(agentElements->node))+2);
+    sprintf(ipcFullPath, "%s/%s", ipcFolderPath, zyre_uuid(agentElements->node));
+    ipcEndpoint = calloc(1, strlen(ipcFolderPath)+strlen(zyre_uuid(agentElements->node))+8);
+    sprintf(ipcEndpoint, "ipc://%s/%s", ipcFolderPath, zyre_uuid(agentElements->node));
     
     zsock_t *ipcPublisher = agentElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
     if (ipcPublisher == NULL){
@@ -1222,10 +1222,9 @@ initLoop (zsock_t *pipe, void *args){
 #endif
     
     //start logger stream if needed
-    zsock_t *logger = NULL;
     if (admin_logInStream){
         sprintf(endpoint, "tcp://%s:*", agentElements->ipAddress);
-        logger = agentElements->logger = zsock_new_pub(endpoint);
+        agentElements->logger = zsock_new_pub(endpoint);
         strncpy(endpoint, zsock_endpoint(agentElements->logger), 256);
         char *insert = endpoint + strlen(endpoint) - 1;
         while (*insert != ':' && insert > endpoint) {
@@ -1348,20 +1347,20 @@ initLoop (zsock_t *pipe, void *args){
     zyrePollItem.events = ZMQ_POLLIN;
     zyrePollItem.revents = 0;
 
-    zloop_t *loop = agentElements->loop = zloop_new ();
-    assert (loop);
-    zloop_set_verbose (loop, false);
+    agentElements->loop = zloop_new ();
+    assert (agentElements->loop);
+    zloop_set_verbose (agentElements->loop, false);
 
-    zloop_poller (loop, &zpipePollItem, manageParent, agentElements);
-    zloop_poller_set_tolerant(loop, &zpipePollItem);
-    zloop_poller (loop, &zyrePollItem, manageBusIncoming, agentElements);
-    zloop_poller_set_tolerant(loop, &zyrePollItem);
+    zloop_poller (agentElements->loop, &zpipePollItem, manageParent, agentElements);
+    zloop_poller_set_tolerant(agentElements->loop, &zpipePollItem);
+    zloop_poller (agentElements->loop, &zyrePollItem, manageBusIncoming, agentElements);
+    zloop_poller_set_tolerant(agentElements->loop, &zyrePollItem);
     
     zloop_timer(agentElements->loop, 1000, 0, triggerDefinitionUpdate, NULL);
     zloop_timer(agentElements->loop, 1000, 0, triggerMappingUpdate, NULL);
 
     if (canContinue){
-        zloop_start (loop); //start returns when one of the pollers returns -1
+        zloop_start (agentElements->loop); //start returns when one of the pollers returns -1
     }
     
     igs_debug("loop stopping...");
@@ -1376,25 +1375,25 @@ initLoop (zsock_t *pipe, void *args){
     HASH_ITER(hh, subscribers, s, tmps) {
         network_cleanAndFreeSubscriber(s);
     }
-    zyre_stop (node);
+    zyre_stop (agentElements->node);
     zclock_sleep (100);
-    zyre_destroy (&node);
-    zsock_destroy(&publisher);
+    zyre_destroy (&agentElements->node);
+    zsock_destroy(&agentElements->publisher);
 #if defined __unix__ || defined __APPLE__ || defined __linux__
-    if (ipcPublisher != NULL){
-        zsock_destroy(&ipcPublisher);
+    if (agentElements->ipcPublisher != NULL){
+        zsock_destroy(&agentElements->ipcPublisher);
         zsys_file_delete(ipcFullPath); //destroy ipcPath in file system
         //NB: ipcPath is based on peer id which is unique. It will never be used again.
     }
     free(ipcFullPath);
     free(ipcEndpoint);
 #endif
-    if (logger != NULL){
-        zsock_destroy(&logger);
+    if (agentElements->logger != NULL){
+        zsock_destroy(&agentElements->logger);
     }
     
-    zloop_destroy (&loop);
-    assert (loop == NULL);
+    zloop_destroy (&agentElements->loop);
+    assert (agentElements->loop == NULL);
     //call registered interruption callbacks
     forcedStopCalback_t *cb = NULL;
     if (forcedStop){
@@ -1722,7 +1721,9 @@ int igs_stop(){
             //if its node still exists
             zstr_sendx (agentElements->agentActor, "$TERM", NULL);
         }
-        zactor_destroy (&agentElements->agentActor);
+        if (agentElements->agentActor != NULL){
+            zactor_destroy (&agentElements->agentActor);
+        }
         //cleaning agent
         free (agentElements);
         agentElements = NULL;
