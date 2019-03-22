@@ -111,6 +111,8 @@ typedef enum {
 } iopType_t;
 
 //read IOP using void*
+// value : pointer to actual value, initialized by function, to be freed by user
+// size : size of returned value
 PUBLIC int igs_readInput(const char *name, void **value, size_t *size);
 PUBLIC int igs_readOutput(const char *name, void **value, size_t *size);
 PUBLIC int igs_readParameter(const char *name, void **value, size_t *size);

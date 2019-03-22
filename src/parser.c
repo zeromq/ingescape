@@ -3,7 +3,6 @@
 //
 //  Created by Stephane Vales
 //  Modified by Patxi Berard
-//  Modified by Vincent Deliencourt
 //  Copyright © 2017 Ingenuity i/o. All rights reserved.
 //
 
