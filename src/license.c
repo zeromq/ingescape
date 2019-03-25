@@ -114,12 +114,12 @@ void license_parseCommand(const char *command, const char *data){
         int platformNbIOPs = 0;
         sscanf(data, "%d %d", &platformNbAgents, &platformNbIOPs);
         license->platformNbAgents = MAX(license->platformNbAgents, platformNbAgents);
-        license->platformNbIOPs = MAX(license->platformNbIOPs, platformNbIOPs);
+        license->platformNbIOPs = (license->platformNbIOPs > platformNbIOPs)?license->platformNbIOPs:platformNbIOPs;
     }else if (strcmp(command, "editor_owner") == 0 && license->editorOwner == NULL){
         license->editorOwner = strdup(data);
     }else if (strcmp(command, "editor_expiration") == 0){
         long editorExpirationDate = atol(data);
-        license->editorExpirationDate = MAX(license->editorExpirationDate, editorExpirationDate);
+        license->editorExpirationDate = (license->editorExpirationDate > editorExpirationDate)?license->editorExpirationDate:editorExpirationDate;
         time_t t = time(NULL);
         if (license->editorExpirationDate < t){
             license->isEditorLicenseExpired = true;
