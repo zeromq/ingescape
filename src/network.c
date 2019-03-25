@@ -91,6 +91,9 @@ bool network_RequestOutputsFromMappedAgents = false;
 bool forcedStop = false;
 bool allowIpc = true;
 
+#if ENABLE_LICENSE_ENFORCEMENT
+licenseEnforcement_t *licEnforcement = NULL;
+#endif
 
 //global parameters
 //prefixes for sending definitions and mappings through zyre
@@ -554,6 +557,13 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             free(subscriber);
                             subscriber = NULL;
                         }
+#if ENABLE_LICENSE_ENFORCEMENT
+                        licEnforcement->currentAgentsNb++;
+                        if (licEnforcement->currentAgentsNb > license->platformNbAgents){
+                            igs_error("Maximum number of allowed agents (%d) is exceeded : agent will stop", MAX_NB_OF_AGENTS);
+                            return -1;
+                        }
+#endif
                         subscriber = calloc(1, sizeof(subscriber_t));
                         zagent->subscriber = subscriber;
                         subscriber->agentName = strdup(name);
@@ -711,6 +721,15 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         subscriber->definition = NULL;
                     }
                     
+                    #if ENABLE_LICENSE_ENFORCEMENT
+                    licEnforcement->currentIOPNb += (HASH_COUNT(newDefinition->inputs_table) +
+                                                     HASH_COUNT(newDefinition->outputs_table) +
+                                                     HASH_COUNT(newDefinition->params_table));
+                    if (licEnforcement->currentIOPNb > license->platformNbIOPs){
+                        igs_error("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", MAX_NB_OF_IOP);
+                        return -1;
+                    }
+                    #endif
                     igs_debug("Store definition for agent %s", name);
                     subscriber->definition = newDefinition;
                     //Check the involvement of this new agent and its definition in our mapping and update subscriptions
@@ -1112,6 +1131,12 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
     return 0;
 }
 
+//Timer callback to stop loop if license is expired or demo mode is on
+int triggerLicenseStop(zloop_t *loop, int timer_id, void *arg){
+    igs_error("License has expired and runtime duration limit is reached : stopping loop.");
+    return -1;
+}
+
 //Timer callback to update and (re)send our mapping to agents on the private channel
 int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop)
@@ -1142,6 +1167,12 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 static void
 initLoop (zsock_t *pipe, void *args){
     IGS_UNUSED(args)
+    
+#if ENABLE_LICENSE_ENFORCEMENT
+    if (licEnforcement == NULL){
+        licEnforcement = calloc(1, sizeof(licenseEnforcement_t));
+    }
+#endif
 
     network_needToSendDefinitionUpdate = false;
     network_needToUpdateMapping = false;
@@ -1358,6 +1389,13 @@ initLoop (zsock_t *pipe, void *args){
     
     zloop_timer(agentElements->loop, 1000, 0, triggerDefinitionUpdate, NULL);
     zloop_timer(agentElements->loop, 1000, 0, triggerMappingUpdate, NULL);
+    
+#if ENABLE_LICENSE_ENFORCEMENT
+    if (license != NULL && license->isLicenseExpired){
+        igs_error("License has expired : starting timer for demonstration mode...");
+        zloop_timer(agentElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, NULL);
+    }
+#endif
 
     if (canContinue){
         zloop_start (agentElements->loop); //start returns when one of the pollers returns -1
@@ -1412,6 +1450,11 @@ initLoop (zsock_t *pipe, void *args){
         #endif
         //TODO : do that for windows also
     }
+#if ENABLE_LICENSE_ENFORCEMENT
+    if (licEnforcement != NULL){
+        free(licEnforcement);
+    }
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1575,10 +1618,10 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
         return 0;
     }
     
+    license_readLicense();
     agentElements->zyrePort = port;
     agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
-    
     return 1;
 }
 
@@ -1637,6 +1680,7 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
         return 0;
     }
     
+    license_readLicense();
     agentElements->zyrePort = port;
     agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
@@ -1699,6 +1743,7 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
         return 0;
     }
     
+    license_readLicense();
     agentElements->zyrePort = 0;
     agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
@@ -1734,6 +1779,7 @@ int igs_stop(){
     }else{
         igs_debug("Agent already stopped");
     }
+    license_cleanLicense();
     return 1;
 }
 

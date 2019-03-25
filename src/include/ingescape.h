@@ -326,6 +326,18 @@ PUBLIC void igs_setAllowIpc(bool allow);
 PUBLIC bool igs_getAllowIpc(void);
 #endif
 
+//////////////////////////////////////////////////
+//licenses
+// Default license path is empty and is automatically set to agent's executable path.
+// When path is set manually, it takes priority to agent's executable path.
+void igs_setLicensePath(const char *path);
+char *igs_getLicensePath(void);
+    
+//Any agent developer can use this function to check the license against her/his agent's unique id.
+//IDs are provided by the ingescape team.
+//Returns true if check is OK.
+bool igs_checkLicenseForAgent(const char *agentId);
+    
 #ifdef __cplusplus
 }
 #endif

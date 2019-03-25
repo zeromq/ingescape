@@ -14,6 +14,7 @@ macro(add_ingescape_sources _SOURCES)
         ${macro_current_dir}/../../../src/admin.c
         ${macro_current_dir}/../../../src/bus.c
         ${macro_current_dir}/../../../src/token.c
+        ${macro_current_dir}/../../../src/license.c
         ${macro_current_dir}/../../../dependencies/yajl/src/yajl_alloc.c
         ${macro_current_dir}/../../../dependencies/yajl/src/yajl_buf.c
         ${macro_current_dir}/../../../dependencies/yajl/src/yajl_encode.c
@@ -91,6 +92,10 @@ macro(add_ingescape_libraries_dependencies _LIBS _pkg_config_libs_private)
     ELSE (ZYRE_FOUND)
         message( FATAL_ERROR "zyre not found." )
     ENDIF (ZYRE_FOUND)
+
+    IF (APPLE)
+        list(APPEND ${_LIBS} "-framework CoreFoundation")
+    ENDIF (APPLE)
     
     if (MSVC)
         # required libraries for msvc

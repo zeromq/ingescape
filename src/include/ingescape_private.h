@@ -197,6 +197,33 @@ typedef struct serviceHeader {
     char *value;
     UT_hash_handle hh;
 } serviceHeader_t;
+    
+//license
+typedef struct licenseForAgent {
+    char *agentId;
+    char *agentName;
+    struct licenseForAgent *prev;
+    struct licenseForAgent *next;
+} licenseForAgent_t;
+
+typedef struct license {
+    char *customer;
+    char *order;
+    long licenseExpirationDate;
+    bool isLicenseExpired;
+    int platformNbAgents;
+    int platformNbIOPs;
+    char *editorOwner;
+    long editorExpirationDate;
+    bool isEditorLicenseExpired;
+    zlist_t *features;
+    zlist_t *agents;
+} license_t;
+    
+typedef struct licenseEnforcement {
+    long currentIOPNb;
+    long currentAgentsNb;
+} licenseEnforcement_t;
 
 //////////////////  FUNCTIONS  //////////////////
 
@@ -255,6 +282,15 @@ extern serviceHeader_t *serviceHeaders;
 void token_freeToken(igs_token_t *t);
 bool token_addValuesToArgumentsFromMessage(const char *name, igs_tokenArgument_t *arg, zmsg_t *msg);
 int token_freeValuesInArguments(igs_tokenArgument_t *arg);
+
+//license
+#define ENABLE_LICENSE_ENFORCEMENT 0
+#define MAX_NB_OF_AGENTS 5
+#define MAX_NB_OF_IOP 50
+#define MAX_EXEC_DURATION_DURING_EVAL 300
+extern license_t *license;
+void license_cleanLicense(void);
+void license_readLicense(void);
 
 #ifdef __cplusplus
 }
