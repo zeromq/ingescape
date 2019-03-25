@@ -20,6 +20,14 @@
 
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
+#include <pthread.h>
+#endif
+#if (defined WIN32 || defined _WIN32)
+#include "unixfunctions.h"
+#endif
+
+#if defined(__unix__) || defined(__linux__) || \
+(defined(__APPLE__) && defined(__MACH__))
 pthread_mutex_t *license_readWriteMutex = NULL;
 #else
 #define W_OK 02
