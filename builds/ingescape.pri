@@ -15,6 +15,7 @@ SOURCES += \
     $$PWD/../src/admin.c \
     $$PWD/../src/bus.c \
     $$PWD/../src/token.c \
+    $$PWD/../src/license.c \
     $$PWD/../dependencies/yajl/src/yajl_alloc.c \
     $$PWD/../dependencies/yajl/src/yajl_buf.c \
     $$PWD/../dependencies/yajl/src/yajl_encode.c \
@@ -103,6 +104,7 @@ mac:{
     #
     # - cons: all required librairies must be linked explictly
     #         AND does not work if libraries are installed in another directory
+    LIBS += -framework CoreFoundation
     LIBS += /usr/local/lib/libczmq.dylib
     LIBS += /usr/local/lib/libzyre.dylib
 }
