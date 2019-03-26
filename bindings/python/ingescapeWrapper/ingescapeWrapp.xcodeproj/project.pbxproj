@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8D3D815F20878E17007FDA55 /* regex.c in Sources */ = {isa = PBXBuildFile; fileRef = 8D3D815B20878E16007FDA55 /* regex.c */; };
 		8D483D072096FF4300E49A3D /* ingescapePython.c in Sources */ = {isa = PBXBuildFile; fileRef = 8D483D062096FF4300E49A3D /* ingescapePython.c */; };
 		8D704C42205FF5FC00AB57B1 /* mainc.c in Sources */ = {isa = PBXBuildFile; fileRef = 8D704C41205FF5FC00AB57B1 /* mainc.c */; };
 		8DABCD2A20779EF000B7AD9B /* mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 8DABCD1E20779EF000B7AD9B /* mapping.c */; };
@@ -58,8 +57,6 @@
 /* Begin PBXFileReference section */
 		8D193EC22029F08200B5D2DA /* ingescapeWrapp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ingescapeWrapp; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D193ECD202A054D00B5D2DA /* setup.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = setup.py; sourceTree = "<group>"; };
-		8D3D815B20878E16007FDA55 /* regex.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = regex.c; sourceTree = "<group>"; };
-		8D3D815E20878E16007FDA55 /* regex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
 		8D483D062096FF4300E49A3D /* ingescapePython.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ingescapePython.c; sourceTree = "<group>"; };
 		8D704C41205FF5FC00AB57B1 /* mainc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mainc.c; sourceTree = "<group>"; };
 		8DABCD1E20779EF000B7AD9B /* mapping.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mapping.c; sourceTree = "<group>"; };
@@ -154,8 +151,6 @@
 				8DABCD2220779EF000B7AD9B /* stopcallback.c */,
 				8DB2B4EA207CBA5E00159FD4 /* advanced.h */,
 				8DB2B4E9207CBA5E00159FD4 /* advanced.c */,
-				8D3D815B20878E16007FDA55 /* regex.c */,
-				8D3D815E20878E16007FDA55 /* regex.h */,
 				8D193EC32029F08200B5D2DA /* Products */,
 			);
 			path = ingescapeWrapp;
@@ -262,7 +257,6 @@
 				8DABCD2F20779EF000B7AD9B /* input.c in Sources */,
 				8DABCD2A20779EF000B7AD9B /* mapping.c in Sources */,
 				8D483D072096FF4300E49A3D /* ingescapePython.c in Sources */,
-				8D3D815F20878E17007FDA55 /* regex.c in Sources */,
 				8DABCD2D20779EF000B7AD9B /* observecallback.c in Sources */,
 				8DB2B4EB207CBA5E00159FD4 /* advanced.c in Sources */,
 				8D704C42205FF5FC00AB57B1 /* mainc.c in Sources */,
