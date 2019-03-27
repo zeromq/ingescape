@@ -23,7 +23,6 @@ void definition_freeIOP (agent_iop_t* iop){
     if (iop == NULL){
         return;
     }
-    model_readWriteLock();
     if ((iop)->name != NULL){
         free((char*)(iop)->name);
     }
@@ -47,7 +46,6 @@ void definition_freeIOP (agent_iop_t* iop){
         }
     }
     free(iop);
-    model_readWriteUnlock();
 }
 
 int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *def){
@@ -118,19 +116,25 @@ agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_
     switch (type) {
         case IGS_INPUT_T:
             if (definition_addIopToDefinition(iop, IGS_INPUT_T, igs_internal_definition) < 1){
+                model_readWriteLock();
                 definition_freeIOP(iop);
+                model_readWriteUnlock();
                 return NULL;
             }
             break;
         case IGS_OUTPUT_T:
             if (definition_addIopToDefinition(iop, IGS_OUTPUT_T, igs_internal_definition) < 1){
+                model_readWriteLock();
                 definition_freeIOP(iop);
+                model_readWriteUnlock();
                 return NULL;
             }
             break;
         case IGS_PARAMETER_T:
             if (definition_addIopToDefinition(iop, IGS_PARAMETER_T, igs_internal_definition) < 1){
+                model_readWriteLock();
                 definition_freeIOP(iop);
+                model_readWriteUnlock();
                 return NULL;
             }
             break;
@@ -158,6 +162,7 @@ void definition_freeDefinition (definition* def) {
         free((char*)def->version);
         def->version = NULL;
     }
+    model_readWriteLock();
     agent_iop_t *current_iop, *tmp_iop;
     HASH_ITER(hh, def->params_table, current_iop, tmp_iop) {
         HASH_DEL(def->params_table,current_iop);
@@ -174,6 +179,7 @@ void definition_freeDefinition (definition* def) {
         definition_freeIOP(current_iop);
         current_iop = NULL;
     }
+    model_readWriteUnlock();
     igs_token_t *token, *tmpToken;
     HASH_ITER(hh, def->tokens_table, token, tmpToken) {
         HASH_DEL(def->tokens_table,token);
@@ -418,8 +424,10 @@ int igs_removeInput(const char *name){
         igs_warn("The input %s could not be found", name);
         return -2;
     }
+    model_readWriteLock();
     HASH_DEL(igs_internal_definition->inputs_table, iop);
     definition_freeIOP(iop);
+    model_readWriteUnlock();
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
@@ -446,8 +454,10 @@ int igs_removeOutput(const char *name){
         igs_warn("The output %s could not be found", name);
         return -2;
     }
+    model_readWriteLock();
     HASH_DEL(igs_internal_definition->outputs_table, iop);
     definition_freeIOP(iop);
+    model_readWriteUnlock();
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
@@ -474,8 +484,10 @@ int igs_removeParameter(const char *name){
         igs_warn("The parameter %s could not be found", name);
         return -2;
     }
+    model_readWriteLock();
     HASH_DEL(igs_internal_definition->params_table, iop);
     definition_freeIOP(iop);
+    model_readWriteUnlock();
     network_needToSendDefinitionUpdate = true;
     return 1;
 }

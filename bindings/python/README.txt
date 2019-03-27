@@ -14,8 +14,8 @@ Dependencies :
 	-libingescape.dylib
 	-libzyre.dylib
 	-libyajl.dylib
-    	-libzmq.5.dylib
-    	-libczmq.4.dylib
+    -libzmq.5.dylib
+    -libczmq.4.dylib
 
 Python3 and python3-dev for python3's Python.h
 
@@ -23,11 +23,6 @@ Python3 and python3-dev for python3's Python.h
 ===================================================
 
 In a terminal :
-    cd /ingescapeWrapper/ingescapeWrapp
-    python3 setup.py build
-    sudo python3 setup.py install
-
-    cd ../../ingescapepython
     python3 setup.py install
 
 ---------------------EXAMPLES----------------------
