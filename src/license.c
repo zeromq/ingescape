@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <czmq.h>
+#include <sodium.h>
 #include "ingescape_private.h"
 
 #ifdef __APPLE__
@@ -36,6 +37,9 @@ pthread_mutex_t license_readWriteMutex = NULL;
 
 license_t *license = NULL;
 char *licensePath = NULL;
+
+uint8_t secretKey[crypto_secretstream_xchacha20poly1305_KEYBYTES] = {1,255,34,41,58,63,47,183,134,223,33,41,25,16,87,38,211,27,183,124,185,196,107,128,34,92,83,54,35,60,37,28};
+#define CHUNK_SIZE 4096
 
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
@@ -69,6 +73,86 @@ void license_readWriteUnlock(void) {
     }
 }
 
+void encryptLicenseToFile(const char *target_file, const char *source_string,
+                          const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]){
+    unsigned char  buf_in[CHUNK_SIZE];
+    unsigned char  buf_out[CHUNK_SIZE + crypto_secretstream_xchacha20poly1305_ABYTES];
+    unsigned char  header[crypto_secretstream_xchacha20poly1305_HEADERBYTES];
+    crypto_secretstream_xchacha20poly1305_state st;
+    FILE          *fp_t;
+    unsigned long long out_len;
+    unsigned char  tag;
+    
+    fp_t = fopen(target_file, "wb");
+    crypto_secretstream_xchacha20poly1305_init_push(&st, header, key);
+    fwrite(header, 1, sizeof header, fp_t);
+    
+    const char *source_index = source_string;
+    while (source_index < source_string + strlen(source_string)){
+        size_t sizeToCopy = MIN(CHUNK_SIZE, strlen(source_index));
+        memcpy(buf_in, source_index, sizeToCopy);
+        source_index += sizeToCopy;
+        tag = (*source_index == '\0') ? crypto_secretstream_xchacha20poly1305_TAG_FINAL : 0;
+        crypto_secretstream_xchacha20poly1305_push(&st, buf_out, &out_len, buf_in, sizeToCopy,
+                                                   NULL, 0, tag);
+        fwrite(buf_out, 1, (size_t) out_len, fp_t);
+    }
+    fclose(fp_t);
+}
+
+int decryptLicenseFromFile(char **target_string, const char *source_file,
+                           const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]){
+    unsigned char  buf_in[CHUNK_SIZE + crypto_secretstream_xchacha20poly1305_ABYTES];
+    unsigned char  buf_out[CHUNK_SIZE];
+    unsigned char  header[crypto_secretstream_xchacha20poly1305_HEADERBYTES];
+    crypto_secretstream_xchacha20poly1305_state st;
+    FILE          *fp_s;
+    unsigned long long out_len;
+    size_t         rlen;
+    int            eof;
+    int            ret = -1;
+    unsigned char  tag;
+    
+    size_t targetSize = 0;
+    
+    fp_s = fopen(source_file, "rb");
+    if (fp_s == NULL){
+        printf("%s file not found\n", source_file);
+        goto ret;
+    }
+    fread(header, 1, sizeof header, fp_s);
+    if (crypto_secretstream_xchacha20poly1305_init_pull(&st, header, key) != 0) {
+        goto ret; /* incomplete header */
+    }
+    char *target_index = NULL;
+    do {
+        rlen = fread(buf_in, 1, sizeof buf_in, fp_s);
+        eof = feof(fp_s);
+        if (crypto_secretstream_xchacha20poly1305_pull(&st, buf_out, &out_len, &tag,
+                                                       buf_in, rlen, NULL, 0) != 0) {
+            igs_fatal("license file is corrupted and will be ignored");
+            goto ret; /* corrupted chunk */
+        }
+        if (tag == crypto_secretstream_xchacha20poly1305_TAG_FINAL && ! eof) {
+            igs_fatal("license file size is incorrect : file will be ignored");
+            goto ret; /* premature end (end of file reached before the end of the stream) */
+        }
+        if (targetSize == 0){
+            targetSize = out_len + 1; //+1 to reserve space for final \0
+            *target_string = calloc(1, targetSize);
+            target_index = *target_string;
+        }else{
+            targetSize += out_len;
+            *target_string = realloc(*target_string, targetSize);
+        }
+        memcpy(target_index, buf_out, out_len);
+        target_index += out_len;
+    } while (! eof);
+    ret = 0;
+ret:
+    fclose(fp_s);
+    return ret;
+}
 
 const char* license_getFilenameExt(const char *filename) {
     const char *dot = strrchr(filename, '.');
@@ -78,6 +162,8 @@ const char* license_getFilenameExt(const char *filename) {
 
 #ifdef __APPLE__
 void switchToBundlePath(char **path){
+    assert(path);
+    assert(*path);
     CFBundleRef b = CFBundleGetMainBundle();
     if (b != NULL){
         CFURLRef newPathURL = CFBundleCopyBundleURL(b);
@@ -97,16 +183,18 @@ void switchToBundlePath(char **path){
 //NB: because several license files can be parsed, this function
 //takes the least restricting values found in the files
 //NB: license informations are not cumulated : first file found gives customer, owner, etc.
-void license_parseCommand(const char *command, const char *data){
+void license_parseLine(const char *command, const char *data){
     if (strcmp(command, "customer") == 0 && license->customer == NULL){
         license->customer = strdup(data);
     }else if (strcmp(command, "order") == 0 && license->order == NULL){
         license->order = strdup(data);
     }else if (strcmp(command, "expiration") == 0){
         long licenseExpirationDate = atol(data);
-        license->editorExpirationDate = (license->licenseExpirationDate > licenseExpirationDate)?license->licenseExpirationDate:licenseExpirationDate;
-        unsigned long t = (unsigned long)time(NULL);
-        if (license->licenseExpirationDate < t){
+        if (license->licenseExpirationDate < licenseExpirationDate){
+            license->licenseExpirationDate = licenseExpirationDate;
+        }
+        long t = (long)time(NULL);
+        if (license->licenseExpirationDate - t < 0){
             license->isLicenseExpired = true;
         }
     }else if (strcmp(command, "platform") == 0){
@@ -177,6 +265,12 @@ void license_cleanLicense(void){
 }
 
 void license_readLicense(void){
+    if (license == NULL){
+        if (sodium_init() != 0) {
+            //nothing to do ?
+            //NB: sodium returns -1 when trying to initialize more than once
+        }
+    }
     if (licensePath == NULL){
         //use agent executable file as license path
 #if defined __unix__ || defined __APPLE__ || defined __linux__
@@ -220,7 +314,6 @@ void license_readLicense(void){
         switchToBundlePath(&licensePath);
 #endif
     }
-    
     zdir_t *path = NULL;
     license_cleanLicense();
     license_readWriteLock();
@@ -235,34 +328,39 @@ void license_readLicense(void){
             const char *name = zfile_filename(file, licensePath);
             const char *extension = license_getFilenameExt(name);
             if (strcmp(extension, "igslicense") == 0
-                && zfile_is_readable(file)
-                && zfile_input(file) == 0){
+                && zfile_is_readable(file)){
                 if (license == NULL){
                     license = calloc(1, sizeof(license_t));
                     license->features = zlist_new();
                     license->agents = zlist_new();
                 }
                 igs_debug("parsing license file %s/%s", licensePath, name);
+                //decrypt file
+                char *license = NULL;
+                decryptLicenseFromFile(&license, zfile_filename(file, NULL), secretKey);
+                //igs_debug("raw license file:\n%s", license);
                 //parse file
-                const char *line;
-                while ((line = zfile_readln(file))){
-                    if (line[0] == ':'){
+                char * curLine = license;
+                while(curLine){
+                    char * nextLine = strchr(curLine, '\n');
+                    if (nextLine) *nextLine = '\0';  // temporarily terminate the current line
+                    if (curLine[0] == ':'){
                         //we have a line with something to parse
-                        char command[256] = "";
+                        char type[256] = "";
                         char data[256] = "";
-                        if (sscanf(line, ":%s %[\001-\377]", command, data) == 2){
-                            license_parseCommand(command, data);
+                        if (sscanf(curLine, ":%s %[\001-\377]", type, data) == 2){
+                            license_parseLine(type, data);
                         }
                     }
+                    if (nextLine) *nextLine = '\n';  // then restore newline-char, just to be tidy
+                    curLine = nextLine ? (nextLine+1) : NULL;
                 }
-                zfile_close(file);
-                break;
             }
             file = zlist_next(filesList);
         }
     }
     if (license == NULL){
-        igs_info("no license found in %s : switching to demo mode", licensePath);
+        igs_fatal("no license found in %s : switching to demo mode", licensePath);
         license = calloc(1, sizeof(license_t));
         license->features = zlist_new();
         license->agents = zlist_new();
