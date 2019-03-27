@@ -5,6 +5,10 @@
 //  Created by Stephane Vales on 25/03/2019.
 //  Copyright © 2019 Ingescape. All rights reserved.
 //
+
+//Check here for sodium:
+//https://libsodium.gitbook.io/doc/secret-key_cryptography/secretstream
+
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
