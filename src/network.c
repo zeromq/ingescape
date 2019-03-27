@@ -280,6 +280,12 @@ void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
     igs_debug("cleaning subscription to %s\n", subscriber->agentName);
     // clean the agent definition
     if(subscriber->definition != NULL){
+#if ENABLE_LICENSE_ENFORCEMENT
+        licEnforcement->currentIOPNb -= (HASH_COUNT(subscriber->definition->inputs_table) +
+                                         HASH_COUNT(subscriber->definition->outputs_table) +
+                                         HASH_COUNT(subscriber->definition->params_table));
+        licEnforcement->currentAgentsNb--;
+#endif
         definition_freeDefinition(subscriber->definition);
     }
     //clean the agent mapping
@@ -557,13 +563,6 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             free(subscriber);
                             subscriber = NULL;
                         }
-#if ENABLE_LICENSE_ENFORCEMENT
-                        licEnforcement->currentAgentsNb++;
-                        if (licEnforcement->currentAgentsNb > license->platformNbAgents){
-                            igs_error("Maximum number of allowed agents (%d) is exceeded : agent will stop", MAX_NB_OF_AGENTS);
-                            return -1;
-                        }
-#endif
                         subscriber = calloc(1, sizeof(subscriber_t));
                         zagent->subscriber = subscriber;
                         subscriber->agentName = strdup(name);
@@ -726,7 +725,12 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                                      HASH_COUNT(newDefinition->outputs_table) +
                                                      HASH_COUNT(newDefinition->params_table));
                     if (licEnforcement->currentIOPNb > license->platformNbIOPs){
-                        igs_error("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", MAX_NB_OF_IOP);
+                        igs_fatal("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", license->platformNbIOPs);
+                        return -1;
+                    }
+                    licEnforcement->currentAgentsNb++;
+                    if (licEnforcement->currentAgentsNb > license->platformNbAgents){
+                        igs_fatal("Maximum number of allowed agents (%d) is exceeded : agent will stop", license->platformNbAgents);
                         return -1;
                     }
                     #endif
@@ -1172,6 +1176,8 @@ initLoop (zsock_t *pipe, void *args){
     if (licEnforcement == NULL){
         licEnforcement = calloc(1, sizeof(licenseEnforcement_t));
     }
+    licEnforcement->currentAgentsNb = 0;
+    licEnforcement->currentIOPNb = 0;
 #endif
 
     network_needToSendDefinitionUpdate = false;
@@ -1392,7 +1398,7 @@ initLoop (zsock_t *pipe, void *args){
     
 #if ENABLE_LICENSE_ENFORCEMENT
     if (license != NULL && license->isLicenseExpired){
-        igs_error("License has expired : starting timer for demonstration mode...");
+        igs_fatal("License has expired : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
         zloop_timer(agentElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, NULL);
     }
 #endif
