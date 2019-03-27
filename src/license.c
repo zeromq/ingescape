@@ -89,7 +89,12 @@ void encryptLicenseToFile(const char *target_file, const char *source_string,
     
     const char *source_index = source_string;
     while (source_index < source_string + strlen(source_string)){
-        size_t sizeToCopy = MIN(CHUNK_SIZE, strlen(source_index));
+        size_t sizeToCopy = 0;
+        if (strlen(source_index) > CHUNK_SIZE){
+            sizeToCopy = CHUNK_SIZE;
+        }else{
+            sizeToCopy = strlen(source_index);
+        }
         memcpy(buf_in, source_index, sizeToCopy);
         source_index += sizeToCopy;
         tag = (*source_index == '\0') ? crypto_secretstream_xchacha20poly1305_TAG_FINAL : 0;
@@ -194,20 +199,26 @@ void license_parseLine(const char *command, const char *data){
             license->licenseExpirationDate = licenseExpirationDate;
         }
         long t = (long)time(NULL);
-        if (license->licenseExpirationDate - t < 0){
+        if (license->licenseExpirationDate < t){
             license->isLicenseExpired = true;
         }
     }else if (strcmp(command, "platform") == 0){
         int platformNbAgents = 0;
         int platformNbIOPs = 0;
         sscanf(data, "%d %d", &platformNbAgents, &platformNbIOPs);
-        license->platformNbAgents = (license->platformNbAgents > platformNbAgents)?license->platformNbAgents:platformNbAgents;
-        license->platformNbIOPs = (license->platformNbIOPs > platformNbIOPs)?license->platformNbIOPs:platformNbIOPs;
-    }else if (strcmp(command, "editor_owner") == 0 && license->editorOwner == NULL){
+        if (license->platformNbAgents < platformNbAgents){
+            license->platformNbAgents = platformNbAgents;
+        }
+        if (license->platformNbIOPs < platformNbIOPs){
+            license->platformNbIOPs = platformNbIOPs;
+        }
+    }else if (strcmp(command, "editorOwner") == 0 && license->editorOwner == NULL){
         license->editorOwner = strdup(data);
-    }else if (strcmp(command, "editor_expiration") == 0){
+    }else if (strcmp(command, "editorExpiration") == 0){
         long editorExpirationDate = atol(data);
-        license->editorExpirationDate = (license->editorExpirationDate > editorExpirationDate)?license->editorExpirationDate:editorExpirationDate;
+        if (license->editorExpirationDate < editorExpirationDate){
+            license->editorExpirationDate = editorExpirationDate;
+        }
         time_t t = time(NULL);
         if (license->editorExpirationDate < t){
             license->isEditorLicenseExpired = true;
