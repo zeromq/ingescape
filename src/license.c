@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <czmq.h>
 #include <sodium.h>
-#include <dirent.h>
 #include "ingescape_private.h"
 
 #ifdef __APPLE__
@@ -23,6 +22,7 @@
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
 #include <pthread.h>
+#include <dirent.h>
 #endif
 #if (defined WIN32 || defined _WIN32)
 #include "unixfunctions.h"
