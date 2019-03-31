@@ -202,8 +202,6 @@ typedef struct serviceHeader {
 typedef struct licenseForAgent {
     char *agentId;
     char *agentName;
-    struct licenseForAgent *prev;
-    struct licenseForAgent *next;
 } licenseForAgent_t;
 
 typedef struct license {
@@ -288,6 +286,7 @@ int token_freeValuesInArguments(igs_tokenArgument_t *arg);
 #define MAX_NB_OF_AGENTS 5
 #define MAX_NB_OF_IOP 50
 #define MAX_EXEC_DURATION_DURING_EVAL 300
+#define igs_license(...) igs_log(IGS_LOG_FATAL+1, __func__, __VA_ARGS__)
 extern license_t *license;
 void license_cleanLicense(void);
 void license_readLicense(void);

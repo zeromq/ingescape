@@ -135,11 +135,11 @@ int decryptLicenseFromFile(char **target_string, const char *source_file,
         eof = feof(fp_s);
         if (crypto_secretstream_xchacha20poly1305_pull(&st, buf_out, &out_len, &tag,
                                                        buf_in, rlen, NULL, 0) != 0) {
-            igs_fatal("license file is corrupted and will be ignored");
+            igs_license("license file is corrupted and will be ignored");
             goto ret; /* corrupted chunk */
         }
         if (tag == crypto_secretstream_xchacha20poly1305_TAG_FINAL && ! eof) {
-            igs_fatal("license file size is incorrect : file will be ignored");
+            igs_license("license file size is incorrect : file will be ignored");
             goto ret; /* premature end (end of file reached before the end of the stream) */
         }
         if (targetSize == 0){
@@ -371,7 +371,7 @@ void license_readLicense(void){
         }
     }
     if (license == NULL){
-        igs_fatal("no license found in %s : switching to demo mode", licensePath);
+        igs_license("no license found in %s : switching to demo mode", licensePath);
         license = calloc(1, sizeof(license_t));
         license->features = zlist_new();
         license->agents = zlist_new();
@@ -409,7 +409,7 @@ void igs_setLicensePath(const char *path){
         }
         licensePath = strdup(path);
     }else{
-        igs_warn("%s does not exist", path);
+        igs_license("%s does not exist", path);
     }
 }
 char *igs_getLicensePath(void){

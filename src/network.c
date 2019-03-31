@@ -725,12 +725,12 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                                      HASH_COUNT(newDefinition->outputs_table) +
                                                      HASH_COUNT(newDefinition->params_table));
                     if (licEnforcement->currentIOPNb > license->platformNbIOPs){
-                        igs_fatal("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", license->platformNbIOPs);
+                        igs_license("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", license->platformNbIOPs);
                         return -1;
                     }
                     licEnforcement->currentAgentsNb++;
                     if (licEnforcement->currentAgentsNb > license->platformNbAgents){
-                        igs_fatal("Maximum number of allowed agents (%d) is exceeded : agent will stop", license->platformNbAgents);
+                        igs_license("Maximum number of allowed agents (%d) is exceeded : agent will stop", license->platformNbAgents);
                         return -1;
                     }
                     #endif
@@ -924,6 +924,47 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     model_readWriteUnlock();
                     zyre_whisper(node, peer, &resp);
                     igs_debug("send parameters values to %s", peer);
+                }else if (strlen("LICENSE_INFO") == strlen(message) && strncmp (message, "LICENSE_INFO", strlen("LICENSE_INFO")) == 0){
+                    zmsg_t *resp = zmsg_new();
+                    if (license == NULL){
+                        zmsg_addstr(resp, "no license available");
+                    }else{
+                        char buf[128] = "";
+                        struct tm ts;
+                        zmsg_addstr(resp, "customer");
+                        zmsg_addstr(resp, license->customer);
+                        zmsg_addstr(resp, "order");
+                        zmsg_addstr(resp, license->order);
+                        zmsg_addstr(resp, "platformNbAgents");
+                        zmsg_addstrf(resp, "%d", license->platformNbAgents);
+                        zmsg_addstr(resp, "platformNbIOPs");
+                        zmsg_addstrf(resp, "%d", license->platformNbIOPs);
+                        zmsg_addstr(resp, "licenseExpirationDate");
+                        ts = *localtime(&license->licenseExpirationDate);
+                        strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", &ts);
+                        zmsg_addstr(resp, buf);
+                        zmsg_addstr(resp, "editorOwner");
+                        zmsg_addstr(resp, license->editorOwner);
+                        zmsg_addstr(resp, "editorExpirationDate");
+                        ts = *localtime(&license->editorExpirationDate);
+                        strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", &ts);
+                        zmsg_addstr(resp, buf);
+                        char *feature = zlist_first(license->features);
+                        while (feature != NULL) {
+                            zmsg_addstr(resp, "feature");
+                            zmsg_addstr(resp, feature);
+                            feature = zlist_next(license->features);
+                        }
+                        licenseForAgent_t *agent = zlist_first(license->agents);
+                        while (agent != NULL) {
+                            zmsg_addstr(resp, "agent");
+                            zmsg_addstr(resp, agent->agentId);
+                            zmsg_addstr(resp, agent->agentName);
+                            agent = zlist_next(license->agents);
+                        }
+                    }
+                    zyre_whisper(node, peer, &resp);
+                    igs_debug("send license information to %s", peer);
                 }else if (strlen("STOP") == strlen(message) && strncmp (message, "STOP", strlen("STOP")) == 0){
                     free(message);
                     forcedStop = true;
@@ -1222,7 +1263,7 @@ initLoop (zsock_t *pipe, void *args){
     }
     agentElements->publisher = zsock_new_pub(endpoint);
     if (agentElements->publisher == NULL){
-        igs_error("Could not create publishing socket : Agent will interrupt immediately.");
+        igs_error("Could not create publishing socket (%s): Agent will interrupt immediately.", endpoint);
         canContinue = false;
     }else{
         strncpy(endpoint, zsock_endpoint(agentElements->publisher), 256);
@@ -1398,7 +1439,7 @@ initLoop (zsock_t *pipe, void *args){
     
 #if ENABLE_LICENSE_ENFORCEMENT
     if (license != NULL && license->isLicenseExpired){
-        igs_fatal("License has expired : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
+        igs_license("License has expired : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
         zloop_timer(agentElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, NULL);
     }
 #endif
