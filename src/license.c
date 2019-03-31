@@ -347,11 +347,11 @@ void license_readLicense(void){
                 }
                 igs_debug("parsing license file %s/%s", licensePath, name);
                 //decrypt file
-                char *license = NULL;
-                decryptLicenseFromFile(&license, zfile_filename(file, NULL), secretKey);
+                char *licenseText = NULL;
+                decryptLicenseFromFile(&licenseText, zfile_filename(file, NULL), secretKey);
                 //igs_debug("raw license file:\n%s", license);
                 //parse file
-                char * curLine = license;
+                char * curLine = licenseText;
                 while(curLine){
                     char * nextLine = strchr(curLine, '\n');
                     if (nextLine) *nextLine = '\0';  // temporarily terminate the current line

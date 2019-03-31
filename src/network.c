@@ -1178,6 +1178,9 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
 
 //Timer callback to stop loop if license is expired or demo mode is on
 int triggerLicenseStop(zloop_t *loop, int timer_id, void *arg){
+    IGS_UNUSED(loop);
+    IGS_UNUSED(timer_id);
+    IGS_UNUSED(arg);
     igs_error("License has expired and runtime duration limit is reached : stopping loop.");
     return -1;
 }
