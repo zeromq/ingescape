@@ -173,7 +173,7 @@ int subscribeToPublisherOutput(subscriber_t *subscriber, const char *outputName)
             igs_debug("Subscribe to agent %s output %s",subscriber->agentName,outputName);
             zsock_set_subscribe(subscriber->subscriber, outputName);
             mappingFilter_t *f = calloc(1, sizeof(mappingFilter_t));
-            strncpy(f->filter, outputName, MAX_FILTER_SIZE);
+            strncpy(f->filter, outputName, MAX_FILTER_SIZE-1);
             DL_APPEND(subscriber->mappingsFilters, f);
         }else{
             //printf("\n****************\nFILTER BIS %s - %s\n***************\n", subscriber->igsAgentName, outputName);
@@ -252,13 +252,13 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
     return 0;
 }
 
-void sendDefinitionToAgent(const char *peerId, const char *definition)
+void sendDefinitionToAgent(const char *peerId, const char *def)
 {
-    if(peerId != NULL &&  definition != NULL)
+    if(peerId != NULL &&  def != NULL)
     {
         if(agentElements->node != NULL)
         {
-            zyre_whispers(agentElements->node, peerId, "%s%s", definitionPrefix, definition);
+            zyre_whispers(agentElements->node, peerId, "%s%s", definitionPrefix, def);
         } else {
             igs_warn("Could not send our definition to %s : our agent is not connected",peerId);
         }
@@ -478,14 +478,14 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 zagent->reconnected = 0;
                 zagent->subscriber = NULL;
                 zagent->hasJoinedPrivateChannel = false;
-                strncpy(zagent->peerId, peer, NAME_BUFFER_SIZE);
+                strncpy(zagent->peerId, peer, NAME_BUFFER_SIZE-1);
                 HASH_ADD_STR(zyreAgents, peerId, zagent);
             }else{
                 //Agent already exists, we set its reconnected flag
                 //(this is used below to avoid agent destruction on EXIT received after timeout)
                 zagent->reconnected++;
             }
-            strncpy(zagent->name, name, NAME_BUFFER_SIZE);
+            strncpy(zagent->name, name, NAME_BUFFER_SIZE-1);
             assert(headers);
             char *k;
             const char *v;
@@ -502,7 +502,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if(strncmp(k,"publisher", strlen("publisher")) == 0)
                 {
                     char endpointAddress[128];
-                    strncpy(endpointAddress, address, 128);
+                    strncpy(endpointAddress, address, 127);
 
                     // IP adress extraction 
                     char *insert = endpointAddress + strlen(endpointAddress);
@@ -1230,6 +1230,7 @@ initLoop (zsock_t *pipe, void *args){
     bool canContinue = true;
     //prepare zyre
     agentElements->node = zyre_new (igsAgentName);
+//    zyre_set_verbose(agentElements->node);
     if (strlen(agentElements->brokerEndPoint) > 0){
         zyre_gossip_connect(agentElements->node,
                             "%s", agentElements->brokerEndPoint);
@@ -1258,11 +1259,11 @@ initLoop (zsock_t *pipe, void *args){
     }
     
     //start TCP publisher
-    char endpoint[256];
+    char endpoint[512];
     if (network_publishingPort == 0){
-        snprintf(endpoint, 255, "tcp://%s:*", agentElements->ipAddress);
+        snprintf(endpoint, 511, "tcp://%s:*", agentElements->ipAddress);
     }else{
-        snprintf(endpoint, 255, "tcp://%s:%d", agentElements->ipAddress, network_publishingPort);
+        snprintf(endpoint, 511, "tcp://%s:%d", agentElements->ipAddress, network_publishingPort);
     }
     agentElements->publisher = zsock_new_pub(endpoint);
     if (agentElements->publisher == NULL){
@@ -1318,7 +1319,7 @@ initLoop (zsock_t *pipe, void *args){
     zyre_set_header(agentElements->node, "canBeFrozen", "%i", agentCanBeFrozen);
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
-    int ret;
+    ssize_t ret;
     pid_t pid;
     pid = getpid();
     zyre_set_header(agentElements->node, "pid", "%i", pid);
@@ -1633,7 +1634,7 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
     forcedStop = false;
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
-    strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
+    strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH-1);
     agentElements->brokerEndPoint[0] = '\0';
     agentElements->ipAddress[0] = '\0';
     
@@ -1697,7 +1698,7 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
     forcedStop = false;
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     agentElements->brokerEndPoint[0] = '\0';
-    strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
+    strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH-1);
     
 #if (defined WIN32 || defined _WIN32)
     WORD version_requested = MAKEWORD (2, 2);
@@ -1756,8 +1757,8 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
     forcedStop = false;
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
-    strncpy(agentElements->brokerEndPoint, brokerIpAddress, IP_ADDRESS_LENGTH);
-    strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
+    strncpy(agentElements->brokerEndPoint, brokerIpAddress, IP_ADDRESS_LENGTH-1);
+    strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH-1);
     agentElements->ipAddress[0] = '\0';
     
 #if (defined WIN32 || defined _WIN32)
@@ -1877,7 +1878,7 @@ int igs_setAgentName(const char *name){
     if (spaceInName){
         igs_warn("Spaces are not allowed in agent name: %s has been renamed to %s", name, n);
     }
-    strncpy(igsAgentName, n, MAX_AGENT_NAME_LENGTH);
+    strncpy(igsAgentName, n, MAX_AGENT_NAME_LENGTH-1);
     free(n);
     
     if (needRestart){
@@ -2003,7 +2004,7 @@ int igs_setAgentState(const char *state){
     }
     
     if (strcmp(state, igsAgentState) != 0){
-        strncpy(igsAgentState, state, MAX_AGENT_NAME_LENGTH);
+        strncpy(igsAgentState, state, MAX_AGENT_NAME_LENGTH-1);
         igs_debug("changed to %s", igsAgentState);
         if (agentElements != NULL && agentElements->node != NULL){
             zyre_shouts(agentElements->node, CHANNEL, "STATE=%s", igsAgentState);
@@ -2138,7 +2139,7 @@ void igs_die(){
 }
 
 void igs_setCommandLine(const char *line){
-    strncpy(commandLine, line, COMMAND_LINE_LENGTH);
+    strncpy(commandLine, line, COMMAND_LINE_LENGTH-1);
     igs_debug("Command line set to %s", commandLine);
 }
 
