@@ -346,16 +346,15 @@ void license_readLicense(void){
         if ((dir = opendir (licensePath)) != NULL) {
             ent = readdir (dir);
             while (ent != NULL) {
-                if (ent->d_type != DT_DIR){
-                    zfile_t *new = zfile_new(licensePath, ent->d_name);
-                    const char *name = zfile_filename(new, licensePath);
-                    const char *extension = license_getFilenameExt(name);
-                    if (strcmp(extension, "igslicense") == 0
-                        && zfile_is_readable(new)){
-                        zlist_append(filesList, new);
-                    }else{
-                        zfile_destroy(&new);
-                    }
+                zfile_t *new = zfile_new(licensePath, ent->d_name);
+                const char *name = zfile_filename(new, licensePath);
+                const char *extension = license_getFilenameExt(name);
+                if (strcmp(extension, "igslicense") == 0
+                    && !zfile_is_directory(new)
+                    && zfile_is_readable(new)){
+                    zlist_append(filesList, new);
+                }else{
+                    zfile_destroy(&new);
                 }
                 ent = readdir (dir);
             }
