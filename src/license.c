@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <czmq.h>
 #include <sodium.h>
+#include <dirent.h>
 #include "ingescape_private.h"
 
 #ifdef __APPLE__
@@ -176,10 +177,16 @@ void switchToBundlePath(char **path){
         free (*path);
         *path = strdup(CFStringGetCStringPtr(newPath, kCFStringEncodingUTF8));
         char *index = *path + strlen(*path) - 2; //start just before final '/' in URL
-        while (*index != '/' && index > *path){
-            index--;
+        //we change license path only if bundle path ends with '.app'
+        if (*index == 'p' &&
+            *(index - 1) == 'p'&&
+            *(index - 2) == 'a'&&
+            *(index - 3) == '.'){
+            while (*index != '/' && index > *path){
+                index--;
+            }
+            *index = '\0';
         }
-        *index = '\0';
     }
 }
 #endif
@@ -282,19 +289,18 @@ void license_readLicense(void){
             //NB: sodium returns -1 when trying to initialize more than once
         }
     }
+    license_cleanLicense();
+    license_readWriteLock();
     if (licensePath == NULL){
         //use agent executable file as license path
 #if defined __unix__ || defined __APPLE__ || defined __linux__
-        int ret;
-        pid_t pid;
-        pid = getpid();
 #ifdef __APPLE__
 #if TARGET_OS_IOS
         char pathbuf[64] = "no_path";
-        ret = 1;
 #elif TARGET_OS_OSX
+        pid_t pid = getpid();
         char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
-        ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
+        proc_pidpath (pid, pathbuf, sizeof(pathbuf));
 #endif
 #else
         char pathbuf[4*1024];
@@ -325,50 +331,72 @@ void license_readLicense(void){
         switchToBundlePath(&licensePath);
 #endif
     }
-    zdir_t *path = NULL;
-    license_cleanLicense();
-    license_readWriteLock();
+    
     if (!zsys_file_exists(licensePath)){
         igs_error("%s could not be opened properly : no license found", licensePath);
     }else{
-        path = zdir_new(licensePath, NULL);
-        zlist_t *filesList = zdir_list(path);
-        //iterate on files in folder to find a license file
-        zfile_t *file = zlist_first(filesList);
-        while (file != NULL && !zfile_is_directory(file)) {
-            const char *name = zfile_filename(file, licensePath);
-            const char *extension = license_getFilenameExt(name);
-            if (strcmp(extension, "igslicense") == 0
-                && zfile_is_readable(file)){
-                if (license == NULL){
-                    license = calloc(1, sizeof(license_t));
-                    license->features = zlist_new();
-                    license->agents = zlist_new();
-                }
-                igs_debug("parsing license file %s/%s", licensePath, name);
-                //decrypt file
-                char *licenseText = NULL;
-                decryptLicenseFromFile(&licenseText, zfile_filename(file, NULL), secretKey);
-                //igs_debug("raw license file:\n%s", license);
-                //parse file
-                char * curLine = licenseText;
-                while(curLine){
-                    char * nextLine = strchr(curLine, '\n');
-                    if (nextLine) *nextLine = '\0';  // temporarily terminate the current line
-                    if (curLine[0] == ':'){
-                        //we have a line with something to parse
-                        char type[256] = "";
-                        char data[256] = "";
-                        if (sscanf(curLine, ":%s %[\001-\377]", type, data) == 2){
-                            license_parseLine(type, data);
-                        }
+        //NB: zdir provides a function to scan folder contents but
+        //this function scans all subdirectories which may time a very
+        //long time to do, e.g. in /Applications/.
+        //That's why we use dirent here.
+        igs_license("scan for licenses in %s", licensePath);
+        zlist_t *filesList = zlist_new();
+        DIR *dir;
+        struct dirent *ent;
+        if ((dir = opendir (licensePath)) != NULL) {
+            ent = readdir (dir);
+            while (ent != NULL) {
+                if (ent->d_type != DT_DIR){
+                    zfile_t *new = zfile_new(licensePath, ent->d_name);
+                    const char *name = zfile_filename(new, licensePath);
+                    const char *extension = license_getFilenameExt(name);
+                    if (strcmp(extension, "igslicense") == 0
+                        && zfile_is_readable(new)){
+                        zlist_append(filesList, new);
+                    }else{
+                        zfile_destroy(&new);
                     }
-                    if (nextLine) *nextLine = '\n';  // then restore newline-char, just to be tidy
-                    curLine = nextLine ? (nextLine+1) : NULL;
                 }
+                ent = readdir (dir);
             }
+            closedir (dir);
+        } else {
+            // could not open directory
+        }
+        //iterate on license files in folder
+        zfile_t *file = zlist_first(filesList);
+        while (file != NULL) {
+            if (license == NULL){
+                license = calloc(1, sizeof(license_t));
+                license->features = zlist_new();
+                license->agents = zlist_new();
+            }
+            const char *name = zfile_filename(file, NULL);
+            igs_debug("parsing license file %s", name);
+            //decrypt file
+            char *licenseText = NULL;
+            decryptLicenseFromFile(&licenseText, zfile_filename(file, NULL), secretKey);
+            //igs_debug("raw license file:\n%s", license);
+            //parse file
+            char * curLine = licenseText;
+            while(curLine){
+                char * nextLine = strchr(curLine, '\n');
+                if (nextLine) *nextLine = '\0';  // temporarily terminate the current line
+                if (curLine[0] == ':'){
+                    //we have a line with something to parse
+                    char type[256] = "";
+                    char data[256] = "";
+                    if (sscanf(curLine, ":%s %[\001-\377]", type, data) == 2){
+                        license_parseLine(type, data);
+                    }
+                }
+                if (nextLine) *nextLine = '\n';  // then restore newline-char, just to be tidy
+                curLine = nextLine ? (nextLine+1) : NULL;
+            }
+            zfile_destroy(&file);
             file = zlist_next(filesList);
         }
+        zlist_destroy(&filesList);
     }
     if (license == NULL){
         igs_license("no license found in %s : switching to demo mode", licensePath);
