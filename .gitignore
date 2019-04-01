@@ -867,3 +867,5 @@ src/.scannerwork/.sonar_lock
 src/.scannerwork/report-task.txt
 dependencies/windows/innosetup/Output/
 firstFullAgent.zip
+bindings/c#/IngescapeCSharpWrapper/IngescapeCSharpUnitTest/obj/
+bindings/c#/IngescapeCSharpWrapper/.vs/
