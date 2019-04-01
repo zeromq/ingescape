@@ -25,6 +25,9 @@ namespace IngescapeCSharp
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     delegate void igs_muteCallback(bool isMuted, IntPtr myData);
 
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+    delegate void igs_freezeCallback(bool isPaused, IntPtr myData);
+
 
     class Ingescape
     {
@@ -84,18 +87,19 @@ namespace IngescapeCSharp
         //its inputs are not reactive to external data.
         //NB: the internal semantics of freeze and unfreeze for a given agent
         //are up to the developer and can be controlled using callbacks and igs_observeFreeze
-        /* TODO : implement
-        PUBLIC int igs_freeze(void);
-        PUBLIC bool igs_isFrozen(void);
-        PUBLIC int igs_unfreeze(void);
-        typedef void (* igs_freezeCallback) (bool isPaused, void* myData);
-        PUBLIC int igs_observeFreeze(igs_freezeCallback cb, void* myData);
-        */
+        [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_freeze();
+        [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool igs_isFrozen();
+        [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_unfreeze();
+        [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_observeFreeze(igs_freezeCallback cb, IntPtr myData);
         [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void igs_setCanBeFrozen(bool canBeFrozen);
-        /* TODO : implement
-        PUBLIC bool igs_canBeFrozen(void);
-        */
+        [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool igs_canBeFrozen();
+
         //////////////////////////////////////////////////
         //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
