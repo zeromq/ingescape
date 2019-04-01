@@ -11,7 +11,7 @@ namespace IngescapeCSharp
     public enum iopType_t { IGS_INTEGER_T = 1, IGS_DOUBLE_T, IGS_STRING_T, IGS_BOOL_T, IGS_IMPULSION_T, IGS_DATA_T };
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    delegate void igs_observeCallback(iop_t iopType,
+    public delegate void igs_observeCallback(iop_t iopType,
                                         [MarshalAs(UnmanagedType.LPStr)] string name,
                                         iopType_t valueType,
                                         IntPtr value,
@@ -20,16 +20,16 @@ namespace IngescapeCSharp
 
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    delegate void igs_forcedStopCallback(IntPtr myData);
+    public delegate void igs_forcedStopCallback(IntPtr myData);
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    delegate void igs_muteCallback(bool isMuted, IntPtr myData);
+    public delegate void igs_muteCallback(bool isMuted, IntPtr myData);
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    delegate void igs_freezeCallback(bool isPaused, IntPtr myData);
+    public delegate void igs_freezeCallback(bool isPaused, IntPtr myData);
 
 
-    class Ingescape
+     public class Ingescape
     {
         //////////////////////////////////////////////////
         // Initialization and control
