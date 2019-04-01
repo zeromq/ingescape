@@ -241,12 +241,16 @@ namespace IngescapeCSharp
         [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_getParametersNumber();
 
-        /* TODO : implement
-        PUBLIC char** igs_getInputsList(long* nbOfElements); //returned char** must be freed using igs_freeIOPList
-        PUBLIC char** igs_getOutputsList(long* nbOfElements); //returned char** must be freed using igs_freeIOPList
-        PUBLIC char** igs_getParametersList(long* nbOfElements); //returned char** must be freed using igs_freeIOPList
-        PUBLIC void igs_freeIOPList(char*** list, long nbOfElements);
-        */
+        
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr igs_getInputsList(ref long nbOfElements); //returned char** must be freed using igs_freeIOPList
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr igs_getOutputsList(ref long nbOfElements); //returned char** must be freed using igs_freeIOPList
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr igs_getParametersList(ref long nbOfElements); //returned char** must be freed using igs_freeIOPList
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_freeIOPList(ref IntPtr list, long nbOfElements);
+        
 
         [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool igs_checkInputExistence([MarshalAs(UnmanagedType.LPStr)]  string name);
