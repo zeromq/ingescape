@@ -340,16 +340,16 @@ namespace IngescapeCSharp
         //IngeScape library version
         //returns MAJOR*10000 + MINOR*100 + MICRO
         //displays MAJOR.MINOR.MICRO in console
-        /* TODO : Implement
-        PUBLIC int igs_version(void);
-        */
+        [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_version();
 
         //Utility functions to find network adapters with broadcast capabilities
         //to be used in igs_startWithDevice
-        /*TODO : implement
-        PUBLIC void igs_getNetdevicesList(char*** devices, int* nb);
-        PUBLIC void igs_freeNetdevicesList(char** devices, int nb);
-        */
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_getNetdevicesList(out IntPtr devices, ref int nb);
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_freeNetdevicesList(IntPtr devices, int nb);
+
 
         //Command line for the agent can be passed here for inclusion in the
         //agent's headers. If not used, header is initialized with exec path.
@@ -363,10 +363,11 @@ namespace IngescapeCSharp
         //mapped agents to send us their current output values
         //through a private communication for our proper initialization.
         //By default, this behavior is disabled.
-        /*TODO : implement
-        PUBLIC void igs_setRequestOutputsFromMappedAgents(bool notify);
-        PUBLIC bool igs_getRequestOutputsFromMappedAgents(void);
-        */
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_setRequestOutputsFromMappedAgents(bool notify);
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool igs_getRequestOutputsFromMappedAgents();
+
 
         /* Logs policy
          - fatal : Events that force application termination.
@@ -386,12 +387,33 @@ namespace IngescapeCSharp
            IGS_LOG_FATAL
         }
         igs_logLevel_t;
+        */
 
         //set/get library parameters
         [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void igs_setVerbose(bool verbose);
         [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool igs_isVerbose();
+
+        /*
+        PUBLIC void igs_setUseColorVerbose(bool useColor); //use colors in console
+        PUBLIC bool igs_getUseColorVerbose(void);
+        PUBLIC void igs_setLogStream(bool useLogStream); //enable logs in socket stream
+        PUBLIC bool igs_getLogStream(void);
+        PUBLIC void igs_setLogInFile(bool useLogFile); //enable logs in file
+        PUBLIC bool igs_getLogInFile(void);
+        PUBLIC void igs_setLogPath(const char* path); //default directory is ~/ on UNIX systems and current PATH on Windows
+        PUBLIC char* igs_getLogPath(void); // must be freed by caller
+
+        PUBLIC void igs_setLogLevel(igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
+        PUBLIC igs_logLevel_t igs_getLogLevel(void);
+        PUBLIC void igs_log(igs_logLevel_t, const char* function, const char* format, ...)  CHECK_PRINTF(3);
+        #define igs_trace(...) igs_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
+        #define igs_debug(...) igs_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)
+        #define igs_info(...)  igs_log(IGS_LOG_INFO, __func__, __VA_ARGS__)
+        #define igs_warn(...)  igs_log(IGS_LOG_WARN, __func__, __VA_ARGS__)
+        #define igs_error(...) igs_log(IGS_LOG_ERROR, __func__, __VA_ARGS__)
+        #define igs_fatal(...) igs_log(IGS_LOG_FATAL, __func__, __VA_ARGS__)
         */
     }
 }
