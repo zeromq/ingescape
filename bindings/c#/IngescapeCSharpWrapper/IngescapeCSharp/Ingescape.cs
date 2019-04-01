@@ -195,12 +195,13 @@ namespace IngescapeCSharp
 
         //clear IOP data in memory without having to write the IOP
         //(relevant for IOPs with IGS_DATA_T type only)
-        /* TODO : implement it
-        PUBLIC void igs_clearDataForInput(const char* name);
-        PUBLIC void igs_clearDataForOutput(const char* name);
-        PUBLIC void igs_clearDataForParameter(const char* name);
-        */
-
+        [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_clearDataForInput(string name);
+        [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_clearDataForOutput(string name);
+        [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_clearDataForParameter(string name);
+       
         //observe writing to an IOP
         [DllImport("C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void igs_observeInput([MarshalAs(UnmanagedType.LPStr)] string name,
