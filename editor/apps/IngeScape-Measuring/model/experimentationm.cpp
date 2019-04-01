@@ -16,15 +16,20 @@
 
 /**
  * @brief Constructor
+ * @param name
+ * @param creationDate
  * @param parent
  */
-ExperimentationM::ExperimentationM(QObject *parent) : QObject(parent),
-    _name("")
+ExperimentationM::ExperimentationM(QString name,
+                                   QDateTime creationDate,
+                                   QObject *parent) : QObject(parent),
+    _name(name),
+    _creationDate(creationDate)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Experimentation" << _name;
+    qInfo() << "New Model of Experimentation" << _name << "(" << _creationDate.toString("dd/MM/yy hh:mm:ss") << ")";
 
 
     // Records are sorted on their start date/time (chronological order)

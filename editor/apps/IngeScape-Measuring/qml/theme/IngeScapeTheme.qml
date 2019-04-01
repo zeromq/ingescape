@@ -75,11 +75,11 @@ Item {
     readonly property color loadingScreen_darkBlue: "#07101B"
     readonly property color loadingScreen_lightBlue: "#35404D"
 
-    //readonly property color redColor: "#E30513"
+    readonly property color redColor: "#E30513"
     //readonly property color middleDarkRedColor:"#851618"
     //readonly property color darkRedColor:"#7A110E"
 
-    //readonly property color darkBlueGreyColor: "#3C424F"
+    readonly property color darkBlueGreyColor: "#3C424F"
     //readonly property color blueGreyColor2: "#434B57"
     //readonly property color blueGreyColor : "#525A66"
 
@@ -87,7 +87,7 @@ Item {
 
     readonly property color veryDarkGreyColor: "#282D34"
     //readonly property color darkGreyColor2: "#2B3137"
-    //readonly property color darkGreyColor : "#575757"
+    readonly property color darkGreyColor : "#575757"
     readonly property color greyColor : "#6F6F6F"
     //readonly property color greyColor2 : "#878787"
     //readonly property color lightGreyColor : "#9C9C9C"

@@ -79,6 +79,10 @@ Item {
         }
 
         text: "Nouvelle Expé"
+
+        onClicked: {
+            createExperimentationPopup.open();
+        }
     }
 
     ListView {
@@ -106,5 +110,8 @@ Item {
     Popup.CreateExperimentationPopup {
         id: createExperimentationPopup
 
+        //anchors.centerIn: parent
+
+        controller: rootItem.controller
     }
 }

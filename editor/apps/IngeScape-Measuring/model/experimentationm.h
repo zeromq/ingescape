@@ -51,11 +51,16 @@ class ExperimentationM : public QObject
 
 
 public:
+
     /**
      * @brief Constructor
+     * @param name
+     * @param creationDate
      * @param parent
      */
-    explicit ExperimentationM(QObject *parent = nullptr);
+    explicit ExperimentationM(QString name,
+                              QDateTime creationDate,
+                              QObject *parent = nullptr);
 
 
     /**
