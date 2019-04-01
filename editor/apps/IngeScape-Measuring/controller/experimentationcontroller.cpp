@@ -18,12 +18,19 @@
  * @brief Constructor
  * @param parent
  */
-ExperimentationController::ExperimentationController(QObject *parent) : QObject(parent)
+ExperimentationController::ExperimentationController(IngeScapeModelManager* modelManager,
+                                                     QObject *parent) : QObject(parent),
+    _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New Experimentation Controller";
+
+    if (_modelManager != nullptr)
+    {
+        connect(_modelManager, &IngeScapeModelManager::currentExperimentationChanged, this, &ExperimentationController::onCurrentExperimentationChanged);
+    }
 }
 
 
@@ -34,4 +41,25 @@ ExperimentationController::~ExperimentationController()
 {
     qInfo() << "Delete Experimentation Controller";
 
+    if (_modelManager != nullptr)
+    {
+        disconnect(_modelManager, nullptr, this, nullptr);
+
+        _modelManager = nullptr;
+    }
+}
+
+
+/**
+ * @brief Slot called when the current experimentation changed
+ * @param currentExperimentation
+ */
+void ExperimentationController::onCurrentExperimentationChanged(ExperimentationM* currentExperimentation)
+{
+    if (currentExperimentation != nullptr)
+    {
+        qDebug() << "onCurrentExperimentationChanged" << currentExperimentation->name();
+
+
+    }
 }

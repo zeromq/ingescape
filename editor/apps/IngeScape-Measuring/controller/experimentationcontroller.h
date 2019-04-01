@@ -18,6 +18,9 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
+#include <controller/ingescapemodelmanager.h>
+
+
 /**
  * @brief The ExperimentationController class defines the controller to manage the current experimentation
  */
@@ -27,11 +30,14 @@ class ExperimentationController : public QObject
 
 
 public:
+
     /**
      * @brief Constructor
+     * @param modelManager
      * @param parent
      */
-    explicit ExperimentationController(QObject *parent = nullptr);
+    explicit ExperimentationController(IngeScapeModelManager* modelManager,
+                                       QObject *parent = nullptr);
 
 
     /**
@@ -45,8 +51,17 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+    /**
+     * @brief Slot called when the current experimentation changed
+     * @param currentExperimentation
+     */
+    void onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
+
 
 private:
+
+    // Manager for the data model of our IngeScape measuring application
+    IngeScapeModelManager* _modelManager;
 
 };
 

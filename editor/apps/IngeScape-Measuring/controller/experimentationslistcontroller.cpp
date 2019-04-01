@@ -18,9 +18,11 @@
  * @brief Constructor
  * @param parent
  */
-ExperimentationsListController::ExperimentationsListController(QObject *parent) : QObject(parent),
+ExperimentationsListController::ExperimentationsListController(IngeScapeModelManager* modelManager,
+                                                               QObject *parent) : QObject(parent),
     _defaultGroupOther(nullptr),
-    _newGroup(nullptr)
+    _newGroup(nullptr),
+    _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -44,13 +46,26 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
     //
     // FIXME for tests
     //
-    for (int i = 1; i < 3; i++)
-    {
-        QString groupName = QString("Group for test %1").arg(i);
+    int nbExpes = 1;
 
-        ExperimentationsGroupVM *group = new ExperimentationsGroupVM(groupName, nullptr);
+    for (int i = 0; i < 3; i++)
+    {
+        QString groupName = QString("Group for test %1").arg(i + 1);
+
+        ExperimentationsGroupVM* group = new ExperimentationsGroupVM(groupName, nullptr);
 
         _allExperimentationsGroups.append(group);
+
+        for (int j = 0; j < 2; j++)
+        {
+            QString expeName = QString("Expe for test %1").arg(nbExpes);
+
+            ExperimentationM* experimentation = new ExperimentationM(expeName, QDateTime::currentDateTime(), nullptr);
+
+            group->experimentations()->append(experimentation);
+
+            nbExpes++;
+        }
     }
 
 }
@@ -78,6 +93,11 @@ ExperimentationsListController::~ExperimentationsListController()
         ExperimentationsGroupVM* temp = _newGroup;
         setnewGroup(nullptr);
         delete temp;
+    }
+
+    if (_modelManager != nullptr)
+    {
+        _modelManager = nullptr;
     }
 }
 
@@ -144,5 +164,45 @@ bool ExperimentationsListController::canCreateExperimentationsGroupWithName(QStr
     }
     else {
         return false;
+    }
+}
+
+
+/**
+ * @brief Open an experimentation of a group
+ * @param experimentation
+ */
+void ExperimentationsListController::openExperimentationOfGroup(ExperimentationM* experimentation, ExperimentationsGroupVM* experimentationsGroup)
+{
+    if ((experimentation != nullptr) && (experimentationsGroup != nullptr))
+    {
+        qInfo() << "Open the experimentation" << experimentation->name() << "of the group" << experimentationsGroup->name();
+
+        // Update the model manager
+        if (_modelManager != nullptr)
+        {
+            _modelManager->setcurrentExperimentation(experimentation);
+            _modelManager->setcurrentExperimentationsGroup(experimentationsGroup);
+        }
+    }
+}
+
+
+/**
+ * @brief Delete an experimentation of a group
+ * @param experimentation
+ * @param experimentationsGroup
+ */
+void ExperimentationsListController::deleteExperimentationOfGroup(ExperimentationM* experimentation, ExperimentationsGroupVM* experimentationsGroup)
+{
+    if ((experimentation != nullptr) && (experimentationsGroup != nullptr))
+    {
+        qInfo() << "Delete the experimentation" << experimentation->name() << "of the group" << experimentationsGroup->name();
+
+        // Remove from the group
+        experimentationsGroup->experimentations()->remove(experimentation);
+
+        // Free memory
+        delete experimentation;
     }
 }

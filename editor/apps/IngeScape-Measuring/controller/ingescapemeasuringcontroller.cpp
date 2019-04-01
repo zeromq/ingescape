@@ -25,109 +25,110 @@
  * @param parent
  */
 IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QObject(parent),
-  _networkDevice(""),
-  _ipAddress(""),
-  _port(0),
-  _errorMessageWhenConnectionFailed(""),
-  _snapshotDirectory(""),
-  _modelManager(nullptr),
-  _networkC(nullptr),
-  _experimentationsListC(nullptr),
-  _experimentationC(nullptr),
-  _subjectsC(nullptr),
-  _tasksC(nullptr),
-  _recordC(nullptr),
-  _terminationSignalWatcher(nullptr)
+    _networkDevice(""),
+    _ipAddress(""),
+    _port(0),
+    _errorMessageWhenConnectionFailed(""),
+    _snapshotDirectory(""),
+    _modelManager(nullptr),
+    _networkC(nullptr),
+    _experimentationsListC(nullptr),
+    _experimentationC(nullptr),
+    _subjectsC(nullptr),
+    _tasksC(nullptr),
+    _recordC(nullptr),
+    _terminationSignalWatcher(nullptr)
   //_jsonHelper(nullptr),
   //_platformDirectoryPath(""),
   //_platformDefaultFilePath("")
 {
-  qInfo() << "New IngeScape Measuring Controller";
+    qInfo() << "New IngeScape Measuring Controller";
 
-  //
-  // Snapshots directory
-  //
-  QString snapshotsDirectoryPath = IngeScapeUtils::getSnapshotsPath();
-  QDir snapshotsDirectory(snapshotsDirectoryPath);
-  if (snapshotsDirectory.exists())
-  {
-      _snapshotDirectory = snapshotsDirectoryPath;
-  }
-  else
-  {
-      qCritical() << "ERROR: could not create directory at '" << snapshotsDirectoryPath << "' !";
-  }
-
-
-  //
-  // Settings
-  //
-  IngeScapeSettings& settings = IngeScapeSettings::Instance();
-
-  // Settings about the "Network"
-  settings.beginGroup("network");
-  _networkDevice = settings.value("networkDevice", QVariant("")).toString();
-  _ipAddress = settings.value("ipAddress", QVariant("")).toString();
-  _port = settings.value("port", QVariant(0)).toInt();
-  qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
-  settings.endGroup();
+    //
+    // Snapshots directory
+    //
+    QString snapshotsDirectoryPath = IngeScapeUtils::getSnapshotsPath();
+    QDir snapshotsDirectory(snapshotsDirectoryPath);
+    if (snapshotsDirectory.exists())
+    {
+        _snapshotDirectory = snapshotsDirectoryPath;
+    }
+    else
+    {
+        qCritical() << "ERROR: could not create directory at '" << snapshotsDirectoryPath << "' !";
+    }
 
 
-  // Root directory
-  QString rootPath = IngeScapeUtils::getRootPath();
-  QDir rootDir(rootPath);
-  if (!rootDir.exists()) {
-      qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
-  }
+    //
+    // Settings
+    //
+    IngeScapeSettings& settings = IngeScapeSettings::Instance();
+
+    // Settings about the "Network"
+    settings.beginGroup("network");
+    _networkDevice = settings.value("networkDevice", QVariant("")).toString();
+    _ipAddress = settings.value("ipAddress", QVariant("")).toString();
+    _port = settings.value("port", QVariant(0)).toInt();
+    qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
+    settings.endGroup();
 
 
-  /*// Directory for platform files
-  QString platformPath = IngeScapeEditorUtils::getPlatformsPath();
-
-  QDir platformDir(platformPath);
-  if (!platformDir.exists()) {
-      qCritical() << "ERROR: could not create directory at '" << platformPath << "' !";
-  }
-  else
-  {
-      _platformDirectoryPath = platformPath;
-
-      // Init the path to the JSON file to load the last platform
-      _platformDefaultFilePath = QString("%1last.json").arg(_platformDirectoryPath);
-  }*/
+    // Root directory
+    QString rootPath = IngeScapeUtils::getRootPath();
+    QDir rootDir(rootPath);
+    if (!rootDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
+    }
 
 
-  // Create the helper to manage JSON files
-  //_jsonHelper = new JsonHelper(this);
+    /*// Directory for platform files
+    QString platformPath = IngeScapeEditorUtils::getPlatformsPath();
 
-  //
-  // Create sub-controllers
-  //
+    QDir platformDir(platformPath);
+    if (!platformDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << platformPath << "' !";
+    }
+    else
+    {
+        _platformDirectoryPath = platformPath;
 
-  // Create the manager for the data model of our IngeScape measuring application
-  _modelManager = new IngeScapeModelManager(this);
-
-  // Create the controller for network communications
-  _networkC = new NetworkController(this);
-
-  // Create the controller to manage the list of experimentations
-  _experimentationsListC = new ExperimentationsListController(this);
-
-  // Create the controller to manage the current experimentation
-  _experimentationC = new ExperimentationController(this);
-
-  // Create the controller to manage the subjects of the current experimentation
-  _subjectsC = new SubjectsController(this);
-
-  // Create the controller to manage the tasks of the current experimentation
-  _tasksC = new TasksController(this);
-
-  // Create the controller to manage a record of the current experimentation
-  _recordC = new RecordController(this);
+        // Init the path to the JSON file to load the last platform
+        _platformDefaultFilePath = QString("%1last.json").arg(_platformDirectoryPath);
+    }*/
 
 
-  // Connect to signals from the network controller
-  /*connect(_networkC, &NetworkController::agentEntered, _modelManager, &IngeScapeModelManager::onAgentEntered);
+    // Create the helper to manage JSON files
+    //_jsonHelper = new JsonHelper(this);
+
+    //
+    // Create sub-controllers
+    //
+
+    // Create the manager for the data model of our IngeScape measuring application
+    _modelManager = new IngeScapeModelManager(this);
+
+    // Create the controller for network communications
+    _networkC = new NetworkController(this);
+
+    // Create the controller to manage the list of experimentations
+    _experimentationsListC = new ExperimentationsListController(_modelManager, this);
+
+    // Create the controller to manage the current experimentation
+    _experimentationC = new ExperimentationController(_modelManager, this);
+
+    // Create the controller to manage the subjects of the current experimentation
+    _subjectsC = new SubjectsController(this);
+
+    // Create the controller to manage the tasks of the current experimentation
+    _tasksC = new TasksController(this);
+
+    // Create the controller to manage a record of the current experimentation
+    _recordC = new RecordController(this);
+
+
+
+    // Connect to signals from the network controller
+    /*connect(_networkC, &NetworkController::agentEntered, _modelManager, &IngeScapeModelManager::onAgentEntered);
   connect(_networkC, &NetworkController::agentExited, _modelManager, &IngeScapeModelManager::onAgentExited);
   connect(_networkC, &NetworkController::launcherEntered, _modelManager, &IngeScapeModelManager::onLauncherEntered);
   connect(_networkC, &NetworkController::launcherExited, _modelManager, &IngeScapeModelManager::onLauncherExited);
@@ -135,44 +136,44 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   connect(_networkC, &NetworkController::recorderExited, _recordsSupervisionC, &RecordsSupervisionController::onRecorderExited);*/
 
 
-  // Update the list of available network devices
-  _networkC->updateAvailableNetworkDevices();
+    // Update the list of available network devices
+    _networkC->updateAvailableNetworkDevices();
 
-  // There is only one available network device, we use it !
-  if (_networkC->availableNetworkDevices().count() == 1) {
-      _networkDevice = _networkC->availableNetworkDevices().at(0);
-  }
+    // There is only one available network device, we use it !
+    if (_networkC->availableNetworkDevices().count() == 1) {
+        _networkDevice = _networkC->availableNetworkDevices().at(0);
+    }
 
-  // Start our INGESCAPE agent with a network device (or an IP address) and a port
-  bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
+    // Start our INGESCAPE agent with a network device (or an IP address) and a port
+    bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
-  if (isStarted)
-  {
-      // Initialize platform from online mapping
-      //_modelManager->setisMappingActivated(true);
-  }
-  else {
-      seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
-  }
-
-
-  //
-  // Subscribe to system signals to interceipt interruption and termination signals
-  //
-  _terminationSignalWatcher = new TerminationSignalWatcher(this);
-  connect(_terminationSignalWatcher, &TerminationSignalWatcher::terminationSignal,
-                   [=] () {
-                      qDebug() << "\n\n\n CATCH Termination Signal \n\n\n";
-
-                      if (QApplication::instance() != nullptr)
-                      {
-                          QApplication::instance()->quit();
-                      }
-                   });
+    if (isStarted)
+    {
+        // Initialize platform from online mapping
+        //_modelManager->setisMappingActivated(true);
+    }
+    else {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
+    }
 
 
-  // Sleep to display our loading screen
-  QThread::msleep(2000);
+    //
+    // Subscribe to system signals to interceipt interruption and termination signals
+    //
+    _terminationSignalWatcher = new TerminationSignalWatcher(this);
+    connect(_terminationSignalWatcher, &TerminationSignalWatcher::terminationSignal,
+            [=] () {
+        qDebug() << "\n\n\n CATCH Termination Signal \n\n\n";
+
+        if (QApplication::instance() != nullptr)
+        {
+            QApplication::instance()->quit();
+        }
+    });
+
+
+    // Sleep to display our loading screen
+    QThread::msleep(2000);
 }
 
 
@@ -181,99 +182,99 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
 */
 IngeScapeMeasuringController::~IngeScapeMeasuringController()
 {
-  //
-  // Clean-up our TerminationSignalWatcher first
-  //
-  if (_terminationSignalWatcher != nullptr)
-  {
-      disconnect(_terminationSignalWatcher, nullptr);
-      delete _terminationSignalWatcher;
-      _terminationSignalWatcher = nullptr;
-  }
+    //
+    // Clean-up our TerminationSignalWatcher first
+    //
+    if (_terminationSignalWatcher != nullptr)
+    {
+        disconnect(_terminationSignalWatcher, nullptr);
+        delete _terminationSignalWatcher;
+        _terminationSignalWatcher = nullptr;
+    }
 
 
-  //
-  // Clean-up sub-controllers
-  //
+    //
+    // Clean-up sub-controllers
+    //
 
-  if (_experimentationsListC != nullptr)
-  {
-      disconnect(_experimentationsListC);
+    if (_experimentationsListC != nullptr)
+    {
+        disconnect(_experimentationsListC);
 
-      ExperimentationsListController* temp = _experimentationsListC;
-      setexperimentationsListC(nullptr);
-      delete temp;
-      temp = nullptr;
-  }
+        ExperimentationsListController* temp = _experimentationsListC;
+        setexperimentationsListC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
 
-  if (_experimentationC != nullptr)
-  {
-      disconnect(_experimentationC);
+    if (_experimentationC != nullptr)
+    {
+        disconnect(_experimentationC);
 
-      ExperimentationController* temp = _experimentationC;
-      setexperimentationC(nullptr);
-      delete temp;
-      temp = nullptr;
-  }
+        ExperimentationController* temp = _experimentationC;
+        setexperimentationC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
 
-  if (_subjectsC != nullptr)
-  {
-      disconnect(_subjectsC);
+    if (_subjectsC != nullptr)
+    {
+        disconnect(_subjectsC);
 
-      SubjectsController* temp = _subjectsC;
-      setsubjectsC(nullptr);
-      delete temp;
-      temp = nullptr;
-  }
+        SubjectsController* temp = _subjectsC;
+        setsubjectsC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
 
-  if (_tasksC != nullptr)
-  {
-      disconnect(_tasksC);
+    if (_tasksC != nullptr)
+    {
+        disconnect(_tasksC);
 
-      TasksController* temp = _tasksC;
-      settasksC(nullptr);
-      delete temp;
-      temp = nullptr;
-  }
+        TasksController* temp = _tasksC;
+        settasksC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
 
-  if (_recordC != nullptr)
-  {
-      disconnect(_recordC);
+    if (_recordC != nullptr)
+    {
+        disconnect(_recordC);
 
-      RecordController* temp = _recordC;
-      setrecordC(nullptr);
-      delete temp;
-      temp = nullptr;
-  }
+        RecordController* temp = _recordC;
+        setrecordC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
 
-  if (_modelManager != nullptr)
-  {
-      disconnect(_modelManager);
+    if (_modelManager != nullptr)
+    {
+        disconnect(_modelManager);
 
-      IngeScapeModelManager* temp = _modelManager;
-      setmodelManager(nullptr);
-      delete temp;
-      temp = nullptr;
-  }
+        IngeScapeModelManager* temp = _modelManager;
+        setmodelManager(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
 
-  if (_networkC != nullptr)
-  {
-      disconnect(_networkC);
+    if (_networkC != nullptr)
+    {
+        disconnect(_networkC);
 
-      NetworkController* temp = _networkC;
-      setnetworkC(nullptr);
-      delete temp;
-      temp = nullptr;
-  }
+        NetworkController* temp = _networkC;
+        setnetworkC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
 
-  // Delete json helper
-  /*if (_jsonHelper != nullptr)
+    // Delete json helper
+    /*if (_jsonHelper != nullptr)
   {
       delete _jsonHelper;
       _jsonHelper = nullptr;
   }*/
 
-  qInfo() << "Delete IngeScape Measuring Controller";
+    qInfo() << "Delete IngeScape Measuring Controller";
 }
 
 
@@ -285,12 +286,12 @@ IngeScapeMeasuringController::~IngeScapeMeasuringController()
 */
 QObject* IngeScapeMeasuringController::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
 {
-  Q_UNUSED(engine);
-  Q_UNUSED(scriptEngine);
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
 
-  // NOTE: A QObject singleton type instance returned from a singleton type provider is owned by the QML engine.
-  // For this reason, the singleton type provider function should not be implemented as a singleton factory.
-  return new IngeScapeMeasuringController();
+    // NOTE: A QObject singleton type instance returned from a singleton type provider is owned by the QML engine.
+    // For this reason, the singleton type provider function should not be implemented as a singleton factory.
+    return new IngeScapeMeasuringController();
 }
 
 

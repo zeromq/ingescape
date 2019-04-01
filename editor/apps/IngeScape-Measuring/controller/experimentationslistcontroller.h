@@ -18,6 +18,7 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
+#include <controller/ingescapemodelmanager.h>
 #include <viewModel/experimentationsgroupvm.h>
 
 
@@ -39,11 +40,14 @@ class ExperimentationsListController : public QObject
 
 
 public:
+
     /**
      * @brief Constructor
+     * @param modelManager
      * @param parent
      */
-    explicit ExperimentationsListController(QObject *parent = nullptr);
+    explicit ExperimentationsListController(IngeScapeModelManager* modelManager,
+                                            QObject *parent = nullptr);
 
 
     /**
@@ -77,6 +81,22 @@ public:
     Q_INVOKABLE bool canCreateExperimentationsGroupWithName(QString experimentationsGroupName);
 
 
+    /**
+     * @brief Open an experimentation of a group
+     * @param experimentation
+     * @param experimentationsGroup
+     */
+    Q_INVOKABLE void openExperimentationOfGroup(ExperimentationM* experimentation, ExperimentationsGroupVM* experimentationsGroup);
+
+
+    /**
+     * @brief Delete an experimentation of a group
+     * @param experimentation
+     * @param experimentationsGroup
+     */
+    Q_INVOKABLE void deleteExperimentationOfGroup(ExperimentationM* experimentation, ExperimentationsGroupVM* experimentationsGroup);
+
+
 Q_SIGNALS:
 
 
@@ -84,6 +104,9 @@ public Q_SLOTS:
 
 
 private:
+
+    // Manager for the data model of our IngeScape measuring application
+    IngeScapeModelManager* _modelManager;
 
 };
 

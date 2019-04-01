@@ -40,15 +40,14 @@ class IngeScapeModelManager : public QObject
     Q_OBJECT
 
     // The experimentations group currently selected
-    I2_QML_PROPERTY(ExperimentationsGroupVM*, selectedExperimentationsGroup)
+    I2_QML_PROPERTY(ExperimentationsGroupVM*, currentExperimentationsGroup)
 
     // The experimentation currently selected
-    I2_QML_PROPERTY(ExperimentationM*, selectedExperimentation)
-
-
+    I2_QML_PROPERTY(ExperimentationM*, currentExperimentation)
 
 
 public:
+
     /**
      * @brief Constructor
      * @param parent

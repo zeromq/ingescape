@@ -85,24 +85,25 @@ Item {
         }
     }
 
-    ListView {
+
+    Column {
+        id: columnExperimentationsGroups
 
         anchors {
             top: btnNewExpe.bottom
             topMargin: 20
             left: parent.left
+            leftMargin: 20
             right: parent.right
-            bottom: parent.bottom
+            rightMargin: 20
+            //bottom: parent.bottom
         }
         spacing: 10
 
-        model: controller.allExperimentationsGroups
+        Repeater {
+            model: controller ? controller.allExperimentationsGroups : null
 
-        delegate: Text {
-            //height: 40
-            //width: 200
-
-            text: model.name
+            delegate: componentExperimentationsGroup
         }
     }
 
@@ -113,5 +114,165 @@ Item {
         //anchors.centerIn: parent
 
         controller: rootItem.controller
+    }
+
+
+    //
+    // Component for "Experimentations Group VM"
+    //
+    Component {
+        id: componentExperimentationsGroup
+
+        Rectangle {
+            id: rootExperimentationsGroup
+
+            property ExperimentationsGroupVM experimentationsGroup: model.QtObject
+
+            width: parent.width
+            height: txtName.height + columnExperimentations.anchors.topMargin + columnExperimentations.height
+
+            color: "#44333333"
+            border {
+                color: "black"
+                width: 1
+            }
+
+            Text {
+                id: txtName
+
+                anchors {
+                    left: parent.left
+                    top: parent.top
+                }
+
+                text: rootExperimentationsGroup.experimentationsGroup ? rootExperimentationsGroup.experimentationsGroup.name : ""
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 16
+                }
+            }
+
+            Column {
+                id: columnExperimentations
+
+                anchors {
+                    top: txtName.bottom
+                    topMargin: 10
+                    left: parent.left
+                    leftMargin: 30
+                    right: parent.right
+                }
+
+                Repeater {
+                    model: experimentationsGroup ? experimentationsGroup.experimentations : null
+
+                    delegate: Rectangle {
+                        id: rootExperimentation
+
+                        property ExperimentationM experimentation: model.QtObject
+
+                        width: parent.width
+                        height: 30
+
+                        color: "#443333AA"
+                        border {
+                            color: "black"
+                            width: 1
+                        }
+
+                        Row {
+                            spacing: 20
+
+                            anchors {
+                                left: parent.left
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: rootExperimentation.experimentation ? rootExperimentation.experimentation.name : ""
+
+                                color: IngeScapeTheme.whiteColor
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    weight : Font.Medium
+                                    pixelSize : 12
+                                }
+                            }
+
+                            Text {
+                                text: rootExperimentation.experimentation ? rootExperimentation.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy hh:mm:ss") : ""
+
+                                color: IngeScapeTheme.whiteColor
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    weight : Font.Medium
+                                    pixelSize : 12
+                                }
+                            }
+                        }
+
+                        /*MouseArea {
+                            id: mouseAreaExperimentation
+
+                            anchors.fill: parent
+
+                            hoverEnabled: true
+                        }*/
+
+                        Row {
+                            spacing: 20
+
+                            anchors {
+                                right: parent.right
+                            }
+                            height: parent.height
+
+                            //visible: mouseAreaExperimentation.containsMouse
+
+                            Button {
+                                id: btnOpen
+
+                                text: "Open"
+
+                                width: 100
+                                height: parent.height
+
+                                onClicked: {
+                                    if (rootExperimentation.experimentation && rootItem.controller)
+                                    {
+                                        console.log("QML: Open " + rootExperimentation.experimentation.name);
+
+                                        // Open the experimentation of the group
+                                        rootItem.controller.openExperimentationOfGroup(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup);
+                                    }
+                                }
+                            }
+
+                            Button {
+                                id: btnDelete
+
+                                text: "Delete"
+
+                                width: 100
+                                height: parent.height
+
+                                onClicked: {
+                                    if (rootExperimentation.experimentation && rootItem.controller)
+                                    {
+                                        console.log("QML: Delete " + rootExperimentation.experimentation.name);
+
+                                        // Delete the experimentation of the group
+                                        rootItem.controller.deleteExperimentationOfGroup(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

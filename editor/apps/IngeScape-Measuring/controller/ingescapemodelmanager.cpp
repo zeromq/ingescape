@@ -19,8 +19,8 @@
  * @param parent
  */
 IngeScapeModelManager::IngeScapeModelManager(QObject *parent) : QObject(parent),
-    _selectedExperimentationsGroup(nullptr),
-    _selectedExperimentation(nullptr)
+    _currentExperimentationsGroup(nullptr),
+    _currentExperimentation(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -73,12 +73,12 @@ IngeScapeModelManager::~IngeScapeModelManager()
 {
     qInfo() << "Delete IngeScape Model Manager";
 
-    if (_selectedExperimentationsGroup != nullptr) {
-        setselectedExperimentationsGroup(nullptr);
+    if (_currentExperimentationsGroup != nullptr) {
+        setcurrentExperimentationsGroup(nullptr);
     }
 
-    if (_selectedExperimentation != nullptr) {
-        setselectedExperimentation(nullptr);
+    if (_currentExperimentation != nullptr) {
+        setcurrentExperimentation(nullptr);
     }
 
 }

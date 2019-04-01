@@ -49,6 +49,33 @@ Item {
     //--------------------------------------------------------
 
 
+
+    //--------------------------------------------------------
+    //
+    //
+    // Slots
+    //
+    //
+    //--------------------------------------------------------
+
+    Connections {
+        target: IngeScapeMeasuringC.modelManager
+
+        onCurrentExperimentationChanged: {
+
+            if (IngeScapeMeasuringC.modelManager.currentExperimentation)
+            {
+                //console.log("QML: on Current Experimentation changed: " + IngeScapeMeasuringC.modelManager.currentExperimentation.name);
+
+                stackview.push(componentExperimentationView);
+            }
+            /*else {
+                console.log("QML: on Current Experimentation changed to NULL");
+            }*/
+        }
+    }
+
+
     //--------------------------------------------------------
     //
     //
@@ -98,49 +125,6 @@ Item {
     }
 
 
-    /*SwipeView {
-        id: swipeView
-
-        anchors.fill: parent
-
-        currentIndex: 0
-
-
-        //
-        // Experimentations List View
-        //
-        ExperimentationsListView {
-            id: experimentationsListView
-
-            controller: IngeScapeMeasuringC.experimentationsListC
-        }
-
-
-        //
-        // Experimentations View
-        //
-        ExperimentationView {
-            id: experimentationView
-        }
-
-
-        //
-        // Subjects View
-        //
-        Subject.SubjectsView {
-            id: subjectsView
-        }
-
-
-        //
-        // Tasks View
-        //
-        Task.TasksView {
-            id: tasksView
-        }
-
-    }*/
-
 
     //
     // Experimentations List View
@@ -164,74 +148,44 @@ Item {
 
         ExperimentationView {
             id: experimentationView
-        }
-    }
 
+            controller: IngeScapeMeasuringC.experimentationC
+            modelManager: IngeScapeMeasuringC.modelManager
 
+            //
+            // Slots
+            //
 
-    Row {
-        anchors {
-            top: parent.top
-            left: parent.left
-        }
-        Button {
-            text: "PREVIOUS"
-
-            onClicked: {
-                console.log("PREVIOUS");
-
-                //swipeView.currentIndex--;
+            onGoBackToHome: {
+                //console.log("QML: on Go Back To Home");
 
                 stackview.pop();
-            }
-        }
 
-        Button {
-            text: "NEXT"
-
-            onClicked: {
-                console.log("NEXT");
-
-                //swipeView.currentIndex++;
-
-                stackview.push(componentExperimentationView);
+                // Reset the current experimentation
+                if (IngeScapeMeasuringC.modelManager)
+                {
+                    IngeScapeMeasuringC.modelManager.currentExperimentation = null;
+                    IngeScapeMeasuringC.modelManager.currentExperimentationsGroup = null;
+                }
             }
         }
     }
 
 
     //
-    // Left panel
+    // Subjects View
     //
-    /*Rectangle {
-        id: leftPanel
-
-        width: IngeScapeTheme.leftPanelWidth
-
-        anchors {
-            left: parent.left
-            top: parent.top
-            bottom: parent.bottom
-        }
-
-        color: IngeScapeTheme.blackColor
-
-        I2CustomRectangle {
-            anchors {
-                fill: parent
-                topMargin: 9
-            }
-            color: IngeScapeTheme.leftPanelBackgroundColor
-
-            fuzzyRadius: 8
-            topRightRadius : 5
-
-            borderWidth: 1
-            borderColor: IngeScapeTheme.selectedTabsBackgroundColor
-
-        }
+    /*Subject.SubjectsView {
+        id: subjectsView
     }*/
 
+
+    //
+    // Tasks View
+    //
+    /*Task.TasksView {
+        id: tasksView
+    }*/
 
 
     //
