@@ -91,6 +91,9 @@ bool network_RequestOutputsFromMappedAgents = false;
 bool forcedStop = false;
 bool allowIpc = true;
 
+#if ENABLE_LICENSE_ENFORCEMENT
+licenseEnforcement_t *licEnforcement = NULL;
+#endif
 
 //global parameters
 //prefixes for sending definitions and mappings through zyre
@@ -170,7 +173,7 @@ int subscribeToPublisherOutput(subscriber_t *subscriber, const char *outputName)
             igs_debug("Subscribe to agent %s output %s",subscriber->agentName,outputName);
             zsock_set_subscribe(subscriber->subscriber, outputName);
             mappingFilter_t *f = calloc(1, sizeof(mappingFilter_t));
-            strncpy(f->filter, outputName, MAX_FILTER_SIZE);
+            strncpy(f->filter, outputName, MAX_FILTER_SIZE-1);
             DL_APPEND(subscriber->mappingsFilters, f);
         }else{
             //printf("\n****************\nFILTER BIS %s - %s\n***************\n", subscriber->igsAgentName, outputName);
@@ -249,13 +252,13 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
     return 0;
 }
 
-void sendDefinitionToAgent(const char *peerId, const char *definition)
+void sendDefinitionToAgent(const char *peerId, const char *def)
 {
-    if(peerId != NULL &&  definition != NULL)
+    if(peerId != NULL &&  def != NULL)
     {
         if(agentElements->node != NULL)
         {
-            zyre_whispers(agentElements->node, peerId, "%s%s", definitionPrefix, definition);
+            zyre_whispers(agentElements->node, peerId, "%s%s", definitionPrefix, def);
         } else {
             igs_warn("Could not send our definition to %s : our agent is not connected",peerId);
         }
@@ -277,6 +280,12 @@ void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
     igs_debug("cleaning subscription to %s\n", subscriber->agentName);
     // clean the agent definition
     if(subscriber->definition != NULL){
+#if ENABLE_LICENSE_ENFORCEMENT
+        licEnforcement->currentIOPNb -= (HASH_COUNT(subscriber->definition->inputs_table) +
+                                         HASH_COUNT(subscriber->definition->outputs_table) +
+                                         HASH_COUNT(subscriber->definition->params_table));
+        licEnforcement->currentAgentsNb--;
+#endif
         definition_freeDefinition(subscriber->definition);
     }
     //clean the agent mapping
@@ -469,14 +478,14 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 zagent->reconnected = 0;
                 zagent->subscriber = NULL;
                 zagent->hasJoinedPrivateChannel = false;
-                strncpy(zagent->peerId, peer, NAME_BUFFER_SIZE);
+                strncpy(zagent->peerId, peer, NAME_BUFFER_SIZE-1);
                 HASH_ADD_STR(zyreAgents, peerId, zagent);
             }else{
                 //Agent already exists, we set its reconnected flag
                 //(this is used below to avoid agent destruction on EXIT received after timeout)
                 zagent->reconnected++;
             }
-            strncpy(zagent->name, name, NAME_BUFFER_SIZE);
+            strncpy(zagent->name, name, NAME_BUFFER_SIZE-1);
             assert(headers);
             char *k;
             const char *v;
@@ -493,7 +502,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if(strncmp(k,"publisher", strlen("publisher")) == 0)
                 {
                     char endpointAddress[128];
-                    strncpy(endpointAddress, address, 128);
+                    strncpy(endpointAddress, address, 127);
 
                     // IP adress extraction 
                     char *insert = endpointAddress + strlen(endpointAddress);
@@ -711,6 +720,20 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         subscriber->definition = NULL;
                     }
                     
+                    #if ENABLE_LICENSE_ENFORCEMENT
+                    licEnforcement->currentIOPNb += (HASH_COUNT(newDefinition->inputs_table) +
+                                                     HASH_COUNT(newDefinition->outputs_table) +
+                                                     HASH_COUNT(newDefinition->params_table));
+                    if (licEnforcement->currentIOPNb > license->platformNbIOPs){
+                        igs_license("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", license->platformNbIOPs);
+                        return -1;
+                    }
+                    licEnforcement->currentAgentsNb++;
+                    if (licEnforcement->currentAgentsNb > license->platformNbAgents){
+                        igs_license("Maximum number of allowed agents (%d) is exceeded : agent will stop", license->platformNbAgents);
+                        return -1;
+                    }
+                    #endif
                     igs_debug("Store definition for agent %s", name);
                     subscriber->definition = newDefinition;
                     //Check the involvement of this new agent and its definition in our mapping and update subscriptions
@@ -901,6 +924,47 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     model_readWriteUnlock();
                     zyre_whisper(node, peer, &resp);
                     igs_debug("send parameters values to %s", peer);
+                }else if (strlen("LICENSE_INFO") == strlen(message) && strncmp (message, "LICENSE_INFO", strlen("LICENSE_INFO")) == 0){
+                    zmsg_t *resp = zmsg_new();
+                    if (license == NULL){
+                        zmsg_addstr(resp, "no license available");
+                    }else{
+                        char buf[128] = "";
+                        struct tm ts;
+                        zmsg_addstr(resp, "customer");
+                        zmsg_addstr(resp, license->customer);
+                        zmsg_addstr(resp, "order");
+                        zmsg_addstr(resp, license->order);
+                        zmsg_addstr(resp, "platformNbAgents");
+                        zmsg_addstrf(resp, "%d", license->platformNbAgents);
+                        zmsg_addstr(resp, "platformNbIOPs");
+                        zmsg_addstrf(resp, "%d", license->platformNbIOPs);
+                        zmsg_addstr(resp, "licenseExpirationDate");
+                        ts = *localtime(&license->licenseExpirationDate);
+                        strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", &ts);
+                        zmsg_addstr(resp, buf);
+                        zmsg_addstr(resp, "editorOwner");
+                        zmsg_addstr(resp, license->editorOwner);
+                        zmsg_addstr(resp, "editorExpirationDate");
+                        ts = *localtime(&license->editorExpirationDate);
+                        strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", &ts);
+                        zmsg_addstr(resp, buf);
+                        char *feature = zlist_first(license->features);
+                        while (feature != NULL) {
+                            zmsg_addstr(resp, "feature");
+                            zmsg_addstr(resp, feature);
+                            feature = zlist_next(license->features);
+                        }
+                        licenseForAgent_t *agent = zlist_first(license->agents);
+                        while (agent != NULL) {
+                            zmsg_addstr(resp, "agent");
+                            zmsg_addstr(resp, agent->agentId);
+                            zmsg_addstr(resp, agent->agentName);
+                            agent = zlist_next(license->agents);
+                        }
+                    }
+                    zyre_whisper(node, peer, &resp);
+                    igs_debug("send license information to %s", peer);
                 }else if (strlen("STOP") == strlen(message) && strncmp (message, "STOP", strlen("STOP")) == 0){
                     free(message);
                     forcedStop = true;
@@ -1112,6 +1176,15 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
     return 0;
 }
 
+//Timer callback to stop loop if license is expired or demo mode is on
+int triggerLicenseStop(zloop_t *loop, int timer_id, void *arg){
+    IGS_UNUSED(loop);
+    IGS_UNUSED(timer_id);
+    IGS_UNUSED(arg);
+    igs_error("License has expired and runtime duration limit is reached : stopping loop.");
+    return -1;
+}
+
 //Timer callback to update and (re)send our mapping to agents on the private channel
 int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop)
@@ -1142,6 +1215,14 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 static void
 initLoop (zsock_t *pipe, void *args){
     IGS_UNUSED(args)
+    
+#if ENABLE_LICENSE_ENFORCEMENT
+    if (licEnforcement == NULL){
+        licEnforcement = calloc(1, sizeof(licenseEnforcement_t));
+    }
+    licEnforcement->currentAgentsNb = 0;
+    licEnforcement->currentIOPNb = 0;
+#endif
 
     network_needToSendDefinitionUpdate = false;
     network_needToUpdateMapping = false;
@@ -1149,6 +1230,7 @@ initLoop (zsock_t *pipe, void *args){
     bool canContinue = true;
     //prepare zyre
     agentElements->node = zyre_new (igsAgentName);
+//    zyre_set_verbose(agentElements->node);
     if (strlen(agentElements->brokerEndPoint) > 0){
         zyre_gossip_connect(agentElements->node,
                             "%s", agentElements->brokerEndPoint);
@@ -1177,15 +1259,15 @@ initLoop (zsock_t *pipe, void *args){
     }
     
     //start TCP publisher
-    char endpoint[256];
+    char endpoint[512];
     if (network_publishingPort == 0){
-        snprintf(endpoint, 255, "tcp://%s:*", agentElements->ipAddress);
+        snprintf(endpoint, 511, "tcp://%s:*", agentElements->ipAddress);
     }else{
-        snprintf(endpoint, 255, "tcp://%s:%d", agentElements->ipAddress, network_publishingPort);
+        snprintf(endpoint, 511, "tcp://%s:%d", agentElements->ipAddress, network_publishingPort);
     }
     agentElements->publisher = zsock_new_pub(endpoint);
     if (agentElements->publisher == NULL){
-        igs_error("Could not create publishing socket : Agent will interrupt immediately.");
+        igs_error("Could not create publishing socket (%s): Agent will interrupt immediately.", endpoint);
         canContinue = false;
     }else{
         strncpy(endpoint, zsock_endpoint(agentElements->publisher), 256);
@@ -1237,7 +1319,7 @@ initLoop (zsock_t *pipe, void *args){
     zyre_set_header(agentElements->node, "canBeFrozen", "%i", agentCanBeFrozen);
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
-    int ret;
+    ssize_t ret;
     pid_t pid;
     pid = getpid();
     zyre_set_header(agentElements->node, "pid", "%i", pid);
@@ -1358,6 +1440,13 @@ initLoop (zsock_t *pipe, void *args){
     
     zloop_timer(agentElements->loop, 1000, 0, triggerDefinitionUpdate, NULL);
     zloop_timer(agentElements->loop, 1000, 0, triggerMappingUpdate, NULL);
+    
+#if ENABLE_LICENSE_ENFORCEMENT
+    if (license != NULL && license->isLicenseExpired){
+        igs_license("License has expired : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
+        zloop_timer(agentElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, NULL);
+    }
+#endif
 
     if (canContinue){
         zloop_start (agentElements->loop); //start returns when one of the pollers returns -1
@@ -1412,6 +1501,11 @@ initLoop (zsock_t *pipe, void *args){
         #endif
         //TODO : do that for windows also
     }
+#if ENABLE_LICENSE_ENFORCEMENT
+    if (licEnforcement != NULL){
+        free(licEnforcement);
+    }
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1540,7 +1634,7 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
     forcedStop = false;
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
-    strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
+    strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH-1);
     agentElements->brokerEndPoint[0] = '\0';
     agentElements->ipAddress[0] = '\0';
     
@@ -1575,10 +1669,10 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
         return 0;
     }
     
+    license_readLicense();
     agentElements->zyrePort = port;
     agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
-    
     return 1;
 }
 
@@ -1604,7 +1698,7 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
     forcedStop = false;
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     agentElements->brokerEndPoint[0] = '\0';
-    strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
+    strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH-1);
     
 #if (defined WIN32 || defined _WIN32)
     WORD version_requested = MAKEWORD (2, 2);
@@ -1637,6 +1731,7 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
         return 0;
     }
     
+    license_readLicense();
     agentElements->zyrePort = port;
     agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
@@ -1662,8 +1757,8 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
     forcedStop = false;
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
-    strncpy(agentElements->brokerEndPoint, brokerIpAddress, IP_ADDRESS_LENGTH);
-    strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
+    strncpy(agentElements->brokerEndPoint, brokerIpAddress, IP_ADDRESS_LENGTH-1);
+    strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH-1);
     agentElements->ipAddress[0] = '\0';
     
 #if (defined WIN32 || defined _WIN32)
@@ -1699,6 +1794,7 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
         return 0;
     }
     
+    license_readLicense();
     agentElements->zyrePort = 0;
     agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
@@ -1734,6 +1830,7 @@ int igs_stop(){
     }else{
         igs_debug("Agent already stopped");
     }
+    license_cleanLicense();
     return 1;
 }
 
@@ -1781,7 +1878,7 @@ int igs_setAgentName(const char *name){
     if (spaceInName){
         igs_warn("Spaces are not allowed in agent name: %s has been renamed to %s", name, n);
     }
-    strncpy(igsAgentName, n, MAX_AGENT_NAME_LENGTH);
+    strncpy(igsAgentName, n, MAX_AGENT_NAME_LENGTH-1);
     free(n);
     
     if (needRestart){
@@ -1907,7 +2004,7 @@ int igs_setAgentState(const char *state){
     }
     
     if (strcmp(state, igsAgentState) != 0){
-        strncpy(igsAgentState, state, MAX_AGENT_NAME_LENGTH);
+        strncpy(igsAgentState, state, MAX_AGENT_NAME_LENGTH-1);
         igs_debug("changed to %s", igsAgentState);
         if (agentElements != NULL && agentElements->node != NULL){
             zyre_shouts(agentElements->node, CHANNEL, "STATE=%s", igsAgentState);
@@ -2042,7 +2139,7 @@ void igs_die(){
 }
 
 void igs_setCommandLine(const char *line){
-    strncpy(commandLine, line, COMMAND_LINE_LENGTH);
+    strncpy(commandLine, line, COMMAND_LINE_LENGTH-1);
     igs_debug("Command line set to %s", commandLine);
 }
 

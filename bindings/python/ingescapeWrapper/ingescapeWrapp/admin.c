@@ -275,6 +275,3 @@ PyObject * version_wrapper(PyObject * self, PyObject * args)
     ret = PyLong_FromLong(version);
     return ret;
 }
-
-
-

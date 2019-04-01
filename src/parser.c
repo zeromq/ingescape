@@ -12,10 +12,7 @@
 #include "unixfunctions.h"
 #endif
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdocumentation"
 #include "yajl_tree.h"
-#pragma clang diagnostic pop
 #include "yajl_gen.h"
 #include "ingescape_private.h"
 
@@ -173,7 +170,7 @@ static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
                     iop->value.b = string_to_boolean (IGSYAJL_GET_STRING(value));
                     break;
                 case IGS_STRING_T:
-                    iop->value.s = strdup (IGSYAJL_IS_STRING(value) ? value->u.string : NULL);
+                    iop->value.s =  (IGSYAJL_IS_STRING(value) ? strdup(value->u.string) : NULL);
                     break;
                 case IGS_IMPULSION_T:
                     //IMPULSION has no value
@@ -323,6 +320,7 @@ static void json_add_token_to_hash (igs_token_t **hasht, igsyajl_val obj){
             json_parse_token_arguments(token, arguments);
         }
         //TODO: parse reply
+        IGS_UNUSED(reply)
         HASH_ADD_STR(*hasht, name, token);
     }else{
         igs_warn("%s already exists", name);
@@ -415,19 +413,19 @@ static definition* json_parse_definition (igsyajl_val node) {
     path[1] = STR_NAME;
     v = igsyajl_tree_get(node, path, igsyajl_t_any);
     if (v){
-        def->name = strdup (IGSYAJL_IS_STRING(v) ? (v)->u.string : NULL);
+        def->name = (IGSYAJL_IS_STRING(v) ? strdup((v)->u.string) : NULL);
     }
 
     path[1] = STR_DESCRIPTION;
     v = igsyajl_tree_get(node, path, igsyajl_t_any);
     if (v){
-        def->description = strdup (IGSYAJL_IS_STRING(v) ? (v)->u.string : NULL);
+        def->description = (IGSYAJL_IS_STRING(v) ? strdup((v)->u.string) : NULL);
     }
 
     path[1] = STR_VERSION;
     v = igsyajl_tree_get(node, path, igsyajl_t_any);
     if (v){
-        def->version = strdup (IGSYAJL_IS_STRING(v) ? (v)->u.string : NULL);
+        def->version = (IGSYAJL_IS_STRING(v) ? strdup((v)->u.string) : NULL);
     }
 
     path[1] = STR_INPUTS;

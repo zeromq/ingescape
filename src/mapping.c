@@ -175,7 +175,7 @@ int igs_loadMappingFromPath (const char* file_path){
         igs_error("Mapping could not be loaded from path %s", file_path);
         return -1;
     }else{
-        strncpy(mappingPath, file_path, MAX_PATH);
+        strncpy(mappingPath, file_path, MAX_PATH-1);
         igs_internal_mapping = tmp;
         network_needToUpdateMapping = true;
     }
