@@ -173,6 +173,43 @@ Item {
         }
 
         initialItem: componentMainView
+
+        delegate: StackViewDelegate {
+
+            pushTransition: StackViewTransition {
+                PropertyAnimation {
+                    target: enterItem
+                    property: "y"
+                    from: target.height
+                    to: 0
+                    duration: 250
+                }
+                /*PropertyAnimation {
+                    target: exitItem
+                    property: "y"
+                    from: 0
+                    to: 0
+                    duration: 250
+                }*/
+            }
+
+            popTransition: StackViewTransition {
+                /*PropertyAnimation {
+                    target: enterItem
+                    property: "y"
+                    from: 0
+                    to: 0
+                    duration: 250
+                }*/
+                PropertyAnimation {
+                    target: exitItem
+                    property: "y"
+                    from: 0
+                    to: target.height
+                    duration: 250
+                }
+            }
+        }
     }
 
 
@@ -272,7 +309,7 @@ Item {
                         font {
                             family: IngeScapeTheme.textFontFamily
                             weight : Font.Medium
-                            pixelSize : 14
+                            pixelSize : 18
                         }
                     }
 
