@@ -78,7 +78,7 @@ Item {
             horizontalCenter: parent.horizontalCenter
         }
 
-        text: "Nouvelle Expé"
+        text: "New Experimentation"
 
         onClicked: {
             createExperimentationPopup.open();
@@ -108,6 +108,9 @@ Item {
     }
 
 
+    //
+    // Create Experimentation Popup
+    //
     Popup.CreateExperimentationPopup {
         id: createExperimentationPopup
 
@@ -118,7 +121,7 @@ Item {
 
 
     //
-    // Component for "Experimentations Group VM"
+    // Component for "Experimentations Group (View Model)"
     //
     Component {
         id: componentExperimentationsGroup

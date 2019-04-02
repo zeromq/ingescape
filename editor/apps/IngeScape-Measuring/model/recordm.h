@@ -20,6 +20,7 @@
 
 #include <model/subject/subjectm.h>
 #include <model/task/taskm.h>
+#include <model/measuringenums.h>
 
 
 /**
@@ -42,7 +43,11 @@ class RecordM : public QObject
     I2_QML_PROPERTY(QDateTime, startDateTime)
 
     // End date and time of our record
-    I2_QML_PROPERTY(QDateTime, endDateTime)
+    I2_QML_PROPERTY_CUSTOM_SETTER(QDateTime, endDateTime)
+
+    // Duration of our record
+    //I2_QML_PROPERTY_QTime(duration)
+    I2_QML_PROPERTY(QDateTime, duration)
 
     // IndependentVariableValues (Table de Hash [UID V.I. - Valeur de la V.I.])
     // liste des valeurs des V.I. de la tâche
@@ -57,7 +62,20 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit RecordM(QObject *parent = nullptr);
+    //explicit RecordM(QObject *parent = nullptr);
+
+
+    /**
+     * @brief Constructor
+     * @param name
+     * @param subject
+     * @param task
+     * @param parent
+     */
+    explicit RecordM(QString name,
+                     SubjectM* subject = nullptr,
+                     TaskM* task = nullptr,
+                     QObject *parent = nullptr);
 
 
     /**

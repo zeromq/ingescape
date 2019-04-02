@@ -36,8 +36,8 @@ ApplicationWindow {
     visible: true
 
     // Default size
-    width: IngeScapeTheme.appDefaultWidth
-    height: IngeScapeTheme.appDefaultHeight
+    width: IngeScapeTheme.appMinWidth // IngeScapeTheme.appDefaultWidth
+    height: IngeScapeTheme.appMinHeight // IngeScapeTheme.appDefaultHeight
 
     // Minimum size
     minimumWidth: IngeScapeTheme.appMinWidth

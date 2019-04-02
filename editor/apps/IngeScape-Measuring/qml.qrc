@@ -27,5 +27,6 @@
         <file>qml/subject/SubjectsView.qml</file>
         <file>qml/task/TasksView.qml</file>
         <file>qml/popup/CreateExperimentationPopup.qml</file>
+        <file>qml/popup/CreateRecordPopup.qml</file>
     </qresource>
 </RCC>

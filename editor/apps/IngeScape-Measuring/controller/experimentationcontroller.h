@@ -46,6 +46,29 @@ public:
     ~ExperimentationController();
 
 
+    /**
+     * @brief Create a new record for a subject and a task
+     * @param recordName
+     * @param subject
+     * @param task
+     */
+    Q_INVOKABLE void createNewRecordForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task);
+
+
+    /**
+     * @brief Open a record
+     * @param record
+     */
+    Q_INVOKABLE void openRecord(RecordM* record);
+
+
+    /**
+     * @brief Delete a record
+     * @param record
+     */
+    Q_INVOKABLE void deleteRecord(RecordM* record);
+
+
 Q_SIGNALS:
 
 

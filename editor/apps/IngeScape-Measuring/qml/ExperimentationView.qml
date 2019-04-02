@@ -21,6 +21,8 @@ import I2Quick 1.0
 import INGESCAPE 1.0
 
 //import "theme" as Theme
+import "popup" as Popup
+
 
 Item {
     id: rootItem
@@ -130,48 +132,249 @@ Item {
     }
 
 
-    Column {
+    Rectangle {
         id: configurationPanel
 
         anchors {
-            left: parent.left
             top: headers.bottom
             topMargin: 50
+            left: parent.left
+            bottom: parent.bottom
         }
 
-        Button {
-            text: "Subjects"
+        width: 250
 
-            onClicked: {
-                console.log("QML: Open Subjects");
+        color: "#33770000"
+
+        Column {
+
+
+            Button {
+                text: "Subjects"
+
+                onClicked: {
+                    console.log("QML: Open Subjects");
+                }
+            }
+
+            Button {
+                text: "Tasks"
+
+                onClicked: {
+                    console.log("QML: Open Tasks");
+                }
+            }
+
+            Button {
+                text: "Coding"
+
+                enabled: false
+            }
+
+            Button {
+                text: "Clean"
+
+                enabled: false
+            }
+
+            Button {
+                text: "Export"
+
+                onClicked: {
+                    console.log("QML: Export...");
+                }
+            }
+        }
+    }
+
+
+    Rectangle {
+        id: recordsPanel
+
+        anchors {
+            top: headers.bottom
+            topMargin: 50
+            left: configurationPanel.right
+            right: parent.right
+            bottom: parent.bottom
+        }
+        color: "#33000077"
+
+        Row {
+            id: recordsHeader
+
+            spacing: 20
+
+            Text {
+                id: titleRecords
+
+                text: qsTr("Records")
+            }
+
+            Button {
+                id: btnNewRecord
+
+                text: "New Record"
+
+                onClicked: {
+                    createRecordPopup.open();
+                }
             }
         }
 
-        Button {
-            text: "Tasks"
 
-            onClicked: {
-                console.log("QML: Open Tasks");
+        Column {
+
+            anchors {
+                top: recordsHeader.bottom
+                topMargin: 20
+                left: parent.left
+                right: parent.right
+            }
+
+            Repeater {
+                model: rootItem.experimentation ? rootItem.experimentation.allRecords : null
+
+                delegate: componentRecord
             }
         }
+    }
 
-        Button {
-            text: "Coding"
 
-            enabled: false
-        }
+    //
+    // Create Experimentation Popup
+    //
+    Popup.CreateRecordPopup {
+        id: createRecordPopup
 
-        Button {
-            text: "Clean"
+        //anchors.centerIn: parent
 
-            enabled: false
-        }
+        controller: rootItem.controller
+        experimentation: rootItem.experimentation
+    }
 
-        Button {
-            text: "Export"
 
-            onClicked: {
-                console.log("QML: Export...");
+    //
+    // Component for "Record (Model)"
+    //
+    Component {
+        id: componentRecord
+
+        Rectangle {
+            id: rootRecord
+
+            property RecordM record: model.QtObject
+
+            width: parent.width
+            height: 30
+
+            color: "#44333333"
+            border {
+                color: "black"
+                width: 1
+            }
+
+            Row {
+                spacing: 30
+
+                anchors {
+                    left: parent.left
+                    verticalCenter: parent.verticalCenter
+                }
+
+                Text {
+                    text: rootRecord.record ? rootRecord.record.name : ""
+
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 12
+                    }
+                }
+
+                Text {
+                    /*text: rootRecord.record ? rootRecord.record.startDateTime.toLocaleString(Qt.locale(), "dd/MM/yyyy hh:mm:ss")
+                                            : "../../.... ..:..:.."*/
+                    text: "../../.... ..:..:.."
+
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 12
+                    }
+                }
+
+                Text {
+                    /*text: rootRecord.record ? rootRecord.record.duration.toLocaleString(Qt.locale(), "hh:mm:ss.zzz")
+                                            : "00:00:00.000"*/
+                    text: "00:00:00.000"
+
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 12
+                    }
+                }
+            }
+
+            /*MouseArea {
+                id: mouseAreaRecord
+
+                anchors.fill: parent
+
+                hoverEnabled: true
+            }*/
+
+            Row {
+                spacing: 20
+
+                anchors {
+                    right: parent.right
+                }
+                height: parent.height
+
+                //visible: mouseAreaRecord.containsMouse
+
+                Button {
+                    id: btnOpen
+
+                    text: "Open"
+
+                    width: 100
+                    height: parent.height
+
+                    onClicked: {
+                        if (rootRecord.record && rootItem.controller)
+                        {
+                            console.log("QML: Open " + rootRecord.record.name);
+
+                            // Open the record
+                            rootItem.controller.openRecord(rootRecord.record);
+                        }
+                    }
+                }
+
+                Button {
+                    id: btnDelete
+
+                    text: "Delete"
+
+                    width: 100
+                    height: parent.height
+
+                    onClicked: {
+                        if (rootRecord.record && rootItem.controller)
+                        {
+                            console.log("QML: Delete " + rootRecord.record.name);
+
+                            // Delete the record
+                            rootItem.controller.deleteRecord(rootRecord.record);
+                        }
+                    }
+                }
             }
         }
     }

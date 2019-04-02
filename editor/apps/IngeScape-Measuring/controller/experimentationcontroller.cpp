@@ -51,6 +51,64 @@ ExperimentationController::~ExperimentationController()
 
 
 /**
+ * @brief Create a new record for a subject and a task
+ * @param recordName
+ * @param subject
+ * @param task
+ */
+void ExperimentationController::createNewRecordForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task)
+{
+    if (!recordName.isEmpty() && (subject != nullptr) && (task != nullptr)
+            && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    {
+        qDebug() << "Create new record" << recordName << "for subject" << subject->name() << "and task" << task->name();
+
+        // Create the new record
+        RecordM* record = new RecordM(recordName, subject, task, nullptr);
+
+        // Add the record to the experimentation
+        _modelManager->currentExperimentation()->allRecords()->append(record);
+    }
+}
+
+
+/**
+ * @brief Open a record
+ * @param record
+ */
+void ExperimentationController::openRecord(RecordM* record)
+{
+    if ((record != nullptr)
+                    && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    {
+        qInfo() << "Open the record" << record->name() << "of the experimentation" << _modelManager->currentExperimentation()->name();
+
+        // FIXME TODO: openRecord
+    }
+}
+
+
+/**
+ * @brief Delete a record
+ * @param record
+ */
+void ExperimentationController::deleteRecord(RecordM* record)
+{
+    if ((record != nullptr)
+            && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    {
+        qInfo() << "Delete the record" << record->name() << "of the experimentation" << _modelManager->currentExperimentation()->name();
+
+        // Remove from the experimentation
+        _modelManager->currentExperimentation()->allRecords()->remove(record);
+
+        // Free memory
+        delete record;
+    }
+}
+
+
+/**
  * @brief Slot called when the current experimentation changed
  * @param currentExperimentation
  */
@@ -60,6 +118,6 @@ void ExperimentationController::onCurrentExperimentationChanged(ExperimentationM
     {
         qDebug() << "onCurrentExperimentationChanged" << currentExperimentation->name();
 
-
+        // FIXME TODO: load data about this experimentation (subjects, tasks, ...)
     }
 }

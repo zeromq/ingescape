@@ -34,6 +34,26 @@ ExperimentationM::ExperimentationM(QString name,
 
     // Records are sorted on their start date/time (chronological order)
     _allRecords.setSortProperty("startDateTime");
+
+
+    //
+    // FIXME for tests
+    //
+    for (int i = 0; i < 3; i++)
+    {
+        QString subjectName = QString("Subject for test %1").arg(i + 1);
+        QString taskName = QString("Task for test %1").arg(i + 1);
+
+        SubjectM* subject = new SubjectM(nullptr);
+        subject->setname(subjectName);
+
+        _allSubjects.append(subject);
+
+        TaskM* task = new TaskM(nullptr);
+        task->setname(taskName);
+
+        _allTasks.append(task);
+    }
 }
 
 
