@@ -162,6 +162,29 @@ Item {
     }
 
 
+    //
+    // Main view
+    //
+    /*StackView {
+        id: stackview
+
+        anchors {
+            top: headers.bottom
+            topMargin: 50
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+        }
+
+        initialItem: componentConfigurationAndRecordsList
+
+        //
+    }*/
+
+
+    //
+    // Configuration Panel
+    //
     Rectangle {
         id: configurationPanel
 
@@ -177,7 +200,6 @@ Item {
         color: "#44AAAAAA"
 
         Column {
-
 
             Button {
                 text: "Subjects"
@@ -224,6 +246,9 @@ Item {
     }
 
 
+    //
+    // Records Panel
+    //
     Rectangle {
         id: recordsPanel
 

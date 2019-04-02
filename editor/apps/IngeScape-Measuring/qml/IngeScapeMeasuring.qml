@@ -87,6 +87,7 @@ Item {
 
     StackView {
         id: stackview
+
         anchors.fill: parent
 
         /*pushEnter: Transition {
