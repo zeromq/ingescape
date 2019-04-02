@@ -21,8 +21,6 @@ import QtQuick.Window 2.3
 
 import INGESCAPE 1.0
 
-import "subject" as Subject
-import "task" as Task
 
 Item {
     id: rootItem
@@ -159,8 +157,8 @@ Item {
             // Slots
             //
 
-            onGoBackToParentView: {
-                console.log("QML: on Go Back to 'Experimentations List' view");
+            onGoBackToHome: {
+                console.log("QML: on Go Back to 'Home'");
 
                 // Remove the "Experimentation View" from the stack
                 stackview.pop();
@@ -172,76 +170,9 @@ Item {
                     IngeScapeMeasuringC.modelManager.currentExperimentationsGroup = null;
                 }
             }
-
-            onGoToSubjectsView: {
-                console.log("QML: on Go to Subjects view");
-
-                // Add the "Subjects View" to the stack
-                stackview.push(componentSubjectsView);
-            }
-
-            onGoToTasksView: {
-                console.log("QML: on Go to Tasks view");
-
-                // Add the "Tasks View" to the stack
-                stackview.push(componentTasksView);
-            }
         }
     }
 
-
-    //
-    // Subjects View
-    //
-    Component {
-        id: componentSubjectsView
-
-        Subject.SubjectsView {
-            id: subjectsView
-
-            //controller: IngeScapeMeasuringC.experimentationC
-            //modelManager: IngeScapeMeasuringC.modelManager
-
-
-            //
-            // Slots
-            //
-
-            onGoBackToParentView: {
-                console.log("QML: on Go Back to 'Experimentations' view");
-
-                // Remove the "Experimentation View" from the stack
-                stackview.pop();
-            }
-        }
-    }
-
-
-    //
-    // Tasks View
-    //
-    Component {
-        id: componentTasksView
-
-        Task.TasksView {
-            id: tasksView
-
-            //controller: IngeScapeMeasuringC.experimentationC
-            //modelManager: IngeScapeMeasuringC.modelManager
-
-
-            //
-            // Slots
-            //
-
-            onGoBackToParentView: {
-                console.log("QML: on Go Back to 'Experimentations' view");
-
-                // Remove the "Experimentation View" from the stack
-                stackview.pop();
-            }
-        }
-    }
 
 
     //

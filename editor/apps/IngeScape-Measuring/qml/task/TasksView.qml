@@ -52,8 +52,8 @@ Item {
     //
     //--------------------------------
 
-    // Go back to "Parent" view
-    signal goBackToParentView();
+    // Close Tasks view
+    signal closeTasksView();
 
 
 
@@ -74,20 +74,20 @@ Item {
     }
 
     Button {
-        id: btnGoBack
+        id: btnClose
 
         anchors {
-            left: parent.left
+            right: parent.right
             top: parent.top
         }
 
-        text: "BACK"
+        text: "X"
 
         onClicked: {
-            console.log("QML: Go back to 'Parent' view");
+            console.log("QML: close Tasks view");
 
-            // Emit the signal "goBackToParentView"
-            rootItem.goBackToParentView();
+            // Emit the signal "closeTasksView"
+            rootItem.closeTasksView();
         }
     }
 

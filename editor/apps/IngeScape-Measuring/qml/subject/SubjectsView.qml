@@ -54,8 +54,8 @@ Item {
     //
     //--------------------------------
 
-    // Go back to "Parent" view
-    signal goBackToParentView();
+    // Close Subjects view
+    signal closeSubjectsView();
 
 
 
@@ -76,25 +76,25 @@ Item {
     }
 
     Button {
-        id: btnGoBack
+        id: btnClose
 
         anchors {
-            left: parent.left
+            right: parent.right
             top: parent.top
         }
 
-        text: "BACK"
+        text: "X"
 
         onClicked: {
-            console.log("QML: Go back to 'Parent' view");
+            console.log("QML: close Subjects view");
 
-            // Emit the signal "goBackToParentView"
-            rootItem.goBackToParentView();
+            // Emit the signal "closeSubjectsView"
+            rootItem.closeSubjectsView();
         }
     }
 
-    Text {
-        id: title
+    Row {
+        id: header
 
         anchors {
             top: parent.top
@@ -102,13 +102,25 @@ Item {
             horizontalCenter: parent.horizontalCenter
         }
 
-        text: "Subjects"
+        Text {
+            id: title
 
-        color: IngeScapeTheme.whiteColor
-        font {
-            family: IngeScapeTheme.textFontFamily
-            weight : Font.Medium
-            pixelSize : 20
+            text: "Subjects"
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 20
+            }
+        }
+
+        Button {
+            text: "New Subject"
+
+            onClicked: {
+                console.log("New Subject");
+            }
         }
     }
 
@@ -121,7 +133,7 @@ Item {
 
         anchors {
             left: parent.left
-            top: title.bottom
+            top: header.bottom
             topMargin: 30
             bottom: parent.bottom
         }
@@ -184,40 +196,13 @@ Item {
 
         anchors {
             left: characteristicsPanel.right
-            top: title.bottom
+            top: header.bottom
             topMargin: 30
             bottom: parent.bottom
         }
 
         color: "#44AAAAAA"
 
-        Row {
-            id: subjectsHeader
-
-            anchors {
-                left: parent.left
-                top: parent.top
-            }
-
-            Text {
-                text: "Subjects"
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight : Font.Medium
-                    pixelSize : 16
-                }
-            }
-
-            Button {
-                text: "New Subject"
-
-                onClicked: {
-                    console.log("New Subject");
-                }
-            }
-        }
     }
 
 }

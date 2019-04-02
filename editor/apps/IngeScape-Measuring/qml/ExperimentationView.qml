@@ -22,6 +22,8 @@ import INGESCAPE 1.0
 
 //import "theme" as Theme
 import "popup" as Popup
+import "subject" as Subject
+import "task" as Task
 
 
 Item {
@@ -54,14 +56,8 @@ Item {
     //
     //--------------------------------
 
-    // Go back to "Parent" view
-    signal goBackToParentView();
-
-    // Go to "Subjects" view
-    signal goToSubjectsView();
-
-    // Go to "Tasks" view
-    signal goToTasksView();
+    // Go back to "Home"
+    signal goBackToHome();
 
 
 
@@ -89,18 +85,18 @@ Item {
             top: parent.top
         }
 
-        text: "BACK"
+        text: "HOME"
 
         onClicked: {
-            console.log("QML: Go back to 'Parent' view");
+            console.log("QML: Go back to 'Home'");
 
-            // Emit the signal the "goBackToParentView"
-            rootItem.goBackToParentView();
+            // Emit the signal the "Go Back To Home"
+            rootItem.goBackToHome();
         }
     }
 
     Column {
-        id: headers
+        id: header
 
         anchors {
             top: parent.top
@@ -165,160 +161,218 @@ Item {
     //
     // Main view
     //
-    /*StackView {
+    StackView {
         id: stackview
 
         anchors {
-            top: headers.bottom
+            top: header.bottom
             topMargin: 50
             bottom: parent.bottom
             left: parent.left
             right: parent.right
         }
 
-        initialItem: componentConfigurationAndRecordsList
-
-        //
-    }*/
+        initialItem: componentMainView
+    }
 
 
-    //
-    // Configuration Panel
-    //
-    Rectangle {
-        id: configurationPanel
+    Component {
+        id: componentMainView
 
-        anchors {
-            top: headers.bottom
-            topMargin: 50
-            left: parent.left
-            bottom: parent.bottom
+        Item {
+            id: mainView
+
+            //
+            // Configuration Panel
+            //
+            Rectangle {
+                id: configurationPanel
+
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+                width: 250
+
+                color: "#44AAAAAA"
+
+                Column {
+
+                    Button {
+                        text: "Subjects"
+
+                        onClicked: {
+                            console.log("QML: Add the 'Subjects View' to the stack");
+
+                            // Add the "Subjects View" to the stack
+                            stackview.push(componentSubjectsView);
+                        }
+                    }
+
+                    Button {
+                        text: "Tasks"
+
+                        onClicked: {
+                            console.log("QML: Add the 'Tasks View' to the stack");
+
+                            // Add the "Tasks View" to the stack
+                            stackview.push(componentTasksView);
+                        }
+                    }
+
+                    Button {
+                        text: "Coding"
+
+                        enabled: false
+                    }
+
+                    Button {
+                        text: "Clean"
+
+                        enabled: false
+                    }
+
+                    Button {
+                        text: "Export"
+
+                        onClicked: {
+                            console.log("QML: Export...");
+                        }
+                    }
+                }
+            }
+
+
+            //
+            // Records Panel
+            //
+            Rectangle {
+                id: recordsPanel
+
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: configurationPanel.right
+                    right: parent.right
+                }
+                color: "#44222222"
+
+                Row {
+                    id: recordsHeader
+
+                    spacing: 20
+
+                    Text {
+                        id: titleRecords
+
+                        text: qsTr("Records")
+
+                        color: IngeScapeTheme.whiteColor
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            weight : Font.Medium
+                            pixelSize : 14
+                        }
+                    }
+
+                    Button {
+                        id: btnNewRecord
+
+                        text: "New Record"
+
+                        onClicked: {
+                            createRecordPopup.open();
+                        }
+                    }
+                }
+
+
+                Column {
+
+                    anchors {
+                        top: recordsHeader.bottom
+                        topMargin: 20
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    Repeater {
+                        model: rootItem.experimentation ? rootItem.experimentation.allRecords : null
+
+                        delegate: componentRecord
+                    }
+                }
+            }
+
+
+            //
+            // Create Experimentation Popup
+            //
+            Popup.CreateRecordPopup {
+                id: createRecordPopup
+
+                //anchors.centerIn: parent
+
+                controller: rootItem.controller
+                experimentation: rootItem.experimentation
+            }
+
         }
+    }
 
-        width: 250
 
-        color: "#44AAAAAA"
+    //
+    // Subjects View
+    //
+    Component {
+        id: componentSubjectsView
 
-        Column {
+        Subject.SubjectsView {
+            id: subjectsView
 
-            Button {
-                text: "Subjects"
+            //controller: IngeScapeMeasuringC.experimentationC
+            //modelManager: IngeScapeMeasuringC.modelManager
 
-                onClicked: {
-                    console.log("QML: Go to Subjects view");
 
-                    // Emit the signal "goToSubjectsView"
-                    rootItem.goToSubjectsView();
-                }
-            }
+            //
+            // Slots
+            //
 
-            Button {
-                text: "Tasks"
+            onCloseSubjectsView: {
+                console.log("QML: on Close Subjects view");
 
-                onClicked: {
-                    console.log("QML: Go to Tasks view");
-
-                    // Emit the signal "goToTasksView"
-                    rootItem.goToTasksView();
-                }
-            }
-
-            Button {
-                text: "Coding"
-
-                enabled: false
-            }
-
-            Button {
-                text: "Clean"
-
-                enabled: false
-            }
-
-            Button {
-                text: "Export"
-
-                onClicked: {
-                    console.log("QML: Export...");
-                }
+                // Remove the "Subjects View" from the stack
+                stackview.pop();
             }
         }
     }
 
 
     //
-    // Records Panel
+    // Tasks View
     //
-    Rectangle {
-        id: recordsPanel
+    Component {
+        id: componentTasksView
 
-        anchors {
-            top: headers.bottom
-            topMargin: 50
-            left: configurationPanel.right
-            right: parent.right
-            bottom: parent.bottom
-        }
-        color: "#44222222"
+        Task.TasksView {
+            id: tasksView
 
-        Row {
-            id: recordsHeader
+            //controller: IngeScapeMeasuringC.experimentationC
+            //modelManager: IngeScapeMeasuringC.modelManager
 
-            spacing: 20
 
-            Text {
-                id: titleRecords
+            //
+            // Slots
+            //
 
-                text: qsTr("Records")
+            onCloseTasksView: {
+                console.log("QML: on Close Tasks view");
 
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight : Font.Medium
-                    pixelSize : 14
-                }
-            }
-
-            Button {
-                id: btnNewRecord
-
-                text: "New Record"
-
-                onClicked: {
-                    createRecordPopup.open();
-                }
+                // Remove the "Tasks View" from the stack
+                stackview.pop();
             }
         }
-
-
-        Column {
-
-            anchors {
-                top: recordsHeader.bottom
-                topMargin: 20
-                left: parent.left
-                right: parent.right
-            }
-
-            Repeater {
-                model: rootItem.experimentation ? rootItem.experimentation.allRecords : null
-
-                delegate: componentRecord
-            }
-        }
-    }
-
-
-    //
-    // Create Experimentation Popup
-    //
-    Popup.CreateRecordPopup {
-        id: createRecordPopup
-
-        //anchors.centerIn: parent
-
-        controller: rootItem.controller
-        experimentation: rootItem.experimentation
     }
 
 
