@@ -13,7 +13,7 @@
  */
 
 pragma Singleton
-import QtQuick 2.8
+import QtQuick 2.9
 import I2Quick 1.0
 
 

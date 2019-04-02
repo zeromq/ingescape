@@ -12,7 +12,7 @@
  *
  */
 
-import QtQuick 2.8
+import QtQuick 2.9
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 
@@ -27,8 +27,6 @@ import "popup" as Popup
 Item {
 
     id: rootItem
-
-    //anchors.fill: parent
 
 
     //--------------------------------------------------------
@@ -55,7 +53,7 @@ Item {
 
         anchors.fill: parent
 
-        color: "#EEAAAA"
+        color: "#FF663333"
     }
 
     Text {
@@ -63,10 +61,18 @@ Item {
 
         anchors {
             top: parent.top
+            topMargin: 10
             horizontalCenter: parent.horizontalCenter
         }
 
         text: "Experimentations"
+
+        color: IngeScapeTheme.whiteColor
+        font {
+            family: IngeScapeTheme.textFontFamily
+            weight : Font.Medium
+            pixelSize : 20
+        }
     }
 
     Button {
@@ -134,7 +140,7 @@ Item {
             width: parent.width
             height: txtName.height + columnExperimentations.anchors.topMargin + columnExperimentations.height
 
-            color: "#44333333"
+            color: "#44222222"
             border {
                 color: "black"
                 width: 1
@@ -180,7 +186,7 @@ Item {
                         width: parent.width
                         height: 30
 
-                        color: "#443333AA"
+                        color: "#44222222"
                         border {
                             color: "black"
                             width: 1

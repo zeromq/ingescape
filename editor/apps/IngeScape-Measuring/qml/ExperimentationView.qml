@@ -12,7 +12,7 @@
  *
  */
 
-import QtQuick 2.8
+import QtQuick 2.9
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 
@@ -54,8 +54,15 @@ Item {
     //
     //--------------------------------
 
-    //
-    signal goBackToHome();
+    // Go back to "Parent" view
+    signal goBackToParentView();
+
+    // Go to "Subjects" view
+    signal goToSubjectsView();
+
+    // Go to "Tasks" view
+    signal goToTasksView();
+
 
 
     //--------------------------------------------------------
@@ -71,23 +78,24 @@ Item {
 
         anchors.fill: parent
 
-        color: "#AAEEAA"
+        color: "#FF336633"
     }
 
     Button {
-        id: btnHome
+        id: btnGoBack
 
         anchors {
             left: parent.left
             top: parent.top
         }
 
-        text: "HOME"
+        text: "BACK"
 
         onClicked: {
-            console.log("QML: Go back to home");
+            console.log("QML: Go back to 'Parent' view");
 
-            rootItem.goBackToHome();
+            // Emit the signal the "goBackToParentView"
+            rootItem.goBackToParentView();
         }
     }
 
@@ -96,6 +104,7 @@ Item {
 
         anchors {
             top: parent.top
+            topMargin: 10
             horizontalCenter: parent.horizontalCenter
         }
         spacing: 10
@@ -103,30 +112,51 @@ Item {
         Text {
             //id: title
 
-            text: rootItem.experimentation ? rootItem.experimentation.name : ""
-
             anchors {
                 horizontalCenter: parent.horizontalCenter
+            }
+
+            text: rootItem.experimentation ? rootItem.experimentation.name : ""
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 18
             }
         }
 
         Text {
             //id: title
+
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+            }
 
             text: (rootItem.modelManager && rootItem.modelManager.currentExperimentationsGroup) ? rootItem.modelManager.currentExperimentationsGroup.name : ""
 
-            anchors {
-                horizontalCenter: parent.horizontalCenter
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
             }
         }
 
         Text {
             //id: title
 
-            text: rootItem.experimentation ? rootItem.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy hh:mm:ss") : ""
-
             anchors {
                 horizontalCenter: parent.horizontalCenter
+            }
+
+            text: rootItem.experimentation ? rootItem.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy hh:mm:ss") : ""
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
             }
         }
     }
@@ -144,7 +174,7 @@ Item {
 
         width: 250
 
-        color: "#33770000"
+        color: "#44AAAAAA"
 
         Column {
 
@@ -153,7 +183,10 @@ Item {
                 text: "Subjects"
 
                 onClicked: {
-                    console.log("QML: Open Subjects");
+                    console.log("QML: Go to Subjects view");
+
+                    // Emit the signal "goToSubjectsView"
+                    rootItem.goToSubjectsView();
                 }
             }
 
@@ -161,7 +194,10 @@ Item {
                 text: "Tasks"
 
                 onClicked: {
-                    console.log("QML: Open Tasks");
+                    console.log("QML: Go to Tasks view");
+
+                    // Emit the signal "goToTasksView"
+                    rootItem.goToTasksView();
                 }
             }
 
@@ -198,7 +234,7 @@ Item {
             right: parent.right
             bottom: parent.bottom
         }
-        color: "#33000077"
+        color: "#44222222"
 
         Row {
             id: recordsHeader
@@ -209,6 +245,13 @@ Item {
                 id: titleRecords
 
                 text: qsTr("Records")
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 14
+                }
             }
 
             Button {
@@ -268,7 +311,7 @@ Item {
             width: parent.width
             height: 30
 
-            color: "#44333333"
+            color: "#44222222"
             border {
                 color: "black"
                 width: 1

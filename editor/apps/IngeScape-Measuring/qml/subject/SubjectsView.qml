@@ -13,13 +13,15 @@
  */
 
 import QtQuick 2.9
-import QtQuick.Controls 2.2
+import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 
 import I2Quick 1.0
-import QtQuick.Window 2.3
 
 import INGESCAPE 1.0
+
+//import "theme" as Theme
+import "../popup" as Popup
 
 
 Item {
@@ -36,7 +38,22 @@ Item {
     //
     //--------------------------------------------------------
 
-    //property type name: value
+    property SubjectsController controller: null;
+
+    //property IngeScapeModelManager modelManager: null;
+
+
+
+    //--------------------------------
+    //
+    //
+    // Signals
+    //
+    //
+    //--------------------------------
+
+    // Go back to "Parent" view
+    signal goBackToParentView();
 
 
 
@@ -53,7 +70,25 @@ Item {
 
         anchors.fill: parent
 
-        color: "#AAAAEE"
+        color: "#FF333366"
+    }
+
+    Button {
+        id: btnGoBack
+
+        anchors {
+            left: parent.left
+            top: parent.top
+        }
+
+        text: "BACK"
+
+        onClicked: {
+            console.log("QML: Go back to 'Parent' view");
+
+            // Emit the signal "goBackToParentView"
+            rootItem.goBackToParentView();
+        }
     }
 
     Text {
@@ -61,9 +96,17 @@ Item {
 
         anchors {
             top: parent.top
+            topMargin: 10
             horizontalCenter: parent.horizontalCenter
         }
 
         text: "Subjects"
+
+        color: IngeScapeTheme.whiteColor
+        font {
+            family: IngeScapeTheme.textFontFamily
+            weight : Font.Medium
+            pixelSize : 20
+        }
     }
 }
