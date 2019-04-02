@@ -87,6 +87,7 @@ Item {
         text: "New Experimentation"
 
         onClicked: {
+            // Open the popup
             createExperimentationPopup.open();
         }
     }

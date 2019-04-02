@@ -319,6 +319,7 @@ Item {
                         text: "New Record"
 
                         onClicked: {
+                            // Open the popup
                             createRecordPopup.open();
                         }
                     }
@@ -368,8 +369,8 @@ Item {
         Subject.SubjectsView {
             id: subjectsView
 
-            //controller: IngeScapeMeasuringC.experimentationC
-            //modelManager: IngeScapeMeasuringC.modelManager
+            controller: IngeScapeMeasuringC.subjectsC
+            modelManager: IngeScapeMeasuringC.modelManager
 
 
             //
@@ -395,7 +396,7 @@ Item {
         Task.TasksView {
             id: tasksView
 
-            //controller: IngeScapeMeasuringC.experimentationC
+            controller: IngeScapeMeasuringC.tasksC
             //modelManager: IngeScapeMeasuringC.modelManager
 
 

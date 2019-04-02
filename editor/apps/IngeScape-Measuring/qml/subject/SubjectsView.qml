@@ -102,6 +102,8 @@ Item {
             horizontalCenter: parent.horizontalCenter
         }
 
+        spacing: 20
+
         Text {
             id: title
 
@@ -149,6 +151,8 @@ Item {
                 top: parent.top
             }
 
+            spacing: 20
+
             Text {
                 text: "Characteristics"
 
@@ -164,25 +168,38 @@ Item {
                 text: "New Characteristic"
 
                 onClicked: {
-                    console.log("New Characteristic");
+                    // Open the popup
+                    createCharacteristicPopup.open();
                 }
             }
         }
 
         Column {
             anchors {
-                left: parent.left
                 top: characteristicsHeader.bottom
                 topMargin: 20
+                left: parent.left
+                leftMargin: 5
+                right: parent.right
+                rightMargin: 5
             }
 
             Repeater {
                 model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
 
-                delegate: Text {
-                    text: model.name
-                }
+                delegate: Characteristic {
 
+                    modelM: model.QtObject
+
+                    //
+                    // Slots
+                    //
+                    onDeleteCharacteristic: {
+                        if (rootItem.controller) {
+                            rootItem.controller.deleteCharacteristic(model.QtObject);
+                        }
+                    }
+                }
             }
         }
     }
@@ -203,6 +220,18 @@ Item {
 
         color: "#44AAAAAA"
 
+    }
+
+
+    //
+    // Create Characteristic Popup
+    //
+    Popup.CreateCharacteristicPopup {
+        id: createCharacteristicPopup
+
+        //anchors.centerIn: parent
+
+        controller: rootItem.controller
     }
 
 }

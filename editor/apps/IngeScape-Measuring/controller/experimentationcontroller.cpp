@@ -16,6 +16,7 @@
 
 /**
  * @brief Constructor
+ * @param modelManager
  * @param parent
  */
 ExperimentationController::ExperimentationController(IngeScapeModelManager* modelManager,
@@ -61,7 +62,7 @@ void ExperimentationController::createNewRecordForSubjectAndTask(QString recordN
     if (!recordName.isEmpty() && (subject != nullptr) && (task != nullptr)
             && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
     {
-        qDebug() << "Create new record" << recordName << "for subject" << subject->name() << "and task" << task->name();
+        qInfo() << "Create new record" << recordName << "for subject" << subject->name() << "and task" << task->name();
 
         // Create the new record
         RecordM* record = new RecordM(recordName, subject, task, nullptr);

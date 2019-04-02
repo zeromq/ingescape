@@ -42,9 +42,12 @@ I2PopupBase {
     //
     //--------------------------------------------------------
 
-    property ExperimentationsListController controller: null;
+    property SubjectsController controller: null;
 
-    property ExperimentationsGroupVM selectedExperimentationsGroup: null
+    property ExperimentationM experimentation: null;
+
+    //property CharacteristicValueTypes selectedType: null;
+    property int selectedType: -1;
 
 
     //--------------------------------
@@ -69,10 +72,6 @@ I2PopupBase {
 
     onOpened: {
 
-        // By default, select the default group "Other"
-        if (controller) {
-            rootPopup.selectedExperimentationsGroup = controller.defaultGroupOther;
-        }
     }
 
 
@@ -91,9 +90,8 @@ I2PopupBase {
         //console.log("QML: Reset all user inputs and close popup");
 
         // Reset all user inputs
-        txtExperimentationName.text = "";
-        txtNewExperimentationsGroupName.text = "";
-        rootPopup.selectedExperimentationsGroup = null;
+        txtCharacteristicName.text = "";
+        rootPopup.selectedType = -1;
 
         // Close the popup
         rootPopup.close();
@@ -132,7 +130,7 @@ I2PopupBase {
 
             //horizontalAlignment: Text.AlignHCenter
 
-            text: qsTr("New experimentation:")
+            text: qsTr("New characteristic:")
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -166,7 +164,7 @@ I2PopupBase {
             }
 
             TextField {
-                id: txtExperimentationName
+                id: txtCharacteristicName
 
                 height: 30
                 width: 250 // parent.width
@@ -200,7 +198,7 @@ I2PopupBase {
                 //}
 
                 /*onTextChanged: {
-                    console.log("onTextChanged " + txtExperimentationName.text);
+                    console.log("onTextChanged " + txtCharacteristicName.text);
                 }*/
             }
         }
@@ -214,111 +212,54 @@ I2PopupBase {
             }
 
             Text {
-                id: txtGroupsTitle
+                id: txtTypesTitle
 
                 anchors {
                     left: parent.left
                     top: parent.top
                 }
 
-                text: qsTr("Groups:")
+                text: qsTr("Type:")
                 color: "white"
             }
 
             Column {
                 anchors {
                     top: parent.top
-                    left: txtGroupsTitle.right
+                    left: txtTypesTitle.right
                     leftMargin: 10
                     right: parent.right
                 }
                 spacing: 10
 
                 ExclusiveGroup {
-                    id: exclusiveExperimentationsGroup
+                    id: exclusiveGroupTypes
                 }
 
                 Repeater {
-                    model: controller ? controller.allExperimentationsGroups : null
+                    model: controller ? controller.allCharacteristicValueTypes : null
 
                     delegate: RadioButton {
-                        id: radioExperimentationsGroup
+                        id: radioCharacteristicValueType
 
                         text: model.name
 
-                        exclusiveGroup: exclusiveExperimentationsGroup
+                        exclusiveGroup: exclusiveGroupTypes
 
-                        checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
+                        checked: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === model.value))
 
                         onCheckedChanged: {
                             if (checked) {
-                                console.log("Select experimentations group: " + model.name);
+                                console.log("Select Characteristic Value Type: " + model.name + " (" + model.value + ")");
 
-                                rootPopup.selectedExperimentationsGroup = model.QtObject;
+                                rootPopup.selectedType = model.value;
                             }
                         }
 
                         Binding {
-                            target: radioExperimentationsGroup
+                            target: radioCharacteristicValueType
                             property: "checked"
-                            value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
-                        }
-                    }
-                }
-
-                Row {
-
-                    RadioButton {
-                        id: radioNewExperimentationsGroup
-
-                        text: (controller && controller.newGroup) ? controller.newGroup.name
-                                                                  : ""
-
-                        exclusiveGroup: exclusiveExperimentationsGroup
-
-                        checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.newGroup))
-
-                        onCheckedChanged: {
-                            if (checked) {
-                                console.log("Select new experimentations group: ...");
-
-                                rootPopup.selectedExperimentationsGroup = controller.newGroup;
-                            }
-                        }
-
-                        Binding {
-                            target: radioNewExperimentationsGroup
-                            property: "checked"
-                            value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.newGroup))
-                        }
-                    }
-
-                    TextField {
-                        id: txtNewExperimentationsGroupName
-
-                        height: 30
-                        width: 250 // parent.width
-
-                        //verticalAlignment: TextInput.AlignVCenter
-                        text: ""
-
-                        style: I2TextFieldStyle {
-                            backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                            borderColor: IngeScapeTheme.whiteColor
-                            borderErrorColor: IngeScapeTheme.redColor
-                            radiusTextBox: 1
-                            borderWidth: 0;
-                            borderWidthActive: 1
-                            textIdleColor: IngeScapeTheme.whiteColor;
-                            textDisabledColor: IngeScapeTheme.darkGreyColor
-
-                            padding.left: 3
-                            padding.right: 3
-
-                            font {
-                                pixelSize:15
-                                family: IngeScapeTheme.textFontFamily
-                            }
+                            value: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === model.value))
                         }
                     }
                 }
@@ -390,9 +331,10 @@ I2PopupBase {
                 activeFocusOnPress: true
                 text: "OK"
 
-                enabled: ((txtExperimentationName.text.length > 0) && controller && controller.newGroup
+                /*enabled: ((txtCharacteristicName.text.length > 0) && controller && controller.newGroup
                           && ( (rootPopup.selectedExperimentationsGroup !== controller.newGroup)
-                               || controller.canCreateExperimentationsGroupWithName(txtNewExperimentationsGroupName.text) ) )
+                               || controller.canCreateExperimentationsGroupWithName(txtNewExperimentationsGroupName.text) ) )*/
+                enabled: ((txtCharacteristicName.text.length > 0) && (rootPopup.selectedType > -1))
 
                 style: I2SvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
@@ -413,19 +355,21 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    //console.log("QML: create new Experimentation " + txtExperimentationName.text + " in group " + rootPopup.selectedExperimentationsGroup.name);
+                    console.log("QML: create new Characteristic " + txtCharacteristicName.text + " of type " + rootPopup.selectedType);
 
                     if (controller)
                     {
                         // Selected group is the special one to create a new group
-                        if (rootPopup.selectedExperimentationsGroup === controller.newGroup)
+                        if (rootPopup.selectedType === controller.characteristicValueTypeEnum)
                         {
-                            controller.createNewExperimentationInNewGroup(txtExperimentationName.text, txtNewExperimentationsGroupName.text);
+                            // FIXME TODO: ENUM
+                            console.log("ENUM");
+                            //controller.createNewExperimentationInNewGroup(txtCharacteristicName.text, txtNewExperimentationsGroupName.text);
                         }
                         // Selected group already exist
                         else
                         {
-                            controller.createNewExperimentationInGroup(txtExperimentationName.text, rootPopup.selectedExperimentationsGroup);
+                            controller.createNewCharacteristic(txtCharacteristicName.text, rootPopup.selectedType);
                         }
                     }
 

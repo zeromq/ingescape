@@ -14,6 +14,34 @@
 
 #include "measuringenums.h"
 
+/**
+ * @brief Enum "LogTypes" to string
+ * @param value
+ * @return
+ */
+QString CharacteristicValueTypes::enumToString(int value)
+{
+    switch (value)
+    {
+    case CharacteristicValueTypes::UNKNOWN:
+        return tr("Unknown");
+
+    case CharacteristicValueTypes::INTEGER:
+        return tr("Integer");
+
+    case CharacteristicValueTypes::DOUBLE:
+        return tr("Double");
+
+    case CharacteristicValueTypes::TEXT:
+        return tr("Text");
+
+    case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
+        return tr("Enum");
+
+    default:
+        return "";
+    }
+}
 
 
 //--------------------------------------------------------------

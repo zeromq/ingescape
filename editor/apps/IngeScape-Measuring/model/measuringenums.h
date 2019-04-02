@@ -22,13 +22,13 @@
 /**
   * Types of the value for a characteristic
   */
-I2_ENUM(CharacteristicValueTypes, UNKNOWN, TEXT, INTEGER, DOUBLE, CHARACTERISTIC_ENUM)
+I2_ENUM_CUSTOM(CharacteristicValueTypes, UNKNOWN, INTEGER, DOUBLE, TEXT, CHARACTERISTIC_ENUM)
 
 
 /**
   * Types of the value for an independent variable
   */
-I2_ENUM(IndependentVariableValueTypes, UNKNOWN, TEXT, INTEGER, DOUBLE, INDEPENDENT_VARIABLE_ENUM)
+I2_ENUM(IndependentVariableValueTypes, UNKNOWN, INTEGER, DOUBLE, TEXT, INDEPENDENT_VARIABLE_ENUM)
 
 
 // Date date of our application

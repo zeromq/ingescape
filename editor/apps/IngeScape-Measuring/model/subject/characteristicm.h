@@ -49,12 +49,13 @@ public:
 
     /**
      * @brief Constructor
+     * @param name
+     * @param valueType
      * @param parent
      */
-    explicit CharacteristicM(QObject *parent = nullptr);
-
-
-    //CharacteristicM(QString name, CharacteristicValueTypes::Value valueType, QObject *parent = nullptr);
+    explicit CharacteristicM(QString name,
+                             CharacteristicValueTypes::Value valueType,
+                             QObject *parent = nullptr);
 
 
     /**

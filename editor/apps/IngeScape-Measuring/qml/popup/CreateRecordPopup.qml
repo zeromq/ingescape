@@ -72,11 +72,6 @@ I2PopupBase {
 
     onOpened: {
 
-        // By default, select the default group "Other"
-        if (controller) {
-            //rootPopup.selectedExperimentationsGroup = controller.defaultGroupOther;
-        }
-
         /*if (experimentation) {
             console.log(experimentation.name + " with " + experimentation.allSubjects.count + " subjects and " + experimentation.allTasks.count + " tasks");
         }

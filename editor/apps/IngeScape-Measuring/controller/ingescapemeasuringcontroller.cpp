@@ -117,7 +117,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
     _experimentationC = new ExperimentationController(_modelManager, this);
 
     // Create the controller to manage the subjects of the current experimentation
-    _subjectsC = new SubjectsController(this);
+    _subjectsC = new SubjectsController(_modelManager, this);
 
     // Create the controller to manage the tasks of the current experimentation
     _tasksC = new TasksController(this);

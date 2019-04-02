@@ -16,17 +16,21 @@
 
 /**
  * @brief Constructor
+ * @param name
+ * @param valueType
  * @param parent
  */
-CharacteristicM::CharacteristicM(QObject *parent) : QObject(parent),
-    _name(""),
-    _valueType(CharacteristicValueTypes::UNKNOWN),
+CharacteristicM::CharacteristicM(QString name,
+                                 CharacteristicValueTypes::Value valueType,
+                                 QObject *parent) : QObject(parent),
+    _name(name),
+    _valueType(valueType),
     _enumValues(QStringList())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Characteristic" << _name;
+    qInfo() << "New Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType);
 }
 
 
@@ -35,6 +39,6 @@ CharacteristicM::CharacteristicM(QObject *parent) : QObject(parent),
  */
 CharacteristicM::~CharacteristicM()
 {
-    qInfo() << "Delete Model of Characteristic" << _name;
+    qInfo() << "Delete Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType);
 
 }
