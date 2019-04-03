@@ -49,6 +49,8 @@ I2PopupBase {
     //property CharacteristicValueTypes selectedType: null;
     property int selectedType: -1;
 
+    property var enumTexts: [];
+
 
     //--------------------------------
     //
@@ -74,6 +76,22 @@ I2PopupBase {
 
     }
 
+    /*onSelectedTypeChanged: {
+        if (rootPopup.controller && (rootPopup.selectedType > -1))
+        {
+            // ENUM
+            if (rootPopup.selectedType === rootPopup.controller.characteristicValueTypeEnum)
+            {
+
+            }
+            // NOT enum
+            else
+            {
+
+            }
+        }
+    }*/
+
 
     //--------------------------------
     //
@@ -92,6 +110,9 @@ I2PopupBase {
         // Reset all user inputs
         txtCharacteristicName.text = "";
         rootPopup.selectedType = -1;
+        radioExistingEnum.checked = true;
+        spinBoxValuesNumber.value = 2;
+        enumTexts = [];
 
         // Close the popup
         rootPopup.close();
@@ -203,12 +224,14 @@ I2PopupBase {
             }
         }
 
-        Rectangle {
+        Item {
             anchors {
-                left: parent.left
-                leftMargin: 10
                 top: rowName.bottom
                 topMargin: 20
+                left: parent.left
+                leftMargin: 10
+                right: parent.right
+                rightMargin: 10
             }
 
             Text {
@@ -220,16 +243,21 @@ I2PopupBase {
                 }
 
                 text: qsTr("Type:")
+
                 color: "white"
             }
 
             Column {
+                id: columnTypes
+
                 anchors {
                     top: parent.top
                     left: txtTypesTitle.right
                     leftMargin: 10
-                    right: parent.right
+                    //right: parent.right
                 }
+                width: 150
+
                 spacing: 10
 
                 ExclusiveGroup {
@@ -263,6 +291,115 @@ I2PopupBase {
                         }
                     }
                 }
+            }
+
+
+            // FIXME TODO
+            /*Loader {
+                id: loaderEnum
+            }*/
+
+            //
+            // We cannot use a TabView because ids in its sub tree is not known
+            //
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    left: columnTypes.right
+                    right: parent.right
+                }
+                height: 250
+
+                // Selected type is "Enum"
+                visible: (rootPopup.controller && (rootPopup.selectedType > -1) && (rootPopup.selectedType === rootPopup.controller.characteristicValueTypeEnum))
+
+                color: "transparent"
+                border {
+                    color: "white"
+                    width: 1
+                }
+
+                Row {
+                    id: tabs
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 10
+
+                    ExclusiveGroup {
+                        id: tabsExclusiveGroup
+                    }
+
+                    RadioButton {
+                        id: radioExistingEnum
+
+                        text: "Existing Enum"
+
+                        exclusiveGroup: tabsExclusiveGroup
+                    }
+
+                    RadioButton {
+                        id: radioNewEnum
+
+                        text: "New Enum"
+
+                        exclusiveGroup: tabsExclusiveGroup
+                    }
+                }
+
+                Item {
+                    id: contentNewEnum
+
+                    anchors {
+                        top: tabs.bottom
+                        topMargin: 10
+                        left: parent.left
+                        leftMargin: 5
+                    }
+
+                    visible: radioNewEnum.checked
+
+                    Row {
+                        id: headerNewEnum
+
+                        spacing: 10
+
+                        Text {
+                            text: "Number of values:"
+                        }
+
+                        SpinBox {
+                            id: spinBoxValuesNumber
+
+                            value: 2
+                        }
+                    }
+
+                    Column {
+                        anchors {
+                            top: headerNewEnum.bottom
+                            topMargin: 5
+                        }
+
+                        Repeater {
+                            model: spinBoxValuesNumber.value
+
+                            delegate: TextField {
+                                id: enumText
+
+                                width: 200
+
+                                text: rootPopup.enumTexts[index] ? rootPopup.enumTexts[index] : ""
+
+                                onTextChanged: {
+                                    console.log(index + ": text changed to " + enumText.text);
+
+                                    rootPopup.enumTexts[index] = enumText.text;
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
         }
 
@@ -360,16 +497,16 @@ I2PopupBase {
                     if (controller)
                     {
                         // Selected group is the special one to create a new group
-                        if (rootPopup.selectedType === controller.characteristicValueTypeEnum)
+                        if (rootPopup.selectedType === rootPopup.controller.characteristicValueTypeEnum)
                         {
                             // FIXME TODO: ENUM
-                            console.log("ENUM");
-                            //controller.createNewExperimentationInNewGroup(txtCharacteristicName.text, txtNewExperimentationsGroupName.text);
+                            console.log("ENUM (" + spinBoxValuesNumber.value + ") " + rootPopup.enumTexts.slice(0, spinBoxValuesNumber.value));
+                            //rootPopup.controller.createNewExperimentationInNewGroup(txtCharacteristicName.text, txtNewExperimentationsGroupName.text);
                         }
                         // Selected group already exist
                         else
                         {
-                            controller.createNewCharacteristic(txtCharacteristicName.text, rootPopup.selectedType);
+                            rootPopup.controller.createNewCharacteristic(txtCharacteristicName.text, rootPopup.selectedType);
                         }
                     }
 
