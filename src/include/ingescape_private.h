@@ -288,8 +288,10 @@ int token_freeValuesInArguments(igs_tokenArgument_t *arg);
 #define MAX_EXEC_DURATION_DURING_EVAL 300
 #define igs_license(...) igs_log(IGS_LOG_FATAL+1, __func__, __VA_ARGS__)
 extern license_t *license;
+#if !TARGET_OS_IOS
 void license_cleanLicense(void);
 void license_readLicense(void);
+#endif
 
 #ifdef __cplusplus
 }

@@ -146,7 +146,6 @@
 		97A2128D22391A0D00ACCFB0 /* libzyre.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A2128B22391A0D00ACCFB0 /* libzyre.2.dylib */; };
 		97A2128E22391A0D00ACCFB0 /* libczmq.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A2128C22391A0D00ACCFB0 /* libczmq.4.dylib */; };
 		97FAC32B2244C88A0036293B /* yajl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 973D1BB22226916D00D363BF /* yajl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		97FAC32D2247BE920036293B /* license.c in Sources */ = {isa = PBXBuildFile; fileRef = 97FAC32C2247BE920036293B /* license.c */; };
 		97FAC32E2247BE920036293B /* license.c in Sources */ = {isa = PBXBuildFile; fileRef = 97FAC32C2247BE920036293B /* license.c */; };
 /* End PBXBuildFile section */
 
@@ -252,7 +251,7 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = include/sodium;
-			dstSubfolderSpec = 7;
+			dstSubfolderSpec = 16;
 			files = (
 				979A7D5B1EA8A9CB003153EF /* core.h in CopyFiles */,
 				979A7D5C1EA8A9CB003153EF /* crypto_aead_aes256gcm.h in CopyFiles */,
@@ -2723,7 +2722,6 @@
 			files = (
 				979A79A11EA7B112003153EF /* network.c in Sources */,
 				9772A52720BDE42700729D59 /* token.c in Sources */,
-				97FAC32D2247BE920036293B /* license.c in Sources */,
 				979A79A01EA7B112003153EF /* model.c in Sources */,
 				973DC288207A93E6004C1D80 /* bus.c in Sources */,
 				979A799F1EA7B112003153EF /* mapping.c in Sources */,

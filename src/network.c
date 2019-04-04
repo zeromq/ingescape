@@ -925,6 +925,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     zyre_whisper(node, peer, &resp);
                     igs_debug("send parameters values to %s", peer);
                 }else if (strlen("LICENSE_INFO") == strlen(message) && strncmp (message, "LICENSE_INFO", strlen("LICENSE_INFO")) == 0){
+#if !TARGET_OS_IOS
                     zmsg_t *resp = zmsg_new();
                     if (license == NULL){
                         zmsg_addstr(resp, "no license available");
@@ -965,6 +966,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     }
                     zyre_whisper(node, peer, &resp);
                     igs_debug("send license information to %s", peer);
+#endif
                 }else if (strlen("STOP") == strlen(message) && strncmp (message, "STOP", strlen("STOP")) == 0){
                     free(message);
                     forcedStop = true;
@@ -1668,8 +1670,9 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
         agentElements = NULL;
         return 0;
     }
-    
+#if !TARGET_OS_IOS
     license_readLicense();
+#endif
     agentElements->zyrePort = port;
     agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
@@ -1730,8 +1733,9 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
         free(agentElements);
         return 0;
     }
-    
+#if !TARGET_OS_IOS
     license_readLicense();
+#endif
     agentElements->zyrePort = port;
     agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
@@ -1793,8 +1797,9 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
         agentElements = NULL;
         return 0;
     }
-    
+#if !TARGET_OS_IOS
     license_readLicense();
+#endif
     agentElements->zyrePort = 0;
     agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
@@ -1830,7 +1835,9 @@ int igs_stop(){
     }else{
         igs_debug("Agent already stopped");
     }
+#if !TARGET_OS_IOS
     license_cleanLicense();
+#endif
     return 1;
 }
 
