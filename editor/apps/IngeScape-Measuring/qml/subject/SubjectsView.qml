@@ -121,7 +121,11 @@ Item {
             text: "New Subject"
 
             onClicked: {
-                console.log("New Subject");
+                //console.log("QML: New Subject");
+
+                if (rootItem.controller) {
+                    rootItem.controller.createNewSubject();
+                }
             }
         }
     }
@@ -213,6 +217,7 @@ Item {
 
         anchors {
             left: characteristicsPanel.right
+            right: parent.right
             top: header.bottom
             topMargin: 30
             bottom: parent.bottom
@@ -220,6 +225,36 @@ Item {
 
         color: "#44AAAAAA"
 
+
+        TableView {
+            anchors {
+                fill: parent
+                margins: 10
+            }
+
+            TableViewColumn {
+                role: "uid"
+                title: "ID"
+                width: 150
+            }
+
+            TableViewColumn {
+                role: "name"
+                title: "Name"
+                width: 150
+            }
+
+            model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+
+            /*itemDelegate: Item {
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: styleData.textColor
+                    elide: styleData.elideMode
+                    text: styleData.value
+                }
+            }*/
+        }
     }
 
 

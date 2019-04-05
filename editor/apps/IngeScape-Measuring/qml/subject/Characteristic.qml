@@ -127,7 +127,7 @@ Item {
 
         visible: (rootItem.modelM && (rootItem.modelM.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM))
 
-        spacing: 2
+        spacing: 3
 
         Repeater {
             model: rootItem.modelM ? rootItem.modelM.enumValues : null

@@ -26,6 +26,9 @@ class SubjectM : public QObject
 {
     Q_OBJECT
 
+    // Unique ID of our subject
+    I2_QML_PROPERTY(QString, uid)
+
     // Name of our subject
     I2_QML_PROPERTY(QString, name)
 
@@ -50,9 +53,11 @@ public:
 
     /**
      * @brief Constructor
+     * @param uid
      * @param parent
      */
-    explicit SubjectM(QObject *parent = nullptr);
+    explicit SubjectM(QString uid,
+                      QObject *parent = nullptr);
 
 
     /**

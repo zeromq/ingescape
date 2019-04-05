@@ -33,7 +33,7 @@ class SubjectsController : public QObject
     I2_ENUM_LISTMODEL(CharacteristicValueTypes, allCharacteristicValueTypes)
 
     //
-    I2_QML_PROPERTY_READONLY(CharacteristicValueTypes::Value, characteristicValueTypeEnum)
+    //I2_QOBJECT_HASHMODEL(QString, hashFromCharacteristicIdToName)
 
 
 public:
@@ -74,6 +74,12 @@ public:
      * @param characteristic
      */
     Q_INVOKABLE void deleteCharacteristic(CharacteristicM* characteristic);
+
+
+    /**
+     * @brief Create a new subject
+     */
+    Q_INVOKABLE void createNewSubject();
 
 
 Q_SIGNALS:

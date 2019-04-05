@@ -21,7 +21,6 @@
  */
 SubjectsController::SubjectsController(IngeScapeModelManager* modelManager,
                                        QObject *parent) : QObject(parent),
-    _characteristicValueTypeEnum(CharacteristicValueTypes::CHARACTERISTIC_ENUM),
     _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -68,7 +67,7 @@ void SubjectsController::createNewCharacteristic(QString characteristicName, int
     {
         CharacteristicValueTypes::Value characteristicValueType = static_cast<CharacteristicValueTypes::Value>(nCharacteristicValueType);
 
-        qInfo() << "Create new characteristic" << characteristicName << "of type" << CharacteristicValueTypes::staticEnumToString(characteristicValueType);
+        //qInfo() << "Create new characteristic" << characteristicName << "of type" << CharacteristicValueTypes::staticEnumToString(characteristicValueType);
 
         // Create the new characteristic
         CharacteristicM* characteristic = new CharacteristicM(characteristicName, characteristicValueType, nullptr);
@@ -115,5 +114,27 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
 
         // Free memory
         delete characteristic;
+    }
+}
+
+
+/**
+ * @brief Create a new subject
+ */
+void SubjectsController::createNewSubject()
+{
+    if ((_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    {
+        QDateTime now = QDateTime::currentDateTime();
+
+        QString uid = now.toString("S-yyMMdd-hhmmss-zzz");
+
+        // Create a new subject
+        SubjectM* subject = new SubjectM(uid, nullptr);
+
+        QString name = "...";
+        subject->setname(name);
+
+        _modelManager->currentExperimentation()->allSubjects()->append(subject);
     }
 }

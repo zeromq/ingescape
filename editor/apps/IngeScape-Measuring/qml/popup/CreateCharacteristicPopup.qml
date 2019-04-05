@@ -76,21 +76,6 @@ I2PopupBase {
 
     }
 
-    /*onSelectedTypeChanged: {
-        if (rootPopup.controller && (rootPopup.selectedType > -1))
-        {
-            // ENUM
-            if (rootPopup.selectedType === rootPopup.controller.characteristicValueTypeEnum)
-            {
-
-            }
-            // NOT enum
-            else
-            {
-
-            }
-        }
-    }*/
 
 
     //--------------------------------
@@ -311,7 +296,7 @@ I2PopupBase {
                 height: 250
 
                 // Selected type is "Enum"
-                visible: (rootPopup.controller && (rootPopup.selectedType > -1) && (rootPopup.selectedType === rootPopup.controller.characteristicValueTypeEnum))
+                visible: (rootPopup.selectedType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)
 
                 color: "transparent"
                 border {
@@ -504,8 +489,8 @@ I2PopupBase {
 
                     if (controller)
                     {
-                        // Selected group is the special one to create a new group
-                        if (rootPopup.selectedType === rootPopup.controller.characteristicValueTypeEnum)
+                        // Selected type is ENUM
+                        if (rootPopup.selectedType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)
                         {
                             // Use only the N first elements of the array (the array may be longer than the number of displayed TextFields
                             // if the user decreases the value of the spin box after edition the last TextField)
@@ -537,7 +522,7 @@ I2PopupBase {
                                 console.warn("Some values of the enum are empty, edit them !");
                             }
                         }
-                        // Selected group already exist
+                        // Selected type is NOT ENUM
                         else
                         {
                             rootPopup.controller.createNewCharacteristic(txtCharacteristicName.text, rootPopup.selectedType);
