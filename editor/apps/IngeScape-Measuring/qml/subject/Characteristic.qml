@@ -29,7 +29,7 @@ Item {
     //anchors.fill: parent
 
     width: parent.width
-    height: 30
+    height: rowHeader.height + columnEnumValues.anchors.topMargin + columnEnumValues.height
 
 
     //--------------------------------------------------------
@@ -78,14 +78,20 @@ Item {
     }
 
     Row {
-        spacing: 30
+        id: rowHeader
+
+        height: 30
+
+        spacing: 20
 
         anchors {
             left: parent.left
-            verticalCenter: parent.verticalCenter
+            top: parent.top
         }
 
         Text {
+            anchors.verticalCenter: parent.verticalCenter
+
             text: rootItem.modelM ? rootItem.modelM.name : ""
 
             color: IngeScapeTheme.whiteColor
@@ -97,6 +103,8 @@ Item {
         }
 
         Text {
+            anchors.verticalCenter: parent.verticalCenter
+
             text: rootItem.modelM ? CharacteristicValueTypes.enumToString(rootItem.modelM.valueType) : ""
 
             color: IngeScapeTheme.whiteColor
@@ -104,6 +112,35 @@ Item {
                 family: IngeScapeTheme.textFontFamily
                 //weight : Font.Medium
                 pixelSize : 12
+            }
+        }
+    }
+
+    Column {
+        id: columnEnumValues
+
+        anchors {
+            left: parent.left
+            top: rowHeader.bottom
+            topMargin: 5
+        }
+
+        visible: (rootItem.modelM && (rootItem.modelM.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM))
+
+        spacing: 2
+
+        Repeater {
+            model: rootItem.modelM ? rootItem.modelM.enumValues : null
+
+            delegate: Text {
+                text: "- " + modelData
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    //weight : Font.Medium
+                    pixelSize : 12
+                }
             }
         }
     }

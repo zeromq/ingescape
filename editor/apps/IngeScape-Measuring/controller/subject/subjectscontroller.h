@@ -62,6 +62,14 @@ public:
 
 
     /**
+     * @brief Create a new characteristic of type enum
+     * @param characteristicName
+     * @param enumValues
+     */
+    Q_INVOKABLE void createNewCharacteristicEnum(QString characteristicName, QStringList enumValues);
+
+
+    /**
      * @brief Delete a characteristic
      * @param characteristic
      */

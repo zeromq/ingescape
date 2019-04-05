@@ -80,6 +80,28 @@ void SubjectsController::createNewCharacteristic(QString characteristicName, int
 
 
 /**
+ * @brief Create a new characteristic of type enum
+ * @param characteristicName
+ * @param enumValues
+ */
+void SubjectsController::createNewCharacteristicEnum(QString characteristicName, QStringList enumValues)
+{
+    if (!characteristicName.isEmpty() && !enumValues.isEmpty()
+            && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    {
+        qInfo() << "Create new characteristic" << characteristicName << "of type" << CharacteristicValueTypes::staticEnumToString(CharacteristicValueTypes::CHARACTERISTIC_ENUM) << "with values:" << enumValues;
+
+        // Create the new characteristic
+        CharacteristicM* characteristic = new CharacteristicM(characteristicName, CharacteristicValueTypes::CHARACTERISTIC_ENUM, nullptr);
+        characteristic->setenumValues(enumValues);
+
+        // Add the characteristic to the experimentation
+        _modelManager->currentExperimentation()->allCharacteristics()->append(characteristic);
+    }
+}
+
+
+/**
  * @brief Delete a characteristic
  * @param characteristic
  */

@@ -390,9 +390,17 @@ I2PopupBase {
 
                                 text: rootPopup.enumTexts[index] ? rootPopup.enumTexts[index] : ""
 
-                                onTextChanged: {
-                                    console.log(index + ": text changed to " + enumText.text);
+                                Component.onCompleted: {
+                                    // If this index is not defined, initialize it with empty string
+                                    if (typeof rootPopup.enumTexts[index] === 'undefined') {
+                                        rootPopup.enumTexts[index] = "";
+                                    }
+                                }
 
+                                onTextChanged: {
+                                    //console.log(index + ": text changed to " + enumText.text);
+
+                                    // Update the strings array for this index
                                     rootPopup.enumTexts[index] = enumText.text;
                                 }
                             }
@@ -499,19 +507,45 @@ I2PopupBase {
                         // Selected group is the special one to create a new group
                         if (rootPopup.selectedType === rootPopup.controller.characteristicValueTypeEnum)
                         {
-                            // FIXME TODO: ENUM
-                            console.log("ENUM (" + spinBoxValuesNumber.value + ") " + rootPopup.enumTexts.slice(0, spinBoxValuesNumber.value));
-                            //rootPopup.controller.createNewExperimentationInNewGroup(txtCharacteristicName.text, txtNewExperimentationsGroupName.text);
+                            // Use only the N first elements of the array (the array may be longer than the number of displayed TextFields
+                            // if the user decreases the value of the spin box after edition the last TextField)
+                            // Where N = spinBoxValuesNumber.value (the value of the spin box)
+                            var displayedEnumTexts = rootPopup.enumTexts.slice(0, spinBoxValuesNumber.value);
+
+                            var index = 0;
+                            var isEmptyValue = false;
+
+                            displayedEnumTexts.forEach(function(element) {
+                                if (element === "") {
+                                    isEmptyValue = true;
+                                    console.log("value at " + index + " is empty, edit it !");
+                                }
+                                index++;
+                              });
+
+                            console.log("QML: Enum with " + spinBoxValuesNumber.value + " strings: " + displayedEnumTexts);
+
+                            if (isEmptyValue === false)
+                            {
+                                rootPopup.controller.createNewCharacteristicEnum(txtCharacteristicName.text, displayedEnumTexts);
+
+                                // Reset all user inputs and close the popup
+                                rootPopup.resetInputsAndClosePopup();
+                            }
+                            else
+                            {
+                                console.warn("Some values of the enum are empty, edit them !");
+                            }
                         }
                         // Selected group already exist
                         else
                         {
                             rootPopup.controller.createNewCharacteristic(txtCharacteristicName.text, rootPopup.selectedType);
+
+                            // Reset all user inputs and close the popup
+                            rootPopup.resetInputsAndClosePopup();
                         }
                     }
-
-                    // Reset all user inputs and close the popup
-                    rootPopup.resetInputsAndClosePopup();
                 }
             }
         }
