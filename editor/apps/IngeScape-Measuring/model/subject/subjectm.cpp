@@ -24,6 +24,7 @@ SubjectM::SubjectM(QString uid,
                    QObject *parent) : QObject(parent),
     _uid(uid),
     _name("")
+    //_isCurrentlyEditing(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -113,8 +114,70 @@ QString SubjectM::getValueOfCharacteristic(QString characteristicName)
         QVariant characteristicVariant = _mapFromCharacteristicIdToValue.value(characteristicName);
 
         characteristicValue = characteristicVariant.toString();
+
+        qDebug() << "getValueOfCharacteristic" << characteristicName << "-->" << characteristicValue;
     }
 
     return characteristicValue;
+}
+
+
+/**
+ * @brief Set the value of a characteristic
+ * @param characteristicValue
+ * @param characteristic
+ */
+void SubjectM::setValueOfCharacteristic(QString characteristicValue, CharacteristicM* characteristic)
+{
+    if (characteristic != nullptr)
+    {
+        // UNKNOWN, INTEGER, DOUBLE, TEXT, CHARACTERISTIC_ENUM
+        switch (characteristic->valueType())
+        {
+        case CharacteristicValueTypes::INTEGER:
+        {
+            bool success = false;
+            int nValue = characteristicValue.toInt(&success);
+            if (success) {
+                qDebug() << "Set (INTEGER)" << nValue << "in" << characteristic->name() << "of" << _uid;
+                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(nValue));
+            }
+        }
+            break;
+
+        case CharacteristicValueTypes::DOUBLE:
+        {
+            bool success = false;
+            double dValue = characteristicValue.toDouble(&success);
+            if (success) {
+                qDebug() << "Set (DOUBLE)" << dValue << "in" << characteristic->name() << "of" << _uid;
+                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(dValue));
+            }
+        }
+            break;
+
+        case CharacteristicValueTypes::TEXT:
+        {
+            qDebug() << "Set (TEXT)" << characteristicValue << "in" << characteristic->name() << "of" << _uid;
+            _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(characteristicValue));
+        }
+            break;
+
+        case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
+        {
+            if (!characteristic->enumValues().isEmpty() && !characteristicValue.isEmpty()
+                    && characteristic->enumValues().contains(characteristicValue))
+            {
+                qDebug() << "Set (CHARACTERISTIC_ENUM)" << characteristicValue << "in" << characteristic->name() << "of" << _uid;
+                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(characteristicValue));
+            }
+        }
+            break;
+
+        default:
+            qWarning() << "We cannot set the value" << characteristicValue << "of the characteristic" << characteristic->name() << "because the type" <<  characteristic->valueType() << "is wrong !";
+            break;
+        }
+    }
 }
 

@@ -36,11 +36,8 @@ class SubjectM : public QObject
     // Name of our subject
     I2_QML_PROPERTY(QString, name)
 
-    // First name of our subject
-    //I2_QML_PROPERTY(QString, firstName)
-
-    // Last name of our subject
-    //I2_QML_PROPERTY(QString, lastName)
+    // Flag indicating ...
+    //I2_QML_PROPERTY(bool, isCurrentlyEditing)
 
     // Values of the characteristics of our subject
     // Hash table from a (unique) id of characteristic to the characteristic value
@@ -93,6 +90,14 @@ public:
      * @return
      */
     Q_INVOKABLE QString getValueOfCharacteristic(QString characteristicName);
+
+
+    /**
+     * @brief Set the value of a characteristic
+     * @param characteristicValue
+     * @param characteristic
+     */
+    Q_INVOKABLE void setValueOfCharacteristic(QString characteristicValue, CharacteristicM* characteristic);
 
 
 
