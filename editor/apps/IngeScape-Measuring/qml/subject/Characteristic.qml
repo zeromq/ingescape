@@ -169,7 +169,7 @@ Item {
         onClicked: {
             if (rootItem.modelM)
             {
-                console.log("QML: Delete Characteristic " + rootItem.modelM.name);
+                //console.log("QML: Delete Characteristic " + rootItem.modelM.name);
 
                 // Emit the signal "Delete Characteristic"
                 rootItem.deleteCharacteristic();

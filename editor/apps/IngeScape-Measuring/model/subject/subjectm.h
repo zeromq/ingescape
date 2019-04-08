@@ -17,6 +17,10 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
+#include <model/subject/characteristicm.h>
+
+
+static const QString CHARACTERISTIC_UID = "UID";
 
 
 /**
@@ -48,6 +52,9 @@ class SubjectM : public QObject
     //I2_QML_PROPERTY(QList<QObject*>, temp)
     //I2_QML_PROPERTY(QHash<QString, QObject*>, temp)
 
+    // Values of the characteristics of our subject
+    //I2_QML_PROPERTY(QList<QVariant>, characteristicValues)
+
 
 public:
 
@@ -64,6 +71,29 @@ public:
      * @brief Destructor
      */
     ~SubjectM();
+
+
+    /**
+     * @brief Add the characteristic to our experimentation
+     * @param characteristic
+     */
+    void addCharacteristic(CharacteristicM* characteristic);
+
+
+    /**
+     * @brief Remove the characteristic from our experimentation
+     * @param characteristic
+     */
+    void removeCharacteristic(CharacteristicM* characteristic);
+
+
+    /**
+     * @brief Get the value of a characteristic
+     * @param characteristicName
+     * @return
+     */
+    Q_INVOKABLE QString getValueOfCharacteristic(QString characteristicName);
+
 
 
 Q_SIGNALS:

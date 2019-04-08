@@ -30,5 +30,6 @@
         <file>qml/popup/CreateRecordPopup.qml</file>
         <file>qml/popup/CreateCharacteristicPopup.qml</file>
         <file>qml/subject/Characteristic.qml</file>
+        <file>qml/subject/Subject.qml</file>
     </qresource>
 </RCC>

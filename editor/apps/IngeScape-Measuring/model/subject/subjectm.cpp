@@ -14,6 +14,7 @@
 
 #include "subjectm.h"
 
+
 /**
  * @brief Constructor
  * @param uid
@@ -29,8 +30,9 @@ SubjectM::SubjectM(QString uid,
 
     qInfo() << "New Model of Subject" << _uid;
 
-    _mapFromCharacteristicIdToValue.insert("age", QVariant(35));
-    _mapFromCharacteristicIdToValue.insert("type", QVariant("HOMME"));
+    // Add the default characteristic
+    _mapFromCharacteristicIdToValue.insert(CHARACTERISTIC_UID, QVariant(_uid));
+
 }
 
 
@@ -42,3 +44,77 @@ SubjectM::~SubjectM()
     qInfo() << "Delete Model of Subject" << _uid;
 
 }
+
+
+/**
+ * @brief Add the characteristic to our experimentation
+ * @param characteristic
+ */
+void SubjectM::addCharacteristic(CharacteristicM* characteristic)
+{
+    if (characteristic != nullptr)
+    {
+        if (!_mapFromCharacteristicIdToValue.contains(characteristic->name()))
+        {
+            // UNKNOWN, INTEGER, DOUBLE, TEXT, CHARACTERISTIC_ENUM
+            switch (characteristic->valueType())
+            {
+            case CharacteristicValueTypes::INTEGER:
+                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(0));
+                break;
+
+            case CharacteristicValueTypes::DOUBLE:
+                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(0.0));
+                break;
+
+            case CharacteristicValueTypes::TEXT:
+                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(""));
+                break;
+
+            case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
+                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(""));
+                break;
+
+            default:
+                qWarning() << "We cannot add the characteristic" << characteristic->name() << "because the type" <<  characteristic->valueType() << "is wrong !";
+                break;
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Remove the characteristic from our experimentation
+ * @param characteristic
+ */
+void SubjectM::removeCharacteristic(CharacteristicM* characteristic)
+{
+    if (characteristic != nullptr)
+    {
+        if (_mapFromCharacteristicIdToValue.contains(characteristic->name())) {
+            _mapFromCharacteristicIdToValue.remove(characteristic->name());
+        }
+    }
+}
+
+
+/**
+ * @brief Get the value of a characteristic
+ * @param characteristicName
+ * @return
+ */
+QString SubjectM::getValueOfCharacteristic(QString characteristicName)
+{
+    QString characteristicValue = "";
+
+    if (_mapFromCharacteristicIdToValue.contains(characteristicName))
+    {
+        QVariant characteristicVariant = _mapFromCharacteristicIdToValue.value(characteristicName);
+
+        characteristicValue = characteristicVariant.toString();
+    }
+
+    return characteristicValue;
+}
+

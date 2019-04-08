@@ -237,7 +237,12 @@ I2PopupBase {
                     model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
                     function modelToString(_model) {
-                        return _model.name;
+                        if (_model) {
+                            return _model.name;
+                        }
+                        else {
+                            return "";
+                        }
                     }
 
                     /*onSelectedItemChanged: {

@@ -56,6 +56,32 @@ SubjectsController::~SubjectsController()
 
 
 /**
+ * @brief Return true if the user can create a characteristic with the name
+ * Check if the name is not empty and if a characteristic with the same name does not already exist
+ * @param characteristicName
+ * @return
+ */
+bool SubjectsController::canCreateCharacteristicWithName(QString characteristicName)
+{
+    if (!characteristicName.isEmpty()
+            && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    {
+        for (CharacteristicM* characteristic : _modelManager->currentExperimentation()->allCharacteristics()->toList())
+        {
+            if ((characteristic != nullptr) && (characteristic->name() == characteristicName))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
  * @brief Create a new characteristic
  * @param characteristicName
  * @param nCharacteristicValueType
@@ -73,7 +99,10 @@ void SubjectsController::createNewCharacteristic(QString characteristicName, int
         CharacteristicM* characteristic = new CharacteristicM(characteristicName, characteristicValueType, nullptr);
 
         // Add the characteristic to the experimentation
-        _modelManager->currentExperimentation()->allCharacteristics()->append(characteristic);
+        //_modelManager->currentExperimentation()->allCharacteristics()->append(characteristic);
+
+        // Add the characteristic to the experimentation
+        _modelManager->currentExperimentation()->addCharacteristic(characteristic);
     }
 }
 
@@ -95,7 +124,10 @@ void SubjectsController::createNewCharacteristicEnum(QString characteristicName,
         characteristic->setenumValues(enumValues);
 
         // Add the characteristic to the experimentation
-        _modelManager->currentExperimentation()->allCharacteristics()->append(characteristic);
+        //_modelManager->currentExperimentation()->allCharacteristics()->append(characteristic);
+
+        // Add the characteristic to the experimentation
+        _modelManager->currentExperimentation()->addCharacteristic(characteristic);
     }
 }
 
@@ -110,7 +142,10 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
             && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
     {
         // Remove from the experimentation
-        _modelManager->currentExperimentation()->allCharacteristics()->remove(characteristic);
+        //_modelManager->currentExperimentation()->allCharacteristics()->remove(characteristic);
+
+        // Remove the characteristic from the experimentation
+        _modelManager->currentExperimentation()->removeCharacteristic(characteristic);
 
         // Free memory
         delete characteristic;
@@ -132,9 +167,38 @@ void SubjectsController::createNewSubject()
         // Create a new subject
         SubjectM* subject = new SubjectM(uid, nullptr);
 
-        QString name = "...";
-        subject->setname(name);
+        // FIXME: subject name usefull ?
+        //QString name = "...";
+        //subject->setname(name);
+
+        // For each existing characteristic
+        for (CharacteristicM* characteristic : _modelManager->currentExperimentation()->allCharacteristics()->toList())
+        {
+            // Check that it is not the UID that have already been added
+            if ((characteristic != nullptr) && (characteristic->name() != CHARACTERISTIC_UID))
+            {
+                subject->addCharacteristic(characteristic);
+            }
+        }
 
         _modelManager->currentExperimentation()->allSubjects()->append(subject);
+    }
+}
+
+
+/**
+ * @brief Delete a subject
+ * @param subject
+ */
+void SubjectsController::deleteSubject(SubjectM* subject)
+{
+    if ((subject != nullptr)
+            && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    {
+        // Remove from the experimentation
+        _modelManager->currentExperimentation()->allSubjects()->remove(subject);
+
+        // Free memory
+        delete subject;
     }
 }

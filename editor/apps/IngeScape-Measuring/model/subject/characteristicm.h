@@ -19,6 +19,7 @@
 #include <I2PropertyHelpers.h>
 #include <model/measuringenums.h>
 
+
 /**
  * @brief The CharacteristicM class defines a model of characteristic
  */

@@ -461,10 +461,8 @@ I2PopupBase {
                 activeFocusOnPress: true
                 text: "OK"
 
-                /*enabled: ((txtCharacteristicName.text.length > 0) && controller && controller.newGroup
-                          && ( (rootPopup.selectedExperimentationsGroup !== controller.newGroup)
-                               || controller.canCreateExperimentationsGroupWithName(txtNewExperimentationsGroupName.text) ) )*/
-                enabled: ((txtCharacteristicName.text.length > 0) && (rootPopup.selectedType > -1))
+                enabled: ((txtCharacteristicName.text.length > 0) && (rootPopup.selectedType > -1)
+                          && controller && controller.canCreateCharacteristicWithName(txtCharacteristicName.text) )
 
                 style: I2SvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE

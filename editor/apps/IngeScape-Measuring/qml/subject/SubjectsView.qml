@@ -226,13 +226,14 @@ Item {
         color: "#44AAAAAA"
 
 
-        TableView {
+
+        /*TableView {
             anchors {
                 fill: parent
                 margins: 10
             }
 
-            TableViewColumn {
+            /*TableViewColumn {
                 role: "uid"
                 title: "ID"
                 width: 150
@@ -246,14 +247,91 @@ Item {
 
             model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
-            /*itemDelegate: Item {
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: styleData.textColor
-                    elide: styleData.elideMode
-                    text: styleData.value
+        }*/
+
+        Rectangle {
+            id: tableHeader
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+            }
+            height: 30
+
+            color: "#88222222"
+            border {
+                color: "black"
+                width: 1
+            }
+
+            Row {
+                anchors.fill: parent
+
+                spacing: 0
+
+                Repeater {
+                    model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
+
+                    delegate: Rectangle {
+                        id: headerColumn
+
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+                        width: 150
+
+                        color: "transparent"
+                        border {
+                            color: "black"
+                            width: 1
+                        }
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            text: model.name
+
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight : Font.Medium
+                                pixelSize : 12
+                            }
+                        }
+                    }
                 }
-            }*/
+            }
+        }
+
+        Column {
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: tableHeader.bottom
+                bottom: parent.bottom
+            }
+
+            Repeater {
+                model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+
+                delegate: Subject {
+
+                    modelM: model.QtObject
+                    allCharacteristics: rootItem.experimentation.allCharacteristics
+
+
+                    //
+                    // Slots
+                    //
+                    onDeleteSubject: {
+                        if (rootItem.controller) {
+                            rootItem.controller.deleteSubject(model.QtObject);
+                        }
+                    }
+                }
+            }
         }
     }
 

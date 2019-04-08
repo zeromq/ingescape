@@ -32,9 +32,6 @@ class SubjectsController : public QObject
     // List of all types for characteristic value
     I2_ENUM_LISTMODEL(CharacteristicValueTypes, allCharacteristicValueTypes)
 
-    //
-    //I2_QOBJECT_HASHMODEL(QString, hashFromCharacteristicIdToName)
-
 
 public:
 
@@ -51,6 +48,15 @@ public:
      * @brief Destructor
      */
     ~SubjectsController();
+
+
+    /**
+     * @brief Return true if the user can create a characteristic with the name
+     * Check if the name is not empty and if a characteristic with the same name does not already exist
+     * @param characteristicName
+     * @return
+     */
+    Q_INVOKABLE bool canCreateCharacteristicWithName(QString characteristicName);
 
 
     /**
@@ -80,6 +86,13 @@ public:
      * @brief Create a new subject
      */
     Q_INVOKABLE void createNewSubject();
+
+
+    /**
+     * @brief Delete a subject
+     * @param subject
+     */
+    Q_INVOKABLE void deleteSubject(SubjectM* subject);
 
 
 Q_SIGNALS:

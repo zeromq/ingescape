@@ -69,6 +69,21 @@ public:
     ~ExperimentationM();
 
 
+    /**
+     * @brief Add the characteristic to our experimentation
+     * @param characteristic
+     */
+    void addCharacteristic(CharacteristicM* characteristic);
+
+
+    /**
+     * @brief Remove the characteristic from our experimentation
+     * @param characteristic
+     */
+    void removeCharacteristic(CharacteristicM* characteristic);
+
+
+
 Q_SIGNALS:
 
 

@@ -36,6 +36,11 @@ ExperimentationM::ExperimentationM(QString name,
     _allRecords.setSortProperty("startDateTime");
 
 
+    // Default characteristic "UID"
+    CharacteristicM* characteristicUID = new CharacteristicM(CHARACTERISTIC_UID, CharacteristicValueTypes::TEXT, this);
+    _allCharacteristics.append(characteristicUID);
+
+
     //
     // FIXME for tests
     //
@@ -58,5 +63,51 @@ ExperimentationM::~ExperimentationM()
 {
     qInfo() << "Delete Model of Experimentation" << _name;
 
+}
+
+
+/**
+ * @brief Add the characteristic to our experimentation
+ * @param characteristic
+ */
+void ExperimentationM::addCharacteristic(CharacteristicM* characteristic)
+{
+    if (characteristic != nullptr)
+    {
+        // Add to the list
+        _allCharacteristics.append(characteristic);
+
+        // Add this characteristic for all existing subjects
+        for (SubjectM* subject : _allSubjects)
+        {
+            if (subject != nullptr)
+            {
+                subject->addCharacteristic(characteristic);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Remove the characteristic from our experimentation
+ * @param characteristic
+ */
+void ExperimentationM::removeCharacteristic(CharacteristicM* characteristic)
+{
+    if (characteristic != nullptr)
+    {
+        // Remove from the list
+        _allCharacteristics.remove(characteristic);
+
+        // Remove this characteristic for all existing subjects
+        for (SubjectM* subject : _allSubjects)
+        {
+            if (subject != nullptr)
+            {
+                subject->removeCharacteristic(characteristic);
+            }
+        }
+    }
 }
 
