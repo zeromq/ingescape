@@ -1,5 +1,5 @@
 /*
- *	IngeScape Measuring
+ *	IngeScape Assessments
  *
  *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setOrganizationName("Ingenuity i/o");
     app.setOrganizationDomain("ingenuity.io");
-    app.setApplicationName("IngeScape-Measuring");
+    app.setApplicationName("IngeScape-Assessments");
     app.setApplicationVersion("0.1.0.0");
 
     // - behavior when our last window is closed
@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
         //
         //------------------------------
 
-        QString logFilePath = QString("%1log-IngeScape-Measuring.csv").arg(rootDirectoryPath);
+        QString logFilePath = QString("%1log-IngeScape-Assessments.csv").arg(rootDirectoryPath);
 
         // Set the log level from which logs are printed in the console
         //igs_setLogLevel(IGS_LOG_DEBUG);
@@ -274,13 +274,13 @@ int main(int argc, char *argv[])
 
         // Get (and create if needed) the settings path of our application ([DocumentsLocation]/IngeScape/Settings/)
         QString settingsDirectoryPath = IngeScapeUtils::getSettingsPath();
-        QString settingsFilePath = QString("%1IngeScape-Measuring.ini").arg(settingsDirectoryPath);
+        QString settingsFilePath = QString("%1IngeScape-Assessments.ini").arg(settingsDirectoryPath);
 
         QFile settingsFile(settingsFilePath);
         if (!settingsFile.exists())
         {
             // Copy our .ini file
-            if (QFile::copy(":/settings/IngeScape-Measuring.ini", settingsFilePath))
+            if (QFile::copy(":/settings/IngeScape-Assessments.ini", settingsFilePath))
             {
                 // Update permissions for our .ini file
                 QFileDevice::Permissions filePermissions =  QFileDevice::ReadUser | QFileDevice::WriteUser | QFileDevice::ReadGroup | QFileDevice::WriteGroup;

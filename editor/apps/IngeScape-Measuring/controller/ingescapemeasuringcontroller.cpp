@@ -1,5 +1,5 @@
 /*
- *	IngeScape Measuring
+ *	IngeScape Assessments
  *
  *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
@@ -104,7 +104,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
     // Create sub-controllers
     //
 
-    // Create the manager for the data model of our IngeScape measuring application
+    // Create the manager for the data model of our IngeScape Assessments application
     _modelManager = new IngeScapeModelManager(this);
 
     // Create the controller for network communications

@@ -259,7 +259,7 @@ win32 {
     # Set application info
     QMAKE_TARGET_COMPANY = Ingenuity i/o
     QMAKE_TARGET_PRODUCT = $${TARGET}
-    QMAKE_TARGET_DESCRIPTION = IngeScape-Measuring
+    QMAKE_TARGET_DESCRIPTION = IngeScape-Assessments
     QMAKE_TARGET_COPYRIGHT = Copyright (c) 2019, Ingenuity i/o
 }
 

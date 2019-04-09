@@ -1,5 +1,5 @@
 /*
- *	IngeScape Measuring
+ *	IngeScape Assessments
  *
  *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
@@ -103,7 +103,7 @@ Item {
         spacing: 20
 
 
-        // Label: IngeScape Measuring
+        // Label: IngeScape Assessments
         Row {
 
             Text {
@@ -142,7 +142,7 @@ Item {
                     bottomMargin: 8
                 }
 
-                text: qsTr("MEASURING")
+                text: qsTr("ASSESSMENTS")
 
                 font {
                     family: IngeScapeTheme.loadingFontFamily

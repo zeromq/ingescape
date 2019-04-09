@@ -24,7 +24,7 @@
 /**
   * Types of IngeScape elements on the network
   */
-I2_ENUM(IngeScapeTypes, UNKNOWN, AGENT, LAUNCHER, RECORDER, EDITOR, MEASURING)
+I2_ENUM(IngeScapeTypes, UNKNOWN, AGENT, LAUNCHER, RECORDER, EDITOR, ASSESSMENTS)
 
 
 /**

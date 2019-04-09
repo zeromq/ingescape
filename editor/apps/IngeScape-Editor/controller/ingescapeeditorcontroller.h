@@ -65,7 +65,7 @@ class IngeScapeEditorController : public QObject
     // Snapshot Directory
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 
-    // Manager for the data model of our INGESCAPE editor
+    // Manager for the data model of our IngeScape editor
     I2_QML_PROPERTY_READONLY(IngeScapeModelManager*, modelManager)
 
     // Controller for agents supervision

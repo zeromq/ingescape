@@ -1,5 +1,5 @@
 /*
- *	IngeScape Measuring
+ *	IngeScape Assessments
  *
  *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
@@ -33,7 +33,7 @@
 
 
 /**
- * @brief The IngeScapeModelManager class defines the manager for the data model of our IngeScape measuring application
+ * @brief The IngeScapeModelManager class defines the manager for the data model of our IngeScape Assessments application
  */
 class IngeScapeModelManager : public QObject
 {

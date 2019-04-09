@@ -1,5 +1,5 @@
 /*
- *	IngeScape Measuring
+ *	IngeScape Assessments
  *
  *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
@@ -105,7 +105,7 @@ public Q_SLOTS:
 
 private:
 
-    // Manager for the data model of our IngeScape measuring application
+    // Manager for the data model of our IngeScape Assessments application
     IngeScapeModelManager* _modelManager;
 
 };

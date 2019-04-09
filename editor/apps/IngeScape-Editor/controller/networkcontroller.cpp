@@ -97,7 +97,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             bool isIngeScapeLauncher = false;
             bool isIngeScapeRecorder = false;
             bool isIngeScapePlayer = false;
-            //bool isIngeScapeMeasuring = false;
+            //bool isIngeScapeAssessments = false;
             QString hostname = "";
             bool canBeFrozen = false;
             QString commandLine = "";

@@ -1,5 +1,5 @@
 /*
- *	IngeScape Measuring
+ *	IngeScape Assessments
  *
  *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
@@ -43,7 +43,7 @@ ApplicationWindow {
     minimumWidth: IngeScapeTheme.appMinWidth
     minimumHeight: IngeScapeTheme.appMinHeight
 
-    title: qsTr("IngeScape Measuring - v%1").arg(Qt.application.version)
+    title: qsTr("IngeScape Assessments (for ergonomics and human factors) - v%1").arg(Qt.application.version)
 
     color: IngeScapeTheme.windowBackgroundColor
 
@@ -107,7 +107,7 @@ ApplicationWindow {
                 shortcut: StandardKey.AddTab
 
                 onTriggered: {
-                    I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "IngeScape-Measuring");
+                    I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "IngeScape-Assessments");
                 }
             }
         }

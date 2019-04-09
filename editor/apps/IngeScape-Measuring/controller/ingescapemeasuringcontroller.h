@@ -1,5 +1,5 @@
 /*
- *	IngeScape Measuring
+ *	IngeScape Assessments
  *
  *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
@@ -55,7 +55,7 @@ class IngeScapeMeasuringController : public QObject
     // Snapshot Directory
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 
-    // Manager for the data model of our IngeScape measuring application
+    // Manager for the data model of our IngeScape Assessments application
     I2_QML_PROPERTY_READONLY(IngeScapeModelManager*, modelManager)
 
     // Controller for network communication

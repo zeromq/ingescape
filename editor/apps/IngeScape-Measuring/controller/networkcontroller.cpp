@@ -1,5 +1,5 @@
 /*
- *	IngeScape Measuring
+ *	IngeScape Assessments
  *
  *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
@@ -69,7 +69,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             bool isIngeScapeLauncher = false;
             bool isIngeScapeRecorder = false;
             bool isIngeScapePlayer = false;
-            //bool isIngeScapeMeasuring = false;
+            //bool isIngeScapeAssessments = false;
             QString hostname = "";
             bool canBeFrozen = false;
             QString commandLine = "";
@@ -271,14 +271,14 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
  * @param parent
  */
 NetworkController::NetworkController(QObject *parent) : QObject(parent),
-    _measuringAgentName(""),
+    _assessmentsAgentName(""),
     _isIngeScapeAgentStarted(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Init the name of our IngeScape agent with the application name
-    _measuringAgentName = QApplication::instance()->applicationName();
+    _assessmentsAgentName = QApplication::instance()->applicationName();
     QString organizationName = QApplication::instance()->organizationName();
     QString version = QApplication::instance()->applicationVersion();
 
@@ -286,10 +286,10 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     igs_setVerbose(true);
 
     // Set the name of our agent
-    igs_setAgentName(_measuringAgentName.toStdString().c_str());
+    igs_setAgentName(_assessmentsAgentName.toStdString().c_str());
 
-    // Add  header to declare ourselves as a measuring
-    //igs_busAddServiceDescription("isMeasuring", "1");
+    // Add  header to declare ourselves as assessments
+    //igs_busAddServiceDescription("isAssessments", "1");
 
     //
     // Create our internal definition
@@ -297,8 +297,8 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     // Set definition and mapping by default to editor
     QString definitionByDefault = "{  \
                                   \"definition\": {  \
-                                  \"name\": \""+ _measuringAgentName + "\",   \
-                                  \"description\": \"Definition of " + _measuringAgentName + " made by "+ organizationName +"\",  \
+                                  \"name\": \""+ _assessmentsAgentName + "\",   \
+                                  \"description\": \"Definition of " + _assessmentsAgentName + " made by "+ organizationName +"\",  \
                                   \"version\": \"" + version + "\",  \
                                   \"parameters\": [],   \
                                   \"inputs\": [],       \
@@ -311,8 +311,8 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     //
     QString mappingByDefault = "{      \
                                   \"mapping\": {    \
-                                  \"name\": \"" + _measuringAgentName + "\",   \
-                                  \"description\": \"Mapping of " + _measuringAgentName + " made by "+ organizationName + "\",  \
+                                  \"name\": \"" + _assessmentsAgentName + "\",   \
+                                  \"description\": \"Mapping of " + _assessmentsAgentName + " made by "+ organizationName + "\",  \
                                   \"version\": \"" + version + "\",  \
                                   \"mapping_out\": [],   \
                                   \"mapping_cat\": [] }}";
@@ -362,7 +362,7 @@ bool NetworkController::start(QString networkDevice, QString ipAddress, int port
 
         if (_isIngeScapeAgentStarted == 1)
         {
-            qInfo() << "IngeScape Agent" << _measuringAgentName << "started";
+            qInfo() << "IngeScape Agent" << _assessmentsAgentName << "started";
         }
         else {
             qCritical() << "The network has NOT been initialized on" << networkDevice << "or" << ipAddress << "and port" << QString::number(port);

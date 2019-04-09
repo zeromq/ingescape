@@ -1,5 +1,5 @@
 /*
- *	IngeScape Measuring
+ *	IngeScape Assessments
  *
  *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
@@ -74,8 +74,8 @@ public Q_SLOTS:
 
 private:
 
-    // Name of our agent "IngeScape Measuring"
-    QString _measuringAgentName;
+    // Name of our agent "IngeScape Assessments"
+    QString _assessmentsAgentName;
 
     // Our IngeScape agent is successfully started if the result of igs_startWithDevice / igs_startWithIP is 1 (O otherwise)
     int _isIngeScapeAgentStarted;
