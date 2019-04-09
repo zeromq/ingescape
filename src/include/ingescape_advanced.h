@@ -96,18 +96,18 @@ typedef struct igs_tokenArgument{
 //Example:
 // igs_tokenArgument_t *list = NULL;
 // igs_addIntToArgumentsList(&list, 10);
-void igs_addIntToArgumentsList(igs_tokenArgument_t **list, int value);
-void igs_addBoolToArgumentsList(igs_tokenArgument_t **list, bool value);
-void igs_addDoubleToArgumentsList(igs_tokenArgument_t **list, double value);
-void igs_addStringToArgumentsList(igs_tokenArgument_t **list, const char *value);
-void igs_addDataToArgumentsList(igs_tokenArgument_t **list, void *value, size_t size);
-void igs_destroyArgumentsList(igs_tokenArgument_t **list);
-igs_tokenArgument_t *igs_cloneArgumentsList(igs_tokenArgument_t *list);
+PUBLIC void igs_addIntToArgumentsList(igs_tokenArgument_t **list, int value);
+PUBLIC void igs_addBoolToArgumentsList(igs_tokenArgument_t **list, bool value);
+PUBLIC void igs_addDoubleToArgumentsList(igs_tokenArgument_t **list, double value);
+PUBLIC void igs_addStringToArgumentsList(igs_tokenArgument_t **list, const char *value);
+PUBLIC void igs_addDataToArgumentsList(igs_tokenArgument_t **list, void *value, size_t size);
+PUBLIC void igs_destroyArgumentsList(igs_tokenArgument_t **list);
+PUBLIC igs_tokenArgument_t *igs_cloneArgumentsList(igs_tokenArgument_t *list);
 
 //send a token to another agent
 //requires to pass agent name or UUID, token name and a list of arguments
 //passed arguments list will be deallocated and destroyed
-int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenArgument_t **list);
+PUBLIC int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenArgument_t **list);
 
 
 //CREATE TOKENS for our agent
