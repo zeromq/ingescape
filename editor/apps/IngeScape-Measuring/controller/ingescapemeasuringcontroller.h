@@ -34,7 +34,7 @@
 
 
 /**
- * @brief The IngeScapeMeasuringController class defines the main controller of the IngeScape measuring application
+ * @brief The IngeScapeMeasuringController class defines the main controller of the IngeScape Assessments application
  */
 class IngeScapeMeasuringController : public QObject
 {

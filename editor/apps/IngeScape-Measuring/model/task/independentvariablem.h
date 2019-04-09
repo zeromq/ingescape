@@ -17,7 +17,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <model/measuringenums.h>
+#include <model/assessmentsenums.h>
 
 
 /**

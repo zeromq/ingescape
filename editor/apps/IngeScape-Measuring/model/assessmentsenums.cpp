@@ -12,7 +12,7 @@
  *
  */
 
-#include "measuringenums.h"
+#include "assessmentsenums.h"
 
 /**
  * @brief Enum "LogTypes" to string
@@ -54,7 +54,7 @@ QString CharacteristicValueTypes::enumToString(int value)
  * @brief Constructor
  * @param parent
  */
-MeasuringEnums::MeasuringEnums(QObject *parent) : QObject(parent)
+AssessmentsEnums::AssessmentsEnums(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

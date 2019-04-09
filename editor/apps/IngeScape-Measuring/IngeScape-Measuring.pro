@@ -38,6 +38,7 @@ SOURCES += main.cpp \
     controller/ingescapemeasuringcontroller.cpp \
     controller/networkcontroller.cpp \
     controller/ingescapemodelmanager.cpp \
+    model/assessmentsenums.cpp \
     model/subject/subjectm.cpp \
     model/subject/characteristicm.cpp \
     model/subject/characteristicenumm.cpp \
@@ -46,7 +47,6 @@ SOURCES += main.cpp \
     model/task/independentvariablem.cpp \
     model/task/independentvariableenumm.cpp \
     model/task/dependentvariablem.cpp \
-    model/measuringenums.cpp \
     model/recordm.cpp \
     controller/experimentationslistcontroller.cpp \
     controller/subject/subjectscontroller.cpp \
@@ -57,6 +57,7 @@ SOURCES += main.cpp \
 
 
 HEADERS += \
+    model/assessmentsenums.h \
     stable.h \
     controller/ingescapemeasuringcontroller.h \
     controller/networkcontroller.h \
@@ -69,7 +70,6 @@ HEADERS += \
     model/task/independentvariablem.h \
     model/task/independentvariableenumm.h \
     model/task/dependentvariablem.h \
-    model/measuringenums.h \
     model/recordm.h \
     controller/experimentationslistcontroller.h \
     controller/subject/subjectscontroller.h \

@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef MEASURINGENUMS_H
-#define MEASURINGENUMS_H
+#ifndef ASSESSMENTSENUMS_H
+#define ASSESSMENTSENUMS_H
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
@@ -75,9 +75,9 @@ static const QDate APPLICATION_START_DATE = QDate::currentDate();
 
 
 /**
- * @brief The MeasuringEnums class is a helper for enumerations and constants specific to the "Measuring" application
+ * @brief The AssessmentsEnums class is a helper for enumerations and constants specific to the "Measuring" application
  */
-class MeasuringEnums : public QObject
+class AssessmentsEnums : public QObject
 {
     Q_OBJECT
 
@@ -88,11 +88,11 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit MeasuringEnums(QObject *parent = nullptr);
+    explicit AssessmentsEnums(QObject *parent = nullptr);
 
 
 };
 
-QML_DECLARE_TYPE(MeasuringEnums)
+QML_DECLARE_TYPE(AssessmentsEnums)
 
-#endif // MEASURINGENUMS_H
+#endif // ASSESSMENTSENUMS_H
