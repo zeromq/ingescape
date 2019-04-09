@@ -369,8 +369,8 @@ Item {
         Subject.SubjectsView {
             id: subjectsView
 
-            controller: IngeScapeMeasuringC.subjectsC
-            modelManager: IngeScapeMeasuringC.modelManager
+            controller: IngeScapeAssessmentsC.subjectsC
+            modelManager: IngeScapeAssessmentsC.modelManager
 
 
             //
@@ -396,8 +396,8 @@ Item {
         Task.TasksView {
             id: tasksView
 
-            controller: IngeScapeMeasuringC.tasksC
-            //modelManager: IngeScapeMeasuringC.modelManager
+            controller: IngeScapeAssessmentsC.tasksC
+            //modelManager: IngeScapeAssessmentsC.modelManager
 
 
             //

@@ -57,13 +57,13 @@ Item {
     //--------------------------------------------------------
 
     Connections {
-        target: IngeScapeMeasuringC.modelManager
+        target: IngeScapeAssessmentsC.modelManager
 
         onCurrentExperimentationChanged: {
 
-            if (IngeScapeMeasuringC.modelManager.currentExperimentation)
+            if (IngeScapeAssessmentsC.modelManager.currentExperimentation)
             {
-                //console.log("QML: on Current Experimentation changed: " + IngeScapeMeasuringC.modelManager.currentExperimentation.name);
+                //console.log("QML: on Current Experimentation changed: " + IngeScapeAssessmentsC.modelManager.currentExperimentation.name);
 
                 // Add the "Experimentation View" to the stack
                 stackview.push(componentExperimentationView);
@@ -135,7 +135,7 @@ Item {
         ExperimentationsListView {
             id: experimentationsListView
 
-            controller: IngeScapeMeasuringC.experimentationsListC
+            controller: IngeScapeAssessmentsC.experimentationsListC
         }
     }
 
@@ -149,8 +149,8 @@ Item {
         ExperimentationView {
             id: experimentationView
 
-            controller: IngeScapeMeasuringC.experimentationC
-            modelManager: IngeScapeMeasuringC.modelManager
+            controller: IngeScapeAssessmentsC.experimentationC
+            modelManager: IngeScapeAssessmentsC.modelManager
 
 
             //
@@ -164,10 +164,10 @@ Item {
                 stackview.pop();
 
                 // Reset the current experimentation
-                if (IngeScapeMeasuringC.modelManager)
+                if (IngeScapeAssessmentsC.modelManager)
                 {
-                    IngeScapeMeasuringC.modelManager.currentExperimentation = null;
-                    IngeScapeMeasuringC.modelManager.currentExperimentationsGroup = null;
+                    IngeScapeAssessmentsC.modelManager.currentExperimentation = null;
+                    IngeScapeAssessmentsC.modelManager.currentExperimentationsGroup = null;
                 }
             }
         }

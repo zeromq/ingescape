@@ -75,7 +75,7 @@ static const QDate APPLICATION_START_DATE = QDate::currentDate();
 
 
 /**
- * @brief The AssessmentsEnums class is a helper for enumerations and constants specific to the "Measuring" application
+ * @brief The AssessmentsEnums class is a helper for enumerations and constants specific to the "Assessments" application
  */
 class AssessmentsEnums : public QObject
 {

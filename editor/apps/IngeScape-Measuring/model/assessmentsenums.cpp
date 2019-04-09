@@ -46,7 +46,7 @@ QString CharacteristicValueTypes::enumToString(int value)
 
 //--------------------------------------------------------------
 //
-//  Measuring Enums
+//  Assessments Enums
 //
 //--------------------------------------------------------------
 

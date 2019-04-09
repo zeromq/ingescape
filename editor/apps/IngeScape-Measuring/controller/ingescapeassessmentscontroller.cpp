@@ -12,7 +12,7 @@
  *
  */
 
-#include "ingescapemeasuringcontroller.h"
+#include "ingescapeassessmentscontroller.h"
 
 #include <QApplication>
 
@@ -24,7 +24,7 @@
  * @brief Constructor
  * @param parent
  */
-IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QObject(parent),
+IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) : QObject(parent),
     _networkDevice(""),
     _ipAddress(""),
     _port(0),
@@ -42,7 +42,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
   //_platformDirectoryPath(""),
   //_platformDefaultFilePath("")
 {
-    qInfo() << "New IngeScape Measuring Controller";
+    qInfo() << "New IngeScape Assessments Controller";
 
     //
     // Snapshots directory
@@ -180,7 +180,7 @@ IngeScapeMeasuringController::IngeScapeMeasuringController(QObject *parent) : QO
 /**
 * @brief Destructor
 */
-IngeScapeMeasuringController::~IngeScapeMeasuringController()
+IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
 {
     //
     // Clean-up our TerminationSignalWatcher first
@@ -274,7 +274,7 @@ IngeScapeMeasuringController::~IngeScapeMeasuringController()
       _jsonHelper = nullptr;
   }*/
 
-    qInfo() << "Delete IngeScape Measuring Controller";
+    qInfo() << "Delete IngeScape Assessments Controller";
 }
 
 
@@ -284,21 +284,21 @@ IngeScapeMeasuringController::~IngeScapeMeasuringController()
 * @param scriptEngine
 * @return
 */
-QObject* IngeScapeMeasuringController::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
+QObject* IngeScapeAssessmentsController::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
 {
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
     // NOTE: A QObject singleton type instance returned from a singleton type provider is owned by the QML engine.
     // For this reason, the singleton type provider function should not be implemented as a singleton factory.
-    return new IngeScapeMeasuringController();
+    return new IngeScapeAssessmentsController();
 }
 
 
 /**
  * @brief Actions to perform before the application closing
  */
-void IngeScapeMeasuringController::processBeforeClosing()
+void IngeScapeAssessmentsController::processBeforeClosing()
 {
     // TODO...
 }
@@ -307,7 +307,7 @@ void IngeScapeMeasuringController::processBeforeClosing()
 /**
  * @brief Method used to force the creation of our singleton from QML
  */
-void IngeScapeMeasuringController::forceCreation()
+void IngeScapeAssessmentsController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
 }

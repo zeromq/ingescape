@@ -22,7 +22,7 @@
 
 #include <I2Quick.h>
 
-#include <controller/ingescapemeasuringcontroller.h>
+#include <controller/ingescapeassessmentscontroller.h>
 
 //
 // IngeScape Common
@@ -115,7 +115,7 @@ void registerCustomQmlTypes()
     //
     //----------------
     // Singleton used as primary access point to our controllers
-    qmlRegisterSingletonType<IngeScapeMeasuringController>("INGESCAPE", 1, 0, "IngeScapeMeasuringC", &IngeScapeMeasuringController::qmlSingleton);
+    qmlRegisterSingletonType<IngeScapeAssessmentsController>("INGESCAPE", 1, 0, "IngeScapeAssessmentsC", &IngeScapeAssessmentsController::qmlSingleton);
 
     // sub-controllers
     qmlRegisterUncreatableType<ExperimentationController>("INGESCAPE", 1, 0, "ExperimentationController", "Internal Class");

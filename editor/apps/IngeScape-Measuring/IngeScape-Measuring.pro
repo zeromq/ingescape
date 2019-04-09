@@ -35,7 +35,7 @@ RCC_DIR = tmp
 
 
 SOURCES += main.cpp \
-    controller/ingescapemeasuringcontroller.cpp \
+    controller/ingescapeassessmentscontroller.cpp \
     controller/networkcontroller.cpp \
     controller/ingescapemodelmanager.cpp \
     model/assessmentsenums.cpp \
@@ -57,9 +57,9 @@ SOURCES += main.cpp \
 
 
 HEADERS += \
+    controller/ingescapeassessmentscontroller.h \
     model/assessmentsenums.h \
     stable.h \
-    controller/ingescapemeasuringcontroller.h \
     controller/networkcontroller.h \
     controller/ingescapemodelmanager.h \
     model/subject/subjectm.h \

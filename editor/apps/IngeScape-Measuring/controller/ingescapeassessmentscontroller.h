@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef INGESCAPEMEASURINGCONTROLLER_H
-#define INGESCAPEMEASURINGCONTROLLER_H
+#ifndef INGESCAPEASSESSMENTSCONTROLLER_H
+#define INGESCAPEASSESSMENTSCONTROLLER_H
 
 #include <QObject>
 #include <QtQml>
@@ -34,9 +34,9 @@
 
 
 /**
- * @brief The IngeScapeMeasuringController class defines the main controller of the IngeScape Assessments application
+ * @brief The IngeScapeAssessmentsController class defines the main controller of the IngeScape Assessments application
  */
-class IngeScapeMeasuringController : public QObject
+class IngeScapeAssessmentsController : public QObject
 {
     Q_OBJECT
 
@@ -82,13 +82,13 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit IngeScapeMeasuringController(QObject *parent = nullptr);
+    explicit IngeScapeAssessmentsController(QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~IngeScapeMeasuringController();
+    ~IngeScapeAssessmentsController();
 
 
     /**
@@ -128,6 +128,6 @@ private:
 
 };
 
-QML_DECLARE_TYPE(IngeScapeMeasuringController)
+QML_DECLARE_TYPE(IngeScapeAssessmentsController)
 
-#endif // INGESCAPEMEASURINGCONTROLLER_H
+#endif // INGESCAPEASSESSMENTSCONTROLLER_H

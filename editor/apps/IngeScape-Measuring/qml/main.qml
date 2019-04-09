@@ -66,7 +66,7 @@ ApplicationWindow {
                 shortcut: StandardKey.New
 
                 onTriggered: {
-                    IngeScapeMeasuringC.clearCurrentPlatform();
+                    IngeScapeAssessmentsC.clearCurrentPlatform();
                 }
             }
 
@@ -75,7 +75,7 @@ ApplicationWindow {
                 shortcut: StandardKey.Open
 
                 onTriggered: {
-                    IngeScapeMeasuringC.loadPlatformFromSelectedFile();
+                    IngeScapeAssessmentsC.loadPlatformFromSelectedFile();
                 }
             }
 
@@ -84,7 +84,7 @@ ApplicationWindow {
                 shortcut: StandardKey.Save
 
                 onTriggered: {
-                    IngeScapeMeasuringC.savePlatformToSelectedFile();
+                    IngeScapeAssessmentsC.savePlatformToSelectedFile();
                 }
             }*/
 
@@ -130,7 +130,7 @@ ApplicationWindow {
 
             Instantiator {
                 id: subWindowsInstantiator
-                model: 0 // IngeScapeMeasuringC.openedWindows
+                model: 0 // IngeScapeAssessmentsC.openedWindows
 
                 MenuItem {
                     text: model.QtObject.title
@@ -170,7 +170,7 @@ ApplicationWindow {
     // When user clicks on window close button
     onClosing: {
         console.info("QML: Close Window");
-        IngeScapeMeasuringC.processBeforeClosing();
+        IngeScapeAssessmentsC.processBeforeClosing();
     }
 
 
@@ -250,8 +250,8 @@ ApplicationWindow {
 
             /*onVisibleChanged: {
                 if (visible) {
-                    if (IngeScapeMeasuringC.agentsMappingC) {
-                        IngeScapeMeasuringC.agentsMappingC.fitToView();
+                    if (IngeScapeAssessmentsC.agentsMappingC) {
+                        IngeScapeAssessmentsC.agentsMappingC.fitToView();
                     }
                 }
             }*/
@@ -267,22 +267,22 @@ ApplicationWindow {
 
             onStopped: {
                 // Init controller
-                IngeScapeMeasuringC.forceCreation();
+                IngeScapeAssessmentsC.forceCreation();
 
                 // Set the directory used to store snasphots of our application
-                I2SnapshotHelper.directory = IngeScapeMeasuringC.snapshotDirectory;
+                I2SnapshotHelper.directory = IngeScapeAssessmentsC.snapshotDirectory;
 
                 // Binding to display our application loader
                 applicationLoader.visible = Qt.binding(function() {
-                    return ((applicationLoader.status === Loader.Ready) && (IngeScapeMeasuringC.modelManager !== null));
+                    return ((applicationLoader.status === Loader.Ready) && (IngeScapeAssessmentsC.modelManager !== null));
                 });
 
                 /*subWindowsInstantiator.model = Qt.binding(function() {
-                    return IngeScapeMeasuringC.openedWindows;
+                    return IngeScapeAssessmentsC.openedWindows;
                 });*/
 
                 // Load our QML UI
-                applicationLoader.source = "IngeScapeMeasuring.qml";
+                applicationLoader.source = "IngeScapeAssessments.qml";
             }
         }
 

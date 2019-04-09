@@ -2,7 +2,7 @@
     <qresource prefix="/">
         <file>qml/main.qml</file>
         <file>settings/IngeScape-Assessments.ini</file>
-        <file>qml/IngeScapeMeasuring.qml</file>
+        <file>qml/IngeScapeAssessments.qml</file>
         <file>qml/theme/IngeScapeTheme.qml</file>
         <file>qml/LoadingScreen.qml</file>
         <file>resources/fonts/akrobat/Akrobat-Black.ttf</file>
