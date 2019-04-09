@@ -162,20 +162,17 @@ void SubjectsController::createNewSubject()
     {
         QDateTime now = QDateTime::currentDateTime();
 
-        QString uid = now.toString("S-yyMMdd-hhmmss-zzz");
+        QString subjectUID = now.toString("S-yyMMdd-hhmmss-zzz");
+        QString subjectName = "...";
 
         // Create a new subject
-        SubjectM* subject = new SubjectM(uid, nullptr);
-
-        // FIXME: subject name usefull ?
-        //QString name = "...";
-        //subject->setname(name);
+        SubjectM* subject = new SubjectM(subjectUID, subjectName, nullptr);
 
         // For each existing characteristic
         for (CharacteristicM* characteristic : _modelManager->currentExperimentation()->allCharacteristics()->toList())
         {
-            // Check that it is not the UID that have already been added
-            if ((characteristic != nullptr) && (characteristic->name() != CHARACTERISTIC_UID))
+            // Do not add the characteristic "UID" and "Name" that have already been added
+            if ((characteristic != nullptr) && (characteristic->name() != CHARACTERISTIC_UID) && (characteristic->name() != CHARACTERISTIC_NAME))
             {
                 subject->addCharacteristic(characteristic);
             }

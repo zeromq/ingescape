@@ -18,21 +18,26 @@
 /**
  * @brief Constructor
  * @param uid
+ * @param name
  * @param parent
  */
 SubjectM::SubjectM(QString uid,
+                   QString name,
                    QObject *parent) : QObject(parent),
     _uid(uid),
-    _name("")
+    _name(name)
     //_isCurrentlyEditing(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Subject" << _uid;
+    qInfo() << "New Model of Subject" << _name << "(" << _uid << ")";
 
-    // Add the default characteristic
+    // Add the default characteristic "UID"
     _mapFromCharacteristicIdToValue.insert(CHARACTERISTIC_UID, QVariant(_uid));
+
+    // Add the default characteristic "Name"
+    _mapFromCharacteristicIdToValue.insert(CHARACTERISTIC_NAME, QVariant(_name));
 
 }
 
@@ -42,7 +47,7 @@ SubjectM::SubjectM(QString uid,
  */
 SubjectM::~SubjectM()
 {
-    qInfo() << "Delete Model of Subject" << _uid;
+    qInfo() << "Delete Model of Subject" << _name << "(" << _uid << ")";
 
 }
 

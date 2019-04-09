@@ -49,6 +49,8 @@ I2PopupBase {
     //property SubjectM selectedSubject: null
     //property TaskM selectedTask: null
 
+    property date currentDate: new Date();
+
 
     //--------------------------------
     //
@@ -71,6 +73,8 @@ I2PopupBase {
     //--------------------------------
 
     onOpened: {
+
+        rootPopup.currentDate = new Date();
 
         /*if (experimentation) {
             console.log(experimentation.name + " with " + experimentation.allSubjects.count + " subjects and " + experimentation.allTasks.count + " tasks");
@@ -96,7 +100,7 @@ I2PopupBase {
         console.log("QML: Reset all user inputs and close popup");
 
         // Reset all user inputs
-        txtRecordName.text = "";
+        //txtRecordName.text = "";
         comboSubjects.selectedIndex = -1;
         comboTasks.selectedIndex = -1;
 
@@ -164,6 +168,8 @@ I2PopupBase {
 
                 Text {
                     text: qsTr("Name:")
+
+                    width: 150
                     height: 30
 
                     color: IngeScapeTheme.whiteColor
@@ -174,11 +180,11 @@ I2PopupBase {
                     }
                 }
 
-                TextField {
+                /*TextField {
                     id: txtRecordName
 
                     height: 30
-                    width: 250 // parent.width
+                    width: 250
 
                     //verticalAlignment: TextInput.AlignVCenter
                     text: ""
@@ -201,16 +207,36 @@ I2PopupBase {
                             family: IngeScapeTheme.textFontFamily
                         }
                     }
+                }*/
 
-                    //Binding {
-                    //    target: txtLogFilePath
-                    //    property: "text"
-                    //    value: rootItem.agent.logFilePath
-                    //}
+                Text {
+                    id: txtRecordName
 
-                    /*onTextChanged: {
-                    console.log("onTextChanged " + txtRecordName.text);
-                    }*/
+                    // the subject and the task are defined
+                    text: if (comboSubjects.selectedItem && comboTasks.selectedItem) {
+                              String("Record-%1-%2-%3").arg(comboSubjects.selectedItem.name).arg(comboTasks.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+                          }
+                    // Only the subject is defined
+                          else if (comboSubjects.selectedItem) {
+                              String("Record-%1-???-%2").arg(comboSubjects.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+                          }
+                    // Only the task is defined
+                          else if (comboTasks.selectedItem) {
+                              String("Record-???-%1-%2").arg(comboTasks.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+                          }
+                          else {
+                              String("Record-???-???-%1").arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+                          }
+
+                    width: 250
+                    height: 30
+
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
                 }
             }
 
@@ -221,6 +247,8 @@ I2PopupBase {
 
                 Text {
                     text: qsTr("Subject:")
+
+                    width: 150
                     height: 30
 
                     color: IngeScapeTheme.whiteColor
@@ -259,6 +287,8 @@ I2PopupBase {
 
                 Text {
                     text: qsTr("Task:")
+
+                    width: 150
                     height: 30
 
                     color: IngeScapeTheme.whiteColor
@@ -275,7 +305,12 @@ I2PopupBase {
                     model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
 
                     function modelToString(_model) {
-                        return _model.name;
+                        if (_model) {
+                            return _model.name;
+                        }
+                        else {
+                            return "";
+                        }
                     }
 
                     /*onSelectedItemChanged: {
@@ -352,8 +387,8 @@ I2PopupBase {
                 activeFocusOnPress: true
                 text: "OK"
 
-                // FIXME TODO: canCreateRecordWithName(txtRecordName.text)
-                enabled: (txtRecordName.text.length > 0) && (comboSubjects.selectedItem !== null) && (comboTasks.selectedItem !== null)
+                //enabled: (txtRecordName.text.length > 0) && (comboSubjects.selectedItem !== null) && (comboTasks.selectedItem !== null)
+                enabled: (txtRecordName.text.length > 0) && (typeof comboSubjects.selectedItem !== 'undefined') && (typeof comboTasks.selectedItem !== 'undefined')
 
                 style: I2SvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
@@ -376,7 +411,7 @@ I2PopupBase {
                 onClicked: {
                     //console.log("QML: create new Record " + txtRecordName.text);
 
-                    if (controller)
+                    if (controller && comboSubjects.selectedItem && comboTasks.selectedItem)
                     {
                         controller.createNewRecordForSubjectAndTask(txtRecordName.text, comboSubjects.selectedItem, comboTasks.selectedItem);
                     }

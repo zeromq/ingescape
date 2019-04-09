@@ -40,6 +40,10 @@ ExperimentationM::ExperimentationM(QString name,
     CharacteristicM* characteristicUID = new CharacteristicM(CHARACTERISTIC_UID, CharacteristicValueTypes::TEXT, this);
     _allCharacteristics.append(characteristicUID);
 
+    // Default characteristic "UID"
+    CharacteristicM* characteristicName = new CharacteristicM(CHARACTERISTIC_NAME, CharacteristicValueTypes::TEXT, this);
+    _allCharacteristics.append(characteristicName);
+
 
     //
     // FIXME for tests

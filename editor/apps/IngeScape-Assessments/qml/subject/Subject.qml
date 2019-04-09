@@ -29,7 +29,7 @@ Item {
     //anchors.fill: parent
 
     width: parent.width
-    height: 25
+    height: 30
 
 
     //--------------------------------------------------------
@@ -232,14 +232,14 @@ Item {
 
     Row {
         anchors {
-            top: parent.top
-            bottom: parent.bottom
             right: parent.right
         }
-        //height: parent.height
+        height: parent.height
 
         Button {
             id: btnEdit
+
+            height: parent.height
 
             checkable: true
 
@@ -270,6 +270,8 @@ Item {
 
         Button {
             id: btnDelete
+
+            height: parent.height
 
             text: "Delete"
 

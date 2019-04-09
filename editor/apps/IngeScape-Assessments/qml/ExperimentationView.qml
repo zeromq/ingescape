@@ -338,7 +338,29 @@ Item {
                     Repeater {
                         model: rootItem.experimentation ? rootItem.experimentation.allRecords : null
 
-                        delegate: componentRecord
+                        delegate: Record {
+
+                            modelM: model.QtObject
+
+                            //
+                            // Slots
+                            //
+                            onOpenRecord: {
+                                if (rootItem.controller && modelM) {
+                                    //console.log("QML: onOpenRecord " + modelM.name);
+
+                                    rootItem.controller.openRecord(modelM);
+                                }
+                            }
+
+                            onDeleteRecord: {
+                                if (rootItem.controller && modelM) {
+                                    //console.log("QML: onDeleteRecord " + modelM.name);
+
+                                    rootItem.controller.deleteRecord(modelM);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -409,132 +431,6 @@ Item {
 
                 // Remove the "Tasks View" from the stack
                 stackview.pop();
-            }
-        }
-    }
-
-
-    //
-    // Component for "Record (Model)"
-    //
-    Component {
-        id: componentRecord
-
-        Rectangle {
-            id: rootRecord
-
-            property RecordM record: model.QtObject
-
-            width: parent.width
-            height: 30
-
-            color: "#44222222"
-            border {
-                color: "black"
-                width: 1
-            }
-
-            Row {
-                spacing: 30
-
-                anchors {
-                    left: parent.left
-                    verticalCenter: parent.verticalCenter
-                }
-
-                Text {
-                    text: rootRecord.record ? rootRecord.record.name : ""
-
-                    color: IngeScapeTheme.whiteColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 12
-                    }
-                }
-
-                Text {
-                    /*text: rootRecord.record ? rootRecord.record.startDateTime.toLocaleString(Qt.locale(), "dd/MM/yyyy hh:mm:ss")
-                                            : "../../.... ..:..:.."*/
-                    text: "../../.... ..:..:.."
-
-                    color: IngeScapeTheme.whiteColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 12
-                    }
-                }
-
-                Text {
-                    /*text: rootRecord.record ? rootRecord.record.duration.toLocaleString(Qt.locale(), "hh:mm:ss.zzz")
-                                            : "00:00:00.000"*/
-                    text: "00:00:00.000"
-
-                    color: IngeScapeTheme.whiteColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 12
-                    }
-                }
-            }
-
-            /*MouseArea {
-                id: mouseAreaRecord
-
-                anchors.fill: parent
-
-                hoverEnabled: true
-            }*/
-
-            Row {
-                spacing: 20
-
-                anchors {
-                    right: parent.right
-                }
-                height: parent.height
-
-                //visible: mouseAreaRecord.containsMouse
-
-                Button {
-                    id: btnOpen
-
-                    text: "Open"
-
-                    width: 100
-                    height: parent.height
-
-                    onClicked: {
-                        if (rootRecord.record && rootItem.controller)
-                        {
-                            console.log("QML: Open " + rootRecord.record.name);
-
-                            // Open the record
-                            rootItem.controller.openRecord(rootRecord.record);
-                        }
-                    }
-                }
-
-                Button {
-                    id: btnDelete
-
-                    text: "Delete"
-
-                    width: 100
-                    height: parent.height
-
-                    onClicked: {
-                        if (rootRecord.record && rootItem.controller)
-                        {
-                            console.log("QML: Delete " + rootRecord.record.name);
-
-                            // Delete the record
-                            rootItem.controller.deleteRecord(rootRecord.record);
-                        }
-                    }
-                }
             }
         }
     }

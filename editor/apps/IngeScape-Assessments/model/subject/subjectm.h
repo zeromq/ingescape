@@ -21,6 +21,7 @@
 
 
 static const QString CHARACTERISTIC_UID = "UID";
+static const QString CHARACTERISTIC_NAME = "Name";
 
 
 /**
@@ -30,7 +31,7 @@ class SubjectM : public QObject
 {
     Q_OBJECT
 
-    // Unique ID of our subject
+    // Unique identifier of our subject
     I2_QML_PROPERTY(QString, uid)
 
     // Name of our subject
@@ -58,9 +59,11 @@ public:
     /**
      * @brief Constructor
      * @param uid
+     * @param name
      * @param parent
      */
     explicit SubjectM(QString uid,
+                      QString name = "",
                       QObject *parent = nullptr);
 
 

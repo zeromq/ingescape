@@ -30,6 +30,9 @@ class RecordM : public QObject
 {
     Q_OBJECT
 
+    // Unique identifier of our record
+    I2_QML_PROPERTY(QString, uid)
+
     // Name of our record
     I2_QML_PROPERTY(QString, name)
 
@@ -67,14 +70,18 @@ public:
 
     /**
      * @brief Constructor
+     * @param uid
      * @param name
      * @param subject
      * @param task
+     * @param startDateTime
      * @param parent
      */
-    explicit RecordM(QString name,
-                     SubjectM* subject = nullptr,
-                     TaskM* task = nullptr,
+    explicit RecordM(QString uid,
+                     QString name,
+                     SubjectM* subject,
+                     TaskM* task,
+                     QDateTime startDateTime,
                      QObject *parent = nullptr);
 
 
