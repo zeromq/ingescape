@@ -56,7 +56,6 @@ ApplicationWindow {
 
     menuBar: MenuBar {
 
-        // Platform
         Menu {
             id: menuToRename
             title: qsTr("TO RENAME")
@@ -112,6 +111,76 @@ ApplicationWindow {
             }
         }
 
+        // Visualize mode
+        Menu {
+            title: qsTr("I2QuickInspector")
+
+            ExclusiveGroup {
+                id: visualizeGroup
+            }
+
+            MenuItem {
+                id: visualizeNormal
+
+                text: qsTr("Normal rendering")
+                checkable: true
+                checked: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      //I2QuickInspector.currentWindowRenderingMode = I2WindowRenderingMode.Normal;
+                }
+            }
+
+            MenuItem {
+                id: visualizeClipping
+
+                text: qsTr("Visualize clipping")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      //I2QuickInspector.currentWindowRenderingMode = I2WindowRenderingMode.VisualizeClipping;
+                }
+            }
+
+            MenuItem {
+                id: visualizeBatches
+
+                text: qsTr("Visualize batches")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                     //I2QuickInspector.currentWindowRenderingMode = I2WindowRenderingMode.VisualizeBatches;
+                }
+            }
+
+            MenuItem {
+                id: visualizeOverdraw
+
+                text: qsTr("Visualize overdraw")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      //I2QuickInspector.currentWindowRenderingMode = I2WindowRenderingMode.VisualizeOverdraw;
+                }
+            }
+
+            MenuItem {
+                id: visualizeChanges
+
+                text: qsTr("Visualize changes")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      //I2QuickInspector.currentWindowRenderingMode = I2WindowRenderingMode.VisualizeChanges;
+                }
+            }
+        }
+
 
         // Windows
         /*Menu {
@@ -132,7 +201,7 @@ ApplicationWindow {
                 id: subWindowsInstantiator
                 model: 0 // IngeScapeAssessmentsC.openedWindows
 
-                MenuItem {
+                delegate: MenuItem {
                     text: model.QtObject.title
 
                     onTriggered: {
@@ -163,6 +232,8 @@ ApplicationWindow {
     //----------------------------------
 
     Component.onCompleted: {
+        //I2QuickInspector.currentWindow = mainWindow;
+
         // Start our loader delay animation when our initial content is ready
         loaderDelayAnimation.start();
     }

@@ -56,7 +56,7 @@ Item {
     //--------------------------------
 
     // Delete Subject
-    signal deleteSubject();
+    //signal deleteSubject();
 
 
 
@@ -150,8 +150,10 @@ Item {
 
                         visible: !rootItem.isCurrentlyEditing
 
-                        text: (rootItem.modelM && valueColumn.characteristic) ? rootItem.modelM.getValueOfCharacteristic(valueColumn.characteristic.name)
-                                                                              : ""
+                        //text: (rootItem.modelM && valueColumn.characteristic) ? rootItem.modelM.getValueOfCharacteristic(valueColumn.characteristic.name)
+                        //                                                      : ""
+
+                        text: "FIXME"
 
                         color: IngeScapeTheme.whiteColor
                         font {
@@ -161,7 +163,7 @@ Item {
                         }
                     }
 
-                    TextField {
+                    /*TextField {
                         id: txtEditor
 
                         anchors {
@@ -201,10 +203,10 @@ Item {
                                 rootItem.modelM.setValueOfCharacteristic(txtEditor.text, valueColumn.characteristic);
                             }
                         }
-                    }
+                    }*/
 
                     // FIXME: use a Loader instead of visible
-                    I2ComboboxStringList {
+                    /*I2ComboboxStringList {
                         id: cmbEditor
 
                         anchors {
@@ -224,7 +226,7 @@ Item {
                                 rootItem.modelM.setValueOfCharacteristic(cmbEditor.selectedItem, valueColumn.characteristic);
                             }
                         }
-                    }
+                    }*/
                 }
             }
         }
@@ -268,7 +270,7 @@ Item {
             }
         }
 
-        Button {
+        /*Button {
             id: btnDelete
 
             height: parent.height
@@ -286,7 +288,7 @@ Item {
                     rootItem.deleteSubject();
                 }
             }
-        }
+        }*/
     }
 
 }

@@ -32,5 +32,6 @@
         <file>qml/subject/Characteristic.qml</file>
         <file>qml/subject/Subject.qml</file>
         <file>qml/Record.qml</file>
+        <file>qml/subject/CharacteristicValueEditor.qml</file>
     </qresource>
 </RCC>

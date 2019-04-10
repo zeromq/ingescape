@@ -22,23 +22,22 @@
  * @param parent
  */
 SubjectM::SubjectM(QString uid,
-                   QString name,
+                   //QString name,
                    QObject *parent) : QObject(parent),
     _uid(uid),
-    _name(name)
-    //_isCurrentlyEditing(false)
+    _name(""), //_name(name),
+    _propertyMap(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New Model of Subject" << _name << "(" << _uid << ")";
 
-    // Add the default characteristic "UID"
-    _mapFromCharacteristicIdToValue.insert(CHARACTERISTIC_UID, QVariant(_uid));
+    // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
+    _propertyMap = new QQmlPropertyMap(this);
 
-    // Add the default characteristic "Name"
-    _mapFromCharacteristicIdToValue.insert(CHARACTERISTIC_NAME, QVariant(_name));
-
+    // Connect to signal "Value Changed" fro the "Qml Property Map"
+    connect(_propertyMap, &QQmlPropertyMap::valueChanged, this, &SubjectM::_onCharacteristicValueChanged);
 }
 
 
@@ -49,6 +48,19 @@ SubjectM::~SubjectM()
 {
     qInfo() << "Delete Model of Subject" << _name << "(" << _uid << ")";
 
+    // Free memory
+    if (_propertyMap != nullptr)
+    {
+        /*// Clear each value
+        for (QString key : _propertyMap->keys())
+        {
+            _propertyMap->clear(key);
+        }*/
+
+        QQmlPropertyMap* temp = _propertyMap;
+        setpropertyMap(nullptr);
+        delete temp;
+    }
 }
 
 
@@ -58,33 +70,35 @@ SubjectM::~SubjectM()
  */
 void SubjectM::addCharacteristic(CharacteristicM* characteristic)
 {
-    if (characteristic != nullptr)
+    if ((characteristic != nullptr) && (_propertyMap != nullptr))
     {
-        if (!_mapFromCharacteristicIdToValue.contains(characteristic->name()))
+        // It is not possible to remove keys from the map;
+        // once a key has been added, you can only modify or clear its associated value
+        // --> Do not test if the map contains this key
+        //if (!_propertyMap->contains(characteristic->name()))
+
+        // UNKNOWN, INTEGER, DOUBLE, TEXT, CHARACTERISTIC_ENUM
+        switch (characteristic->valueType())
         {
-            // UNKNOWN, INTEGER, DOUBLE, TEXT, CHARACTERISTIC_ENUM
-            switch (characteristic->valueType())
-            {
-            case CharacteristicValueTypes::INTEGER:
-                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(0));
-                break;
+        case CharacteristicValueTypes::INTEGER:
+            _propertyMap->insert(characteristic->name(), QVariant(0));
+            break;
 
-            case CharacteristicValueTypes::DOUBLE:
-                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(0.0));
-                break;
+        case CharacteristicValueTypes::DOUBLE:
+            _propertyMap->insert(characteristic->name(), QVariant(0.0));
+            break;
 
-            case CharacteristicValueTypes::TEXT:
-                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(""));
-                break;
+        case CharacteristicValueTypes::TEXT:
+            _propertyMap->insert(characteristic->name(), QVariant(""));
+            break;
 
-            case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(""));
-                break;
+        case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
+            _propertyMap->insert(characteristic->name(), QVariant("..."));
+            break;
 
-            default:
-                qWarning() << "We cannot add the characteristic" << characteristic->name() << "because the type" <<  characteristic->valueType() << "is wrong !";
-                break;
-            }
+        default:
+            qWarning() << "We cannot add the characteristic" << characteristic->name() << "because the type" <<  characteristic->valueType() << "is wrong !";
+            break;
         }
     }
 }
@@ -96,93 +110,26 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
  */
 void SubjectM::removeCharacteristic(CharacteristicM* characteristic)
 {
-    if (characteristic != nullptr)
+    if ((characteristic != nullptr) && (_propertyMap != nullptr))
     {
-        if (_mapFromCharacteristicIdToValue.contains(characteristic->name())) {
-            _mapFromCharacteristicIdToValue.remove(characteristic->name());
-        }
+        // Clears the value (if any) associated with key
+        _propertyMap->clear(characteristic->name());
     }
 }
 
 
 /**
- * @brief Get the value of a characteristic
- * @param characteristicName
- * @return
+ * @brief Slot called when the value of a characteristic changed
+ * @param key
+ * @param value
  */
-QString SubjectM::getValueOfCharacteristic(QString characteristicName)
+void SubjectM::_onCharacteristicValueChanged(const QString &key, const QVariant &value)
 {
-    QString characteristicValue = "";
+    qDebug() << key << "-->" << value.toString();
 
-    if (_mapFromCharacteristicIdToValue.contains(characteristicName))
+    if (key == CHARACTERISTIC_NAME)
     {
-        QVariant characteristicVariant = _mapFromCharacteristicIdToValue.value(characteristicName);
-
-        characteristicValue = characteristicVariant.toString();
-
-        qDebug() << "getValueOfCharacteristic" << characteristicName << "-->" << characteristicValue;
-    }
-
-    return characteristicValue;
-}
-
-
-/**
- * @brief Set the value of a characteristic
- * @param characteristicValue
- * @param characteristic
- */
-void SubjectM::setValueOfCharacteristic(QString characteristicValue, CharacteristicM* characteristic)
-{
-    if (characteristic != nullptr)
-    {
-        // UNKNOWN, INTEGER, DOUBLE, TEXT, CHARACTERISTIC_ENUM
-        switch (characteristic->valueType())
-        {
-        case CharacteristicValueTypes::INTEGER:
-        {
-            bool success = false;
-            int nValue = characteristicValue.toInt(&success);
-            if (success) {
-                qDebug() << "Set (INTEGER)" << nValue << "in" << characteristic->name() << "of" << _uid;
-                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(nValue));
-            }
-        }
-            break;
-
-        case CharacteristicValueTypes::DOUBLE:
-        {
-            bool success = false;
-            double dValue = characteristicValue.toDouble(&success);
-            if (success) {
-                qDebug() << "Set (DOUBLE)" << dValue << "in" << characteristic->name() << "of" << _uid;
-                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(dValue));
-            }
-        }
-            break;
-
-        case CharacteristicValueTypes::TEXT:
-        {
-            qDebug() << "Set (TEXT)" << characteristicValue << "in" << characteristic->name() << "of" << _uid;
-            _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(characteristicValue));
-        }
-            break;
-
-        case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-        {
-            if (!characteristic->enumValues().isEmpty() && !characteristicValue.isEmpty()
-                    && characteristic->enumValues().contains(characteristicValue))
-            {
-                qDebug() << "Set (CHARACTERISTIC_ENUM)" << characteristicValue << "in" << characteristic->name() << "of" << _uid;
-                _mapFromCharacteristicIdToValue.insert(characteristic->name(), QVariant(characteristicValue));
-            }
-        }
-            break;
-
-        default:
-            qWarning() << "We cannot set the value" << characteristicValue << "of the characteristic" << characteristic->name() << "because the type" <<  characteristic->valueType() << "is wrong !";
-            break;
-        }
+        setname(value.toString());
     }
 }
 
