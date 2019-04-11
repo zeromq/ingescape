@@ -1,9 +1,7 @@
 INCLUDEPATH += $$PWD
 
-# NB.1: quick-private is only required by the patched version of QQuickRepeater
-# NB.2: core-private is only required by the patched version of QSortFilterProxyModel
-#       that will be useless with Qt 5.6.2
-QT += qml quick svg xml sql quick-private core-private concurrent
+
+QT += qml quick svg xml sql quick-private core-private gui-private concurrent
 
 
 SOURCES += \
