@@ -16,7 +16,7 @@
 
 #include <QDebug>
 
-#include <private/qquickwindow_p.h>
+//#include <private/qquickwindow_p.h>
 
 
 /**
@@ -148,6 +148,7 @@ void DebugQuickInspector::_applyCurrentWindowRenderingMode()
     // Update our window if needed
     if (_currentWindow != nullptr)
     {
+/*
         // Get the private API of our window
         QQuickWindowPrivate *windowPrivate = QQuickWindowPrivate::get(_currentWindow);
         if (windowPrivate != nullptr)
@@ -192,6 +193,7 @@ void DebugQuickInspector::_applyCurrentWindowRenderingMode()
                 QMetaObject::invokeMethod(this, "_applyCurrentWindowRenderingModeFinished", Qt::QueuedConnection);
             }
         }
+ */
     }
 }
 
