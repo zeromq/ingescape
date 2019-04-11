@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -21,6 +22,8 @@
 #include <QDate>
 
 #include <I2Quick.h>
+
+#include "ingescapecommon.h"
 
 #include <controller/ingescapeassessmentscontroller.h>
 
@@ -328,6 +331,13 @@ int main(int argc, char *argv[])
     // - Display error images when SVG items are missing (source: "image://I2svg/.....")
     I2SVGImageProvider::showErrorsAsImage = true;
 
+
+    //
+    // Register Ingescape common
+    //
+    IngeScapeCommon::registerQmlTypes();
+
+
     //
     // Register our custom QML types
     //
@@ -348,6 +358,13 @@ int main(int argc, char *argv[])
 
         // Runtime version of Qt. This may be a different version than the version the application was compiled against
         qmlContext->setContextProperty("QT_RUNTIME_VERSION", QString(qVersion()));
+
+        // Debug menu
+#ifdef QT_DEBUG
+        qmlContext->setContextProperty("SHOW_DEBUG_MENU", true);
+#else
+        qmlContext->setContextProperty("SHOW_DEBUG_MENU", false);
+#endif
     }
 
 

@@ -15,6 +15,7 @@
 import QtQuick 2.9
 import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.3
 import QtQml 2.2
 
 import I2Quick 1.0
@@ -33,7 +34,8 @@ ApplicationWindow {
     //
     //----------------------------------
 
-    visible: true
+    title: qsTr("IngeScape Assessments (for ergonomics and human factors) - v%1").arg(Qt.application.version)
+
 
     // Default size
     width: IngeScapeTheme.appMinWidth // IngeScapeTheme.appDefaultWidth
@@ -43,9 +45,16 @@ ApplicationWindow {
     minimumWidth: IngeScapeTheme.appMinWidth
     minimumHeight: IngeScapeTheme.appMinHeight
 
-    title: qsTr("IngeScape Assessments (for ergonomics and human factors) - v%1").arg(Qt.application.version)
+
+    visible: true
+
 
     color: IngeScapeTheme.windowBackgroundColor
+
+    style: ApplicationWindowStyle {
+        background: Item {
+        }
+    }
 
 
     //----------------------------------
@@ -153,6 +162,81 @@ ApplicationWindow {
                 }
             }
         }*/
+
+
+        // Debug
+        Menu {
+            title: qsTr("Debug")
+
+            visible: SHOW_DEBUG_MENU
+
+            ExclusiveGroup {
+                id: visualizeGroup
+            }
+
+            MenuItem {
+                id: visualizeNormal
+
+                text: qsTr("Normal rendering")
+                checkable: true
+                checked: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      DebugQuickInspector.currentWindowRenderingMode = DebugWindowRenderingMode.Normal;
+                }
+            }
+
+            MenuItem {
+                id: visualizeClipping
+
+                text: qsTr("Visualize clipping")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      DebugQuickInspector.currentWindowRenderingMode = DebugWindowRenderingMode.VisualizeClipping;
+                }
+            }
+
+            MenuItem {
+                id: visualizeBatches
+
+                text: qsTr("Visualize batches")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                     DebugQuickInspector.currentWindowRenderingMode = DebugWindowRenderingMode.VisualizeBatches;
+                }
+            }
+
+            MenuItem {
+                id: visualizeOverdraw
+
+                text: qsTr("Visualize overdraw")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      DebugQuickInspector.currentWindowRenderingMode = DebugWindowRenderingMode.VisualizeOverdraw;
+                }
+            }
+
+            MenuItem {
+                id: visualizeChanges
+
+                text: qsTr("Visualize changes")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      DebugQuickInspector.currentWindowRenderingMode = DebugWindowRenderingMode.VisualizeChanges;
+                }
+            }
+        }
+
+
     }
 
 
@@ -163,9 +247,16 @@ ApplicationWindow {
     //----------------------------------
 
     Component.onCompleted: {
+        // Define the window associated to Qt Quick inspector
+        if (SHOW_DEBUG_MENU)
+        {
+            DebugQuickInspector.currentWindow = mainWindow;
+        }
+
         // Start our loader delay animation when our initial content is ready
         loaderDelayAnimation.start();
     }
+
 
     // When user clicks on window close button
     onClosing: {

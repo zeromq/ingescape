@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -16,6 +17,8 @@
 
 #include <misc/terminationsignalwatcher.h>
 #include <settings/ingescapesettings.h>
+
+#include "misc/debugquickinspector.h"
 
 
 /**
@@ -29,17 +32,13 @@ IngeScapeCommon::IngeScapeCommon()
 /**
  * @brief Register our C++ types and extensions in the QML system
  */
-void IngeScapeCommon::registerPGIMQmlTypes()
+void IngeScapeCommon::registerQmlTypes()
 {
-    // Our custom QML namespace
-    //const char *uri = "IngeScapeCommon";
-
-
     //
     // Enum classes
     //
-    //qmlRegisterSingletonType<AiguilleStates>(uri, 1, 0, "AiguilleStates", &AiguilleStates::qmlSingleton);
-    //qmlRegisterSingletonType<AlarmTypes>(uri, 1, 0, "AlarmTypes", &AlarmTypes::qmlSingleton);
+    qmlRegisterSingletonType<DebugWindowRenderingMode>("INGESCAPE", 1, 0,  "DebugWindowRenderingMode", &DebugWindowRenderingMode::qmlSingleton);
+
 
 
     //
@@ -54,6 +53,8 @@ void IngeScapeCommon::registerPGIMQmlTypes()
     //
     //qmlRegisterUncreatableType<CircuitsElementsController>(uri, 1, 0, "CircuitsElementsController", "Internal class");
     //qmlRegisterUncreatableType<EquipmentEditorController>(uri, 1, 0, "EquipmentEditorController", "Internal class");
+     qmlRegisterSingletonType<DebugQuickInspector>("INGESCAPE", 1, 0, "DebugQuickInspector", &DebugQuickInspector::qmlSingleton);
+
 
 
     //
@@ -61,7 +62,6 @@ void IngeScapeCommon::registerPGIMQmlTypes()
     //
     //qmlRegisterType(QUrl("qrc:/qml/CircuitsElementsPanel.qml"), uri, 1, 0, "CircuitsElementsPanel");
     //qmlRegisterType(QUrl("qrc:/qml/Clock.qml"), uri, 1, 0, "Clock");
-
 
 }
 

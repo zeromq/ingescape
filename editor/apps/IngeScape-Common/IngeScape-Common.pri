@@ -10,14 +10,16 @@ SOURCES += \
         $$PWD/ingescapecommon.cpp \
     $$PWD/settings/ingescapesettings.cpp \
     $$PWD/misc/terminationsignalwatcher.cpp \
-    $$PWD/misc/ingescapeutils.cpp
+    $$PWD/misc/ingescapeutils.cpp \
+    $$PWD/misc/debugquickinspector.cpp
 
 HEADERS += \
         $$PWD/ingescapecommon.h \
         $$PWD/ingescape-common_global.h \
     $$PWD/settings/ingescapesettings.h \
     $$PWD/misc/terminationsignalwatcher.h \
-    $$PWD/misc/ingescapeutils.h
+    $$PWD/misc/ingescapeutils.h \
+    $$PWD/misc/debugquickinspector.h
 
 
 #RESOURCES += \
