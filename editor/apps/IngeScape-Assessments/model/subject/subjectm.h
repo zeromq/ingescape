@@ -20,7 +20,7 @@
 #include <model/subject/characteristicm.h>
 
 
-static const QString CHARACTERISTIC_UID = "UID";
+static const QString CHARACTERISTIC_NAME = "Name";
 
 
 /**
@@ -30,14 +30,14 @@ class SubjectM : public QObject
 {
     Q_OBJECT
 
-    // Unique ID of our subject
-    I2_QML_PROPERTY(QString, uid)
+    // Unique identifier of our subject
+    I2_QML_PROPERTY_READONLY(QString, uid)
 
     // Name of our subject
     I2_QML_PROPERTY(QString, name)
 
-    // Flag indicating ...
-    //I2_QML_PROPERTY(bool, isCurrentlyEditing)
+    // "Qml Property Map" allows to set key-value pairs that can be used in QML bindings
+    I2_QML_PROPERTY(QQmlPropertyMap*, propertyMap)
 
     // Values of the characteristics of our subject
     // Hash table from a (unique) id of characteristic to the characteristic value
@@ -45,22 +45,17 @@ class SubjectM : public QObject
 
     //I2_QML_PROPERTY(QHash<QString, QVariant>, mapFromCharacteristicIdToValue)
 
-    // FIXME for tests
-    //I2_QML_PROPERTY(QList<QObject*>, temp)
-    //I2_QML_PROPERTY(QHash<QString, QObject*>, temp)
-
-    // Values of the characteristics of our subject
-    //I2_QML_PROPERTY(QList<QVariant>, characteristicValues)
-
 
 public:
 
     /**
      * @brief Constructor
      * @param uid
+     * @param name
      * @param parent
      */
     explicit SubjectM(QString uid,
+                      //QString name = "",
                       QObject *parent = nullptr);
 
 
@@ -84,35 +79,24 @@ public:
     void removeCharacteristic(CharacteristicM* characteristic);
 
 
-    /**
-     * @brief Get the value of a characteristic
-     * @param characteristicName
-     * @return
-     */
-    Q_INVOKABLE QString getValueOfCharacteristic(QString characteristicName);
-
-
-    /**
-     * @brief Set the value of a characteristic
-     * @param characteristicValue
-     * @param characteristic
-     */
-    Q_INVOKABLE void setValueOfCharacteristic(QString characteristicValue, CharacteristicM* characteristic);
-
-
-
 Q_SIGNALS:
 
 
 public Q_SLOTS:
 
 
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the value of a characteristic changed
+     * @param key
+     * @param value
+     */
+    void _onCharacteristicValueChanged(const QString &key, const QVariant &value);
+
+
 private:
 
-    // FIXME accessible for QML
-    // Values of the characteristics of our subject
-    // Hash table from a (unique) id of characteristic to the characteristic value
-    QHash<QString, QVariant> _mapFromCharacteristicIdToValue;
 
 };
 

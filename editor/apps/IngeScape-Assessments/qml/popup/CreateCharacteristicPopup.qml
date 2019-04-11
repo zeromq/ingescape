@@ -95,7 +95,6 @@ I2PopupBase {
         // Reset all user inputs
         txtCharacteristicName.text = "";
         rootPopup.selectedType = -1;
-        radioExistingEnum.checked = true;
         spinBoxValuesNumber.value = 2;
         enumTexts = [];
 
@@ -305,89 +304,65 @@ I2PopupBase {
                 }
 
                 Row {
-                    id: tabs
+                    id: headerNewEnum
 
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors {
+                        top: parent.top
+                        topMargin: 10
+                        left: parent.left
+                        leftMargin: 10
+                    }
+
                     spacing: 10
 
-                    ExclusiveGroup {
-                        id: tabsExclusiveGroup
+                    Text {
+                        text: "Number of values:"
+
+                        color: IngeScapeTheme.whiteColor
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            weight : Font.Medium
+                            pixelSize : 14
+                        }
                     }
 
-                    RadioButton {
-                        id: radioExistingEnum
+                    SpinBox {
+                        id: spinBoxValuesNumber
 
-                        text: "Existing Enum"
-
-                        exclusiveGroup: tabsExclusiveGroup
-                    }
-
-                    RadioButton {
-                        id: radioNewEnum
-
-                        text: "New Enum"
-
-                        exclusiveGroup: tabsExclusiveGroup
+                        value: 2
                     }
                 }
 
-                Item {
-                    id: contentNewEnum
-
+                Column {
                     anchors {
-                        top: tabs.bottom
+                        top: headerNewEnum.bottom
                         topMargin: 10
                         left: parent.left
-                        leftMargin: 5
+                        leftMargin: 10
                     }
 
-                    visible: radioNewEnum.checked
+                    Repeater {
+                        model: spinBoxValuesNumber.value
 
-                    Row {
-                        id: headerNewEnum
+                        delegate: TextField {
+                            id: enumText
 
-                        spacing: 10
+                            width: 250
 
-                        Text {
-                            text: "Number of values:"
-                        }
+                            text: rootPopup.enumTexts[index] ? rootPopup.enumTexts[index] : ""
 
-                        SpinBox {
-                            id: spinBoxValuesNumber
-
-                            value: 2
-                        }
-                    }
-
-                    Column {
-                        anchors {
-                            top: headerNewEnum.bottom
-                            topMargin: 5
-                        }
-
-                        Repeater {
-                            model: spinBoxValuesNumber.value
-
-                            delegate: TextField {
-                                id: enumText
-
-                                width: 200
-
-                                text: rootPopup.enumTexts[index] ? rootPopup.enumTexts[index] : ""
-
-                                Component.onCompleted: {
-                                    // If this index is not defined, initialize it with empty string
-                                    if (typeof rootPopup.enumTexts[index] === 'undefined') {
-                                        rootPopup.enumTexts[index] = "";
-                                    }
+                            Component.onCompleted: {
+                                // If this index is not defined, initialize it with empty string
+                                if (typeof rootPopup.enumTexts[index] === 'undefined') {
+                                    rootPopup.enumTexts[index] = "";
                                 }
+                            }
 
-                                onTextChanged: {
-                                    //console.log(index + ": text changed to " + enumText.text);
+                            onTextChanged: {
+                                //console.log(index + ": text changed to " + enumText.text);
 
-                                    // Update the strings array for this index
-                                    rootPopup.enumTexts[index] = enumText.text;
-                                }
+                                // Update the strings array for this index
+                                rootPopup.enumTexts[index] = enumText.text;
                             }
                         }
                     }

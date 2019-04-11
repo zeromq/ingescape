@@ -29,7 +29,7 @@ Item {
     //anchors.fill: parent
 
     width: parent.width
-    height: 25
+    height: 30
 
 
     //--------------------------------------------------------
@@ -56,7 +56,7 @@ Item {
     //--------------------------------
 
     // Delete Subject
-    signal deleteSubject();
+    //signal deleteSubject();
 
 
 
@@ -150,8 +150,10 @@ Item {
 
                         visible: !rootItem.isCurrentlyEditing
 
-                        text: (rootItem.modelM && valueColumn.characteristic) ? rootItem.modelM.getValueOfCharacteristic(valueColumn.characteristic.name)
-                                                                              : ""
+                        //text: (rootItem.modelM && valueColumn.characteristic) ? rootItem.modelM.getValueOfCharacteristic(valueColumn.characteristic.name)
+                        //                                                      : ""
+
+                        text: "FIXME"
 
                         color: IngeScapeTheme.whiteColor
                         font {
@@ -161,7 +163,7 @@ Item {
                         }
                     }
 
-                    TextField {
+                    /*TextField {
                         id: txtEditor
 
                         anchors {
@@ -201,10 +203,10 @@ Item {
                                 rootItem.modelM.setValueOfCharacteristic(txtEditor.text, valueColumn.characteristic);
                             }
                         }
-                    }
+                    }*/
 
                     // FIXME: use a Loader instead of visible
-                    I2ComboboxStringList {
+                    /*I2ComboboxStringList {
                         id: cmbEditor
 
                         anchors {
@@ -224,7 +226,7 @@ Item {
                                 rootItem.modelM.setValueOfCharacteristic(cmbEditor.selectedItem, valueColumn.characteristic);
                             }
                         }
-                    }
+                    }*/
                 }
             }
         }
@@ -232,14 +234,14 @@ Item {
 
     Row {
         anchors {
-            top: parent.top
-            bottom: parent.bottom
             right: parent.right
         }
-        //height: parent.height
+        height: parent.height
 
         Button {
             id: btnEdit
+
+            height: parent.height
 
             checkable: true
 
@@ -268,8 +270,10 @@ Item {
             }
         }
 
-        Button {
+        /*Button {
             id: btnDelete
+
+            height: parent.height
 
             text: "Delete"
 
@@ -284,7 +288,7 @@ Item {
                     rootItem.deleteSubject();
                 }
             }
-        }
+        }*/
     }
 
 }

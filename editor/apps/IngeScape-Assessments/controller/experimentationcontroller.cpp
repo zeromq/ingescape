@@ -64,8 +64,12 @@ void ExperimentationController::createNewRecordForSubjectAndTask(QString recordN
     {
         qInfo() << "Create new record" << recordName << "for subject" << subject->name() << "and task" << task->name();
 
-        // Create the new record
-        RecordM* record = new RecordM(recordName, subject, task, nullptr);
+        QDateTime now = QDateTime::currentDateTime();
+
+        QString recordUID = now.toString("R-yyMMdd-hhmmss-zzz");
+
+        // Create a new record
+        RecordM* record = new RecordM(recordUID, recordName, subject, task, now, nullptr);
 
         // Add the record to the experimentation
         _modelManager->currentExperimentation()->allRecords()->append(record);
@@ -80,7 +84,7 @@ void ExperimentationController::createNewRecordForSubjectAndTask(QString recordN
 void ExperimentationController::openRecord(RecordM* record)
 {
     if ((record != nullptr)
-                    && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+            && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
     {
         qInfo() << "Open the record" << record->name() << "of the experimentation" << _modelManager->currentExperimentation()->name();
 

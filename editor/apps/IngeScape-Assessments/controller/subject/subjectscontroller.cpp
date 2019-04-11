@@ -99,9 +99,6 @@ void SubjectsController::createNewCharacteristic(QString characteristicName, int
         CharacteristicM* characteristic = new CharacteristicM(characteristicName, characteristicValueType, nullptr);
 
         // Add the characteristic to the experimentation
-        //_modelManager->currentExperimentation()->allCharacteristics()->append(characteristic);
-
-        // Add the characteristic to the experimentation
         _modelManager->currentExperimentation()->addCharacteristic(characteristic);
     }
 }
@@ -124,9 +121,6 @@ void SubjectsController::createNewCharacteristicEnum(QString characteristicName,
         characteristic->setenumValues(enumValues);
 
         // Add the characteristic to the experimentation
-        //_modelManager->currentExperimentation()->allCharacteristics()->append(characteristic);
-
-        // Add the characteristic to the experimentation
         _modelManager->currentExperimentation()->addCharacteristic(characteristic);
     }
 }
@@ -141,9 +135,6 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
     if ((characteristic != nullptr)
             && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
     {
-        // Remove from the experimentation
-        //_modelManager->currentExperimentation()->allCharacteristics()->remove(characteristic);
-
         // Remove the characteristic from the experimentation
         _modelManager->currentExperimentation()->removeCharacteristic(characteristic);
 
@@ -162,20 +153,17 @@ void SubjectsController::createNewSubject()
     {
         QDateTime now = QDateTime::currentDateTime();
 
-        QString uid = now.toString("S-yyMMdd-hhmmss-zzz");
+        QString subjectUID = now.toString("S-yyMMdd-hhmmss-zzz");
 
         // Create a new subject
-        SubjectM* subject = new SubjectM(uid, nullptr);
-
-        // FIXME: subject name usefull ?
-        //QString name = "...";
-        //subject->setname(name);
+        SubjectM* subject = new SubjectM(subjectUID, nullptr);
 
         // For each existing characteristic
         for (CharacteristicM* characteristic : _modelManager->currentExperimentation()->allCharacteristics()->toList())
         {
-            // Check that it is not the UID that have already been added
-            if ((characteristic != nullptr) && (characteristic->name() != CHARACTERISTIC_UID))
+            // Do not add the characteristic "Name" that have already been added
+            //if ((characteristic != nullptr) && (characteristic->name() != CHARACTERISTIC_NAME))
+            if (characteristic != nullptr)
             {
                 subject->addCharacteristic(characteristic);
             }

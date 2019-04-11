@@ -15,6 +15,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
+import QtQml 2.12
 
 import I2Quick 1.0
 
@@ -44,6 +45,7 @@ Item {
 
     property ExperimentationM experimentation: modelManager ? modelManager.currentExperimentation : null;
 
+    property int indexSubjectCurrentlyEditing: -1;
 
 
     //--------------------------------
@@ -226,30 +228,208 @@ Item {
         color: "#44AAAAAA"
 
 
+        TableView {
+            id: tableSubjects
 
-        /*TableView {
             anchors {
                 fill: parent
                 margins: 10
             }
 
-            /*TableViewColumn {
-                role: "uid"
-                title: "ID"
-                width: 150
-            }
+            rowDelegate: Rectangle {
+                width: childrenRect.width
+                height: 30
 
-            TableViewColumn {
-                role: "name"
-                title: "Name"
-                width: 150
+                color: styleData.selected ? "lightblue"
+                                          : (styleData.alternate ? "lightgray" : "white")
             }
 
             model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
-        }*/
+            TableViewColumn {
+                role: "name"
+                title: "Name"
 
-        Rectangle {
+                width: 350
+
+                delegate: Item {
+
+                    anchors.fill: parent
+
+                    Row {
+                        id: rowSubjectOptions
+
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+
+                        spacing: 5
+
+                        visible: styleData.selected
+
+                        Button {
+                            id: btnEdit
+
+                            anchors {
+                                top: parent.top
+                            }
+                            width: 70
+                            height: 30
+
+                            checkable: true
+
+                            checked: (rootItem.indexSubjectCurrentlyEditing === styleData.row)
+
+                            text: checked ? "Validate" : "Edit"
+
+                            onClicked: {
+
+                                if (rootItem.indexSubjectCurrentlyEditing === styleData.row)
+                                {
+                                    console.log("QML: Validate Subject " + styleData.value + " (" + styleData.row + ")");
+
+                                    // Reset the index
+                                    rootItem.indexSubjectCurrentlyEditing = -1;
+                                }
+                                else
+                                {
+                                    console.log("QML: Edit Subject " + styleData.value + " (" + styleData.row + ")");
+
+                                    // Set the index
+                                    rootItem.indexSubjectCurrentlyEditing = styleData.row;
+                                }
+                            }
+                        }
+
+                        Button {
+                            id: btnDelete
+
+                            anchors {
+                                top: parent.top
+                            }
+                            width: 70
+                            height: 30
+
+                            text: "Delete"
+
+                            onClicked: {
+                                if (rootItem.controller && rootItem.experimentation)
+                                {
+                                    var subject = rootItem.experimentation.allSubjects.get(styleData.row);
+
+                                    if (subject)
+                                    {
+                                        //console.log("QML: Delete Subject " + subject.name);
+
+                                        rootItem.controller.deleteSubject(subject);
+
+                                        // Reset the index
+                                        rootItem.indexSubjectCurrentlyEditing = -1;
+
+                                        // Clear the selection
+                                        tableSubjects.selection.clear();
+                                    }
+                                }
+
+
+
+                                /*if (rootItem.modelM)
+                                {
+                                    //console.log("QML: Delete Subject " + rootItem.modelM.uid);
+
+                                    // Emit the signal "Delete Subject"
+                                    rootItem.deleteSubject();
+                                }*/
+
+                                /*if (rootItem.controller) {
+                                    rootItem.controller.deleteSubject(model.QtObject);
+                                }*/
+                            }
+                        }
+                    }
+
+                    Rectangle {
+
+                        width: 200
+                        height: parent.height
+
+                        anchors {
+                            left: styleData.selected ? rowSubjectOptions.right : parent.left
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+
+                        color: "transparent"
+                        border {
+                            color: "black"
+                            width: 1
+                        }
+
+                        Text {
+                            text: styleData.value
+                        }
+                    }
+                }
+            }
+
+            Instantiator {
+                id: columnsInstantiator
+
+                model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
+
+                delegate: TableViewColumn {
+                    id: column
+
+                    property CharacteristicM characteristic: model.QtObject
+
+                    role: model.name
+                    title: model.name
+
+                    width: 150
+
+                    delegate: CharacteristicValueEditor {
+                        id: characteristicValueEditor
+
+                        characteristic: column.characteristic
+                        //characteristicValueType: column.characteristic ? column.characteristic.valueType : CharacteristicValueTypes.UNKNOWN;
+
+                        characteristicValue: model.propertyMap[column.role]
+
+                        isCurrentlyEditing: (rootItem.indexSubjectCurrentlyEditing === styleData.row)
+
+                        onCharacteristicValueChanged: {
+                            // QQmlDMAbstractItemModelData
+                            console.log("QML: Subjects View on Characteristic Value Changed " + characteristicValue);
+                            model.propertyMap[column.role] = characteristicValue;
+                        }
+                    }
+                }
+
+                onObjectAdded: {
+                    console.log("onObjectAdded " + index)
+                    tableSubjects.insertColumn(index, object);
+                }
+                onObjectRemoved: {
+                    console.log("onObjectRemoved " + index)
+                    tableSubjects.removeColumn(index);
+                }
+            }
+
+            onSelectionChanged: {
+                console.log("onSelectionChanged " + tableSubjects.selection);
+
+                if (rootItem.indexSubjectCurrentlyEditing > -1)
+                {
+                    console.log("TODO " + rootItem.indexSubjectCurrentlyEditing);
+                }
+            }
+            onDoubleClicked: {
+                console.log("onDoubleClicked ");
+            }
+        }
+
+        /*Rectangle {
             id: tableHeader
 
             anchors {
@@ -303,9 +483,9 @@ Item {
                     }
                 }
             }
-        }
+        }*/
 
-        Column {
+        /*Column {
             anchors {
                 left: parent.left
                 right: parent.right
@@ -332,7 +512,7 @@ Item {
                     }
                 }
             }
-        }
+        }*/
     }
 
 

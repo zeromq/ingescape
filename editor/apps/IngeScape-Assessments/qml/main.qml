@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -51,6 +52,14 @@ ApplicationWindow {
 
     color: IngeScapeTheme.windowBackgroundColor
 
+
+    // NB: we must override the style of our ApplicationWindow if we want a white background!
+    // Because someone at Qt thinks that white means no background color and thus default system color
+    // (i.e. light gray)
+    // property QtObject styleData: QtObject {
+    //    readonly property bool hasColor: window.color != "#ffffff"
+    // }
+    //
     style: ApplicationWindowStyle {
         background: Item {
         }
@@ -65,7 +74,6 @@ ApplicationWindow {
 
     menuBar: MenuBar {
 
-        // Platform
         Menu {
             id: menuToRename
             title: qsTr("TO RENAME")
@@ -141,7 +149,7 @@ ApplicationWindow {
                 id: subWindowsInstantiator
                 model: 0 // IngeScapeAssessmentsC.openedWindows
 
-                MenuItem {
+                delegate: MenuItem {
                     text: model.QtObject.title
 
                     onTriggered: {
@@ -166,7 +174,7 @@ ApplicationWindow {
 
         // Debug
         Menu {
-            title: qsTr("Debug")
+            title: qsTr("Debug Qt Quick")
 
             visible: SHOW_DEBUG_MENU
 
