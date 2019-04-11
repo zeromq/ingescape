@@ -57,8 +57,8 @@ Item {
     //
     //--------------------------------
 
-    // Delete Subject
-    //signal deleteSubject();
+    // Characteristic Value Updated
+    signal characteristicValueUpdated(var value);
 
 
     //--------------------------------
@@ -143,7 +143,11 @@ Item {
 
             onTextChanged: {
                 //console.log("QML: on Text Changed " + txtEditor.text);
-                rootItem.characteristicValue = txtEditor.text;
+
+                //rootItem.characteristicValue = txtEditor.text;
+
+                // Emit the signal "Characteristic Value Updated"
+                rootItem.characteristicValueUpdated(txtEditor.text);
             }
         }
 
@@ -161,10 +165,15 @@ Item {
             model: rootItem.characteristic ? rootItem.characteristic.enumValues : null
 
             onSelectedItemChanged: {
-                if (cmbEditor.selectedItem && rootItem.characteristic)
+
+                if (cmbEditor.selectedItem)
                 {
-                    //console.log("QML on Selected Item Changed " + cmbEditor.selectedItem);
-                    rootItem.characteristicValue = cmbEditor.selectedItem;
+                    //console.log("QML: on Selected Item Changed " + cmbEditor.selectedItem);
+
+                    //rootItem.characteristicValue = cmbEditor.selectedItem;
+
+                    // Emit the signal "Characteristic Value Updated"
+                    rootItem.characteristicValueUpdated(cmbEditor.selectedItem);
                 }
             }
         }

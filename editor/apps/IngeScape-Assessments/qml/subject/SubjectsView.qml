@@ -75,7 +75,7 @@ Item {
      */
     function editSubjectAtRowIndex(rowIndex) {
 
-        console.log("QML: Edit the subject at the row index " + rowIndex);
+        //console.log("QML: Edit the subject at the row index " + rowIndex);
 
         // Set the index
         rootItem.indexSubjectCurrentlyEditing = rowIndex;
@@ -88,7 +88,7 @@ Item {
     function stopCurrentEditionOfSubject() {
         if (rootItem.indexSubjectCurrentlyEditing > -1)
         {
-            console.log("QML: Stop the current edition of the subject at the row index " + rootItem.indexSubjectCurrentlyEditing);
+            //console.log("QML: Stop the current edition of the subject at the row index " + rootItem.indexSubjectCurrentlyEditing);
 
             // Reset the index
             rootItem.indexSubjectCurrentlyEditing = -1;
@@ -423,10 +423,13 @@ Item {
 
                         isCurrentlyEditing: (rootItem.indexSubjectCurrentlyEditing === styleData.row)
 
-                        onCharacteristicValueChanged: {
-                            // QQmlDMAbstractItemModelData
-                            console.log("QML: Subjects View on Characteristic Value Changed " + characteristicValue);
+                        /*onCharacteristicValueChanged: {
+                            console.log("QML: on Characteristic Value Changed " + characteristicValue);
                             model.propertyMap[column.role] = characteristicValue;
+                        }*/
+                        onCharacteristicValueUpdated: {
+                            //console.log("QML: on Characteristic Value Updated " + value);
+                            model.propertyMap[column.role] = value;
                         }
                     }
                 }
