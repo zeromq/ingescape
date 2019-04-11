@@ -21,7 +21,7 @@
 
 
 /**
- * @brief The CharacteristicM class defines a model of characteristic
+ * @brief The CharacteristicM class defines a model of characteristic for a subject
  */
 class CharacteristicM : public QObject
 {
@@ -39,8 +39,8 @@ class CharacteristicM : public QObject
     // Type of our characteristic value
     I2_QML_PROPERTY_READONLY(CharacteristicValueTypes::Value, valueType)
 
-    // Flag indicating if our characteristic can be deleted
-    I2_QML_PROPERTY_READONLY(bool, canBeDeleted)
+    // Flag indicating if our characteristic is the subject name
+    I2_QML_PROPERTY_READONLY(bool, isSubjectName)
 
     // Details if valueType == CHARACTERISTIC_ENUM ?
     // Link with CharacteristicEnumM ?
@@ -55,12 +55,12 @@ public:
      * @brief Constructor
      * @param name
      * @param valueType
-     * @param canBeDeleted
+     * @param isSubjectName
      * @param parent
      */
     explicit CharacteristicM(QString name,
                              CharacteristicValueTypes::Value valueType,
-                             bool canBeDeleted = true,
+                             bool isSubjectName = false,
                              QObject *parent = nullptr);
 
 

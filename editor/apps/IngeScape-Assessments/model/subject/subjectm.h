@@ -20,7 +20,7 @@
 #include <model/subject/characteristicm.h>
 
 
-static const QString CHARACTERISTIC_NAME = "Name";
+static const QString CHARACTERISTIC_SUBJECT_NAME = "Name";
 
 
 /**
@@ -37,7 +37,7 @@ class SubjectM : public QObject
     I2_QML_PROPERTY(QString, name)
 
     // "Qml Property Map" allows to set key-value pairs that can be used in QML bindings
-    I2_QML_PROPERTY(QQmlPropertyMap*, propertyMap)
+    I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, propertyMap)
 
     // Values of the characteristics of our subject
     // Hash table from a (unique) id of characteristic to the characteristic value

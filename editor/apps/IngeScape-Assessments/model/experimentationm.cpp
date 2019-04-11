@@ -36,8 +36,8 @@ ExperimentationM::ExperimentationM(QString name,
     _allRecords.setSortProperty("startDateTime");
 
 
-    // Default characteristic "Name"
-    CharacteristicM* characteristicName = new CharacteristicM(CHARACTERISTIC_NAME, CharacteristicValueTypes::TEXT, false, this);
+    // Characteristic "Subject Name"
+    CharacteristicM* characteristicName = new CharacteristicM(CHARACTERISTIC_SUBJECT_NAME, CharacteristicValueTypes::TEXT, true, this);
     _allCharacteristics.append(characteristicName);
 
 

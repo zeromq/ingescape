@@ -127,7 +127,7 @@ void SubjectM::_onCharacteristicValueChanged(const QString &key, const QVariant 
 {
     qDebug() << key << "-->" << value.toString();
 
-    if (key == CHARACTERISTIC_NAME)
+    if (key == CHARACTERISTIC_SUBJECT_NAME)
     {
         setname(value.toString());
     }

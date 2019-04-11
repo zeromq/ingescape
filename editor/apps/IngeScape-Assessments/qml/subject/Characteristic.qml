@@ -164,7 +164,7 @@ Item {
 
         text: "Delete"
 
-        visible: rootItem.modelM.canBeDeleted
+        visible: !rootItem.modelM.isSubjectName
 
         onClicked: {
             if (rootItem.modelM)

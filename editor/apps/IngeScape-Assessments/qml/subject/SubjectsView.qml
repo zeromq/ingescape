@@ -282,122 +282,6 @@ Item {
 
             model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
-            TableViewColumn {
-                role: "name"
-                title: "Name"
-
-                width: 350
-
-                delegate: Item {
-
-                    anchors.fill: parent
-
-                    Row {
-                        id: rowSubjectOptions
-
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                        }
-
-                        spacing: 5
-
-                        visible: styleData.selected
-
-                        Button {
-                            id: btnEdit
-
-                            anchors {
-                                top: parent.top
-                            }
-                            width: 70
-                            height: 30
-
-                            checkable: true
-
-                            checked: (rootItem.indexSubjectCurrentlyEditing === styleData.row)
-
-                            text: checked ? "Validate" : "Edit"
-
-                            onClicked: {
-
-                                if (rootItem.indexSubjectCurrentlyEditing === styleData.row)
-                                {
-                                    // Stop the current edition of the subject
-                                    stopCurrentEditionOfSubject();
-                                }
-                                else
-                                {
-                                    // Edit the subject at the row index
-                                    editSubjectAtRowIndex(styleData.row);
-                                }
-                            }
-
-                            Binding {
-                                target: btnEdit
-                                property: "checked"
-                                value: (rootItem.indexSubjectCurrentlyEditing === styleData.row)
-                            }
-                        }
-
-                        Button {
-                            id: btnDelete
-
-                            anchors {
-                                top: parent.top
-                            }
-                            width: 70
-                            height: 30
-
-                            text: "Delete"
-
-                            onClicked: {
-                                if (rootItem.controller && rootItem.experimentation)
-                                {
-                                    var subject = rootItem.experimentation.allSubjects.get(styleData.row);
-
-                                    if (subject)
-                                    {
-                                        //console.log("QML: Delete Subject " + subject.name);
-
-                                        // Stop the current edition of the subject
-                                        stopCurrentEditionOfSubject();
-
-                                        rootItem.controller.deleteSubject(subject);
-
-                                        // Clear the selection
-                                        tableSubjects.selection.clear();
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    Rectangle {
-
-                        width: 200
-                        height: parent.height
-
-                        anchors {
-                            left: styleData.selected ? rowSubjectOptions.right : parent.left
-                            top: parent.top
-                            bottom: parent.bottom
-                        }
-
-                        color: "transparent"
-                        border {
-                            color: "black"
-                            width: 1
-                        }
-
-                        Text {
-                            text: styleData.value
-                        }
-                    }
-                }
-
-            }
-
             Instantiator {
                 id: columnsInstantiator
 
@@ -411,35 +295,68 @@ Item {
                     role: model.name
                     title: model.name
 
-                    width: 150
+                    width: (characteristic && characteristic.isSubjectName) ? 250 : 150
 
                     delegate: CharacteristicValueEditor {
                         id: characteristicValueEditor
 
                         characteristic: column.characteristic
-                        //characteristicValueType: column.characteristic ? column.characteristic.valueType : CharacteristicValueTypes.UNKNOWN;
 
-                        characteristicValue: model.propertyMap[column.role]
+                        characteristicValue: model ? model.propertyMap[column.role] : ""
+
+                        isSelected: styleData.selected
 
                         isCurrentlyEditing: (rootItem.indexSubjectCurrentlyEditing === styleData.row)
 
-                        /*onCharacteristicValueChanged: {
-                            console.log("QML: on Characteristic Value Changed " + characteristicValue);
-                            model.propertyMap[column.role] = characteristicValue;
-                        }*/
+
+                        //
+                        // Slots
+                        //
+
+                        onEditSubject: {
+                            // Edit the subject at the row index
+                            rootItem.editSubjectAtRowIndex(styleData.row);
+                        }
+
+                        onStopEditionOfSubject: {
+                            // Stop the current edition of the subject
+                            rootItem.stopCurrentEditionOfSubject();
+                        }
+
                         onCharacteristicValueUpdated: {
-                            //console.log("QML: on Characteristic Value Updated " + value);
-                            model.propertyMap[column.role] = value;
+                            if (model)
+                            {
+                                //console.log("QML: on Characteristic Value Updated " + value);
+                                model.propertyMap[column.role] = value;
+                            }
+                        }
+
+                        onDeleteSubject: {
+
+                            if (rootItem.controller && model)
+                            {
+                                //console.log("QML: Delete Subject " + model.name);
+
+                                // Stop the current edition of the subject
+                                stopCurrentEditionOfSubject();
+
+                                // Delete the subject
+                                rootItem.controller.deleteSubject(model.QtObject);
+
+                                // Clear the selection
+                                tableSubjects.selection.clear();
+                            }
                         }
                     }
                 }
 
                 onObjectAdded: {
-                    console.log("onObjectAdded " + index + " columnCount= " + tableSubjects.columnCount)
-                    tableSubjects.insertColumn(index, object);
+                    //console.log("onObjectAdded " + index);
+                    //tableSubjects.insertColumn(index, object);
+                    tableSubjects.addColumn(object);
                 }
                 onObjectRemoved: {
-                    console.log("onObjectRemoved " + index)
+                    //console.log("onObjectRemoved " + index);
                     tableSubjects.removeColumn(index);
                 }
             }
@@ -480,91 +397,6 @@ Item {
                 }
             }
         }
-
-        /*Rectangle {
-            id: tableHeader
-
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.top
-            }
-            height: 30
-
-            color: "#88222222"
-            border {
-                color: "black"
-                width: 1
-            }
-
-            Row {
-                anchors.fill: parent
-
-                spacing: 0
-
-                Repeater {
-                    model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
-
-                    delegate: Rectangle {
-                        id: headerColumn
-
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                        }
-                        width: 150
-
-                        color: "transparent"
-                        border {
-                            color: "black"
-                            width: 1
-                        }
-
-                        Text {
-                            anchors.centerIn: parent
-
-                            text: model.name
-
-                            color: IngeScapeTheme.whiteColor
-                            font {
-                                family: IngeScapeTheme.textFontFamily
-                                weight : Font.Medium
-                                pixelSize : 12
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
-
-        /*Column {
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: tableHeader.bottom
-                bottom: parent.bottom
-            }
-
-            Repeater {
-                model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
-
-                delegate: Subject {
-
-                    modelM: model.QtObject
-                    allCharacteristics: rootItem.experimentation.allCharacteristics
-
-
-                    //
-                    // Slots
-                    //
-                    onDeleteSubject: {
-                        if (rootItem.controller) {
-                            rootItem.controller.deleteSubject(model.QtObject);
-                        }
-                    }
-                }
-            }
-        }*/
     }
 
 
