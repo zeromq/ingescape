@@ -365,9 +365,11 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
 {
     if (_modelManager != nullptr)
     {
+        ActionEditorController* actionEditorC = nullptr;
+
         if (action != nullptr)
         {
-            ActionEditorController* actionEditorC = _getActionEditorFromModelOfAction(action);
+            actionEditorC = _getActionEditorFromModelOfAction(action);
 
             // The corresponding editor is already opened
             if (actionEditorC != nullptr)
@@ -382,7 +384,7 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
                 setselectedAction(action);
 
                 // Create an action editor
-                ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), action, _modelManager->allAgentsGroupsByName()->toList());
+                actionEditorC = new ActionEditorController(_buildNewActionName(), action, _modelManager->allAgentsGroupsByName()->toList());
 
                 _hashActionEditorControllerFromModelOfAction.insert(action, actionEditorC);
 
@@ -393,7 +395,7 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
         else
         {
             // Create an action editor
-            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), nullptr, _modelManager->allAgentsGroupsByName()->toList());
+            actionEditorC = new ActionEditorController(_buildNewActionName(), nullptr, _modelManager->allAgentsGroupsByName()->toList());
 
             _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
 

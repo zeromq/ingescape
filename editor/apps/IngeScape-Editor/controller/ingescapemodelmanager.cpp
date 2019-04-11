@@ -852,13 +852,13 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
         else
         {
             // Create a new model of agent
-            AgentM* agent = createAgentModel(agentName,
-                                             nullptr,
-                                             peerId,
-                                             ipAddress,
-                                             hostname,
-                                             commandLine,
-                                             true);
+            agent = createAgentModel(agentName,
+                                     nullptr,
+                                     peerId,
+                                     ipAddress,
+                                     hostname,
+                                     commandLine,
+                                     true);
 
             if (agent != nullptr)
             {
@@ -1093,8 +1093,8 @@ void IngeScapeModelManager::onValuePublished(PublishedValueM* publishedValue)
 
             while (_publishedValues.count() > numberOfKeptValues)
             {
-                PublishedValueM* publishedValue = _publishedValues.takeAt(_publishedValues.count() - 1);
-                delete publishedValue;
+                PublishedValueM* tempPublishedValue = _publishedValues.takeAt(_publishedValues.count() - 1);
+                delete tempPublishedValue;
             }
         }
 

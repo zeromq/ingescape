@@ -52,11 +52,9 @@ void AbstractTimeRangeFilter::forceUpdate()
  */
 void AbstractTimeRangeFilter::setTimeRange(int startTimeInMilliseconds, int endTimeInMilliseconds)
 {
-    if (
-        (_startTimeInMilliseconds != startTimeInMilliseconds)
-        ||
-        (_endTimeInMilliseconds != endTimeInMilliseconds)
-        )
+    if ( (_startTimeInMilliseconds != startTimeInMilliseconds)
+         ||
+         (_endTimeInMilliseconds != endTimeInMilliseconds) )
     {
         // Save values
         _startTimeInMilliseconds = startTimeInMilliseconds;

@@ -286,7 +286,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
         if (agentsGroupedByName != nullptr)
         {
             // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
-            AgentInMappingVM* agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position);
+            agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position);
 
             if (agentInMapping != nullptr)
             {

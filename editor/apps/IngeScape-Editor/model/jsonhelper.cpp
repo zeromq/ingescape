@@ -919,8 +919,8 @@ QList<RecordM*> JsonHelper::createRecordModelList(QByteArray byteArrayOfJson)
                         // Create record
                         RecordM* record = new RecordM(jsonId.toString(),
                                                       jsonName.toString(),
-                                                      QDateTime::fromSecsSinceEpoch(jsonBeginDateTime.toDouble()),
-                                                      QDateTime::fromSecsSinceEpoch(jsonEndDateTime.toDouble()));
+                                                      QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonBeginDateTime.toDouble())),
+                                                      QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonEndDateTime.toDouble())));
 
                         recordsList.append(record);
                     }

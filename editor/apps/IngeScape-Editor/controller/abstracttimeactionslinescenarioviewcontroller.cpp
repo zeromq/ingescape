@@ -39,8 +39,11 @@
 
 // time ranges number
 #define TIME_RANGES_COUNT 8
+
 // time ranges for time ticks
 int TIME_RANGES[TIME_RANGES_COUNT] = {1, 2, 5, 10, 30, 60, 120, 300};
+
+#define NB_MILLI_SECONDS_IN_ONE_MINUTE 60000.0
 
 
 /**
@@ -92,9 +95,9 @@ AbstractTimeActionslineScenarioViewController::AbstractTimeActionslineScenarioVi
     _totalTimePeriodInMinutes = LENGTH_TIME_LINE * 60.0;
 
     // range per default
-    _timeRangeBetweenTimeTicksInMilliSeconds = TIME_RANGES[4]*1000;
+    _timeRangeBetweenTimeTicksInMilliSeconds = TIME_RANGES[4] * 1000;
 
-    for (int milliseconds = 0; milliseconds < (_totalTimePeriodInMinutes*60000.0); milliseconds += _timeRangeBetweenTimeTicksInMilliSeconds/3)
+    for (int milliseconds = 0; milliseconds < (_totalTimePeriodInMinutes * NB_MILLI_SECONDS_IN_ONE_MINUTE); milliseconds += _timeRangeBetweenTimeTicksInMilliSeconds/3)
     {
         // Check if we have a normal tick
         bool isBigTick = ((milliseconds%_timeRangeBetweenTimeTicksInMilliSeconds) == 0);
@@ -106,7 +109,7 @@ AbstractTimeActionslineScenarioViewController::AbstractTimeActionslineScenarioVi
     }
 
     // - Add a last time tick (for decoration purposes only)
-    TimeTickM* timeTick = new TimeTickM((_totalTimePeriodInMinutes*60000.0), TimeTickTypes::BIG_TICK);
+    TimeTickM* timeTick = new TimeTickM(static_cast<int>(_totalTimePeriodInMinutes * NB_MILLI_SECONDS_IN_ONE_MINUTE), TimeTickTypes::BIG_TICK);
     timeTicksList.append(timeTick);
 
     // Save our list of time ticks
@@ -144,13 +147,14 @@ void AbstractTimeActionslineScenarioViewController::updateTimeCoordinatesOfTimeT
     {
         if (minDeltaBetweenTicks < TIME_RANGES[index])
         {
-            _timeRangeBetweenTimeTicksInMilliSeconds = TIME_RANGES[index]*1000;
+            _timeRangeBetweenTimeTicksInMilliSeconds = TIME_RANGES[index] * 1000;
             break;
         }
     }
 
     // change time ticks list if the range has changed
-    if (_timeRangeBetweenTimeTicksInMilliSeconds != previousTimeRange)
+    //if (_timeRangeBetweenTimeTicksInMilliSeconds != previousTimeRange)
+    if (!qFuzzyCompare(_timeRangeBetweenTimeTicksInMilliSeconds, previousTimeRange))
     {
         // clear the ticks list
         _timeTicks.deleteAllItems();
@@ -170,7 +174,7 @@ void AbstractTimeActionslineScenarioViewController::updateTimeCoordinatesOfTimeT
             rangeForSmallTicks = _timeRangeBetweenTimeTicksInMilliSeconds/2;
         }
 
-        for (int milliseconds = 0; milliseconds < (_totalTimePeriodInMinutes*60000.0); milliseconds += rangeForSmallTicks)
+        for (int milliseconds = 0; milliseconds < (_totalTimePeriodInMinutes * NB_MILLI_SECONDS_IN_ONE_MINUTE); milliseconds += rangeForSmallTicks)
         {
             // Check if we have a normal tick or a big one
             bool isBigTick = ((milliseconds%_timeRangeBetweenTimeTicksInMilliSeconds) == 0);
@@ -182,7 +186,7 @@ void AbstractTimeActionslineScenarioViewController::updateTimeCoordinatesOfTimeT
         }
 
         // - Add a last time tick (for decoration purposes only)
-        TimeTickM* timeTick = new TimeTickM((_totalTimePeriodInMinutes*60000.0), TimeTickTypes::BIG_TICK);
+        TimeTickM* timeTick = new TimeTickM(static_cast<int>(_totalTimePeriodInMinutes * NB_MILLI_SECONDS_IN_ONE_MINUTE), TimeTickTypes::BIG_TICK);
         timeTicksList.append(timeTick);
 
         // Save our new list of time ticks
@@ -269,10 +273,10 @@ qreal AbstractTimeActionslineScenarioViewController::convertTimeInMillisecondsTo
     Q_UNUSED(extraQmlUpdateField)
 
     // Compute delta in seconds between this date and our origin
-    qreal deltaSeconds = (timeInMilliSeconds/1000.0 - _startRelativeTimeInSeconds);
+    qreal deltaSeconds = (timeInMilliSeconds / 1000.0 - _startRelativeTimeInSeconds);
 
     // Round value to avoid rendering artefacts
-    return (qRound(_pixelsPerMinute * (deltaSeconds/60.0)) + _timeMarginInPixels);
+    return (qRound(_pixelsPerMinute * (deltaSeconds / 60.0)) + _timeMarginInPixels);
 }
 
 
@@ -290,7 +294,7 @@ int AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordinateSy
 
     qreal timeSeconds = ((xValue- _timeMarginInPixels)/_pixelsPerMinute) * 60.0;
 
-    return ((timeSeconds + _startRelativeTimeInSeconds) * 1000.0);
+    return static_cast<int>((timeSeconds + _startRelativeTimeInSeconds) * 1000.0);
 }
 
 
@@ -335,7 +339,7 @@ qreal AbstractTimeActionslineScenarioViewController::convertDurationInMillisecon
     Q_UNUSED(extraQmlUpdateField)
 
     // Round value to avoid rendering artefacts
-    return qRound( static_cast<qreal>(durationInMilliseconds) * _pixelsPerMinute/60000.0);
+    return qRound( static_cast<qreal>(durationInMilliseconds) * _pixelsPerMinute / NB_MILLI_SECONDS_IN_ONE_MINUTE);
 }
 
 
@@ -390,14 +394,17 @@ void AbstractTimeActionslineScenarioViewController::setviewportWidth(int value)
 void AbstractTimeActionslineScenarioViewController::_updateFilteredTimeTicksListTimeRange()
 {
     // Compute the viewport range in misslisecond with right and left margin of 20 pixels
-    qreal viewportTimeRangeStartInMilliseconds =  (_viewportX-_timeMarginInPixels-20)/(_pixelsPerMinute/60000.0);
-    qreal viewportTimeRangeEndInMilliseconds =  (_viewportX+_viewportWidth+20)/(_pixelsPerMinute/60000.0);
+    qreal viewportTimeRangeStartInMilliseconds = (_viewportX - _timeMarginInPixels - 20) / (_pixelsPerMinute / NB_MILLI_SECONDS_IN_ONE_MINUTE);
+    qreal viewportTimeRangeEndInMilliseconds = (_viewportX + _viewportWidth + 20) / (_pixelsPerMinute / NB_MILLI_SECONDS_IN_ONE_MINUTE);
+
+    int intViewportTimeRangeStartInMilliseconds =  static_cast<int>(viewportTimeRangeStartInMilliseconds);
+    int intViewportTimeRangeEndInMilliseconds =  static_cast<int>(viewportTimeRangeEndInMilliseconds);
 
     // Set the new time range
-    _filteredListTimeTicks.setTimeRange(viewportTimeRangeStartInMilliseconds,viewportTimeRangeEndInMilliseconds);
+    _filteredListTimeTicks.setTimeRange(intViewportTimeRangeStartInMilliseconds, intViewportTimeRangeEndInMilliseconds);
 
     // Emit the change for actions view models
-    Q_EMIT timeRangeChanged(viewportTimeRangeStartInMilliseconds,viewportTimeRangeEndInMilliseconds);
+    Q_EMIT timeRangeChanged(intViewportTimeRangeStartInMilliseconds, intViewportTimeRangeEndInMilliseconds);
 }
 
 
