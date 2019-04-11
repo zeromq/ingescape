@@ -273,7 +273,7 @@ ApplicationWindow {
                 id: subWindowsInstantiator
                 model: 0 // IngeScapeEditorC.openedWindows
 
-                MenuItem {
+                delegate: MenuItem {
                     text: model.QtObject.title
 
                     onTriggered: {

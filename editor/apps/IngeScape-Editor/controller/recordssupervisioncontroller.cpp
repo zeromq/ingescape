@@ -131,7 +131,7 @@ void RecordsSupervisionController::deleteRecord(RecordVM* record)
         // Notify the recorder that it has to remove entry from the data base
         if (_isRecorderON)
         {
-            QString commandAndParameters = QString("%1=%2").arg(command_DeleteRecord, record->modelM()->id());
+            QString commandAndParameters = QString("%1=%2").arg(command_DeleteRecord, record->modelM()->uid());
 
             Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
         }
@@ -248,9 +248,9 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
         {
             for (RecordM* record : recordsList)
             {
-                if ((record != nullptr) && !_hashFromRecordIdToModel.contains(record->id()))
+                if ((record != nullptr) && !_hashFromRecordIdToModel.contains(record->uid()))
                 {
-                    _hashFromRecordIdToModel.insert(record->id(), record);
+                    _hashFromRecordIdToModel.insert(record->uid(), record);
 
                     // Create a view model of record with this model
                     _createRecordVMwithModel(record);
@@ -278,9 +278,9 @@ void RecordsSupervisionController::onAddedRecord(QString recordJSON)
         {
             RecordM* newRecord = recordsList.at(0);
 
-            if ((newRecord != nullptr) && !_hashFromRecordIdToModel.contains(newRecord->id()))
+            if ((newRecord != nullptr) && !_hashFromRecordIdToModel.contains(newRecord->uid()))
             {
-                _hashFromRecordIdToModel.insert(newRecord->id(), newRecord);
+                _hashFromRecordIdToModel.insert(newRecord->uid(), newRecord);
 
                 // Create a view model of record with this model
                 _createRecordVMwithModel(newRecord);
@@ -369,11 +369,11 @@ void RecordsSupervisionController::_onTimeout_DisplayTime()
  */
 void RecordsSupervisionController::_createRecordVMwithModel(RecordM* model)
 {
-    if ((model != nullptr) && !_hashFromRecordIdToViewModel.contains(model->id()))
+    if ((model != nullptr) && !_hashFromRecordIdToViewModel.contains(model->uid()))
     {
         RecordVM* vm = new RecordVM(model);
 
-        _hashFromRecordIdToViewModel.insert(model->id(), vm);
+        _hashFromRecordIdToViewModel.insert(model->uid(), vm);
 
         // Insert in the displayed list
         _recordsList.insert(0, vm);
@@ -387,12 +387,12 @@ void RecordsSupervisionController::_createRecordVMwithModel(RecordM* model)
  */
 void RecordsSupervisionController::_deleteRecordVMwithModel(RecordM* model)
 {
-    if ((model != nullptr) && _hashFromRecordIdToViewModel.contains(model->id()))
+    if ((model != nullptr) && _hashFromRecordIdToViewModel.contains(model->uid()))
     {
-        RecordVM* vm = _hashFromRecordIdToViewModel.value(model->id());
+        RecordVM* vm = _hashFromRecordIdToViewModel.value(model->uid());
         if (vm != nullptr)
         {
-            _hashFromRecordIdToViewModel.remove(model->id());
+            _hashFromRecordIdToViewModel.remove(model->uid());
 
             if (_playingRecord != nullptr) {
                 setplayingRecord(nullptr);
