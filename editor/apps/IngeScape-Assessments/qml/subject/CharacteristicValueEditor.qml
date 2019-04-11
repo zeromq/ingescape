@@ -48,6 +48,8 @@ Item {
 
     property bool isCurrentlyEditing: false;
 
+    property bool areVisibleOptions: characteristic ? (characteristic.isSubjectName && isSelected) : false;
+
 
     //--------------------------------
     //
@@ -79,9 +81,7 @@ Item {
     //--------------------------------
 
     /*onCharacteristicChanged: {
-        if (characteristic) {
-            console.log("QML: on Characteristic changed " + characteristic.name);
-        }
+        console.log("QML: on Characteristic changed " + characteristic.name);
     }*/
 
     /*onCharacteristicValueChanged: {
@@ -103,77 +103,19 @@ Item {
     //
     //--------------------------------------------------------
 
-    Row {
-        id: rowOptions
+    Loader {
+        id: loaderOptions
 
-        anchors {
-            left: parent.left
-            top: parent.top
-            bottom: parent.bottom
-        }
-
-        spacing: 5
-
-        visible: rootItem.characteristic ? (rootItem.characteristic.isSubjectName && rootItem.isSelected)
-                                         : false
-
-        Button {
-            id: btnEdit
-
-            anchors {
-                top: parent.top
-            }
-            width: 50
-            height: 30
-
-            checkable: true
-
-            checked: rootItem.isCurrentlyEditing
-
-            text: checked ? "SAVE" : "EDIT"
-
-            onClicked: {
-
-                if (checked) {
-                    // Emit the signal "Edit Subject"
-                    rootItem.editSubject();
-                }
-                else {
-                    // Emit the signal "Stop Edition of Subject"
-                    rootItem.stopEditionOfSubject();
-                }
-            }
-
-            Binding {
-                target: btnEdit
-                property: "checked"
-                value: rootItem.isCurrentlyEditing
-            }
-        }
-
-        Button {
-            id: btnDelete
-
-            anchors {
-                top: parent.top
-            }
-            width: 50
-            height: 30
-
-            text: "DEL"
-
-            onClicked: {
-                // Emit the signal "Delete Subject"
-                rootItem.deleteSubject();
-            }
-        }
+        sourceComponent: (characteristic && characteristic.isSubjectName) ? componentOptions : null
     }
 
     Rectangle {
         id: background
 
         anchors {
-            left: rowOptions.visible ? rowOptions.right : parent.left
+            //left: rowOptions.visible ? rowOptions.right : parent.left
+            left: parent.left
+            leftMargin: rootItem.areVisibleOptions ? 105 : 0
             right: parent.right
             top: parent.top
             bottom: parent.bottom
@@ -260,5 +202,78 @@ Item {
             }
         }
 
+    }
+
+
+    //
+    // Options
+    //
+    Component {
+        id: componentOptions
+
+        Row {
+            id: rowOptions
+
+            anchors {
+                left: parent.left
+                top: parent.top
+                bottom: parent.bottom
+            }
+
+            spacing: 5
+
+            visible: rootItem.areVisibleOptions
+
+            Button {
+                id: btnEdit
+
+                anchors {
+                    top: parent.top
+                }
+                width: 50
+                height: 30
+
+                checkable: true
+
+                checked: rootItem.isCurrentlyEditing
+
+                text: checked ? "SAVE" : "EDIT"
+
+                onClicked: {
+
+                    if (checked) {
+                        // Emit the signal "Edit Subject"
+                        rootItem.editSubject();
+                    }
+                    else {
+                        // Emit the signal "Stop Edition of Subject"
+                        rootItem.stopEditionOfSubject();
+                    }
+                }
+
+                Binding {
+                    target: btnEdit
+                    property: "checked"
+                    value: rootItem.isCurrentlyEditing
+                }
+            }
+
+            Button {
+                id: btnDelete
+
+                anchors {
+                    top: parent.top
+                }
+                width: 50
+                height: 30
+
+                text: "DEL"
+
+                onClicked: {
+                    // Emit the signal "Delete Subject"
+                    rootItem.deleteSubject();
+                }
+            }
+        }
     }
 }
