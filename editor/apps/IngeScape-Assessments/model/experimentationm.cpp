@@ -37,7 +37,7 @@ ExperimentationM::ExperimentationM(QString name,
 
 
     // Default characteristic "Name"
-    CharacteristicM* characteristicName = new CharacteristicM(CHARACTERISTIC_NAME, CharacteristicValueTypes::TEXT, this);
+    CharacteristicM* characteristicName = new CharacteristicM(CHARACTERISTIC_NAME, CharacteristicValueTypes::TEXT, false, this);
     _allCharacteristics.append(characteristicName);
 
 
@@ -62,6 +62,18 @@ ExperimentationM::ExperimentationM(QString name,
 ExperimentationM::~ExperimentationM()
 {
     qInfo() << "Delete Model of Experimentation" << _name;
+
+    // Delete all characteristics of our experimentation
+    _allCharacteristics.deleteAllItems();
+
+    // Delete all subjects of our experimentation
+    _allSubjects.deleteAllItems();
+
+    // Delete all tasks of our experimentation
+    _allTasks.deleteAllItems();
+
+    // Delete all records of our experimentation
+    _allRecords.deleteAllItems();
 
 }
 

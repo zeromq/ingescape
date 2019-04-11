@@ -45,6 +45,7 @@ Item {
 
     property ExperimentationM experimentation: modelManager ? modelManager.currentExperimentation : null;
 
+    property int indexPreviousSelectedSubject: -1;
     property int indexSubjectCurrentlyEditing: -1;
 
 
@@ -58,6 +59,41 @@ Item {
 
     // Close Subjects view
     signal closeSubjectsView();
+
+
+
+    //--------------------------------
+    //
+    //
+    // Functions
+    //
+    //
+    //--------------------------------
+
+    /**
+     * Edit a subject at a row index
+     */
+    function editSubjectAtRowIndex(rowIndex) {
+
+        console.log("QML: Edit the subject at the row index " + rowIndex);
+
+        // Set the index
+        rootItem.indexSubjectCurrentlyEditing = rowIndex;
+    }
+
+
+    /**
+     * Stop the current edition of a subject
+     */
+    function stopCurrentEditionOfSubject() {
+        if (rootItem.indexSubjectCurrentlyEditing > -1)
+        {
+            console.log("QML: Stop the current edition of the subject at the row index " + rootItem.indexSubjectCurrentlyEditing);
+
+            // Reset the index
+            rootItem.indexSubjectCurrentlyEditing = -1;
+        }
+    }
 
 
 
@@ -287,18 +323,20 @@ Item {
 
                                 if (rootItem.indexSubjectCurrentlyEditing === styleData.row)
                                 {
-                                    console.log("QML: Validate Subject " + styleData.value + " (" + styleData.row + ")");
-
-                                    // Reset the index
-                                    rootItem.indexSubjectCurrentlyEditing = -1;
+                                    // Stop the current edition of the subject
+                                    stopCurrentEditionOfSubject();
                                 }
                                 else
                                 {
-                                    console.log("QML: Edit Subject " + styleData.value + " (" + styleData.row + ")");
-
-                                    // Set the index
-                                    rootItem.indexSubjectCurrentlyEditing = styleData.row;
+                                    // Edit the subject at the row index
+                                    editSubjectAtRowIndex(styleData.row);
                                 }
+                            }
+
+                            Binding {
+                                target: btnEdit
+                                property: "checked"
+                                value: (rootItem.indexSubjectCurrentlyEditing === styleData.row)
                             }
                         }
 
@@ -322,29 +360,15 @@ Item {
                                     {
                                         //console.log("QML: Delete Subject " + subject.name);
 
-                                        rootItem.controller.deleteSubject(subject);
+                                        // Stop the current edition of the subject
+                                        stopCurrentEditionOfSubject();
 
-                                        // Reset the index
-                                        rootItem.indexSubjectCurrentlyEditing = -1;
+                                        rootItem.controller.deleteSubject(subject);
 
                                         // Clear the selection
                                         tableSubjects.selection.clear();
                                     }
                                 }
-
-
-
-                                /*if (rootItem.modelM)
-                                {
-                                    //console.log("QML: Delete Subject " + rootItem.modelM.uid);
-
-                                    // Emit the signal "Delete Subject"
-                                    rootItem.deleteSubject();
-                                }*/
-
-                                /*if (rootItem.controller) {
-                                    rootItem.controller.deleteSubject(model.QtObject);
-                                }*/
                             }
                         }
                     }
@@ -371,6 +395,7 @@ Item {
                         }
                     }
                 }
+
             }
 
             Instantiator {
@@ -407,7 +432,7 @@ Item {
                 }
 
                 onObjectAdded: {
-                    console.log("onObjectAdded " + index)
+                    console.log("onObjectAdded " + index + " columnCount= " + tableSubjects.columnCount)
                     tableSubjects.insertColumn(index, object);
                 }
                 onObjectRemoved: {
@@ -416,16 +441,40 @@ Item {
                 }
             }
 
-            onSelectionChanged: {
-                console.log("onSelectionChanged " + tableSubjects.selection);
-
-                if (rootItem.indexSubjectCurrentlyEditing > -1)
-                {
-                    console.log("TODO " + rootItem.indexSubjectCurrentlyEditing);
-                }
-            }
             onDoubleClicked: {
-                console.log("onDoubleClicked ");
+                //console.log("onDoubleClicked " + row);
+
+                // Edit the subject at the row index
+                editSubjectAtRowIndex(row);
+            }
+
+
+            // NOT Called
+            //onSelectionChanged: {
+            //}
+            // --> Workaround
+            Connections {
+                target: tableSubjects.selection
+
+                onSelectionChanged: {
+                    //console.log("onSelectionChanged:");
+
+                    if ((rootItem.indexPreviousSelectedSubject === rootItem.indexSubjectCurrentlyEditing) && (rootItem.indexSubjectCurrentlyEditing > -1))
+                    {
+                        // Stop the current edition of the subject
+                        stopCurrentEditionOfSubject();
+                    }
+
+                    // Reset
+                    rootItem.indexPreviousSelectedSubject = -1;
+
+                    tableSubjects.selection.forEach(function(rowIndex) {
+                        //console.log("row " + rowIndex + " is selected");
+
+                        // Update
+                        rootItem.indexPreviousSelectedSubject = rowIndex;
+                    })
+                }
             }
         }
 

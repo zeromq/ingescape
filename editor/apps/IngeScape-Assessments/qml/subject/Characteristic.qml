@@ -164,7 +164,7 @@ Item {
 
         text: "Delete"
 
-        //visible: mouseArea.containsMouse
+        visible: rootItem.modelM.canBeDeleted
 
         onClicked: {
             if (rootItem.modelM)

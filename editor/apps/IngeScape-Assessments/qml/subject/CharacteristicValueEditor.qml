@@ -73,6 +73,12 @@ Item {
         console.log("QML: on Characteristic Value " + characteristicValue);
     }*/
 
+    /*onIsCurrentlyEditingChanged: {
+        if (isCurrentlyEditing === false) {
+            console.log("QML: is Currently Editing from true to false " + characteristicValue);
+        }
+    }*/
+
 
     //--------------------------------------------------------
     //
@@ -101,8 +107,7 @@ Item {
 
             visible: !rootItem.isCurrentlyEditing
 
-            text: (typeof rootItem.characteristicValue !== 'undefined') ? rootItem.characteristicValue
-                                                                        : ""
+            text: (typeof rootItem.characteristicValue !== 'undefined') ? rootItem.characteristicValue : ""
         }
 
         TextField {
@@ -137,7 +142,7 @@ Item {
             }
 
             onTextChanged: {
-                console.log("QML: on Text Changed " + txtEditor.text);
+                //console.log("QML: on Text Changed " + txtEditor.text);
                 rootItem.characteristicValue = txtEditor.text;
             }
         }
@@ -158,7 +163,7 @@ Item {
             onSelectedItemChanged: {
                 if (cmbEditor.selectedItem && rootItem.characteristic)
                 {
-                    console.log("QML on Selected Item Changed " + cmbEditor.selectedItem);
+                    //console.log("QML on Selected Item Changed " + cmbEditor.selectedItem);
                     rootItem.characteristicValue = cmbEditor.selectedItem;
                 }
             }

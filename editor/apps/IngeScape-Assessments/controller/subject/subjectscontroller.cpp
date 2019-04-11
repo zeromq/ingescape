@@ -96,7 +96,7 @@ void SubjectsController::createNewCharacteristic(QString characteristicName, int
         //qInfo() << "Create new characteristic" << characteristicName << "of type" << CharacteristicValueTypes::staticEnumToString(characteristicValueType);
 
         // Create the new characteristic
-        CharacteristicM* characteristic = new CharacteristicM(characteristicName, characteristicValueType, nullptr);
+        CharacteristicM* characteristic = new CharacteristicM(characteristicName, characteristicValueType);
 
         // Add the characteristic to the experimentation
         _modelManager->currentExperimentation()->addCharacteristic(characteristic);
@@ -117,7 +117,7 @@ void SubjectsController::createNewCharacteristicEnum(QString characteristicName,
         qInfo() << "Create new characteristic" << characteristicName << "of type" << CharacteristicValueTypes::staticEnumToString(CharacteristicValueTypes::CHARACTERISTIC_ENUM) << "with values:" << enumValues;
 
         // Create the new characteristic
-        CharacteristicM* characteristic = new CharacteristicM(characteristicName, CharacteristicValueTypes::CHARACTERISTIC_ENUM, nullptr);
+        CharacteristicM* characteristic = new CharacteristicM(characteristicName, CharacteristicValueTypes::CHARACTERISTIC_ENUM);
         characteristic->setenumValues(enumValues);
 
         // Add the characteristic to the experimentation
@@ -161,8 +161,6 @@ void SubjectsController::createNewSubject()
         // For each existing characteristic
         for (CharacteristicM* characteristic : _modelManager->currentExperimentation()->allCharacteristics()->toList())
         {
-            // Do not add the characteristic "Name" that have already been added
-            //if ((characteristic != nullptr) && (characteristic->name() != CHARACTERISTIC_NAME))
             if (characteristic != nullptr)
             {
                 subject->addCharacteristic(characteristic);

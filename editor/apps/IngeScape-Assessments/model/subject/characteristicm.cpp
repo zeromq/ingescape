@@ -18,13 +18,16 @@
  * @brief Constructor
  * @param name
  * @param valueType
+ * @param canBeDeleted
  * @param parent
  */
 CharacteristicM::CharacteristicM(QString name,
                                  CharacteristicValueTypes::Value valueType,
+                                 bool canBeDeleted,
                                  QObject *parent) : QObject(parent),
     _name(name),
     _valueType(valueType),
+    _canBeDeleted(canBeDeleted),
     _enumValues(QStringList())
 {
     // Force ownership of our object, it will prevent Qml from stealing it

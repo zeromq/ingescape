@@ -35,9 +35,6 @@ IngeScapeModelManager::IngeScapeModelManager(QObject *parent) : QObject(parent),
     // FIXME TESTS
     //
 
-    //CharacteristicM *characteristicAge = new CharacteristicM("Age", CharacteristicValueTypes::INTEGER, this);
-
-
     QStringList enumBool = { tr("FALSE"), tr("TRUE") };
     //QStringList enumBool_French = { "FAUX", "VRAI" };
 
@@ -47,13 +44,13 @@ IngeScapeModelManager::IngeScapeModelManager(QObject *parent) : QObject(parent),
     QStringList enumGender = { tr("NEUTRAL"), tr("WOMAN"), tr("MAN") };
     //QStringList enumGender_French = { "NEUTRE", "FEMME", "HOMME" };
 
-    CharacteristicM *characteristicBool = new CharacteristicM("Booléen", CharacteristicValueTypes::CHARACTERISTIC_ENUM, this);
+    CharacteristicM *characteristicBool = new CharacteristicM("Booléen", CharacteristicValueTypes::CHARACTERISTIC_ENUM);
     characteristicBool->setenumValues(enumBool);
 
-    CharacteristicM *characteristicYesNo = new CharacteristicM("Oui/Non", CharacteristicValueTypes::CHARACTERISTIC_ENUM, this);
+    CharacteristicM *characteristicYesNo = new CharacteristicM("Oui/Non", CharacteristicValueTypes::CHARACTERISTIC_ENUM);
     characteristicYesNo->setenumValues(enumYesNo);
 
-    CharacteristicM *characteristicGender = new CharacteristicM("Genre", CharacteristicValueTypes::CHARACTERISTIC_ENUM, this);
+    CharacteristicM *characteristicGender = new CharacteristicM("Genre", CharacteristicValueTypes::CHARACTERISTIC_ENUM);
     characteristicGender->setenumValues(enumGender);
 }
 
