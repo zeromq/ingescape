@@ -141,6 +141,9 @@ Item {
         TextField {
             id: txtEditor
 
+            property var intValidator: IntValidator {}
+            property var doubleValidator: DoubleValidator {}
+
             anchors {
                 fill: parent
                 margins: 1
@@ -149,6 +152,25 @@ Item {
             visible: rootItem.isCurrentlyEditing && rootItem.characteristic && (rootItem.characteristic.valueType !== CharacteristicValueTypes.CHARACTERISTIC_ENUM)
 
             text: (typeof rootItem.characteristicValue !== 'undefined') ? rootItem.characteristicValue : ""
+
+            //inputMethodHints: Qt.ImhFormattedNumbersOnly
+
+            validator: if (rootItem.characteristic)
+                       {
+                           if (rootItem.characteristic.valueType === CharacteristicValueTypes.INTEGER) {
+                               return txtEditor.intValidator;
+                           }
+                           else if (rootItem.characteristic.valueType === CharacteristicValueTypes.DOUBLE) {
+                               return txtEditor.doubleValidator;
+                           }
+                           else {
+                               return null;
+                           }
+                       }
+                       else {
+                           return null;
+                       }
+
 
             style: I2TextFieldStyle {
                 backgroundColor: IngeScapeTheme.darkBlueGreyColor
