@@ -17,6 +17,7 @@
 
 /**
  * @brief Constructor
+ * @param modelManager
  * @param parent
  */
 SubjectsController::SubjectsController(IngeScapeModelManager* modelManager,

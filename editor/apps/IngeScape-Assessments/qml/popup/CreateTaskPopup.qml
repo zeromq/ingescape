@@ -15,6 +15,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Dialogs 1.3
 
 import I2Quick 1.0
 
@@ -44,7 +45,7 @@ I2PopupBase {
 
     property TasksController controller: null;
 
-    //property ExperimentationM experimentation: null
+    property url selectedPlatformUrl: "";
 
 
 
@@ -95,6 +96,8 @@ I2PopupBase {
 
         // Reset all user inputs
         txtTaskName.text = "";
+        //txtPlatformUrl.text = "";
+        rootPopup.selectedPlatformUrl = "";
 
         // Close the popup
         rootPopup.close();
@@ -162,7 +165,7 @@ I2PopupBase {
                 Text {
                     text: qsTr("Name:")
 
-                    width: 150
+                    width: 100
                     height: 30
 
                     color: IngeScapeTheme.whiteColor
@@ -212,7 +215,7 @@ I2PopupBase {
                 Text {
                     text: qsTr("Platform:")
 
-                    width: 150
+                    width: 100
                     height: 30
 
                     color: IngeScapeTheme.whiteColor
@@ -220,6 +223,51 @@ I2PopupBase {
                         family: IngeScapeTheme.textFontFamily
                         weight : Font.Medium
                         pixelSize : 16
+                    }
+                }
+
+                TextField {
+                    id: txtPlatformUrl
+
+                    height: 30
+                    width: 150
+
+                    //verticalAlignment: TextInput.AlignVCenter
+                    text: rootPopup.selectedPlatformUrl
+
+                    style: I2TextFieldStyle {
+                        backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                        borderColor: IngeScapeTheme.whiteColor
+                        borderErrorColor: IngeScapeTheme.redColor
+                        radiusTextBox: 1
+                        borderWidth: 0;
+                        borderWidthActive: 1
+                        textIdleColor: IngeScapeTheme.whiteColor;
+                        textDisabledColor: IngeScapeTheme.darkGreyColor
+
+                        padding.left: 3
+                        padding.right: 3
+
+                        font {
+                            pixelSize:15
+                            family: IngeScapeTheme.textFontFamily
+                        }
+                    }
+                }
+
+                Button {
+                    id: btnSelectPlatformFile
+
+                    text: qsTr("Select file...")
+
+                    width: 100
+                    height: 30
+
+                    onClicked: {
+                        //console.log("QML: Select platform file...");
+
+                        // Open the file dialog
+                        fileDialog.open();
                     }
                 }
 
@@ -292,7 +340,8 @@ I2PopupBase {
                 activeFocusOnPress: true
                 text: "OK"
 
-                enabled: (txtTaskName.text.length > 0)
+                enabled: ( (txtTaskName.text.length > 0) && (txtPlatformUrl.text.length > 0)
+                          && controller && controller.canCreateTaskWithName(txtTaskName.text) )
 
                 style: I2SvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
@@ -313,12 +362,13 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    console.log("QML: create new Task " + txtTaskName.text);
+                    //console.log("QML: create new Task " + txtTaskName.text + " with platform " + txtPlatformUrl.text);
 
-                    /*if (controller && comboSubjects.selectedItem && comboTasks.selectedItem)
+                    if (controller)
                     {
-                        controller.createNewRecordForSubjectAndTask(txtRecordName.text, comboSubjects.selectedItem, comboTasks.selectedItem);
-                    }*/
+                        // Create a new task with an IngeScape platform file
+                        controller.createNewTaskWithIngeScapePlatformFile(txtTaskName.text, txtPlatformUrl.text);
+                    }
 
                     // Reset all user inputs and close the popup
                     rootPopup.resetInputsAndClosePopup();
@@ -326,6 +376,34 @@ I2PopupBase {
             }
         }
 
+    }
+
+
+    FileDialog {
+        id: fileDialog
+
+        title: "Select an IngeScape platform file"
+
+        //folder: shortcuts.home
+        folder: shortcuts.documents
+
+        //defaultSuffix: ".json"
+        nameFilters: [ "JSON files (*.json)" ]
+
+        onAccepted: {
+            //console.log("Selected Platform Url: " + fileDialog.fileUrl)
+
+            // Set the selected platform URL
+            rootPopup.selectedPlatformUrl = fileDialog.fileUrl;
+
+            //fileDialog.close();
+        }
+
+        /*onRejected: {
+            console.log("Canceled");
+
+            //fileDialog.close();
+        }*/
     }
 
 }

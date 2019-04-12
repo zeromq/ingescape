@@ -16,10 +16,12 @@
 
 /**
  * @brief Constructor
+ * @param name
  * @param parent
  */
-TaskM::TaskM(QObject *parent) : QObject(parent),
-    _name("")
+TaskM::TaskM(QString name,
+             QObject *parent) : QObject(parent),
+    _name(name)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

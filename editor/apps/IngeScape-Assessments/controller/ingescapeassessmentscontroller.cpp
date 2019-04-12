@@ -126,6 +126,9 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _recordC = new RecordController(this);
 
 
+    // Connect to signals from the data model manager of our IngeScape Assessments application
+    connect(_modelManager, &IngeScapeModelManager::currentExperimentationChanged, this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
+
 
     // Connect to signals from the network controller
     /*connect(_networkC, &NetworkController::agentEntered, _modelManager, &IngeScapeModelManager::onAgentEntered);
@@ -310,4 +313,36 @@ void IngeScapeAssessmentsController::processBeforeClosing()
 void IngeScapeAssessmentsController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
+}
+
+
+/**
+ * @brief Slot called when the current experimentation changed
+ * @param value
+ */
+void IngeScapeAssessmentsController::_onCurrentExperimentationChanged(ExperimentationM* currentExperimentation)
+{
+    if (currentExperimentation != nullptr)
+    {
+        qDebug() << "Current Experimentation = " << currentExperimentation->name();
+
+        if (_experimentationC != nullptr) {
+            //_experimentationC->setcurrentExperimentation(currentExperimentation);
+        }
+
+        if (_subjectsC != nullptr) {
+            //_subjectsC->setcurrentExperimentation(currentExperimentation);
+        }
+
+        if (_tasksC != nullptr) {
+            _tasksC->setcurrentExperimentation(currentExperimentation);
+        }
+
+        if (_recordC != nullptr) {
+            //_recordC->setcurrentExperimentation(currentExperimentation);
+        }
+    }
+    else {
+        qDebug() << "Current Experimentation is NULL !";
+    }
 }

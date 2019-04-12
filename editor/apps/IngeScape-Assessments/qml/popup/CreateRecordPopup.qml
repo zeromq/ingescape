@@ -414,6 +414,7 @@ I2PopupBase {
 
                     if (controller && comboSubjects.selectedItem && comboTasks.selectedItem)
                     {
+                        // Create a new record for a subject and a task
                         controller.createNewRecordForSubjectAndTask(txtRecordName.text, comboSubjects.selectedItem, comboTasks.selectedItem);
                     }
 

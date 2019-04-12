@@ -42,6 +42,7 @@ Item {
 
     //property IngeScapeModelManager modelManager: null;
 
+    property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
 
 
     //--------------------------------
@@ -127,6 +128,42 @@ Item {
 
                 // Open the popup
                 createTaskPopup.open();
+            }
+        }
+    }
+
+    Column {
+        id: columnTasksList
+
+        anchors {
+            top: header.bottom
+            topMargin: 20
+            left: parent.left
+            leftMargin: 5
+            //right: parent.right
+            //rightMargin: 5
+        }
+        width: 250
+
+        Repeater {
+            model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
+
+            /*delegate: Characteristic {
+
+                modelM: model.QtObject
+
+                //
+                // Slots
+                //
+                onDeleteCharacteristic: {
+                    if (rootItem.controller) {
+                        rootItem.controller.deleteCharacteristic(model.QtObject);
+                    }
+                }
+            }*/
+
+            delegate: Text {
+                text: model.name
             }
         }
     }

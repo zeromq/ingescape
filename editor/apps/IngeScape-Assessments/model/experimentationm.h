@@ -70,17 +70,31 @@ public:
 
 
     /**
-     * @brief Add the characteristic to our experimentation
+     * @brief Add a characteristic to our experimentation
      * @param characteristic
      */
     void addCharacteristic(CharacteristicM* characteristic);
 
 
     /**
-     * @brief Remove the characteristic from our experimentation
+     * @brief Remove a characteristic from our experimentation
      * @param characteristic
      */
     void removeCharacteristic(CharacteristicM* characteristic);
+
+
+    /**
+     * @brief Add a task to our experimentation
+     * @param task
+     */
+    void addTask(TaskM* task);
+
+
+    /**
+     * @brief Remove a task from our experimentation
+     * @param task
+     */
+    void removeTask(TaskM* task);
 
 
 

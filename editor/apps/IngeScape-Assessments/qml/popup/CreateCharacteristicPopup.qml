@@ -445,7 +445,7 @@ I2PopupBase {
                 activeFocusOnPress: true
                 text: "OK"
 
-                enabled: ((txtCharacteristicName.text.length > 0) && (rootPopup.selectedType > -1)
+                enabled: ( (txtCharacteristicName.text.length > 0) && (rootPopup.selectedType > -1)
                           && controller && controller.canCreateCharacteristicWithName(txtCharacteristicName.text) )
 
                 style: I2SvgButtonStyle {

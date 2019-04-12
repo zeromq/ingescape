@@ -114,6 +114,15 @@ public Q_SLOTS:
     void forceCreation();
 
 
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the current experimentation changed
+     * @param value
+     */
+    void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
+
+
 private:
 
     // To subscribe to termination signals

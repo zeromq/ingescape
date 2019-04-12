@@ -79,7 +79,7 @@ ExperimentationM::~ExperimentationM()
 
 
 /**
- * @brief Add the characteristic to our experimentation
+ * @brief Add a characteristic to our experimentation
  * @param characteristic
  */
 void ExperimentationM::addCharacteristic(CharacteristicM* characteristic)
@@ -102,7 +102,7 @@ void ExperimentationM::addCharacteristic(CharacteristicM* characteristic)
 
 
 /**
- * @brief Remove the characteristic from our experimentation
+ * @brief Remove a characteristic from our experimentation
  * @param characteristic
  */
 void ExperimentationM::removeCharacteristic(CharacteristicM* characteristic)
@@ -120,6 +120,34 @@ void ExperimentationM::removeCharacteristic(CharacteristicM* characteristic)
                 subject->removeCharacteristic(characteristic);
             }
         }
+    }
+}
+
+
+/**
+ * @brief Add a task to our experimentation
+ * @param task
+ */
+void ExperimentationM::addTask(TaskM* task)
+{
+    if (task != nullptr)
+    {
+        // Add to the list
+        _allTasks.append(task);
+    }
+}
+
+
+/**
+ * @brief Remove a task from our experimentation
+ * @param task
+ */
+void ExperimentationM::removeTask(TaskM* task)
+{
+    if (task != nullptr)
+    {
+        // Remove from the list
+        _allTasks.remove(task);
     }
 }
 

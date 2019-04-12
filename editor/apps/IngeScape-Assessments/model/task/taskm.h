@@ -45,9 +45,11 @@ class TaskM : public QObject
 public:
     /**
      * @brief Constructor
+     * @param name
      * @param parent
      */
-    explicit TaskM(QObject *parent = nullptr);
+    explicit TaskM(QString name,
+                   QObject *parent = nullptr);
 
 
     /**
