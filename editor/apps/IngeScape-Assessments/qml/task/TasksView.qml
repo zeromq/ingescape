@@ -44,6 +44,8 @@ Item {
 
     property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
 
+    property TaskM selectedTak: null;
+
 
     //--------------------------------
     //
@@ -71,7 +73,7 @@ Item {
 
         anchors.fill: parent
 
-        color: "#FF663366"
+        color: "#FF333366"
     }
 
     Button {
@@ -86,7 +88,7 @@ Item {
         text: "X"
 
         onClicked: {
-            console.log("QML: close Tasks view");
+            //console.log("QML: close Tasks view");
 
             // Emit the signal "closeTasksView"
             rootItem.closeTasksView();
@@ -113,8 +115,8 @@ Item {
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 20
+                weight: Font.Medium
+                pixelSize: 20
             }
         }
 
@@ -132,40 +134,94 @@ Item {
         }
     }
 
-    Column {
-        id: columnTasksList
+    ListView {
+
+        id: listOfTasks
 
         anchors {
             top: header.bottom
             topMargin: 20
+            bottom: parent.bottom
+            bottomMargin: 5
             left: parent.left
             leftMargin: 5
-            //right: parent.right
-            //rightMargin: 5
         }
-        width: 250
+        width: 300
 
-        Repeater {
-            model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
+        model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
 
-            /*delegate: Characteristic {
+        delegate: TaskInList {
 
-                modelM: model.QtObject
+            modelM: model.QtObject
 
-                //
-                // Slots
-                //
-                onDeleteCharacteristic: {
-                    if (rootItem.controller) {
-                        rootItem.controller.deleteCharacteristic(model.QtObject);
-                    }
+            isSelected: ListView.isCurrentItem
+
+            //
+            // Slots
+            //
+            onSelectTask: {
+                //console.log("QML: on Select Task " + model.name + " at " + index);
+
+                // First, select the task
+                rootItem.selectedTak = model.QtObject;
+
+                // Then, set the index
+                listOfTasks.currentIndex = index;
+            }
+
+            onDeleteTask: {
+                if (rootItem.controller) {
+                    console.log("QML: on Delete Task " + model.name);
+
+                    // First, un-select the task
+                    rootItem.selectedTak = null;
+
+                    // Then, reset the index
+                    listOfTasks.currentIndex = -1;
+
+                    // Delete the task
+                    rootItem.controller.deleteTask(model.QtObject);
                 }
-            }*/
+            }
 
-            delegate: Text {
-                text: model.name
+            onDuplicateTask: {
+                if (rootItem.controller) {
+                    console.log("QML: on Duplicate Task " + model.name);
+                }
             }
         }
+
+        onCurrentIndexChanged: {
+            // If the index is defined but if the selected task is null, we have to select the corresponding task
+            if ((currentIndex > -1) && (rootItem.selectedTak === null)
+                    && rootItem.experimentation && (currentIndex < rootItem.experimentation.allTasks.count))
+            {
+                //console.log("QML: Must select task at " + currentIndex);
+                rootItem.selectedTak = rootItem.experimentation.allTasks.get(currentIndex);
+            }
+        }
+
+    }
+
+
+    //
+    // Task
+    //
+    Task {
+        id: task
+
+        anchors {
+            top: header.bottom
+            topMargin: 20
+            bottom: parent.bottom
+            bottomMargin: 5
+            left: listOfTasks.right
+            leftMargin: 0
+            right: parent.right
+            rightMargin: 5
+        }
+
+        modelM: rootItem.selectedTak
     }
 
 
@@ -179,4 +235,5 @@ Item {
 
         controller: rootItem.controller
     }
+
 }

@@ -67,6 +67,13 @@ public:
     Q_INVOKABLE void createNewTaskWithIngeScapePlatformFile(QString taskName, QString platformFilePath);
 
 
+    /**
+     * @brief Delete a task
+     * @param task
+     */
+    Q_INVOKABLE void deleteTask(TaskM* task);
+
+
 Q_SIGNALS:
 
 

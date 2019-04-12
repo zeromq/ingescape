@@ -97,7 +97,8 @@ void TasksController::createNewTaskWithIngeScapePlatformFile(QString taskName, Q
             // Create the new task
             TaskM* task = new TaskM(taskName);
 
-            // FIXME: use the platformFileUrl
+            // Set the URL of the IngeScape platform file (JSON)
+            task->setplatformFileUrl(platformFileUrl);
 
             // Add the task to the current experimentation
             _currentExperimentation->addTask(task);
@@ -105,5 +106,22 @@ void TasksController::createNewTaskWithIngeScapePlatformFile(QString taskName, Q
         else {
             qWarning() << "Failed to create the task" << taskName << "because the URL" << platformFilePath << "is wrong !";
         }
+    }
+}
+
+
+/**
+ * @brief Delete a task
+ * @param task
+ */
+void TasksController::deleteTask(TaskM* task)
+{
+    if ((task != nullptr) && (_currentExperimentation != nullptr))
+    {
+        // Remove the task from the current experimentation
+        _currentExperimentation->removeTask(task);
+
+        // Free memory
+        delete task;
     }
 }

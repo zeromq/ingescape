@@ -184,13 +184,8 @@ Item {
                 height: parent.height
 
                 onClicked: {
-                    if (rootItem.modelM)
-                    {
-                        //console.log("QML: Open the record " + rootItem.modelM.name);
-
-                        // Emit the signal "Open Record"
-                        rootItem.openRecord();
-                    }
+                    // Emit the signal "Open Record"
+                    rootItem.openRecord();
                 }
             }
 
@@ -203,13 +198,8 @@ Item {
                 height: parent.height
 
                 onClicked: {
-                    if (rootItem.modelM)
-                    {
-                        //console.log("QML: Delete the record " + rootItem.modelM.name);
-
-                        // Emit the signal "Delete Record"
-                        rootItem.deleteRecord();
-                    }
+                    // Emit the signal "Delete Record"
+                    rootItem.deleteRecord();
                 }
             }
         }

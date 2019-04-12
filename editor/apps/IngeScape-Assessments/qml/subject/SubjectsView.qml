@@ -125,7 +125,7 @@ Item {
         text: "X"
 
         onClicked: {
-            console.log("QML: close Subjects view");
+            //console.log("QML: close Subjects view");
 
             // Emit the signal "closeSubjectsView"
             rootItem.closeSubjectsView();
@@ -175,7 +175,7 @@ Item {
     //
     // Characteristics Panel
     //
-    Rectangle {
+    Item {
         id: characteristicsPanel
 
         anchors {
@@ -186,13 +186,12 @@ Item {
         }
         width: 350
 
-        color: "#44222222"
-
         Row {
             id: characteristicsHeader
 
             anchors {
                 left: parent.left
+                leftMargin: 5
                 top: parent.top
             }
 
