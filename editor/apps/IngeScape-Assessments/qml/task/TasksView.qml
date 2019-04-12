@@ -40,8 +40,6 @@ Item {
 
     property TasksController controller: null;
 
-    //property IngeScapeModelManager modelManager: null;
-
     property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
 
     property TaskM selectedTak: null;

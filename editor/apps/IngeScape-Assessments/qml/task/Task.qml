@@ -39,10 +39,6 @@ Item {
     //
     //--------------------------------------------------------
 
-    //property TasksController controller: null;
-
-    //property IngeScapeModelManager modelManager: null;
-
     property TaskM modelM: null;
 
 

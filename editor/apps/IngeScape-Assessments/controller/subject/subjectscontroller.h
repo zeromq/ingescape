@@ -19,7 +19,8 @@
 #include <I2PropertyHelpers.h>
 
 #include <model/assessmentsenums.h>
-#include <controller/ingescapemodelmanager.h>
+//#include <controller/ingescapemodelmanager.h>
+#include <model/experimentationm.h>
 
 
 /**
@@ -32,6 +33,9 @@ class SubjectsController : public QObject
     // List of all types for characteristic value
     I2_ENUM_LISTMODEL(CharacteristicValueTypes, allCharacteristicValueTypes)
 
+    // Model of the current experimentation
+    I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)
+
 
 public:
 
@@ -40,7 +44,7 @@ public:
      * @param modelManager
      * @param parent
      */
-    explicit SubjectsController(IngeScapeModelManager* modelManager,
+    explicit SubjectsController(//IngeScapeModelManager* modelManager,
                                 QObject *parent = nullptr);
 
 
@@ -104,7 +108,7 @@ public Q_SLOTS:
 private:
 
     // Manager for the data model of our IngeScape Assessments application
-    IngeScapeModelManager* _modelManager;
+    //IngeScapeModelManager* _modelManager;
 
 };
 

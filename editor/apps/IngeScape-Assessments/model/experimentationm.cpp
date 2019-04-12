@@ -125,6 +125,34 @@ void ExperimentationM::removeCharacteristic(CharacteristicM* characteristic)
 
 
 /**
+ * @brief Add a subject to our experimentation
+ * @param subject
+ */
+void ExperimentationM::addSubject(SubjectM* subject)
+{
+    if (subject != nullptr)
+    {
+        // Add to the list
+        _allSubjects.append(subject);
+    }
+}
+
+
+/**
+ * @brief Remove a subject from our experimentation
+ * @param subject
+ */
+void ExperimentationM::removeSubject(SubjectM* subject)
+{
+    if (subject != nullptr)
+    {
+        // Remove from the list
+        _allSubjects.remove(subject);
+    }
+}
+
+
+/**
  * @brief Add a task to our experimentation
  * @param task
  */
@@ -148,6 +176,34 @@ void ExperimentationM::removeTask(TaskM* task)
     {
         // Remove from the list
         _allTasks.remove(task);
+    }
+}
+
+
+/**
+ * @brief Add a record to our experimentation
+ * @param record
+ */
+void ExperimentationM::addRecord(RecordM* record)
+{
+    if (record != nullptr)
+    {
+        // Add to the list
+        _allRecords.append(record);
+    }
+}
+
+
+/**
+ * @brief Remove a record from our experimentation
+ * @param record
+ */
+void ExperimentationM::removeRecord(RecordM* record)
+{
+    if (record != nullptr)
+    {
+        // Remove from the list
+        _allRecords.remove(record);
     }
 }
 

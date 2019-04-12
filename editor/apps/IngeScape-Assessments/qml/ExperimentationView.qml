@@ -44,7 +44,7 @@ Item {
 
     property IngeScapeModelManager modelManager: null;
 
-    property ExperimentationM experimentation: modelManager ? modelManager.currentExperimentation : null;
+    property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
 
 
 
@@ -412,7 +412,6 @@ Item {
             id: subjectsView
 
             controller: IngeScapeAssessmentsC.subjectsC
-            modelManager: IngeScapeAssessmentsC.modelManager
 
 
             //
@@ -439,7 +438,6 @@ Item {
             id: tasksView
 
             controller: IngeScapeAssessmentsC.tasksC
-            //modelManager: IngeScapeAssessmentsC.modelManager
 
 
             //

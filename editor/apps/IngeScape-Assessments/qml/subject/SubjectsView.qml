@@ -41,9 +41,7 @@ Item {
 
     property SubjectsController controller: null;
 
-    property IngeScapeModelManager modelManager: null;
-
-    property ExperimentationM experimentation: modelManager ? modelManager.currentExperimentation : null;
+    property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
 
     property int indexPreviousSelectedSubject: -1;
     property int indexSubjectCurrentlyEditing: -1;

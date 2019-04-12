@@ -114,10 +114,10 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _experimentationsListC = new ExperimentationsListController(_modelManager, this);
 
     // Create the controller to manage the current experimentation
-    _experimentationC = new ExperimentationController(_modelManager, this);
+    _experimentationC = new ExperimentationController(this);
 
     // Create the controller to manage the subjects of the current experimentation
-    _subjectsC = new SubjectsController(_modelManager, this);
+    _subjectsC = new SubjectsController(this);
 
     // Create the controller to manage the tasks of the current experimentation
     _tasksC = new TasksController(this);
@@ -327,11 +327,11 @@ void IngeScapeAssessmentsController::_onCurrentExperimentationChanged(Experiment
         qDebug() << "Current Experimentation = " << currentExperimentation->name();
 
         if (_experimentationC != nullptr) {
-            //_experimentationC->setcurrentExperimentation(currentExperimentation);
+            _experimentationC->setcurrentExperimentation(currentExperimentation);
         }
 
         if (_subjectsC != nullptr) {
-            //_subjectsC->setcurrentExperimentation(currentExperimentation);
+            _subjectsC->setcurrentExperimentation(currentExperimentation);
         }
 
         if (_tasksC != nullptr) {

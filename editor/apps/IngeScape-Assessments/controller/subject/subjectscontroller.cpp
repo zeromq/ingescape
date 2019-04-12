@@ -20,9 +20,10 @@
  * @param modelManager
  * @param parent
  */
-SubjectsController::SubjectsController(IngeScapeModelManager* modelManager,
+SubjectsController::SubjectsController(//IngeScapeModelManager* modelManager,
                                        QObject *parent) : QObject(parent),
-    _modelManager(modelManager)
+    _currentExperimentation(nullptr)
+    //_modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -33,10 +34,6 @@ SubjectsController::SubjectsController(IngeScapeModelManager* modelManager,
     _allCharacteristicValueTypes.fillWithAllEnumValues();
     _allCharacteristicValueTypes.removeEnumValue(CharacteristicValueTypes::UNKNOWN);
 
-    /*if (_modelManager != nullptr)
-    {
-        connect(_modelManager, &IngeScapeModelManager::currentExperimentationChanged, this, &SubjectsController::onCurrentExperimentationChanged);
-    }*/
 }
 
 
@@ -47,12 +44,18 @@ SubjectsController::~SubjectsController()
 {
     qInfo() << "Delete Subjects Controller";
 
-    if (_modelManager != nullptr)
+    // Reset the model of the current experimentation
+    if (_currentExperimentation != nullptr)
+    {
+        setcurrentExperimentation(nullptr);
+    }
+
+    /*if (_modelManager != nullptr)
     {
         //disconnect(_modelManager, nullptr, this, nullptr);
 
         _modelManager = nullptr;
-    }
+    }*/
 }
 
 
@@ -64,10 +67,9 @@ SubjectsController::~SubjectsController()
  */
 bool SubjectsController::canCreateCharacteristicWithName(QString characteristicName)
 {
-    if (!characteristicName.isEmpty()
-            && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    if (!characteristicName.isEmpty() && (_currentExperimentation != nullptr))
     {
-        for (CharacteristicM* characteristic : _modelManager->currentExperimentation()->allCharacteristics()->toList())
+        for (CharacteristicM* characteristic : _currentExperimentation->allCharacteristics()->toList())
         {
             if ((characteristic != nullptr) && (characteristic->name() == characteristicName))
             {
@@ -89,8 +91,7 @@ bool SubjectsController::canCreateCharacteristicWithName(QString characteristicN
  */
 void SubjectsController::createNewCharacteristic(QString characteristicName, int nCharacteristicValueType)
 {
-    if (!characteristicName.isEmpty() && (nCharacteristicValueType > -1)
-            && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    if (!characteristicName.isEmpty() && (nCharacteristicValueType > -1) && (_currentExperimentation != nullptr))
     {
         CharacteristicValueTypes::Value characteristicValueType = static_cast<CharacteristicValueTypes::Value>(nCharacteristicValueType);
 
@@ -99,8 +100,8 @@ void SubjectsController::createNewCharacteristic(QString characteristicName, int
         // Create the new characteristic
         CharacteristicM* characteristic = new CharacteristicM(characteristicName, characteristicValueType);
 
-        // Add the characteristic to the experimentation
-        _modelManager->currentExperimentation()->addCharacteristic(characteristic);
+        // Add the characteristic to the current experimentation
+        _currentExperimentation->addCharacteristic(characteristic);
     }
 }
 
@@ -112,17 +113,16 @@ void SubjectsController::createNewCharacteristic(QString characteristicName, int
  */
 void SubjectsController::createNewCharacteristicEnum(QString characteristicName, QStringList enumValues)
 {
-    if (!characteristicName.isEmpty() && !enumValues.isEmpty()
-            && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    if (!characteristicName.isEmpty() && !enumValues.isEmpty() && (_currentExperimentation != nullptr))
     {
-        qInfo() << "Create new characteristic" << characteristicName << "of type" << CharacteristicValueTypes::staticEnumToString(CharacteristicValueTypes::CHARACTERISTIC_ENUM) << "with values:" << enumValues;
+        //qInfo() << "Create new characteristic" << characteristicName << "of type" << CharacteristicValueTypes::staticEnumToString(CharacteristicValueTypes::CHARACTERISTIC_ENUM) << "with values:" << enumValues;
 
         // Create the new characteristic
         CharacteristicM* characteristic = new CharacteristicM(characteristicName, CharacteristicValueTypes::CHARACTERISTIC_ENUM);
         characteristic->setenumValues(enumValues);
 
-        // Add the characteristic to the experimentation
-        _modelManager->currentExperimentation()->addCharacteristic(characteristic);
+        // Add the characteristic to the current experimentation
+        _currentExperimentation->addCharacteristic(characteristic);
     }
 }
 
@@ -133,11 +133,10 @@ void SubjectsController::createNewCharacteristicEnum(QString characteristicName,
  */
 void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
 {
-    if ((characteristic != nullptr)
-            && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    if ((characteristic != nullptr) && (_currentExperimentation != nullptr))
     {
-        // Remove the characteristic from the experimentation
-        _modelManager->currentExperimentation()->removeCharacteristic(characteristic);
+        // Remove the characteristic from the current experimentation
+        _currentExperimentation->removeCharacteristic(characteristic);
 
         // Free memory
         delete characteristic;
@@ -150,7 +149,7 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
  */
 void SubjectsController::createNewSubject()
 {
-    if ((_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    if (_currentExperimentation != nullptr)
     {
         QDateTime now = QDateTime::currentDateTime();
 
@@ -160,7 +159,7 @@ void SubjectsController::createNewSubject()
         SubjectM* subject = new SubjectM(subjectUID, nullptr);
 
         // For each existing characteristic
-        for (CharacteristicM* characteristic : _modelManager->currentExperimentation()->allCharacteristics()->toList())
+        for (CharacteristicM* characteristic : _currentExperimentation->allCharacteristics()->toList())
         {
             if (characteristic != nullptr)
             {
@@ -168,7 +167,8 @@ void SubjectsController::createNewSubject()
             }
         }
 
-        _modelManager->currentExperimentation()->allSubjects()->append(subject);
+        // Add the subject to the current experimentation
+        _currentExperimentation->addSubject(subject);
     }
 }
 
@@ -179,11 +179,10 @@ void SubjectsController::createNewSubject()
  */
 void SubjectsController::deleteSubject(SubjectM* subject)
 {
-    if ((subject != nullptr)
-            && (_modelManager != nullptr) && (_modelManager->currentExperimentation() != nullptr))
+    if ((subject != nullptr) && (_currentExperimentation != nullptr))
     {
-        // Remove from the experimentation
-        _modelManager->currentExperimentation()->allSubjects()->remove(subject);
+        // Remove the subject from the current experimentation
+        _currentExperimentation->removeSubject(subject);
 
         // Free memory
         delete subject;

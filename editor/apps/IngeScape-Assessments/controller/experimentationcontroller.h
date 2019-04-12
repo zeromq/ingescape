@@ -18,7 +18,8 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
-#include <controller/ingescapemodelmanager.h>
+//#include <controller/ingescapemodelmanager.h>
+#include <model/experimentationm.h>
 
 
 /**
@@ -28,6 +29,9 @@ class ExperimentationController : public QObject
 {
     Q_OBJECT
 
+    // Model of the current experimentation
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
+
 
 public:
 
@@ -36,7 +40,7 @@ public:
      * @param modelManager
      * @param parent
      */
-    explicit ExperimentationController(IngeScapeModelManager* modelManager,
+    explicit ExperimentationController(//IngeScapeModelManager* modelManager,
                                        QObject *parent = nullptr);
 
 
@@ -74,17 +78,20 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+
+private Q_SLOTS:
+
     /**
      * @brief Slot called when the current experimentation changed
      * @param currentExperimentation
      */
-    void onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
+    void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
 
 
 private:
 
     // Manager for the data model of our IngeScape Assessments application
-    IngeScapeModelManager* _modelManager;
+    //IngeScapeModelManager* _modelManager;
 
 };
 

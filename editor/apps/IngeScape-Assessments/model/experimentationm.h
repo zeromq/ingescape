@@ -84,6 +84,20 @@ public:
 
 
     /**
+     * @brief Add a subject to our experimentation
+     * @param subject
+     */
+    void addSubject(SubjectM* subject);
+
+
+    /**
+     * @brief Remove a subject from our experimentation
+     * @param subject
+     */
+    void removeSubject(SubjectM* subject);
+
+
+    /**
      * @brief Add a task to our experimentation
      * @param task
      */
@@ -95,6 +109,20 @@ public:
      * @param task
      */
     void removeTask(TaskM* task);
+
+
+    /**
+     * @brief Add a record to our experimentation
+     * @param record
+     */
+    void addRecord(RecordM* record);
+
+
+    /**
+     * @brief Remove a record from our experimentation
+     * @param record
+     */
+    void removeRecord(RecordM* record);
 
 
 
