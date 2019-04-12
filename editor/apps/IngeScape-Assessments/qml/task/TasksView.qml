@@ -80,6 +80,7 @@ Item {
             right: parent.right
             top: parent.top
         }
+        height: 30
 
         text: "X"
 
@@ -91,22 +92,54 @@ Item {
         }
     }
 
-    Text {
-        id: title
+    Row {
+        id: header
 
         anchors {
+            left: parent.left
+            leftMargin: 10
             top: parent.top
             topMargin: 10
-            horizontalCenter: parent.horizontalCenter
         }
 
-        text: "Tasks"
+        spacing: 20
 
-        color: IngeScapeTheme.whiteColor
-        font {
-            family: IngeScapeTheme.textFontFamily
-            weight : Font.Medium
-            pixelSize : 20
+        Text {
+            id: title
+
+            text: "Tasks"
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 20
+            }
         }
+
+        Button {
+            text: "New Task"
+
+            height: 30
+
+            onClicked: {
+                console.log("QML: New Task");
+
+                // Open the popup
+                createTaskPopup.open();
+            }
+        }
+    }
+
+
+    //
+    // Create Task@ Popup
+    //
+    Popup.CreateTaskPopup {
+        id: createTaskPopup
+
+        //anchors.centerIn: parent
+
+        controller: rootItem.controller
     }
 }

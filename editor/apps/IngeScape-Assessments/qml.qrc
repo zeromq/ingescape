@@ -33,5 +33,6 @@
         <file>qml/Record.qml</file>
         <file>qml/subject/CharacteristicValueEditor.qml</file>
         <file>qml/theme/IngeScapeRadioButtonStyle.qml</file>
+        <file>qml/popup/CreateTaskPopup.qml</file>
     </qresource>
 </RCC>
