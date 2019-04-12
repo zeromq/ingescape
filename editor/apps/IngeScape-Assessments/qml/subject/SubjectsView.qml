@@ -120,6 +120,7 @@ Item {
             right: parent.right
             top: parent.top
         }
+        height: 30
 
         text: "X"
 
@@ -157,6 +158,8 @@ Item {
 
         Button {
             text: "New Subject"
+
+            height: 30
 
             onClicked: {
                 //console.log("QML: New Subject");
@@ -208,6 +211,8 @@ Item {
 
             Button {
                 text: "New Characteristic"
+
+                height: 30
 
                 onClicked: {
                     // Open the popup

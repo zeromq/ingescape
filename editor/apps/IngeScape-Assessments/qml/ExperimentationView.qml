@@ -84,6 +84,7 @@ Item {
             left: parent.left
             top: parent.top
         }
+        height: 30
 
         text: "HOME"
 
@@ -230,14 +231,19 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
-                width: 250
+                width: 150
 
                 color: "#44AAAAAA"
 
                 Column {
 
+                    spacing: 10
+
                     Button {
                         text: "Subjects"
+
+                        width: 100
+                        height: 30
 
                         onClicked: {
                             console.log("QML: Add the 'Subjects View' to the stack");
@@ -250,6 +256,9 @@ Item {
                     Button {
                         text: "Tasks"
 
+                        width: 100
+                        height: 30
+
                         onClicked: {
                             console.log("QML: Add the 'Tasks View' to the stack");
 
@@ -261,17 +270,26 @@ Item {
                     Button {
                         text: "Coding"
 
+                        width: 100
+                        height: 30
+
                         enabled: false
                     }
 
                     Button {
                         text: "Clean"
 
+                        width: 100
+                        height: 30
+
                         enabled: false
                     }
 
                     Button {
                         text: "Export"
+
+                        width: 100
+                        height: 30
 
                         onClicked: {
                             console.log("QML: Export...");
@@ -315,6 +333,8 @@ Item {
 
                     Button {
                         id: btnNewRecord
+
+                        height: 30
 
                         text: "New Record"
 

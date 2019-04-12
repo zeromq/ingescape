@@ -20,6 +20,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
+import "../theme" as Theme
 
 I2PopupBase {
     id: rootPopup
@@ -135,12 +136,13 @@ I2PopupBase {
 
             //horizontalAlignment: Text.AlignHCenter
 
-            text: qsTr("New characteristic:")
+            text: qsTr("New characteristic")
 
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                pixelSize: 16
+                weight : Font.Medium
+                pixelSize : 18
             }
         }
 
@@ -149,7 +151,7 @@ I2PopupBase {
 
             anchors {
                 top: title.bottom
-                topMargin: 50
+                topMargin: 30
                 left: parent.left
                 leftMargin: 10
             }
@@ -228,7 +230,12 @@ I2PopupBase {
 
                 text: qsTr("Type:")
 
-                color: "white"
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 16
+                }
             }
 
             Column {
@@ -259,6 +266,8 @@ I2PopupBase {
                         exclusiveGroup: exclusiveGroupTypes
 
                         checked: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === model.value))
+
+                        style: Theme.IngeScapeRadioButtonStyle { }
 
                         onCheckedChanged: {
                             if (checked) {

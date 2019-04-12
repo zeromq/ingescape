@@ -141,19 +141,20 @@ I2PopupBase {
 
             //horizontalAlignment: Text.AlignHCenter
 
-            text: qsTr("New record:")
+            text: qsTr("New record")
 
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                pixelSize: 16
+                weight : Font.Medium
+                pixelSize : 18
             }
         }
 
         Column {
             anchors {
                 top: title.bottom
-                topMargin: 50
+                topMargin: 30
                 left: parent.left
                 leftMargin: 10
             }

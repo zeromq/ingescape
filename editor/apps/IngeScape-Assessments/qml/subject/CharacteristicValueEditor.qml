@@ -48,7 +48,6 @@ Item {
 
     property bool isCurrentlyEditing: false;
 
-    property bool areVisibleOptions: characteristic ? (characteristic.isSubjectName && isSelected) : false;
 
 
     //--------------------------------
@@ -113,9 +112,8 @@ Item {
         id: background
 
         anchors {
-            //left: rowOptions.visible ? rowOptions.right : parent.left
             left: parent.left
-            leftMargin: rootItem.areVisibleOptions ? 105 : 0
+            leftMargin: (characteristic && characteristic.isSubjectName) ? 105 : 0
             right: parent.right
             top: parent.top
             bottom: parent.bottom
@@ -244,7 +242,24 @@ Item {
 
             spacing: 5
 
-            visible: rootItem.areVisibleOptions
+            visible: characteristic ? (characteristic.isSubjectName && isSelected) : false;
+
+            Button {
+                id: btnDelete
+
+                anchors {
+                    top: parent.top
+                }
+                width: 50
+                height: 30
+
+                text: "DEL"
+
+                onClicked: {
+                    // Emit the signal "Delete Subject"
+                    rootItem.deleteSubject();
+                }
+            }
 
             Button {
                 id: btnEdit
@@ -280,22 +295,6 @@ Item {
                 }
             }
 
-            Button {
-                id: btnDelete
-
-                anchors {
-                    top: parent.top
-                }
-                width: 50
-                height: 30
-
-                text: "DEL"
-
-                onClicked: {
-                    // Emit the signal "Delete Subject"
-                    rootItem.deleteSubject();
-                }
-            }
         }
     }
 }

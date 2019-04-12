@@ -83,6 +83,7 @@ Item {
             topMargin: 20
             horizontalCenter: parent.horizontalCenter
         }
+        height: 30
 
         text: "New Experimentation"
 
@@ -233,7 +234,7 @@ Item {
                         }*/
 
                         Row {
-                            spacing: 20
+                            spacing: 10
 
                             anchors {
                                 right: parent.right

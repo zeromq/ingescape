@@ -20,6 +20,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
+import "../theme" as Theme
 
 I2PopupBase {
     id: rootPopup
@@ -128,16 +129,16 @@ I2PopupBase {
                 leftMargin: 20
                 topMargin: 20
             }
-            height: 25
 
             //horizontalAlignment: Text.AlignHCenter
 
-            text: qsTr("New experimentation:")
+            text: qsTr("New experimentation")
 
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                pixelSize: 16
+                weight : Font.Medium
+                pixelSize: 18
             }
         }
 
@@ -146,7 +147,7 @@ I2PopupBase {
 
             anchors {
                 top: title.bottom
-                topMargin: 50
+                topMargin: 30
                 left: parent.left
                 leftMargin: 10
             }
@@ -154,8 +155,9 @@ I2PopupBase {
             spacing: 10
 
             Text {
-                text: qsTr("Name:")
                 height: 30
+
+                text: qsTr("Name:")
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -222,7 +224,13 @@ I2PopupBase {
                 }
 
                 text: qsTr("Groups:")
-                color: "white"
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 16
+                }
             }
 
             Column {
@@ -232,7 +240,7 @@ I2PopupBase {
                     leftMargin: 10
                     right: parent.right
                 }
-                spacing: 10
+                spacing: 15
 
                 ExclusiveGroup {
                     id: exclusiveExperimentationsGroup
@@ -249,6 +257,8 @@ I2PopupBase {
                         exclusiveGroup: exclusiveExperimentationsGroup
 
                         checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
+
+                        style: Theme.IngeScapeRadioButtonStyle { }
 
                         onCheckedChanged: {
                             if (checked) {
@@ -268,8 +278,12 @@ I2PopupBase {
 
                 Row {
 
+                    spacing: 10
+
                     RadioButton {
                         id: radioNewExperimentationsGroup
+
+                        height: 30
 
                         text: (controller && controller.newGroup) ? controller.newGroup.name
                                                                   : ""
@@ -277,6 +291,8 @@ I2PopupBase {
                         exclusiveGroup: exclusiveExperimentationsGroup
 
                         checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.newGroup))
+
+                        style: Theme.IngeScapeRadioButtonStyle { }
 
                         onCheckedChanged: {
                             if (checked) {
