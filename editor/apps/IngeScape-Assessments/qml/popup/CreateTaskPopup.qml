@@ -25,7 +25,7 @@ import INGESCAPE 1.0
 I2PopupBase {
     id: rootPopup
 
-    height: 500
+    height: 400
     width: 500
 
     anchors.centerIn: parent
@@ -128,21 +128,20 @@ I2PopupBase {
 
             anchors {
                 left: parent.left
+                right: parent.right
                 top: parent.top
-                leftMargin: 20
                 topMargin: 20
             }
-            height: 25
 
-            //horizontalAlignment: Text.AlignHCenter
+            horizontalAlignment: Text.AlignHCenter
 
             text: qsTr("New task")
 
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 18
+                weight: Font.Medium
+                pixelSize: 20
             }
         }
 
@@ -167,6 +166,9 @@ I2PopupBase {
 
                     width: 100
                     height: 30
+
+                    horizontalAlignment: Text.AlignRight
+                    verticalAlignment: Text.AlignVCenter
 
                     color: IngeScapeTheme.whiteColor
                     font {
@@ -218,6 +220,9 @@ I2PopupBase {
                     width: 100
                     height: 30
 
+                    horizontalAlignment: Text.AlignRight
+                    verticalAlignment: Text.AlignVCenter
+
                     color: IngeScapeTheme.whiteColor
                     font {
                         family: IngeScapeTheme.textFontFamily
@@ -230,7 +235,7 @@ I2PopupBase {
                     id: txtPlatformUrl
 
                     height: 30
-                    width: 150
+                    width: 250
 
                     //verticalAlignment: TextInput.AlignVCenter
                     text: rootPopup.selectedPlatformUrl

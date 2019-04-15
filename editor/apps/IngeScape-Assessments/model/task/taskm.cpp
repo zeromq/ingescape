@@ -90,6 +90,31 @@ void TaskM::setplatformFileUrl(QUrl value)
 
 
 /**
+ * @brief Return true if the user can create an independent variable with the name
+ * Check if the name is not empty and if a independent variable with the same name does not already exist
+ * @param independentVariableName
+ * @return
+ */
+bool TaskM::canCreateIndependentVariableWithName(QString independentVariableName)
+{
+    if (!independentVariableName.isEmpty())
+    {
+        for (IndependentVariableM* independentVariable : _independentVariables.toList())
+        {
+            if ((independentVariable != nullptr) && (independentVariable->name() == independentVariableName))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
  * @brief Update the list of dependent variables
  */
 void TaskM::_updateDependentVariables()

@@ -61,6 +61,15 @@ public:
     ~TaskM();
 
 
+    /**
+     * @brief Return true if the user can create an independent variable with the name
+     * Check if the name is not empty and if a independent variable with the same name does not already exist
+     * @param independentVariableName
+     * @return
+     */
+    Q_INVOKABLE bool canCreateIndependentVariableWithName(QString independentVariableName);
+
+
 Q_SIGNALS:
 
 

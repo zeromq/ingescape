@@ -29,6 +29,10 @@ TasksController::TasksController(//IngeScapeModelManager* modelManager,
 
     qInfo() << "New Tasks Controller";
 
+    // Fill without type "UNKNOWN"
+    _allIndependentVariableValueTypes.fillWithAllEnumValues();
+    _allIndependentVariableValueTypes.removeEnumValue(IndependentVariableValueTypes::UNKNOWN);
+
 }
 
 

@@ -25,7 +25,7 @@ import "../theme" as Theme
 I2PopupBase {
     id: rootPopup
 
-    height: 500
+    height: 600
     width: 500
 
     anchors.centerIn: parent
@@ -43,11 +43,13 @@ I2PopupBase {
     //
     //--------------------------------------------------------
 
-    property SubjectsController controller: null;
+    property TasksController controller: null;
+
+    property TaskM task: null;
 
     //property ExperimentationM experimentation: null;
 
-    //property CharacteristicValueTypes selectedType: null;
+    //property IndependentVariableValueTypes selectedType: null;
     property int selectedType: -1;
 
     property var enumTexts: [];
@@ -94,7 +96,8 @@ I2PopupBase {
         //console.log("QML: Reset all user inputs and close popup");
 
         // Reset all user inputs
-        txtCharacteristicName.text = "";
+        txtIndependentVariableName.text = "";
+        txtIndependentVariableDescription.text = "";
         rootPopup.selectedType = -1;
         spinBoxValuesNumber.value = 2;
         enumTexts = [];
@@ -135,7 +138,7 @@ I2PopupBase {
 
             horizontalAlignment: Text.AlignHCenter
 
-            text: qsTr("New characteristic")
+            text: qsTr("New independent variable")
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -158,7 +161,7 @@ I2PopupBase {
             spacing: 10
 
             Text {
-                width: 75
+                width: 125
                 height: 30
 
                 text: qsTr("Name:")
@@ -175,7 +178,7 @@ I2PopupBase {
             }
 
             TextField {
-                id: txtCharacteristicName
+                id: txtIndependentVariableName
 
                 height: 30
                 width: 250
@@ -209,14 +212,73 @@ I2PopupBase {
                 //}
 
                 /*onTextChanged: {
-                    console.log("onTextChanged " + txtCharacteristicName.text);
+                    console.log("onTextChanged " + txtIndependentVariableName.text);
                 }*/
+            }
+        }
+
+        Row {
+            id: rowDescription
+
+            anchors {
+                top: rowName.bottom
+                topMargin: 20
+                left: parent.left
+                leftMargin: 10
+            }
+
+            spacing: 10
+
+            Text {
+                width: 125
+                height: 30
+
+                text: qsTr("Description:")
+
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 16
+                }
+            }
+
+            TextField {
+                id: txtIndependentVariableDescription
+
+                height: 30
+                width: 250
+
+                //verticalAlignment: TextInput.AlignVCenter
+                text: ""
+
+                style: I2TextFieldStyle {
+                    backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                    borderColor: IngeScapeTheme.whiteColor
+                    borderErrorColor: IngeScapeTheme.redColor
+                    radiusTextBox: 1
+                    borderWidth: 0;
+                    borderWidthActive: 1
+                    textIdleColor: IngeScapeTheme.whiteColor;
+                    textDisabledColor: IngeScapeTheme.darkGreyColor
+
+                    padding.left: 3
+                    padding.right: 3
+
+                    font {
+                        pixelSize:15
+                        family: IngeScapeTheme.textFontFamily
+                    }
+                }
             }
         }
 
         Item {
             anchors {
-                top: rowName.bottom
+                top: rowDescription.bottom
                 topMargin: 20
                 left: parent.left
                 leftMargin: 10
@@ -231,7 +293,7 @@ I2PopupBase {
                     left: parent.left
                     top: parent.top
                 }
-                width: 75
+                width: 125
                 height: 30
 
                 text: qsTr("Type:")
@@ -262,10 +324,10 @@ I2PopupBase {
                 }
 
                 Repeater {
-                    model: controller ? controller.allCharacteristicValueTypes : null
+                    model: controller ? controller.allIndependentVariableValueTypes : null
 
                     delegate: RadioButton {
-                        id: radioCharacteristicValueType
+                        id: radioIndependentVariableValueType
 
                         text: model.name
 
@@ -277,14 +339,14 @@ I2PopupBase {
 
                         onCheckedChanged: {
                             if (checked) {
-                                console.log("Select Characteristic Value Type: " + model.name + " (" + model.value + ")");
+                                console.log("Select IndependentVariable Value Type: " + model.name + " (" + model.value + ")");
 
                                 rootPopup.selectedType = model.value;
                             }
                         }
 
                         Binding {
-                            target: radioCharacteristicValueType
+                            target: radioIndependentVariableValueType
                             property: "checked"
                             value: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === model.value))
                         }
@@ -311,7 +373,7 @@ I2PopupBase {
                 height: 200
 
                 // Selected type is "Enum"
-                visible: (rootPopup.selectedType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)
+                visible: (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
 
                 color: "transparent"
                 border {
@@ -458,8 +520,8 @@ I2PopupBase {
                 activeFocusOnPress: true
                 text: "OK"
 
-                enabled: ( (txtCharacteristicName.text.length > 0) && (rootPopup.selectedType > -1)
-                          && controller && controller.canCreateCharacteristicWithName(txtCharacteristicName.text) )
+                enabled: ( (txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > -1)
+                          && rootPopup.task && rootPopup.task.canCreateIndependentVariableWithName(txtIndependentVariableName.text) )
 
                 style: I2SvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
@@ -480,12 +542,12 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    console.log("QML: create new Characteristic " + txtCharacteristicName.text + " of type " + rootPopup.selectedType);
+                    console.log("QML: create new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
 
-                    if (controller)
+                    /*if (controller)
                     {
                         // Selected type is ENUM
-                        if (rootPopup.selectedType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)
+                        if (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
                         {
                             // Use only the N first elements of the array (the array may be longer than the number of displayed TextFields
                             // if the user decreases the value of the spin box after edition the last TextField)
@@ -507,7 +569,7 @@ I2PopupBase {
 
                             if (isEmptyValue === false)
                             {
-                                rootPopup.controller.createNewCharacteristicEnum(txtCharacteristicName.text, displayedEnumTexts);
+                                rootPopup.controller.createNewIndependentVariableEnum(txtIndependentVariableName.text, displayedEnumTexts);
 
                                 // Reset all user inputs and close the popup
                                 rootPopup.resetInputsAndClosePopup();
@@ -520,12 +582,12 @@ I2PopupBase {
                         // Selected type is NOT ENUM
                         else
                         {
-                            rootPopup.controller.createNewCharacteristic(txtCharacteristicName.text, rootPopup.selectedType);
+                            rootPopup.controller.createNewIndependentVariable(txtIndependentVariableName.text, rootPopup.selectedType);
 
                             // Reset all user inputs and close the popup
                             rootPopup.resetInputsAndClosePopup();
                         }
-                    }
+                    }*/
                 }
             }
         }

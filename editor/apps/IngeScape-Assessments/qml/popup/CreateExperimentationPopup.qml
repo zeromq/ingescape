@@ -125,20 +125,20 @@ I2PopupBase {
 
             anchors {
                 left: parent.left
+                right: parent.right
                 top: parent.top
-                leftMargin: 20
                 topMargin: 20
             }
 
-            //horizontalAlignment: Text.AlignHCenter
+            horizontalAlignment: Text.AlignHCenter
 
             text: qsTr("New experimentation")
 
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize: 18
+                weight: Font.Medium
+                pixelSize: 20
             }
         }
 
@@ -147,7 +147,7 @@ I2PopupBase {
 
             anchors {
                 top: title.bottom
-                topMargin: 30
+                topMargin: 40
                 left: parent.left
                 leftMargin: 10
             }
@@ -155,9 +155,13 @@ I2PopupBase {
             spacing: 10
 
             Text {
+                width: 75
                 height: 30
 
                 text: qsTr("Name:")
+
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -171,7 +175,7 @@ I2PopupBase {
                 id: txtExperimentationName
 
                 height: 30
-                width: 250 // parent.width
+                width: 250
 
                 //verticalAlignment: TextInput.AlignVCenter
                 text: ""
@@ -209,10 +213,12 @@ I2PopupBase {
 
         Rectangle {
             anchors {
+                top: rowName.bottom
+                topMargin: 30
                 left: parent.left
                 leftMargin: 10
-                top: rowName.bottom
-                topMargin: 20
+                right: parent.right
+                rightMargin: 10
             }
 
             Text {
@@ -222,8 +228,12 @@ I2PopupBase {
                     left: parent.left
                     top: parent.top
                 }
+                width: 75
+                height: 30
 
                 text: qsTr("Groups:")
+
+                horizontalAlignment: Text.AlignRight
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -313,7 +323,7 @@ I2PopupBase {
                         id: txtNewExperimentationsGroupName
 
                         height: 30
-                        width: 250 // parent.width
+                        width: 250
 
                         //verticalAlignment: TextInput.AlignVCenter
                         text: ""

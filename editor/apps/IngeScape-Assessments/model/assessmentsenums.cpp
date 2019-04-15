@@ -44,6 +44,36 @@ QString CharacteristicValueTypes::enumToString(int value)
 }
 
 
+/**
+ * @brief Enum "LogTypes" to string
+ * @param value
+ * @return
+ */
+QString IndependentVariableValueTypes::enumToString(int value)
+{
+    switch (value)
+    {
+    case IndependentVariableValueTypes::UNKNOWN:
+        return tr("Unknown");
+
+    case IndependentVariableValueTypes::INTEGER:
+        return tr("Integer");
+
+    case IndependentVariableValueTypes::DOUBLE:
+        return tr("Double");
+
+    case CharacteristicValueTypes::TEXT:
+        return tr("Text");
+
+    case IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM:
+        return tr("Enum");
+
+    default:
+        return "";
+    }
+}
+
+
 //--------------------------------------------------------------
 //
 //  Assessments Enums

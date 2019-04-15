@@ -24,7 +24,7 @@ import INGESCAPE 1.0
 I2PopupBase {
     id: rootPopup
 
-    height: 500
+    height: 400
     width: 500
 
     anchors.centerIn: parent
@@ -133,21 +133,20 @@ I2PopupBase {
 
             anchors {
                 left: parent.left
+                right: parent.right
                 top: parent.top
-                leftMargin: 20
                 topMargin: 20
             }
-            height: 25
 
-            //horizontalAlignment: Text.AlignHCenter
+            horizontalAlignment: Text.AlignHCenter
 
             text: qsTr("New record")
 
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 18
+                weight: Font.Medium
+                pixelSize: 20
             }
         }
 
@@ -170,8 +169,11 @@ I2PopupBase {
                 Text {
                     text: qsTr("Name:")
 
-                    width: 150
+                    width: 100
                     height: 30
+
+                    horizontalAlignment: Text.AlignRight
+                    verticalAlignment: Text.AlignVCenter
 
                     color: IngeScapeTheme.whiteColor
                     font {
@@ -213,6 +215,11 @@ I2PopupBase {
                 Text {
                     id: txtRecordName
 
+                    width: 250
+                    height: 30
+
+                    verticalAlignment: Text.AlignVCenter
+
                     // the subject and the task are defined
                     text: if (comboSubjects.selectedItem && comboTasks.selectedItem) {
                               String("Record-%1-%2-%3").arg(comboSubjects.selectedItem.name).arg(comboTasks.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
@@ -228,9 +235,6 @@ I2PopupBase {
                           else {
                               String("Record-???-???-%1").arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
                           }
-
-                    width: 250
-                    height: 30
 
                     color: IngeScapeTheme.whiteColor
                     font {
@@ -249,8 +253,11 @@ I2PopupBase {
                 Text {
                     text: qsTr("Subject:")
 
-                    width: 150
+                    width: 100
                     height: 30
+
+                    horizontalAlignment: Text.AlignRight
+                    verticalAlignment: Text.AlignVCenter
 
                     color: IngeScapeTheme.whiteColor
                     font {
@@ -292,8 +299,11 @@ I2PopupBase {
                 Text {
                     text: qsTr("Task:")
 
-                    width: 150
+                    width: 100
                     height: 30
+
+                    horizontalAlignment: Text.AlignRight
+                    verticalAlignment: Text.AlignVCenter
 
                     color: IngeScapeTheme.whiteColor
                     font {

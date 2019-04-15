@@ -28,7 +28,7 @@ I2_ENUM_CUSTOM(CharacteristicValueTypes, UNKNOWN, INTEGER, DOUBLE, TEXT, CHARACT
 /**
   * Types of the value for an independent variable
   */
-I2_ENUM(IndependentVariableValueTypes, UNKNOWN, INTEGER, DOUBLE, TEXT, INDEPENDENT_VARIABLE_ENUM)
+I2_ENUM_CUSTOM(IndependentVariableValueTypes, UNKNOWN, INTEGER, DOUBLE, TEXT, INDEPENDENT_VARIABLE_ENUM)
 
 
 // Date date of our application

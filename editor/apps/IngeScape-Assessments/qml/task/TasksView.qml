@@ -219,6 +219,7 @@ Item {
             rightMargin: 5
         }
 
+        controller: rootItem.controller
         modelM: rootItem.selectedTak
     }
 

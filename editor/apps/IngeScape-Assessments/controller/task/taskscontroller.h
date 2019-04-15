@@ -29,6 +29,9 @@ class TasksController : public QObject
 {
     Q_OBJECT
 
+    // List of all types for independent variable value
+    I2_ENUM_LISTMODEL(IndependentVariableValueTypes, allIndependentVariableValueTypes)
+
     // Model of the current experimentation
     I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)
 
