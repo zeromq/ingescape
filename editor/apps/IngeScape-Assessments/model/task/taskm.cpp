@@ -57,6 +57,10 @@ TaskM::~TaskM()
 {
     qInfo() << "Delete Model of Task" << _name;
 
+    // Free memory
+    _independentVariables.deleteAllItems();
+    _dependentVariables.deleteAllItems();
+
 }
 
 
@@ -87,71 +91,29 @@ void TaskM::setplatformFileUrl(QUrl value)
 
 
 /**
- * @brief Return true if the user can create an independent variable with the name
- * Check if the name is not empty and if a independent variable with the same name does not already exist
- * @param independentVariableName
- * @return
+ * @brief Add an Independent Variable to our task
+ * @param independentVariable
  */
-bool TaskM::canCreateIndependentVariableWithName(QString independentVariableName)
+void TaskM::addIndependentVariable(IndependentVariableM* independentVariable)
 {
-    if (!independentVariableName.isEmpty())
+    if (independentVariable != nullptr)
     {
-        for (IndependentVariableM* independentVariable : _independentVariables.toList())
-        {
-            if ((independentVariable != nullptr) && (independentVariable->name() == independentVariableName))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
-
-/**
- * @brief Create a new independent variable
- * @param independentVariableName
- * @param independentVariableDescription
- * @param nIndependentVariableValueType
- */
-void TaskM::createNewIndependentVariable(QString independentVariableName, QString independentVariableDescription, int nIndependentVariableValueType)
-{
-    if (!independentVariableName.isEmpty() && (nIndependentVariableValueType > -1))
-    {
-        IndependentVariableValueTypes::Value independentVariableValueType = static_cast<IndependentVariableValueTypes::Value>(nIndependentVariableValueType);
-
-        qInfo() << "Create new independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(independentVariableValueType);
-
-        // Create the new independent variable
-        IndependentVariableM* independentVariable = new IndependentVariableM(independentVariableName, independentVariableDescription, independentVariableValueType);
-
-        // Add the independent variable to the list
+        // Add to the list
         _independentVariables.append(independentVariable);
     }
 }
 
 
 /**
- * @brief Create a new independent variable of type enum
- * @param independentVariableName
- * @param independentVariableDescription
- * @param enumValues
+ * @brief Remove an Independent Variable from our task
+ * @param independentVariable
  */
-void TaskM::createNewIndependentVariableEnum(QString independentVariableName, QString independentVariableDescription, QStringList enumValues)
+void TaskM::removeIndependentVariable(IndependentVariableM* independentVariable)
 {
-    if (!independentVariableName.isEmpty() && !enumValues.isEmpty())
+    if (independentVariable != nullptr)
     {
-        qInfo() << "Create new independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM) << "with values:" << enumValues;
-
-        // Create the new independent variable
-        IndependentVariableM* independentVariable = new IndependentVariableM(independentVariableName, independentVariableDescription, IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
-        independentVariable->setenumValues(enumValues);
-
-        // Add the independent variable to the list
-        _independentVariables.append(independentVariable);
+        // Remove from the list
+        _independentVariables.remove(independentVariable);
     }
 }
 

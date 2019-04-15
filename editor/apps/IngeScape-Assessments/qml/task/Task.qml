@@ -41,7 +41,7 @@ Item {
 
     property TasksController controller: null;
 
-    property TaskM modelM: null;
+    property TaskM modelM: controller ? controller.selectedTask : null;
 
 
     //--------------------------------
@@ -192,6 +192,10 @@ Item {
             TableViewColumn {
                 role: "valueType"
                 title: qsTr("Type")
+
+                delegate: Text {
+                    text: IndependentVariableValueTypes.enumToString(styleData.value)
+                }
             }
         }
     }
@@ -297,8 +301,6 @@ Item {
         //anchors.centerIn: parent
 
         controller: rootItem.controller
-
-        task: rootItem.modelM
     }
 
 }

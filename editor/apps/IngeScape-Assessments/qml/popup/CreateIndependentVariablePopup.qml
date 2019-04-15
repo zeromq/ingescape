@@ -45,10 +45,6 @@ I2PopupBase {
 
     property TasksController controller: null;
 
-    property TaskM task: null;
-
-    //property ExperimentationM experimentation: null;
-
     //property IndependentVariableValueTypes selectedType: null;
     property int selectedType: -1;
 
@@ -521,7 +517,7 @@ I2PopupBase {
                 text: "OK"
 
                 enabled: ( (txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > -1)
-                          && rootPopup.task && rootPopup.task.canCreateIndependentVariableWithName(txtIndependentVariableName.text) )
+                          && rootPopup.controller && rootPopup.controller.canCreateIndependentVariableWithName(txtIndependentVariableName.text) )
 
                 style: I2SvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
@@ -544,7 +540,7 @@ I2PopupBase {
                 onClicked: {
                     console.log("QML: create new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
 
-                    if (rootPopup.task)
+                    if (rootPopup.controller)
                     {
                         // Selected type is ENUM
                         if (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
@@ -569,7 +565,7 @@ I2PopupBase {
 
                             if (isEmptyValue === false)
                             {
-                                rootPopup.task.createNewIndependentVariableEnum(txtIndependentVariableName.text, txtIndependentVariableDescription.text, displayedEnumTexts);
+                                rootPopup.controller.createNewIndependentVariableEnum(txtIndependentVariableName.text, txtIndependentVariableDescription.text, displayedEnumTexts);
 
                                 // Reset all user inputs and close the popup
                                 rootPopup.resetInputsAndClosePopup();
@@ -582,7 +578,7 @@ I2PopupBase {
                         // Selected type is NOT ENUM
                         else
                         {
-                            rootPopup.task.createNewIndependentVariable(txtIndependentVariableName.text, txtIndependentVariableDescription.text, rootPopup.selectedType);
+                            rootPopup.controller.createNewIndependentVariable(txtIndependentVariableName.text, txtIndependentVariableDescription.text, rootPopup.selectedType);
 
                             // Reset all user inputs and close the popup
                             rootPopup.resetInputsAndClosePopup();

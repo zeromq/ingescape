@@ -35,6 +35,9 @@ class TasksController : public QObject
     // Model of the current experimentation
     I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)
 
+    // Model of the selected task
+    I2_QML_PROPERTY(TaskM*, selectedTask)
+
 
 public:
 
@@ -75,6 +78,40 @@ public:
      * @param task
      */
     Q_INVOKABLE void deleteTask(TaskM* task);
+
+
+    /**
+     * @brief Return true if the user can create an independent variable with the name
+     * Check if the name is not empty and if a independent variable with the same name does not already exist
+     * @param independentVariableName
+     * @return
+     */
+    Q_INVOKABLE bool canCreateIndependentVariableWithName(QString independentVariableName);
+
+
+    /**
+     * @brief Create a new independent variable
+     * @param independentVariableName
+     * @param independentVariableDescription
+     * @param nIndependentVariableValueType
+     */
+    Q_INVOKABLE void createNewIndependentVariable(QString independentVariableName, QString independentVariableDescription, int nIndependentVariableValueType);
+
+
+    /**
+     * @brief Create a new independent variable of type enum
+     * @param independentVariableName
+     * @param independentVariableDescription
+     * @param enumValues
+     */
+    Q_INVOKABLE void createNewIndependentVariableEnum(QString independentVariableName, QString independentVariableDescription, QStringList enumValues);
+
+
+    /**
+     * @brief Delete an independent variable
+     * @param independentVariable
+     */
+    Q_INVOKABLE void deleteIndependentVariable(IndependentVariableM* independentVariable);
 
 
 Q_SIGNALS:

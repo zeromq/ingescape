@@ -21,7 +21,8 @@
  */
 TasksController::TasksController(//IngeScapeModelManager* modelManager,
                                  QObject *parent) : QObject(parent),
-    _currentExperimentation(nullptr)
+    _currentExperimentation(nullptr),
+    _selectedTask(nullptr)
     //_modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -42,6 +43,10 @@ TasksController::TasksController(//IngeScapeModelManager* modelManager,
 TasksController::~TasksController()
 {
     qInfo() << "Delete Tasks Controller";
+
+    if (_selectedTask != nullptr) {
+        setselectedTask(nullptr);
+    }
 
     // Reset the model of the current experimentation
     if (_currentExperimentation != nullptr)
@@ -122,10 +127,101 @@ void TasksController::deleteTask(TaskM* task)
 {
     if ((task != nullptr) && (_currentExperimentation != nullptr))
     {
+        if (task == _selectedTask) {
+            setselectedTask(nullptr);
+        }
+
         // Remove the task from the current experimentation
         _currentExperimentation->removeTask(task);
 
         // Free memory
         delete task;
+    }
+}
+
+
+/**
+ * @brief Return true if the user can create an independent variable with the name
+ * Check if the name is not empty and if a independent variable with the same name does not already exist
+ * @param independentVariableName
+ * @return
+ */
+bool TasksController::canCreateIndependentVariableWithName(QString independentVariableName)
+{
+    if (!independentVariableName.isEmpty() && (_selectedTask != nullptr))
+    {
+        for (IndependentVariableM* independentVariable : _selectedTask->independentVariables()->toList())
+        {
+            if ((independentVariable != nullptr) && (independentVariable->name() == independentVariableName))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
+ * @brief Create a new independent variable
+ * @param independentVariableName
+ * @param independentVariableDescription
+ * @param nIndependentVariableValueType
+ */
+void TasksController::createNewIndependentVariable(QString independentVariableName, QString independentVariableDescription, int nIndependentVariableValueType)
+{
+    if (!independentVariableName.isEmpty() && (nIndependentVariableValueType > -1) && (_selectedTask != nullptr))
+    {
+        IndependentVariableValueTypes::Value independentVariableValueType = static_cast<IndependentVariableValueTypes::Value>(nIndependentVariableValueType);
+
+        qInfo() << "Create new independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(independentVariableValueType);
+
+        // Create the new independent variable
+        IndependentVariableM* independentVariable = new IndependentVariableM(independentVariableName, independentVariableDescription, independentVariableValueType);
+
+        // Add the independent variable to the selected task
+        _selectedTask->addIndependentVariable(independentVariable);
+    }
+}
+
+
+/**
+ * @brief Create a new independent variable of type enum
+ * @param independentVariableName
+ * @param independentVariableDescription
+ * @param enumValues
+ */
+void TasksController::createNewIndependentVariableEnum(QString independentVariableName, QString independentVariableDescription, QStringList enumValues)
+{
+    if (!independentVariableName.isEmpty() && !enumValues.isEmpty() && (_selectedTask != nullptr))
+    {
+        qInfo() << "Create new independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM) << "with values:" << enumValues;
+
+        // Create the new independent variable
+        IndependentVariableM* independentVariable = new IndependentVariableM(independentVariableName, independentVariableDescription, IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
+        independentVariable->setenumValues(enumValues);
+
+        // Add the independent variable to the selected task
+        _selectedTask->addIndependentVariable(independentVariable);
+    }
+}
+
+
+/**
+ * @brief Delete an independent variable
+ * @param independentVariable
+ */
+void TasksController::deleteIndependentVariable(IndependentVariableM* independentVariable)
+{
+    if ((independentVariable != nullptr) && (_selectedTask != nullptr))
+    {
+        // Remove the independent variable from the selected task
+        _selectedTask->removeIndependentVariable(independentVariable);
+
+        // Free memory
+        delete independentVariable;
     }
 }

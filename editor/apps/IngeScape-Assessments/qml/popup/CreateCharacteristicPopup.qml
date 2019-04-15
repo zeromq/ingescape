@@ -45,8 +45,6 @@ I2PopupBase {
 
     property SubjectsController controller: null;
 
-    //property ExperimentationM experimentation: null;
-
     //property CharacteristicValueTypes selectedType: null;
     property int selectedType: -1;
 

@@ -62,30 +62,17 @@ public:
 
 
     /**
-     * @brief Return true if the user can create an independent variable with the name
-     * Check if the name is not empty and if a independent variable with the same name does not already exist
-     * @param independentVariableName
-     * @return
+     * @brief Add an Independent Variable to our task
+     * @param independentVariable
      */
-    Q_INVOKABLE bool canCreateIndependentVariableWithName(QString independentVariableName);
+    void addIndependentVariable(IndependentVariableM* independentVariable);
 
 
     /**
-     * @brief Create a new independent variable
-     * @param independentVariableName
-     * @param independentVariableDescription
-     * @param nIndependentVariableValueType
+     * @brief Remove an Independent Variable from our task
+     * @param independentVariable
      */
-    Q_INVOKABLE void createNewIndependentVariable(QString independentVariableName, QString independentVariableDescription, int nIndependentVariableValueType);
-
-
-    /**
-     * @brief Create a new independent variable of type enum
-     * @param independentVariableName
-     * @param independentVariableDescription
-     * @param enumValues
-     */
-    Q_INVOKABLE void createNewIndependentVariableEnum(QString independentVariableName, QString independentVariableDescription, QStringList enumValues);
+    void removeIndependentVariable(IndependentVariableM* independentVariable);
 
 
 Q_SIGNALS:
