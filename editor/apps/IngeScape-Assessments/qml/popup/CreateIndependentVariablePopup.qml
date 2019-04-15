@@ -544,7 +544,7 @@ I2PopupBase {
                 onClicked: {
                     console.log("QML: create new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
 
-                    /*if (controller)
+                    if (rootPopup.task)
                     {
                         // Selected type is ENUM
                         if (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
@@ -569,7 +569,7 @@ I2PopupBase {
 
                             if (isEmptyValue === false)
                             {
-                                rootPopup.controller.createNewIndependentVariableEnum(txtIndependentVariableName.text, displayedEnumTexts);
+                                rootPopup.task.createNewIndependentVariableEnum(txtIndependentVariableName.text, txtIndependentVariableDescription.text, displayedEnumTexts);
 
                                 // Reset all user inputs and close the popup
                                 rootPopup.resetInputsAndClosePopup();
@@ -582,12 +582,12 @@ I2PopupBase {
                         // Selected type is NOT ENUM
                         else
                         {
-                            rootPopup.controller.createNewIndependentVariable(txtIndependentVariableName.text, rootPopup.selectedType);
+                            rootPopup.task.createNewIndependentVariable(txtIndependentVariableName.text, txtIndependentVariableDescription.text, rootPopup.selectedType);
 
                             // Reset all user inputs and close the popup
                             rootPopup.resetInputsAndClosePopup();
                         }
-                    }*/
+                    }
                 }
             }
         }

@@ -70,6 +70,24 @@ public:
     Q_INVOKABLE bool canCreateIndependentVariableWithName(QString independentVariableName);
 
 
+    /**
+     * @brief Create a new independent variable
+     * @param independentVariableName
+     * @param independentVariableDescription
+     * @param nIndependentVariableValueType
+     */
+    Q_INVOKABLE void createNewIndependentVariable(QString independentVariableName, QString independentVariableDescription, int nIndependentVariableValueType);
+
+
+    /**
+     * @brief Create a new independent variable of type enum
+     * @param independentVariableName
+     * @param independentVariableDescription
+     * @param enumValues
+     */
+    Q_INVOKABLE void createNewIndependentVariableEnum(QString independentVariableName, QString independentVariableDescription, QStringList enumValues);
+
+
 Q_SIGNALS:
 
 

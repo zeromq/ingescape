@@ -34,10 +34,7 @@ TaskM::TaskM(QString name,
     //
     for (int i = 1; i < 6; i++)
     {
-        IndependentVariableM* independentVariable = new IndependentVariableM();
-        independentVariable->setname(QString("VI %1").arg(i));
-        independentVariable->setdescription(QString("description of VI %1").arg(i));
-        independentVariable->setvalueType(IndependentVariableValueTypes::DOUBLE);
+        IndependentVariableM* independentVariable = new IndependentVariableM(QString("VI %1").arg(i), QString("description of VI %1").arg(i), IndependentVariableValueTypes::DOUBLE);
 
         _independentVariables.append(independentVariable);
 
@@ -110,6 +107,51 @@ bool TaskM::canCreateIndependentVariableWithName(QString independentVariableName
     }
     else {
         return false;
+    }
+}
+
+
+/**
+ * @brief Create a new independent variable
+ * @param independentVariableName
+ * @param independentVariableDescription
+ * @param nIndependentVariableValueType
+ */
+void TaskM::createNewIndependentVariable(QString independentVariableName, QString independentVariableDescription, int nIndependentVariableValueType)
+{
+    if (!independentVariableName.isEmpty() && (nIndependentVariableValueType > -1))
+    {
+        IndependentVariableValueTypes::Value independentVariableValueType = static_cast<IndependentVariableValueTypes::Value>(nIndependentVariableValueType);
+
+        qInfo() << "Create new independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(independentVariableValueType);
+
+        // Create the new independent variable
+        IndependentVariableM* independentVariable = new IndependentVariableM(independentVariableName, independentVariableDescription, independentVariableValueType);
+
+        // Add the independent variable to the list
+        _independentVariables.append(independentVariable);
+    }
+}
+
+
+/**
+ * @brief Create a new independent variable of type enum
+ * @param independentVariableName
+ * @param independentVariableDescription
+ * @param enumValues
+ */
+void TaskM::createNewIndependentVariableEnum(QString independentVariableName, QString independentVariableDescription, QStringList enumValues)
+{
+    if (!independentVariableName.isEmpty() && !enumValues.isEmpty())
+    {
+        qInfo() << "Create new independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM) << "with values:" << enumValues;
+
+        // Create the new independent variable
+        IndependentVariableM* independentVariable = new IndependentVariableM(independentVariableName, independentVariableDescription, IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
+        independentVariable->setenumValues(enumValues);
+
+        // Add the independent variable to the list
+        _independentVariables.append(independentVariable);
     }
 }
 
