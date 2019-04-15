@@ -42,6 +42,7 @@ class DependentVariableM : public QObject
     I2_QML_PROPERTY(QString, outputName)
 
     // Frequency (double ? (nb répétitions par secondes Hertz))
+    //I2_QML_PROPERTY(double, frequency)
 
 
 public:

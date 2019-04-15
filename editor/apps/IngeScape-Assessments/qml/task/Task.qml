@@ -88,7 +88,7 @@ Item {
     }
 
 
-    Text {
+    /*Text {
         id: txtName
 
         anchors {
@@ -105,8 +105,185 @@ Item {
             weight: Font.Medium
             pixelSize: 18
         }
+    }*/
+
+
+    Rectangle {
+        id: panelIndepVar
+
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: parent.top
+        }
+        height: parent.height / 2
+
+        color: "transparent"
+        border {
+            width: 1
+            color: "white"
+        }
+
+        Row {
+            id: headerIndepVar
+
+            anchors {
+                left: parent.left
+                leftMargin: 10
+                top: parent.top
+                topMargin: 10
+            }
+
+            spacing: 20
+
+            Text {
+                text: "Independent Variables"
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Medium
+                    pixelSize: 18
+                }
+            }
+
+            Button {
+                text: "New Independent Variable"
+
+                height: 30
+
+                onClicked: {
+                    console.log("QML: New Independent Variable");
+
+                    // Open the popup
+                    //createTaskPopup.open();
+                }
+            }
+        }
+
+
+        TableView {
+            id: tableIndepVar
+
+            anchors {
+                left: parent.left
+                leftMargin: 10
+                right: parent.right
+                rightMargin: 10
+                top: headerIndepVar.bottom
+                topMargin: 10
+                bottom: parent.bottom
+                bottomMargin: 10
+            }
+
+            model: rootItem.modelM ? rootItem.modelM.independentVariables : null
+
+            TableViewColumn {
+                role: "name"
+                title: qsTr("Nom")
+            }
+
+            TableViewColumn {
+                role: "description"
+                title: qsTr("Description")
+            }
+
+            TableViewColumn {
+                role: "valueType"
+                title: qsTr("Type")
+            }
+        }
     }
 
+    Rectangle {
+        id: panelDepVar
 
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+        height: parent.height / 2
+
+        color: "transparent"
+        border {
+            width: 1
+            color: "white"
+        }
+
+        Row {
+            id: headerDepVar
+
+            anchors {
+                left: parent.left
+                leftMargin: 10
+                top: parent.top
+                topMargin: 10
+            }
+
+            spacing: 20
+
+            Text {
+                text: "Dependent Variables"
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Medium
+                    pixelSize: 18
+                }
+            }
+
+            Button {
+                text: "New Dependent Variable"
+
+                height: 30
+
+                onClicked: {
+                    console.log("QML: New Dependent Variable");
+
+                    // Open the popup
+                    //createTaskPopup.open();
+                }
+            }
+        }
+
+        TableView {
+            id: tableDepVar
+
+            anchors {
+                left: parent.left
+                leftMargin: 10
+                right: parent.right
+                rightMargin: 10
+                top: headerDepVar.bottom
+                topMargin: 10
+                bottom: parent.bottom
+                bottomMargin: 10
+            }
+
+            model: rootItem.modelM ? rootItem.modelM.dependentVariables : null
+
+            TableViewColumn {
+                role: "name"
+                title: qsTr("Nom")
+            }
+
+            TableViewColumn {
+                role: "description"
+                title: qsTr("Description")
+            }
+
+            TableViewColumn {
+                role: "agentName"
+                title: qsTr("Agent")
+            }
+
+            TableViewColumn {
+                role: "outputName"
+                title: qsTr("Sortie")
+            }
+        }
+    }
 
 }

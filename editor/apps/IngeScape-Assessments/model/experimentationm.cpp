@@ -190,6 +190,19 @@ void ExperimentationM::addRecord(RecordM* record)
     {
         // Add to the list
         _allRecords.append(record);
+
+        if (record->subject() != nullptr)
+        {
+            qDebug() << "Subkect:" << record->subject()->name() << "(" << record->subject()->uid() << ")";
+
+            for (CharacteristicM* characteristic : _allCharacteristics)
+            {
+                if ((characteristic != nullptr) && record->subject()->propertyMap()->contains(characteristic->name()))
+                {
+                    qDebug() << characteristic->name() << ":" << record->subject()->propertyMap()->value(characteristic->name());
+                }
+            }
+        }
     }
 }
 

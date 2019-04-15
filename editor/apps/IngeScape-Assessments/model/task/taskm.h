@@ -39,10 +39,10 @@ class TaskM : public QObject
     I2_QML_PROPERTY_READONLY(QString, platformFileName)
 
     // List of independent variables
-    //I2_QOBJECT_LISTMODEL(IndependentVariableM, independentVariables)
+    I2_QOBJECT_LISTMODEL(IndependentVariableM, independentVariables)
 
     // List of dependent variables
-    //I2_QOBJECT_LISTMODEL(DependentVariableM, dependentVariables)
+    I2_QOBJECT_LISTMODEL(DependentVariableM, dependentVariables)
 
 
 public:
@@ -68,6 +68,11 @@ public Q_SLOTS:
 
 
 private:
+
+    /**
+     * @brief Update the list of dependent variables
+     */
+    void _updateDependentVariables();
 
 
 };

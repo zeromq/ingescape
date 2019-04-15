@@ -29,6 +29,27 @@ TaskM::TaskM(QString name,
 
     qInfo() << "New Model of Task" << _name;
 
+    //
+    // FIXME for tests
+    //
+    for (int i = 1; i < 6; i++)
+    {
+        IndependentVariableM* independentVariable = new IndependentVariableM();
+        independentVariable->setname(QString("VI %1").arg(i));
+        independentVariable->setdescription(QString("description of VI %1").arg(i));
+        independentVariable->setvalueType(IndependentVariableValueTypes::DOUBLE);
+
+        _independentVariables.append(independentVariable);
+
+
+        DependentVariableM* dependentVariable = new DependentVariableM();
+        dependentVariable->setname(QString("VD %1").arg(i));
+        dependentVariable->setdescription(QString("description of VD %1").arg(i));
+        dependentVariable->setagentName("Leap Motion");
+        dependentVariable->setoutputName(QString("Finger %1").arg(i));
+
+        _dependentVariables.append(dependentVariable);
+    }
 }
 
 
@@ -55,11 +76,27 @@ void TaskM::setplatformFileUrl(QUrl value)
         // Update file name
         if (_platformFileUrl.isValid()) {
             setplatformFileName(_platformFileUrl.fileName());
+
+            // Update the list of dependent variables
+            _updateDependentVariables();
         }
         else {
             setplatformFileName("");
         }
 
         Q_EMIT platformFileUrlChanged(value);
+    }
+}
+
+
+/**
+ * @brief Update the list of dependent variables
+ */
+void TaskM::_updateDependentVariables()
+{
+    if (_platformFileUrl.isValid())
+    {
+        // FIXME TODO: _updateDependentVariables
+        qDebug() << "TODO _updateDependentVariables...";
     }
 }

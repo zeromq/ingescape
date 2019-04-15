@@ -263,6 +263,9 @@ I2PopupBase {
                 I2ComboboxItemModel {
                     id: comboSubjects
 
+                    enabled: rootItem.experimentation ? (rootItem.experimentation.allSubjects.count > 0)
+                                                      : false
+
                     model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
                     function modelToString(_model) {
@@ -302,6 +305,9 @@ I2PopupBase {
 
                 I2ComboboxItemModel {
                     id: comboTasks
+
+                    enabled: rootItem.experimentation ? (rootItem.experimentation.allTasks.count > 0)
+                                                      : false
 
                     model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
 
