@@ -11,6 +11,7 @@ SOURCES += \
     $$PWD/misc/ingescapeutils.cpp \
     $$PWD/misc/debugquickinspector.cpp \
     $$PWD/model/enums.cpp \
+    $$PWD/model/jsonhelper.cpp \
     $$PWD/model/agent/agentm.cpp \
     $$PWD/model/agent/definition/definitionm.cpp \
     $$PWD/model/agent/definition/agentiopm.cpp \
@@ -26,6 +27,7 @@ HEADERS += \
     $$PWD/misc/ingescapeutils.h \
     $$PWD/misc/debugquickinspector.h \
     $$PWD/model/enums.h \
+    $$PWD/model/jsonhelper.h \
     $$PWD/model/agent/agentm.h \
     $$PWD/model/agent/definition/definitionm.h \
     $$PWD/model/agent/definition/agentiopm.h \

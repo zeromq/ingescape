@@ -12,7 +12,7 @@
  *
  */
 
-#include "recordm.h"
+#include "experimentationrecordm.h"
 
 
 /**
@@ -23,7 +23,7 @@
  * @param startDateTime
  * @param parent
  */
-RecordM::RecordM(QString uid,
+ExperimentationRecordM::ExperimentationRecordM(QString uid,
                  QString name,
                  SubjectM* subject,
                  TaskM* task,
@@ -51,7 +51,7 @@ RecordM::RecordM(QString uid,
 /**
  * @brief Destructor
  */
-RecordM::~RecordM()
+ExperimentationRecordM::~ExperimentationRecordM()
 {
     if ((_subject != nullptr) && (_task != nullptr))
     {
@@ -67,7 +67,7 @@ RecordM::~RecordM()
  * @brief Setter for property "End Date Time"
  * @param value
  */
-void RecordM::setendDateTime(QDateTime value)
+void ExperimentationRecordM::setendDateTime(QDateTime value)
 {
     if (_endDateTime != value)
     {

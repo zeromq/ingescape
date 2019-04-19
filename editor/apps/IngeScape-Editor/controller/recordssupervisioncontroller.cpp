@@ -26,11 +26,9 @@
 /**
  * @brief Constructor
  * @param modelManager
- * @param jsonHelper
  * @param parent
  */
 RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager* modelManager,
-                                                           JsonHelper* jsonHelper,
                                                            QObject *parent) : QObject(parent),
     _peerIdOfRecorder(""),
     _peerNameOfRecorder(""),
@@ -41,8 +39,7 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     _isLoadingRecord(false),
     _playingRecord(nullptr),
     _currentRecordTime(QDateTime(QDate::currentDate())),
-    _modelManager(modelManager),
-    _jsonHelper(jsonHelper)
+    _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -70,7 +67,6 @@ RecordsSupervisionController::~RecordsSupervisionController()
 
     // Reset pointers
     _modelManager = nullptr;
-    _jsonHelper = nullptr;
 }
 
 
@@ -239,10 +235,10 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
         }
     }
 
-    if (!recordsJSON.isEmpty() && (_jsonHelper != nullptr))
+    if (!recordsJSON.isEmpty())
     {
         QByteArray byteArrayOfJson = recordsJSON.toUtf8();
-        QList<RecordM*> recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
+        QList<RecordM*> recordsList = _createRecordsListFromJSON(byteArrayOfJson);
 
         if (!recordsList.isEmpty())
         {
@@ -269,10 +265,10 @@ void RecordsSupervisionController::onAddedRecord(QString recordJSON)
 {
     //qDebug() << "onAddedRecord" << recordJSON;
 
-    if (!recordJSON.isEmpty() && (_jsonHelper != nullptr))
+    if (!recordJSON.isEmpty())
     {
         QByteArray byteArrayOfJson = recordJSON.toUtf8();
-        QList<RecordM*> recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
+        QList<RecordM*> recordsList = _createRecordsListFromJSON(byteArrayOfJson);
 
         if (recordsList.count() == 1)
         {
@@ -361,6 +357,53 @@ void RecordsSupervisionController::_onTimeout_DisplayTime()
 {
     setcurrentRecordTime(_currentRecordTime.addMSecs(INTERVAL_ELAPSED_TIME));
 }
+
+
+/**
+ * @brief Create a model of record from JSON data
+ * @param byteArrayOfJson
+ * @return
+ */
+QList<RecordM*> RecordsSupervisionController::_createRecordsListFromJSON(QByteArray byteArrayOfJson)
+{
+    QList<RecordM*> recordsList;
+
+    QJsonDocument jsonAgentDefinition = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonAgentDefinition.isObject())
+    {
+        QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
+        QJsonValue recordsValue = jsonFileRoot.object().value("Records");
+
+        if (recordsValue.isArray())
+        {
+            for (QJsonValue jsonValue : recordsValue.toArray())
+            {
+                if (jsonValue.isObject())
+                {
+                    QJsonObject jsonRecord = jsonValue.toObject();
+
+                    QJsonValue jsonId = jsonRecord.value("id");
+                    QJsonValue jsonName = jsonRecord.value("name_record");
+                    QJsonValue jsonBeginDateTime = jsonRecord.value("time_beg");
+                    QJsonValue jsonEndDateTime = jsonRecord.value("time_end");
+
+                    if (jsonName.isString() && jsonId.isString())
+                    {
+                        // Create record
+                        RecordM* record = new RecordM(jsonId.toString(),
+                                                      jsonName.toString(),
+                                                      QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonBeginDateTime.toDouble())),
+                                                      QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonEndDateTime.toDouble())));
+
+                        recordsList.append(record);
+                    }
+                }
+            }
+        }
+    }
+    return recordsList;
+}
+
 
 
 /**

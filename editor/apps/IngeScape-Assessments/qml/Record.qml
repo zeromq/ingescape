@@ -40,7 +40,7 @@ Item {
     //
     //--------------------------------------------------------
 
-    property RecordM modelM: null;
+    property ExperimentationRecordM modelM: null;
 
 
 

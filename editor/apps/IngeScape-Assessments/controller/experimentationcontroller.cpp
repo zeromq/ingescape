@@ -88,8 +88,8 @@ void ExperimentationController::createNewRecordForSubjectAndTask(QString recordN
 
         QString recordUID = now.toString("R-yyMMdd-hhmmss-zzz");
 
-        // Create a new record
-        RecordM* record = new RecordM(recordUID, recordName, subject, task, now, nullptr);
+        // Create a new (experimentation) record
+        ExperimentationRecordM* record = new ExperimentationRecordM(recordUID, recordName, subject, task, now, nullptr);
 
         // Add the record to the current experimentation
         _currentExperimentation->addRecord(record);
@@ -101,7 +101,7 @@ void ExperimentationController::createNewRecordForSubjectAndTask(QString recordN
  * @brief Open a record
  * @param record
  */
-void ExperimentationController::openRecord(RecordM* record)
+void ExperimentationController::openRecord(ExperimentationRecordM* record)
 {
     if ((record != nullptr) && (_currentExperimentation != nullptr))
     {
@@ -116,7 +116,7 @@ void ExperimentationController::openRecord(RecordM* record)
  * @brief Delete a record
  * @param record
  */
-void ExperimentationController::deleteRecord(RecordM* record)
+void ExperimentationController::deleteRecord(ExperimentationRecordM* record)
 {
     if ((record != nullptr) && (_currentExperimentation != nullptr))
     {

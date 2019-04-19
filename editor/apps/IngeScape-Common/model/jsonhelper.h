@@ -1,7 +1,7 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -21,7 +21,7 @@
 #include <QJsonArray>
 
 #include <I2PropertyHelpers.h>
-#include <model/recordm.h>
+#include <model/agent/agentm.h>
 #include <model/scenario/scenariom.h>
 
 
@@ -159,14 +159,6 @@ public:
      * @return
      */
     QJsonObject exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine);
-
-
-    /**
-     * @brief Create a model of record from JSON data
-     * @param byteArrayOfJson
-     * @return
-     */
-    QList<RecordM*> createRecordModelList(QByteArray byteArrayOfJson);
 
 
 Q_SIGNALS:

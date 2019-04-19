@@ -13,7 +13,8 @@
  */
 
 #include "publishedvaluem.h"
-#include <model/iop/agentiopm.h>
+#include <model/agent/definition/agentiopm.h>
+
 
 /**
  * @brief Constructor

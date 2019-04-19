@@ -27,7 +27,7 @@
 #include <model/task/independentvariablem.h>
 //#include <model/task/independentvariableenumm.h>
 #include <model/task/dependentvariablem.h>
-#include <model/recordm.h>
+#include <model/experimentationrecordm.h>
 
 #include <viewModel/experimentationsgroupvm.h>
 

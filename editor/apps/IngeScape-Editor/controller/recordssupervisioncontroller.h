@@ -67,11 +67,9 @@ public:
     /**
      * @brief Constructor
      * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
     explicit RecordsSupervisionController(IngeScapeModelManager* modelManager,
-                                          JsonHelper* jsonHelper,
                                           QObject *parent = nullptr);
 
 
@@ -193,6 +191,14 @@ private Q_SLOTS:
 private:
 
     /**
+     * @brief Create a model of record from JSON data
+     * @param byteArrayOfJson
+     * @return
+     */
+    QList<RecordM*> _createRecordsListFromJSON(QByteArray byteArrayOfJson);
+
+
+    /**
      * @brief Create a view model of record with a model
      * @param model
      */
@@ -210,9 +216,6 @@ private:
 
     // Manager for the data model of INGESCAPE
     IngeScapeModelManager* _modelManager;
-
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
 
     // Hash table from record id to a model of record
     QHash<QString, RecordM*> _hashFromRecordIdToModel;

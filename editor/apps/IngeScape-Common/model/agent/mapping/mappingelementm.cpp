@@ -1,5 +1,5 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
  *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *

@@ -1,7 +1,7 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -883,52 +883,6 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
     jsonScenario.insert("actions_timeline", jsonActionsInTimelineArray);
 
     return jsonScenario;
-}
-
-
-/**
- * @brief Create a model of record from JSON data
- * @param byteArrayOfJson
- * @return
- */
-QList<RecordM*> JsonHelper::createRecordModelList(QByteArray byteArrayOfJson)
-{
-    QList<RecordM*> recordsList;
-
-    QJsonDocument jsonAgentDefinition = QJsonDocument::fromJson(byteArrayOfJson);
-    if (jsonAgentDefinition.isObject())
-    {
-        QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
-        QJsonValue recordsValue = jsonFileRoot.object().value("Records");
-
-        if (recordsValue.isArray())
-        {   
-            for (QJsonValue jsonValue : recordsValue.toArray())
-            {
-                if (jsonValue.isObject())
-                {
-                    QJsonObject jsonRecord = jsonValue.toObject();
-
-                    QJsonValue jsonId = jsonRecord.value("id");
-                    QJsonValue jsonName = jsonRecord.value("name_record");
-                    QJsonValue jsonBeginDateTime = jsonRecord.value("time_beg");
-                    QJsonValue jsonEndDateTime = jsonRecord.value("time_end");
-
-                    if (jsonName.isString() && jsonId.isString())
-                    {
-                        // Create record
-                        RecordM* record = new RecordM(jsonId.toString(),
-                                                      jsonName.toString(),
-                                                      QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonBeginDateTime.toDouble())),
-                                                      QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonEndDateTime.toDouble())));
-
-                        recordsList.append(record);
-                    }
-                }
-            }
-        }
-    }
-    return recordsList;
 }
 
 

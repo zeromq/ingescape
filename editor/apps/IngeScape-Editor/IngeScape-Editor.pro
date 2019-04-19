@@ -47,7 +47,6 @@ SOURCES += main.cpp \
     controller/valueshistorycontroller.cpp \
     controller/abstracttimeactionslinescenarioviewcontroller.cpp \
     misc/collapsiblecolumn.cpp \
-    model/jsonhelper.cpp \
     model/scenario/condition/actionconditionm.cpp \
     model/scenario/actionm.cpp \
     model/scenario/scenariom.cpp \
@@ -113,7 +112,6 @@ HEADERS += \
     controller/valueshistorycontroller.h \
     controller/abstracttimeactionslinescenarioviewcontroller.h \
     misc/collapsiblecolumn.h \
-    model/jsonhelper.h \
     model/scenario/condition/actionconditionm.h \
     model/scenario/actionm.h \
     model/scenario/scenariom.h \

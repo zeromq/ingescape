@@ -130,7 +130,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _hostsSupervisionC = new HostsSupervisionController(_modelManager, this);
 
     // Create the controller for records supervision
-    _recordsSupervisionC = new RecordsSupervisionController(_modelManager, _jsonHelper, this);
+    _recordsSupervisionC = new RecordsSupervisionController(_modelManager, this);
 
     // Create the controller for agents mapping
     _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, this);

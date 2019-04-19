@@ -184,7 +184,7 @@ void ExperimentationM::removeTask(TaskM* task)
  * @brief Add a record to our experimentation
  * @param record
  */
-void ExperimentationM::addRecord(RecordM* record)
+void ExperimentationM::addRecord(ExperimentationRecordM* record)
 {
     if (record != nullptr)
     {
@@ -211,7 +211,7 @@ void ExperimentationM::addRecord(RecordM* record)
  * @brief Remove a record from our experimentation
  * @param record
  */
-void ExperimentationM::removeRecord(RecordM* record)
+void ExperimentationM::removeRecord(ExperimentationRecordM* record)
 {
     if (record != nullptr)
     {

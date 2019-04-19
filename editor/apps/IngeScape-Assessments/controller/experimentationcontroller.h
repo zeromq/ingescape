@@ -63,14 +63,14 @@ public:
      * @brief Open a record
      * @param record
      */
-    Q_INVOKABLE void openRecord(RecordM* record);
+    Q_INVOKABLE void openRecord(ExperimentationRecordM* record);
 
 
     /**
      * @brief Delete a record
      * @param record
      */
-    Q_INVOKABLE void deleteRecord(RecordM* record);
+    Q_INVOKABLE void deleteRecord(ExperimentationRecordM* record);
 
 
 Q_SIGNALS:

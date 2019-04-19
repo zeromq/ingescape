@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef RECORDM_H
-#define RECORDM_H
+#ifndef EXPERIMENTATIONRECORDM_H
+#define EXPERIMENTATIONRECORDM_H
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
@@ -24,9 +24,9 @@
 
 
 /**
- * @brief The RecordM class defines a model of record
+ * @brief The ExperimentationRecordM class defines a model of record
  */
-class RecordM : public QObject
+class ExperimentationRecordM : public QObject
 {
     Q_OBJECT
 
@@ -63,13 +63,6 @@ public:
 
     /**
      * @brief Constructor
-     * @param parent
-     */
-    //explicit RecordM(QObject *parent = nullptr);
-
-
-    /**
-     * @brief Constructor
      * @param uid
      * @param name
      * @param subject
@@ -77,18 +70,18 @@ public:
      * @param startDateTime
      * @param parent
      */
-    explicit RecordM(QString uid,
-                     QString name,
-                     SubjectM* subject,
-                     TaskM* task,
-                     QDateTime startDateTime,
-                     QObject *parent = nullptr);
+    explicit ExperimentationRecordM(QString uid,
+                                    QString name,
+                                    SubjectM* subject,
+                                    TaskM* task,
+                                    QDateTime startDateTime,
+                                    QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~RecordM();
+    ~ExperimentationRecordM();
 
 
 Q_SIGNALS:
@@ -102,6 +95,6 @@ private:
 
 };
 
-QML_DECLARE_TYPE(RecordM)
+QML_DECLARE_TYPE(ExperimentationRecordM)
 
-#endif // RECORDM_H
+#endif // EXPERIMENTATIONRECORDM_H
