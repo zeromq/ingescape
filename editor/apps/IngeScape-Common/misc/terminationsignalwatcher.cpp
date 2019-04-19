@@ -45,8 +45,8 @@ TerminationSignalWatcher::TerminationSignalWatcher(QObject *parent) : QObject(pa
 
     // Subscribe to signals
     // - save previous handlers
-    sigaction (SIGINT, NULL, &_defaultHandlerSIGINT);
-    sigaction (SIGTERM, NULL, &_defaultHandlerSIGTERM);
+    sigaction(SIGINT, nullptr, &_defaultHandlerSIGINT);
+    sigaction(SIGTERM, nullptr, &_defaultHandlerSIGTERM);
 
     // - register a new sigaction for
     struct sigaction sigact;
@@ -54,8 +54,8 @@ TerminationSignalWatcher::TerminationSignalWatcher(QObject *parent) : QObject(pa
     sigact.sa_flags = 0;
     sigemptyset(&sigact.sa_mask);
 
-    sigaction(SIGINT, &sigact, NULL);
-    sigaction(SIGTERM, &sigact, NULL);
+    sigaction(SIGINT, &sigact, nullptr);
+    sigaction(SIGTERM, &sigact, nullptr);
 
 #endif
 
@@ -80,17 +80,17 @@ TerminationSignalWatcher::~TerminationSignalWatcher()
     //
 #ifdef Q_OS_UNIX
     // Restore default handlers
-    sigaction (SIGINT, &_defaultHandlerSIGINT, NULL);
-    sigaction (SIGTERM, &_defaultHandlerSIGTERM, NULL);
-    _defaultHandlerSIGINT.sa_handler = NULL;
-    _defaultHandlerSIGTERM.sa_handler = NULL;
+    sigaction (SIGINT, &_defaultHandlerSIGINT, nullptr);
+    sigaction (SIGTERM, &_defaultHandlerSIGTERM, nullptr);
+    _defaultHandlerSIGINT.sa_handler = nullptr;
+    _defaultHandlerSIGTERM.sa_handler = nullptr;
 
     // Clean-up our socket notifier
     if (_socketNotifier != nullptr)
     {
-        disconnect(_socketNotifier, 0, this, 0);
+        disconnect(_socketNotifier, nullptr, this, nullptr);
         delete _socketNotifier;
-        _socketNotifier = NULL;
+        _socketNotifier = nullptr;
     }
 
 #endif

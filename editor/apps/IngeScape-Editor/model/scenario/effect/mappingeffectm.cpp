@@ -93,7 +93,7 @@ void MappingEffectM::setoutputAgent(AgentsGroupedByNameVM* value)
         {
             // DIS-connect to signals from the agents grouped by name
             //disconnect(_outputAgent, &AgentsGroupedByNameVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
-            disconnect(_outputAgent, 0, this, 0);
+            disconnect(_outputAgent, nullptr, this, nullptr);
         }
 
         // Set the new value
@@ -233,7 +233,7 @@ void MappingEffectM::setagent(AgentsGroupedByNameVM* agent)
         if (previousAgent != nullptr)
         {
             // DIS-connect to signals from the agents grouped by name
-            disconnect(_agent, 0, this, 0);
+            disconnect(_agent, nullptr, this, nullptr);
         }
 
         // Reset the input

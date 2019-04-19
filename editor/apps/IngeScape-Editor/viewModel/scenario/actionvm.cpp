@@ -93,7 +93,7 @@ ActionVM::~ActionVM()
     // Remove revert timer
     if (_timerToReverse != nullptr)
     {
-        disconnect(_timerToReverse, 0, this, 0);
+        disconnect(_timerToReverse, nullptr, this, nullptr);
         _timerToReverse->stop();
         delete _timerToReverse;
         _timerToReverse = nullptr;
@@ -102,7 +102,7 @@ ActionVM::~ActionVM()
     // Remove rearm timer
     if (_timerToRearm != nullptr)
     {
-        disconnect(_timerToRearm, 0, this, 0);
+        disconnect(_timerToRearm, nullptr, this, nullptr);
         _timerToRearm->stop();
         delete _timerToRearm;
         _timerToRearm = nullptr;

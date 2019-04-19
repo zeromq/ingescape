@@ -1,5 +1,5 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Assessments
  *
  *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
  *

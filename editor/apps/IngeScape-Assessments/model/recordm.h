@@ -49,8 +49,8 @@ class RecordM : public QObject
     I2_QML_PROPERTY_CUSTOM_SETTER(QDateTime, endDateTime)
 
     // Duration of our record
-    //I2_QML_PROPERTY_QTime(duration)
-    I2_QML_PROPERTY(QDateTime, duration)
+    I2_QML_PROPERTY_QTime(duration)
+    //I2_QML_PROPERTY(QDateTime, duration)
 
     // IndependentVariableValues (Table de Hash [UID V.I. - Valeur de la V.I.])
     // liste des valeurs des V.I. de la tâche

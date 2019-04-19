@@ -189,7 +189,7 @@ void AgentsGroupedByNameVM::removeOldAgentModel(AgentM* model)
         if (_models.contains(model))
         {
             // DIS-connect to signals from the model
-            disconnect(model, 0, this, 0);
+            disconnect(model, nullptr, this, nullptr);
 
             // Remove from our list
             _models.remove(model);
@@ -257,7 +257,7 @@ void AgentsGroupedByNameVM::deleteAgentsGroupedByDefinition(AgentsGroupedByDefin
         Q_EMIT agentsGroupedByDefinitionWillBeDeleted(agentsGroupedByDefinition);
 
         // DIS-connect to signals from this view model of agents grouped by definition
-        disconnect(agentsGroupedByDefinition, 0, this, 0);
+        disconnect(agentsGroupedByDefinition, nullptr, this, nullptr);
 
         if (agentsGroupedByDefinition->definition() != nullptr)
         {

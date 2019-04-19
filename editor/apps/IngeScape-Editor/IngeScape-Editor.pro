@@ -48,10 +48,7 @@ SOURCES += main.cpp \
     controller/abstracttimeactionslinescenarioviewcontroller.cpp \
     misc/collapsiblecolumn.cpp \
     model/agentm.cpp \
-    model/iop/agentiopm.cpp \
-    model/iop/outputm.cpp \
     model/jsonhelper.cpp \
-    model/definitionm.cpp \
     model/mapping/agentmappingm.cpp \
     model/mapping/elementmappingm.cpp \
     model/scenario/condition/actionconditionm.cpp \
@@ -59,7 +56,6 @@ SOURCES += main.cpp \
     model/scenario/scenariom.cpp \
     model/scenario/scenariomarkerm.cpp \
     model/scenario/condition/iopvalueconditionm.cpp \
-    model/enums.cpp \
     model/publishedvaluem.cpp \
     model/scenario/timetickm.cpp \
     model/scenario/effect/actioneffectm.cpp \
@@ -97,7 +93,8 @@ SOURCES += main.cpp \
     viewModel/link/linkconnectorvm.cpp \
     misc/textfielddoublevalidator.cpp \
     misc/numberconstants.cpp \
-    viewModel/link/mappingelementvm.cpp
+    viewModel/link/mappingelementvm.cpp \
+    model/editorenums.cpp
 
 HEADERS += \
     stable.h \
@@ -121,10 +118,7 @@ HEADERS += \
     controller/abstracttimeactionslinescenarioviewcontroller.h \
     misc/collapsiblecolumn.h \
     model/agentm.h \
-    model/iop/agentiopm.h \
-    model/iop/outputm.h \
     model/jsonhelper.h \
-    model/definitionm.h \
     model/mapping/agentmappingm.h \
     model/mapping/elementmappingm.h \
     model/scenario/condition/actionconditionm.h \
@@ -132,7 +126,6 @@ HEADERS += \
     model/scenario/scenariom.h \
     model/scenario/scenariomarkerm.h \
     model/scenario/condition/iopvalueconditionm.h \
-    model/enums.h \
     model/publishedvaluem.h \
     model/scenario/timetickm.h \
     model/scenario/effect/actioneffectm.h \
@@ -170,7 +163,8 @@ HEADERS += \
     viewModel/link/linkconnectorvm.h \
     misc/textfielddoublevalidator.h \
     misc/numberconstants.h \
-    viewModel/link/mappingelementvm.h
+    viewModel/link/mappingelementvm.h \
+    model/editorenums.h
 
 
 RESOURCES += qml.qrc

@@ -5,19 +5,27 @@ QT += qml quick svg xml sql quick-private core-private gui-private concurrent
 
 
 SOURCES += \
-        $$PWD/ingescapecommon.cpp \
+    $$PWD/ingescapecommon.cpp \
     $$PWD/settings/ingescapesettings.cpp \
     $$PWD/misc/terminationsignalwatcher.cpp \
     $$PWD/misc/ingescapeutils.cpp \
-    $$PWD/misc/debugquickinspector.cpp
+    $$PWD/misc/debugquickinspector.cpp \
+    $$PWD/model/enums.cpp \
+    $$PWD/model/definitionm.cpp \
+    $$PWD/model/iop/agentiopm.cpp \
+    $$PWD/model/iop/outputm.cpp
 
 HEADERS += \
-        $$PWD/ingescapecommon.h \
-        $$PWD/ingescape-common_global.h \
+    $$PWD/ingescapecommon.h \
+    $$PWD/ingescape-common_global.h \
     $$PWD/settings/ingescapesettings.h \
     $$PWD/misc/terminationsignalwatcher.h \
     $$PWD/misc/ingescapeutils.h \
-    $$PWD/misc/debugquickinspector.h
+    $$PWD/misc/debugquickinspector.h \
+    $$PWD/model/enums.h \
+    $$PWD/model/definitionm.h \
+    $$PWD/model/iop/agentiopm.h \
+    $$PWD/model/iop/outputm.h
 
 
 #RESOURCES += \

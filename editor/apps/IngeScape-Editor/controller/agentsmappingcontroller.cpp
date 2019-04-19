@@ -18,6 +18,7 @@
 #include <QQmlEngine>
 #include <QDebug>
 #include <QFileDialog>
+#include <model/editorenums.h>
 
 
 /**

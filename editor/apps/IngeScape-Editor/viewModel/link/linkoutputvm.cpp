@@ -54,7 +54,7 @@ LinkOutputVM::~LinkOutputVM()
     // Stop and clean the timer
     //
     _timer.stop();
-    disconnect(&_timer, 0, this, 0);
+    disconnect(&_timer, nullptr, this, nullptr);
 
 
     if (_output != nullptr)

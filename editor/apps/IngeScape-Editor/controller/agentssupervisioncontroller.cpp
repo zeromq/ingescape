@@ -17,6 +17,7 @@
 
 #include <QQmlEngine>
 #include <QDebug>
+#include <model/editorenums.h>
 
 
 /**
@@ -154,7 +155,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
         }
 
         // DIS-connect to signals from this view model of agents grouped by definition
-        disconnect(agentsGroupedByDefinition, 0, this, 0);
+        disconnect(agentsGroupedByDefinition, nullptr, this, nullptr);
 
         // Remove it from the list
         _agentsList.remove(agentsGroupedByDefinition);

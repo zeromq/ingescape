@@ -36,7 +36,7 @@
 
 // FIXME: Why this include is not needed in the IngeScape Editor ?
 extern "C" {
-#include <ingescape.h>
+    #include <ingescape.h>
 }
 
 

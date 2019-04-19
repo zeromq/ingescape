@@ -14,6 +14,7 @@
 
 #include "agentsgroupedbydefinitionvm.h"
 #include <QFileDialog>
+#include <model/editorenums.h>
 
 
 /**
@@ -70,7 +71,7 @@ AgentsGroupedByDefinitionVM::~AgentsGroupedByDefinitionVM()
     {
         qInfo() << "Delete View Model of Agents grouped by definition" << _definition->name() << "(and name" << _name << ")";
 
-        disconnect(_definition, 0, this, 0);
+        disconnect(_definition, nullptr, this, nullptr);
 
         // Reset and delete the definition
         DefinitionM* temp = _definition;
@@ -89,7 +90,7 @@ AgentsGroupedByDefinitionVM::~AgentsGroupedByDefinitionVM()
     for (AgentM* model : _models)
     {
         if (model != nullptr) {
-            disconnect(model, 0, this, 0);
+            disconnect(model, nullptr, this, nullptr);
         }
     }
 
@@ -433,7 +434,7 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
                 //qDebug() << "Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
 
                 // DIS-connect from signals of the model
-                disconnect(model, 0, this, 0);
+                disconnect(model, nullptr, this, nullptr);
             }
         }
     }

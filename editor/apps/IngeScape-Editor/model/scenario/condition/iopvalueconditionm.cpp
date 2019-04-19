@@ -158,7 +158,7 @@ void IOPValueConditionM::setagent(AgentsGroupedByNameVM* agent)
         if (previousAgent != nullptr)
         {
             // DIS-connect to signals from the agents grouped by name
-            disconnect(previousAgent, 0, this, 0);
+            disconnect(previousAgent, nullptr, this, nullptr);
         }
 
         // Reset the agent IOP

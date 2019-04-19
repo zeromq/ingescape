@@ -1,7 +1,7 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -60,31 +60,19 @@ static const QString SEPARATOR_LINK_OUTPUT_AND_LINK_INPUT = QString("-->");
 static const QString HOSTNAME_NOT_DEFINED = QString("HOSTNAME NOT DEFINED");
 
 
-static const QString command_LoadDefinition = "LOAD_THIS_DEFINITION#";
-static const QString command_LoadMapping = "LOAD_THIS_MAPPING#";
-static const QString command_ClearMapping = "CLEAR_MAPPING";
-
 static const QString command_StartAgent = "RUN";
 static const QString command_StopAgent = "STOP";
+
 static const QString command_MuteAgent = "MUTE_ALL";
 static const QString command_UnmuteAgent = "UNMUTE_ALL";
 static const QString command_MuteAgentOutput = "MUTE";
 static const QString command_UnmuteAgentOutput = "UNMUTE";
+
 static const QString command_FreezeAgent = "FREEZE";
 static const QString command_UnfreezeAgent = "UNFREEZE";
 
 static const QString command_MapAgents = "MAP";
 static const QString command_UnmapAgents = "UNMAP";
-
-static const QString command_EnableLogStream = "ENABLE_LOG_STREAM";
-static const QString command_DisableLogStream = "DISABLE_LOG_STREAM";
-static const QString command_EnableLogFile = "ENABLE_LOG_FILE";
-static const QString command_DisableLogFile = "DISABLE_LOG_FILE";
-static const QString command_SetLogPath = "SET_LOG_PATH";
-static const QString command_SetDefinitionPath = "SET_DEFINITION_PATH";
-static const QString command_SetMappingPath = "SET_MAPPING_PATH";
-static const QString command_SaveDefinitionToPath = "SAVE_DEFINITION_TO_PATH";
-static const QString command_SaveMappingToPath = "SAVE_MAPPING_TO_PATH";
 
 static const QString command_ExecutedAction = "EXECUTED_ACTION";
 

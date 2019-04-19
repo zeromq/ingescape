@@ -1,7 +1,7 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.

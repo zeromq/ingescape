@@ -1,7 +1,7 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -188,7 +188,7 @@ void DefinitionM::_onOutputsListChanged()
                 _mapFromOutputNameToOutput.remove(output->name());
 
                 // DIS-connect to signals from the output
-                disconnect(output, 0, this, 0);
+                disconnect(output, nullptr, this, nullptr);
             }
         }
     }
