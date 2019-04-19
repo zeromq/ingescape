@@ -40,7 +40,6 @@ SOURCES += main.cpp \
     controller/agentssupervisioncontroller.cpp \
     controller/agentsmappingcontroller.cpp \
     controller/ingescapeeditorcontroller.cpp \
-    controller/ingescapemodelmanager.cpp \
     controller/networkcontroller.cpp \
     controller/scenariocontroller.cpp \
     controller/actioneditorcontroller.cpp \
@@ -66,7 +65,8 @@ SOURCES += main.cpp \
     viewModel/link/linkoutputvm.cpp \
     viewModel/link/linkvm.cpp \
     viewModel/link/linkconnectorvm.cpp \
-    model/editorenums.cpp
+    model/editorenums.cpp \
+    controller/editormodelmanager.cpp
 
 HEADERS += \
     stable.h \
@@ -82,7 +82,6 @@ HEADERS += \
     controller/agentssupervisioncontroller.h \
     controller/agentsmappingcontroller.h \
     controller/ingescapeeditorcontroller.h \
-    controller/ingescapemodelmanager.h \
     controller/networkcontroller.h \
     controller/scenariocontroller.h \
     controller/actioneditorcontroller.h \
@@ -108,7 +107,8 @@ HEADERS += \
     viewModel/link/linkoutputvm.h \
     viewModel/link/linkvm.h \
     viewModel/link/linkconnectorvm.h \
-    model/editorenums.h
+    model/editorenums.h \
+    controller/editormodelmanager.h
 
 
 RESOURCES += qml.qrc

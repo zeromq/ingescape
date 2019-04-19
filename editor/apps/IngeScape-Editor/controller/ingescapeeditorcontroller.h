@@ -27,7 +27,7 @@
 #include <controller/agentsmappingcontroller.h>
 #include <controller/agentssupervisioncontroller.h>
 #include <controller/hostssupervisioncontroller.h>
-#include <controller/ingescapemodelmanager.h>
+#include <controller/editormodelmanager.h>
 #include <controller/logstreamcontroller.h>
 #include <controller/networkcontroller.h>
 #include <controller/recordssupervisioncontroller.h>
@@ -66,7 +66,7 @@ class IngeScapeEditorController : public QObject
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 
     // Manager for the data model of our IngeScape editor
-    I2_QML_PROPERTY_READONLY(IngeScapeModelManager*, modelManager)
+    I2_QML_PROPERTY_READONLY(EditorModelManager*, modelManager)
 
     // Controller for agents supervision
     I2_QML_PROPERTY_READONLY(AgentsSupervisionController*, agentsSupervisionC)

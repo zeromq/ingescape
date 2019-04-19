@@ -22,7 +22,7 @@
 
 #include "I2PropertyHelpers.h"
 
-#include <controller/ingescapemodelmanager.h>
+#include <controller/editormodelmanager.h>
 #include <controller/actioneditorcontroller.h>
 #include <viewModel/agentsgroupedbynamevm.h>
 #include <viewModel/scenario/actionvm.h>
@@ -115,7 +115,7 @@ public:
      * @param jsonHelper
      * @param parent
      */
-    explicit ScenarioController(IngeScapeModelManager* modelManager,
+    explicit ScenarioController(EditorModelManager* modelManager,
                                 JsonHelper* jsonHelper,
                                 QObject *parent = nullptr);
 
@@ -473,7 +473,7 @@ private:
 private:
 
     // Manager for the data model of INGESCAPE
-    IngeScapeModelManager* _modelManager;
+    EditorModelManager* _modelManager;
 
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;

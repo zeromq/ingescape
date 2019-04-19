@@ -19,7 +19,7 @@
 #include <QObject>
 #include <QtQml>
 #include <I2PropertyHelpers.h>
-#include <controller/ingescapemodelmanager.h>
+#include <controller/editormodelmanager.h>
 #include <viewModel/agentinmappingvm.h>
 #include <viewModel/link/linkvm.h>
 
@@ -67,7 +67,7 @@ public:
      * @param jsonHelper
      * @param parent
      */
-    explicit AgentsMappingController(IngeScapeModelManager* modelManager,
+    explicit AgentsMappingController(EditorModelManager* modelManager,
                                      JsonHelper* jsonHelper,
                                      QObject *parent = nullptr);
 
@@ -454,7 +454,7 @@ private:
 private:
 
     // Manager for the data model of INGESCAPE
-    IngeScapeModelManager* _modelManager;
+    EditorModelManager* _modelManager;
 
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;

@@ -20,7 +20,7 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <controller/ingescapemodelmanager.h>
+#include <controller/editormodelmanager.h>
 #include <viewModel/recordvm.h>
 #include <model/recordm.h>
 
@@ -69,7 +69,7 @@ public:
      * @param modelManager
      * @param parent
      */
-    explicit RecordsSupervisionController(IngeScapeModelManager* modelManager,
+    explicit RecordsSupervisionController(EditorModelManager* modelManager,
                                           QObject *parent = nullptr);
 
 
@@ -215,7 +215,7 @@ private:
 private:
 
     // Manager for the data model of INGESCAPE
-    IngeScapeModelManager* _modelManager;
+    EditorModelManager* _modelManager;
 
     // Hash table from record id to a model of record
     QHash<QString, RecordM*> _hashFromRecordIdToModel;

@@ -26,7 +26,7 @@
  * @param jsonHelper
  * @param parent
  */
-AgentsSupervisionController::AgentsSupervisionController(IngeScapeModelManager* modelManager,
+AgentsSupervisionController::AgentsSupervisionController(EditorModelManager* modelManager,
                                                          JsonHelper* jsonHelper,
                                                          QObject *parent) : QObject(parent),
     _selectedAgent(nullptr),

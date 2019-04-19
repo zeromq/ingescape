@@ -132,12 +132,10 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
 
     // Connect to signals from the network controller
-    /*connect(_networkC, &NetworkController::agentEntered, _modelManager, &IngeScapeModelManager::onAgentEntered);
-  connect(_networkC, &NetworkController::agentExited, _modelManager, &IngeScapeModelManager::onAgentExited);
-  connect(_networkC, &NetworkController::launcherEntered, _modelManager, &IngeScapeModelManager::onLauncherEntered);
-  connect(_networkC, &NetworkController::launcherExited, _modelManager, &IngeScapeModelManager::onLauncherExited);
-  connect(_networkC, &NetworkController::recorderEntered, _recordsSupervisionC, &RecordsSupervisionController::onRecorderEntered);
-  connect(_networkC, &NetworkController::recorderExited, _recordsSupervisionC, &RecordsSupervisionController::onRecorderExited);*/
+    /*connect(_networkC, &NetworkController::agentEntered, _modelManager, &AssessmentsModelManager::onAgentEntered);
+    connect(_networkC, &NetworkController::agentExited, _modelManager, &AssessmentsModelManager::onAgentExited);
+    connect(_networkC, &NetworkController::launcherEntered, _modelManager, &AssessmentsModelManager::onLauncherEntered);
+    connect(_networkC, &NetworkController::launcherExited, _modelManager, &AssessmentsModelManager::onLauncherExited);*/
 
 
     // Update the list of available network devices

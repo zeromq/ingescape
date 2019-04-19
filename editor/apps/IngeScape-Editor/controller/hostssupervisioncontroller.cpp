@@ -23,7 +23,7 @@
  * @brief Constructor
  * @param parent
  */
-HostsSupervisionController::HostsSupervisionController(IngeScapeModelManager* modelManager,
+HostsSupervisionController::HostsSupervisionController(EditorModelManager* modelManager,
                                                        QObject *parent) : QObject(parent),
     _selectedHost(nullptr),
     _modelManager(modelManager)

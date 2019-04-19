@@ -18,7 +18,6 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
-//#include <controller/ingescapemodelmanager.h>
 #include <model/experimentationm.h>
 
 

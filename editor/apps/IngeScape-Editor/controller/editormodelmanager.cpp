@@ -13,7 +13,7 @@
  *
  */
 
-#include "ingescapemodelmanager.h"
+#include "editormodelmanager.h"
 
 #include <QQmlEngine>
 #include <QDebug>
@@ -31,7 +31,7 @@
  * @param rootDirectoryPath
  * @param parent
  */
-IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
+EditorModelManager::EditorModelManager(JsonHelper* jsonHelper,
                                              QString rootDirectoryPath,
                                              QObject *parent) : QObject(parent),
     _isMappingActivated(false),
@@ -52,7 +52,7 @@ IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
 /**
  * @brief Destructor
  */
-IngeScapeModelManager::~IngeScapeModelManager()
+EditorModelManager::~EditorModelManager()
 {
     qInfo() << "Delete INGESCAPE Model Manager";
 
@@ -86,7 +86,7 @@ IngeScapeModelManager::~IngeScapeModelManager()
  * @brief Setter for property "is Activated Mapping"
  * @param value
  */
-void IngeScapeModelManager::setisMappingActivated(bool value)
+void EditorModelManager::setisMappingActivated(bool value)
 {
     if (_isMappingActivated != value)
     {
@@ -108,7 +108,7 @@ void IngeScapeModelManager::setisMappingActivated(bool value)
  * @brief Setter for property "is Controlled Mapping"
  * @param value
  */
-void IngeScapeModelManager::setisMappingControlled(bool value)
+void EditorModelManager::setisMappingControlled(bool value)
 {
     if (_isMappingControlled != value)
     {
@@ -137,7 +137,7 @@ void IngeScapeModelManager::setisMappingControlled(bool value)
  * @param isON optional (false by default)
  * @return
  */
-AgentM* IngeScapeModelManager::createAgentModel(QString agentName,
+AgentM* EditorModelManager::createAgentModel(QString agentName,
                                                 DefinitionM* definition,
                                                 QString peerId,
                                                 QString ipAddress,
@@ -164,7 +164,7 @@ AgentM* IngeScapeModelManager::createAgentModel(QString agentName,
         }
 
         // Connect to signals from this new agent
-        connect(agent, &AgentM::networkDataWillBeCleared, this, &IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared);
+        connect(agent, &AgentM::networkDataWillBeCleared, this, &EditorModelManager::_onNetworkDataOfAgentWillBeCleared);
 
         if (!agent->peerId().isEmpty()) {
             _hashFromPeerIdToAgent.insert(agent->peerId(), agent);
@@ -196,7 +196,7 @@ AgentM* IngeScapeModelManager::createAgentModel(QString agentName,
  * @brief Delete a model of agent
  * @param agent
  */
-void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
+void EditorModelManager::deleteAgentModel(AgentM* agent)
 {
     if ((agent != nullptr) && !agent->name().isEmpty())
     {
@@ -244,7 +244,7 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
  * @brief Delete a view model of agents grouped by name
  * @param agentsGroupedByName
  */
-void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName)
+void EditorModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName)
 {
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
     {
@@ -276,7 +276,7 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
  * @param hostName
  * @return
  */
-HostM* IngeScapeModelManager::getHostModelWithName(QString hostName)
+HostM* EditorModelManager::getHostModelWithName(QString hostName)
 {
     if (_hashFromNameToHost.contains(hostName)) {
         return _hashFromNameToHost.value(hostName);
@@ -292,7 +292,7 @@ HostM* IngeScapeModelManager::getHostModelWithName(QString hostName)
  * @param hostName
  * @return
  */
-QString IngeScapeModelManager::getPeerIdOfLauncherOnHost(QString hostName)
+QString EditorModelManager::getPeerIdOfLauncherOnHost(QString hostName)
 {
     // Get the model of host with the name
     HostM* host = getHostModelWithName(hostName);
@@ -311,7 +311,7 @@ QString IngeScapeModelManager::getPeerIdOfLauncherOnHost(QString hostName)
  * @param peerId
  * @return
  */
-AgentM* IngeScapeModelManager::getAgentModelFromPeerId(QString peerId)
+AgentM* EditorModelManager::getAgentModelFromPeerId(QString peerId)
 {
     if (_hashFromPeerIdToAgent.contains(peerId)) {
         return _hashFromPeerIdToAgent.value(peerId);
@@ -327,7 +327,7 @@ AgentM* IngeScapeModelManager::getAgentModelFromPeerId(QString peerId)
  * @param name
  * @return
  */
-AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString name)
+AgentsGroupedByNameVM* EditorModelManager::getAgentsGroupedForName(QString name)
 {
     if (_hashFromNameToAgentsGrouped.contains(name)) {
         return _hashFromNameToAgentsGrouped.value(name);
@@ -342,7 +342,7 @@ AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString na
  * @brief Get the hash table from a name to the group of agents with this name
  * @return
  */
-QHash<QString, AgentsGroupedByNameVM*> IngeScapeModelManager::getHashTableFromNameToAgentsGrouped()
+QHash<QString, AgentsGroupedByNameVM*> EditorModelManager::getHashTableFromNameToAgentsGrouped()
 {
     return _hashFromNameToAgentsGrouped;
 }
@@ -351,7 +351,7 @@ QHash<QString, AgentsGroupedByNameVM*> IngeScapeModelManager::getHashTableFromNa
 /**
  * @brief Import an agent or an agents list from selected file (definition)
  */
-bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
+bool EditorModelManager::importAgentOrAgentsListFromSelectedFile()
 {
     bool success = true;
 
@@ -437,7 +437,7 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
  * @param jsonArrayOfAgents
  * @param versionJsonPlatform
  */
-bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgents, QString versionJsonPlatform)
+bool EditorModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgents, QString versionJsonPlatform)
 {
     bool success = true;
 
@@ -598,7 +598,7 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
  * @brief Export the agents into JSON
  * @return array of all agents (grouped by name)
  */
-QJsonArray IngeScapeModelManager::exportAgentsToJSON()
+QJsonArray EditorModelManager::exportAgentsToJSON()
 {
     QJsonArray jsonArrayAgentsGroupedByName = QJsonArray();
 
@@ -672,7 +672,7 @@ QJsonArray IngeScapeModelManager::exportAgentsToJSON()
 /**
  * @brief Export the agents list to selected file
  */
-void IngeScapeModelManager::exportAgentsListToSelectedFile()
+void EditorModelManager::exportAgentsListToSelectedFile()
 {
     // "File Dialog" to get the file (path) to save
     QString agentsListFilePath = QFileDialog::getSaveFileName(nullptr,
@@ -708,7 +708,7 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile()
 /**
  * @brief Simulate an exit for each agent ON
  */
-void IngeScapeModelManager::simulateExitForEachAgentON()
+void EditorModelManager::simulateExitForEachAgentON()
 {
     for (AgentM* agent : _hashFromPeerIdToAgent.values())
     {
@@ -724,7 +724,7 @@ void IngeScapeModelManager::simulateExitForEachAgentON()
 /**
  * @brief Simulate an exit for each launcher
  */
-void IngeScapeModelManager::simulateExitForEachLauncher()
+void EditorModelManager::simulateExitForEachLauncher()
 {
     for (QString hostName : _hashFromNameToHost.keys())
     {
@@ -740,7 +740,7 @@ void IngeScapeModelManager::simulateExitForEachLauncher()
 /**
  * @brief Delete agents OFF
  */
-void IngeScapeModelManager::deleteAgentsOFF()
+void EditorModelManager::deleteAgentsOFF()
 {   
     for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
     {
@@ -768,7 +768,7 @@ void IngeScapeModelManager::deleteAgentsOFF()
  * If there are variants of this definition, we open each variant
  * @param definition
  */
-void IngeScapeModelManager::openDefinition(DefinitionM* definition)
+void EditorModelManager::openDefinition(DefinitionM* definition)
 {
     if (definition != nullptr)
     {
@@ -826,7 +826,7 @@ void IngeScapeModelManager::openDefinition(DefinitionM* definition)
  * @param canBeFrozen
  * @param loggerPort
  */
-void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort)
+void EditorModelManager::onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort)
 {
     if (!peerId.isEmpty() && !agentName.isEmpty() && !ipAddress.isEmpty())
     {
@@ -875,7 +875,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
  * @param peer Id
  * @param agent name
  */
-void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
+void EditorModelManager::onAgentExited(QString peerId, QString agentName)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr)
@@ -894,7 +894,7 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
  * @param hostName
  * @param ipAddress
  */
-void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort)
+void EditorModelManager::onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort)
 {
     if (!hostName.isEmpty())
     {
@@ -952,7 +952,7 @@ void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostName, 
  * @param peerId
  * @param hostName
  */
-void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
+void EditorModelManager::onLauncherExited(QString peerId, QString hostName)
 {
     Q_UNUSED(peerId)
 
@@ -996,7 +996,7 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
  * @param agent name
  * @param definition in JSON format
  */
-void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON)
+void EditorModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON)
 {
     Q_UNUSED(agentName)
 
@@ -1030,7 +1030,7 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
  * @param agent name
  * @param mapping in JSON format
  */
-void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName, QString mappingJSON)
+void EditorModelManager::onMappingReceived(QString peerId, QString agentName, QString mappingJSON)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
 
@@ -1070,7 +1070,7 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
  * @brief Slot called when a new value is published
  * @param publishedValue
  */
-void IngeScapeModelManager::onValuePublished(PublishedValueM* publishedValue)
+void EditorModelManager::onValuePublished(PublishedValueM* publishedValue)
 {
     if (publishedValue != nullptr)
     {
@@ -1115,7 +1115,7 @@ void IngeScapeModelManager::onValuePublished(PublishedValueM* publishedValue)
  * @param peerId
  * @param isMuted
  */
-void IngeScapeModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
+void EditorModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
@@ -1129,7 +1129,7 @@ void IngeScapeModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMut
  * @param peerId
  * @param canBeFrozen
  */
-void IngeScapeModelManager::onCanBeFrozenFromAgentUpdated(QString peerId, bool canBeFrozen)
+void EditorModelManager::onCanBeFrozenFromAgentUpdated(QString peerId, bool canBeFrozen)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
@@ -1143,7 +1143,7 @@ void IngeScapeModelManager::onCanBeFrozenFromAgentUpdated(QString peerId, bool c
  * @param peerId
  * @param isFrozen
  */
-void IngeScapeModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen)
+void EditorModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
@@ -1158,7 +1158,7 @@ void IngeScapeModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFr
  * @param isMuted
  * @param outputName
  */
-void IngeScapeModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName)
+void EditorModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
@@ -1172,7 +1172,7 @@ void IngeScapeModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bo
  * @param peerId
  * @param stateName
  */
-void IngeScapeModelManager::onAgentStateChanged(QString peerId, QString stateName)
+void EditorModelManager::onAgentStateChanged(QString peerId, QString stateName)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
@@ -1186,7 +1186,7 @@ void IngeScapeModelManager::onAgentStateChanged(QString peerId, QString stateNam
  * @param peerId
  * @param hasLogInStream
  */
-void IngeScapeModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInStream)
+void EditorModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInStream)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
@@ -1200,7 +1200,7 @@ void IngeScapeModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInS
  * @param peerId
  * @param hasLogInStream
  */
-void IngeScapeModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFile)
+void EditorModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFile)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
@@ -1214,7 +1214,7 @@ void IngeScapeModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFil
  * @param peerId
  * @param logFilePath
  */
-void IngeScapeModelManager::onAgentLogFilePath(QString peerId, QString logFilePath)
+void EditorModelManager::onAgentLogFilePath(QString peerId, QString logFilePath)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
@@ -1228,7 +1228,7 @@ void IngeScapeModelManager::onAgentLogFilePath(QString peerId, QString logFilePa
  * @param peerId
  * @param definitionFilePath
  */
-void IngeScapeModelManager::onAgentDefinitionFilePath(QString peerId, QString definitionFilePath)
+void EditorModelManager::onAgentDefinitionFilePath(QString peerId, QString definitionFilePath)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
@@ -1242,7 +1242,7 @@ void IngeScapeModelManager::onAgentDefinitionFilePath(QString peerId, QString de
  * @param peerId
  * @param mappingFilePath
  */
-void IngeScapeModelManager::onAgentMappingFilePath(QString peerId, QString mappingFilePath)
+void EditorModelManager::onAgentMappingFilePath(QString peerId, QString mappingFilePath)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
@@ -1255,7 +1255,7 @@ void IngeScapeModelManager::onAgentMappingFilePath(QString peerId, QString mappi
  * @brief Slot called when a model of agent has to be deleted
  * @param model
  */
-void IngeScapeModelManager::_onAgentModelHasToBeDeleted(AgentM* model)
+void EditorModelManager::_onAgentModelHasToBeDeleted(AgentM* model)
 {
     if (model != nullptr) {
         deleteAgentModel(model);
@@ -1267,7 +1267,7 @@ void IngeScapeModelManager::_onAgentModelHasToBeDeleted(AgentM* model)
  * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
  * @param definitionsList
  */
-void IngeScapeModelManager::_onDefinitionsToOpen(QList<DefinitionM*> definitionsList)
+void EditorModelManager::_onDefinitionsToOpen(QList<DefinitionM*> definitionsList)
 {
     _openDefinitions(definitionsList);
 }
@@ -1277,7 +1277,7 @@ void IngeScapeModelManager::_onDefinitionsToOpen(QList<DefinitionM*> definitions
  * @brief Slot called when some view models of outputs have been added to an agent(s grouped by name)
  * @param newOutputs
  */
-void IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName(QList<OutputVM*> newOutputs)
+void EditorModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName(QList<OutputVM*> newOutputs)
 {
     AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !newOutputs.isEmpty())
@@ -1305,7 +1305,7 @@ void IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName(QList<O
  * @brief Slot called when some view models of outputs will be removed from an agent(s grouped by name)
  * @param oldOutputs
  */
-void IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName(QList<OutputVM*> oldOutputs)
+void EditorModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName(QList<OutputVM*> oldOutputs)
 {
     AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !oldOutputs.isEmpty())
@@ -1332,7 +1332,7 @@ void IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName(QList
 /**
  * @brief Slot called when a view model of agents grouped by name has become useless (no more agents grouped by definition)
  */
-void IngeScapeModelManager::_onUselessAgentsGroupedByName()
+void EditorModelManager::_onUselessAgentsGroupedByName()
 {
     AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
     if (agentsGroupedByName != nullptr)
@@ -1347,7 +1347,7 @@ void IngeScapeModelManager::_onUselessAgentsGroupedByName()
  * @brief Slot called when the network data of an agent will be cleared
  * @param peerId
  */
-void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
+void EditorModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
 {
     /*AgentM* agent = qobject_cast<AgentM*>(sender());
     if (agent != nullptr)
@@ -1365,7 +1365,7 @@ void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
  * @brief Create a new view model of agents grouped by name
  * @param model
  */
-void IngeScapeModelManager::_createAgentsGroupedByName(AgentM* model)
+void EditorModelManager::_createAgentsGroupedByName(AgentM* model)
 {
     if ((model != nullptr) && !model->name().isEmpty())
     {
@@ -1373,14 +1373,14 @@ void IngeScapeModelManager::_createAgentsGroupedByName(AgentM* model)
         AgentsGroupedByNameVM* agentsGroupedByName = new AgentsGroupedByNameVM(model->name(), this);
 
         // Connect to signals from this new view model of agents grouped by definition
-        //connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreModelAndUseless, this, &IngeScapeModelManager::_onUselessAgentsGroupedByName);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreAgentsGroupedByDefinitionAndUseless, this, &IngeScapeModelManager::_onUselessAgentsGroupedByName);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::_onAgentModelHasToBeDeleted);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &IngeScapeModelManager::_onDefinitionsToOpen);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsHaveBeenAdded, this, &IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsWillBeRemoved, this, &IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName);
+        //connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreModelAndUseless, this, &EditorModelManager::_onUselessAgentsGroupedByName);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreAgentsGroupedByDefinitionAndUseless, this, &EditorModelManager::_onUselessAgentsGroupedByName);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &EditorModelManager::agentsGroupedByDefinitionHasBeenCreated);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &EditorModelManager::agentsGroupedByDefinitionWillBeDeleted);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &EditorModelManager::_onAgentModelHasToBeDeleted);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &EditorModelManager::_onDefinitionsToOpen);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsHaveBeenAdded, this, &EditorModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsWillBeRemoved, this, &EditorModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName);
 
         _hashFromNameToAgentsGrouped.insert(agentsGroupedByName->name(), agentsGroupedByName);
 
@@ -1399,7 +1399,7 @@ void IngeScapeModelManager::_createAgentsGroupedByName(AgentM* model)
  * @brief Open a list of definitions (if the definition is already opened, we bring it to front)
  * @param definitionsToOpen
  */
-void IngeScapeModelManager::_openDefinitions(QList<DefinitionM*> definitionsToOpen)
+void EditorModelManager::_openDefinitions(QList<DefinitionM*> definitionsToOpen)
 {
     // Traverse the list of definitions to open
     for (DefinitionM* definition : definitionsToOpen)

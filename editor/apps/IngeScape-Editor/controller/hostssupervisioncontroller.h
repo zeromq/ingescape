@@ -19,7 +19,7 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
-#include <controller/ingescapemodelmanager.h>
+#include <controller/editormodelmanager.h>
 #include <viewModel/hostvm.h>
 
 
@@ -43,7 +43,7 @@ public:
      * @param modelManager
      * @param parent
      */
-    explicit HostsSupervisionController(IngeScapeModelManager* modelManager,
+    explicit HostsSupervisionController(EditorModelManager* modelManager,
                                         QObject *parent = nullptr);
 
 
@@ -123,7 +123,7 @@ private:
 private:
 
     // Manager for the data model of INGESCAPE
-    IngeScapeModelManager* _modelManager;
+    EditorModelManager* _modelManager;
 
     // Hash table from "(host)Name" to the "(view model of) Host"
     QHash<QString, HostVM*> _hashFromNameToHost;

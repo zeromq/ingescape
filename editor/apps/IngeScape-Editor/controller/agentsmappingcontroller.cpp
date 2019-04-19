@@ -28,7 +28,7 @@
  * @param directoryPath
  * @param parent
  */
-AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelManager,
+AgentsMappingController::AgentsMappingController(EditorModelManager* modelManager,
                                                  JsonHelper* jsonHelper,
                                                  QObject *parent) : QObject(parent),
       _viewWidth(1920 - 320), // Full HD - Width of left panel

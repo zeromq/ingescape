@@ -28,7 +28,7 @@
  * @param modelManager
  * @param parent
  */
-RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager* modelManager,
+RecordsSupervisionController::RecordsSupervisionController(EditorModelManager* modelManager,
                                                            QObject *parent) : QObject(parent),
     _peerIdOfRecorder(""),
     _peerNameOfRecorder(""),

@@ -24,7 +24,7 @@
  * @param jsonHelper
  * @param parent
  */
-ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
+ScenarioController::ScenarioController(EditorModelManager* modelManager,
                                        JsonHelper* jsonHelper,
                                        QObject *parent) : QObject(parent),
     _selectedAction(nullptr),
