@@ -22,7 +22,7 @@
 
 #include "I2PropertyHelpers.h"
 
-#include "model/scenario/actionm.h"
+#include <model/scenario/actionm.h>
 #include "viewModel/scenario/actionvm.h"
 #include "viewModel/scenario/actioninpalettevm.h"
 

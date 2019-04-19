@@ -14,7 +14,7 @@
 
 #include "agentsgroupedbydefinitionvm.h"
 #include <QFileDialog>
-#include <model/editorenums.h>
+#include <model/enums.h>
 
 
 /**

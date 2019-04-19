@@ -47,48 +47,25 @@ SOURCES += main.cpp \
     controller/valueshistorycontroller.cpp \
     controller/abstracttimeactionslinescenarioviewcontroller.cpp \
     misc/collapsiblecolumn.cpp \
-    model/scenario/condition/actionconditionm.cpp \
-    model/scenario/actionm.cpp \
-    model/scenario/scenariom.cpp \
-    model/scenario/condition/iopvalueconditionm.cpp \
-    model/publishedvaluem.cpp \
-    model/scenario/timetickm.cpp \
-    model/scenario/effect/actioneffectm.cpp \
-    model/scenario/effect/iopvalueeffectm.cpp \
-    model/scenario/effect/mappingeffectm.cpp \
-    model/scenario/effect/effectonagentm.cpp \
     sortFilter/valueshistorysortfilter.cpp \
-    viewModel/agentinmappingvm.cpp \
-    viewModel/scenario/actionvm.cpp \
-    viewModel/iop/inputvm.cpp \
-    viewModel/iop/outputvm.cpp \
-    viewModel/scenario/actionconditionvm.cpp \
-    viewModel/scenario/actioneffectvm.cpp \
-    viewModel/scenario/actioninpalettevm.cpp \
-    viewModel/scenario/actionexecutionvm.cpp \
-    viewModel/iop/parametervm.cpp \
     model/hostm.cpp \
-    viewModel/iop/agentiopvm.cpp \
     sortFilter/abstracttimerangefilter.cpp \
     controller/hostssupervisioncontroller.cpp \
-    viewModel/hostvm.cpp \
     model/recordm.cpp \
     controller/recordssupervisioncontroller.cpp \
-    viewModel/recordvm.cpp \
     controller/logstreamcontroller.cpp \
     model/logm.cpp \
     sortFilter/logssortfilter.cpp \
-    model/scenario/condition/conditiononagentm.cpp \
     misc/qquickwindowblocktouches.cpp \
-    viewModel/agentsgroupedbynamevm.cpp \
-    viewModel/agentsgroupedbydefinitionvm.cpp \
+    misc/textfielddoublevalidator.cpp \
+    misc/numberconstants.cpp \
+    viewModel/agentinmappingvm.cpp \
+    viewModel/hostvm.cpp \
+    viewModel/recordvm.cpp \
     viewModel/link/linkinputvm.cpp \
     viewModel/link/linkoutputvm.cpp \
     viewModel/link/linkvm.cpp \
     viewModel/link/linkconnectorvm.cpp \
-    misc/textfielddoublevalidator.cpp \
-    misc/numberconstants.cpp \
-    viewModel/link/mappingelementvm.cpp \
     model/editorenums.cpp
 
 HEADERS += \
@@ -112,48 +89,25 @@ HEADERS += \
     controller/valueshistorycontroller.h \
     controller/abstracttimeactionslinescenarioviewcontroller.h \
     misc/collapsiblecolumn.h \
-    model/scenario/condition/actionconditionm.h \
-    model/scenario/actionm.h \
-    model/scenario/scenariom.h \
-    model/scenario/condition/iopvalueconditionm.h \
-    model/publishedvaluem.h \
-    model/scenario/timetickm.h \
-    model/scenario/effect/actioneffectm.h \
-    model/scenario/effect/iopvalueeffectm.h \
-    model/scenario/effect/mappingeffectm.h \
-    model/scenario/effect/effectonagentm.h \
     sortFilter/valueshistorysortfilter.h \
-    viewModel/agentinmappingvm.h \
-    viewModel/scenario/actionvm.h \
-    viewModel/iop/inputvm.h \
-    viewModel/iop/outputvm.h \
-    viewModel/scenario/actionconditionvm.h \
-    viewModel/scenario/actioneffectvm.h \
-    viewModel/scenario/actioninpalettevm.h \
-    viewModel/scenario/actionexecutionvm.h \
-    viewModel/iop/parametervm.h \
     model/hostm.h \
-    viewModel/iop/agentiopvm.h \
     sortFilter/abstracttimerangefilter.h \
     controller/hostssupervisioncontroller.h \
-    viewModel/hostvm.h \
     model/recordm.h \
     controller/recordssupervisioncontroller.h \
-    viewModel/recordvm.h \
     controller/logstreamcontroller.h \
     model/logm.h \
     sortFilter/logssortfilter.h \
-    model/scenario/condition/conditiononagentm.h \
     misc/qquickwindowblocktouches.h \
-    viewModel/agentsgroupedbynamevm.h \
-    viewModel/agentsgroupedbydefinitionvm.h \
+    misc/textfielddoublevalidator.h \
+    misc/numberconstants.h \
+    viewModel/agentinmappingvm.h \
+    viewModel/hostvm.h \
+    viewModel/recordvm.h \
     viewModel/link/linkinputvm.h \
     viewModel/link/linkoutputvm.h \
     viewModel/link/linkvm.h \
     viewModel/link/linkconnectorvm.h \
-    misc/textfielddoublevalidator.h \
-    misc/numberconstants.h \
-    viewModel/link/mappingelementvm.h \
     model/editorenums.h
 
 

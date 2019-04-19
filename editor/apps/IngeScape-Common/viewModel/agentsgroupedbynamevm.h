@@ -23,7 +23,7 @@
 #include <viewModel/iop/inputvm.h>
 #include <viewModel/iop/outputvm.h>
 #include <viewModel/iop/parametervm.h>
-#include <viewModel/link/mappingelementvm.h>
+#include <viewModel/mapping/mappingelementvm.h>
 
 
 /**
