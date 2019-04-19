@@ -13,7 +13,7 @@
  *
  */
 
-#include "editormodelmanager.h"
+#include "ingescapemodelmanager.h"
 
 #include <QQmlEngine>
 #include <QDebug>
@@ -34,15 +34,13 @@
 IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
                                              QString rootDirectoryPath,
                                              QObject *parent) : QObject(parent),
-    _isMappingActivated(false),
-    _isMappingControlled(false),
     _jsonHelper(jsonHelper),
     _rootDirectoryPath(rootDirectoryPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New IngeScape Editor Model Manager";
+    qInfo() << "New IngeScape Model Manager";
 
     // Agents grouped are sorted on their name (alphabetical order)
     _allAgentsGroupsByName.setSortProperty("name");
@@ -54,16 +52,13 @@ IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
  */
 IngeScapeModelManager::~IngeScapeModelManager()
 {
-    qInfo() << "Delete INGESCAPE Model Manager";
-
-    // Clear all opened definitions
-    _openedDefinitions.clear();
+    qInfo() << "Delete IngeScape Model Manager";
 
     // Free memory
     _publishedValues.deleteAllItems();
 
-    qDeleteAll(_hashFromNameToHost);
-    _hashFromNameToHost.clear();
+    //qDeleteAll(_hashFromNameToHost);
+    //_hashFromNameToHost.clear();
 
     // Free memory
     _hashFromNameToAgentsGrouped.clear();
@@ -79,50 +74,6 @@ IngeScapeModelManager::~IngeScapeModelManager()
 
     // Reset pointers
     _jsonHelper = nullptr;
-}
-
-
-/**
- * @brief Setter for property "is Activated Mapping"
- * @param value
- */
-void IngeScapeModelManager::setisMappingActivated(bool value)
-{
-    if (_isMappingActivated != value)
-    {
-        _isMappingActivated = value;
-
-        if (_isMappingActivated) {
-            qInfo() << "Mapping Activated";
-        }
-        else {
-            qInfo() << "Mapping DE-activated";
-        }
-
-        Q_EMIT isMappingActivatedChanged(value);
-    }
-}
-
-
-/**
- * @brief Setter for property "is Controlled Mapping"
- * @param value
- */
-void IngeScapeModelManager::setisMappingControlled(bool value)
-{
-    if (_isMappingControlled != value)
-    {
-        _isMappingControlled = value;
-
-        if (_isMappingControlled) {
-            qInfo() << "Mapping Controlled";
-        }
-        else {
-            qInfo() << "Mapping Observed";
-        }
-
-        Q_EMIT isMappingControlledChanged(value);
-    }
 }
 
 
@@ -276,7 +227,7 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
  * @param hostName
  * @return
  */
-HostM* IngeScapeModelManager::getHostModelWithName(QString hostName)
+/*HostM* EditorModelManager::getHostModelWithName(QString hostName)
 {
     if (_hashFromNameToHost.contains(hostName)) {
         return _hashFromNameToHost.value(hostName);
@@ -284,7 +235,7 @@ HostM* IngeScapeModelManager::getHostModelWithName(QString hostName)
     else {
         return nullptr;
     }
-}
+}*/
 
 
 /**
@@ -292,7 +243,7 @@ HostM* IngeScapeModelManager::getHostModelWithName(QString hostName)
  * @param hostName
  * @return
  */
-QString IngeScapeModelManager::getPeerIdOfLauncherOnHost(QString hostName)
+/*QString IngeScapeModelManager::getPeerIdOfLauncherOnHost(QString hostName)
 {
     // Get the model of host with the name
     HostM* host = getHostModelWithName(hostName);
@@ -303,7 +254,7 @@ QString IngeScapeModelManager::getPeerIdOfLauncherOnHost(QString hostName)
     else {
         return "";
     }
-}
+}*/
 
 
 /**
@@ -342,10 +293,10 @@ AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString na
  * @brief Get the hash table from a name to the group of agents with this name
  * @return
  */
-QHash<QString, AgentsGroupedByNameVM*> IngeScapeModelManager::getHashTableFromNameToAgentsGrouped()
+/*QHash<QString, AgentsGroupedByNameVM*> IngeScapeModelManager::getHashTableFromNameToAgentsGrouped()
 {
     return _hashFromNameToAgentsGrouped;
-}
+}*/
 
 
 /**
@@ -595,117 +546,6 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
 
 
 /**
- * @brief Export the agents into JSON
- * @return array of all agents (grouped by name)
- */
-QJsonArray IngeScapeModelManager::exportAgentsToJSON()
-{
-    QJsonArray jsonArrayAgentsGroupedByName = QJsonArray();
-
-    if (_jsonHelper != nullptr)
-    {
-        // List of all groups (of agents) grouped by name
-        for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
-        {
-            if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
-            {
-                QJsonObject jsonAgentsGroupedByName = QJsonObject();
-
-                // Name
-                jsonAgentsGroupedByName.insert("agentName", agentsGroupedByName->name());
-
-                QJsonArray jsonArrayAgentsGroupedByDefinition = QJsonArray();
-
-                // List of all groups (of agents) grouped by definition
-                for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : agentsGroupedByName->allAgentsGroupsByDefinition()->toList())
-                {
-                    if (agentsGroupedByDefinition != nullptr)
-                    {
-                        QJsonObject jsonAgentsGroupedByDefinition = QJsonObject();
-
-                        // Definition
-                        if (agentsGroupedByDefinition->definition() != nullptr)
-                        {
-                            QJsonObject jsonDefinition = _jsonHelper->exportAgentDefinitionToJson(agentsGroupedByDefinition->definition());
-                            jsonAgentsGroupedByDefinition.insert("definition", jsonDefinition);
-                        }
-                        else {
-                            jsonAgentsGroupedByDefinition.insert("definition", QJsonValue());
-                        }
-
-                        // Clones (models)
-                        QJsonArray jsonClones = QJsonArray();
-
-                        for (AgentM* model : agentsGroupedByDefinition->models()->toList())
-                        {
-                            // Hostname and Command Line must be defined to be added to the array of clones
-                            if ((model != nullptr) && !model->hostname().isEmpty() && !model->commandLine().isEmpty())
-                            {
-                                qDebug() << "Export" << model->name() << "on" << model->hostname() << "at" << model->commandLine() << "(" << model->peerId() << ")";
-
-                                QJsonObject jsonClone = QJsonObject();
-                                jsonClone.insert("hostname", model->hostname());
-                                jsonClone.insert("commandLine", model->commandLine());
-                                jsonClone.insert("peerId", model->peerId());
-                                jsonClone.insert("address", model->address());
-
-                                jsonClones.append(jsonClone);
-                            }
-                        }
-
-                        jsonAgentsGroupedByDefinition.insert("clones", jsonClones);
-
-                        jsonArrayAgentsGroupedByDefinition.append(jsonAgentsGroupedByDefinition);
-                    }
-                }
-
-                jsonAgentsGroupedByName.insert("definitions", jsonArrayAgentsGroupedByDefinition);
-
-                jsonArrayAgentsGroupedByName.append(jsonAgentsGroupedByName);
-            }
-        }
-    }
-    return jsonArrayAgentsGroupedByName;
-}
-
-
-/**
- * @brief Export the agents list to selected file
- */
-void IngeScapeModelManager::exportAgentsListToSelectedFile()
-{
-    // "File Dialog" to get the file (path) to save
-    QString agentsListFilePath = QFileDialog::getSaveFileName(nullptr,
-                                                              "Save agents",
-                                                              _rootDirectoryPath,
-                                                              "JSON (*.json)");
-
-    if (!agentsListFilePath.isEmpty())
-    {
-        qInfo() << "Save the agents list to JSON file" << agentsListFilePath;
-
-        // Export the agents into JSON
-        QJsonArray jsonArrayOfAgents = exportAgentsToJSON();
-
-        QJsonObject jsonRoot = QJsonObject();
-        jsonRoot.insert("agents", jsonArrayOfAgents);
-
-        QByteArray byteArrayOfJson = QJsonDocument(jsonRoot).toJson(QJsonDocument::Indented);
-
-        QFile jsonFile(agentsListFilePath);
-        if (jsonFile.open(QIODevice::WriteOnly))
-        {
-            jsonFile.write(byteArrayOfJson);
-            jsonFile.close();
-        }
-        else {
-            qCritical() << "Can not open file" << agentsListFilePath;
-        }
-    }
-}
-
-
-/**
  * @brief Simulate an exit for each agent ON
  */
 void IngeScapeModelManager::simulateExitForEachAgentON()
@@ -724,7 +564,7 @@ void IngeScapeModelManager::simulateExitForEachAgentON()
 /**
  * @brief Simulate an exit for each launcher
  */
-void IngeScapeModelManager::simulateExitForEachLauncher()
+/*void IngeScapeModelManager::simulateExitForEachLauncher()
 {
     for (QString hostName : _hashFromNameToHost.keys())
     {
@@ -734,7 +574,7 @@ void IngeScapeModelManager::simulateExitForEachLauncher()
             onLauncherExited("", hostName);
         }
     }
-}
+}*/
 
 
 /**
@@ -759,59 +599,6 @@ void IngeScapeModelManager::deleteAgentsOFF()
                 deleteAgentsGroupedByName(agentsGroupedByName);
             }
         }
-    }
-}
-
-
-/**
- * @brief Open a definition
- * If there are variants of this definition, we open each variant
- * @param definition
- */
-void IngeScapeModelManager::openDefinition(DefinitionM* definition)
-{
-    if (definition != nullptr)
-    {
-        QString definitionName = definition->name();
-
-        qDebug() << "Open the definition" << definitionName;
-
-        QList<DefinitionM*> definitionsToOpen;
-
-        /*// Variant --> we have to open each variants of this definition
-        if (definition->isVariant())
-        {
-            for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
-            {
-                if (agentsGroupedByName != nullptr)
-                {
-                    // Get the list of definitions with a specific name
-                    QList<DefinitionM*> definitionsList = agentsGroupedByName->getDefinitionsWithName(definitionName);
-
-                    if (!definitionsList.isEmpty())
-                    {
-                        for (DefinitionM* iterator : definitionsList)
-                        {
-                            // Same name, same version and variant, we have to open it
-                            if ((iterator != nullptr) && (iterator->version() == definition->version()) && iterator->isVariant()) {
-                                definitionsToOpen.append(iterator);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            // Simply add the definition
-            definitionsToOpen.append(definition);
-        }*/
-
-        // Simply add the definition
-        definitionsToOpen.append(definition);
-
-        // Open the list of definitions
-        _openDefinitions(definitionsToOpen);
     }
 }
 
@@ -894,7 +681,7 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
  * @param hostName
  * @param ipAddress
  */
-void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort)
+/*void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort)
 {
     if (!hostName.isEmpty())
     {
@@ -944,7 +731,7 @@ void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostName, 
             }
         }
     }
-}
+}*/
 
 
 /**
@@ -952,7 +739,7 @@ void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostName, 
  * @param peerId
  * @param hostName
  */
-void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
+/*void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
 {
     Q_UNUSED(peerId)
 
@@ -987,7 +774,7 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
             }
         }
     }
-}
+}*/
 
 
 /**
@@ -1111,147 +898,6 @@ void IngeScapeModelManager::onValuePublished(PublishedValueM* publishedValue)
 
 
 /**
- * @brief Slot called when the flag "is Muted" from an agent updated
- * @param peerId
- * @param isMuted
- */
-void IngeScapeModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != nullptr) {
-        agent->setisMuted(isMuted);
-    }
-}
-
-
-/**
- * @brief Slot called when the flag "can be Frozen" from an agent updated
- * @param peerId
- * @param canBeFrozen
- */
-void IngeScapeModelManager::onCanBeFrozenFromAgentUpdated(QString peerId, bool canBeFrozen)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != nullptr) {
-        agent->setcanBeFrozen(canBeFrozen);
-    }
-}
-
-
-/**
- * @brief Slot called when the flag "is Frozen" from an agent updated
- * @param peerId
- * @param isFrozen
- */
-void IngeScapeModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != nullptr) {
-        agent->setisFrozen(isFrozen);
-    }
-}
-
-
-/**
- * @brief Slot called when the flag "is Muted" from an output of agent updated
- * @param peerId
- * @param isMuted
- * @param outputName
- */
-void IngeScapeModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != nullptr) {
-        agent->setisMutedOfOutput(isMuted, outputName);
-    }
-}
-
-
-/**
- * @brief Slot called when the state of an agent changes
- * @param peerId
- * @param stateName
- */
-void IngeScapeModelManager::onAgentStateChanged(QString peerId, QString stateName)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != nullptr) {
-        agent->setstate(stateName);
-    }
-}
-
-
-/**
- * @brief Slot called when we receive the flag "Log In Stream" for an agent
- * @param peerId
- * @param hasLogInStream
- */
-void IngeScapeModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInStream)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != nullptr) {
-        agent->sethasLogInStream(hasLogInStream);
-    }
-}
-
-
-/**
- * @brief Slot called when we receive the flag "Log In File" for an agent
- * @param peerId
- * @param hasLogInStream
- */
-void IngeScapeModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFile)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != nullptr) {
-        agent->sethasLogInFile(hasLogInFile);
-    }
-}
-
-
-/**
- * @brief Slot called when we receive the path of "Log File" for an agent
- * @param peerId
- * @param logFilePath
- */
-void IngeScapeModelManager::onAgentLogFilePath(QString peerId, QString logFilePath)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != nullptr) {
-        agent->setlogFilePath(logFilePath);
-    }
-}
-
-
-/**
- * @brief Slot called when we receive the path of "Definition File" for an agent
- * @param peerId
- * @param definitionFilePath
- */
-void IngeScapeModelManager::onAgentDefinitionFilePath(QString peerId, QString definitionFilePath)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != nullptr) {
-        agent->setdefinitionFilePath(definitionFilePath);
-    }
-}
-
-
-/**
- * @brief Slot called when we receive the path of "Mapping File" for an agent
- * @param peerId
- * @param mappingFilePath
- */
-void IngeScapeModelManager::onAgentMappingFilePath(QString peerId, QString mappingFilePath)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != nullptr) {
-        agent->setmappingFilePath(mappingFilePath);
-    }
-}
-
-
-/**
  * @brief Slot called when a model of agent has to be deleted
  * @param model
  */
@@ -1260,16 +906,6 @@ void IngeScapeModelManager::_onAgentModelHasToBeDeleted(AgentM* model)
     if (model != nullptr) {
         deleteAgentModel(model);
     }
-}
-
-
-/**
- * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
- * @param definitionsList
- */
-void IngeScapeModelManager::_onDefinitionsToOpen(QList<DefinitionM*> definitionsList)
-{
-    _openDefinitions(definitionsList);
 }
 
 
@@ -1391,29 +1027,5 @@ void IngeScapeModelManager::_createAgentsGroupedByName(AgentM* model)
 
         // Add the new model of agent
         agentsGroupedByName->addNewAgentModel(model);
-    }
-}
-
-
-/**
- * @brief Open a list of definitions (if the definition is already opened, we bring it to front)
- * @param definitionsToOpen
- */
-void IngeScapeModelManager::_openDefinitions(QList<DefinitionM*> definitionsToOpen)
-{
-    // Traverse the list of definitions to open
-    for (DefinitionM* definition : definitionsToOpen)
-    {
-        if (definition != nullptr)
-        {
-            if (!_openedDefinitions.contains(definition)) {
-                _openedDefinitions.append(definition);
-            }
-            else {
-                qDebug() << "The 'Definition'" << definition->name() << "is already opened...bring it to front !";
-
-                Q_EMIT definition->bringToFront();
-            }
-        }
     }
 }

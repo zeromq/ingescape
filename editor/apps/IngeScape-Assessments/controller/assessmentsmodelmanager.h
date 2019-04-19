@@ -19,15 +19,15 @@
 //#include <QtQml>
 #include <I2PropertyHelpers.h>
 #include <model/assessmentsenums.h>
-#include <model/jsonhelper.h>
 #include <model/experimentationm.h>
+#include <controller/ingescapemodelmanager.h>
 #include <viewModel/experimentationsgroupvm.h>
 
 
 /**
  * @brief The AssessmentsModelManager class defines the manager for the data model of our IngeScape Assessments application
  */
-class AssessmentsModelManager : public QObject
+class AssessmentsModelManager : public IngeScapeModelManager
 {
     Q_OBJECT
 
@@ -43,10 +43,12 @@ public:
     /**
      * @brief Constructor
      * @param jsonHelper
+     * @param rootDirectoryPath
      * @param parent
      */
     explicit AssessmentsModelManager(JsonHelper* jsonHelper,
-                                   QObject *parent = nullptr);
+                                     QString rootDirectoryPath,
+                                     QObject *parent = nullptr);
 
 
     /**
@@ -62,9 +64,6 @@ public Q_SLOTS:
 
 
 private:
-
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
 
 };
 

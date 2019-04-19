@@ -113,11 +113,12 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Create the helper to manage JSON files
     _jsonHelper = new JsonHelper(this);
 
+
     //
     // Create sub-controllers
     //
 
-    // Create the manager for the data model of INGESCAPE
+    // Create the manager for the data model of our IngeScape Editor application
     _modelManager = new EditorModelManager(_jsonHelper, rootPath, this);
 
     // Create the controller for network communications

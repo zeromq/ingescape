@@ -19,11 +19,12 @@
 #include <misc/terminationsignalwatcher.h>
 #include <settings/ingescapesettings.h>
 
-#include <model/enums.h>
-#include <model/agent/agentm.h>
+#include <controller/ingescapemodelmanager.h>
+//#include <model/enums.h>
+//#include <model/agent/agentm.h>
 #include <model/scenario/scenariom.h>
 #include <model/scenario/timetickm.h>
-#include <viewModel/agentsgroupedbynamevm.h>
+//#include <viewModel/agentsgroupedbynamevm.h>
 
 
 /**
@@ -63,8 +64,9 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     // Controllers
     //
     //----------------
-    //qmlRegisterUncreatableType<EquipmentEditorController>(uri, 1, 0, "EquipmentEditorController", "Internal class");
-     qmlRegisterSingletonType<DebugQuickInspector>("INGESCAPE", 1, 0, "DebugQuickInspector", &DebugQuickInspector::qmlSingleton);
+    qmlRegisterSingletonType<DebugQuickInspector>("INGESCAPE", 1, 0, "DebugQuickInspector", &DebugQuickInspector::qmlSingleton);
+
+    qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal class");
 
 
     //----------------

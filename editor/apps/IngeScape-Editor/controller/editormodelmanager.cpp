@@ -16,13 +16,8 @@
 #include "editormodelmanager.h"
 
 #include <QQmlEngine>
-#include <QDebug>
 #include <QFileDialog>
 #include <I2Quick.h>
-
-
-// Threshold beyond which we consider that there are too many values
-#define TOO_MANY_VALUES 2000
 
 
 /**
@@ -32,20 +27,18 @@
  * @param parent
  */
 EditorModelManager::EditorModelManager(JsonHelper* jsonHelper,
-                                             QString rootDirectoryPath,
-                                             QObject *parent) : QObject(parent),
+                                       QString rootDirectoryPath,
+                                       QObject *parent) : IngeScapeModelManager(jsonHelper,
+                                                                                rootDirectoryPath,
+                                                                                parent),
     _isMappingActivated(false),
-    _isMappingControlled(false),
-    _jsonHelper(jsonHelper),
-    _rootDirectoryPath(rootDirectoryPath)
+    _isMappingControlled(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New IngeScape Editor Model Manager";
 
-    // Agents grouped are sorted on their name (alphabetical order)
-    _allAgentsGroupsByName.setSortProperty("name");
 }
 
 
@@ -54,18 +47,18 @@ EditorModelManager::EditorModelManager(JsonHelper* jsonHelper,
  */
 EditorModelManager::~EditorModelManager()
 {
-    qInfo() << "Delete INGESCAPE Model Manager";
+    qInfo() << "Delete IngeScape Editor Model Manager";
+
+    // Call our mother class
+    IngeScapeModelManager::~IngeScapeModelManager();
 
     // Clear all opened definitions
     _openedDefinitions.clear();
 
-    // Free memory
-    _publishedValues.deleteAllItems();
-
     qDeleteAll(_hashFromNameToHost);
     _hashFromNameToHost.clear();
 
-    // Free memory
+    /*// Free memory
     _hashFromNameToAgentsGrouped.clear();
 
     // Delete all view model of agents grouped by name
@@ -78,7 +71,7 @@ EditorModelManager::~EditorModelManager()
     _allAgentsGroupsByName.clear();
 
     // Reset pointers
-    _jsonHelper = nullptr;
+    _jsonHelper = nullptr;*/
 }
 
 
@@ -127,151 +120,6 @@ void EditorModelManager::setisMappingControlled(bool value)
 
 
 /**
- * @brief Create a new model of agent with a name, a definition (can be NULL) and some properties
- * @param agentName
- * @param definition optional (NULL by default)
- * @param peerId optional (empty by default)
- * @param ipAddress optional (empty by default)
- * @param hostname optional (default value)
- * @param commandLine optional (empty by default)
- * @param isON optional (false by default)
- * @return
- */
-AgentM* EditorModelManager::createAgentModel(QString agentName,
-                                                DefinitionM* definition,
-                                                QString peerId,
-                                                QString ipAddress,
-                                                QString hostname,
-                                                QString commandLine,
-                                                bool isON)
-{
-    AgentM* agent = nullptr;
-
-    if (!agentName.isEmpty())
-    {
-        // Create a new model of agent
-        agent = new AgentM(agentName,
-                           peerId,
-                           ipAddress,
-                           hostname,
-                           commandLine,
-                           isON,
-                           this);
-
-        // If defined, set the definition
-        if (definition != nullptr) {
-            agent->setdefinition(definition);
-        }
-
-        // Connect to signals from this new agent
-        connect(agent, &AgentM::networkDataWillBeCleared, this, &EditorModelManager::_onNetworkDataOfAgentWillBeCleared);
-
-        if (!agent->peerId().isEmpty()) {
-            _hashFromPeerIdToAgent.insert(agent->peerId(), agent);
-        }
-
-        // Emit the signal "Agent Model has been Created"
-        Q_EMIT agentModelHasBeenCreated(agent);
-
-
-        // Get the (view model of) agents grouped for this name
-        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agent->name());
-        if (agentsGroupedByName != nullptr)
-        {
-            // Add the new model of agent
-            agentsGroupedByName->addNewAgentModel(agent);
-        }
-        else
-        {
-            // Create a new view model of agents grouped by name
-            _createAgentsGroupedByName(agent);
-        }
-    }
-
-    return agent;
-}
-
-
-/**
- * @brief Delete a model of agent
- * @param agent
- */
-void EditorModelManager::deleteAgentModel(AgentM* agent)
-{
-    if ((agent != nullptr) && !agent->name().isEmpty())
-    {
-        // Emit the signal "Agent Model will be Deleted"
-        Q_EMIT agentModelWillBeDeleted(agent);
-
-        // Reset the definition of the agent and free memory
-        if (agent->definition() != nullptr)
-        {
-            DefinitionM* agentDefinition = agent->definition();
-            agent->setdefinition(nullptr);
-            delete agentDefinition;
-        }
-
-        // Reset the mapping of the agent and free memory
-        if (agent->mapping() != nullptr)
-        {
-            AgentMappingM* agentMapping = agent->mapping();
-            agent->setmapping(nullptr);
-            delete agentMapping;
-        }
-
-        // DIS-connect to signals from the agent
-        disconnect(agent, nullptr, this, nullptr);
-
-        if (!agent->peerId().isEmpty()) {
-            _hashFromPeerIdToAgent.remove(agent->peerId());
-        }
-
-        // Get the (view model of) agents grouped for this name
-        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(agent->name());
-        if (agentsGroupedByName != nullptr)
-        {
-            // Remove the old model of agent
-            agentsGroupedByName->removeOldAgentModel(agent);
-        }
-
-        // Free memory
-        delete agent;
-    }
-}
-
-
-/**
- * @brief Delete a view model of agents grouped by name
- * @param agentsGroupedByName
- */
-void EditorModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName)
-{
-    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
-    {
-        // Clear our agent just before its deletion
-        agentsGroupedByName->clearBeforeDeletion();
-
-        // Else, signals "agentsGroupedByDefinitionWillBeDeleted" and "agentModelHasToBeDeleted" will not be catched (after "disconnect")
-
-        // DIS-connect to its signals
-        disconnect(agentsGroupedByName, nullptr, this, nullptr);
-
-        // Remove from the hash table
-        _hashFromNameToAgentsGrouped.remove(agentsGroupedByName->name());
-
-        // Remove from the sorted list
-        _allAgentsGroupsByName.remove(agentsGroupedByName);
-
-        // Emit the signal "Agents grouped by name will be deleted"
-        Q_EMIT agentsGroupedByNameWillBeDeleted(agentsGroupedByName);
-
-        // Free memory
-        delete agentsGroupedByName;
-    }
-}
-
-
-/**
  * @brief Get the model of host with a name
  * @param hostName
  * @return
@@ -307,290 +155,12 @@ QString EditorModelManager::getPeerIdOfLauncherOnHost(QString hostName)
 
 
 /**
- * @brief Get the model of agent from a Peer Id
- * @param peerId
- * @return
- */
-AgentM* EditorModelManager::getAgentModelFromPeerId(QString peerId)
-{
-    if (_hashFromPeerIdToAgent.contains(peerId)) {
-        return _hashFromPeerIdToAgent.value(peerId);
-    }
-    else {
-        return nullptr;
-    }
-}
-
-
-/**
- * @brief Get the (view model of) agents grouped for a name
- * @param name
- * @return
- */
-AgentsGroupedByNameVM* EditorModelManager::getAgentsGroupedForName(QString name)
-{
-    if (_hashFromNameToAgentsGrouped.contains(name)) {
-        return _hashFromNameToAgentsGrouped.value(name);
-    }
-    else {
-        return nullptr;
-    }
-}
-
-
-/**
  * @brief Get the hash table from a name to the group of agents with this name
  * @return
  */
 QHash<QString, AgentsGroupedByNameVM*> EditorModelManager::getHashTableFromNameToAgentsGrouped()
 {
     return _hashFromNameToAgentsGrouped;
-}
-
-
-/**
- * @brief Import an agent or an agents list from selected file (definition)
- */
-bool EditorModelManager::importAgentOrAgentsListFromSelectedFile()
-{
-    bool success = true;
-
-    if (_jsonHelper != nullptr)
-    {
-        // "File Dialog" to get the file (path) to open
-        QString agentFilePath = QFileDialog::getOpenFileName(nullptr,
-                                                             "Open an agent(s) definition",
-                                                             _rootDirectoryPath,
-                                                             "JSON (*.json)");
-
-        if (!agentFilePath.isEmpty())
-        {
-            QFile jsonFile(agentFilePath);
-            if (jsonFile.open(QIODevice::ReadOnly))
-            {
-                QByteArray byteArrayOfJson = jsonFile.readAll();
-                jsonFile.close();
-
-                QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
-                //if (jsonDocument.isObject())
-
-                QJsonObject jsonRoot = jsonDocument.object();
-
-                // List of agents
-                if (jsonRoot.contains("agents"))
-                {
-                    // Version
-                    QString versionJsonPlatform = "";
-                    if (jsonRoot.contains("version"))
-                    {
-                        versionJsonPlatform = jsonRoot.value("version").toString();
-
-                        qDebug() << "Version of JSON platform is" << versionJsonPlatform;
-                    }
-                    else {
-                        qDebug() << "UNDEFINED version of JSON platform";
-                    }
-
-                    // Import the agents list from a json byte content
-                    success = importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
-                }
-                // One agent
-                else if (jsonRoot.contains("definition"))
-                {
-                    QJsonValue jsonDefinition = jsonRoot.value("definition");
-                    if (jsonDefinition.isObject())
-                    {
-                        // Create a model of agent definition from the JSON
-                        DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
-                        if (agentDefinition != nullptr)
-                        {
-                            // Create a new model of agent with the name of the definition
-                            createAgentModel(agentDefinition->name(), agentDefinition);
-                        }
-                        // An error occured, the definition is NULL
-                        else {
-                            qWarning() << "The file" << agentFilePath << "does not contain an agent definition !";
-
-                            success = false;
-                        }
-                    }
-                }
-                else {
-                    qWarning() << "The file" << agentFilePath << "does not contain one or several agent definition(s) !";
-
-                    success = false;
-                }
-            }
-            else {
-                qCritical() << "Can not open file" << agentFilePath;
-
-                success = false;
-            }
-        }
-    }
-    return success;
-}
-
-
-/**
- * @brief Import an agents list from a JSON array
- * @param jsonArrayOfAgents
- * @param versionJsonPlatform
- */
-bool EditorModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgents, QString versionJsonPlatform)
-{
-    bool success = true;
-
-    if (_jsonHelper != nullptr)
-    {
-        for (QJsonValue jsonIteratorAgent : jsonArrayOfAgents)
-        {
-            if (jsonIteratorAgent.isObject())
-            {
-                QJsonObject jsonAgentsGroupedByName = jsonIteratorAgent.toObject();
-
-                QJsonValue jsonName = jsonAgentsGroupedByName.value("agentName");
-                QJsonArray jsonArrayOfDefinitions;
-
-                // The version is the current one, use directly the array of definitions
-                if (versionJsonPlatform == VERSION_JSON_PLATFORM)
-                {
-                    QJsonValue jsonDefinitions = jsonAgentsGroupedByName.value("definitions");
-                    if (jsonDefinitions.isArray()) {
-                        jsonArrayOfDefinitions = jsonDefinitions.toArray();
-                    }
-                }
-                // Convert the previous format of JSON into the new format of JSON
-                else
-                {
-                    jsonArrayOfDefinitions = QJsonArray();
-                    QJsonValue jsonDefinition = jsonAgentsGroupedByName.value("definition");
-                    QJsonValue jsonClones = jsonAgentsGroupedByName.value("clones");
-
-                    // The definition can be NULL
-                    if ((jsonDefinition.isObject() || jsonDefinition.isNull())
-                            && jsonClones.isArray())
-                    {
-                        // Create a temporary json object and add it to the array of definitions
-                        QJsonObject jsonObject = QJsonObject();
-                        jsonObject.insert("definition", jsonDefinition);
-                        jsonObject.insert("clones", jsonClones);
-
-                        jsonArrayOfDefinitions.append(jsonObject);
-                    }
-                }
-
-                if (jsonName.isString() && !jsonArrayOfDefinitions.isEmpty())
-                {
-                    QString agentName = jsonName.toString();
-
-                    for (QJsonValue jsonIteratorDefinition : jsonArrayOfDefinitions)
-                    {
-                        QJsonObject jsonAgentsGroupedByDefinition = jsonIteratorDefinition.toObject();
-
-                        QJsonValue jsonDefinition = jsonAgentsGroupedByDefinition.value("definition");
-                        QJsonValue jsonClones = jsonAgentsGroupedByDefinition.value("clones");
-
-                        // Manage the definition
-                        DefinitionM* agentDefinition = nullptr;
-
-                        if (jsonDefinition.isObject())
-                        {
-                            // Create a model of agent definition from JSON object
-                            agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
-                        }
-                        // The definition can be NULL
-                        /*else if (jsonDefinition.isNull()) {
-                            // Nothing to do
-                        }*/
-
-                        // Manage the list of clones
-                        QJsonArray arrayOfClones = jsonClones.toArray();
-
-                        // None clone have a defined hostname (the agent is only defined by a definition)
-                        if (arrayOfClones.isEmpty())
-                        {
-                            qDebug() << "Clone of" << agentName << "without hostname and command line";
-
-                            // Make a copy of the definition
-                            DefinitionM* copyOfDefinition = nullptr;
-                            if (agentDefinition != nullptr) {
-                                copyOfDefinition = agentDefinition->copy();
-                            }
-
-                            // Create a new model of agent
-                            createAgentModel(agentName,
-                                             copyOfDefinition);
-                        }
-                        // There are some clones with a defined hostname
-                        else
-                        {
-                            for (QJsonValue jsonIteratorClone : arrayOfClones)
-                            {
-                                if (jsonIteratorClone.isObject())
-                                {
-                                    QJsonObject jsonClone = jsonIteratorClone.toObject();
-
-                                    QJsonValue jsonHostname = jsonClone.value("hostname");
-                                    QJsonValue jsonCommandLine = jsonClone.value("commandLine");
-                                    QJsonValue jsonPeerId = jsonClone.value("peerId");
-                                    QJsonValue jsonAddress = jsonClone.value("address");
-
-                                    if (jsonHostname.isString() && jsonCommandLine.isString() && jsonPeerId.isString() && jsonAddress.isString())
-                                    {
-                                        QString hostname = jsonHostname.toString();
-                                        QString commandLine = jsonCommandLine.toString();
-                                        QString peerId = jsonPeerId.toString();
-                                        QString ipAddress = jsonAddress.toString();
-
-                                        //if (!hostname.isEmpty() && !commandLine.isEmpty())
-                                        if (!hostname.isEmpty() && !commandLine.isEmpty() && !peerId.isEmpty() && !ipAddress.isEmpty())
-                                        {
-                                            // Check that there is not yet an agent with this peer id
-                                            AgentM* agent = getAgentModelFromPeerId(peerId);
-                                            if (agent == nullptr)
-                                            {
-                                                qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
-
-                                                // Make a copy of the definition
-                                                DefinitionM* copyOfDefinition = nullptr;
-                                                if (agentDefinition != nullptr) {
-                                                    copyOfDefinition = agentDefinition->copy();
-                                                }
-
-                                                // Create a new model of agent
-                                                createAgentModel(agentName,
-                                                                 copyOfDefinition,
-                                                                 peerId,
-                                                                 ipAddress,
-                                                                 hostname,
-                                                                 commandLine);
-                                            }
-                                            else {
-                                                qWarning() << "The agent" << agent->name() << "already exists with the peer id" << peerId;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Free memory
-                        if (agentDefinition != nullptr) {
-                            delete agentDefinition;
-                        }
-                    }
-                }
-                else
-                {
-                    qWarning() << "The JSON object does not contain an agent name !";
-
-                    success = false;
-                }
-            }
-        }
-    }
-    return success;
 }
 
 
@@ -706,22 +276,6 @@ void EditorModelManager::exportAgentsListToSelectedFile()
 
 
 /**
- * @brief Simulate an exit for each agent ON
- */
-void EditorModelManager::simulateExitForEachAgentON()
-{
-    for (AgentM* agent : _hashFromPeerIdToAgent.values())
-    {
-        if ((agent != nullptr) && agent->isON())
-        {
-            // Simulate an exit for this agent
-            onAgentExited(agent->peerId(), agent->name());
-        }
-    }
-}
-
-
-/**
  * @brief Simulate an exit for each launcher
  */
 void EditorModelManager::simulateExitForEachLauncher()
@@ -732,32 +286,6 @@ void EditorModelManager::simulateExitForEachLauncher()
         {
             // Simulate an exit for this host (name)
             onLauncherExited("", hostName);
-        }
-    }
-}
-
-
-/**
- * @brief Delete agents OFF
- */
-void EditorModelManager::deleteAgentsOFF()
-{   
-    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
-    {
-        if (agentsGroupedByName != nullptr)
-        {
-            // ON
-            if (agentsGroupedByName->isON())
-            {
-                // Delete agents OFF
-                agentsGroupedByName->deleteAgentsOFF();
-            }
-            // OFF
-            else
-            {
-                // Delete the view model of agents grouped by name
-                deleteAgentsGroupedByName(agentsGroupedByName);
-            }
         }
     }
 }
@@ -1061,50 +589,6 @@ void EditorModelManager::onMappingReceived(QString peerId, QString agentName, QS
             if (previousMapping != nullptr) {
                 delete previousMapping;
             }
-        }
-    }
-}
-
-
-/**
- * @brief Slot called when a new value is published
- * @param publishedValue
- */
-void EditorModelManager::onValuePublished(PublishedValueM* publishedValue)
-{
-    if (publishedValue != nullptr)
-    {
-        // Add to the list at the first position
-        _publishedValues.prepend(publishedValue);
-
-        // Check if there are too many values
-        if (_publishedValues.count() > TOO_MANY_VALUES)
-        {
-            // We kept 80% of the values
-            int numberOfKeptValues = static_cast<int>(0.8 * TOO_MANY_VALUES);
-
-            int numberOfDeletedValues = _publishedValues.count() - numberOfKeptValues;
-
-            qDebug() << _publishedValues.count() << "values: we delete the" << numberOfDeletedValues << "oldest values and kept the" << numberOfKeptValues << "newest values";
-
-            // FIXME: More efficient ?
-            //_publishedValues.removeRows()
-            //_publishedValues.removeColumns()
-
-            while (_publishedValues.count() > numberOfKeptValues)
-            {
-                PublishedValueM* tempPublishedValue = _publishedValues.takeAt(_publishedValues.count() - 1);
-                delete tempPublishedValue;
-            }
-        }
-
-
-        // Get the (view model of) agents grouped for the name
-        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(publishedValue->agentName());
-        if (agentsGroupedByName != nullptr)
-        {
-            // Update the current value of an I/O/P of this agent(s)
-            agentsGroupedByName->updateCurrentValueOfIOP(publishedValue);
         }
     }
 }

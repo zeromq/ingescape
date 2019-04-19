@@ -81,8 +81,8 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     }
 
 
-    /*// Directory for platform files
-    QString platformPath = IngeScapeEditorUtils::getPlatformsPath();
+    // Directory for platform files
+    /*QString platformPath = IngeScapeUtils::getPlatformsPath();
 
     QDir platformDir(platformPath);
     if (!platformDir.exists()) {
@@ -106,7 +106,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     //
 
     // Create the manager for the data model of our IngeScape Assessments application
-    _modelManager = new AssessmentsModelManager(_jsonHelper, this);
+    _modelManager = new AssessmentsModelManager(_jsonHelper, rootPath, this);
 
     // Create the controller for network communications
     _networkC = new NetworkController(this);
@@ -270,11 +270,11 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
     }
 
     // Delete json helper
-    /*if (_jsonHelper != nullptr)
-  {
-      delete _jsonHelper;
-      _jsonHelper = nullptr;
-  }*/
+    if (_jsonHelper != nullptr)
+    {
+        delete _jsonHelper;
+        _jsonHelper = nullptr;
+    }
 
     qInfo() << "Delete IngeScape Assessments Controller";
 }

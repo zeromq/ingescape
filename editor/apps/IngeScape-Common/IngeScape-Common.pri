@@ -40,7 +40,8 @@ SOURCES += \
     $$PWD/viewModel/scenario/actionconditionvm.cpp \
     $$PWD/viewModel/scenario/actioneffectvm.cpp \
     $$PWD/viewModel/scenario/actioninpalettevm.cpp \
-    $$PWD/viewModel/scenario/actionexecutionvm.cpp
+    $$PWD/viewModel/scenario/actionexecutionvm.cpp \
+    $$PWD/controller/ingescapemodelmanager.cpp
 
 HEADERS += \
     $$PWD/ingescapecommon.h \
@@ -79,7 +80,8 @@ HEADERS += \
     $$PWD/viewModel/scenario/actionconditionvm.h \
     $$PWD/viewModel/scenario/actioneffectvm.h \
     $$PWD/viewModel/scenario/actioninpalettevm.h \
-    $$PWD/viewModel/scenario/actionexecutionvm.h
+    $$PWD/viewModel/scenario/actionexecutionvm.h \
+    $$PWD/controller/ingescapemodelmanager.h
 
 
 #RESOURCES += \

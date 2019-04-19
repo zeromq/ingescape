@@ -19,23 +19,16 @@
 //#include <QtQml>
 #include <I2PropertyHelpers.h>
 #include <model/editorenums.h>
-#include <model/jsonhelper.h>
+#include <controller/ingescapemodelmanager.h>
 #include <model/hostm.h>
-#include <model/publishedvaluem.h>
-#include <viewModel/agentsgroupedbynamevm.h>
-
-static const QString VERSION_JSON_PLATFORM = QString("1.0");
 
 
 /**
- * @brief The EditorModelManager class defines the manager for the data model of INGESCAPE
+ * @brief The EditorModelManager class defines the manager for the data model of IngeScape
  */
-class EditorModelManager : public QObject
+class EditorModelManager : public IngeScapeModelManager
 {
     Q_OBJECT
-
-    // List of all groups (of agents) grouped by name
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentsGroupedByNameVM, allAgentsGroupsByName)
 
     // Flag indicating if our global mapping is activated
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingActivated)
@@ -46,9 +39,6 @@ class EditorModelManager : public QObject
     // List of opened definitions
     I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
 
-    // List of all published values
-    I2_QOBJECT_LISTMODEL(PublishedValueM, publishedValues)
-
 
 public:
     /**
@@ -58,48 +48,14 @@ public:
      * @param parent
      */
     explicit EditorModelManager(JsonHelper* jsonHelper,
-                                   QString rootDirectoryPath,
-                                   QObject *parent = nullptr);
+                                QString rootDirectoryPath,
+                                QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
     ~EditorModelManager();
-
-
-    /**
-     * @brief Create a new model of agent with a name, a definition (can be NULL) and some properties
-     * @param agentName
-     * @param definition optional (NULL by default)
-     * @param peerId optional (empty by default)
-     * @param ipAddress optional (empty by default)
-     * @param hostname optional (default value)
-     * @param commandLine optional (empty by default)
-     * @param isON optional (false by default)
-     * @return
-     */
-    AgentM* createAgentModel(QString agentName,
-                             DefinitionM* definition = nullptr,
-                             QString peerId = "",
-                             QString ipAddress = "",
-                             QString hostname = HOSTNAME_NOT_DEFINED,
-                             QString commandLine = "",
-                             bool isON = false);
-
-
-    /**
-     * @brief Delete a model of agent
-     * @param agent
-     */
-    void deleteAgentModel(AgentM* agent);
-
-
-    /**
-     * @brief Delete a view model of agents grouped by name
-     * @param agentsGroupedByName
-     */
-    void deleteAgentsGroupedByName(AgentsGroupedByNameVM* agentsGroupedByName);
 
 
     /**
@@ -119,40 +75,10 @@ public:
 
 
     /**
-     * @brief Get the model of agent from a Peer Id
-     * @param peerId
-     * @return
-     */
-    AgentM* getAgentModelFromPeerId(QString peerId);
-
-
-    /**
-     * @brief Get the (view model of) agents grouped for a name
-     * @param name
-     * @return
-     */
-    AgentsGroupedByNameVM* getAgentsGroupedForName(QString name);
-
-
-    /**
      * @brief Get the hash table from a name to the group of agents with this name
      * @return
      */
     QHash<QString, AgentsGroupedByNameVM*> getHashTableFromNameToAgentsGrouped();
-
-
-    /**
-     * @brief Import an agent or an agents list from selected file (definition)
-     */
-    Q_INVOKABLE bool importAgentOrAgentsListFromSelectedFile();
-
-
-    /**
-     * @brief Import an agents list from a JSON array
-     * @param jsonArrayOfAgents
-     * @param versionJsonPlatform
-     */
-    bool importAgentsListFromJson(QJsonArray jsonArrayOfAgents, QString versionJsonPlatform);
 
 
     /**
@@ -169,21 +95,9 @@ public:
 
 
     /**
-     * @brief Simulate an exit for each agent ON
-     */
-    void simulateExitForEachAgentON();
-
-
-    /**
      * @brief Simulate an exit for each launcher
      */
     void simulateExitForEachLauncher();
-
-
-    /**
-     * @brief Delete agents OFF
-     */
-    void deleteAgentsOFF();
 
 
     /**
@@ -271,14 +185,6 @@ Q_SIGNALS:
     void removeInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingActivated);
 
 
-    /**
-     * @brief Signal emitted when a command must be sent on the network to an agent
-     * @param peerIdsList
-     * @param command
-     */
-    //void commandAskedToAgent(QStringList peerIdsList, QString command);
-
-
 public Q_SLOTS:
 
     /**
@@ -335,13 +241,6 @@ public Q_SLOTS:
      * @param mapping in JSON format
      */
     void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
-
-
-    /**
-     * @brief Slot called when a new value is published
-     * @param publishedValue
-     */
-    void onValuePublished(PublishedValueM* publishedValue);
 
 
     /**
@@ -485,18 +384,6 @@ private:
 
 
 private:
-
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
-
-    // Path to the root directory to load/save files
-    QString _rootDirectoryPath;
-
-    // Map from "peer id" to a model of agent
-    QHash<QString, AgentM*> _hashFromPeerIdToAgent;
-
-    // Hash table from a name to the group of agents with this name
-    QHash<QString, AgentsGroupedByNameVM*> _hashFromNameToAgentsGrouped;
 
     // Hash table from name to a model of host (corresponding to an INGESCAPE launcher)
     QHash<QString, HostM*> _hashFromNameToHost;

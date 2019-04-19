@@ -19,10 +19,12 @@
  * @param parent
  */
 AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
-                                                 QObject *parent) : QObject(parent),
+                                                 QString rootDirectoryPath,
+                                                 QObject *parent) : IngeScapeModelManager(jsonHelper,
+                                                                                          rootDirectoryPath,
+                                                                                          parent),
     _currentExperimentationsGroup(nullptr),
-    _currentExperimentation(nullptr),
-    _jsonHelper(jsonHelper)
+    _currentExperimentation(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -59,7 +61,10 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
  */
 AssessmentsModelManager::~AssessmentsModelManager()
 {
-    qInfo() << "Delete IngeScape Model Manager";
+    qInfo() << "Delete IngeScape Assessments Model Manager";
+
+    // Call our mother class
+    IngeScapeModelManager::~IngeScapeModelManager();
 
     if (_currentExperimentationsGroup != nullptr) {
         setcurrentExperimentationsGroup(nullptr);
@@ -69,6 +74,4 @@ AssessmentsModelManager::~AssessmentsModelManager()
         setcurrentExperimentation(nullptr);
     }
 
-    // Reset pointers
-    _jsonHelper = nullptr;
 }

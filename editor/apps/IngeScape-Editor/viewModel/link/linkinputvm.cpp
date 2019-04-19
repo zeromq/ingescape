@@ -57,7 +57,7 @@ bool LinkInputVM::canLinkWith(LinkConnectorVM* linkConnector)
     if ((linkOutput != nullptr) && (linkOutput->output() != nullptr) && (linkOutput->output()->firstModel() != nullptr)
             && (_input != nullptr) && (_input->firstModel() != nullptr))
     {
-        // Call parent class function
+        // Call our mother class
         return _canLinkOutputToInput(linkOutput->output()->firstModel()->agentIOPValueType(), _input->firstModel()->agentIOPValueType());
     }
     else {
