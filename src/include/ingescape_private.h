@@ -223,6 +223,14 @@ typedef struct licenseEnforcement {
     long currentAgentsNb;
 } licenseEnforcement_t;
 
+typedef struct license_callback {
+    igs_licenseCallback callback_ptr;
+    void* data;
+    struct license_callback *prev;
+    struct license_callback *next;
+} license_callback_t;
+    
+
 //////////////////  FUNCTIONS  //////////////////
 
 //  definition
@@ -283,11 +291,12 @@ int token_freeValuesInArguments(igs_tokenArgument_t *arg);
 
 //license
 #define ENABLE_LICENSE_ENFORCEMENT 0
-#define MAX_NB_OF_AGENTS 5
-#define MAX_NB_OF_IOP 50
+#define MAX_NB_OF_AGENTS 50
+#define MAX_NB_OF_IOP 1000
 #define MAX_EXEC_DURATION_DURING_EVAL 300
 #define igs_license(...) igs_log(IGS_LOG_FATAL+1, __func__, __VA_ARGS__)
 extern license_t *license;
+extern license_callback_t *licenseCallbacks;
 #if !TARGET_OS_IOS
 void license_cleanLicense(void);
 void license_readLicense(void);

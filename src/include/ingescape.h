@@ -164,7 +164,7 @@ PUBLIC void igs_clearDataForOutput(const char *name);
 PUBLIC void igs_clearDataForParameter(const char *name);
 
 //observe writing to an IOP
-typedef void (*igs_observeCallback)(iop_t iopType, const char* name, iopType_t valueType, void* value, size_t valueSize, void* myData);
+typedef void (*igs_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData);
 PUBLIC int igs_observeInput(const char *name, igs_observeCallback cb, void *myData);
 PUBLIC int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData);
 PUBLIC int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData);
@@ -331,13 +331,19 @@ PUBLIC bool igs_getAllowIpc(void);
 //licenses
 // Default license path is empty and is automatically set to agent's executable path.
 // When path is set manually, it takes priority to agent's executable path.
-void igs_setLicensePath(const char *path);
-char *igs_getLicensePath(void);
+PUBLIC void igs_setLicensePath(const char *path);
+PUBLIC char *igs_getLicensePath(void);
     
 //Any agent developer can use this function to check the license against her/his agent's unique id.
 //IDs are provided by the ingescape team.
 //Returns true if check is OK.
-bool igs_checkLicenseForAgent(const char *agentId);
+PUBLIC bool igs_checkLicenseForAgent(const char *agentId);
+
+//use this callback mechanism to be notified when the timer
+//or number of agents or number of IOPs has been exceeded in demo mode
+typedef void (*igs_licenseCallback)(void *myData);
+PUBLIC int igs_observeLicense(igs_licenseCallback cb, void *myData);
+    
 #endif
     
 #ifdef __cplusplus

@@ -38,6 +38,7 @@ pthread_mutex_t license_readWriteMutex = NULL;
 
 license_t *license = NULL;
 char *licensePath = NULL;
+license_callback_t *licenseCallbacks = NULL;
 
 uint8_t secretKey[crypto_secretstream_xchacha20poly1305_KEYBYTES] = {1,255,34,41,58,63,47,183,134,223,33,41,25,16,87,38,211,27,183,124,185,196,107,128,34,92,83,54,35,60,37,28};
 #define CHUNK_SIZE 4096
@@ -455,4 +456,12 @@ bool igs_checkLicenseForAgent(const char *agentId){
         }
     }
     return false;
+}
+
+int igs_observeLicense(igs_licenseCallback cb, void *myData){
+    license_callback_t *l = (license_callback_t *)calloc(1, sizeof(license_callback_t));
+    l->callback_ptr = cb;
+    l->data = myData;
+    DL_APPEND(licenseCallbacks, l);
+    return 1;
 }

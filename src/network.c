@@ -726,11 +726,19 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                                      HASH_COUNT(newDefinition->params_table));
                     if (licEnforcement->currentIOPNb > license->platformNbIOPs){
                         igs_license("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", license->platformNbIOPs);
+                        license_callback_t *el = NULL;
+                        DL_FOREACH(licenseCallbacks, el){
+                            el->callback_ptr(el->data);
+                        }
                         return -1;
                     }
                     licEnforcement->currentAgentsNb++;
                     if (licEnforcement->currentAgentsNb > license->platformNbAgents){
                         igs_license("Maximum number of allowed agents (%d) is exceeded : agent will stop", license->platformNbAgents);
+                        license_callback_t *el = NULL;
+                        DL_FOREACH(licenseCallbacks, el){
+                            el->callback_ptr(el->data);
+                        }
                         return -1;
                     }
                     #endif
@@ -1183,7 +1191,11 @@ int triggerLicenseStop(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop);
     IGS_UNUSED(timer_id);
     IGS_UNUSED(arg);
-    igs_error("License has expired and runtime duration limit is reached : stopping loop.");
+    igs_license("License has expired and runtime duration limit is reached : stopping loop.");
+    license_callback_t *el = NULL;
+    DL_FOREACH(licenseCallbacks, el){
+        el->callback_ptr(el->data);
+    }
     return -1;
 }
 
@@ -1445,7 +1457,7 @@ initLoop (zsock_t *pipe, void *args){
     
 #if ENABLE_LICENSE_ENFORCEMENT
     if (license != NULL && license->isLicenseExpired){
-        igs_license("License has expired : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
+        igs_license("License is not valid : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
         zloop_timer(agentElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, NULL);
     }
 #endif
