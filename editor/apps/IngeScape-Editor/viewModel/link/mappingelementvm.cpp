@@ -21,7 +21,7 @@
  * @param parent
  */
 MappingElementVM::MappingElementVM(QString name,
-                                   ElementMappingM* modelM,
+                                   MappingElementM* modelM,
                                    QObject *parent) : QObject(parent),
     _name(name),
     _firstModel(nullptr),

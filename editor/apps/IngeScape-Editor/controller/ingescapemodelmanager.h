@@ -16,9 +16,9 @@
 #define INGESCAPEMODELMANAGER_H
 
 #include <QObject>
-#include <QtQml>
-
+//#include <QtQml>
 #include <I2PropertyHelpers.h>
+#include <model/editorenums.h>
 #include <model/jsonhelper.h>
 #include <model/hostm.h>
 #include <model/publishedvaluem.h>

@@ -185,13 +185,13 @@ AgentMappingM* JsonHelper::createModelOfAgentMappingFromJSON(QString inputAgentN
 
         if (jsonMappingOut.isArray())
         {
-            QList<ElementMappingM*> tempMappingElements;
+            QList<MappingElementM*> tempMappingElements;
 
             for (QJsonValue jsonMap : jsonMappingOut.toArray())
             {
                 if (jsonMap.isObject())
                 {
-                    ElementMappingM* mappingElement = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
+                    MappingElementM* mappingElement = _createModelOfMappingElement(inputAgentName, jsonMap.toObject());
                     if (mappingElement != nullptr) {
                         tempMappingElements.append(mappingElement);
                     }
@@ -280,7 +280,7 @@ QJsonObject JsonHelper::exportAgentMappingToJson(AgentMappingM* agentMapping)
         jsonMapping.insert("version", agentMapping->version());
 
         QJsonArray jsonArray;
-        for (ElementMappingM* mappingElement : agentMapping->mappingElements()->toList())
+        for (MappingElementM* mappingElement : agentMapping->mappingElements()->toList())
         {
             if (mappingElement != nullptr)
             {
@@ -308,7 +308,7 @@ QJsonObject JsonHelper::exportAgentMappingToJson(AgentMappingM* agentMapping)
  * @return JSON object
  */
 QJsonObject JsonHelper::exportAgentMappingWithChangesToJson(AgentMappingM* agentMapping,
-                                                            QList<ElementMappingM*> addedMappingElements,
+                                                            QList<MappingElementM*> addedMappingElements,
                                                             QStringList namesOfRemovedMappingElements)
 {
     QJsonObject jsonMapping;
@@ -321,10 +321,10 @@ QJsonObject JsonHelper::exportAgentMappingWithChangesToJson(AgentMappingM* agent
 
         QJsonArray jsonArray;
 
-        QList<ElementMappingM*> tempList = agentMapping->mappingElements()->toList();
+        QList<MappingElementM*> tempList = agentMapping->mappingElements()->toList();
         tempList.append(addedMappingElements);
 
-        for (ElementMappingM* mappingElement : tempList)
+        for (MappingElementM* mappingElement : tempList)
         {
             if ((mappingElement != nullptr) && !mappingElement->name().isEmpty()
                     // Check that the name of this mapping element is NOT part of the names of removed mapping elements
@@ -403,7 +403,7 @@ QString JsonHelper::getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocu
  * @return
  */
 QString JsonHelper::getJsonOfAgentMappingWithChanges(AgentMappingM* agentMapping,
-                                                     QList<ElementMappingM*> addedMappingElements,
+                                                     QList<MappingElementM*> addedMappingElements,
                                                      QStringList namesOfRemovedMappingElements,
                                                      QJsonDocument::JsonFormat jsonFormat)
 {
@@ -1139,14 +1139,14 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
 
 
 /**
- * @brief Create a model of element mapping Input name/Output agent name/Output name with JSON
+ * @brief Create a model of mapping element Input name/Output agent name/Output name with JSON
  * @param inputAgentName
  * @param jsonObject
  * @return
  */
-ElementMappingM* JsonHelper::_createModelOfElementMapping(QString inputAgentName, QJsonObject jsonObject)
+MappingElementM* JsonHelper::_createModelOfMappingElement(QString inputAgentName, QJsonObject jsonObject)
 {
-    ElementMappingM* mappingElement = nullptr;
+    MappingElementM* mappingElement = nullptr;
 
     QJsonValue jsonInputName = jsonObject.value("input_name");
     QJsonValue jsonOutputAgentName = jsonObject.value("agent_name");
@@ -1155,7 +1155,7 @@ ElementMappingM* JsonHelper::_createModelOfElementMapping(QString inputAgentName
     // All names must be defined
     if (jsonInputName.isString() && jsonOutputAgentName.isString() && jsonOutputName.isString())
     {
-        mappingElement = new ElementMappingM(inputAgentName,
+        mappingElement = new MappingElementM(inputAgentName,
                                              jsonInputName.toString(),
                                              jsonOutputAgentName.toString(),
                                              jsonOutputName.toString());

@@ -105,7 +105,7 @@ public:
      * @return JSON object
      */
     QJsonObject exportAgentMappingWithChangesToJson(AgentMappingM* agentMapping,
-                                                    QList<ElementMappingM*> addedMappingElements,
+                                                    QList<MappingElementM*> addedMappingElements,
                                                     QStringList namesOfRemovedMappingElements);
 
 
@@ -136,7 +136,7 @@ public:
      * @return
      */
     QString getJsonOfAgentMappingWithChanges(AgentMappingM* agentMapping,
-                                             QList<ElementMappingM*> addedMappingElements,
+                                             QList<MappingElementM*> addedMappingElements,
                                              QStringList namesOfRemovedMappingElements,
                                              QJsonDocument::JsonFormat jsonFormat);
 
@@ -195,12 +195,12 @@ private:
 
 
     /**
-     * @brief Create a model of element mapping Input name/Output agent name/Output name with JSON
+     * @brief Create a model of mapping element Input name/Output agent name/Output name with JSON
      * @param inputAgentName
      * @param jsonObject
      * @return
      */
-    ElementMappingM* _createModelOfElementMapping(QString inputAgentName, QJsonObject jsonObject);
+    MappingElementM* _createModelOfMappingElement(QString inputAgentName, QJsonObject jsonObject);
 
 
     /**

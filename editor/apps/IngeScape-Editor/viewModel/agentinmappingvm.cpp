@@ -195,7 +195,7 @@ void AgentInMappingVM::addLink_WhileMappingWasUNactivated(QString linkId, QStrin
     if (!_hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.contains(linkId))
     {
         // Create a model of mapping element with agent names and with input/output names
-        ElementMappingM* mappingElement = new ElementMappingM(_name, inputName, outputAgentName, outputName);
+        MappingElementM* mappingElement = new MappingElementM(_name, inputName, outputAgentName, outputName);
 
         _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.insert(linkId, mappingElement);
 
@@ -212,7 +212,7 @@ void AgentInMappingVM::cancelAddLink_WhileMappingWasUNactivated(QString linkId)
 {
     qDebug() << "cancelAddLink_WhileMappingWasUNactivated" << linkId;
 
-    ElementMappingM* mappingElement = getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(linkId);
+    MappingElementM* mappingElement = getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(linkId);
     if (mappingElement != nullptr)
     {
         _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.remove(linkId);
@@ -234,7 +234,7 @@ void AgentInMappingVM::cancelAllAddedLinks_WhileMappingWasUNactivated()
 {
     qDebug() << "Cancel all added links while the global mapping was UN-activated";
 
-    QList<ElementMappingM*> addedMappingElements = _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.values();
+    QList<MappingElementM*> addedMappingElements = _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.values();
 
     _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.clear();
     sethadLinksAdded_WhileMappingWasUNactivated(false);
@@ -249,7 +249,7 @@ void AgentInMappingVM::cancelAllAddedLinks_WhileMappingWasUNactivated()
  * @param linkId
  * @return
  */
-ElementMappingM* AgentInMappingVM::getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId)
+MappingElementM* AgentInMappingVM::getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId)
 {
     if (_hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.contains(linkId)) {
         return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.value(linkId);
@@ -274,7 +274,7 @@ QList<QString> AgentInMappingVM::getAddedLinkIds_WhileMappingWasUNactivated()
  * @brief Get the list of all (models of) added mapping elements while the global mapping was UN-activated
  * @return
  */
-QList<ElementMappingM*> AgentInMappingVM::getAddedMappingElements_WhileMappingWasUNactivated()
+QList<MappingElementM*> AgentInMappingVM::getAddedMappingElements_WhileMappingWasUNactivated()
 {
     return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.values();
 }

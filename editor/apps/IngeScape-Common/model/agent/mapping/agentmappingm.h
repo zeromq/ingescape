@@ -20,7 +20,7 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <model/agent/mapping/elementmappingm.h>
+#include <model/agent/mapping/mappingelementm.h>
 
 
 /**
@@ -40,7 +40,7 @@ class AgentMappingM : public QObject
     I2_QML_PROPERTY(QString, description)
 
     // List of (mapping) elements of our agent mapping
-    I2_QOBJECT_LISTMODEL(ElementMappingM, mappingElements)
+    I2_QOBJECT_LISTMODEL(MappingElementM, mappingElements)
 
     // List of all names of mapping elements
     //I2_CPP_NOSIGNAL_PROPERTY(QStringList, namesOfMappingElements)
@@ -68,7 +68,7 @@ public:
      * @param name
      * @return
      */
-    ElementMappingM* getMappingElementFromName(QString name);
+    MappingElementM* getMappingElementFromName(QString name);
 
 
 private Q_SLOTS:
@@ -82,7 +82,7 @@ private Q_SLOTS:
 private:
 
     // Hash table from a name to a model of mapping element
-    QHash<QString, ElementMappingM*> _hashFromNameToMappingElement;
+    QHash<QString, MappingElementM*> _hashFromNameToMappingElement;
 
 };
 

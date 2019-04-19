@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef ELEMENTMAPPINGM_H
-#define ELEMENTMAPPINGM_H
+#ifndef MAPPINGELEMENTM_H
+#define MAPPINGELEMENTM_H
 
 #include <QObject>
 #include <QtQml>
@@ -21,9 +21,9 @@
 #include <I2PropertyHelpers.h>
 
 /**
- * @brief The ElementMappingM class defines a model of a mapping node as described in the JSON of the agent mapping.
+ * @brief The MappingElementM class defines a model of a mapping node as described in the JSON of the agent mapping.
  */
-class ElementMappingM : public QObject
+class MappingElementM : public QObject
 {  
     Q_OBJECT
 
@@ -54,7 +54,7 @@ public:
      * @param output
      * @param parent
      */
-    explicit ElementMappingM(QString inputAgent,
+    explicit MappingElementM(QString inputAgent,
                              QString input,
                              QString outputAgent,
                              QString output,
@@ -64,7 +64,7 @@ public:
     /**
      * @brief Destructor
      */
-    ~ElementMappingM();
+    ~MappingElementM();
 
 
     /**
@@ -87,6 +87,6 @@ public:
 
 };
 
-QML_DECLARE_TYPE(ElementMappingM)
+QML_DECLARE_TYPE(MappingElementM)
 
-#endif // ELEMENTMAPPINGM_H
+#endif // MAPPINGELEMENTM_H

@@ -16,7 +16,7 @@ SOURCES += \
     $$PWD/model/agent/definition/agentiopm.cpp \
     $$PWD/model/agent/definition/outputm.cpp \
     $$PWD/model/agent/mapping/agentmappingm.cpp \
-    $$PWD/model/agent/mapping/elementmappingm.cpp
+    $$PWD/model/agent/mapping/mappingelementm.cpp
 
 HEADERS += \
     $$PWD/ingescapecommon.h \
@@ -31,7 +31,7 @@ HEADERS += \
     $$PWD/model/agent/definition/agentiopm.h \
     $$PWD/model/agent/definition/outputm.h \
     $$PWD/model/agent/mapping/agentmappingm.h \
-    $$PWD/model/agent/mapping/elementmappingm.h
+    $$PWD/model/agent/mapping/mappingelementm.h
 
 
 #RESOURCES += \

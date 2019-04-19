@@ -18,7 +18,9 @@
 #include <misc/debugquickinspector.h>
 #include <misc/terminationsignalwatcher.h>
 #include <settings/ingescapesettings.h>
+
 #include <model/enums.h>
+#include <model/agent/agentm.h>
 
 
 /**
@@ -48,8 +50,13 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     //
     // Models
     //
-    //qmlRegisterUncreatableType<AiguilleM>(uri, 1, 0, "AiguilleM", "Internal class");
-    //qmlRegisterUncreatableType<AlarmInstanceM>(uri, 1, 0, "AlarmInstanceM", "Internal class");
+    qmlRegisterUncreatableType<AgentIOPM>("INGESCAPE", 1, 0, "AgentIOPM", "Internal class");
+    qmlRegisterUncreatableType<AgentM>("INGESCAPE", 1, 0, "AgentM", "Internal class");
+    qmlRegisterUncreatableType<AgentMappingM>("INGESCAPE", 1, 0, "AgentMappingM", "Internal class");
+    qmlRegisterUncreatableType<DefinitionM>("INGESCAPE", 1, 0, "DefinitionM", "Internal class");
+    qmlRegisterUncreatableType<Enums>("INGESCAPE", 1, 0, "Enums", "Internal class");
+    qmlRegisterUncreatableType<MappingElementM>("INGESCAPE", 1, 0, "MappingElementM", "Internal class");
+    qmlRegisterUncreatableType<OutputM>("INGESCAPE", 1, 0, "OutputM", "Internal class");
 
 
     //

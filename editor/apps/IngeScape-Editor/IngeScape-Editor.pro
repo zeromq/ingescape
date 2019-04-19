@@ -229,23 +229,9 @@ mac {
     message(macOS and iOS specific rules)
 
 
-    # Include Gstreamer hearders
-    # GST not included ins master branch
-#    INCLUDEPATH += /usr/local/include/gstreamer-1.0
-#    INCLUDEPATH += /usr/local/include/glib-2.0
-#    INCLUDEPATH += /usr/local/lib/glib-2.0/include
-
     # Compute the LFLAG associated to our frameworks
     LIBS += -L../../frameworks/I2Quick/Mac -lI2Quick
 
-    # Add gstreamer libs
-    # GST not included in master branch
-#    LIBS += -L/usr/local/lib -lglib-2.0.0
-#    LIBS += -L/usr/local/lib -lgstreamer-1.0.0
-#    LIBS += -L/usr/local/lib -lgobject-2.0.0
-#    LIBS += -L/usr/local/lib -lgstvideo-1.0.0
-#    LIBS += -L/usr/local/lib -lgstbase-1.0.0
-#    LIBS += -L/usr/local/lib -lgstapp-1.0.0
 
     # Copy libraries into the MacOS directory of our application
     librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB}

@@ -447,31 +447,6 @@ Item {
 
     }
 
-    //
-    // popup displaying stream: GST not included in master branch
-    //
-    /*
-    Window {
-        id: streamPopup
-        width: 400
-        height: 250
-
-        Rectangle {
-
-            anchors.fill: parent
-
-            color: IngeScapeTheme.editorsBackgroundColor
-
-            GstVideoReceiver{
-                id:receiver
-                anchors.margins: 10
-                anchors.fill: parent
-                endpoint: "tcp://10.0.0.10:5660"
-            }
-        }
-    }
-    */
-
 
     PopUp.MenuPopup  {
         id : popupOptions

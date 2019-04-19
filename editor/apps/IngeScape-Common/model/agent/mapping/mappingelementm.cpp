@@ -12,7 +12,7 @@
  *
  */
 
-#include "elementmappingm.h"
+#include "mappingelementm.h"
 #include <model/enums.h>
 
 /**
@@ -23,7 +23,7 @@
  * @param output
  * @param parent
  */
-ElementMappingM::ElementMappingM(QString inputAgent,
+MappingElementM::MappingElementM(QString inputAgent,
                                  QString input,
                                  QString outputAgent,
                                  QString output,
@@ -38,18 +38,18 @@ ElementMappingM::ElementMappingM(QString inputAgent,
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Get our link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of our mapping element)
-    _name = ElementMappingM::getLinkNameFromNamesList(_outputAgent, _output, _inputAgent, _input);
+    _name = MappingElementM::getLinkNameFromNamesList(_outputAgent, _output, _inputAgent, _input);
 
-    //qInfo() << "New Model of Element Mapping" << _name;
+    //qInfo() << "New Model of Mapping Element" << _name;
 }
 
 
 /**
  * @brief Destructor
  */
-ElementMappingM::~ElementMappingM()
+MappingElementM::~MappingElementM()
 {
-    //qInfo() << "Delete Model of Element Mapping" << _name;
+    //qInfo() << "Delete Model of Mapping Element" << _name;
 }
 
 
@@ -61,7 +61,7 @@ ElementMappingM::~ElementMappingM()
  * @param input
  * @return link name with format "outputAgent##output-->inputAgent##input"
  */
-QString ElementMappingM::getLinkNameFromNamesList(QString outputAgent, QString output, QString inputAgent, QString input)
+QString MappingElementM::getLinkNameFromNamesList(QString outputAgent, QString output, QString inputAgent, QString input)
 {
     if (!inputAgent.isEmpty() && !input.isEmpty() && !outputAgent.isEmpty() && !output.isEmpty())
     {
@@ -79,7 +79,7 @@ QString ElementMappingM::getLinkNameFromNamesList(QString outputAgent, QString o
  * @param link name with format "outputAgent##output-->inputAgent##input"
  * @return
  */
-QStringList ElementMappingM::getNamesListFromLinkName(QString linkName)
+QStringList MappingElementM::getNamesListFromLinkName(QString linkName)
 {
     QStringList namesList;
 

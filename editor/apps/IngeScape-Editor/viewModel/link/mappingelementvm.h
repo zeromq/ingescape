@@ -17,7 +17,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <model/agent/mapping/elementmappingm.h>
+#include <model/agent/mapping/mappingelementm.h>
 
 /**
  * @brief The MappingElementVM class defines a view model of a mapping element
@@ -31,10 +31,10 @@ class MappingElementVM : public QObject
     I2_QML_PROPERTY_READONLY(QString, name)
 
     // Models of mapping elements
-    I2_QOBJECT_LISTMODEL(ElementMappingM, models)
+    I2_QOBJECT_LISTMODEL(MappingElementM, models)
 
     // First model of mapping element
-    I2_QML_PROPERTY_READONLY(ElementMappingM*, firstModel)
+    I2_QML_PROPERTY_READONLY(MappingElementM*, firstModel)
 
     // Flag indicating if our mapping element has its corresponding link in the global mapping
     // Used to improve performances
@@ -50,7 +50,7 @@ public:
      * @param parent
      */
     explicit MappingElementVM(QString name,
-                              ElementMappingM* modelM,
+                              MappingElementM* modelM,
                               QObject *parent = nullptr);
 
 

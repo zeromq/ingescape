@@ -471,7 +471,7 @@ private:
      * @param mappingElement
      * @return Pair<haveToAdd, MappingElementVM> flag indicating if we have to add the view model of mapping element
      */
-    QPair<bool, MappingElementVM*> _manageNewMappingElementModel(ElementMappingM* mappingElement);
+    QPair<bool, MappingElementVM*> _manageNewMappingElementModel(MappingElementM* mappingElement);
 
 
     /**
@@ -479,7 +479,7 @@ private:
      * @param mappingElement
      * @return Pair<haveToRemove, MappingElementVM> flag indicating if we have to remove the view model of mapping element
      */
-    QPair<bool, MappingElementVM*> _manageOldMappingElementModel(ElementMappingM* mappingElement);
+    QPair<bool, MappingElementVM*> _manageOldMappingElementModel(MappingElementM* mappingElement);
 
 
 private:

@@ -16,16 +16,16 @@
 #define INGESCAPEMODELMANAGER_H
 
 #include <QObject>
+//#include <QtQml>
 #include <I2PropertyHelpers.h>
-
 #include <model/assessmentsenums.h>
 #include <model/experimentationm.h>
 #include <model/subject/subjectm.h>
 #include <model/subject/characteristicm.h>
-#include <model/subject/characteristicenumm.h>
+//#include <model/subject/characteristicenumm.h>
 #include <model/task/taskm.h>
 #include <model/task/independentvariablem.h>
-#include <model/task/independentvariableenumm.h>
+//#include <model/task/independentvariableenumm.h>
 #include <model/task/dependentvariablem.h>
 #include <model/recordm.h>
 

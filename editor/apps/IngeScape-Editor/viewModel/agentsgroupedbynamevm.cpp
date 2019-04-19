@@ -647,7 +647,7 @@ void AgentsGroupedByNameVM::_onMappingOfModelChangedWithPreviousAndNewValues(Age
         {
             QList<MappingElementVM*> mappingElementsToAdd;
 
-            for (ElementMappingM* mappingElementM : newMapping->mappingElements()->toList())
+            for (MappingElementM* mappingElementM : newMapping->mappingElements()->toList())
             {
                 if (mappingElementM != nullptr)
                 {
@@ -679,7 +679,7 @@ void AgentsGroupedByNameVM::_onMappingOfModelChangedWithPreviousAndNewValues(Age
         {
             QList<MappingElementVM*> mappingElementsToRemove;
 
-            for (ElementMappingM* mappingElementM : previousMapping->mappingElements()->toList())
+            for (MappingElementM* mappingElementM : previousMapping->mappingElements()->toList())
             {
                 if (mappingElementM != nullptr)
                 {
@@ -1682,7 +1682,7 @@ QPair<bool, ParameterVM*> AgentsGroupedByNameVM::_manageOldParameterModel(AgentI
  * @param model
  * @return Pair<haveToAdd, MappingElementVM> flag indicating if we have to add the view model of mapping element
  */
-QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageNewMappingElementModel(ElementMappingM* model)
+QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageNewMappingElementModel(MappingElementM* model)
 {
     bool haveToAdd = false;
     MappingElementVM* mappingElementVM = nullptr;
@@ -1715,7 +1715,7 @@ QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageNewMappingElementMo
             if (_currentMapping != nullptr)
             {
                 // Create a copy of the mapping element
-                ElementMappingM* copy = new ElementMappingM(model->inputAgent(), model->input(), model->outputAgent(), model->output());
+                MappingElementM* copy = new MappingElementM(model->inputAgent(), model->input(), model->outputAgent(), model->output());
 
                 _currentMapping->mappingElements()->append(copy);
             }
@@ -1731,7 +1731,7 @@ QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageNewMappingElementMo
  * @param model
  * @return Pair<haveToRemove, MappingElementVM> flag indicating if we have to remove the view model of mapping element
  */
-QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageOldMappingElementModel(ElementMappingM* model)
+QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageOldMappingElementModel(MappingElementM* model)
 {
     bool haveToRemove = false;
     MappingElementVM* mappingElementVM = nullptr;
@@ -1757,7 +1757,7 @@ QPair<bool, MappingElementVM*> AgentsGroupedByNameVM::_manageOldMappingElementMo
                 // Update the current mapping of our agent(s grouped by name)
                 if (_currentMapping != nullptr)
                 {
-                    ElementMappingM* copy = _currentMapping->getMappingElementFromName(model->name());
+                    MappingElementM* copy = _currentMapping->getMappingElementFromName(model->name());
                     if (copy != nullptr) {
                         _currentMapping->mappingElements()->remove(copy);
 

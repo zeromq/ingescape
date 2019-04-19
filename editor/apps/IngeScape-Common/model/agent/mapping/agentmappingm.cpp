@@ -64,7 +64,7 @@ AgentMappingM::~AgentMappingM()
  * @param name
  * @return
  */
-ElementMappingM* AgentMappingM::getMappingElementFromName(QString name)
+MappingElementM* AgentMappingM::getMappingElementFromName(QString name)
 {
     if (_hashFromNameToMappingElement.contains(name)) {
         return _hashFromNameToMappingElement.value(name);
@@ -83,7 +83,7 @@ void AgentMappingM::_onMappingElementsListChanged()
     //_namesOfMappingElements.clear();
     _hashFromNameToMappingElement.clear();
 
-    for (ElementMappingM* mappingElement : _mappingElements.toList())
+    for (MappingElementM* mappingElement : _mappingElements.toList())
     {
         if ((mappingElement != nullptr) && !mappingElement->name().isEmpty())
         {

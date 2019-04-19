@@ -42,9 +42,6 @@ class CharacteristicM : public QObject
     // Flag indicating if our characteristic is the subject name
     I2_QML_PROPERTY_READONLY(bool, isSubjectName)
 
-    // Details if valueType == CHARACTERISTIC_ENUM ?
-    // Link with CharacteristicEnumM ?
-
     // List of possible values if the value type is "CHARACTERISTIC_ENUM"
     I2_QML_PROPERTY_READONLY(QStringList, enumValues)
 
