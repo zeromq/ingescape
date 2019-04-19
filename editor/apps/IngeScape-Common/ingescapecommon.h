@@ -28,7 +28,7 @@ public:
     /**
      * @brief Register our C++ types and extensions in the QML system
      */
-    static void registerQmlTypes();
+    static void registerIngeScapeQmlTypes();
 
 };
 

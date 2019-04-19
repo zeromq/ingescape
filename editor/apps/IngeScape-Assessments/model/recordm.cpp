@@ -35,7 +35,8 @@ RecordM::RecordM(QString uid,
     _task(task),
     _startDateTime(startDateTime),
     _endDateTime(QDateTime()),
-    _duration(QDateTime())
+    //_duration(QDateTime())
+    _duration(QTime())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -76,7 +77,8 @@ void RecordM::setendDateTime(QDateTime value)
         qint64 milliSeconds = _startDateTime.msecsTo(_endDateTime);
         QTime time = QTime(0, 0, 0, 0).addMSecs(static_cast<int>(milliSeconds));
 
-        setduration(QDateTime(_startDateTime.date(), time));
+        //setduration(QDateTime(_startDateTime.date(), time));
+        setduration(time);
 
         Q_EMIT endDateTimeChanged(value);
     }

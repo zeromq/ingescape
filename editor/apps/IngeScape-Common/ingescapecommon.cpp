@@ -15,10 +15,10 @@
 
 #include "ingescapecommon.h"
 
+#include <misc/debugquickinspector.h>
 #include <misc/terminationsignalwatcher.h>
 #include <settings/ingescapesettings.h>
-
-#include "misc/debugquickinspector.h"
+#include <model/enums.h>
 
 
 /**
@@ -32,11 +32,15 @@ IngeScapeCommon::IngeScapeCommon()
 /**
  * @brief Register our C++ types and extensions in the QML system
  */
-void IngeScapeCommon::registerQmlTypes()
+void IngeScapeCommon::registerIngeScapeQmlTypes()
 {
     //
     // Enum classes
     //
+    qmlRegisterSingletonType<AgentIOPTypes>("INGESCAPE", 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
+    qmlRegisterSingletonType<AgentIOPValueTypes>("INGESCAPE", 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
+    qmlRegisterSingletonType<AgentIOPValueTypeGroups>("INGESCAPE", 1, 0, "AgentIOPValueTypeGroups", &AgentIOPValueTypeGroups::qmlSingleton);
+    qmlRegisterSingletonType<LogTypes>("INGESCAPE", 1, 0, "LogTypes", &LogTypes::qmlSingleton);
     qmlRegisterSingletonType<DebugWindowRenderingMode>("INGESCAPE", 1, 0,  "DebugWindowRenderingMode", &DebugWindowRenderingMode::qmlSingleton);
 
 

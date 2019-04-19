@@ -36,6 +36,7 @@
 //
 // IngeScape Common
 //
+#include <ingescapecommon.h>
 #include <settings/ingescapesettings.h>
 #include <misc/ingescapeutils.h>
 
@@ -112,10 +113,6 @@ void registerCustomQmlTypes()
     qmlRegisterSingletonType<ActionEffectTypes>("INGESCAPE", 1, 0, "ActionEffectTypes", &ActionEffectTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentConditionValues>("INGESCAPE", 1, 0, "AgentConditionValues", &AgentConditionValues::qmlSingleton);
     qmlRegisterSingletonType<AgentEffectValues>("INGESCAPE", 1, 0, "AgentEffectValues", &AgentEffectValues::qmlSingleton);
-    qmlRegisterSingletonType<AgentIOPTypes>("INGESCAPE", 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
-    qmlRegisterSingletonType<AgentIOPValueTypes>("INGESCAPE", 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
-    qmlRegisterSingletonType<AgentIOPValueTypeGroups>("INGESCAPE", 1, 0, "AgentIOPValueTypeGroups", &AgentIOPValueTypeGroups::qmlSingleton);
-    qmlRegisterSingletonType<LogTypes>("INGESCAPE", 1, 0, "LogTypes", &LogTypes::qmlSingleton);
     qmlRegisterSingletonType<MappingEffectValues>("INGESCAPE", 1, 0, "MappingEffectValues", &MappingEffectValues::qmlSingleton);
     qmlRegisterSingletonType<ValidationDurationTypes>("INGESCAPE", 1, 0, "ValidationDurationTypes", &ValidationDurationTypes::qmlSingleton);
     qmlRegisterSingletonType<ValueComparisonTypes>("INGESCAPE", 1, 0, "ValueComparisonTypes", &ValueComparisonTypes::qmlSingleton);
@@ -400,9 +397,12 @@ int main(int argc, char *argv[])
     // - Display error images when SVG items are missing (source: "image://I2svg/.....")
     I2SVGImageProvider::showErrorsAsImage = true;
 
-    // Init streaming capability
-    // GST not included in master branch
-    // gst_init (NULL, NULL);
+
+    //
+    // Register Ingescape Common QML types
+    //
+    IngeScapeCommon::registerIngeScapeQmlTypes();
+
 
     //
     // Register our custom QML types

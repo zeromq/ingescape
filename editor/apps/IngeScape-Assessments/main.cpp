@@ -23,13 +23,12 @@
 
 #include <I2Quick.h>
 
-#include "ingescapecommon.h"
-
 #include <controller/ingescapeassessmentscontroller.h>
 
 //
 // IngeScape Common
 //
+#include <ingescapecommon.h>
 #include <settings/ingescapesettings.h>
 #include <misc/ingescapeutils.h>
 
@@ -333,9 +332,9 @@ int main(int argc, char *argv[])
 
 
     //
-    // Register Ingescape common
+    // Register Ingescape Common QML types
     //
-    IngeScapeCommon::registerQmlTypes();
+    IngeScapeCommon::registerIngeScapeQmlTypes();
 
 
     //
