@@ -37,7 +37,6 @@ RCC_DIR = tmp
 SOURCES += main.cpp \
     controller/ingescapeassessmentscontroller.cpp \
     controller/networkcontroller.cpp \
-    controller/ingescapemodelmanager.cpp \
     model/assessmentsenums.cpp \
     model/subject/subjectm.cpp \
     model/subject/characteristicm.cpp \
@@ -53,7 +52,8 @@ SOURCES += main.cpp \
     controller/experimentationcontroller.cpp \
     controller/record/recordcontroller.cpp \
     viewModel/experimentationsgroupvm.cpp \
-    model/experimentationrecordm.cpp
+    model/experimentationrecordm.cpp \
+    controller/assessmentsmodelmanager.cpp
 
 
 HEADERS += \
@@ -61,7 +61,6 @@ HEADERS += \
     model/assessmentsenums.h \
     stable.h \
     controller/networkcontroller.h \
-    controller/ingescapemodelmanager.h \
     model/subject/subjectm.h \
     model/subject/characteristicm.h \
     model/subject/characteristicenumm.h \
@@ -76,7 +75,8 @@ HEADERS += \
     controller/experimentationcontroller.h \
     controller/record/recordcontroller.h \
     viewModel/experimentationsgroupvm.h \
-    model/experimentationrecordm.h
+    model/experimentationrecordm.h \
+    controller/assessmentsmodelmanager.h
 
 
 RESOURCES += qml.qrc

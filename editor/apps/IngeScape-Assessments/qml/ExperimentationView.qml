@@ -42,7 +42,7 @@ Item {
 
     property ExperimentationController controller: null;
 
-    property IngeScapeModelManager modelManager: null;
+    property AssessmentsModelManager modelManager: null;
 
     property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
 

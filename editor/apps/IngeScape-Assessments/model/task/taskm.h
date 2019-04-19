@@ -83,11 +83,6 @@ public Q_SLOTS:
 
 private:
 
-    /**
-     * @brief Update the list of dependent variables
-     */
-    void _updateDependentVariables();
-
 
 };
 

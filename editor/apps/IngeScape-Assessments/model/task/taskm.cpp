@@ -77,9 +77,6 @@ void TaskM::setplatformFileUrl(QUrl value)
         // Update file name
         if (_platformFileUrl.isValid()) {
             setplatformFileName(_platformFileUrl.fileName());
-
-            // Update the list of dependent variables
-            _updateDependentVariables();
         }
         else {
             setplatformFileName("");
@@ -114,18 +111,5 @@ void TaskM::removeIndependentVariable(IndependentVariableM* independentVariable)
     {
         // Remove from the list
         _independentVariables.remove(independentVariable);
-    }
-}
-
-
-/**
- * @brief Update the list of dependent variables
- */
-void TaskM::_updateDependentVariables()
-{
-    if (_platformFileUrl.isValid())
-    {
-        // FIXME TODO: _updateDependentVariables
-        qDebug() << "TODO _updateDependentVariables...";
     }
 }

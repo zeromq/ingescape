@@ -18,7 +18,7 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
-#include <controller/ingescapemodelmanager.h>
+#include <controller/assessmentsmodelmanager.h>
 #include <viewModel/experimentationsgroupvm.h>
 
 
@@ -52,7 +52,7 @@ public:
      * @param modelManager
      * @param parent
      */
-    explicit ExperimentationsListController(IngeScapeModelManager* modelManager,
+    explicit ExperimentationsListController(AssessmentsModelManager* modelManager,
                                             QObject *parent = nullptr);
 
 
@@ -112,7 +112,7 @@ public Q_SLOTS:
 private:
 
     // Manager for the data model of our IngeScape Assessments application
-    IngeScapeModelManager* _modelManager;
+    AssessmentsModelManager* _modelManager;
 
 };
 

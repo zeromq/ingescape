@@ -12,30 +12,22 @@
  *
  */
 
-#ifndef INGESCAPEMODELMANAGER_H
-#define INGESCAPEMODELMANAGER_H
+#ifndef ASSESSMENTSMODELMANAGER_H
+#define ASSESSMENTSMODELMANAGER_H
 
 #include <QObject>
 //#include <QtQml>
 #include <I2PropertyHelpers.h>
 #include <model/assessmentsenums.h>
+#include <model/jsonhelper.h>
 #include <model/experimentationm.h>
-#include <model/subject/subjectm.h>
-#include <model/subject/characteristicm.h>
-//#include <model/subject/characteristicenumm.h>
-#include <model/task/taskm.h>
-#include <model/task/independentvariablem.h>
-//#include <model/task/independentvariableenumm.h>
-#include <model/task/dependentvariablem.h>
-#include <model/experimentationrecordm.h>
-
 #include <viewModel/experimentationsgroupvm.h>
 
 
 /**
- * @brief The IngeScapeModelManager class defines the manager for the data model of our IngeScape Assessments application
+ * @brief The AssessmentsModelManager class defines the manager for the data model of our IngeScape Assessments application
  */
-class IngeScapeModelManager : public QObject
+class AssessmentsModelManager : public QObject
 {
     Q_OBJECT
 
@@ -50,15 +42,17 @@ public:
 
     /**
      * @brief Constructor
+     * @param jsonHelper
      * @param parent
      */
-    explicit IngeScapeModelManager(QObject *parent = nullptr);
+    explicit AssessmentsModelManager(JsonHelper* jsonHelper,
+                                   QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~IngeScapeModelManager();
+    ~AssessmentsModelManager();
 
 
 Q_SIGNALS:
@@ -69,9 +63,11 @@ public Q_SLOTS:
 
 private:
 
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
 
 };
 
-QML_DECLARE_TYPE(IngeScapeModelManager)
+QML_DECLARE_TYPE(AssessmentsModelManager)
 
-#endif // INGESCAPEMODELMANAGER_H
+#endif // ASSESSMENTSMODELMANAGER_H

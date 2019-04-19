@@ -12,23 +12,22 @@
  *
  */
 
-#include "ingescapemodelmanager.h"
+#include "assessmentsmodelmanager.h"
 
 /**
  * @brief Constructor
  * @param parent
  */
-IngeScapeModelManager::IngeScapeModelManager(QObject *parent) : QObject(parent),
+AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
+                                                 QObject *parent) : QObject(parent),
     _currentExperimentationsGroup(nullptr),
-    _currentExperimentation(nullptr)
+    _currentExperimentation(nullptr),
+    _jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New IngeScape Model Manager";
-
-    // Agents grouped are sorted on their name (alphabetical order)
-    //_allAgentsGroupsByName.setSortProperty("name");
+    qInfo() << "New IngeScape Assessments Model Manager";
 
 
     //
@@ -58,7 +57,7 @@ IngeScapeModelManager::IngeScapeModelManager(QObject *parent) : QObject(parent),
 /**
  * @brief Destructor
  */
-IngeScapeModelManager::~IngeScapeModelManager()
+AssessmentsModelManager::~AssessmentsModelManager()
 {
     qInfo() << "Delete IngeScape Model Manager";
 
@@ -70,4 +69,6 @@ IngeScapeModelManager::~IngeScapeModelManager()
         setcurrentExperimentation(nullptr);
     }
 
+    // Reset pointers
+    _jsonHelper = nullptr;
 }

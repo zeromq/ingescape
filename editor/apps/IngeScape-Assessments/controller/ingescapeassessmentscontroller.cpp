@@ -37,8 +37,8 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _subjectsC(nullptr),
     _tasksC(nullptr),
     _recordC(nullptr),
-    _terminationSignalWatcher(nullptr)
-  //_jsonHelper(nullptr),
+    _terminationSignalWatcher(nullptr),
+    _jsonHelper(nullptr)
   //_platformDirectoryPath(""),
   //_platformDefaultFilePath("")
 {
@@ -98,14 +98,15 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
 
     // Create the helper to manage JSON files
-    //_jsonHelper = new JsonHelper(this);
+    _jsonHelper = new JsonHelper(this);
+
 
     //
     // Create sub-controllers
     //
 
     // Create the manager for the data model of our IngeScape Assessments application
-    _modelManager = new IngeScapeModelManager(this);
+    _modelManager = new AssessmentsModelManager(_jsonHelper, this);
 
     // Create the controller for network communications
     _networkC = new NetworkController(this);
@@ -120,14 +121,14 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _subjectsC = new SubjectsController(this);
 
     // Create the controller to manage the tasks of the current experimentation
-    _tasksC = new TasksController(this);
+    _tasksC = new TasksController(_modelManager, _jsonHelper, this);
 
     // Create the controller to manage a record of the current experimentation
     _recordC = new RecordController(this);
 
 
     // Connect to signals from the data model manager of our IngeScape Assessments application
-    connect(_modelManager, &IngeScapeModelManager::currentExperimentationChanged, this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
+    connect(_modelManager, &AssessmentsModelManager::currentExperimentationChanged, this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
 
 
     // Connect to signals from the network controller
@@ -254,7 +255,7 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
     {
         disconnect(_modelManager);
 
-        IngeScapeModelManager* temp = _modelManager;
+        AssessmentsModelManager* temp = _modelManager;
         setmodelManager(nullptr);
         delete temp;
         temp = nullptr;

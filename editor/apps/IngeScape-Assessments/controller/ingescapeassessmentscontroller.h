@@ -23,7 +23,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <controller/networkcontroller.h>
-#include <controller/ingescapemodelmanager.h>
+#include <controller/assessmentsmodelmanager.h>
 #include <controller/experimentationslistcontroller.h>
 #include <controller/experimentationcontroller.h>
 #include <controller/subject/subjectscontroller.h>
@@ -56,7 +56,7 @@ class IngeScapeAssessmentsController : public QObject
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 
     // Manager for the data model of our IngeScape Assessments application
-    I2_QML_PROPERTY_READONLY(IngeScapeModelManager*, modelManager)
+    I2_QML_PROPERTY_READONLY(AssessmentsModelManager*, modelManager)
 
     // Controller for network communication
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
@@ -129,7 +129,7 @@ private:
     TerminationSignalWatcher *_terminationSignalWatcher;
 
     // Helper to manage JSON files
-    //JsonHelper* _jsonHelper;
+    JsonHelper* _jsonHelper;
 
     // Path to the directory containing JSON files about platforms
     //QString _platformDirectoryPath;

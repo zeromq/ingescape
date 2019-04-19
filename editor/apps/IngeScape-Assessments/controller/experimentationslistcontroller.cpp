@@ -18,7 +18,7 @@
  * @brief Constructor
  * @param parent
  */
-ExperimentationsListController::ExperimentationsListController(IngeScapeModelManager* modelManager,
+ExperimentationsListController::ExperimentationsListController(AssessmentsModelManager* modelManager,
                                                                QObject *parent) : QObject(parent),
     _defaultGroupOther(nullptr),
     _newGroup(nullptr),

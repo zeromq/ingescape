@@ -18,7 +18,8 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
-//#include <controller/ingescapemodelmanager.h>
+#include <controller/assessmentsmodelmanager.h>
+#include <model/jsonhelper.h>
 #include <model/experimentationm.h>
 
 
@@ -44,9 +45,11 @@ public:
     /**
      * @brief Constructor
      * @param modelManager
+     * @param jsonHelper
      * @param parent
      */
-    explicit TasksController(//IngeScapeModelManager* modelManager,
+    explicit TasksController(AssessmentsModelManager* modelManager,
+                             JsonHelper* jsonHelper,
                              QObject *parent = nullptr);
 
 
@@ -122,8 +125,21 @@ public Q_SLOTS:
 
 private:
 
+    /**
+     * @brief Update the list of dependent variables of a task
+     * @param task
+     */
+    void _updateDependentVariablesOfTask(TaskM* task);
+
+
+private:
+
     // Manager for the data model of our IngeScape Assessments application
-    //IngeScapeModelManager* _modelManager;
+    AssessmentsModelManager* _modelManager;
+
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
+
 
 };
 

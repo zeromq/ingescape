@@ -17,13 +17,16 @@
 /**
  * @brief Constructor
  * @param modelManager
+ * @param jsonHelper
  * @param parent
  */
-TasksController::TasksController(//IngeScapeModelManager* modelManager,
+TasksController::TasksController(AssessmentsModelManager* modelManager,
+                                 JsonHelper* jsonHelper,
                                  QObject *parent) : QObject(parent),
     _currentExperimentation(nullptr),
-    _selectedTask(nullptr)
-    //_modelManager(modelManager)
+    _selectedTask(nullptr),
+    _modelManager(modelManager),
+    _jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -54,12 +57,9 @@ TasksController::~TasksController()
         setcurrentExperimentation(nullptr);
     }
 
-    /*if (_modelManager != nullptr)
-    {
-        //disconnect(_modelManager, nullptr, this, nullptr);
-
-        _modelManager = nullptr;
-    }*/
+    // Reset pointers
+    _modelManager = nullptr;
+    _jsonHelper = nullptr;
 }
 
 
@@ -108,6 +108,9 @@ void TasksController::createNewTaskWithIngeScapePlatformFile(QString taskName, Q
 
             // Set the URL of the IngeScape platform file (JSON)
             task->setplatformFileUrl(platformFileUrl);
+
+            // Update the list of dependent variables of the task
+            _updateDependentVariablesOfTask(task);
 
             // Add the task to the current experimentation
             _currentExperimentation->addTask(task);
@@ -223,5 +226,21 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
 
         // Free memory
         delete independentVariable;
+    }
+}
+
+
+/**
+ * @brief Update the list of dependent variables of a task
+ * @param task
+ */
+void TasksController::_updateDependentVariablesOfTask(TaskM* task)
+{
+    if (task != nullptr)
+    {
+        if (task->platformFileUrl().isValid())
+        {
+            //_jsonHelper->
+        }
     }
 }

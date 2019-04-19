@@ -42,7 +42,7 @@ IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New INGESCAPE Model Manager";
+    qInfo() << "New IngeScape Editor Model Manager";
 
     // Agents grouped are sorted on their name (alphabetical order)
     _allAgentsGroupsByName.setSortProperty("name");
