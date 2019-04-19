@@ -42,8 +42,6 @@ Item {
 
     property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
 
-    property TaskM selectedTak: null;
-
 
     //--------------------------------
     //
@@ -87,6 +85,10 @@ Item {
 
         onClicked: {
             //console.log("QML: close Tasks view");
+
+            if (controller) {
+                controller.selectedTask = null;
+            }
 
             // Emit the signal "closeTasksView"
             rootItem.closeTasksView();
@@ -158,21 +160,25 @@ Item {
             // Slots
             //
             onSelectTask: {
-                //console.log("QML: on Select Task " + model.name + " at " + index);
+                if (rootItem.controller)
+                {
+                    //console.log("QML: on Select Task " + model.name + " at " + index);
 
-                // First, select the task
-                rootItem.selectedTak = model.QtObject;
+                    // First, select the task
+                    rootItem.controller.selectedTask = model.QtObject;
 
-                // Then, set the index
-                listOfTasks.currentIndex = index;
+                    // Then, set the index
+                    listOfTasks.currentIndex = index;
+                }
             }
 
             onDeleteTask: {
-                if (rootItem.controller) {
-                    console.log("QML: on Delete Task " + model.name);
+                if (rootItem.controller)
+                {
+                    //console.log("QML: on Delete Task " + model.name);
 
                     // First, un-select the task
-                    rootItem.selectedTak = null;
+                    rootItem.controller.selectedTask = null;
 
                     // Then, reset the index
                     listOfTasks.currentIndex = -1;
@@ -191,11 +197,11 @@ Item {
 
         onCurrentIndexChanged: {
             // If the index is defined but if the selected task is null, we have to select the corresponding task
-            if ((currentIndex > -1) && (rootItem.selectedTak === null)
+            if ((currentIndex > -1) && (rootItem.controller.selectedTask === null)
                     && rootItem.experimentation && (currentIndex < rootItem.experimentation.allTasks.count))
             {
                 //console.log("QML: Must select task at " + currentIndex);
-                rootItem.selectedTak = rootItem.experimentation.allTasks.get(currentIndex);
+                rootItem.controller.selectedTask = rootItem.experimentation.allTasks.get(currentIndex);
             }
         }
 
@@ -219,7 +225,7 @@ Item {
             rightMargin: 5
         }
 
-        modelM: rootItem.selectedTak
+        controller: rootItem.controller
     }
 
 

@@ -61,6 +61,20 @@ public:
     ~TaskM();
 
 
+    /**
+     * @brief Add an Independent Variable to our task
+     * @param independentVariable
+     */
+    void addIndependentVariable(IndependentVariableM* independentVariable);
+
+
+    /**
+     * @brief Remove an Independent Variable from our task
+     * @param independentVariable
+     */
+    void removeIndependentVariable(IndependentVariableM* independentVariable);
+
+
 Q_SIGNALS:
 
 

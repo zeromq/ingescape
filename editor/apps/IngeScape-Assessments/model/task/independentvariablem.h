@@ -49,9 +49,15 @@ class IndependentVariableM : public QObject
 public:
     /**
      * @brief Constructor
+     * @param name
+     * @param description
+     * @param valueType
      * @param parent
      */
-    explicit IndependentVariableM(QObject *parent = nullptr);
+    explicit IndependentVariableM(QString name,
+                                  QString description,
+                                  IndependentVariableValueTypes::Value valueType,
+                                  QObject *parent = nullptr);
 
 
     /**

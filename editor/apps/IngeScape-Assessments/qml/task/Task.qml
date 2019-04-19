@@ -22,7 +22,7 @@ import I2Quick 1.0
 import INGESCAPE 1.0
 
 //import "theme" as Theme
-//import "../popup" as Popup
+import "../popup" as Popup
 
 
 Item {
@@ -39,8 +39,9 @@ Item {
     //
     //--------------------------------------------------------
 
-    property TaskM modelM: null;
+    property TasksController controller: null;
 
+    property TaskM modelM: controller ? controller.selectedTask : null;
 
 
     //--------------------------------
@@ -156,7 +157,7 @@ Item {
                     console.log("QML: New Independent Variable");
 
                     // Open the popup
-                    //createTaskPopup.open();
+                    createIndependentVariablePopup.open();
                 }
             }
         }
@@ -191,6 +192,10 @@ Item {
             TableViewColumn {
                 role: "valueType"
                 title: qsTr("Type")
+
+                delegate: Text {
+                    text: IndependentVariableValueTypes.enumToString(styleData.value)
+                }
             }
         }
     }
@@ -284,6 +289,18 @@ Item {
                 title: qsTr("Sortie")
             }
         }
+    }
+
+
+    //
+    // Create Characteristic Popup
+    //
+    Popup.CreateIndependentVariablePopup {
+        id: createIndependentVariablePopup
+
+        //anchors.centerIn: parent
+
+        controller: rootItem.controller
     }
 
 }

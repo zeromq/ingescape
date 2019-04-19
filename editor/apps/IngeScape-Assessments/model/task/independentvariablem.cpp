@@ -16,18 +16,24 @@
 
 /**
  * @brief Constructor
+ * @param name
+ * @param description
+ * @param valueType
  * @param parent
  */
-IndependentVariableM::IndependentVariableM(QObject *parent) : QObject(parent),
-    _name(""),
-    _description(""),
-    _valueType(IndependentVariableValueTypes::UNKNOWN),
+IndependentVariableM::IndependentVariableM(QString name,
+                                           QString description,
+                                           IndependentVariableValueTypes::Value valueType,
+                                           QObject *parent) : QObject(parent),
+    _name(name),
+    _description(description),
+    _valueType(valueType),
     _enumValues(QStringList())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Independent Variable" << _name;
+    qInfo() << "New Model of Independent Variable" << _name << "of type" << IndependentVariableValueTypes::staticEnumToString(_valueType);
 }
 
 
@@ -36,6 +42,6 @@ IndependentVariableM::IndependentVariableM(QObject *parent) : QObject(parent),
  */
 IndependentVariableM::~IndependentVariableM()
 {
-    qInfo() << "Delete Model of Independent Variable" << _name;
+    qInfo() << "Delete Model of Independent Variable" << _name << "of type" << IndependentVariableValueTypes::staticEnumToString(_valueType);
 
 }

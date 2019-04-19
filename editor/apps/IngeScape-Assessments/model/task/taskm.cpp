@@ -34,10 +34,7 @@ TaskM::TaskM(QString name,
     //
     for (int i = 1; i < 6; i++)
     {
-        IndependentVariableM* independentVariable = new IndependentVariableM();
-        independentVariable->setname(QString("VI %1").arg(i));
-        independentVariable->setdescription(QString("description of VI %1").arg(i));
-        independentVariable->setvalueType(IndependentVariableValueTypes::DOUBLE);
+        IndependentVariableM* independentVariable = new IndependentVariableM(QString("VI %1").arg(i), QString("description of VI %1").arg(i), IndependentVariableValueTypes::DOUBLE);
 
         _independentVariables.append(independentVariable);
 
@@ -59,6 +56,10 @@ TaskM::TaskM(QString name,
 TaskM::~TaskM()
 {
     qInfo() << "Delete Model of Task" << _name;
+
+    // Free memory
+    _independentVariables.deleteAllItems();
+    _dependentVariables.deleteAllItems();
 
 }
 
@@ -85,6 +86,34 @@ void TaskM::setplatformFileUrl(QUrl value)
         }
 
         Q_EMIT platformFileUrlChanged(value);
+    }
+}
+
+
+/**
+ * @brief Add an Independent Variable to our task
+ * @param independentVariable
+ */
+void TaskM::addIndependentVariable(IndependentVariableM* independentVariable)
+{
+    if (independentVariable != nullptr)
+    {
+        // Add to the list
+        _independentVariables.append(independentVariable);
+    }
+}
+
+
+/**
+ * @brief Remove an Independent Variable from our task
+ * @param independentVariable
+ */
+void TaskM::removeIndependentVariable(IndependentVariableM* independentVariable)
+{
+    if (independentVariable != nullptr)
+    {
+        // Remove from the list
+        _independentVariables.remove(independentVariable);
     }
 }
 

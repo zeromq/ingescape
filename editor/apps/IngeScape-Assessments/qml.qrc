@@ -36,5 +36,6 @@
         <file>qml/popup/CreateTaskPopup.qml</file>
         <file>qml/task/Task.qml</file>
         <file>qml/task/TaskInList.qml</file>
+        <file>qml/popup/CreateIndependentVariablePopup.qml</file>
     </qresource>
 </RCC>
