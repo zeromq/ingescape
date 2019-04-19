@@ -75,7 +75,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     settings.beginGroup("network");
     _networkDevice = settings.value("networkDevice", QVariant("")).toString();
     _ipAddress = settings.value("ipAddress", QVariant("")).toString();
-    _port = settings.value("port", QVariant(0)).toInt();
+    _port = settings.value("port", QVariant(0)).toUInt();
     qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
     settings.endGroup();
 
@@ -565,12 +565,12 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
 
     if ((_networkC != nullptr) && (_modelManager != nullptr))
     {
-        bool isInt = false;
-        int nPort = strPort.toInt(&isInt);
-        if (isInt && (nPort > 0))
+        bool isUInt = false;
+        uint port = strPort.toUInt(&isUInt);
+        if (isUInt && (port > 0))
         {
             // Port and Network device have not changed...
-            if ((nPort == _port) && (networkDevice == _networkDevice))
+            if ((port == _port) && (networkDevice == _networkDevice))
             {
                 // Nothing to do
                 success = true;
@@ -594,13 +594,13 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
 
                 // Update properties
                 setnetworkDevice(networkDevice);
-                setport(nPort);
+                setport(port);
 
                 // Update settings file
                 IngeScapeSettings &settings = IngeScapeSettings::Instance();
                 settings.beginGroup("network");
                 settings.setValue("networkDevice", networkDevice);
-                settings.setValue("port", nPort);
+                settings.setValue("port", port);
                 settings.endGroup();
                 // Save new values
                 settings.sync();
@@ -620,7 +620,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 }
 
                 // Start our INGESCAPE agent with the network device and the port
-                success = _networkC->start(networkDevice, "", nPort);
+                success = _networkC->start(networkDevice, "", port);
 
                 if (success) {
                     _modelManager->setisMappingActivated(true);
@@ -628,10 +628,10 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
             }
         }
         else {
-            if (!isInt) {
-                qWarning() << "Port" << strPort << "is not an int !";
+            if (!isUInt) {
+                qWarning() << "Port" << strPort << "is not an unsigned int !";
             }
-            else if (nPort <= 0) {
+            else if (port <= 0) {
                 qWarning() << "Port" << strPort << "is negative or null !";
             }
         }

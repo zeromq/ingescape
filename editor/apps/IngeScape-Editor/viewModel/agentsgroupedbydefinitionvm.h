@@ -17,7 +17,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <model/agentm.h>
+#include <model/agent/agentm.h>
 
 /**
  * @brief The AgentsGroupedByDefinitionVM class defines a view model of group of agents who have the same name and the same definition

@@ -21,7 +21,6 @@
 #include <I2PropertyHelpers.h>
 #include <model/jsonhelper.h>
 #include <model/hostm.h>
-#include <model/agentm.h>
 #include <model/publishedvaluem.h>
 #include <viewModel/agentsgroupedbynamevm.h>
 

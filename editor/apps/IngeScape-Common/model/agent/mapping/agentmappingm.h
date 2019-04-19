@@ -20,8 +20,8 @@
 
 #include <I2PropertyHelpers.h>
 
-//include the mapping element defined
-#include <model/mapping/elementmappingm.h>
+#include <model/agent/mapping/elementmappingm.h>
+
 
 /**
  * @brief The AgentMappingM class defines a model of agent mapping as is descripted in a json in ingescape API

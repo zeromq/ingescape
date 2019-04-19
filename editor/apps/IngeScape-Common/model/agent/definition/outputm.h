@@ -20,7 +20,7 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <model/iop/agentiopm.h>
+#include <model/agent/definition/agentiopm.h>
 
 /**
  * @brief The OutputM class defines a model of output

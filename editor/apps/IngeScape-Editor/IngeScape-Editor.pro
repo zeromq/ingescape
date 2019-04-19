@@ -47,14 +47,10 @@ SOURCES += main.cpp \
     controller/valueshistorycontroller.cpp \
     controller/abstracttimeactionslinescenarioviewcontroller.cpp \
     misc/collapsiblecolumn.cpp \
-    model/agentm.cpp \
     model/jsonhelper.cpp \
-    model/mapping/agentmappingm.cpp \
-    model/mapping/elementmappingm.cpp \
     model/scenario/condition/actionconditionm.cpp \
     model/scenario/actionm.cpp \
     model/scenario/scenariom.cpp \
-    model/scenario/scenariomarkerm.cpp \
     model/scenario/condition/iopvalueconditionm.cpp \
     model/publishedvaluem.cpp \
     model/scenario/timetickm.cpp \
@@ -117,14 +113,10 @@ HEADERS += \
     controller/valueshistorycontroller.h \
     controller/abstracttimeactionslinescenarioviewcontroller.h \
     misc/collapsiblecolumn.h \
-    model/agentm.h \
     model/jsonhelper.h \
-    model/mapping/agentmappingm.h \
-    model/mapping/elementmappingm.h \
     model/scenario/condition/actionconditionm.h \
     model/scenario/actionm.h \
     model/scenario/scenariom.h \
-    model/scenario/scenariomarkerm.h \
     model/scenario/condition/iopvalueconditionm.h \
     model/publishedvaluem.h \
     model/scenario/timetickm.h \

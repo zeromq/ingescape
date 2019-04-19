@@ -18,7 +18,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <model/iop/outputm.h>
+#include <model/agent/definition/outputm.h>
 #include <viewModel/iop/agentiopvm.h>
 
 

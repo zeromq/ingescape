@@ -21,7 +21,7 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-#include <model/agentm.h>
+#include <model/agent/agentm.h>
 #include <model/publishedvaluem.h>
 
 
@@ -61,7 +61,7 @@ public:
      * @param port
      * @return
      */
-    bool start(QString networkDevice, QString ipAddress, int port);
+    bool start(QString networkDevice, QString ipAddress, uint port);
 
 
     /**

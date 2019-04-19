@@ -17,7 +17,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <model/agentm.h>
+#include <model/agent/agentm.h>
 #include <model/publishedvaluem.h>
 #include <viewModel/agentsgroupedbydefinitionvm.h>
 #include <viewModel/iop/inputvm.h>

@@ -68,7 +68,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     settings.beginGroup("network");
     _networkDevice = settings.value("networkDevice", QVariant("")).toString();
     _ipAddress = settings.value("ipAddress", QVariant("")).toString();
-    _port = settings.value("port", QVariant(0)).toInt();
+    _port = settings.value("port", QVariant(0)).toUInt();
     qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
     settings.endGroup();
 

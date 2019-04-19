@@ -21,7 +21,6 @@
 #include <QJsonArray>
 
 #include <I2PropertyHelpers.h>
-#include <viewModel/agentinmappingvm.h>
 #include <model/recordm.h>
 #include <model/scenario/scenariom.h>
 

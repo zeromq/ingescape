@@ -17,7 +17,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <model/iop/agentiopm.h>
+#include <model/agent/definition/agentiopm.h>
 
 
 /**

@@ -21,8 +21,8 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <model/definitionm.h>
-#include <model/mapping/agentmappingm.h>
+#include <model/agent/definition/definitionm.h>
+#include <model/agent/mapping/agentmappingm.h>
 
 
 /**

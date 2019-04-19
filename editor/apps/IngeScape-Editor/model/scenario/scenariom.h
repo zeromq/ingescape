@@ -22,7 +22,6 @@
 
 #include "I2PropertyHelpers.h"
 
-//#include "model/scenario/scenariomarkerm.h"
 #include "model/scenario/actionm.h"
 #include "viewModel/scenario/actionvm.h"
 #include "viewModel/scenario/actioninpalettevm.h"
@@ -40,9 +39,6 @@ class ScenarioM: public QObject
 
     // Current date time
     //I2_QML_PROPERTY(QDateTime, currentTime)
-
-    // List of markers
-    //I2_QOBJECT_LISTMODEL(ScenarioMarkerM, markersList)
 
     // List of actions
     I2_QOBJECT_LISTMODEL(ActionM, actionsList)

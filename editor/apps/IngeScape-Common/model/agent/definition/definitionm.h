@@ -20,8 +20,8 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <model/iop/agentiopm.h>
-#include <model/iop/outputm.h>
+#include <model/agent/definition/agentiopm.h>
+#include <model/agent/definition/outputm.h>
 
 
 /**

@@ -23,7 +23,6 @@ extern "C" {
 #include <czmq.h>
 }
 
-#include "model/definitionm.h"
 
 static const QString suffix_Launcher = ".ingescapelauncher";
 
@@ -778,7 +777,7 @@ NetworkController::~NetworkController()
  * @param port
  * @return
  */
-bool NetworkController::start(QString networkDevice, QString ipAddress, int port)
+bool NetworkController::start(QString networkDevice, QString ipAddress, uint port)
 {
     if (_isIngeScapeAgentStarted == 0)
     {

@@ -17,7 +17,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <model/mapping/elementmappingm.h>
+#include <model/agent/mapping/elementmappingm.h>
 
 /**
  * @brief The MappingElementVM class defines a view model of a mapping element

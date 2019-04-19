@@ -52,7 +52,7 @@ public:
      * @param port
      * @return
      */
-    bool start(QString networkDevice, QString ipAddress, int port);
+    bool start(QString networkDevice, QString ipAddress, uint port);
 
 
     /**

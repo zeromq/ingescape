@@ -11,9 +11,12 @@ SOURCES += \
     $$PWD/misc/ingescapeutils.cpp \
     $$PWD/misc/debugquickinspector.cpp \
     $$PWD/model/enums.cpp \
-    $$PWD/model/definitionm.cpp \
-    $$PWD/model/iop/agentiopm.cpp \
-    $$PWD/model/iop/outputm.cpp
+    $$PWD/model/agent/agentm.cpp \
+    $$PWD/model/agent/definition/definitionm.cpp \
+    $$PWD/model/agent/definition/agentiopm.cpp \
+    $$PWD/model/agent/definition/outputm.cpp \
+    $$PWD/model/agent/mapping/agentmappingm.cpp \
+    $$PWD/model/agent/mapping/elementmappingm.cpp
 
 HEADERS += \
     $$PWD/ingescapecommon.h \
@@ -23,9 +26,12 @@ HEADERS += \
     $$PWD/misc/ingescapeutils.h \
     $$PWD/misc/debugquickinspector.h \
     $$PWD/model/enums.h \
-    $$PWD/model/definitionm.h \
-    $$PWD/model/iop/agentiopm.h \
-    $$PWD/model/iop/outputm.h
+    $$PWD/model/agent/agentm.h \
+    $$PWD/model/agent/definition/definitionm.h \
+    $$PWD/model/agent/definition/agentiopm.h \
+    $$PWD/model/agent/definition/outputm.h \
+    $$PWD/model/agent/mapping/agentmappingm.h \
+    $$PWD/model/agent/mapping/elementmappingm.h
 
 
 #RESOURCES += \

@@ -47,7 +47,7 @@ class IngeScapeAssessmentsController : public QObject
     I2_QML_PROPERTY_READONLY(QString, ipAddress)
 
     // Network settings - port
-    I2_QML_PROPERTY_READONLY(int, port)
+    I2_QML_PROPERTY_READONLY(uint, port)
 
     // Error message when a connection attempt fails
     I2_QML_PROPERTY_READONLY(QString, errorMessageWhenConnectionFailed)
