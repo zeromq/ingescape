@@ -418,27 +418,27 @@ public Q_SLOTS:
 
     /**
      * @brief Slot called when the flag "is Mapping Activated" changed
-     * @param isMappingActivated
+     * @param isMappingConnected
      */
-    void onIsMappingActivatedChanged(bool isMappingActivated);
+    void onIsMappingConnectedChanged(bool isMappingConnected);
 
 
     /**
-     * @brief Slot called when inputs must be added to our Editor for a list of outputs
+     * @brief Slot called when inputs must be added to our application for a list of agent outputs
      * @param agentName
      * @param newOutputsIds
-     * @param isMappingActivated
+     * @param isMappingConnected
      */
-    void onAddInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds, bool isMappingActivated);
+    void onAddInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected);
 
 
     /**
-     * @brief Slot called when inputs must be removed from our Editor for a list of outputs
+     * @brief Slot called when inputs must be removed from our application for a list of agent outputs
      * @param agentName
      * @param oldOutputsIds
-     * @param isMappingActivated
+     * @param isMappingConnected
      */
-    void onRemoveInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingActivated);
+    void onRemoveInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected);
 
 
 private:

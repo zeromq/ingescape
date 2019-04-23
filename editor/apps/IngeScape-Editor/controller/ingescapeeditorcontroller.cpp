@@ -180,7 +180,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Connect to signals from the model manager
-    connect(_modelManager, &EditorModelManager::isMappingActivatedChanged, _agentsMappingC, &AgentsMappingController::onIsMappingActivatedChanged);
+    connect(_modelManager, &EditorModelManager::isMappingConnectedChanged, _agentsMappingC, &AgentsMappingController::onIsMappingConnectedChanged);
     connect(_modelManager, &EditorModelManager::isMappingControlledChanged, _agentsMappingC, &AgentsMappingController::onIsMappingControlledChanged);
 
     connect(_modelManager, &EditorModelManager::agentModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelHasBeenCreated);
@@ -196,9 +196,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_modelManager, &EditorModelManager::agentsGroupedByDefinitionHasBeenCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated);
     connect(_modelManager, &EditorModelManager::agentsGroupedByDefinitionWillBeDeleted, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted);
 
-    connect(_modelManager, &EditorModelManager::isMappingActivatedChanged, _networkC, &NetworkController::onIsMappingActivatedChanged);
-    connect(_modelManager, &EditorModelManager::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
-    connect(_modelManager, &EditorModelManager::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
+    connect(_modelManager, &EditorModelManager::isMappingConnectedChanged, _networkC, &NetworkController::onIsMappingConnectedChanged);
+    connect(_modelManager, &EditorModelManager::addInputsToOurApplicationForAgentOutputs, _networkC, &NetworkController::onAddInputsToOurApplicationForAgentOutputs);
+    connect(_modelManager, &EditorModelManager::removeInputsFromOurApplicationForAgentOutputs, _networkC, &NetworkController::onRemoveInputsFromOurApplicationForAgentOutputs);
 
 
     // Connect to signals from the controller for supervision of agents
@@ -260,7 +260,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     if (isStarted)
     {
         // Initialize platform from online mapping
-        _modelManager->setisMappingActivated(true);
+        _modelManager->setisMappingConnected(true);
     }
     else {
         seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
@@ -587,7 +587,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                     qInfo() << "Restart the network on" << networkDevice << "with" << strPort << "(and KEEP the current platform)";
                 }
 
-                _modelManager->setisMappingActivated(false);
+                _modelManager->setisMappingConnected(false);
                 _modelManager->setisMappingControlled(false);
 
                 // Stop our INGESCAPE agent
@@ -624,7 +624,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 success = _networkC->start(networkDevice, "", port);
 
                 if (success) {
-                    _modelManager->setisMappingActivated(true);
+                    _modelManager->setisMappingConnected(true);
                 }
             }
         }

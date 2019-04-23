@@ -918,8 +918,8 @@ void ScenarioController::executeEffectsOfAction(ActionM* action, int lineInTimeL
     if ((action != nullptr) && !action->effectsList()->isEmpty())
     {
         // Active the mapping if needed
-        if ((_modelManager != nullptr) && !_modelManager->isMappingActivated()) {
-            _modelManager->setisMappingActivated(true);
+        if ((_modelManager != nullptr) && !_modelManager->isMappingConnected()) {
+            _modelManager->setisMappingConnected(true);
         }
 
         QString commandAndParameters = QString("%1=%2|%3").arg(command_ExecutedAction,
@@ -1503,8 +1503,8 @@ void ScenarioController::_startScenario()
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
     // Active the mapping if needed
-    if ((_modelManager != nullptr) && !_modelManager->isMappingActivated()) {
-        _modelManager->setisMappingActivated(true);
+    if ((_modelManager != nullptr) && !_modelManager->isMappingConnected()) {
+        _modelManager->setisMappingConnected(true);
     }
 
     // Disconnect from signals

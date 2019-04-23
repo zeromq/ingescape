@@ -839,7 +839,7 @@ Item {
             if (IngeScapeEditorC.modelManager)
             {
                 // UN-activate the mapping
-                IngeScapeEditorC.modelManager.isMappingActivated = false;
+                IngeScapeEditorC.modelManager.isMappingConnected = false;
             }
         }
 
@@ -849,13 +849,13 @@ Item {
             if (IngeScapeEditorC.modelManager)
             {
                 // UN-activate the mapping
-                IngeScapeEditorC.modelManager.isMappingActivated = false;
+                IngeScapeEditorC.modelManager.isMappingConnected = false;
 
                 // Switch to CONTROL
                 IngeScapeEditorC.modelManager.isMappingControlled = true;
 
                 // Activate the mapping
-                IngeScapeEditorC.modelManager.isMappingActivated = true;
+                IngeScapeEditorC.modelManager.isMappingConnected = true;
             }
         }
 

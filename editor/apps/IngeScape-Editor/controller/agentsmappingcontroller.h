@@ -218,10 +218,10 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot called when the flag "is Mapping Activated" changed
-     * @param isMappingActivated
+     * @brief Slot called when the flag "is Mapping Connected" changed
+     * @param isMappingConnected
      */
-    void onIsMappingActivatedChanged(bool isMappingActivated);
+    void onIsMappingConnectedChanged(bool isMappingConnected);
 
 
     /**

@@ -102,7 +102,7 @@ Item {
 
             I2PieSlice {
                 id: pieSlice
-                //visible: IngeScapeEditorC.modelManager.isMappingActivated
+                //visible: IngeScapeEditorC.modelManager.isMappingConnected
 
                 anchors.fill: parent
 
@@ -148,23 +148,23 @@ Item {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                 pressedID: releasedID + "-pressed"
-                releasedID: IngeScapeEditorC.modelManager.isMappingActivated ? "connect-on" : "connect-off"
+                releasedID: IngeScapeEditorC.modelManager.isMappingConnected ? "connect-on" : "connect-off"
                 disabledID : releasedID
             }
 
             onClicked: {
-                IngeScapeEditorC.modelManager.isMappingActivated = checked;
+                IngeScapeEditorC.modelManager.isMappingConnected = checked;
             }
 
             Binding {
                 target: activeMappingBtn
                 property: "checked"
-                value: IngeScapeEditorC.modelManager.isMappingActivated
+                value: IngeScapeEditorC.modelManager.isMappingConnected
             }
         }
 
         Rectangle {
-            //visible: IngeScapeEditorC.modelManager.isMappingActivated
+            //visible: IngeScapeEditorC.modelManager.isMappingConnected
             color: "transparent"
             width: childrenRect.width
             height: childrenRect.height
@@ -359,7 +359,7 @@ Item {
                     left : parent.left
                 }
 
-                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingActivated
+                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingConnected
                 text : "No active mapping at the moment."
 
                 color : IngeScapeTheme.blueGreyColor
@@ -376,7 +376,7 @@ Item {
                     left : parent.left
                 }
 
-                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingActivated
+                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingConnected
                 text : "Click on the button to synchronize with the current platform and get the active mapping.\nOr create/load a platform description and click on the button to apply it to the platform."
 
                 color : IngeScapeTheme.blueGreyColor

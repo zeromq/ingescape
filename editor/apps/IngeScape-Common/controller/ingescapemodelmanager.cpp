@@ -34,6 +34,7 @@
 IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
                                              QString rootDirectoryPath,
                                              QObject *parent) : QObject(parent),
+    _isMappingConnected(false),
     _jsonHelper(jsonHelper),
     _rootDirectoryPath(rootDirectoryPath)
 {
@@ -74,6 +75,28 @@ IngeScapeModelManager::~IngeScapeModelManager()
 
     // Reset pointers
     _jsonHelper = nullptr;
+}
+
+
+/**
+ * @brief Setter for property "is Mapping Connected"
+ * @param value
+ */
+void IngeScapeModelManager::setisMappingConnected(bool value)
+{
+    if (_isMappingConnected != value)
+    {
+        _isMappingConnected = value;
+
+        if (_isMappingConnected) {
+            qInfo() << "Mapping CONNECTED";
+        }
+        else {
+            qInfo() << "Mapping DIS-CONNECTED";
+        }
+
+        Q_EMIT isMappingConnectedChanged(value);
+    }
 }
 
 
@@ -293,10 +316,10 @@ AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString na
  * @brief Get the hash table from a name to the group of agents with this name
  * @return
  */
-/*QHash<QString, AgentsGroupedByNameVM*> IngeScapeModelManager::getHashTableFromNameToAgentsGrouped()
+QHash<QString, AgentsGroupedByNameVM*> IngeScapeModelManager::getHashTableFromNameToAgentsGrouped()
 {
     return _hashFromNameToAgentsGrouped;
-}*/
+}
 
 
 /**
@@ -930,8 +953,8 @@ void IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName(QList<O
 
         if (!newOutputsIds.isEmpty())
         {
-            // Emit the signal "Add Inputs to Editor for Outputs"
-            Q_EMIT addInputsToEditorForOutputs(agentsGroupedByName->name(), newOutputsIds, _isMappingActivated);
+            // Emit the signal "Add Inputs to our application for Agent Outputs"
+            Q_EMIT addInputsToOurApplicationForAgentOutputs(agentsGroupedByName->name(), newOutputsIds, _isMappingConnected);
         }
     }
 }
@@ -958,8 +981,8 @@ void IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName(QList
 
         if (!oldOutputsIds.isEmpty())
         {
-            // Emit the signal "Remove Inputs to Editor for Outputs"
-            Q_EMIT removeInputsToEditorForOutputs(agentsGroupedByName->name(), oldOutputsIds, _isMappingActivated);
+            // Emit the signal "Remove Inputs from our application for Agent Outputs"
+            Q_EMIT removeInputsFromOurApplicationForAgentOutputs(agentsGroupedByName->name(), oldOutputsIds, _isMappingConnected);
         }
     }
 }
@@ -1014,7 +1037,6 @@ void IngeScapeModelManager::_createAgentsGroupedByName(AgentM* model)
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &IngeScapeModelManager::_onAgentModelHasToBeDeleted);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &IngeScapeModelManager::_onDefinitionsToOpen);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsHaveBeenAdded, this, &IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsWillBeRemoved, this, &IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName);
 

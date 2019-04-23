@@ -1118,9 +1118,9 @@ void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerI
 
 /**
  * @brief Slot called when the flag "is Mapping Activated" changed
- * @param isMappingActivated
+ * @param isMappingConnected
  */
-void NetworkController::onIsMappingActivatedChanged(bool isMappingActivated)
+void NetworkController::onIsMappingConnectedChanged(bool isMappingConnected)
 {
     if ((_agentEditor != nullptr) && (_agentEditor->definition() != nullptr))
     {
@@ -1145,7 +1145,7 @@ void NetworkController::onIsMappingActivatedChanged(bool isMappingActivated)
                         //AgentIOPValueTypes::Value valueType = pair.second;
 
                         // Mapping Activated (Connected)
-                        if (isMappingActivated)
+                        if (isMappingConnected)
                         {
                             // Add mapping between our input and this output
                             unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
@@ -1180,12 +1180,12 @@ void NetworkController::onIsMappingActivatedChanged(bool isMappingActivated)
 
 
 /**
- * @brief Slot called when inputs must be added to our Editor for a list of outputs
+ * @brief Slot called when inputs must be added to our application for a list of agent outputs
  * @param agentName
  * @param newOutputsIds
- * @param isMappingActivated
+ * @param isMappingConnected
  */
-void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds, bool isMappingActivated)
+void NetworkController::onAddInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected)
 {
     if ((_agentEditor != nullptr) && (_agentEditor->definition() != nullptr) && !newOutputsIds.isEmpty())
     {
@@ -1256,7 +1256,7 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QString
                     }
 
                     // The mapping is activated (connected)
-                    if (isMappingActivated)
+                    if (isMappingConnected)
                     {
                         // Add mapping between our input and this output
                         unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
@@ -1279,14 +1279,14 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QString
 
 
 /**
- * @brief Slot called when inputs must be removed from our Editor for a list of outputs
+ * @brief Slot called when inputs must be removed from our application for a list of agent outputs
  * @param agentName
  * @param oldOutputsIds
- * @param isMappingActivated
+ * @param isMappingConnected
  */
-void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingActivated)
+void NetworkController::onRemoveInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected)
 {
-    Q_UNUSED(isMappingActivated)
+    Q_UNUSED(isMappingConnected)
 
     if ((_agentEditor != nullptr) && (_agentEditor->definition() != nullptr) && !oldOutputsIds.isEmpty())
     {
@@ -1303,7 +1303,7 @@ void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QStr
                 QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, outputId);
 
                 // The mapping is activated (connected)
-                //if (isMappingActivated)
+                //if (isMappingConnected)
                 //{
                 // Remove mapping between our input and this output
                 int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());

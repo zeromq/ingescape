@@ -152,7 +152,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     if (isStarted)
     {
         // Initialize platform from online mapping
-        //_modelManager->setisMappingActivated(true);
+        //_modelManager->setisMappingConnected(true);
     }
     else {
         seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));

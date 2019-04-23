@@ -31,7 +31,7 @@ EditorModelManager::EditorModelManager(JsonHelper* jsonHelper,
                                        QObject *parent) : IngeScapeModelManager(jsonHelper,
                                                                                 rootDirectoryPath,
                                                                                 parent),
-    _isMappingActivated(false),
+    //_isMappingActivated(false),
     _isMappingControlled(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -49,56 +49,19 @@ EditorModelManager::~EditorModelManager()
 {
     qInfo() << "Delete IngeScape Editor Model Manager";
 
-    // Call our mother class
-    IngeScapeModelManager::~IngeScapeModelManager();
-
     // Clear all opened definitions
     _openedDefinitions.clear();
 
     qDeleteAll(_hashFromNameToHost);
     _hashFromNameToHost.clear();
 
-    /*// Free memory
-    _hashFromNameToAgentsGrouped.clear();
-
-    // Delete all view model of agents grouped by name
-    for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
-    {
-        if (agentsGroupedByName != nullptr) {
-            deleteAgentsGroupedByName(agentsGroupedByName);
-        }
-    }
-    _allAgentsGroupsByName.clear();
-
-    // Reset pointers
-    _jsonHelper = nullptr;*/
+    // Mother class is automatically called
+    //IngeScapeModelManager::~IngeScapeModelManager();
 }
 
 
 /**
- * @brief Setter for property "is Activated Mapping"
- * @param value
- */
-void EditorModelManager::setisMappingActivated(bool value)
-{
-    if (_isMappingActivated != value)
-    {
-        _isMappingActivated = value;
-
-        if (_isMappingActivated) {
-            qInfo() << "Mapping Activated";
-        }
-        else {
-            qInfo() << "Mapping DE-activated";
-        }
-
-        Q_EMIT isMappingActivatedChanged(value);
-    }
-}
-
-
-/**
- * @brief Setter for property "is Controlled Mapping"
+ * @brief Setter for property "is Mapping Controlled"
  * @param value
  */
 void EditorModelManager::setisMappingControlled(bool value)
@@ -151,16 +114,6 @@ QString EditorModelManager::getPeerIdOfLauncherOnHost(QString hostName)
     else {
         return "";
     }
-}
-
-
-/**
- * @brief Get the hash table from a name to the group of agents with this name
- * @return
- */
-QHash<QString, AgentsGroupedByNameVM*> EditorModelManager::getHashTableFromNameToAgentsGrouped()
-{
-    return _hashFromNameToAgentsGrouped;
 }
 
 
@@ -354,7 +307,7 @@ void EditorModelManager::openDefinition(DefinitionM* definition)
  * @param canBeFrozen
  * @param loggerPort
  */
-void EditorModelManager::onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort)
+/*void EditorModelManager::onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort)
 {
     if (!peerId.isEmpty() && !agentName.isEmpty() && !ipAddress.isEmpty())
     {
@@ -395,7 +348,7 @@ void EditorModelManager::onAgentEntered(QString peerId, QString agentName, QStri
             }
         }
     }
-}
+}*/
 
 
 /**
@@ -403,7 +356,7 @@ void EditorModelManager::onAgentEntered(QString peerId, QString agentName, QStri
  * @param peer Id
  * @param agent name
  */
-void EditorModelManager::onAgentExited(QString peerId, QString agentName)
+/*void EditorModelManager::onAgentExited(QString peerId, QString agentName)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != nullptr)
@@ -413,7 +366,7 @@ void EditorModelManager::onAgentExited(QString peerId, QString agentName)
         // Update the state (flag "is ON")
         agent->setisON(false);
     }
-}
+}*/
 
 
 /**
@@ -524,7 +477,7 @@ void EditorModelManager::onLauncherExited(QString peerId, QString hostName)
  * @param agent name
  * @param definition in JSON format
  */
-void EditorModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON)
+/*void EditorModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON)
 {
     Q_UNUSED(agentName)
 
@@ -549,7 +502,7 @@ void EditorModelManager::onDefinitionReceived(QString peerId, QString agentName,
             }
         }
     }
-}
+}*/
 
 
 /**
@@ -558,7 +511,7 @@ void EditorModelManager::onDefinitionReceived(QString peerId, QString agentName,
  * @param agent name
  * @param mapping in JSON format
  */
-void EditorModelManager::onMappingReceived(QString peerId, QString agentName, QString mappingJSON)
+/*void EditorModelManager::onMappingReceived(QString peerId, QString agentName, QString mappingJSON)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
 
@@ -591,7 +544,7 @@ void EditorModelManager::onMappingReceived(QString peerId, QString agentName, QS
             }
         }
     }
-}
+}*/
 
 
 /**
@@ -736,18 +689,6 @@ void EditorModelManager::onAgentMappingFilePath(QString peerId, QString mappingF
 
 
 /**
- * @brief Slot called when a model of agent has to be deleted
- * @param model
- */
-void EditorModelManager::_onAgentModelHasToBeDeleted(AgentM* model)
-{
-    if (model != nullptr) {
-        deleteAgentModel(model);
-    }
-}
-
-
-/**
  * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
  * @param definitionsList
  */
@@ -758,123 +699,23 @@ void EditorModelManager::_onDefinitionsToOpen(QList<DefinitionM*> definitionsLis
 
 
 /**
- * @brief Slot called when some view models of outputs have been added to an agent(s grouped by name)
- * @param newOutputs
- */
-void EditorModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName(QList<OutputVM*> newOutputs)
-{
-    AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
-    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !newOutputs.isEmpty())
-    {
-        QStringList newOutputsIds;
-
-        for (OutputVM* output : newOutputs)
-        {
-            if ((output != nullptr) && !output->uid().isEmpty())
-            {
-                newOutputsIds.append(output->uid());
-            }
-        }
-
-        if (!newOutputsIds.isEmpty())
-        {
-            // Emit the signal "Add Inputs to Editor for Outputs"
-            Q_EMIT addInputsToEditorForOutputs(agentsGroupedByName->name(), newOutputsIds, _isMappingActivated);
-        }
-    }
-}
-
-
-/**
- * @brief Slot called when some view models of outputs will be removed from an agent(s grouped by name)
- * @param oldOutputs
- */
-void EditorModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName(QList<OutputVM*> oldOutputs)
-{
-    AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
-    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !oldOutputs.isEmpty())
-    {
-        QStringList oldOutputsIds;
-
-        for (OutputVM* output : oldOutputs)
-        {
-            if ((output != nullptr) && !output->uid().isEmpty())
-            {
-                oldOutputsIds.append(output->uid());
-            }
-        }
-
-        if (!oldOutputsIds.isEmpty())
-        {
-            // Emit the signal "Remove Inputs to Editor for Outputs"
-            Q_EMIT removeInputsToEditorForOutputs(agentsGroupedByName->name(), oldOutputsIds, _isMappingActivated);
-        }
-    }
-}
-
-
-/**
- * @brief Slot called when a view model of agents grouped by name has become useless (no more agents grouped by definition)
- */
-void EditorModelManager::_onUselessAgentsGroupedByName()
-{
-    AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
-    if (agentsGroupedByName != nullptr)
-    {
-        // Delete the view model of agents grouped by name
-        deleteAgentsGroupedByName(agentsGroupedByName);
-    }
-}
-
-
-/**
- * @brief Slot called when the network data of an agent will be cleared
- * @param peerId
- */
-void EditorModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
-{
-    /*AgentM* agent = qobject_cast<AgentM*>(sender());
-    if (agent != nullptr)
-    {
-        qDebug() << "[Model Manager] on Network Data of agent" << agent->name() << "will be Cleared:" << agent->hostname() << "(" << agent->peerId() << ")";
-    }*/
-
-    if (!peerId.isEmpty()) {
-        _hashFromPeerIdToAgent.remove(peerId);
-    }
-}
-
-
-/**
  * @brief Create a new view model of agents grouped by name
  * @param model
  */
 void EditorModelManager::_createAgentsGroupedByName(AgentM* model)
 {
+    // Call our mother class
+    IngeScapeModelManager::_createAgentsGroupedByName(model);
+
     if ((model != nullptr) && !model->name().isEmpty())
     {
-        // Create a new view model of agents grouped by name
-        AgentsGroupedByNameVM* agentsGroupedByName = new AgentsGroupedByNameVM(model->name(), this);
-
-        // Connect to signals from this new view model of agents grouped by definition
-        //connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreModelAndUseless, this, &EditorModelManager::_onUselessAgentsGroupedByName);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::noMoreAgentsGroupedByDefinitionAndUseless, this, &EditorModelManager::_onUselessAgentsGroupedByName);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionHasBeenCreated, this, &EditorModelManager::agentsGroupedByDefinitionHasBeenCreated);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentsGroupedByDefinitionWillBeDeleted, this, &EditorModelManager::agentsGroupedByDefinitionWillBeDeleted);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelHasToBeDeleted, this, &EditorModelManager::_onAgentModelHasToBeDeleted);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &EditorModelManager::_onDefinitionsToOpen);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsHaveBeenAdded, this, &EditorModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::outputsWillBeRemoved, this, &EditorModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName);
-
-        _hashFromNameToAgentsGrouped.insert(agentsGroupedByName->name(), agentsGroupedByName);
-
-        _allAgentsGroupsByName.append(agentsGroupedByName);
-
-        // Emit the signal "Agents grouped by name has been created"
-        Q_EMIT agentsGroupedByNameHasBeenCreated(agentsGroupedByName);
-
-        // Add the new model of agent
-        agentsGroupedByName->addNewAgentModel(model);
+        // Get the (view model of) agents grouped for this name
+        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(model->name());
+        if (agentsGroupedByName != nullptr)
+        {
+            // Connect to signals from this new view model of agents grouped by definition
+            connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &EditorModelManager::_onDefinitionsToOpen);
+        }
     }
 }
 

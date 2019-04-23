@@ -31,7 +31,7 @@ class EditorModelManager : public IngeScapeModelManager
     Q_OBJECT
 
     // Flag indicating if our global mapping is activated
-    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingActivated)
+    //I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingActivated)
 
     // Flag indicating if our global mapping is controlled (or passive)
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingControlled)
@@ -55,7 +55,7 @@ public:
     /**
      * @brief Destructor
      */
-    ~EditorModelManager();
+    ~EditorModelManager() Q_DECL_OVERRIDE;
 
 
     /**
@@ -72,13 +72,6 @@ public:
      * @return
      */
     QString getPeerIdOfLauncherOnHost(QString hostName);
-
-
-    /**
-     * @brief Get the hash table from a name to the group of agents with this name
-     * @return
-     */
-    QHash<QString, AgentsGroupedByNameVM*> getHashTableFromNameToAgentsGrouped();
 
 
     /**
@@ -110,49 +103,6 @@ public:
 
 Q_SIGNALS:
 
-
-    /**
-     * @brief Signal emitted when a new model of agent has been created
-     * @param agent
-     */
-    void agentModelHasBeenCreated(AgentM* agent);
-
-
-    /**
-     * @brief Signal emitted when a model of agent will be deleted
-     * @param agent
-     */
-    void agentModelWillBeDeleted(AgentM* agent);
-
-
-    /**
-     * @brief Signal emitted when a new view model of agents grouped by name has been created
-     * @param agentsGroupedByName
-     */
-    void agentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName);
-
-
-    /**
-     * @brief Signal emitted when a view model of agents grouped by name will be deleted
-     * @param agentsGroupedByName
-     */
-    void agentsGroupedByNameWillBeDeleted(AgentsGroupedByNameVM* agentsGroupedByName);
-
-
-    /**
-     * @brief Signal emitted when a new view model of agents grouped by definition has been created
-     * @param agentsGroupedByDefinition
-     */
-    void agentsGroupedByDefinitionHasBeenCreated(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
-
-
-    /**
-     * @brief Signal emitted when a view model of agents grouped by definition will be deleted
-     * @param agentsGroupedByDefinition
-     */
-    void agentsGroupedByDefinitionWillBeDeleted(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
-
-
     /**
      * @brief Signal emitted when a model of host has been created
      * @param host
@@ -167,24 +117,6 @@ Q_SIGNALS:
     void hostModelWillBeDeleted(HostM* host);
 
 
-    /**
-     * @brief Emitted when inputs must be added to our Editor for a list of outputs
-     * @param agentName
-     * @param newOutputsIds
-     * @param isMappingActivated
-     */
-    void addInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds, bool isMappingActivated);
-
-
-    /**
-     * @brief Emitted when inputs must be removed from our Editor for a list of outputs
-     * @param agentName
-     * @param oldOutputsIds
-     * @param isMappingActivated
-     */
-    void removeInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingActivated);
-
-
 public Q_SLOTS:
 
     /**
@@ -197,7 +129,7 @@ public Q_SLOTS:
      * @param canBeFrozen
      * @param loggerPort
      */
-    void onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort);
+    //void onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort);
 
 
     /**
@@ -205,7 +137,7 @@ public Q_SLOTS:
      * @param peer Id
      * @param agent name
      */
-    void onAgentExited(QString peerId, QString agentName);
+    //void onAgentExited(QString peerId, QString agentName);
 
 
     /**
@@ -231,7 +163,7 @@ public Q_SLOTS:
      * @param agent name
      * @param definition in JSON format
      */
-    void onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON);
+    //void onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON);
 
 
     /**
@@ -240,7 +172,7 @@ public Q_SLOTS:
      * @param agent name
      * @param mapping in JSON format
      */
-    void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
+    //void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
 
 
     /**
@@ -324,14 +256,7 @@ public Q_SLOTS:
     void onAgentMappingFilePath(QString peerId, QString mappingFilePath);
 
 
-private Q_SLOTS:
-
-    /**
-     * @brief Slot called when a model of agent has to be deleted
-     * @param model
-     */
-    void _onAgentModelHasToBeDeleted(AgentM* model);
-
+protected Q_SLOTS:
 
     /**
      * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
@@ -340,40 +265,13 @@ private Q_SLOTS:
     void _onDefinitionsToOpen(QList<DefinitionM*> definitionsList);
 
 
-    /**
-     * @brief Slot called when some view models of outputs have been added to an agent(s grouped by name)
-     * @param newOutputs
-     */
-    void _onOutputsHaveBeenAddedToAgentsGroupedByName(QList<OutputVM*> newOutputs);
-
-
-    /**
-     * @brief Slot called when some view models of outputs will be removed from an agent(s grouped by name)
-     * @param oldOutputs
-     */
-    void _onOutputsWillBeRemovedFromAgentsGroupedByName(QList<OutputVM*> oldOutputs);
-
-
-    /**
-     * @brief Slot called when a view model of agents grouped by name has become useless (no more agents grouped by definition)
-     */
-    void _onUselessAgentsGroupedByName();
-
-
-    /**
-     * @brief Slot called when the network data of an agent will be cleared
-     * @param peerId
-     */
-    void _onNetworkDataOfAgentWillBeCleared(QString peerId);
-
-
-private:
+protected:
 
     /**
      * @brief Create a new view model of agents grouped by name
      * @param model
      */
-    void _createAgentsGroupedByName(AgentM* model);
+    void _createAgentsGroupedByName(AgentM* model) Q_DECL_OVERRIDE;
 
 
     /**
@@ -383,7 +281,7 @@ private:
     void _openDefinitions(QList<DefinitionM*> definitionsToOpen);
 
 
-private:
+protected:
 
     // Hash table from name to a model of host (corresponding to an INGESCAPE launcher)
     QHash<QString, HostM*> _hashFromNameToHost;

@@ -33,6 +33,9 @@ class IngeScapeModelManager : public QObject
 {
     Q_OBJECT
 
+    // Flag indicating if our global mapping is connected (activated)
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingConnected)
+
     // List of all groups (of agents) grouped by name
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentsGroupedByNameVM, allAgentsGroupsByName)
 
@@ -128,7 +131,7 @@ public:
      * @brief Get the hash table from a name to the group of agents with this name
      * @return
      */
-    //QHash<QString, AgentsGroupedByNameVM*> getHashTableFromNameToAgentsGrouped();
+    QHash<QString, AgentsGroupedByNameVM*> getHashTableFromNameToAgentsGrouped();
 
 
     /**
@@ -208,21 +211,21 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Emitted when inputs must be added to our Editor for a list of outputs
+     * @brief Signal emitted when inputs must be added to our application for a list of agent outputs
      * @param agentName
      * @param newOutputsIds
-     * @param isMappingActivated
+     * @param isMappingConnected
      */
-    //void addInputsToEditorForOutputs(QString agentName, QStringList newOutputsIds, bool isMappingActivated);
+    void addInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected);
 
 
     /**
-     * @brief Emitted when inputs must be removed from our Editor for a list of outputs
+     * @brief Signal emitted when inputs must be removed from our application for a list of agent outputs
      * @param agentName
      * @param oldOutputsIds
-     * @param isMappingActivated
+     * @param isMappingConnected
      */
-    //void removeInputsToEditorForOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingActivated);
+    void removeInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected);
 
 
 public Q_SLOTS:
@@ -290,7 +293,7 @@ public Q_SLOTS:
     void onValuePublished(PublishedValueM* publishedValue);
 
 
-private Q_SLOTS:
+protected Q_SLOTS:
 
     /**
      * @brief Slot called when a model of agent has to be deleted
@@ -326,16 +329,16 @@ private Q_SLOTS:
     void _onNetworkDataOfAgentWillBeCleared(QString peerId);
 
 
-private:
+protected:
 
     /**
      * @brief Create a new view model of agents grouped by name
      * @param model
      */
-    void _createAgentsGroupedByName(AgentM* model);
+    virtual void _createAgentsGroupedByName(AgentM* model);
 
 
-private:
+protected:
 
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;

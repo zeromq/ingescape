@@ -126,7 +126,7 @@ void AgentsMappingController::setisLoadedView(bool value)
             if (allAgentsOFF)
             {
                 // DE-activate the mapping
-                _modelManager->setisMappingActivated(false);
+                _modelManager->setisMappingConnected(false);
             }
             // There have been changes in the mapping while the mapping was UN-activated
             else if (isAddedOrRemovedLink_WhileMappingWasUNactivated)
@@ -152,7 +152,7 @@ void AgentsMappingController::clearMapping()
 
     // 1- First, DE-activate the mapping
     if (_modelManager != nullptr) {
-        _modelManager->setisMappingActivated(false);
+        _modelManager->setisMappingConnected(false);
     }
 
     // Clear the hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent")
@@ -221,7 +221,7 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
         qInfo() << "Remove the link between agents" << link->outputAgent()->name() << "and" << link->inputAgent()->name();
 
         // The global mapping is activated AND the input agent is ON
-        if ((_modelManager != nullptr) && _modelManager->isMappingActivated() && link->inputAgent()->agentsGroupedByName()->isON())
+        if ((_modelManager != nullptr) && _modelManager->isMappingConnected() && link->inputAgent()->agentsGroupedByName()->isON())
         {
             if (!_hashFromLinkIdToRemovedLink_WaitingReply.contains(link->uid()))
             {
@@ -292,7 +292,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
             if (agentInMapping != nullptr)
             {
                 // The global mapping is activated
-                if (_modelManager->isMappingActivated())
+                if (_modelManager->isMappingConnected())
                 {
                     // CONTROL
                     /*if (_modelManager->isMappingControlled())
@@ -410,7 +410,7 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
                 qInfo() << "QML asked to create the link" << linkId;
 
                 // The global mapping is activated AND the input agent is ON
-                if ((_modelManager != nullptr) && _modelManager->isMappingActivated() && inputAgent->agentsGroupedByName()->isON())
+                if ((_modelManager != nullptr) && _modelManager->isMappingConnected() && inputAgent->agentsGroupedByName()->isON())
                 {
                     // Create a new TEMPORARY link between the two agents
                     link = _createLinkBetweenTwoAgents(linkName,
@@ -562,7 +562,7 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
                 QJsonObject jsonMapping = QJsonObject();
 
                 // The global mapping is activated AND the agent is ON
-                if (_modelManager->isMappingActivated() && agentInMapping->agentsGroupedByName()->isON())
+                if (_modelManager->isMappingConnected() && agentInMapping->agentsGroupedByName()->isON())
                 {
                     // Export the current mapping
                     jsonMapping = _jsonHelper->exportAgentMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping());
@@ -763,12 +763,12 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
 
 
 /**
- * @brief Slot called when the flag "is Mapping Activated" changed
- * @param isMappingActivated
+ * @brief Slot called when the flag "is Mapping Connected" changed
+ * @param isMappingConnected
  */
-void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivated)
+void AgentsMappingController::onIsMappingConnectedChanged(bool isMappingConnected)
 {
-    if ((_modelManager != nullptr) && (_jsonHelper != nullptr) && isMappingActivated)
+    if ((_modelManager != nullptr) && (_jsonHelper != nullptr) && isMappingConnected)
     {
         // CONTROL
         if (_modelManager->isMappingControlled())
@@ -909,7 +909,7 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
             if ((agentInMapping != nullptr) && (_modelManager != nullptr))
             {
                 // The mapping is activated
-                if (_modelManager->isMappingActivated())
+                if (_modelManager->isMappingConnected())
                 {
                     // OBSERVE
                     if (!_modelManager->isMappingControlled())
@@ -975,7 +975,7 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
     // Model of Agent ON
     if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty()
             // The global mapping is activated
-            && (_modelManager != nullptr) && _modelManager->isMappingActivated())
+            && (_modelManager != nullptr) && _modelManager->isMappingConnected())
     {
         QString agentName = model->name();
 
@@ -1069,7 +1069,7 @@ void AgentsMappingController::onMappingElementsHaveBeenAdded(QList<MappingElemen
                     qInfo() << mappingElement->name() << "MAPPED";
 
                     // The global mapping is activated
-                    if (_modelManager->isMappingActivated())
+                    if (_modelManager->isMappingConnected())
                     {
                         // Link the agent on its input from the mapping element (add a missing link TO the agent)
                         _linkAgentOnInputFromMappingElement(inputAgent, mappingElement);
@@ -1164,7 +1164,7 @@ void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElemen
                     if (link != nullptr)
                     {
                         // The global mapping is activated
-                        if (_modelManager->isMappingActivated())
+                        if (_modelManager->isMappingConnected())
                         {
                             // The link was Temporary
                             if (link->isTemporary())
@@ -1501,7 +1501,7 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
         }
 
         // The global mapping is activated AND the agent is ON
-        if (_modelManager->isMappingActivated() && agent->agentsGroupedByName()->isON())
+        if (_modelManager->isMappingConnected() && agent->agentsGroupedByName()->isON())
         {
             // Send the command "Clear Mapping" on the network to this agent(s)
             Q_EMIT commandAskedToAgent(agent->agentsGroupedByName()->peerIdsList(), command_ClearMapping);
