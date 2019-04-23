@@ -43,6 +43,9 @@ Item {
 
     property TaskM modelM: controller ? controller.selectedTask : null;
 
+    property int indexPreviousSelectedDependentVariable: -1;
+    property int indexDependentVariableCurrentlyEditing: -1;
+
 
     //--------------------------------
     //
@@ -65,7 +68,30 @@ Item {
     //
     //--------------------------------
 
+    /**
+     * Edit a dependent variable at a row index
+     */
+    function editDependentVariableAtRowIndex(rowIndex) {
 
+        console.log("QML: Edit the dependent variable at the row index " + rowIndex);
+
+        // Set the index
+        rootItem.indexDependentVariableCurrentlyEditing = rowIndex;
+    }
+
+
+    /**
+     * Stop the current edition of a dependent variable
+     */
+    function stopCurrentEditionOfDependentVariable() {
+        if (rootItem.indexDependentVariableCurrentlyEditing > -1)
+        {
+            console.log("QML: Stop the current edition of the dependent variable at the row index " + rootItem.indexDependentVariableCurrentlyEditing);
+
+            // Reset the index
+            rootItem.indexDependentVariableCurrentlyEditing = -1;
+        }
+    }
 
 
     //--------------------------------------------------------
@@ -109,6 +135,9 @@ Item {
     }*/
 
 
+    //
+    // Independent Variables Panel
+    //
     Rectangle {
         id: panelIndepVar
 
@@ -200,6 +229,10 @@ Item {
         }
     }
 
+
+    //
+    // Dependent Variables Panel
+    //
     Rectangle {
         id: panelDepVar
 
@@ -247,14 +280,15 @@ Item {
                 onClicked: {
                     console.log("QML: New Dependent Variable");
 
-                    // Open the popup
-                    //createTaskPopup.open();
+                    if (controller) {
+                        controller.createNewDependentVariable();
+                    }
                 }
             }
         }
 
         TableView {
-            id: tableDepVar
+            id: tableDepVariables
 
             anchors {
                 left: parent.left
@@ -267,26 +301,150 @@ Item {
                 bottomMargin: 10
             }
 
+            rowDelegate: Rectangle {
+                width: childrenRect.width
+                height: styleData.selected ? 30 : 20
+
+                color: styleData.selected ? "lightblue"
+                                          : (styleData.alternate ? "lightgray" : "white")
+            }
+
             model: rootItem.modelM ? rootItem.modelM.dependentVariables : null
 
             TableViewColumn {
+                id: columnName
+
                 role: "name"
                 title: qsTr("Nom")
+
+                //width: parent.width / 4.0
+
+                delegate: VariableTextEditor {
+
+                    variable: model.QtObject
+
+                    variableValue: styleData.value
+
+                    //isSelected: styleData.selected
+
+                    isCurrentlyEditing: (rootItem.indexDependentVariableCurrentlyEditing === styleData.row)
+
+
+                    //
+                    // Slots
+                    //
+
+                    onEditVariable: {
+                        // Edit the dependent variable at the row index
+                        rootItem.editDependentVariableAtRowIndex(styleData.row);
+                    }
+
+                    onStopEditionOfVariable: {
+                        // Stop the current edition of the dependent variable
+                        rootItem.stopCurrentEditionOfDependentVariable();
+                    }
+
+                    onVariableValueUpdated: {
+                        if (model)
+                        {
+                            console.log("QML: on (Dependent) Variable Value Updated for Name " + value);
+                            model.name = value;
+                        }
+                    }
+                }
             }
 
             TableViewColumn {
+                id: columnDescription
+
                 role: "description"
                 title: qsTr("Description")
+
+                //width: parent.width / 4.0
+
+                delegate: VariableTextEditor {
+
+                    variable: model.QtObject
+
+                    variableValue: styleData.value
+
+                    //isSelected: styleData.selected
+
+                    isCurrentlyEditing: (rootItem.indexDependentVariableCurrentlyEditing === styleData.row)
+
+
+                    //
+                    // Slots
+                    //
+
+                    onEditVariable: {
+                        // Edit the dependent variable at the row index
+                        rootItem.editDependentVariableAtRowIndex(styleData.row);
+                    }
+
+                    onStopEditionOfVariable: {
+                        // Stop the current edition of the dependent variable
+                        rootItem.stopCurrentEditionOfDependentVariable();
+                    }
+
+                    onVariableValueUpdated: {
+                        if (model)
+                        {
+                            console.log("QML: on (Dependent) Variable Value Updated for Description " + value);
+                            model.description = value;
+                        }
+                    }
+                }
             }
 
             TableViewColumn {
+                id: columnAgentName
+
                 role: "agentName"
                 title: qsTr("Agent")
             }
 
             TableViewColumn {
+                id: columnOutputName
+
                 role: "outputName"
                 title: qsTr("Sortie")
+            }
+
+            onDoubleClicked: {
+                console.log("onDoubleClicked " + row);
+
+                // Edit the dependent variable at the row index
+                editDependentVariableAtRowIndex(row);
+            }
+
+            // NOT Called
+            //onSelectionChanged: {
+            //}
+            // --> Workaround
+            Connections {
+                target: tableDepVariables.selection
+
+                onSelectionChanged: {
+                    //console.log("onSelectionChanged:");
+
+                    if ((rootItem.indexPreviousSelectedDependentVariable === rootItem.indexDependentVariableCurrentlyEditing)
+                            && (rootItem.indexDependentVariableCurrentlyEditing > -1))
+                    {
+                        // Stop the current edition of the dependent variable
+                        stopCurrentEditionOfDependentVariable();
+                    }
+
+                    // Reset
+                    rootItem.indexPreviousSelectedDependentVariable = -1;
+
+                    tableDepVariables.selection.forEach(function(rowIndex) {
+                        //console.log("row " + rowIndex + " is selected");
+
+                        // Update
+                        rootItem.indexPreviousSelectedDependentVariable = rowIndex;
+                    })
+                }
             }
         }
     }

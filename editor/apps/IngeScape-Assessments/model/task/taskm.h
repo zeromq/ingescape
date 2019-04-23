@@ -75,6 +75,20 @@ public:
     void removeIndependentVariable(IndependentVariableM* independentVariable);
 
 
+    /**
+     * @brief Add a Dependent Variable to our task
+     * @param dependentVariable
+     */
+    void addDependentVariable(DependentVariableM* dependentVariable);
+
+
+    /**
+     * @brief Remove a Dependent Variable from our task
+     * @param dependentVariable
+     */
+    void removeDependentVariable(DependentVariableM* dependentVariable);
+
+
 Q_SIGNALS:
 
 

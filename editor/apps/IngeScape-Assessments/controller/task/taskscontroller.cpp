@@ -231,6 +231,28 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
 
 
 /**
+ * @brief Create a new dependent variable
+ */
+void TasksController::createNewDependentVariable()
+{
+    if (_selectedTask != nullptr)
+    {
+        qDebug() << "Create a new dependent variable";
+
+        DependentVariableM* dependentVariable = new DependentVariableM();
+
+        dependentVariable->setname("VD");
+        //dependentVariable->setdescription("");
+        //dependentVariable->setagentName("");
+        //dependentVariable->setoutputName("");
+
+        // Add the dependent variable to the selected task
+        _selectedTask->addDependentVariable(dependentVariable);
+    }
+}
+
+
+/**
  * @brief Update the list of dependent variables of a task
  * @param task
  */
@@ -269,9 +291,10 @@ void TasksController::_updateDependentVariablesOfTask(TaskM* task)
                             qDebug() << "UNDEFINED version of JSON platform";
                         }
 
-                        // FIXME TODO: _updateDependentVariablesOfTask
                         // Import the agents list from a json byte content
-                        //_modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
+                        _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
+
+                        qDebug() << _modelManager->allAgentsGroupsByName()->count() << "agents (groups by name)";
                     }
                 }
                 else {

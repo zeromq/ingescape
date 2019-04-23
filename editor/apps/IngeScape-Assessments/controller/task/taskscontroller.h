@@ -117,6 +117,12 @@ public:
     Q_INVOKABLE void deleteIndependentVariable(IndependentVariableM* independentVariable);
 
 
+    /**
+     * @brief Create a new dependent variable
+     */
+    Q_INVOKABLE void createNewDependentVariable();
+
+
 Q_SIGNALS:
 
 

@@ -113,3 +113,28 @@ void TaskM::removeIndependentVariable(IndependentVariableM* independentVariable)
         _independentVariables.remove(independentVariable);
     }
 }
+
+
+/**
+ * @brief Add a Dependent Variable to our task
+ * @param dependentVariable
+ */
+void TaskM::addDependentVariable(DependentVariableM* dependentVariable)
+{
+    if (dependentVariable != nullptr)
+    {
+        // Add to the list
+        _dependentVariables.append(dependentVariable);
+    }
+}
+
+
+/**
+ * @brief Remove a Dependent Variable from our task
+ * @param dependentVariable
+ */
+void TaskM::removeDependentVariable(DependentVariableM* dependentVariable)
+{
+    // Remove from the list
+    _dependentVariables.remove(dependentVariable);
+}
