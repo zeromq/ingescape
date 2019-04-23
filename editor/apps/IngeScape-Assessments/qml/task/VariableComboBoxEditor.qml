@@ -134,7 +134,7 @@ Item {
         }
 
         // FIXME: use a Loader instead of visible
-        /*I2ComboboxStringList {
+        I2ComboboxStringList {
             id: cmbEditor
 
             anchors {
@@ -156,10 +156,6 @@ Item {
                     rootItem.variableValueUpdated(cmbEditor.selectedItem);
                 }
             }
-        }*/
-
-        //I2ComboboxItemModel {
-        //}
-
+        }
     }
 }

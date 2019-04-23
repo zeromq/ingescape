@@ -56,6 +56,29 @@ Item {
 
 
 
+    //--------------------------------
+    //
+    //
+    // Slots
+    //
+    //
+    //--------------------------------
+
+    /*Connections {
+        target: rootItem.controller
+
+        onSelectedTaskChanged: {
+            if (rootItem.controller.selectedTask)
+            {
+                console.log("QML: on Selected Task changed to " + rootItem.controller.selectedTask.name);
+            }
+            else {
+                console.log("QML: on Selected Task changed to NULL");
+            }
+        }
+    }*/
+
+
     //--------------------------------------------------------
     //
     //
@@ -154,7 +177,9 @@ Item {
 
             modelM: model.QtObject
 
-            isSelected: ListView.isCurrentItem
+            //isSelected: ListView.isCurrentItem
+            isSelected: rootItem.controller && rootItem.controller.selectedTask && (modelM === rootItem.controller.selectedTask)
+
 
             //
             // Slots
@@ -166,9 +191,6 @@ Item {
 
                     // First, select the task
                     rootItem.controller.selectedTask = model.QtObject;
-
-                    // Then, set the index
-                    listOfTasks.currentIndex = index;
                 }
             }
 
@@ -179,9 +201,6 @@ Item {
 
                     // First, un-select the task
                     rootItem.controller.selectedTask = null;
-
-                    // Then, reset the index
-                    listOfTasks.currentIndex = -1;
 
                     // Delete the task
                     rootItem.controller.deleteTask(model.QtObject);
@@ -194,17 +213,6 @@ Item {
                 }
             }
         }
-
-        onCurrentIndexChanged: {
-            // If the index is defined but if the selected task is null, we have to select the corresponding task
-            if ((currentIndex > -1) && (rootItem.controller.selectedTask === null)
-                    && rootItem.experimentation && (currentIndex < rootItem.experimentation.allTasks.count))
-            {
-                //console.log("QML: Must select task at " + currentIndex);
-                rootItem.controller.selectedTask = rootItem.experimentation.allTasks.get(currentIndex);
-            }
-        }
-
     }
 
 

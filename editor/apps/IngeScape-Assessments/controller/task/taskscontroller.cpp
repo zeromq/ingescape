@@ -64,6 +64,36 @@ TasksController::~TasksController()
 
 
 /**
+ * @brief Setter for property "Selected Task"
+ * @param value
+ */
+void TasksController::setselectedTask(TaskM *value)
+{
+    if (_selectedTask != value)
+    {
+        // Previous selected task was defined
+        if (_selectedTask != nullptr)
+        {
+            // Clear the list of agents of the unselected task
+            _clearAgentsOfUnselectedTask(_selectedTask);
+        }
+
+        // Update the selected task
+        _selectedTask = value;
+
+        // New selected task is defined
+        if (_selectedTask != nullptr)
+        {
+            // Fill the list of agents of the selected task
+            _fillAgentsOfSelectedTask(_selectedTask);
+        }
+
+        Q_EMIT selectedTaskChanged(value);
+    }
+}
+
+
+/**
  * @brief Return true if the user can create a task with the name
  * Check if the name is not empty and if a task with the same name does not already exist
  * @param taskName
@@ -109,11 +139,11 @@ void TasksController::createNewTaskWithIngeScapePlatformFile(QString taskName, Q
             // Set the URL of the IngeScape platform file (JSON)
             task->setplatformFileUrl(platformFileUrl);
 
-            // Update the list of dependent variables of the task
-            _updateDependentVariablesOfTask(task);
-
             // Add the task to the current experimentation
             _currentExperimentation->addTask(task);
+
+            // Select this new task
+            setselectedTask(task);
         }
         else {
             qWarning() << "Failed to create the task" << taskName << "because the URL" << platformFilePath << "is wrong !";
@@ -253,13 +283,29 @@ void TasksController::createNewDependentVariable()
 
 
 /**
- * @brief Update the list of dependent variables of a task
+ * @brief Clear the list of agents of the unselected task
  * @param task
  */
-void TasksController::_updateDependentVariablesOfTask(TaskM* task)
+void TasksController::_clearAgentsOfUnselectedTask(TaskM* task)
+{
+    if (task != nullptr)
+    {
+        // FIXME TODO _clearAgentsOfUnselectedTask
+        qDebug() << "Clear the list of agents of the unselected task" << task->name();
+    }
+}
+
+
+/**
+ * @brief Fill the list of agents of the selected task
+ * @param task
+ */
+void TasksController::_fillAgentsOfSelectedTask(TaskM* task)
 {
     if ((task != nullptr) && (_modelManager != nullptr))
     {
+        qDebug() << "Fill the list of agents of the selected task" << task->name();
+
         if (task->platformFileUrl().isValid())
         {
             QString platformFilePath = task->platformFileUrl().path();
@@ -294,7 +340,18 @@ void TasksController::_updateDependentVariablesOfTask(TaskM* task)
                         // Import the agents list from a json byte content
                         _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
 
-                        qDebug() << _modelManager->allAgentsGroupsByName()->count() << "agents (groups by name)";
+                        // Update the list of agent names
+                        QStringList agentNamesList;
+                        for (AgentsGroupedByNameVM* agentsGroupedByName : _modelManager->allAgentsGroupsByName()->toList())
+                        {
+                            if (agentsGroupedByName != nullptr)
+                            {
+                                agentNamesList.append(agentsGroupedByName->name());
+                            }
+                        }
+                        task->setagentNamesList(agentNamesList);
+
+                        qDebug() << _modelManager->allAgentsGroupsByName()->count() << "agents (groups by name):" << agentNamesList;
                     }
                 }
                 else {

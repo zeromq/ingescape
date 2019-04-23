@@ -22,7 +22,9 @@
 TaskM::TaskM(QString name,
              QObject *parent) : QObject(parent),
     _name(name),
-    _platformFileUrl(QUrl())
+    _platformFileUrl(QUrl()),
+    _platformFileName(QString("")),
+    _agentNamesList(QStringList())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -32,7 +34,7 @@ TaskM::TaskM(QString name,
     //
     // FIXME for tests
     //
-    for (int i = 1; i < 6; i++)
+    for (int i = 1; i < 5; i++)
     {
         IndependentVariableM* independentVariable = new IndependentVariableM(QString("VI %1").arg(i), QString("description of VI %1").arg(i), IndependentVariableValueTypes::DOUBLE);
 

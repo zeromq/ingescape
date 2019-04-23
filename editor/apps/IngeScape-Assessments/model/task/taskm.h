@@ -32,17 +32,20 @@ class TaskM : public QObject
     // Name of our task
     I2_QML_PROPERTY(QString, name)
 
-    // URL of the IngeScape platform (JSON file)
+    // URL of the IngeScape platform (JSON file) of our task
     I2_CPP_PROPERTY_CUSTOM_SETTER(QUrl, platformFileUrl)
 
-    // Name of the IngeScape platform (JSON file)
+    // Name of the IngeScape platform (JSON file) of our task
     I2_QML_PROPERTY_READONLY(QString, platformFileName)
 
-    // List of independent variables
+    // List of independent variables of our task
     I2_QOBJECT_LISTMODEL(IndependentVariableM, independentVariables)
 
-    // List of dependent variables
+    // List of dependent variables of our task
     I2_QOBJECT_LISTMODEL(DependentVariableM, dependentVariables)
+
+    // List of agent names of the IngeScape platform
+    I2_QML_PROPERTY_READONLY(QStringList, agentNamesList)
 
 
 public:

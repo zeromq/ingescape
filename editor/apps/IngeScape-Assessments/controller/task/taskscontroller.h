@@ -37,7 +37,7 @@ class TasksController : public QObject
     I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)
 
     // Model of the selected task
-    I2_QML_PROPERTY(TaskM*, selectedTask)
+    I2_QML_PROPERTY_CUSTOM_SETTER(TaskM*, selectedTask)
 
 
 public:
@@ -132,10 +132,17 @@ public Q_SLOTS:
 private:
 
     /**
-     * @brief Update the list of dependent variables of a task
+     * @brief Clear the list of agents of the unselected task
      * @param task
      */
-    void _updateDependentVariablesOfTask(TaskM* task);
+    void _clearAgentsOfUnselectedTask(TaskM* task);
+
+
+    /**
+     * @brief Fill the list of agents of the selected task
+     * @param task
+     */
+    void _fillAgentsOfSelectedTask(TaskM* task);
 
 
 private:

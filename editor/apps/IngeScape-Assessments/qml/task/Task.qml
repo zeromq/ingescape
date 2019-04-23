@@ -46,6 +46,8 @@ Item {
     property int indexPreviousSelectedDependentVariable: -1;
     property int indexDependentVariableCurrentlyEditing: -1;
 
+    visible: rootItem.modelM ? true : false
+
 
     //--------------------------------
     //
@@ -317,11 +319,11 @@ Item {
                 role: "name"
                 title: qsTr("Nom")
 
-                //width: parent.width / 4.0
+                width: tableDepVariables.width / 4.0
 
                 delegate: VariableTextEditor {
 
-                    variable: model.QtObject
+                    variable: model ? model.QtObject : null
 
                     variableValue: styleData.value
 
@@ -347,7 +349,7 @@ Item {
                     onVariableValueUpdated: {
                         if (model)
                         {
-                            console.log("QML: on (Dependent) Variable Value Updated for Name " + value);
+                            //console.log("QML: on (Dependent) Variable Value Updated for 'Name' " + value);
                             model.name = value;
                         }
                     }
@@ -360,11 +362,11 @@ Item {
                 role: "description"
                 title: qsTr("Description")
 
-                //width: parent.width / 4.0
+                width: tableDepVariables.width / 4.0
 
                 delegate: VariableTextEditor {
 
-                    variable: model.QtObject
+                    variable: model ? model.QtObject : null
 
                     variableValue: styleData.value
 
@@ -390,7 +392,7 @@ Item {
                     onVariableValueUpdated: {
                         if (model)
                         {
-                            console.log("QML: on (Dependent) Variable Value Updated for Description " + value);
+                            //console.log("QML: on (Dependent) Variable Value Updated for 'Description' " + value);
                             model.description = value;
                         }
                     }
@@ -402,6 +404,44 @@ Item {
 
                 role: "agentName"
                 title: qsTr("Agent")
+
+                width: tableDepVariables.width / 4.0
+
+                delegate: VariableComboBoxEditor {
+
+                    variable: model ? model.QtObject : null
+
+                    variableValue: styleData.value
+
+                    //isSelected: styleData.selected
+
+                    isCurrentlyEditing: (rootItem.indexDependentVariableCurrentlyEditing === styleData.row)
+
+                    models: rootItem.modelM ? rootItem.modelM.agentNamesList : []
+
+
+                    //
+                    // Slots
+                    //
+
+                    onEditVariable: {
+                        // Edit the dependent variable at the row index
+                        rootItem.editDependentVariableAtRowIndex(styleData.row);
+                    }
+
+                    onStopEditionOfVariable: {
+                        // Stop the current edition of the dependent variable
+                        rootItem.stopCurrentEditionOfDependentVariable();
+                    }
+
+                    onVariableValueUpdated: {
+                        if (model)
+                        {
+                            console.log("QML: on (Dependent) Variable Value Updated for 'Agent Name' " + value);
+                            model.agentName = value;
+                        }
+                    }
+                }
             }
 
             TableViewColumn {
@@ -409,6 +449,8 @@ Item {
 
                 role: "outputName"
                 title: qsTr("Sortie")
+
+                width: tableDepVariables.width / 4.0
             }
 
             onDoubleClicked: {
