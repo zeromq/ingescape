@@ -236,11 +236,51 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
  */
 void TasksController::_updateDependentVariablesOfTask(TaskM* task)
 {
-    if (task != nullptr)
+    if ((task != nullptr) && (_modelManager != nullptr))
     {
         if (task->platformFileUrl().isValid())
         {
-            //_jsonHelper->
+            QString platformFilePath = task->platformFileUrl().path();
+
+            QFile jsonFile(platformFilePath);
+            if (jsonFile.exists())
+            {
+                if (jsonFile.open(QIODevice::ReadOnly))
+                {
+                    QByteArray byteArrayOfJson = jsonFile.readAll();
+                    jsonFile.close();
+
+                    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+                    QJsonObject jsonRoot = jsonDocument.object();
+
+                    // List of agents
+                    if (jsonRoot.contains("agents"))
+                    {
+                        // Version
+                        QString versionJsonPlatform = "";
+                        if (jsonRoot.contains("version"))
+                        {
+                            versionJsonPlatform = jsonRoot.value("version").toString();
+
+                            qDebug() << "Version of JSON platform is" << versionJsonPlatform;
+                        }
+                        else {
+                            qDebug() << "UNDEFINED version of JSON platform";
+                        }
+
+                        // FIXME TODO: _updateDependentVariablesOfTask
+                        // Import the agents list from a json byte content
+                        //_modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
+                    }
+                }
+                else {
+                    qCritical() << "Can not open file" << platformFilePath;
+                }
+            }
+            else {
+                qWarning() << "There is no file" << platformFilePath;
+            }
         }
     }
 }

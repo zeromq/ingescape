@@ -16,6 +16,8 @@
 
 /**
  * @brief Constructor
+ * @param jsonHelper
+ * @param rootDirectoryPath
  * @param parent
  */
 AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
@@ -33,7 +35,7 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
 
 
     //
-    // FIXME TESTS
+    // FIXME for tests
     //
 
     QStringList enumBool = { tr("FALSE"), tr("TRUE") };
@@ -63,9 +65,6 @@ AssessmentsModelManager::~AssessmentsModelManager()
 {
     qInfo() << "Delete IngeScape Assessments Model Manager";
 
-    // Call our mother class
-    IngeScapeModelManager::~IngeScapeModelManager();
-
     if (_currentExperimentationsGroup != nullptr) {
         setcurrentExperimentationsGroup(nullptr);
     }
@@ -74,4 +73,6 @@ AssessmentsModelManager::~AssessmentsModelManager()
         setcurrentExperimentation(nullptr);
     }
 
+    // Mother class is automatically called
+    //IngeScapeModelManager::~IngeScapeModelManager();
 }

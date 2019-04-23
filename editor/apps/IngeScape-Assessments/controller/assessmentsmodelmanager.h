@@ -19,8 +19,8 @@
 //#include <QtQml>
 #include <I2PropertyHelpers.h>
 #include <model/assessmentsenums.h>
-#include <model/experimentationm.h>
 #include <controller/ingescapemodelmanager.h>
+//#include <model/experimentationm.h>
 #include <viewModel/experimentationsgroupvm.h>
 
 
@@ -55,6 +55,7 @@ public:
      * @brief Destructor
      */
     ~AssessmentsModelManager();
+    //~AssessmentsModelManager() Q_DECL_OVERRIDE;
 
 
 Q_SIGNALS:
