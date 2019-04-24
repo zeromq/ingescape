@@ -117,5 +117,37 @@ mac:{
 #
 unix:!mac {
     message("Scope is unix...")
+
     #TODO
+
+    ##Add headers from dependencies
+    #zyre_include_path = $$PWD/../dependencies/windows/headers/zyre_suite
+
+    #INCLUDEPATH += $$zyre_include_path
+
+    #DEPENDPATH += $$zyre_include_path
+
+    android {
+        ############ Android ###########
+        message("Compilation android scope ...")
+
+        # This define is used in "network.c" to use the "ifaddrs.h" for android but only to pass the compilation
+        # After we need to use the newest functions : "igs_start_ip" & "init_actor_ip" instead of "igs_start" & "init_actor"
+        # Because getting the IP Address dynamically by "ifaddrs.c" doesnt work
+        DEFINES += ANDROID
+
+        INCLUDEPATH += /usr/local/include
+
+        INCLUDEPATH += $$PWD/../dependencies/android/android-ifaddrs-master/ \
+
+        #ifaddrs
+        SOURCES += $$PWD/../dependencies/android/android-ifaddrs-master/ifaddrs.c \
+
+        HEADERS += $$PWD/../dependencies/android/android-ifaddrs-master/ifaddrs.h \
+
+        #Add librairies
+        libs_path = $$PWD/../dependencies/android/libs-armeabi-v7a
+        #LIBS += $$quote(-L$$libs_path/) -lzmq -lczmq -lzyre -lsodium
+        LIBS += $$quote(-L$$libs_path/) -lczmq -lzyre -lsodium \
+    }
 }
