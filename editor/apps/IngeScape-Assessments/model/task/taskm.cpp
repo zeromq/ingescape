@@ -39,15 +39,6 @@ TaskM::TaskM(QString name,
         IndependentVariableM* independentVariable = new IndependentVariableM(QString("VI %1").arg(i), QString("description of VI %1").arg(i), IndependentVariableValueTypes::DOUBLE);
 
         _independentVariables.append(independentVariable);
-
-
-        DependentVariableM* dependentVariable = new DependentVariableM();
-        dependentVariable->setname(QString("VD %1").arg(i));
-        dependentVariable->setdescription(QString("description of VD %1").arg(i));
-        dependentVariable->setagentName("Leap Motion");
-        dependentVariable->setoutputName(QString("Finger %1").arg(i));
-
-        _dependentVariables.append(dependentVariable);
     }
 }
 
@@ -90,6 +81,30 @@ void TaskM::setplatformFileUrl(QUrl value)
 
 
 /**
+ * @brief Update the list of agent names and the hash table from an agent name to the list of its outputs names
+ * (in the platform of our task)
+ * @param agentNamesList
+ * @param hashFromAgentNameToOutputNamesList
+ */
+void TaskM::updateAgentNamesAndOutputNames(QStringList agentNamesList, QHash<QString, QStringList> hashFromAgentNameToOutputNamesList)
+{
+    setagentNamesList(agentNamesList);
+
+    _hashFromAgentNameToOutputNamesList = hashFromAgentNameToOutputNamesList;
+
+    // For each existing dependent variable
+    for (DependentVariableM* dependentVariable : _dependentVariables.toList())
+    {
+        if (dependentVariable != nullptr)
+        {
+            // Update the list of output names for this agent name (of the dependent variable)
+            _updateOutputNamesListOfDependentVariable(dependentVariable, "");
+        }
+    }
+}
+
+
+/**
  * @brief Add an Independent Variable to our task
  * @param independentVariable
  */
@@ -125,6 +140,8 @@ void TaskM::addDependentVariable(DependentVariableM* dependentVariable)
 {
     if (dependentVariable != nullptr)
     {
+        connect(dependentVariable, &DependentVariableM::agentNameChanged, this, &TaskM::_onAgentNameOfDependentVariableChanged);
+
         // Add to the list
         _dependentVariables.append(dependentVariable);
     }
@@ -137,6 +154,51 @@ void TaskM::addDependentVariable(DependentVariableM* dependentVariable)
  */
 void TaskM::removeDependentVariable(DependentVariableM* dependentVariable)
 {
+    disconnect(dependentVariable, nullptr, this, nullptr);
+
     // Remove from the list
     _dependentVariables.remove(dependentVariable);
+}
+
+
+/**
+ * @brief Slot called when the agent name of a dependent variable changed
+ * @param agentName
+ */
+void TaskM::_onAgentNameOfDependentVariableChanged(QString agentName)
+{
+    DependentVariableM* dependentVariable = qobject_cast<DependentVariableM*>(sender());
+    if (dependentVariable != nullptr)
+    {
+        // Update the list of output names for this agent name (of the dependent variable)
+        _updateOutputNamesListOfDependentVariable(dependentVariable, agentName);
+    }
+}
+
+
+/**
+ * @brief Update the list of output names for an agent name (of a dependent variable)
+ * @param dependentVariable
+ * @param agentName
+ */
+void TaskM::_updateOutputNamesListOfDependentVariable(DependentVariableM* dependentVariable, QString agentName)
+{
+    if (dependentVariable != nullptr)
+    {
+        //qDebug() << "Agent" << agentName << "selected in" << dependentVariable->name();
+
+        if (agentName.isEmpty())
+        {
+            dependentVariable->setoutputNamesList(QStringList());
+        }
+        else
+        {
+            if (_hashFromAgentNameToOutputNamesList.contains(agentName))
+            {
+                QStringList outputNamesList = _hashFromAgentNameToOutputNamesList.value(agentName);
+
+                dependentVariable->setoutputNamesList(outputNamesList);
+            }
+        }
+    }
 }

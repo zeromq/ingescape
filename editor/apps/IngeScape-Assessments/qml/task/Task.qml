@@ -208,6 +208,14 @@ Item {
                 bottomMargin: 10
             }
 
+            rowDelegate: Rectangle {
+                width: childrenRect.width
+                height: styleData.selected ? 30 : 20
+
+                color: styleData.selected ? "lightblue"
+                                          : (styleData.alternate ? "lightgray" : "white")
+            }
+
             model: rootItem.modelM ? rootItem.modelM.independentVariables : null
 
             TableViewColumn {
@@ -336,7 +344,7 @@ Item {
                     // Slots
                     //
 
-                    onEditVariable: {
+                    /*onEditVariable: {
                         // Edit the dependent variable at the row index
                         rootItem.editDependentVariableAtRowIndex(styleData.row);
                     }
@@ -344,12 +352,14 @@ Item {
                     onStopEditionOfVariable: {
                         // Stop the current edition of the dependent variable
                         rootItem.stopCurrentEditionOfDependentVariable();
-                    }
+                    }*/
 
                     onVariableValueUpdated: {
                         if (model)
                         {
                             //console.log("QML: on (Dependent) Variable Value Updated for 'Name' " + value);
+
+                            // Update the name
                             model.name = value;
                         }
                     }
@@ -378,21 +388,12 @@ Item {
                     //
                     // Slots
                     //
-
-                    onEditVariable: {
-                        // Edit the dependent variable at the row index
-                        rootItem.editDependentVariableAtRowIndex(styleData.row);
-                    }
-
-                    onStopEditionOfVariable: {
-                        // Stop the current edition of the dependent variable
-                        rootItem.stopCurrentEditionOfDependentVariable();
-                    }
-
                     onVariableValueUpdated: {
                         if (model)
                         {
                             //console.log("QML: on (Dependent) Variable Value Updated for 'Description' " + value);
+
+                            // Update the description
                             model.description = value;
                         }
                     }
@@ -423,21 +424,12 @@ Item {
                     //
                     // Slots
                     //
-
-                    onEditVariable: {
-                        // Edit the dependent variable at the row index
-                        rootItem.editDependentVariableAtRowIndex(styleData.row);
-                    }
-
-                    onStopEditionOfVariable: {
-                        // Stop the current edition of the dependent variable
-                        rootItem.stopCurrentEditionOfDependentVariable();
-                    }
-
                     onVariableValueUpdated: {
                         if (model)
                         {
                             console.log("QML: on (Dependent) Variable Value Updated for 'Agent Name' " + value);
+
+                            // Update the agent name
                             model.agentName = value;
                         }
                     }
@@ -451,10 +443,37 @@ Item {
                 title: qsTr("Sortie")
 
                 width: tableDepVariables.width / 4.0
+
+                delegate: VariableComboBoxEditor {
+
+                    variable: model ? model.QtObject : null
+
+                    variableValue: styleData.value
+
+                    //isSelected: styleData.selected
+
+                    isCurrentlyEditing: (rootItem.indexDependentVariableCurrentlyEditing === styleData.row)
+
+                    models: model ? model.outputNamesList : []
+
+
+                    //
+                    // Slots
+                    //
+                    onVariableValueUpdated: {
+                        if (model)
+                        {
+                            console.log("QML: on (Dependent) Variable Value Updated for 'Output Name' " + value);
+
+                            // Update the output name
+                            model.outputName = value;
+                        }
+                    }
+                }
             }
 
             onDoubleClicked: {
-                console.log("onDoubleClicked " + row);
+                //console.log("onDoubleClicked " + row);
 
                 // Edit the dependent variable at the row index
                 editDependentVariableAtRowIndex(row);

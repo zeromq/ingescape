@@ -153,7 +153,6 @@ private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 
-
 };
 
 QML_DECLARE_TYPE(TasksController)

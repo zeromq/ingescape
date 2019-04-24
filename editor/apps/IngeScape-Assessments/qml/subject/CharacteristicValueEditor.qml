@@ -121,7 +121,7 @@ Item {
 
         color: "transparent"
         border {
-            color: "black"
+            color: "silver"
             width: 1
         }
 

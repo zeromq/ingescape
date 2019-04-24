@@ -53,7 +53,7 @@ Item {
 
         anchors.fill: parent
 
-        color: "#FF663333"
+        color: "#FF553333"
     }
 
     Text {
@@ -140,7 +140,7 @@ Item {
             property ExperimentationsGroupVM experimentationsGroup: model.QtObject
 
             width: parent.width
-            height: txtName.height + columnExperimentations.anchors.topMargin + columnExperimentations.height
+            height: txtName.anchors.topMargin + txtName.height + columnExperimentations.anchors.topMargin + columnExperimentations.height
 
             color: "#44222222"
             border {
@@ -153,7 +153,9 @@ Item {
 
                 anchors {
                     left: parent.left
+                    leftMargin: 5
                     top: parent.top
+                    topMargin: 5
                 }
 
                 text: rootExperimentationsGroup.experimentationsGroup ? rootExperimentationsGroup.experimentationsGroup.name : ""
@@ -199,6 +201,7 @@ Item {
 
                             anchors {
                                 left: parent.left
+                                leftMargin: 5
                                 verticalCenter: parent.verticalCenter
                             }
 

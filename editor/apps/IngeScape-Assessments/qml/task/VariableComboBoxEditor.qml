@@ -27,9 +27,8 @@ Item {
     id: rootItem
 
     //anchors.fill: parent
-
     width: parent.width
-    height: 30
+    height: parent.height
 
 
     //--------------------------------------------------------
@@ -118,7 +117,7 @@ Item {
 
         color: "transparent"
         border {
-            color: "black"
+            color: "silver"
             width: 1
         }
 

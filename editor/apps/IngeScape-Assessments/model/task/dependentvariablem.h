@@ -41,6 +41,9 @@ class DependentVariableM : public QObject
     // Name of the (agent) output in the platform associated to the task
     I2_QML_PROPERTY(QString, outputName)
 
+    // List of output names of the agent
+    I2_QML_PROPERTY_READONLY(QStringList, outputNamesList)
+
     // Frequency (double ? (nb répétitions par secondes Hertz))
     //I2_QML_PROPERTY(double, frequency)
 

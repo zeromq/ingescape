@@ -340,18 +340,38 @@ void TasksController::_fillAgentsOfSelectedTask(TaskM* task)
                         // Import the agents list from a json byte content
                         _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
 
-                        // Update the list of agent names
+
+                        //
+                        // Update the list of agent names and the hash table from an agent name to the list of its outputs names
+                        // in the platform of the (selected) task
+                        //
                         QStringList agentNamesList;
+                        QHash<QString, QStringList> hashFromAgentNameToOutputNamesList;
+
                         for (AgentsGroupedByNameVM* agentsGroupedByName : _modelManager->allAgentsGroupsByName()->toList())
                         {
                             if (agentsGroupedByName != nullptr)
                             {
                                 agentNamesList.append(agentsGroupedByName->name());
+
+                                QStringList outputNamesList;
+                                for (OutputVM* output : agentsGroupedByName->outputsList()->toList())
+                                {
+                                    if (output != nullptr)
+                                    {
+                                        outputNamesList.append(output->name());
+                                    }
+                                }
+                                hashFromAgentNameToOutputNamesList.insert(agentsGroupedByName->name(), outputNamesList);
                             }
                         }
-                        task->setagentNamesList(agentNamesList);
 
-                        qDebug() << _modelManager->allAgentsGroupsByName()->count() << "agents (groups by name):" << agentNamesList;
+                        // Update the list of agent names and the hash table from an agent name to the list of its outputs names
+                        task->updateAgentNamesAndOutputNames(agentNamesList, hashFromAgentNameToOutputNamesList);
+
+                        qDebug() << "Agents of the selected task:" << agentNamesList << "(" << hashFromAgentNameToOutputNamesList << ")";
+
+                        // FIXME TODO: clean Models and VM of agents
                     }
                 }
                 else {

@@ -22,7 +22,8 @@ DependentVariableM::DependentVariableM(QObject *parent) : QObject(parent),
     _name(""),
     _description(""),
     _agentName(""),
-    _outputName("")
+    _outputName(""),
+    _outputNamesList(QStringList())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

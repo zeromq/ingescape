@@ -276,7 +276,7 @@ Item {
 
             rowDelegate: Rectangle {
                 width: childrenRect.width
-                height: 30
+                height: styleData.selected ? 30 : 20
 
                 color: styleData.selected ? "lightblue"
                                           : (styleData.alternate ? "lightgray" : "white")

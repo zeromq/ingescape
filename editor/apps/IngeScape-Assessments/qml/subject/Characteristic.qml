@@ -86,6 +86,7 @@ Item {
 
         anchors {
             left: parent.left
+            leftMargin: 5
             top: parent.top
         }
 
@@ -98,7 +99,7 @@ Item {
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight : Font.Medium
-                pixelSize : 12
+                pixelSize : 14
             }
         }
 
