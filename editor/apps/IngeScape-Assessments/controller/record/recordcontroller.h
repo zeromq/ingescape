@@ -17,6 +17,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
+#include <model/experimentationrecordm.h>
 
 
 /**
@@ -25,6 +26,9 @@
 class RecordController : public QObject
 {
     Q_OBJECT
+
+    // The (experimentation) record currently selected
+    I2_QML_PROPERTY(ExperimentationRecordM*, currentRecord)
 
 
 public:

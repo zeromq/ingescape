@@ -18,7 +18,8 @@
  * @brief Constructor
  * @param parent
  */
-RecordController::RecordController(QObject *parent) : QObject(parent)
+RecordController::RecordController(QObject *parent) : QObject(parent),
+    _currentRecord(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

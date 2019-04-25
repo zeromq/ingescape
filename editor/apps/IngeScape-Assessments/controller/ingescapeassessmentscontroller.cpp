@@ -36,7 +36,6 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _experimentationC(nullptr),
     _subjectsC(nullptr),
     _tasksC(nullptr),
-    _recordC(nullptr),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr)
   //_platformDirectoryPath(""),
@@ -123,9 +122,6 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     // Create the controller to manage the tasks of the current experimentation
     _tasksC = new TasksController(_modelManager, _jsonHelper, this);
 
-    // Create the controller to manage a record of the current experimentation
-    _recordC = new RecordController(this);
-
 
     // Connect to signals from the data model manager of our IngeScape Assessments application
     connect(_modelManager, &AssessmentsModelManager::currentExperimentationChanged, this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
@@ -152,7 +148,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     if (isStarted)
     {
         // Initialize platform from online mapping
-        //_modelManager->setisMappingConnected(true);
+        _modelManager->setisMappingConnected(true);
     }
     else {
         seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
@@ -235,16 +231,6 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
 
         TasksController* temp = _tasksC;
         settasksC(nullptr);
-        delete temp;
-        temp = nullptr;
-    }
-
-    if (_recordC != nullptr)
-    {
-        disconnect(_recordC);
-
-        RecordController* temp = _recordC;
-        setrecordC(nullptr);
         delete temp;
         temp = nullptr;
     }
@@ -337,9 +323,6 @@ void IngeScapeAssessmentsController::_onCurrentExperimentationChanged(Experiment
             _tasksC->setcurrentExperimentation(currentExperimentation);
         }
 
-        if (_recordC != nullptr) {
-            //_recordC->setcurrentExperimentation(currentExperimentation);
-        }
     }
     else {
         qDebug() << "Current Experimentation is NULL !";

@@ -28,7 +28,6 @@
 #include <controller/experimentationcontroller.h>
 #include <controller/subject/subjectscontroller.h>
 #include <controller/task/taskscontroller.h>
-#include <controller/record/recordcontroller.h>
 
 #include <misc/terminationsignalwatcher.h>
 
@@ -72,9 +71,6 @@ class IngeScapeAssessmentsController : public QObject
 
     // Controller to manage the tasks of the current experimentation
     I2_QML_PROPERTY_READONLY(TasksController*, tasksC)
-
-    // Controller to manage a record of the current experimentation
-    I2_QML_PROPERTY_READONLY(RecordController*, recordC)
 
 
 public:

@@ -21,6 +21,9 @@ import QtQuick.Window 2.3
 
 import INGESCAPE 1.0
 
+import "experimentation" as Experimentation
+import "record" as Record
+
 
 Item {
     id: rootItem
@@ -58,6 +61,7 @@ Item {
 
     Connections {
         target: IngeScapeAssessmentsC.modelManager
+        //target: IngeScapeAssessmentsC.experimentationC
 
         onCurrentExperimentationChanged: {
 
@@ -68,9 +72,33 @@ Item {
                 // Add the "Experimentation View" to the stack
                 stackview.push(componentExperimentationView);
             }
-            /*else {
+            else {
                 console.log("QML: on Current Experimentation changed to NULL");
-            }*/
+
+                // Remove the "Experimentation View" from the stack
+                stackview.pop();
+            }
+        }
+    }
+
+    Connections {
+        target: IngeScapeAssessmentsC.experimentationC.recordC
+
+        onCurrentRecordChanged: {
+
+            if (IngeScapeAssessmentsC.experimentationC.recordC.currentRecord)
+            {
+                console.log("QML: on Current Record changed: " + IngeScapeAssessmentsC.experimentationC.recordC.currentRecord.name);
+
+                // Add the "Record View" to the stack
+                stackview.push(componentRecordView);
+            }
+            else {
+                console.log("QML: on Current Record changed to NULL");
+
+                // Remove the "Record View" from the stack
+                stackview.pop();
+            }
         }
     }
 
@@ -146,8 +174,8 @@ Item {
     Component {
         id: componentExperimentationView
 
-        ExperimentationView {
-            id: experimentationView
+        Experimentation.ExperimentationView {
+            //id: experimentationView
 
             controller: IngeScapeAssessmentsC.experimentationC
             modelManager: IngeScapeAssessmentsC.modelManager
@@ -160,14 +188,41 @@ Item {
             onGoBackToHome: {
                 console.log("QML: on Go Back to 'Home'");
 
-                // Remove the "Experimentation View" from the stack
-                stackview.pop();
-
                 // Reset the current experimentation
                 if (IngeScapeAssessmentsC.modelManager)
                 {
                     IngeScapeAssessmentsC.modelManager.currentExperimentation = null;
                     IngeScapeAssessmentsC.modelManager.currentExperimentationsGroup = null;
+                }
+            }
+        }
+    }
+
+
+    //
+    // Record View
+    //
+    Component {
+        id: componentRecordView
+
+        Record.RecordView {
+            //id: recordView
+
+            controller: IngeScapeAssessmentsC.experimentationC.recordC
+            //modelManager: IngeScapeAssessmentsC.modelManager
+
+
+            //
+            // Slots
+            //
+
+            onGoBackToExperimentation: {
+                console.log("QML: on Go Back to 'Experimentation'");
+
+                // Reset the current record
+                if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.recordC)
+                {
+                    IngeScapeAssessmentsC.experimentationC.recordC.currentRecord = null;
                 }
             }
         }

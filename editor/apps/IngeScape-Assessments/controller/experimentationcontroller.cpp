@@ -21,6 +21,7 @@
  */
 ExperimentationController::ExperimentationController(//IngeScapeModelManager* modelManager,
                                                      QObject *parent) : QObject(parent),
+    _recordC(nullptr),
     _currentExperimentation(nullptr)
     //_modelManager(modelManager)
 {
@@ -29,6 +30,8 @@ ExperimentationController::ExperimentationController(//IngeScapeModelManager* mo
 
     qInfo() << "New Experimentation Controller";
 
+    // Create the controller to manage a record of the current experimentation
+    _recordC = new RecordController(this);
 }
 
 
@@ -43,6 +46,16 @@ ExperimentationController::~ExperimentationController()
     if (_currentExperimentation != nullptr)
     {
         setcurrentExperimentation(nullptr);
+    }
+
+    if (_recordC != nullptr)
+    {
+        disconnect(_recordC);
+
+        RecordController* temp = _recordC;
+        setrecordC(nullptr);
+        delete temp;
+        temp = nullptr;
     }
 
     /*if (_modelManager != nullptr)
@@ -93,6 +106,9 @@ void ExperimentationController::createNewRecordForSubjectAndTask(QString recordN
 
         // Add the record to the current experimentation
         _currentExperimentation->addRecord(record);
+
+        // Open this new record
+        openRecord(record);
     }
 }
 
@@ -107,7 +123,8 @@ void ExperimentationController::openRecord(ExperimentationRecordM* record)
     {
         qInfo() << "Open the record" << record->name() << "of the experimentation" << _currentExperimentation->name();
 
-        // FIXME TODO: openRecord
+        // Update the current record
+        _recordC->setcurrentRecord(record);
     }
 }
 

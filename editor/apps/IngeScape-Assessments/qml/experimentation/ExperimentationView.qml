@@ -21,9 +21,9 @@ import I2Quick 1.0
 import INGESCAPE 1.0
 
 //import "theme" as Theme
-import "popup" as Popup
-import "subject" as Subject
-import "task" as Task
+import "../popup" as Popup
+import "../subject" as Subject
+import "../task" as Task
 
 
 Item {
@@ -78,7 +78,7 @@ Item {
     }
 
     Button {
-        id: btnGoBack
+        id: btnGoBackToHome
 
         anchors {
             left: parent.left
@@ -358,7 +358,7 @@ Item {
                     Repeater {
                         model: rootItem.experimentation ? rootItem.experimentation.allRecords : null
 
-                        delegate: Record {
+                        delegate: RecordInList {
 
                             modelM: model.QtObject
 

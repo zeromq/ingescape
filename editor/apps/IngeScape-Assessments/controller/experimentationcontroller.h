@@ -18,6 +18,7 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
+#include <controller/record/recordcontroller.h>
 #include <model/experimentationm.h>
 
 
@@ -27,6 +28,9 @@
 class ExperimentationController : public QObject
 {
     Q_OBJECT
+
+    // Controller to manage a record of the current experimentation
+    I2_QML_PROPERTY_READONLY(RecordController*, recordC)
 
     // Model of the current experimentation
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
