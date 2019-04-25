@@ -40,5 +40,6 @@
         <file>qml/task/VariableTextEditor.qml</file>
         <file>qml/task/VariableComboBoxEditor.qml</file>
         <file>qml/record/RecordView.qml</file>
+        <file>qml/record/IndependentVariableValueEditor.qml</file>
     </qresource>
 </RCC>

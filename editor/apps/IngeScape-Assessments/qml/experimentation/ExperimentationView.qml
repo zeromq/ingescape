@@ -167,7 +167,7 @@ Item {
 
         anchors {
             top: header.bottom
-            topMargin: 50
+            topMargin: 20
             bottom: parent.bottom
             left: parent.left
             right: parent.right
