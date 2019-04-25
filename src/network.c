@@ -75,10 +75,6 @@
 
     PIP_ADAPTER_ADDRESSES pCurrAddresses = NULL;
     PIP_ADAPTER_UNICAST_ADDRESS pUnicast = NULL;
-#else
-    #ifdef ANDROID
-    #include "ifaddrs.h"
-    #endif
 #endif
 
 
