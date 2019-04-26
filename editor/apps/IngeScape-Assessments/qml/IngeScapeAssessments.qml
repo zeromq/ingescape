@@ -49,6 +49,28 @@ Item {
     //
     //--------------------------------------------------------
 
+    /**
+     * Reset the current experimentation
+     */
+    function resetCurrentExperimentation()
+    {
+        if (IngeScapeAssessmentsC.modelManager)
+        {
+            IngeScapeAssessmentsC.modelManager.currentExperimentation = null;
+            IngeScapeAssessmentsC.modelManager.currentExperimentationsGroup = null;
+        }
+    }
+
+    /**
+     * Reset the current record
+     */
+    function resetCurrentRecord()
+    {
+        if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.recordC)
+        {
+            IngeScapeAssessmentsC.experimentationC.recordC.currentRecord = null;
+        }
+    }
 
 
     //--------------------------------------------------------
@@ -186,14 +208,10 @@ Item {
             //
 
             onGoBackToHome: {
-                console.log("QML: on Go Back to 'Home'");
+                console.log("QML: on Go Back to 'Home' (from 'Experimentation' view)");
 
                 // Reset the current experimentation
-                if (IngeScapeAssessmentsC.modelManager)
-                {
-                    IngeScapeAssessmentsC.modelManager.currentExperimentation = null;
-                    IngeScapeAssessmentsC.modelManager.currentExperimentationsGroup = null;
-                }
+                rootItem.resetCurrentExperimentation();
             }
         }
     }
@@ -216,14 +234,21 @@ Item {
             // Slots
             //
 
-            onGoBackToExperimentation: {
-                console.log("QML: on Go Back to 'Experimentation'");
+            onGoBackToHome: {
+                console.log("QML: on Go Back to 'Home' (from 'Record' view)");
 
                 // Reset the current record
-                if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.recordC)
-                {
-                    IngeScapeAssessmentsC.experimentationC.recordC.currentRecord = null;
-                }
+                rootItem.resetCurrentRecord();
+
+                // Reset the current experimentation
+                rootItem.resetCurrentExperimentation();
+            }
+
+            onGoBackToExperimentation: {
+                console.log("QML: on Go Back to 'Experimentation' (from 'Record' view)");
+
+                // Reset the current record
+                rootItem.resetCurrentRecord();
             }
         }
     }
