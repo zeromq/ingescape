@@ -17,13 +17,16 @@
 /**
  * @brief Constructor
  * @param modelManager
+ * @param jsonHelper
  * @param parent
  */
-ExperimentationController::ExperimentationController(//IngeScapeModelManager* modelManager,
+ExperimentationController::ExperimentationController(AssessmentsModelManager* modelManager,
+                                                     JsonHelper* jsonHelper,
                                                      QObject *parent) : QObject(parent),
     _recordC(nullptr),
-    _currentExperimentation(nullptr)
-    //_modelManager(modelManager)
+    _currentExperimentation(nullptr),
+    _modelManager(modelManager),
+    _jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -31,7 +34,7 @@ ExperimentationController::ExperimentationController(//IngeScapeModelManager* mo
     qInfo() << "New Experimentation Controller";
 
     // Create the controller to manage a record of the current experimentation
-    _recordC = new RecordController(this);
+    _recordC = new RecordController(_modelManager, _jsonHelper, this);
 }
 
 
@@ -64,6 +67,10 @@ ExperimentationController::~ExperimentationController()
 
         _modelManager = nullptr;
     }*/
+
+    // Reset pointers
+    _modelManager = nullptr;
+    _jsonHelper = nullptr;
 }
 
 

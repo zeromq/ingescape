@@ -17,7 +17,8 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-
+#include <controller/assessmentsmodelmanager.h>
+#include <model/jsonhelper.h>
 #include <controller/record/recordcontroller.h>
 #include <model/experimentationm.h>
 
@@ -41,9 +42,11 @@ public:
     /**
      * @brief Constructor
      * @param modelManager
+     * @param jsonHelper
      * @param parent
      */
-    explicit ExperimentationController(//IngeScapeModelManager* modelManager,
+    explicit ExperimentationController(AssessmentsModelManager* modelManager,
+                                       JsonHelper* jsonHelper,
                                        QObject *parent = nullptr);
 
 
@@ -94,7 +97,10 @@ private Q_SLOTS:
 private:
 
     // Manager for the data model of our IngeScape Assessments application
-    //IngeScapeModelManager* _modelManager;
+    AssessmentsModelManager* _modelManager;
+
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
 
 };
 

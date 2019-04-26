@@ -17,6 +17,8 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
+#include <controller/assessmentsmodelmanager.h>
+#include <model/jsonhelper.h>
 #include <model/experimentationrecordm.h>
 
 
@@ -28,16 +30,20 @@ class RecordController : public QObject
     Q_OBJECT
 
     // The (experimentation) record currently selected
-    I2_QML_PROPERTY(ExperimentationRecordM*, currentRecord)
+    I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationRecordM*, currentRecord)
 
 
 public:
 
     /**
      * @brief Constructor
+     * @param modelManager
+     * @param jsonHelper
      * @param parent
      */
-    explicit RecordController(QObject *parent = nullptr);
+    explicit RecordController(AssessmentsModelManager* modelManager,
+                              JsonHelper* jsonHelper,
+                              QObject *parent = nullptr);
 
 
     /**
@@ -49,10 +55,23 @@ public:
 Q_SIGNALS:
 
 
-public Q_SLOTS:
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the current record changed
+     * @param currentRecord
+     * @param previousRecord
+     */
+    void _onCurrentRecordChanged(ExperimentationRecordM* previousRecord, ExperimentationRecordM* currentRecord);
 
 
 private:
+
+    // Manager for the data model of our IngeScape Assessments application
+    AssessmentsModelManager* _modelManager;
+
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
 
 };
 

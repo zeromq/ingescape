@@ -114,7 +114,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _experimentationsListC = new ExperimentationsListController(_modelManager, this);
 
     // Create the controller to manage the current experimentation
-    _experimentationC = new ExperimentationController(this);
+    _experimentationC = new ExperimentationController(_modelManager, _jsonHelper, this);
 
     // Create the controller to manage the subjects of the current experimentation
     _subjectsC = new SubjectsController(this);

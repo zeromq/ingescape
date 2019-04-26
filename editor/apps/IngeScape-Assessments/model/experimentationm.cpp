@@ -193,7 +193,7 @@ void ExperimentationM::addRecord(ExperimentationRecordM* record)
 
         if (record->subject() != nullptr)
         {
-            qDebug() << "Subkect:" << record->subject()->name() << "(" << record->subject()->uid() << ")";
+            qDebug() << "Subject:" << record->subject()->name() << "(" << record->subject()->uid() << ")";
 
             for (CharacteristicM* characteristic : _allCharacteristics)
             {

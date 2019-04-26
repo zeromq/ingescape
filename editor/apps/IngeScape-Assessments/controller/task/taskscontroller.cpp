@@ -382,5 +382,8 @@ void TasksController::_fillAgentsOfSelectedTask(TaskM* task)
                 qWarning() << "There is no file" << platformFilePath;
             }
         }
+        else {
+            qWarning() << "The URL of platform" << task->platformFileUrl() << "is not valid";
+        }
     }
 }
