@@ -42,6 +42,7 @@ Item {
     property DependentVariableM variable: null;
     //property IndependentVariableM variable: null;
 
+    // Keep type "var" because the C++ use a QVariant
     property var variableValue: "";
 
     //property bool isSelected: false;

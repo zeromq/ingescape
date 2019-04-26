@@ -42,6 +42,7 @@ Item {
 
     property CharacteristicM characteristic: null;
 
+    // Keep type "var" because the C++ use a QVariant
     property var characteristicValue: "";
 
     property bool isSelected: false;

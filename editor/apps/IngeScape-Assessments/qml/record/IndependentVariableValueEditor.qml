@@ -45,6 +45,7 @@ Item {
 
     property IndependentVariableM variable: null;
 
+    // Keep type "var" because the C++ use a QVariant
     property var variableValue: "";
 
     property bool isCurrentlyEditing: false;
@@ -60,10 +61,10 @@ Item {
     //--------------------------------
 
     // Signal emitted when the user clicks on the toggle button to edit the variable
-    signal editVariable();
+    //signal editVariable();
 
     // Signal emitted when the user clicks on the toggle button to stop the edition of the variable
-    signal stopEditionOfVariable();
+    //signal stopEditionOfVariable();
 
     // Independent Variable Value Updated
     signal independentVariableValueUpdated(var value);
@@ -83,12 +84,6 @@ Item {
 
     /*onCharacteristicValueChanged: {
         console.log("QML: on Characteristic Value changed " + characteristicValue);
-    }*/
-
-    /*onIsCurrentlyEditingChanged: {
-        if (isCurrentlyEditing === false) {
-            console.log("QML: is Currently Editing from true to false " + characteristicValue);
-        }
     }*/
 
 
@@ -132,6 +127,7 @@ Item {
 
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignRight
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -172,22 +168,21 @@ Item {
             visible: !rootItem.isCurrentlyEditing
 
             text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
+            elide: Text.ElideRight
 
             verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                //weight: Font.Medium
-                pixelSize: 12
+                weight: Font.Medium
+                pixelSize: 14
             }
         }
 
-        TextField {
-            id: txtEditor
 
-            property var intValidator: IntValidator {}
-            property var doubleValidator: DoubleValidator {}
+        Loader {
+            id: loaderEditor
 
             anchors {
                 left: txtName.right
@@ -200,7 +195,66 @@ Item {
                 bottomMargin: 1
             }
 
-            visible: rootItem.isCurrentlyEditing && rootItem.variable && (rootItem.variable.valueType !== IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
+            visible: rootItem.isCurrentlyEditing
+
+            // Load editor in function of the value type:
+            // - Enum --> combobox
+            // - NOT enum --> text field
+            sourceComponent: (rootItem.variable && (rootItem.variable.valueType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)) ? componentComboboxEditor
+                                                                                                                                              : componentTextFieldEditor
+        }
+    }
+
+
+    //
+    // component Combobox Editor
+    //
+    Component {
+        id: componentComboboxEditor
+
+        I2ComboboxStringList {
+            id: comboboxEditor
+
+            model: rootItem.variable ? rootItem.variable.enumValues : null
+
+            onSelectedItemChanged: {
+
+                if (comboboxEditor.selectedItem)
+                {
+                    //console.log("QML: on Selected Item Changed " + comboboxEditor.selectedItem);
+
+                    // Emit the signal "Independent Variable Value Updated"
+                    rootItem.independentVariableValueUpdated(comboboxEditor.selectedItem);
+                }
+            }
+
+            Component.onCompleted: {
+
+                //console.log("onCompleted: selectedIndex=" + comboboxEditor.selectedIndex + " -- variableValue=" + rootItem.variableValue);
+
+                if ((comboboxEditor.selectedIndex < 0) && (typeof rootItem.variableValue !== 'undefined'))
+                {
+                    var index = comboboxEditor.model.indexOf(rootItem.variableValue);
+                    if (index > -1) {
+                        comboboxEditor.selectedIndex = index;
+                    }
+                }
+            }
+        }
+    }
+
+
+    //
+    // component TextField Editor
+    //
+    Component {
+        id: componentTextFieldEditor
+
+        TextField {
+            id: textFieldEditor
+
+            property var intValidator: IntValidator {}
+            property var doubleValidator: DoubleValidator {}
 
             text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
 
@@ -209,10 +263,10 @@ Item {
             validator: if (rootItem.variable)
                        {
                            if (rootItem.variable.valueType === IndependentVariableValueTypes.INTEGER) {
-                               return txtEditor.intValidator;
+                               return textFieldEditor.intValidator;
                            }
                            else if (rootItem.variable.valueType === IndependentVariableValueTypes.DOUBLE) {
-                               return txtEditor.doubleValidator;
+                               return textFieldEditor.doubleValidator;
                            }
                            else {
                                return null;
@@ -243,42 +297,15 @@ Item {
             }
 
             onTextChanged: {
-                console.log("QML: on Text Changed " + txtEditor.text);
+                //console.log("QML: on Text Changed " + textFieldEditor.text);
 
                 // Emit the signal "Independent Variable Value Updated"
-                rootItem.independentVariableValueUpdated(txtEditor.text);
-            }
-        }
-
-        // FIXME: use a Loader instead of visible
-        I2ComboboxStringList {
-            id: cmbEditor
-
-            anchors {
-                left: txtName.right
-                leftMargin: 5
-                right: parent.right
-                top: parent.top
-                topMargin: 1
-                bottom: parent.bottom
-                bottomMargin: 1
+                rootItem.independentVariableValueUpdated(textFieldEditor.text);
             }
 
-            visible: rootItem.isCurrentlyEditing && rootItem.variable && (rootItem.variable.valueType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
-
-            model: rootItem.variable ? rootItem.variable.enumValues : null
-
-            onSelectedItemChanged: {
-
-                if (cmbEditor.selectedItem)
-                {
-                    console.log("QML: on Selected Item Changed " + cmbEditor.selectedItem);
-
-                    // Emit the signal "Independent Variable Value Updated"
-                    rootItem.independentVariableValueUpdated(cmbEditor.selectedItem);
-                }
-            }
-
+            /*Component.onCompleted: {
+                console.log("onCompleted: text=" + textFieldEditor.text + " -- variableValue=" + rootItem.variableValue);
+            }*/
         }
     }
 }
