@@ -45,8 +45,6 @@ Item {
     // Keep type "var" because the C++ use a QVariant
     property var variableValue: "";
 
-    //property bool isSelected: false;
-
     property bool isCurrentlyEditing: false;
 
 
@@ -86,12 +84,6 @@ Item {
 
     /*onVariableValueChanged: {
         console.log("QML: on Variable Value changed " + variableValue);
-    }*/
-
-    /*onIsCurrentlyEditingChanged: {
-        if (isCurrentlyEditing === false) {
-            console.log("QML: is Currently Editing from true to false " + variableValue);
-        }
     }*/
 
 

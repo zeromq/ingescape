@@ -45,8 +45,6 @@ Item {
     // Keep type "var" because the C++ use a QVariant
     property var variableValue: "";
 
-    //property bool isSelected: false;
-
     property bool isCurrentlyEditing: false;
 
     property var models: []
@@ -90,12 +88,6 @@ Item {
         console.log("QML: on Variable Value changed " + variableValue);
     }*/
 
-    /*onIsCurrentlyEditingChanged: {
-        if (isCurrentlyEditing === false) {
-            console.log("QML: is Currently Editing from true to false " + variableValue);
-        }
-    }*/
-
 
     //--------------------------------------------------------
     //
@@ -133,9 +125,8 @@ Item {
             text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
         }
 
-        // FIXME: use a Loader instead of visible
         I2ComboboxStringList {
-            id: cmbEditor
+            id: comboboxEditor
 
             anchors {
                 fill: parent
@@ -146,14 +137,30 @@ Item {
 
             model: rootItem.models ? rootItem.models : null
 
+            enabled: rootItem.models ? (rootItem.models.length > 0)
+                                     : false
+
             onSelectedItemChanged: {
 
-                if (cmbEditor.selectedItem)
+                if (comboboxEditor.selectedItem)
                 {
-                    //console.log("QML: on Selected Item Changed " + cmbEditor.selectedItem);
+                    //console.log("QML: on Selected Item Changed " + comboboxEditor.selectedItem);
 
                     // Emit the signal "Characteristic Value Updated"
-                    rootItem.variableValueUpdated(cmbEditor.selectedItem);
+                    rootItem.variableValueUpdated(comboboxEditor.selectedItem);
+                }
+            }
+
+            onVisibleChanged: {
+                console.log("onVisibleChanged: selectedIndex=" + comboboxEditor.selectedIndex + " -- variableValue=" + rootItem.variableValue);
+
+                if (visible && (comboboxEditor.selectedIndex < 0) && (typeof rootItem.variableValue !== 'undefined'))
+                {
+                    var index = comboboxEditor.model.indexOf(rootItem.variableValue);
+                    if (index > -1) {
+                        console.log("Must select index " + index);
+                        comboboxEditor.selectedIndex = index;
+                    }
                 }
             }
         }

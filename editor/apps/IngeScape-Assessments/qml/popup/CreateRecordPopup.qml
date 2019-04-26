@@ -270,10 +270,10 @@ I2PopupBase {
                 I2ComboboxItemModel {
                     id: comboSubjects
 
+                    model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+
                     enabled: rootItem.experimentation ? (rootItem.experimentation.allSubjects.count > 0)
                                                       : false
-
-                    model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
                     function modelToString(_model) {
                         if (_model) {

@@ -233,9 +233,24 @@ Item {
                 title: qsTr("Type")
 
                 delegate: Text {
-                    text: IndependentVariableValueTypes.enumToString(styleData.value)
+                    text: IndependentVariableValueTypes.enumToString(styleData.value) + ((styleData.value === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM) ? " {" + tableIndepVar.model.get(styleData.row).enumValues + "}"
+                                                                                                                                                                       : "" )
+
+                    verticalAlignment: Text.AlignVCenter
+
+                    color: styleData.selected ? IngeScapeTheme.whiteColor : IngeScapeTheme.blackColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        //weight: Font.Medium
+                        pixelSize: 12
+                    }
                 }
             }
+
+            /*TableViewColumn {
+                role: "enumValues"
+                title: qsTr("")
+            }*/
         }
     }
 
