@@ -26,7 +26,7 @@ SubjectM::SubjectM(QString uid,
                    QObject *parent) : QObject(parent),
     _uid(uid),
     _name(""), //_name(name),
-    _propertyMap(nullptr)
+    _mapCharacteristicValues(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -34,10 +34,10 @@ SubjectM::SubjectM(QString uid,
     qInfo() << "New Model of Subject" << _name << "(" << _uid << ")";
 
     // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
-    _propertyMap = new QQmlPropertyMap(this);
+    _mapCharacteristicValues = new QQmlPropertyMap(this);
 
     // Connect to signal "Value Changed" fro the "Qml Property Map"
-    connect(_propertyMap, &QQmlPropertyMap::valueChanged, this, &SubjectM::_onCharacteristicValueChanged);
+    connect(_mapCharacteristicValues, &QQmlPropertyMap::valueChanged, this, &SubjectM::_onCharacteristicValueChanged);
 }
 
 
@@ -49,16 +49,16 @@ SubjectM::~SubjectM()
     qInfo() << "Delete Model of Subject" << _name << "(" << _uid << ")";
 
     // Free memory
-    if (_propertyMap != nullptr)
+    if (_mapCharacteristicValues != nullptr)
     {
         /*// Clear each value
-        for (QString key : _propertyMap->keys())
+        for (QString key : _mapCharacteristicValues->keys())
         {
-            _propertyMap->clear(key);
+            _mapCharacteristicValues->clear(key);
         }*/
 
-        QQmlPropertyMap* temp = _propertyMap;
-        setpropertyMap(nullptr);
+        QQmlPropertyMap* temp = _mapCharacteristicValues;
+        setmapCharacteristicValues(nullptr);
         delete temp;
     }
 }
@@ -70,29 +70,29 @@ SubjectM::~SubjectM()
  */
 void SubjectM::addCharacteristic(CharacteristicM* characteristic)
 {
-    if ((characteristic != nullptr) && (_propertyMap != nullptr))
+    if ((characteristic != nullptr) && (_mapCharacteristicValues != nullptr))
     {
         // It is not possible to remove keys from the map;
         // once a key has been added, you can only modify or clear its associated value
         // --> Do not test if the map contains this key
-        //if (!_propertyMap->contains(characteristic->name()))
+        //if (!_mapCharacteristicValues->contains(characteristic->name()))
 
         /*switch (characteristic->valueType())
         {
         case CharacteristicValueTypes::INTEGER:
-            _propertyMap->insert(characteristic->name(), QVariant(0));
+            _mapCharacteristicValues->insert(characteristic->name(), QVariant(0));
             break;
 
         case CharacteristicValueTypes::DOUBLE:
-            _propertyMap->insert(characteristic->name(), QVariant(0.0));
+            _mapCharacteristicValues->insert(characteristic->name(), QVariant(0.0));
             break;
 
         case CharacteristicValueTypes::TEXT:
-            _propertyMap->insert(characteristic->name(), QVariant(""));
+            _mapCharacteristicValues->insert(characteristic->name(), QVariant(""));
             break;
 
         case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-            _propertyMap->insert(characteristic->name(), QVariant(""));
+            _mapCharacteristicValues->insert(characteristic->name(), QVariant(""));
             break;
 
         default:
@@ -101,7 +101,7 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
         }*/
 
         // Insert an (invalid) not initialized QVariant
-        _propertyMap->insert(characteristic->name(), QVariant());
+        _mapCharacteristicValues->insert(characteristic->name(), QVariant());
     }
 }
 
@@ -112,10 +112,10 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
  */
 void SubjectM::removeCharacteristic(CharacteristicM* characteristic)
 {
-    if ((characteristic != nullptr) && (_propertyMap != nullptr))
+    if ((characteristic != nullptr) && (_mapCharacteristicValues != nullptr))
     {
         // Clears the value (if any) associated with key
-        _propertyMap->clear(characteristic->name());
+        _mapCharacteristicValues->clear(characteristic->name());
     }
 }
 

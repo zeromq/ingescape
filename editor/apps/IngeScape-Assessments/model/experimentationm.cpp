@@ -197,9 +197,9 @@ void ExperimentationM::addRecord(ExperimentationRecordM* record)
 
             for (CharacteristicM* characteristic : _allCharacteristics)
             {
-                if ((characteristic != nullptr) && record->subject()->propertyMap()->contains(characteristic->name()))
+                if ((characteristic != nullptr) && record->subject()->mapCharacteristicValues()->contains(characteristic->name()))
                 {
-                    qDebug() << characteristic->name() << ":" << record->subject()->propertyMap()->value(characteristic->name());
+                    qDebug() << characteristic->name() << ":" << record->subject()->mapCharacteristicValues()->value(characteristic->name());
                 }
             }
         }

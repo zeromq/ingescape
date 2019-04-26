@@ -38,7 +38,7 @@ class SubjectM : public QObject
 
     // Values of the characteristics of our subject
     // "Qml Property Map" allows to set key-value pairs that can be used in QML bindings
-    I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, propertyMap)
+    I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, mapCharacteristicValues)
 
     // Hash table from a (unique) id of characteristic to the characteristic value
     //I2_QOBJECT_HASHMODEL(QVariant, hashFromCharacteristicIdToValue)

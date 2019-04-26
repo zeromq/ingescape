@@ -82,7 +82,10 @@ ExperimentationRecordM::ExperimentationRecordM(QString uid,
         }
 
         // FIXME TODO: connect to changes from the list _task->independentVariables()
+        // Useless because "rootItem.record.mapIndependentVariableValues[model.name] = value" in QML/JS works...
+        // ...even if the key was not inserted in C++ first (_mapIndependentVariableValues->insert(independentVariable->name(), QVariant()))
         //connect(_task->independentVariables(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationRecordM::_onIndependentVariablesListChanged);
+
 
         // Connect to signal "Value Changed" fro the "Qml Property Map"
         //connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &ExperimentationRecordM::_onIndependentVariableValueChanged);

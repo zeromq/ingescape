@@ -304,7 +304,7 @@ Item {
 
                         characteristic: column.characteristic
 
-                        characteristicValue: model ? model.propertyMap[column.role] : ""
+                        characteristicValue: model ? model.mapCharacteristicValues[column.role] : ""
 
                         isSelected: styleData.selected
 
@@ -331,7 +331,7 @@ Item {
                                 //console.log("QML: on Characteristic Value Updated " + value);
 
                                 // Update the value (in C++)
-                                model.propertyMap[column.role] = value;
+                                model.mapCharacteristicValues[column.role] = value;
                             }
                         }
 
