@@ -16,6 +16,9 @@ import QtQuick 2.9
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 
+// Needed to access to ToolTip (https://doc.qt.io/qt-5.11/qml-qtquick-controls2-tooltip.html)
+import QtQuick.Controls 2.5 as Controls2
+
 import I2Quick 1.0
 
 import INGESCAPE 1.0
@@ -43,8 +46,6 @@ Item {
     property IndependentVariableM variable: null;
 
     property var variableValue: "";
-
-    property bool isSelected: false;
 
     property bool isCurrentlyEditing: false;
 
@@ -115,148 +116,169 @@ Item {
             width: 1
         }
 
-        Row {
+        Text {
+            id: txtName
 
-            Text {
-                id: txtName
+            anchors {
+                left: parent.left
+                leftMargin: 5
+                top: parent.top
+                bottom: parent.bottom
+                margins: 1
+            }
+            width: 100
 
-                width: 100
+            text: rootItem.variable ? rootItem.variable.name + ":" : ""
 
-                text: rootItem.variable ? rootItem.variable.name + ":" : ""
+            elide: Text.ElideRight
+            verticalAlignment: Text.AlignVCenter
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                //weight: Font.Medium
+                pixelSize: 12
             }
 
-            Text {
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
+            MouseArea {
+                id: mouseAreaName
 
-                visible: !rootItem.isCurrentlyEditing
+                anchors.fill: parent
 
-                text: (typeof rootItem.characteristicValue !== 'undefined') ? rootItem.characteristicValue : ""
+                hoverEnabled: true
             }
 
-            TextField {
-                id: txtEditor
+            Controls2.ToolTip {
+                visible: mouseAreaName.containsMouse
+                delay: 800
+                text: rootItem.variable ? IndependentVariableValueTypes.enumToString(rootItem.variable.valueType) + "\n" + rootItem.variable.description : ""
+            }
+        }
 
-                property var intValidator: IntValidator {}
-                property var doubleValidator: DoubleValidator {}
+        Text {
+            id: txtValue
 
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
+            anchors {
+                left: txtName.right
+                leftMargin: 5
+                right: parent.right
+                rightMargin: 1
+                top: parent.top
+                topMargin: 1
+                bottom: parent.bottom
+                bottomMargin: 1
+            }
 
-                visible: rootItem.isCurrentlyEditing && rootItem.characteristic && (rootItem.characteristic.valueType !== CharacteristicValueTypes.CHARACTERISTIC_ENUM)
+            visible: !rootItem.isCurrentlyEditing
 
-                text: (typeof rootItem.characteristicValue !== 'undefined') ? rootItem.characteristicValue : ""
+            text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
 
-                //inputMethodHints: Qt.ImhFormattedNumbersOnly
+            verticalAlignment: Text.AlignVCenter
 
-                validator: if (rootItem.characteristic)
-                           {
-                               if (rootItem.characteristic.valueType === CharacteristicValueTypes.INTEGER) {
-                                   return txtEditor.intValidator;
-                               }
-                               else if (rootItem.characteristic.valueType === CharacteristicValueTypes.DOUBLE) {
-                                   return txtEditor.doubleValidator;
-                               }
-                               else {
-                                   return null;
-                               }
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                //weight: Font.Medium
+                pixelSize: 12
+            }
+        }
+
+        TextField {
+            id: txtEditor
+
+            property var intValidator: IntValidator {}
+            property var doubleValidator: DoubleValidator {}
+
+            anchors {
+                left: txtName.right
+                leftMargin: 5
+                right: parent.right
+                rightMargin: 1
+                top: parent.top
+                topMargin: 1
+                bottom: parent.bottom
+                bottomMargin: 1
+            }
+
+            visible: rootItem.isCurrentlyEditing && rootItem.variable && (rootItem.variable.valueType !== IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
+
+            text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
+
+            //inputMethodHints: Qt.ImhFormattedNumbersOnly
+
+            validator: if (rootItem.variable)
+                       {
+                           if (rootItem.variable.valueType === IndependentVariableValueTypes.INTEGER) {
+                               return txtEditor.intValidator;
+                           }
+                           else if (rootItem.variable.valueType === IndependentVariableValueTypes.DOUBLE) {
+                               return txtEditor.doubleValidator;
                            }
                            else {
                                return null;
                            }
+                       }
+                       else {
+                           return null;
+                       }
 
 
-                style: I2TextFieldStyle {
-                    backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                    borderColor: IngeScapeTheme.whiteColor
-                    borderErrorColor: IngeScapeTheme.redColor
-                    radiusTextBox: 1
-                    borderWidth: 0;
-                    borderWidthActive: 1
-                    textIdleColor: IngeScapeTheme.whiteColor;
-                    textDisabledColor: IngeScapeTheme.darkGreyColor
+            style: I2TextFieldStyle {
+                backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                borderColor: IngeScapeTheme.whiteColor
+                borderErrorColor: IngeScapeTheme.redColor
+                radiusTextBox: 1
+                borderWidth: 0;
+                borderWidthActive: 1
+                textIdleColor: IngeScapeTheme.whiteColor;
+                textDisabledColor: IngeScapeTheme.darkGreyColor
 
-                    padding.left: 3
-                    padding.right: 3
+                padding.left: 3
+                padding.right: 3
 
-                    font {
-                        pixelSize:15
-                        family: IngeScapeTheme.textFontFamily
-                    }
-                }
-
-                onTextChanged: {
-                    //console.log("QML: on Text Changed " + txtEditor.text);
-
-                    // Emit the signal "Characteristic Value Updated"
-                    rootItem.characteristicValueUpdated(txtEditor.text);
+                font {
+                    pixelSize:15
+                    family: IngeScapeTheme.textFontFamily
                 }
             }
 
-            // FIXME: use a Loader instead of visible
-            I2ComboboxStringList {
-                id: cmbEditor
+            onTextChanged: {
+                console.log("QML: on Text Changed " + txtEditor.text);
 
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
+                // Emit the signal "Independent Variable Value Updated"
+                rootItem.independentVariableValueUpdated(txtEditor.text);
+            }
+        }
 
-                visible: rootItem.isCurrentlyEditing && rootItem.characteristic && (rootItem.characteristic.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)
+        // FIXME: use a Loader instead of visible
+        I2ComboboxStringList {
+            id: cmbEditor
 
-                model: rootItem.characteristic ? rootItem.characteristic.enumValues : null
+            anchors {
+                left: txtName.right
+                leftMargin: 5
+                right: parent.right
+                top: parent.top
+                topMargin: 1
+                bottom: parent.bottom
+                bottomMargin: 1
+            }
 
-                onSelectedItemChanged: {
+            visible: rootItem.isCurrentlyEditing && rootItem.variable && (rootItem.variable.valueType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
 
-                    if (cmbEditor.selectedItem)
-                    {
-                        //console.log("QML: on Selected Item Changed " + cmbEditor.selectedItem);
+            model: rootItem.variable ? rootItem.variable.enumValues : null
 
-                        // Emit the signal "Characteristic Value Updated"
-                        rootItem.characteristicValueUpdated(cmbEditor.selectedItem);
-                    }
+            onSelectedItemChanged: {
+
+                if (cmbEditor.selectedItem)
+                {
+                    console.log("QML: on Selected Item Changed " + cmbEditor.selectedItem);
+
+                    // Emit the signal "Independent Variable Value Updated"
+                    rootItem.independentVariableValueUpdated(cmbEditor.selectedItem);
                 }
             }
 
         }
     }
-
-
-    /*Button {
-        id: btnEdit
-
-        anchors {
-            top: parent.top
-        }
-        width: 50
-        height: 30
-
-        checkable: true
-
-        checked: rootItem.isCurrentlyEditing
-
-        text: checked ? "SAVE" : "EDIT"
-
-        onClicked: {
-
-            if (checked) {
-                // Emit the signal "Edit Subject"
-                rootItem.editSubject();
-            }
-            else {
-                // Emit the signal "Stop Edition of Subject"
-                rootItem.stopEditionOfSubject();
-            }
-        }
-
-        Binding {
-            target: btnEdit
-            property: "checked"
-            value: rootItem.isCurrentlyEditing
-        }
-    }*/
 }

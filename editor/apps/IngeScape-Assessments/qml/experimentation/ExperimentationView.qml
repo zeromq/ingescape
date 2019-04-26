@@ -118,8 +118,8 @@ Item {
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 18
+                weight: Font.Medium
+                pixelSize: 18
             }
         }
 
@@ -135,8 +135,8 @@ Item {
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
+                weight: Font.Medium
+                pixelSize: 16
             }
         }
 
@@ -152,8 +152,8 @@ Item {
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
+                weight: Font.Medium
+                pixelSize: 16
             }
         }
     }
@@ -326,8 +326,8 @@ Item {
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.textFontFamily
-                            weight : Font.Medium
-                            pixelSize : 18
+                            weight: Font.Medium
+                            pixelSize: 18
                         }
                     }
 

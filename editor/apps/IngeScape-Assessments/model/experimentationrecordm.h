@@ -52,8 +52,12 @@ class ExperimentationRecordM : public QObject
     I2_QML_PROPERTY_QTime(duration)
     //I2_QML_PROPERTY(QDateTime, duration)
 
-    // IndependentVariableValues (Table de Hash [UID V.I. - Valeur de la V.I.])
-    // liste des valeurs des V.I. de la tâche
+    // Values of the independent variables of the task
+    // "Qml Property Map" allows to set key-value pairs that can be used in QML bindings
+    I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, mapIndependentVariableValues)
+
+    // Hash table from a (unique) id of independent variable to the independent variable value
+    //I2_QOBJECT_HASHMODEL(QVariant, hashFromIndependentVariableIdToValue)
 
     // DependentVariableValues (TODO ?): Les valeurs des VD (sorties d’agents)
     // sont stockées avec le temps correspondant au changement de la valeur d’une sortie

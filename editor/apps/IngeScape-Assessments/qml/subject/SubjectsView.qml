@@ -201,8 +201,8 @@ Item {
                 color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
-                    weight : Font.Medium
-                    pixelSize : 16
+                    weight: Font.Medium
+                    pixelSize: 16
                 }
             }
 
@@ -329,6 +329,8 @@ Item {
                             if (model)
                             {
                                 //console.log("QML: on Characteristic Value Updated " + value);
+
+                                // Update the value (in C++)
                                 model.propertyMap[column.role] = value;
                             }
                         }

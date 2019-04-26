@@ -36,7 +36,7 @@ TaskM::TaskM(QString name,
     //
     for (int i = 1; i < 5; i++)
     {
-        IndependentVariableM* independentVariable = new IndependentVariableM(QString("VI %1").arg(i), QString("description of VI %1").arg(i), IndependentVariableValueTypes::DOUBLE);
+        IndependentVariableM* independentVariable = new IndependentVariableM(QString("VI %1").arg(i), QString("description of VI %1").arg(i), IndependentVariableValueTypes::TEXT);
 
         _independentVariables.append(independentVariable);
     }

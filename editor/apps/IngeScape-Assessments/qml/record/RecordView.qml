@@ -140,8 +140,8 @@ Item {
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
+                weight: Font.Medium
+                pixelSize: 16
             }
         }
 
@@ -157,8 +157,8 @@ Item {
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
+                weight: Font.Medium
+                pixelSize: 16
             }
         }
 
@@ -174,8 +174,8 @@ Item {
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
+                weight: Font.Medium
+                pixelSize: 16
             }
         }
     }
@@ -212,7 +212,14 @@ Item {
                 topMargin: 5
             }
 
-            text: qsTr("ACTIONS:")
+            text: qsTr("Actions:")
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 14
+            }
         }
     }
 
@@ -248,7 +255,14 @@ Item {
                 topMargin: 5
             }
 
-            text: qsTr("COMMENTAIRES:")
+            text: qsTr("Comments:")
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 14
+            }
         }
 
         TextArea {
@@ -302,11 +316,40 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
                 top: parent.top
                 topMargin: 5
             }
+            height: 30
 
             text: qsTr("Independent Variable:")
+
+            verticalAlignment: Text.AlignVCenter
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 14
+            }
         }
 
-        ListView {
+        Button {
+            id: btnEditIndependentVariable
+
+            anchors {
+                top: parent.top
+                topMargin: 5
+                right: parent.right
+                rightMargin: 5
+            }
+            width: 50
+            height: 30
+
+            checkable: true
+
+            checked: false
+
+            text: checked ? "SAVE" : "EDIT"
+        }
+
+        Column {
             id: listIndependentVariable
 
             anchors {
@@ -320,28 +363,34 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
                 bottomMargin: 5
             }
 
-            model: rootItem.record && rootItem.record.task ? rootItem.record.task.independentVariables : null
+            spacing: 5
 
-            //delegate: IndependentVariableValueEditor {
-            delegate: Rectangle {
+            Repeater {
 
-                width: parent.width
-                height: 30
+                model: (rootItem.record && rootItem.record.task) ? rootItem.record.task.independentVariables : null
 
-                color: "transparent"
-                border {
-                    color: "lightgray"
-                    width: 1
+                delegate: IndependentVariableValueEditor {
+
+                    variable: model ? model.QtObject : null
+
+                    variableValue: (rootItem.record && rootItem.record.mapIndependentVariableValues && model) ? rootItem.record.mapIndependentVariableValues[model.name] : ""
+
+                    isCurrentlyEditing: btnEditIndependentVariable.checked
+
+
+                    //
+                    // Slots
+                    //
+                    onIndependentVariableValueUpdated: {
+                        if (rootItem.record && rootItem.record.mapIndependentVariableValues && model)
+                        {
+                            //console.log("QML: on (IN-dependent) Variable Value Updated for " + model.name + ": " + value);
+
+                            // Update the value (in C++)
+                            rootItem.record.mapIndependentVariableValues[model.name] = value;
+                        }
+                    }
                 }
-
-                Text {
-                    //id: todo
-
-                    width: 100
-
-                    text: model.name + ":"
-                }
-
             }
         }
     }
@@ -379,7 +428,14 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
                 topMargin: 5
             }
 
-            text: qsTr("ATTACHMENTS:")
+            text: qsTr("Attachments:")
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 14
+            }
         }
     }
 
@@ -395,7 +451,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             right: parent.right
             bottom: parent.bottom
         }
-        height: 200
+        height: 250
 
         color: "white"
 
@@ -403,6 +459,13 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             anchors.centerIn: parent
 
             text: qsTr("TIMELINE")
+
+            //color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 14
+            }
         }
     }
 }

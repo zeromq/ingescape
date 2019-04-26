@@ -178,8 +178,8 @@ I2PopupBase {
                     color: IngeScapeTheme.whiteColor
                     font {
                         family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
+                        weight: Font.Medium
+                        pixelSize: 16
                     }
                 }
 
@@ -239,8 +239,8 @@ I2PopupBase {
                     color: IngeScapeTheme.whiteColor
                     font {
                         family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
+                        weight: Font.Medium
+                        pixelSize: 16
                     }
                 }
             }
@@ -262,8 +262,8 @@ I2PopupBase {
                     color: IngeScapeTheme.whiteColor
                     font {
                         family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
+                        weight: Font.Medium
+                        pixelSize: 16
                     }
                 }
 
@@ -308,8 +308,8 @@ I2PopupBase {
                     color: IngeScapeTheme.whiteColor
                     font {
                         family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
+                        weight: Font.Medium
+                        pixelSize: 16
                     }
                 }
 
@@ -372,8 +372,8 @@ I2PopupBase {
 
                     font {
                         family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
+                        weight: Font.Medium
+                        pixelSize: 16
                     }
                     labelColorPressed: IngeScapeTheme.blackColor
                     labelColorReleased: IngeScapeTheme.whiteColor
@@ -416,8 +416,8 @@ I2PopupBase {
 
                     font {
                         family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
+                        weight: Font.Medium
+                        pixelSize: 16
                     }
                     labelColorPressed: IngeScapeTheme.blackColor
                     labelColorReleased: IngeScapeTheme.whiteColor

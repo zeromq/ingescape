@@ -27,8 +27,8 @@ RadioButtonStyle {
         color: IngeScapeTheme.whiteColor
         font {
             family: IngeScapeTheme.textFontFamily
-            //weight : Font.Medium
-            pixelSize : 14
+            //weight: Font.Medium
+            pixelSize: 14
         }
     }
 }

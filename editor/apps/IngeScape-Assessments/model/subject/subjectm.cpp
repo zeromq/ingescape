@@ -77,8 +77,7 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
         // --> Do not test if the map contains this key
         //if (!_propertyMap->contains(characteristic->name()))
 
-        // UNKNOWN, INTEGER, DOUBLE, TEXT, CHARACTERISTIC_ENUM
-        switch (characteristic->valueType())
+        /*switch (characteristic->valueType())
         {
         case CharacteristicValueTypes::INTEGER:
             _propertyMap->insert(characteristic->name(), QVariant(0));
@@ -93,13 +92,16 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
             break;
 
         case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-            _propertyMap->insert(characteristic->name(), QVariant("..."));
+            _propertyMap->insert(characteristic->name(), QVariant(""));
             break;
 
         default:
             qWarning() << "We cannot add the characteristic" << characteristic->name() << "because the type" <<  characteristic->valueType() << "is wrong !";
             break;
-        }
+        }*/
+
+        // Insert an (invalid) not initialized QVariant
+        _propertyMap->insert(characteristic->name(), QVariant());
     }
 }
 
