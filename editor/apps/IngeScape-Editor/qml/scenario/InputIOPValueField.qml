@@ -232,7 +232,7 @@ Item {
         Binding {
             target: comboboxBooleanValue
             property: "selectedIndex"
-            value: if (iopVM && getModelValue() !== "") // Empty values from the text field won't change the value of the combobox
+            value: if (iopVM && (getModelValue() !== "")) // Empty values from the text field won't change the value of the combobox
                    {
                        // Only "1" and "0" values from the TextField update the combobox since its the two values assigned to the model by this combobox
                        if (Number(getModelValue()) === 0)
@@ -247,7 +247,7 @@ Item {
         }
 
         onSelectedItemChanged: {
-            if (selectedIndex >= 0 && iopVM)
+            if ((selectedIndex >= 0) && iopVM)
             {
                 setModelValue( (selectedItem === "TRUE") ? "1" : "0" )
             }

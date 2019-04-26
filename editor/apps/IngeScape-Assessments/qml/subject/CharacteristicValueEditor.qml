@@ -88,12 +88,6 @@ Item {
         console.log("QML: on Characteristic Value changed " + characteristicValue);
     }*/
 
-    /*onIsCurrentlyEditingChanged: {
-        if (isCurrentlyEditing === false) {
-            console.log("QML: is Currently Editing from true to false " + characteristicValue);
-        }
-    }*/
-
 
     //--------------------------------------------------------
     //
@@ -127,6 +121,8 @@ Item {
         }
 
         Text {
+            id: txtValue
+
             anchors {
                 fill: parent
                 margins: 1
@@ -135,99 +131,31 @@ Item {
             visible: !rootItem.isCurrentlyEditing
 
             text: (typeof rootItem.characteristicValue !== 'undefined') ? rootItem.characteristicValue : ""
+
+            verticalAlignment: Text.AlignVCenter
         }
 
-        TextField {
-            id: txtEditor
-
-            property var intValidator: IntValidator {}
-            property var doubleValidator: DoubleValidator {}
+        Loader {
+            id: loaderEditor
 
             anchors {
                 fill: parent
                 margins: 1
             }
 
-            visible: rootItem.isCurrentlyEditing && rootItem.characteristic && (rootItem.characteristic.valueType !== CharacteristicValueTypes.CHARACTERISTIC_ENUM)
+            visible: rootItem.isCurrentlyEditing
 
-            text: (typeof rootItem.characteristicValue !== 'undefined') ? rootItem.characteristicValue : ""
-
-            //inputMethodHints: Qt.ImhFormattedNumbersOnly
-
-            validator: if (rootItem.characteristic)
-                       {
-                           if (rootItem.characteristic.valueType === CharacteristicValueTypes.INTEGER) {
-                               return txtEditor.intValidator;
-                           }
-                           else if (rootItem.characteristic.valueType === CharacteristicValueTypes.DOUBLE) {
-                               return txtEditor.doubleValidator;
-                           }
-                           else {
-                               return null;
-                           }
-                       }
-                       else {
-                           return null;
-                       }
-
-
-            style: I2TextFieldStyle {
-                backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                borderColor: IngeScapeTheme.whiteColor
-                borderErrorColor: IngeScapeTheme.redColor
-                radiusTextBox: 1
-                borderWidth: 0;
-                borderWidthActive: 1
-                textIdleColor: IngeScapeTheme.whiteColor;
-                textDisabledColor: IngeScapeTheme.darkGreyColor
-
-                padding.left: 3
-                padding.right: 3
-
-                font {
-                    pixelSize:15
-                    family: IngeScapeTheme.textFontFamily
-                }
-            }
-
-            onTextChanged: {
-                //console.log("QML: on Text Changed " + txtEditor.text);
-
-                // Emit the signal "Characteristic Value Updated"
-                rootItem.characteristicValueUpdated(txtEditor.text);
-            }
+            // Load editor in function of the value type:
+            // - Enum --> combobox
+            // - NOT enum --> text field
+            sourceComponent: (rootItem.characteristic && (rootItem.characteristic.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)) ? componentComboboxEditor
+                                                                                                                                               : componentTextFieldEditor
         }
-
-        // FIXME: use a Loader instead of visible
-        I2ComboboxStringList {
-            id: cmbEditor
-
-            anchors {
-                fill: parent
-                margins: 1
-            }
-
-            visible: rootItem.isCurrentlyEditing && rootItem.characteristic && (rootItem.characteristic.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)
-
-            model: rootItem.characteristic ? rootItem.characteristic.enumValues : null
-
-            onSelectedItemChanged: {
-
-                if (cmbEditor.selectedItem)
-                {
-                    //console.log("QML: on Selected Item Changed " + cmbEditor.selectedItem);
-
-                    // Emit the signal "Characteristic Value Updated"
-                    rootItem.characteristicValueUpdated(cmbEditor.selectedItem);
-                }
-            }
-        }
-
     }
 
 
     //
-    // Options
+    // component Options
     //
     Component {
         id: componentOptions
@@ -296,6 +224,123 @@ Item {
                 }
             }
 
+        }
+    }
+
+
+    //
+    // component Combobox Editor
+    //
+    Component {
+        id: componentComboboxEditor
+
+        I2ComboboxStringList {
+            id: comboboxEditor
+
+            model: rootItem.characteristic ? rootItem.characteristic.enumValues : null
+
+            onSelectedItemChanged: {
+
+                if (comboboxEditor.selectedItem)
+                {
+                    //console.log("QML: on Selected Item Changed " + comboboxEditor.selectedItem);
+
+                    // Emit the signal "Characteristic Value Updated"
+                    rootItem.characteristicValueUpdated(comboboxEditor.selectedItem);
+                }
+            }
+
+            /*Component.onCompleted: {
+
+                //console.log("onCompleted: selectedIndex=" + comboboxEditor.selectedIndex + " -- characteristicValue=" + rootItem.characteristicValue);
+
+                if ((comboboxEditor.selectedIndex < 0) && (typeof rootItem.characteristicValue !== 'undefined'))
+                {
+                    var index = comboboxEditor.model.indexOf(rootItem.characteristicValue);
+                    if (index > -1) {
+                        comboboxEditor.selectedIndex = index;
+                    }
+                }
+            }*/
+
+            onVisibleChanged: {
+
+                //console.log("onVisibleChanged: selectedIndex=" + comboboxEditor.selectedIndex + " -- characteristicValue=" + rootItem.characteristicValue);
+
+                if (visible && (comboboxEditor.selectedIndex < 0) && (typeof rootItem.characteristicValue !== 'undefined'))
+                {
+                    var index = comboboxEditor.model.indexOf(rootItem.characteristicValue);
+                    if (index > -1) {
+                        comboboxEditor.selectedIndex = index;
+                    }
+                }
+            }
+        }
+    }
+
+
+    //
+    // component TextField Editor
+    //
+    Component {
+        id: componentTextFieldEditor
+
+        TextField {
+            id: textFieldEditor
+
+            property var intValidator: IntValidator {}
+            property var doubleValidator: DoubleValidator {}
+
+            text: (typeof rootItem.characteristicValue !== 'undefined') ? rootItem.characteristicValue : ""
+
+            //inputMethodHints: Qt.ImhFormattedNumbersOnly
+
+            validator: if (rootItem.characteristic)
+                       {
+                           if (rootItem.characteristic.valueType === CharacteristicValueTypes.INTEGER) {
+                               return textFieldEditor.intValidator;
+                           }
+                           else if (rootItem.characteristic.valueType === CharacteristicValueTypes.DOUBLE) {
+                               return textFieldEditor.doubleValidator;
+                           }
+                           else {
+                               return null;
+                           }
+                       }
+                       else {
+                           return null;
+                       }
+
+
+            style: I2TextFieldStyle {
+                backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                borderColor: IngeScapeTheme.whiteColor
+                borderErrorColor: IngeScapeTheme.redColor
+                radiusTextBox: 1
+                borderWidth: 0;
+                borderWidthActive: 1
+                textIdleColor: IngeScapeTheme.whiteColor;
+                textDisabledColor: IngeScapeTheme.darkGreyColor
+
+                padding.left: 3
+                padding.right: 3
+
+                font {
+                    pixelSize:15
+                    family: IngeScapeTheme.textFontFamily
+                }
+            }
+
+            onTextChanged: {
+                //console.log("QML: on Text Changed " + textFieldEditor.text);
+
+                // Emit the signal "Characteristic Value Updated"
+                rootItem.characteristicValueUpdated(textFieldEditor.text);
+            }
+
+            /*Component.onCompleted: {
+                console.log("onCompleted: text=" + textFieldEditor.text + " -- characteristicValue=" + rootItem.characteristicValue);
+            }*/
         }
     }
 }

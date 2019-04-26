@@ -159,11 +159,13 @@ Item {
 
         anchors {
             top: parent.top
+            topMargin: 2
             right: parent.right
+            rightMargin: 2
         }
-        //width: 100
+        height: 30
 
-        text: "Delete"
+        text: "DEL"
 
         visible: !rootItem.modelM.isSubjectName
 
