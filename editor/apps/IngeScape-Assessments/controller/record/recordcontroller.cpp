@@ -115,7 +115,7 @@ void RecordController::_onCurrentRecordChanged(ExperimentationRecordM* previousR
                         ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonRoot.value("scenario").toObject(), hashFromNameToAgentsGrouped);
                         if (scenarioToImport != nullptr)
                         {
-
+                            // FIXME TODO: scenarioToImport
                         }
                     }
                 }

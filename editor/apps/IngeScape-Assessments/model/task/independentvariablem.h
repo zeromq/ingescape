@@ -37,7 +37,7 @@ class IndependentVariableM : public QObject
     //I2_QML_PROPERTY(QString, unit)
 
     // Type of our independent variable value
-    I2_QML_PROPERTY_READONLY(IndependentVariableValueTypes::Value, valueType)
+    I2_QML_PROPERTY(IndependentVariableValueTypes::Value, valueType)
 
     // List of possible values if the value type is "INDEPENDENT_VARIABLE_ENUM"
     I2_QML_PROPERTY(QStringList, enumValues)

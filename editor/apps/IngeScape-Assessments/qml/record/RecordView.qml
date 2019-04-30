@@ -331,7 +331,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
         }
 
         Button {
-            id: btnEditIndependentVariable
+            id: btnEditValuesOfIndependentVariable
 
             anchors {
                 top: parent.top
@@ -375,7 +375,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
 
                     variableValue: (rootItem.record && rootItem.record.mapIndependentVariableValues && model) ? rootItem.record.mapIndependentVariableValues[model.name] : ""
 
-                    isCurrentlyEditing: btnEditIndependentVariable.checked
+                    isCurrentlyEditing: btnEditValuesOfIndependentVariable.checked
 
 
                     //
