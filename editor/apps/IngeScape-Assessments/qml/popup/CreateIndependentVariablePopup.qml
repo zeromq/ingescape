@@ -45,10 +45,16 @@ I2PopupBase {
 
     property TasksController controller: null;
 
-    //property IndependentVariableValueTypes selectedType: null;
+    // property IndependentVariableValueTypes selectedType
     property int selectedType: -1;
 
     property var enumTexts: [];
+
+    // Our popup is used:
+    // - to create a new independent variable
+    // OR
+    // - to edit an existing independent variable...in this case, this property must be set
+    property IndependentVariableM independentVariableCurrentlyEdited: null;
 
 
     //--------------------------------
@@ -72,7 +78,16 @@ I2PopupBase {
     //--------------------------------
 
     onOpened: {
+        if (rootPopup.independentVariableCurrentlyEdited)
+        {
+            // Update controls
+            txtIndependentVariableName.text = rootPopup.independentVariableCurrentlyEdited.name;
+            txtIndependentVariableDescription.text = rootPopup.independentVariableCurrentlyEdited.description;
+            spinBoxValuesNumber.value = rootPopup.independentVariableCurrentlyEdited.enumValues.length;
 
+            rootPopup.selectedType = rootPopup.independentVariableCurrentlyEdited.valueType;
+            rootPopup.enumTexts = rootPopup.independentVariableCurrentlyEdited.enumValues;
+        }
     }
 
 
@@ -94,9 +109,11 @@ I2PopupBase {
         // Reset all user inputs
         txtIndependentVariableName.text = "";
         txtIndependentVariableDescription.text = "";
-        rootPopup.selectedType = -1;
         spinBoxValuesNumber.value = 2;
-        enumTexts = [];
+
+        rootPopup.selectedType = -1;
+        rootPopup.enumTexts = [];
+        rootPopup.independentVariableCurrentlyEdited = null;
 
         // Close the popup
         rootPopup.close();
@@ -538,50 +555,63 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    console.log("QML: create new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
 
                     if (rootPopup.controller)
                     {
-                        // Selected type is ENUM
-                        if (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
+                        // Edit an existing independent variable
+                        if (rootPopup.independentVariableCurrentlyEdited)
                         {
-                            // Use only the N first elements of the array (the array may be longer than the number of displayed TextFields
-                            // if the user decreases the value of the spin box after edition the last TextField)
-                            // Where N = spinBoxValuesNumber.value (the value of the spin box)
-                            var displayedEnumTexts = rootPopup.enumTexts.slice(0, spinBoxValuesNumber.value);
+                            console.log("QML: edit an existing Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
 
-                            var index = 0;
-                            var isEmptyValue = false;
+                            // Reset all user inputs and close the popup
+                            rootPopup.resetInputsAndClosePopup();
+                        }
+                        // Create a new independent variable
+                        else
+                        {
+                            console.log("QML: create a new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
 
-                            displayedEnumTexts.forEach(function(element) {
-                                if (element === "") {
-                                    isEmptyValue = true;
-                                    console.log("value at " + index + " is empty, edit it !");
-                                }
-                                index++;
-                              });
-
-                            console.log("QML: Enum with " + spinBoxValuesNumber.value + " strings: " + displayedEnumTexts);
-
-                            if (isEmptyValue === false)
+                            // Selected type is ENUM
+                            if (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
                             {
-                                rootPopup.controller.createNewIndependentVariableEnum(txtIndependentVariableName.text, txtIndependentVariableDescription.text, displayedEnumTexts);
+                                // Use only the N first elements of the array (the array may be longer than the number of displayed TextFields
+                                // if the user decreases the value of the spin box after edition the last TextField)
+                                // Where N = spinBoxValuesNumber.value (the value of the spin box)
+                                var displayedEnumTexts = rootPopup.enumTexts.slice(0, spinBoxValuesNumber.value);
+
+                                var index = 0;
+                                var isEmptyValue = false;
+
+                                displayedEnumTexts.forEach(function(element) {
+                                    if (element === "") {
+                                        isEmptyValue = true;
+                                        console.log("value at " + index + " is empty, edit it !");
+                                    }
+                                    index++;
+                                });
+
+                                console.log("QML: Enum with " + spinBoxValuesNumber.value + " strings: " + displayedEnumTexts);
+
+                                if (isEmptyValue === false)
+                                {
+                                    rootPopup.controller.createNewIndependentVariableEnum(txtIndependentVariableName.text, txtIndependentVariableDescription.text, displayedEnumTexts);
+
+                                    // Reset all user inputs and close the popup
+                                    rootPopup.resetInputsAndClosePopup();
+                                }
+                                else
+                                {
+                                    console.warn("Some values of the enum are empty, edit them !");
+                                }
+                            }
+                            // Selected type is NOT ENUM
+                            else
+                            {
+                                rootPopup.controller.createNewIndependentVariable(txtIndependentVariableName.text, txtIndependentVariableDescription.text, rootPopup.selectedType);
 
                                 // Reset all user inputs and close the popup
                                 rootPopup.resetInputsAndClosePopup();
                             }
-                            else
-                            {
-                                console.warn("Some values of the enum are empty, edit them !");
-                            }
-                        }
-                        // Selected type is NOT ENUM
-                        else
-                        {
-                            rootPopup.controller.createNewIndependentVariable(txtIndependentVariableName.text, txtIndependentVariableDescription.text, rootPopup.selectedType);
-
-                            // Reset all user inputs and close the popup
-                            rootPopup.resetInputsAndClosePopup();
                         }
                     }
                 }

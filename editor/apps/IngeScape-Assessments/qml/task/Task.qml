@@ -187,6 +187,9 @@ Item {
                 onClicked: {
                     console.log("QML: New Independent Variable");
 
+                    // Update the independent variable currently edited
+                    //createIndependentVariablePopup.independentVariableCurrentlyEdited = null;
+
                     // Open the popup
                     createIndependentVariablePopup.open();
                 }
@@ -251,6 +254,20 @@ Item {
                 role: "enumValues"
                 title: qsTr("")
             }*/
+
+            onDoubleClicked: {
+                var independentVariable = tableIndepVar.model.get(row);
+                if (independentVariable)
+                {
+                    console.log("on Double Clicked on row " + row + " (" + independentVariable.name + ")");
+
+                    // Update the independent variable currently edited
+                    createIndependentVariablePopup.independentVariableCurrentlyEdited = independentVariable;
+
+                    // Open the popup
+                    createIndependentVariablePopup.open();
+                }
+            }
         }
     }
 
