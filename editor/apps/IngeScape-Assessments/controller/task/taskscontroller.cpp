@@ -199,12 +199,40 @@ bool TasksController::canCreateIndependentVariableWithName(QString independentVa
 
 
 /**
+ * @brief Return true if the user can edit an independent variable with the name
+ * Check if the name is not empty and if a independent variable with the same name does not already exist
+ * @param independentVariableCurrentlyEdited
+ * @param independentVariableName
+ * @return
+ */
+bool TasksController::canEditIndependentVariableWithName(IndependentVariableM* independentVariableCurrentlyEdited, QString independentVariableName)
+{
+    if ((independentVariableCurrentlyEdited != nullptr) && !independentVariableName.isEmpty() && (_selectedTask != nullptr))
+    {
+        for (IndependentVariableM* independentVariable : _selectedTask->independentVariables()->toList())
+        {
+            if ((independentVariable != nullptr) && (independentVariable != independentVariableCurrentlyEdited) && (independentVariable->name() == independentVariableName))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
  * @brief Create a new independent variable
  * @param independentVariableName
  * @param independentVariableDescription
  * @param nIndependentVariableValueType
  */
-void TasksController::createNewIndependentVariable(QString independentVariableName, QString independentVariableDescription, int nIndependentVariableValueType)
+void TasksController::createNewIndependentVariable(QString independentVariableName,
+                                                   QString independentVariableDescription,
+                                                   int nIndependentVariableValueType)
 {
     if (!independentVariableName.isEmpty() && (nIndependentVariableValueType > -1) && (_selectedTask != nullptr))
     {
@@ -227,7 +255,9 @@ void TasksController::createNewIndependentVariable(QString independentVariableNa
  * @param independentVariableDescription
  * @param enumValues
  */
-void TasksController::createNewIndependentVariableEnum(QString independentVariableName, QString independentVariableDescription, QStringList enumValues)
+void TasksController::createNewIndependentVariableEnum(QString independentVariableName,
+                                                       QString independentVariableDescription,
+                                                       QStringList enumValues)
 {
     if (!independentVariableName.isEmpty() && !enumValues.isEmpty() && (_selectedTask != nullptr))
     {
@@ -239,6 +269,56 @@ void TasksController::createNewIndependentVariableEnum(QString independentVariab
 
         // Add the independent variable to the selected task
         _selectedTask->addIndependentVariable(independentVariable);
+    }
+}
+
+
+/**
+ * @brief Save the modifications of the Independent Variable currently edited
+ * @param independentVariableCurrentlyEdited
+ * @param independentVariableName
+ * @param independentVariableDescription
+ * @param nIndependentVariableValueType
+ */
+void TasksController::saveModificationsOfIndependentVariable(IndependentVariableM* independentVariableCurrentlyEdited,
+                                                             QString independentVariableName,
+                                                             QString independentVariableDescription,
+                                                             int nIndependentVariableValueType)
+{
+    if ((independentVariableCurrentlyEdited != nullptr) && !independentVariableName.isEmpty() && (nIndependentVariableValueType > -1) && (_selectedTask != nullptr))
+    {
+        IndependentVariableValueTypes::Value independentVariableValueType = static_cast<IndependentVariableValueTypes::Value>(nIndependentVariableValueType);
+
+        qInfo() << "Edit independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(independentVariableValueType);
+
+        independentVariableCurrentlyEdited->setname(independentVariableName);
+        independentVariableCurrentlyEdited->setdescription(independentVariableDescription);
+        independentVariableCurrentlyEdited->setvalueType(independentVariableValueType);
+        independentVariableCurrentlyEdited->setenumValues(QStringList());
+    }
+}
+
+
+/**
+ * @brief Save the modifications of the Independent Variable (of type enum) currently edited
+ * @param independentVariableCurrentlyEdited
+ * @param independentVariableName
+ * @param independentVariableDescription
+ * @param enumValues
+ */
+void TasksController::saveModificationsOfIndependentVariableEnum(IndependentVariableM* independentVariableCurrentlyEdited,
+                                                                 QString independentVariableName,
+                                                                 QString independentVariableDescription,
+                                                                 QStringList enumValues)
+{
+    if ((independentVariableCurrentlyEdited != nullptr) && !independentVariableName.isEmpty() && !enumValues.isEmpty() && (_selectedTask != nullptr))
+    {
+        qInfo() << "Edit independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM) << "with values:" << enumValues;
+
+        independentVariableCurrentlyEdited->setname(independentVariableName);
+        independentVariableCurrentlyEdited->setdescription(independentVariableDescription);
+        independentVariableCurrentlyEdited->setvalueType(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
+        independentVariableCurrentlyEdited->setenumValues(enumValues);
     }
 }
 

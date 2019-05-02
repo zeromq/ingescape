@@ -93,12 +93,24 @@ public:
 
 
     /**
+     * @brief Return true if the user can edit an independent variable with the name
+     * Check if the name is not empty and if a independent variable with the same name does not already exist
+     * @param independentVariableCurrentlyEdited
+     * @param independentVariableName
+     * @return
+     */
+    Q_INVOKABLE bool canEditIndependentVariableWithName(IndependentVariableM* independentVariableCurrentlyEdited, QString independentVariableName);
+
+
+    /**
      * @brief Create a new independent variable
      * @param independentVariableName
      * @param independentVariableDescription
      * @param nIndependentVariableValueType
      */
-    Q_INVOKABLE void createNewIndependentVariable(QString independentVariableName, QString independentVariableDescription, int nIndependentVariableValueType);
+    Q_INVOKABLE void createNewIndependentVariable(QString independentVariableName,
+                                                  QString independentVariableDescription,
+                                                  int nIndependentVariableValueType);
 
 
     /**
@@ -107,7 +119,35 @@ public:
      * @param independentVariableDescription
      * @param enumValues
      */
-    Q_INVOKABLE void createNewIndependentVariableEnum(QString independentVariableName, QString independentVariableDescription, QStringList enumValues);
+    Q_INVOKABLE void createNewIndependentVariableEnum(QString independentVariableName,
+                                                      QString independentVariableDescription,
+                                                      QStringList enumValues);
+
+
+    /**
+     * @brief Save the modifications of the Independent Variable currently edited
+     * @param independentVariableCurrentlyEdited
+     * @param independentVariableName
+     * @param independentVariableDescription
+     * @param nIndependentVariableValueType
+     */
+    Q_INVOKABLE void saveModificationsOfIndependentVariable(IndependentVariableM* independentVariableCurrentlyEdited,
+                                                            QString independentVariableName,
+                                                            QString independentVariableDescription,
+                                                            int nIndependentVariableValueType);
+
+
+    /**
+     * @brief Save the modifications of the Independent Variable (of type enum) currently edited
+     * @param independentVariableCurrentlyEdited
+     * @param independentVariableName
+     * @param independentVariableDescription
+     * @param enumValues
+     */
+    Q_INVOKABLE void saveModificationsOfIndependentVariableEnum(IndependentVariableM* independentVariableCurrentlyEdited,
+                                                                QString independentVariableName,
+                                                                QString independentVariableDescription,
+                                                                QStringList enumValues);
 
 
     /**
