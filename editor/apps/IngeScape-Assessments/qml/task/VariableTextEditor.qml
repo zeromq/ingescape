@@ -121,6 +121,8 @@ Item {
             visible: !rootItem.isCurrentlyEditing
 
             text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
+
+            verticalAlignment: Text.AlignVCenter
         }
 
         TextField {

@@ -282,6 +282,56 @@ Item {
                                           : (styleData.alternate ? "lightgray" : "white")
             }
 
+            headerDelegate: Rectangle {
+                height: 30
+                width: parent.width
+
+                color: "darkgray"
+
+                Text {
+                    id: txtColumnHeader
+
+                    anchors {
+                        fill: parent
+                        leftMargin: (styleData.column === 0) ? 110 : 5
+                    }
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: styleData.textAlignment
+
+                    text: styleData.value
+                    elide: Text.ElideRight
+                    color: IngeScapeTheme.blackColor
+                    //renderType: Text.NativeRendering
+                }
+
+                Rectangle {
+                    id: leftSeparator
+
+                    visible: (styleData.column === 0)
+
+                    anchors {
+                        left: parent.left
+                        leftMargin: 105
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    width: 1
+                    color: "silver"
+                }
+
+                Rectangle {
+                    id: rightSeparator
+
+                    anchors {
+                        right: parent.right
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    width: 1
+                    color: "silver"
+                }
+            }
+
             model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
             Instantiator {

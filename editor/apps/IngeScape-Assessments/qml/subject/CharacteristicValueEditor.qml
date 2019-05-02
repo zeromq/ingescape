@@ -115,10 +115,10 @@ Item {
         }
 
         color: "transparent"
-        border {
+        /*border {
             color: "silver"
             width: 1
-        }
+        }*/
 
         Text {
             id: txtValue
@@ -150,6 +150,32 @@ Item {
             // - NOT enum --> text field
             sourceComponent: (rootItem.characteristic && (rootItem.characteristic.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)) ? componentComboboxEditor
                                                                                                                                                : componentTextFieldEditor
+        }
+
+        Rectangle {
+            id: leftSeparator
+
+            visible: (characteristic && characteristic.isSubjectName)
+
+            anchors {
+                left: parent.left
+                top: parent.top
+                bottom: parent.bottom
+            }
+            width: 1
+            color: "silver"
+        }
+
+        Rectangle {
+            id: rightSeparator
+
+            anchors {
+                right: parent.right
+                top: parent.top
+                bottom: parent.bottom
+            }
+            width: 1
+            color: "silver"
         }
     }
 
