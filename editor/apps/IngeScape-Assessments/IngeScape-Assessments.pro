@@ -53,7 +53,8 @@ SOURCES += main.cpp \
     controller/record/recordcontroller.cpp \
     viewModel/experimentationsgroupvm.cpp \
     model/experimentationrecordm.cpp \
-    controller/assessmentsmodelmanager.cpp
+    controller/assessmentsmodelmanager.cpp \
+    model/task/agentnameandoutputsm.cpp
 
 
 HEADERS += \
@@ -76,7 +77,8 @@ HEADERS += \
     controller/record/recordcontroller.h \
     viewModel/experimentationsgroupvm.h \
     model/experimentationrecordm.h \
-    controller/assessmentsmodelmanager.h
+    controller/assessmentsmodelmanager.h \
+    model/task/agentnameandoutputsm.h
 
 
 RESOURCES += qml.qrc

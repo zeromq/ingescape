@@ -20,6 +20,7 @@
 
 #include <model/task/dependentvariablem.h>
 #include <model/task/independentvariablem.h>
+#include <model/task/agentnameandoutputsm.h>
 
 
 /**
@@ -43,6 +44,10 @@ class TaskM : public QObject
 
     // List of dependent variables of our task
     I2_QOBJECT_LISTMODEL(DependentVariableM, dependentVariables)
+
+    // Hash table from an agent name to a (simplified) model of agent with its name and its outputs
+    // Found in the platform (JSON file) of our task
+    I2_QOBJECT_HASHMODEL(AgentNameAndOutputsM, hashFromAgentNameToSimplifiedAgent)
 
     // List of agent names in the IngeScape platform of our task
     I2_QML_PROPERTY_READONLY(QStringList, agentNamesList)
@@ -121,6 +126,14 @@ private:
      * @param agentName
      */
     void _updateOutputNamesListOfDependentVariable(DependentVariableM* dependentVariable, QString agentName);
+
+
+    /**
+     * @brief Update the list of agents from a platform file path
+     * Update the hash table from an agent name to a (simplified) model of agent with its name and its outputs
+     * @param platformFilePath
+     */
+    void _updateAgentsFromPlatformFilePath(QString platformFilePath);
 
 
 private:

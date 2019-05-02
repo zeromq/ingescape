@@ -151,6 +151,7 @@ void registerCustomQmlTypes()
     // Models
     //
     //----------------
+    qmlRegisterUncreatableType<AgentNameAndOutputsM>("INGESCAPE", 1, 0, "AgentNameAndOutputsM", "Internal class");
     qmlRegisterUncreatableType<AssessmentsEnums>("INGESCAPE", 1, 0, "AssessmentsEnums", "Internal class");
     //qmlRegisterUncreatableType<CharacteristicEnumM>("INGESCAPE", 1, 0, "CharacteristicEnumM", "Internal class");
     qmlRegisterUncreatableType<CharacteristicM>("INGESCAPE", 1, 0, "CharacteristicM", "Internal class");

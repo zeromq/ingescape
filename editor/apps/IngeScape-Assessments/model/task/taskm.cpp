@@ -68,11 +68,19 @@ void TaskM::setplatformFileUrl(QUrl value)
         _platformFileUrl = value;
 
         // Update file name
-        if (_platformFileUrl.isValid()) {
+        if (_platformFileUrl.isValid())
+        {
             setplatformFileName(_platformFileUrl.fileName());
+
+            // Update the hash table from an agent name to a (simplified) model of agent with its name and its outputs
+            _updateAgentsFromPlatformFilePath(_platformFileUrl.path());
         }
-        else {
+        else
+        {
             setplatformFileName("");
+
+            // Free memory
+            _hashFromAgentNameToSimplifiedAgent.deleteAllItems();
         }
 
         Q_EMIT platformFileUrlChanged(value);
@@ -200,5 +208,106 @@ void TaskM::_updateOutputNamesListOfDependentVariable(DependentVariableM* depend
                 dependentVariable->setoutputNamesList(outputNamesList);
             }
         }
+    }
+}
+
+
+/**
+ * @brief Update the list of agents from a platform file path
+ * Update the hash table from an agent name to a (simplified) model of agent with its name and its outputs
+ * @param platformFilePath
+ */
+void TaskM::_updateAgentsFromPlatformFilePath(QString platformFilePath)
+{
+    // Clear the hash table
+    _hashFromAgentNameToSimplifiedAgent.deleteAllItems();
+
+    QFile jsonFile(platformFilePath);
+    if (jsonFile.exists())
+    {
+        if (jsonFile.open(QIODevice::ReadOnly))
+        {
+            QByteArray byteArrayOfJson = jsonFile.readAll();
+            jsonFile.close();
+
+            QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+            QJsonObject jsonRoot = jsonDocument.object();
+
+            // List of agents
+            if (jsonRoot.contains("agents"))
+            {
+                for (QJsonValue jsonIteratorAgent : jsonRoot.value("agents").toArray())
+                {
+                    if (jsonIteratorAgent.isObject())
+                    {
+                        QJsonObject jsonAgentsGroupedByName = jsonIteratorAgent.toObject();
+
+                        QJsonValue jsonAgentName = jsonAgentsGroupedByName.value("agentName");
+                        QJsonValue jsonAgentDefinitions = jsonAgentsGroupedByName.value("definitions");
+
+                        if (jsonAgentName.isString() && jsonAgentDefinitions.isArray())
+                        {
+                            // Init parameters
+                            QString agentName = jsonAgentName.toString();
+                            QStringList outputNamesList = QStringList();
+
+                            // Array of definitions
+                            for (QJsonValue jsonIteratorDefinition : jsonAgentDefinitions.toArray())
+                            {
+                                QJsonObject jsonAgentsGroupedByDefinition = jsonIteratorDefinition.toObject();
+
+                                QJsonValue jsonDefinition = jsonAgentsGroupedByDefinition.value("definition");
+
+                                // Definition
+                                if (jsonDefinition.isObject())
+                                {
+                                    QJsonObject jsonObjectDefinition = jsonDefinition.toObject();
+
+                                    QJsonValue jsonOutputs = jsonObjectDefinition.value("outputs");
+
+                                    if (jsonOutputs.isArray())
+                                    {
+                                        // Array of outputs
+                                        for (QJsonValue jsonOutput : jsonOutputs.toArray())
+                                        {
+                                            if (jsonOutput.isObject())
+                                            {
+                                                QJsonObject jsonObjectOutput = jsonOutput.toObject();
+
+                                                QJsonValue jsonOutputName = jsonObjectOutput.value("name");
+                                                //QJsonValue jsonType = jsonObjectOutput.value("type");
+
+                                                if (jsonOutputName.isString() && !outputNamesList.contains(jsonOutputName.toString()))
+                                                {
+                                                    outputNamesList.append(jsonOutputName.toString());
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Create the (simplified) agent with a name and a list of output names
+                            AgentNameAndOutputsM* agentNameAndOutputs = new AgentNameAndOutputsM(agentName, outputNamesList);
+
+                            if (!_hashFromAgentNameToSimplifiedAgent.containsKey(agentName))
+                            {
+                                _hashFromAgentNameToSimplifiedAgent.insert(agentName, agentNameAndOutputs);
+                            }
+                            else {
+                                qCritical() << "There is already a (simplified) agent with name" << agentName;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            qCritical() << "Can not open file" << platformFilePath;
+        }
+    }
+    else {
+        qWarning() << "There is no file" << platformFilePath;
     }
 }
