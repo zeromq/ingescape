@@ -49,9 +49,6 @@ class TaskM : public QObject
     // Found in the platform (JSON file) of our task
     I2_QOBJECT_HASHMODEL(AgentNameAndOutputsM, hashFromAgentNameToSimplifiedAgent)
 
-    // List of agent names in the IngeScape platform of our task
-    I2_QML_PROPERTY_READONLY(QStringList, agentNamesList)
-
 
 public:
     /**
@@ -67,15 +64,6 @@ public:
      * @brief Destructor
      */
     ~TaskM();
-
-
-    /**
-     * @brief Update the list of agent names and the hash table from an agent name to the list of its outputs names
-     * (in the platform of our task)
-     * @param agentNamesList
-     * @param hashFromAgentNameToOutputNamesList
-     */
-    void updateAgentNamesAndOutputNames(QStringList agentNamesList, QHash<QString, QStringList> hashFromAgentNameToOutputNamesList);
 
 
     /**
@@ -111,22 +99,8 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 
-    /**
-     * @brief Slot called when the agent name of a dependent variable changed
-     * @param agentName
-     */
-    void _onAgentNameOfDependentVariableChanged(QString agentName);
-
 
 private:
-
-    /**
-     * @brief Update the list of output names for an agent name (of a dependent variable)
-     * @param dependentVariable
-     * @param agentName
-     */
-    void _updateOutputNamesListOfDependentVariable(DependentVariableM* dependentVariable, QString agentName);
-
 
     /**
      * @brief Update the list of agents from a platform file path
@@ -138,8 +112,6 @@ private:
 
 private:
 
-    // Hash table from an agent name to the list of its outputs names (in the platform of our task)
-    QHash<QString, QStringList> _hashFromAgentNameToOutputNamesList;
 
 };
 

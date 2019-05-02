@@ -37,7 +37,7 @@ class TasksController : public QObject
     I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)
 
     // Model of the selected task
-    I2_QML_PROPERTY_CUSTOM_SETTER(TaskM*, selectedTask)
+    I2_QML_PROPERTY(TaskM*, selectedTask)
 
 
 public:
@@ -48,8 +48,8 @@ public:
      * @param jsonHelper
      * @param parent
      */
-    explicit TasksController(AssessmentsModelManager* modelManager,
-                             JsonHelper* jsonHelper,
+    explicit TasksController(//AssessmentsModelManager* modelManager,
+                             //JsonHelper* jsonHelper,
                              QObject *parent = nullptr);
 
 
@@ -171,27 +171,14 @@ public Q_SLOTS:
 
 private:
 
-    /**
-     * @brief Clear the list of agents of the unselected task
-     * @param task
-     */
-    void _clearAgentsOfUnselectedTask(TaskM* task);
-
-
-    /**
-     * @brief Fill the list of agents of the selected task
-     * @param task
-     */
-    void _fillAgentsOfSelectedTask(TaskM* task);
-
 
 private:
 
     // Manager for the data model of our IngeScape Assessments application
-    AssessmentsModelManager* _modelManager;
+    //AssessmentsModelManager* _modelManager;
 
     // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
+    //JsonHelper* _jsonHelper;
 
 };
 

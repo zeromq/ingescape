@@ -152,7 +152,7 @@ Item {
             }
 
             onVisibleChanged: {
-                console.log("onVisibleChanged: selectedIndex=" + comboboxEditor.selectedIndex + " -- variableValue=" + rootItem.variableValue);
+                //console.log("onVisibleChanged: selectedIndex=" + comboboxEditor.selectedIndex + " -- variableValue=" + rootItem.variableValue);
 
                 if (visible && (comboboxEditor.selectedIndex < 0) && (typeof rootItem.variableValue !== 'undefined'))
                 {

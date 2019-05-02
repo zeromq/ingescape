@@ -450,7 +450,7 @@ Item {
 
                     isCurrentlyEditing: (rootItem.indexDependentVariableCurrentlyEditing === styleData.row)
 
-                    models: rootItem.modelM ? rootItem.modelM.agentNamesList : []
+                    models: rootItem.modelM ? rootItem.modelM.hashFromAgentNameToSimplifiedAgent.keys : []
 
 
                     //
@@ -459,10 +459,13 @@ Item {
                     onVariableValueUpdated: {
                         if (model)
                         {
-                            console.log("QML: on (Dependent) Variable Value Updated for 'Agent Name' " + value);
+                            //console.log("QML: on (Dependent) Variable Value Updated for 'Agent Name' " + value);
 
                             // Update the agent name
                             model.agentName = value;
+
+                            // Reset the output name
+                            model.outputName = "";
                         }
                     }
                 }
@@ -486,7 +489,8 @@ Item {
 
                     isCurrentlyEditing: (rootItem.indexDependentVariableCurrentlyEditing === styleData.row)
 
-                    models: model ? model.outputNamesList : []
+                    models: rootItem.modelM && model && (model.agentName.length > 0) && rootItem.modelM.hashFromAgentNameToSimplifiedAgent.containsKey(model.agentName) ? rootItem.modelM.hashFromAgentNameToSimplifiedAgent.value(model.agentName).outputNamesList
+                                                                                                                                                                        : []
 
 
                     //
@@ -495,7 +499,7 @@ Item {
                     onVariableValueUpdated: {
                         if (model)
                         {
-                            console.log("QML: on (Dependent) Variable Value Updated for 'Output Name' " + value);
+                            //console.log("QML: on (Dependent) Variable Value Updated for 'Output Name' " + value);
 
                             // Update the output name
                             model.outputName = value;

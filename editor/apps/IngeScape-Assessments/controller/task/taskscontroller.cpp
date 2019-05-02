@@ -20,13 +20,13 @@
  * @param jsonHelper
  * @param parent
  */
-TasksController::TasksController(AssessmentsModelManager* modelManager,
-                                 JsonHelper* jsonHelper,
+TasksController::TasksController(//AssessmentsModelManager* modelManager,
+                                 //JsonHelper* jsonHelper,
                                  QObject *parent) : QObject(parent),
     _currentExperimentation(nullptr),
-    _selectedTask(nullptr),
-    _modelManager(modelManager),
-    _jsonHelper(jsonHelper)
+    _selectedTask(nullptr)
+    //_modelManager(modelManager),
+    //_jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -58,8 +58,8 @@ TasksController::~TasksController()
     }
 
     // Reset pointers
-    _modelManager = nullptr;
-    _jsonHelper = nullptr;
+    //_modelManager = nullptr;
+    //_jsonHelper = nullptr;
 }
 
 
@@ -67,15 +67,14 @@ TasksController::~TasksController()
  * @brief Setter for property "Selected Task"
  * @param value
  */
-void TasksController::setselectedTask(TaskM *value)
+/*void TasksController::setselectedTask(TaskM *value)
 {
     if (_selectedTask != value)
     {
         // Previous selected task was defined
         if (_selectedTask != nullptr)
         {
-            // Clear the list of agents of the unselected task
-            _clearAgentsOfUnselectedTask(_selectedTask);
+
         }
 
         // Update the selected task
@@ -84,13 +83,12 @@ void TasksController::setselectedTask(TaskM *value)
         // New selected task is defined
         if (_selectedTask != nullptr)
         {
-            // Fill the list of agents of the selected task
-            _fillAgentsOfSelectedTask(_selectedTask);
+
         }
 
         Q_EMIT selectedTaskChanged(value);
     }
-}
+}*/
 
 
 /**
@@ -358,112 +356,5 @@ void TasksController::createNewDependentVariable()
 
         // Add the dependent variable to the selected task
         _selectedTask->addDependentVariable(dependentVariable);
-    }
-}
-
-
-/**
- * @brief Clear the list of agents of the unselected task
- * @param task
- */
-void TasksController::_clearAgentsOfUnselectedTask(TaskM* task)
-{
-    if (task != nullptr)
-    {
-        // FIXME TODO _clearAgentsOfUnselectedTask
-        qDebug() << "Clear the list of agents of the unselected task" << task->name();
-    }
-}
-
-
-/**
- * @brief Fill the list of agents of the selected task
- * @param task
- */
-void TasksController::_fillAgentsOfSelectedTask(TaskM* task)
-{
-    if ((task != nullptr) && (_modelManager != nullptr))
-    {
-        qDebug() << "Fill the list of agents of the selected task" << task->name();
-
-        if (task->platformFileUrl().isValid())
-        {
-            QString platformFilePath = task->platformFileUrl().path();
-
-            QFile jsonFile(platformFilePath);
-            if (jsonFile.exists())
-            {
-                if (jsonFile.open(QIODevice::ReadOnly))
-                {
-                    QByteArray byteArrayOfJson = jsonFile.readAll();
-                    jsonFile.close();
-
-                    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
-
-                    QJsonObject jsonRoot = jsonDocument.object();
-
-                    // List of agents
-                    if (jsonRoot.contains("agents"))
-                    {
-                        // Version
-                        QString versionJsonPlatform = "";
-                        if (jsonRoot.contains("version"))
-                        {
-                            versionJsonPlatform = jsonRoot.value("version").toString();
-
-                            qDebug() << "Version of JSON platform is" << versionJsonPlatform;
-                        }
-                        else {
-                            qDebug() << "UNDEFINED version of JSON platform";
-                        }
-
-                        // Import the agents list from a json byte content
-                        _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
-
-
-                        //
-                        // Update the list of agent names and the hash table from an agent name to the list of its outputs names
-                        // in the platform of the (selected) task
-                        //
-                        QStringList agentNamesList;
-                        QHash<QString, QStringList> hashFromAgentNameToOutputNamesList;
-
-                        for (AgentsGroupedByNameVM* agentsGroupedByName : _modelManager->allAgentsGroupsByName()->toList())
-                        {
-                            if (agentsGroupedByName != nullptr)
-                            {
-                                agentNamesList.append(agentsGroupedByName->name());
-
-                                QStringList outputNamesList;
-                                for (OutputVM* output : agentsGroupedByName->outputsList()->toList())
-                                {
-                                    if (output != nullptr)
-                                    {
-                                        outputNamesList.append(output->name());
-                                    }
-                                }
-                                hashFromAgentNameToOutputNamesList.insert(agentsGroupedByName->name(), outputNamesList);
-                            }
-                        }
-
-                        // Update the list of agent names and the hash table from an agent name to the list of its outputs names
-                        task->updateAgentNamesAndOutputNames(agentNamesList, hashFromAgentNameToOutputNamesList);
-
-                        qDebug() << "Agents of the selected task:" << agentNamesList << "(" << hashFromAgentNameToOutputNamesList << ")";
-
-                        // FIXME TODO: clean Models and VM of agents
-                    }
-                }
-                else {
-                    qCritical() << "Can not open file" << platformFilePath;
-                }
-            }
-            else {
-                qWarning() << "There is no file" << platformFilePath;
-            }
-        }
-        else {
-            qWarning() << "The URL of platform" << task->platformFileUrl() << "is not valid";
-        }
     }
 }

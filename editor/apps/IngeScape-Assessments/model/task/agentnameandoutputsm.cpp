@@ -29,7 +29,7 @@ AgentNameAndOutputsM::AgentNameAndOutputsM(QString agentName,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of (simplified) Agent" << _agentName << "with outputs:" << _outputNamesList;
+    //qInfo() << "New Model of (simplified) Agent" << _agentName << "with outputs:" << _outputNamesList;
 }
 
 
@@ -38,5 +38,5 @@ AgentNameAndOutputsM::AgentNameAndOutputsM(QString agentName,
  */
 AgentNameAndOutputsM::~AgentNameAndOutputsM()
 {
-    qInfo() << "Delete Model of (simplified) Agent" << _agentName << "with outputs:" << _outputNamesList;
+    //qInfo() << "Delete Model of (simplified) Agent" << _agentName << "with outputs:" << _outputNamesList;
 }
