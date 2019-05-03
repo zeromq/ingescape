@@ -141,7 +141,7 @@ Item {
     // Independent Variables Panel
     //
     Rectangle {
-        id: panelIndepVar
+        id: panelIndependentVariable
 
         anchors {
             left: parent.left
@@ -157,7 +157,7 @@ Item {
         }
 
         Row {
-            id: headerIndepVar
+            id: headerIndependentVariable
 
             anchors {
                 left: parent.left
@@ -198,14 +198,14 @@ Item {
 
 
         TableView {
-            id: tableIndepVar
+            id: tableIndependentVariable
 
             anchors {
                 left: parent.left
                 leftMargin: 10
                 right: parent.right
                 rightMargin: 10
-                top: headerIndepVar.bottom
+                top: headerIndependentVariable.bottom
                 topMargin: 10
                 bottom: parent.bottom
                 bottomMargin: 10
@@ -219,34 +219,94 @@ Item {
                                           : (styleData.alternate ? "lightgray" : "white")
             }
 
+            headerDelegate: Rectangle {
+                height: 30
+                width: parent.width
+
+                color: "darkgray"
+
+                Text {
+                    id: txtColumnHeader1
+
+                    anchors {
+                        fill: parent
+                        leftMargin: (styleData.column === 0) ? 55 : 5
+                    }
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: styleData.textAlignment
+
+                    text: styleData.value
+                    elide: Text.ElideRight
+                    color: IngeScapeTheme.blackColor
+                }
+
+                Rectangle {
+                    id: leftSeparator1
+
+                    visible: (styleData.column === 0)
+
+                    anchors {
+                        left: parent.left
+                        leftMargin: 50
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    width: 1
+                    color: "silver"
+                }
+
+                Rectangle {
+                    id: rightSeparator1
+
+                    anchors {
+                        right: parent.right
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    width: 1
+                    color: "silver"
+                }
+            }
+
             model: rootItem.modelM ? rootItem.modelM.independentVariables : null
 
             TableViewColumn {
                 role: "name"
                 title: qsTr("Nom")
+                width: 200
+
+                delegate: IndependentVariableTableCell {
+                    cellText: styleData.value
+
+                    // Slot on signal "Delete Independent Variable"
+                    onDeleteIndependentVariable: {
+                        if (rootItem.controller && model)
+                        {
+                            //console.log("QML: Delete Independent Variable " + model.name);
+                            rootItem.controller.deleteIndependentVariable(model.QtObject);
+                        }
+                    }
+                }
             }
 
             TableViewColumn {
                 role: "description"
                 title: qsTr("Description")
+                width: 200
+
+                delegate: IndependentVariableTableCell {
+                    cellText: styleData.value
+                }
             }
 
             TableViewColumn {
                 role: "valueType"
                 title: qsTr("Type")
+                width: 200
 
-                delegate: Text {
-                    text: IndependentVariableValueTypes.enumToString(styleData.value) + ((styleData.value === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM) ? " {" + tableIndepVar.model.get(styleData.row).enumValues + "}"
-                                                                                                                                                                       : "" )
-
-                    verticalAlignment: Text.AlignVCenter
-
-                    color: styleData.selected ? IngeScapeTheme.whiteColor : IngeScapeTheme.blackColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        //weight: Font.Medium
-                        pixelSize: 12
-                    }
+                delegate: IndependentVariableTableCell {
+                    cellText: IndependentVariableValueTypes.enumToString(styleData.value) + ((styleData.value === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM) ? " {" + tableIndependentVariable.model.get(styleData.row).enumValues + "}"
+                                                                                                                                                                           : "" )
                 }
             }
 
@@ -256,10 +316,10 @@ Item {
             }*/
 
             onDoubleClicked: {
-                var independentVariable = tableIndepVar.model.get(row);
+                var independentVariable = tableIndependentVariable.model.get(row);
                 if (independentVariable)
                 {
-                    console.log("on Double Clicked on row " + row + " (" + independentVariable.name + ")");
+                    //console.log("on Double Clicked on row " + row + " (" + independentVariable.name + ")");
 
                     // Update the independent variable currently edited
                     createIndependentVariablePopup.independentVariableCurrentlyEdited = independentVariable;
@@ -276,7 +336,7 @@ Item {
     // Dependent Variables Panel
     //
     Rectangle {
-        id: panelDepVar
+        id: panelDependentVariable
 
         anchors {
             left: parent.left
@@ -292,7 +352,7 @@ Item {
         }
 
         Row {
-            id: headerDepVar
+            id: headerDependentVariable
 
             anchors {
                 left: parent.left
@@ -330,14 +390,14 @@ Item {
         }
 
         TableView {
-            id: tableDepVariables
+            id: tableDependentVariable
 
             anchors {
                 left: parent.left
                 leftMargin: 10
                 right: parent.right
                 rightMargin: 10
-                top: headerDepVar.bottom
+                top: headerDependentVariable.bottom
                 topMargin: 10
                 bottom: parent.bottom
                 bottomMargin: 10
@@ -351,6 +411,55 @@ Item {
                                           : (styleData.alternate ? "lightgray" : "white")
             }
 
+            headerDelegate: Rectangle {
+                height: 30
+                width: parent.width
+
+                color: "darkgray"
+
+                Text {
+                    id: txtColumnHeader2
+
+                    anchors {
+                        fill: parent
+                        leftMargin: (styleData.column === 0) ? 55 : 5
+                    }
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: styleData.textAlignment
+
+                    text: styleData.value
+                    elide: Text.ElideRight
+                    color: IngeScapeTheme.blackColor
+                }
+
+                Rectangle {
+                    id: leftSeparator2
+
+                    visible: (styleData.column === 0)
+
+                    anchors {
+                        left: parent.left
+                        leftMargin: 50
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    width: 1
+                    color: "silver"
+                }
+
+                Rectangle {
+                    id: rightSeparator2
+
+                    anchors {
+                        right: parent.right
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    width: 1
+                    color: "silver"
+                }
+            }
+
             model: rootItem.modelM ? rootItem.modelM.dependentVariables : null
 
             TableViewColumn {
@@ -359,7 +468,7 @@ Item {
                 role: "name"
                 title: qsTr("Nom")
 
-                width: tableDepVariables.width / 4.0
+                width: tableDependentVariable.width / 4.0
 
                 delegate: VariableTextEditor {
 
@@ -395,6 +504,14 @@ Item {
                             model.name = value;
                         }
                     }
+
+                    onDeleteDependentVariable: {
+                        if (rootItem.controller && model)
+                        {
+                            //console.log("QML: Delete Dependent Variable " + model.name);
+                            rootItem.controller.deleteDependentVariable(model.QtObject);
+                        }
+                    }
                 }
             }
 
@@ -404,7 +521,7 @@ Item {
                 role: "description"
                 title: qsTr("Description")
 
-                width: tableDepVariables.width / 4.0
+                width: tableDependentVariable.width / 4.0
 
                 delegate: VariableTextEditor {
 
@@ -438,7 +555,7 @@ Item {
                 role: "agentName"
                 title: qsTr("Agent")
 
-                width: tableDepVariables.width / 4.0
+                width: tableDependentVariable.width / 4.0
 
                 delegate: VariableComboBoxEditor {
 
@@ -477,7 +594,7 @@ Item {
                 role: "outputName"
                 title: qsTr("Sortie")
 
-                width: tableDepVariables.width / 4.0
+                width: tableDependentVariable.width / 4.0
 
                 delegate: VariableComboBoxEditor {
 
@@ -520,7 +637,7 @@ Item {
             //}
             // --> Workaround
             Connections {
-                target: tableDepVariables.selection
+                target: tableDependentVariable.selection
 
                 onSelectionChanged: {
                     //console.log("onSelectionChanged:");
@@ -535,7 +652,7 @@ Item {
                     // Reset
                     rootItem.indexPreviousSelectedDependentVariable = -1;
 
-                    tableDepVariables.selection.forEach(function(rowIndex) {
+                    tableDependentVariable.selection.forEach(function(rowIndex) {
                         //console.log("row " + rowIndex + " is selected");
 
                         // Update

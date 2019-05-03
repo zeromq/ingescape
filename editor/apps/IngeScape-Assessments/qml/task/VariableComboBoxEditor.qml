@@ -40,7 +40,6 @@ Item {
     //--------------------------------------------------------
 
     property DependentVariableM variable: null;
-    //property IndependentVariableM variable: null;
 
     // Keep type "var" because the C++ use a QVariant
     property var variableValue: "";
@@ -68,9 +67,6 @@ Item {
     // Variable Value Updated
     signal variableValueUpdated(var value);
 
-    // Delete Variable
-    //signal deleteVariable();
-
 
     //--------------------------------
     //
@@ -97,15 +93,11 @@ Item {
     //
     //--------------------------------------------------------
 
-    Rectangle {
+    /*Rectangle {
         id: background
 
         anchors {
-            left: parent.left
-            //leftMargin: (variable && variable.isSubjectName) ? 105 : 0
-            right: parent.right
-            top: parent.top
-            bottom: parent.bottom
+            fill: parent
         }
 
         color: "transparent"
@@ -113,58 +105,76 @@ Item {
             color: "silver"
             width: 1
         }
+    }*/
 
-        Text {
-            anchors {
-                fill: parent
-                margins: 1
-            }
-
-            visible: !rootItem.isCurrentlyEditing
-
-            text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
-
-            verticalAlignment: Text.AlignVCenter
+    Text {
+        anchors {
+            fill: parent
+            leftMargin: 5
         }
 
-        I2ComboboxStringList {
-            id: comboboxEditor
+        visible: !rootItem.isCurrentlyEditing
 
-            anchors {
-                fill: parent
-                margins: 1
+        text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
+
+        verticalAlignment: Text.AlignVCenter
+        //color: styleData.selected ? IngeScapeTheme.whiteColor : IngeScapeTheme.blackColor
+        font {
+            family: IngeScapeTheme.textFontFamily
+            //weight: Font.Medium
+            pixelSize: 12
+        }
+    }
+
+    I2ComboboxStringList {
+        id: comboboxEditor
+
+        anchors {
+            fill: parent
+            margins: 1
+        }
+
+        visible: rootItem.isCurrentlyEditing
+
+        model: rootItem.models ? rootItem.models : null
+
+        enabled: rootItem.models ? (rootItem.models.length > 0)
+                                 : false
+
+        onSelectedItemChanged: {
+
+            if (comboboxEditor.selectedItem)
+            {
+                //console.log("QML: on Selected Item Changed " + comboboxEditor.selectedItem);
+
+                // Emit the signal "Characteristic Value Updated"
+                rootItem.variableValueUpdated(comboboxEditor.selectedItem);
             }
+        }
 
-            visible: rootItem.isCurrentlyEditing
+        onVisibleChanged: {
+            //console.log("onVisibleChanged: selectedIndex=" + comboboxEditor.selectedIndex + " -- variableValue=" + rootItem.variableValue);
 
-            model: rootItem.models ? rootItem.models : null
-
-            enabled: rootItem.models ? (rootItem.models.length > 0)
-                                     : false
-
-            onSelectedItemChanged: {
-
-                if (comboboxEditor.selectedItem)
-                {
-                    //console.log("QML: on Selected Item Changed " + comboboxEditor.selectedItem);
-
-                    // Emit the signal "Characteristic Value Updated"
-                    rootItem.variableValueUpdated(comboboxEditor.selectedItem);
-                }
-            }
-
-            onVisibleChanged: {
-                //console.log("onVisibleChanged: selectedIndex=" + comboboxEditor.selectedIndex + " -- variableValue=" + rootItem.variableValue);
-
-                if (visible && (comboboxEditor.selectedIndex < 0) && (typeof rootItem.variableValue !== 'undefined'))
-                {
-                    var index = comboboxEditor.model.indexOf(rootItem.variableValue);
-                    if (index > -1) {
-                        console.log("Must select index " + index);
-                        comboboxEditor.selectedIndex = index;
-                    }
+            if (visible && (comboboxEditor.selectedIndex < 0) && (typeof rootItem.variableValue !== 'undefined'))
+            {
+                var index = comboboxEditor.model.indexOf(rootItem.variableValue);
+                if (index > -1) {
+                    console.log("Must select index " + index);
+                    comboboxEditor.selectedIndex = index;
                 }
             }
         }
+    }
+
+    Rectangle {
+        id: rightSeparator
+
+        anchors {
+            right: parent.right
+            top: parent.top
+            bottom: parent.bottom
+        }
+        width: 1
+        color: "silver"
     }
 }

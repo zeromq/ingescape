@@ -39,13 +39,17 @@ Item {
     //
     //--------------------------------------------------------
 
+    // Model of our (Dependent) Variable
     property DependentVariableM variable: null;
-    //property IndependentVariableM variable: null;
 
     // Keep type "var" because the C++ use a QVariant
     property var variableValue: "";
 
+    // FLag indicating
     property bool isCurrentlyEditing: false;
+
+    // FLag indicating if our cell is in the first column
+    property bool isFirstColumn: (styleData.column === 0)
 
 
 
@@ -66,8 +70,8 @@ Item {
     // Variable Value Updated
     signal variableValueUpdated(var value);
 
-    // Delete Variable
-    //signal deleteVariable();
+    // Delete Dependent Variable
+    signal deleteDependentVariable();
 
 
     //--------------------------------
@@ -95,15 +99,50 @@ Item {
     //
     //--------------------------------------------------------
 
-    Rectangle {
-        id: background
+    // FIXME: Loader instead of visible on "rootItem.isFirstColumn" ?
+    // --> What is the least expensive between a Loader and a Button ?
+
+    Button {
+        id: btnDeleteDependentVariable
 
         anchors {
             left: parent.left
-            //leftMargin: (variable && variable.isSubjectName) ? 105 : 0
-            right: parent.right
+            top: parent.top
+        }
+        width: 50
+        height: 30
+
+        text: "DEL"
+
+        //visible: styleData.selected
+        visible: styleData.selected && rootItem.isFirstColumn
+
+        onClicked: {
+            // Emit the signal "Delete Dependent Variable"
+            rootItem.deleteDependentVariable();
+        }
+    }
+
+    Rectangle {
+        id: leftSeparator
+
+        anchors {
+            left: parent.left
+            leftMargin: 50
             top: parent.top
             bottom: parent.bottom
+        }
+        width: 1
+        color: "silver"
+
+        visible: rootItem.isFirstColumn
+    }
+
+    /*Rectangle {
+        id: background
+
+        anchors {
+            fill: parent
         }
 
         color: "transparent"
@@ -111,58 +150,75 @@ Item {
             color: "silver"
             width: 1
         }
+    }*/
 
-        Text {
-            anchors {
-                fill: parent
-                margins: 1
-            }
-
-            visible: !rootItem.isCurrentlyEditing
-
-            text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
-
-            verticalAlignment: Text.AlignVCenter
+    Text {
+        anchors {
+            fill: parent
+            leftMargin: rootItem.isFirstColumn ? 55 : 5
         }
 
-        TextField {
-            id: txtEditor
+        visible: !rootItem.isCurrentlyEditing
 
-            anchors {
-                fill: parent
-                margins: 1
-            }
+        text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
 
-            visible: rootItem.isCurrentlyEditing
+        verticalAlignment: Text.AlignVCenter
+        //color: styleData.selected ? IngeScapeTheme.whiteColor : IngeScapeTheme.blackColor
+        font {
+            family: IngeScapeTheme.textFontFamily
+            //weight: Font.Medium
+            pixelSize: 12
+        }
+    }
 
-            text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
+    TextField {
+        id: txtEditor
 
-            style: I2TextFieldStyle {
-                backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                borderColor: IngeScapeTheme.whiteColor
-                borderErrorColor: IngeScapeTheme.redColor
-                radiusTextBox: 1
-                borderWidth: 0;
-                borderWidthActive: 1
-                textIdleColor: IngeScapeTheme.whiteColor;
-                textDisabledColor: IngeScapeTheme.darkGreyColor
+        anchors {
+            fill: parent
+            leftMargin: rootItem.isFirstColumn ? 50 : 0
+        }
 
-                padding.left: 3
-                padding.right: 3
+        visible: rootItem.isCurrentlyEditing
 
-                font {
-                    pixelSize:15
-                    family: IngeScapeTheme.textFontFamily
-                }
-            }
+        text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
 
-            onTextChanged: {
-                //console.log("QML: on Text Changed " + txtEditor.text);
+        style: I2TextFieldStyle {
+            backgroundColor: IngeScapeTheme.darkBlueGreyColor
+            borderColor: IngeScapeTheme.whiteColor
+            borderErrorColor: IngeScapeTheme.redColor
+            radiusTextBox: 1
+            borderWidth: 0;
+            borderWidthActive: 1
+            textIdleColor: IngeScapeTheme.whiteColor;
+            textDisabledColor: IngeScapeTheme.darkGreyColor
 
-                // Emit the signal "Variable Value Updated"
-                rootItem.variableValueUpdated(txtEditor.text);
+            padding.left: 3
+            padding.right: 3
+
+            font {
+                pixelSize:15
+                family: IngeScapeTheme.textFontFamily
             }
         }
 
+        onTextChanged: {
+            //console.log("QML: on Text Changed " + txtEditor.text);
+
+            // Emit the signal "Variable Value Updated"
+            rootItem.variableValueUpdated(txtEditor.text);
+        }
+    }
+
+    Rectangle {
+        id: rightSeparator
+
+        anchors {
+            right: parent.right
+            top: parent.top
+            bottom: parent.bottom
+        }
+        width: 1
+        color: "silver"
     }
 }

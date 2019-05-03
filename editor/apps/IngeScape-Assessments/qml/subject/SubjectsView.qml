@@ -301,7 +301,6 @@ Item {
                     text: styleData.value
                     elide: Text.ElideRight
                     color: IngeScapeTheme.blackColor
-                    //renderType: Text.NativeRendering
                 }
 
                 Rectangle {

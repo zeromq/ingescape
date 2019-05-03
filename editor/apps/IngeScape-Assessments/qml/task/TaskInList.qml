@@ -152,7 +152,7 @@ Item {
         Row {
             id: rowOptions
 
-            spacing: 5
+            spacing: 0
 
             anchors {
                 right: parent.right
@@ -165,7 +165,7 @@ Item {
             Button {
                 id: btnDuplicate
 
-                text: "Duplicate"
+                text: "COPY"
 
                 //width: 80
                 height: parent.height
@@ -181,7 +181,7 @@ Item {
 
                 text: "DEL"
 
-                width: 50
+                //width: 50
                 height: parent.height
 
                 onClicked: {

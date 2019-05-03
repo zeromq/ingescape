@@ -163,6 +163,14 @@ public:
     Q_INVOKABLE void createNewDependentVariable();
 
 
+    /**
+     * @brief Delete an dependent variable
+     * @param dependentVariable
+     */
+    Q_INVOKABLE void deleteDependentVariable(DependentVariableM* dependentVariable);
+
+
+
 Q_SIGNALS:
 
 

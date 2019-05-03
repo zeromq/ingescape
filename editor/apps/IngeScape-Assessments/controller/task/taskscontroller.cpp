@@ -358,3 +358,20 @@ void TasksController::createNewDependentVariable()
         _selectedTask->addDependentVariable(dependentVariable);
     }
 }
+
+
+/**
+ * @brief Delete an dependent variable
+ * @param dependentVariable
+ */
+void TasksController::deleteDependentVariable(DependentVariableM* dependentVariable)
+{
+    if ((dependentVariable != nullptr) && (_selectedTask != nullptr))
+    {
+        // Remove the dependent variable from the selected task
+        _selectedTask->removeDependentVariable(dependentVariable);
+
+        // Free memory
+        delete dependentVariable;
+    }
+}
