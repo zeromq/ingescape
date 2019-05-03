@@ -35,6 +35,9 @@ class RecordController : public QObject
     // List of actions
     I2_QOBJECT_LISTMODEL(ActionM, actionsList)
 
+    // Selected action
+    I2_QML_PROPERTY_DELETE_PROOF(ActionM*, selectedAction)
+
 
 public:
 

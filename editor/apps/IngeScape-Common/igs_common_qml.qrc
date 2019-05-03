@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/theme/IngeScapeTheme.qml</file>
+        <file>qml/ActionsListItem.qml</file>
+        <file>resources/fonts/akrobat/Akrobat-Black.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-Bold.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-ExtraBold.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-ExtraLight.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-Light.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-SemiBold.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-Thin.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Bold_Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Bold.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Light_Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Light.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Medium_Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Medium.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans.ttf</file>
+        <file>resources/fonts/titillium/Titillium-Regular.otf</file>
+        <file>resources/SVG/ingescape-pictos.svg</file>
+        <file>qml/theme/LabellessSvgButtonStyle.qml</file>
+    </qresource>
+</RCC>

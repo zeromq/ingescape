@@ -292,7 +292,7 @@ I2PopupBase {
             Button {
                 id: cancelButton
 
-                property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -305,7 +305,7 @@ I2PopupBase {
                 text: "Cancel"
 
                 style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "button"
@@ -333,7 +333,7 @@ I2PopupBase {
             Button {
                 id: okButton
 
-                property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -349,7 +349,7 @@ I2PopupBase {
                           && controller && controller.canCreateTaskWithName(txtTaskName.text) )
 
                 style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "button"

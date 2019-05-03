@@ -257,7 +257,7 @@ Item {
                 }
 
                 width : 6
-                color : IngeScapeTheme.selectedAgentColor
+                color : IngeScapeTheme.selectionColor
             }
 
 
@@ -267,7 +267,7 @@ Item {
                     fill: parent
                 }
                 visible: playPauseRecordButton.checked
-                color: IngeScapeTheme.selectedAgentColor
+                color: IngeScapeTheme.orangeColor
             }
 
             // Separator

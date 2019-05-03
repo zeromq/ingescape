@@ -32,8 +32,8 @@ I2ComboboxStyle {
     listItemTextColorIdle : IngeScapeTheme.whiteColor
     frameVisible : false
     listRadius: 0
-    listItemTextColorSelected : IngeScapeTheme.orangeColor
-    listBackgroundColorPressed : IngeScapeTheme.darkBlueGreyColor
+    listItemTextColorSelected: IngeScapeTheme.selectionColor
+    listBackgroundColorPressed: IngeScapeTheme.darkBlueGreyColor
 
     isI2Icon : false
     dropdownIcon : "image://I2svg/resources/SVG/ingescape-pictos.svg#iconCombo"

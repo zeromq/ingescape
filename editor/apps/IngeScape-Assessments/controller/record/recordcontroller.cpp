@@ -24,6 +24,7 @@ RecordController::RecordController(AssessmentsModelManager* modelManager,
                                    JsonHelper* jsonHelper,
                                    QObject *parent) : QObject(parent),
     _currentRecord(nullptr),
+    _selectedAction(nullptr),
     _modelManager(modelManager),
     _jsonHelper(jsonHelper)
 {

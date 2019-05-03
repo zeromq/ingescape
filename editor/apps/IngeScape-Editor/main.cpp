@@ -180,7 +180,7 @@ void registerCustomQmlTypes()
     //
     //------------------
     // - Singleton used to enable consistent app styling through predefined colors, fonts, etc.
-    qmlRegisterSingletonType(QUrl("qrc:/qml/theme/IngeScapeTheme.qml"), "INGESCAPE", 1, 0, "IngeScapeTheme");
+    qmlRegisterSingletonType(QUrl("qrc:/qml/theme/IngeScapeEditorTheme.qml"), "INGESCAPE", 1, 0, "IngeScapeEditorTheme");
 
     // - Scrollview style
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeScrollViewStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeScrollViewStyle");

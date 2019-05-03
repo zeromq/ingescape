@@ -113,11 +113,19 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterUncreatableType<ParameterVM>("INGESCAPE", 1, 0, "ParameterVM", "Internal class");
 
 
+    //------------------
     //
     // QML components
     //
-    //qmlRegisterType(QUrl("qrc:/qml/CircuitsElementsPanel.qml"), uri, 1, 0, "CircuitsElementsPanel");
-    //qmlRegisterType(QUrl("qrc:/qml/Clock.qml"), uri, 1, 0, "Clock");
+    //------------------
+    // - Singleton used to enable consistent app styling through predefined colors, fonts, etc.
+    qmlRegisterSingletonType(QUrl("qrc:/qml/theme/IngeScapeTheme.qml"), "INGESCAPE", 1, 0, "IngeScapeTheme");
+
+    // - Label-less SVG Button style
+    qmlRegisterType(QUrl("qrc:/qml/theme/LabellessSvgButtonStyle.qml"), "INGESCAPE", 1, 0, "LabellessSvgButtonStyle");
+
+    // - Actions List Item
+    qmlRegisterType(QUrl("qrc:/qml/ActionsListItem.qml"), "INGESCAPE", 1, 0, "ActionsListItem");
 
 }
 

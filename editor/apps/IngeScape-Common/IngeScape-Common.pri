@@ -98,3 +98,8 @@ HEADERS += \
 #DISTFILES += \
 #    $$PWD/IngeScape-Common.qmltypes \
 #    $$PWD/qmldir
+
+DISTFILES +=
+
+RESOURCES += \
+    $$PWD/igs_common_qml.qrc

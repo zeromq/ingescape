@@ -103,7 +103,7 @@ Item {
 
             visible: controller && rootItem.agent && (controller.selectedAgent === rootItem.agent)
 
-            color: IngeScapeTheme.selectedAgentColor
+            color: IngeScapeTheme.selectionColor
         }
 
         // Remove button

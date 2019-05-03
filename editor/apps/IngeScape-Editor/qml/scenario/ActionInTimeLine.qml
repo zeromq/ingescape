@@ -288,11 +288,11 @@ Item {
             left : parent.left
         }
         verticalAlignment: Text.AlignVCenter
-        color : (controller && controller.selectedActionVMInTimeline && actionVMItem.myActionVM  && controller.selectedActionVMInTimeline === actionVMItem.myActionVM) ?
-                    actionVMMouseArea.pressed? IngeScapeTheme.lightGreyColor : IngeScapeTheme.orangeColor
-        : actionVMMouseArea.pressed? IngeScapeTheme.greyColor : IngeScapeTheme.lightGreyColor
+        color: (controller && controller.selectedActionVMInTimeline && actionVMItem.myActionVM  && (controller.selectedActionVMInTimeline === actionVMItem.myActionVM)) ?
+                   (actionVMMouseArea.pressed ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.orangeColor)
+                 : (actionVMMouseArea.pressed ? IngeScapeTheme.greyColor : IngeScapeTheme.lightGreyColor)
 
-        text : (actionVMItem.myActionVM && actionVMItem.myActionVM.modelM) ? actionVMItem.myActionVM.modelM.name : ""
+        text: (actionVMItem.myActionVM && actionVMItem.myActionVM.modelM) ? actionVMItem.myActionVM.modelM.name : ""
         font {
             family : IngeScapeTheme.textFontFamily
             pixelSize: 16

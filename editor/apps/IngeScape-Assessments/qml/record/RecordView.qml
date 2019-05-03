@@ -236,46 +236,34 @@ Item {
             }
         }
 
-        ListView {
+        Column {
             id: actionsList
 
             anchors {
                 top: titleActions.bottom
-                topMargin: 5
+                topMargin: 10
                 left: parent.left
-                leftMargin: 5
                 right: parent.right
-                rightMargin: 5
                 bottom: parent.bottom
-                bottomMargin: 5
             }
 
-            model: rootItem.controller ? rootItem.controller.actionsList : null
+            spacing: 0
 
-            delegate: Rectangle {
+            Repeater {
 
-                width: parent.width
-                height: 30
+                model: rootItem.controller ? rootItem.controller.actionsList : null
 
-                color: "transparent"
-                border {
-                    color: "black"
-                    width: 1
-                }
+                delegate: ActionsListItem {
+                    id : actionInList
 
-                Text {
-                    anchors.fill: parent
+                    width: parent.width
+                    height: 42
 
-                    text: model.name
+                    action: model.QtObject
+                    controller: rootItem.controller
 
-                    verticalAlignment: Text.AlignVCenter
-
-                    color: IngeScapeTheme.whiteColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        //weight: Font.Medium
-                        pixelSize: 14
-                    }
+                    //actionItemIsHovered: mouseArea.containsMouse
+                    //actionItemIsPressed: mouseArea.pressed
                 }
             }
         }

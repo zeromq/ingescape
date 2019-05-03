@@ -86,7 +86,7 @@ Rectangle {
 
 
     border {
-        color: IngeScapeTheme.selectedAgentColor
+        color: IngeScapeTheme.selectionColor
         width: rootItem._isSelected ? 1 : 0
     }
 

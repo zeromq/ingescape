@@ -101,7 +101,9 @@ I2PopupBase {
             Button {
                 id: cancelButton
                 activeFocusOnPress: true
-                property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+
+                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
                 height: boundingBox.height
                 width: boundingBox.width
 
@@ -142,7 +144,8 @@ I2PopupBase {
             Button {
                 id: okButton
 
-                property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
                 height: boundingBox.height
                 width: boundingBox.width
 

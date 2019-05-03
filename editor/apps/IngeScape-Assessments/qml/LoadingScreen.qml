@@ -75,7 +75,7 @@ Item {
         /*I2SvgItem {
             id: logo
 
-            svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+            svgFileCache: IngeScapeTheme.svgFileIngeScape
             svgElementId: "loader-ingescape"
         }*/
 
