@@ -96,6 +96,11 @@ public Q_SLOTS:
 
 private:
 
+    /**
+     * @brief For debug purpose: Print the value of all independent variables
+     */
+    void _printIndependentVariableValues();
+
 
 };
 

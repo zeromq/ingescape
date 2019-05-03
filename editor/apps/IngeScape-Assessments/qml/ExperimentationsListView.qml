@@ -237,7 +237,7 @@ Item {
                         }*/
 
                         Row {
-                            spacing: 10
+                            spacing: 0
 
                             anchors {
                                 right: parent.right
@@ -249,9 +249,9 @@ Item {
                             Button {
                                 id: btnOpen
 
-                                text: "Open"
+                                text: "OPEN"
 
-                                width: 100
+                                //width: 100
                                 height: parent.height
 
                                 onClicked: {
@@ -268,9 +268,9 @@ Item {
                             Button {
                                 id: btnDelete
 
-                                text: "Delete"
+                                text: "DEL"
 
-                                width: 100
+                                //width: 100
                                 height: parent.height
 
                                 onClicked: {

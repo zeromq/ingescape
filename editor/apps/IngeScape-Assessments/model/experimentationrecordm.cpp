@@ -102,8 +102,8 @@ ExperimentationRecordM::~ExperimentationRecordM()
     {
         qInfo() << "Delete Model of Record" << _name << "(" << _uid << ") for subject" << _subject->name() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
 
-        setsubject(nullptr);
-        settask(nullptr);
+        // For debug purpose: Print the value of all independent variables
+        _printIndependentVariableValues();
 
         // Free memory
         if (_mapIndependentVariableValues != nullptr)
@@ -118,6 +118,10 @@ ExperimentationRecordM::~ExperimentationRecordM()
             setmapIndependentVariableValues(nullptr);
             delete temp;
         }
+
+        // Reset pointers
+        setsubject(nullptr);
+        settask(nullptr);
     }
 }
 
@@ -140,5 +144,31 @@ void ExperimentationRecordM::setendDateTime(QDateTime value)
         setduration(time);
 
         Q_EMIT endDateTimeChanged(value);
+    }
+}
+
+
+/**
+ * @brief For debug purpose: Print the value of all independent variables
+ */
+void ExperimentationRecordM::_printIndependentVariableValues()
+{
+    if ((_task != nullptr) && (_mapIndependentVariableValues != nullptr))
+    {
+        for (IndependentVariableM* independentVariable : _task->independentVariables()->toList())
+        {
+            if ((independentVariable != nullptr) && _mapIndependentVariableValues->contains(independentVariable->name()))
+            {
+                QVariant var = _mapIndependentVariableValues->value(independentVariable->name());
+
+                // Check validity
+                if (var.isValid()) {
+                    qDebug() << "Independent Variable:" << independentVariable->name() << "(" << IndependentVariableValueTypes::staticEnumToString(independentVariable->valueType()) << ") --> value:" << var;
+                }
+                else {
+                    qDebug() << "Independent Variable:" << independentVariable->name() << "(" << IndependentVariableValueTypes::staticEnumToString(independentVariable->valueType()) << ") --> value: UNDEFINED";
+                }
+            }
+        }
     }
 }
