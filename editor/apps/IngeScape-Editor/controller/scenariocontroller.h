@@ -193,9 +193,9 @@ public:
 
 
     /**
-     * @brief Set an action into the palette at index
+     * @brief Set a model of action into the palette at index
      * @param index where to insert the action
-     * @param action to insert
+     * @param actionM model of action to insert
      */
     Q_INVOKABLE void setActionInPalette(int index, ActionM* actionM);
 
