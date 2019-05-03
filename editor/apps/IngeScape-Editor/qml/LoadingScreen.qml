@@ -57,7 +57,7 @@ Item {
         I2SvgItem {
             id: logo
 
-            svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+            svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
             svgElementId: "loader-ingescape"
         }
 

@@ -294,7 +294,7 @@ WindowBlockTouches {
                                 visible: (control.checkedState === Qt.Checked)
                                 anchors.centerIn: parent
 
-                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                svgFileCache: IngeScapeTheme.svgFileIngeScape;
                                 svgElementId: "check";
 
                             }

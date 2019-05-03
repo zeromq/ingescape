@@ -6,7 +6,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
-import "./theme" as Theme
+//import "./theme" as Theme
 
 Item {
     id: rootItem
@@ -198,7 +198,7 @@ Item {
 
                 visible: rootItem.actionItemIsHovered
 
-                style: Theme.LabellessSvgButtonStyle {
+                style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
 
                     pressedID: releasedID + "-pressed"
@@ -224,7 +224,7 @@ Item {
                 //visible: rootItem.actionItemIsSelected
                 visible: rootItem.actionItemIsHovered
 
-                style: Theme.LabellessSvgButtonStyle {
+                style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
 
                     pressedID: releasedID + "-pressed"

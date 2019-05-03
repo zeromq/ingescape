@@ -17,7 +17,8 @@
 pragma Singleton
 import QtQuick 2.8
 import I2Quick 1.0
-//import INGESCAPE 1.0
+import INGESCAPE 1.0
+
 
 /**
   * Singleton that provides access to standard colors, fonts, etc.
@@ -89,7 +90,7 @@ Item {
     //-----------------------------------------
 
     // Left panel lists Background
-    readonly property color selectedTabsBackgroundColor: theme.veryDarkGreyColor
+    readonly property color selectedTabsBackgroundColor: IngeScapeTheme.veryDarkGreyColor
 
 
 
@@ -99,20 +100,20 @@ Item {
     //
     //-----------------------------------------
     // Labels
-    readonly property color agentsListLabelColor: theme.whiteColor
-    readonly property color agentsListLabel2Color: theme.whiteColor
-    readonly property color agentsListPressedLabel2Color: theme.lightGreyColor
-    readonly property color agentsListTextColor: theme.lightBlueGreyColor
+    readonly property color agentsListLabelColor: IngeScapeTheme.whiteColor
+    readonly property color agentsListLabel2Color: IngeScapeTheme.whiteColor
+    readonly property color agentsListPressedLabel2Color: IngeScapeTheme.lightGreyColor
+    readonly property color agentsListTextColor: IngeScapeTheme.lightBlueGreyColor
 
-    readonly property color agentOFFLabelColor: theme.lightGreyColor
-    readonly property color agentOFFLabel2Color: theme.lightGreyColor
-    readonly property color agentOFFPressedLabel2Color: theme.greyColor
-    readonly property color agentOFFTextColor: theme.blueGreyColor
+    readonly property color agentOFFLabelColor: IngeScapeTheme.lightGreyColor
+    readonly property color agentOFFLabel2Color: IngeScapeTheme.lightGreyColor
+    readonly property color agentOFFPressedLabel2Color: IngeScapeTheme.greyColor
+    readonly property color agentOFFTextColor: IngeScapeTheme.blueGreyColor
 
 
     // List
-    readonly property color agentsListItemBackgroundColor: theme.veryDarkGreyColor
-    readonly property color agentsListItemRollOverBackgroundColor: theme.darkGreyColor2
+    readonly property color agentsListItemBackgroundColor: IngeScapeTheme.veryDarkGreyColor
+    readonly property color agentsListItemRollOverBackgroundColor: IngeScapeTheme.darkGreyColor2
 
 
 
@@ -123,8 +124,8 @@ Item {
     //-----------------------------------------
 
     // Labels
-    readonly property color definitionEditorsLabelColor: theme.whiteColor
-    readonly property color definitionEditorsAgentDescriptionColor: theme.lightGreyColor
+    readonly property color definitionEditorsLabelColor: IngeScapeTheme.whiteColor
+    readonly property color definitionEditorsAgentDescriptionColor: IngeScapeTheme.lightGreyColor
 
 
 
@@ -136,7 +137,7 @@ Item {
 
 
     // Background
-    readonly property color scenarioBackgroundColor: theme.veryDarkGreyColor
+    readonly property color scenarioBackgroundColor: IngeScapeTheme.veryDarkGreyColor
 
 
     // Lines height in timeline
@@ -152,7 +153,7 @@ Item {
     //
     // Background
     //
-    readonly property color agentsMappingBackgroundColor: theme.blackColor
+    readonly property color agentsMappingBackgroundColor: IngeScapeTheme.blackColor
     // - grid
     readonly property color agentsMappingGridLineColor: "#3E414B"
     readonly property color agentsMappingGridSublineColor: "#232830"
@@ -170,7 +171,7 @@ Item {
 
 
     // - Default state
-    readonly property color agentsMappingLinkDefaultColor: theme.whiteColor
+    readonly property color agentsMappingLinkDefaultColor: IngeScapeTheme.whiteColor
     // - Hover state
     readonly property int agentsMappingLinkHoverFuzzyRadius: 4
     readonly property color agentsMappingLinkHoverFuzzyColor: "firebrick"
@@ -209,7 +210,7 @@ Item {
             return (conditions === true) ? theme.redColor2 : theme.darkRedColor2
 
         case 4: //AgentIOPValueTypeGroups.MIXED:
-            return (conditions === true) ? theme.whiteColor : theme.darkGreyColor
+            return (conditions === true) ? IngeScapeTheme.whiteColor : IngeScapeTheme.darkGreyColor
 
         case 5: //AgentIOPValueTypeGroups.UNKNOWN:
             return "#000000";
@@ -257,9 +258,9 @@ Item {
     //
     // Agents
     //
-    readonly property color agentsONNameMappingColor : theme.whiteColor
-    readonly property color agentsOFFNameMappingColor : theme.greyColor
+    readonly property color agentsONNameMappingColor: IngeScapeTheme.whiteColor
+    readonly property color agentsOFFNameMappingColor: IngeScapeTheme.greyColor
 
-    readonly property color agentsONInputsOutputsMappingColor : theme.whiteColor
-    readonly property color agentsOFFInputsOutputsMappingColor : theme.lightGreyColor
+    readonly property color agentsONInputsOutputsMappingColor : IngeScapeTheme.whiteColor
+    readonly property color agentsOFFInputsOutputsMappingColor : IngeScapeTheme.lightGreyColor
 }

@@ -199,7 +199,7 @@ Item {
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter;
                             text: styleData.title
-                            color: styleData.selected ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.greyColor
+                            color: styleData.selected ? IngeScapeEditorTheme.agentsListLabelColor : IngeScapeTheme.greyColor
                             wrapMode: Text.Wrap;
 
                             font {

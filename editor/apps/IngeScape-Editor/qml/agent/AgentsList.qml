@@ -30,7 +30,7 @@ import "../agentsmapping" as AgentMapping
 import "../popup" as Popups
 
 // theme sub-directory
-import "../theme" as Theme;
+//import "../theme" as Theme;
 
 // parent-directory
 import ".." as Editor;
@@ -203,7 +203,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: Theme.LabellessSvgButtonStyle {
+                style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
@@ -235,7 +235,7 @@ Item {
                 }
                 activeFocusOnPress: true
 
-                style: Theme.LabellessSvgButtonStyle {
+                style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
@@ -281,7 +281,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: Theme.LabellessSvgButtonStyle {
+                style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
@@ -318,7 +318,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: Theme.LabellessSvgButtonStyle {
+                style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"

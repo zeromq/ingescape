@@ -360,7 +360,7 @@ I2PopupBase {
                         visible: control.checked
                         anchors.centerIn: parent
 
-                        svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                        svgFileCache: IngeScapeTheme.svgFileIngeScape;
                         svgElementId: "check";
                     }
                 }
@@ -395,7 +395,7 @@ I2PopupBase {
             }
 
             style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"
@@ -436,7 +436,7 @@ I2PopupBase {
             }
 
             style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"

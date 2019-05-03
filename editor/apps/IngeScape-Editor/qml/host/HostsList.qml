@@ -227,7 +227,7 @@ Item {
                     elide: Text.ElideRight
 
                     text: model.name
-                    color: IngeScapeTheme.agentsListLabelColor
+                    color: IngeScapeEditorTheme.agentsListLabelColor
                     font: IngeScapeTheme.headingFont
                 }
 
@@ -271,7 +271,6 @@ Item {
                         //height: txtAgentName.height
                         height: 16
 
-                        //color: mouseAreaToolTip.containsMouse ? IngeScapeTheme.agentsListItemRollOverBackgroundColor : IngeScapeTheme.agentsListItemBackgroundColor
                         color: "transparent"
 
                         Text {
@@ -288,7 +287,7 @@ Item {
 
                             elide: Text.ElideRight
 
-                            color: model.isON ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
+                            color: model.isON ? IngeScapeEditorTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
 
                             font: IngeScapeTheme.normalFont
                         }

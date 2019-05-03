@@ -21,7 +21,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
-import "../theme" as Theme;
+//import "../theme" as Theme;
 
 
 Window {
@@ -172,8 +172,8 @@ Window {
             }
 
             activeFocusOnPress: true
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            style: LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "closeEditor"
@@ -580,8 +580,8 @@ Window {
                                                     right : parent.right
                                                 }
 
-                                                style: Theme.LabellessSvgButtonStyle {
-                                                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                                                style: LabellessSvgButtonStyle {
+                                                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                                                     pressedID: releasedID + "-pressed"
                                                     //releasedID: model.isMutedOutput ? "active-mute" : "inactive-mute"

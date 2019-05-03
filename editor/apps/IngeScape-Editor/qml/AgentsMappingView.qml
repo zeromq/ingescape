@@ -23,7 +23,7 @@ import INGESCAPE 1.0
 
 // agentsmapping sub-directory
 import "agentsmapping" as AgentsMapping
-import "theme" as Theme
+//import "theme" as Theme
 
 Item {
     id: rootItem
@@ -144,8 +144,8 @@ Item {
             activeFocusOnPress: true
             checkable: true
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            style: LabellessSvgButtonStyle {
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                 pressedID: releasedID + "-pressed"
                 releasedID: IngeScapeEditorC.modelManager.isMappingConnected ? "connect-on" : "connect-off"
@@ -164,7 +164,6 @@ Item {
         }
 
         Rectangle {
-            //visible: IngeScapeEditorC.modelManager.isMappingConnected
             color: "transparent"
             width: childrenRect.width
             height: childrenRect.height
@@ -183,8 +182,8 @@ Item {
                 activeFocusOnPress: true
                 checkable: true
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: IngeScapeEditorC.modelManager.isMappingControlled ? "control" : "observe"

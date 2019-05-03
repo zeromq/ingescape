@@ -75,7 +75,7 @@ Item {
 
         border.width: 0
 
-        color: agentItemIsHovered ? IngeScapeTheme.agentsListItemRollOverBackgroundColor : IngeScapeTheme.agentsListItemBackgroundColor
+        color: agentItemIsHovered ? IngeScapeEditorTheme.agentsListItemRollOverBackgroundColor : IngeScapeEditorTheme.agentsListItemBackgroundColor
 
         Rectangle {
             anchors {
@@ -184,7 +184,7 @@ Item {
 
                 text: textMetricsName.elidedText
 
-                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
+                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeEditorTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
 
                 font: IngeScapeTheme.headingFont
 

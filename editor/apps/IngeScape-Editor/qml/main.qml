@@ -39,12 +39,12 @@ ApplicationWindow {
     visible: true
 
     // Default size
-    width: IngeScapeTheme.appDefaultWidth
-    height: IngeScapeTheme.appDefaultHeight
+    width: IngeScapeEditorTheme.appDefaultWidth
+    height: IngeScapeEditorTheme.appDefaultHeight
 
     // Minimum size
-    minimumWidth: IngeScapeTheme.appMinWidth
-    minimumHeight: IngeScapeTheme.appMinHeight
+    minimumWidth: IngeScapeEditorTheme.appMinWidth
+    minimumHeight: IngeScapeEditorTheme.appMinHeight
 
     title: qsTr("IngeScape Editor - v%1").arg(Qt.application.version)
 

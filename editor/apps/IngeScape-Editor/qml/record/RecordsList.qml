@@ -308,7 +308,7 @@ Item {
                     elide: Text.ElideRight
 
                     text: model.modelM.name
-                    color: playPauseRecordButton.checked ? IngeScapeTheme.agentsListItemBackgroundColor : IngeScapeTheme.agentsListLabelColor
+                    color: playPauseRecordButton.checked ? IngeScapeEditorTheme.agentsListItemBackgroundColor : IngeScapeEditorTheme.agentsListLabelColor
                     font: IngeScapeTheme.headingFont
                 }
 

@@ -115,7 +115,7 @@ I2PopupBase {
                 }
 
                 style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "button"
@@ -158,7 +158,7 @@ I2PopupBase {
                 }
 
                 style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "button"
