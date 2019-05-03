@@ -40,14 +40,20 @@ Item {
     //
     //--------------------------------------------------------
 
+    // Model of our characteristic
     property CharacteristicM characteristic: null;
 
     // Keep type "var" because the C++ use a QVariant
     property var characteristicValue: "";
 
+    // FLag indicating if our characteristic is selected
     property bool isSelected: false;
 
+    // FLag indicating if the user is currently editing our characteristic
     property bool isCurrentlyEditing: false;
+
+    // FLag indicating if our cell is in the first column
+    property bool isFirstColumn: (styleData.column === 0)
 
 
 
@@ -100,18 +106,15 @@ Item {
     Loader {
         id: loaderOptions
 
-        sourceComponent: (characteristic && characteristic.isSubjectName) ? componentOptions : null
+        sourceComponent: rootItem.isFirstColumn ? componentOptions : null
     }
 
     Rectangle {
         id: background
 
         anchors {
-            left: parent.left
-            leftMargin: (characteristic && characteristic.isSubjectName) ? 105 : 0
-            right: parent.right
-            top: parent.top
-            bottom: parent.bottom
+            fill: parent
+            leftMargin: rootItem.isFirstColumn ? 105 : 0
         }
 
         color: "transparent"
@@ -120,12 +123,26 @@ Item {
             width: 1
         }*/
 
+        Rectangle {
+            id: leftSeparator
+
+            visible: rootItem.isFirstColumn
+
+            anchors {
+                left: parent.left
+                top: parent.top
+                bottom: parent.bottom
+            }
+            width: 1
+            color: "silver"
+        }
+
         Text {
             id: txtValue
 
             anchors {
                 fill: parent
-                margins: 1
+                margins: 5
             }
 
             visible: !rootItem.isCurrentlyEditing
@@ -133,6 +150,12 @@ Item {
             text: (typeof rootItem.characteristicValue !== 'undefined') ? rootItem.characteristicValue : ""
 
             verticalAlignment: Text.AlignVCenter
+            //color: styleData.selected ? IngeScapeTheme.whiteColor : IngeScapeTheme.blackColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                //weight: Font.Medium
+                pixelSize: 12
+            }
         }
 
         Loader {
@@ -150,20 +173,6 @@ Item {
             // - NOT enum --> text field
             sourceComponent: (rootItem.characteristic && (rootItem.characteristic.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)) ? componentComboboxEditor
                                                                                                                                                : componentTextFieldEditor
-        }
-
-        Rectangle {
-            id: leftSeparator
-
-            visible: (characteristic && characteristic.isSubjectName)
-
-            anchors {
-                left: parent.left
-                top: parent.top
-                bottom: parent.bottom
-            }
-            width: 1
-            color: "silver"
         }
 
         Rectangle {
@@ -195,9 +204,9 @@ Item {
                 bottom: parent.bottom
             }
 
-            spacing: 5
+            spacing: 0
 
-            visible: characteristic ? (characteristic.isSubjectName && isSelected) : false;
+            visible: rootItem.isSelected
 
             Button {
                 id: btnDelete

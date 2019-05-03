@@ -346,7 +346,7 @@ Item {
                     role: model.name
                     title: model.name
 
-                    width: (characteristic && characteristic.isSubjectName) ? 250 : 150
+                    width: (index === 0) ? 250 : 150
 
                     delegate: CharacteristicValueEditor {
                         id: characteristicValueEditor

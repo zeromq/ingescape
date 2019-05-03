@@ -45,7 +45,7 @@ Item {
     // Keep type "var" because the C++ use a QVariant
     property var variableValue: "";
 
-    // FLag indicating
+    // FLag indicating if the user is currently editing our variable
     property bool isCurrentlyEditing: false;
 
     // FLag indicating if our cell is in the first column
