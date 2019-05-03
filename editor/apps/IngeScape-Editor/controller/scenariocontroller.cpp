@@ -35,6 +35,7 @@ ScenarioController::ScenarioController(EditorModelManager* modelManager,
     _nextActionToActivate(nullptr),
     _modelManager(modelManager),
     _jsonHelper(jsonHelper),
+    _allActionNames(QStringList()),
     _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -167,9 +168,12 @@ void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
                         // Add action into the list
                         _actionsList.append(actionM);
 
-                        // Add action into the map
-                        _mapActionsFromActionName.insert(actionM->name(), actionM);
+                        // Add action name
+                        if (!_allActionNames.contains(actionM->name())) {
+                            _allActionNames.append(actionM->name());
+                        }
 
+                        // Add action into the map
                         if (!_hashFromUidToModelOfAction.contains(actionM->uid())) {
                             _hashFromUidToModelOfAction.insert(actionM->uid(), actionM);
                         }
@@ -502,12 +506,17 @@ void ScenarioController::deleteAction(ActionM* action)
         // Delete the action item
         if (_actionsList.contains(action))
         {
+            // Remove action form the list
             _actionsList.remove(action);
 
-            _mapActionsFromActionName.remove(action->name());
+            // Remove name form the list
+            //_allActionNames.removeAll(action->name());
+            _allActionNames.removeOne(action->name());
 
+            // Remove action form the hash table
             _hashFromUidToModelOfAction.remove(actionId);
 
+            // Free memory
             delete action;
 
             // Free the UID of the action model
@@ -534,8 +543,10 @@ void ScenarioController::validateActionEditor(ActionEditorController* actionEdit
             // Insert into the list
             _actionsList.append(originalAction);
 
-            // Insert into the map
-            _mapActionsFromActionName.insert(originalAction->name(), originalAction);
+            // Add action name
+            if (!_allActionNames.contains(originalAction->name())) {
+                _allActionNames.append(originalAction->name());
+            }
 
             // Insert into the hash table
             _hashFromUidToModelOfAction.insert(originalAction->uid(), originalAction);
@@ -962,8 +973,10 @@ void ScenarioController::clearScenario()
     // Delete all models of action
     _actionsList.deleteAllItems();
 
+    // Clear names list
+    _allActionNames.clear();
+
     // Clear map
-    _mapActionsFromActionName.clear();
     _hashFromUidToModelOfAction.clear();
 
     // Reset actions in palette
@@ -1385,8 +1398,6 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
  */
 QString ScenarioController::_buildNewActionName()
 {
-    //int index = _mapActionsFromActionName.count() + 1;
-
     int index = 0;
 
     // QString::arg(int a, int fieldWidth = 0, int base = 10, QChar fillChar = QLatin1Char(' '))
@@ -1394,7 +1405,7 @@ QString ScenarioController::_buildNewActionName()
     // fieldWidth specifies the minimum amount of space that a is padded to and filled with the character fillChar.
     QString tmpName = QString("Action_%1").arg(index, 3, 10, QChar('0'));
 
-    while (_mapActionsFromActionName.contains(tmpName))
+    while (_allActionNames.contains(tmpName))
     {
         index++;
         tmpName = QString("Action_%1").arg(index, 3, 10, QChar('0'));

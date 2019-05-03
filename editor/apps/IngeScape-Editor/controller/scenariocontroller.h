@@ -484,8 +484,8 @@ private:
     // Hash table of action editor controller from a view model of action
     QHash<ActionVM*, ActionEditorController*> _hashActionEditorControllerFromViewModelOfAction;
 
-    // Map of actions model from the action name
-    QHash<QString, ActionM*> _mapActionsFromActionName;
+    // List of all action names
+    QStringList _allActionNames;
 
     // Hash table from action UID to the corresponding model of action
     QHash<int, ActionM*> _hashFromUidToModelOfAction;

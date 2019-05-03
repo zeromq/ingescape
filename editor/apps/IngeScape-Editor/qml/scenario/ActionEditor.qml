@@ -154,7 +154,7 @@ WindowBlockTouches {
 
                 visible: IngeScapeEditorC.isAvailableModelVisualizer
 
-                text: "(uid=" + rootItem.actionM.uid + ")"
+                text: rootItem.actionM ? "(uid=" + rootItem.actionM.uid + ")" : ""
 
                 color: IngeScapeTheme.whiteColor
                 font {
