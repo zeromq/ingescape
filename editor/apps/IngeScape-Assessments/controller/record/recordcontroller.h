@@ -32,6 +32,9 @@ class RecordController : public QObject
     // The (experimentation) record currently selected
     I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationRecordM*, currentRecord)
 
+    // List of actions
+    I2_QOBJECT_LISTMODEL(ActionM, actionsList)
+
 
 public:
 

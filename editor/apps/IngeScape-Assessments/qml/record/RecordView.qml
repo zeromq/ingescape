@@ -102,6 +102,20 @@ Item {
             }
         }
 
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+
+            text: ">"
+            verticalAlignment: Text.AlignVCenter
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Bold
+                pixelSize: 18
+            }
+        }
+
         Button {
             id: btnGoBackToExperimentation
 
@@ -218,7 +232,51 @@ Item {
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 14
+                pixelSize: 16
+            }
+        }
+
+        ListView {
+            id: actionsList
+
+            anchors {
+                top: titleActions.bottom
+                topMargin: 5
+                left: parent.left
+                leftMargin: 5
+                right: parent.right
+                rightMargin: 5
+                bottom: parent.bottom
+                bottomMargin: 5
+            }
+
+            model: rootItem.controller ? rootItem.controller.actionsList : null
+
+            delegate: Rectangle {
+
+                width: parent.width
+                height: 30
+
+                color: "transparent"
+                border {
+                    color: "black"
+                    width: 1
+                }
+
+                Text {
+                    anchors.fill: parent
+
+                    text: model.name
+
+                    verticalAlignment: Text.AlignVCenter
+
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        //weight: Font.Medium
+                        pixelSize: 14
+                    }
+                }
             }
         }
     }
@@ -261,7 +319,7 @@ Item {
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 14
+                pixelSize: 16
             }
         }
 
@@ -326,7 +384,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 14
+                pixelSize: 16
             }
         }
 
@@ -434,7 +492,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 14
+                pixelSize: 16
             }
         }
     }
@@ -464,7 +522,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 14
+                pixelSize: 16
             }
         }
     }

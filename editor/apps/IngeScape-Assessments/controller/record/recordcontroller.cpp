@@ -47,6 +47,9 @@ RecordController::~RecordController()
         setcurrentRecord(nullptr);
     }
 
+    // Free memory
+    _actionsList.deleteAllItems();
+
     // Reset pointers
     _modelManager = nullptr;
     _jsonHelper = nullptr;
@@ -115,7 +118,58 @@ void RecordController::_onCurrentRecordChanged(ExperimentationRecordM* previousR
                         ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonRoot.value("scenario").toObject(), hashFromNameToAgentsGrouped);
                         if (scenarioToImport != nullptr)
                         {
-                            // FIXME TODO: scenarioToImport
+                            // Append the list of actions
+                            if (!scenarioToImport->actionsList()->isEmpty())
+                            {
+                                // Add actions into our list
+                                _actionsList.append(scenarioToImport->actionsList()->toList());
+                            }
+
+                            // Append the list of actions in timeline
+                            /*if (!scenarioToImport->actionsInTimelineList()->isEmpty())
+                            {
+                                // Add each actionVM in to the right line of our timeline
+                                for (ActionVM* actionVM : scenarioToImport->actionsInTimelineList()->toList())
+                                {
+                                    if ((actionVM != nullptr) && (actionVM->modelM() != nullptr))
+                                    {
+                                        int actionId = actionVM->modelM()->uid();
+                                        int lineIndexInTimeLine = actionVM->lineInTimeLine();
+
+                                        // Add the new action VM to our hash table
+                                        QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
+                                        listOfActionVM.append(actionVM);
+                                        _hashFromUidToViewModelsOfAction.insert(actionId, listOfActionVM);
+
+                                        // Get the "Sorted" list of view models of action with the index of the line (in the time line)
+                                        I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndexInTimeLine);
+
+                                        // Add the action VM to the line
+                                        if (sortedListOfActionVM != nullptr) {
+                                            sortedListOfActionVM->append(actionVM);
+                                        }
+                                        else
+                                        {
+                                            // Create a new list and add to the hash table
+                                            sortedListOfActionVM = new I2CustomItemSortFilterListModel<ActionVM>();
+                                            sortedListOfActionVM->setSortProperty("startTime");
+                                            sortedListOfActionVM->append(actionVM);
+
+                                            _hashFromLineIndexToSortedViewModelsOfAction.insert(lineIndexInTimeLine, sortedListOfActionVM);
+                                        }
+
+                                        _actionsInTimeLine.append(actionVM);
+
+                                        // Increment the line number if necessary
+                                        if (_linesNumberInTimeLine < lineIndexInTimeLine + 2) {
+                                            setlinesNumberInTimeLine(lineIndexInTimeLine + 2);
+                                        }
+                                    }
+                                }
+                            }*/
+
+                            // Free memory
+                            delete scenarioToImport;
                         }
                     }
                 }

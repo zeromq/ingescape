@@ -13,6 +13,7 @@
  */
 
 #include "experimentationm.h"
+#include <misc/ingescapeutils.h>
 
 /**
  * @brief Constructor
@@ -44,14 +45,27 @@ ExperimentationM::ExperimentationM(QString name,
     //
     // FIXME for tests
     //
-    for (int i = 0; i < 3; i++)
+
+    SubjectM* debugSubject = new SubjectM("S", this);
+    debugSubject->mapCharacteristicValues()->insert(CHARACTERISTIC_SUBJECT_NAME, QVariant("M. JEAN"));
+
+    _allSubjects.append(debugSubject);
+
+
+    // Directory for platform files
+    QString platformPath = IngeScapeUtils::getPlatformsPath();
+
+    for (int i = 0; i < 2; i++)
     {
         QString taskName = QString("Task for test %1").arg(i + 1);
 
-        TaskM* task = new TaskM(nullptr);
-        task->setname(taskName);
+        TaskM* debugTask = new TaskM(taskName, this);
 
-        _allTasks.append(task);
+        QString platformFilePath = QString("%1i2.json").arg(platformPath);
+        QUrl platformFileUrl = QUrl(platformFilePath);
+        debugTask->setplatformFileUrl(platformFileUrl);
+
+        _allTasks.append(debugTask);
     }
 }
 
