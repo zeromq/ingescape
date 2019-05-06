@@ -44,7 +44,7 @@ Item {
     // true if agent Item contains the mouse (rollover)
     property bool agentItemIsHovered : false
 
-    width: IngeScapeTheme.leftPanelWidth
+    width: IngeScapeEditorTheme.leftPanelWidth
     height: 85
 
 

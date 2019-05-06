@@ -274,7 +274,7 @@ Item {
         Item {
             id : actionListItem
 
-            width: IngeScapeTheme.leftPanelWidth
+            width: IngeScapeEditorTheme.leftPanelWidth
             height: 42
 
             // Not Draggable Action Item

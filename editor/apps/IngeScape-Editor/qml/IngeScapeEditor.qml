@@ -151,7 +151,7 @@ Item {
     Rectangle {
         id: leftPanel
 
-        width: IngeScapeTheme.leftPanelWidth
+        width: IngeScapeEditorTheme.leftPanelWidth
 
         anchors {
             left: parent.left

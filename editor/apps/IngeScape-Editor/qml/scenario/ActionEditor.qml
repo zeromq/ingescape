@@ -34,7 +34,7 @@ WindowBlockTouches {
     height: minimumHeight
 
     minimumWidth: 475
-    minimumHeight: IngeScapeTheme.appMinHeight
+    minimumHeight: IngeScapeEditorTheme.appMinHeight
 
     flags: Qt.Dialog
 

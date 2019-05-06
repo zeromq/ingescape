@@ -362,7 +362,7 @@ Item {
         Item {
             id: agentItem
 
-            width: IngeScapeTheme.leftPanelWidth
+            width: IngeScapeEditorTheme.leftPanelWidth
             height: 85
 
 
