@@ -225,8 +225,11 @@ Item {
                 top: parent.top
                 topMargin: 5
             }
+            height: 30
 
             text: qsTr("Actions:")
+
+            verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -253,17 +256,25 @@ Item {
 
                 model: rootItem.controller ? rootItem.controller.actionsList : null
 
-                delegate: ActionsListItem {
-                    id : actionInList
+                delegate: MouseArea {
+                    id: mouseArea
 
                     width: parent.width
                     height: 42
 
-                    action: model.QtObject
-                    controller: rootItem.controller
+                    hoverEnabled: true
 
-                    //actionItemIsHovered: mouseArea.containsMouse
-                    //actionItemIsPressed: mouseArea.pressed
+                    ActionsListItem {
+                        id : actionInList
+
+                        anchors.fill: parent
+
+                        action: model.QtObject
+                        controller: rootItem.controller
+
+                        actionItemIsHovered: mouseArea.containsMouse
+                        //actionItemIsPressed: mouseArea.pressed
+                    }
                 }
             }
         }
@@ -300,8 +311,11 @@ Item {
                 top: parent.top
                 topMargin: 5
             }
+            height: 30
 
             text: qsTr("Comments:")
+
+            verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -473,8 +487,11 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
                 top: parent.top
                 topMargin: 5
             }
+            height: 30
 
             text: qsTr("Attachments:")
+
+            verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
             font {
