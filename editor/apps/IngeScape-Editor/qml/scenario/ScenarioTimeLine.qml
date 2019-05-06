@@ -30,17 +30,17 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property var controller : null;
+    property var controller: null;
 
-    property var viewController : IngeScapeEditorC.timeLineC;
+    property var viewController: IngeScapeEditorC.timeLineC;
 
 
     // graphical properties
-    property int linesNumber : controller ? controller.linesNumberInTimeLine : 0;
-    property int lineHeight : IngeScapeTheme.lineInTimeLineHeight
+    property int linesNumber: controller ? controller.linesNumberInTimeLine : 0;
+    property int lineHeight: IngeScapeTheme.lineInTimeLineHeight;
 
     // flag indicating if our component is reduced or expanded
-    property bool isReduced : true;
+    property bool isReduced: true;
 
     onIsReducedChanged : {
         // Allow resize animations
@@ -53,8 +53,8 @@ Item {
         }
         else
         {
-            rootItem.height = IngeScapeTheme.bottomPanelHeight;
-            //rootItem.height = IngeScapeTheme.bottomPanelHeight_OneRow;
+            rootItem.height = IngeScapeEditorTheme.bottomPanelHeight;
+            //rootItem.height = IngeScapeEditorTheme.bottomPanelHeight_OneRow;
         }
     }
 
