@@ -30,7 +30,6 @@ class LinkOutputVM : public LinkConnectorVM
 
     // View model of output
     I2_QML_PROPERTY_READONLY(OutputVM*, output)
-    //I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(OutputVM*, output)
 
     // Flag indicating if a new value is published on our output
     I2_QML_PROPERTY_READONLY(bool, isPublishedNewValue)
