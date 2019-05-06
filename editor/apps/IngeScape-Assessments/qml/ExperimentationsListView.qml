@@ -48,13 +48,13 @@ Item {
     //
     //--------------------------------------------------------
 
-    /*Rectangle {
+    Rectangle {
         id: background
 
         anchors.fill: parent
 
         color: IngeScapeTheme.veryDarkGreyColor
-    }*/
+    }
 
     Text {
         id: title
@@ -199,7 +199,7 @@ Item {
                         }
 
                         Row {
-                            spacing: 20
+                            spacing: 10
 
                             anchors {
                                 left: parent.left
@@ -214,7 +214,7 @@ Item {
                                 font {
                                     family: IngeScapeTheme.textFontFamily
                                     weight: Font.Medium
-                                    pixelSize: 12
+                                    pixelSize: 14
                                 }
                             }
 
@@ -224,8 +224,8 @@ Item {
                                 color: IngeScapeTheme.whiteColor
                                 font {
                                     family: IngeScapeTheme.textFontFamily
-                                    weight: Font.Medium
-                                    pixelSize: 12
+                                    //weight: Font.Medium
+                                    pixelSize: 14
                                 }
                             }
                         }

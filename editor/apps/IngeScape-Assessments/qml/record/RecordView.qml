@@ -212,8 +212,8 @@ Item {
 
         color: "transparent"
         border {
-            color: "black"
-            width: 2
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
         }
 
         Text {
@@ -232,7 +232,7 @@ Item {
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 16
+                pixelSize: 18
             }
         }
 
@@ -287,8 +287,8 @@ Item {
 
         color: "transparent"
         border {
-            color: "black"
-            width: 2
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
         }
 
         Text {
@@ -307,7 +307,7 @@ Item {
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 16
+                pixelSize: 18
             }
         }
 
@@ -349,8 +349,8 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
 
         color: "transparent"
         border {
-            color: "black"
-            width: 2
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
         }
 
         Text {
@@ -372,7 +372,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 16
+                pixelSize: 18
             }
         }
 
@@ -460,8 +460,8 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
 
         color: "transparent"
         border {
-            color: "black"
-            width: 2
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
         }
 
         Text {
@@ -480,7 +480,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 16
+                pixelSize: 18
             }
         }
     }
@@ -510,7 +510,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 16
+                pixelSize: 18
             }
         }
     }

@@ -349,7 +349,7 @@ void TasksController::createNewDependentVariable()
 
         DependentVariableM* dependentVariable = new DependentVariableM();
 
-        dependentVariable->setname("VD");
+        dependentVariable->setname("Dep. Var.");
         //dependentVariable->setdescription("");
         //dependentVariable->setagentName("");
         //dependentVariable->setoutputName("");

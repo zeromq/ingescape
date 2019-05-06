@@ -92,7 +92,11 @@ Item {
 
         anchors.fill: parent
 
-        color: "#FF333366"
+        color: IngeScapeTheme.veryDarkGreyColor
+        border {
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
+        }
     }
 
     Button {
@@ -127,6 +131,7 @@ Item {
             top: parent.top
             topMargin: 10
         }
+        height: 30
 
         spacing: 20
 
@@ -134,6 +139,9 @@ Item {
             id: title
 
             text: "Tasks"
+
+            height: parent.height
+            verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -146,10 +154,10 @@ Item {
         Button {
             text: "New Task"
 
-            height: 30
+            height: parent.height
 
             onClicked: {
-                console.log("QML: New Task");
+                //console.log("QML: New Task");
 
                 // Open the popup
                 createTaskPopup.open();
@@ -170,6 +178,9 @@ Item {
             leftMargin: 5
         }
         width: 300
+
+        // In front of the Task (main view)
+        z: 1
 
         model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
 
@@ -228,10 +239,12 @@ Item {
             bottom: parent.bottom
             bottomMargin: 5
             left: listOfTasks.right
-            leftMargin: 0
+            leftMargin: -1
             right: parent.right
             rightMargin: 5
         }
+        // Behind the list of tasks
+        z: 0
 
         controller: rootItem.controller
     }

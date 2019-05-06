@@ -92,9 +92,42 @@ Item {
         anchors.fill: parent
 
         color: rootItem.isSelected ? "lightsteelblue" : "transparent"
-        border {
-            color: "black"
+
+        Rectangle {
+            id: leftBorder
+
+            anchors {
+                left: parent.left
+                top: parent.top
+                bottom: parent.bottom
+            }
             width: 1
+
+            color: IngeScapeTheme.darkGreyColor
+        }
+        Rectangle {
+            id: topBorder
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+            }
+            height: 1
+
+            color: IngeScapeTheme.darkGreyColor
+        }
+        Rectangle {
+            id: bottomBorder
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+            height: 1
+
+            color: IngeScapeTheme.darkGreyColor
         }
 
         Text {

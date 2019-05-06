@@ -111,7 +111,7 @@ Item {
 
         color: "lightsteelblue"
         border {
-            color: "black"
+            color: IngeScapeTheme.darkGreyColor
             width: 1
         }
     }
@@ -140,21 +140,16 @@ Item {
     //
     // Independent Variables Panel
     //
-    Rectangle {
+    Item {
         id: panelIndependentVariable
 
         anchors {
             left: parent.left
             right: parent.right
             top: parent.top
+            margins: 1
         }
         height: parent.height / 2
-
-        color: "transparent"
-        border {
-            width: 1
-            color: "white"
-        }
 
         Row {
             id: headerIndependentVariable
@@ -163,13 +158,17 @@ Item {
                 left: parent.left
                 leftMargin: 10
                 top: parent.top
-                topMargin: 10
+                topMargin: 5
             }
+            height: 30
 
             spacing: 20
 
             Text {
                 text: "Independent Variables"
+
+                height: parent.height
+                verticalAlignment: Text.AlignVCenter
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -182,7 +181,7 @@ Item {
             Button {
                 text: "New Independent Variable"
 
-                height: 30
+                height: parent.height
 
                 onClicked: {
                     console.log("QML: New Independent Variable");
@@ -335,20 +334,28 @@ Item {
     //
     // Dependent Variables Panel
     //
-    Rectangle {
+    Item {
         id: panelDependentVariable
 
         anchors {
             left: parent.left
             right: parent.right
             bottom: parent.bottom
+            margins: 1
         }
         height: parent.height / 2
 
-        color: "transparent"
-        border {
-            width: 1
-            color: "white"
+        Rectangle {
+            id: topSeparator
+
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+            height: 1
+
+            color: IngeScapeTheme.darkGreyColor
         }
 
         Row {
@@ -358,13 +365,17 @@ Item {
                 left: parent.left
                 leftMargin: 10
                 top: parent.top
-                topMargin: 10
+                topMargin: 5
             }
+            height: 30
 
             spacing: 20
 
             Text {
                 text: "Dependent Variables"
+
+                height: parent.height
+                verticalAlignment: Text.AlignVCenter
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -377,7 +388,7 @@ Item {
             Button {
                 text: "New Dependent Variable"
 
-                height: 30
+                height: parent.height
 
                 onClicked: {
                     console.log("QML: New Dependent Variable");

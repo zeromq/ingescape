@@ -69,13 +69,13 @@ Item {
     //
     //--------------------------------------------------------
 
-    /*Rectangle {
+    Rectangle {
         id: background
 
         anchors.fill: parent
 
         color: IngeScapeTheme.veryDarkGreyColor
-    }*/
+    }
 
     Button {
         id: btnGoBackToHome
@@ -231,18 +231,31 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
-                width: 150
+                width: 120
 
-                color: "#44AAAAAA"
+                color: "transparent"
+                border {
+                    color: IngeScapeTheme.darkGreyColor
+                    width: 1
+                }
 
                 Column {
+
+                    anchors {
+                        left: parent.left
+                        leftMargin: 10
+                        top: parent.top
+                        topMargin: 10
+                    }
+
+                    width: 100
 
                     spacing: 10
 
                     Button {
                         text: "Subjects"
 
-                        width: 100
+                        width: parent.width
                         height: 30
 
                         onClicked: {
@@ -256,7 +269,7 @@ Item {
                     Button {
                         text: "Tasks"
 
-                        width: 100
+                        width: parent.width
                         height: 30
 
                         onClicked: {
@@ -270,7 +283,7 @@ Item {
                     Button {
                         text: "Coding"
 
-                        width: 100
+                        width: parent.width
                         height: 30
 
                         enabled: false
@@ -279,7 +292,7 @@ Item {
                     Button {
                         text: "Clean"
 
-                        width: 100
+                        width: parent.width
                         height: 30
 
                         enabled: false
@@ -288,7 +301,7 @@ Item {
                     Button {
                         text: "Export"
 
-                        width: 100
+                        width: parent.width
                         height: 30
 
                         onClicked: {
@@ -311,10 +324,23 @@ Item {
                     left: configurationPanel.right
                     right: parent.right
                 }
-                color: "#44222222"
+
+                color: "transparent"
+                border {
+                    color: IngeScapeTheme.darkGreyColor
+                    width: 1
+                }
 
                 Row {
                     id: recordsHeader
+
+                    anchors {
+                        left: parent.left
+                        leftMargin: 10
+                        top: parent.top
+                        topMargin: 10
+                    }
+                    height: 30
 
                     spacing: 20
 
@@ -323,18 +349,21 @@ Item {
 
                         text: qsTr("Records")
 
+                        height: parent.height
+                        verticalAlignment: Text.AlignVCenter
+
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.textFontFamily
                             weight: Font.Medium
-                            pixelSize: 18
+                            pixelSize: 20
                         }
                     }
 
                     Button {
                         id: btnNewRecord
 
-                        height: 30
+                        height: parent.height
 
                         text: "New Record"
 
@@ -352,7 +381,9 @@ Item {
                         top: recordsHeader.bottom
                         topMargin: 20
                         left: parent.left
+                        leftMargin: 10
                         right: parent.right
+                        rightMargin: 10
                     }
 
                     Repeater {
