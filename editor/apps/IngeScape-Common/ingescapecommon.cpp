@@ -20,11 +20,9 @@
 #include <settings/ingescapesettings.h>
 
 #include <controller/ingescapemodelmanager.h>
-//#include <model/enums.h>
-//#include <model/agent/agentm.h>
+#include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <model/scenario/scenariom.h>
 #include <model/scenario/timetickm.h>
-//#include <viewModel/agentsgroupedbynamevm.h>
 
 
 /**
@@ -66,6 +64,7 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     //----------------
     qmlRegisterSingletonType<DebugQuickInspector>("INGESCAPE", 1, 0, "DebugQuickInspector", &DebugQuickInspector::qmlSingleton);
 
+    qmlRegisterUncreatableType<AbstractTimeActionslineScenarioViewController>("INGESCAPE", 1, 0, "AbstractTimeActionslineScenarioViewController", "Internal Class");
     qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal class");
 
 
