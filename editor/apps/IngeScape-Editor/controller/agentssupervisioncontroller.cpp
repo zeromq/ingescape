@@ -356,8 +356,8 @@ QList<DefinitionM*> AgentsSupervisionController::_getDefinitionsListWithName(QSt
  */
 void AgentsSupervisionController::_updateDefinitionVariants(QString definitionName, QList<DefinitionM*> definitionsList)
 {
-    //Q_UNUSED(definitionName)
-    qDebug() << "Update the definition variants for definition name" << definitionName << "(" << definitionsList.count() << "definitions)";
+    Q_UNUSED(definitionName)
+    //qDebug() << "Update the definition variants for definition name" << definitionName << "(" << definitionsList.count() << "definitions)";
 
     // We can use versions as keys of the map because the list contains only definition with the same name
     QHash<QString, QList<DefinitionM*>> hashFromVersionToDefinitionsList;

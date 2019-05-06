@@ -524,7 +524,7 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                             AgentM* agent = getAgentModelFromPeerId(peerId);
                                             if (agent == nullptr)
                                             {
-                                                qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
+                                                //qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
 
                                                 // Make a copy of the definition
                                                 DefinitionM* copyOfDefinition = nullptr;

@@ -141,8 +141,9 @@ WindowBlockTouches {
             }
 
             activeFocusOnPress: true
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+            style: LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "closeEditor"
@@ -521,7 +522,7 @@ WindowBlockTouches {
                                     height : width
                                     radius : width/2
 
-                                    color : IngeScapeTheme.colorOfIOPTypeWithConditions(model.iopValueTypeGroup, true);
+                                    color: IngeScapeEditorTheme.colorOfIOPTypeWithConditions(model.iopValueTypeGroup, true);
                                 }
 
                                 Text {
@@ -651,7 +652,7 @@ WindowBlockTouches {
             }
 
             style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"

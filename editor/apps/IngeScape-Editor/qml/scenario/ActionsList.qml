@@ -167,7 +167,7 @@ Item {
             bottom : actionsListScrollView.top
         }
 
-        color : IngeScapeTheme.selectedTabsBackgroundColor
+        color : IngeScapeEditorTheme.selectedTabsBackgroundColor
 
 
         Row {
@@ -193,8 +193,8 @@ Item {
 
                 enabled: (IngeScapeEditorC.modelManager && (IngeScapeEditorC.modelManager.allAgentsGroupsByName.count > 0))
 
-                style : Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "new-agent"
@@ -230,8 +230,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "delete-all"
@@ -258,7 +258,7 @@ Item {
             right: parent.right
         }
 
-        color: IngeScapeTheme.leftPanelBackgroundColor
+        color: IngeScapeTheme.blackColor
 
         height: 1
     }

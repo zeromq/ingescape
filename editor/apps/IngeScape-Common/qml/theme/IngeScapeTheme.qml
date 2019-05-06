@@ -23,6 +23,20 @@ import I2Quick 1.0
 Item {
     id: theme
 
+
+    //-----------------------------------------
+    //
+    // Sizes of UI elements
+    //
+    //-----------------------------------------
+
+    // Width of time (with format "hh:mm:ss.zzz")
+    readonly property int timeWidth: 80
+
+    // Lines height in timeline
+    property int lineInTimeLineHeight: 37
+
+
     //-----------------------------------------
     //
     // SVG files

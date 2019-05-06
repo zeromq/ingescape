@@ -172,8 +172,9 @@ WindowBlockTouches {
                 }
 
                 activeFocusOnPress: true
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "closeEditor"
@@ -680,8 +681,8 @@ WindowBlockTouches {
                                         activeFocusOnPress: true
                                         checkable: true
 
-                                        style: Theme.LabellessSvgButtonStyle {
-                                            fileCache: IngeScapeTheme.svgFileINGESCAPE
+                                        style: LabellessSvgButtonStyle {
+                                            fileCache: IngeScapeTheme.svgFileIngeScape
 
                                             pressedID: releasedID + "-pressed"
                                             releasedID: "warningActionEditor"
@@ -716,7 +717,7 @@ WindowBlockTouches {
                                             I2SvgItem {
                                                 id : backgroundPopup
 
-                                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                                svgFileCache: IngeScapeTheme.svgFileIngeScape
                                                 svgElementId: "tooltip"
                                             }
 
@@ -909,7 +910,7 @@ WindowBlockTouches {
                                             anchors.centerIn: parent
 
                                             style: I2SvgToggleButtonStyle {
-                                                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                                                fileCache: IngeScapeTheme.svgFileIngeScape
 
                                                 toggleCheckedReleasedID: "enabledToggle-checked";
                                                 toggleCheckedPressedID: "enabledToggle-checked-pressed";
@@ -1039,8 +1040,9 @@ WindowBlockTouches {
                                     }
 
                                     activeFocusOnPress: true
-                                    style: Theme.LabellessSvgButtonStyle {
-                                        fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                                    style: LabellessSvgButtonStyle {
+                                        fileCache: IngeScapeTheme.svgFileIngeScape
 
                                         pressedID: releasedID + "-pressed"
                                         releasedID: "closeEditor"
@@ -1069,8 +1071,8 @@ WindowBlockTouches {
                                 left: parent.left
                             }
 
-                            style: Theme.LabellessSvgButtonStyle {
-                                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                            style: LabellessSvgButtonStyle {
+                                fileCache: IngeScapeTheme.svgFileIngeScape
 
                                 pressedID: releasedID + "-pressed"
                                 releasedID: "createButton"
@@ -1149,7 +1151,7 @@ WindowBlockTouches {
                             verticalCenter: titleCdt.verticalCenter
                         }
 
-                        svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                        svgFileCache: IngeScapeTheme.svgFileIngeScape
                         svgElementId: "arrowWhite"
 
                         rotation: conditionsItem.isOpened ? 0 : 270
@@ -1649,8 +1651,9 @@ WindowBlockTouches {
                                     }
 
                                     activeFocusOnPress: true
-                                    style: Theme.LabellessSvgButtonStyle {
-                                        fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                                    style: LabellessSvgButtonStyle {
+                                        fileCache: IngeScapeTheme.svgFileIngeScape
 
                                         pressedID: releasedID + "-pressed"
                                         releasedID: "closeEditor"
@@ -1677,8 +1680,8 @@ WindowBlockTouches {
                                 left: parent.left
                             }
 
-                            style: Theme.LabellessSvgButtonStyle {
-                                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                            style: LabellessSvgButtonStyle {
+                                fileCache: IngeScapeTheme.svgFileIngeScape
 
                                 pressedID: releasedID + "-pressed"
                                 releasedID: "createButton"
@@ -1758,7 +1761,7 @@ WindowBlockTouches {
                             verticalCenter: titleAdvMode.verticalCenter
                         }
 
-                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
+                        svgFileCache : IngeScapeTheme.svgFileIngeScape
                         svgElementId: "arrowWhite"
 
                         rotation: advancedModesItem.isOpened? 0 : 270
@@ -1851,7 +1854,7 @@ WindowBlockTouches {
                                     visible: control.checked
                                     anchors.centerIn: parent
 
-                                    svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                    svgFileCache: IngeScapeTheme.svgFileIngeScape
                                     svgElementId: "check";
 
                                 }
@@ -2183,7 +2186,7 @@ WindowBlockTouches {
                                         visible: control.checked
                                         anchors.centerIn: parent
 
-                                        svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                        svgFileCache: IngeScapeTheme.svgFileIngeScape
                                         svgElementId: "check";
 
                                     }
@@ -2418,7 +2421,7 @@ WindowBlockTouches {
                 width: boundingBox.width
 
                 enabled : visible
-                text : "Cancel"
+                text: "Cancel"
 
                 anchors {
                     verticalCenter: okButton.verticalCenter
@@ -2427,7 +2430,7 @@ WindowBlockTouches {
                 }
 
                 style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "button"

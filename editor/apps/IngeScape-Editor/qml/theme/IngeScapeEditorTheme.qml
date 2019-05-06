@@ -48,9 +48,6 @@ Item {
     readonly property int bottomPanelHeight: 300
     readonly property int bottomPanelHeight_OneRow: 100
 
-    // Width of time (with format "hh:mm:ss.zzz")
-    readonly property int timeWidth: 80
-
 
     //-----------------------------------------
     //
@@ -126,22 +123,6 @@ Item {
     // Labels
     readonly property color definitionEditorsLabelColor: IngeScapeTheme.whiteColor
     readonly property color definitionEditorsAgentDescriptionColor: IngeScapeTheme.lightGreyColor
-
-
-
-    //-----------------------------------------
-    //
-    // Scenario UI elements
-    //
-    //-----------------------------------------
-
-
-    // Background
-    readonly property color scenarioBackgroundColor: IngeScapeTheme.veryDarkGreyColor
-
-
-    // Lines height in timeline
-    property int lineInTimeLineHeight: 37
 
 
     //-----------------------------------------

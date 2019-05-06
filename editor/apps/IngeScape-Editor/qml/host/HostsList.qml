@@ -148,7 +148,7 @@ Item {
             bottom : hostsListScrollView.top
         }
 
-        color : IngeScapeTheme.selectedTabsBackgroundColor
+        color : IngeScapeEditorTheme.selectedTabsBackgroundColor
     }
 
 
@@ -162,7 +162,7 @@ Item {
             right: parent.right
         }
 
-        color: IngeScapeTheme.leftPanelBackgroundColor
+        color: IngeScapeTheme.blackColor
 
         height: 1
     }
@@ -197,7 +197,7 @@ Item {
                     right: parent.right
                 }
 
-                color: IngeScapeTheme.leftPanelBackgroundColor
+                color: IngeScapeTheme.blackColor
 
                 height: 1
             }
@@ -227,7 +227,7 @@ Item {
                     elide: Text.ElideRight
 
                     text: model.name
-                    color: IngeScapeEditorTheme.agentsListLabelColor
+                    color: IngeScapeTheme.whiteColor
                     font: IngeScapeTheme.headingFont
                 }
 
@@ -242,7 +242,7 @@ Item {
                     elide: Text.ElideRight
 
                     text: model.modelM.ipAddress
-                    color: IngeScapeTheme.agentsListTextColor
+                    color: IngeScapeTheme.lightBlueGreyColor
                     font: IngeScapeTheme.heading2Font
                 }
 
@@ -287,7 +287,7 @@ Item {
 
                             elide: Text.ElideRight
 
-                            color: model.isON ? IngeScapeEditorTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
+                            color: model.isON ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
 
                             font: IngeScapeTheme.normalFont
                         }
@@ -337,8 +337,8 @@ Item {
                                 right : parent.right
                             }
 
-                            style: Theme.LabellessSvgButtonStyle {
-                                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                            style: LabellessSvgButtonStyle {
+                                fileCache: IngeScapeTheme.svgFileIngeScape
 
                                 pressedID: releasedID + "-pressed"
                                 releasedID: "delete"
@@ -374,8 +374,8 @@ Item {
 
                 activeFocusOnPress: true
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "button-options"
@@ -408,8 +408,8 @@ Item {
                     rightMargin: 5
                 }
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: model.isStreaming ? "on" : "off"

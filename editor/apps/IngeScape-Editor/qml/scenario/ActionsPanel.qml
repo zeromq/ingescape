@@ -181,8 +181,9 @@ Item {
                     enabled : visible
 
                     activeFocusOnPress: true
-                    style: Theme.LabellessSvgButtonStyle {
-                        fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    style: LabellessSvgButtonStyle {
+                        fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                         pressedID: releasedID + "-pressed"
                         releasedID: "removeActionInPalette"

@@ -282,7 +282,7 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            color: (myModel && myModel.input && myModel.input.isDefinedInAllDefinitions) ? (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
+                            color: (myModel && myModel.input && myModel.input.isDefinedInAllDefinitions) ? (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeEditorTheme.agentsONInputsOutputsMappingColor : IngeScapeEditorTheme.agentsOFFInputsOutputsMappingColor)
                                                                                                          : (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
 
                             font: IngeScapeTheme.heading2Font
@@ -391,7 +391,7 @@ Rectangle {
                             }
 
                             color: if (myModel && myModel.input && myModel.input.firstModel) {
-                                       IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.input.firstModel.agentIOPValueTypeGroup, true);
+                                       IngeScapeEditorTheme.colorOfIOPTypeWithConditions(myModel.input.firstModel.agentIOPValueTypeGroup, true);
                                    }
                                    else {
                                        IngeScapeTheme.whiteColor
@@ -536,7 +536,7 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            color: (myModel && myModel.output && myModel.output.isDefinedInAllDefinitions) ? (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
+                            color: (myModel && myModel.output && myModel.output.isDefinedInAllDefinitions) ? (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeEditorTheme.agentsONInputsOutputsMappingColor : IngeScapeEditorTheme.agentsOFFInputsOutputsMappingColor)
                                                                                                            : (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
                             font: IngeScapeTheme.heading2Font
 
@@ -576,7 +576,7 @@ Rectangle {
                             Drag.hotSpot.y: height/2
                             Drag.keys: ["OutputSlotItem"]
 
-                            color: draggablePointTO.dragActive ? IngeScapeTheme.agentsMappingBackgroundColor : "transparent"
+                            color: draggablePointTO.dragActive ? IngeScapeEditorTheme.agentsMappingBackgroundColor : "transparent"
                             parent: draggablePointTO.dragActive ? rootItem.parent  : linkPointOut
 
                             MouseArea {
@@ -645,7 +645,7 @@ Rectangle {
                             }
 
                             color: if (myModel && myModel.output && myModel.output.firstModel) {
-                                       IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.output.firstModel.agentIOPValueTypeGroup, !myModel.output.firstModel.isMuted);
+                                       IngeScapeEditorTheme.colorOfIOPTypeWithConditions(myModel.output.firstModel.agentIOPValueTypeGroup, !myModel.output.firstModel.isMuted);
                                    }
                                    else {
                                        IngeScapeTheme.whiteColor
@@ -656,7 +656,7 @@ Rectangle {
                             I2SvgItem {
                                 anchors.centerIn: parent
 
-                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE
+                                svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
                                 svgElementId: "outputIsMuted"
 
                                 visible: (myModel.output && myModel.output.firstModel && myModel.output.firstModel.isMuted)
@@ -831,8 +831,8 @@ Rectangle {
                 leftMargin: 10
             }
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            style: LabellessSvgButtonStyle {
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "definition-button"
@@ -871,7 +871,7 @@ Rectangle {
             text: rootItem.agentName
             font: IngeScapeTheme.headingFont
 
-            color: (dropEnabled === true) ? ((rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON) ? IngeScapeTheme.agentsONNameMappingColor : IngeScapeTheme.agentsOFFNameMappingColor)
+            color: (dropEnabled === true) ? ((rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON) ? IngeScapeEditorTheme.agentsONNameMappingColor : IngeScapeEditorTheme.agentsOFFNameMappingColor)
                                           : IngeScapeTheme.lightGreyColor
         }
 
@@ -930,8 +930,8 @@ Rectangle {
 
             activeFocusOnPress: true
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            style: LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "delete"
@@ -994,7 +994,7 @@ Rectangle {
                 margins: 2
             }
 
-            svgFileCache: IngeScapeTheme.svgFileINGESCAPE
+            svgFileCache: IngeScapeTheme.svgFileIngeScape
             svgElementId: "dropImpossible"
 
             visible : (rootItem.dropEnabled === false)
@@ -1020,7 +1020,7 @@ Rectangle {
             radius : height/2
 
             color : if (agentMappingVM) {
-                        IngeScapeTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedLinkInputsValueTypeGroup, true);
+                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedLinkInputsValueTypeGroup, true);
                     }
                     else {
                         IngeScapeTheme.whiteColor
@@ -1049,7 +1049,7 @@ Rectangle {
             radius : height/2
 
             color : if (agentMappingVM) {
-                        IngeScapeTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedLinkOutputsValueTypeGroup, true);
+                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedLinkOutputsValueTypeGroup, true);
                     }
                     else {
                         IngeScapeTheme.whiteColor

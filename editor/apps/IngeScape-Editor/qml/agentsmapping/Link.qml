@@ -54,14 +54,14 @@ I2CubicBezierCurve {
 
 
     // Default state
-    property color defaultColor: IngeScapeTheme.agentsMappingLinkDefaultColor
+    property color defaultColor: IngeScapeEditorTheme.agentsMappingLinkDefaultColor
 
     // Hover state
-    property int hoverFuzzyRadius: IngeScapeTheme.agentsMappingLinkHoverFuzzyRadius
-    property color hoverFuzzyColor: IngeScapeTheme.agentsMappingLinkHoverFuzzyColor
+    property int hoverFuzzyRadius: IngeScapeEditorTheme.agentsMappingLinkHoverFuzzyRadius
+    property color hoverFuzzyColor: IngeScapeEditorTheme.agentsMappingLinkHoverFuzzyColor
 
     // Press state
-    property color pressColor: IngeScapeTheme.agentsMappingLinkPressColor
+    property color pressColor: IngeScapeEditorTheme.agentsMappingLinkPressColor
 
 
     // Check if we represent a link or a "brin"
@@ -81,10 +81,10 @@ I2CubicBezierCurve {
             {
                 //if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingConnected) {
                 if (linkOutput.isPublishedNewValue) {
-                    IngeScapeTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, true);
+                    IngeScapeEditorTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, true);
                 }
                 else {
-                    IngeScapeTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, false);
+                    IngeScapeEditorTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, false);
                 }
             }
             else
@@ -94,10 +94,10 @@ I2CubicBezierCurve {
                 {
                     //if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingConnected) {
                     if (linkOutput.isPublishedNewValue) {
-                        IngeScapeTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, true);
+                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, true);
                     }
                     else {
-                        IngeScapeTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, false);
+                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, false);
                     }
                 }
                 else {
@@ -106,10 +106,10 @@ I2CubicBezierCurve {
             }
 
 
-    strokeWidth: rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinDefaultWidth : IngeScapeTheme.agentsMappingLinkDefaultWidth
+    strokeWidth: rootItem._isBrin ? IngeScapeEditorTheme.agentsMappingBrinDefaultWidth : IngeScapeEditorTheme.agentsMappingLinkDefaultWidth
 
-    strokeDashArray: (viewModel && viewModel.isTemporary) ? (rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinVirtualStrokeDashArray : IngeScapeTheme.agentsMappingLinkVirtualStrokeDashArray)
-                                                           : ""
+    strokeDashArray: (viewModel && viewModel.isTemporary) ? (rootItem._isBrin ? IngeScapeEditorTheme.agentsMappingBrinVirtualStrokeDashArray : IngeScapeEditorTheme.agentsMappingLinkVirtualStrokeDashArray)
+                                                          : ""
 
     // Fuzzy contour
     fuzzyColor: IngeScapeTheme.lightGreyColor

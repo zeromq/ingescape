@@ -133,7 +133,7 @@ void AgentsGroupedByNameVM::addNewAgentModel(AgentM* model)
 {
     if (model != nullptr)
     {
-        qDebug() << "Grouped by" << _name << ": Add new model" << model;
+        //qDebug() << "Grouped by" << _name << ": Add new model" << model;
 
         if (!_models.contains(model))
         {

@@ -81,7 +81,7 @@ Item {
             bottom : recordsListScrollView.top
         }
 
-        color : IngeScapeTheme.selectedTabsBackgroundColor
+        color : IngeScapeEditorTheme.selectedTabsBackgroundColor
 
 
         Button {
@@ -97,7 +97,7 @@ Item {
             enabled: controller.playingRecord === null
 
             style: I2SvgToggleButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 toggleCheckedReleasedID: "record-stop";
                 toggleCheckedPressedID: "record-stop-pressed";
@@ -151,7 +151,7 @@ Item {
             right: parent.right
         }
 
-        color: IngeScapeTheme.leftPanelBackgroundColor
+        color: IngeScapeTheme.blackColor
 
         height: 1
     }
@@ -278,7 +278,7 @@ Item {
                     right: parent.right
                 }
 
-                color: IngeScapeTheme.leftPanelBackgroundColor
+                color: IngeScapeTheme.blackColor
 
                 height: 1
             }
@@ -308,7 +308,7 @@ Item {
                     elide: Text.ElideRight
 
                     text: model.modelM.name
-                    color: playPauseRecordButton.checked ? IngeScapeEditorTheme.agentsListItemBackgroundColor : IngeScapeEditorTheme.agentsListLabelColor
+                    color: playPauseRecordButton.checked ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
                     font: IngeScapeTheme.headingFont
                 }
 
@@ -331,7 +331,7 @@ Item {
                     .arg(Qt.formatTime(model.modelM.beginDateTime, "HH:mm:ss"))
                     .arg(Qt.formatDateTime(model.modelM.duration, "HH:mm:ss"))
 
-                    color: playPauseRecordButton.checked ? IngeScapeTheme.agentsListItemBackgroundColor :IngeScapeTheme.agentsListTextColor
+                    color: playPauseRecordButton.checked ? IngeScapeTheme.veryDarkGreyColor :IngeScapeTheme.lightBlueGreyColor
                     font: IngeScapeTheme.normalFont
                 }
             }
@@ -392,7 +392,7 @@ Item {
                                                      || (controller.playingRecord.modelM && (controller.playingRecord.modelM.id === model.modelM.id)) )
 
                 style: I2SvgToggleButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                     toggleCheckedReleasedID: "pause";
                     toggleCheckedPressedID: "pause-pressed";
@@ -441,8 +441,8 @@ Item {
 
                 activeFocusOnPress: true
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "delete"

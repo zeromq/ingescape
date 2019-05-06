@@ -322,7 +322,7 @@ Item {
 
             anchors.fill: parent
 
-            color: IngeScapeTheme.agentsMappingBackgroundColor
+            color: IngeScapeEditorTheme.agentsMappingBackgroundColor
 
             SeamlessGrid {
                 anchors.fill: parent
@@ -333,8 +333,8 @@ Item {
                 cellSize: rootItem.backgroundCellSize * workspace.scale
                 numberOfSubDivisions: rootItem.backgroundCellNumberOfSubDivisions
 
-                cellStroke: IngeScapeTheme.agentsMappingGridLineColor
-                subCellStroke: IngeScapeTheme.agentsMappingGridSublineColor
+                cellStroke: IngeScapeEditorTheme.agentsMappingGridLineColor
+                subCellStroke: IngeScapeEditorTheme.agentsMappingGridSublineColor
             }
         }
 

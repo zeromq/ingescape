@@ -178,7 +178,7 @@ Item {
             bottom : agentsListScrollView.top
         }
 
-        color : IngeScapeTheme.selectedTabsBackgroundColor
+        color : IngeScapeEditorTheme.selectedTabsBackgroundColor
 
         Row {
             id: headerRow
@@ -204,7 +204,7 @@ Item {
                 }
 
                 style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "new-agent"
@@ -236,7 +236,7 @@ Item {
                 activeFocusOnPress: true
 
                 style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "import"
@@ -282,7 +282,7 @@ Item {
                 }
 
                 style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "export"
@@ -319,7 +319,7 @@ Item {
                 }
 
                 style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "delete-all"
@@ -347,7 +347,7 @@ Item {
             right: parent.right
         }
 
-        color: IngeScapeTheme.leftPanelBackgroundColor
+        color: IngeScapeTheme.blackColor
 
         height: 1
     }

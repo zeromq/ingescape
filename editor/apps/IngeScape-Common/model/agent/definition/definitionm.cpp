@@ -33,7 +33,7 @@ DefinitionM::DefinitionM(QString name,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Agent Definition" << _name << "with version" << _version << "about" << _description;
+    //qInfo() << "New Model of Agent Definition" << _name << "with version" << _version << "about" << _description;
 
     // Connect to signal "Count Changed" from the list of Inputs/Outputs/Parameters
     connect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onInputsListChanged);
@@ -47,7 +47,7 @@ DefinitionM::DefinitionM(QString name,
  */
 DefinitionM::~DefinitionM()
 {
-    qInfo() << "Delete Model of Agent Definition" << _name;
+    //qInfo() << "Delete Model of Agent Definition" << _name;
 
     // DIS-connect from signal "Count Changed" from the list of Inputs/Outputs/Parameters
     disconnect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onInputsListChanged);

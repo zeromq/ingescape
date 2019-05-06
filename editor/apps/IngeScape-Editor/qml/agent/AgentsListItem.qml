@@ -84,7 +84,7 @@ Item {
                 right: parent.right
             }
 
-            color: IngeScapeTheme.leftPanelBackgroundColor
+            color: IngeScapeTheme.blackColor
 
             height: 1
         }
@@ -122,8 +122,8 @@ Item {
 
             activeFocusOnPress: true
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            style: LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "delete"
@@ -184,7 +184,7 @@ Item {
 
                 text: textMetricsName.elidedText
 
-                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeEditorTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
+                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeEditorTheme.agentsListLabelColor : IngeScapeEditorTheme.agentOFFLabelColor
 
                 font: IngeScapeTheme.headingFont
 
@@ -291,10 +291,10 @@ Item {
                                    else
                                    {
                                        if (definitionNameBtn.pressed) {
-                                           IngeScapeTheme.agentsListPressedLabel2Color
+                                           IngeScapeEditorTheme.agentsListPressedLabel2Color
                                        }
                                        else {
-                                           IngeScapeTheme.agentsListLabel2Color
+                                           IngeScapeEditorTheme.agentsListLabel2Color
                                        }
                                    }
                                }
@@ -315,16 +315,16 @@ Item {
                                    else
                                    {
                                        if (definitionNameBtn.pressed) {
-                                           IngeScapeTheme.agentOFFPressedLabel2Color
+                                           IngeScapeEditorTheme.agentOFFPressedLabel2Color
                                        }
                                        else {
-                                           IngeScapeTheme.agentOFFLabel2Color
+                                           IngeScapeEditorTheme.agentOFFLabel2Color
                                        }
                                    }
                                }
                            }
                            else {
-                               IngeScapeTheme.agentOFFLabel2Color
+                               IngeScapeEditorTheme.agentOFFLabel2Color
                            }
 
                     font: IngeScapeTheme.heading2Font
@@ -378,7 +378,7 @@ Item {
 
                 text: rootItem.agent ? rootItem.agent.hostnames: ""
 
-                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeTheme.agentsListTextColor : IngeScapeTheme.agentOFFTextColor
+                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeEditorTheme.agentsListTextColor : IngeScapeEditorTheme.agentOFFTextColor
                 font: IngeScapeTheme.normalFont
             }
 
@@ -405,8 +405,8 @@ Item {
                 visible: (model.isON === true)
                 activeFocusOnPress: true
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: model.isMuted ? "active-mute" : "inactive-mute"
@@ -428,8 +428,8 @@ Item {
                 activeFocusOnPress: true
                 enabled: visible
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: model.isON ? "on" : "off"
@@ -464,8 +464,8 @@ Item {
                 enabled : visible
                 activeFocusOnPress: true
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: model.isFrozen ? "active-freeze" : "inactive-freeze"
@@ -484,8 +484,8 @@ Item {
                 visible: (model.isON === true)
                 activeFocusOnPress: true
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "button-options"

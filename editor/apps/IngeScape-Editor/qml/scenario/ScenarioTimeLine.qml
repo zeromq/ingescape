@@ -165,7 +165,7 @@ Item {
         anchors {
             fill : parent
         }
-        color: IngeScapeTheme.scenarioBackgroundColor
+        color: IngeScapeTheme.veryDarkGreyColor
         fuzzyRadius: 8
     }
 
@@ -610,7 +610,7 @@ Item {
                                 width : height
                                 opacity : 0.8
 
-                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE
+                                svgFileCache: IngeScapeTheme.svgFileIngeScape
                                 svgElementId: "dropImpossible"
                             }
 
@@ -668,8 +668,8 @@ Item {
 
                                     visible : ghostAction.actionModelGhost && !ghostAction.actionModelGhost.shallRevert
 
-                                    svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                                    svgElementId: "timelineAction";
+                                    svgFileCache: IngeScapeTheme.svgFileIngeScape
+                                    svgElementId: "timelineAction"
                                 }
 
                                 // Revert action
@@ -696,32 +696,33 @@ Item {
                                         x : 0;
                                         y : 0
 
-                                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
+                                        svgFileCache: IngeScapeTheme.svgFileIngeScape
                                         svgElementId: "revertAction"
                                     }
 
                                     I2SvgItem {
-                                        id : revertActionExecutionGhost
-                                        x : if (ghostAction.actionModelGhost) {
-                                                if (ghostAction.actionModelGhost.shallRevertWhenValidityIsOver)
-                                                {
-                                                    rect.width - width;
-                                                }
-                                                else if (ghostAction.actionModelGhost.shallRevertAfterTime) {
-                                                    viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(ghostAction.actionModelGhost.revertAfterTime, viewController.pixelsPerMinute) - width;
-                                                }
-                                                else {
-                                                    0;
-                                                }
-                                            }
-                                            else {
-                                                0;
-                                            }
+                                        id: revertActionExecutionGhost
 
-                                        y : 0
-                                        rotation : 180
-                                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                                        svgElementId:"revertAction" ;
+                                        x: if (ghostAction.actionModelGhost) {
+                                               if (ghostAction.actionModelGhost.shallRevertWhenValidityIsOver)
+                                               {
+                                                   rect.width - width;
+                                               }
+                                               else if (ghostAction.actionModelGhost.shallRevertAfterTime) {
+                                                   viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(ghostAction.actionModelGhost.revertAfterTime, viewController.pixelsPerMinute) - width;
+                                               }
+                                               else {
+                                                   0;
+                                               }
+                                           }
+                                           else {
+                                               0;
+                                           }
+
+                                        y: 0
+                                        rotation: 180
+                                        svgFileCache: IngeScapeTheme.svgFileIngeScape
+                                        svgElementId:"revertAction"
                                     }
                                 }
                             }
@@ -1013,12 +1014,13 @@ Item {
 
                     I2SvgItem {
                         id :svgCurrentTime
+
                         anchors {
                             horizontalCenter : parent.left
                             bottom : parent.bottom
                         }
 
-                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
+                        svgFileCache: IngeScapeTheme.svgFileIngeScape
                         svgElementId: "currentTime"
                     }
 
@@ -1151,7 +1153,7 @@ Item {
         I2SvgItem {
             anchors.centerIn: parent
 
-            svgFileCache: IngeScapeTheme.svgFileINGESCAPE
+            svgFileCache: IngeScapeTheme.svgFileIngeScape
             svgElementId: "reduceTimeline"
 
             rotation : (rootItem.isReduced) ? 180 : 0;
@@ -1168,7 +1170,7 @@ Item {
     }
 
 
-    //Zone allowing to change height of the time line
+    // Zone allowing to change height of the time line
     Rectangle {
         id : resizeRectangle
         anchors {
@@ -1183,7 +1185,7 @@ Item {
         I2SvgItem {
             anchors.centerIn: parent
 
-            svgFileCache: IngeScapeTheme.svgFileINGESCAPE
+            svgFileCache: IngeScapeTheme.svgFileIngeScape
             svgElementId: "resizeTimeline"
         }
 
@@ -1256,8 +1258,8 @@ Item {
             activeFocusOnPress: true
             checkable: true
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            style: LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: (controller && controller.isPlaying) ? "timeline-pause" : "timeline-play"

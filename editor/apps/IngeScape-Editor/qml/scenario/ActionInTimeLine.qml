@@ -32,7 +32,7 @@ Item {
     property var viewController : IngeScapeEditorC.timeLineC;
 
     // height of a line in the time line
-    property int lineHeight : IngeScapeTheme.lineInTimeLineHeight
+    property int lineHeight: IngeScapeTheme.lineInTimeLineHeight
 
 
     //ghost temporary start time when drag is active
@@ -208,7 +208,7 @@ Item {
 
                     visible: !model.shallRevert
 
-                    svgFileCache: IngeScapeTheme.svgFileINGESCAPE
+                    svgFileCache: IngeScapeTheme.svgFileIngeScape
                     svgElementId: (model.neverExecuted ? "notExcutedAction"
                                                        : (model.isExecuted ? "timelineAction" : "currentAction"))
                 }
@@ -240,10 +240,9 @@ Item {
                         x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute);
                         y : 0
 
-                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                        svgElementId: (model.neverExecuted)?
-                                          "notExecutedRevertAction"
-                                        : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
+                        svgFileCache: IngeScapeTheme.svgFileIngeScape;
+                        svgElementId: (model.neverExecuted ? "notExecutedRevertAction"
+                                                           : (model.isExecuted ? "revertAction" : "currentRevertAction"))
                     }
 
                     I2SvgItem {
@@ -251,10 +250,9 @@ Item {
                         x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.reverseTime, viewController.pixelsPerMinute) - width;
                         y : 0
                         rotation : 180
-                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                        svgElementId: (model.neverExecuted)?
-                                          "notExecutedRevertAction"
-                                        : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
+                        svgFileCache: IngeScapeTheme.svgFileIngeScape
+                        svgElementId: (model.neverExecuted ? "notExecutedRevertAction"
+                                                           : (model.isExecuted ? "revertAction" : "currentRevertAction"))
                     }
                 }
 

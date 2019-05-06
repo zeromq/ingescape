@@ -949,12 +949,12 @@ void AgentsGroupedByDefinitionVM::_onOpenValuesHistoryOfAgent()
  */
 void AgentsGroupedByDefinitionVM::_updateWithAllModels()
 {
-    if (_definition != nullptr) {
+    /*if (_definition != nullptr) {
         qDebug() << "Grouped by definition" << _definition->name() << ": Update with all (" << _models.count() << ") models of" << _name << "(" << this << ")";
     }
     else {
         qDebug() << "Grouped by definition 'NULL': Update with all (" << _models.count() << ") models of" << _name << "(" << this << ")";
-    }
+    }*/
 
     // Note: hostname is never empty (default value is HOSTNAME_NOT_DEFINED)
     _peerIdsList.clear();
