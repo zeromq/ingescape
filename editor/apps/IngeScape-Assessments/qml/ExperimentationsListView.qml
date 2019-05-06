@@ -48,13 +48,13 @@ Item {
     //
     //--------------------------------------------------------
 
-    Rectangle {
+    /*Rectangle {
         id: background
 
         anchors.fill: parent
 
-        color: "#FF553333"
-    }
+        color: IngeScapeTheme.veryDarkGreyColor
+    }*/
 
     Text {
         id: title
@@ -140,11 +140,12 @@ Item {
             property ExperimentationsGroupVM experimentationsGroup: model.QtObject
 
             width: parent.width
-            height: txtName.anchors.topMargin + txtName.height + columnExperimentations.anchors.topMargin + columnExperimentations.height
+            height: txtName.anchors.topMargin + txtName.height + columnExperimentations.anchors.topMargin + columnExperimentations.height + 5
 
-            color: "#44222222"
+            color: "transparent"
+            radius: 5
             border {
-                color: "black"
+                color: IngeScapeTheme.darkGreyColor
                 width: 1
             }
 
@@ -190,9 +191,10 @@ Item {
                         width: parent.width
                         height: 30
 
-                        color: "#44222222"
+                        color: "transparent"
+                        //radius: 5
                         border {
-                            color: "black"
+                            color: IngeScapeTheme.darkGreyColor
                             width: 1
                         }
 

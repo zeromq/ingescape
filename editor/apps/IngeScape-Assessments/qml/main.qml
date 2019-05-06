@@ -50,7 +50,8 @@ ApplicationWindow {
     visible: true
 
 
-    color: IngeScapeTheme.windowBackgroundColor
+    //color: IngeScapeTheme.windowBackgroundColor
+    color: IngeScapeTheme.veryDarkGreyColor
 
 
     // NB: we must override the style of our ApplicationWindow if we want a white background!
@@ -345,14 +346,6 @@ ApplicationWindow {
 
             /*onLoaded: {
                 console.log("onLoaded " + applicationLoader.item)
-            }*/
-
-            /*onVisibleChanged: {
-                if (visible) {
-                    if (IngeScapeAssessmentsC.agentsMappingC) {
-                        IngeScapeAssessmentsC.agentsMappingC.fitToView();
-                    }
-                }
             }*/
         }
 

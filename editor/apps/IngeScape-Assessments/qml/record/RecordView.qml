@@ -70,13 +70,13 @@ Item {
     //
     //--------------------------------------------------------
 
-    Rectangle {
+    /*Rectangle {
         id: background
 
         anchors.fill: parent
 
-        color: "#FF335555"
-    }
+        color: IngeScapeTheme.veryDarkGreyColor
+    }*/
 
     Row {
         id: breadcrumb

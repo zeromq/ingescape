@@ -39,8 +39,8 @@ Item {
     readonly property int appDefaultHeight: 1080
 
     // Height of our bottom panel
-    readonly property int bottomPanelHeight: 300
-    //readonly property int bottomPanelHeight_OneRow: 100
+    readonly property int timelineHeight: 300
+    //readonly property int timelineHeight_OneRow: 100
 
 
     //-----------------------------------------

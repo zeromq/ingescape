@@ -69,13 +69,13 @@ Item {
     //
     //--------------------------------------------------------
 
-    Rectangle {
+    /*Rectangle {
         id: background
 
         anchors.fill: parent
 
-        color: "#FF336633"
-    }
+        color: IngeScapeTheme.veryDarkGreyColor
+    }*/
 
     Button {
         id: btnGoBackToHome
