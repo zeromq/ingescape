@@ -275,6 +275,18 @@ Item {
                         actionItemIsHovered: mouseArea.containsMouse
                         actionItemIsPressed: mouseArea.pressed
                     }
+
+                    onPressed: {
+                        if (rootItem.controller)
+                        {
+                            if (rootItem.controller.selectedAction === model.QtObject) {
+                                rootItem.controller.selectedAction = null;
+                            }
+                            else {
+                                rootItem.controller.selectedAction = model.QtObject;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -504,35 +516,6 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
 
 
     //
-    // Timeline
-    //
-    /*Rectangle {
-        id: timeline
-
-        anchors {
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-        }
-        height: 250
-
-        color: "white"
-
-        Text {
-            anchors.centerIn: parent
-
-            text: qsTr("TIMELINE")
-
-            //color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 18
-            }
-        }
-    }*/
-
-    //
     // Scenario TimeLine
     //
     ScenarioTimeLine {
@@ -544,7 +527,6 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             bottom: parent.bottom
         }
         height: 0
-        //height: 250
 
         scenarioController: null; //IngeScapeEditorC.scenarioC
         timeLineController: rootItem.controller ? rootItem.controller.timeLineC : null;
