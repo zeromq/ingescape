@@ -23,7 +23,7 @@
 
 /**
  * @brief Constructor
- * @param agentsGroupedByName Models of agents grouped by the same name
+ * @param agentsGroupedByName View model of agents grouped by the same name
  * @param position Position of the top left corner
  * @param parent
  */

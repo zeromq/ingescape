@@ -21,6 +21,7 @@
 #include <I2PropertyHelpers.h>
 #include <controller/editormodelmanager.h>
 #include <viewModel/agentinmappingvm.h>
+#include <viewModel/mapping/actioninmappingvm.h>
 #include <viewModel/link/linkvm.h>
 
 
@@ -41,8 +42,11 @@ class AgentsMappingController : public QObject
     I2_QML_PROPERTY_FUZZY_COMPARE(double, xSpawnZoneOffset)
     I2_QML_PROPERTY_FUZZY_COMPARE(double, ySpawnZoneOffset)
 
-    // List of all agents in mapping
+    // List of all agents in the mapping
     I2_QOBJECT_LISTMODEL(AgentInMappingVM, allAgentsInMapping)
+
+    // List of all actions in the mapping
+    I2_QOBJECT_LISTMODEL(ActionInMappingVM, allActionsInMapping)
 
     // List of all links between agents in the global mapping
     I2_QOBJECT_LISTMODEL(LinkVM, allLinksInMapping)
@@ -52,6 +56,9 @@ class AgentsMappingController : public QObject
 
     // Selected agent in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
+
+    // Selected action in the mapping
+    I2_QML_PROPERTY_DELETE_PROOF(ActionInMappingVM*, selectedAction)
 
     // Selected link between agents in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(LinkVM*, selectedLink)
@@ -105,6 +112,14 @@ public:
      * @param position
      */
     Q_INVOKABLE void dropAgentNameToMappingAtPosition(const QString& agentName, QPointF position);
+
+
+    /**
+     * @brief Called when an action from the list is dropped on the current mapping at a position
+     * @param action
+     * @param position
+     */
+    Q_INVOKABLE void dropActionToMappingAtPosition(ActionM* action, QPointF position);
 
 
     /**

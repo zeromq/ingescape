@@ -406,7 +406,7 @@ Item {
                     drag.smoothed: false
                     drag.target: draggableItem
 
-                    cursorShape: (mouseArea.drag.active)? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                    cursorShape: mouseArea.drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
 
                     onPressed: {
                         if (controller) {

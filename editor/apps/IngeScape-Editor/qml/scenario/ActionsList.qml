@@ -319,7 +319,7 @@ Item {
 
                     drag.smoothed: false
                     drag.target: draggableItem
-                    cursorShape: mouseArea.drag.active ? Qt.PointingHandCursor : Qt.OpenHandCursor //Qt.OpenHandCursor
+                    cursorShape: mouseArea.drag.active ? Qt.PointingHandCursor : Qt.OpenHandCursor
 
                     onPressed: {
                         if (controller)
@@ -413,7 +413,7 @@ Item {
                         Column {
                             id: columnText
 
-                            height: temporaryStartTimeAction.visible ? (nameAction.height + temporaryStartTimeAction.height) + 3
+                            height: temporaryStartTimeAction.visible ? (nameAction.height + temporaryStartTimeAction.height + 3)
                                                                      : nameAction.height
                             anchors.centerIn: parent
                             spacing: 6

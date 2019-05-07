@@ -8,8 +8,6 @@
  *
  *
  *	Contributors:
- *      Alexandre Lemort    <lemort@ingenuity.io>
- *      Justine Limoges     <limoges@ingenuity.io>
  *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
  *
  */
@@ -17,7 +15,7 @@
 import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
-import QtQuick.Controls 2.0 as Controls2
+//import QtQuick.Controls 2.0 as Controls2
 
 import I2Quick 1.0
 
@@ -39,68 +37,37 @@ Rectangle {
     property var controller : null;
 
     // Model associated to our QML item
-    property AgentInMappingVM agentMappingVM: null
+    property ActionInMappingVM actionInMappingVM: null;
 
-    property var agentsGroupedByName: agentMappingVM ? agentMappingVM.agentsGroupedByName : null
-
-    property string agentName: agentMappingVM ? agentMappingVM.name : ""
-
-    // Flag indicating if our agent is reduced (List of Inputs/Outputs are hidden)
-    property bool isReduced: agentMappingVM && agentMappingVM.isReduced
-
-    // Flag indicating if mouse areas over input/output names (to display the tooltip) are enabled
-    // When our agent is reduced, the user must hover the header of our agent to double click on it (to open it)
-    // --> this flag allows to prevent the mouse areas over input/output names to detect a hover and to display the tooltip
-    property bool areToolTipEnabled: false
+    property var actionM: actionInMappingVM ? actionInMappingVM.action : null;
 
     // false if the agent is dropping and the drop is not available, true otherwise
-    property bool dropEnabled: true
+    //property bool dropEnabled: true
 
     // Flag indicating if the mouse is hover our agent
-    property bool agentItemIsHovered: mouseArea.containsMouse
+    property bool actionItemIsHovered: mouseArea.containsMouse
 
     // To check if our item is selected or not
-    property bool _isSelected: (controller && rootItem.agentMappingVM && (controller.selectedAgent === rootItem.agentMappingVM))
+    property bool _isSelected: (controller && rootItem.actionInMappingVM && (controller.selectedAction === rootItem.actionInMappingVM))
 
-
-    // Duration of expand/collapse animation in milliseconds (250 ms => default duration of QML animations)
-    property int _expandCollapseAnimationDuration: 250
-
-
-    width: 258
-
-    height: (rootItem.agentMappingVM && !rootItem.isReduced) ? (54 + 22 * Math.max(rootItem.agentMappingVM.linkInputsList.count, rootItem.agentMappingVM.linkOutputsList.count))
-                                                             : 42
+    width: 150
+    height: width
+    radius: width / 2
 
 
     // Init position of our agent
-    x: (agentMappingVM && agentMappingVM.position) ? agentMappingVM.position.x : 0
-    y: (agentMappingVM && agentMappingVM.position) ? agentMappingVM.position.y : 0
+    x: (actionInMappingVM && actionInMappingVM.position) ? actionInMappingVM.position.x : 0
+    y: (actionInMappingVM && actionInMappingVM.position) ? actionInMappingVM.position.y : 0
 
 
-    radius: 6
-
-    color: (dropEnabled === true) ? (mouseArea.pressed ? IngeScapeTheme.darkGreyColor2
-                                                       : (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON) ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.veryDarkGreyColor)
-                                  : IngeScapeTheme.darkGreyColor2
+    color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2
+                             : IngeScapeTheme.darkBlueGreyColor
 
 
     border {
         color: IngeScapeTheme.selectionColor
         width: rootItem._isSelected ? 1 : 0
     }
-
-
-    onIsReducedChanged: {
-        if (rootItem.isReduced)
-        {
-            //console.log(rootItem.agentName + " Reduced --> areToolTipEnabled = false");
-
-            // Disable each mouse areas over input/output names to prevent them to display the corresponding tooltip
-            rootItem.areToolTipEnabled = false;
-        }
-    }
-
 
 
     //--------------------------------
@@ -113,20 +80,9 @@ Rectangle {
     // Bindings to save the position of our agent when we move it (drag-n-drop)
     //
     Binding {
-        target: rootItem.agentMappingVM
+        target: rootItem.actionInMappingVM
         property: "position"
         value: Qt.point(rootItem.x, rootItem.y)
-    }
-
-
-
-    //
-    // Animation used when our item is collapsed or expanded (its height changes)
-    //
-    Behavior on height {
-        NumberAnimation {
-            duration: rootItem._expandCollapseAnimationDuration
-        }
     }
 
 
@@ -176,25 +132,16 @@ Rectangle {
         }
 
         onClicked: {
-            if (controller && agentMappingVM) {
-                if (controller.selectedAgent === agentMappingVM)
+            if (controller && actionInMappingVM) {
+                if (controller.selectedAction === actionInMappingVM)
                 {
-                    controller.selectedAgent = null;
+                    controller.selectedAction = null;
                 }
                 else {
-                    controller.selectedAgent = agentMappingVM;
+                    controller.selectedAction = actionInMappingVM;
                 }
             }
         }
-
-        onDoubleClicked: {
-            // Check if our agent is locked reduced (prevent to open the list of Inputs/Outputs)
-            if (agentMappingVM && !agentMappingVM.isLockedReduced)
-            {
-                agentMappingVM.isReduced = !agentMappingVM.isReduced;
-            }
-        }
-
 
 
         //------------------------------------------
@@ -210,52 +157,26 @@ Rectangle {
             anchors {
                 left: parent.left
                 right: parent.right
+
+                top: parent.top
+                //topMargin: 5
                 bottom: parent.bottom
-
-                top: separator.bottom
-
-                // When our agent is reduced, all slots must be centered on Y = AgentNodeView.height/2 = 21
-                topMargin: (!rootItem.isReduced) ? 5 : -31
-            }
-
-            visible: (opacity !== 0)
-            opacity: !rootItem.isReduced ? 1 : 0
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: rootItem._expandCollapseAnimationDuration
-                }
-            }
-
-            Behavior on anchors.topMargin {
-                NumberAnimation {
-                    duration: rootItem._expandCollapseAnimationDuration
-                }
             }
 
 
             //
             // Inlets / Input slots
             //
-            CollapsibleColumn {
+            Column {
                 id: columnInputSlots
 
                 anchors {
                     fill: parent
                 }
 
-                value: rootItem.isReduced ? 0 : 1
-
-                Behavior on value {
-                    NumberAnimation {
-                        duration: rootItem._expandCollapseAnimationDuration
-                    }
-                }
-
-
                 Repeater {
                     // List of intput slots VM
-                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.linkInputsList : 0)
+                    model: 1 // rootItem.actionInMappingVM ? rootItem.actionInMappingVM.linkInputsList : null
 
                     delegate: Item {
                         id: inputSlotItem
@@ -268,41 +189,6 @@ Rectangle {
                             right: parent.right
                         }
 
-                        Text {
-                            id: agentInput
-
-                            anchors {
-                                left: parent.left
-                                leftMargin: 20
-                                right: parent.horizontalCenter
-                                rightMargin: 5
-                                verticalCenter: parent.verticalCenter
-                            }
-
-                            elide: Text.ElideRight
-                            text: myModel ? myModel.name : ""
-
-                            color: (myModel && myModel.input && myModel.input.isDefinedInAllDefinitions) ? (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeEditorTheme.agentsONInputsOutputsMappingColor : IngeScapeEditorTheme.agentsOFFInputsOutputsMappingColor)
-                                                                                                         : (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
-
-                            font: IngeScapeTheme.heading2Font
-
-                            MouseArea {
-                                id: rootTooltipInput
-                                anchors.fill: parent
-                                acceptedButtons: Qt.NoButton
-                                hoverEnabled: rootItem.areToolTipEnabled
-                                cursorShape: Qt.PointingHandCursor
-                            }
-
-                            Controls2.ToolTip {
-                                delay: 400
-                                visible: rootTooltipInput.containsMouse
-                                text: ((myModel && myModel.input && myModel.input.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.input.firstModel.agentIOPValueType) + ")": "")
-                            }
-                        }
-
-
                         Rectangle {
                             id: draggablePointFROM
 
@@ -311,7 +197,7 @@ Rectangle {
                             radius: height/2
 
                             property bool dragActive: mouseAreaPointFROM.drag.active;
-                            property var agentInMappingVMOfInput: rootItem.agentMappingVM;
+                            property var agentInMappingVMOfInput: rootItem.actionInMappingVM;
                             property var inputSlotModel: model.QtObject
 
                             Drag.active: mouseAreaPointFROM.drag.active;
@@ -340,7 +226,7 @@ Rectangle {
 
                                 hoverEnabled: true
 
-                                cursorShape: (draggablePointFROM.dragActive) ? Qt.ClosedHandCursor : Qt.PointingHandCursor
+                                cursorShape: draggablePointFROM.dragActive ? Qt.ClosedHandCursor : Qt.PointingHandCursor
 
                                 onPressed: {
                                     draggablePointFROM.z = rootItem.parent.maxZ++;
@@ -374,7 +260,7 @@ Rectangle {
 
 
                         Rectangle {
-                            id : linkPoint
+                            id: linkPoint
 
                             anchors {
                                 horizontalCenter: parent.left
@@ -386,16 +272,10 @@ Rectangle {
                             radius: height/2
 
                             border {
-                                width : 0
-                                color : IngeScapeTheme.whiteColor
+                                width: 0
+                                color: IngeScapeTheme.whiteColor
                             }
-
-                            color: if (myModel && myModel.input && myModel.input.firstModel) {
-                                       IngeScapeEditorTheme.colorOfIOPTypeWithConditions(myModel.input.firstModel.agentIOPValueTypeGroup, true);
-                                   }
-                                   else {
-                                       IngeScapeTheme.whiteColor
-                                   }
+                            color: IngeScapeEditorTheme.purpleColor
                         }
 
 
@@ -448,14 +328,14 @@ Rectangle {
                                 var dragItem = drag.source;
                                 if (dragItem)
                                 {
-                                    if ((typeof dragItem.outputSlotModel !== 'undefined') && dragItem.agentInMappingVMOfOutput && rootItem.agentMappingVM)
+                                    if ((typeof dragItem.outputSlotModel !== 'undefined') && dragItem.agentInMappingVMOfOutput && rootItem.actionInMappingVM)
                                     {
                                         dragItem.color = "transparent";
                                         linkPoint.border.width = 0
                                         linkPoint.scale = 1
 
-                                        //console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
-                                        controller.dropLinkBetweenTwoAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
+                                        console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
+                                        //controller.dropLinkBetweenTwoAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.actionInMappingVM, inputSlotItem.myModel);
                                     }
                                 }
                             }
@@ -486,25 +366,17 @@ Rectangle {
             //
             // Outlets / Output slots
             //
-            CollapsibleColumn {
+            Column {
                 id: columnOutputSlots
 
                 anchors {
                     fill: parent
                 }
 
-                value: rootItem.isReduced ? 0 : 1
-
-                Behavior on value {
-                    NumberAnimation {
-                        duration: rootItem._expandCollapseAnimationDuration
-                    }
-                }
-
 
                 Repeater {
                     // List of output slots VM
-                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.linkOutputsList : 0)
+                    model: 1 // rootItem.actionInMappingVM ? rootItem.actionInMappingVM.linkOutputsList : null
 
                     delegate: Item {
                         id: outputSlotItem
@@ -515,40 +387,6 @@ Rectangle {
                         anchors {
                             left: parent.left
                             right: parent.right
-                        }
-
-                        Text {
-                            id: agentOutput
-
-                            anchors {
-                                left: parent.horizontalCenter
-                                leftMargin: 5
-                                right: parent.right
-                                rightMargin: 20
-                                verticalCenter: parent.verticalCenter
-                            }
-
-                            horizontalAlignment: Text.AlignRight
-                            elide: Text.ElideRight
-                            text: myModel ? myModel.name : ""
-
-                            color: (myModel && myModel.output && myModel.output.isDefinedInAllDefinitions) ? (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeEditorTheme.agentsONInputsOutputsMappingColor : IngeScapeEditorTheme.agentsOFFInputsOutputsMappingColor)
-                                                                                                           : (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
-                            font: IngeScapeTheme.heading2Font
-
-                            MouseArea {
-                                id: rootTooltipOutput
-                                anchors.fill: parent
-                                acceptedButtons: Qt.NoButton
-                                hoverEnabled: rootItem.areToolTipEnabled
-                                cursorShape: Qt.PointingHandCursor
-                            }
-
-                            Controls2.ToolTip {
-                                delay: 400
-                                visible: rootTooltipOutput.containsMouse
-                                text: ((myModel && myModel.output && myModel.output.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.output.firstModel.agentIOPValueType) + ")": "")
-                            }
                         }
 
                         Rectangle {
@@ -564,7 +402,7 @@ Rectangle {
                             }
 
                             property bool dragActive : mouseAreaPointTO.drag.active;
-                            property var agentInMappingVMOfOutput : rootItem.agentMappingVM
+                            property var agentInMappingVMOfOutput : rootItem.actionInMappingVM
                             property var outputSlotModel: model.QtObject
 
                             Drag.active: draggablePointTO.dragActive;
@@ -587,7 +425,7 @@ Rectangle {
 
                                 hoverEnabled: true
 
-                                cursorShape: (draggablePointTO.dragActive) ? Qt.ClosedHandCursor : Qt.PointingHandCursor
+                                cursorShape: draggablePointTO.dragActive ? Qt.ClosedHandCursor : Qt.PointingHandCursor
 
                                 onPressed: {
                                     draggablePointTO.z = rootItem.parent.maxZ++;
@@ -639,24 +477,7 @@ Rectangle {
                                 width: 0
                                 color: IngeScapeTheme.whiteColor
                             }
-
-                            color: if (myModel && myModel.output && myModel.output.firstModel) {
-                                       IngeScapeEditorTheme.colorOfIOPTypeWithConditions(myModel.output.firstModel.agentIOPValueTypeGroup, !myModel.output.firstModel.isMuted);
-                                   }
-                                   else {
-                                       IngeScapeTheme.whiteColor
-                                   }
-
-
-
-                            I2SvgItem {
-                                anchors.centerIn: parent
-
-                                svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
-                                svgElementId: "outputIsMuted"
-
-                                visible: (myModel.output && myModel.output.firstModel && myModel.output.firstModel.isMuted)
-                            }
+                            color: IngeScapeEditorTheme.purpleColor
                         }
 
 
@@ -709,20 +530,18 @@ Rectangle {
                                 var dragItem = drag.source;
                                 if (dragItem)
                                 {
-                                    if (typeof dragItem.inputSlotModel !== 'undefined' && controller && rootItem.agentMappingVM && outputSlotItem.myModel)
+                                    if (typeof dragItem.inputSlotModel !== 'undefined' && controller && rootItem.actionInMappingVM && outputSlotItem.myModel)
                                     {
                                         dragItem.color = "transparent";
                                         linkPointOut.border.width = 0
                                         linkPointOut.scale = 1
 
-                                        //console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
-                                        controller.dropLinkBetweenTwoAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
+                                        console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
+                                        //controller.dropLinkBetweenTwoAgents(rootItem.actionInMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
                                     }
                                 }
                             }
                         }
-
-
 
 
 
@@ -744,80 +563,14 @@ Rectangle {
         }
 
 
-        // Timer started when the flag "is Reduced" evolve from true to false (reduced --> opened)
-        Timer {
-            interval: 500
-            running: !rootItem.isReduced
-
-            onTriggered: {
-                if (!rootItem.isReduced)
-                {
-                    //console.log(rootItem.agentName + " on timer triggered: areToolTipEnabled = true");
-
-                    // Enable each mouse areas over input/output names to allows them to display the corresponding tooltip
-                    rootItem.areToolTipEnabled = true;
-                }
-            }
-        }
-
-
         //------------------------------------------
         //
         // Header
         //
         //------------------------------------------
 
-
-        // Expand / Collapse mask
-        Rectangle {
-            id: expandCollapseMask
-
-            anchors {
-                left: parent.left
-                leftMargin: 18
-                right: parent.right
-                rightMargin: 18
-
-                bottom: separator.bottom
-                top: parent.top
-                topMargin: 2
-            }
-
-            color: rootItem.color
-
-            visible: ((columnInputSlots.value !== 0) && (columnInputSlots.value !== 1))
-        }
-
-
-        // Separator
-        Rectangle {
-            id: separator
-
-            anchors {
-                left: parent.left
-                leftMargin: 18
-                right: parent.right
-                rightMargin: 18
-                top: parent.top
-                topMargin: 41
-            }
-
-            height: 2
-            color: txtAgentName.color
-
-            opacity: (!rootItem.isReduced) ? 1 : 0
-            visible: (opacity !== 0)
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: rootItem._expandCollapseAnimationDuration
-                }
-            }
-        }
-
-
         // Button to open the definition
-        Button {
+        /*Button {
             id: btnOpenDefinition
 
             anchors {
@@ -835,7 +588,7 @@ Rectangle {
                 disabledID : releasedID
             }
 
-            opacity: rootItem.agentItemIsHovered ? 1 : 0
+            opacity: rootItem.actionItemIsHovered ? 1 : 0
 
             visible: (opacity !== 0)
             enabled: visible
@@ -848,59 +601,26 @@ Rectangle {
                 // Open the definition(s)
                 rootItem.agentsGroupedByName.openDefinition();
             }
-        }
+        }*/
 
 
-        // Agent Name
+        // Action Name
         Text {
-            id: txtAgentName
+            id: txtActionName
 
             anchors {
                 left: parent.left
                 leftMargin: 30
-                right: agentWithSameName.visible ? agentWithSameName.left : btnRemoveFromMapping.left
+                right: btnRemoveFromMapping.left
                 top: parent.top
                 topMargin: 10
             }
 
             elide: Text.ElideRight
-            text: rootItem.agentName
+            text: rootItem.actionInMappingVM ? rootItem.actionInMappingVM.name : "";
             font: IngeScapeTheme.headingFont
 
-            color: (dropEnabled === true) ? ((rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isON) ? IngeScapeEditorTheme.agentsONNameMappingColor : IngeScapeEditorTheme.agentsOFFNameMappingColor)
-                                          : IngeScapeTheme.lightGreyColor
-        }
-
-        // FIXME DEBUG
-        Row {
-            anchors {
-                top: parent.top
-                right: parent.right
-            }
-            visible: IngeScapeEditorC.isAvailableModelVisualizer
-
-            Rectangle {
-                visible: agentMappingVM ? agentMappingVM.hadLinksAdded_WhileMappingWasUNactivated : false
-                color: "red"
-                width: 8
-                height: 8
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "+"
-                }
-            }
-            Rectangle {
-                visible: agentMappingVM ? agentMappingVM.hadLinksRemoved_WhileMappingWasUNactivated : false
-                color: "red"
-                width: 8
-                height: 8
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "-"
-                }
-            }
+            color: IngeScapeEditorTheme.agentsONNameMappingColor
         }
 
 
@@ -915,7 +635,7 @@ Rectangle {
                 rightMargin: 10
             }
 
-            opacity: rootItem.agentItemIsHovered ? 1 : 0
+            opacity: rootItem.actionItemIsHovered ? 1 : 0
 
             visible: (opacity !== 0)
             enabled: visible
@@ -937,8 +657,10 @@ Rectangle {
             onClicked: {
                 if (controller)
                 {
-                    // Delete our agent
-                    controller.deleteAgentInMapping(rootItem.agentMappingVM);
+                    console.log("QML: FIXME TODO deleteActionInMapping...");
+
+                    // Delete our action
+                    //controller.deleteActionInMapping(rootItem.actionInMappingVM);
                 }
             }
         }
@@ -949,41 +671,9 @@ Rectangle {
         // Warnings
         //
         //-------------------
-        Rectangle {
-            id: agentWithSameName
-
-            anchors {
-                top: parent.top
-                topMargin: 8
-                right: parent.right
-                rightMargin: 26
-            }
-            height: 16
-            width: height
-            radius: height / 2
-
-            visible: (rootItem.agentsGroupedByName && (rootItem.agentsGroupedByName.numberOfAgentsON > 1))
-
-            color: IngeScapeTheme.redColor
-
-            Text {
-                anchors.centerIn: parent
-
-                text: (rootItem.agentsGroupedByName ? rootItem.agentsGroupedByName.numberOfAgentsON : "")
-
-                color: IngeScapeTheme.whiteColor
-
-                font {
-                    family: IngeScapeTheme.labelFontFamily
-                    weight: Font.Black
-                    pixelSize: 13
-                }
-            }
-        }
-
 
         // Drop Impossible
-        I2SvgItem {
+        /*I2SvgItem {
             anchors {
                 right: parent.right
                 top: parent.top
@@ -993,8 +683,8 @@ Rectangle {
             svgFileCache: IngeScapeTheme.svgFileIngeScape
             svgElementId: "dropImpossible"
 
-            visible : (rootItem.dropEnabled === false)
-        }
+            visible: (rootItem.dropEnabled === false)
+        }*/
 
 
 
@@ -1011,25 +701,11 @@ Rectangle {
                 verticalCenter: parent.verticalCenter
             }
 
-            height : 13
-            width : height
-            radius : height/2
+            height: 13
+            width: height
+            radius: height/2
 
-            color : if (agentMappingVM) {
-                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedLinkInputsValueTypeGroup, true);
-                    }
-                    else {
-                        IngeScapeTheme.whiteColor
-                    }
-
-            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.linkInputsList.count > 0)) ? 1 : 0
-            visible: (opacity !== 0)
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: rootItem._expandCollapseAnimationDuration
-                }
-            }
+            color: IngeScapeEditorTheme.purpleColor
         }
 
         Rectangle {
@@ -1040,27 +716,12 @@ Rectangle {
                 verticalCenter: parent.verticalCenter
             }
 
-            height : 13
-            width : height
-            radius : height/2
+            height: 13
+            width: height
+            radius: height/2
 
-            color : if (agentMappingVM) {
-                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedLinkOutputsValueTypeGroup, true);
-                    }
-                    else {
-                        IngeScapeTheme.whiteColor
-                    }
-
-            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.linkOutputsList.count > 0)) ? 1 : 0
-            visible: (opacity !== 0)
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: rootItem._expandCollapseAnimationDuration
-                }
-            }
+            color: IngeScapeEditorTheme.purpleColor
         }
-
 
     }
 }

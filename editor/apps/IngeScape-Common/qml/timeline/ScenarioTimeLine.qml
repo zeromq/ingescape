@@ -484,10 +484,16 @@ Item {
                                 keys: ["ActionsListItem", "ActionInTimeLine"]
 
                                 onEntered: {
-                                    var dragItem = drag.source;
-                                    // display ghost
-                                    if (typeof dragItem.action !== 'undefined') {
-                                        ghostAction.actionModelGhost = dragItem.action;
+                                    if (drag.source !== null)
+                                    {
+                                        var dragItem = drag.source;
+
+                                        // Check if our source has an "action" property
+                                        if (typeof dragItem.action !== 'undefined')
+                                        {
+                                            // display ghost
+                                            ghostAction.actionModelGhost = dragItem.action;
+                                        }
                                     }
                                 }
 

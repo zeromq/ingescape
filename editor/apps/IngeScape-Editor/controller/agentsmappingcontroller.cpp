@@ -37,6 +37,7 @@ AgentsMappingController::AgentsMappingController(EditorModelManager* modelManage
       _ySpawnZoneOffset(0),
       _isEmptyMapping(true),
       _selectedAgent(nullptr),
+      _selectedAction(nullptr),
       _selectedLink(nullptr),
       _isLoadedView(false),
       _modelManager(modelManager),
@@ -58,6 +59,7 @@ AgentsMappingController::~AgentsMappingController()
 {
     // Clean-up current selections
     setselectedAgent(nullptr);
+    setselectedAction(nullptr);
     setselectedLink(nullptr);
 
     // DIS-connect from signal "Count Changed" from the list of agents in mapping
@@ -72,9 +74,12 @@ AgentsMappingController::~AgentsMappingController()
     _hashFromOutputAgentNameToListOfWaitingMappingElements.clear();
     _allLinksInMapping.deleteAllItems();
 
-    // Delete all agents in mapping
+    // Delete all agents in the mapping
     _hashFromNameToAgentInMapping.clear();
     _allAgentsInMapping.deleteAllItems();
+
+    // Delete all actions in the mapping
+    _allActionsInMapping.deleteAllItems();
 
     // Reset pointers
     _modelManager = nullptr;
@@ -376,6 +381,29 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
                 setselectedAgent(agentInMapping);
             }
         }
+    }
+}
+
+
+/**
+ * @brief Called when an action from the list is dropped on the current mapping at a position
+ * @param action
+ * @param position
+ */
+void AgentsMappingController::dropActionToMappingAtPosition(ActionM* action, QPointF position)
+{
+    if (action != nullptr)
+    {
+        qDebug() << "Drop action" << action->name() << "at" << position;
+
+        // Create a new view model of action in mapping
+        ActionInMappingVM* actionInMapping = new ActionInMappingVM(action, position);
+
+        // Add to the list
+        _allActionsInMapping.append(actionInMapping);
+
+        // Selects this new action
+        setselectedAction(actionInMapping);
     }
 }
 

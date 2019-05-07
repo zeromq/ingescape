@@ -44,5 +44,6 @@
         <file>qml/validator/BoundsDoubleValidator.qml</file>
         <file>qml/scenario/InputIOPValueField.qml</file>
         <file>resources/SVG/ingescape-editor.svg</file>
+        <file>qml/agentsmapping/ActionInMapping.qml</file>
     </qresource>
 </RCC>

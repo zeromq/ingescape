@@ -167,11 +167,13 @@ void registerCustomQmlTypes()
     // View Models
     //
     //---------------
+    qmlRegisterUncreatableType<ActionInMappingVM>("INGESCAPE", 1, 0, "ActionInMappingVM", "Internal class");
     qmlRegisterUncreatableType<AgentInMappingVM>("INGESCAPE", 1, 0, "AgentInMappingVM", "Internal class");
     qmlRegisterUncreatableType<LinkConnectorVM>("INGESCAPE", 1, 0, "LinkConnectorVM", "Internal class");
     qmlRegisterUncreatableType<LinkInputVM>("INGESCAPE", 1, 0, "LinkInputVM", "Internal class");
     qmlRegisterUncreatableType<LinkOutputVM>("INGESCAPE", 1, 0, "LinkOutputVM", "Internal class");
     qmlRegisterUncreatableType<LinkVM>("INGESCAPE", 1, 0, "LinkVM", "Internal class");
+    qmlRegisterUncreatableType<ObjectInMappingVM>("INGESCAPE", 1, 0, "ObjectInMappingVM", "Internal class");
 
 
     //------------------

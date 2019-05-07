@@ -26,7 +26,7 @@
 
 
 /**
- * @brief The AgentInMappingVM class a view model of agent in the global mapping
+ * @brief The AgentInMappingVM class defines a view model of agent in the global mapping
  * Allows to manage agents and links graphically
  */
 class AgentInMappingVM : public QObject
@@ -75,7 +75,7 @@ class AgentInMappingVM : public QObject
 public:
     /**
      * @brief Constructor
-     * @param agentsGroupedByName Models of agents grouped by the same name
+     * @param agentsGroupedByName View model of agents grouped by the same name
      * @param position Position of the top left corner
      * @param parent
      */
