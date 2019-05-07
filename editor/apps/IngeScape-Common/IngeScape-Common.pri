@@ -42,7 +42,8 @@ SOURCES += \
     $$PWD/viewModel/scenario/actioninpalettevm.cpp \
     $$PWD/viewModel/scenario/actionexecutionvm.cpp \
     $$PWD/controller/ingescapemodelmanager.cpp \
-    $$PWD/controller/abstracttimeactionslinescenarioviewcontroller.cpp
+    $$PWD/controller/abstracttimeactionslinescenarioviewcontroller.cpp \
+    $$PWD/sortFilter/abstracttimerangefilter.cpp
 
 HEADERS += \
     $$PWD/ingescapecommon.h \
@@ -83,7 +84,8 @@ HEADERS += \
     $$PWD/viewModel/scenario/actioninpalettevm.h \
     $$PWD/viewModel/scenario/actionexecutionvm.h \
     $$PWD/controller/ingescapemodelmanager.h \
-    $$PWD/controller/abstracttimeactionslinescenarioviewcontroller.h
+    $$PWD/controller/abstracttimeactionslinescenarioviewcontroller.h \
+    $$PWD/sortFilter/abstracttimerangefilter.h
 
 
 #RESOURCES += \

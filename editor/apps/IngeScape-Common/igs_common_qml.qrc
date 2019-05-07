@@ -21,5 +21,7 @@
         <file>resources/fonts/titillium/Titillium-Regular.otf</file>
         <file>resources/SVG/ingescape-pictos.svg</file>
         <file>qml/theme/LabellessSvgButtonStyle.qml</file>
+        <file>qml/timeline/ActionInTimeLine.qml</file>
+        <file>qml/timeline/ScenarioTimeLine.qml</file>
     </qresource>
 </RCC>

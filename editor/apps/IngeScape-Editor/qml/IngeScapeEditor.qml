@@ -131,17 +131,20 @@ Item {
 
 
     //
-    // Bottom panel
+    // Scenario TimeLine
     //
-    Scenario.ScenarioTimeLine {
+    ScenarioTimeLine {
         id: bottomPanel
+
         anchors {
             left: leftPanel.right
             right: parent.right
             bottom: parent.bottom
         }
         height: 0
-        controller: IngeScapeEditorC.scenarioC
+
+        scenarioController: IngeScapeEditorC.scenarioC
+        timeLineController: IngeScapeEditorC.timeLineC
     }
 
 

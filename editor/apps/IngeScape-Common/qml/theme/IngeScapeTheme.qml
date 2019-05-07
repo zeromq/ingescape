@@ -30,6 +30,10 @@ Item {
     //
     //-----------------------------------------
 
+    // Height of our time line
+    readonly property int timeLineHeight: 300
+    readonly property int timeLineHeight_OneRow: 100
+
     // Width of time (with format "hh:mm:ss.zzz")
     readonly property int timeWidth: 80
 

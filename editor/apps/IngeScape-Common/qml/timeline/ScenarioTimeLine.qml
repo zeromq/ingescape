@@ -29,14 +29,13 @@ Item {
     //
     //--------------------------------
 
-    // Controller associated to our view
-    property var controller: null;
-
-    property var viewController: IngeScapeEditorC.timeLineC;
+    // Controllers associated to our view
+    property var scenarioController: null;
+    property var timeLineController: null;
 
 
     // graphical properties
-    property int linesNumber: controller ? controller.linesNumberInTimeLine : 0;
+    property int linesNumber: scenarioController ? scenarioController.linesNumberInTimeLine : 0;
     property int lineHeight: IngeScapeTheme.lineInTimeLineHeight;
 
     // flag indicating if our component is reduced or expanded
@@ -53,8 +52,8 @@ Item {
         }
         else
         {
-            rootItem.height = IngeScapeEditorTheme.bottomPanelHeight;
-            //rootItem.height = IngeScapeEditorTheme.bottomPanelHeight_OneRow;
+            rootItem.height = IngeScapeTheme.timeLineHeight;
+            //rootItem.height = IngeScapeTheme.timeLineHeight_OneRow;
         }
     }
 
@@ -79,17 +78,17 @@ Item {
 
     function updateZoomOfTimeLine(deltaScale, centerPointX, centerPointY) {
         // Check bounds of our delta scale
-        var previousPixelsPerMinute = viewController.pixelsPerMinute;
+        var previousPixelsPerMinute = timeLineController.pixelsPerMinute;
         var newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
 
-        if (newPixelsPerMinute < viewController.minPixelsPerMinute)
+        if (newPixelsPerMinute < timeLineController.minPixelsPerMinute)
         {
-            newPixelsPerMinute = viewController.minPixelsPerMinute;
+            newPixelsPerMinute = timeLineController.minPixelsPerMinute;
             deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
         }
-        else if (newPixelsPerMinute > viewController.maxPixelsPerMinute)
+        else if (newPixelsPerMinute > timeLineController.maxPixelsPerMinute)
         {
-            newPixelsPerMinute = viewController.maxPixelsPerMinute;
+            newPixelsPerMinute = timeLineController.maxPixelsPerMinute;
             deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
         }
 
@@ -102,7 +101,7 @@ Item {
                     );
 
         // Update current time unit
-        viewController.pixelsPerMinute *= deltaScale;
+        timeLineController.pixelsPerMinute *= deltaScale;
     }
 
     function dragViewWithDelta (deltaX, deltaY) {
@@ -259,25 +258,25 @@ Item {
             interactive: false
             contentX: contentArea.contentX
 
-            contentWidth: viewController.timeTicksTotalWidth
+            contentWidth: timeLineController.timeTicksTotalWidth
             contentHeight: timeLineArea.height
             clip : true
 
             Item {
                 id: timeLinesContent
 
-                width: viewController.timeTicksTotalWidth
+                width: timeLineController.timeTicksTotalWidth
                 height: timeLineArea.height
 
 
                 // Time ticks
                 Repeater {
-                    model: viewController.filteredListTimeTicks
+                    model: timeLineController.filteredListTimeTicks
 
                     // NB: two items to avoid complex QML bindings that
                     //     are interpreted by the Javascript stack
                     delegate : Item {
-                        x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInMilliSeconds, viewController.pixelsPerMinute)
+                        x: timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInMilliSeconds, timeLineController.pixelsPerMinute)
                         y: 0
 
                         I2Line {
@@ -317,7 +316,7 @@ Item {
 
             onPinchUpdated: {
                 // Check if we have at least two points
-                if (pinch.pointCount >= 2 && viewController)
+                if (pinch.pointCount >= 2 && timeLineController)
                 {
                     // Compute delta between our new scale factor and the previous one
                     var deltaScale = pinch.scale/pinch.previousScale;
@@ -328,9 +327,9 @@ Item {
 
             onPinchFinished: {
                 // update time coordinates X axis
-                if (viewController)
+                if (timeLineController)
                 {
-                    viewController.updateTimeCoordinatesOfTimeTicks();
+                    timeLineController.updateTimeCoordinatesOfTimeTicks();
                 }
 
                 // Move content of our flickable within bounds
@@ -398,8 +397,8 @@ Item {
 
                     onClicked: {
                         // deselect action in timeline
-                        if (controller && controller.selectedActionVMInTimeline) {
-                            controller.selectedActionVMInTimeline = null;
+                        if (scenarioController && scenarioController.selectedActionVMInTimeline) {
+                            scenarioController.selectedActionVMInTimeline = null;
 
                         }
                     }
@@ -409,7 +408,7 @@ Item {
 
                         // with ctrl => zoom In and zoom out
                         if (wheel.modifiers && Qt.ControlModifier) {
-                            var previousPixelsPerMinute = viewController.pixelsPerMinute;
+                            var previousPixelsPerMinute = timeLineController.pixelsPerMinute;
                             var deltaScale;
 
                             // Check if we must zoom-in or zoom-out
@@ -433,15 +432,15 @@ Item {
 
 
                             // update time coordinates X axis
-                            if (viewController)
+                            if (timeLineController)
                             {
-                                viewController.updateTimeCoordinatesOfTimeTicks();
+                                timeLineController.updateTimeCoordinatesOfTimeTicks();
                             }
                         }
 
                         // else navigation in vertical
                         else {
-                            var yMaxOfTimeLine = rootItem.lineHeight * rootItem.linesNumber - viewController.viewportHeight;
+                            var yMaxOfTimeLine = rootItem.lineHeight * rootItem.linesNumber - timeLineController.viewportHeight;
                             var nbCranMolette = wheel.angleDelta.y/120.0;
                             contentArea.contentY = Math.max(0, Math.min(contentArea.contentY - nbCranMolette * 100, yMaxOfTimeLine));
                         }
@@ -465,15 +464,17 @@ Item {
                         //
                         Item {
                             id: content
-                            width: viewController.timeTicksTotalWidth
+                            width: timeLineController.timeTicksTotalWidth
                             height: rootItem.lineHeight * rootItem.linesNumber
 
                             Repeater {
-                                model : controller ? controller.filteredListActionsInTimeLine : 0;
+                                model: scenarioController ? scenarioController.filteredListActionsInTimeLine : 0;
 
                                 ActionInTimeLine {
-                                    myActionVM : model.QtObject;
-                                    controller : rootItem.controller
+                                    myActionVM: model.QtObject;
+
+                                    scenarioController: rootItem.scenarioController
+                                    timeLineController: rootItem.timeLineController
                                 }
                             }
 
@@ -493,23 +494,23 @@ Item {
                                 onPositionChanged: {
                                     var dragItem = drag.source;
 
-                                    var startInDateTime = viewController.convertAbscissaInCoordinateSystemToQDateTime(drag.x, viewController.pixelsPerMinute);
-                                    var starttimeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
+                                    var startInDateTime = timeLineController.convertAbscissaInCoordinateSystemToQDateTime(drag.x, timeLineController.pixelsPerMinute);
+                                    var starttimeInMilliseconds = timeLineController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, timeLineController.pixelsPerMinute)
 
                                     var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
                                     var canInsertActionVM = false;
 
                                     // action comes from the actions list
-                                    if (controller && (typeof dragItem.action !== 'undefined'))
+                                    if (scenarioController && (typeof dragItem.action !== 'undefined'))
                                     {
                                         // test if the drop is possible
-                                        canInsertActionVM = controller.canInsertActionVMTo(dragItem.action, starttimeInMilliseconds, lineNumber)
+                                        canInsertActionVM = scenarioController.canInsertActionVMTo(dragItem.action, starttimeInMilliseconds, lineNumber)
 
                                         if (canInsertActionVM) {
                                             ghostDropImpossible.visible = false;
                                             // move ghost
                                             ghostAction.actionModelGhost = dragItem.action;
-                                            ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, viewController.pixelsPerMinute);
+                                            ghostAction.x = timeLineController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, timeLineController.pixelsPerMinute);
                                             ghostAction.y = lineNumber * rootItem.lineHeight;
                                             ghostAction.startTime = startInDateTime;
                                             if  (typeof dragItem.temporaryStartTime !== 'undefined') {
@@ -521,7 +522,7 @@ Item {
                                             ghostAction.actionModelGhost = null;
 
                                             // ghost drop impossible
-                                            ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, viewController.pixelsPerMinute);
+                                            ghostDropImpossible.x = timeLineController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, timeLineController.pixelsPerMinute);
                                             ghostDropImpossible.y = lineNumber * rootItem.lineHeight + (rootItem.lineHeight/2 - ghostDropImpossible.width/2);
                                             ghostDropImpossible.visible = true;
                                         }
@@ -529,16 +530,16 @@ Item {
                                     }
 
                                     // action comes from the timeline
-                                    if (controller && (typeof dragItem.myActionVM !== 'undefined') && (dragItem.myActionVM.modelM !== null))
+                                    if (scenarioController && (typeof dragItem.myActionVM !== 'undefined') && (dragItem.myActionVM.modelM !== null))
                                     {
                                         // test if the drop is possible
-                                        canInsertActionVM = controller.canInsertActionVMTo(dragItem.myActionVM.modelM, starttimeInMilliseconds, lineNumber, dragItem.myActionVM)
+                                        canInsertActionVM = scenarioController.canInsertActionVMTo(dragItem.myActionVM.modelM, starttimeInMilliseconds, lineNumber, dragItem.myActionVM)
 
                                         if (canInsertActionVM) {
                                             ghostDropImpossible.visible = false;
                                             // move ghost
                                             ghostAction.actionModelGhost = dragItem.myActionVM.modelM;
-                                            ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, viewController.pixelsPerMinute);
+                                            ghostAction.x = timeLineController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, timeLineController.pixelsPerMinute);
                                             ghostAction.y = lineNumber * rootItem.lineHeight;
                                             ghostAction.startTime = startInDateTime;
                                             if  (typeof dragItem.temporaryStartTime !== 'undefined') {
@@ -550,7 +551,7 @@ Item {
                                             ghostAction.actionModelGhost = null;
 
                                             // ghost drop impossible
-                                            ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, viewController.pixelsPerMinute);
+                                            ghostDropImpossible.x = timeLineController.convertQTimeToAbscissaInCoordinateSystem(startInDateTime, timeLineController.pixelsPerMinute);
                                             ghostDropImpossible.y = lineNumber * rootItem.lineHeight + (rootItem.lineHeight/2 - ghostDropImpossible.width/2);
                                             ghostDropImpossible.visible = true;
                                         }
@@ -571,23 +572,23 @@ Item {
 
                                 onDropped: {
                                     var dragItem = drag.source;
-                                    var timeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute);
+                                    var timeInMilliseconds = timeLineController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, timeLineController.pixelsPerMinute);
                                     var lineNumber = Math.floor(drag.y / rootItem.lineHeight);
 
                                     // The first line is reserved for live insertions from the palette
                                     if (lineNumber > 0)
                                     {
                                         // action comes from the actions list : add the action on the time line
-                                        if ((typeof dragItem.action !== 'undefined') && controller)
+                                        if ((typeof dragItem.action !== 'undefined') && scenarioController)
                                         {
-                                            controller.addActionVMAtTime(dragItem.action, timeInMilliseconds, lineNumber);
+                                            scenarioController.addActionVMAtTime(dragItem.action, timeInMilliseconds, lineNumber);
                                         }
 
 
                                         // action comes from the timeline : update start time and line number
                                         if ((typeof dragItem.myActionVM !== 'undefined') && (dragItem.myActionVM.modelM !== null))
                                         {
-                                            controller.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
+                                            scenarioController.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
                                         }
                                     }
 
@@ -632,10 +633,10 @@ Item {
                                                 0;
                                                 break;
                                             case ValidationDurationTypes.FOREVER:
-                                                (viewController.timeTicksTotalWidth - viewController.convertQTimeToAbscissaInCoordinateSystem(startTime, viewController.pixelsPerMinute))
+                                                (timeLineController.timeTicksTotalWidth - timeLineController.convertQTimeToAbscissaInCoordinateSystem(startTime, timeLineController.pixelsPerMinute))
                                                 break;
                                             case ValidationDurationTypes.CUSTOM:
-                                                viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(actionModelGhost.validityDuration, viewController.pixelsPerMinute)
+                                                timeLineController.convertDurationInMillisecondsToLengthInCoordinateSystem(actionModelGhost.validityDuration, timeLineController.pixelsPerMinute)
                                                 break;
                                             default:
                                                 0
@@ -709,7 +710,7 @@ Item {
                                                    rect.width - width;
                                                }
                                                else if (ghostAction.actionModelGhost.shallRevertAfterTime) {
-                                                   viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(ghostAction.actionModelGhost.revertAfterTime, viewController.pixelsPerMinute) - width;
+                                                   timeLineController.convertDurationInMillisecondsToLengthInCoordinateSystem(ghostAction.actionModelGhost.revertAfterTime, timeLineController.pixelsPerMinute) - width;
                                                }
                                                else {
                                                    0;
@@ -768,12 +769,12 @@ Item {
             interactive: false
             contentX: contentArea.contentX
 
-            contentWidth: viewController.timeTicksTotalWidth
+            contentWidth: timeLineController.timeTicksTotalWidth
             contentHeight: timeLineArea.height
             clip : true
 
             Item {
-                width: viewController.timeTicksTotalWidth
+                width: timeLineController.timeTicksTotalWidth
                 height: timeLineArea.height
 
                 // NB: two items to avoid complex QML bindings that
@@ -821,7 +822,7 @@ Item {
 
             anchors.fill: parent
 
-            contentWidth: viewController.timeTicksTotalWidth
+            contentWidth: timeLineController.timeTicksTotalWidth
             contentHeight: columnHeadersArea.height
             boundsBehavior: Flickable.StopAtBounds;
 
@@ -871,7 +872,7 @@ Item {
                         // with ctrl => zoom In and zoom out
                         if (wheel.modifiers && Qt.ControlModifier) {
 
-                            var previousPixelsPerMinute = viewController.pixelsPerMinute;
+                            var previousPixelsPerMinute = timeLineController.pixelsPerMinute;
                             var deltaScale;
 
                             // Check if we must zoom-in or zoom-out
@@ -895,15 +896,15 @@ Item {
 
 
                             // update time coordinates X axis
-                            if (viewController)
+                            if (timeLineController)
                             {
-                                viewController.updateTimeCoordinatesOfTimeTicks();
+                                timeLineController.updateTimeCoordinatesOfTimeTicks();
                             }
                         }
 
                         // else navigation along timeline
                         else {
-                            var xMaxOfTimeLine = viewController.timeTicksTotalWidth - viewController.viewportWidth;
+                            var xMaxOfTimeLine = timeLineController.timeTicksTotalWidth - timeLineController.viewportWidth;
                             var nbCranMolette = wheel.angleDelta.y/120.0;
                             contentArea.contentX = Math.max(0, Math.min(contentArea.contentX - nbCranMolette * 100, xMaxOfTimeLine));
                         }
@@ -916,17 +917,17 @@ Item {
             Item {
                 id: columnHeadersContent
 
-                width: viewController.timeTicksTotalWidth
+                width: timeLineController.timeTicksTotalWidth
                 height: columnHeadersArea.height
 
                 //
                 // Time ticks
                 //
                 Repeater {
-                    model: viewController.filteredListTimeTicks
+                    model: timeLineController.filteredListTimeTicks
 
                     delegate: Item {
-                        x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInMilliSeconds, viewController.pixelsPerMinute)
+                        x: timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInMilliSeconds, timeLineController.pixelsPerMinute)
                         anchors {
                             top : columnHeadersContent.top
                             bottom : columnHeadersContent.bottom
@@ -1000,8 +1001,8 @@ Item {
                                 verticalCenterOffset: 1
                             }
 
-                            text: controller ? controller.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss':'zzz")
-                                             : "00:00:00.000"
+                            text: scenarioController ? scenarioController.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss':'zzz")
+                                                     : "00:00:00.000"
 
                             color: IngeScapeTheme.whiteColor
                             font {
@@ -1040,17 +1041,17 @@ Item {
                         drag.smoothed: false
                         drag.target: currentTimeItem
 
-                        drag.minimumX : viewController.timeMarginInPixels
-                        drag.maximumX : viewController.timeTicksTotalWidth - viewController.timeMarginInPixels
+                        drag.minimumX : timeLineController.timeMarginInPixels
+                        drag.maximumX : timeLineController.timeTicksTotalWidth - timeLineController.timeMarginInPixels
                         drag.minimumY : 0
                         drag.maximumY : 0
 
-                        // viewController => CurrentTimeItem
+                        // timeLineController => CurrentTimeItem
                         Binding {
-                            target: controller
+                            target: scenarioController
                             property: "currentTime"
-                            value: if (viewController) {
-                                       viewController.convertAbscissaInCoordinateSystemToQDateTime(currentTimeItem.x, viewController.pixelsPerMinute)
+                            value: if (timeLineController) {
+                                       timeLineController.convertAbscissaInCoordinateSystemToQDateTime(currentTimeItem.x, timeLineController.pixelsPerMinute)
                                    }
                                    else {
                                        0
@@ -1058,13 +1059,13 @@ Item {
                             when: currentTimeMouseArea.drag.active
                         }
 
-                        // CurrentTimeItem => viewController
+                        // CurrentTimeItem => timeLineController
                         Binding {
                             target: currentTimeItem
                             property: "x"
-                            value: if (controller && viewController)
+                            value: if (scenarioController && timeLineController)
                                    {
-                                       viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
+                                       timeLineController.convertQTimeToAbscissaInCoordinateSystem(scenarioController.currentTime, timeLineController.pixelsPerMinute)
                                    }
                                    else {
                                        0
@@ -1103,8 +1104,8 @@ Item {
             }
             height : 13
 
-            property var scrollBarSize: if (viewController) {
-                                           Math.max(8,(viewController.viewportWidth*scrollTimeLine.width)/viewController.timeTicksTotalWidth);
+            property var scrollBarSize: if (timeLineController) {
+                                           Math.max(8,(timeLineController.viewportWidth*scrollTimeLine.width)/timeLineController.timeTicksTotalWidth);
                                         }
                                         else {
                                             0
@@ -1222,11 +1223,11 @@ Item {
                 if (mouseAreaResizeTimeLine.pressed) {
                     var deltaY = previousPositionY - mouse.y;
 
-                    if (rootItem.height + deltaY > IngeScapeTheme.bottomPanelHeight) {
+                    if (rootItem.height + deltaY > IngeScapeTheme.timeLineHeight) {
                         rootItem.height += deltaY;
                     }
                     else {
-                        rootItem.height = IngeScapeTheme.bottomPanelHeight;
+                        rootItem.height = IngeScapeTheme.timeLineHeight;
                     }
                 }
             }
@@ -1262,20 +1263,20 @@ Item {
                 fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
-                releasedID: (controller && controller.isPlaying) ? "timeline-pause" : "timeline-play"
+                releasedID: (scenarioController && scenarioController.isPlaying) ? "timeline-pause" : "timeline-play"
                 disabledID : releasedID
             }
 
             onClicked: {
-                if (controller) {
-                    controller.isPlaying = checked;
+                if (scenarioController) {
+                    scenarioController.isPlaying = checked;
                 }
             }
 
             Binding {
                 target: playScenarioBtn
                 property: "checked"
-                value: controller ? controller.isPlaying : false
+                value: scenarioController ? scenarioController.isPlaying : false
             }
         }
 
@@ -1325,30 +1326,30 @@ Item {
     //
     //--------------------------------------------------------
 
-    // ContentArea => ViewController
+    // ContentArea => timeLineController
     Binding {
-        target: viewController
+        target: timeLineController
         property: "viewportX"
         value: contentArea.contentX
     }
 
-    // ContentArea => ViewController
+    // ContentArea => timeLineController
     Binding {
-        target: viewController
+        target: timeLineController
         property: "viewportY"
         value: contentArea.contentY
     }
 
-    // ContentArea => ViewController
+    // ContentArea => timeLineController
     Binding {
-        target: viewController
+        target: timeLineController
         property: "viewportWidth"
         value: timeLineArea.width
     }
 
-    // ContentArea => ViewController
+    // ContentArea => timeLineController
     Binding {
-        target: viewController
+        target: timeLineController
         property: "viewportHeight"
         value: timeLineArea.height
     }
@@ -1375,8 +1376,8 @@ Item {
     Binding {
         target: contentArea
         property: "contentX"
-        value: if (viewController) {
-                   (scrollBarHorizontal.x * viewController.timeTicksTotalWidth)/scrollTimeLine.width
+        value: if (timeLineController) {
+                   (scrollBarHorizontal.x * timeLineController.timeTicksTotalWidth)/scrollTimeLine.width
                }
                else {
                    0
@@ -1384,12 +1385,12 @@ Item {
         when: mouseArea.drag.active
     }
 
-    // viewController => scrollBarHorizontal
+    // timeLineController => scrollBarHorizontal
     Binding {
         target: scrollBarHorizontal
         property: "x"
-        value: if (viewController) {
-                   Math.max(0, (viewController.viewportX*scrollTimeLine.width)/viewController.timeTicksTotalWidth);
+        value: if (timeLineController) {
+                   Math.max(0, (timeLineController.viewportX*scrollTimeLine.width)/timeLineController.timeTicksTotalWidth);
                }
                else {
                    0

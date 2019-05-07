@@ -44,10 +44,6 @@ Item {
     // Width of our left panel
     readonly property int leftPanelWidth: 320
 
-    // Height of our bottom panel
-    readonly property int bottomPanelHeight: 300
-    readonly property int bottomPanelHeight_OneRow: 100
-
 
     //-----------------------------------------
     //

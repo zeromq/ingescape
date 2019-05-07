@@ -126,5 +126,9 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     // - Actions List Item
     qmlRegisterType(QUrl("qrc:/qml/ActionsListItem.qml"), "INGESCAPE", 1, 0, "ActionsListItem");
 
+    // - Timeline
+    qmlRegisterType(QUrl("qrc:/qml/timeline/ActionInTimeLine.qml"), "INGESCAPE", 1, 0, "ActionInTimeLine");
+    qmlRegisterType(QUrl("qrc:/qml/timeline/ScenarioTimeLine.qml"), "INGESCAPE", 1, 0, "ScenarioTimeLine");
+
 }
 

@@ -273,7 +273,7 @@ Item {
                         controller: rootItem.controller
 
                         actionItemIsHovered: mouseArea.containsMouse
-                        //actionItemIsPressed: mouseArea.pressed
+                        actionItemIsPressed: mouseArea.pressed
                     }
                 }
             }
@@ -506,7 +506,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
     //
     // Timeline
     //
-    Rectangle {
+    /*Rectangle {
         id: timeline
 
         anchors {
@@ -530,5 +530,23 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
                 pixelSize: 18
             }
         }
+    }*/
+
+    //
+    // Scenario TimeLine
+    //
+    ScenarioTimeLine {
+        id: timeline
+
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+        height: 0
+        //height: 250
+
+        scenarioController: null; //IngeScapeEditorC.scenarioC
+        timeLineController: null; //IngeScapeEditorC.timeLineC
     }
 }

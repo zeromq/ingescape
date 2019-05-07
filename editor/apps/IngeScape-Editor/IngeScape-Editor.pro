@@ -47,7 +47,6 @@ SOURCES += main.cpp \
     misc/collapsiblecolumn.cpp \
     sortFilter/valueshistorysortfilter.cpp \
     model/hostm.cpp \
-    sortFilter/abstracttimerangefilter.cpp \
     controller/hostssupervisioncontroller.cpp \
     model/recordm.cpp \
     controller/recordssupervisioncontroller.cpp \
@@ -88,7 +87,6 @@ HEADERS += \
     misc/collapsiblecolumn.h \
     sortFilter/valueshistorysortfilter.h \
     model/hostm.h \
-    sortFilter/abstracttimerangefilter.h \
     controller/hostssupervisioncontroller.h \
     model/recordm.h \
     controller/recordssupervisioncontroller.h \
