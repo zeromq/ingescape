@@ -274,8 +274,7 @@ WindowBlockTouches {
                                 verticalCenterOffset: 1
                             }
 
-                            //color: IngeScapeTheme.lightGreyColor
-                            color: IngeScapeTheme.colorOfLogType(model.value)
+                            color: IngeScapeEditorTheme.colorOfLogType(model.value)
 
                             text: " " + model.name
                             elide: Text.ElideRight
@@ -503,8 +502,7 @@ WindowBlockTouches {
 
                                 //elide: Text.ElideRight
 
-                                //color: IngeScapeTheme.whiteColor
-                                color: IngeScapeTheme.colorOfLogType(model.logType)
+                                color: IngeScapeEditorTheme.colorOfLogType(model.logType)
 
                                 font {
                                     family: IngeScapeTheme.textFontFamily

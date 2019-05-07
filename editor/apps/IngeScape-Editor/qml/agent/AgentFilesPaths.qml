@@ -275,7 +275,7 @@ I2PopupBase {
             }
 
             onClicked: {
-                console.log("Cancel");
+                //console.log("Cancel");
 
                 rootItem.close();
             }
