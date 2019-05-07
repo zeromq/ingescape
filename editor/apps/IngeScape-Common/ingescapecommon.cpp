@@ -70,6 +70,14 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
 
     //----------------
     //
+    // Sort and Filter
+    //
+    //----------------
+    qmlRegisterUncreatableType<AbstractTimeRangeFilter>("INGESCAPE", 1, 0, "AbstractTimeRangeFilter", "Internal class");
+
+
+    //----------------
+    //
     // Models
     //
     //----------------

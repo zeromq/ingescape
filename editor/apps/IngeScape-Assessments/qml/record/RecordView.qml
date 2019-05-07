@@ -547,6 +547,6 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
         //height: 250
 
         scenarioController: null; //IngeScapeEditorC.scenarioC
-        timeLineController: null; //IngeScapeEditorC.timeLineC
+        timeLineController: rootItem.controller ? rootItem.controller.timeLineC : null;
     }
 }
