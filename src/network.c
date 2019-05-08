@@ -2293,7 +2293,7 @@ void igs_setAgentTimeout(unsigned int duration){
 
 void igs_setPublishingPort(unsigned int port){
     if (agentElements != NULL && agentElements->publisher != NULL){
-        igs_warn("agent is already started : stop it first to change its publishing port");
+        igs_error("agent is already started : stop it first to change its publishing port");
         return;
     }
     network_publishingPort = port;
