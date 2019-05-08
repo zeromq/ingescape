@@ -108,7 +108,11 @@ Item {
 
         anchors.fill: parent
 
-        color: "#FF333366"
+        color: IngeScapeTheme.veryDarkGreyColor
+        border {
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
+        }
     }
 
     Button {
@@ -138,6 +142,7 @@ Item {
             topMargin: 10
             horizontalCenter: parent.horizontalCenter
         }
+        height: 30
 
         spacing: 20
 
@@ -145,6 +150,9 @@ Item {
             id: title
 
             text: "Subjects"
+
+            height: parent.height
+            verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -157,7 +165,7 @@ Item {
         Button {
             text: "New Subject"
 
-            height: 30
+            height: parent.height
 
             onClicked: {
                 //console.log("QML: New Subject");
@@ -173,7 +181,7 @@ Item {
     //
     // Characteristics Panel
     //
-    Item {
+    Rectangle {
         id: characteristicsPanel
 
         anchors {
@@ -182,7 +190,13 @@ Item {
             topMargin: 30
             bottom: parent.bottom
         }
-        width: 350
+        width: 300
+
+        color: "transparent"
+        border {
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
+        }
 
         Row {
             id: characteristicsHeader
@@ -191,12 +205,19 @@ Item {
                 left: parent.left
                 leftMargin: 5
                 top: parent.top
+                topMargin: 5
             }
+            height: 30
 
             spacing: 20
 
             Text {
+                id: titleCharacteristics
+
                 text: "Characteristics"
+
+                height: parent.height
+                verticalAlignment: Text.AlignVCenter
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -209,7 +230,7 @@ Item {
             Button {
                 text: "New Characteristic"
 
-                height: 30
+                height: parent.height
 
                 onClicked: {
                     // Open the popup
@@ -263,7 +284,11 @@ Item {
             bottom: parent.bottom
         }
 
-        color: "#44AAAAAA"
+        color: "transparent"
+        border {
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
+        }
 
 
         TableView {

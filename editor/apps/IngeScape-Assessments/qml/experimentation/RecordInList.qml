@@ -73,9 +73,9 @@ Item {
 
         anchors.fill: parent
 
-        color: "#44222222"
+        color: "transparent"
         border {
-            color: "black"
+            color: IngeScapeTheme.darkGreyColor
             width: 1
         }
 
@@ -84,6 +84,7 @@ Item {
 
             anchors {
                 left: parent.left
+                leftMargin: 5
                 verticalCenter: parent.verticalCenter
             }
 
@@ -96,7 +97,7 @@ Item {
                 font {
                     family: IngeScapeTheme.textFontFamily
                     weight: Font.Medium
-                    pixelSize: 12
+                    pixelSize: 14
                 }
             }
 
@@ -108,8 +109,8 @@ Item {
                 color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 12
+                    //weight: Font.Medium
+                    pixelSize: 14
                 }
             }
 
@@ -121,8 +122,8 @@ Item {
                 color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 12
+                    //weight: Font.Medium
+                    pixelSize: 14
                 }
             }
 
@@ -135,8 +136,8 @@ Item {
                 color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 12
+                    //weight: Font.Medium
+                    pixelSize: 14
                 }
             }
 
@@ -151,8 +152,8 @@ Item {
                 color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 12
+                    //weight: Font.Medium
+                    pixelSize: 14
                 }
             }
         }
@@ -166,7 +167,7 @@ Item {
         }*/
 
         Row {
-            spacing: 5
+            spacing: 0
 
             anchors {
                 right: parent.right

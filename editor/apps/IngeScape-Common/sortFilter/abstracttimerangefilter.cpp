@@ -25,17 +25,17 @@
  * @brief Default constructor
  * @param parent
  */
-AbstractTimeRangeFilter::AbstractTimeRangeFilter(QObject *parent) :
-    I2SortFilterProxyModel(parent),
+AbstractTimeRangeFilter::AbstractTimeRangeFilter(QObject *parent) : I2SortFilterProxyModel(parent),
     _startTimeInMilliseconds(-1),
     _endTimeInMilliseconds(-1)
 {
-
     setDynamicSortFilter(false);
+
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
 }
+
 
 /**
  * @brief Fore update of our filter (invalidateFilter is private, thus we need a function to call it)
@@ -44,6 +44,7 @@ void AbstractTimeRangeFilter::forceUpdate()
 {
     invalidateFilter();
 }
+
 
 /**
  * @brief Set our time range
@@ -65,6 +66,7 @@ void AbstractTimeRangeFilter::setTimeRange(int startTimeInMilliseconds, int endT
     }
 }
 
+
 /**
  * @brief filterAccepts is used to check if an item should be included in our result list or not
  *
@@ -80,7 +82,7 @@ bool AbstractTimeRangeFilter::filterAccepts(QObject* item, int index) const
     bool result = false;
 
     // Try to cast our item as an TimeTickM
-    TimeTickM * timeTickItem = dynamic_cast<TimeTickM*>(item);
+    TimeTickM* timeTickItem = dynamic_cast<TimeTickM*>(item);
     if (timeTickItem != nullptr)
     {
         //
@@ -109,6 +111,7 @@ bool AbstractTimeRangeFilter::filterAccepts(QObject* item, int index) const
 
     return result;
 }
+
 
 /**
  * @brief isLessThan is used to compare items in order to sort them

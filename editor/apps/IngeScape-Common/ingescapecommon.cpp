@@ -20,11 +20,9 @@
 #include <settings/ingescapesettings.h>
 
 #include <controller/ingescapemodelmanager.h>
-//#include <model/enums.h>
-//#include <model/agent/agentm.h>
+#include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <model/scenario/scenariom.h>
 #include <model/scenario/timetickm.h>
-//#include <viewModel/agentsgroupedbynamevm.h>
 
 
 /**
@@ -66,7 +64,16 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     //----------------
     qmlRegisterSingletonType<DebugQuickInspector>("INGESCAPE", 1, 0, "DebugQuickInspector", &DebugQuickInspector::qmlSingleton);
 
+    qmlRegisterUncreatableType<AbstractTimeActionslineScenarioViewController>("INGESCAPE", 1, 0, "AbstractTimeActionslineScenarioViewController", "Internal Class");
     qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal class");
+
+
+    //----------------
+    //
+    // Sort and Filter
+    //
+    //----------------
+    qmlRegisterUncreatableType<AbstractTimeRangeFilter>("INGESCAPE", 1, 0, "AbstractTimeRangeFilter", "Internal class");
 
 
     //----------------
@@ -126,6 +133,10 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
 
     // - Actions List Item
     qmlRegisterType(QUrl("qrc:/qml/ActionsListItem.qml"), "INGESCAPE", 1, 0, "ActionsListItem");
+
+    // - Timeline
+    qmlRegisterType(QUrl("qrc:/qml/timeline/ActionInTimeLine.qml"), "INGESCAPE", 1, 0, "ActionInTimeLine");
+    qmlRegisterType(QUrl("qrc:/qml/timeline/ScenarioTimeLine.qml"), "INGESCAPE", 1, 0, "ScenarioTimeLine");
 
 }
 

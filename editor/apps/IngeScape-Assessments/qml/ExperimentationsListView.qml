@@ -53,7 +53,7 @@ Item {
 
         anchors.fill: parent
 
-        color: "#FF553333"
+        color: IngeScapeTheme.veryDarkGreyColor
     }
 
     Text {
@@ -140,11 +140,12 @@ Item {
             property ExperimentationsGroupVM experimentationsGroup: model.QtObject
 
             width: parent.width
-            height: txtName.anchors.topMargin + txtName.height + columnExperimentations.anchors.topMargin + columnExperimentations.height
+            height: txtName.anchors.topMargin + txtName.height + columnExperimentations.anchors.topMargin + columnExperimentations.height + 5
 
-            color: "#44222222"
+            color: "transparent"
+            radius: 5
             border {
-                color: "black"
+                color: IngeScapeTheme.darkGreyColor
                 width: 1
             }
 
@@ -190,14 +191,15 @@ Item {
                         width: parent.width
                         height: 30
 
-                        color: "#44222222"
+                        color: "transparent"
+                        //radius: 5
                         border {
-                            color: "black"
+                            color: IngeScapeTheme.darkGreyColor
                             width: 1
                         }
 
                         Row {
-                            spacing: 20
+                            spacing: 10
 
                             anchors {
                                 left: parent.left
@@ -212,7 +214,7 @@ Item {
                                 font {
                                     family: IngeScapeTheme.textFontFamily
                                     weight: Font.Medium
-                                    pixelSize: 12
+                                    pixelSize: 14
                                 }
                             }
 
@@ -222,8 +224,8 @@ Item {
                                 color: IngeScapeTheme.whiteColor
                                 font {
                                     family: IngeScapeTheme.textFontFamily
-                                    weight: Font.Medium
-                                    pixelSize: 12
+                                    //weight: Font.Medium
+                                    pixelSize: 14
                                 }
                             }
                         }

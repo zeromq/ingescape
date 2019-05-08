@@ -107,7 +107,7 @@ Item {
 
         color: "transparent"
         border {
-            color: "silver"
+            color: IngeScapeTheme.darkGreyColor
             width: 1
         }
 

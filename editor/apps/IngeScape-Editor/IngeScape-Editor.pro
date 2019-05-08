@@ -44,11 +44,9 @@ SOURCES += main.cpp \
     controller/scenariocontroller.cpp \
     controller/actioneditorcontroller.cpp \
     controller/valueshistorycontroller.cpp \
-    controller/abstracttimeactionslinescenarioviewcontroller.cpp \
     misc/collapsiblecolumn.cpp \
     sortFilter/valueshistorysortfilter.cpp \
     model/hostm.cpp \
-    sortFilter/abstracttimerangefilter.cpp \
     controller/hostssupervisioncontroller.cpp \
     model/recordm.cpp \
     controller/recordssupervisioncontroller.cpp \
@@ -86,11 +84,9 @@ HEADERS += \
     controller/scenariocontroller.h \
     controller/actioneditorcontroller.h \
     controller/valueshistorycontroller.h \
-    controller/abstracttimeactionslinescenarioviewcontroller.h \
     misc/collapsiblecolumn.h \
     sortFilter/valueshistorysortfilter.h \
     model/hostm.h \
-    sortFilter/abstracttimerangefilter.h \
     controller/hostssupervisioncontroller.h \
     model/recordm.h \
     controller/recordssupervisioncontroller.h \

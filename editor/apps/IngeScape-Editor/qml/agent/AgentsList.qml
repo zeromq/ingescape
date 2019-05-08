@@ -178,7 +178,7 @@ Item {
             bottom : agentsListScrollView.top
         }
 
-        color : IngeScapeEditorTheme.selectedTabsBackgroundColor
+        color: IngeScapeEditorTheme.selectedTabsBackgroundColor
 
         Row {
             id: headerRow

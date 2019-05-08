@@ -70,13 +70,13 @@ Item {
     //
     //--------------------------------------------------------
 
-    Rectangle {
+    /*Rectangle {
         id: background
 
         anchors.fill: parent
 
-        color: "#FF335555"
-    }
+        color: IngeScapeTheme.veryDarkGreyColor
+    }*/
 
     Row {
         id: breadcrumb
@@ -212,8 +212,8 @@ Item {
 
         color: "transparent"
         border {
-            color: "black"
-            width: 2
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
         }
 
         Text {
@@ -225,14 +225,17 @@ Item {
                 top: parent.top
                 topMargin: 5
             }
+            height: 30
 
             text: qsTr("Actions:")
+
+            verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 16
+                pixelSize: 18
             }
         }
 
@@ -253,17 +256,37 @@ Item {
 
                 model: rootItem.controller ? rootItem.controller.actionsList : null
 
-                delegate: ActionsListItem {
-                    id : actionInList
+                delegate: MouseArea {
+                    id: mouseArea
 
                     width: parent.width
                     height: 42
 
-                    action: model.QtObject
-                    controller: rootItem.controller
+                    hoverEnabled: true
 
-                    //actionItemIsHovered: mouseArea.containsMouse
-                    //actionItemIsPressed: mouseArea.pressed
+                    ActionsListItem {
+                        id : actionInList
+
+                        anchors.fill: parent
+
+                        action: model.QtObject
+                        controller: rootItem.controller
+
+                        actionItemIsHovered: mouseArea.containsMouse
+                        actionItemIsPressed: mouseArea.pressed
+                    }
+
+                    onPressed: {
+                        if (rootItem.controller)
+                        {
+                            if (rootItem.controller.selectedAction === model.QtObject) {
+                                rootItem.controller.selectedAction = null;
+                            }
+                            else {
+                                rootItem.controller.selectedAction = model.QtObject;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -287,8 +310,8 @@ Item {
 
         color: "transparent"
         border {
-            color: "black"
-            width: 2
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
         }
 
         Text {
@@ -300,14 +323,17 @@ Item {
                 top: parent.top
                 topMargin: 5
             }
+            height: 30
 
             text: qsTr("Comments:")
+
+            verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 16
+                pixelSize: 18
             }
         }
 
@@ -349,8 +375,8 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
 
         color: "transparent"
         border {
-            color: "black"
-            width: 2
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
         }
 
         Text {
@@ -372,7 +398,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 16
+                pixelSize: 18
             }
         }
 
@@ -460,8 +486,8 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
 
         color: "transparent"
         border {
-            color: "black"
-            width: 2
+            color: IngeScapeTheme.darkGreyColor
+            width: 1
         }
 
         Text {
@@ -473,23 +499,26 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
                 top: parent.top
                 topMargin: 5
             }
+            height: 30
 
             text: qsTr("Attachments:")
+
+            verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 16
+                pixelSize: 18
             }
         }
     }
 
 
     //
-    // Timeline
+    // Scenario TimeLine
     //
-    Rectangle {
+    ScenarioTimeLine {
         id: timeline
 
         anchors {
@@ -497,21 +526,9 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             right: parent.right
             bottom: parent.bottom
         }
-        height: 250
+        height: 0
 
-        color: "white"
-
-        Text {
-            anchors.centerIn: parent
-
-            text: qsTr("TIMELINE")
-
-            //color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 16
-            }
-        }
+        scenarioController: null; //IngeScapeEditorC.scenarioC
+        timeLineController: rootItem.controller ? rootItem.controller.timeLineC : null;
     }
 }

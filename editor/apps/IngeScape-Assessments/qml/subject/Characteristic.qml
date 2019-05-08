@@ -70,9 +70,9 @@ Item {
 
         anchors.fill: parent
 
-        color: "#44222222"
+        color: "transparent"
         border {
-            color: "black"
+            color: IngeScapeTheme.darkGreyColor
             width: 1
         }
     }
@@ -122,6 +122,7 @@ Item {
 
         anchors {
             left: parent.left
+            leftMargin: 5
             top: rowHeader.bottom
             topMargin: 5
         }

@@ -28,8 +28,8 @@ Item {
     property  var myActionVM : null;
 
     // Controllers associated to our view
-    property var controller : null;
-    property var viewController : IngeScapeEditorC.timeLineC;
+    property var scenarioController: null;
+    property var timeLineController: null;
 
     // height of a line in the time line
     property int lineHeight: IngeScapeTheme.lineInTimeLineHeight
@@ -88,7 +88,7 @@ Item {
         property: "x"
         value: if (myActionVM)
                {
-                    viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute)
+                    timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, timeLineController.pixelsPerMinute)
                }
                else {
                    0
@@ -96,7 +96,7 @@ Item {
         when: !actionVMMouseArea.drag.active
     }
 
-    x : myActionVM ? viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute) : 0;
+    x : myActionVM ? timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, timeLineController.pixelsPerMinute) : 0;
     y : myActionVM ? (actionVMItem.lineHeight * myActionVM.lineInTimeLine) : 0;
     height : actionVMItem.lineHeight
     width : if (myActionVM && myActionVM.modelM)
@@ -107,10 +107,10 @@ Item {
                     0;
                     break;
                 case ValidationDurationTypes.FOREVER:
-                    (viewController.timeTicksTotalWidth - viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute))
+                    (timeLineController.timeTicksTotalWidth - timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, timeLineController.pixelsPerMinute))
                     break;
                 case ValidationDurationTypes.CUSTOM:
-                    viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(myActionVM.modelM.validityDuration, viewController.pixelsPerMinute)
+                    timeLineController.convertDurationInMillisecondsToLengthInCoordinateSystem(myActionVM.modelM.validityDuration, timeLineController.pixelsPerMinute)
                     break;
                 default:
                     0;
@@ -128,8 +128,8 @@ Item {
     Keys.onPressed: {
         if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
         {
-            if (controller && controller.selectedActionVMInTimeline) {
-                controller.removeActionVMfromTimeLine(controller.selectedActionVMInTimeline);
+            if (scenarioController && scenarioController.selectedActionVMInTimeline) {
+                scenarioController.removeActionVMfromTimeLine(scenarioController.selectedActionVMInTimeline);
             }
 
             event.accepted = true;
@@ -139,8 +139,8 @@ Item {
     //deselect action VM
     onFocusChanged: {
         if (!focus) {
-            if (controller && controller.selectedActionVMInTimeline) {
-                controller.selectedActionVMInTimeline = null;
+            if (scenarioController && scenarioController.selectedActionVMInTimeline) {
+                scenarioController.selectedActionVMInTimeline = null;
             }
         }
     }
@@ -162,7 +162,7 @@ Item {
         color : IngeScapeTheme.blueGreyColor2
 
         border {
-            width : (controller && controller.selectedActionVMInTimeline && actionVMItem.myActionVM  && controller.selectedActionVMInTimeline === actionVMItem.myActionVM) ? 1 :0;
+            width : (scenarioController && scenarioController.selectedActionVMInTimeline && actionVMItem.myActionVM  && scenarioController.selectedActionVMInTimeline === actionVMItem.myActionVM) ? 1 :0;
             color : IngeScapeTheme.orangeColor
         }
     }
@@ -194,7 +194,7 @@ Item {
                 // Not revert action
                 I2SvgItem {
                     id : notRevertItem
-                    x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute) - width/2;
+                    x : timeLineController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, timeLineController.pixelsPerMinute) - width/2;
 
                     onXChanged: {
                         if (visible) {
@@ -237,7 +237,7 @@ Item {
 
                     I2SvgItem {
                         id : actionExecution
-                        x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute);
+                        x : timeLineController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, timeLineController.pixelsPerMinute);
                         y : 0
 
                         svgFileCache: IngeScapeTheme.svgFileIngeScape;
@@ -247,7 +247,7 @@ Item {
 
                     I2SvgItem {
                         id : revertActionExecution
-                        x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.reverseTime, viewController.pixelsPerMinute) - width;
+                        x : timeLineController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.reverseTime, timeLineController.pixelsPerMinute) - width;
                         y : 0
                         rotation : 180
                         svgFileCache: IngeScapeTheme.svgFileIngeScape
@@ -286,7 +286,7 @@ Item {
             left : parent.left
         }
         verticalAlignment: Text.AlignVCenter
-        color: (controller && controller.selectedActionVMInTimeline && actionVMItem.myActionVM  && (controller.selectedActionVMInTimeline === actionVMItem.myActionVM)) ?
+        color: (scenarioController && scenarioController.selectedActionVMInTimeline && actionVMItem.myActionVM  && (scenarioController.selectedActionVMInTimeline === actionVMItem.myActionVM)) ?
                    (actionVMMouseArea.pressed ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.orangeColor)
                  : (actionVMMouseArea.pressed ? IngeScapeTheme.greyColor : IngeScapeTheme.lightGreyColor)
 
@@ -316,7 +316,7 @@ Item {
         hoverEnabled: true
 
         drag.smoothed: false
-        drag.target: !controller.isPlaying ? actionVMItem : null
+        drag.target: !scenarioController.isPlaying ? actionVMItem : null
         cursorShape: (actionVMMouseArea.drag.active)? Qt.PointingHandCursor : Qt.OpenHandCursor //Qt.OpenHandCursor
 
         onPressed: {
@@ -341,8 +341,8 @@ Item {
             //
             itemDragged.parent = actionVMItem;
 
-            if (actionVMItem && actionVMItem.myActionVM && actionVMItem.viewController) {
-                actionVMItem.x = actionVMItem.viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(actionVMItem.myActionVM.startTime, actionVMItem.viewController.pixelsPerMinute);
+            if (actionVMItem && actionVMItem.myActionVM && actionVMItem.timeLineController) {
+                actionVMItem.x = actionVMItem.timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(actionVMItem.myActionVM.startTime, actionVMItem.timeLineController.pixelsPerMinute);
                 actionVMItem.y = (actionVMItem.lineHeight * actionVMItem.myActionVM.lineInTimeLine);
             }
         }
@@ -352,24 +352,24 @@ Item {
             actionVMItem.forceActiveFocus()
 
             // selection of the action VM
-            if (controller && actionVMItem.myActionVM) {
-                if (controller.selectedActionVMInTimeline !== actionVMItem.myActionVM) {
-                    controller.selectedActionVMInTimeline = actionVMItem.myActionVM;
+            if (scenarioController && actionVMItem.myActionVM) {
+                if (scenarioController.selectedActionVMInTimeline !== actionVMItem.myActionVM) {
+                    scenarioController.selectedActionVMInTimeline = actionVMItem.myActionVM;
                 }
                 else {
-                    controller.selectedActionVMInTimeline = null;
+                    scenarioController.selectedActionVMInTimeline = null;
                 }
             }
         }
 
         onDoubleClicked: {
             // open action editor
-            if (controller && actionVMItem.myActionVM)
+            if (scenarioController && actionVMItem.myActionVM)
             {
-                controller.openActionEditorWithViewModel(actionVMItem.myActionVM);
+                scenarioController.openActionEditorWithViewModel(actionVMItem.myActionVM);
 
                 // select the action VM
-                controller.selectedActionVMInTimeline = actionVMItem.myActionVM;
+                scenarioController.selectedActionVMInTimeline = actionVMItem.myActionVM;
             }
         }
     }
