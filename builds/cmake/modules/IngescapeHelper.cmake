@@ -15,6 +15,7 @@ macro(add_ingescape_sources _SOURCES)
         ${macro_current_dir}/../../../src/bus.c
         ${macro_current_dir}/../../../src/token.c
         ${macro_current_dir}/../../../src/license.c
+        ${macro_current_dir}/../../../src/monitor.c
         ${macro_current_dir}/../../../dependencies/yajl/src/yajl_alloc.c
         ${macro_current_dir}/../../../dependencies/yajl/src/yajl_buf.c
         ${macro_current_dir}/../../../dependencies/yajl/src/yajl_encode.c

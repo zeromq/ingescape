@@ -30,13 +30,24 @@ extern "C" {
 
 #define MAX_STRING_MSG_LENGTH 4096
 
-//network configuration
+//network configuration and monitoring
 //void igs_setBusEndpoint(const char *endpoint); //usefull only with gossip discovery - TODO
 //void igs_connectAgentOnEndpoint(const char *endpoint); //not officially supported in Zyre 2.0.x yet
 PUBLIC void igs_setPublishingPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 
+PUBLIC void igs_enableMonitoring(unsigned int period); //in milliseconds
+PUBLIC void igs_disableMonitoring(void);
+PUBLIC void igs_monitoringShallStartStopAgent(bool flag);
+typedef enum {
+    IGS_NETWORK_OK = 1,
+    IGS_NETWORK_DEVICE_NOT_AVAILABLE,
+    IGS_NETWORK_ADDRESS_CHANGED
+} igs_monitorEvent_t;
+typedef void (*igs_monitorCallback)(igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData);
+PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
+    
 //////////////////////////////////////////////////
 //data serialization using ZMQ
 //TODO: give code examples here or link to documentation for zmsg and zframe
