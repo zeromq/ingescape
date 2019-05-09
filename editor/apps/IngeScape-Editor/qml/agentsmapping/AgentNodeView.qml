@@ -415,7 +415,7 @@ Rectangle {
                                 {
                                     var dragItem = drag.source;
 
-                                    if (typeof dragItem.dragActive !== 'undefined' && dragItem.outputSlotModel.canLinkWith(inputSlotItem.myModel))
+                                    if ((typeof dragItem.dragActive !== 'undefined') && dragItem.outputSlotModel.canLinkWith(inputSlotItem.myModel))
                                     {
                                         dragItem.color = dragItem.border.color;
                                         linkPoint.border.width = 2
@@ -423,12 +423,12 @@ Rectangle {
                                     }
                                     else
                                     {
-                                        console.log("inputDropArea: no dragActive "+dragItem.agent)
+                                        console.log("(agent) inputDropArea: no dragActive " + dragItem.agent)
                                     }
                                 }
                                 else
                                 {
-                                    console.log("inputDropArea: no source "+ drag.source)
+                                    console.log("(agent) inputDropArea: no source " + drag.source)
                                 }
                             }
 
@@ -454,7 +454,7 @@ Rectangle {
                                         linkPoint.border.width = 0
                                         linkPoint.scale = 1
 
-                                        //console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
+                                        console.log("(agent) inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
                                         controller.dropLinkBetweenTwoAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
                                     }
                                 }
@@ -677,7 +677,7 @@ Rectangle {
                                 {
                                     var dragItem = drag.source;
 
-                                    if (typeof dragItem.dragActive !== 'undefined'  && outputSlotItem.myModel.canLinkWith(dragItem.inputSlotModel))
+                                    if ((typeof dragItem.dragActive !== 'undefined') && outputSlotItem.myModel.canLinkWith(dragItem.inputSlotModel))
                                     {
                                         dragItem.color = dragItem.border.color;
                                         linkPointOut.border.width = 2
@@ -685,12 +685,12 @@ Rectangle {
                                     }
                                     else
                                     {
-                                        console.log("outputDropArea: no dragActive "+dragItem.agent)
+                                        console.log("(agent) outputDropArea: no dragActive " + dragItem.agent)
                                     }
                                 }
                                 else
                                 {
-                                    console.log("outputDropArea: no source "+ drag.source)
+                                    console.log("(agent) outputDropArea: no source " + drag.source)
                                 }
                             }
 
@@ -715,7 +715,7 @@ Rectangle {
                                         linkPointOut.border.width = 0
                                         linkPointOut.scale = 1
 
-                                        //console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
+                                        console.log("(agent) outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
                                         controller.dropLinkBetweenTwoAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
                                     }
                                 }

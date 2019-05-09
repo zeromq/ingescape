@@ -39,7 +39,10 @@ Rectangle {
     // Model associated to our QML item
     property ActionInMappingVM actionInMappingVM: null;
 
-    property var actionM: actionInMappingVM ? actionInMappingVM.action : null;
+    property ActionM actionM: actionInMappingVM ? actionInMappingVM.action : null;
+
+    property LinkInputVM linkInput: actionInMappingVM ? actionInMappingVM.linkInput : null;
+    property LinkOutputVM linkOutput: actionInMappingVM ? actionInMappingVM.linkOutput : null;
 
     // false if the agent is dropping and the drop is not available, true otherwise
     //property bool dropEnabled: true
@@ -51,8 +54,8 @@ Rectangle {
     property bool _isSelected: (controller && rootItem.actionInMappingVM && (controller.selectedAction === rootItem.actionInMappingVM))
 
     width: 150
-    height: width
-    radius: width / 2
+    height: 100
+    radius: 50 // 75
 
 
     // Init position of our agent
@@ -146,215 +149,353 @@ Rectangle {
 
         //------------------------------------------
         //
-        // Input and output slots
+        // Input slot
         //
         //------------------------------------------
-
-
         Item {
-            id: inputOutputSlotSection
+            id: inputSlotItem
 
+            height: 22
             anchors {
                 left: parent.left
                 right: parent.right
+                verticalCenter: parent.verticalCenter
+            }
 
-                top: parent.top
-                //topMargin: 5
-                bottom: parent.bottom
+            Rectangle {
+                id: draggablePointFROM
+
+                parent: draggablePointFROM.dragActive ? rootItem.parent  : linkPoint
+
+                height: linkPoint.height
+                width: height
+                radius: height/2
+
+                property bool dragActive: mouseAreaPointFROM.drag.active;
+                property var agentInMappingVMOfInput: rootItem.actionInMappingVM;
+                property var inputSlotModel: model.QtObject
+
+                Drag.active: mouseAreaPointFROM.drag.active;
+                Drag.hotSpot.x: width/2
+                Drag.hotSpot.y: height/2
+                Drag.keys: ["InputSlotItem"]
+
+                color: draggablePointFROM.dragActive ? IngeScapeTheme.blackColor : "transparent"
+                border {
+                    width: 1
+                    color: draggablePointFROM.dragActive ? linkPoint.color : "transparent"
+                }
+
+                MouseArea {
+                    id: mouseAreaPointFROM
+
+                    anchors.fill: parent
+
+                    drag.target: parent
+                    // Disable smoothed so that the Item pixel from where we started
+                    // the drag remains under the mouse cursor
+                    drag.smoothed: false
+
+                    hoverEnabled: true
+
+                    cursorShape: draggablePointFROM.dragActive ? Qt.ClosedHandCursor : Qt.PointingHandCursor
+
+                    onPressed: {
+                        draggablePointFROM.z = rootItem.parent.maxZ++;
+                        linkDraggablePoint.z = rootItem.parent.maxZ++;
+                    }
+
+                    onReleased: {
+                        // Drop our item
+                        draggablePointFROM.Drag.drop();
+
+                        // replace the draggablePointTO
+                        draggablePointFROM.x = 0
+                        draggablePointFROM.y = 0
+                    }
+                }
+
+                Link {
+                    id: linkDraggablePoint
+
+                    parent: rootItem.parent
+
+                    strokeDashArray: "5, 5"
+                    visible: draggablePointFROM.dragActive
+
+                    secondPoint: Qt.point(rootItem.linkInput.position.x, rootItem.linkInput.position.y)
+                    firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width, draggablePointFROM.y + draggablePointFROM.height/2)
+
+                    defaultColor:linkPoint.color
+                }
             }
 
 
-            //
-            // Inlets / Input slots
-            //
-            Column {
-                id: columnInputSlots
+            Rectangle {
+                id: linkPoint
 
                 anchors {
-                    fill: parent
+                    horizontalCenter: parent.left
+                    verticalCenter: parent.verticalCenter
                 }
 
-                Repeater {
-                    // List of intput slots VM
-                    model: 1 // rootItem.actionInMappingVM ? rootItem.actionInMappingVM.linkInputsList : null
+                height: 15
+                width: height
+                radius: height/2
 
-                    delegate: Item {
-                        id: inputSlotItem
+                border {
+                    width: 0
+                    color: IngeScapeTheme.whiteColor
+                }
+                color: IngeScapeEditorTheme.purpleColor
+            }
 
-                        property var myModel: model.QtObject
 
-                        height: 22
-                        anchors {
-                            left: parent.left
-                            right: parent.right
+            DropArea {
+                id: inputDropArea
+
+                anchors {
+                    fill: linkPoint
+                    margins: -3
+                }
+
+                // Only accept drag events from output slot items
+                keys: ["OutputSlotItem"]
+
+                onEntered: {
+                    if (drag.source !== null)
+                    {
+                        var dragItem = drag.source;
+
+                        if ((typeof dragItem.dragActive !== 'undefined') && dragItem.outputSlotModel.canLinkWith(rootItem.linkInput))
+                        {
+                            dragItem.color = dragItem.border.color;
+                            linkPoint.border.width = 2
+                            linkPoint.scale = 1.2
                         }
-
-                        Rectangle {
-                            id: draggablePointFROM
-
-                            height: linkPoint.height
-                            width: height
-                            radius: height/2
-
-                            property bool dragActive: mouseAreaPointFROM.drag.active;
-                            property var agentInMappingVMOfInput: rootItem.actionInMappingVM;
-                            property var inputSlotModel: model.QtObject
-
-                            Drag.active: mouseAreaPointFROM.drag.active;
-                            Drag.hotSpot.x: width/2
-                            Drag.hotSpot.y: height/2
-                            Drag.keys: ["InputSlotItem"]
-
-                            border {
-                                width: 1
-                                color: draggablePointFROM.dragActive ? linkPoint.color : "transparent"
-                            }
-
-                            color: draggablePointFROM.dragActive ? IngeScapeTheme.blackColor : "transparent"
-
-                            parent: draggablePointFROM.dragActive ? rootItem.parent  : linkPoint
-
-                            MouseArea {
-                                id: mouseAreaPointFROM
-
-                                anchors.fill: parent
-
-                                drag.target: parent
-                                // Disable smoothed so that the Item pixel from where we started
-                                // the drag remains under the mouse cursor
-                                drag.smoothed: false
-
-                                hoverEnabled: true
-
-                                cursorShape: draggablePointFROM.dragActive ? Qt.ClosedHandCursor : Qt.PointingHandCursor
-
-                                onPressed: {
-                                    draggablePointFROM.z = rootItem.parent.maxZ++;
-                                    linkDraggablePoint.z = rootItem.parent.maxZ++;
-                                }
-
-                                onReleased: {
-                                    // Drop our item
-                                    draggablePointFROM.Drag.drop();
-
-                                    // replace the draggablePointTO
-                                    draggablePointFROM.x = 0
-                                    draggablePointFROM.y = 0
-                                }
-                            }
-
-                            Link {
-                                id: linkDraggablePoint
-
-                                parent: rootItem.parent
-
-                                strokeDashArray: "5, 5"
-                                visible: draggablePointFROM.dragActive
-
-                                secondPoint: Qt.point(myModel.position.x, myModel.position.y)
-                                firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width, draggablePointFROM.y + draggablePointFROM.height/2)
-
-                                defaultColor:linkPoint.color
-                            }
+                        else
+                        {
+                            console.log("(action) inputDropArea: no dragActive " + dragItem.agent)
                         }
+                    }
+                    else
+                    {
+                        console.log("(action) inputDropArea: no source " + drag.source)
+                    }
+                }
 
 
-                        Rectangle {
-                            id: linkPoint
+                onExited: {
+                    var dragItem = drag.source;
+                    if (typeof dragItem.dragActive !== 'undefined')
+                    {
+                        dragItem.color = "transparent";
+                        linkPoint.border.width = 0
+                        linkPoint.scale = 1
+                    }
+                }
 
-                            anchors {
-                                horizontalCenter: parent.left
-                                verticalCenter: parent.verticalCenter
-                            }
 
-                            height: 15
-                            width: height
-                            radius: height/2
+                onDropped: {
+                    var dragItem = drag.source;
+                    if (dragItem)
+                    {
+                        if ((typeof dragItem.outputSlotModel !== 'undefined') && dragItem.agentInMappingVMOfOutput && rootItem.actionInMappingVM)
+                        {
+                            dragItem.color = "transparent";
+                            linkPoint.border.width = 0
+                            linkPoint.scale = 1
 
-                            border {
-                                width: 0
-                                color: IngeScapeTheme.whiteColor
-                            }
-                            color: IngeScapeEditorTheme.purpleColor
+                            console.log("(action) inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + rootItem.linkInput);
+                            //controller.dropLinkBetweenTwoAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.actionInMappingVM, rootItem.linkInput);
                         }
+                    }
+                }
+
+            }
 
 
-                        DropArea {
-                            id: inputDropArea
 
-                            anchors {
-                                fill: linkPoint
-                                margins: -3
-                            }
+            //
+            // Bindings to save the anchor point of our input slot
+            // i.e. the point used to draw a link
+            //
+            Binding {
+                target: rootItem.linkInput
 
-                            // Only accept drag events from output slot items
-                            keys: ["OutputSlotItem"]
+                property: "position"
 
-                            onEntered: {
-                                if (drag.source !== null)
-                                {
-                                    var dragItem = drag.source;
-
-                                    if (typeof dragItem.dragActive !== 'undefined' && dragItem.outputSlotModel.canLinkWith(inputSlotItem.myModel))
-                                    {
-                                        dragItem.color = dragItem.border.color;
-                                        linkPoint.border.width = 2
-                                        linkPoint.scale = 1.2
-                                    }
-                                    else
-                                    {
-                                        console.log("inputDropArea: no dragActive "+dragItem.agent)
-                                    }
-                                }
-                                else
-                                {
-                                    console.log("inputDropArea: no source "+ drag.source)
-                                }
-                            }
+                value: Qt.point(rootItem.x + inputSlotItem.x + linkPoint.x + linkPoint.width/2,
+                                rootItem.y + inputSlotItem.y + linkPoint.y + linkPoint.height/2)
+            }
+        }
 
 
-                            onExited: {
-                                var dragItem = drag.source;
-                                if (typeof dragItem.dragActive !== 'undefined')
-                                {
-                                    dragItem.color = "transparent";
-                                    linkPoint.border.width = 0
-                                    linkPoint.scale = 1
-                                }
-                            }
+        //------------------------------------------
+        //
+        // Output slot
+        //
+        //------------------------------------------
+        Item {
+            id: outputSlotItem
+
+            height: 22
+            anchors {
+                left: parent.left
+                right: parent.right
+                verticalCenter: parent.verticalCenter
+            }
+
+            Rectangle {
+                id: draggablePointTO
+
+                parent: draggablePointTO.dragActive ? rootItem.parent : linkPointOut
+
+                height: linkPointOut.height
+                width: height
+                radius: height/2
+
+                color: draggablePointTO.dragActive ? IngeScapeEditorTheme.agentsMappingBackgroundColor : "transparent"
+                border {
+                    width: 1
+                    color: draggablePointTO.dragActive ? linkPointOut.color : "transparent"
+                }
+
+                property bool dragActive : mouseAreaPointTO.drag.active;
+                property var agentInMappingVMOfOutput : rootItem.actionInMappingVM
+                property var outputSlotModel: model.QtObject
+
+                Drag.active: draggablePointTO.dragActive;
+                Drag.hotSpot.x: width/2
+                Drag.hotSpot.y: height/2
+                Drag.keys: ["OutputSlotItem"]
 
 
-                            onDropped: {
-                                var dragItem = drag.source;
-                                if (dragItem)
-                                {
-                                    if ((typeof dragItem.outputSlotModel !== 'undefined') && dragItem.agentInMappingVMOfOutput && rootItem.actionInMappingVM)
-                                    {
-                                        dragItem.color = "transparent";
-                                        linkPoint.border.width = 0
-                                        linkPoint.scale = 1
+                MouseArea {
+                    id: mouseAreaPointTO
 
-                                        console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
-                                        //controller.dropLinkBetweenTwoAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.actionInMappingVM, inputSlotItem.myModel);
-                                    }
-                                }
-                            }
+                    anchors.fill: parent
 
+                    drag.target: parent
+                    // Disable smoothed so that the Item pixel from where we started
+                    // the drag remains under the mouse cursor
+                    drag.smoothed: false
+
+                    hoverEnabled: true
+
+                    cursorShape: draggablePointTO.dragActive ? Qt.ClosedHandCursor : Qt.PointingHandCursor
+
+                    onPressed: {
+                        draggablePointTO.z = rootItem.parent.maxZ++;
+                        linkDraggablePointTO.z = rootItem.parent.maxZ++;
+                    }
+
+                    onReleased: {
+                        // Drop our item
+                        draggablePointTO.Drag.drop();
+
+                        // replace the draggablePointTO
+                        draggablePointTO.x = 0
+                        draggablePointTO.y = 0
+                    }
+                }
+
+
+
+                Link {
+                    id: linkDraggablePointTO
+
+                    parent: rootItem.parent
+
+                    strokeDashArray: "5, 5"
+                    visible: draggablePointTO.dragActive
+
+                    firstPoint: Qt.point(rootItem.linkOutput.position.x, rootItem.linkOutput.position.y)
+                    secondPoint: Qt.point(draggablePointTO.x, draggablePointTO.y + draggablePointTO.height/2)
+
+                    defaultColor:linkPointOut.color
+                }
+            }
+
+
+
+            Rectangle {
+                id: linkPointOut
+
+                anchors {
+                    horizontalCenter: parent.right
+                    verticalCenter: parent.verticalCenter
+                }
+
+                height: 15
+                width: height
+                radius: height/2
+
+                border {
+                    width: 0
+                    color: IngeScapeTheme.whiteColor
+                }
+                color: IngeScapeEditorTheme.purpleColor
+            }
+
+
+
+            DropArea {
+                id: outputDropArea
+
+                anchors {
+                    fill: linkPointOut
+                    margins: -3
+                }
+
+                // Only accept drag events from input slot items
+                keys: ["InputSlotItem"]
+
+                onEntered: {
+                    if (drag.source !== null)
+                    {
+                        var dragItem = drag.source;
+
+                        if ((typeof dragItem.dragActive !== 'undefined') && rootItem.linkOutput.canLinkWith(dragItem.inputSlotModel))
+                        {
+                            dragItem.color = dragItem.border.color;
+                            linkPointOut.border.width = 2
+                            linkPointOut.scale = 1.2
                         }
+                        else
+                        {
+                            console.log("(action) outputDropArea: no dragActive " + dragItem.agent)
+                        }
+                    }
+                    else
+                    {
+                        console.log("(action) outputDropArea: no source " + drag.source)
+                    }
+                }
 
 
+                onExited: {
+                    var dragItem = drag.source;
+                    if (typeof dragItem.dragActive !== 'undefined')
+                    {
+                        dragItem.color = "transparent";
+                        linkPointOut.border.width = 0
+                        linkPointOut.scale = 1
+                    }
+                }
 
-                        //
-                        // Bindings to save the anchor point of our input slot
-                        // i.e. the point used to draw a link
-                        //
-                        Binding {
-                            target: myModel
+                onDropped: {
+                    var dragItem = drag.source;
+                    if (dragItem)
+                    {
+                        if (typeof dragItem.inputSlotModel !== 'undefined' && controller && rootItem.actionInMappingVM && rootItem.linkOutput)
+                        {
+                            dragItem.color = "transparent";
+                            linkPointOut.border.width = 0
+                            linkPointOut.scale = 1
 
-                            property: "position"
-
-                            value: Qt.point(rootItem.x + inputOutputSlotSection.x + columnInputSlots.x + inputSlotItem.x + linkPoint.x + linkPoint.width/2,
-                                            rootItem.y + inputOutputSlotSection.y + columnInputSlots.y + inputSlotItem.y + linkPoint.y + linkPoint.height/2)
+                            console.log("(action) outputDropArea: create a link from " + rootItem.linkOutput + " to " + dragItem.inputSlotModel);
+                            //controller.dropLinkBetweenTwoAgents(rootItem.actionInMappingVM, rootItem.linkOutput, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
                         }
                     }
                 }
@@ -363,202 +504,16 @@ Rectangle {
 
 
             //
+            // Bindings to save the anchor point of our input slot
+            // i.e. the point used to draw a link
             //
-            // Outlets / Output slots
-            //
-            Column {
-                id: columnOutputSlots
+            Binding {
+                target: rootItem.linkOutput
 
-                anchors {
-                    fill: parent
-                }
+                property: "position"
 
-
-                Repeater {
-                    // List of output slots VM
-                    model: 1 // rootItem.actionInMappingVM ? rootItem.actionInMappingVM.linkOutputsList : null
-
-                    delegate: Item {
-                        id: outputSlotItem
-
-                        property var myModel: model.QtObject
-
-                        height: 22
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                        }
-
-                        Rectangle {
-                            id : draggablePointTO
-
-                            height: linkPointOut.height
-                            width: height
-                            radius: height/2
-
-                            border {
-                                width : 1
-                                color : draggablePointTO.dragActive ? linkPointOut.color : "transparent"
-                            }
-
-                            property bool dragActive : mouseAreaPointTO.drag.active;
-                            property var agentInMappingVMOfOutput : rootItem.actionInMappingVM
-                            property var outputSlotModel: model.QtObject
-
-                            Drag.active: draggablePointTO.dragActive;
-                            Drag.hotSpot.x: width/2
-                            Drag.hotSpot.y: height/2
-                            Drag.keys: ["OutputSlotItem"]
-
-                            color: draggablePointTO.dragActive ? IngeScapeEditorTheme.agentsMappingBackgroundColor : "transparent"
-                            parent: draggablePointTO.dragActive ? rootItem.parent  : linkPointOut
-
-                            MouseArea {
-                                id: mouseAreaPointTO
-
-                                anchors.fill: parent
-
-                                drag.target: parent
-                                // Disable smoothed so that the Item pixel from where we started
-                                // the drag remains under the mouse cursor
-                                drag.smoothed: false
-
-                                hoverEnabled: true
-
-                                cursorShape: draggablePointTO.dragActive ? Qt.ClosedHandCursor : Qt.PointingHandCursor
-
-                                onPressed: {
-                                    draggablePointTO.z = rootItem.parent.maxZ++;
-                                    linkDraggablePointTO.z = rootItem.parent.maxZ++;
-                                }
-
-                                onReleased: {
-                                    // Drop our item
-                                    draggablePointTO.Drag.drop();
-
-                                    // replace the draggablePointTO
-                                    draggablePointTO.x = 0
-                                    draggablePointTO.y = 0
-                                }
-                            }
-
-
-
-                            Link {
-                                id: linkDraggablePointTO
-
-                                parent: rootItem.parent
-
-                                strokeDashArray: "5, 5"
-                                visible: draggablePointTO.dragActive
-
-                                firstPoint: Qt.point(myModel.position.x, myModel.position.y)
-                                secondPoint: Qt.point(draggablePointTO.x, draggablePointTO.y + draggablePointTO.height/2)
-
-                                defaultColor:linkPointOut.color
-                            }
-                        }
-
-
-
-                        Rectangle {
-                            id: linkPointOut
-
-                            anchors {
-                                horizontalCenter: parent.right
-                                verticalCenter: parent.verticalCenter
-                            }
-
-                            height: 15
-                            width: height
-                            radius: height/2
-
-                            border {
-                                width: 0
-                                color: IngeScapeTheme.whiteColor
-                            }
-                            color: IngeScapeEditorTheme.purpleColor
-                        }
-
-
-
-                        DropArea {
-                            id: outputDropArea
-
-                            anchors {
-                                fill: linkPointOut
-                                margins: -3
-                            }
-
-                            // Only accept drag events from input slot items
-                            keys: ["InputSlotItem"]
-
-                            onEntered: {
-                                if (drag.source !== null)
-                                {
-                                    var dragItem = drag.source;
-
-                                    if (typeof dragItem.dragActive !== 'undefined'  && outputSlotItem.myModel.canLinkWith(dragItem.inputSlotModel))
-                                    {
-                                        dragItem.color = dragItem.border.color;
-                                        linkPointOut.border.width = 2
-                                        linkPointOut.scale = 1.2
-                                    }
-                                    else
-                                    {
-                                        console.log("outputDropArea: no dragActive "+dragItem.agent)
-                                    }
-                                }
-                                else
-                                {
-                                    console.log("outputDropArea: no source "+ drag.source)
-                                }
-                            }
-
-
-                            onExited: {
-                                var dragItem = drag.source;
-                                if (typeof dragItem.dragActive !== 'undefined')
-                                {
-                                    dragItem.color = "transparent";
-                                    linkPointOut.border.width = 0
-                                    linkPointOut.scale = 1
-                                }
-                            }
-
-                            onDropped: {
-                                var dragItem = drag.source;
-                                if (dragItem)
-                                {
-                                    if (typeof dragItem.inputSlotModel !== 'undefined' && controller && rootItem.actionInMappingVM && outputSlotItem.myModel)
-                                    {
-                                        dragItem.color = "transparent";
-                                        linkPointOut.border.width = 0
-                                        linkPointOut.scale = 1
-
-                                        console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
-                                        //controller.dropLinkBetweenTwoAgents(rootItem.actionInMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
-                                    }
-                                }
-                            }
-                        }
-
-
-
-                        //
-                        // Bindings to save the anchor point of our input slot
-                        // i.e. the point used to draw a link
-                        //
-                        Binding {
-                            target: myModel
-
-                            property: "position"
-
-                            value: Qt.point(rootItem.x + inputOutputSlotSection.x + columnOutputSlots.x + outputSlotItem.x + linkPointOut.x + linkPointOut.width/2,
-                                            rootItem.y + inputOutputSlotSection.y + columnOutputSlots.y + outputSlotItem.y + linkPointOut.y + linkPointOut.height/2)
-                        }
-                    }
-                }
+                value: Qt.point(rootItem.x + outputSlotItem.x + linkPointOut.x + linkPointOut.width/2,
+                                rootItem.y + outputSlotItem.y + linkPointOut.y + linkPointOut.height/2)
             }
         }
 
@@ -610,16 +565,18 @@ Rectangle {
 
             anchors {
                 left: parent.left
-                leftMargin: 30
-                right: btnRemoveFromMapping.left
-                top: parent.top
-                topMargin: 10
+                leftMargin: 15
+                right: parent.right
+                rightMargin: 15
+                verticalCenter: parent.verticalCenter
             }
 
-            elide: Text.ElideRight
             text: rootItem.actionInMappingVM ? rootItem.actionInMappingVM.name : "";
+            //wrapMode: Text.WordWrap
+            wrapMode: Text.Wrap
+            maximumLineCount: 2
+            elide: Text.ElideRight
             font: IngeScapeTheme.headingFont
-
             color: IngeScapeEditorTheme.agentsONNameMappingColor
         }
 
@@ -631,8 +588,7 @@ Rectangle {
             anchors {
                 top: parent.top
                 topMargin: 10
-                right: parent.right
-                rightMargin: 10
+                horizontalCenter: parent.horizontalCenter
             }
 
             opacity: rootItem.actionItemIsHovered ? 1 : 0
@@ -685,43 +641,5 @@ Rectangle {
 
             visible: (rootItem.dropEnabled === false)
         }*/
-
-
-
-        //-------------------
-        //
-        // Global Points
-        //
-        //-------------------
-        Rectangle {
-            id: inputGlobalPoint
-
-            anchors {
-                horizontalCenter: parent.left
-                verticalCenter: parent.verticalCenter
-            }
-
-            height: 13
-            width: height
-            radius: height/2
-
-            color: IngeScapeEditorTheme.purpleColor
-        }
-
-        Rectangle {
-            id : outputGlobalPoint
-
-            anchors {
-                horizontalCenter : parent.right
-                verticalCenter: parent.verticalCenter
-            }
-
-            height: 13
-            width: height
-            radius: height/2
-
-            color: IngeScapeEditorTheme.purpleColor
-        }
-
     }
 }

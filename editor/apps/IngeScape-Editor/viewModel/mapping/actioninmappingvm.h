@@ -19,6 +19,8 @@
 #include <I2PropertyHelpers.h>
 #include <viewModel/mapping/objectinmappingvm.h>
 #include <model/scenario/actionm.h>
+#include <viewModel/link/linkinputvm.h>
+#include <viewModel/link/linkoutputvm.h>
 
 /**
  * @brief The ActionInMappingVM class defines a view model of action in the global mapping
@@ -29,6 +31,12 @@ class ActionInMappingVM : public ObjectInMappingVM
 
     // Model of action
     I2_QML_PROPERTY_READONLY(ActionM*, action)
+
+    // View model of link input
+    I2_QML_PROPERTY_READONLY(LinkInputVM*, linkInput)
+
+    // View model of link output
+    I2_QML_PROPERTY_READONLY(LinkOutputVM*, linkOutput)
 
 
 public:
