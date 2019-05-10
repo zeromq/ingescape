@@ -37,6 +37,10 @@ LinkOutputVM::LinkOutputVM(OutputVM* output,
         // Connect to signals from the view model of output
         connect(_output, &OutputVM::currentValueChanged, this, &LinkOutputVM::_oncurrentValueChanged);
     }
+    else {
+        setname("out");
+        setuid(QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(AgentIOPValueTypes::IMPULSION)));
+    }
 
     // Init the timer to reset the flag "is Published New Value"
     // Allows to play an animation when the value changed
@@ -83,16 +87,26 @@ void LinkOutputVM::simulateCurrentValueOfModelChanged()
  */
 bool LinkOutputVM::canLinkWith(LinkConnectorVM* linkConnector)
 {
+    bool canLink = false;
+
     LinkInputVM* linkInput = qobject_cast<LinkInputVM*>(linkConnector);
-    if ((linkInput != nullptr) && (linkInput->input() != nullptr) && (linkInput->input()->firstModel() != nullptr)
-            && (_output != nullptr) && (_output->firstModel() != nullptr))
+    if (linkInput != nullptr)
     {
-        // Call our mother class
-        return _canLinkOutputToInput(_output->firstModel()->agentIOPValueType(), linkInput->input()->firstModel()->agentIOPValueType());
+        // If the input OR the output is null, we try to link an action
+        if ((linkInput->input() == nullptr) || (_output == nullptr))
+        {
+            canLink = true;
+        }
+        //
+        else if ((linkInput->input() != nullptr) && (linkInput->input()->firstModel() != nullptr)
+                && (_output != nullptr) && (_output->firstModel() != nullptr))
+        {
+            // Call our mother class
+            canLink = _canLinkOutputToInput(_output->firstModel()->agentIOPValueType(), linkInput->input()->firstModel()->agentIOPValueType());
+        }
     }
-    else {
-        return false;
-    }
+
+    return canLink;
 }
 
 

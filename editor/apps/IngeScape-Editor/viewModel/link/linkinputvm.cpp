@@ -32,6 +32,10 @@ LinkInputVM::LinkInputVM(InputVM* input,
         setname(_input->name());
         setuid(_input->uid());
     }
+    else {
+        setname("in");
+        setuid(QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(AgentIOPValueTypes::IMPULSION)));
+    }
 }
 
 
@@ -53,14 +57,24 @@ LinkInputVM::~LinkInputVM()
  */
 bool LinkInputVM::canLinkWith(LinkConnectorVM* linkConnector)
 {
+    bool canLink = false;
+
     LinkOutputVM* linkOutput = qobject_cast<LinkOutputVM*>(linkConnector);
-    if ((linkOutput != nullptr) && (linkOutput->output() != nullptr) && (linkOutput->output()->firstModel() != nullptr)
-            && (_input != nullptr) && (_input->firstModel() != nullptr))
+    if (linkOutput != nullptr)
     {
-        // Call our mother class
-        return _canLinkOutputToInput(linkOutput->output()->firstModel()->agentIOPValueType(), _input->firstModel()->agentIOPValueType());
+        // If the input OR the output is null, we try to link an action
+        if ((linkOutput->output() == nullptr) || (_input == nullptr))
+        {
+            canLink = true;
+        }
+        //
+        else if ((linkOutput != nullptr) && (linkOutput->output() != nullptr) && (linkOutput->output()->firstModel() != nullptr)
+                 && (_input != nullptr) && (_input->firstModel() != nullptr))
+         {
+             // Call our mother class
+             canLink = _canLinkOutputToInput(linkOutput->output()->firstModel()->agentIOPValueType(), _input->firstModel()->agentIOPValueType());
+         }
     }
-    else {
-        return false;
-    }
+
+    return canLink;
 }

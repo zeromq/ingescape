@@ -513,6 +513,34 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
 }
 
 
+void AgentsMappingController::dropLinkBetweenTwoActions(ActionInMappingVM* outputAction, LinkOutputVM* linkOutput, ActionInMappingVM* inputAction, LinkInputVM* linkInput)
+{
+    if ((outputAction != nullptr) && (outputAction->action() != nullptr) && (linkOutput != nullptr)
+            && (inputAction != nullptr) && (inputAction->action() != nullptr) && (linkInput != nullptr))
+    {
+        qDebug() << "drop Link from action" << outputAction->action()->name() << "." << linkOutput->uid() << "to action" << inputAction->action()->name() << "." << linkInput->uid();
+    }
+}
+
+void AgentsMappingController::dropLinkFromActionToAgent(ActionInMappingVM* outputAction, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput)
+{
+    if ((outputAction != nullptr) && (outputAction->action() != nullptr) && (linkOutput != nullptr)
+            && (inputAgent != nullptr) && (inputAgent->agentsGroupedByName() != nullptr) && (linkInput != nullptr) && (linkInput->input() != nullptr))
+    {
+        qDebug() << "drop Link from action" << outputAction->action()->name() << "." << linkOutput->uid() << "to agent" << inputAgent->agentsGroupedByName()->name() << "." << linkInput->uid();
+    }
+}
+
+void AgentsMappingController::dropLinkFromAgentToAction(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, ActionInMappingVM* inputAction, LinkInputVM* linkInput)
+{
+    if ((outputAgent != nullptr) && (outputAgent->agentsGroupedByName() != nullptr) && (linkOutput != nullptr) && (linkOutput->output() != nullptr)
+            && (inputAction != nullptr) && (inputAction->action() != nullptr) && (linkInput != nullptr))
+    {
+        qDebug() << "drop Link from agent" << outputAgent->agentsGroupedByName()->name() << "." << linkOutput->uid() << "to action" << inputAction->action()->name() << "." << linkInput->uid();
+    }
+}
+
+
 /**
  * @brief Get the (view model of) agent in the global mapping from an agent name
  * @param name

@@ -266,16 +266,16 @@ Rectangle {
                     if (drag.source !== null)
                     {
                         var dragItem = drag.source;
-
-                        if ((typeof dragItem.dragActive !== 'undefined') && dragItem.outputSlotModel.canLinkWith(rootItem.linkInput))
+                        if (dragItem && (typeof dragItem.dragActive !== 'undefined') && dragItem.outputSlotModel
+                                && dragItem.outputSlotModel.canLinkWith(rootItem.linkInput))
                         {
                             dragItem.color = dragItem.border.color;
-                            linkPoint.border.width = 2
-                            linkPoint.scale = 1.2
+                            linkPoint.border.width = 2;
+                            linkPoint.scale = 1.2;
                         }
                         else
                         {
-                            console.log("(action) inputDropArea: no dragActive " + dragItem.agent)
+                            console.log("(action) inputDropArea: can NOT Link " + dragItem.outputSlotModel + " and " + rootItem.linkInput)
                         }
                     }
                     else
@@ -290,8 +290,8 @@ Rectangle {
                     if (typeof dragItem.dragActive !== 'undefined')
                     {
                         dragItem.color = "transparent";
-                        linkPoint.border.width = 0
-                        linkPoint.scale = 1
+                        linkPoint.border.width = 0;
+                        linkPoint.scale = 1;
                     }
                 }
 
@@ -309,7 +309,7 @@ Rectangle {
                             linkPoint.scale = 1;
 
                             console.log("(action) inputDropArea: create a link from " + dragItem.actionInMappingVMOfOutput + "." + dragItem.outputSlotModel + " to " + rootItem.linkInput);
-                            //controller.dropLinkBetweenTwoActions(dragItem.actionInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.actionInMappingVM, rootItem.linkInput);
+                            controller.dropLinkBetweenTwoActions(dragItem.actionInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.actionInMappingVM, rootItem.linkInput);
                         }
                         // Agent
                         else if (dragItem.agentInMappingVMOfOutput)
@@ -319,7 +319,7 @@ Rectangle {
                             linkPoint.scale = 1;
 
                             console.log("(action) inputDropArea: create a link from " + dragItem.agentInMappingVMOfOutput + "." + dragItem.outputSlotModel + " to " + rootItem.linkInput);
-                            //controller.dropLinkFromAgentToAction(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.actionInMappingVM, rootItem.linkInput);
+                            controller.dropLinkFromAgentToAction(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.actionInMappingVM, rootItem.linkInput);
                         }
                     }
                 }
@@ -467,16 +467,16 @@ Rectangle {
                     if (drag.source !== null)
                     {
                         var dragItem = drag.source;
-
-                        if ((typeof dragItem.dragActive !== 'undefined') && rootItem.linkOutput.canLinkWith(dragItem.inputSlotModel))
+                        if (dragItem && (typeof dragItem.dragActive !== 'undefined') && rootItem.linkOutput
+                                && rootItem.linkOutput.canLinkWith(dragItem.inputSlotModel))
                         {
                             dragItem.color = dragItem.border.color;
-                            linkPointOut.border.width = 2
-                            linkPointOut.scale = 1.2
+                            linkPointOut.border.width = 2;
+                            linkPointOut.scale = 1.2;
                         }
                         else
                         {
-                            console.log("(action) outputDropArea: no dragActive " + dragItem.agent)
+                            console.log("(action) outputDropArea: can NOT Link " + rootItem.linkOutput + " and " + dragItem.inputSlotModel)
                         }
                     }
                     else
@@ -491,8 +491,8 @@ Rectangle {
                     if (typeof dragItem.dragActive !== 'undefined')
                     {
                         dragItem.color = "transparent";
-                        linkPointOut.border.width = 0
-                        linkPointOut.scale = 1
+                        linkPointOut.border.width = 0;
+                        linkPointOut.scale = 1;
                     }
                 }
 
@@ -509,7 +509,7 @@ Rectangle {
                             linkPointOut.scale = 1;
 
                             console.log("(action) outputDropArea: create a link from " + rootItem.linkOutput + " to " + dragItem.actionInMappingVMOfInput + "." + dragItem.inputSlotModel);
-                            //controller.dropLinkBetweenTwoActions(rootItem.actionInMappingVM, rootItem.linkOutput, dragItem.actionInMappingVMOfInput, dragItem.inputSlotModel);
+                            controller.dropLinkBetweenTwoActions(rootItem.actionInMappingVM, rootItem.linkOutput, dragItem.actionInMappingVMOfInput, dragItem.inputSlotModel);
                         }
                         // Agent
                         else if (dragItem.agentInMappingVMOfInput)
@@ -519,7 +519,7 @@ Rectangle {
                             linkPointOut.scale = 1;
 
                             console.log("(action) outputDropArea: create a link from " + rootItem.linkOutput + " to " + dragItem.agentInMappingVMOfInput + "." + dragItem.inputSlotModel);
-                            //controller.dropLinkFromActionToAgent(rootItem.actionInMappingVM, rootItem.linkOutput, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
+                            controller.dropLinkFromActionToAgent(rootItem.actionInMappingVM, rootItem.linkOutput, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
                         }
                     }
                 }
