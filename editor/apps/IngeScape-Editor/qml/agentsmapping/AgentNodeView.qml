@@ -352,8 +352,8 @@ Rectangle {
                                     draggablePointFROM.Drag.drop();
 
                                     // replace the draggablePointTO
-                                    draggablePointFROM.x = 0
-                                    draggablePointFROM.y = 0
+                                    draggablePointFROM.x = 0;
+                                    draggablePointFROM.y = 0;
                                 }
                             }
 
@@ -418,8 +418,8 @@ Rectangle {
                                     if ((typeof dragItem.dragActive !== 'undefined') && dragItem.outputSlotModel.canLinkWith(inputSlotItem.myModel))
                                     {
                                         dragItem.color = dragItem.border.color;
-                                        linkPoint.border.width = 2
-                                        linkPoint.scale = 1.2
+                                        linkPoint.border.width = 2;
+                                        linkPoint.scale = 1.2;
                                     }
                                     else
                                     {
@@ -432,17 +432,15 @@ Rectangle {
                                 }
                             }
 
-
                             onExited: {
                                 var dragItem = drag.source;
                                 if (typeof dragItem.dragActive !== 'undefined')
                                 {
                                     dragItem.color = "transparent";
-                                    linkPoint.border.width = 0
-                                    linkPoint.scale = 1
+                                    linkPoint.border.width = 0;
+                                    linkPoint.scale = 1;
                                 }
                             }
-
 
                             onDropped: {
                                 var dragItem = drag.source;
@@ -451,8 +449,8 @@ Rectangle {
                                     if ((typeof dragItem.outputSlotModel !== 'undefined') && dragItem.agentInMappingVMOfOutput && rootItem.agentMappingVM)
                                     {
                                         dragItem.color = "transparent";
-                                        linkPoint.border.width = 0
-                                        linkPoint.scale = 1
+                                        linkPoint.border.width = 0;
+                                        linkPoint.scale = 1;
 
                                         console.log("(agent) inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
                                         controller.dropLinkBetweenTwoAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
@@ -599,8 +597,8 @@ Rectangle {
                                     draggablePointTO.Drag.drop();
 
                                     // replace the draggablePointTO
-                                    draggablePointTO.x = 0
-                                    draggablePointTO.y = 0
+                                    draggablePointTO.x = 0;
+                                    draggablePointTO.y = 0;
                                 }
                             }
 
@@ -680,8 +678,8 @@ Rectangle {
                                     if ((typeof dragItem.dragActive !== 'undefined') && outputSlotItem.myModel.canLinkWith(dragItem.inputSlotModel))
                                     {
                                         dragItem.color = dragItem.border.color;
-                                        linkPointOut.border.width = 2
-                                        linkPointOut.scale = 1.2
+                                        linkPointOut.border.width = 2;
+                                        linkPointOut.scale = 1.2;
                                     }
                                     else
                                     {
@@ -694,14 +692,13 @@ Rectangle {
                                 }
                             }
 
-
                             onExited: {
                                 var dragItem = drag.source;
                                 if (typeof dragItem.dragActive !== 'undefined')
                                 {
                                     dragItem.color = "transparent";
-                                    linkPointOut.border.width = 0
-                                    linkPointOut.scale = 1
+                                    linkPointOut.border.width = 0;
+                                    linkPointOut.scale = 1;
                                 }
                             }
 
@@ -709,11 +706,11 @@ Rectangle {
                                 var dragItem = drag.source;
                                 if (dragItem)
                                 {
-                                    if (typeof dragItem.inputSlotModel !== 'undefined' && controller && rootItem.agentMappingVM && outputSlotItem.myModel)
+                                    if ((typeof dragItem.inputSlotModel !== 'undefined') && controller && rootItem.agentMappingVM && outputSlotItem.myModel)
                                     {
                                         dragItem.color = "transparent";
-                                        linkPointOut.border.width = 0
-                                        linkPointOut.scale = 1
+                                        linkPointOut.border.width = 0;
+                                        linkPointOut.scale = 1;
 
                                         console.log("(agent) outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
                                         controller.dropLinkBetweenTwoAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
