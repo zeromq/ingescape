@@ -24,6 +24,7 @@
 
 /**
  * @brief The ActionInMappingVM class defines a view model of action in the global mapping
+ * Allows to manage actions and links graphically
  */
 class ActionInMappingVM : public ObjectInMappingVM
 {

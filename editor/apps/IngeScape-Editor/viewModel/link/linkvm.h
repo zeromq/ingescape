@@ -18,7 +18,9 @@
 #include <QObject>
 
 #include <I2PropertyHelpers.h>
-#include <viewModel/agentinmappingvm.h>
+#include <viewModel/mapping/mappingelementvm.h>
+//#include <viewModel/agentinmappingvm.h>
+#include <viewModel/mapping/objectinmappingvm.h>
 #include <viewModel/link/linkinputvm.h>
 #include <viewModel/link/linkoutputvm.h>
 
@@ -40,13 +42,15 @@ class LinkVM : public QObject
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(MappingElementVM*, mappingElement)
 
     // View model of the output agent of our link (link starts from this agent)
-    I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, outputAgent)
+    //I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, outputAgent)
+    I2_QML_PROPERTY_DELETE_PROOF(ObjectInMappingVM*, outputObject)
 
     // View model of the output slot associated to our link
     I2_QML_PROPERTY_DELETE_PROOF(LinkOutputVM*, linkOutput)
 
     // View model of the input agent of our link (link ends to this agent)
-    I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, inputAgent)
+    //I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, inputAgent)
+    I2_QML_PROPERTY_DELETE_PROOF(ObjectInMappingVM*, inputObject)
 
     // View model of the input slot associated to our link
     I2_QML_PROPERTY_DELETE_PROOF(LinkInputVM*, linkInput)
@@ -70,9 +74,11 @@ public:
      */
     explicit LinkVM(QString name,
                     MappingElementVM* mappingElement,
-                    AgentInMappingVM* outputAgent,
+                    //AgentInMappingVM* outputAgent,
+                    ObjectInMappingVM* outputObject,
                     LinkOutputVM* linkOutput,
-                    AgentInMappingVM* inputAgent,
+                    //AgentInMappingVM* inputAgent,
+                    ObjectInMappingVM* inputObject,
                     LinkInputVM* linkInput,
                     bool isTemporary,
                     QObject *parent = nullptr);

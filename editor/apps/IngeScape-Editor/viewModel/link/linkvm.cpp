@@ -67,9 +67,11 @@ LinkVM::~LinkVM()
 
     setmappingElement(nullptr);
 
-    setoutputAgent(nullptr);
+    //setoutputAgent(nullptr);
+    setoutputObject(nullptr);
     setlinkOutput(nullptr);
-    setinputAgent(nullptr);
+    //setinputAgent(nullptr);
+    setinputObject(nullptr);
     setlinkInput(nullptr);
 }
 

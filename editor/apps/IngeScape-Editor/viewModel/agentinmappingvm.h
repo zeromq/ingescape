@@ -17,9 +17,8 @@
 
 #include <QObject>
 #include <QtQml>
-
 #include <I2PropertyHelpers.h>
-
+#include <viewModel/mapping/objectinmappingvm.h>
 #include <viewModel/agentsgroupedbynamevm.h>
 #include <viewModel/link/linkinputvm.h>
 #include <viewModel/link/linkoutputvm.h>
@@ -29,12 +28,12 @@
  * @brief The AgentInMappingVM class defines a view model of agent in the global mapping
  * Allows to manage agents and links graphically
  */
-class AgentInMappingVM : public QObject
+class AgentInMappingVM : public ObjectInMappingVM
 {
     Q_OBJECT
 
     // Name of our agent
-    I2_QML_PROPERTY_READONLY(QString, name)
+    //I2_QML_PROPERTY_READONLY(QString, name)
 
     // Agents grouped by name
     I2_QML_PROPERTY_READONLY(AgentsGroupedByNameVM*, agentsGroupedByName)
@@ -46,7 +45,7 @@ class AgentInMappingVM : public QObject
     I2_QOBJECT_LISTMODEL(LinkOutputVM, linkOutputsList)
 
     // The position corresponds to the corner Top-Left of the box
-    I2_QML_PROPERTY(QPointF, position)
+    //I2_QML_PROPERTY(QPointF, position)
 
     // Flag indicating if our agent is reduced
     I2_QML_PROPERTY(bool, isReduced)

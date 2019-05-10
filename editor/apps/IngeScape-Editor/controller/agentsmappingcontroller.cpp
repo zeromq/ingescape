@@ -518,7 +518,43 @@ void AgentsMappingController::dropLinkBetweenTwoActions(ActionInMappingVM* outpu
     if ((outputAction != nullptr) && (outputAction->action() != nullptr) && (linkOutput != nullptr)
             && (inputAction != nullptr) && (inputAction->action() != nullptr) && (linkInput != nullptr))
     {
-        qDebug() << "drop Link from action" << outputAction->action()->name() << "." << linkOutput->uid() << "to action" << inputAction->action()->name() << "." << linkInput->uid();
+        qDebug() << "drop Link from action" << outputAction->name() << "." << linkOutput->uid() << "to action" << inputAction->name() << "." << linkInput->uid();
+
+        // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
+        QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAction->name(), linkOutput->uid(), inputAction->name(), linkInput->uid());
+
+        LinkVM* link = getLinkInMappingFromId(linkId);
+
+        // Check that the link does NOT exist
+        if (link == nullptr)
+        {
+            // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
+            QString linkName = MappingElementM::getLinkNameFromNamesList(outputAction->name(), linkOutput->name(), inputAction->name(), linkInput->name());
+
+            // Create a new link between two agents
+            link = new LinkVM(linkName,
+                              nullptr,
+                              outputAgent,
+                              linkOutput,
+                              inputAgent,
+                              linkInput,
+                              false,
+                              this);
+
+            // Add to the list to update the view (QML)
+            _allLinksInMapping.append(link);
+
+            // Add to the hash table
+            _hashFromIdToLinkInMapping.insert(link->uid(), link);
+
+            // Update the list of links between agents in the global mapping for this link name
+            QList<LinkVM*> linksWithSameName = getLinksInMappingFromName(linkName);
+            linksWithSameName.append(link);
+            _hashFromNameToListOfLinksInMapping.insert(linkName, linksWithSameName);
+        }
+        else {
+            qWarning() << "The link" << link->uid() << "already exist";
+        }
     }
 }
 
@@ -527,7 +563,43 @@ void AgentsMappingController::dropLinkFromActionToAgent(ActionInMappingVM* outpu
     if ((outputAction != nullptr) && (outputAction->action() != nullptr) && (linkOutput != nullptr)
             && (inputAgent != nullptr) && (inputAgent->agentsGroupedByName() != nullptr) && (linkInput != nullptr) && (linkInput->input() != nullptr))
     {
-        qDebug() << "drop Link from action" << outputAction->action()->name() << "." << linkOutput->uid() << "to agent" << inputAgent->agentsGroupedByName()->name() << "." << linkInput->uid();
+        qDebug() << "drop Link from action" << outputAction->name() << "." << linkOutput->uid() << "to agent" << inputAgent->name() << "." << linkInput->uid();
+
+        // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
+        QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAction->name(), linkOutput->uid(), inputAgent->name(), linkInput->uid());
+
+        LinkVM* link = getLinkInMappingFromId(linkId);
+
+        // Check that the link does NOT exist
+        if (link == nullptr)
+        {
+            // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
+            QString linkName = MappingElementM::getLinkNameFromNamesList(outputAction->name(), linkOutput->name(), inputAgent->name(), linkInput->name());
+
+            // Create a new link between two agents
+            link = new LinkVM(linkName,
+                              nullptr,
+                              outputAgent,
+                              linkOutput,
+                              inputAgent,
+                              linkInput,
+                              false,
+                              this);
+
+            // Add to the list to update the view (QML)
+            _allLinksInMapping.append(link);
+
+            // Add to the hash table
+            _hashFromIdToLinkInMapping.insert(link->uid(), link);
+
+            // Update the list of links between agents in the global mapping for this link name
+            QList<LinkVM*> linksWithSameName = getLinksInMappingFromName(linkName);
+            linksWithSameName.append(link);
+            _hashFromNameToListOfLinksInMapping.insert(linkName, linksWithSameName);
+        }
+        else {
+            qWarning() << "The link" << link->uid() << "already exist";
+        }
     }
 }
 
@@ -536,7 +608,43 @@ void AgentsMappingController::dropLinkFromAgentToAction(AgentInMappingVM* output
     if ((outputAgent != nullptr) && (outputAgent->agentsGroupedByName() != nullptr) && (linkOutput != nullptr) && (linkOutput->output() != nullptr)
             && (inputAction != nullptr) && (inputAction->action() != nullptr) && (linkInput != nullptr))
     {
-        qDebug() << "drop Link from agent" << outputAgent->agentsGroupedByName()->name() << "." << linkOutput->uid() << "to action" << inputAction->action()->name() << "." << linkInput->uid();
+        qDebug() << "drop Link from agent" << outputAgent->name() << "." << linkOutput->uid() << "to action" << inputAction->name() << "." << linkInput->uid();
+
+        // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
+        QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAgent->name(), linkOutput->uid(), inputAction->name(), linkInput->uid());
+
+        LinkVM* link = getLinkInMappingFromId(linkId);
+
+        // Check that the link does NOT exist
+        if (link == nullptr)
+        {
+            // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
+            QString linkName = MappingElementM::getLinkNameFromNamesList(outputAgent->name(), linkOutput->name(), inputAction->name(), linkInput->name());
+
+            // Create a new link between two agents
+            link = new LinkVM(linkName,
+                              nullptr,
+                              outputAgent,
+                              linkOutput,
+                              inputAgent,
+                              linkInput,
+                              false,
+                              this);
+
+            // Add to the list to update the view (QML)
+            _allLinksInMapping.append(link);
+
+            // Add to the hash table
+            _hashFromIdToLinkInMapping.insert(link->uid(), link);
+
+            // Update the list of links between agents in the global mapping for this link name
+            QList<LinkVM*> linksWithSameName = getLinksInMappingFromName(linkName);
+            linksWithSameName.append(link);
+            _hashFromNameToListOfLinksInMapping.insert(linkName, linksWithSameName);
+        }
+        else {
+            qWarning() << "The link" << link->uid() << "already exist";
+        }
     }
 }
 
