@@ -220,54 +220,61 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
     bool linkHasBeenDeleted = false;
 
     if ((link != nullptr)
-            && (link->inputAgent() != nullptr) && (link->inputAgent()->agentsGroupedByName() != nullptr) && (link->linkInput() != nullptr)
-            && (link->outputAgent() != nullptr) && (link->outputAgent()->agentsGroupedByName() != nullptr) && (link->linkOutput() != nullptr))
+            && (link->inputObject() != nullptr) && (link->linkInput() != nullptr)
+            && (link->outputObject() != nullptr) && (link->linkOutput() != nullptr))
     {
-        qInfo() << "Remove the link between agents" << link->outputAgent()->name() << "and" << link->inputAgent()->name();
+        //(link->inputAgent()->agentsGroupedByName() != nullptr)
+        //(link->outputAgent()->agentsGroupedByName() != nullptr)
 
-        // The global mapping is activated AND the input agent is ON
-        if ((_modelManager != nullptr) && _modelManager->isMappingConnected() && link->inputAgent()->agentsGroupedByName()->isON())
+        AgentInMappingVM* inputAgent = qobject_cast<AgentInMappingVM*>(link->inputObject());
+        if ((inputAgent != nullptr) && (inputAgent->agentsGroupedByName() != nullptr))
         {
-            if (!_hashFromLinkIdToRemovedLink_WaitingReply.contains(link->uid()))
+            qInfo() << "Remove the link between agents" << link->outputObject()->name() << "and" << link->inputObject()->name();
+
+            // The global mapping is activated AND the input agent is ON
+            if ((_modelManager != nullptr) && _modelManager->isMappingConnected() && inputAgent->agentsGroupedByName()->isON())
             {
-                // Insert in the hash table the "(unique) link id" and the link for which we are waiting a reply to the request "remove"
-                _hashFromLinkIdToRemovedLink_WaitingReply.insert(link->uid(), link);
+                if (!_hashFromLinkIdToRemovedLink_WaitingReply.contains(link->uid()))
+                {
+                    // Insert in the hash table the "(unique) link id" and the link for which we are waiting a reply to the request "remove"
+                    _hashFromLinkIdToRemovedLink_WaitingReply.insert(link->uid(), link);
 
-                // Update the flag to give a feedback to the user
-                link->setisTemporary(true);
-            }
-            else {
-                qWarning() << "The request" << command_UnmapAgents << "has already been sent to remove the link" << link->uid();
-            }
+                    // Update the flag to give a feedback to the user
+                    link->setisTemporary(true);
+                }
+                else {
+                    qWarning() << "The request" << command_UnmapAgents << "has already been sent to remove the link" << link->uid();
+                }
 
-            // Emit signal "Command asked to agent about Mapping Input"
-            Q_EMIT commandAskedToAgentAboutMappingInput(link->inputAgent()->agentsGroupedByName()->peerIdsList(),
-                                                        command_UnmapAgents,
-                                                        link->linkInput()->name(),
-                                                        link->outputAgent()->name(),
-                                                        link->linkOutput()->name());
-        }
-        // The global mapping is NOT activated OR the input agent is OFF
-        else
-        {
-            MappingElementM* mappingElement = link->inputAgent()->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid());
-
-            // This link has been added while the mapping was UN-activated...
-            if (mappingElement != nullptr)
-            {
-                // ...just cancel the add of the link while the global mapping is UN-activated
-                link->inputAgent()->cancelAddLink_WhileMappingWasUNactivated(link->uid());
+                // Emit signal "Command asked to agent about Mapping Input"
+                Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->agentsGroupedByName()->peerIdsList(),
+                                                            command_UnmapAgents,
+                                                            link->linkInput()->name(),
+                                                            link->outputObject()->name(),
+                                                            link->linkOutput()->name());
             }
-            // Remove the link while the global mapping is UN-activated
+            // The global mapping is NOT activated OR the input agent is OFF
             else
             {
-                link->inputAgent()->removeLink_WhileMappingWasUNactivated(link->uid(), link->mappingElement());
+                MappingElementM* mappingElement = inputAgent->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid());
+
+                // This link has been added while the mapping was UN-activated...
+                if (mappingElement != nullptr)
+                {
+                    // ...just cancel the add of the link while the global mapping is UN-activated
+                    inputAgent->cancelAddLink_WhileMappingWasUNactivated(link->uid());
+                }
+                // Remove the link while the global mapping is UN-activated
+                else
+                {
+                    inputAgent->removeLink_WhileMappingWasUNactivated(link->uid(), link->mappingElement());
+                }
+
+                // Delete the link between two agents
+                _deleteLinkBetweenTwoAgents(link);
+
+                linkHasBeenDeleted = true;
             }
-
-            // Delete the link between two agents
-            _deleteLinkBetweenTwoAgents(link);
-
-            linkHasBeenDeleted = true;
         }
     }
 
@@ -534,9 +541,9 @@ void AgentsMappingController::dropLinkBetweenTwoActions(ActionInMappingVM* outpu
             // Create a new link between two agents
             link = new LinkVM(linkName,
                               nullptr,
-                              outputAgent,
+                              outputAction,
                               linkOutput,
-                              inputAgent,
+                              inputAction,
                               linkInput,
                               false,
                               this);
@@ -579,7 +586,7 @@ void AgentsMappingController::dropLinkFromActionToAgent(ActionInMappingVM* outpu
             // Create a new link between two agents
             link = new LinkVM(linkName,
                               nullptr,
-                              outputAgent,
+                              outputAction,
                               linkOutput,
                               inputAgent,
                               linkInput,
@@ -626,7 +633,7 @@ void AgentsMappingController::dropLinkFromAgentToAction(AgentInMappingVM* output
                               nullptr,
                               outputAgent,
                               linkOutput,
-                              inputAgent,
+                              inputAction,
                               linkInput,
                               false,
                               this);
@@ -1352,10 +1359,14 @@ void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElemen
                         // The global mapping is NOT activated
                         else
                         {
-                            if ((link->inputAgent() != nullptr) && (link->linkInput() != nullptr) && (link->outputAgent() != nullptr) && (link->linkOutput() != nullptr))
+                            if ((link->inputObject() != nullptr) && (link->linkInput() != nullptr) && (link->outputObject() != nullptr) && (link->linkOutput() != nullptr))
                             {
-                                // Simulate that the user add this link while the global mapping is UN-activated
-                                link->inputAgent()->addLink_WhileMappingWasUNactivated(link->uid(), link->linkInput()->name(), link->outputAgent()->name(), link->linkOutput()->name());
+                                AgentInMappingVM* inputAgent = qobject_cast<AgentInMappingVM*>(link->inputObject());
+                                if (inputAgent != nullptr)
+                                {
+                                    // Simulate that the user add this link while the global mapping is UN-activated
+                                    inputAgent->addLink_WhileMappingWasUNactivated(link->uid(), link->linkInput()->name(), link->outputObject()->name(), link->linkOutput()->name());
+                                }
                             }
                         }
                     }
@@ -1461,11 +1472,14 @@ void AgentsMappingController::_onLinkInputsListWillBeRemoved(const QList<LinkInp
         // Traverse the list of all links
         for (LinkVM* link : _allLinksInMapping.toList())
         {
-            if ((link != nullptr) && (link->inputAgent() != nullptr) && (link->inputAgent() == agentInMapping)
-                    && (link->linkInput() != nullptr) && removedLinkInputs.contains(link->linkInput()))
+            if ((link != nullptr) && (link->inputObject() != nullptr) && (link->linkInput() != nullptr))
             {
-                // Delete the link between two agents
-                _deleteLinkBetweenTwoAgents(link);
+                AgentInMappingVM* inputAgent = qobject_cast<AgentInMappingVM*>(link->inputObject());
+                if ((inputAgent != nullptr) && (inputAgent == agentInMapping) && removedLinkInputs.contains(link->linkInput()))
+                {
+                    // Delete the link between two agents
+                    _deleteLinkBetweenTwoAgents(link);
+                }
             }
         }
     }
@@ -1486,17 +1500,20 @@ void AgentsMappingController::_onLinkOutputsListWillBeRemoved(const QList<LinkOu
         // Traverse the list of all links
         for (LinkVM* link : _allLinksInMapping.toList())
         {
-            if ((link != nullptr) && (link->outputAgent() != nullptr) && (link->outputAgent() == agentInMapping)
-                    && (link->linkOutput() != nullptr) && removedLinkOutputs.contains(link->linkOutput()))
+            if ((link != nullptr) && (link->outputObject() != nullptr) && (link->linkOutput() != nullptr))
             {
-                if (link->mappingElement() != nullptr)
+                AgentInMappingVM* outputAgent = qobject_cast<AgentInMappingVM*>(link->outputObject());
+                if ((outputAgent != nullptr) && (outputAgent == agentInMapping) && removedLinkOutputs.contains(link->linkOutput()))
                 {
-                     // Add a "Waiting Mapping Element" on the output agent (name)
-                    _addWaitingMappingElementOnOutputAgent(link->outputAgent()->name(), link->mappingElement());
-                }
+                    if (link->mappingElement() != nullptr)
+                    {
+                        // Add a "Waiting Mapping Element" on the output agent (name)
+                        _addWaitingMappingElementOnOutputAgent(link->outputObject()->name(), link->mappingElement());
+                    }
 
-                // Delete the link between two agents
-                _deleteLinkBetweenTwoAgents(link);
+                    // Delete the link between two agents
+                    _deleteLinkBetweenTwoAgents(link);
+                }
             }
         }
     }
@@ -1650,12 +1667,12 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
         // We have to delete the link to clean our HMI
         for (LinkVM* link : _allLinksInMapping.toList())
         {
-            if ( (link != nullptr) && ((link->outputAgent() == agent) || (link->inputAgent() == agent)) )
+            if ( (link != nullptr) && ((link->outputObject() == agent) || (link->inputObject() == agent)) )
             {
-                if (link->outputAgent() == agent)
+                if (link->outputObject() == agent)
                 {
                     // Add a "Waiting Mapping Element" on the output agent (name)
-                   _addWaitingMappingElementOnOutputAgent(link->outputAgent()->name(), link->mappingElement());
+                   _addWaitingMappingElementOnOutputAgent(link->outputObject()->name(), link->mappingElement());
                 }
 
                 _deleteLinkBetweenTwoAgents(link);
@@ -1874,12 +1891,13 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
                     // Or when our input agent was OFF
                     else
                     {
-                        if (link->inputAgent() != nullptr)
+                        if (link->inputObject() != nullptr)
                         {
-                            if (link->inputAgent()->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid()))
+                            AgentInMappingVM* inputAgent = qobject_cast<AgentInMappingVM*>(link->inputObject());
+                            if ((inputAgent != nullptr) && inputAgent->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid()))
                             {
                                 qDebug() << "There is still the corresponding added Mapping Element" << link->uid() << "while the Mapping was UN-activated";
-                                link->inputAgent()->mappingElementAdded_CorrespondingLinkAddedWhileMappingWasUNactivated(link->uid());
+                                inputAgent->mappingElementAdded_CorrespondingLinkAddedWhileMappingWasUNactivated(link->uid());
                             }
                         }
                     }

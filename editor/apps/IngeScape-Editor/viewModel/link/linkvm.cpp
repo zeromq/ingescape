@@ -28,28 +28,33 @@
  */
 LinkVM::LinkVM(QString name,
                MappingElementVM* mappingElement,
-               AgentInMappingVM* outputAgent,
+               //AgentInMappingVM* outputAgent,
+               ObjectInMappingVM* outputObject,
                LinkOutputVM* linkOutput,
-               AgentInMappingVM* inputAgent,
+               //AgentInMappingVM* inputAgent,
+               ObjectInMappingVM* inputObject,
                LinkInputVM* linkInput,
                bool isTemporary,
                QObject *parent) : QObject(parent),
     _name(name),
     _uid(""),
     _mappingElement(nullptr),
-    _outputAgent(outputAgent),
+    //_outputAgent(outputAgent),
+    _outputObject(outputObject),
     _linkOutput(linkOutput),
-    _inputAgent(inputAgent),
+    //_inputAgent(inputAgent),
+    _inputObject(inputObject),
     _linkInput(linkInput),
     _isTemporary(isTemporary)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if ((_outputAgent != nullptr) && (_linkOutput != nullptr) && (_inputAgent != nullptr) && (_linkInput != nullptr))
+    //if ((_outputAgent != nullptr) && (_linkOutput != nullptr) && (_inputAgent != nullptr) && (_linkInput != nullptr))
+    if ((_outputObject != nullptr) && (_linkOutput != nullptr) && (_inputObject != nullptr) && (_linkInput != nullptr))
     {
         // Get our link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-        _uid = LinkVM::getLinkIdFromAgentNamesAndIOids(_outputAgent->name(), _linkOutput->uid(), _inputAgent->name(), _linkInput->uid());
+        _uid = LinkVM::getLinkIdFromAgentNamesAndIOids(_outputObject->name(), _linkOutput->uid(), _inputObject->name(), _linkInput->uid());
 
         //qInfo() << "New Link" << _uid << "in the global mapping (" << _name << ")";
     }

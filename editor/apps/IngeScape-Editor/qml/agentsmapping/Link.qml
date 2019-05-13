@@ -66,8 +66,8 @@ I2CubicBezierCurve {
 
     // Check if we represent a link or a "brin"
     property bool _isBrin: (viewModel
-                            && viewModel.inputAgent && viewModel.inputAgent.isReduced
-                            && viewModel.outputAgent && viewModel.outputAgent.isReduced)
+                            && viewModel.inputObject && (typeof viewModel.inputObject.isReduced !== 'undefined') && viewModel.inputObject.isReduced
+                            && viewModel.outputObject && (typeof viewModel.outputObject.isReduced !== 'undefined') && viewModel.outputObject.isReduced)
 
 
     // NB: Clip MUST be true to clip our mouse area
@@ -76,15 +76,15 @@ I2CubicBezierCurve {
     // allowing to increase mouse area
     hitTestAreaMargin : 3
 
-    // if the inputAgent and outputAgent are reduced : global type of its outputs
-    stroke: if (rootItem._isBrin && linkOutput && viewModel && viewModel.outputAgent)
+    // if the inputAgent and outputAgent are reduced: global type of its outputs
+    stroke: if (rootItem._isBrin && linkOutput && viewModel && viewModel.outputObject)
             {
                 //if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingConnected) {
                 if (linkOutput.isPublishedNewValue) {
-                    IngeScapeEditorTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, true);
+                    IngeScapeEditorTheme.colorOfIOPTypeWithConditions(viewModel.outputObject.reducedLinkOutputsValueTypeGroup, true);
                 }
                 else {
-                    IngeScapeEditorTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, false);
+                    IngeScapeEditorTheme.colorOfIOPTypeWithConditions(viewModel.outputObject.reducedLinkOutputsValueTypeGroup, false);
                 }
             }
             else

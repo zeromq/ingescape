@@ -809,7 +809,7 @@ WindowBlockTouches {
                                             target: comboEffectOnMapping_OutputAgent
                                             property: "selectedIndex"
                                             value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myEffect.modelM.outputAgent)
-                                                                                                                    : -1
+                                                                                                                   : -1
                                         }
 
                                         onSelectedItemChanged: {
