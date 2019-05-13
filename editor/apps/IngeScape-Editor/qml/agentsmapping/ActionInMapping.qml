@@ -635,10 +635,8 @@ Rectangle {
             onClicked: {
                 if (controller)
                 {
-                    console.log("QML: FIXME TODO deleteActionInMapping...");
-
                     // Delete our action
-                    //controller.deleteActionInMapping(rootItem.actionInMappingVM);
+                    controller.deleteActionInMapping(rootItem.actionInMappingVM);
                 }
             }
         }

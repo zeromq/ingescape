@@ -99,10 +99,24 @@ public:
 
 
     /**
+     * @brief Remove the action from the mapping and delete the view model
+     * @param action
+     */
+    Q_INVOKABLE void deleteActionInMapping(ActionInMappingVM* action);
+
+
+    /**
      * @brief Remove a link between two agents from the mapping
      * @param link
      */
     Q_INVOKABLE void removeLinkBetweenTwoAgents(LinkVM* link);
+
+
+    /**
+     * @brief Remove a link between two objects in the mapping
+     * @param link
+     */
+    Q_INVOKABLE void removeLinkBetweenTwoObjectsInMapping(LinkVM* link);
 
 
     /**
@@ -132,16 +146,17 @@ public:
     Q_INVOKABLE void dropLinkBetweenTwoAgents(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput);
 
 
+    /**
+     * @brief Slot called when a link from an output is dropped over an input on the current mapping
+     * Or when a link to an input is dropped over an output
+     * @param outputAction
+     * @param linkOutput
+     * @param inputAction
+     * @param linkInput
+     */
     Q_INVOKABLE void dropLinkBetweenTwoActions(ActionInMappingVM* outputAction, LinkOutputVM* linkOutput, ActionInMappingVM* inputAction, LinkInputVM* linkInput);
     Q_INVOKABLE void dropLinkFromActionToAgent(ActionInMappingVM* outputAction, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput);
     Q_INVOKABLE void dropLinkFromAgentToAction(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, ActionInMappingVM* inputAction, LinkInputVM* linkInput);
-
-
-    /**
-     * @brief Remove a link between two actions in the mapping
-     * @param link
-     */
-    //Q_INVOKABLE void removeLinkBetweenTwoActions(LinkVM* link);
 
 
     /**
@@ -354,30 +369,30 @@ private:
 
 
     /**
-     * @brief Create a link between two agents
+     * @brief Create a link between two objects in the mapping
      * @param linkName
-     * @param outputAgent
+     * @param outputObject
      * @param linkOutput
-     * @param inputAgent
+     * @param inputObject
      * @param linkInput
      * @param mappingElement
      * @param isTemporary
      * @return
      */
-    LinkVM* _createLinkBetweenTwoAgents(const QString& linkName,
-                                        AgentInMappingVM* outputAgent,
-                                        LinkOutputVM* linkOutput,
-                                        AgentInMappingVM* inputAgent,
-                                        LinkInputVM* linkInput,
-                                        MappingElementVM* mappingElement,
-                                        bool isTemporary = false);
+    LinkVM* _createLinkBetweenTwoObjectsInMapping(const QString& linkName,
+                                                  ObjectInMappingVM* outputObject,
+                                                  LinkOutputVM* linkOutput,
+                                                  ObjectInMappingVM* inputObject,
+                                                  LinkInputVM* linkInput,
+                                                  MappingElementVM* mappingElement = nullptr,
+                                                  bool isTemporary = false);
 
 
     /**
-     * @brief Delete a link between two agents
+     * @brief Delete a link between two objects in the mapping
      * @param link
      */
-    void _deleteLinkBetweenTwoAgents(LinkVM* link);
+    void _deleteLinkBetweenTwoObjectsInMapping(LinkVM* link);
 
 
     /**

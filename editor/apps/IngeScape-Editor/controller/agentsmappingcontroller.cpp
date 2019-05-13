@@ -165,7 +165,7 @@ void AgentsMappingController::clearMapping()
 
     // 2- Delete all links
     for (LinkVM* link : _allLinksInMapping.toList()) {
-        _deleteLinkBetweenTwoAgents(link);
+        _deleteLinkBetweenTwoObjectsInMapping(link);
     }
 
     // 3- Delete all agents in mapping
@@ -211,9 +211,49 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
 
 
 /**
+ * @brief Remove the action from the mapping and delete the view model
+ * @param action
+ */
+void AgentsMappingController::deleteActionInMapping(ActionInMappingVM* action)
+{
+    if (action != nullptr)
+    {
+        qInfo() << "Delete the action" << action->name() << "in the Mapping";
+
+        // Unselect our action if needed
+        if (_selectedAction == action) {
+            setselectedAction(nullptr);
+        }
+
+        // DIS-connect to signals from this action in mapping
+        disconnect(action, nullptr, this, nullptr);
+
+        // Remove from the hash table
+        //_hashFromNameToActionInMapping.remove(action->name());
+
+        // Remove all the links with this action
+        //_removeAllLinksWithAction(action);
+        for (LinkVM* link : _allLinksInMapping.toList())
+        {
+            if ( (link != nullptr) && ((link->outputObject() == action) || (link->inputObject() == action)) )
+            {
+                // Delete the link between two objects in the mapping
+                _deleteLinkBetweenTwoObjectsInMapping(link);
+            }
+        }
+
+        // Remove from the list to update view (QML)
+        _allActionsInMapping.remove(action);
+
+        // Free memory
+        delete action;
+    }
+}
+
+
+/**
  * @brief Remove a link between two agents from the mapping
  * @param link
- * @return true if the link has been deleted during the call of our method
  */
 void AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
 {
@@ -268,8 +308,80 @@ void AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
                     inputAgent->removeLink_WhileMappingWasUNactivated(link->uid(), link->mappingElement());
                 }
 
-                // Delete the link between two agents
-                _deleteLinkBetweenTwoAgents(link);
+                // Delete the link between two agents in the mapping
+                _deleteLinkBetweenTwoObjectsInMapping(link);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Remove a link between two objects in the mapping
+ * @param link
+ */
+void AgentsMappingController::removeLinkBetweenTwoObjectsInMapping(LinkVM* link)
+{
+    if (link != nullptr)
+    {
+        if ( (link->inputObject() != nullptr) && (link->linkInput() != nullptr)
+             && (link->outputObject() != nullptr) && (link->linkOutput() != nullptr) )
+        {
+            if ((link->linkInput()->input() != nullptr) && (link->linkOutput()->output() != nullptr))
+            {
+                AgentInMappingVM* inputAgent = qobject_cast<AgentInMappingVM*>(link->inputObject());
+                AgentInMappingVM* outputAgent = qobject_cast<AgentInMappingVM*>(link->outputObject());
+
+                // Two agents
+                if ((inputAgent != nullptr) && (outputAgent != nullptr))
+                {
+                    qDebug() << "Remove link between 2 AGENTS";
+
+                    // FIXME TODO: parameters (and Q_INVOKABLE)
+                    removeLinkBetweenTwoAgents(link);
+                }
+            }
+            else if ((link->linkInput()->input() == nullptr) && (link->linkOutput()->output() == nullptr))
+            {
+                ActionInMappingVM* inputAction = qobject_cast<ActionInMappingVM*>(link->inputObject());
+                ActionInMappingVM* outputAction = qobject_cast<ActionInMappingVM*>(link->outputObject());
+
+                // Two actions
+                if ((inputAction != nullptr) && (outputAction != nullptr))
+                {
+                    qDebug() << "Remove link between 2 ACTIONS";
+
+                    // Delete the link between two agents in the mapping
+                    _deleteLinkBetweenTwoObjectsInMapping(link);
+                }
+            }
+            else if (link->linkInput()->input() != nullptr)
+            {
+                AgentInMappingVM* inputAgent = qobject_cast<AgentInMappingVM*>(link->inputObject());
+                ActionInMappingVM* outputAction = qobject_cast<ActionInMappingVM*>(link->outputObject());
+
+                // From Agent to Action
+                if ((inputAgent != nullptr) && (outputAction != nullptr))
+                {
+                    qDebug() << "Remove link from ACTION to AGENT";
+
+                    // Delete the link between two agents in the mapping
+                    _deleteLinkBetweenTwoObjectsInMapping(link);
+                }
+            }
+            else if (link->linkOutput()->output() != nullptr)
+            {
+                ActionInMappingVM* inputAction = qobject_cast<ActionInMappingVM*>(link->inputObject());
+                AgentInMappingVM* outputAgent = qobject_cast<AgentInMappingVM*>(link->outputObject());
+
+                // From Action to Agent
+                if ((inputAction != nullptr) && (outputAgent != nullptr))
+                {
+                    qDebug() << "Remove link from AGENT to ACTION";
+
+                    // Delete the link between two agents in the mapping
+                    _deleteLinkBetweenTwoObjectsInMapping(link);
+                }
             }
         }
     }
@@ -440,13 +552,13 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
                 if ((_modelManager != nullptr) && _modelManager->isMappingConnected() && inputAgent->agentsGroupedByName()->isON())
                 {
                     // Create a new TEMPORARY link between the two agents
-                    link = _createLinkBetweenTwoAgents(linkName,
-                                                       outputAgent,
-                                                       linkOutput,
-                                                       inputAgent,
-                                                       linkInput,
-                                                       nullptr,
-                                                       true);
+                    link = _createLinkBetweenTwoObjectsInMapping(linkName,
+                                                                 outputAgent,
+                                                                 linkOutput,
+                                                                 inputAgent,
+                                                                 linkInput,
+                                                                 nullptr,
+                                                                 true);
 
                     if ((link != nullptr) && !_hashFromLinkIdToAddedLink_WaitingReply.contains(link->uid()))
                     {
@@ -468,13 +580,13 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
                 else
                 {
                     // Create a new (REAL) link between the two agents
-                    link = _createLinkBetweenTwoAgents(linkName,
-                                                       outputAgent,
-                                                       linkOutput,
-                                                       inputAgent,
-                                                       linkInput,
-                                                       nullptr,
-                                                       false);
+                    link = _createLinkBetweenTwoObjectsInMapping(linkName,
+                                                                 outputAgent,
+                                                                 linkOutput,
+                                                                 inputAgent,
+                                                                 linkInput,
+                                                                 nullptr,
+                                                                 false);
 
                     if (link != nullptr)
                     {
@@ -514,6 +626,14 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
 }
 
 
+/**
+ * @brief Slot called when a link from an output is dropped over an input on the current mapping
+ * Or when a link to an input is dropped over an output
+ * @param outputAction
+ * @param linkOutput
+ * @param inputAction
+ * @param linkInput
+ */
 void AgentsMappingController::dropLinkBetweenTwoActions(ActionInMappingVM* outputAction, LinkOutputVM* linkOutput, ActionInMappingVM* inputAction, LinkInputVM* linkInput)
 {
     if ((outputAction != nullptr) && (outputAction->action() != nullptr) && (linkOutput != nullptr)
@@ -521,44 +641,27 @@ void AgentsMappingController::dropLinkBetweenTwoActions(ActionInMappingVM* outpu
     {
         qDebug() << "drop Link from action" << outputAction->name() << "." << linkOutput->uid() << "to action" << inputAction->name() << "." << linkInput->uid();
 
-        // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-        QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAction->name(), linkOutput->uid(), inputAction->name(), linkInput->uid());
+        // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
+        QString linkName = MappingElementM::getLinkNameFromNamesList(outputAction->name(), linkOutput->name(), inputAction->name(), linkInput->name());
 
-        LinkVM* link = getLinkInMappingFromId(linkId);
-
-        // Check that the link does NOT exist
-        if (link == nullptr)
-        {
-            // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
-            QString linkName = MappingElementM::getLinkNameFromNamesList(outputAction->name(), linkOutput->name(), inputAction->name(), linkInput->name());
-
-            // Create a new link between two agents
-            link = new LinkVM(linkName,
-                              nullptr,
-                              outputAction,
-                              linkOutput,
-                              inputAction,
-                              linkInput,
-                              false,
-                              this);
-
-            // Add to the list to update the view (QML)
-            _allLinksInMapping.append(link);
-
-            // Add to the hash table
-            _hashFromIdToLinkInMapping.insert(link->uid(), link);
-
-            // Update the list of links between agents in the global mapping for this link name
-            QList<LinkVM*> linksWithSameName = getLinksInMappingFromName(linkName);
-            linksWithSameName.append(link);
-            _hashFromNameToListOfLinksInMapping.insert(linkName, linksWithSameName);
-        }
-        else {
-            qWarning() << "The link" << link->uid() << "already exist";
-        }
+        // Create a link between two actions in the mapping
+        _createLinkBetweenTwoObjectsInMapping(linkName,
+                                              outputAction,
+                                              linkOutput,
+                                              inputAction,
+                                              linkInput);
     }
 }
 
+
+/**
+ * @brief Slot called when a link from an output is dropped over an input on the current mapping
+ * Or when a link to an input is dropped over an output
+ * @param outputAction
+ * @param linkOutput
+ * @param inputAgent
+ * @param linkInput
+ */
 void AgentsMappingController::dropLinkFromActionToAgent(ActionInMappingVM* outputAction, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput)
 {
     if ((outputAction != nullptr) && (outputAction->action() != nullptr) && (linkOutput != nullptr)
@@ -566,44 +669,27 @@ void AgentsMappingController::dropLinkFromActionToAgent(ActionInMappingVM* outpu
     {
         qDebug() << "drop Link from action" << outputAction->name() << "." << linkOutput->uid() << "to agent" << inputAgent->name() << "." << linkInput->uid();
 
-        // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-        QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAction->name(), linkOutput->uid(), inputAgent->name(), linkInput->uid());
+        // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
+        QString linkName = MappingElementM::getLinkNameFromNamesList(outputAction->name(), linkOutput->name(), inputAgent->name(), linkInput->name());
 
-        LinkVM* link = getLinkInMappingFromId(linkId);
-
-        // Check that the link does NOT exist
-        if (link == nullptr)
-        {
-            // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
-            QString linkName = MappingElementM::getLinkNameFromNamesList(outputAction->name(), linkOutput->name(), inputAgent->name(), linkInput->name());
-
-            // Create a new link between two agents
-            link = new LinkVM(linkName,
-                              nullptr,
-                              outputAction,
-                              linkOutput,
-                              inputAgent,
-                              linkInput,
-                              false,
-                              this);
-
-            // Add to the list to update the view (QML)
-            _allLinksInMapping.append(link);
-
-            // Add to the hash table
-            _hashFromIdToLinkInMapping.insert(link->uid(), link);
-
-            // Update the list of links between agents in the global mapping for this link name
-            QList<LinkVM*> linksWithSameName = getLinksInMappingFromName(linkName);
-            linksWithSameName.append(link);
-            _hashFromNameToListOfLinksInMapping.insert(linkName, linksWithSameName);
-        }
-        else {
-            qWarning() << "The link" << link->uid() << "already exist";
-        }
+        // Create a link between from action to agent in the mapping
+        _createLinkBetweenTwoObjectsInMapping(linkName,
+                                              outputAction,
+                                              linkOutput,
+                                              inputAgent,
+                                              linkInput);
     }
 }
 
+
+/**
+ * @brief Slot called when a link from an output is dropped over an input on the current mapping
+ * Or when a link to an input is dropped over an output
+ * @param outputAgent
+ * @param linkOutput
+ * @param inputAction
+ * @param linkInput
+ */
 void AgentsMappingController::dropLinkFromAgentToAction(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, ActionInMappingVM* inputAction, LinkInputVM* linkInput)
 {
     if ((outputAgent != nullptr) && (outputAgent->agentsGroupedByName() != nullptr) && (linkOutput != nullptr) && (linkOutput->output() != nullptr)
@@ -611,41 +697,15 @@ void AgentsMappingController::dropLinkFromAgentToAction(AgentInMappingVM* output
     {
         qDebug() << "drop Link from agent" << outputAgent->name() << "." << linkOutput->uid() << "to action" << inputAction->name() << "." << linkInput->uid();
 
-        // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-        QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAgent->name(), linkOutput->uid(), inputAction->name(), linkInput->uid());
+        // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
+        QString linkName = MappingElementM::getLinkNameFromNamesList(outputAgent->name(), linkOutput->name(), inputAction->name(), linkInput->name());
 
-        LinkVM* link = getLinkInMappingFromId(linkId);
-
-        // Check that the link does NOT exist
-        if (link == nullptr)
-        {
-            // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
-            QString linkName = MappingElementM::getLinkNameFromNamesList(outputAgent->name(), linkOutput->name(), inputAction->name(), linkInput->name());
-
-            // Create a new link between two agents
-            link = new LinkVM(linkName,
-                              nullptr,
-                              outputAgent,
-                              linkOutput,
-                              inputAction,
-                              linkInput,
-                              false,
-                              this);
-
-            // Add to the list to update the view (QML)
-            _allLinksInMapping.append(link);
-
-            // Add to the hash table
-            _hashFromIdToLinkInMapping.insert(link->uid(), link);
-
-            // Update the list of links between agents in the global mapping for this link name
-            QList<LinkVM*> linksWithSameName = getLinksInMappingFromName(linkName);
-            linksWithSameName.append(link);
-            _hashFromNameToListOfLinksInMapping.insert(linkName, linksWithSameName);
-        }
-        else {
-            qWarning() << "The link" << link->uid() << "already exist";
-        }
+        // Create a link between from agent to action in the mapping
+        _createLinkBetweenTwoObjectsInMapping(linkName,
+                                              outputAgent,
+                                              linkOutput,
+                                              inputAction,
+                                              linkInput);
     }
 }
 
@@ -887,7 +947,7 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
                 if (link != nullptr)
                 {
                     // Delete this link (between two agents) to cancel the add
-                    _deleteLinkBetweenTwoAgents(link);
+                    _deleteLinkBetweenTwoObjectsInMapping(link);
                 }
             }
 
@@ -1090,7 +1150,7 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
                                 if (link != nullptr)
                                 {
                                     // Delete this link (between two agents) to cancel the add
-                                    _deleteLinkBetweenTwoAgents(link);
+                                    _deleteLinkBetweenTwoObjectsInMapping(link);
                                 }
                             }
 
@@ -1347,8 +1407,8 @@ void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElemen
                                 }
                             }
 
-                            // Delete the link between two agents
-                            _deleteLinkBetweenTwoAgents(link);
+                            // Delete the link between two agents in the mapping
+                            _deleteLinkBetweenTwoObjectsInMapping(link);
                         }
                         // The global mapping is NOT activated
                         else
@@ -1471,8 +1531,8 @@ void AgentsMappingController::_onLinkInputsListWillBeRemoved(const QList<LinkInp
                 AgentInMappingVM* inputAgent = qobject_cast<AgentInMappingVM*>(link->inputObject());
                 if ((inputAgent != nullptr) && (inputAgent == agentInMapping) && removedLinkInputs.contains(link->linkInput()))
                 {
-                    // Delete the link between two agents
-                    _deleteLinkBetweenTwoAgents(link);
+                    // Delete the link between two agents in the mapping
+                    _deleteLinkBetweenTwoObjectsInMapping(link);
                 }
             }
         }
@@ -1505,8 +1565,8 @@ void AgentsMappingController::_onLinkOutputsListWillBeRemoved(const QList<LinkOu
                         _addWaitingMappingElementOnOutputAgent(link->outputObject()->name(), link->mappingElement());
                     }
 
-                    // Delete the link between two agents
-                    _deleteLinkBetweenTwoAgents(link);
+                    // Delete the link between two agents in the mapping
+                    _deleteLinkBetweenTwoObjectsInMapping(link);
                 }
             }
         }
@@ -1555,31 +1615,31 @@ AgentInMappingVM* AgentsMappingController::_createAgentInMappingAtPosition(Agent
 
 
 /**
- * @brief Create a link between two agents
+ * @brief Create a link between two objects in the mapping
  * @param linkName
- * @param outputAgent
+ * @param outputObject
  * @param linkOutput
- * @param inputAgent
+ * @param inputObject
  * @param linkInput
  * @param mappingElement
  * @param isTemporary
  * @return
  */
-LinkVM* AgentsMappingController::_createLinkBetweenTwoAgents(const QString& linkName,
-                                                             AgentInMappingVM* outputAgent,
-                                                             LinkOutputVM* linkOutput,
-                                                             AgentInMappingVM* inputAgent,
-                                                             LinkInputVM* linkInput,
-                                                             MappingElementVM* mappingElement,
-                                                             bool isTemporary)
+LinkVM* AgentsMappingController::_createLinkBetweenTwoObjectsInMapping(const QString& linkName,
+                                                                       ObjectInMappingVM* outputObject,
+                                                                       LinkOutputVM* linkOutput,
+                                                                       ObjectInMappingVM* inputObject,
+                                                                       LinkInputVM* linkInput,
+                                                                       MappingElementVM* mappingElement,
+                                                                       bool isTemporary)
 {
     LinkVM* link = nullptr;
 
-    if ((outputAgent != nullptr) && (linkOutput != nullptr)
-            && (inputAgent != nullptr) && (linkInput != nullptr))
+    if ((outputObject != nullptr) && (linkOutput != nullptr)
+            && (inputObject != nullptr) && (linkInput != nullptr))
     {
-        // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-        QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAgent->name(), linkOutput->uid(), inputAgent->name(), linkInput->uid());
+        // Get the link id (with format "outputObject##output::outputType-->inputObject##input::inputType") from object names and Input/Output ids
+        QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputObject->name(), linkOutput->uid(), inputObject->name(), linkInput->uid());
 
         link = getLinkInMappingFromId(linkId);
 
@@ -1589,9 +1649,9 @@ LinkVM* AgentsMappingController::_createLinkBetweenTwoAgents(const QString& link
             // Create a new link between two agents
             link = new LinkVM(linkName,
                               mappingElement,
-                              outputAgent,
+                              outputObject,
                               linkOutput,
-                              inputAgent,
+                              inputObject,
                               linkInput,
                               isTemporary,
                               this);
@@ -1617,10 +1677,10 @@ LinkVM* AgentsMappingController::_createLinkBetweenTwoAgents(const QString& link
 
 
 /**
- * @brief Delete a link between two agents
+ * @brief Delete a link between two objects in the mapping
  * @param link
  */
-void AgentsMappingController::_deleteLinkBetweenTwoAgents(LinkVM* link)
+void AgentsMappingController::_deleteLinkBetweenTwoObjectsInMapping(LinkVM* link)
 {
     if (link != nullptr)
     {
@@ -1658,7 +1718,6 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
     {
         qDebug() << "Remove all Links with agent" << agent->name();
 
-        // We have to delete the link to clean our HMI
         for (LinkVM* link : _allLinksInMapping.toList())
         {
             if ( (link != nullptr) && ((link->outputObject() == agent) || (link->inputObject() == agent)) )
@@ -1669,7 +1728,8 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
                    _addWaitingMappingElementOnOutputAgent(link->outputObject()->name(), link->mappingElement());
                 }
 
-                _deleteLinkBetweenTwoAgents(link);
+                // Delete the link between two objects in the mapping
+                _deleteLinkBetweenTwoObjectsInMapping(link);
             }
         }
 
@@ -1832,12 +1892,12 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
                         if (linkInput != nullptr)
                         {
                             // Create a new REAL link between the two agents
-                            _createLinkBetweenTwoAgents(linkName,
-                                                        outputAgent,
-                                                        linkOutput,
-                                                        inputAgent,
-                                                        linkInput,
-                                                        mappingElement);
+                            _createLinkBetweenTwoObjectsInMapping(linkName,
+                                                                  outputAgent,
+                                                                  linkOutput,
+                                                                  inputAgent,
+                                                                  linkInput,
+                                                                  mappingElement);
 
                             // Remove eventually the corresponding "Waiting Mapping Element" on the output agent name
                             _removeWaitingMappingElementOnOutputAgent(outputAgent->name(), mappingElement);
@@ -1946,12 +2006,12 @@ void AgentsMappingController::_linkAgentOnOutputs(AgentInMappingVM* agentInMappi
                         if ((linkOutput != nullptr) && (linkInput != nullptr))
                         {
                             // Create a new REAL link between the two agents
-                            _createLinkBetweenTwoAgents(linkName,
-                                                        agentInMapping,
-                                                        linkOutput,
-                                                        inputAgent,
-                                                        linkInput,
-                                                        waitingMappingElement);
+                            _createLinkBetweenTwoObjectsInMapping(linkName,
+                                                                  agentInMapping,
+                                                                  linkOutput,
+                                                                  inputAgent,
+                                                                  linkInput,
+                                                                  waitingMappingElement);
 
                             // Remove the corresponding "Waiting Mapping Element" on the output agent name
                             _removeWaitingMappingElementOnOutputAgent(agentName, waitingMappingElement);

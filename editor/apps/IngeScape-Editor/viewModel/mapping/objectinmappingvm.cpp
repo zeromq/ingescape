@@ -29,7 +29,7 @@ ObjectInMappingVM::ObjectInMappingVM(QString name,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Object" << _name << "in the global mapping";
+    //qInfo() << "New Object" << _name << "in the global mapping";
 }
 
 
@@ -38,5 +38,5 @@ ObjectInMappingVM::ObjectInMappingVM(QString name,
  */
 ObjectInMappingVM::~ObjectInMappingVM()
 {
-    qInfo() << "Delete Object" << _name << "in the global mapping";
+    //qInfo() << "Delete Object" << _name << "in the global mapping";
 }

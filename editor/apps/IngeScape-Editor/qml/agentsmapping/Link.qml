@@ -228,7 +228,7 @@ I2CubicBezierCurve {
         if ((event.key === Qt.Key_Backspace) || (event.key === Qt.Key_Delete))
         {
             if (controller && controller.selectedLink) {
-                controller.removeLinkBetweenTwoAgents(controller.selectedLink);
+                controller.removeLinkBetweenTwoObjectsInMapping(controller.selectedLink);
             }
 
             event.accepted = true;
