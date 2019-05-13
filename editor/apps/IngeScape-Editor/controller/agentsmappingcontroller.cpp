@@ -215,10 +215,8 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
  * @param link
  * @return true if the link has been deleted during the call of our method
  */
-bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
+void AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
 {
-    bool linkHasBeenDeleted = false;
-
     if ((link != nullptr)
             && (link->inputObject() != nullptr) && (link->linkInput() != nullptr)
             && (link->outputObject() != nullptr) && (link->linkOutput() != nullptr))
@@ -272,13 +270,9 @@ bool AgentsMappingController::removeLinkBetweenTwoAgents(LinkVM* link)
 
                 // Delete the link between two agents
                 _deleteLinkBetweenTwoAgents(link);
-
-                linkHasBeenDeleted = true;
             }
         }
     }
-
-    return linkHasBeenDeleted;
 }
 
 

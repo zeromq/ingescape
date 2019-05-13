@@ -101,9 +101,8 @@ public:
     /**
      * @brief Remove a link between two agents from the mapping
      * @param link
-     * @return true if the link has been deleted during the call of our method
      */
-    Q_INVOKABLE bool removeLinkBetweenTwoAgents(LinkVM* link);
+    Q_INVOKABLE void removeLinkBetweenTwoAgents(LinkVM* link);
 
 
     /**
@@ -136,6 +135,13 @@ public:
     Q_INVOKABLE void dropLinkBetweenTwoActions(ActionInMappingVM* outputAction, LinkOutputVM* linkOutput, ActionInMappingVM* inputAction, LinkInputVM* linkInput);
     Q_INVOKABLE void dropLinkFromActionToAgent(ActionInMappingVM* outputAction, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput);
     Q_INVOKABLE void dropLinkFromAgentToAction(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, ActionInMappingVM* inputAction, LinkInputVM* linkInput);
+
+
+    /**
+     * @brief Remove a link between two actions in the mapping
+     * @param link
+     */
+    //Q_INVOKABLE void removeLinkBetweenTwoActions(LinkVM* link);
 
 
     /**

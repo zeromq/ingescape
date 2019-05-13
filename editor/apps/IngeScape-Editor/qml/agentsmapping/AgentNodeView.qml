@@ -368,7 +368,7 @@ Rectangle {
                                 secondPoint: Qt.point(myModel.position.x, myModel.position.y)
                                 firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width, draggablePointFROM.y + draggablePointFROM.height/2)
 
-                                defaultColor:linkPoint.color
+                                defaultColor: linkPoint.color
                             }
                         }
 
@@ -415,7 +415,8 @@ Rectangle {
                                 {
                                     var dragItem = drag.source;
 
-                                    if ((typeof dragItem.dragActive !== 'undefined') && dragItem.outputSlotModel.canLinkWith(inputSlotItem.myModel))
+                                    if ((typeof dragItem.dragActive !== 'undefined') && dragItem.outputSlotModel
+                                            && dragItem.outputSlotModel.canLinkWith(inputSlotItem.myModel))
                                     {
                                         dragItem.color = dragItem.border.color;
                                         linkPoint.border.width = 2;
@@ -423,7 +424,7 @@ Rectangle {
                                     }
                                     else
                                     {
-                                        console.log("(agent) inputDropArea: no dragActive " + dragItem.agent)
+                                        console.log("(agent) inputDropArea: can NOT Link " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel)
                                     }
                                 }
                                 else
@@ -434,7 +435,8 @@ Rectangle {
 
                             onExited: {
                                 var dragItem = drag.source;
-                                if (typeof dragItem.dragActive !== 'undefined')
+
+                                if (dragItem && (typeof dragItem.dragActive !== 'undefined'))
                                 {
                                     dragItem.color = "transparent";
                                     linkPoint.border.width = 0;
@@ -444,16 +446,25 @@ Rectangle {
 
                             onDropped: {
                                 var dragItem = drag.source;
-                                if (dragItem)
-                                {
-                                    if ((typeof dragItem.outputSlotModel !== 'undefined') && dragItem.agentInMappingVMOfOutput && rootItem.agentMappingVM)
-                                    {
-                                        dragItem.color = "transparent";
-                                        linkPoint.border.width = 0;
-                                        linkPoint.scale = 1;
 
-                                        console.log("(agent) inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
+                                if (dragItem && (typeof dragItem.outputSlotModel !== 'undefined')
+                                        && controller && rootItem.agentMappingVM && inputSlotItem.myModel)
+                                {
+                                    dragItem.color = "transparent";
+                                    linkPoint.border.width = 0;
+                                    linkPoint.scale = 1;
+
+                                    // Agent
+                                    if (dragItem.agentInMappingVMOfOutput)
+                                    {
+                                        //console.log("(agent) inputDropArea: create a link from " + dragItem.agentInMappingVMOfOutput + "." + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
                                         controller.dropLinkBetweenTwoAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
+                                    }
+                                    // Action
+                                    else if (dragItem.actionInMappingVMOfOutput)
+                                    {
+                                        //console.log("(agent) inputDropArea: create a link from " + dragItem.actionInMappingVMOfOutput + "." + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
+                                        controller.dropLinkFromActionToAgent(dragItem.actionInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
                                     }
                                 }
                             }
@@ -615,7 +626,7 @@ Rectangle {
                                 firstPoint: Qt.point(myModel.position.x, myModel.position.y)
                                 secondPoint: Qt.point(draggablePointTO.x, draggablePointTO.y + draggablePointTO.height/2)
 
-                                defaultColor:linkPointOut.color
+                                defaultColor: linkPointOut.color
                             }
                         }
 
@@ -675,7 +686,8 @@ Rectangle {
                                 {
                                     var dragItem = drag.source;
 
-                                    if ((typeof dragItem.dragActive !== 'undefined') && outputSlotItem.myModel.canLinkWith(dragItem.inputSlotModel))
+                                    if ((typeof dragItem.dragActive !== 'undefined') && outputSlotItem.myModel
+                                            && outputSlotItem.myModel.canLinkWith(dragItem.inputSlotModel))
                                     {
                                         dragItem.color = dragItem.border.color;
                                         linkPointOut.border.width = 2;
@@ -683,7 +695,7 @@ Rectangle {
                                     }
                                     else
                                     {
-                                        console.log("(agent) outputDropArea: no dragActive " + dragItem.agent)
+                                        console.log("(agent) outputDropArea: can NOT Link " + outputSlotItem.myModel + " and " + dragItem.inputSlotModel)
                                     }
                                 }
                                 else
@@ -694,7 +706,8 @@ Rectangle {
 
                             onExited: {
                                 var dragItem = drag.source;
-                                if (typeof dragItem.dragActive !== 'undefined')
+
+                                if (dragItem && (typeof dragItem.dragActive !== 'undefined'))
                                 {
                                     dragItem.color = "transparent";
                                     linkPointOut.border.width = 0;
@@ -704,22 +717,29 @@ Rectangle {
 
                             onDropped: {
                                 var dragItem = drag.source;
-                                if (dragItem)
-                                {
-                                    if ((typeof dragItem.inputSlotModel !== 'undefined') && controller && rootItem.agentMappingVM && outputSlotItem.myModel)
-                                    {
-                                        dragItem.color = "transparent";
-                                        linkPointOut.border.width = 0;
-                                        linkPointOut.scale = 1;
 
-                                        console.log("(agent) outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
+                                if (dragItem && (typeof dragItem.inputSlotModel !== 'undefined')
+                                        && controller && rootItem.agentMappingVM && outputSlotItem.myModel)
+                                {
+                                    dragItem.color = "transparent";
+                                    linkPointOut.border.width = 0;
+                                    linkPointOut.scale = 1;
+
+                                    // Agent
+                                    if (dragItem.agentInMappingVMOfInput)
+                                    {
+                                        //console.log("(agent) outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.agentInMappingVMOfInput + "." + dragItem.inputSlotModel);
                                         controller.dropLinkBetweenTwoAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
+                                    }
+                                    // Action
+                                    else if (dragItem.actionInMappingVMOfInput)
+                                    {
+                                        //console.log("(agent) outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.actionInMappingVMOfInput + "." + dragItem.inputSlotModel);
+                                        controller.dropLinkFromAgentToAction(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.actionInMappingVMOfInput, dragItem.inputSlotModel);
                                     }
                                 }
                             }
                         }
-
-
 
 
 

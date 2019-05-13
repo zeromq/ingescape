@@ -225,7 +225,7 @@ I2CubicBezierCurve {
 
     // Remove selected map between IOP
     Keys.onPressed: {
-        if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
+        if ((event.key === Qt.Key_Backspace) || (event.key === Qt.Key_Delete))
         {
             if (controller && controller.selectedLink) {
                 controller.removeLinkBetweenTwoAgents(controller.selectedLink);
