@@ -106,13 +106,6 @@ public:
 
 
     /**
-     * @brief Remove a link between two agents from the mapping
-     * @param link
-     */
-    Q_INVOKABLE void removeLinkBetweenTwoAgents(LinkVM* link);
-
-
-    /**
      * @brief Remove a link between two objects in the mapping
      * @param link
      */
@@ -386,6 +379,13 @@ private:
                                                   LinkInputVM* linkInput,
                                                   MappingElementVM* mappingElement = nullptr,
                                                   bool isTemporary = false);
+
+
+    /**
+     * @brief Remove a link between two agents from the mapping
+     * @param link
+     */
+    void _removeLinkBetweenTwoAgents(LinkVM* link);
 
 
     /**
