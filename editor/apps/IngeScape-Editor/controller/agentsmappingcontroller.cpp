@@ -701,6 +701,10 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
 
     if ((_jsonHelper != nullptr) && (_modelManager != nullptr))
     {
+        // Copy the list of links
+        QList<LinkVM*> linksList = _allLinksInMapping.toList();
+
+        // List of agents and their mapping
         for (AgentInMappingVM* agentInMapping : _allAgentsInMapping)
         {
             if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr) && (agentInMapping->agentsGroupedByName()->currentMapping() != nullptr))
@@ -750,6 +754,60 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
                 jsonArray.append(jsonAgent);
             }
         }
+
+        // List of actions and their mapping
+        for (ActionInMappingVM* actionInMapping : _allActionsInMapping)
+        {
+            if ((actionInMapping != nullptr) && (actionInMapping->action() != nullptr))
+            {
+                QJsonObject jsonAction;
+
+                // Set the action name and unique id
+                //jsonAction.insert("actionName", actionInMapping->name());
+                jsonAction.insert("actionName", actionInMapping->action()->name());
+                jsonAction.insert("actionUID", actionInMapping->action()->uid());
+
+                // Set the position
+                QString position = QString("%1, %2").arg(QString::number(actionInMapping->position().x()), QString::number(actionInMapping->position().y()));
+                jsonAction.insert("position", position);
+
+                // Set the mapping
+                QJsonArray jsonMapping = QJsonArray();
+
+                for (LinkVM* link : linksList)
+                {
+                    if ((link != nullptr) && (link->inputObject() != nullptr) && (link->inputObject() == actionInMapping)
+                            && (link->outputObject() != nullptr))
+                    {
+                        QJsonObject jsonMappingElement;
+
+                        //jsonMappingElement.insert("input_action", actionInMapping->name());
+                        jsonMappingElement.insert("input", link->linkInput()->name());
+
+                        //jsonMappingElement.insert("output_object", link->outputObject()->name());
+
+                        // Property "output" is defined --> From Agent to Action
+                        if (link->linkOutput()->output() != nullptr) {
+                            jsonMappingElement.insert("output_agent", link->outputObject()->name());
+                        }
+                        // Property "output" is null --> From Action to Action
+                        else {
+                            jsonMappingElement.insert("output_action", link->outputObject()->name());
+                        }
+                        jsonMappingElement.insert("output", link->linkOutput()->name());
+
+                        jsonMapping.append(jsonMappingElement);
+
+                        // FIXME: remove list element during traversal
+                        linksList.removeOne(link);
+                    }
+                }
+
+                jsonAction.insert("mapping", jsonMapping);
+
+                jsonArray.append(jsonAction);
+            }
+        }
     }
     return jsonArray;
 }
@@ -769,53 +827,116 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
         {
             if (jsonValue.isObject())
             {
-                QJsonObject jsonAgent = jsonValue.toObject();
+                QJsonObject jsonObjectInMapping = jsonValue.toObject();
 
-                // Get values for keys "agentName", "mapping" and "position"
-                QJsonValue jsonName = jsonAgent.value("agentName");
-                QJsonValue jsonMapping = jsonAgent.value("mapping");
-                QJsonValue jsonPosition = jsonAgent.value("position");
+                // Get values for keys "mapping" and "position"
+                QJsonValue jsonMapping = jsonObjectInMapping.value("mapping");
+                QJsonValue jsonPosition = jsonObjectInMapping.value("position");
 
-                if (jsonName.isString() && jsonMapping.isObject() && jsonPosition.isString())
+                // Agent
+                if (jsonObjectInMapping.contains("agentName"))
                 {
-                    QString agentName = jsonName.toString();
+                    // Get value for key "agentName"
+                    QJsonValue jsonName = jsonObjectInMapping.value("agentName");
 
-                    // Create the agent mapping from JSON
-                    AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMappingFromJSON(agentName, jsonMapping.toObject());
-
-                    // Position
-                    QPointF position = QPointF();
-
-                    QStringList positionStringList = jsonPosition.toString().split(", ");
-                    if (positionStringList.count() == 2)
+                    if (jsonName.isString() && jsonMapping.isObject() && jsonPosition.isString())
                     {
-                        QString strX = positionStringList.at(0);
-                        QString strY = positionStringList.at(1);
+                        QString agentName = jsonName.toString();
 
-                        if (!strX.isEmpty() && !strY.isEmpty()) {
-                            position = QPointF(static_cast<qreal>(strX.toFloat()), static_cast<qreal>(strY.toFloat()));
+                        // Create the agent mapping from JSON
+                        AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMappingFromJSON(agentName, jsonMapping.toObject());
+
+                        // Position
+                        QPointF position = QPointF();
+
+                        QStringList positionStringList = jsonPosition.toString().split(", ");
+                        if (positionStringList.count() == 2)
+                        {
+                            QString strX = positionStringList.at(0);
+                            QString strY = positionStringList.at(1);
+
+                            if (!strX.isEmpty() && !strY.isEmpty()) {
+                                position = QPointF(static_cast<qreal>(strX.toFloat()), static_cast<qreal>(strY.toFloat()));
+                            }
+                        }
+
+                        // Get the (view model of) agents grouped for this name
+                        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
+
+                        if ((agentsGroupedByName != nullptr) && !position.isNull())
+                        {
+                            //qDebug() << "Position:" << position.x() << position.y() << "is defined for" << agentName << "with" << agentsGroupedByName->models()->count() << "models";
+
+                            // Create a new agent in the global mapping (with the "Agents Grouped by Name") at a specific position
+                            AgentInMappingVM* agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position);
+
+
+                            // If there are some mapping elements, save the pair [agent, its mapping] in the list
+                            // We will create the corresponding links when all agents would have been added to the global mapping
+                            if ((agentInMapping != nullptr) && (agentMapping != nullptr) && !agentMapping->mappingElements()->isEmpty())
+                            {
+                                QPair<AgentInMappingVM*, AgentMappingM*> pair = QPair<AgentInMappingVM*, AgentMappingM*>(agentInMapping, agentMapping);
+
+                                listOfAgentsAndMappings.append(pair);
+                            }
                         }
                     }
+                }
+                // Action
+                else if (jsonObjectInMapping.contains("actionName"))
+                {
+                    // Get value for key "actionName"
+                    QJsonValue jsonName = jsonObjectInMapping.value("actionName");
 
-                    // Get the (view model of) agents grouped for this name
-                    AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
-
-                    if ((agentsGroupedByName != nullptr) && !position.isNull())
+                    if (jsonName.isString() && jsonMapping.isArray() && jsonPosition.isString())
                     {
-                        //qDebug() << "Position:" << position.x() << position.y() << "is defined for" << agentName << "with" << agentsGroupedByName->models()->count() << "models";
+                        QString actionName = jsonName.toString();
 
-                        // Create a new agent in the global mapping (with the "Agents Grouped by Name") at a specific position
-                        AgentInMappingVM* agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position);
-
-
-                        // If there are some mapping elements, save the pair [agent, its mapping] in the list
-                        // We will create the corresponding links when all agents would have been added to the global mapping
-                        if ((agentInMapping != nullptr) && (agentMapping != nullptr) && !agentMapping->mappingElements()->isEmpty())
+                        // Traverse the list of mapping elements
+                        for (QJsonValue jsonIterator : jsonMapping.toArray())
                         {
-                            QPair<AgentInMappingVM*, AgentMappingM*> pair = QPair<AgentInMappingVM*, AgentMappingM*>(agentInMapping, agentMapping);
-
-                            listOfAgentsAndMappings.append(pair);
+                            QJsonObject jsonMappingElement = jsonIterator.toObject();
+                            if (jsonMappingElement.contains("output_agent"))
+                            {
+                                QJsonValue jsonOutputAgent = jsonMappingElement.value("output_agent");
+                                QJsonValue jsonOutput = jsonMappingElement.value("output");
+                                qDebug() << "Link Agent" << jsonOutputAgent.toString() << "." << jsonOutput.toString() << "to Action" << actionName;
+                            }
+                            else if (jsonMappingElement.contains("output_action"))
+                            {
+                                QJsonValue jsonOutputAction = jsonMappingElement.value("output_action");
+                                QJsonValue jsonOutput = jsonMappingElement.value("output");
+                                qDebug() << "Link Action" << jsonOutputAction.toString() << "." << jsonOutput.toString() << "to Action" << actionName;
+                            }
+                            else {
+                                qCritical() << "The JSON mapping element for action" << actionName << "is bad formatted !";
+                            }
                         }
+
+                        // Position
+                        QPointF position = QPointF();
+
+                        QStringList positionStringList = jsonPosition.toString().split(", ");
+                        if (positionStringList.count() == 2)
+                        {
+                            QString strX = positionStringList.at(0);
+                            QString strY = positionStringList.at(1);
+
+                            if (!strX.isEmpty() && !strY.isEmpty()) {
+                                position = QPointF(static_cast<qreal>(strX.toFloat()), static_cast<qreal>(strY.toFloat()));
+                            }
+                        }
+
+                        // Get the (model of) action for this name
+                        //ActionM* action = _modelManager->getActionForName(actionName);
+
+                        /*if ((action != nullptr) && !position.isNull())
+                        {
+                            //qDebug() << "Position:" << position.x() << position.y() << "is defined for" << actionName << "with" << action;
+
+                            // Create a new agent in the global mapping (with the "Agents Grouped by Name") at a specific position
+                            ActionInMappingVM* actionInMapping = dropActionToMappingAtPosition(action, position);
+                        }*/
                     }
                 }
             }
