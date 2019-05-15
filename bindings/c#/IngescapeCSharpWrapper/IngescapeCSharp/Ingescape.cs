@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace IngescapeCSharp
 {
@@ -378,17 +380,6 @@ namespace IngescapeCSharp
          - debug : Information that is diagnostically helpful to people more than just developers but useless for system monitoring.
          - trace : Information about parts of functions, for detailed diagnostic only.
          */
-        /*TODO : implement
-        typedef enum {
-           IGS_LOG_TRACE = 0,
-           IGS_LOG_DEBUG,
-           IGS_LOG_INFO,
-           IGS_LOG_WARN,
-           IGS_LOG_ERROR,
-           IGS_LOG_FATAL
-        }
-        igs_logLevel_t;
-        */
 
         //set/get library parameters
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -396,31 +387,37 @@ namespace IngescapeCSharp
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool igs_isVerbose();
 
-        //PUBLIC void igs_setUseColorVerbose(bool useColor); //use colors in console
-        //PUBLIC bool igs_getUseColorVerbose(void);
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_setUseColorVerbose(bool useColor); //use colors in console
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool igs_getUseColorVerbose();
 
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void igs_setLogStream(bool useLogStream); //enable logs in socket stream
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool igs_getLogStream();
 
-        //PUBLIC void igs_setLogInFile(bool useLogFile); //enable logs in file
-        //PUBLIC bool igs_getLogInFile(void);
-        //PUBLIC void igs_setLogPath(const char* path); //default directory is ~/ on UNIX systems and current PATH on Windows
-        //PUBLIC char* igs_getLogPath(void); // must be freed by caller
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_setLogInFile(bool useLogFile); //enable logs in file
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool igs_getLogInFile();
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_setLogPath(string path); //default directory is ~/ on UNIX systems and current PATH on Windows
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr igs_getLogPath(); // must be freed by caller
 
-        //PUBLIC void igs_setLogLevel(igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
-        //PUBLIC igs_logLevel_t igs_getLogLevel(void);
-        //PUBLIC void igs_log(igs_logLevel_t, const char* function, const char* format, ...)  CHECK_PRINTF(3);
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_setLogLevel(igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern igs_logLevel_t igs_getLogLevel();
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void igs_log(igs_logLevel_t logLevel, string function, string message, params object[] args);
 
-        //#define igs_trace(...) igs_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
-        //#define igs_debug(...) igs_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)
-        //#define igs_info(...)  igs_log(IGS_LOG_INFO, __func__, __VA_ARGS__)
-        //#define igs_warn(...)  igs_log(IGS_LOG_WARN, __func__, __VA_ARGS__)
-        //#define igs_error(...) igs_log(IGS_LOG_ERROR, __func__, __VA_ARGS__)
-        //#define igs_fatal(...) igs_log(IGS_LOG_FATAL, __func__, __VA_ARGS__)
-
+        public static void igs_trace(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_TRACE, memberName, message); }
+        public static void igs_debug(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_DEBUG, memberName, message); }
+        public static void igs_info(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_INFO, memberName, message); }
+        public static void igs_warn(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_WARN, memberName, message); }
+        public static void igs_error(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_ERROR, memberName, message); }
+        public static void igs_fatal(string message, [CallerMemberName] string memberName = "") {igs_log(igs_logLevel_t.IGS_LOG_FATAL, memberName, message);}
     }
 }

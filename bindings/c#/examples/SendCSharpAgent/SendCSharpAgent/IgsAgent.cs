@@ -63,10 +63,36 @@ namespace SendCSharpAgent
             //Load mapping from file
             Ingescape.igs_loadMappingFromPath("../igs-csharp-sample-mapping.json");
 
-            //Log
-            //Ingescape.igs_setLogLevel(IGS_LOG_TRACE);
-            //Ingescape.igs_setLogInFile(true);
+            //Verbose
+            Ingescape.igs_setVerbose(true);
+            bool isVerbose = Ingescape.igs_isVerbose();
+            Console.WriteLine("Is verbose : " + isVerbose);
+
+            //Color Verbose
+            Ingescape.igs_setUseColorVerbose(true);
+            bool isColorVerbose = Ingescape.igs_getUseColorVerbose();
+            Console.WriteLine("Is colored verbose : " + isColorVerbose);
+
+            //Log Stream
             Ingescape.igs_setLogStream(true);
+            bool isLogStream = Ingescape.igs_getLogStream();
+            Console.WriteLine("Is log stream : " + isLogStream);
+
+            //Log in file
+            Ingescape.igs_setLogInFile(true);
+            bool isLogFile = Ingescape.igs_getLogInFile();
+            Console.WriteLine("Is log file : " + isLogFile);
+
+            //Log path
+            Ingescape.igs_setLogPath("testLogFile.txt");
+            IntPtr logPathPtr = Ingescape.igs_getLogPath();
+            string logPath = Marshal.PtrToStringAnsi(logPathPtr);
+            Console.WriteLine("Log file path : " + logPath);
+
+            //Log level
+            Ingescape.igs_setLogLevel(igs_logLevel_t.IGS_LOG_TRACE);
+            igs_logLevel_t logLevel = Ingescape.igs_getLogLevel();
+            Console.WriteLine("Log level : " + logLevel);
 
             //Start the agent on the network
             Ingescape.igs_startWithDevice("Ethernet", 5670);
@@ -74,7 +100,12 @@ namespace SendCSharpAgent
 
         public void writeInLog(string msg)
         {
-            Ingescape.igs_log(igs_logLevel_t.IGS_LOG_ERROR, "test function", msg);
+            //Test the log file function
+            Ingescape.igs_log(igs_logLevel_t.IGS_LOG_WARN, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+
+            //Test the function like macro function wrapping
+            Ingescape.igs_warn(msg);
+
             Console.WriteLine("write in log : " + msg);
         }
 
