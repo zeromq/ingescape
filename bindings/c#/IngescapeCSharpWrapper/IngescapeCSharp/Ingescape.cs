@@ -9,6 +9,7 @@ namespace IngescapeCSharp
 {
     public enum iop_t { IGS_INPUT_T = 1, IGS_OUTPUT_T, IGS_PARAMETER_T };
     public enum iopType_t { IGS_INTEGER_T = 1, IGS_DOUBLE_T, IGS_STRING_T, IGS_BOOL_T, IGS_IMPULSION_T, IGS_DATA_T };
+    public enum igs_logLevel_t{IGS_LOG_TRACE = 0,IGS_LOG_DEBUG,IGS_LOG_INFO,IGS_LOG_WARN,IGS_LOG_ERROR,IGS_LOG_FATAL};
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     public delegate void igs_observeCallback(iop_t iopType,
@@ -395,25 +396,31 @@ namespace IngescapeCSharp
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool igs_isVerbose();
 
-        /*
-        PUBLIC void igs_setUseColorVerbose(bool useColor); //use colors in console
-        PUBLIC bool igs_getUseColorVerbose(void);
-        PUBLIC void igs_setLogStream(bool useLogStream); //enable logs in socket stream
-        PUBLIC bool igs_getLogStream(void);
-        PUBLIC void igs_setLogInFile(bool useLogFile); //enable logs in file
-        PUBLIC bool igs_getLogInFile(void);
-        PUBLIC void igs_setLogPath(const char* path); //default directory is ~/ on UNIX systems and current PATH on Windows
-        PUBLIC char* igs_getLogPath(void); // must be freed by caller
+        //PUBLIC void igs_setUseColorVerbose(bool useColor); //use colors in console
+        //PUBLIC bool igs_getUseColorVerbose(void);
 
-        PUBLIC void igs_setLogLevel(igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
-        PUBLIC igs_logLevel_t igs_getLogLevel(void);
-        PUBLIC void igs_log(igs_logLevel_t, const char* function, const char* format, ...)  CHECK_PRINTF(3);
-        #define igs_trace(...) igs_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
-        #define igs_debug(...) igs_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)
-        #define igs_info(...)  igs_log(IGS_LOG_INFO, __func__, __VA_ARGS__)
-        #define igs_warn(...)  igs_log(IGS_LOG_WARN, __func__, __VA_ARGS__)
-        #define igs_error(...) igs_log(IGS_LOG_ERROR, __func__, __VA_ARGS__)
-        #define igs_fatal(...) igs_log(IGS_LOG_FATAL, __func__, __VA_ARGS__)
-        */
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_setLogStream(bool useLogStream); //enable logs in socket stream
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool igs_getLogStream();
+
+        //PUBLIC void igs_setLogInFile(bool useLogFile); //enable logs in file
+        //PUBLIC bool igs_getLogInFile(void);
+        //PUBLIC void igs_setLogPath(const char* path); //default directory is ~/ on UNIX systems and current PATH on Windows
+        //PUBLIC char* igs_getLogPath(void); // must be freed by caller
+
+        //PUBLIC void igs_setLogLevel(igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
+        //PUBLIC igs_logLevel_t igs_getLogLevel(void);
+        //PUBLIC void igs_log(igs_logLevel_t, const char* function, const char* format, ...)  CHECK_PRINTF(3);
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_log(igs_logLevel_t logLevel, string function, string message, params object[] args);
+
+        //#define igs_trace(...) igs_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
+        //#define igs_debug(...) igs_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)
+        //#define igs_info(...)  igs_log(IGS_LOG_INFO, __func__, __VA_ARGS__)
+        //#define igs_warn(...)  igs_log(IGS_LOG_WARN, __func__, __VA_ARGS__)
+        //#define igs_error(...) igs_log(IGS_LOG_ERROR, __func__, __VA_ARGS__)
+        //#define igs_fatal(...) igs_log(IGS_LOG_FATAL, __func__, __VA_ARGS__)
+
     }
 }
