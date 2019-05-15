@@ -16,7 +16,6 @@
 
 #include <QDebug>
 #include <QFileDialog>
-#include <misc/ingescapeutils.h>
 
 /**
  * @brief Constructor
@@ -163,19 +162,17 @@ void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
                 // Add each action to our list
                 for (ActionM* actionM : scenarioToImport->actionsList()->toList())
                 {
-                    if (actionM != nullptr)
+                    if ((actionM != nullptr) && (_modelManager->getActionWithId(actionM->uid()) == nullptr))
                     {
-                        // Add action into the list
+                        // Add the action to the model manager
+                        _modelManager->storeNewAction(actionM);
+
+                        // Add the action to the list
                         _actionsList.append(actionM);
 
                         // Add action name
                         if (!_allActionNames.contains(actionM->name())) {
                             _allActionNames.append(actionM->name());
-                        }
-
-                        // Add action into the map
-                        if (!_hashFromUidToModelOfAction.contains(actionM->uid())) {
-                            _hashFromUidToModelOfAction.insert(actionM->uid(), actionM);
                         }
                     }
                 }
@@ -271,7 +268,7 @@ void ScenarioController::importExecutedActionsFromJson(QByteArray byteArrayOfJso
                         qDebug() << "Executed action" << actionId << "on line" << lineIndexInTimeLine << "at" << executionTime << "ms";
 
                         /*// Get the model of action with its (unique) id
-                        ActionM* action = _getModelOfActionWithId(actionId);
+                        ActionM* action = _modelManager->getActionWithId(actionId);
                         if (action != nullptr)
                         {
 
@@ -459,7 +456,7 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
   */
 void ScenarioController::deleteAction(ActionM* action)
 {
-    if (action != nullptr)
+    if ((action != nullptr) && (_modelManager != nullptr))
     {
         int actionId = action->uid();
 
@@ -503,25 +500,15 @@ void ScenarioController::deleteAction(ActionM* action)
             _hashFromUidToViewModelsOfAction.remove(actionId);
         }
 
-        // Delete the action item
-        if (_actionsList.contains(action))
-        {
-            // Remove action form the list
-            _actionsList.remove(action);
+        // Remove the action form the list
+        _actionsList.remove(action);
 
-            // Remove name form the list
-            //_allActionNames.removeAll(action->name());
-            _allActionNames.removeOne(action->name());
+        // Remove the name form the list
+        //_allActionNames.removeAll(action->name());
+        _allActionNames.removeOne(action->name());
 
-            // Remove action form the hash table
-            _hashFromUidToModelOfAction.remove(actionId);
-
-            // Free memory
-            delete action;
-
-            // Free the UID of the action model
-            IngeScapeUtils::freeUIDofActionM(actionId);
-        }
+        // Delete the model of action
+        _modelManager->deleteAction(action);
     }
 }
 
@@ -532,24 +519,24 @@ void ScenarioController::deleteAction(ActionM* action)
   */
 void ScenarioController::validateActionEditor(ActionEditorController* actionEditorC)
 {
-    if (actionEditorC != nullptr)
+    if ((actionEditorC != nullptr) && (_modelManager != nullptr))
     {
         // Validate modification
         actionEditorC->validateModification();
 
         ActionM* originalAction = actionEditorC->originalAction();
-        if ((originalAction != nullptr) && !_actionsList.contains(originalAction))
+        if ((originalAction != nullptr) && (_modelManager->getActionWithId(originalAction->uid()) == nullptr))
         {
-            // Insert into the list
+            // Add the action to the model manager
+            _modelManager->storeNewAction(originalAction);
+
+            // Add the action to the list
             _actionsList.append(originalAction);
 
             // Add action name
             if (!_allActionNames.contains(originalAction->name())) {
                 _allActionNames.append(originalAction->name());
             }
-
-            // Insert into the hash table
-            _hashFromUidToModelOfAction.insert(originalAction->uid(), originalAction);
         }
 
         // Set selected action
@@ -970,14 +957,11 @@ void ScenarioController::clearScenario()
     _hashActionEditorControllerFromViewModelOfAction.clear();
     _openedActionsEditorsControllers.deleteAllItems();
 
-    // Delete all models of action
-    _actionsList.deleteAllItems();
+    // Clear the list of actions
+    _actionsList.clear();
 
     // Clear names list
     _allActionNames.clear();
-
-    // Clear map
-    _hashFromUidToModelOfAction.clear();
 
     // Reset actions in palette
     for (ActionInPaletteVM* actionInPalette : _actionsInPaletteList.toList())
@@ -1191,10 +1175,10 @@ void ScenarioController::onRunAction(QString actionID)
     bool success = false;
     int id = actionID.toInt(&success);
 
-    if (success)
+    if (success && (_modelManager != nullptr))
     {
         // Get the model of action with this (unique) id
-        ActionM* action = _getModelOfActionWithId(id);
+        ActionM* action = _modelManager->getActionWithId(id);
         if (action != nullptr)
         {
             // Execute all effects of the action
@@ -1796,22 +1780,6 @@ void ScenarioController::_executeAction(ActionVM* actionVM, ActionExecutionVM* a
 
         // Notify the action that its effects has been executed
         actionVM->effectsExecuted(currentTimeInMilliSeconds);
-    }
-}
-
-
-/**
- * @brief Get the model of action with its (unique) id
- * @param actionId
- * @return
- */
-ActionM* ScenarioController::_getModelOfActionWithId(int actionId)
-{
-    if (_hashFromUidToModelOfAction.contains(actionId)) {
-        return _hashFromUidToModelOfAction.value(actionId);
-    }
-    else {
-        return nullptr;
     }
 }
 

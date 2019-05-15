@@ -433,14 +433,6 @@ private:
 
 
     /**
-     * @brief Get the model of action with its (unique) id
-     * @param actionId
-     * @return
-     */
-    ActionM* _getModelOfActionWithId(int actionId);
-
-
-    /**
      * @brief Get the list of view models of action with its (unique) id
      * @param actionId
      * @return
@@ -486,9 +478,6 @@ private:
 
     // List of all action names
     QStringList _allActionNames;
-
-    // Hash table from action UID to the corresponding model of action
-    QHash<int, ActionM*> _hashFromUidToModelOfAction;
 
     // Hash table from action UID to the corresponding list of view models of action (in the timeline)
     QHash<int, QList<ActionVM*> > _hashFromUidToViewModelsOfAction;

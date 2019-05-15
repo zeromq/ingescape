@@ -173,6 +173,11 @@ void AgentsMappingController::clearMapping()
         deleteAgentInMapping(agent);
     }
 
+    // 4- Delete all actions in mapping
+    for (ActionInMappingVM* action : _allActionsInMapping.toList()) {
+        deleteActionInMapping(action);
+    }
+
     qInfo() << "The Mapping is empty !";
 }
 
@@ -791,8 +796,15 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
                             jsonMappingElement.insert("output_agent", link->outputObject()->name());
                         }
                         // Property "output" is null --> From Action to Action
-                        else {
+                        else
+                        {
                             jsonMappingElement.insert("output_action", link->outputObject()->name());
+
+                            ActionInMappingVM* outputAction = qobject_cast<ActionInMappingVM*>(link->outputObject());
+                            if ((outputAction != nullptr) && (outputAction->action() != nullptr))
+                            {
+                                jsonMappingElement.insert("output_action_id", outputAction->action()->uid());
+                            }
                         }
                         jsonMappingElement.insert("output", link->linkOutput()->name());
 
@@ -819,7 +831,7 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
  */
 void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping)
 {
-    if (_jsonHelper != nullptr)
+    if ((_modelManager != nullptr) && (_jsonHelper != nullptr))
     {
         QList<QPair<AgentInMappingVM*, AgentMappingM*>> listOfAgentsAndMappings;
 
@@ -887,10 +899,12 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                 {
                     // Get value for key "actionName"
                     QJsonValue jsonName = jsonObjectInMapping.value("actionName");
+                    QJsonValue jsonUID = jsonObjectInMapping.value("actionUID");
 
-                    if (jsonName.isString() && jsonMapping.isArray() && jsonPosition.isString())
+                    if (jsonName.isString() && jsonUID.isDouble() && jsonMapping.isArray() && jsonPosition.isString())
                     {
                         QString actionName = jsonName.toString();
+                        int actionUID = jsonUID.toInt();
 
                         // Traverse the list of mapping elements
                         for (QJsonValue jsonIterator : jsonMapping.toArray())
@@ -905,8 +919,9 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                             else if (jsonMappingElement.contains("output_action"))
                             {
                                 QJsonValue jsonOutputAction = jsonMappingElement.value("output_action");
+                                QJsonValue jsonOutputActionUID = jsonMappingElement.value("output_action_id");
                                 QJsonValue jsonOutput = jsonMappingElement.value("output");
-                                qDebug() << "Link Action" << jsonOutputAction.toString() << "." << jsonOutput.toString() << "to Action" << actionName;
+                                qDebug() << "Link Action" << jsonOutputAction.toString() << "(" << jsonOutputActionUID.toInt() << ")." << jsonOutput.toString() << "to Action" << actionName;
                             }
                             else {
                                 qCritical() << "The JSON mapping element for action" << actionName << "is bad formatted !";
@@ -928,15 +943,16 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                         }
 
                         // Get the (model of) action for this name
-                        //ActionM* action = _modelManager->getActionForName(actionName);
+                        ActionM* action = _modelManager->getActionWithId(actionUID);
 
-                        /*if ((action != nullptr) && !position.isNull())
+                        if ((action != nullptr) && !position.isNull())
                         {
-                            //qDebug() << "Position:" << position.x() << position.y() << "is defined for" << actionName << "with" << action;
+                            qDebug() << "Position:" << position.x() << position.y() << "is defined for" << actionName << "with" << action;
 
                             // Create a new agent in the global mapping (with the "Agents Grouped by Name") at a specific position
-                            ActionInMappingVM* actionInMapping = dropActionToMappingAtPosition(action, position);
-                        }*/
+                            //ActionInMappingVM* actionInMapping = dropActionToMappingAtPosition(action, position);
+                            dropActionToMappingAtPosition(action, position);
+                        }
                     }
                 }
             }

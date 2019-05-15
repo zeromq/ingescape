@@ -128,6 +128,34 @@ public:
 
 
     /**
+     * @brief Get the model of action with its (unique) id
+     * @param actionId
+     * @return
+     */
+    ActionM* getActionWithId(int actionId);
+
+
+    /**
+     * @brief Store a new model of action
+     * @param action
+     */
+    void storeNewAction(ActionM* action);
+
+
+    /**
+     * @brief Delete a model of action
+     * @param action
+     */
+    void deleteAction(ActionM* action);
+
+
+    /**
+     * @brief Delete all (models of) actions
+     */
+    void deleteAllActions();
+
+
+    /**
      * @brief Get the hash table from a name to the group of agents with this name
      * @return
      */
@@ -346,7 +374,7 @@ protected:
     // Path to the root directory to load/save files
     QString _rootDirectoryPath;
 
-    // Map from "peer id" to a model of agent
+    // Map from a "peer id" to a model of agent
     QHash<QString, AgentM*> _hashFromPeerIdToAgent;
 
     // Hash table from a name to the group of agents with this name
@@ -354,6 +382,9 @@ protected:
 
     // Hash table from name to a model of host (corresponding to an INGESCAPE launcher)
     //QHash<QString, HostM*> _hashFromNameToHost;
+
+    // Hash table from an action (Unique) ID to the corresponding model of action
+    QHash<int, ActionM*> _hashFromUidToModelOfAction;
 
 };
 

@@ -19,6 +19,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <I2Quick.h>
+#include <misc/ingescapeutils.h>
 
 
 // Threshold beyond which we consider that there are too many values
@@ -309,6 +310,72 @@ AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString na
     else {
         return nullptr;
     }
+}
+
+
+/**
+ * @brief Get the model of action with its (unique) id
+ * @param actionId
+ * @return
+ */
+ActionM* IngeScapeModelManager::getActionWithId(int actionId)
+{
+    if (_hashFromUidToModelOfAction.contains(actionId)) {
+        return _hashFromUidToModelOfAction.value(actionId);
+    }
+    else {
+        return nullptr;
+    }
+}
+
+
+/**
+ * @brief Store a new model of action
+ * @param action
+ */
+void IngeScapeModelManager::storeNewAction(ActionM* action)
+{
+    if ((action != nullptr) && !_hashFromUidToModelOfAction.contains(action->uid()))
+    {
+        _hashFromUidToModelOfAction.insert(action->uid(), action);
+    }
+}
+
+
+/**
+ * @brief Delete a model of action
+ * @param action
+ */
+void IngeScapeModelManager::deleteAction(ActionM* action)
+{
+    if ((action != nullptr) && _hashFromUidToModelOfAction.contains(action->uid()))
+    {
+        int actionId = action->uid();
+
+        // Remove action form the hash table
+        _hashFromUidToModelOfAction.remove(actionId);
+
+        // Free memory
+        delete action;
+
+        // Free the UID of the action model
+        IngeScapeUtils::freeUIDofActionM(actionId);
+    }
+}
+
+
+/**
+ * @brief Delete all (models of) actions
+ */
+void IngeScapeModelManager::deleteAllActions()
+{
+    //qDeleteAll(_hashFromUidToModelOfAction);
+
+    for (ActionM* action : _hashFromUidToModelOfAction.values())
+    {
+        deleteAction(action);
+    }
+    _hashFromUidToModelOfAction.clear();
 }
 
 

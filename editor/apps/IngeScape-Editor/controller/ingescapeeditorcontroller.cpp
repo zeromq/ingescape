@@ -491,8 +491,12 @@ void IngeScapeEditorController::clearCurrentPlatform()
         _scenarioC->clearScenario();
     }
 
-    // Delete agents OFF
-    if (_modelManager != nullptr) {
+    if (_modelManager != nullptr)
+    {
+        // Delete all actions
+        _modelManager->deleteAllActions();
+
+        // Delete agents OFF
         _modelManager->deleteAgentsOFF();
     }
 
@@ -967,16 +971,16 @@ void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
             _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
         }
 
-        // Import the global mapping (of agents) from JSON
-        if ((_agentsMappingC != nullptr) && jsonRoot.contains("mapping"))
-        {
-            _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
-        }
-
         // Import the scenario from JSON
         if ((_scenarioC != nullptr) && jsonRoot.contains("scenario"))
         {
             _scenarioC->importScenarioFromJson(jsonRoot.value("scenario").toObject());
+        }
+
+        // Import the global mapping (of agents) from JSON
+        if ((_agentsMappingC != nullptr) && jsonRoot.contains("mapping"))
+        {
+            _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
         }
     }
 }
