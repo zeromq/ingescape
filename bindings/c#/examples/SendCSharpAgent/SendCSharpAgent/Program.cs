@@ -11,16 +11,29 @@ namespace SendCSharpAgent
 {
     class Program
     {
-
-
         static void Main(string[] args)
         {
             ConsoleKeyInfo cki;
             Console.Clear();
 
-            Console.WriteLine(" ------------Send c# agent example ------------");
+            Console.WriteLine(" ------------C# agent sample ------------");
 
-            Ingescape.igs_startWithDevice("Ethernet", 5670);
+            //Intanciate Igs agent middleware
+            IgsAgent igsAgent = new IgsAgent();
+
+            //Add inputs, output & parameter dynamically
+            igsAgent.createDefDynamically();
+
+            //Observe all inputs
+            igsAgent.observeInputs();
+
+            //Add mapping dynamically
+            igsAgent.createMappingDynamically();
+
+            //Write on outputs
+            igsAgent.writeOnInputs();
+
+            //Remove mapping dynamically after a while
 
             while (true)
             {
@@ -32,7 +45,7 @@ namespace SendCSharpAgent
                 // Exit if the user pressed the 'X' key.
                 if (cki.Key == ConsoleKey.X)
                 {
-                    Ingescape.igs_stop();
+                    igsAgent.stop();
                     break;
                 }
             }
