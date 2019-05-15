@@ -35,9 +35,11 @@ namespace SendCSharpAgent
 
             //Remove mapping dynamically after a while
 
+            int iteration = 0;
+            string msg = null;
             while (true)
             {
-                Console.Write("Press  'X' to quit \n");
+                Console.Write("Press  'X' to quit \n Press  'A' to write in log \n");
 
                 // Start a console read operation. Do not display the input.
                 cki = Console.ReadKey(true);
@@ -47,6 +49,13 @@ namespace SendCSharpAgent
                 {
                     igsAgent.stop();
                     break;
+                }
+
+                // Exit if the user pressed the 'A' key.
+                if (cki.Key == ConsoleKey.A)
+                {
+                    msg = "log : " + iteration++;
+                    igsAgent.writeInLog(msg);
                 }
             }
         }

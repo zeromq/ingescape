@@ -16,7 +16,7 @@ namespace SendCSharpAgent
         [MarshalAs(UnmanagedType.LPStr)] string name,
         iopType_t valueType,
         IntPtr value,
-        long valueSize,
+        int valueSize,
         IntPtr myData)
         {
             Console.WriteLine("callback test");
@@ -63,8 +63,19 @@ namespace SendCSharpAgent
             //Load mapping from file
             Ingescape.igs_loadMappingFromPath("../igs-csharp-sample-mapping.json");
 
+            //Log
+            //Ingescape.igs_setLogLevel(IGS_LOG_TRACE);
+            //Ingescape.igs_setLogInFile(true);
+            Ingescape.igs_setLogStream(true);
+
             //Start the agent on the network
             Ingescape.igs_startWithDevice("Ethernet", 5670);
+        }
+
+        public void writeInLog(string msg)
+        {
+            Ingescape.igs_log(igs_logLevel_t.IGS_LOG_ERROR, "test function", msg);
+            Console.WriteLine("write in log : " + msg);
         }
 
         public void observeInputs()
@@ -75,7 +86,6 @@ namespace SendCSharpAgent
             int nbOfElement = -1;
             IntPtr intptr = Ingescape.igs_getInputsList(ref nbOfElement);
 
-            nbOfElement = 5;
             //intPtr tab
             IntPtr[] intPtrArray = new IntPtr[nbOfElement];
 
@@ -83,10 +93,10 @@ namespace SendCSharpAgent
             string[] inputsList = new string[nbOfElement];
 
             //Copy the pointer to the tab of pointer
-            Marshal.Copy(intptr, intPtrArray, 0, (int)nbOfElement);
+            Marshal.Copy(intptr, intPtrArray, 0, nbOfElement);
 
             //Fill the string tab
-            for (int i = 0; i < (int)nbOfElement; i++)
+            for (int i = 0; i < nbOfElement; i++)
             {
                 inputsList[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
 
@@ -121,8 +131,20 @@ namespace SendCSharpAgent
 
         public void writeOnInputs()
         {
+            //Integer
+            int value = 100;
+            int result = Ingescape.igs_writeInputAsInt("integer", value);
+
+            //Double
+            double val = 100.111;
+            result = Ingescape.igs_writeInputAsDouble("double", val);
+
+            //String
             string msg = "Helloword";
-            int result = Ingescape.igs_writeOutputAsString("string-out", msg);
+            result = Ingescape.igs_writeOutputAsString("string", msg);
+
+            //Impulsion
+            result = Ingescape.igs_writeOutputAsImpulsion("impulsion");
         }
 
         public void stop()
