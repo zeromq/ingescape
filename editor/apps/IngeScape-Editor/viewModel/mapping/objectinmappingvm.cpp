@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -16,20 +16,23 @@
 
 /**
  * @brief Constructor
+ * @param type
  * @param name
  * @param position
  * @param parent
  */
-ObjectInMappingVM::ObjectInMappingVM(QString name,
+ObjectInMappingVM::ObjectInMappingVM(ObjectInMappingTypes::Value type,
+                                     QString name,
                                      QPointF position,
                                      QObject *parent) : QObject(parent),
+    _type(type),
     _name(name),
     _position(position)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    //qInfo() << "New Object" << _name << "in the global mapping";
+    //qInfo() << "New (Object)" << ObjectInMappingTypes::staticEnumToKey(_type) << _name << "in the global mapping";
 }
 
 
@@ -38,5 +41,5 @@ ObjectInMappingVM::ObjectInMappingVM(QString name,
  */
 ObjectInMappingVM::~ObjectInMappingVM()
 {
-    //qInfo() << "Delete Object" << _name << "in the global mapping";
+    //qInfo() << "Delete (Object)" << ObjectInMappingTypes::staticEnumToKey(_type) << _name << "in the global mapping";
 }

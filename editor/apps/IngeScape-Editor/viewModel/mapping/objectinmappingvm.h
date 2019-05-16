@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -16,8 +16,14 @@
 #define OBJECTINMAPPINGVM_H
 
 #include <QObject>
-
 #include <I2PropertyHelpers.h>
+
+
+/**
+  * Types of objects in the mapping
+  */
+I2_ENUM(ObjectInMappingTypes, UNKNOWN, AGENT, ACTION)
+
 
 /**
  * @brief The ObjectInMappingVM class is the base class for derived class of view model of agent/action in mapping
@@ -25,6 +31,9 @@
 class ObjectInMappingVM : public QObject
 {
     Q_OBJECT
+
+    // Type of our object
+    I2_QML_PROPERTY_READONLY(ObjectInMappingTypes::Value, type)
 
     // Name of our object
     I2_QML_PROPERTY_READONLY(QString, name)
@@ -43,11 +52,13 @@ public:
 
     /**
      * @brief Constructor
+     * @param type
      * @param name
      * @param position
      * @param parent
      */
-    explicit ObjectInMappingVM(QString name,
+    explicit ObjectInMappingVM(ObjectInMappingTypes::Value type,
+                               QString name,
                                QPointF position,
                                QObject *parent = nullptr);
 

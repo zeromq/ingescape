@@ -45,6 +45,7 @@ SOURCES += main.cpp \
     controller/actioneditorcontroller.cpp \
     controller/valueshistorycontroller.cpp \
     misc/collapsiblecolumn.cpp \
+    model/actionmappingm.cpp \
     sortFilter/valueshistorysortfilter.cpp \
     model/hostm.cpp \
     controller/hostssupervisioncontroller.cpp \
@@ -69,6 +70,7 @@ SOURCES += main.cpp \
     viewModel/mapping/actioninmappingvm.cpp
 
 HEADERS += \
+    model/actionmappingm.h \
     stable.h \
     uthash/libut.h \
     uthash/ringbuf.h \

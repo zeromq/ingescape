@@ -32,9 +32,6 @@ class AgentInMappingVM : public ObjectInMappingVM
 {
     Q_OBJECT
 
-    // Name of our agent
-    //I2_QML_PROPERTY_READONLY(QString, name)
-
     // Agents grouped by name
     I2_QML_PROPERTY_READONLY(AgentsGroupedByNameVM*, agentsGroupedByName)
 
@@ -43,9 +40,6 @@ class AgentInMappingVM : public ObjectInMappingVM
 
     // List of view models of link outputs
     I2_QOBJECT_LISTMODEL(LinkOutputVM, linkOutputsList)
-
-    // The position corresponds to the corner Top-Left of the box
-    //I2_QML_PROPERTY(QPointF, position)
 
     // Flag indicating if our agent is reduced
     I2_QML_PROPERTY(bool, isReduced)

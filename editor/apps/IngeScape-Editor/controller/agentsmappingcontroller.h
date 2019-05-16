@@ -161,6 +161,14 @@ public:
 
 
     /**
+     * @brief Get the (view model of) action in the global mapping from a unique id
+     * @param uid
+     * @return
+     */
+    ActionInMappingVM* getActionInMappingFromUid(const int& uid);
+
+
+    /**
      * @brief Get the list of (view model of) links between agents in the global mapping from a link name
      * @param linkName
      * @return
@@ -353,12 +361,22 @@ private Q_SLOTS:
 private:
 
     /**
-     * @brief Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
+     * @brief Create a new agent in the global mapping with an "Agents Grouped by Name" and at a specific position
      * @param agentsGroupedByName
      * @param position
      * @return
      */
     AgentInMappingVM* _createAgentInMappingAtPosition(AgentsGroupedByNameVM* agentsGroupedByName, QPointF position);
+
+
+    /**
+     * @brief Create a new action in the global mapping with a unique id, with a model of action and at a specific position
+     * @param uid
+     * @param action
+     * @param position
+     * @return
+     */
+    ActionInMappingVM* _createActionInMappingAtPosition(int uid, ActionM* action, QPointF position);
 
 
     /**
@@ -502,6 +520,11 @@ private:
 
     // Hash table from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;
+
+    // Hash table:
+    // - from unique id of action in the global mapping
+    // - to the (view model of) action in the global mapping
+    QHash<int, ActionInMappingVM*> _hashFromUidToActionInMapping;
 
     // Link name as key is not unique (because the value type of the Input/Output can be different)
     // Hash table from link name to a list of view models of links between agents in mapping

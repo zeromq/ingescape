@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -16,15 +16,19 @@
 
 /**
  * @brief Constructor
+ * @param uid
  * @param action
  * @param position
  * @param parent
  */
-ActionInMappingVM::ActionInMappingVM(ActionM* action,
+ActionInMappingVM::ActionInMappingVM(int uid,
+                                     ActionM* action,
                                      QPointF position,
-                                     QObject *parent) : ObjectInMappingVM("",
+                                     QObject *parent) : ObjectInMappingVM(ObjectInMappingTypes::ACTION,
+                                                                          "",
                                                                           position,
                                                                           parent),
+    _uid(uid),
     _action(action),
     _linkInput(nullptr),
     _linkOutput(nullptr)
@@ -40,7 +44,7 @@ ActionInMappingVM::ActionInMappingVM(ActionM* action,
         _linkInput = new LinkInputVM(nullptr, this);
         _linkOutput = new LinkOutputVM(nullptr, this);
 
-        qInfo() << "New Action" << _name << "in the global mapping";
+        qInfo() << "New Action" << _name << "(" << _uid << ") in the global mapping";
     }
 }
 

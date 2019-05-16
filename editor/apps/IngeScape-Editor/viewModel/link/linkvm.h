@@ -41,15 +41,13 @@ class LinkVM : public QObject
     // View model of the corresponding mapping element
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(MappingElementVM*, mappingElement)
 
-    // View model of the output agent of our link (link starts from this agent)
-    //I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, outputAgent)
+    // View model of the output object of our link (link starts from this object)
     I2_QML_PROPERTY_DELETE_PROOF(ObjectInMappingVM*, outputObject)
 
     // View model of the output slot associated to our link
     I2_QML_PROPERTY_DELETE_PROOF(LinkOutputVM*, linkOutput)
 
-    // View model of the input agent of our link (link ends to this agent)
-    //I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, inputAgent)
+    // View model of the input object of our link (link ends to this object)
     I2_QML_PROPERTY_DELETE_PROOF(ObjectInMappingVM*, inputObject)
 
     // View model of the input slot associated to our link
