@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{433522B5-F605-4025-A276-A011FC51FB5B}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SendCSharpAgent</RootNamespace>
-    <AssemblyName>SendCSharpAgent</AssemblyName>
+    <RootNamespace>CSharpSampleAgent</RootNamespace>
+    <AssemblyName>CSharpSampleAgent</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

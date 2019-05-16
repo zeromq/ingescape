@@ -1,0 +1,46 @@
+{
+	"definition": {
+		"name": "Csharp-Sample",
+		"description": "this module is the Csharp sample agent",
+		"version": "1.0",
+		"parameters": [{
+                   "name": "integer",
+                   "type": "INTEGER",
+                   "value": 0
+                   },{
+                   "name": "double",
+                   "type": "DOUBLE",
+                   "value": 0.0
+                   }, {
+                   "name": "boolean",
+                   "type": "BOOL",
+                   "value": "true"
+                   }],
+        "inputs": [{
+                   "name": "integer",
+                   "type": "INTEGER",
+                   "value": 0
+                   },{
+                   "name": "double",
+                   "type": "DOUBLE",
+                   "value": 0.0
+                   }, {
+                   "name": "boolean",
+                   "type": "BOOL",
+                   "value": "true"
+                   }],
+        "outputs": [{
+                   "name": "integer-out",
+                   "type": "INTEGER",
+                   "value": 0
+                   },{
+                   "name": "double-out",
+                   "type": "DOUBLE",
+                   "value": 0.0
+                   }, {
+                   "name": "boolean-out",
+                   "type": "BOOL",
+                   "value": "true"
+                   }]
+	}
+}

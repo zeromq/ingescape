@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using IngescapeCSharp;
 
-namespace SendCSharpAgent
+namespace CSharpSampleAgent
 {
     class IgsAgent
     {

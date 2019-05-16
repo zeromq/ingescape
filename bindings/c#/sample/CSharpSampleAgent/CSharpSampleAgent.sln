@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendCSharpAgent", "SendCSharpAgent\SendCSharpAgent.csproj", "{433522B5-F605-4025-A276-A011FC51FB5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpSampleAgent", "CSharpSampleAgent\CSharpSampleAgent.csproj", "{433522B5-F605-4025-A276-A011FC51FB5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

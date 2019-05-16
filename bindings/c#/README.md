@@ -1,6 +1,15 @@
-TODO : future works
-1) Check if it is updated in correlation with the ingescape.h
-2) Check the path in the C: to link with the dll librairy
-3) When imported in project rename the workspace
-4) Implement the missing functions
-5) Write a script to generate this class (IngeScape.cs) from the ingescape.h file automatically
+To build
+
+Open the vs solution to build the c# library : .\IngescapeCSharpWrapper\IngescapeCSharpWrapper.sln
+Check the path of the library : C:\\ingescape\\libs\\debug\\ingescape.dll
+Build
+You will find the 3 files composing the c# library : .\IngescapeCSharpWrapper\IngescapeCSharp\bin\Debug\netstandard2.0
+IngescapeCSharp.deps.json
+IngescapeCSharp.dll
+IngescapeCSharp.pdb
+
+To test it
+Open the sample vs solution to build a c# sample agent : .\IngescapeCSharpWrapper\IngescapeCSharpWrapper.sln
+
+
+

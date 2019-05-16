@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using IngescapeCSharp;
 
-namespace SendCSharpAgent
+namespace CSharpSampleAgent
 {
     class Program
     {
