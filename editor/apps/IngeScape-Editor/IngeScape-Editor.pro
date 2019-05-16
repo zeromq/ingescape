@@ -40,64 +40,31 @@ SOURCES += main.cpp \
     controller/agentssupervisioncontroller.cpp \
     controller/agentsmappingcontroller.cpp \
     controller/ingescapeeditorcontroller.cpp \
-    controller/ingescapemodelmanager.cpp \
     controller/networkcontroller.cpp \
     controller/scenariocontroller.cpp \
     controller/actioneditorcontroller.cpp \
     controller/valueshistorycontroller.cpp \
-    controller/abstracttimeactionslinescenarioviewcontroller.cpp \
     misc/collapsiblecolumn.cpp \
-    model/agentm.cpp \
-    model/iop/agentiopm.cpp \
-    model/iop/outputm.cpp \
-    model/jsonhelper.cpp \
-    model/definitionm.cpp \
-    model/mapping/agentmappingm.cpp \
-    model/mapping/elementmappingm.cpp \
-    model/scenario/condition/actionconditionm.cpp \
-    model/scenario/actionm.cpp \
-    model/scenario/scenariom.cpp \
-    model/scenario/scenariomarkerm.cpp \
-    model/scenario/condition/iopvalueconditionm.cpp \
-    model/enums.cpp \
-    model/publishedvaluem.cpp \
-    model/scenario/timetickm.cpp \
-    model/scenario/effect/actioneffectm.cpp \
-    model/scenario/effect/iopvalueeffectm.cpp \
-    model/scenario/effect/mappingeffectm.cpp \
-    model/scenario/effect/effectonagentm.cpp \
     sortFilter/valueshistorysortfilter.cpp \
-    viewModel/agentinmappingvm.cpp \
-    viewModel/scenario/actionvm.cpp \
-    viewModel/iop/inputvm.cpp \
-    viewModel/iop/outputvm.cpp \
-    viewModel/scenario/actionconditionvm.cpp \
-    viewModel/scenario/actioneffectvm.cpp \
-    viewModel/scenario/actioninpalettevm.cpp \
-    viewModel/scenario/actionexecutionvm.cpp \
-    viewModel/iop/parametervm.cpp \
     model/hostm.cpp \
-    viewModel/iop/agentiopvm.cpp \
-    sortFilter/abstracttimerangefilter.cpp \
     controller/hostssupervisioncontroller.cpp \
-    viewModel/hostvm.cpp \
     model/recordm.cpp \
     controller/recordssupervisioncontroller.cpp \
-    viewModel/recordvm.cpp \
     controller/logstreamcontroller.cpp \
     model/logm.cpp \
     sortFilter/logssortfilter.cpp \
-    model/scenario/condition/conditiononagentm.cpp \
     misc/qquickwindowblocktouches.cpp \
-    viewModel/agentsgroupedbynamevm.cpp \
-    viewModel/agentsgroupedbydefinitionvm.cpp \
+    misc/textfielddoublevalidator.cpp \
+    misc/numberconstants.cpp \
+    viewModel/agentinmappingvm.cpp \
+    viewModel/hostvm.cpp \
+    viewModel/recordvm.cpp \
     viewModel/link/linkinputvm.cpp \
     viewModel/link/linkoutputvm.cpp \
     viewModel/link/linkvm.cpp \
     viewModel/link/linkconnectorvm.cpp \
-    misc/textfielddoublevalidator.cpp \
-    misc/numberconstants.cpp \
-    viewModel/link/mappingelementvm.cpp
+    model/editorenums.cpp \
+    controller/editormodelmanager.cpp
 
 HEADERS += \
     stable.h \
@@ -113,64 +80,31 @@ HEADERS += \
     controller/agentssupervisioncontroller.h \
     controller/agentsmappingcontroller.h \
     controller/ingescapeeditorcontroller.h \
-    controller/ingescapemodelmanager.h \
     controller/networkcontroller.h \
     controller/scenariocontroller.h \
     controller/actioneditorcontroller.h \
     controller/valueshistorycontroller.h \
-    controller/abstracttimeactionslinescenarioviewcontroller.h \
     misc/collapsiblecolumn.h \
-    model/agentm.h \
-    model/iop/agentiopm.h \
-    model/iop/outputm.h \
-    model/jsonhelper.h \
-    model/definitionm.h \
-    model/mapping/agentmappingm.h \
-    model/mapping/elementmappingm.h \
-    model/scenario/condition/actionconditionm.h \
-    model/scenario/actionm.h \
-    model/scenario/scenariom.h \
-    model/scenario/scenariomarkerm.h \
-    model/scenario/condition/iopvalueconditionm.h \
-    model/enums.h \
-    model/publishedvaluem.h \
-    model/scenario/timetickm.h \
-    model/scenario/effect/actioneffectm.h \
-    model/scenario/effect/iopvalueeffectm.h \
-    model/scenario/effect/mappingeffectm.h \
-    model/scenario/effect/effectonagentm.h \
     sortFilter/valueshistorysortfilter.h \
-    viewModel/agentinmappingvm.h \
-    viewModel/scenario/actionvm.h \
-    viewModel/iop/inputvm.h \
-    viewModel/iop/outputvm.h \
-    viewModel/scenario/actionconditionvm.h \
-    viewModel/scenario/actioneffectvm.h \
-    viewModel/scenario/actioninpalettevm.h \
-    viewModel/scenario/actionexecutionvm.h \
-    viewModel/iop/parametervm.h \
     model/hostm.h \
-    viewModel/iop/agentiopvm.h \
-    sortFilter/abstracttimerangefilter.h \
     controller/hostssupervisioncontroller.h \
-    viewModel/hostvm.h \
     model/recordm.h \
     controller/recordssupervisioncontroller.h \
-    viewModel/recordvm.h \
     controller/logstreamcontroller.h \
     model/logm.h \
     sortFilter/logssortfilter.h \
-    model/scenario/condition/conditiononagentm.h \
     misc/qquickwindowblocktouches.h \
-    viewModel/agentsgroupedbynamevm.h \
-    viewModel/agentsgroupedbydefinitionvm.h \
+    misc/textfielddoublevalidator.h \
+    misc/numberconstants.h \
+    viewModel/agentinmappingvm.h \
+    viewModel/hostvm.h \
+    viewModel/recordvm.h \
     viewModel/link/linkinputvm.h \
     viewModel/link/linkoutputvm.h \
     viewModel/link/linkvm.h \
     viewModel/link/linkconnectorvm.h \
-    misc/textfielddoublevalidator.h \
-    misc/numberconstants.h \
-    viewModel/link/mappingelementvm.h
+    model/editorenums.h \
+    controller/editormodelmanager.h
 
 
 RESOURCES += qml.qrc
@@ -243,23 +177,9 @@ mac {
     message(macOS and iOS specific rules)
 
 
-    # Include Gstreamer hearders
-    # GST not included ins master branch
-#    INCLUDEPATH += /usr/local/include/gstreamer-1.0
-#    INCLUDEPATH += /usr/local/include/glib-2.0
-#    INCLUDEPATH += /usr/local/lib/glib-2.0/include
-
     # Compute the LFLAG associated to our frameworks
     LIBS += -L../../frameworks/I2Quick/Mac -lI2Quick
 
-    # Add gstreamer libs
-    # GST not included in master branch
-#    LIBS += -L/usr/local/lib -lglib-2.0.0
-#    LIBS += -L/usr/local/lib -lgstreamer-1.0.0
-#    LIBS += -L/usr/local/lib -lgobject-2.0.0
-#    LIBS += -L/usr/local/lib -lgstvideo-1.0.0
-#    LIBS += -L/usr/local/lib -lgstbase-1.0.0
-#    LIBS += -L/usr/local/lib -lgstapp-1.0.0
 
     # Copy libraries into the MacOS directory of our application
     librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB}

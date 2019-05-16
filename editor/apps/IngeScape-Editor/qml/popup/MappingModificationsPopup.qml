@@ -276,7 +276,8 @@ I2PopupBase {
                 rightMargin: 20
             }
 
-            property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
             height: boundingBox.height
             width: boundingBox.width
 
@@ -286,7 +287,7 @@ I2PopupBase {
             activeFocusOnPress: true
 
             style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"
@@ -322,7 +323,8 @@ I2PopupBase {
                 rightMargin: 20
             }
 
-            property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+           property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
             height: boundingBox.height
             width: boundingBox.width
 
@@ -333,7 +335,7 @@ I2PopupBase {
             activeFocusOnPress: true
 
             style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"

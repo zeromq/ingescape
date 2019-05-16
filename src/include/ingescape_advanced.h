@@ -30,13 +30,29 @@ extern "C" {
 
 #define MAX_STRING_MSG_LENGTH 4096
 
-//network configuration
+//network configuration and monitoring
 //void igs_setBusEndpoint(const char *endpoint); //usefull only with gossip discovery - TODO
 //void igs_connectAgentOnEndpoint(const char *endpoint); //not officially supported in Zyre 2.0.x yet
 PUBLIC void igs_setPublishingPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 
+//IngeScape provides an integrated monitor to detect events relative to the network
+PUBLIC void igs_enableMonitoring(unsigned int period); //in milliseconds
+PUBLIC void igs_disableMonitoring(void);
+
+//When the monitor is started and igs_monitoringShallStartStopAgent is set to true :
+// - IP change will cause the agent to restart on the new IP (same device, same port)
+// - Network device disappearance will cause the agent to stop. Agent will restart when device is back.
+PUBLIC void igs_monitoringShallStartStopAgent(bool flag);
+typedef enum {
+    IGS_NETWORK_OK = 1, //Default status when the monitor starts
+    IGS_NETWORK_DEVICE_NOT_AVAILABLE,
+    IGS_NETWORK_ADDRESS_CHANGED
+} igs_monitorEvent_t;
+typedef void (*igs_monitorCallback)(igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData);
+PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
+    
 //////////////////////////////////////////////////
 //data serialization using ZMQ
 //TODO: give code examples here or link to documentation for zmsg and zframe
@@ -96,18 +112,18 @@ typedef struct igs_tokenArgument{
 //Example:
 // igs_tokenArgument_t *list = NULL;
 // igs_addIntToArgumentsList(&list, 10);
-void igs_addIntToArgumentsList(igs_tokenArgument_t **list, int value);
-void igs_addBoolToArgumentsList(igs_tokenArgument_t **list, bool value);
-void igs_addDoubleToArgumentsList(igs_tokenArgument_t **list, double value);
-void igs_addStringToArgumentsList(igs_tokenArgument_t **list, const char *value);
-void igs_addDataToArgumentsList(igs_tokenArgument_t **list, void *value, size_t size);
-void igs_destroyArgumentsList(igs_tokenArgument_t **list);
-igs_tokenArgument_t *igs_cloneArgumentsList(igs_tokenArgument_t *list);
+PUBLIC void igs_addIntToArgumentsList(igs_tokenArgument_t **list, int value);
+PUBLIC void igs_addBoolToArgumentsList(igs_tokenArgument_t **list, bool value);
+PUBLIC void igs_addDoubleToArgumentsList(igs_tokenArgument_t **list, double value);
+PUBLIC void igs_addStringToArgumentsList(igs_tokenArgument_t **list, const char *value);
+PUBLIC void igs_addDataToArgumentsList(igs_tokenArgument_t **list, void *value, size_t size);
+PUBLIC void igs_destroyArgumentsList(igs_tokenArgument_t **list);
+PUBLIC igs_tokenArgument_t *igs_cloneArgumentsList(igs_tokenArgument_t *list);
 
 //send a token to another agent
 //requires to pass agent name or UUID, token name and a list of arguments
 //passed arguments list will be deallocated and destroyed
-int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenArgument_t **list);
+PUBLIC int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenArgument_t **list);
 
 
 //CREATE TOKENS for our agent
@@ -150,6 +166,41 @@ PUBLIC bool igs_checkTokenArgumentExistence(const char *tokenName, const char *a
 //PUBLIC bool igs_isReplyAddedForToken(const char *name);
 //PUBLIC bool igs_checkTokenReplyArgumentExistence(const char *tokenName, const char *argName);
 
+//////////////////////////////////////////////////
+//JSON facilities
+
+typedef void* igsJSON_t;
+PUBLIC void igs_JSONfree(igsJSON_t *json);
+
+// generate a JSON string
+PUBLIC igsJSON_t igs_JSONinit(void); //must call igs_JSONcloseAndFree on returned value to free it
+PUBLIC void igs_JSONopenMap(igsJSON_t json);
+PUBLIC void igs_JSONcloseMap(igsJSON_t json);
+PUBLIC void igs_JSONopenArray(igsJSON_t json);
+PUBLIC void igs_JSONcloseArray(igsJSON_t json);
+PUBLIC void igs_JSONaddNULL(igsJSON_t json);
+PUBLIC void igs_JSONaddBool(igsJSON_t json, bool value);
+PUBLIC void igs_JSONaddInt(igsJSON_t json, long long value);
+PUBLIC void igs_JSONaddDouble(igsJSON_t json, double value);
+PUBLIC void igs_JSONaddString(igsJSON_t json, const char *value);
+PUBLIC void igs_JSONprint(igsJSON_t json);
+PUBLIC char* igs_JSONdump(igsJSON_t json); //returned value must be freed by caller
+
+// parse a JSON string or file based on parsing events and a callback
+typedef enum {
+    IGS_JSON_NULL = 1,
+    IGS_JSON_STRING,
+    IGS_JSON_KEY,
+    IGS_JSON_NUMBER, //FIXME int vs double
+    IGS_JSON_BOOL,
+    IGS_JSON_MAP_START,
+    IGS_JSON_MAP_END,
+    IGS_JSON_ARRAY_START,
+    IGS_JSON_ARRAY_END
+} igs_JSONValueType_t;
+typedef void (*igs_JSONCallback)(igs_JSONValueType_t type, void *value, size_t size, void *myData);
+PUBLIC void igs_JSONparseFromFile(const char *path, igs_JSONCallback cb, void *myData);
+PUBLIC void igs_JSONparseFromString(const char *content, igs_JSONCallback cb, void *myData);
 
 //////////////////////////////////////////////////
 //security

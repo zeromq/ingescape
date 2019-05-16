@@ -175,7 +175,7 @@ int igs_loadMappingFromPath (const char* file_path){
         igs_error("Mapping could not be loaded from path %s", file_path);
         return -1;
     }else{
-        strncpy(mappingPath, file_path, MAX_PATH);
+        strncpy(mappingPath, file_path, MAX_PATH-1);
         igs_internal_mapping = tmp;
         network_needToUpdateMapping = true;
     }
@@ -400,6 +400,11 @@ unsigned long igs_addMappingEntry(const char *fromOurInput,
     if (spaceInName){
         igs_warn("Spaces are not allowed in agent name: %s has been renamed to %s", toAgent, reviewedToAgent);
     }
+    char *aName = igs_getAgentName();
+    if (strcmp(reviewedToAgent, aName) == 0){
+        igs_warn("mapping inputs to outputs of the same agent will not work (except from one clone or variant to others)");
+    }
+    free(aName);
 
     //withOutput
     if((withOutput == NULL) || (strlen(withOutput) == 0)){

@@ -23,7 +23,7 @@ import INGESCAPE 1.0
 
 // agentsmapping sub-directory
 import "agentsmapping" as AgentsMapping
-import "theme" as Theme
+//import "theme" as Theme
 
 Item {
     id: rootItem
@@ -102,7 +102,7 @@ Item {
 
             I2PieSlice {
                 id: pieSlice
-                //visible: IngeScapeEditorC.modelManager.isMappingActivated
+                //visible: IngeScapeEditorC.modelManager.isMappingConnected
 
                 anchors.fill: parent
 
@@ -144,27 +144,26 @@ Item {
             activeFocusOnPress: true
             checkable: true
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            style: LabellessSvgButtonStyle {
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                 pressedID: releasedID + "-pressed"
-                releasedID: IngeScapeEditorC.modelManager.isMappingActivated ? "connect-on" : "connect-off"
+                releasedID: IngeScapeEditorC.modelManager.isMappingConnected ? "connect-on" : "connect-off"
                 disabledID : releasedID
             }
 
             onClicked: {
-                IngeScapeEditorC.modelManager.isMappingActivated = checked;
+                IngeScapeEditorC.modelManager.isMappingConnected = checked;
             }
 
             Binding {
                 target: activeMappingBtn
                 property: "checked"
-                value: IngeScapeEditorC.modelManager.isMappingActivated
+                value: IngeScapeEditorC.modelManager.isMappingConnected
             }
         }
 
         Rectangle {
-            //visible: IngeScapeEditorC.modelManager.isMappingActivated
             color: "transparent"
             width: childrenRect.width
             height: childrenRect.height
@@ -183,8 +182,8 @@ Item {
                 activeFocusOnPress: true
                 checkable: true
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: IngeScapeEditorC.modelManager.isMappingControlled ? "control" : "observe"
@@ -254,7 +253,7 @@ Item {
 
                         I2SvgItem {
                             anchors.centerIn: parent
-                            svgFileCache: IngeScapeTheme.svgFileINGESCAPE
+                            svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                             svgElementId: control.checked ? (control.pressed ? "radio-observe-on" : "radio-observe-white")
                                                           : (control.pressed ? "radio-observe-on" : "radio-observe-off");
@@ -316,7 +315,7 @@ Item {
 
                         I2SvgItem {
                             anchors.centerIn: parent
-                            svgFileCache: IngeScapeTheme.svgFileINGESCAPE
+                            svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                             svgElementId: control.checked ? (control.pressed ? "radio-control-on" : "radio-control-white")
                                                           : (control.pressed ? "radio-control-on" : "radio-control-off");
@@ -359,7 +358,7 @@ Item {
                     left : parent.left
                 }
 
-                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingActivated
+                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingConnected
                 text : "No active mapping at the moment."
 
                 color : IngeScapeTheme.blueGreyColor
@@ -376,7 +375,7 @@ Item {
                     left : parent.left
                 }
 
-                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingActivated
+                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingConnected
                 text : "Click on the button to synchronize with the current platform and get the active mapping.\nOr create/load a platform description and click on the button to apply it to the platform."
 
                 color : IngeScapeTheme.blueGreyColor

@@ -51,7 +51,7 @@
     if (result) {
         Py_RETURN_TRUE;
     } else{
-        Py_RETURN_TRUE;
+        Py_RETURN_FALSE;
     }
 }
 

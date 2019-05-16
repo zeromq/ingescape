@@ -23,7 +23,7 @@
  * @brief Constructor
  * @param parent
  */
-HostsSupervisionController::HostsSupervisionController(IngeScapeModelManager* modelManager,
+HostsSupervisionController::HostsSupervisionController(EditorModelManager* modelManager,
                                                        QObject *parent) : QObject(parent),
     _selectedHost(nullptr),
     _modelManager(modelManager)
@@ -138,7 +138,7 @@ void HostsSupervisionController::onHostModelWillBeDeleted(HostM* host)
         HostVM* hostVM = _getHostWithName(hostName);
         if (hostVM != nullptr)
         {
-            disconnect(hostVM, 0, this, 0);
+            disconnect(hostVM, nullptr, this, nullptr);
 
             _hashFromNameToHost.remove(hostName);
 

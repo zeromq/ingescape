@@ -27,7 +27,7 @@
 #include <controller/agentsmappingcontroller.h>
 #include <controller/agentssupervisioncontroller.h>
 #include <controller/hostssupervisioncontroller.h>
-#include <controller/ingescapemodelmanager.h>
+#include <controller/editormodelmanager.h>
 #include <controller/logstreamcontroller.h>
 #include <controller/networkcontroller.h>
 #include <controller/recordssupervisioncontroller.h>
@@ -51,7 +51,7 @@ class IngeScapeEditorController : public QObject
     I2_QML_PROPERTY_READONLY(QString, ipAddress)
 
     // Network settings - port
-    I2_QML_PROPERTY_READONLY(int, port)
+    I2_QML_PROPERTY_READONLY(uint, port)
 
     // Flag indicating if the Model/View Model Visualizer is available
     I2_QML_PROPERTY_READONLY(bool, isAvailableModelVisualizer)
@@ -65,8 +65,8 @@ class IngeScapeEditorController : public QObject
     // Snapshot Directory
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 
-    // Manager for the data model of our INGESCAPE editor
-    I2_QML_PROPERTY_READONLY(IngeScapeModelManager*, modelManager)
+    // Manager for the data model of our IngeScape editor
+    I2_QML_PROPERTY_READONLY(EditorModelManager*, modelManager)
 
     // Controller for agents supervision
     I2_QML_PROPERTY_READONLY(AgentsSupervisionController*, agentsSupervisionC)

@@ -20,8 +20,8 @@
 
 #include <I2PropertyHelpers.h>
 
-#include "model/recordm.h"
-#include "model/agentm.h"
+#include <model/recordm.h>
+
 
 /**
  * @brief The RecordVM class defines a view model of record in the supervision list

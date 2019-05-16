@@ -81,6 +81,7 @@ Item {
 
             Rectangle {
                 id: circle
+
                 anchors {
                     left: parent.left
                     leftMargin: 5
@@ -91,36 +92,8 @@ Item {
                 height: width
                 radius: width/2
 
-                color: switch (model.firstModel.agentIOPValueType)
-                        {
-                        case AgentIOPValueTypes.INTEGER:
-                            IngeScapeTheme.yellowColor
-                            break;
-                        case AgentIOPValueTypes.BOOL:
-                            IngeScapeTheme.yellowColor
-                            break;
-                        case AgentIOPValueTypes.DOUBLE:
-                            IngeScapeTheme.yellowColor
-                            break;
-                        case AgentIOPValueTypes.STRING:
-                            IngeScapeTheme.greenColor
-                            break;
-                        case AgentIOPValueTypes.IMPULSION:
-                            IngeScapeTheme.purpleColor
-                            break;
-                        case AgentIOPValueTypes.DATA:
-                            IngeScapeTheme.redColor2
-                            break;
-                        case AgentIOPValueTypes.MIXED:
-                            IngeScapeTheme.whiteColor
-                            break;
-                        case AgentIOPValueTypes.UNKNOWN:
-                            "#000000"
-                            break;
-                        default:
-                            IngeScapeTheme.whiteColor;
-                            break;
-                        }
+                color: (model && model.firstModel) ? IngeScapeEditorTheme.colorOfIOPTypeWithConditions(model.firstModel.agentIOPValueTypeGroup, true)
+                                                   : IngeScapeTheme.whiteColor
             }
 
             Text {
@@ -132,7 +105,7 @@ Item {
                     right: parent.right
                 }
                 elide : Text.ElideRight
-                font:comboboxStyle.itemsFont;
+                font: comboboxStyle.itemsFont;
                 color: (mouseArea.containsPress ? comboboxStyle.listItemTextColorPressed
                                                 : (selection === index ? comboboxStyle.listItemTextColorSelected
                                                                        : comboboxStyle.listItemTextColorIdle));

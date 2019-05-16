@@ -49,10 +49,10 @@ pthread_mutex_t lock = NULL;
 #endif
 
 static const char *log_levels[] = {
-    "TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "FATAL"
+    "TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "FATAL", "LICENSE"
 };
 static const char *log_colors[] = {
-    "\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"
+    "\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m", "\x1b[35m"
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -68,11 +68,11 @@ void admin_computeTime(char *dest){
     snprintf(dest,128,"%02d/%02d/%d;%02d:%02d:%02d.%06ld",
              tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min, tm->tm_sec, tick.tv_usec);
 #else
-   struct timeval tick;
+    struct timeval tick;
     gettimeofday(&tick, NULL);
     struct tm *tm = localtime(&tick.tv_sec);
     snprintf(dest,128,"%02d/%02d/%d;%02d:%02d:%02d.%06d",
-             tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min, tm->tm_sec, tick.tv_usec);
+             tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min, tm->tm_sec, (int)tick.tv_usec);
 #endif
     }
 
@@ -166,9 +166,9 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
             free(name);
         }
         if (admin_logFile[0] == '~'){
-            char buff[4096] = "";
-            strncpy(buff, admin_logFile, 4095);
-            admin_makeFilePath(buff, admin_logFile, 4095);
+            char buff[4097] = "";
+            strncpy(buff, admin_logFile, 4096);
+            admin_makeFilePath(buff, admin_logFile, 4096);
         }
         if (access(admin_logFile, W_OK) == -1){
             printf("need to create log file: %s\n", admin_logFile);
@@ -287,7 +287,7 @@ void igs_setLogPath(const char *path){
             printf("'%s' is already the log path\n", admin_logFile);
             return;
         }else{
-            strncpy(admin_logFile, tmpPath, 4095);
+            strncpy(admin_logFile, tmpPath, 4096);
         }
         bool needToResetFile = false;
         if (fp != NULL){

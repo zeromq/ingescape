@@ -141,8 +141,9 @@ WindowBlockTouches {
             }
 
             activeFocusOnPress: true
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+            style: LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "closeEditor"
@@ -294,7 +295,7 @@ WindowBlockTouches {
                                 visible: (control.checkedState === Qt.Checked)
                                 anchors.centerIn: parent
 
-                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                svgFileCache: IngeScapeTheme.svgFileIngeScape;
                                 svgElementId: "check";
 
                             }
@@ -521,7 +522,7 @@ WindowBlockTouches {
                                     height : width
                                     radius : width/2
 
-                                    color : IngeScapeTheme.colorOfIOPTypeWithConditions(model.iopValueTypeGroup, true);
+                                    color: IngeScapeEditorTheme.colorOfIOPTypeWithConditions(model.iopValueTypeGroup, true);
                                 }
 
                                 Text {
@@ -635,7 +636,8 @@ WindowBlockTouches {
         Button {
             id: okButton
 
-            property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
             height: boundingBox.height
             width: boundingBox.width
 
@@ -650,7 +652,7 @@ WindowBlockTouches {
             }
 
             style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"

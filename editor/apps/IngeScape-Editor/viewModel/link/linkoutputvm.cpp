@@ -54,7 +54,7 @@ LinkOutputVM::~LinkOutputVM()
     // Stop and clean the timer
     //
     _timer.stop();
-    disconnect(&_timer, 0, this, 0);
+    disconnect(&_timer, nullptr, this, nullptr);
 
 
     if (_output != nullptr)
@@ -87,7 +87,7 @@ bool LinkOutputVM::canLinkWith(LinkConnectorVM* linkConnector)
     if ((linkInput != nullptr) && (linkInput->input() != nullptr) && (linkInput->input()->firstModel() != nullptr)
             && (_output != nullptr) && (_output->firstModel() != nullptr))
     {
-        // Call parent class function
+        // Call our mother class
         return _canLinkOutputToInput(_output->firstModel()->agentIOPValueType(), linkInput->input()->firstModel()->agentIOPValueType());
     }
     else {

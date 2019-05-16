@@ -22,7 +22,7 @@
 
 #include "I2PropertyHelpers.h"
 
-#include <controller/ingescapemodelmanager.h>
+#include <controller/editormodelmanager.h>
 #include <controller/actioneditorcontroller.h>
 #include <viewModel/agentsgroupedbynamevm.h>
 #include <viewModel/scenario/actionvm.h>
@@ -115,7 +115,7 @@ public:
      * @param jsonHelper
      * @param parent
      */
-    explicit ScenarioController(IngeScapeModelManager* modelManager,
+    explicit ScenarioController(EditorModelManager* modelManager,
                                 JsonHelper* jsonHelper,
                                 QObject *parent = nullptr);
 
@@ -193,9 +193,9 @@ public:
 
 
     /**
-     * @brief Set an action into the palette at index
+     * @brief Set a model of action into the palette at index
      * @param index where to insert the action
-     * @param action to insert
+     * @param actionM model of action to insert
      */
     Q_INVOKABLE void setActionInPalette(int index, ActionM* actionM);
 
@@ -473,7 +473,7 @@ private:
 private:
 
     // Manager for the data model of INGESCAPE
-    IngeScapeModelManager* _modelManager;
+    EditorModelManager* _modelManager;
 
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
@@ -484,8 +484,8 @@ private:
     // Hash table of action editor controller from a view model of action
     QHash<ActionVM*, ActionEditorController*> _hashActionEditorControllerFromViewModelOfAction;
 
-    // Map of actions model from the action name
-    QHash<QString, ActionM*> _mapActionsFromActionName;
+    // List of all action names
+    QStringList _allActionNames;
 
     // Hash table from action UID to the corresponding model of action
     QHash<int, ActionM*> _hashFromUidToModelOfAction;

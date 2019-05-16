@@ -192,8 +192,12 @@ function install_deps_centos {
 }
 
 function install_deps_darwin {
-    brew install libsodium zeromq czmq zyre
-    #FIXME Is there a distinction between 'regular' and 'development' libs for osx ?
+    # Brew install does not seem to upgrade a formula if it is already installed 
+    # We try to upgrade only if the install fails (surely because an older version was already installed...)
+    brew install libsodium || brew upgrade libsodium
+    brew install zeromq    || brew upgrade zeromq
+    brew install czmq      || brew upgrade czmq
+    brew install zyre      || brew updgrade zyre
 }
 
 function install_deps_from_git {

@@ -22,7 +22,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <model/hostm.h>
-#include <model/agentm.h>
+#include <model/agent/agentm.h>
 
 
 /**

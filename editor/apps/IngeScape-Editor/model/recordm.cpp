@@ -17,18 +17,18 @@
 
 /**
  * @brief Constructor
- * @param id
+ * @param uid
  * @param name
  * @param beginDate
  * @param endDate
  * @param parent
  */
-RecordM::RecordM(QString id,
+RecordM::RecordM(QString uid,
                  QString name,
                  QDateTime beginDate,
                  QDateTime endDate,
                  QObject *parent) : QObject(parent),
-    _id(id),
+    _uid(uid),
     _name(name),
     _beginDateTime(beginDate),
     _endDateTime(endDate),
@@ -41,7 +41,7 @@ RecordM::RecordM(QString id,
 
     _duration = QDateTime(APPLICATION_START_DATE).addMSecs(ms);
 
-    qInfo() << "New Model of Record" << _name << "(" << _id << ") with duration" << _duration.toString("dd/MM/yyyy HH:mm:ss");
+    qInfo() << "New Model of Record" << _name << "(" << _uid << ") with duration" << _duration.toString("dd/MM/yyyy HH:mm:ss");
 }
 
 
@@ -50,5 +50,5 @@ RecordM::RecordM(QString id,
  */
 RecordM::~RecordM()
 {
-    qInfo() << "Delete Model of Record" << _name << "(" << _id << ") ";
+    qInfo() << "Delete Model of Record" << _name << "(" << _uid << ") ";
 }

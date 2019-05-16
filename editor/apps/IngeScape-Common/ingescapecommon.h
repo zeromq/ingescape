@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -27,7 +28,7 @@ public:
     /**
      * @brief Register our C++ types and extensions in the QML system
      */
-    static void registerPGIMQmlTypes();
+    static void registerIngeScapeQmlTypes();
 
 };
 

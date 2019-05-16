@@ -26,11 +26,9 @@
 /**
  * @brief Constructor
  * @param modelManager
- * @param jsonHelper
  * @param parent
  */
-RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager* modelManager,
-                                                           JsonHelper* jsonHelper,
+RecordsSupervisionController::RecordsSupervisionController(EditorModelManager* modelManager,
                                                            QObject *parent) : QObject(parent),
     _peerIdOfRecorder(""),
     _peerNameOfRecorder(""),
@@ -41,8 +39,7 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     _isLoadingRecord(false),
     _playingRecord(nullptr),
     _currentRecordTime(QDateTime(QDate::currentDate())),
-    _modelManager(modelManager),
-    _jsonHelper(jsonHelper)
+    _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -70,7 +67,6 @@ RecordsSupervisionController::~RecordsSupervisionController()
 
     // Reset pointers
     _modelManager = nullptr;
-    _jsonHelper = nullptr;
 }
 
 
@@ -131,7 +127,7 @@ void RecordsSupervisionController::deleteRecord(RecordVM* record)
         // Notify the recorder that it has to remove entry from the data base
         if (_isRecorderON)
         {
-            QString commandAndParameters = QString("%1=%2").arg(command_DeleteRecord, record->modelM()->id());
+            QString commandAndParameters = QString("%1=%2").arg(command_DeleteRecord, record->modelM()->uid());
 
             Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
         }
@@ -239,18 +235,18 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
         }
     }
 
-    if (!recordsJSON.isEmpty() && (_jsonHelper != nullptr))
+    if (!recordsJSON.isEmpty())
     {
         QByteArray byteArrayOfJson = recordsJSON.toUtf8();
-        QList<RecordM*> recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
+        QList<RecordM*> recordsList = _createRecordsListFromJSON(byteArrayOfJson);
 
         if (!recordsList.isEmpty())
         {
             for (RecordM* record : recordsList)
             {
-                if ((record != nullptr) && !_hashFromRecordIdToModel.contains(record->id()))
+                if ((record != nullptr) && !_hashFromRecordIdToModel.contains(record->uid()))
                 {
-                    _hashFromRecordIdToModel.insert(record->id(), record);
+                    _hashFromRecordIdToModel.insert(record->uid(), record);
 
                     // Create a view model of record with this model
                     _createRecordVMwithModel(record);
@@ -269,18 +265,18 @@ void RecordsSupervisionController::onAddedRecord(QString recordJSON)
 {
     //qDebug() << "onAddedRecord" << recordJSON;
 
-    if (!recordJSON.isEmpty() && (_jsonHelper != nullptr))
+    if (!recordJSON.isEmpty())
     {
         QByteArray byteArrayOfJson = recordJSON.toUtf8();
-        QList<RecordM*> recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
+        QList<RecordM*> recordsList = _createRecordsListFromJSON(byteArrayOfJson);
 
         if (recordsList.count() == 1)
         {
             RecordM* newRecord = recordsList.at(0);
 
-            if ((newRecord != nullptr) && !_hashFromRecordIdToModel.contains(newRecord->id()))
+            if ((newRecord != nullptr) && !_hashFromRecordIdToModel.contains(newRecord->uid()))
             {
-                _hashFromRecordIdToModel.insert(newRecord->id(), newRecord);
+                _hashFromRecordIdToModel.insert(newRecord->uid(), newRecord);
 
                 // Create a view model of record with this model
                 _createRecordVMwithModel(newRecord);
@@ -364,16 +360,63 @@ void RecordsSupervisionController::_onTimeout_DisplayTime()
 
 
 /**
+ * @brief Create a model of record from JSON data
+ * @param byteArrayOfJson
+ * @return
+ */
+QList<RecordM*> RecordsSupervisionController::_createRecordsListFromJSON(QByteArray byteArrayOfJson)
+{
+    QList<RecordM*> recordsList;
+
+    QJsonDocument jsonAgentDefinition = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonAgentDefinition.isObject())
+    {
+        QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
+        QJsonValue recordsValue = jsonFileRoot.object().value("Records");
+
+        if (recordsValue.isArray())
+        {
+            for (QJsonValue jsonValue : recordsValue.toArray())
+            {
+                if (jsonValue.isObject())
+                {
+                    QJsonObject jsonRecord = jsonValue.toObject();
+
+                    QJsonValue jsonId = jsonRecord.value("id");
+                    QJsonValue jsonName = jsonRecord.value("name_record");
+                    QJsonValue jsonBeginDateTime = jsonRecord.value("time_beg");
+                    QJsonValue jsonEndDateTime = jsonRecord.value("time_end");
+
+                    if (jsonName.isString() && jsonId.isString())
+                    {
+                        // Create record
+                        RecordM* record = new RecordM(jsonId.toString(),
+                                                      jsonName.toString(),
+                                                      QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonBeginDateTime.toDouble())),
+                                                      QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonEndDateTime.toDouble())));
+
+                        recordsList.append(record);
+                    }
+                }
+            }
+        }
+    }
+    return recordsList;
+}
+
+
+
+/**
  * @brief Create a view model of record with a model
  * @param model
  */
 void RecordsSupervisionController::_createRecordVMwithModel(RecordM* model)
 {
-    if ((model != nullptr) && !_hashFromRecordIdToViewModel.contains(model->id()))
+    if ((model != nullptr) && !_hashFromRecordIdToViewModel.contains(model->uid()))
     {
         RecordVM* vm = new RecordVM(model);
 
-        _hashFromRecordIdToViewModel.insert(model->id(), vm);
+        _hashFromRecordIdToViewModel.insert(model->uid(), vm);
 
         // Insert in the displayed list
         _recordsList.insert(0, vm);
@@ -387,12 +430,12 @@ void RecordsSupervisionController::_createRecordVMwithModel(RecordM* model)
  */
 void RecordsSupervisionController::_deleteRecordVMwithModel(RecordM* model)
 {
-    if ((model != nullptr) && _hashFromRecordIdToViewModel.contains(model->id()))
+    if ((model != nullptr) && _hashFromRecordIdToViewModel.contains(model->uid()))
     {
-        RecordVM* vm = _hashFromRecordIdToViewModel.value(model->id());
+        RecordVM* vm = _hashFromRecordIdToViewModel.value(model->uid());
         if (vm != nullptr)
         {
-            _hashFromRecordIdToViewModel.remove(model->id());
+            _hashFromRecordIdToViewModel.remove(model->uid());
 
             if (_playingRecord != nullptr) {
                 setplayingRecord(nullptr);

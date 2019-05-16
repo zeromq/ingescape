@@ -39,12 +39,12 @@ ApplicationWindow {
     visible: true
 
     // Default size
-    width: IngeScapeTheme.appDefaultWidth
-    height: IngeScapeTheme.appDefaultHeight
+    width: IngeScapeEditorTheme.appDefaultWidth
+    height: IngeScapeEditorTheme.appDefaultHeight
 
     // Minimum size
-    minimumWidth: IngeScapeTheme.appMinWidth
-    minimumHeight: IngeScapeTheme.appMinHeight
+    minimumWidth: IngeScapeEditorTheme.appMinWidth
+    minimumHeight: IngeScapeEditorTheme.appMinHeight
 
     title: qsTr("IngeScape Editor - v%1").arg(Qt.application.version)
 
@@ -140,16 +140,16 @@ ApplicationWindow {
             MenuItem {
                 id: menuPlugUNplugMapping
 
-                text: "" // (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Disconnect mapping") : qsTr("Connect mapping")
+                text: "" // (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingConnected) ? qsTr("Disconnect mapping") : qsTr("Connect mapping")
 
                 onTriggered: {
-                    if (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) {
+                    if (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingConnected) {
                         //console.log("DE-activate mapping");
-                        IngeScapeEditorC.modelManager.isMappingActivated = false;
+                        IngeScapeEditorC.modelManager.isMappingConnected = false;
                     }
                     else {
                         //console.log("Activate mapping");
-                        IngeScapeEditorC.modelManager.isMappingActivated = true;
+                        IngeScapeEditorC.modelManager.isMappingConnected = true;
                     }
                 }
             }
@@ -273,7 +273,7 @@ ApplicationWindow {
                 id: subWindowsInstantiator
                 model: 0 // IngeScapeEditorC.openedWindows
 
-                MenuItem {
+                delegate: MenuItem {
                     text: model.QtObject.title
 
                     onTriggered: {
@@ -419,7 +419,7 @@ ApplicationWindow {
                 });
 
                 menuPlugUNplugMapping.text = Qt.binding(function() {
-                    return (((IngeScapeEditorC.modelManager !== null) && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
+                    return (((IngeScapeEditorC.modelManager !== null) && IngeScapeEditorC.modelManager.isMappingConnected) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
                 });
 
                 subWindowsInstantiator.model = Qt.binding(function() {

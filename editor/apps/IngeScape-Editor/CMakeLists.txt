@@ -223,6 +223,7 @@ target_link_libraries(
     ${PROJECT_NAME}
     Qt5::Qml
     Qt5::Quick
+    Qt5::QuickPrivate
     Qt5::Svg
     Qt5::Xml
     Qt5::Concurrent

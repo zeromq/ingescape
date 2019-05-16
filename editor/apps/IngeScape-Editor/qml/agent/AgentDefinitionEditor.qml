@@ -21,7 +21,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
-import "../theme" as Theme;
+//import "../theme" as Theme;
 
 
 Window {
@@ -172,8 +172,9 @@ Window {
             }
 
             activeFocusOnPress: true
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+            style: LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "closeEditor"
@@ -212,14 +213,15 @@ Window {
             }
 
             Text {
-                id : definitionNameTxt
+                id: definitionNameTxt
 
                 anchors {
                     left : parent.left
                 }
 
-                text : definitionName.elidedText
-                color: IngeScapeTheme.definitionEditorsLabelColor
+                text: definitionName.elidedText
+
+                color: IngeScapeEditorTheme.definitionEditorsLabelColor
                 font {
                     family: IngeScapeTheme.textFontFamily
                     pixelSize: 23
@@ -266,7 +268,7 @@ Window {
             elide : Text.ElideRight
             maximumLineCount : 3
 
-            color: IngeScapeTheme.definitionEditorsAgentDescriptionColor
+            color: IngeScapeEditorTheme.definitionEditorsAgentDescriptionColor
             font {
                 family: IngeScapeTheme.textFontFamily
                 pixelSize : 16
@@ -301,7 +303,7 @@ Window {
                         id : svgMenu
                         anchors.centerIn: parent
 
-                        svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                        svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
                         svgElementId: styleData.selected ? "tab-" + index + "-Selected"
                                                          : "tab-" + index;
 
@@ -380,7 +382,7 @@ Window {
                                         // Allow to hide the header of column "Current value" (index = 3) and "Mute" (index = 4) for Inputs and Parameters
                                         text: ((tab.title !== "Outputs") && ((index === 3) || (index === 4))) ? "" : modelData
 
-                                        color : IngeScapeTheme.definitionEditorsAgentDescriptionColor
+                                        color: IngeScapeEditorTheme.definitionEditorsAgentDescriptionColor
                                         font {
                                             family: IngeScapeTheme.textFontFamily
                                             pixelSize : 16
@@ -496,7 +498,7 @@ Window {
                                                 height : width
                                                 radius : width/2
 
-                                                color : IngeScapeTheme.colorOfIOPTypeWithConditions(model.agentIOPValueTypeGroup, true);
+                                                color: IngeScapeEditorTheme.colorOfIOPTypeWithConditions(model.agentIOPValueTypeGroup, true);
                                             }
 
                                             Text {
@@ -580,8 +582,8 @@ Window {
                                                     right : parent.right
                                                 }
 
-                                                style: Theme.LabellessSvgButtonStyle {
-                                                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                                                style: LabellessSvgButtonStyle {
+                                                    fileCache: IngeScapeTheme.svgFileIngeScape
 
                                                     pressedID: releasedID + "-pressed"
                                                     //releasedID: model.isMutedOutput ? "active-mute" : "inactive-mute"

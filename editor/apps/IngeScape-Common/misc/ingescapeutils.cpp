@@ -1,5 +1,5 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
  *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
@@ -25,7 +25,7 @@ static int BIGGEST_UID_OF_ACTION_MODEL = -1;
 
 //--------------------------------------------------------------
 //
-// IngeScapeUtils
+// IngeScape Utils
 //
 //--------------------------------------------------------------
 

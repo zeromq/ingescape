@@ -131,17 +131,20 @@ Item {
 
 
     //
-    // Bottom panel
+    // Scenario TimeLine
     //
-    Scenario.ScenarioTimeLine {
+    ScenarioTimeLine {
         id: bottomPanel
+
         anchors {
             left: leftPanel.right
             right: parent.right
             bottom: parent.bottom
         }
         height: 0
-        controller: IngeScapeEditorC.scenarioC
+
+        scenarioController: IngeScapeEditorC.scenarioC
+        timeLineController: IngeScapeEditorC.timeLineC
     }
 
 
@@ -151,7 +154,7 @@ Item {
     Rectangle {
         id: leftPanel
 
-        width: IngeScapeTheme.leftPanelWidth
+        width: IngeScapeEditorTheme.leftPanelWidth
 
         anchors {
             left: parent.left
@@ -159,20 +162,20 @@ Item {
             bottom: parent.bottom
         }
 
-        color : IngeScapeTheme.agentsMappingBackgroundColor
+        color: IngeScapeEditorTheme.agentsMappingBackgroundColor
 
         I2CustomRectangle {
             anchors {
                 fill: parent
                 topMargin: 9
             }
-            color: IngeScapeTheme.leftPanelBackgroundColor
+            color: IngeScapeTheme.blackColor
 
             fuzzyRadius: 8
             topRightRadius : 5
 
             borderWidth: 1
-            borderColor: IngeScapeTheme.selectedTabsBackgroundColor
+            borderColor: IngeScapeEditorTheme.selectedTabsBackgroundColor
 
             // tabs of left panel
             I2TabView {
@@ -184,7 +187,8 @@ Item {
                     frameOverlap: 1
 
                     tab: I2CustomRectangle {
-                        color: styleData.selected ? IngeScapeTheme.selectedTabsBackgroundColor : "transparent"
+                        color: styleData.selected ? IngeScapeEditorTheme.selectedTabsBackgroundColor : "transparent"
+
                         implicitWidth: (IngeScapeEditorC.recordsSupervisionC && (IngeScapeEditorC.recordsSupervisionC.isRecorderON === true)) ? leftPanelTabs.width / 4
                                                                                                                                               : leftPanelTabs.width / 3
                         implicitHeight: 26
@@ -195,11 +199,14 @@ Item {
 
                         Text {
                             id: text
+
                             anchors.fill: parent
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter;
+
                             text: styleData.title
-                            color: styleData.selected ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.greyColor
+
+                            color: styleData.selected ? IngeScapeTheme.whiteColor : IngeScapeTheme.greyColor
                             wrapMode: Text.Wrap;
 
                             font {
@@ -212,7 +219,7 @@ Item {
                     }
 
                     frame: Rectangle {
-                        color: IngeScapeTheme.selectedTabsBackgroundColor
+                        color: IngeScapeEditorTheme.selectedTabsBackgroundColor
                     }
                 }
 

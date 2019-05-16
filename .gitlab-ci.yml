@@ -39,8 +39,8 @@ stages:
       - dependencies/unix/*
       - dependencies/windows/unix/*
       - editor/frameworks/**/*
-      - editor/IngeScape-Common/**/*
-      - editor/IngeScape-Editor/**/*
+      - editor/apps/IngeScape-Common/**/*
+      - editor/apps/IngeScape-Editor/**/*
     refs:
       - master
 

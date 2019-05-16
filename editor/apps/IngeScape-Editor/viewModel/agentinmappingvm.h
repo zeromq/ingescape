@@ -146,7 +146,7 @@ public:
      * @param linkId
      * @return
      */
-    ElementMappingM* getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId);
+    MappingElementM* getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId);
 
 
     /**
@@ -160,7 +160,7 @@ public:
      * @brief Get the list of all (models of) added mapping elements while the global mapping was UN-activated
      * @return
      */
-    QList<ElementMappingM*> getAddedMappingElements_WhileMappingWasUNactivated();
+    QList<MappingElementM*> getAddedMappingElements_WhileMappingWasUNactivated();
 
 
     /**
@@ -330,7 +330,7 @@ private:
     QHash<QString, LinkOutputVM*> _hashFromIdToLinkOutput;
 
     // Hash table from "(unique) link id" to added link (model of mapping element) while the mapping was UN-activated
-    QHash<QString, ElementMappingM*> _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated;
+    QHash<QString, MappingElementM*> _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated;
 
     // Hash table from "(unique) link id" to removed link (view model of mapping element) while the mapping was UN-activated
     QHash<QString, MappingElementVM*> _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated;

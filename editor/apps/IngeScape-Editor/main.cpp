@@ -36,6 +36,7 @@
 //
 // IngeScape Common
 //
+#include <ingescapecommon.h>
 #include <settings/ingescapesettings.h>
 #include <misc/ingescapeutils.h>
 
@@ -108,17 +109,7 @@ void registerCustomQmlTypes()
     // Enums
     //
     //---------------
-    qmlRegisterSingletonType<ActionConditionTypes>("INGESCAPE", 1, 0, "ActionConditionTypes", &ActionConditionTypes::qmlSingleton);
-    qmlRegisterSingletonType<ActionEffectTypes>("INGESCAPE", 1, 0, "ActionEffectTypes", &ActionEffectTypes::qmlSingleton);
-    qmlRegisterSingletonType<AgentConditionValues>("INGESCAPE", 1, 0, "AgentConditionValues", &AgentConditionValues::qmlSingleton);
-    qmlRegisterSingletonType<AgentEffectValues>("INGESCAPE", 1, 0, "AgentEffectValues", &AgentEffectValues::qmlSingleton);
-    qmlRegisterSingletonType<AgentIOPTypes>("INGESCAPE", 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
-    qmlRegisterSingletonType<AgentIOPValueTypes>("INGESCAPE", 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
-    qmlRegisterSingletonType<AgentIOPValueTypeGroups>("INGESCAPE", 1, 0, "AgentIOPValueTypeGroups", &AgentIOPValueTypeGroups::qmlSingleton);
-    qmlRegisterSingletonType<LogTypes>("INGESCAPE", 1, 0, "LogTypes", &LogTypes::qmlSingleton);
-    qmlRegisterSingletonType<MappingEffectValues>("INGESCAPE", 1, 0, "MappingEffectValues", &MappingEffectValues::qmlSingleton);
-    qmlRegisterSingletonType<ValidationDurationTypes>("INGESCAPE", 1, 0, "ValidationDurationTypes", &ValidationDurationTypes::qmlSingleton);
-    qmlRegisterSingletonType<ValueComparisonTypes>("INGESCAPE", 1, 0, "ValueComparisonTypes", &ValueComparisonTypes::qmlSingleton);
+
 
 
     //----------------
@@ -130,13 +121,13 @@ void registerCustomQmlTypes()
     qmlRegisterSingletonType<IngeScapeEditorController>("INGESCAPE", 1, 0, "IngeScapeEditorC", &IngeScapeEditorController::qmlSingleton);
 
     // sub-controllers
-    qmlRegisterUncreatableType<AbstractTimeActionslineScenarioViewController>("INGESCAPE", 1, 0, "AbstractTimeActionslineScenarioViewController", "Internal Class");
     qmlRegisterUncreatableType<ActionEditorController>("INGESCAPE", 1, 0, "ActionEditorController", "Internal Class");
     qmlRegisterUncreatableType<AgentsMappingController>("INGESCAPE", 1, 0, "AgentsMappingController", "Internal Class");
     qmlRegisterUncreatableType<AgentsSupervisionController>("INGESCAPE", 1, 0, "AgentsSupervisionController", "Internal Class");
+    qmlRegisterUncreatableType<EditorModelManager>("INGESCAPE", 1, 0, "EditorModelManager", "Internal Class");
     qmlRegisterUncreatableType<HostsSupervisionController>("INGESCAPE", 1, 0, "HostsSupervisionController", "Internal Class");
-    qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal Class");
     qmlRegisterUncreatableType<LogStreamController>("INGESCAPE", 1, 0, "LogStreamController", "Internal Class");
+    qmlRegisterUncreatableType<RecordsSupervisionController>("INGESCAPE", 1, 0, "RecordsSupervisionController", "Internal Class");
     qmlRegisterUncreatableType<ScenarioController>("INGESCAPE", 1, 0, "ScenarioController", "Internal Class");
     qmlRegisterUncreatableType<ValuesHistoryController>("INGESCAPE", 1, 0, "ValuesHistoryController", "Internal Class");
 
@@ -161,36 +152,14 @@ void registerCustomQmlTypes()
     qmlRegisterSingletonType<NumberConstants>("INGESCAPE", 1, 0, "NumberConstants", &NumberConstants::qmlSingleton);
 
 
-    // GST not included in master branch
-    // qmlRegisterType<GstVideoReceiver>("INGESCAPE", 1, 0, "GstVideoReceiver");
-
-
-
     //----------------
     //
     // Models
     //
     //----------------
-    qmlRegisterUncreatableType<ActionConditionM>("INGESCAPE", 1, 0, "ActionConditionM", "Internal class");
-    qmlRegisterUncreatableType<ActionEffectM>("INGESCAPE", 1, 0, "ActionEffectM", "Internal class");
-    qmlRegisterUncreatableType<ActionM>("INGESCAPE", 1, 0, "ActionM", "Internal class");
-    qmlRegisterUncreatableType<AgentIOPM>("INGESCAPE", 1, 0, "AgentIOPM", "Internal class");
-    qmlRegisterUncreatableType<AgentM>("INGESCAPE", 1, 0, "AgentM", "Internal class");
-    qmlRegisterUncreatableType<AgentMappingM>("INGESCAPE", 1, 0, "AgentMappingM", "Internal class");
-    qmlRegisterUncreatableType<ConditionOnAgentM>("INGESCAPE", 1, 0, "ConditionOnAgentM", "Internal class");
-    qmlRegisterUncreatableType<DefinitionM>("INGESCAPE", 1, 0, "DefinitionM", "Internal class");
-    qmlRegisterUncreatableType<EffectOnAgentM>("INGESCAPE", 1, 0, "EffectOnAgentM", "Internal class");
-    qmlRegisterUncreatableType<ElementMappingM>("INGESCAPE", 1, 0, "ElementMappingM", "Internal class");
-    qmlRegisterUncreatableType<Enums>("INGESCAPE", 1, 0, "Enums", "Internal class");
+    qmlRegisterUncreatableType<EditorEnums>("INGESCAPE", 1, 0, "EditorEnums", "Internal class");
     qmlRegisterUncreatableType<HostM>("INGESCAPE", 1, 0, "HostM", "Internal class");
-    qmlRegisterUncreatableType<IOPValueConditionM>("INGESCAPE", 1, 0, "IOPValueConditionM", "Internal class");
-    qmlRegisterUncreatableType<IOPValueEffectM>("INGESCAPE", 1, 0, "IOPValueEffectM", "Internal class");
     qmlRegisterUncreatableType<LogM>("INGESCAPE", 1, 0, "LogM", "Internal class");
-    qmlRegisterUncreatableType<OutputM>("INGESCAPE", 1, 0, "OutputM", "Internal class");
-    qmlRegisterUncreatableType<PublishedValueM>("INGESCAPE", 1, 0, "PublishedValueM", "Internal class");
-    qmlRegisterUncreatableType<MappingEffectM>("INGESCAPE", 1, 0, "MappingEffectM", "Internal class");
-    qmlRegisterUncreatableType<ScenarioM>("INGESCAPE", 1, 0, "ScenarioM", "Internal class");
-    qmlRegisterUncreatableType<TimeTickM>("INGESCAPE", 1, 0, "TimeTickM", "Internal class");
 
 
     //---------------
@@ -198,23 +167,11 @@ void registerCustomQmlTypes()
     // View Models
     //
     //---------------
-    qmlRegisterUncreatableType<ActionConditionVM>("INGESCAPE", 1, 0, "ActionConditionVM", "Internal class");
-    qmlRegisterUncreatableType<ActionEffectVM>("INGESCAPE", 1, 0, "ActionEffectVM", "Internal class");
-    qmlRegisterUncreatableType<ActionExecutionVM>("INGESCAPE", 1, 0, "ActionExecutionVM", "Internal class");
-    qmlRegisterUncreatableType<ActionInPaletteVM>("INGESCAPE", 1, 0, "ActionInPaletteVM", "Internal class");
-    qmlRegisterUncreatableType<ActionVM>("INGESCAPE", 1, 0, "ActionVM", "Internal class");
     qmlRegisterUncreatableType<AgentInMappingVM>("INGESCAPE", 1, 0, "AgentInMappingVM", "Internal class");
-    qmlRegisterUncreatableType<AgentIOPVM>("INGESCAPE", 1, 0, "AgentIOPVM", "Internal class");
-    qmlRegisterUncreatableType<AgentsGroupedByDefinitionVM>("INGESCAPE", 1, 0, "AgentsGroupedByDefinitionVM", "Internal class");
-    qmlRegisterUncreatableType<AgentsGroupedByNameVM>("INGESCAPE", 1, 0, "AgentsGroupedByNameVM", "Internal class");
-    qmlRegisterUncreatableType<InputVM>("INGESCAPE", 1, 0, "InputVM", "Internal class");
     qmlRegisterUncreatableType<LinkConnectorVM>("INGESCAPE", 1, 0, "LinkConnectorVM", "Internal class");
     qmlRegisterUncreatableType<LinkInputVM>("INGESCAPE", 1, 0, "LinkInputVM", "Internal class");
     qmlRegisterUncreatableType<LinkOutputVM>("INGESCAPE", 1, 0, "LinkOutputVM", "Internal class");
     qmlRegisterUncreatableType<LinkVM>("INGESCAPE", 1, 0, "LinkVM", "Internal class");
-    qmlRegisterUncreatableType<MappingElementVM>("INGESCAPE", 1, 0, "MappingElementVM", "Internal class");
-    qmlRegisterUncreatableType<OutputVM>("INGESCAPE", 1, 0, "OutputVM", "Internal class");
-    qmlRegisterUncreatableType<ParameterVM>("INGESCAPE", 1, 0, "ParameterVM", "Internal class");
 
 
     //------------------
@@ -223,7 +180,7 @@ void registerCustomQmlTypes()
     //
     //------------------
     // - Singleton used to enable consistent app styling through predefined colors, fonts, etc.
-    qmlRegisterSingletonType(QUrl("qrc:/qml/theme/IngeScapeTheme.qml"), "INGESCAPE", 1, 0, "IngeScapeTheme");
+    qmlRegisterSingletonType(QUrl("qrc:/qml/theme/IngeScapeEditorTheme.qml"), "INGESCAPE", 1, 0, "IngeScapeEditorTheme");
 
     // - Scrollview style
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeScrollViewStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeScrollViewStyle");
@@ -400,9 +357,12 @@ int main(int argc, char *argv[])
     // - Display error images when SVG items are missing (source: "image://I2svg/.....")
     I2SVGImageProvider::showErrorsAsImage = true;
 
-    // Init streaming capability
-    // GST not included in master branch
-    // gst_init (NULL, NULL);
+
+    //
+    // Register Ingescape Common QML types
+    //
+    IngeScapeCommon::registerIngeScapeQmlTypes();
+
 
     //
     // Register our custom QML types

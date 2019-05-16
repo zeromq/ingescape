@@ -360,7 +360,7 @@ I2PopupBase {
                         visible: control.checked
                         anchors.centerIn: parent
 
-                        svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                        svgFileCache: IngeScapeTheme.svgFileIngeScape;
                         svgElementId: "check";
                     }
                 }
@@ -383,7 +383,7 @@ I2PopupBase {
             id: cancelButton
             activeFocusOnPress: true
 
-            property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
 
             height: boundingBox.height
             width: boundingBox.width
@@ -395,7 +395,7 @@ I2PopupBase {
             }
 
             style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"
@@ -422,7 +422,8 @@ I2PopupBase {
         Button {
             id: okButton
 
-            property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
             height: boundingBox.height
             width: boundingBox.width
 
@@ -435,7 +436,7 @@ I2PopupBase {
             }
 
             style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"

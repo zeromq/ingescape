@@ -20,7 +20,7 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <controller/ingescapemodelmanager.h>
+#include <controller/editormodelmanager.h>
 #include <sortFilter/valueshistorysortfilter.h>
 
 
@@ -47,7 +47,7 @@ public:
      * @param modelManager
      * @param parent
      */
-    explicit ValuesHistoryController(IngeScapeModelManager* modelManager, QObject *parent = nullptr);
+    explicit ValuesHistoryController(EditorModelManager* modelManager, QObject *parent = nullptr);
 
 
     /**
@@ -128,7 +128,7 @@ private:
 
 private:
     // Manager for the data model of INGESCAPE
-    IngeScapeModelManager* _modelManager;
+    EditorModelManager* _modelManager;
 
     // List of filtered (and sorted) values
     ValuesHistorySortFilter _filteredValues;

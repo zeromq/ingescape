@@ -30,7 +30,7 @@ import "../agentsmapping" as AgentMapping
 import "../popup" as Popups
 
 // theme sub-directory
-import "../theme" as Theme;
+//import "../theme" as Theme;
 
 // parent-directory
 import ".." as Editor;
@@ -178,7 +178,7 @@ Item {
             bottom : agentsListScrollView.top
         }
 
-        color : IngeScapeTheme.selectedTabsBackgroundColor
+        color: IngeScapeEditorTheme.selectedTabsBackgroundColor
 
         Row {
             id: headerRow
@@ -203,8 +203,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "new-agent"
@@ -235,8 +235,8 @@ Item {
                 }
                 activeFocusOnPress: true
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "import"
@@ -281,8 +281,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "export"
@@ -318,8 +318,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "delete-all"
@@ -347,7 +347,7 @@ Item {
             right: parent.right
         }
 
-        color: IngeScapeTheme.leftPanelBackgroundColor
+        color: IngeScapeTheme.blackColor
 
         height: 1
     }
@@ -362,7 +362,7 @@ Item {
         Item {
             id: agentItem
 
-            width: IngeScapeTheme.leftPanelWidth
+            width: IngeScapeEditorTheme.leftPanelWidth
             height: 85
 
 

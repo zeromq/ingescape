@@ -111,6 +111,8 @@ typedef enum {
 } iopType_t;
 
 //read IOP using void*
+// value : pointer to actual value, initialized by function, to be freed by user
+// size : size of returned value
 PUBLIC int igs_readInput(const char *name, void **value, size_t *size);
 PUBLIC int igs_readOutput(const char *name, void **value, size_t *size);
 PUBLIC int igs_readParameter(const char *name, void **value, size_t *size);
@@ -162,7 +164,7 @@ PUBLIC void igs_clearDataForOutput(const char *name);
 PUBLIC void igs_clearDataForParameter(const char *name);
 
 //observe writing to an IOP
-typedef void (*igs_observeCallback)(iop_t iopType, const char* name, iopType_t valueType, void* value, size_t valueSize, void* myData);
+typedef void (*igs_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData);
 PUBLIC int igs_observeInput(const char *name, igs_observeCallback cb, void *myData);
 PUBLIC int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData);
 PUBLIC int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData);
@@ -324,6 +326,26 @@ PUBLIC void igs_setAllowIpc(bool allow);
 PUBLIC bool igs_getAllowIpc(void);
 #endif
 
+#if !TARGET_OS_IOS
+//////////////////////////////////////////////////
+//licenses
+// Default license path is empty and is automatically set to agent's executable path.
+// When path is set manually, it takes priority to agent's executable path.
+PUBLIC void igs_setLicensePath(const char *path);
+PUBLIC char *igs_getLicensePath(void);
+    
+//Any agent developer can use this function to check the license against her/his agent's unique id.
+//IDs are provided by the ingescape team.
+//Returns true if check is OK.
+PUBLIC bool igs_checkLicenseForAgent(const char *agentId);
+
+//use this callback mechanism to be notified when the timer
+//or number of agents or number of IOPs has been exceeded in demo mode
+typedef void (*igs_licenseCallback)(void *myData);
+PUBLIC int igs_observeLicense(igs_licenseCallback cb, void *myData);
+    
+#endif
+    
 #ifdef __cplusplus
 }
 #endif

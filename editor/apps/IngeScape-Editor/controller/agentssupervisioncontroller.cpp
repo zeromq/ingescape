@@ -17,6 +17,7 @@
 
 #include <QQmlEngine>
 #include <QDebug>
+#include <model/editorenums.h>
 
 
 /**
@@ -25,7 +26,7 @@
  * @param jsonHelper
  * @param parent
  */
-AgentsSupervisionController::AgentsSupervisionController(IngeScapeModelManager* modelManager,
+AgentsSupervisionController::AgentsSupervisionController(EditorModelManager* modelManager,
                                                          JsonHelper* jsonHelper,
                                                          QObject *parent) : QObject(parent),
     _selectedAgent(nullptr),
@@ -154,7 +155,7 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
         }
 
         // DIS-connect to signals from this view model of agents grouped by definition
-        disconnect(agentsGroupedByDefinition, 0, this, 0);
+        disconnect(agentsGroupedByDefinition, nullptr, this, nullptr);
 
         // Remove it from the list
         _agentsList.remove(agentsGroupedByDefinition);
@@ -355,8 +356,8 @@ QList<DefinitionM*> AgentsSupervisionController::_getDefinitionsListWithName(QSt
  */
 void AgentsSupervisionController::_updateDefinitionVariants(QString definitionName, QList<DefinitionM*> definitionsList)
 {
-    //Q_UNUSED(definitionName)
-    qDebug() << "Update the definition variants for definition name" << definitionName << "(" << definitionsList.count() << "definitions)";
+    Q_UNUSED(definitionName)
+    //qDebug() << "Update the definition variants for definition name" << definitionName << "(" << definitionsList.count() << "definitions)";
 
     // We can use versions as keys of the map because the list contains only definition with the same name
     QHash<QString, QList<DefinitionM*>> hashFromVersionToDefinitionsList;

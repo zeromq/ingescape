@@ -118,8 +118,9 @@ WindowBlockTouches {
             }
 
             activeFocusOnPress: true
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+            style: LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "closeEditor"
@@ -273,8 +274,7 @@ WindowBlockTouches {
                                 verticalCenterOffset: 1
                             }
 
-                            //color: IngeScapeTheme.lightGreyColor
-                            color: IngeScapeTheme.colorOfLogType(model.value)
+                            color: IngeScapeEditorTheme.colorOfLogType(model.value)
 
                             text: " " + model.name
                             elide: Text.ElideRight
@@ -296,7 +296,7 @@ WindowBlockTouches {
                                 visible: (control.checkedState === Qt.Checked)
                                 anchors.centerIn: parent
 
-                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                svgFileCache: IngeScapeTheme.svgFileIngeScape
                                 svgElementId: "check";
 
                             }
@@ -502,8 +502,7 @@ WindowBlockTouches {
 
                                 //elide: Text.ElideRight
 
-                                //color: IngeScapeTheme.whiteColor
-                                color: IngeScapeTheme.colorOfLogType(model.logType)
+                                color: IngeScapeEditorTheme.colorOfLogType(model.logType)
 
                                 font {
                                     family: IngeScapeTheme.textFontFamily
@@ -558,7 +557,8 @@ WindowBlockTouches {
         Button {
             id: okButton
 
-            property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
             height: boundingBox.height
             width: boundingBox.width
 
@@ -573,7 +573,7 @@ WindowBlockTouches {
             }
 
             style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"

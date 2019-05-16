@@ -71,7 +71,7 @@ I2PopupBase {
                 bottomMargin: 16
             }
 
-            property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
 
             height: boundingBox.height
             width: boundingBox.width
@@ -80,7 +80,7 @@ I2PopupBase {
             text: "OK"
 
             style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                fileCache: IngeScapeTheme.svgFileIngeScape
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"

@@ -67,41 +67,8 @@ I2ComboboxItemModel {
         height : width
         radius : width/2
 
-        color : if (selectedItem && selectedItem.firstModel) {
-                    switch (selectedItem.firstModel.agentIOPValueType)
-                    {
-                    case AgentIOPValueTypes.INTEGER:
-                        IngeScapeTheme.yellowColor
-                        break;
-                    case AgentIOPValueTypes.BOOL:
-                        IngeScapeTheme.yellowColor
-                        break;
-                    case AgentIOPValueTypes.DOUBLE:
-                        IngeScapeTheme.yellowColor
-                        break;
-                    case AgentIOPValueTypes.STRING:
-                        IngeScapeTheme.greenColor
-                        break;
-                    case AgentIOPValueTypes.IMPULSION:
-                        IngeScapeTheme.purpleColor
-                        break;
-                    case AgentIOPValueTypes.DATA:
-                        IngeScapeTheme.redColor2
-                        break;
-                    case AgentIOPValueTypes.MIXED:
-                        IngeScapeTheme.whiteColor
-                        break;
-                    case AgentIOPValueTypes.UNKNOWN:
-                        "#000000"
-                        break;
-                    default:
-                        IngeScapeTheme.whiteColor;
-                        break;
-                    }
-                }
-                else {
-                    IngeScapeTheme.whiteColor;
-                }
+        color : (selectedItem && selectedItem.firstModel) ? IngeScapeEditorTheme.colorOfIOPTypeWithConditions(selectedItem.firstModel.agentIOPValueTypeGroup, true)
+                                                          : IngeScapeTheme.whiteColor
     }
 
     Controls2.ToolTip {

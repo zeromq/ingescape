@@ -19,7 +19,7 @@
  * @param modelManager
  * @param parent
  */
-ValuesHistoryController::ValuesHistoryController(IngeScapeModelManager* modelManager,
+ValuesHistoryController::ValuesHistoryController(EditorModelManager* modelManager,
                                                  QObject *parent) : QObject(parent),
     _modelManager(modelManager)
 {

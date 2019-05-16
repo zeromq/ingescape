@@ -27,7 +27,7 @@ class RecordM : public QObject
     Q_OBJECT
 
     // Record id
-    I2_QML_PROPERTY_READONLY(QString, id)
+    I2_QML_PROPERTY_READONLY(QString, uid)
 
     // Record name
     I2_QML_PROPERTY_READONLY(QString, name)
@@ -46,13 +46,13 @@ class RecordM : public QObject
 public:
     /**
      * @brief Constructor
-     * @param id
+     * @param uid
      * @param name
      * @param begin
      * @param end
      * @param parent
      */
-    explicit RecordM(QString id,
+    explicit RecordM(QString uid,
                      QString name,
                      QDateTime begin,
                      QDateTime end,
