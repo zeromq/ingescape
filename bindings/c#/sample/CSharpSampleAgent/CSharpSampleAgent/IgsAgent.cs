@@ -98,6 +98,55 @@ namespace CSharpSampleAgent
             Ingescape.igs_startWithDevice("Ethernet", 5670);
         }
 
+        public void readGenericFunctions()
+        {
+            /*
+             * Input
+             */ 
+            //Write a value
+            string str = "helloword-input";
+            Ingescape.igs_writeInputAsString("string", str);
+
+            //Use the generic function to read the value of the input
+            IntPtr[] intPtrArray = new IntPtr[1];
+            int size = 0;
+            Ingescape.igs_readInput("string", intPtrArray, ref size);
+            string value = Marshal.PtrToStringAnsi(intPtrArray[0]);
+
+            //Print the value
+            Console.WriteLine("Value of the input string : " + value);
+
+            /*
+             * Output
+             */
+            //Write a value
+            str = "helloword-out";
+            Ingescape.igs_writeOutputAsString("string-out", str);
+
+            //Use the generic function to read the value of the output
+            //intPtrArray = new IntPtr[1];
+            Ingescape.igs_readOutput("string-out", intPtrArray, ref size);
+            value = Marshal.PtrToStringAnsi(intPtrArray[0]);
+
+            //Print the value
+            Console.WriteLine("Value of the output string : " + value);
+
+            /*
+             * Parameter
+             */
+            //Write a value
+            str = "helloword-param";
+            Ingescape.igs_writeParameterAsString("string-param", str);
+
+            //Use the generic function to read the value of the parameter
+            //intPtrArray = new IntPtr[1];
+            Ingescape.igs_readParameter("string-param", intPtrArray, ref size);
+            value = Marshal.PtrToStringAnsi(intPtrArray[0]);
+
+            //Print the value
+            Console.WriteLine("Value of the parameter string : " + value);
+        }
+
         public void writeInLog(string msg)
         {
             //Test the log file function

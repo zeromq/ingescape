@@ -33,7 +33,8 @@ namespace CSharpSampleAgent
             //Write on outputs
             igsAgent.writeOnInputs();
 
-            //Remove mapping dynamically after a while
+            //Read inputs
+            igsAgent.readGenericFunctions();
 
             int iteration = 0;
             string msg = null;

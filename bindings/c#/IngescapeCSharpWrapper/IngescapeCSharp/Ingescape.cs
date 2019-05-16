@@ -107,11 +107,12 @@ namespace IngescapeCSharp
         //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
         //read IOP using void*
-        /* TODO : implement
-        PUBLIC int igs_readInput(const char* name, void** value, size_t *size);
-        PUBLIC int igs_readOutput(const char* name, void** value, size_t *size);
-        PUBLIC int igs_readParameter(const char* name, void** value, size_t *size);
-        */
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_readInput(string name, IntPtr[] value, ref int size);
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_readOutput(string name, IntPtr[] value, ref int size);
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_readParameter(string name, IntPtr[] value, ref int size);
 
         //read per type
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
