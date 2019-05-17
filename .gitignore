@@ -877,3 +877,4 @@ bindings/c#/examples/SendCSharpAgent/SendCSharpAgent/obj/
 bindings/c#/examples/SendCSharpAgent/SendCSharpAgent/bin/
 
 bindings/c#/sample/CSharpSampleAgent/.vs/
+bindings/c#/sample/CSharpSampleAgent/CSharpSampleAgent/bin/Debug/testLogFile.txt
