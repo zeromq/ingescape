@@ -36,6 +36,9 @@ namespace CSharpSampleAgent
             //Read inputs
             igsAgent.readGenericFunctions();
 
+            //Write & Read data
+            igsAgent.writeAndReadData();
+
             int iteration = 0;
             string msg = null;
             while (true)
@@ -57,6 +60,8 @@ namespace CSharpSampleAgent
                 {
                     msg = "log : " + iteration++;
                     igsAgent.writeInLog(msg);
+
+                    igsAgent.writeOnInputs();
                 }
             }
         }

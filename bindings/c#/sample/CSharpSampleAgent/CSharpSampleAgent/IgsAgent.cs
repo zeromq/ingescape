@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using IngescapeCSharp;
@@ -53,6 +55,9 @@ namespace CSharpSampleAgent
                 default:
                     break;
             }
+
+            //Data
+            string myDataStr =  Marshal.PtrToStringAnsi(myData);
         }
 
         public IgsAgent()
@@ -62,6 +67,9 @@ namespace CSharpSampleAgent
 
             //Load mapping from file
             Ingescape.igs_loadMappingFromPath("../igs-csharp-sample-mapping.json");
+
+            //Get mapping version 
+            string mappingVersion = Ingescape.getMappingVersion();
 
             //Verbose
             Ingescape.igs_setVerbose(true);
@@ -150,7 +158,7 @@ namespace CSharpSampleAgent
         public void writeInLog(string msg)
         {
             //Test the log file function
-            Ingescape.igs_log(igs_logLevel_t.IGS_LOG_WARN, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+            Ingescape.igs_log(igs_logLevel_t.IGS_LOG_INFO, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
 
             //Test the function like macro function wrapping
             Ingescape.igs_warn(msg);
@@ -175,6 +183,9 @@ namespace CSharpSampleAgent
             //Copy the pointer to the tab of pointer
             Marshal.Copy(intptr, intPtrArray, 0, nbOfElement);
 
+            string myData = "MyData";
+            IntPtr myDataPtr = Marshal.StringToHGlobalAnsi(myData);
+
             //Fill the string tab
             for (int i = 0; i < nbOfElement; i++)
             {
@@ -184,7 +195,8 @@ namespace CSharpSampleAgent
                 //Marshal.FreeCoTaskMem(intPtrArray[i]);
 
                 //Observe the current input
-                Ingescape.igs_observeInput(inputsList[i], callbckPtr, IntPtr.Zero);
+      
+                Ingescape.igs_observeInput(inputsList[i], callbckPtr, myDataPtr);
             }
 
             //release the memory
@@ -201,6 +213,7 @@ namespace CSharpSampleAgent
 
             Ingescape.igs_createOutput("string-out", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
             Ingescape.igs_createOutput("impulsion-out", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
+            Ingescape.igs_createOutput("data-out", iopType_t.IGS_DATA_T, IntPtr.Zero, 0);
         }
 
         public void createMappingDynamically()
@@ -225,6 +238,38 @@ namespace CSharpSampleAgent
 
             //Impulsion
             result = Ingescape.igs_writeOutputAsImpulsion("impulsion");
+        }
+
+        public void writeAndReadData()
+        {
+            byte[] fooBytes;
+
+            //Initialize object
+            Foo foo = new Foo();
+
+            //Serialize object to byte array
+            BinaryFormatter bf = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+            bf.Serialize(ms, foo);
+            fooBytes = ms.ToArray();
+
+            //Write on output
+            int size = fooBytes.Length;
+            Ingescape.igs_writeOutputAsData("data-out", fooBytes, ref size);
+
+            //Read the output
+            int sizeRead = 0;
+            IntPtr[] intPtrArray = new IntPtr[1];
+            Ingescape.igs_readOutputAsData("data-out", intPtrArray, ref sizeRead);
+
+            //IntPtr to byte array
+            byte[] managedFooBytesArray = new byte[size];
+            Marshal.Copy(intPtrArray[0], managedFooBytesArray, 0, size);
+
+            //Deserialize          
+            BinaryFormatter formatter = new BinaryFormatter();
+            MemoryStream msRead = new MemoryStream(managedFooBytesArray);
+            Foo readFoo = (Foo)formatter.Deserialize(msRead);
         }
 
         public void stop()
