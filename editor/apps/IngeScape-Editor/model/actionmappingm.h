@@ -32,6 +32,9 @@ class ActionMappingM : public QObject
     // List of unique ids of (output) actions in the global mapping on which our action is mapped
     I2_CPP_PROPERTY(QList<int>, uidsListOfOutputActionsInMapping)
 
+    // FIXME TODO: List of ...
+    I2_CPP_PROPERTY(QStringList, mappingIdsList)
+
 
 public:
     /**
