@@ -29,6 +29,7 @@ LinkOutputVM::LinkOutputVM(OutputVM* output,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Agent
     if (_output != nullptr)
     {
         setname(_output->name());
@@ -37,8 +38,10 @@ LinkOutputVM::LinkOutputVM(OutputVM* output,
         // Connect to signals from the view model of output
         connect(_output, &OutputVM::currentValueChanged, this, &LinkOutputVM::_oncurrentValueChanged);
     }
-    else {
-        setname("out");
+    // Action
+    else
+    {
+        setname(ACTION_LINK_OUTPUT_NAME);
         setuid(QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(AgentIOPValueTypes::IMPULSION)));
     }
 

@@ -28,12 +28,16 @@ LinkInputVM::LinkInputVM(InputVM* input,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_input != nullptr) {
+    // Agent
+    if (_input != nullptr)
+    {
         setname(_input->name());
         setuid(_input->uid());
     }
-    else {
-        setname("in");
+    // Action
+    else
+    {
+        setname(ACTION_LINK_INPUT_NAME);
         setuid(QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(AgentIOPValueTypes::IMPULSION)));
     }
 }

@@ -26,27 +26,50 @@ class ActionMappingM : public QObject
 {
     Q_OBJECT
 
-    // List of names of (output) agents in the global mapping (and its output) on which our action is mapped
-    I2_CPP_PROPERTY(QStringList, namesListOfOutputAgentInMappingAndOuputName)
+    // List of mapping ids from an Agent to an Action in the global mapping (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
+    I2_CPP_PROPERTY(QStringList, mappingIdsList_FromAgentToAction)
+
+    // List of mapping ids from an Action to an Action in the global mapping (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
+    //I2_CPP_PROPERTY(QStringList, mappingIdsList_FromActionToAction)
 
     // List of unique ids of (output) actions in the global mapping on which our action is mapped
     I2_CPP_PROPERTY(QList<int>, uidsListOfOutputActionsInMapping)
 
-    // FIXME TODO: List of ...
-    I2_CPP_PROPERTY(QStringList, mappingIdsList)
+    // List of mapping ids from an Action to an Agent in the global mapping (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
+    I2_CPP_PROPERTY(QStringList, mappingIdsList_FromActionToAgent)
 
 
 public:
     /**
      * @brief Constructor
-     * @param namesListOfOutputAgentInMappingAndOuputName
-     * @param uidsListOfOutputActionsInMapping
      * @param parent
      */
-    explicit ActionMappingM(QStringList namesListOfOutputAgentInMappingAndOuputName,
-                            QList<int> uidsListOfOutputActionsInMapping,
-                            QObject *parent = nullptr);
+    explicit ActionMappingM(QObject *parent = nullptr);
 
+
+    /**
+     * @brief Destructor
+     */
+    //~ActionMappingM();
+
+
+    /**
+     * @brief Get the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input") from the list of names (each parts of a mapping)
+     * @param outputObjectInMapping
+     * @param output
+     * @param inputObjectInMapping
+     * @param input
+     * @return mappingId with format "outputObjectInMapping##output-->inputObjectInMapping##input"
+     */
+    static QString getMappingIdFromNamesList(QString outputObjectInMapping, QString output, QString inputObjectInMapping, QString input);
+
+
+    /**
+     * @brief Get the list of names (each parts of a mapping) from the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
+     * @param mappingId with format "outputObjectInMapping##output-->inputObjectInMapping##input"
+     * @return
+     */
+    static QStringList getNamesListFromMappingId(QString mappingId);
 
 };
 
