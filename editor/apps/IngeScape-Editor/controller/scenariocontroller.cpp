@@ -1641,7 +1641,7 @@ void ScenarioController::_stopScenario()
 void ScenarioController::_executeEffectsOfAction(ActionM* action)
 {
     if ((action != nullptr) && !action->effectsList()->isEmpty())
-    {
+    {   
         // Execute the actions effects
         for (ActionEffectVM* effectVM : action->effectsList()->toList())
         {
@@ -1654,6 +1654,9 @@ void ScenarioController::_executeEffectsOfAction(ActionM* action)
                 _executeCommandForAgent(pairAgentAndCommandWithParameters.first, pairAgentAndCommandWithParameters.second);
             }
         }
+
+        // Emit the signal "All Effects have been Executed"
+        Q_EMIT action->allEffectsHaveBeenExecuted();
     }
 }
 

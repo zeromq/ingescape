@@ -24,7 +24,7 @@
 LinkOutputVM::LinkOutputVM(OutputVM* output,
                            QObject *parent) : LinkConnectorVM(parent),
     _output(output),
-    _isPublishedNewValue(false)
+    _hasBeenActivated(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -75,11 +75,19 @@ LinkOutputVM::~LinkOutputVM()
 
 
 /**
- * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
+ * @brief Activate (allows to highlight the corresponding links)
  */
-void LinkOutputVM::simulateCurrentValueOfModelChanged()
+void LinkOutputVM::activate()
 {
-    _oncurrentValueChanged(QVariant());
+    // Check that the flag is not already to true
+    if (!_hasBeenActivated)
+    {
+        // Set the flag
+        sethasBeenActivated(true);
+
+        // Start the timer to reset the flag "is Published New Value"
+        _timer.start();
+    }
 }
 
 
@@ -125,14 +133,8 @@ void LinkOutputVM::_oncurrentValueChanged(QVariant value)
         qDebug() << "On Current Value of Output Changed" << _name << value.toString();
     }*/
 
-    // Check that the flag is not already to true
-    if (!_isPublishedNewValue)
-    {
-        setisPublishedNewValue(true);
-
-        // Start the timer to reset the flag "is Published New Value"
-        _timer.start();
-    }
+    // Activate our (link) output
+    activate();
 }
 
 
@@ -145,6 +147,5 @@ void LinkOutputVM::_onTimeout()
     _timer.stop();
 
     // Reset the flag
-    setisPublishedNewValue(false);
+    sethasBeenActivated(false);
 }
-

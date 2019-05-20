@@ -148,7 +148,7 @@ Item {
 
 
     // - Default state
-    readonly property color agentsMappingLinkDefaultColor: theme.purpleColor //IngeScapeTheme.whiteColor
+    readonly property color agentsMappingLinkDefaultColor: IngeScapeTheme.whiteColor
 
     // - Hover state
     readonly property int agentsMappingLinkHoverFuzzyRadius: 4

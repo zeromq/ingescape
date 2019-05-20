@@ -1833,8 +1833,8 @@ void AgentsMappingController::onHighlightLink(const QStringList& parameters)
             {
                 qDebug() << "Highlight the link" << linkName;
 
-                // Simulate that the current value of output model changed: allows to highlight the link
-                link->linkOutput()->simulateCurrentValueOfModelChanged();
+                // Activate the link: allows to highlight the corresponding links
+                link->linkOutput()->activate();
             }
         }
     }

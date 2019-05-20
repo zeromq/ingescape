@@ -45,6 +45,9 @@ ActionInMappingVM::ActionInMappingVM(int uid,
         _linkOutput = new LinkOutputVM(nullptr, this);
 
         qInfo() << "New Action" << _name << "(" << _uid << ") in the global mapping";
+
+        // Connect to signals from the model of action
+        connect(_action, &ActionM::allEffectsHaveBeenExecuted, this, &ActionInMappingVM::_onAllEffectsHaveBeenExecuted);
     }
 }
 
@@ -55,6 +58,15 @@ ActionInMappingVM::ActionInMappingVM(int uid,
 ActionInMappingVM::~ActionInMappingVM()
 {
     qInfo() << "Delete Action" << _name << "in the global mapping";
+
+    if (_action != nullptr)
+    {
+        // DIS-connect to signals from the model of action
+        disconnect(_action, nullptr, this, nullptr);
+
+        // Deleted elsewhere
+        setaction(nullptr);
+    }
 
     // Free memory
     if (_linkInput != nullptr)
@@ -70,5 +82,22 @@ ActionInMappingVM::~ActionInMappingVM()
         LinkOutputVM* temp = _linkOutput;
         setlinkOutput(nullptr);
         delete temp;
+    }
+}
+
+
+/**
+ * @brief Slot called when all effects have been executed
+ */
+void ActionInMappingVM::_onAllEffectsHaveBeenExecuted()
+{
+    if (_linkOutput != nullptr)
+    {
+        if (_action != nullptr) {
+            qDebug() << "Activate (link) output for action" << _action->name();
+        }
+
+        // Activate the link: allows to highlight the corresponding links
+        _linkOutput->activate();
     }
 }

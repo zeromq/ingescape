@@ -79,8 +79,8 @@ I2CubicBezierCurve {
     // if the inputAgent and outputAgent are reduced: global type of its outputs
     stroke: if (rootItem._isBrin && linkOutput && viewModel && viewModel.outputObject)
             {
-                //if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingConnected) {
-                if (linkOutput.isPublishedNewValue) {
+                //if (linkOutput.hasBeenActivated && IngeScapeEditorC.modelManager.isMappingConnected) {
+                if (linkOutput.hasBeenActivated) {
                     IngeScapeEditorTheme.colorOfIOPTypeWithConditions(viewModel.outputObject.reducedLinkOutputsValueTypeGroup, true);
                 }
                 else {
@@ -90,14 +90,16 @@ I2CubicBezierCurve {
             else
             {
                 // if the inputAgent is not reduced : type of its output
-                if (linkOutput && outputModel)
+                if (linkOutput)
                 {
-                    //if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingConnected) {
-                    if (linkOutput.isPublishedNewValue) {
-                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, true);
+                    //if (linkOutput.hasBeenActivated && IngeScapeEditorC.modelManager.isMappingConnected) {
+                    // Agent
+                    if (outputModel) {
+                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, linkOutput.hasBeenActivated);
                     }
+                    // Action
                     else {
-                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, false);
+                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(AgentIOPValueTypeGroups.IMPULSION, linkOutput.hasBeenActivated);
                     }
                 }
                 else {
@@ -117,7 +119,7 @@ I2CubicBezierCurve {
 
     opacity: mouseArea.pressed ? 0.8 : 1
 
-    z: (linkOutput && linkOutput.isPublishedNewValue) ? 1 : 0
+    z: (linkOutput && linkOutput.hasBeenActivated) ? 1 : 0
 
 
     //--------------------------------

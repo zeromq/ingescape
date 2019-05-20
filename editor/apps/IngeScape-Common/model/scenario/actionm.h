@@ -146,6 +146,11 @@ public:
 
 Q_SIGNALS:
 
+    /**
+     * @brief Signal emitted when all effects have been executed
+     */
+    void allEffectsHaveBeenExecuted();
+
 
 public Q_SLOTS:
 

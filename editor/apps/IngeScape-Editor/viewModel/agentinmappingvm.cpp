@@ -104,6 +104,9 @@ AgentInMappingVM::~AgentInMappingVM()
 
     if (_agentsGroupedByName != nullptr)
     {
+        // DIS-connect to signals from the agents grouped by name
+        disconnect(_agentsGroupedByName, nullptr, this, nullptr);
+
         // Deleted elsewhere
         setagentsGroupedByName(nullptr);
     }

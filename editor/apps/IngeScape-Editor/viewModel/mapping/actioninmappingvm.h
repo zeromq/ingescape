@@ -67,6 +67,15 @@ public:
      */
     ~ActionInMappingVM();
 
+
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when all effects have been executed
+     */
+    void _onAllEffectsHaveBeenExecuted();
+
+
 };
 
 QML_DECLARE_TYPE(ActionInMappingVM)
