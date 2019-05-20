@@ -32,7 +32,7 @@ namespace Ingescape
     public delegate void igs_freezeCallback(bool isPaused, IntPtr myData);
 
 
-     public class Ingescape
+     public class Igs
     {
         //////////////////////////////////////////////////
         // Initialization and control
