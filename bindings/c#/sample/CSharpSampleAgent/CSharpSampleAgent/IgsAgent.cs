@@ -255,7 +255,7 @@ namespace CSharpSampleAgent
 
             //Write on output
             int size = fooBytes.Length;
-            Igs.igs_writeOutputAsData("data-out", fooBytes, ref size);
+            Igs.igs_writeOutputAsData("data-out", fooBytes, size);
 
             //Read the output
             int sizeRead = 0;
