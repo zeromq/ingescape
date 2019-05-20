@@ -502,9 +502,34 @@ namespace Ingescape
         //Utility functions to find network adapters with broadcast capabilities
         //to be used in igs_startWithDevice
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void igs_getNetdevicesList(out IntPtr devices, ref int nb);
+        private static extern void igs_getNetdevicesList(IntPtr[,] devices, ref int nb);
+        public static string [] getNetDevicesList()
+        {
+            //Get netdevices list
+            IntPtr[,] ptrTab = new IntPtr[1, 1];
+            int nb = 0;
+            Igs.igs_getNetdevicesList(ptrTab, ref nb);
+
+            //IntPtr to byte array
+            IntPtr[] devicesPtrList = new IntPtr[nb];
+            Marshal.Copy(ptrTab[0, 0], devicesPtrList, 0, nb);
+
+            //List of string inputs
+            string[] devicesList = new string[nb];
+
+            //Fill the string tab
+            for (int i = 0; i < nb; i++)
+            {
+                devicesList[i] = Marshal.PtrToStringAnsi(devicesPtrList[i]);
+            }
+            //HOTFIX : release the memory
+            //Igs.igs_freeNetdevicesList(devicesPtrList, nb);
+
+            return devicesList;
+        }
+
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void igs_freeNetdevicesList(IntPtr devices, int nb);
+        public static extern void igs_freeNetdevicesList(IntPtr[] devices, int nb);
 
 
         //Command line for the agent can be passed here for inclusion in the

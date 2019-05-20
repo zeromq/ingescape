@@ -77,6 +77,9 @@ namespace CSharpSampleAgent
             //Get agent state
             string agentState = Igs.getAgentState();
 
+            //Get network list devices
+            string[] netDevicesList = Igs.getNetDevicesList();
+ 
             //Verbose
             Igs.igs_setVerbose(true);
             bool isVerbose = Igs.igs_isVerbose();
