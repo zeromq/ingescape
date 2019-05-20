@@ -139,6 +139,21 @@ namespace Ingescape
         public static extern IntPtr igs_readInputAsString([MarshalAs(UnmanagedType.LPStr)]  string name);
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_readInputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, IntPtr[] data, ref int size);
+        public static int readInputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, ref byte[] data)
+        {
+            //Initialization
+            int sizeRead = 0;
+            IntPtr[] intPtrArray = new IntPtr[1];
+
+            //Read output data
+            int ret = igs_readInputAsData(name, intPtrArray, ref sizeRead);
+
+            //IntPtr to byte array
+            data = new byte[sizeRead];
+            Marshal.Copy(intPtrArray[0], data, 0, sizeRead);
+
+            return ret;
+        }
 
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool igs_readOutputAsBool([MarshalAs(UnmanagedType.LPStr)]  string name);
@@ -156,8 +171,22 @@ namespace Ingescape
             return str;
         }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int igs_readOutputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, IntPtr[] data, ref int size);
-        
+        private static extern int igs_readOutputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, IntPtr[] data, ref int size);
+        public static int readOutputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, ref byte[] data)
+        {
+            //Initialization
+            int sizeRead = 0;
+            IntPtr[] intPtrArray = new IntPtr[1];
+
+            //Read output data
+            int ret = igs_readOutputAsData(name, intPtrArray, ref sizeRead);
+
+            //IntPtr to byte array
+            data = new byte[sizeRead];
+            Marshal.Copy(intPtrArray[0], data, 0, sizeRead);
+
+            return ret;
+        }
 
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool igs_readParameterAsBool([MarshalAs(UnmanagedType.LPStr)]  string name);
@@ -176,7 +205,21 @@ namespace Ingescape
         }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_readParameterAsData([MarshalAs(UnmanagedType.LPStr)]  string name, IntPtr[] data, ref int size);
+        public static int readParameterAsData([MarshalAs(UnmanagedType.LPStr)]  string name, ref byte[] data)
+        {
+            //Initialization
+            int sizeRead = 0;
+            IntPtr[] intPtrArray = new IntPtr[1];
 
+            //Read output data
+            int ret = igs_readParameterAsData(name, intPtrArray, ref sizeRead);
+
+            //IntPtr to byte array
+            data = new byte[sizeRead];
+            Marshal.Copy(intPtrArray[0], data, 0, sizeRead);
+
+            return ret;
+        }
 
         //write per type
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]

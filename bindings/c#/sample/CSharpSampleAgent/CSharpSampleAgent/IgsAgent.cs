@@ -248,18 +248,13 @@ namespace CSharpSampleAgent
             int size = fooBytes.Length;
             Igs.igs_writeOutputAsData("data-out", fooBytes, size);
 
-            //Read the output
-            int sizeRead = 0;
-            IntPtr[] intPtrArray = new IntPtr[1];
-            Igs.igs_readOutputAsData("data-out", intPtrArray, ref sizeRead);
-
-            //IntPtr to byte array
-            byte[] managedFooBytesArray = new byte[size];
-            Marshal.Copy(intPtrArray[0], managedFooBytesArray, 0, size);
+            //Read data
+            byte[] data = new byte[]{};
+            Igs.readOutputAsData("data-out", ref data);
 
             //Deserialize          
             BinaryFormatter formatter = new BinaryFormatter();
-            MemoryStream msRead = new MemoryStream(managedFooBytesArray);
+            MemoryStream msRead = new MemoryStream(data);
             Foo readFoo = (Foo)formatter.Deserialize(msRead);
         }
 
