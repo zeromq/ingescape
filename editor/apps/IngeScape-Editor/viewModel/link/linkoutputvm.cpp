@@ -45,7 +45,7 @@ LinkOutputVM::LinkOutputVM(OutputVM* output,
         setuid(QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(AgentIOPValueTypes::IMPULSION)));
     }
 
-    // Init the timer to reset the flag "is Published New Value"
+    // Init the timer to reset the flag "has been activated"
     // Allows to play an animation when the value changed
     _timer.setInterval(500);
     connect(&_timer, &QTimer::timeout, this, &LinkOutputVM::_onTimeout);
@@ -82,12 +82,15 @@ void LinkOutputVM::activate()
     // Check that the flag is not already to true
     if (!_hasBeenActivated)
     {
-        // Set the flag
+        // Set the flag (allows to highlight the corresponding links)
         sethasBeenActivated(true);
 
-        // Start the timer to reset the flag "is Published New Value"
+        // Start the timer to reset the flag "has been activated"
         _timer.start();
     }
+
+    // Emit the signal "Activated"
+    Q_EMIT activated();
 }
 
 

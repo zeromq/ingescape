@@ -1189,6 +1189,25 @@ void ScenarioController::onRunAction(QString actionID)
 
 
 /**
+ * @brief Slot called when an action has to be executed
+ * @param action
+ */
+void ScenarioController::onExecuteAction(ActionM* action)
+{
+    if (action != nullptr)
+    {
+        // Execute all effects of the action
+        // Activate (connect) the mapping if necessary
+        // Notify the recorder that the action has been executed
+        executeEffectsOfAction(action, 0);
+
+        // Execute all effects of the action
+        //_executeEffectsOfAction(action);
+    }
+}
+
+
+/**
  * @brief Called when our timer time out to handle the scenario and execute actions
  */
 void ScenarioController::_onTimeout_ExecuteActions()

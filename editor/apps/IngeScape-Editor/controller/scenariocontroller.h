@@ -305,7 +305,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
+     * @brief Signal emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
      * @param peerIdsList
      * @param command
      * @param agentIOPName
@@ -315,7 +315,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Emitted when a command must be sent on the network to an agent about mapping one of its input
+     * @brief Signal emitted when a command must be sent on the network to an agent about mapping one of its input
      * @param peerIdsList
      * @param command
      * @param inputName
@@ -353,6 +353,13 @@ public Q_SLOTS:
      * @param actionID
      */
     void onRunAction(QString actionID);
+
+
+    /**
+     * @brief Slot called when an action has to be executed
+     * @param action
+     */
+    void onExecuteAction(ActionM* action);
 
 
 private Q_SLOTS:

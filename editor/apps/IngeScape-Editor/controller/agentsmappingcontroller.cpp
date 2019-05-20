@@ -595,11 +595,17 @@ void AgentsMappingController::dropLinkBetweenTwoActions(ActionInMappingVM* outpu
         QString linkName = MappingElementM::getLinkNameFromNamesList(outputAction->name(), linkOutput->name(), inputAction->name(), linkInput->name());
 
         // Create a link between two actions in the mapping
-        _createLinkBetweenTwoObjectsInMapping(linkName,
-                                              outputAction,
-                                              linkOutput,
-                                              inputAction,
-                                              linkInput);
+        LinkVM* link = _createLinkBetweenTwoObjectsInMapping(linkName,
+                                                             outputAction,
+                                                             linkOutput,
+                                                             inputAction,
+                                                             linkInput);
+
+        if (link != nullptr)
+        {
+            // Connect to the signal "Activate Input of Object in Mapping" from the link
+            connect(link, &LinkVM::activateInputOfObjectInMapping, this, &AgentsMappingController::_onActivateInputOfActionInMapping);
+        }
     }
 }
 
@@ -623,11 +629,17 @@ void AgentsMappingController::dropLinkFromActionToAgent(ActionInMappingVM* outpu
         QString linkName = MappingElementM::getLinkNameFromNamesList(outputAction->name(), linkOutput->name(), inputAgent->name(), linkInput->name());
 
         // Create a link between from action to agent in the mapping
-        _createLinkBetweenTwoObjectsInMapping(linkName,
-                                              outputAction,
-                                              linkOutput,
-                                              inputAgent,
-                                              linkInput);
+        LinkVM* link = _createLinkBetweenTwoObjectsInMapping(linkName,
+                                                             outputAction,
+                                                             linkOutput,
+                                                             inputAgent,
+                                                             linkInput);
+
+        if (link != nullptr)
+        {
+            // Connect to the signal "Activate Input of Object in Mapping" from the link
+            connect(link, &LinkVM::activateInputOfObjectInMapping, this, &AgentsMappingController::_onWriteOnInputOfAgentInMapping);
+        }
     }
 }
 
@@ -651,11 +663,17 @@ void AgentsMappingController::dropLinkFromAgentToAction(AgentInMappingVM* output
         QString linkName = MappingElementM::getLinkNameFromNamesList(outputAgent->name(), linkOutput->name(), inputAction->name(), linkInput->name());
 
         // Create a link between from agent to action in the mapping
-        _createLinkBetweenTwoObjectsInMapping(linkName,
-                                              outputAgent,
-                                              linkOutput,
-                                              inputAction,
-                                              linkInput);
+        LinkVM* link = _createLinkBetweenTwoObjectsInMapping(linkName,
+                                                             outputAgent,
+                                                             linkOutput,
+                                                             inputAction,
+                                                             linkInput);
+
+        if (link != nullptr)
+        {
+            // Connect to the signal "Activate Input of Object in Mapping" from the link
+            connect(link, &LinkVM::activateInputOfObjectInMapping, this, &AgentsMappingController::_onActivateInputOfActionInMapping);
+        }
     }
 }
 
@@ -1947,6 +1965,53 @@ void AgentsMappingController::_onLinkOutputsListWillBeRemoved(const QList<LinkOu
 
 
 /**
+ * @brief Slot called when an output has been activated, so we have to activate an input (of an action in the global mapping)
+ * @param inputObject
+ * @param linkInput
+ */
+void AgentsMappingController::_onActivateInputOfActionInMapping(ObjectInMappingVM* inputObject, LinkInputVM* linkInput)
+{
+    Q_UNUSED(linkInput)
+
+    if (inputObject != nullptr)
+    {
+        ActionInMappingVM* actionInMapping = qobject_cast<ActionInMappingVM*>(inputObject);
+        if ((actionInMapping != nullptr) && (actionInMapping->action() != nullptr))
+        {
+            qDebug() << "Execute (effects of) Action in Mapping" << actionInMapping->action()->name();
+
+            // Emit the signal "Execute Action"
+            Q_EMIT executeAction(actionInMapping->action());
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when an output has been activated, so we have to write on an input (of an input agent in the global mapping)
+ * @param inputObject
+ * @param linkInput
+ */
+void AgentsMappingController::_onWriteOnInputOfAgentInMapping(ObjectInMappingVM* inputObject, LinkInputVM* linkInput)
+{
+    if ((inputObject != nullptr) && (linkInput != nullptr) && (linkInput->input() != nullptr))
+    {
+        AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(inputObject);
+        if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr))
+        {
+            qDebug() << "Write on Input" << linkInput->input()->name() << "of Agent in Mapping" << agentInMapping->agentsGroupedByName()->name();
+
+            // Emit the signal "Command asked to agent about Setting Value"
+            Q_EMIT commandAskedToAgentAboutSettingValue(agentInMapping->agentsGroupedByName()->peerIdsList(),
+                                                        "SET_INPUT",
+                                                        linkInput->input()->name(),
+                                                        "0");
+        }
+    }
+}
+
+
+/**
  * @brief Create a new agent in the global mapping with an "Agents Grouped by Name" and at a specific position
  * @param agentsGroupedByName
  * @param position
@@ -2160,6 +2225,9 @@ void AgentsMappingController::_deleteLinkBetweenTwoObjectsInMapping(LinkVM* link
         if (_selectedLink == link) {
             setselectedLink(nullptr);
         }
+
+        // DIS-connect to signals from the link
+        disconnect(link, nullptr, this, nullptr);
 
         // Remove from the hash table
         _hashFromIdToLinkInMapping.remove(link->uid());

@@ -257,6 +257,23 @@ Q_SIGNALS:
     void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
 
 
+    /**
+     * @brief Signal emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
+     * @param peerIdsList
+     * @param command
+     * @param agentIOPName
+     * @param value
+     */
+    void commandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value);
+
+
+    /**
+     * @brief Signal emitted when an action has to be executed
+     * @param action
+     */
+    void executeAction(ActionM* action);
+
+
 public Q_SLOTS:
 
     /**
@@ -356,6 +373,22 @@ private Q_SLOTS:
      * @param removedLinkOutputs
      */
     void _onLinkOutputsListWillBeRemoved(const QList<LinkOutputVM*>& removedLinkOutputs);
+
+
+    /**
+     * @brief Slot called when an output has been activated, so we have to activate an input (of an action in the global mapping)
+     * @param inputObject
+     * @param linkInput
+     */
+    void _onActivateInputOfActionInMapping(ObjectInMappingVM* inputObject, LinkInputVM* linkInput);
+
+
+    /**
+     * @brief Slot called when an output has been activated, so we have to write on an input (of an input agent in the global mapping)
+     * @param inputObject
+     * @param linkInput
+     */
+    void _onWriteOnInputOfAgentInMapping(ObjectInMappingVM* inputObject, LinkInputVM* linkInput);
 
 
 private:

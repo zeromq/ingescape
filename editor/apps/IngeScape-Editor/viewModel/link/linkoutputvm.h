@@ -52,12 +52,17 @@ public:
 
 
     /**
-     * @brief Activate (allows to highlight the corresponding links)
+     * @brief Activate
      */
     void activate();
 
 
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when our (link) output has been activated
+     */
+    void activated();
 
 
 public Q_SLOTS:
@@ -87,7 +92,7 @@ private Q_SLOTS:
 
 private:
 
-    // Timer to reset the flag "is Published New Value"
+    // Timer to reset the flag "has been activated"
     // Allows to play an animation when the value changed
     QTimer _timer;
 

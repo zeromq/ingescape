@@ -63,19 +63,17 @@ public:
      * @brief Constructor
      * @param name
      * @param mappingElement corresponding mapping element
-     * @param outputAgent The link starts from this agent
+     * @param outputObject The link starts from this object (in the global mapping)
      * @param linkOutput The link starts from this output of the output agent
-     * @param inputAgent The link ends to this agent
+     * @param inputObject The link ends to this object (in the global mapping)
      * @param linkInput The link ends to this input of the input agent
      * @param isTemporary
      * @param parent
      */
     explicit LinkVM(QString name,
                     MappingElementVM* mappingElement,
-                    //AgentInMappingVM* outputAgent,
                     ObjectInMappingVM* outputObject,
                     LinkOutputVM* linkOutput,
-                    //AgentInMappingVM* inputAgent,
                     ObjectInMappingVM* inputObject,
                     LinkInputVM* linkInput,
                     bool isTemporary,
@@ -98,6 +96,24 @@ public:
      * @return link id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
      */
     static QString getLinkIdFromAgentNamesAndIOids(QString outputAgent, QString outputId, QString inputAgent, QString inputId);
+
+
+Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when the output has been activated, so we have to activate the input (of the input object in the global mapping)
+     * @param inputObject
+     * @param linkInput
+     */
+    void activateInputOfObjectInMapping(ObjectInMappingVM* inputObject, LinkInputVM* linkInput);
+
+
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the (link) output has been activated
+     */
+    void _onOutputActivated();
 
 };
 
