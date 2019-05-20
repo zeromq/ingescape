@@ -113,6 +113,8 @@ namespace CSharpSampleAgent
 
             //Start the agent on the network
             Igs.igs_startWithDevice("Ethernet", 5670);
+
+            //TODO : implement test of the command line functions
         }
 
         public void readGenericFunctions()

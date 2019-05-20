@@ -577,11 +577,10 @@ namespace Ingescape
 
         //Command line for the agent can be passed here for inclusion in the
         //agent's headers. If not used, header is initialized with exec path.
-        /*TODO : implement
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void igs_setCommandLine([MarshalAs(UnmanagedType.LPStr)]  string line);
-        PUBLIC void igs_setCommandLineFromArgs(int argc, const char* argv[]); //first element is replaced by absolute exec path on UNIX
-        */
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void igs_setCommandLineFromArgs(int argc, string argv); //first element is replaced by absolute exec path on UNIX
 
         //When mapping other agents, it is possible to request the
         //mapped agents to send us their current output values
