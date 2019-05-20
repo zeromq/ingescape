@@ -71,6 +71,12 @@ namespace CSharpSampleAgent
             //Get mapping version 
             string mappingVersion = Igs.getMappingVersion();
 
+            //Get agent name
+            string agentName = Igs.getAgentName();
+
+            //Get agent state
+            string agentState = Igs.getAgentState();
+
             //Verbose
             Igs.igs_setVerbose(true);
             bool isVerbose = Igs.igs_isVerbose();
@@ -172,16 +178,7 @@ namespace CSharpSampleAgent
 
             //Listing of input
             int nbOfElement = -1;
-            IntPtr intptr = Igs.igs_getInputsList(ref nbOfElement);
-
-            //intPtr tab
-            IntPtr[] intPtrArray = new IntPtr[nbOfElement];
-
-            //List of string inputs
-            string[] inputsList = new string[nbOfElement];
-
-            //Copy the pointer to the tab of pointer
-            Marshal.Copy(intptr, intPtrArray, 0, nbOfElement);
+            string[] inputsList = Igs.getInputsList(ref nbOfElement);
 
             string myData = "MyData";
             IntPtr myDataPtr = Marshal.StringToHGlobalAnsi(myData);
@@ -189,18 +186,9 @@ namespace CSharpSampleAgent
             //Fill the string tab
             for (int i = 0; i < nbOfElement; i++)
             {
-                inputsList[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
-
-                //TOFIX : release memory raise an exception
-                //Marshal.FreeCoTaskMem(intPtrArray[i]);
-
-                //Observe the current input
-      
+                //Observe the current input    
                 Igs.igs_observeInput(inputsList[i], callbckPtr, myDataPtr);
             }
-
-            //release the memory
-            Igs.igs_freeIOPList(ref intptr, nbOfElement);           
         }
 
         public void createDefDynamically()
