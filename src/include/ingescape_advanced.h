@@ -173,7 +173,7 @@ typedef void* igsJSON_t;
 PUBLIC void igs_JSONfree(igsJSON_t *json);
 
 // generate a JSON string
-PUBLIC igsJSON_t igs_JSONinit(void); //must call igs_JSONcloseAndFree on returned value to free it
+PUBLIC igsJSON_t igs_JSONinit(void); //must call igs_JSONfree on returned value to free it
 PUBLIC void igs_JSONopenMap(igsJSON_t json);
 PUBLIC void igs_JSONcloseMap(igsJSON_t json);
 PUBLIC void igs_JSONopenArray(igsJSON_t json);
