@@ -55,7 +55,7 @@ igsJSON_t igs_JSONinit(void){
     igsyajl_gen g = igsyajl_gen_alloc(NULL);
     igsyajl_gen_config(g, igsyajl_gen_beautify, 1);
     igsyajl_gen_config(g, igsyajl_gen_validate_utf8, 1);
-    return g;
+    return (igsJSON_t) g;
 }
 void igs_JSONopenMap(igsJSON_t json){
     igsyajl_gen g = (igsyajl_gen) json;

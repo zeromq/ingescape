@@ -169,7 +169,7 @@ PUBLIC bool igs_checkTokenArgumentExistence(const char *tokenName, const char *a
 //////////////////////////////////////////////////
 //JSON facilities
 
-typedef void* igsJSON_t;
+typedef struct _igsJSON* igsJSON_t;
 PUBLIC void igs_JSONfree(igsJSON_t *json);
 
 // generate a JSON string

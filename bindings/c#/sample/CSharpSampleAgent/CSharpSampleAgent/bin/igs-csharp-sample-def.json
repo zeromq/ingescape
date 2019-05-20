@@ -4,16 +4,20 @@
 		"description": "this module is the Csharp sample agent",
 		"version": "1.0",
 		"parameters": [{
-                   "name": "integer",
+                   "name": "integer-param",
                    "type": "INTEGER",
                    "value": 0
                    },{
-                   "name": "double",
+                   "name": "double-param",
                    "type": "DOUBLE",
                    "value": 0.0
                    }, {
-                   "name": "boolean",
+                   "name": "boolean-param",
                    "type": "BOOL",
+                   "value": "true"
+                   }, {
+                   "name": "string-param",
+                   "type": "STRING",
                    "value": "true"
                    }],
         "inputs": [{

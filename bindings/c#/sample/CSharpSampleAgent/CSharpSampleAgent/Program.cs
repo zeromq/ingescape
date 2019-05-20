@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using IngescapeCSharp;
+using Ingescape;
 
 namespace CSharpSampleAgent
 {
@@ -33,7 +33,11 @@ namespace CSharpSampleAgent
             //Write on outputs
             igsAgent.writeOnInputs();
 
-            //Remove mapping dynamically after a while
+            //Read inputs
+            igsAgent.readGenericFunctions();
+
+            //Write & Read data
+            igsAgent.writeAndReadData();
 
             int iteration = 0;
             string msg = null;
@@ -56,6 +60,8 @@ namespace CSharpSampleAgent
                 {
                     msg = "log : " + iteration++;
                     igsAgent.writeInLog(msg);
+
+                    igsAgent.writeOnInputs();
                 }
             }
         }

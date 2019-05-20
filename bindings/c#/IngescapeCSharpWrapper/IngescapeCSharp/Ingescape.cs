@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 
-namespace IngescapeCSharp
+namespace Ingescape
 {
     public enum iop_t { IGS_INPUT_T = 1, IGS_OUTPUT_T, IGS_PARAMETER_T };
     public enum iopType_t { IGS_INTEGER_T = 1, IGS_DOUBLE_T, IGS_STRING_T, IGS_BOOL_T, IGS_IMPULSION_T, IGS_DATA_T };
@@ -32,7 +32,7 @@ namespace IngescapeCSharp
     public delegate void igs_freezeCallback(bool isPaused, IntPtr myData);
 
 
-     public class Ingescape
+     public class Igs
     {
         //////////////////////////////////////////////////
         // Initialization and control
@@ -66,13 +66,27 @@ namespace IngescapeCSharp
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_setAgentName([MarshalAs(UnmanagedType.LPStr)]  string name);
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getAgentName();
+        private static extern IntPtr igs_getAgentName();
+        public static string getAgentName()
+        {
+            string agentName = "";
+            IntPtr ptr = igs_getAgentName();
+            agentName = Marshal.PtrToStringAnsi(ptr);
+            return agentName;
+        }
 
         //control agent state
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_setAgentState([MarshalAs(UnmanagedType.LPStr)]  string state);
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getAgentState();
+        private static extern IntPtr igs_getAgentState();
+        public static string getAgentState()
+        {
+            string str = "";
+            IntPtr ptr = igs_getAgentState();
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
 
         //mute the agent ouputs
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -107,11 +121,12 @@ namespace IngescapeCSharp
         //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
         //read IOP using void*
-        /* TODO : implement
-        PUBLIC int igs_readInput(const char* name, void** value, size_t *size);
-        PUBLIC int igs_readOutput(const char* name, void** value, size_t *size);
-        PUBLIC int igs_readParameter(const char* name, void** value, size_t *size);
-        */
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_readInput(string name, IntPtr[] value, ref int size);
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_readOutput(string name, IntPtr[] value, ref int size);
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_readParameter(string name, IntPtr[] value, ref int size);
 
         //read per type
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -122,10 +137,23 @@ namespace IngescapeCSharp
         public static extern double igs_readInputAsDouble([MarshalAs(UnmanagedType.LPStr)]  string name);
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr igs_readInputAsString([MarshalAs(UnmanagedType.LPStr)]  string name);
-        /*TODO : implement 
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int igs_readInputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, void** data, long* size);
-        */
+        public static extern int igs_readInputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, IntPtr[] data, ref int size);
+        public static int readInputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, ref byte[] data)
+        {
+            //Initialization
+            int sizeRead = 0;
+            IntPtr[] intPtrArray = new IntPtr[1];
+
+            //Read output data
+            int ret = igs_readInputAsData(name, intPtrArray, ref sizeRead);
+
+            //IntPtr to byte array
+            data = new byte[sizeRead];
+            Marshal.Copy(intPtrArray[0], data, 0, sizeRead);
+
+            return ret;
+        }
 
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool igs_readOutputAsBool([MarshalAs(UnmanagedType.LPStr)]  string name);
@@ -135,10 +163,30 @@ namespace IngescapeCSharp
         public static extern double igs_readOutputAsDouble([MarshalAs(UnmanagedType.LPStr)]  string name);
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr igs_readOutputAsString([MarshalAs(UnmanagedType.LPStr)]  string name);
-        /* TODO : implement it
+        public static string readOutputAsString(string name)
+        {
+            string str = "";
+            IntPtr ptr = igs_readOutputAsString(name);
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int igs_readOutputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, void** data, long* size);
-        */
+        private static extern int igs_readOutputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, IntPtr[] data, ref int size);
+        public static int readOutputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, ref byte[] data)
+        {
+            //Initialization
+            int sizeRead = 0;
+            IntPtr[] intPtrArray = new IntPtr[1];
+
+            //Read output data
+            int ret = igs_readOutputAsData(name, intPtrArray, ref sizeRead);
+
+            //IntPtr to byte array
+            data = new byte[sizeRead];
+            Marshal.Copy(intPtrArray[0], data, 0, sizeRead);
+
+            return ret;
+        }
 
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool igs_readParameterAsBool([MarshalAs(UnmanagedType.LPStr)]  string name);
@@ -148,10 +196,30 @@ namespace IngescapeCSharp
         public static extern double igs_readParameterAsDouble([MarshalAs(UnmanagedType.LPStr)]  string name);
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr igs_readParameterAsString([MarshalAs(UnmanagedType.LPStr)]  string name);
-        /*TODO : implement 
+        public static string readParameterAsString(string name)
+        {
+            string str = "";
+            IntPtr ptr = igs_readParameterAsString(name);
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int igs_readParameterAsData([MarshalAs(UnmanagedType.LPStr)]  string name, void** data, long* size);
-        */
+        public static extern int igs_readParameterAsData([MarshalAs(UnmanagedType.LPStr)]  string name, IntPtr[] data, ref int size);
+        public static int readParameterAsData([MarshalAs(UnmanagedType.LPStr)]  string name, ref byte[] data)
+        {
+            //Initialization
+            int sizeRead = 0;
+            IntPtr[] intPtrArray = new IntPtr[1];
+
+            //Read output data
+            int ret = igs_readParameterAsData(name, intPtrArray, ref sizeRead);
+
+            //IntPtr to byte array
+            data = new byte[sizeRead];
+            Marshal.Copy(intPtrArray[0], data, 0, sizeRead);
+
+            return ret;
+        }
 
         //write per type
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -164,9 +232,8 @@ namespace IngescapeCSharp
         public static extern int igs_writeInputAsString([MarshalAs(UnmanagedType.LPStr)]  string name, [MarshalAs(UnmanagedType.LPStr)] string value);
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_writeInputAsImpulsion([MarshalAs(UnmanagedType.LPStr)]  string name);
-        //TODO : implement it
-        //      [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern int igs_writeInputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, void* value, long size);
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_writeInputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, byte[] value, int size);
 
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_writeOutputAsBool([MarshalAs(UnmanagedType.LPStr)]  string name, bool value);
@@ -178,11 +245,8 @@ namespace IngescapeCSharp
         public static extern int igs_writeOutputAsString([MarshalAs(UnmanagedType.LPStr)]  string name, [MarshalAs(UnmanagedType.LPStr)] string value);
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_writeOutputAsImpulsion([MarshalAs(UnmanagedType.LPStr)]  string name);
-        //TODO : implement it
-        //      [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern int igs_writeOutputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, void* value, long size);
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int igs_writeOutputAsData([MarshalAs(UnmanagedType.LPStr)] string name, byte[] data, int size);
+        public static extern int igs_writeOutputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, byte[] value, int size);
 
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_writeParameterAsBool([MarshalAs(UnmanagedType.LPStr)]  string name, bool value);
@@ -192,9 +256,8 @@ namespace IngescapeCSharp
         public static extern int igs_writeParameterAsDouble([MarshalAs(UnmanagedType.LPStr)]  string name, double value);
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_writeParameterAsString([MarshalAs(UnmanagedType.LPStr)]  string name, [MarshalAs(UnmanagedType.LPStr)] string value);
-        //TODO : implement it
-        //      [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern int igs_writeParameterAsData([MarshalAs(UnmanagedType.LPStr)]  string name, void* value, long size);
+        [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int igs_writeParameterAsData([MarshalAs(UnmanagedType.LPStr)]  string name, byte[] value, int size);
 
         //clear IOP data in memory without having to write the IOP
         //(relevant for IOPs with IGS_DATA_T type only)
@@ -246,11 +309,85 @@ namespace IngescapeCSharp
 
         
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getInputsList(ref int nbOfElements); //returned char** must be freed using igs_freeIOPList
+        private static extern IntPtr igs_getInputsList(ref int nbOfElements); //returned char** must be freed using igs_freeIOPList
+        public static string[] getInputsList(ref int nbOfElements)
+        {
+            IntPtr intptr = igs_getInputsList(ref nbOfElements);
+
+            //intPtr tab
+            IntPtr[] intPtrArray = new IntPtr[nbOfElements];
+
+            //List of string inputs
+            string[] list = new string[nbOfElements];
+
+            //Copy the pointer to the tab of pointer
+            Marshal.Copy(intptr, intPtrArray, 0, nbOfElements);
+
+            //Fill the string tab
+            for (int i = 0; i < nbOfElements; i++)
+            {
+                list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
+
+                //TOFIX : release memory raise an exception
+                //Marshal.FreeCoTaskMem(intPtrArray[i]);
+            }
+            //release the memory
+            Igs.igs_freeIOPList(ref intptr, nbOfElements);
+
+            return list;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getOutputsList(ref int nbOfElements); //returned char** must be freed using igs_freeIOPList
+        private static extern IntPtr igs_getOutputsList(ref int nbOfElements); //returned char** must be freed using igs_freeIOPList
+        public static string[] getOutputsList(ref int nbOfElements)
+        {
+            IntPtr intptr = igs_getOutputsList(ref nbOfElements);
+
+            //intPtr tab
+            IntPtr[] intPtrArray = new IntPtr[nbOfElements];
+
+            //List of string inputs
+            string[] list = new string[nbOfElements];
+
+            //Copy the pointer to the tab of pointer
+            Marshal.Copy(intptr, intPtrArray, 0, nbOfElements);
+
+            //Fill the string tab
+            for (int i = 0; i < nbOfElements; i++)
+            {
+                list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
+
+                //TOFIX : release memory raise an exception
+                //Marshal.FreeCoTaskMem(intPtrArray[i]);
+            }
+
+            return list;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getParametersList(ref int nbOfElements); //returned char** must be freed using igs_freeIOPList
+        private static extern IntPtr igs_getParametersList(ref int nbOfElements); //returned char** must be freed using igs_freeIOPList
+        public static string[] getParametersList(ref int nbOfElements)
+        {
+            IntPtr intptr = igs_getParametersList(ref nbOfElements);
+
+            //intPtr tab
+            IntPtr[] intPtrArray = new IntPtr[nbOfElements];
+
+            //List of string inputs
+            string[] list = new string[nbOfElements];
+
+            //Copy the pointer to the tab of pointer
+            Marshal.Copy(intptr, intPtrArray, 0, nbOfElements);
+
+            //Fill the string tab
+            for (int i = 0; i < nbOfElements; i++)
+            {
+                list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
+
+                //TOFIX : release memory raise an exception
+                //Marshal.FreeCoTaskMem(intPtrArray[i]);
+            }
+
+            return list;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void igs_freeIOPList(ref IntPtr list, int nbOfElements);
         
@@ -273,13 +410,41 @@ namespace IngescapeCSharp
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_clearDefinition(); //clears definition data for the agent
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getDefinition(); //returns json string
+        private static extern IntPtr igs_getDefinition(); //returns json string
+        public static string getDefinition()
+        {
+            string str = "";
+            IntPtr ptr = igs_getDefinition();
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getDefinitionName();
+        private static extern IntPtr igs_getDefinitionName();
+        public static string getDefinitionName()
+        {
+            string str = "";
+            IntPtr ptr = igs_getDefinitionName();
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getDefinitionDescription();
+        private static extern IntPtr igs_getDefinitionDescription();
+        public static string getDefinitionDescription()
+        {
+            string str = "";
+            IntPtr ptr = igs_getDefinitionDescription();
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getDefinitionVersion();
+        private static extern IntPtr igs_getDefinitionVersion();
+        public static string getDefinitionVersion()
+        {
+            string str = "";
+            IntPtr ptr = igs_getDefinitionVersion();
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_setDefinitionName([MarshalAs(UnmanagedType.LPStr)] string name);
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -313,13 +478,44 @@ namespace IngescapeCSharp
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int igs_clearMapping(); //clears mapping data for the agent
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getMapping(); //returns json string
+        private static extern IntPtr igs_getMapping(); //returns json string
+        public static string getMapping()
+        {
+            string str = "";
+            IntPtr ptr = igs_getMapping();
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getMappingName();
+        private static extern IntPtr igs_getMappingName();
+        public static string getMappingName()
+        {
+            string str = "";
+            IntPtr ptr = igs_getMappingName();
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getMappingDescription();
+        private static extern IntPtr igs_getMappingDescription();
+        public static string getMappingDescription()
+        {
+            string str = "";
+            IntPtr ptr = igs_getMappingDescription();
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr igs_getMappingVersion();
+        private static extern IntPtr igs_getMappingVersion(); 
+        public static string getMappingVersion()
+        {
+            string mappingVersion = "";
+
+            IntPtr ptr = igs_getMappingVersion();
+
+            mappingVersion = Marshal.PtrToStringAnsi(ptr);
+
+            return mappingVersion;
+        }       
 
         //edit mapping using the API
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -349,9 +545,34 @@ namespace IngescapeCSharp
         //Utility functions to find network adapters with broadcast capabilities
         //to be used in igs_startWithDevice
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void igs_getNetdevicesList(out IntPtr devices, ref int nb);
+        private static extern void igs_getNetdevicesList(IntPtr[,] devices, ref int nb);
+        public static string [] getNetDevicesList()
+        {
+            //Get netdevices list
+            IntPtr[,] ptrTab = new IntPtr[1, 1];
+            int nb = 0;
+            Igs.igs_getNetdevicesList(ptrTab, ref nb);
+
+            //IntPtr to byte array
+            IntPtr[] devicesPtrList = new IntPtr[nb];
+            Marshal.Copy(ptrTab[0, 0], devicesPtrList, 0, nb);
+
+            //List of string inputs
+            string[] devicesList = new string[nb];
+
+            //Fill the string tab
+            for (int i = 0; i < nb; i++)
+            {
+                devicesList[i] = Marshal.PtrToStringAnsi(devicesPtrList[i]);
+            }
+            //HOTFIX : release the memory
+            //Igs.igs_freeNetdevicesList(devicesPtrList, nb);
+
+            return devicesList;
+        }
+
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void igs_freeNetdevicesList(IntPtr devices, int nb);
+        public static extern void igs_freeNetdevicesList(IntPtr[] devices, int nb);
 
 
         //Command line for the agent can be passed here for inclusion in the
@@ -405,7 +626,13 @@ namespace IngescapeCSharp
         public static extern void igs_setLogPath(string path); //default directory is ~/ on UNIX systems and current PATH on Windows
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr igs_getLogPath(); // must be freed by caller
-
+        public static string getLogPath()
+        {
+            string str = "";
+            IntPtr ptr = igs_getLogPath();
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void igs_setLogLevel(igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
         [DllImport("C:\\ingescape\\libs\\debug\\ingescape.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
