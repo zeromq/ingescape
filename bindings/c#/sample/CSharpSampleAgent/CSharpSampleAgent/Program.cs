@@ -39,6 +39,9 @@ namespace CSharpSampleAgent
             //Write & Read data
             igsAgent.writeAndReadData();
 
+            //Read output
+            igsAgent.readOutputs();
+
             int iteration = 0;
             string msg = null;
             while (true)

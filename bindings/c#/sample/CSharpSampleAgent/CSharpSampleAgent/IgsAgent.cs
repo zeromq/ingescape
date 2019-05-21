@@ -25,7 +25,7 @@ namespace CSharpSampleAgent
             switch (valueType)
             {
                 case iopType_t.IGS_BOOL_T:
-                    bool stateReceived = Igs.igs_readInputAsBool("boolean");
+                    bool stateReceived = Igs.readInputAsBool("boolean");
                     Console.WriteLine("Callback sur 'boolean' input : " + stateReceived.ToString());
                     break;
 
@@ -33,7 +33,7 @@ namespace CSharpSampleAgent
                     break;
 
                 case iopType_t.IGS_DOUBLE_T:
-                    double doubleReceived = Igs.igs_readInputAsDouble("double");
+                    double doubleReceived = Igs.readInputAsDouble("double");
                     Console.WriteLine("Callback sur 'double' input : " + doubleReceived.ToString());
                     break;
 
@@ -42,12 +42,12 @@ namespace CSharpSampleAgent
                     break;
 
                 case iopType_t.IGS_INTEGER_T:
-                    int valueReceived = Igs.igs_readInputAsInt("integer");
+                    int valueReceived = Igs.readInputAsInt("integer");
                     Console.WriteLine("Callback sur 'integer' input : " + valueReceived.ToString());
                     break;
 
                 case iopType_t.IGS_STRING_T:
-                    IntPtr intPtr = Igs.igs_readInputAsString("string");
+                    IntPtr intPtr = Igs.readInputAsString("string");
                     string msg = Marshal.PtrToStringAnsi(intPtr);
                     Console.WriteLine("Callback sur 'string' input : " + msg);
                     break;
@@ -63,10 +63,10 @@ namespace CSharpSampleAgent
         public IgsAgent()
         {
             //Load a definition from file
-            Igs.igs_loadDefinitionFromPath("../igs-csharp-sample-def.json");
+            Igs.loadDefinitionFromPath("../igs-csharp-sample-def.json");
 
             //Load mapping from file
-            Igs.igs_loadMappingFromPath("../igs-csharp-sample-mapping.json");
+            Igs.loadMappingFromPath("../igs-csharp-sample-mapping.json");
 
             //Get mapping version 
             string mappingVersion = Igs.getMappingVersion();
@@ -81,38 +81,37 @@ namespace CSharpSampleAgent
             string[] netDevicesList = Igs.getNetDevicesList();
  
             //Verbose
-            Igs.igs_setVerbose(true);
-            bool isVerbose = Igs.igs_isVerbose();
+            Igs.setVerbose(true);
+            bool isVerbose = Igs.isVerbose();
             Console.WriteLine("Is verbose : " + isVerbose);
 
             //Color Verbose
-            Igs.igs_setUseColorVerbose(true);
-            bool isColorVerbose = Igs.igs_getUseColorVerbose();
+            Igs.setUseColorVerbose(true);
+            bool isColorVerbose = Igs.getUseColorVerbose();
             Console.WriteLine("Is colored verbose : " + isColorVerbose);
 
             //Log Stream
-            Igs.igs_setLogStream(true);
-            bool isLogStream = Igs.igs_getLogStream();
+            Igs.setLogStream(true);
+            bool isLogStream = Igs.getLogStream();
             Console.WriteLine("Is log stream : " + isLogStream);
 
             //Log in file
-            Igs.igs_setLogInFile(true);
-            bool isLogFile = Igs.igs_getLogInFile();
+            Igs.setLogInFile(true);
+            bool isLogFile = Igs.getLogInFile();
             Console.WriteLine("Is log file : " + isLogFile);
 
             //Log path
-            Igs.igs_setLogPath("testLogFile.txt");
-            IntPtr logPathPtr = Igs.igs_getLogPath();
-            string logPath = Marshal.PtrToStringAnsi(logPathPtr);
+            Igs.setLogPath("testLogFile.txt");
+            string logPath = Igs.getLogPath();
             Console.WriteLine("Log file path : " + logPath);
 
             //Log level
-            Igs.igs_setLogLevel(igs_logLevel_t.IGS_LOG_TRACE);
-            igs_logLevel_t logLevel = Igs.igs_getLogLevel();
+            Igs.setLogLevel(igs_logLevel_t.IGS_LOG_TRACE);
+            igs_logLevel_t logLevel = Igs.getLogLevel();
             Console.WriteLine("Log level : " + logLevel);
 
             //Start the agent on the network
-            Igs.igs_startWithDevice("Ethernet", 5670);
+            Igs.startWithDevice("Ethernet", 5670);
 
             //TODO : implement test of the command line functions
         }
@@ -124,12 +123,12 @@ namespace CSharpSampleAgent
              */ 
             //Write a value
             string str = "helloword-input";
-            Igs.igs_writeInputAsString("string", str);
+            Igs.writeInputAsString("string", str);
 
             //Use the generic function to read the value of the input
             IntPtr[] intPtrArray = new IntPtr[1];
             int size = 0;
-            Igs.igs_readInput("string", intPtrArray, ref size);
+            Igs.readInput("string", intPtrArray, ref size);
             string value = Marshal.PtrToStringAnsi(intPtrArray[0]);
 
             //Print the value
@@ -140,11 +139,11 @@ namespace CSharpSampleAgent
              */
             //Write a value
             str = "helloword-out";
-            Igs.igs_writeOutputAsString("string-out", str);
+            Igs.writeOutputAsString("string-out", str);
 
             //Use the generic function to read the value of the output
             //intPtrArray = new IntPtr[1];
-            Igs.igs_readOutput("string-out", intPtrArray, ref size);
+            Igs.readOutput("string-out", intPtrArray, ref size);
             value = Marshal.PtrToStringAnsi(intPtrArray[0]);
 
             //Print the value
@@ -155,11 +154,11 @@ namespace CSharpSampleAgent
              */
             //Write a value
             str = "helloword-param";
-            Igs.igs_writeParameterAsString("string-param", str);
+            Igs.writeParameterAsString("string-param", str);
 
             //Use the generic function to read the value of the parameter
             //intPtrArray = new IntPtr[1];
-            Igs.igs_readParameter("string-param", intPtrArray, ref size);
+            Igs.readParameter("string-param", intPtrArray, ref size);
             value = Marshal.PtrToStringAnsi(intPtrArray[0]);
 
             //Print the value
@@ -169,7 +168,7 @@ namespace CSharpSampleAgent
         public void writeInLog(string msg)
         {
             //Test the log file function
-            Igs.igs_log(igs_logLevel_t.IGS_LOG_INFO, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+            Igs.log(igs_logLevel_t.IGS_LOG_INFO, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
 
             //Test the function like macro function wrapping
             Igs.igs_warn(msg);
@@ -192,45 +191,45 @@ namespace CSharpSampleAgent
             for (int i = 0; i < nbOfElement; i++)
             {
                 //Observe the current input    
-                Igs.igs_observeInput(inputsList[i], callbckPtr, myDataPtr);
+                Igs.observeInput(inputsList[i], callbckPtr, myDataPtr);
             }
         }
 
         public void createDefDynamically()
         {
-            Igs.igs_createInput("string", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
-            Igs.igs_createInput("impulsion", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
+            Igs.createInput("string", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
+            Igs.createInput("impulsion", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
 
-            Igs.igs_createParameter("string", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
-            Igs.igs_createParameter("impulsion", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
+            Igs.createParameter("string", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
+            Igs.createParameter("impulsion", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
 
-            Igs.igs_createOutput("string-out", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
-            Igs.igs_createOutput("impulsion-out", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
-            Igs.igs_createOutput("data-out", iopType_t.IGS_DATA_T, IntPtr.Zero, 0);
+            Igs.createOutput("string-out", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
+            Igs.createOutput("impulsion-out", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
+            Igs.createOutput("data-out", iopType_t.IGS_DATA_T, IntPtr.Zero, 0);
         }
 
         public void createMappingDynamically()
         {
-            Igs.igs_addMappingEntry("string", "Csharp-Sample", "string-out");
-            Igs.igs_addMappingEntry("impulsion", "Csharp-Sample", "impulsion-out");
+            Igs.addMappingEntry("string", "Csharp-Sample", "string-out");
+            Igs.addMappingEntry("impulsion", "Csharp-Sample", "impulsion-out");
         }
 
         public void writeOnInputs()
         {
             //Integer
             int value = 100;
-            int result = Igs.igs_writeInputAsInt("integer", value);
+            int result = Igs.writeInputAsInt("integer", value);
 
             //Double
             double val = 100.111;
-            result = Igs.igs_writeInputAsDouble("double", val);
+            result = Igs.writeInputAsDouble("double", val);
 
             //String
             string msg = "Helloword";
-            result = Igs.igs_writeOutputAsString("string", msg);
+            result = Igs.writeOutputAsString("string", msg);
 
             //Impulsion
-            result = Igs.igs_writeOutputAsImpulsion("impulsion");
+            result = Igs.writeOutputAsImpulsion("impulsion");
         }
 
         public void writeAndReadData()
@@ -248,7 +247,7 @@ namespace CSharpSampleAgent
 
             //Write on output
             int size = fooBytes.Length;
-            Igs.igs_writeOutputAsData("data-out", fooBytes, size);
+            Igs.writeOutputAsData("data-out", fooBytes, size);
 
             //Read data
             byte[] data = new byte[]{};
@@ -260,9 +259,14 @@ namespace CSharpSampleAgent
             Foo readFoo = (Foo)formatter.Deserialize(msRead);
         }
 
+        public void readOutputs()
+        {
+            string str = Igs.readOutputAsString("string-out");
+        }
+
         public void stop()
         {
-            Igs.igs_stop();
+            Igs.stop();
         }
     }
 }
