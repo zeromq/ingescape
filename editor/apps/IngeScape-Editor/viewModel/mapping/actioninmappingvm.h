@@ -79,6 +79,13 @@ private Q_SLOTS:
     void _onAllEffectsHaveBeenExecuted();
 
 
+    /**
+     * @brief Slot called when the name of the action changed
+     * @param name
+     */
+    void _onActionNameChanged(QString name);
+
+
 };
 
 QML_DECLARE_TYPE(ActionInMappingVM)

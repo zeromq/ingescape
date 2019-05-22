@@ -46,8 +46,9 @@ ActionInMappingVM::ActionInMappingVM(int uid,
 
         qInfo() << "New Action" << _name << "(" << _uid << ") in the global mapping";
 
-        // Connect to signal "All Effects have been Executed" from the model of action
+        // Connect to signals from the model of action
         connect(_action, &ActionM::allEffectsHaveBeenExecuted, this, &ActionInMappingVM::_onAllEffectsHaveBeenExecuted);
+        connect(_action, &ActionM::nameChanged, this, &ActionInMappingVM::_onActionNameChanged);
     }
 }
 
@@ -61,8 +62,8 @@ ActionInMappingVM::~ActionInMappingVM()
 
     if (_action != nullptr)
     {
-        // DIS-connect to signal "All Effects have been Executed" from the model of action
-        disconnect(_action, &ActionM::allEffectsHaveBeenExecuted, this, &ActionInMappingVM::_onAllEffectsHaveBeenExecuted);
+        // DIS-connect to signals from the model of action
+        disconnect(_action, nullptr, this, nullptr);
 
         // Deleted elsewhere
         setaction(nullptr);
@@ -100,4 +101,16 @@ void ActionInMappingVM::_onAllEffectsHaveBeenExecuted()
         // Activate the link
         _linkOutput->activate();
     }
+}
+
+
+/**
+ * @brief Slot called when the name of the action changed
+ * @param name
+ */
+void ActionInMappingVM::_onActionNameChanged(QString name)
+{
+    //qDebug() << "Action name changed from" << _name << "to" << name;
+
+    setname(name);
 }
