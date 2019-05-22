@@ -602,6 +602,28 @@ Rectangle {
             color: IngeScapeEditorTheme.agentsONNameMappingColor
         }
 
+        // Action UID
+        Text {
+            id: txtActionUID
+
+            anchors {
+                bottom: parent.bottom
+                bottomMargin: 5
+                horizontalCenter: parent.horizontalCenter
+            }
+
+            visible: IngeScapeEditorC.isAvailableModelVisualizer
+
+            text: rootItem.actionInMappingVM ? (rootItem.actionInMappingVM.action ? rootItem.actionInMappingVM.uid + " (" + rootItem.actionInMappingVM.action.uid + ")" : rootItem.actionInMappingVM.uid)
+                                             : "";
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                pixelSize: 16
+            }
+        }
+
 
         // Remove button
         Button {
