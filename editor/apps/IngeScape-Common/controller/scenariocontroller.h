@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -22,7 +22,8 @@
 
 #include "I2PropertyHelpers.h"
 
-#include <controller/editormodelmanager.h>
+//#include <controller/editormodelmanager.h>
+#include <controller/ingescapemodelmanager.h>
 #include <controller/actioneditorcontroller.h>
 #include <viewModel/agentsgroupedbynamevm.h>
 #include <viewModel/scenario/actionvm.h>
@@ -115,7 +116,8 @@ public:
      * @param jsonHelper
      * @param parent
      */
-    explicit ScenarioController(EditorModelManager* modelManager,
+    explicit ScenarioController(//EditorModelManager* modelManager,
+                                IngeScapeModelManager* modelManager,
                                 JsonHelper* jsonHelper,
                                 QObject *parent = nullptr);
 
@@ -473,7 +475,8 @@ private:
 private:
 
     // Manager for the data model of INGESCAPE
-    EditorModelManager* _modelManager;
+    //EditorModelManager* _modelManager;
+    IngeScapeModelManager* _modelManager;
 
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;

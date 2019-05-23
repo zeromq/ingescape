@@ -5,12 +5,14 @@ QT += qml quick svg xml sql quick-private core-private gui-private concurrent
 
 
 SOURCES += \
+    $$PWD/controller/scenariocontroller.cpp \
     $$PWD/ingescapecommon.cpp \
     $$PWD/settings/ingescapesettings.cpp \
     $$PWD/misc/terminationsignalwatcher.cpp \
     $$PWD/misc/ingescapeutils.cpp \
     $$PWD/misc/debugquickinspector.cpp \
     $$PWD/model/enums.cpp \
+    $$PWD/model/hostm.cpp \
     $$PWD/model/jsonhelper.cpp \
     $$PWD/model/publishedvaluem.cpp \
     $$PWD/model/agent/agentm.cpp \
@@ -46,6 +48,7 @@ SOURCES += \
     $$PWD/sortFilter/abstracttimerangefilter.cpp
 
 HEADERS += \
+    $$PWD/controller/scenariocontroller.h \
     $$PWD/ingescapecommon.h \
     $$PWD/ingescape-common_global.h \
     $$PWD/settings/ingescapesettings.h \
@@ -53,6 +56,7 @@ HEADERS += \
     $$PWD/misc/ingescapeutils.h \
     $$PWD/misc/debugquickinspector.h \
     $$PWD/model/enums.h \
+    $$PWD/model/hostm.h \
     $$PWD/model/jsonhelper.h \
     $$PWD/model/publishedvaluem.h \
     $$PWD/model/agent/agentm.h \

@@ -24,6 +24,7 @@ RecordController::RecordController(AssessmentsModelManager* modelManager,
                                    JsonHelper* jsonHelper,
                                    QObject *parent) : QObject(parent),
     _timeLineC(nullptr),
+    _scenarioC(nullptr),
     _currentRecord(nullptr),
     _selectedAction(nullptr),
     _modelManager(modelManager),
@@ -36,6 +37,10 @@ RecordController::RecordController(AssessmentsModelManager* modelManager,
 
     // Create the controller to manage the time-line
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
+
+    // Create the controller for scenario management
+    _scenarioC = new ScenarioController(_modelManager, _jsonHelper, this);
+
 
     // Connect to the signal "time range changed" from the time line
     // to the scenario controller to filter the action view models
@@ -50,6 +55,10 @@ RecordController::~RecordController()
 {
     qInfo() << "Delete Record Controller";
 
+    //
+    // Clean-up sub-controllers
+    //
+
     if (_timeLineC != nullptr)
     {
         //disconnect(_timeLineC);
@@ -58,6 +67,17 @@ RecordController::~RecordController()
         settimeLineC(nullptr);
         delete temp;
     }
+
+    if (_scenarioC != nullptr)
+    {
+        //disconnect(_scenarioC);
+
+        ScenarioController* temp = _scenarioC;
+        setscenarioC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
+
 
     // Reset the model of the current record
     if (_currentRecord != nullptr)
