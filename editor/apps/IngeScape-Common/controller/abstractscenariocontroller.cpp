@@ -15,7 +15,6 @@
 #include "abstractscenariocontroller.h"
 
 #include <QDebug>
-#include <QFileDialog>
 #include <misc/ingescapeutils.h>
 
 /**
@@ -24,8 +23,7 @@
  * @param jsonHelper
  * @param parent
  */
-AbstractScenarioController::AbstractScenarioController(//EditorModelManager* modelManager,
-                                                       IngeScapeModelManager* modelManager,
+AbstractScenarioController::AbstractScenarioController(IngeScapeModelManager* modelManager,
                                                        JsonHelper* jsonHelper,
                                                        QObject *parent) : QObject(parent),
     _selectedAction(nullptr),
