@@ -16,6 +16,7 @@
 		973DC288207A93E6004C1D80 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = 973DC287207A93E6004C1D80 /* bus.c */; };
 		973DC289207A93E6004C1D80 /* bus.c in Sources */ = {isa = PBXBuildFile; fileRef = 973DC287207A93E6004C1D80 /* bus.c */; };
 		97551291207A449300720931 /* ingescape_advanced.h in Headers */ = {isa = PBXBuildFile; fileRef = 975512902078EF1900720931 /* ingescape_advanced.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		97574A9022870C5100C31B99 /* json.c in Sources */ = {isa = PBXBuildFile; fileRef = 9768B2AD22830F0E00310410 /* json.c */; };
 		9762EDDA1EAE547B002062A1 /* definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* definition.c */; };
 		9762EDDB1EAE547B002062A1 /* mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* mapping.c */; };
 		9762EDDC1EAE547B002062A1 /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* model.c */; };
@@ -30,6 +31,7 @@
 		9762EDF91EAE55D2002062A1 /* utringbuffer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79951EA7B112003153EF /* utringbuffer.h */; };
 		9762EDFA1EAE55D2002062A1 /* utstring.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79961EA7B112003153EF /* utstring.h */; };
 		9762EDFB1EAE55D2002062A1 /* utvector.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79971EA7B112003153EF /* utvector.h */; };
+		9768B2AE22830F0E00310410 /* json.c in Sources */ = {isa = PBXBuildFile; fileRef = 9768B2AD22830F0E00310410 /* json.c */; };
 		9772A52720BDE42700729D59 /* token.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* token.c */; };
 		9772A52820BDE42700729D59 /* token.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* token.c */; };
 		977C247A1F03F4FA00CA1675 /* ingescape.h in Headers */ = {isa = PBXBuildFile; fileRef = 977C24791F03F4FA00CA1675 /* ingescape.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -145,6 +147,8 @@
 		97A0FC65224AB0EB00D7E972 /* libsodium.23.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A0FC64224AB0EB00D7E972 /* libsodium.23.dylib */; };
 		97A2128D22391A0D00ACCFB0 /* libzyre.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A2128B22391A0D00ACCFB0 /* libzyre.2.dylib */; };
 		97A2128E22391A0D00ACCFB0 /* libczmq.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A2128C22391A0D00ACCFB0 /* libczmq.4.dylib */; };
+		97ABC93C2282EC5D00215310 /* monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* monitor.c */; };
+		97ABC93D2282EC5D00215310 /* monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* monitor.c */; };
 		97FAC32B2244C88A0036293B /* yajl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 973D1BB22226916D00D363BF /* yajl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		97FAC32E2247BE920036293B /* license.c in Sources */ = {isa = PBXBuildFile; fileRef = 97FAC32C2247BE920036293B /* license.c */; };
 /* End PBXBuildFile section */
@@ -338,6 +342,7 @@
 		9762EDE61EAE54D6002062A1 /* libzyre.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzyre.dylib; path = /usr/local/lib/libzyre.dylib; sourceTree = "<group>"; };
 		97645AA1209704F800F7D47F /* example_definition.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = example_definition.json; path = ../../resources/example_definition.json; sourceTree = "<group>"; };
 		97645AA2209704F800F7D47F /* example_mapping.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = example_mapping.json; path = ../../resources/example_mapping.json; sourceTree = "<group>"; };
+		9768B2AD22830F0E00310410 /* json.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = json.c; sourceTree = "<group>"; };
 		9772A52620BDE42700729D59 /* token.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = token.c; sourceTree = "<group>"; };
 		977C24791F03F4FA00CA1675 /* ingescape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ingescape.h; sourceTree = "<group>"; };
 		979A79781EA7B0D6003153EF /* libingescape.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libingescape.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1181,6 +1186,7 @@
 		97A0FC64224AB0EB00D7E972 /* libsodium.23.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.23.dylib; path = ../../../../../../../../../usr/local/Cellar/libsodium/1.0.17/lib/libsodium.23.dylib; sourceTree = "<group>"; };
 		97A2128B22391A0D00ACCFB0 /* libzyre.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzyre.2.dylib; path = ../../../../../../../../../usr/local/Cellar/zyre/2.0.0/lib/libzyre.2.dylib; sourceTree = "<group>"; };
 		97A2128C22391A0D00ACCFB0 /* libczmq.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libczmq.4.dylib; path = ../../../../../../../../../usr/local/Cellar/czmq/4.2.0/lib/libczmq.4.dylib; sourceTree = "<group>"; };
+		97ABC93B2282EC5D00215310 /* monitor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = monitor.c; sourceTree = "<group>"; };
 		97C926AB1EB23ED100D2B0CE /* ingescape_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_private.h; sourceTree = "<group>"; };
 		97FAC32C2247BE920036293B /* license.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = license.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1287,6 +1293,8 @@
 				973DC287207A93E6004C1D80 /* bus.c */,
 				9772A52620BDE42700729D59 /* token.c */,
 				97FAC32C2247BE920036293B /* license.c */,
+				97ABC93B2282EC5D00215310 /* monitor.c */,
+				9768B2AD22830F0E00310410 /* json.c */,
 			);
 			name = src;
 			path = ../../src;
@@ -2704,10 +2712,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97574A9022870C5100C31B99 /* json.c in Sources */,
 				9762EDDA1EAE547B002062A1 /* definition.c in Sources */,
 				9772A52820BDE42700729D59 /* token.c in Sources */,
 				97FAC32E2247BE920036293B /* license.c in Sources */,
 				9762EDDB1EAE547B002062A1 /* mapping.c in Sources */,
+				97ABC93D2282EC5D00215310 /* monitor.c in Sources */,
 				973DC289207A93E6004C1D80 /* bus.c in Sources */,
 				9762EDDC1EAE547B002062A1 /* model.c in Sources */,
 				972A52651FD1733E00711352 /* admin.c in Sources */,
@@ -2722,8 +2732,10 @@
 			files = (
 				979A79A11EA7B112003153EF /* network.c in Sources */,
 				9772A52720BDE42700729D59 /* token.c in Sources */,
+				97ABC93C2282EC5D00215310 /* monitor.c in Sources */,
 				979A79A01EA7B112003153EF /* model.c in Sources */,
 				973DC288207A93E6004C1D80 /* bus.c in Sources */,
+				9768B2AE22830F0E00310410 /* json.c in Sources */,
 				979A799F1EA7B112003153EF /* mapping.c in Sources */,
 				972A52641FD1733E00711352 /* admin.c in Sources */,
 				979A79A31EA7B112003153EF /* parser.c in Sources */,

@@ -400,6 +400,11 @@ unsigned long igs_addMappingEntry(const char *fromOurInput,
     if (spaceInName){
         igs_warn("Spaces are not allowed in agent name: %s has been renamed to %s", toAgent, reviewedToAgent);
     }
+    char *aName = igs_getAgentName();
+    if (strcmp(reviewedToAgent, aName) == 0){
+        igs_warn("mapping inputs to outputs of the same agent will not work (except from one clone or variant to others)");
+    }
+    free(aName);
 
     //withOutput
     if((withOutput == NULL) || (strlen(withOutput) == 0)){

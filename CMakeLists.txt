@@ -30,7 +30,7 @@ include(IngescapeHelper)
 if (NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE Debug)
 endif ()
-add_definitions(-DINGESCAPE=1)
+add_definitions(-DINGESCAPE=1 -DTARGET_OS_IOS=0)
 
 
 ########################################################################
