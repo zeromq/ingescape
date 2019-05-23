@@ -5,7 +5,7 @@ QT += qml quick svg xml sql quick-private core-private gui-private concurrent
 
 
 SOURCES += \
-    $$PWD/controller/scenariocontroller.cpp \
+    $$PWD/controller/abstractscenariocontroller.cpp \
     $$PWD/ingescapecommon.cpp \
     $$PWD/settings/ingescapesettings.cpp \
     $$PWD/misc/terminationsignalwatcher.cpp \
@@ -48,7 +48,7 @@ SOURCES += \
     $$PWD/sortFilter/abstracttimerangefilter.cpp
 
 HEADERS += \
-    $$PWD/controller/scenariocontroller.h \
+    $$PWD/controller/abstractscenariocontroller.h \
     $$PWD/ingescapecommon.h \
     $$PWD/ingescape-common_global.h \
     $$PWD/settings/ingescapesettings.h \

@@ -42,6 +42,7 @@ SOURCES += main.cpp \
     controller/ingescapeeditorcontroller.cpp \
     controller/networkcontroller.cpp \
     controller/actioneditorcontroller.cpp \
+    controller/scenariocontroller.cpp \
     controller/valueshistorycontroller.cpp \
     misc/collapsiblecolumn.cpp \
     sortFilter/valueshistorysortfilter.cpp \
@@ -65,6 +66,7 @@ SOURCES += main.cpp \
     controller/editormodelmanager.cpp
 
 HEADERS += \
+    controller/scenariocontroller.h \
     stable.h \
     uthash/libut.h \
     uthash/ringbuf.h \

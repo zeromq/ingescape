@@ -39,12 +39,12 @@ RecordController::RecordController(AssessmentsModelManager* modelManager,
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
 
     // Create the controller for scenario management
-    _scenarioC = new ScenarioController(_modelManager, _jsonHelper, this);
+    _scenarioC = new AbstractScenarioController(_modelManager, _jsonHelper, this);
 
 
     // Connect to the signal "time range changed" from the time line
     // to the scenario controller to filter the action view models
-    //connect(_timeLineC, &AbstractTimeActionslineScenarioViewController::timeRangeChanged, _scenarioC, &ScenarioController::onTimeRangeChanged);
+    connect(_timeLineC, &AbstractTimeActionslineScenarioViewController::timeRangeChanged, _scenarioC, &AbstractScenarioController::onTimeRangeChanged);
 }
 
 
@@ -72,7 +72,7 @@ RecordController::~RecordController()
     {
         //disconnect(_scenarioC);
 
-        ScenarioController* temp = _scenarioC;
+        AbstractScenarioController* temp = _scenarioC;
         setscenarioC(nullptr);
         delete temp;
         temp = nullptr;

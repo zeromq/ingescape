@@ -21,7 +21,7 @@
 
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/ingescapemodelmanager.h>
-#include <controller/scenariocontroller.h>
+#include <controller/abstractscenariocontroller.h>
 #include <model/scenario/scenariom.h>
 #include <model/scenario/timetickm.h>
 
@@ -67,7 +67,7 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
 
     qmlRegisterUncreatableType<AbstractTimeActionslineScenarioViewController>("INGESCAPE", 1, 0, "AbstractTimeActionslineScenarioViewController", "Internal Class");
     qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal class");
-    qmlRegisterUncreatableType<ScenarioController>("INGESCAPE", 1, 0, "ScenarioController", "Internal Class");
+    qmlRegisterUncreatableType<AbstractScenarioController>("INGESCAPE", 1, 0, "AbstractScenarioController", "Internal Class");
 
 
     //----------------

@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef SCENARIOCONTROLLER_H
-#define SCENARIOCONTROLLER_H
+#ifndef ABSTRACT_SCENARIO_CONTROLLER_H
+#define ABSTRACT_SCENARIO_CONTROLLER_H
 
 #include <QObject>
 #include <QtQml>
@@ -22,9 +22,7 @@
 
 #include "I2PropertyHelpers.h"
 
-//#include <controller/editormodelmanager.h>
 #include <controller/ingescapemodelmanager.h>
-#include <controller/actioneditorcontroller.h>
 #include <viewModel/agentsgroupedbynamevm.h>
 #include <viewModel/scenario/actionvm.h>
 #include <viewModel/scenario/actioninpalettevm.h>
@@ -42,42 +40,17 @@
 
 
 /**
- * @brief The ScenarioController class defines the controller of our scenario edition
+ * @brief The AbstractScenarioController class is the base class for scenario management
  */
-class ScenarioController: public QObject
+class AbstractScenarioController: public QObject
 {
     Q_OBJECT
 
     // List of actions
     I2_QOBJECT_LISTMODEL(ActionM, actionsList)
 
-    // List of opened action editors
-    I2_QOBJECT_LISTMODEL(ActionEditorController, openedActionsEditorsControllers)
-
     // Selected action
     I2_QML_PROPERTY_DELETE_PROOF(ActionM*, selectedAction)
-
-    // List of all values of condition on agent (state)
-    I2_ENUM_LISTMODEL(AgentConditionValues, allAgentConditionValues)
-
-    // List of all types for values comparison
-    I2_ENUM_LISTMODEL(ValueComparisonTypes, allValueComparisonTypes)
-
-    // List of validity duration type
-    I2_ENUM_LISTMODEL(ValidationDurationTypes, validationDurationsTypesList)
-
-    // --- List of values about effect on agent
-    I2_ENUM_LISTMODEL(AgentEffectValues, agentEffectValuesList)
-    // --- List of effects links type
-    I2_ENUM_LISTMODEL(MappingEffectValues, mappingEffectValuesList)
-
-    // --- List of conditions type
-    I2_ENUM_LISTMODEL(ActionConditionTypes, conditionsTypesList)
-    // --- List of effects type
-    I2_ENUM_LISTMODEL(ActionEffectTypes, effectsTypesList)
-
-    // List of actions in palette
-    I2_QOBJECT_LISTMODEL(ActionInPaletteVM, actionsInPaletteList)
 
     // List of actions in timeline
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, actionsInTimeLine)
@@ -116,16 +89,15 @@ public:
      * @param jsonHelper
      * @param parent
      */
-    explicit ScenarioController(//EditorModelManager* modelManager,
-                                IngeScapeModelManager* modelManager,
-                                JsonHelper* jsonHelper,
-                                QObject *parent = nullptr);
+    explicit AbstractScenarioController(IngeScapeModelManager* modelManager,
+                                        JsonHelper* jsonHelper,
+                                        QObject *parent = nullptr);
 
 
     /**
       * @brief Destructor
       */
-    ~ScenarioController();
+    ~AbstractScenarioController();
 
 
     /**
@@ -142,7 +114,7 @@ public:
       * @brief Import the scenario from JSON
       * @param jsonScenario
       */
-    void importScenarioFromJson(QJsonObject jsonScenario);
+    virtual void importScenarioFromJson(QJsonObject jsonScenario);
 
 
     /**
@@ -153,97 +125,36 @@ public:
 
 
     /**
-      * @brief Check if an agent is used in the current scenario (actions, conditions, effects)
-      * @param agent name
-      */
-    bool isAgentUsedInScenario(QString agentName);
-
-
-    /**
-      * @brief Open the action editor with a model of action
+      * @brief Remove an action from the list and delete it
       * @param action
       */
-    Q_INVOKABLE void openActionEditorWithModel(ActionM* action);
+    virtual Q_INVOKABLE void deleteAction(ActionM* action);
 
 
     /**
-      * @brief Open the action editor with a view model of action
-      * @param action
-      */
-    Q_INVOKABLE void openActionEditorWithViewModel(ActionVM* action);
-
-
-    /**
-      * @brief Delete an action from the list
-      * @param action
-      */
-    Q_INVOKABLE void deleteAction(ActionM* action);
-
-
-    /**
-      * @brief Validate action editior
-      * @param action editor controller
-      */
-    Q_INVOKABLE void validateActionEditor(ActionEditorController* actionEditorC);
-
-
-    /**
-      * @brief Close action editior
-      * @param action editor controller
-      */
-    Q_INVOKABLE void closeActionEditor(ActionEditorController* actionEditorC);
-
-
-    /**
-     * @brief Set a model of action into the palette at index
-     * @param index where to insert the action
-     * @param actionM model of action to insert
-     */
-    Q_INVOKABLE void setActionInPalette(int index, ActionM* actionM);
-
-
-    /**
-     * @brief Add an action VM at the time in ms
-     * @param action model
-     * @param line index
-     */
-    Q_INVOKABLE void addActionVMAtTime(ActionM* actionM, int timeInMs, int lineIndex);
-
-
-    /**
-     * @brief Add an action VM at the current date time
-     * @param action model
-     */
-    Q_INVOKABLE void addActionVMAtCurrentTime(ActionM* actionM);
-
-
-    /**
-     * @brief Remove an action VM from the time line
+     * @brief Remove an action VM from the time line and delete it
      * @param action view model
      */
-    Q_INVOKABLE void removeActionVMfromTimeLine(ActionVM* actionVM);
+    virtual Q_INVOKABLE void removeActionVMfromTimeLine(ActionVM* actionVM);
+
+
+    /**
+     * @brief Clear the current scenario
+     * (clear the list of actions in the list, in the palette and in the timeline)
+     */
+    virtual Q_INVOKABLE void clearScenario();
 
 
     /**
      * @brief Initialize the connections for conditions of all actions
      */
-    Q_INVOKABLE void initializeConditionsConnectionsOfAllActions();
+    void initializeConditionsConnectionsOfAllActions();
 
 
     /**
      * @brief Reset the connections for conditions of all actions
      */
-    Q_INVOKABLE void resetConditionsConnectionsOfAllActions();
-
-
-    /**
-     * @brief Test if an item can be inserted into a line number
-     * @param actionM to insert
-     * @param time to insert
-     * @param line index
-     * @param optional dragged action VM when already in the time-line
-     */
-    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineIndex, ActionVM* draggedActionVM = nullptr);
+    void resetConditionsConnectionsOfAllActions();
 
 
     /**
@@ -254,30 +165,6 @@ public:
      * @param lineInTimeLine
      */
     Q_INVOKABLE void executeEffectsOfAction(ActionM* action, int lineInTimeLine = 0);
-
-
-    /**
-     * @brief Clear the current scenario
-     * (clear the list of actions in the list, in the palette and in the timeline)
-     */
-    Q_INVOKABLE void clearScenario();
-
-
-    /**
-     * @brief Move an actionVM to a start time position in ms and a specific line number
-     * @param action VM
-     * @param time in milliseconds
-     * @param line index
-     */
-    Q_INVOKABLE void moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineIndex);
-
-
-    /**
-     * @brief Check if a view model of an action is inserted in the timeline
-     * @param actionM
-     * @return
-     */
-    Q_INVOKABLE bool isInsertedInTimeLine(ActionM* actionM);
 
 
 Q_SIGNALS:
@@ -357,7 +244,7 @@ public Q_SLOTS:
     void onRunAction(QString actionID);
 
 
-private Q_SLOTS:
+protected Q_SLOTS:
 
     /**
      * @brief Called when our timer time out to handle the scenario and execute actions
@@ -371,21 +258,7 @@ private Q_SLOTS:
     void _onTimeout_DelayOrExecuteActions();
 
 
-private:
-
-    /**
-     * @brief Get a new action name
-     */
-    QString _buildNewActionName();
-
-
-    /**
-     * @brief Insert an actionVM into our timeline
-     * @param action view model
-     * @param line number
-     */
-    void _insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert, int lineNumberRef);
-
+protected:
 
     /**
      * @brief Start the scenario by
@@ -458,34 +331,13 @@ private:
     I2CustomItemSortFilterListModel<ActionVM>* _getSortedListOfActionVMwithLineIndex(int index);
 
 
-    /**
-     * @brief Get the "Action Editor" from a model of action
-     * @return
-     */
-    ActionEditorController* _getActionEditorFromModelOfAction(ActionM* action);
+protected:
 
-
-    /**
-     * @brief Get the "Action Editor" from a view model of action
-     * @return
-     */
-    ActionEditorController* _getActionEditorFromViewModelOfAction(ActionVM* action);
-
-
-private:
-
-    // Manager for the data model of INGESCAPE
-    //EditorModelManager* _modelManager;
+    // Manager for the data model of IngeScape
     IngeScapeModelManager* _modelManager;
 
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
-
-    // Hash table of action editor controller from a model of action
-    QHash<ActionM*, ActionEditorController*> _hashActionEditorControllerFromModelOfAction;
-
-    // Hash table of action editor controller from a view model of action
-    QHash<ActionVM*, ActionEditorController*> _hashActionEditorControllerFromViewModelOfAction;
 
     // List of all action names
     QStringList _allActionNames;
@@ -513,6 +365,6 @@ private:
 
 };
 
-QML_DECLARE_TYPE(ScenarioController)
+QML_DECLARE_TYPE(AbstractScenarioController)
 
-#endif // SCENARIOCONTROLLER_H
+#endif // ABSTRACT_SCENARIO_CONTROLLER_H

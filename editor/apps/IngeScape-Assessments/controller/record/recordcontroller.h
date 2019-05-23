@@ -18,7 +18,7 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
-#include <controller/scenariocontroller.h>
+#include <controller/abstractscenariocontroller.h>
 #include <controller/assessmentsmodelmanager.h>
 #include <model/jsonhelper.h>
 #include <model/experimentationrecordm.h>
@@ -35,7 +35,7 @@ class RecordController : public QObject
     I2_QML_PROPERTY_READONLY(AbstractTimeActionslineScenarioViewController*, timeLineC)
 
     // Controller for scenario management
-    I2_QML_PROPERTY_READONLY(ScenarioController*, scenarioC)
+    I2_QML_PROPERTY_READONLY(AbstractScenarioController*, scenarioC)
 
     // The (experimentation) record currently selected
     I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationRecordM*, currentRecord)
