@@ -1079,7 +1079,8 @@ int igs_writeOutputAsString(const char *name, const char *value){
         igs_error("Output name cannot be NULL or empty");
         return 0;
     }
-    const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_STRING_T, (char *)value, strlen(value)+1);
+    size_t length = (value == NULL)?0:strlen(value)+1;
+    const agent_iop_t *iop = model_writeIOP(name, IGS_OUTPUT_T, IGS_STRING_T, (char *)value, length);
     network_publishOutput(iop);
 
     return (iop == NULL)?0:1;
