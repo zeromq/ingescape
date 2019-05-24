@@ -2366,7 +2366,8 @@ WindowBlockTouches {
                 onClicked: {
                     if (controller && panelController && panelController.originalAction)
                     {
-                        if (controller.isInsertedInTimeLine(panelController.originalAction))
+                        if (controller.isActionInsertedInTimeLine(panelController.originalAction)
+                                || IngeScapeEditorC.agentsMappingC.isActionInsertedInMapping(panelController.originalAction))
                         {
                             deleteConfirmationPopup.open();
                         }

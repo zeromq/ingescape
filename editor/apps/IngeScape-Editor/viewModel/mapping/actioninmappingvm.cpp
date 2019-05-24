@@ -58,7 +58,7 @@ ActionInMappingVM::ActionInMappingVM(int uid,
  */
 ActionInMappingVM::~ActionInMappingVM()
 {
-    qInfo() << "Delete Action" << _name << "in the global mapping";
+    qInfo() << "Delete Action" << _name << "(" << _uid << ") in the global mapping";
 
     if (_action != nullptr)
     {

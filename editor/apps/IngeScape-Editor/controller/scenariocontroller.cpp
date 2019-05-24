@@ -1063,11 +1063,11 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
 
 
 /**
- * @brief Check if a view model of an action is inserted in the timeline
+ * @brief Check if a view model of an action has been inserted in the timeline
  * @param actionM
  * @return
  */
-bool ScenarioController::isInsertedInTimeLine(ActionM* actionM)
+bool ScenarioController::isActionInsertedInTimeLine(ActionM* actionM)
 {
     if ((actionM != nullptr) && _hashFromUidToViewModelsOfAction.contains(actionM->uid()))
     {

@@ -200,6 +200,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_modelManager, &EditorModelManager::addInputsToOurApplicationForAgentOutputs, _networkC, &NetworkController::onAddInputsToOurApplicationForAgentOutputs);
     connect(_modelManager, &EditorModelManager::removeInputsFromOurApplicationForAgentOutputs, _networkC, &NetworkController::onRemoveInputsFromOurApplicationForAgentOutputs);
 
+    connect(_modelManager, &EditorModelManager::actionModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onActionModelWillBeDeleted);
+
 
     // Connect to signals from the controller for supervision of agents
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);

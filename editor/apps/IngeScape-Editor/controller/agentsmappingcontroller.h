@@ -185,6 +185,14 @@ public:
 
 
     /**
+     * @brief Check if an action has been inserted in the global mapping
+     * @param actionM
+     * @return
+     */
+    Q_INVOKABLE bool isActionInsertedInMapping(ActionM* actionM);
+
+
+    /**
      * @brief Export the global mapping (of agents) into JSON
      * @return array of all agents and their mapping
      */
@@ -302,6 +310,13 @@ public Q_SLOTS:
      * @param agentsGroupedByName
      */
     void onAgentsGroupedByNameWillBeDeleted(AgentsGroupedByNameVM* agentsGroupedByName);
+
+
+    /**
+     * @brief Slot called when a model of action will be deleted
+     * @param action
+     */
+    void onActionModelWillBeDeleted(ActionM* action);
 
 
     /**

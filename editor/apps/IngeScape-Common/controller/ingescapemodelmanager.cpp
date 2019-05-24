@@ -348,12 +348,16 @@ void IngeScapeModelManager::storeNewAction(ActionM* action)
  */
 void IngeScapeModelManager::deleteAction(ActionM* action)
 {
-    if ((action != nullptr) && _hashFromUidToModelOfAction.contains(action->uid()))
+    if (action != nullptr)
     {
+        Q_EMIT actionModelWillBeDeleted(action);
+
         int actionId = action->uid();
 
         // Remove action form the hash table
-        _hashFromUidToModelOfAction.remove(actionId);
+        if (_hashFromUidToModelOfAction.contains(actionId)) {
+            _hashFromUidToModelOfAction.remove(actionId);
+        }
 
         // Free memory
         delete action;

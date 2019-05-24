@@ -239,6 +239,13 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when a model of action will be deleted
+     * @param action
+     */
+    void actionModelWillBeDeleted(ActionM* action);
+
+
+    /**
      * @brief Signal emitted when inputs must be added to our application for a list of agent outputs
      * @param agentName
      * @param newOutputsIds

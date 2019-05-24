@@ -193,7 +193,7 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
 {
     if (agent != nullptr)
     {
-        qInfo() << "Delete the agent" << agent->name() << "in the Mapping";
+        //qDebug() << "Delete the agent" << agent->name() << "in the Mapping";
 
         // Unselect our agent if needed
         if (_selectedAgent == agent) {
@@ -228,7 +228,7 @@ void AgentsMappingController::deleteActionInMapping(ActionInMappingVM* action)
     {
         int actionId = action->uid();
 
-        qInfo() << "Delete the action" << action->name() << "(" << actionId << ") in the Mapping";
+        //qDebug() << "Delete the action" << action->name() << "(" << actionId << ") in the Mapping";
 
         // Unselect our action if needed
         if (_selectedAction == action) {
@@ -739,6 +739,27 @@ LinkVM* AgentsMappingController::getLinkInMappingFromId(const QString& linkId)
     else {
         return nullptr;
     }
+}
+
+
+/**
+ * @brief Check if an action has been inserted in the global mapping
+ * @param actionM
+ * @return
+ */
+bool AgentsMappingController::isActionInsertedInMapping(ActionM* actionM)
+{
+    if (actionM != nullptr)
+    {
+        for (ActionInMappingVM* actionInMapping : _allActionsInMapping)
+        {
+            if ((actionInMapping != nullptr) && (actionInMapping->action() == actionM))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 
@@ -1502,6 +1523,27 @@ void AgentsMappingController::onAgentsGroupedByNameWillBeDeleted(AgentsGroupedBy
         {
             // Delete this agent in the mapping
             deleteAgentInMapping(agentInMapping);
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when a model of action will be deleted
+ * @param action
+ */
+void AgentsMappingController::onActionModelWillBeDeleted(ActionM* action)
+{
+    if (action != nullptr)
+    {
+        // Make a copy of the list
+        for (ActionInMappingVM* actionInMapping : _allActionsInMapping.toList())
+        {
+            if ((actionInMapping != nullptr) && (actionInMapping->action() == action))
+            {
+                // Remove the action from the mapping and delete the view model
+                deleteActionInMapping(actionInMapping);
+            }
         }
     }
 }

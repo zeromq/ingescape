@@ -390,7 +390,11 @@ Item {
 
                         visible: !mouseArea.drag.active
 
-                        onNeedConfirmationtoDeleteAction: {
+
+                        //
+                        // Slot on signal "Need Confirmation to Delete Action"
+                        //
+                        onNeedConfirmationToDeleteAction: {
                             deleteConfirmationPopup.myAction = action;
                             deleteConfirmationPopup.open();
                         }

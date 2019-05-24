@@ -43,7 +43,7 @@ Item {
     //--------------------------------
 
     // signal emitted when the delete confirmation popup is needed because the action is already used in the platform
-    signal needConfirmationtoDeleteAction(var action);
+    signal needConfirmationToDeleteAction(var action);
 
 
     //--------------------------------
@@ -235,9 +235,10 @@ Item {
                 onClicked: {
                     if (controller && rootItem.action)
                     {
-                        if (controller.isInsertedInTimeLine(rootItem.action))
+                        if (controller.isActionInsertedInTimeLine(rootItem.action)
+                                || IngeScapeEditorC.agentsMappingC.isActionInsertedInMapping(rootItem.action))
                         {
-                            rootItem.needConfirmationtoDeleteAction(rootItem.action);
+                            rootItem.needConfirmationToDeleteAction(rootItem.action);
                         }
                         else {
                             // Delete our action
