@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -55,11 +55,12 @@ IngeScapeModelManager::~IngeScapeModelManager()
 {
     qInfo() << "Delete IngeScape Model Manager";
 
-    // Free memory
+    // Free memory for published values
     _publishedValues.deleteAllItems();
 
-    //qDeleteAll(_hashFromNameToHost);
-    //_hashFromNameToHost.clear();
+    // Free memory for hosts
+    qDeleteAll(_hashFromNameToHost);
+    _hashFromNameToHost.clear();
 
     // Free memory
     _hashFromNameToAgentsGrouped.clear();
@@ -250,7 +251,7 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
  * @param hostName
  * @return
  */
-/*HostM* EditorModelManager::getHostModelWithName(QString hostName)
+HostM* IngeScapeModelManager::getHostModelWithName(QString hostName)
 {
     if (_hashFromNameToHost.contains(hostName)) {
         return _hashFromNameToHost.value(hostName);
@@ -258,7 +259,7 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
     else {
         return nullptr;
     }
-}*/
+}
 
 
 /**
@@ -266,7 +267,7 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
  * @param hostName
  * @return
  */
-/*QString IngeScapeModelManager::getPeerIdOfLauncherOnHost(QString hostName)
+QString IngeScapeModelManager::getPeerIdOfLauncherOnHost(QString hostName)
 {
     // Get the model of host with the name
     HostM* host = getHostModelWithName(hostName);
@@ -277,7 +278,7 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
     else {
         return "";
     }
-}*/
+}
 
 
 /**
@@ -587,7 +588,7 @@ void IngeScapeModelManager::simulateExitForEachAgentON()
 /**
  * @brief Simulate an exit for each launcher
  */
-/*void IngeScapeModelManager::simulateExitForEachLauncher()
+void IngeScapeModelManager::simulateExitForEachLauncher()
 {
     for (QString hostName : _hashFromNameToHost.keys())
     {
@@ -597,7 +598,7 @@ void IngeScapeModelManager::simulateExitForEachAgentON()
             onLauncherExited("", hostName);
         }
     }
-}*/
+}
 
 
 /**
@@ -704,7 +705,7 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
  * @param hostName
  * @param ipAddress
  */
-/*void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort)
+void IngeScapeModelManager::onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort)
 {
     if (!hostName.isEmpty())
     {
@@ -754,7 +755,7 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
             }
         }
     }
-}*/
+}
 
 
 /**
@@ -762,7 +763,7 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
  * @param peerId
  * @param hostName
  */
-/*void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
+void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
 {
     Q_UNUSED(peerId)
 
@@ -797,7 +798,7 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
             }
         }
     }
-}*/
+}
 
 
 /**

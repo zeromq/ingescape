@@ -391,6 +391,7 @@ I2PopupBase {
 
         //folder: shortcuts.home
         folder: shortcuts.documents
+        //folder: shortcuts.documents + "IngeScape"
 
         //defaultSuffix: ".json"
         nameFilters: [ "JSON files (*.json)" ]
@@ -404,11 +405,11 @@ I2PopupBase {
             //fileDialog.close();
         }
 
-        /*onRejected: {
-            console.log("Canceled");
+        onRejected: {
+            console.log("Canceled " + shortcuts.documents);
 
             //fileDialog.close();
-        }*/
+        }
     }
 
 }

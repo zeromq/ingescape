@@ -20,7 +20,6 @@
 #include <I2PropertyHelpers.h>
 #include <model/editorenums.h>
 #include <controller/ingescapemodelmanager.h>
-#include <model/hostm.h>
 
 
 /**
@@ -59,22 +58,6 @@ public:
 
 
     /**
-     * @brief Get the model of host with a name
-     * @param hostName
-     * @return
-     */
-    HostM* getHostModelWithName(QString hostName);
-
-
-    /**
-     * @brief Get the peer id of the Launcher on a host
-     * @param hostName
-     * @return
-     */
-    QString getPeerIdOfLauncherOnHost(QString hostName);
-
-
-    /**
      * @brief Export the agents into JSON
      * @return array of all agents (grouped by name)
      */
@@ -88,12 +71,6 @@ public:
 
 
     /**
-     * @brief Simulate an exit for each launcher
-     */
-    void simulateExitForEachLauncher();
-
-
-    /**
      * @brief Open a definition
      * If there are variants of this definition, we open each variant
      * @param definition
@@ -103,58 +80,8 @@ public:
 
 Q_SIGNALS:
 
-    /**
-     * @brief Signal emitted when a model of host has been created
-     * @param host
-     */
-    void hostModelHasBeenCreated(HostM* host);
-
-
-    /**
-     * @brief Signal emitted when a model of host will be deleted
-     * @param host
-     */
-    void hostModelWillBeDeleted(HostM* host);
-
 
 public Q_SLOTS:
-
-    /**
-     * @brief Slot called when an agent enter the network
-     * @param peerId
-     * @param agentName
-     * @param ipAddress
-     * @param hostname
-     * @param commandLine
-     * @param canBeFrozen
-     * @param loggerPort
-     */
-    //void onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort);
-
-
-    /**
-     * @brief Slot called when an agent quit the network
-     * @param peer Id
-     * @param agent name
-     */
-    //void onAgentExited(QString peerId, QString agentName);
-
-
-    /**
-     * @brief Slot called when a launcher enter the network
-     * @param peerId
-     * @param hostName
-     * @param ipAddress
-     */
-    void onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort);
-
-
-    /**
-     * @brief Slot called when a launcher quit the network
-     * @param peerId
-     * @param hostName
-     */
-    void onLauncherExited(QString peerId, QString hostName);
     
 
     /**
@@ -281,10 +208,8 @@ protected:
     void _openDefinitions(QList<DefinitionM*> definitionsToOpen);
 
 
-protected:
+private:
 
-    // Hash table from name to a model of host (corresponding to an INGESCAPE launcher)
-    QHash<QString, HostM*> _hashFromNameToHost;
 
 };
 

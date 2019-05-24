@@ -52,9 +52,6 @@ EditorModelManager::~EditorModelManager()
     // Clear all opened definitions
     _openedDefinitions.clear();
 
-    qDeleteAll(_hashFromNameToHost);
-    _hashFromNameToHost.clear();
-
     // Mother class is automatically called
     //IngeScapeModelManager::~IngeScapeModelManager();
 }
@@ -78,41 +75,6 @@ void EditorModelManager::setisMappingControlled(bool value)
         }
 
         Q_EMIT isMappingControlledChanged(value);
-    }
-}
-
-
-/**
- * @brief Get the model of host with a name
- * @param hostName
- * @return
- */
-HostM* EditorModelManager::getHostModelWithName(QString hostName)
-{
-    if (_hashFromNameToHost.contains(hostName)) {
-        return _hashFromNameToHost.value(hostName);
-    }
-    else {
-        return nullptr;
-    }
-}
-
-
-/**
- * @brief Get the peer id of the Launcher on a host
- * @param hostName
- * @return
- */
-QString EditorModelManager::getPeerIdOfLauncherOnHost(QString hostName)
-{
-    // Get the model of host with the name
-    HostM* host = getHostModelWithName(hostName);
-
-    if (host != nullptr) {
-        return host->peerId();
-    }
-    else {
-        return "";
     }
 }
 
@@ -229,22 +191,6 @@ void EditorModelManager::exportAgentsListToSelectedFile()
 
 
 /**
- * @brief Simulate an exit for each launcher
- */
-void EditorModelManager::simulateExitForEachLauncher()
-{
-    for (QString hostName : _hashFromNameToHost.keys())
-    {
-        if (hostName != HOSTNAME_NOT_DEFINED)
-        {
-            // Simulate an exit for this host (name)
-            onLauncherExited("", hostName);
-        }
-    }
-}
-
-
-/**
  * @brief Open a definition
  * If there are variants of this definition, we open each variant
  * @param definition
@@ -293,180 +239,6 @@ void EditorModelManager::openDefinition(DefinitionM* definition)
 
         // Open the list of definitions
         _openDefinitions(definitionsToOpen);
-    }
-}
-
-
-/**
- * @brief Slot called when an agent enter the network
- * @param peerId
- * @param agentName
- * @param ipAddress
- * @param hostname
- * @param commandLine
- * @param canBeFrozen
- * @param loggerPort
- */
-/*void EditorModelManager::onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort)
-{
-    if (!peerId.isEmpty() && !agentName.isEmpty() && !ipAddress.isEmpty())
-    {
-        AgentM* agent = getAgentModelFromPeerId(peerId);
-
-        // An agent with this peer id already exist
-        if (agent != nullptr)
-        {
-            qInfo() << "The agent" << agentName << "with peer id" << peerId << "on" << hostname << "(" << ipAddress << ") is back on the network !";
-
-            // Useless !
-            //agent->sethostname(hostname);
-            //agent->setcommandLine(commandLine);
-
-            // Usefull ?
-            agent->setcanBeFrozen(canBeFrozen);
-            agent->setloggerPort(loggerPort);
-
-            // Update the state (flag "is ON")
-            agent->setisON(true);
-        }
-        // New peer id
-        else
-        {
-            // Create a new model of agent
-            agent = createAgentModel(agentName,
-                                     nullptr,
-                                     peerId,
-                                     ipAddress,
-                                     hostname,
-                                     commandLine,
-                                     true);
-
-            if (agent != nullptr)
-            {
-                agent->setcanBeFrozen(canBeFrozen);
-                agent->setloggerPort(loggerPort);
-            }
-        }
-    }
-}*/
-
-
-/**
- * @brief Slot called when an agent quit the network
- * @param peer Id
- * @param agent name
- */
-/*void EditorModelManager::onAgentExited(QString peerId, QString agentName)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != nullptr)
-    {
-        qInfo() << "The agent" << agentName << "with peer id" << peerId << "exited from the network !";
-
-        // Update the state (flag "is ON")
-        agent->setisON(false);
-    }
-}*/
-
-
-/**
- * @brief Slot called when a launcher enter the network
- * @param peerId
- * @param hostName
- * @param ipAddress
- */
-void EditorModelManager::onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort)
-{
-    if (!hostName.isEmpty())
-    {
-        // Get the model of host with the name
-        HostM* host = getHostModelWithName(hostName);
-        if (host == nullptr)
-        {
-            // Create a new host
-            host = new HostM(hostName, peerId, ipAddress, streamingPort, this);
-
-            _hashFromNameToHost.insert(hostName, host);
-
-            Q_EMIT hostModelHasBeenCreated(host);
-        }
-        else
-        {
-            // Update peer id
-            if (host->peerId() != peerId) {
-                host->setpeerId(peerId);
-            }
-
-            // Update IP address
-            if (host->ipAddress() != ipAddress) {
-                host->setipAddress(ipAddress);
-            }
-
-            // Update streaming port
-            if (host->streamingPort() != streamingPort) {
-                host->setstreamingPort(streamingPort);
-            }
-        }
-
-        // Traverse the list of all agents grouped by name
-        for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
-        {
-            if (agentsGroupedByName != nullptr)
-            {
-                // Traverse the list of its models
-                for (AgentM* agent : agentsGroupedByName->models()->toList())
-                {
-                    if ((agent != nullptr) && (agent->hostname() == hostName) && !agent->commandLine().isEmpty())
-                    {
-                        // This agent can be restarted
-                        agent->setcanBeRestarted(true);
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-/**
- * @brief Slot called when a launcher quit the network
- * @param peerId
- * @param hostName
- */
-void EditorModelManager::onLauncherExited(QString peerId, QString hostName)
-{
-    Q_UNUSED(peerId)
-
-    if (!hostName.isEmpty())
-    {
-        // Get the model of host with the name
-        HostM* host = getHostModelWithName(hostName);
-        if (host != nullptr)
-        {
-            Q_EMIT hostModelWillBeDeleted(host);
-
-            _hashFromNameToHost.remove(hostName);
-
-            // Free memory
-            delete host;
-        }
-
-        // Traverse the list of all agents grouped by name
-        for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
-        {
-            if (agentsGroupedByName != nullptr)
-            {
-                // Traverse the list of all models
-                for (AgentM* agent : agentsGroupedByName->models()->toList())
-                {
-                    if ((agent != nullptr) && (agent->hostname() == hostName))
-                    {
-                        // This agent can NOT be restarted
-                        agent->setcanBeRestarted(false);
-                    }
-                }
-            }
-        }
     }
 }
 

@@ -254,7 +254,7 @@ Item {
 
             Repeater {
 
-                model: rootItem.controller ? rootItem.controller.actionsList : null
+                model: (rootItem.controller && rootItem.controller.scenarioC) ? rootItem.controller.scenarioC.actionsList : null
 
                 delegate: MouseArea {
                     id: mouseArea
@@ -277,13 +277,13 @@ Item {
                     }
 
                     onPressed: {
-                        if (rootItem.controller)
+                        if (rootItem.controller && rootItem.controller.scenarioC)
                         {
-                            if (rootItem.controller.selectedAction === model.QtObject) {
-                                rootItem.controller.selectedAction = null;
+                            if (rootItem.controller.scenarioC.selectedAction === model.QtObject) {
+                                rootItem.controller.scenarioC.selectedAction = null;
                             }
                             else {
-                                rootItem.controller.selectedAction = model.QtObject;
+                                rootItem.controller.scenarioC.selectedAction = model.QtObject;
                             }
                         }
                     }
@@ -528,7 +528,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
         }
         height: 0
 
-        scenarioController: null; //IngeScapeEditorC.scenarioC
+        scenarioController: rootItem.controller ? rootItem.controller.scenarioC : null;
         timeLineController: rootItem.controller ? rootItem.controller.timeLineC : null;
     }
 }

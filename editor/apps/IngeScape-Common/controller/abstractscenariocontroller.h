@@ -1,0 +1,370 @@
+/*
+ *	IngeScape Editor
+ *
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *
+ */
+
+#ifndef ABSTRACT_SCENARIO_CONTROLLER_H
+#define ABSTRACT_SCENARIO_CONTROLLER_H
+
+#include <QObject>
+#include <QtQml>
+#include <QQmlEngine>
+#include <QJSEngine>
+
+#include "I2PropertyHelpers.h"
+
+#include <controller/ingescapemodelmanager.h>
+#include <viewModel/agentsgroupedbynamevm.h>
+#include <viewModel/scenario/actionvm.h>
+#include <viewModel/scenario/actioninpalettevm.h>
+#include <sortFilter/abstracttimerangefilter.h>
+
+
+// Margin in milliseconds to insert an action following another
+#define MARGIN_FOR_ACTION_INSERTION_IN_MS 2000
+
+// Minimum lines displayed into the timeline by default
+#define MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE 6
+
+// Interval in milli-seconds to regularly delay actions (when their conditions are not valid)
+#define INTERVAL_DELAY_ACTIONS 25
+
+
+/**
+ * @brief The AbstractScenarioController class is the base class for scenario management
+ */
+class AbstractScenarioController: public QObject
+{
+    Q_OBJECT
+
+    // List of actions
+    I2_QOBJECT_LISTMODEL(ActionM, actionsList)
+
+    // Selected action
+    I2_QML_PROPERTY_DELETE_PROOF(ActionM*, selectedAction)
+
+    // List of actions in timeline
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, actionsInTimeLine)
+
+    // List of "actionVM in timeline" filtered with a given time range
+    Q_PROPERTY(AbstractTimeRangeFilter* filteredListActionsInTimeLine READ filteredListActionsInTimeLine CONSTANT)
+
+    // Selected action VM in timeline
+    I2_QML_PROPERTY_DELETE_PROOF(ActionVM*, selectedActionVMInTimeline)
+
+    // Number of lines in our timeline
+    I2_QML_PROPERTY(int, linesNumberInTimeLine)
+
+    // Flag indicating if our scenario is currently playing
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isPlaying)
+
+    // Current time (from the beginning of our scenario)
+    // Define a QTime and a QDateTime: Manage a date in addition to the time to prevent a delta in hours between JS (QML) and C++
+    I2_QML_PROPERTY_QTime(currentTime)
+
+    // List of (future) actions to evaluate at each timeout of our timer
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, listOfActionsToEvaluate)
+
+    // List of active actions (the current time is between start time and end time of these actions)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, listOfActiveActions)
+
+    // Next action view model to activate
+    I2_QML_PROPERTY(ActionVM*, nextActionToActivate)
+
+
+public:
+
+    /**
+     * @brief Constructor
+     * @param modelManager
+     * @param jsonHelper
+     * @param parent
+     */
+    explicit AbstractScenarioController(IngeScapeModelManager* modelManager,
+                                        JsonHelper* jsonHelper,
+                                        QObject *parent = nullptr);
+
+
+    /**
+      * @brief Destructor
+      */
+    ~AbstractScenarioController();
+
+
+    /**
+    * @brief Get our filtered list of "time ticks"
+    * @return
+    */
+    AbstractTimeRangeFilter* filteredListActionsInTimeLine()
+    {
+        return &_filteredListActionsInTimeLine;
+    }
+
+
+    /**
+      * @brief Import the scenario from JSON
+      * @param jsonScenario
+      */
+    virtual void importScenarioFromJson(QJsonObject jsonScenario);
+
+
+    /**
+     * @brief Import the executed actions for a scenario from JSON
+     * @param byteArrayOfJson
+     */
+    void importExecutedActionsFromJson(QByteArray byteArrayOfJson);
+
+
+    /**
+      * @brief Remove an action from the list and delete it
+      * @param action
+      */
+    virtual Q_INVOKABLE void deleteAction(ActionM* action);
+
+
+    /**
+     * @brief Remove an action VM from the time line and delete it
+     * @param action view model
+     */
+    virtual Q_INVOKABLE void removeActionVMfromTimeLine(ActionVM* actionVM);
+
+
+    /**
+     * @brief Clear the current scenario
+     * (clear the list of actions in the list, in the palette and in the timeline)
+     */
+    virtual Q_INVOKABLE void clearScenario();
+
+
+    /**
+     * @brief Initialize the connections for conditions of all actions
+     */
+    void initializeConditionsConnectionsOfAllActions();
+
+
+    /**
+     * @brief Reset the connections for conditions of all actions
+     */
+    void resetConditionsConnectionsOfAllActions();
+
+
+    /**
+     * @brief Execute all effects of the action
+     * Activate (connect) the mapping if necessary
+     * Notify the recorder that the action has been executed
+     * @param action
+     * @param lineInTimeLine
+     */
+    Q_INVOKABLE void executeEffectsOfAction(ActionM* action, int lineInTimeLine = 0);
+
+
+Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param peerIdOfLauncher
+     * @param command
+     * @param commandLine
+     */
+    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
+
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to a recorder
+     * @param commandAndParameters
+     */
+    void commandAskedToRecorder(QString commandAndParameters);
+
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to an agent
+     * @param peerIdsList
+     * @param command
+     */
+    void commandAskedToAgent(QStringList peerIdsList, QString command);
+
+
+    /**
+     * @brief Emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
+     * @param peerIdsList
+     * @param command
+     * @param agentIOPName
+     * @param value
+     */
+    void commandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value);
+
+
+    /**
+     * @brief Emitted when a command must be sent on the network to an agent about mapping one of its input
+     * @param peerIdsList
+     * @param command
+     * @param inputName
+     * @param outputAgentName
+     * @param outputName
+     */
+    void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
+
+
+public Q_SLOTS:
+
+    /**
+     * @brief Slot called when an action must be reverted
+     * @param actionExecution
+     */
+    void onRevertAction(ActionExecutionVM* actionExecution);
+
+
+    /**
+     * @brief Slot called when an action must be rearmed
+     */
+    void onRearmAction();
+
+
+    /**
+     * @brief Slot called when the time line range changed
+     * @param startTimeInMilliseconds
+     * @param endTimeInMilliseconds
+     */
+    void onTimeRangeChanged(int startTimeInMilliseconds, int endTimeInMilliseconds);
+
+
+    /**
+     * @brief Slot called when we receive the command "run action" from a recorder
+     * @param actionID
+     */
+    void onRunAction(QString actionID);
+
+
+protected Q_SLOTS:
+
+    /**
+     * @brief Called when our timer time out to handle the scenario and execute actions
+     */
+    void _onTimeout_ExecuteActions();
+
+
+    /**
+     * @brief Called at each interval of our timer to delay actions when their conditions are not valid or execute them otherwise
+     */
+    void _onTimeout_DelayOrExecuteActions();
+
+
+protected:
+
+    /**
+     * @brief Start the scenario by
+     *        making connections for the actions conditions
+     *        starting the action evaluation timer
+     */
+    void _startScenario();
+
+
+    /**
+     * @brief Stop the scenario by
+     *        disconnecting the actions conditions
+     *        stoping the action evaluation timer
+     */
+    void _stopScenario();
+
+
+    /**
+     * @brief Execute all effects of an action
+     * @param action
+     */
+    void _executeEffectsOfAction(ActionM* action);
+
+
+    /**
+     * @brief Execute reverse effects of an action
+     * @param actionExecution
+     */
+    void _executeReverseEffectsOfAction(ActionExecutionVM* actionExecution);
+
+
+    /**
+     * @brief Execute a command for an agent
+     * @param agentsGroupedByName
+     * @param commandAndParameters
+     */
+    void _executeCommandForAgent(AgentsGroupedByNameVM* agentsGroupedByName, QStringList commandAndParameters);
+
+
+    /**
+     * @brief Exectute the action with the revert initialization if necessary
+     * @param action view model
+     * @param action execution view model
+     * @param current time in ms
+     */
+    void _executeAction(ActionVM* actionVM, ActionExecutionVM* actionExecution, int currentTimeInMilliSeconds);
+
+
+    /**
+     * @brief Get the model of action with its (unique) id
+     * @param actionId
+     * @return
+     */
+    ActionM* _getModelOfActionWithId(int actionId);
+
+
+    /**
+     * @brief Get the list of view models of action with its (unique) id
+     * @param actionId
+     * @return
+     */
+    QList<ActionVM*> _getListOfActionVMwithId(int actionId);
+
+
+    /**
+     * @brief Get the "Sorted" list of view models of action with the index of the line (in the time line)
+     * @param index
+     * @return
+     */
+    I2CustomItemSortFilterListModel<ActionVM>* _getSortedListOfActionVMwithLineIndex(int index);
+
+
+protected:
+
+    // Manager for the data model of IngeScape
+    IngeScapeModelManager* _modelManager;
+
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
+
+    // List of all action names
+    QStringList _allActionNames;
+
+    // Hash table from action UID to the corresponding model of action
+    QHash<int, ActionM*> _hashFromUidToModelOfAction;
+
+    // Hash table from action UID to the corresponding list of view models of action (in the timeline)
+    QHash<int, QList<ActionVM*> > _hashFromUidToViewModelsOfAction;
+
+    // Hash table from line index (in the timeline) to the corresponding list of view models of action
+    QHash<int, I2CustomItemSortFilterListModel<ActionVM>* > _hashFromLineIndexToSortedViewModelsOfAction;
+
+    // Timer to handle the scenario and execute actions
+    QTimer _timerToExecuteActions;
+
+    // Timer to regularly delay actions (when their conditions are not valid)
+    QTimer _timerToRegularlyDelayActions;
+
+    // Time of the day in milli-seconds when user starts the scenario, then at the last timeout (of the timer which regularly delay actions)
+    int _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut;
+
+    // List of actionVM in timeline filtered with a given time range in milliseconds
+    AbstractTimeRangeFilter _filteredListActionsInTimeLine;
+
+};
+
+QML_DECLARE_TYPE(AbstractScenarioController)
+
+#endif // ABSTRACT_SCENARIO_CONTROLLER_H

@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -21,7 +21,9 @@
 #include <model/enums.h>
 #include <model/jsonhelper.h>
 #include <model/publishedvaluem.h>
+#include <model/hostm.h>
 #include <viewModel/agentsgroupedbynamevm.h>
+
 
 static const QString VERSION_JSON_PLATFORM = QString("1.0");
 
@@ -100,7 +102,7 @@ public:
      * @param hostName
      * @return
      */
-    //HostM* getHostModelWithName(QString hostName);
+    HostM* getHostModelWithName(QString hostName);
 
 
     /**
@@ -108,7 +110,7 @@ public:
      * @param hostName
      * @return
      */
-    //QString getPeerIdOfLauncherOnHost(QString hostName);
+    QString getPeerIdOfLauncherOnHost(QString hostName);
 
 
     /**
@@ -157,7 +159,7 @@ public:
     /**
      * @brief Simulate an exit for each launcher
      */
-    //void simulateExitForEachLauncher();
+    void simulateExitForEachLauncher();
 
 
     /**
@@ -228,6 +230,20 @@ Q_SIGNALS:
     void removeInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected);
 
 
+    /**
+     * @brief Signal emitted when a model of host has been created
+     * @param host
+     */
+    void hostModelHasBeenCreated(HostM* host);
+
+
+    /**
+     * @brief Signal emitted when a model of host will be deleted
+     * @param host
+     */
+    void hostModelWillBeDeleted(HostM* host);
+
+
 public Q_SLOTS:
 
     /**
@@ -257,7 +273,7 @@ public Q_SLOTS:
      * @param hostName
      * @param ipAddress
      */
-    //void onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort);
+    void onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort);
 
 
     /**
@@ -265,7 +281,7 @@ public Q_SLOTS:
      * @param peerId
      * @param hostName
      */
-    //void onLauncherExited(QString peerId, QString hostName);
+    void onLauncherExited(QString peerId, QString hostName);
     
 
     /**
@@ -353,7 +369,7 @@ protected:
     QHash<QString, AgentsGroupedByNameVM*> _hashFromNameToAgentsGrouped;
 
     // Hash table from name to a model of host (corresponding to an INGESCAPE launcher)
-    //QHash<QString, HostM*> _hashFromNameToHost;
+    QHash<QString, HostM*> _hashFromNameToHost;
 
 };
 
