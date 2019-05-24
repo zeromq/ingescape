@@ -57,6 +57,8 @@ I2_ENUM_CUSTOM(LogTypes, IGS_LOG_TRACE, IGS_LOG_DEBUG, IGS_LOG_INFO, IGS_LOG_WAR
 static const QString SEPARATOR_AGENT_NAME_AND_IOP = QString("##");
 static const QString SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE = QString("::");
 static const QString SEPARATOR_LINK_OUTPUT_AND_LINK_INPUT = QString("-->");
+static const QString ACTION_LINK_INPUT_NAME = QString("IN");
+static const QString ACTION_LINK_OUTPUT_NAME = QString("OUT");
 static const QString HOSTNAME_NOT_DEFINED = QString("HOSTNAME NOT DEFINED");
 
 

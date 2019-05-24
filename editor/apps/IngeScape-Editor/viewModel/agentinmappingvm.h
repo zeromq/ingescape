@@ -17,24 +17,20 @@
 
 #include <QObject>
 #include <QtQml>
-
 #include <I2PropertyHelpers.h>
-
+#include <viewModel/mapping/objectinmappingvm.h>
 #include <viewModel/agentsgroupedbynamevm.h>
 #include <viewModel/link/linkinputvm.h>
 #include <viewModel/link/linkoutputvm.h>
 
 
 /**
- * @brief The AgentInMappingVM class a view model of agent in the global mapping
+ * @brief The AgentInMappingVM class defines a view model of agent in the global mapping
  * Allows to manage agents and links graphically
  */
-class AgentInMappingVM : public QObject
+class AgentInMappingVM : public ObjectInMappingVM
 {
     Q_OBJECT
-
-    // Name of our agent
-    I2_QML_PROPERTY_READONLY(QString, name)
 
     // Agents grouped by name
     I2_QML_PROPERTY_READONLY(AgentsGroupedByNameVM*, agentsGroupedByName)
@@ -44,9 +40,6 @@ class AgentInMappingVM : public QObject
 
     // List of view models of link outputs
     I2_QOBJECT_LISTMODEL(LinkOutputVM, linkOutputsList)
-
-    // The position corresponds to the corner Top-Left of the box
-    I2_QML_PROPERTY(QPointF, position)
 
     // Flag indicating if our agent is reduced
     I2_QML_PROPERTY(bool, isReduced)
@@ -75,7 +68,7 @@ class AgentInMappingVM : public QObject
 public:
     /**
      * @brief Constructor
-     * @param agentsGroupedByName Models of agents grouped by the same name
+     * @param agentsGroupedByName View model of agents grouped by the same name
      * @param position Position of the top left corner
      * @param parent
      */

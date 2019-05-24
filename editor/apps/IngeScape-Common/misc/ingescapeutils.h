@@ -103,6 +103,27 @@ public:
     static void bookUIDforActionM(int uid);
 
 
+    /**
+     * @brief Get an UID for a new view model of action in mapping
+     * @return
+     */
+    static int getUIDforNewActionInMappingVM();
+
+
+    /**
+     * @brief Free an UID of a view model of action in mapping
+     * @param uid
+     */
+    static void freeUIDofActionInMappingVM(int uid);
+
+
+    /**
+     * @brief Book an UID for a new view model of action in mapping
+     * @param uid
+     */
+    static void bookUIDforActionInMappingVM(int uid);
+
+
 protected:
     /**
      * @brief Get (and create if needed) the fullpath of a given sub-directory

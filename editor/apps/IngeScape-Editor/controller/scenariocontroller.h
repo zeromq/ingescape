@@ -185,11 +185,11 @@ public:
 
 
     /**
-     * @brief Check if a view model of an action is inserted in the timeline
+     * @brief Check if a view model of an action has been inserted in the timeline
      * @param actionM
      * @return
      */
-    Q_INVOKABLE bool isInsertedInTimeLine(ActionM* actionM);
+    Q_INVOKABLE bool isActionInsertedInTimeLine(ActionM* actionM);
 
 
 Q_SIGNALS:

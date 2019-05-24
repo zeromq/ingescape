@@ -119,13 +119,16 @@ void RecordController::setcurrentRecord(ExperimentationRecordM *value)
  */
 void RecordController::_onCurrentRecordChanged(ExperimentationRecordM* previousRecord, ExperimentationRecordM* currentRecord)
 {
-    if (_scenarioC != nullptr)
+    if ((_modelManager != nullptr) && (_scenarioC != nullptr))
     {
         // Clean the previous record
         if (previousRecord != nullptr)
         {
             // Clear the previous scenario
             _scenarioC->clearScenario();
+
+            // Delete all (models of) actions
+            _modelManager->deleteAllActions();
         }
 
         // Manage the new (current) record

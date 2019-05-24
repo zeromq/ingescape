@@ -1058,8 +1058,8 @@ void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList
         {
             // Send the command to a peer id of agent
             int success = igs_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s",
-                                                    command.toStdString().c_str(),
-                                                    outputName.toStdString().c_str());
+                                                   command.toStdString().c_str(),
+                                                   outputName.toStdString().c_str());
 
             qInfo() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;
         }
@@ -1082,9 +1082,9 @@ void NetworkController::onCommandAskedToAgentAboutSettingValue(QStringList peerI
         {
             // Send the command to a peer id of agent
             int success = igs_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s %s",
-                                                    command.toStdString().c_str(),
-                                                    agentIOPName.toStdString().c_str(),
-                                                    value.toStdString().c_str());
+                                                   command.toStdString().c_str(),
+                                                   agentIOPName.toStdString().c_str(),
+                                                   value.toStdString().c_str());
 
             qInfo() << "Send command" << command << "for agent" << peerId << "and I/O/P" << agentIOPName << "about setting value" << value << "with success ?" << success;
         }

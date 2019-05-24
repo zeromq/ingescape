@@ -136,19 +136,17 @@ void AbstractScenarioController::importScenarioFromJson(QJsonObject jsonScenario
                 // Add each action to our list
                 for (ActionM* actionM : scenarioToImport->actionsList()->toList())
                 {
-                    if (actionM != nullptr)
+                    if ((actionM != nullptr) && (_modelManager->getActionWithId(actionM->uid()) == nullptr))
                     {
-                        // Add action into the list
+                        // Add the action to the model manager
+                        _modelManager->storeNewAction(actionM);
+
+                        // Add the action to the list
                         _actionsList.append(actionM);
 
                         // Add action name
                         if (!_allActionNames.contains(actionM->name())) {
                             _allActionNames.append(actionM->name());
-                        }
-
-                        // Add action into the map
-                        if (!_hashFromUidToModelOfAction.contains(actionM->uid())) {
-                            _hashFromUidToModelOfAction.insert(actionM->uid(), actionM);
                         }
                     }
                 }
@@ -233,7 +231,7 @@ void AbstractScenarioController::importExecutedActionsFromJson(QByteArray byteAr
                         qDebug() << "Executed action" << actionId << "on line" << lineIndexInTimeLine << "at" << executionTime << "ms";
 
                         /*// Get the model of action with its (unique) id
-                        ActionM* action = _getModelOfActionWithId(actionId);
+                        ActionM* action = _modelManager->getActionWithId(actionId);
                         if (action != nullptr)
                         {
 
@@ -289,7 +287,7 @@ void AbstractScenarioController::importExecutedActionsFromJson(QByteArray byteAr
   */
 void AbstractScenarioController::deleteAction(ActionM* action)
 {
-    if (action != nullptr)
+    if ((action != nullptr) && (_modelManager != nullptr))
     {
         int actionId = action->uid();
 
@@ -311,25 +309,15 @@ void AbstractScenarioController::deleteAction(ActionM* action)
             setselectedAction(nullptr);
         }
 
-        // Delete the action item
-        if (_actionsList.contains(action))
-        {
-            // Remove action form the list
-            _actionsList.remove(action);
+        // Remove the action form the list
+        _actionsList.remove(action);
 
-            // Remove name form the list
-            //_allActionNames.removeAll(action->name());
-            _allActionNames.removeOne(action->name());
+        // Remove the name form the list
+        //_allActionNames.removeAll(action->name());
+        _allActionNames.removeOne(action->name());
 
-            // Remove action form the hash table
-            _hashFromUidToModelOfAction.remove(actionId);
-
-            // Free memory
-            delete action;
-
-            // Free the UID of the action model
-            IngeScapeUtils::freeUIDofActionM(actionId);
-        }
+        // Delete the model of action
+        _modelManager->deleteAction(action);
     }
 }
 
@@ -431,14 +419,12 @@ void AbstractScenarioController::clearScenario()
     // Clean-up current selection
     setselectedActionVMInTimeline(nullptr);
 
-    // Delete all models of action
-    _actionsList.deleteAllItems();
+    // Clear the list of actions
+    _actionsList.clear();
+    // NB: We have to call "_modelManager->deleteAllActions();" after our method "clearScenario()" to free memory
 
     // Clear names list
     _allActionNames.clear();
-
-    // Clear map
-    _hashFromUidToModelOfAction.clear();
 
     // Reset current time
     setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
@@ -598,15 +584,34 @@ void AbstractScenarioController::onRunAction(QString actionID)
     bool success = false;
     int id = actionID.toInt(&success);
 
-    if (success)
+    if (success && (_modelManager != nullptr))
     {
         // Get the model of action with this (unique) id
-        ActionM* action = _getModelOfActionWithId(id);
+        ActionM* action = _modelManager->getActionWithId(id);
         if (action != nullptr)
         {
             // Execute all effects of the action
             _executeEffectsOfAction(action);
         }
+    }
+}
+
+
+/**
+ * @brief Slot called when an action has to be executed
+ * @param action
+ */
+void AbstractScenarioController::onExecuteAction(ActionM* action)
+{
+    if (action != nullptr)
+    {
+        // Execute all effects of the action
+        // Activate (connect) the mapping if necessary
+        // Notify the recorder that the action has been executed
+        executeEffectsOfAction(action, 0);
+
+        // Execute all effects of the action
+        //_executeEffectsOfAction(action);
     }
 }
 
@@ -966,6 +971,9 @@ void AbstractScenarioController::_executeEffectsOfAction(ActionM* action)
                 _executeCommandForAgent(pairAgentAndCommandWithParameters.first, pairAgentAndCommandWithParameters.second);
             }
         }
+
+        // Emit the signal "All Effects have been Executed"
+        Q_EMIT action->allEffectsHaveBeenExecuted();
     }
 }
 
@@ -1097,22 +1105,6 @@ void AbstractScenarioController::_executeAction(ActionVM* actionVM, ActionExecut
 
 
 /**
- * @brief Get the model of action with its (unique) id
- * @param actionId
- * @return
- */
-ActionM* AbstractScenarioController::_getModelOfActionWithId(int actionId)
-{
-    if (_hashFromUidToModelOfAction.contains(actionId)) {
-        return _hashFromUidToModelOfAction.value(actionId);
-    }
-    else {
-        return nullptr;
-    }
-}
-
-
-/**
  * @brief Get the list of view models of action with its (unique) id
  * @param actionId
  * @return
@@ -1142,4 +1134,3 @@ I2CustomItemSortFilterListModel<ActionVM>* AbstractScenarioController::_getSorte
         return nullptr;
     }
 }
-

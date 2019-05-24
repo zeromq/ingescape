@@ -66,8 +66,8 @@ I2CubicBezierCurve {
 
     // Check if we represent a link or a "brin"
     property bool _isBrin: (viewModel
-                            && viewModel.inputAgent && viewModel.inputAgent.isReduced
-                            && viewModel.outputAgent && viewModel.outputAgent.isReduced)
+                            && viewModel.inputObject && (typeof viewModel.inputObject.isReduced !== 'undefined') && viewModel.inputObject.isReduced
+                            && viewModel.outputObject && (typeof viewModel.outputObject.isReduced !== 'undefined') && viewModel.outputObject.isReduced)
 
 
     // NB: Clip MUST be true to clip our mouse area
@@ -76,28 +76,30 @@ I2CubicBezierCurve {
     // allowing to increase mouse area
     hitTestAreaMargin : 3
 
-    // if the inputAgent and outputAgent are reduced : global type of its outputs
-    stroke: if (rootItem._isBrin && linkOutput && viewModel && viewModel.outputAgent)
+    // if the inputAgent and outputAgent are reduced: global type of its outputs
+    stroke: if (rootItem._isBrin && linkOutput && viewModel && viewModel.outputObject)
             {
-                //if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingConnected) {
-                if (linkOutput.isPublishedNewValue) {
-                    IngeScapeEditorTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, true);
+                //if (linkOutput.hasBeenActivated && IngeScapeEditorC.modelManager.isMappingConnected) {
+                if (linkOutput.hasBeenActivated) {
+                    IngeScapeEditorTheme.colorOfIOPTypeWithConditions(viewModel.outputObject.reducedLinkOutputsValueTypeGroup, true);
                 }
                 else {
-                    IngeScapeEditorTheme.colorOfIOPTypeWithConditions(viewModel.outputAgent.reducedLinkOutputsValueTypeGroup, false);
+                    IngeScapeEditorTheme.colorOfIOPTypeWithConditions(viewModel.outputObject.reducedLinkOutputsValueTypeGroup, false);
                 }
             }
             else
             {
                 // if the inputAgent is not reduced : type of its output
-                if (linkOutput && outputModel)
+                if (linkOutput)
                 {
-                    //if (linkOutput.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingConnected) {
-                    if (linkOutput.isPublishedNewValue) {
-                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, true);
+                    //if (linkOutput.hasBeenActivated && IngeScapeEditorC.modelManager.isMappingConnected) {
+                    // Agent
+                    if (outputModel) {
+                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, linkOutput.hasBeenActivated);
                     }
+                    // Action
                     else {
-                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(outputModel.agentIOPValueTypeGroup, false);
+                        IngeScapeEditorTheme.colorOfIOPTypeWithConditions(AgentIOPValueTypeGroups.IMPULSION, linkOutput.hasBeenActivated);
                     }
                 }
                 else {
@@ -117,7 +119,7 @@ I2CubicBezierCurve {
 
     opacity: mouseArea.pressed ? 0.8 : 1
 
-    z: (linkOutput && linkOutput.isPublishedNewValue) ? 1 : 0
+    z: (linkOutput && linkOutput.hasBeenActivated) ? 1 : 0
 
 
     //--------------------------------
@@ -225,10 +227,10 @@ I2CubicBezierCurve {
 
     // Remove selected map between IOP
     Keys.onPressed: {
-        if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
+        if ((event.key === Qt.Key_Backspace) || (event.key === Qt.Key_Delete))
         {
             if (controller && controller.selectedLink) {
-                controller.removeLinkBetweenTwoAgents(controller.selectedLink);
+                controller.removeLinkBetweenTwoObjectsInMapping(controller.selectedLink);
             }
 
             event.accepted = true;

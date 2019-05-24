@@ -31,8 +31,8 @@ class LinkOutputVM : public LinkConnectorVM
     // View model of output
     I2_QML_PROPERTY_READONLY(OutputVM*, output)
 
-    // Flag indicating if a new value is published on our output
-    I2_QML_PROPERTY_READONLY(bool, isPublishedNewValue)
+    // Flag indicating if our (link) output has been activated
+    I2_QML_PROPERTY_READONLY(bool, hasBeenActivated)
 
 
 public:
@@ -52,12 +52,17 @@ public:
 
 
     /**
-     * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
+     * @brief Activate
      */
-    void simulateCurrentValueOfModelChanged();
+    void activate();
 
 
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when our (link) output has been activated
+     */
+    void activated();
 
 
 public Q_SLOTS:
@@ -87,7 +92,7 @@ private Q_SLOTS:
 
 private:
 
-    // Timer to reset the flag "is Published New Value"
+    // Timer to reset the flag "has been activated"
     // Allows to play an animation when the value changed
     QTimer _timer;
 

@@ -16,7 +16,6 @@
 
 #include <QDebug>
 #include <QFileDialog>
-#include <misc/ingescapeutils.h>
 
 /**
  * @brief Constructor
@@ -339,24 +338,24 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
   */
 void ScenarioController::validateActionEditor(ActionEditorController* actionEditorC)
 {
-    if (actionEditorC != nullptr)
+    if ((actionEditorC != nullptr) && (_modelManager != nullptr))
     {
         // Validate modification
         actionEditorC->validateModification();
 
         ActionM* originalAction = actionEditorC->originalAction();
-        if ((originalAction != nullptr) && !_actionsList.contains(originalAction))
+        if ((originalAction != nullptr) && (_modelManager->getActionWithId(originalAction->uid()) == nullptr))
         {
-            // Insert into the list
+            // Add the action to the model manager
+            _modelManager->storeNewAction(originalAction);
+
+            // Add the action to the list
             _actionsList.append(originalAction);
 
             // Add action name
             if (!_allActionNames.contains(originalAction->name())) {
                 _allActionNames.append(originalAction->name());
             }
-
-            // Insert into the hash table
-            _hashFromUidToModelOfAction.insert(originalAction->uid(), originalAction);
         }
 
         // Set selected action
@@ -691,11 +690,11 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
 
 
 /**
- * @brief Check if a view model of an action is inserted in the timeline
+ * @brief Check if a view model of an action has been inserted in the timeline
  * @param actionM
  * @return
  */
-bool ScenarioController::isInsertedInTimeLine(ActionM* actionM)
+bool ScenarioController::isActionInsertedInTimeLine(ActionM* actionM)
 {
     if ((actionM != nullptr) && _hashFromUidToViewModelsOfAction.contains(actionM->uid()))
     {

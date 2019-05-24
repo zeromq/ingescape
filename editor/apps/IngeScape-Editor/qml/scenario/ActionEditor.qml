@@ -809,7 +809,7 @@ WindowBlockTouches {
                                             target: comboEffectOnMapping_OutputAgent
                                             property: "selectedIndex"
                                             value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myEffect.modelM.outputAgent)
-                                                                                                                    : -1
+                                                                                                                   : -1
                                         }
 
                                         onSelectedItemChanged: {
@@ -2366,7 +2366,8 @@ WindowBlockTouches {
                 onClicked: {
                     if (controller && panelController && panelController.originalAction)
                     {
-                        if (controller.isInsertedInTimeLine(panelController.originalAction))
+                        if (controller.isActionInsertedInTimeLine(panelController.originalAction)
+                                || IngeScapeEditorC.agentsMappingC.isActionInsertedInMapping(panelController.originalAction))
                         {
                             deleteConfirmationPopup.open();
                         }
