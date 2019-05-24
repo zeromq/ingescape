@@ -1500,8 +1500,8 @@ void AgentsMappingController::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedB
         // Connect to signals from this new agents grouped by name
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::isONChanged, this, &AgentsMappingController::_onAgentIsONChanged);
         connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelONhasBeenAdded, this, &AgentsMappingController::_onAgentModelONhasBeenAdded);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsHaveBeenAdded, this, &AgentsMappingController::onMappingElementsHaveBeenAdded);
-        connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsWillBeRemoved, this, &AgentsMappingController::onMappingElementsWillBeRemoved);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsHaveBeenAdded, this, &AgentsMappingController::_onMappingElementsHaveBeenAdded);
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::mappingElementsWillBeRemoved, this, &AgentsMappingController::_onMappingElementsWillBeRemoved);
     }
 }
 
@@ -1545,6 +1545,55 @@ void AgentsMappingController::onActionModelWillBeDeleted(ActionM* action)
                 deleteActionInMapping(actionInMapping);
             }
         }
+    }
+}
+
+
+/**
+ * @brief Slot called when we receive the command "highlight link" from a recorder
+ * @param parameters
+ */
+void AgentsMappingController::onHighlightLink(const QStringList& parameters)
+{
+    if (parameters.count() == 4)
+    {
+        QString inputAgentName = parameters.at(0);
+        QString inputName = parameters.at(1);
+        QString outputAgentName = parameters.at(2);
+        QString outputName = parameters.at(3);
+
+        // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
+        QString linkName = MappingElementM::getLinkNameFromNamesList(outputAgentName, outputName, inputAgentName, inputName);
+
+        // Get the list of links between agents in the global mapping from a link name
+        QList<LinkVM*> linksWithSameName = getLinksInMappingFromName(linkName);
+
+        if (linksWithSameName.count() == 1)
+        {
+            LinkVM* link = linksWithSameName.at(0);
+            if ((link != nullptr) && (link->linkOutput() != nullptr))
+            {
+                qDebug() << "Highlight the link" << linkName;
+
+                // Activate the link: allows to highlight the corresponding links
+                link->linkOutput()->activate();
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when the list of all "Agents in Mapping" changed
+ */
+void AgentsMappingController::_onAllAgentsInMappingChanged()
+{
+    // Update the flag "is Empty Mapping"
+    if (_allAgentsInMapping.isEmpty()) {
+        setisEmptyMapping(true);
+    }
+    else {
+        setisEmptyMapping(false);
     }
 }
 
@@ -1708,7 +1757,7 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
  * @brief Slot called when some view models of mapping elements have been added to an agent(s grouped by name)
  * @param newMappingElements
  */
-void AgentsMappingController::onMappingElementsHaveBeenAdded(QList<MappingElementVM*> newMappingElements)
+void AgentsMappingController::_onMappingElementsHaveBeenAdded(QList<MappingElementVM*> newMappingElements)
 {
     AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
     if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !newMappingElements.isEmpty() && (_modelManager != nullptr))
@@ -1761,7 +1810,7 @@ void AgentsMappingController::onMappingElementsHaveBeenAdded(QList<MappingElemen
  * @brief Slot called when some view models of mapping elements will be removed from an agent(s grouped by name)
  * @param oldMappingElements
  */
-void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElementVM*> oldMappingElements)
+void AgentsMappingController::_onMappingElementsWillBeRemoved(QList<MappingElementVM*> oldMappingElements)
 {
     //AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
     //if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !oldMappingElements.isEmpty())
@@ -1863,55 +1912,6 @@ void AgentsMappingController::onMappingElementsWillBeRemoved(QList<MappingElemen
                 }
             }
         }
-    }
-}
-
-
-/**
- * @brief Slot called when we receive the command "highlight link" from a recorder
- * @param parameters
- */
-void AgentsMappingController::onHighlightLink(const QStringList& parameters)
-{
-    if (parameters.count() == 4)
-    {
-        QString inputAgentName = parameters.at(0);
-        QString inputName = parameters.at(1);
-        QString outputAgentName = parameters.at(2);
-        QString outputName = parameters.at(3);
-
-        // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
-        QString linkName = MappingElementM::getLinkNameFromNamesList(outputAgentName, outputName, inputAgentName, inputName);
-
-        // Get the list of links between agents in the global mapping from a link name
-        QList<LinkVM*> linksWithSameName = getLinksInMappingFromName(linkName);
-
-        if (linksWithSameName.count() == 1)
-        {
-            LinkVM* link = linksWithSameName.at(0);
-            if ((link != nullptr) && (link->linkOutput() != nullptr))
-            {
-                qDebug() << "Highlight the link" << linkName;
-
-                // Activate the link: allows to highlight the corresponding links
-                link->linkOutput()->activate();
-            }
-        }
-    }
-}
-
-
-/**
- * @brief Slot called when the list of all "Agents in Mapping" changed
- */
-void AgentsMappingController::_onAllAgentsInMappingChanged()
-{
-    // Update the flag "is Empty Mapping"
-    if (_allAgentsInMapping.isEmpty()) {
-        setisEmptyMapping(true);
-    }
-    else {
-        setisEmptyMapping(false);
     }
 }
 

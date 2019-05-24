@@ -320,6 +320,21 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot called when we receive the command "highlight link" from a recorder
+     * @param parameters
+     */
+    void onHighlightLink(const QStringList& parameters);
+
+
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the list of all "Agents in Mapping" changed
+     */
+    void _onAllAgentsInMappingChanged();
+
+
+    /**
      * @brief Slot called when the flag "is ON" of an agent(s grouped by name) changed
      * @param isON
      */
@@ -337,29 +352,14 @@ public Q_SLOTS:
      * @brief Slot called when some view models of mapping elements have been added to an agent(s grouped by name)
      * @param newMappingElements
      */
-    void onMappingElementsHaveBeenAdded(QList<MappingElementVM*> newMappingElements);
+    void _onMappingElementsHaveBeenAdded(QList<MappingElementVM*> newMappingElements);
 
 
     /**
      * @brief Slot called when some view models of mapping elements will be removed from an agent(s grouped by name)
      * @param oldMappingElements
      */
-    void onMappingElementsWillBeRemoved(QList<MappingElementVM*> oldMappingElements);
-
-
-    /**
-     * @brief Slot called when we receive the command "highlight link" from a recorder
-     * @param parameters
-     */
-    void onHighlightLink(const QStringList& parameters);
-
-
-private Q_SLOTS:
-
-    /**
-     * @brief Slot called when the list of all "Agents in Mapping" changed
-     */
-    void _onAllAgentsInMappingChanged();
+    void _onMappingElementsWillBeRemoved(QList<MappingElementVM*> oldMappingElements);
 
 
     /**

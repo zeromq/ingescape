@@ -422,15 +422,13 @@ Rectangle {
                                         linkPoint.border.width = 2;
                                         linkPoint.scale = 1.2;
                                     }
-                                    else
-                                    {
+                                    /*else {
                                         console.log("(agent) inputDropArea: can NOT Link " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel)
-                                    }
+                                    }*/
                                 }
-                                else
-                                {
+                                /*else {
                                     console.log("(agent) inputDropArea: no source " + drag.source)
-                                }
+                                }*/
                             }
 
                             onExited: {
@@ -693,15 +691,13 @@ Rectangle {
                                         linkPointOut.border.width = 2;
                                         linkPointOut.scale = 1.2;
                                     }
-                                    else
-                                    {
+                                    /*else {
                                         console.log("(agent) outputDropArea: can NOT Link " + outputSlotItem.myModel + " and " + dragItem.inputSlotModel)
-                                    }
+                                    }*/
                                 }
-                                else
-                                {
+                                /*else {
                                     console.log("(agent) outputDropArea: no source " + drag.source)
-                                }
+                                }*/
                             }
 
                             onExited: {

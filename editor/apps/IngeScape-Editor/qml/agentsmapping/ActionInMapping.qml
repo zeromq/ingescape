@@ -54,8 +54,8 @@ Rectangle {
     property bool _isSelected: (controller && rootItem.actionInMappingVM && (controller.selectedAction === rootItem.actionInMappingVM))
 
     width: 150
-    height: 100
-    radius: 50 // 75
+    height: width
+    radius: width / 2.0
 
 
     // Init position of our agent
@@ -274,15 +274,13 @@ Rectangle {
                             linkPoint.border.width = 2;
                             linkPoint.scale = 1.2;
                         }
-                        else
-                        {
+                        /*else {
                             console.log("(action) inputDropArea: can NOT Link " + dragItem.outputSlotModel + " and " + rootItem.linkInput)
-                        }
+                        }*/
                     }
-                    else
-                    {
+                    /*else {
                         console.log("(action) inputDropArea: no source " + drag.source)
-                    }
+                    }*/
                 }
 
 
@@ -474,15 +472,13 @@ Rectangle {
                             linkPointOut.border.width = 2;
                             linkPointOut.scale = 1.2;
                         }
-                        else
-                        {
+                        /*else {
                             console.log("(action) outputDropArea: can NOT Link " + rootItem.linkOutput + " and " + dragItem.inputSlotModel)
-                        }
+                        }*/
                     }
-                    else
-                    {
+                    /*else {
                         console.log("(action) outputDropArea: no source " + drag.source)
-                    }
+                    }*/
                 }
 
 
@@ -596,9 +592,15 @@ Rectangle {
             text: rootItem.actionInMappingVM ? rootItem.actionInMappingVM.name : "";
             //wrapMode: Text.WordWrap
             wrapMode: Text.Wrap
-            maximumLineCount: 2
+            maximumLineCount: 4
             elide: Text.ElideRight
-            font: IngeScapeTheme.headingFont
+
+            horizontalAlignment: Text.AlignHCenter
+            font {
+                family: IngeScapeTheme.labelFontFamily
+                pixelSize: 16
+                weight: Font.Black
+            }
             color: IngeScapeEditorTheme.agentsONNameMappingColor
         }
 
