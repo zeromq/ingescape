@@ -19,8 +19,9 @@
 #include <misc/terminationsignalwatcher.h>
 #include <settings/ingescapesettings.h>
 
-#include <controller/ingescapemodelmanager.h>
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
+#include <controller/ingescapemodelmanager.h>
+#include <controller/abstractscenariocontroller.h>
 #include <model/scenario/scenariom.h>
 #include <model/scenario/timetickm.h>
 
@@ -66,6 +67,7 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
 
     qmlRegisterUncreatableType<AbstractTimeActionslineScenarioViewController>("INGESCAPE", 1, 0, "AbstractTimeActionslineScenarioViewController", "Internal Class");
     qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal class");
+    qmlRegisterUncreatableType<AbstractScenarioController>("INGESCAPE", 1, 0, "AbstractScenarioController", "Internal Class");
 
 
     //----------------
@@ -91,6 +93,7 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterUncreatableType<DefinitionM>("INGESCAPE", 1, 0, "DefinitionM", "Internal class");
     qmlRegisterUncreatableType<EffectOnAgentM>("INGESCAPE", 1, 0, "EffectOnAgentM", "Internal class");
     qmlRegisterUncreatableType<Enums>("INGESCAPE", 1, 0, "Enums", "Internal class");
+    qmlRegisterUncreatableType<HostM>("INGESCAPE", 1, 0, "HostM", "Internal class");
     qmlRegisterUncreatableType<IOPValueConditionM>("INGESCAPE", 1, 0, "IOPValueConditionM", "Internal class");
     qmlRegisterUncreatableType<IOPValueEffectM>("INGESCAPE", 1, 0, "IOPValueEffectM", "Internal class");
     qmlRegisterUncreatableType<MappingEffectM>("INGESCAPE", 1, 0, "MappingEffectM", "Internal class");

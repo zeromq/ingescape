@@ -41,13 +41,12 @@ SOURCES += main.cpp \
     controller/agentsmappingcontroller.cpp \
     controller/ingescapeeditorcontroller.cpp \
     controller/networkcontroller.cpp \
-    controller/scenariocontroller.cpp \
     controller/actioneditorcontroller.cpp \
+    controller/scenariocontroller.cpp \
     controller/valueshistorycontroller.cpp \
     misc/collapsiblecolumn.cpp \
     model/actionmappingm.cpp \
     sortFilter/valueshistorysortfilter.cpp \
-    model/hostm.cpp \
     controller/hostssupervisioncontroller.cpp \
     model/recordm.cpp \
     controller/recordssupervisioncontroller.cpp \
@@ -71,6 +70,7 @@ SOURCES += main.cpp \
 
 HEADERS += \
     model/actionmappingm.h \
+    controller/scenariocontroller.h \
     stable.h \
     uthash/libut.h \
     uthash/ringbuf.h \
@@ -85,12 +85,10 @@ HEADERS += \
     controller/agentsmappingcontroller.h \
     controller/ingescapeeditorcontroller.h \
     controller/networkcontroller.h \
-    controller/scenariocontroller.h \
     controller/actioneditorcontroller.h \
     controller/valueshistorycontroller.h \
     misc/collapsiblecolumn.h \
     sortFilter/valueshistorysortfilter.h \
-    model/hostm.h \
     controller/hostssupervisioncontroller.h \
     model/recordm.h \
     controller/recordssupervisioncontroller.h \
