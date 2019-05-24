@@ -62,14 +62,22 @@ Rectangle {
     x: (actionInMappingVM && actionInMappingVM.position) ? actionInMappingVM.position.x : 0
     y: (actionInMappingVM && actionInMappingVM.position) ? actionInMappingVM.position.y : 0
 
+    scale: 1.0
+
 
     color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2
                              : IngeScapeTheme.darkBlueGreyColor
 
 
-    border {
+    /*border {
         color: IngeScapeTheme.selectionColor
         width: rootItem._isSelected ? 1 : 0
+    }*/
+    border {
+        color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
+
+        width: rootItem._isSelected ? 1
+                                    : ((rootItem.linkOutput && rootItem.linkOutput.hasBeenActivated) ? 2 : 0)
     }
 
 
@@ -90,9 +98,9 @@ Rectangle {
 
 
     // Animate our border when our item is selected / unselected
-    Behavior on border.width {
+    /*Behavior on border.width {
         NumberAnimation {}
-    }
+    }*/
 
 
     //--------------------------------
@@ -117,19 +125,46 @@ Rectangle {
     //
     //--------------------------------
 
-    Rectangle {
+    /*Rectangle {
         id: actionExecutedFeedback
 
         visible: rootItem.linkOutput ? rootItem.linkOutput.hasBeenActivated : false
 
         width: rootItem.width
         height: rootItem.height
-        radius: rootItem.radius
+        //radius: rootItem.radius
 
         color: "transparent"
         border {
             color: "red"
             width: 3
+        }
+    }
+    RotationAnimator {
+        target: actionExecutedFeedback
+
+        from: 0
+        to: 360
+
+        duration: 500
+        //loops: Animation.Infinite
+        running: actionExecutedFeedback.visible
+    }*/
+
+    SequentialAnimation {
+        running: rootItem.linkOutput ? rootItem.linkOutput.hasBeenActivated : false
+
+        NumberAnimation {
+            target: rootItem
+            property: "scale"
+            to: 1.2
+            duration: 250
+        }
+        NumberAnimation {
+            target: rootItem
+            property: "scale"
+            to: 1.0
+            duration: 250
         }
     }
 
