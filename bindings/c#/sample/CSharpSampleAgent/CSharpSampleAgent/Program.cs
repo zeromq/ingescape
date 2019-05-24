@@ -61,10 +61,10 @@ namespace CSharpSampleAgent
                 // Exit if the user pressed the 'A' key.
                 if (cki.Key == ConsoleKey.A)
                 {
-                    msg = "log : " + iteration++;
-                    igsAgent.writeInLog(msg);
-
-                    igsAgent.writeOnInputs();
+                    //Loop of potential functions raising memory leaks
+                    //Write input type int, double, impulsion, string 1000 times
+                    //The memory increase. it seems to have no relation with the c# but more with the C implementation
+                    igsAgent.memoryleakstest();
                 }
             }
         }

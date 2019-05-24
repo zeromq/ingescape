@@ -56,8 +56,6 @@ namespace CSharpSampleAgent
                     break;
             }
 
-            //Data
-            string myDataStr =  Marshal.PtrToStringAnsi(myData);
         }
 
         public IgsAgent()
@@ -80,35 +78,35 @@ namespace CSharpSampleAgent
             //Get network list devices
             string[] netDevicesList = Igs.getNetDevicesList();
  
-            //Verbose
-            Igs.setVerbose(true);
-            bool isVerbose = Igs.isVerbose();
-            Console.WriteLine("Is verbose : " + isVerbose);
+            ////Verbose
+            //Igs.setVerbose(true);
+            //bool isVerbose = Igs.isVerbose();
+            //Console.WriteLine("Is verbose : " + isVerbose);
 
-            //Color Verbose
-            Igs.setUseColorVerbose(true);
-            bool isColorVerbose = Igs.getUseColorVerbose();
-            Console.WriteLine("Is colored verbose : " + isColorVerbose);
+            ////Color Verbose
+            //Igs.setUseColorVerbose(true);
+            //bool isColorVerbose = Igs.getUseColorVerbose();
+            //Console.WriteLine("Is colored verbose : " + isColorVerbose);
 
-            //Log Stream
-            Igs.setLogStream(true);
-            bool isLogStream = Igs.getLogStream();
-            Console.WriteLine("Is log stream : " + isLogStream);
+            ////Log Stream
+            //Igs.setLogStream(true);
+            //bool isLogStream = Igs.getLogStream();
+            //Console.WriteLine("Is log stream : " + isLogStream);
 
-            //Log in file
-            Igs.setLogInFile(true);
-            bool isLogFile = Igs.getLogInFile();
-            Console.WriteLine("Is log file : " + isLogFile);
+            ////Log in file
+            //Igs.setLogInFile(true);
+            //bool isLogFile = Igs.getLogInFile();
+            //Console.WriteLine("Is log file : " + isLogFile);
 
-            //Log path
-            Igs.setLogPath("testLogFile.txt");
-            string logPath = Igs.getLogPath();
-            Console.WriteLine("Log file path : " + logPath);
+            ////Log path
+            //Igs.setLogPath("testLogFile.txt");
+            //string logPath = Igs.getLogPath();
+            //Console.WriteLine("Log file path : " + logPath);
 
-            //Log level
-            Igs.setLogLevel(igs_logLevel_t.IGS_LOG_TRACE);
-            igs_logLevel_t logLevel = Igs.getLogLevel();
-            Console.WriteLine("Log level : " + logLevel);
+            ////Log level
+            //Igs.setLogLevel(igs_logLevel_t.IGS_LOG_TRACE);
+            //igs_logLevel_t logLevel = Igs.getLogLevel();
+            //Console.WriteLine("Log level : " + logLevel);
 
             //Start the agent on the network
             Igs.startWithDevice("Ethernet", 5670);
@@ -200,8 +198,8 @@ namespace CSharpSampleAgent
             Igs.createInput("string", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
             Igs.createInput("impulsion", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
 
-            Igs.createParameter("string", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
-            Igs.createParameter("impulsion", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
+            Igs.createParameter("string-param", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
+            Igs.createParameter("impulsion-param", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
 
             Igs.createOutput("string-out", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
             Igs.createOutput("impulsion-out", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
@@ -259,9 +257,27 @@ namespace CSharpSampleAgent
             Foo readFoo = (Foo)formatter.Deserialize(msRead);
         }
 
-        public void readOutputs()
+        public void memoryleakstest()
         {
-            string str = Igs.readOutputAsString("string-out");
+            for (int i = 0; i < 1000; i++)
+            {
+                int result = -1;
+                
+                //Integer
+                int value = 100;
+                result = Igs.writeInputAsInt("integer", value);
+
+                //Double
+                double val = 100.111;
+                result = Igs.writeInputAsDouble("double", val);
+
+                //String
+                string msg = "Helloword", outputName = "string-out";
+                result = Igs.writeOutputAsString(outputName, msg);
+
+                //Impulsion
+                result = Igs.writeOutputAsImpulsion("impulsion-out");
+            }
         }
 
         public void stop()
