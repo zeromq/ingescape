@@ -112,13 +112,13 @@ Item {
             {
                 console.log("QML: on Current Record Setup changed: " + IngeScapeAssessmentsC.experimentationC.recordC.currentRecordSetup.name);
 
-                // Add the "Record View" to the stack
-                stackview.push(componentRecordView);
+                // Add the "Record Setup View" to the stack
+                stackview.push(componentRecordSetupView);
             }
             else {
                 console.log("QML: on Current Record Setup changed to NULL");
 
-                // Remove the "Record View" from the stack
+                // Remove the "Record Setup View" from the stack
                 stackview.pop();
             }
         }
@@ -218,13 +218,13 @@ Item {
 
 
     //
-    // Record View
+    // Record Setup View
     //
     Component {
-        id: componentRecordView
+        id: componentRecordSetupView
 
-        Record.RecordView {
-            //id: recordView
+        Record.RecordSetupView {
+            //id: recordSetupView
 
             controller: IngeScapeAssessmentsC.experimentationC.recordC
             //modelManager: IngeScapeAssessmentsC.modelManager

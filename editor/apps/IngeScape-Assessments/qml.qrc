@@ -7,7 +7,7 @@
         <file>qml/LoadingScreen.qml</file>
         <file>qml/ExperimentationsListView.qml</file>
         <file>qml/experimentation/ExperimentationView.qml</file>
-        <file>qml/experimentation/RecordInList.qml</file>
+        <file>qml/experimentation/RecordSetupInList.qml</file>
         <file>qml/subject/SubjectsView.qml</file>
         <file>qml/task/TasksView.qml</file>
         <file>qml/popup/CreateExperimentationPopup.qml</file>
@@ -22,7 +22,7 @@
         <file>qml/popup/CreateIndependentVariablePopup.qml</file>
         <file>qml/task/VariableTextEditor.qml</file>
         <file>qml/task/VariableComboBoxEditor.qml</file>
-        <file>qml/record/RecordView.qml</file>
+        <file>qml/record/RecordSetupView.qml</file>
         <file>qml/record/IndependentVariableValueEditor.qml</file>
         <file>qml/task/IndependentVariableTableCell.qml</file>
         <file>resources/SVG/ingescape-assessments.svg</file>

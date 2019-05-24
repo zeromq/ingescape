@@ -389,7 +389,7 @@ Item {
                     Repeater {
                         model: rootItem.experimentation ? rootItem.experimentation.allRecordSetups : null
 
-                        delegate: RecordInList {
+                        delegate: RecordSetupInList {
 
                             modelM: model.QtObject
 
