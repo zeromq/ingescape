@@ -21,7 +21,7 @@
 #include <controller/abstractscenariocontroller.h>
 #include <controller/assessmentsmodelmanager.h>
 #include <model/jsonhelper.h>
-#include <model/experimentationrecordm.h>
+#include <model/recordsetupm.h>
 
 
 /**
@@ -37,8 +37,8 @@ class RecordController : public QObject
     // Controller for scenario management
     I2_QML_PROPERTY_READONLY(AbstractScenarioController*, scenarioC)
 
-    // The (experimentation) record currently selected
-    I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationRecordM*, currentRecord)
+    // The (experimentation) record setup currently selected
+    I2_QML_PROPERTY_CUSTOM_SETTER(RecordSetupM*, currentRecordSetup)
 
 
 public:
@@ -66,11 +66,11 @@ Q_SIGNALS:
 private Q_SLOTS:
 
     /**
-     * @brief Slot called when the current record changed
-     * @param currentRecord
-     * @param previousRecord
+     * @brief Slot called when the current record setup changed
+     * @param previousRecordSetup
+     * @param currentRecordSetup
      */
-    void _onCurrentRecordChanged(ExperimentationRecordM* previousRecord, ExperimentationRecordM* currentRecord);
+    void _onCurrentRecordSetupChanged(RecordSetupM* previousRecordSetup, RecordSetupM* currentRecordSetup);
 
 
 private:

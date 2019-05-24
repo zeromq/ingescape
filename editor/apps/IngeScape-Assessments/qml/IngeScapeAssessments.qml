@@ -62,13 +62,13 @@ Item {
     }
 
     /**
-     * Reset the current record
+     * Reset the current record setup
      */
-    function resetCurrentRecord()
+    function resetCurrentRecordSetup()
     {
         if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.recordC)
         {
-            IngeScapeAssessmentsC.experimentationC.recordC.currentRecord = null;
+            IngeScapeAssessmentsC.experimentationC.recordC.currentRecordSetup = null;
         }
     }
 
@@ -106,17 +106,17 @@ Item {
     Connections {
         target: IngeScapeAssessmentsC.experimentationC.recordC
 
-        onCurrentRecordChanged: {
+        onCurrentRecordSetupChanged: {
 
-            if (IngeScapeAssessmentsC.experimentationC.recordC.currentRecord)
+            if (IngeScapeAssessmentsC.experimentationC.recordC.currentRecordSetup)
             {
-                console.log("QML: on Current Record changed: " + IngeScapeAssessmentsC.experimentationC.recordC.currentRecord.name);
+                console.log("QML: on Current Record Setup changed: " + IngeScapeAssessmentsC.experimentationC.recordC.currentRecordSetup.name);
 
                 // Add the "Record View" to the stack
                 stackview.push(componentRecordView);
             }
             else {
-                console.log("QML: on Current Record changed to NULL");
+                console.log("QML: on Current Record Setup changed to NULL");
 
                 // Remove the "Record View" from the stack
                 stackview.pop();
@@ -247,8 +247,8 @@ Item {
             onGoBackToExperimentation: {
                 console.log("QML: on Go Back to 'Experimentation' (from 'Record' view)");
 
-                // Reset the current record
-                rootItem.resetCurrentRecord();
+                // Reset the current record setup
+                rootItem.resetCurrentRecordSetup();
             }
         }
     }

@@ -38,6 +38,7 @@ SOURCES += main.cpp \
     controller/ingescapeassessmentscontroller.cpp \
     controller/networkcontroller.cpp \
     model/assessmentsenums.cpp \
+    model/recordsetupm.cpp \
     model/subject/subjectm.cpp \
     model/subject/characteristicm.cpp \
     model/subject/characteristicenumm.cpp \
@@ -52,7 +53,6 @@ SOURCES += main.cpp \
     controller/experimentationcontroller.cpp \
     controller/record/recordcontroller.cpp \
     viewModel/experimentationsgroupvm.cpp \
-    model/experimentationrecordm.cpp \
     controller/assessmentsmodelmanager.cpp \
     model/task/agentnameandoutputsm.cpp
 
@@ -60,6 +60,7 @@ SOURCES += main.cpp \
 HEADERS += \
     controller/ingescapeassessmentscontroller.h \
     model/assessmentsenums.h \
+    model/recordsetupm.h \
     stable.h \
     controller/networkcontroller.h \
     model/subject/subjectm.h \
@@ -76,7 +77,6 @@ HEADERS += \
     controller/experimentationcontroller.h \
     controller/record/recordcontroller.h \
     viewModel/experimentationsgroupvm.h \
-    model/experimentationrecordm.h \
     controller/assessmentsmodelmanager.h \
     model/task/agentnameandoutputsm.h
 

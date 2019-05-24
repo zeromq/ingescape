@@ -25,7 +25,7 @@ RecordController::RecordController(AssessmentsModelManager* modelManager,
                                    QObject *parent) : QObject(parent),
     _timeLineC(nullptr),
     _scenarioC(nullptr),
-    _currentRecord(nullptr),
+    _currentRecordSetup(nullptr),
     _modelManager(modelManager),
     _jsonHelper(jsonHelper)
 {
@@ -55,10 +55,10 @@ RecordController::~RecordController()
     qInfo() << "Delete Record Controller";
 
 
-    // Reset the model of the current record
-    if (_currentRecord != nullptr)
+    // Reset the model of the current record setup
+    if (_currentRecordSetup != nullptr)
     {
-        setcurrentRecord(nullptr);
+        setcurrentRecordSetup(nullptr);
     }
 
 
@@ -96,33 +96,33 @@ RecordController::~RecordController()
  * @brief Setter for property "Current Record"
  * @param value
  */
-void RecordController::setcurrentRecord(ExperimentationRecordM *value)
+void RecordController::setcurrentRecordSetup(RecordSetupM *value)
 {
-    if (_currentRecord != value)
+    if (_currentRecordSetup != value)
     {
-        ExperimentationRecordM *previousRecord = _currentRecord;
+        RecordSetupM *previousRecordSetup = _currentRecordSetup;
 
-        _currentRecord = value;
+        _currentRecordSetup = value;
 
         // Manage changes
-        _onCurrentRecordChanged(previousRecord, _currentRecord);
+        _onCurrentRecordSetupChanged(previousRecordSetup, _currentRecordSetup);
 
-        Q_EMIT currentRecordChanged(value);
+        Q_EMIT currentRecordSetupChanged(value);
     }
 }
 
 
 /**
- * @brief Slot called when the current record changed
- * @param currentRecord
- * @param previousRecord
+ * @brief Slot called when the current record setup changed
+ * @param previousRecordSetup
+ * @param currentRecordSetup
  */
-void RecordController::_onCurrentRecordChanged(ExperimentationRecordM* previousRecord, ExperimentationRecordM* currentRecord)
+void RecordController::_onCurrentRecordSetupChanged(RecordSetupM* previousRecordSetup, RecordSetupM* currentRecordSetup)
 {
     if ((_modelManager != nullptr) && (_scenarioC != nullptr))
     {
-        // Clean the previous record
-        if (previousRecord != nullptr)
+        // Clean the previous record setup
+        if (previousRecordSetup != nullptr)
         {
             // Clear the previous scenario
             _scenarioC->clearScenario();
@@ -132,11 +132,11 @@ void RecordController::_onCurrentRecordChanged(ExperimentationRecordM* previousR
         }
 
         // Manage the new (current) record
-        if ((currentRecord != nullptr) && (currentRecord->task() != nullptr))
+        if ((currentRecordSetup != nullptr) && (currentRecordSetup->task() != nullptr))
         {
-            if (currentRecord->task()->platformFileUrl().isValid())
+            if (currentRecordSetup->task()->platformFileUrl().isValid())
             {
-                QString platformFilePath = currentRecord->task()->platformFileUrl().path();
+                QString platformFilePath = currentRecordSetup->task()->platformFileUrl().path();
 
                 QFile jsonFile(platformFilePath);
                 if (jsonFile.exists())
@@ -165,7 +165,7 @@ void RecordController::_onCurrentRecordChanged(ExperimentationRecordM* previousR
                 }
             }
             else {
-                qWarning() << "The URL of platform" << currentRecord->task()->platformFileUrl() << "is not valid";
+                qWarning() << "The URL of platform" << currentRecordSetup->task()->platformFileUrl() << "is not valid";
             }
         }
     }

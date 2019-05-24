@@ -108,49 +108,49 @@ void ExperimentationController::createNewRecordForSubjectAndTask(QString recordN
 
         QString recordUID = now.toString("R-yyMMdd-hhmmss-zzz");
 
-        // Create a new (experimentation) record
-        ExperimentationRecordM* record = new ExperimentationRecordM(recordUID, recordName, subject, task, now, nullptr);
+        // Create a new (experimentation) record setup
+        RecordSetupM* recordSetup = new RecordSetupM(recordUID, recordName, subject, task, now, nullptr);
 
         // Add the record to the current experimentation
-        _currentExperimentation->addRecord(record);
+        _currentExperimentation->addRecordSetup(recordSetup);
 
         // Open this new record
-        openRecord(record);
+        openRecordSetup(recordSetup);
     }
 }
 
 
 /**
- * @brief Open a record
+ * @brief Open a record setup
  * @param record
  */
-void ExperimentationController::openRecord(ExperimentationRecordM* record)
+void ExperimentationController::openRecordSetup(RecordSetupM* recordSetup)
 {
-    if ((record != nullptr) && (_currentExperimentation != nullptr))
+    if ((recordSetup != nullptr) && (_currentExperimentation != nullptr))
     {
-        qInfo() << "Open the record" << record->name() << "of the experimentation" << _currentExperimentation->name();
+        qInfo() << "Open the record" << recordSetup->name() << "of the experimentation" << _currentExperimentation->name();
 
-        // Update the current record
-        _recordC->setcurrentRecord(record);
+        // Update the current record setup
+        _recordC->setcurrentRecordSetup(recordSetup);
     }
 }
 
 
 /**
- * @brief Delete a record
+ * @brief Delete a record setup
  * @param record
  */
-void ExperimentationController::deleteRecord(ExperimentationRecordM* record)
+void ExperimentationController::deleteRecordSetup(RecordSetupM* recordSetup)
 {
-    if ((record != nullptr) && (_currentExperimentation != nullptr))
+    if ((recordSetup != nullptr) && (_currentExperimentation != nullptr))
     {
-        qInfo() << "Delete the record" << record->name() << "of the experimentation" << _currentExperimentation->name();
+        qInfo() << "Delete the record" << recordSetup->name() << "of the experimentation" << _currentExperimentation->name();
 
         // Remove the record from the current experimentation
-        _currentExperimentation->removeRecord(record);
+        _currentExperimentation->removeRecordSetup(recordSetup);
 
         // Free memory
-        delete record;
+        delete recordSetup;
     }
 }
 

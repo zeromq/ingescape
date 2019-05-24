@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef EXPERIMENTATIONRECORDM_H
-#define EXPERIMENTATIONRECORDM_H
+#ifndef RECORD_SETUP_M_H
+#define RECORD_SETUP_M_H
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
@@ -24,9 +24,9 @@
 
 
 /**
- * @brief The ExperimentationRecordM class defines a model of record
+ * @brief The RecordSetupM class defines a model of record setup
  */
-class ExperimentationRecordM : public QObject
+class RecordSetupM : public QObject
 {
     Q_OBJECT
 
@@ -74,7 +74,7 @@ public:
      * @param startDateTime
      * @param parent
      */
-    explicit ExperimentationRecordM(QString uid,
+    explicit RecordSetupM(QString uid,
                                     QString name,
                                     SubjectM* subject,
                                     TaskM* task,
@@ -85,7 +85,7 @@ public:
     /**
      * @brief Destructor
      */
-    ~ExperimentationRecordM();
+    ~RecordSetupM();
 
 
 Q_SIGNALS:
@@ -104,6 +104,6 @@ private:
 
 };
 
-QML_DECLARE_TYPE(ExperimentationRecordM)
+QML_DECLARE_TYPE(RecordSetupM)
 
-#endif // EXPERIMENTATIONRECORDM_H
+#endif // RECORD_SETUP_M_H

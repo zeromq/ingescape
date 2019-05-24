@@ -33,8 +33,8 @@ ExperimentationM::ExperimentationM(QString name,
     qInfo() << "New Model of Experimentation" << _name << "(" << _creationDate.toString("dd/MM/yy hh:mm:ss") << ")";
 
 
-    // Records are sorted on their start date/time (chronological order)
-    _allRecords.setSortProperty("startDateTime");
+    // Record setups are sorted on their start date/time (chronological order)
+    _allRecordSetups.setSortProperty("startDateTime");
 
 
     // Characteristic "Subject Name"
@@ -86,8 +86,8 @@ ExperimentationM::~ExperimentationM()
     // Delete all tasks of our experimentation
     _allTasks.deleteAllItems();
 
-    // Delete all records of our experimentation
-    _allRecords.deleteAllItems();
+    // Delete all record setups of our experimentation
+    _allRecordSetups.deleteAllItems();
 
 }
 
@@ -195,25 +195,25 @@ void ExperimentationM::removeTask(TaskM* task)
 
 
 /**
- * @brief Add a record to our experimentation
+ * @brief Add a record setup to our experimentation
  * @param record
  */
-void ExperimentationM::addRecord(ExperimentationRecordM* record)
+void ExperimentationM::addRecordSetup(RecordSetupM* recordSetup)
 {
-    if (record != nullptr)
+    if (recordSetup != nullptr)
     {
         // Add to the list
-        _allRecords.append(record);
+        _allRecordSetups.append(recordSetup);
 
-        if (record->subject() != nullptr)
+        if (recordSetup->subject() != nullptr)
         {
-            qDebug() << "Subject:" << record->subject()->name() << "(" << record->subject()->uid() << ")";
+            qDebug() << "Subject:" << recordSetup->subject()->name() << "(" << recordSetup->subject()->uid() << ")";
 
             for (CharacteristicM* characteristic : _allCharacteristics)
             {
-                if ((characteristic != nullptr) && record->subject()->mapCharacteristicValues()->contains(characteristic->name()))
+                if ((characteristic != nullptr) && recordSetup->subject()->mapCharacteristicValues()->contains(characteristic->name()))
                 {
-                    qDebug() << characteristic->name() << ":" << record->subject()->mapCharacteristicValues()->value(characteristic->name());
+                    qDebug() << characteristic->name() << ":" << recordSetup->subject()->mapCharacteristicValues()->value(characteristic->name());
                 }
             }
         }
@@ -222,15 +222,15 @@ void ExperimentationM::addRecord(ExperimentationRecordM* record)
 
 
 /**
- * @brief Remove a record from our experimentation
+ * @brief Remove a record setup from our experimentation
  * @param record
  */
-void ExperimentationM::removeRecord(ExperimentationRecordM* record)
+void ExperimentationM::removeRecordSetup(RecordSetupM* recordSetup)
 {
-    if (record != nullptr)
+    if (recordSetup != nullptr)
     {
         // Remove from the list
-        _allRecords.remove(record);
+        _allRecordSetups.remove(recordSetup);
     }
 }
 

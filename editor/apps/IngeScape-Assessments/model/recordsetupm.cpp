@@ -12,7 +12,7 @@
  *
  */
 
-#include "experimentationrecordm.h"
+#include "recordsetupm.h"
 
 
 /**
@@ -23,12 +23,12 @@
  * @param startDateTime
  * @param parent
  */
-ExperimentationRecordM::ExperimentationRecordM(QString uid,
-                 QString name,
-                 SubjectM* subject,
-                 TaskM* task,
-                 QDateTime startDateTime,
-                 QObject *parent) : QObject(parent),
+RecordSetupM::RecordSetupM(QString uid,
+                           QString name,
+                           SubjectM* subject,
+                           TaskM* task,
+                           QDateTime startDateTime,
+                           QObject *parent) : QObject(parent),
     _uid(uid),
     _name(name),
     _subject(subject),
@@ -82,13 +82,13 @@ ExperimentationRecordM::ExperimentationRecordM(QString uid,
         }
 
         // FIXME TODO: connect to changes from the list _task->independentVariables()
-        // Useless because "rootItem.record.mapIndependentVariableValues[model.name] = value" in QML/JS works...
+        // Useless because "rootItem.recordSetup.mapIndependentVariableValues[model.name] = value" in QML/JS works...
         // ...even if the key was not inserted in C++ first (_mapIndependentVariableValues->insert(independentVariable->name(), QVariant()))
-        //connect(_task->independentVariables(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationRecordM::_onIndependentVariablesListChanged);
+        //connect(_task->independentVariables(), &AbstractI2CustomItemListModel::countChanged, this, &RecordSetupM::_onIndependentVariablesListChanged);
 
 
         // Connect to signal "Value Changed" fro the "Qml Property Map"
-        //connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &ExperimentationRecordM::_onIndependentVariableValueChanged);
+        //connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &RecordSetupM::_onIndependentVariableValueChanged);
     }
 }
 
@@ -96,7 +96,7 @@ ExperimentationRecordM::ExperimentationRecordM(QString uid,
 /**
  * @brief Destructor
  */
-ExperimentationRecordM::~ExperimentationRecordM()
+RecordSetupM::~RecordSetupM()
 {
     if ((_subject != nullptr) && (_task != nullptr))
     {
@@ -130,7 +130,7 @@ ExperimentationRecordM::~ExperimentationRecordM()
  * @brief Setter for property "End Date Time"
  * @param value
  */
-void ExperimentationRecordM::setendDateTime(QDateTime value)
+void RecordSetupM::setendDateTime(QDateTime value)
 {
     if (_endDateTime != value)
     {
@@ -151,7 +151,7 @@ void ExperimentationRecordM::setendDateTime(QDateTime value)
 /**
  * @brief For debug purpose: Print the value of all independent variables
  */
-void ExperimentationRecordM::_printIndependentVariableValues()
+void RecordSetupM::_printIndependentVariableValues()
 {
     if ((_task != nullptr) && (_mapIndependentVariableValues != nullptr))
     {
