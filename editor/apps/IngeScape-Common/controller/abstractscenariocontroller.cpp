@@ -971,6 +971,9 @@ void AbstractScenarioController::_executeEffectsOfAction(ActionM* action)
                 _executeCommandForAgent(pairAgentAndCommandWithParameters.first, pairAgentAndCommandWithParameters.second);
             }
         }
+
+        // Emit the signal "All Effects have been Executed"
+        Q_EMIT action->allEffectsHaveBeenExecuted();
     }
 }
 

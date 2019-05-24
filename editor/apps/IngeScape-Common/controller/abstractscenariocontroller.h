@@ -245,10 +245,10 @@ public Q_SLOTS:
 
 
     /**
- * @brief Slot called when an action has to be executed
- * @param action
- */
-void onExecuteAction(ActionM* action);
+     * @brief Slot called when an action has to be executed
+     * @param action
+     */
+    void onExecuteAction(ActionM* action);
 
 
 protected Q_SLOTS:
