@@ -814,7 +814,57 @@ const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t
         }
             break;
         case IGS_IMPULSION_T:{
-            //nothing to do
+            switch (iop->value_type) {
+                case IGS_INTEGER_T:
+                    outSize = iop->valueSize = sizeof(int);
+                    iop->value.i = 0;
+                    outValue = &(iop->value.i);
+                    igs_debug("set %s to %i", iopName, iop->value.i);
+                    break;
+                case IGS_DOUBLE_T:
+                    outSize = iop->valueSize = sizeof(double);
+                    iop->value.d = 0;
+                    outValue = &(iop->value.d);
+                    igs_debug("set %s to %lf", iopName, iop->value.d);
+                    break;
+                case IGS_BOOL_T:
+                    outSize = iop->valueSize = sizeof(bool);
+                    iop->value.b = false;
+                    outValue = &(iop->value.b);
+                    igs_debug("set %s to %i", iopName, iop->value.b);
+                    break;
+                case IGS_STRING_T:
+                {
+                    if (iop->value.s != NULL){
+                        free(iop->value.s);
+                    }
+                    iop->value.s = strdup("");
+                    outSize = iop->valueSize = sizeof(char);
+                    outValue = iop->value.s;
+                    igs_debug("set %s to %s (length: %lu)", iopName, iop->value.s, iop->valueSize - 1);
+                }
+                    break;
+                case IGS_IMPULSION_T:
+                    //nothing to do
+                    outSize = iop->valueSize = 0;
+                    igs_debug("set impulsion %s", iopName);
+                    break;
+                case IGS_DATA_T:
+                {
+                    if (iop->value.data != NULL){
+                        free(iop->value.data);
+                    }
+                    iop->value.data = NULL;
+                    outSize = iop->valueSize = 0;
+                    outValue = NULL;
+                    igs_debug("set %s data (length: %zu)", iopName, iop->valueSize);
+                }
+                    break;
+                default:
+                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    ret = 0;
+                    break;
+            }
             outSize = iop->valueSize = 0;
             igs_debug("set impulsion %s", iopName);
         }
