@@ -117,6 +117,22 @@ Rectangle {
     //
     //--------------------------------
 
+    Rectangle {
+        id: actionExecutedFeedback
+
+        visible: rootItem.linkOutput ? rootItem.linkOutput.hasBeenActivated : false
+
+        width: rootItem.width
+        height: rootItem.height
+        radius: rootItem.radius
+
+        color: "transparent"
+        border {
+            color: "red"
+            width: 3
+        }
+    }
+
     MouseArea {
         id: mouseArea
 
