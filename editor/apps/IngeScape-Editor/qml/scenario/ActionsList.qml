@@ -471,7 +471,7 @@ Item {
 
         property var myAction: null
 
-        confirmationText: "This action is used in the scenario.\nDo you want to completely delete it?"
+        confirmationText: "This action is used in the platform.\nDo you want to completely delete it?"
 
         onDeleteConfirmed: {
             if (myAction && controller) {

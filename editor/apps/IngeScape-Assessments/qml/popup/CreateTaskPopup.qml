@@ -390,8 +390,8 @@ I2PopupBase {
         title: "Select an IngeScape platform file"
 
         //folder: shortcuts.home
-        folder: shortcuts.documents
-        //folder: shortcuts.documents + "IngeScape"
+        //folder: shortcuts.documents
+        folder: shortcuts.documents + "/IngeScape/Platforms"
 
         //defaultSuffix: ".json"
         nameFilters: [ "JSON files (*.json)" ]
