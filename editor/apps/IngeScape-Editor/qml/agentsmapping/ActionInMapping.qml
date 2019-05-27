@@ -157,7 +157,7 @@ Rectangle {
         NumberAnimation {
             target: rootItem
             property: "scale"
-            to: 1.2
+            to: 1.05
             duration: 250
         }
         NumberAnimation {

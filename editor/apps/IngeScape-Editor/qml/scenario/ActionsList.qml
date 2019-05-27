@@ -345,8 +345,10 @@ Item {
                     }
 
                     onPositionChanged: {
-                        itemDragged.x = mouseX - 12 - itemDragged.width;
-                        itemDragged.y = mouseY - 12 - itemDragged.height;
+                        //itemDragged.x = mouseX - 12 - itemDragged.width;
+                        //itemDragged.y = mouseY - 12 - itemDragged.height;
+                        itemDragged.x = mouseX - itemDragged.width / 2.0;
+                        itemDragged.y = mouseY - itemDragged.height - 20;
                     }
 
                     onCanceled: {
@@ -404,6 +406,7 @@ Item {
                         id: itemDragged
 
                         width: Math.max(IngeScapeTheme.timeWidth, nameAction.width + 10)
+                        //width: Math.min(Math.max(IngeScapeTheme.timeWidth, nameAction.width + 10), 250)
                         height: columnText.height + 8
 
                         color: IngeScapeTheme.darkBlueGreyColor
@@ -417,19 +420,26 @@ Item {
                         Column {
                             id: columnText
 
+                            anchors.centerIn: parent
                             height: temporaryStartTimeAction.visible ? (nameAction.height + temporaryStartTimeAction.height + 3)
                                                                      : nameAction.height
-                            anchors.centerIn: parent
+
                             spacing: 6
 
                             Text {
                                 id: nameAction
 
-                                color: IngeScapeTheme.lightGreyColor
-                                text: model.name
-                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors {
+                                    horizontalCenter: parent.horizontalCenter
+                                    //left: parent.left
+                                    //right: parent.right
+                                }
                                 horizontalAlignment: Text.AlignHCenter
 
+                                text: model.name
+                                //elide: Text.ElideRight
+
+                                color: IngeScapeTheme.lightGreyColor
                                 font {
                                     family : IngeScapeTheme.textFontFamily
                                     pixelSize: 14
@@ -443,10 +453,10 @@ Item {
                                 horizontalAlignment: Text.AlignHCenter
 
                                 visible: (text !== "")
-                                color: IngeScapeTheme.lightGreyColor
                                 text: draggableItem.temporaryStartTime ? draggableItem.temporaryStartTime.toLocaleString(Qt.locale(), "HH:mm:ss.zzz")
                                                                        : ""
 
+                                color: IngeScapeTheme.lightGreyColor
                                 font {
                                     family : IngeScapeTheme.textFontFamily
                                     pixelSize: 14

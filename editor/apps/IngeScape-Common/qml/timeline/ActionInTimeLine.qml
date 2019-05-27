@@ -327,7 +327,9 @@ Item {
         onPositionChanged: {// Compute new position if needed
             if (itemDragged.parent !== null)
             {
-                var newPosition = actionVMItem.mapToItem(itemDragged.parent, mouse.x - 12 - itemDragged.width + actionVMMouseArea.x, mouse.y - 12 - itemDragged.height);
+                var newPosition = actionVMItem.mapToItem(itemDragged.parent,
+                                                         mouse.x - 12 - itemDragged.width + actionVMMouseArea.x,
+                                                         mouse.y - 12 - itemDragged.height);
                 itemDragged.x = newPosition.x;
                 itemDragged.y = newPosition.y;
             }
