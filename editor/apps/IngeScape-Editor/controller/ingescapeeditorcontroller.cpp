@@ -356,6 +356,16 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = nullptr;
     }
 
+    if (_scenarioC != nullptr)
+    {
+        disconnect(_scenarioC);
+
+        ScenarioController* temp = _scenarioC;
+        setscenarioC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
+
     if (_modelManager != nullptr)
     {
         disconnect(_modelManager);
@@ -372,16 +382,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
 
         NetworkController* temp = _networkC;
         setnetworkC(nullptr);
-        delete temp;
-        temp = nullptr;
-    }
-
-    if (_scenarioC != nullptr)
-    {
-        disconnect(_scenarioC);
-
-        ScenarioController* temp = _scenarioC;
-        setscenarioC(nullptr);
         delete temp;
         temp = nullptr;
     }
