@@ -18,15 +18,18 @@
  * @brief Constructor
  * @param type
  * @param name
+ * @param uid
  * @param position
  * @param parent
  */
 ObjectInMappingVM::ObjectInMappingVM(ObjectInMappingTypes::Value type,
-                                     QString name,
+                                     //QString name,
+                                     //QString uid,
                                      QPointF position,
                                      QObject *parent) : QObject(parent),
     _type(type),
-    _name(name),
+    _name(""),
+    _uid(""),
     _position(position)
 {
     // Force ownership of our object, it will prevent Qml from stealing it

@@ -32,10 +32,10 @@ class LinkVM : public QObject
 {
     Q_OBJECT
 
-    // Name with all names formatted: "outputAgent##output-->inputAgent##input"
+    // Name with all names formatted: "outputObject##output-->inputObject##input"
     I2_CPP_NOSIGNAL_PROPERTY(QString, name)
 
-    // Unique identifier with agents names and Input/Output ids: "outputAgent##output::outputType-->inputAgent##input::inputType"
+    // Unique identifier with objects ids and Input/Output ids: "outputObject##output::outputType-->inputObject##input::inputType"
     I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
 
     // View model of the corresponding mapping element
@@ -88,14 +88,14 @@ public:
 
 
     /**
-     * @brief Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-     * @param outputAgent
-     * @param output
-     * @param inputAgent
-     * @param input
-     * @return link id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
+     * @brief Get the link id (with format "outputObjectId##output::outputType-->inputObjectId##input::inputType") from object ids and Input/Output ids
+     * @param outputObjectId
+     * @param outputId
+     * @param inputObjectId
+     * @param inputId
+     * @return link id with format "outputObjectId##output::outputType-->inputObjectId##input::inputType"
      */
-    static QString getLinkIdFromAgentNamesAndIOids(QString outputAgent, QString outputId, QString inputAgent, QString inputId);
+    static QString getLinkIdFromObjectIdsAndIOids(QString outputObjectId, QString outputId, QString inputObjectId, QString inputId);
 
 
 Q_SIGNALS:

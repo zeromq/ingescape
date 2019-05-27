@@ -30,7 +30,6 @@
 AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
                                    QPointF position,
                                    QObject *parent) : ObjectInMappingVM(ObjectInMappingTypes::AGENT,
-                                                                        "",
                                                                         position,
                                                                         parent),
     _agentsGroupedByName(agentsGroupedByName),
@@ -47,6 +46,9 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     if (_agentsGroupedByName != nullptr)
     {
         _name = _agentsGroupedByName->name();
+
+        // Name of an agent in the mapping is unique
+        _uid = _name;
 
         qInfo() << "New Agent" << _name << "in the global mapping";
 

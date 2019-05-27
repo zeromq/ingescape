@@ -21,7 +21,7 @@
  */
 ActionMappingM::ActionMappingM(QObject *parent) : QObject(parent),
     _mappingIdsList_FromAgentToAction(QStringList()),
-    _uidsListOfOutputActionsInMapping(QList<int>()),
+    _uidsListOfOutputActionsInMapping(QStringList()),
     _mappingIdsList_FromActionToAgent(QStringList())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -38,14 +38,14 @@ ActionMappingM::ActionMappingM(QObject *parent) : QObject(parent),
 
 
 /**
- * @brief Get the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input") from the list of names (each parts of a mapping)
+ * @brief Get the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input") from the list of UIDs (each parts of a mapping)
  * @param outputObjectInMapping
  * @param output
  * @param inputObjectInMapping
  * @param input
  * @return mappingId with format "outputObjectInMapping##output-->inputObjectInMapping##input"
  */
-QString ActionMappingM::getMappingIdFromNamesList(QString outputObjectInMapping, QString output, QString inputObjectInMapping, QString input)
+QString ActionMappingM::getMappingIdFromUIDsList(QString outputObjectInMapping, QString output, QString inputObjectInMapping, QString input)
 {
     if (!outputObjectInMapping.isEmpty() && !output.isEmpty() && !inputObjectInMapping.isEmpty() && !input.isEmpty())
     {
@@ -59,11 +59,11 @@ QString ActionMappingM::getMappingIdFromNamesList(QString outputObjectInMapping,
 
 
 /**
- * @brief Get the list of names (each parts of a mapping) from the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
+ * @brief Get the list of UIDs (each parts of a mapping) from the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
  * @param mappingId with format "outputObjectInMapping##output-->inputObjectInMapping##input"
  * @return
  */
-QStringList ActionMappingM::getNamesListFromMappingId(QString mappingId)
+QStringList ActionMappingM::getUIDsListFromMappingId(QString mappingId)
 {
     QStringList namesList;
 

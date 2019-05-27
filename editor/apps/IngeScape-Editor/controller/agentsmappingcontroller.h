@@ -165,7 +165,7 @@ public:
      * @param uid
      * @return
      */
-    ActionInMappingVM* getActionInMappingFromUid(const int& uid);
+    ActionInMappingVM* getActionInMappingFromUid(const QString& uid);
 
 
     /**
@@ -424,7 +424,7 @@ private:
      * @param position
      * @return
      */
-    ActionInMappingVM* _createActionInMappingAtPosition(int uid, ActionM* action, QPointF position);
+    ActionInMappingVM* _createActionInMappingAtPosition(QString uid, ActionM* action, QPointF position);
 
 
     /**
@@ -572,7 +572,7 @@ private:
     // Hash table:
     // - from unique id of action in the global mapping
     // - to the (view model of) action in the global mapping
-    QHash<int, ActionInMappingVM*> _hashFromUidToActionInMapping;
+    QHash<QString, ActionInMappingVM*> _hashFromUidToActionInMapping;
 
     // Link name as key is not unique (because the value type of the Input/Output can be different)
     // Hash table from link name to a list of view models of links between agents in mapping

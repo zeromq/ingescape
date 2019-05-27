@@ -21,14 +21,12 @@
  * @param position
  * @param parent
  */
-ActionInMappingVM::ActionInMappingVM(int uid,
+ActionInMappingVM::ActionInMappingVM(QString uid,
                                      ActionM* action,
                                      QPointF position,
                                      QObject *parent) : ObjectInMappingVM(ObjectInMappingTypes::ACTION,
-                                                                          "",
                                                                           position,
                                                                           parent),
-    _uid(uid),
     _action(action),
     _linkInput(nullptr),
     _linkOutput(nullptr)
@@ -39,6 +37,7 @@ ActionInMappingVM::ActionInMappingVM(int uid,
     if (_action != nullptr)
     {
         _name = _action->name();
+        _uid = uid;
 
         // Create the link input and the link output
         _linkInput = new LinkInputVM(nullptr, this);

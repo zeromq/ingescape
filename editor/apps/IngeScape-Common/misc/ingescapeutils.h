@@ -107,21 +107,21 @@ public:
      * @brief Get an UID for a new view model of action in mapping
      * @return
      */
-    static int getUIDforNewActionInMappingVM();
+    static QString getUIDforNewActionInMappingVM();
 
 
     /**
      * @brief Free an UID of a view model of action in mapping
      * @param uid
      */
-    static void freeUIDofActionInMappingVM(int uid);
+    static void freeUIDofActionInMappingVM(QString uid);
 
 
     /**
      * @brief Book an UID for a new view model of action in mapping
      * @param uid
      */
-    static void bookUIDforActionInMappingVM(int uid);
+    static void bookUIDforActionInMappingVM(QString uid);
 
 
 protected:

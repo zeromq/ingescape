@@ -48,8 +48,8 @@ LinkVM::LinkVM(QString name,
 
     if ((_outputObject != nullptr) && (_linkOutput != nullptr) && (_inputObject != nullptr) && (_linkInput != nullptr))
     {
-        // Get our link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-        _uid = LinkVM::getLinkIdFromAgentNamesAndIOids(_outputObject->name(), _linkOutput->uid(), _inputObject->name(), _linkInput->uid());
+        // Get our link id (with format "outputObjectId##output::outputType-->inputObjectId##input::inputType") from object ids and Input/Output ids
+        _uid = LinkVM::getLinkIdFromObjectIdsAndIOids(_outputObject->uid(), _linkOutput->uid(), _inputObject->uid(), _linkInput->uid());
 
         //qInfo() << "New Link" << _uid << "in the global mapping (" << _name << ")";
 
@@ -120,19 +120,19 @@ void LinkVM::setmappingElement(MappingElementVM *value)
 
 
 /**
- * @brief Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
- * @param outputAgent
- * @param output
- * @param inputAgent
- * @param input
- * @return link id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
+ * @brief Get the link id (with format "outputObjectId##output::outputType-->inputObjectId##input::inputType") from object ids and Input/Output ids
+ * @param outputObjectId
+ * @param outputId
+ * @param inputObjectId
+ * @param inputId
+ * @return link id with format "outputObjectId##output::outputType-->inputObjectId##input::inputType"
  */
-QString LinkVM::getLinkIdFromAgentNamesAndIOids(QString outputAgent, QString outputId, QString inputAgent, QString inputId)
+QString LinkVM::getLinkIdFromObjectIdsAndIOids(QString outputObjectId, QString outputId, QString inputObjectId, QString inputId)
 {
-    if (!inputAgent.isEmpty() && !inputId.isEmpty() && !outputAgent.isEmpty() && !outputId.isEmpty())
+    if (!outputObjectId.isEmpty() && !outputId.isEmpty() && !inputObjectId.isEmpty() && !inputId.isEmpty())
     {
-        // outputAgent##output::outputType-->inputAgent##input::inputType
-        return QString("%1%2%3%4%5%2%6").arg(outputAgent, SEPARATOR_AGENT_NAME_AND_IOP, outputId, SEPARATOR_LINK_OUTPUT_AND_LINK_INPUT, inputAgent, inputId);
+        // outputObjectId ## output :: outputType --> inputObjectId ## input :: inputType
+        return QString("%1%2%3%4%5%2%6").arg(outputObjectId, SEPARATOR_AGENT_NAME_AND_IOP, outputId, SEPARATOR_LINK_OUTPUT_AND_LINK_INPUT, inputObjectId, inputId);
     }
     else {
         return "";

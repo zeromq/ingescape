@@ -180,11 +180,11 @@ void IngeScapeUtils::bookUIDforActionM(int uid)
  * @brief Get an UID for a new view model of action in mapping
  * @return
  */
-int IngeScapeUtils::getUIDforNewActionInMappingVM()
+QString IngeScapeUtils::getUIDforNewActionInMappingVM()
 {
     BIGGEST_UID_OF_ACTION_IN_MAPPING_VIEW_MODEL++;
 
-    return BIGGEST_UID_OF_ACTION_IN_MAPPING_VIEW_MODEL;
+    return QString::number(BIGGEST_UID_OF_ACTION_IN_MAPPING_VIEW_MODEL);
 }
 
 
@@ -192,10 +192,13 @@ int IngeScapeUtils::getUIDforNewActionInMappingVM()
  * @brief Free an UID of a view model of action in mapping
  * @param uid
  */
-void IngeScapeUtils::freeUIDofActionInMappingVM(int uid)
+void IngeScapeUtils::freeUIDofActionInMappingVM(QString uid)
 {
+    bool success = false;
+    int nUID = uid.toInt(&success);
+
     // Decrement only if the uid correspond to the biggest one
-    if (uid == BIGGEST_UID_OF_ACTION_IN_MAPPING_VIEW_MODEL)
+    if (success && (nUID == BIGGEST_UID_OF_ACTION_IN_MAPPING_VIEW_MODEL))
     {
         BIGGEST_UID_OF_ACTION_IN_MAPPING_VIEW_MODEL--;
     }
@@ -206,10 +209,14 @@ void IngeScapeUtils::freeUIDofActionInMappingVM(int uid)
  * @brief Book an UID for a new view model of action in mapping
  * @param uid
  */
-void IngeScapeUtils::bookUIDforActionInMappingVM(int uid)
+void IngeScapeUtils::bookUIDforActionInMappingVM(QString uid)
 {
-    if (uid > BIGGEST_UID_OF_ACTION_IN_MAPPING_VIEW_MODEL) {
-        BIGGEST_UID_OF_ACTION_IN_MAPPING_VIEW_MODEL = uid;
+    bool success = false;
+    int nUID = uid.toInt(&success);
+
+    // This UID is greater than the static variable, update it
+    if (success && (nUID > BIGGEST_UID_OF_ACTION_IN_MAPPING_VIEW_MODEL)) {
+        BIGGEST_UID_OF_ACTION_IN_MAPPING_VIEW_MODEL = nUID;
     }
 }
 

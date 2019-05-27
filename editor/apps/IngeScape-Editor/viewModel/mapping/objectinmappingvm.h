@@ -32,11 +32,14 @@ class ObjectInMappingVM : public QObject
 {
     Q_OBJECT
 
-    // Type of our object
+    // Type of our object in the global mapping
     I2_QML_PROPERTY_READONLY(ObjectInMappingTypes::Value, type)
 
-    // Name of our object
+    // Name of our object in the global mapping
     I2_QML_PROPERTY_READONLY(QString, name)
+
+    // Unique id of our object in the global mapping
+    I2_QML_PROPERTY_READONLY(QString, uid)
 
     // The position corresponds to the corner Top-Left of the box
     I2_QML_PROPERTY(QPointF, position)
@@ -54,11 +57,13 @@ public:
      * @brief Constructor
      * @param type
      * @param name
+     * @param uid
      * @param position
      * @param parent
      */
     explicit ObjectInMappingVM(ObjectInMappingTypes::Value type,
-                               QString name,
+                               //QString name,
+                               //QString uid,
                                QPointF position,
                                QObject *parent = nullptr);
 

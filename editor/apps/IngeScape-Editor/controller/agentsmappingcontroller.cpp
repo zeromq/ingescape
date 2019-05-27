@@ -226,7 +226,7 @@ void AgentsMappingController::deleteActionInMapping(ActionInMappingVM* action)
 {
     if (action != nullptr)
     {
-        int actionId = action->uid();
+        QString actionId = action->uid();
 
         //qDebug() << "Delete the action" << action->name() << "(" << actionId << ") in the Mapping";
 
@@ -400,7 +400,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
                                     if (linkOutput != nullptr)
                                     {
                                         // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-                                        linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAgentInMapping->name(), linkOutput->uid(), agentInMapping->name(), linkInput->uid());
+                                        linkId = LinkVM::getLinkIdFromObjectIdsAndIOids(outputAgentInMapping->uid(), linkOutput->uid(), agentInMapping->uid(), linkInput->uid());
                                     }
                                 }
                                 // The output agent is NOT yet in the global mapping
@@ -417,7 +417,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
                                             if (output != nullptr)
                                             {
                                                 // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-                                                linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAgent->name(), output->uid(), agentInMapping->name(), linkInput->uid());
+                                                linkId = LinkVM::getLinkIdFromObjectIdsAndIOids(outputAgent->name(), output->uid(), agentInMapping->uid(), linkInput->uid());
                                             }
                                         }
                                     }
@@ -457,7 +457,7 @@ void AgentsMappingController::dropActionToMappingAtPosition(ActionM* action, QPo
         qDebug() << "Drop action" << action->name() << "at" << position;
 
         // Get an UID for our new view model of action in mapping
-        int uid = IngeScapeUtils::getUIDforNewActionInMappingVM();
+        QString uid = IngeScapeUtils::getUIDforNewActionInMappingVM();
 
         // Create a new view model of action in mapping
         ActionInMappingVM* actionInMapping = _createActionInMappingAtPosition(uid, action, position);
@@ -488,7 +488,7 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
         if (linkInput->canLinkWith(linkOutput))
         {
             // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-            QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAgent->name(), linkOutput->uid(), inputAgent->name(), linkInput->uid());
+            QString linkId = LinkVM::getLinkIdFromObjectIdsAndIOids(outputAgent->uid(), linkOutput->uid(), inputAgent->uid(), linkInput->uid());
 
             LinkVM* link = getLinkInMappingFromId(linkId);
 
@@ -699,7 +699,7 @@ AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(const QStri
  * @param uid
  * @return
  */
-ActionInMappingVM* AgentsMappingController::getActionInMappingFromUid(const int& uid)
+ActionInMappingVM* AgentsMappingController::getActionInMappingFromUid(const QString& uid)
 {
     if (_hashFromUidToActionInMapping.contains(uid)) {
         return _hashFromUidToActionInMapping.value(uid);
@@ -1042,10 +1042,10 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                                     //qDebug() << "Link Action" << jsonOutputActionName.toString() << "(" << jsonOutputActionInMappingUID.toInt() << ")" << "to Agent" << agentName << "." << jsonInputName.toString();
 
                                     // outputObjectInMapping##output-->inputObjectInMapping##input
-                                    QString mappingId_FromActionToAgent = ActionMappingM::getMappingIdFromNamesList(QString::number(jsonOutputActionInMappingUID.toInt()),
-                                                                                                                    jsonOutputName.toString(),
-                                                                                                                    agentName,
-                                                                                                                    jsonInputName.toString());
+                                    QString mappingId_FromActionToAgent = ActionMappingM::getMappingIdFromUIDsList(jsonOutputActionInMappingUID.toString(),
+                                                                                                                   jsonOutputName.toString(),
+                                                                                                                   agentName,
+                                                                                                                   jsonInputName.toString());
 
                                     mappingIdsList_FromActionToAgent.append(mappingId_FromActionToAgent);
                                 }
@@ -1103,11 +1103,11 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                     QJsonValue jsonActionUID = jsonObjectInMapping.value("action_id");
                     QJsonValue jsonActionInMappingUID = jsonObjectInMapping.value("actionInMapping_id");
 
-                    if (jsonActionName.isString() && jsonActionUID.isDouble() && jsonActionInMappingUID.isDouble())
+                    if (jsonActionName.isString() && jsonActionUID.isDouble() && jsonActionInMappingUID.isString())
                     {
                         QString actionName = jsonActionName.toString();
                         int actionUID = jsonActionUID.toInt();
-                        int actionInMappingUID = jsonActionInMappingUID.toInt();
+                        QString actionInMappingUID = jsonActionInMappingUID.toString();
 
                         //
                         // Actions Mapping
@@ -1117,7 +1117,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                         if (jsonActionsMapping.isArray())
                         {
                             QStringList mappingIdsList_FromAgentToAction = QStringList();
-                            QList<int> uidsListOfOutputActionsInMapping = QList<int>();
+                            QStringList uidsListOfOutputActionsInMapping = QStringList();
 
                             // Traverse the list of mapping elements
                             for (QJsonValue jsonIterator : jsonActionsMapping.toArray())
@@ -1135,10 +1135,10 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                                     //qDebug() << "Link Agent" << jsonOutputAgentName.toString() << "." << jsonOutputName.toString() << "to Action" << actionName;
 
                                     // outputObjectInMapping##output-->inputObjectInMapping##input
-                                    QString mappingId_FromAgentToAction = ActionMappingM::getMappingIdFromNamesList(jsonOutputAgentName.toString(),
-                                                                                                                    jsonOutputName.toString(),
-                                                                                                                    QString::number(actionInMappingUID),
-                                                                                                                    jsonInputName.toString());
+                                    QString mappingId_FromAgentToAction = ActionMappingM::getMappingIdFromUIDsList(jsonOutputAgentName.toString(),
+                                                                                                                   jsonOutputName.toString(),
+                                                                                                                   actionInMappingUID,
+                                                                                                                   jsonInputName.toString());
 
                                     mappingIdsList_FromAgentToAction.append(mappingId_FromAgentToAction);
                                 }
@@ -1153,7 +1153,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 
                                     //qDebug() << "Link Action" << jsonOutputActionName.toString() << "(" << jsonOutputActionInMappingUID.toInt() << ")" << "to Action" << actionName;
 
-                                    uidsListOfOutputActionsInMapping.append(jsonOutputActionInMappingUID.toInt());
+                                    uidsListOfOutputActionsInMapping.append(jsonOutputActionInMappingUID.toString());
                                 }
                                 else {
                                     qCritical() << "The JSON mapping element for action" << actionName << "is bad formatted !";
@@ -1243,33 +1243,25 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
             {
                 for (QString mappingId_FromActionToAgent : actionMapping->mappingIdsList_FromActionToAgent())
                 {
-                    // Get the list of names (each parts of a mapping) from the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
-                    QStringList namesList = ActionMappingM::getNamesListFromMappingId(mappingId_FromActionToAgent);
-                    if (namesList.count() == 4)
+                    // Get the list of UIDs (each parts of a mapping) from the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
+                    QStringList uidsList = ActionMappingM::getUIDsListFromMappingId(mappingId_FromActionToAgent);
+                    if (uidsList.count() == 4)
                     {
-                        QString outputObjectInMappingName = namesList.at(0);
-                        QString outputName = namesList.at(1);
-                        QString inputObjectInMappingName = namesList.at(2);
-                        QString inputName = namesList.at(3);
+                        QString outputObjectInMappingUID = uidsList.at(0);
+                        QString outputUID = uidsList.at(1);
+                        QString inputObjectInMappingUID = uidsList.at(2);
+                        QString inputUID = uidsList.at(3);
 
-                        bool success = false;
-                        int outputObjectInMappingUID = outputObjectInMappingName.toInt(&success);
-                        if (success)
+                        // Get the (view model of) action in the global mapping from this unique id
+                        ActionInMappingVM* outputAction = getActionInMappingFromUid(outputObjectInMappingUID);
+
+                        // Get the link input
+                        LinkInputVM* linkInput = _getAloneLinkInputFromName(inputAgent, inputUID, mappingId_FromActionToAgent);
+
+                        if ((outputAction != nullptr) && (outputAction->linkOutput() != nullptr) && (linkInput != nullptr))
                         {
-                            // Get the (view model of) action in the global mapping from this unique id
-                            ActionInMappingVM* outputAction = getActionInMappingFromUid(outputObjectInMappingUID);
-
-                            // Get the link input
-                            LinkInputVM* linkInput = _getAloneLinkInputFromName(inputAgent, inputName, mappingId_FromActionToAgent);
-
-                            if ((outputAction != nullptr) && (outputAction->linkOutput() != nullptr) && (linkInput != nullptr))
-                            {
-                                // Simulate a drop of a link between these 2 actions
-                                dropLinkFromActionToAgent(outputAction, outputAction->linkOutput(), inputAgent, linkInput);
-                            }
-                        }
-                        else {
-                            qCritical() << "UID of action" << outputObjectInMappingName << "is not an int !";
+                            // Simulate a drop of a link between these 2 actions
+                            dropLinkFromActionToAgent(outputAction, outputAction->linkOutput(), inputAgent, linkInput);
                         }
                     }
                 }
@@ -1294,20 +1286,20 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                 for (QString mappingId_FromAgentToAction : actionMapping->mappingIdsList_FromAgentToAction())
                 {
                     // Get the list of names (each parts of a mapping) from the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
-                    QStringList namesList = ActionMappingM::getNamesListFromMappingId(mappingId_FromAgentToAction);
-                    if (namesList.count() == 4)
+                    QStringList uidsList = ActionMappingM::getUIDsListFromMappingId(mappingId_FromAgentToAction);
+                    if (uidsList.count() == 4)
                     {
-                        QString outputObjectInMappingName = namesList.at(0);
-                        QString outputName = namesList.at(1);
-                        QString inputObjectInMappingName = namesList.at(2);
-                        QString inputName = namesList.at(3);
+                        QString outputObjectInMappingUID = uidsList.at(0);
+                        QString outputUID = uidsList.at(1);
+                        QString inputObjectInMappingUID = uidsList.at(2);
+                        QString inputUID = uidsList.at(3);
 
                         // Get the output agent in the global mapping from the output agent name
-                        AgentInMappingVM* outputAgent = getAgentInMappingFromName(outputObjectInMappingName);
+                        AgentInMappingVM* outputAgent = getAgentInMappingFromName(outputObjectInMappingUID);
                         if (outputAgent != nullptr)
                         {
                             // Get the link output
-                            LinkOutputVM* linkOutput = _getAloneLinkOutputFromName(outputAgent, outputName, mappingId_FromAgentToAction);
+                            LinkOutputVM* linkOutput = _getAloneLinkOutputFromName(outputAgent, outputUID, mappingId_FromAgentToAction);
                             if (linkOutput != nullptr)
                             {
                                 // Simulate a drop of the link from the agent to the action
@@ -1317,7 +1309,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                     }
                 }
 
-                for (int uidOfOutputActionInMapping : actionMapping->uidsListOfOutputActionsInMapping())
+                for (QString uidOfOutputActionInMapping : actionMapping->uidsListOfOutputActionsInMapping())
                 {
                     ActionInMappingVM* outputAction = getActionInMappingFromUid(uidOfOutputActionInMapping);
                     if ((outputAction != nullptr) && (outputAction->linkOutput() != nullptr))
@@ -1792,7 +1784,7 @@ void AgentsMappingController::_onMappingElementsHaveBeenAdded(QList<MappingEleme
                             if ((linkInput != nullptr) && (linkOutput != nullptr))
                             {
                                 // Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-                                QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputAgent->name(), linkOutput->uid(), inputAgent->name(), linkInput->uid());
+                                QString linkId = LinkVM::getLinkIdFromObjectIdsAndIOids(outputAgent->uid(), linkOutput->uid(), inputAgent->uid(), linkInput->uid());
 
                                 // Simulate that the user remove this link while the global mapping is UN-activated
                                 inputAgent->removeLink_WhileMappingWasUNactivated(linkId, mappingElement);
@@ -2100,7 +2092,7 @@ AgentInMappingVM* AgentsMappingController::_createAgentInMappingAtPosition(Agent
  * @param position
  * @return
  */
-ActionInMappingVM* AgentsMappingController::_createActionInMappingAtPosition(int uid, ActionM* action, QPointF position)
+ActionInMappingVM* AgentsMappingController::_createActionInMappingAtPosition(QString uid, ActionM* action, QPointF position)
 {
     ActionInMappingVM* actionInMapping = nullptr;
 
@@ -2153,7 +2145,7 @@ LinkVM* AgentsMappingController::_createLinkBetweenTwoObjectsInMapping(const QSt
             && (inputObject != nullptr) && (linkInput != nullptr))
     {
         // Get the link id (with format "outputObject##output::outputType-->inputObject##input::inputType") from object names and Input/Output ids
-        QString linkId = LinkVM::getLinkIdFromAgentNamesAndIOids(outputObject->name(), linkOutput->uid(), inputObject->name(), linkInput->uid());
+        QString linkId = LinkVM::getLinkIdFromObjectIdsAndIOids(outputObject->uid(), linkOutput->uid(), inputObject->uid(), linkInput->uid());
 
         link = getLinkInMappingFromId(linkId);
 

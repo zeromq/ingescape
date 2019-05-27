@@ -33,7 +33,7 @@ class ActionMappingM : public QObject
     //I2_CPP_PROPERTY(QStringList, mappingIdsList_FromActionToAction)
 
     // List of unique ids of (output) actions in the global mapping on which our action is mapped
-    I2_CPP_PROPERTY(QList<int>, uidsListOfOutputActionsInMapping)
+    I2_CPP_PROPERTY(QStringList, uidsListOfOutputActionsInMapping)
 
     // List of mapping ids from an Action to an Agent in the global mapping (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
     I2_CPP_PROPERTY(QStringList, mappingIdsList_FromActionToAgent)
@@ -54,22 +54,22 @@ public:
 
 
     /**
-     * @brief Get the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input") from the list of names (each parts of a mapping)
+     * @brief Get the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input") from the list of UIDs (each parts of a mapping)
      * @param outputObjectInMapping
      * @param output
      * @param inputObjectInMapping
      * @param input
      * @return mappingId with format "outputObjectInMapping##output-->inputObjectInMapping##input"
      */
-    static QString getMappingIdFromNamesList(QString outputObjectInMapping, QString output, QString inputObjectInMapping, QString input);
+    static QString getMappingIdFromUIDsList(QString outputObjectInMapping, QString output, QString inputObjectInMapping, QString input);
 
 
     /**
-     * @brief Get the list of names (each parts of a mapping) from the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
+     * @brief Get the list of UIDs (each parts of a mapping) from the mapping id (with format "outputObjectInMapping##output-->inputObjectInMapping##input")
      * @param mappingId with format "outputObjectInMapping##output-->inputObjectInMapping##input"
      * @return
      */
-    static QStringList getNamesListFromMappingId(QString mappingId);
+    static QStringList getUIDsListFromMappingId(QString mappingId);
 
 };
 

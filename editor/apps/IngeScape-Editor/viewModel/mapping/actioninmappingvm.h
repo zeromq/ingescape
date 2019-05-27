@@ -35,7 +35,7 @@ class ActionInMappingVM : public ObjectInMappingVM
     // The same model of action can be Drag & Drop several times in the global mapping
 
     // Unique id of our action in the global mapping
-    I2_QML_PROPERTY_READONLY(int, uid)
+    //I2_QML_PROPERTY_READONLY(int, uid)
 
     // Model of action
     I2_QML_PROPERTY_READONLY(ActionM*, action)
@@ -56,7 +56,7 @@ public:
      * @param position
      * @param parent
      */
-    explicit ActionInMappingVM(int uid,
+    explicit ActionInMappingVM(QString uid,
                                ActionM* action,
                                QPointF position,
                                QObject *parent = nullptr);
