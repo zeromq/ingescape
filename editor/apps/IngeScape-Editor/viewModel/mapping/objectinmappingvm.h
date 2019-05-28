@@ -44,6 +44,9 @@ class ObjectInMappingVM : public QObject
     // The position corresponds to the corner Top-Left of the box
     I2_QML_PROPERTY(QPointF, position)
 
+    // Flag indicating if our object is reduced
+    I2_QML_PROPERTY(bool, isReduced)
+
     // List of view models of link inputs
     //I2_QOBJECT_LISTMODEL(LinkInputVM, linkInputsList)
 

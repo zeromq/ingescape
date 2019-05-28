@@ -24,7 +24,7 @@ import INGESCAPE 1.0
 import "../theme" as Theme;
 
 
-Rectangle {
+Item {
     id: rootItem
 
 
@@ -44,6 +44,9 @@ Rectangle {
     property LinkInputVM linkInput: actionInMappingVM ? actionInMappingVM.linkInput : null;
     property LinkOutputVM linkOutput: actionInMappingVM ? actionInMappingVM.linkOutput : null;
 
+    // Flag indicating if our action is reduced (Name, Input and Output are hidden)
+    property bool isReduced: actionInMappingVM && actionInMappingVM.isReduced
+
     // false if the agent is dropping and the drop is not available, true otherwise
     //property bool dropEnabled: true
 
@@ -53,9 +56,11 @@ Rectangle {
     // To check if our item is selected or not
     property bool _isSelected: (controller && rootItem.actionInMappingVM && (controller.selectedAction === rootItem.actionInMappingVM))
 
-    width: 150
-    height: width
-    radius: width / 2.0
+    // Duration of expand/collapse animation in milliseconds (250 ms => default duration of QML animations)
+    property int _expandCollapseAnimationDuration: 250
+
+    width: rootItem.isReduced ? 34 : 168
+    height: 48
 
 
     // Init position of our agent
@@ -63,22 +68,6 @@ Rectangle {
     y: (actionInMappingVM && actionInMappingVM.position) ? actionInMappingVM.position.y : 0
 
     scale: 1.0
-
-
-    color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2
-                             : IngeScapeTheme.darkBlueGreyColor
-
-
-    /*border {
-        color: IngeScapeTheme.selectionColor
-        width: rootItem._isSelected ? 1 : 0
-    }*/
-    border {
-        color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
-
-        width: rootItem._isSelected ? 1
-                                    : ((rootItem.linkOutput && rootItem.linkOutput.hasBeenActivated) ? 2 : 0)
-    }
 
 
     //--------------------------------
@@ -94,6 +83,16 @@ Rectangle {
         target: rootItem.actionInMappingVM
         property: "position"
         value: Qt.point(rootItem.x, rootItem.y)
+    }
+
+
+    //
+    // Animation used when our item is collapsed or expanded (its width changes)
+    //
+    Behavior on width {
+        NumberAnimation {
+            duration: rootItem._expandCollapseAnimationDuration
+        }
     }
 
 
@@ -125,39 +124,13 @@ Rectangle {
     //
     //--------------------------------
 
-    /*Rectangle {
-        id: actionExecutedFeedback
-
-        visible: rootItem.linkOutput ? rootItem.linkOutput.hasBeenActivated : false
-
-        width: rootItem.width
-        height: rootItem.height
-        //radius: rootItem.radius
-
-        color: "transparent"
-        border {
-            color: "red"
-            width: 3
-        }
-    }
-    RotationAnimator {
-        target: actionExecutedFeedback
-
-        from: 0
-        to: 360
-
-        duration: 500
-        //loops: Animation.Infinite
-        running: actionExecutedFeedback.visible
-    }*/
-
     SequentialAnimation {
         running: rootItem.linkOutput ? rootItem.linkOutput.hasBeenActivated : false
 
         NumberAnimation {
             target: rootItem
             property: "scale"
-            to: 1.05
+            to: 1.10
             duration: 250
         }
         NumberAnimation {
@@ -167,6 +140,97 @@ Rectangle {
             duration: 250
         }
     }
+
+    Rectangle {
+        id: leftTriangle
+
+        anchors {
+            left: parent.left
+            verticalCenter: parent.verticalCenter
+        }
+        width: 34
+        height: 34
+        rotation: 45
+
+        color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
+        border {
+            color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
+            width: 1
+        }
+    }
+    Rectangle {
+        id: rightTriangle
+
+        anchors {
+            right: parent.right
+            verticalCenter: parent.verticalCenter
+        }
+        width: 34
+        height: 34
+        rotation: 45
+
+        color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
+        border {
+            color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
+            width: 1
+        }
+    }
+    Rectangle {
+        id: center
+
+        anchors {
+            fill: parent
+            leftMargin: 17
+            rightMargin: 17
+        }
+
+        //color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
+        color: "transparent"
+        border {
+            color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
+            width: 4
+        }
+
+        Rectangle {
+            anchors {
+                fill: parent
+            }
+
+            radius: 10
+            color: "transparent"
+            border {
+                color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
+                width: 4
+            }
+        }
+
+        Rectangle {
+            id: topBar
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+            }
+
+            height: 1
+            color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
+        }
+
+        Rectangle {
+            id: bottomBar
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+
+            height: 1
+            color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
+        }
+    }
+
 
     MouseArea {
         id: mouseArea
@@ -197,6 +261,12 @@ Rectangle {
             }
         }
 
+        onDoubleClicked: {
+            if (rootItem.actionInMappingVM) {
+                rootItem.actionInMappingVM.isReduced = !rootItem.actionInMappingVM.isReduced;
+            }
+        }
+
 
         //------------------------------------------
         //
@@ -211,6 +281,15 @@ Rectangle {
                 left: parent.left
                 right: parent.right
                 verticalCenter: parent.verticalCenter
+            }
+
+            visible: (opacity !== 0)
+            opacity: !rootItem.isReduced ? 1 : 0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: rootItem._expandCollapseAnimationDuration
+                }
             }
 
             Rectangle {
@@ -287,6 +366,7 @@ Rectangle {
 
                 anchors {
                     horizontalCenter: parent.left
+                    horizontalCenterOffset: -7
                     verticalCenter: parent.verticalCenter
                 }
 
@@ -406,6 +486,15 @@ Rectangle {
                 verticalCenter: parent.verticalCenter
             }
 
+            visible: (opacity !== 0)
+            opacity: !rootItem.isReduced ? 1 : 0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: rootItem._expandCollapseAnimationDuration
+                }
+            }
+
             Rectangle {
                 id: draggablePointTO
 
@@ -484,6 +573,7 @@ Rectangle {
 
                 anchors {
                     horizontalCenter: parent.right
+                    horizontalCenterOffset: 7
                     verticalCenter: parent.verticalCenter
                 }
 
@@ -593,15 +683,17 @@ Rectangle {
         //
         //------------------------------------------
 
-        // Button to open the definition
-        /*Button {
-            id: btnOpenDefinition
+        // Button to open the action editor
+        Button {
+            id: btnOpenEditor
 
             anchors {
-                top: parent.top
-                topMargin: 10
-                left: parent.left
-                leftMargin: 10
+                //bottom: parent.top
+                //bottomMargin: 5
+                verticalCenter: parent.top
+                //right: parent.left
+                //rightMargin: 5
+                horizontalCenter: parent.left
             }
 
             style: LabellessSvgButtonStyle {
@@ -622,10 +714,16 @@ Rectangle {
             }
 
             onClicked: {
-                // Open the definition(s)
-                rootItem.agentsGroupedByName.openDefinition();
+                if (rootItem.actionInMappingVM && rootItem.actionInMappingVM.action && IngeScapeEditorC.scenarioC)
+                {
+                    // Open the action editor
+                    console.log("Open the action editor of " + rootItem.actionInMappingVM.action.name);
+
+                    // Open the action editor with our model of action
+                    IngeScapeEditorC.scenarioC.openActionEditorWithModel(rootItem.actionInMappingVM.action);
+                }
             }
-        }*/
+        }
 
 
         // Action Name
@@ -634,16 +732,13 @@ Rectangle {
 
             anchors {
                 left: parent.left
-                leftMargin: 15
+                leftMargin: 17
                 right: parent.right
-                rightMargin: 15
+                rightMargin: 17
                 verticalCenter: parent.verticalCenter
             }
 
             text: rootItem.actionInMappingVM ? rootItem.actionInMappingVM.name : "";
-            //wrapMode: Text.WordWrap
-            wrapMode: Text.Wrap
-            maximumLineCount: 4
             elide: Text.ElideRight
 
             horizontalAlignment: Text.AlignHCenter
@@ -656,12 +751,12 @@ Rectangle {
         }
 
         // Action UID
-        Text {
+        /*Text {
             id: txtActionUID
 
             anchors {
                 bottom: parent.bottom
-                bottomMargin: 5
+                bottomMargin: 0
                 horizontalCenter: parent.horizontalCenter
             }
 
@@ -675,7 +770,7 @@ Rectangle {
                 family: IngeScapeTheme.textFontFamily
                 pixelSize: 16
             }
-        }
+        }*/
 
 
         // Remove button
@@ -683,9 +778,12 @@ Rectangle {
             id: btnRemoveFromMapping
 
             anchors {
-                top: parent.top
-                topMargin: 10
-                horizontalCenter: parent.horizontalCenter
+                //bottom: parent.top
+                //bottomMargin: 5
+                verticalCenter: parent.top
+                //left: parent.right
+                //leftMargin: 5
+                horizontalCenter: parent.right
             }
 
             opacity: rootItem.actionItemIsHovered ? 1 : 0

@@ -41,9 +41,6 @@ class AgentInMappingVM : public ObjectInMappingVM
     // List of view models of link outputs
     I2_QOBJECT_LISTMODEL(LinkOutputVM, linkOutputsList)
 
-    // Flag indicating if our agent is reduced
-    I2_QML_PROPERTY(bool, isReduced)
-
     // Flag indicating if our agent is locked reduced (prevent to open the list of Inputs/Outputs)
     I2_QML_PROPERTY_READONLY(bool, isLockedReduced)
 

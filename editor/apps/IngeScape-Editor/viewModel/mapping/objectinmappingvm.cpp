@@ -30,7 +30,8 @@ ObjectInMappingVM::ObjectInMappingVM(ObjectInMappingTypes::Value type,
     _type(type),
     _name(""),
     _uid(""),
-    _position(position)
+    _position(position),
+    _isReduced(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
