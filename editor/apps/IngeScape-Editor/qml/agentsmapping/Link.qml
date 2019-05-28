@@ -66,8 +66,9 @@ I2CubicBezierCurve {
 
     // Check if we represent a link or a "brin"
     property bool _isBrin: (viewModel
-                            && viewModel.inputObject && (typeof viewModel.inputObject.isReduced !== 'undefined') && viewModel.inputObject.isReduced
-                            && viewModel.outputObject && (typeof viewModel.outputObject.isReduced !== 'undefined') && viewModel.outputObject.isReduced)
+                            && viewModel.inputObject && viewModel.inputObject.isReduced
+                            && viewModel.outputObject && viewModel.outputObject.isReduced
+                            && (typeof viewModel.outputObject.reducedLinkOutputsValueTypeGroup !== 'undefined'))
 
 
     // NB: Clip MUST be true to clip our mouse area
