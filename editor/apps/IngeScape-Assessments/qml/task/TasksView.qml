@@ -211,7 +211,7 @@ Item {
                     //console.log("QML: on Delete Task " + model.name);
 
                     // First, un-select the task
-                    rootItem.controller.selectedTask = null;
+                    //rootItem.controller.selectedTask = null;
 
                     // Delete the task
                     rootItem.controller.deleteTask(model.QtObject);
@@ -219,8 +219,12 @@ Item {
             }
 
             onDuplicateTask: {
-                if (rootItem.controller) {
-                    console.log("QML: on Duplicate Task " + model.name);
+                if (rootItem.controller)
+                {
+                    //console.log("QML: on Duplicate Task " + model.name);
+
+                    // Duplicate the task
+                    rootItem.controller.duplicateTask(model.QtObject);
                 }
             }
         }

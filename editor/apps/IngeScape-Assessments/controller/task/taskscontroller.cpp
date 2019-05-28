@@ -117,13 +117,13 @@ bool TasksController::canCreateTaskWithName(QString taskName)
 
 
 /**
- * @brief Create a new task with an IngeScape platform file
+ * @brief Create a new task with an IngeScape platform file path
  * @param taskName
  * @param platformFilePath
  */
-void TasksController::createNewTaskWithIngeScapePlatformFile(QString taskName, QString platformFilePath)
+void TasksController::createNewTaskWithIngeScapePlatformFilePath(QString taskName, QString platformFilePath)
 {
-    if (!taskName.isEmpty() && !platformFilePath.isEmpty() && (_currentExperimentation != nullptr))
+    if (!taskName.isEmpty() && !platformFilePath.isEmpty())
     {
         qInfo() << "Create new task" << taskName << "with file" << platformFilePath;
 
@@ -131,20 +131,11 @@ void TasksController::createNewTaskWithIngeScapePlatformFile(QString taskName, Q
 
         if (platformFileUrl.isValid())
         {
-            // Create the new task
-            TaskM* task = new TaskM(taskName);
-
-            // Set the URL of the IngeScape platform file (JSON)
-            task->setplatformFileUrl(platformFileUrl);
-
-            // Add the task to the current experimentation
-            _currentExperimentation->addTask(task);
-
-            // Select this new task
-            setselectedTask(task);
+            // Create a new task with an IngeScape platform file URL
+            _createNewTaskWithIngeScapePlatformFileUrl(taskName, platformFileUrl);
         }
         else {
-            qWarning() << "Failed to create the task" << taskName << "because the URL" << platformFilePath << "is wrong !";
+            qWarning() << "Failed to create the task" << taskName << "because the path" << platformFilePath << "is wrong !";
         }
     }
 }
@@ -167,6 +158,58 @@ void TasksController::deleteTask(TaskM* task)
 
         // Free memory
         delete task;
+    }
+}
+
+
+/**
+ * @brief Duplicate a task
+ * @param task
+ */
+void TasksController::duplicateTask(TaskM* task)
+{
+    if (task != nullptr)
+    {
+        QString taskName = QString("%1_copy").arg(task->name());
+
+        // Create a new task with an IngeScape platform file URL
+        TaskM* newTask = _createNewTaskWithIngeScapePlatformFileUrl(taskName, task->platformFileUrl());
+
+        if (newTask != nullptr)
+        {
+            // Copy each independent variables
+            for (IndependentVariableM* independentVariable : task->independentVariables()->toList())
+            {
+                if (independentVariable != nullptr)
+                {
+                    // Create the new independent variable
+                    IndependentVariableM* newIndependentVariable = new IndependentVariableM(independentVariable->name(),
+                                                                                            independentVariable->description(),
+                                                                                            independentVariable->valueType());
+
+                    // Add the independent variable to the new task
+                    newTask->addIndependentVariable(newIndependentVariable);
+                }
+            }
+
+            // Copy each dependent variables
+            for (DependentVariableM* dependentVariable : task->dependentVariables()->toList())
+            {
+                if (dependentVariable != nullptr)
+                {
+                    // Create the new dependent variable
+                    DependentVariableM* newDependentVariable = new DependentVariableM();
+
+                    newDependentVariable->setname(dependentVariable->name());
+                    newDependentVariable->setdescription(dependentVariable->description());
+                    newDependentVariable->setagentName(dependentVariable->agentName());
+                    newDependentVariable->setoutputName(dependentVariable->outputName());
+
+                    // Add the dependent variable to the new task
+                    newTask->addDependentVariable(newDependentVariable);
+                }
+            }
+        }
     }
 }
 
@@ -374,4 +417,33 @@ void TasksController::deleteDependentVariable(DependentVariableM* dependentVaria
         // Free memory
         delete dependentVariable;
     }
+}
+
+
+/**
+ * @brief Create a new task with an IngeScape platform file URL
+ * @param taskName
+ * @param platformFileUrl
+ * @return
+ */
+TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskName, QUrl platformFileUrl)
+{
+    TaskM* task = nullptr;
+
+    if (!taskName.isEmpty() && platformFileUrl.isValid() && (_currentExperimentation != nullptr))
+    {
+        // Create the new task
+        task = new TaskM(taskName);
+
+        // Set the URL of the IngeScape platform file (JSON)
+        task->setplatformFileUrl(platformFileUrl);
+
+        // Add the task to the current experimentation
+        _currentExperimentation->addTask(task);
+
+        // Select this new task
+        setselectedTask(task);
+    }
+
+    return task;
 }
