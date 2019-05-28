@@ -59,7 +59,9 @@ Item {
     // Duration of expand/collapse animation in milliseconds (250 ms => default duration of QML animations)
     property int _expandCollapseAnimationDuration: 250
 
-    width: rootItem.isReduced ? 34 : 168
+    property int _borderWidth: 1
+
+    width: rootItem.isReduced ? 34 : 220
     height: 48
 
 
@@ -141,40 +143,68 @@ Item {
         }
     }
 
-    Rectangle {
+    Item {
         id: leftTriangle
 
         anchors {
             left: parent.left
-            verticalCenter: parent.verticalCenter
+            leftMargin: -7
         }
-        width: 34
-        height: 34
-        rotation: 45
+        width: 24
+        height: 48
 
-        color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
-        border {
-            color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
-            width: 1
+        clip: true
+
+        Rectangle {
+
+            anchors {
+                left: parent.left
+                leftMargin: 7
+                verticalCenter: parent.verticalCenter
+            }
+            width: 34
+            height: 34
+            rotation: 45
+
+            color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
+            border {
+                color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
+                width: rootItem._borderWidth
+            }
         }
     }
-    Rectangle {
+
+    Item {
         id: rightTriangle
 
         anchors {
             right: parent.right
-            verticalCenter: parent.verticalCenter
+            rightMargin: -7
         }
-        width: 34
-        height: 34
-        rotation: 45
+        width: 24
+        height: 48
 
-        color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
-        border {
-            color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
-            width: 1
+        clip: true
+
+        Rectangle {
+
+            anchors {
+                right: parent.right
+                rightMargin: 7
+                verticalCenter: parent.verticalCenter
+            }
+            width: 34
+            height: 34
+            rotation: 45
+
+            color: mouseArea.pressed ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
+            border {
+                color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
+                width: rootItem._borderWidth
+            }
         }
     }
+
     Rectangle {
         id: center
 
@@ -213,7 +243,7 @@ Item {
                 top: parent.top
             }
 
-            height: 1
+            height: rootItem._borderWidth
             color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
         }
 
@@ -226,7 +256,7 @@ Item {
                 bottom: parent.bottom
             }
 
-            height: 1
+            height: rootItem._borderWidth
             color: rootItem._isSelected ? IngeScapeTheme.selectionColor : IngeScapeEditorTheme.purpleColor
         }
     }
@@ -369,10 +399,10 @@ Item {
                     horizontalCenterOffset: -7
                     verticalCenter: parent.verticalCenter
                 }
-
                 height: 15
                 width: height
                 radius: height/2
+                opacity: 0
 
                 border {
                     width: 0
@@ -576,10 +606,10 @@ Item {
                     horizontalCenterOffset: 7
                     verticalCenter: parent.verticalCenter
                 }
-
                 height: 15
                 width: height
                 radius: height/2
+                opacity: 0
 
                 border {
                     width: 0
@@ -732,9 +762,9 @@ Item {
 
             anchors {
                 left: parent.left
-                leftMargin: 17
+                leftMargin: 25
                 right: parent.right
-                rightMargin: 17
+                rightMargin: 25
                 verticalCenter: parent.verticalCenter
             }
 
