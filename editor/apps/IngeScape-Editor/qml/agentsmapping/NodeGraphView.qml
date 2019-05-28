@@ -532,8 +532,9 @@ Item {
                     {
                         //IngeScapeEditorC.agentsMappingC.dropActionToMappingAtPosition(dragItem.action, dropPosition);
 
-                        // 75 = ActionInMapping.width / 2
-                        var center = Qt.point(dropPosition.x - 75, dropPosition.y - 75);
+                        // 110 = ActionInMapping.width / 2
+                        // 48 = ActionInMapping.height
+                        var center = Qt.point(dropPosition.x - 110, dropPosition.y - 48);
                         IngeScapeEditorC.agentsMappingC.dropActionToMappingAtPosition(dragItem.action, center);
                     }
                 }

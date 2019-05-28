@@ -59,7 +59,7 @@ Item {
     // Duration of expand/collapse animation in milliseconds (250 ms => default duration of QML animations)
     property int _expandCollapseAnimationDuration: 250
 
-    property int _borderWidth: 1
+    property int _borderWidth: rootItem.linkOutput && rootItem.linkOutput.hasBeenActivated ? 2 : 1
 
     width: rootItem.isReduced ? 34 : 220
     height: 48
@@ -306,7 +306,7 @@ Item {
         Item {
             id: inputSlotItem
 
-            height: 22
+            height: 34
             anchors {
                 left: parent.left
                 right: parent.right
@@ -349,7 +349,10 @@ Item {
                 MouseArea {
                     id: mouseAreaPointFROM
 
-                    anchors.fill: parent
+                    anchors {
+                        fill: parent
+                        margins: -5
+                    }
 
                     drag.target: parent
                     // Disable smoothed so that the Item pixel from where we started
@@ -396,7 +399,7 @@ Item {
 
                 anchors {
                     horizontalCenter: parent.left
-                    horizontalCenterOffset: -7
+                    horizontalCenterOffset: 3
                     verticalCenter: parent.verticalCenter
                 }
                 height: 15
@@ -417,7 +420,7 @@ Item {
 
                 anchors {
                     fill: linkPoint
-                    margins: -3
+                    margins: -10
                 }
 
                 // Only accept drag events from output slot items
@@ -509,7 +512,7 @@ Item {
         Item {
             id: outputSlotItem
 
-            height: 22
+            height: 34
             anchors {
                 left: parent.left
                 right: parent.right
@@ -553,7 +556,10 @@ Item {
                 MouseArea {
                     id: mouseAreaPointTO
 
-                    anchors.fill: parent
+                    anchors {
+                        fill: parent
+                        margins: -5
+                    }
 
                     drag.target: parent
                     // Disable smoothed so that the Item pixel from where we started
@@ -603,7 +609,7 @@ Item {
 
                 anchors {
                     horizontalCenter: parent.right
-                    horizontalCenterOffset: 7
+                    horizontalCenterOffset: -3
                     verticalCenter: parent.verticalCenter
                 }
                 height: 15
@@ -625,7 +631,7 @@ Item {
 
                 anchors {
                     fill: linkPointOut
-                    margins: -3
+                    margins: -10
                 }
 
                 // Only accept drag events from input slot items
