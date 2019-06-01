@@ -64,23 +64,23 @@ lib-linux-release-x64:
   dependencies: []
   
 # Create ingescape library for linux (armv7/armhf)
-lib-linux-release-armhf:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - docker
-  image: ingescape/raspbian-stretch-armhf
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-linux-release-armhf"
-    expire_in: 1 week
-  dependencies: []
+#lib-linux-release-armhf:
+#  <<: *build-lib-files
+#  stage: build-lib
+#  tags:
+#    - docker
+#  image: ingescape/raspbian-stretch-armhf
+#  script:
+#    - git clean -xfd
+#    - mkdir build
+#    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+#    - make -C build
+#  artifacts:
+#    paths:
+#      - build
+#    name: "lib-linux-release-armhf"
+#    expire_in: 1 week
+#  dependencies: []
 
 # Create ingescape library for macos
 lib-macos-release-x64:
@@ -426,43 +426,43 @@ lib-installer-runtime-centos-x64:
     - lib-linux-release-x64
 
 # Create runtime install for linux ARMv7 (armhf) - Generic ZIP
-lib-installer-runtime-linux-armhf:
-  <<: *build-lib-files
-  stage: installer-lib
-  tags:
-    - docker
-  image: ingescape/raspbian-stretch-armhf
-  script:
-    - make -C build package
-    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
-    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
-  artifacts:
-    paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
-    name: "lib-installer-runtime-linux-armhf"
-  dependencies:
-    - lib-linux-release-armhf
+#lib-installer-runtime-linux-armhf:
+#  <<: *build-lib-files
+#  stage: installer-lib
+#  tags:
+#    - docker
+#  image: ingescape/raspbian-stretch-armhf
+#  script:
+#    - make -C build package
+#    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+#    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+#  artifacts:
+#    paths:
+#      - build/ingescape-*
+#      - build/installIngescapeAndDependencies.sh
+#    name: "lib-installer-runtime-linux-armhf"
+#  dependencies:
+#    - lib-linux-release-armhf
 
 # Create runtime install for linux ARMv7 (armhf) - Raspbian 9 (stretch)
-lib-installer-runtime-raspbian-9-armhf:
-  <<: *build-lib-files
-  stage: installer-lib
-  tags:
-    - docker
-  image: ingescape/raspbian-stretch-armhf
-  script:
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Raspbian 9 (stretch)"
-    - make -C build package
-    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
-    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
-  artifacts:
-    paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
-    name: "lib-installer-runtime-raspbian-9-armhf"
-  dependencies:
-    - lib-linux-release-armhf
+#lib-installer-runtime-raspbian-9-armhf:
+#  <<: *build-lib-files
+#  stage: installer-lib
+#  tags:
+#    - docker
+#  image: ingescape/raspbian-stretch-armhf
+#  script:
+#    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Raspbian 9 (stretch)"
+#    - make -C build package
+#    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
+#    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+#  artifacts:
+#    paths:
+#      - build/ingescape-*
+#      - build/installIngescapeAndDependencies.sh
+#    name: "lib-installer-runtime-raspbian-9-armhf"
+#  dependencies:
+#    - lib-linux-release-armhf
 
 # Deploy ingescape in mac os X to be able to compile agents
 lib-deploy-macos-release-x64:
@@ -490,17 +490,17 @@ lib-deploy-linux-release-x64:
     - lib-linux-release-x64
 
 # Deploy ingescape in linux to be able to compile agents
-lib-deploy-linux-release-armhf:
-  <<: *build-lib-files
-  stage: deploy-lib
-  tags:
-    - docker
-  image: ingescape/raspbian-stretch-armhf
-  script:
-    - make -C build install DESTDIR=~/builds/release/armhf
-    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
-  dependencies:
-    - lib-linux-release-armhf
+#lib-deploy-linux-release-armhf:
+#  <<: *build-lib-files
+#  stage: deploy-lib
+#  tags:
+#    - docker
+#  image: ingescape/raspbian-stretch-armhf
+#  script:
+#    - make -C build install DESTDIR=~/builds/release/armhf
+#    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
+#  dependencies:
+#    - lib-linux-release-armhf
 
 # Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-release-x64:
