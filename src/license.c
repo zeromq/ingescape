@@ -40,7 +40,8 @@ license_t *license = NULL;
 char *licensePath = NULL;
 license_callback_t *licenseCallbacks = NULL;
 
-uint8_t secretKey[crypto_secretstream_xchacha20poly1305_KEYBYTES] = {1,255,34,41,58,63,47,183,134,223,33,41,25,16,87,38,211,27,183,124,185,196,107,128,34,92,83,54,35,60,37,28};
+uint8_t secretEncryptionKey[crypto_secretstream_xchacha20poly1305_KEYBYTES] = {1,255,34,41,58,63,47,183,134,223,33,41,25,16,87,38,211,27,183,124,185,196,107,128,34,92,83,54,35,60,37,28};
+unsigned char publicSignKey[crypto_sign_PUBLICKEYBYTES] = {47,20,1,206,112,73,169,19,31,67,21,116,192,151,109,34,215,117,250,86,247,235,53,159,208,126,234,177,133,49,103,111};
 #define CHUNK_SIZE 4096
 
 ////////////////////////////////////////////////////////////////////////
@@ -109,6 +110,7 @@ void encryptLicenseToFile(const char *target_file, const char *source_string,
 
 int decryptLicenseFromFile(char **target_string, const char *source_file,
                            const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]){
+    //decrypt signed string
     unsigned char  buf_in[CHUNK_SIZE + crypto_secretstream_xchacha20poly1305_ABYTES];
     unsigned char  buf_out[CHUNK_SIZE];
     unsigned char  header[crypto_secretstream_xchacha20poly1305_HEADERBYTES];
@@ -121,6 +123,8 @@ int decryptLicenseFromFile(char **target_string, const char *source_file,
     unsigned char  tag;
     
     size_t targetSize = 0;
+    char *target_index = NULL;
+    char *signed_target_string = NULL;
     
     fp_s = fopen(source_file, "rb");
     if (fp_s == NULL){
@@ -131,7 +135,6 @@ int decryptLicenseFromFile(char **target_string, const char *source_file,
     if (crypto_secretstream_xchacha20poly1305_init_pull(&st, header, key) != 0) {
         goto ret; /* incomplete header */
     }
-    char *target_index = NULL;
     do {
         rlen = fread(buf_in, 1, sizeof buf_in, fp_s);
         eof = feof(fp_s);
@@ -146,11 +149,11 @@ int decryptLicenseFromFile(char **target_string, const char *source_file,
         }
         if (targetSize == 0){
             targetSize = out_len + 1; //+1 to reserve space for final \0
-            *target_string = calloc(1, targetSize);
-            target_index = *target_string;
+            signed_target_string = calloc(1, targetSize);
+            target_index = signed_target_string;
         }else{
             targetSize += out_len;
-            *target_string = realloc(*target_string, targetSize);
+            signed_target_string = realloc(signed_target_string, targetSize);
         }
         memcpy(target_index, buf_out, out_len);
         target_index += out_len;
@@ -158,6 +161,18 @@ int decryptLicenseFromFile(char **target_string, const char *source_file,
     ret = 0;
 ret:
     fclose(fp_s);
+    
+    //verify signed string
+    //    printf("decrypted string is %zu bytes long:\n%s***\n", targetSize - 1, signed_target_string);
+    *target_string = calloc(targetSize, sizeof(char));
+    unsigned long long target_string_len;
+    if (crypto_sign_open((unsigned char*)(*target_string), &target_string_len,
+                         (const unsigned char *)signed_target_string, targetSize - 1, publicSignKey) != 0) {
+        igs_license("license signature is incorrect");
+        ret = -1;
+    }
+    
+    free(signed_target_string);
     return ret;
 }
 
@@ -375,7 +390,7 @@ void license_readLicense(void){
             igs_debug("parsing license file %s", name);
             //decrypt file
             char *licenseText = NULL;
-            decryptLicenseFromFile(&licenseText, zfile_filename(file, NULL), secretKey);
+            decryptLicenseFromFile(&licenseText, zfile_filename(file, NULL), secretEncryptionKey);
             //igs_debug("raw license file:\n%s", license);
             //parse file
             char * curLine = licenseText;
