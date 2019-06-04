@@ -166,7 +166,7 @@ static void monitor_initLoop (zsock_t *pipe, void *args){
     zloop_destroy(&monitor->loop);
 }
 
-void igs_enableMonitoring(unsigned int period){
+void igs_monitoringEnable(unsigned int period){
     if (monitor != NULL){
         igs_warn("monitor is already started");
         return;
@@ -177,7 +177,7 @@ void igs_enableMonitoring(unsigned int period){
     monitor->monitorActor = zactor_new (monitor_initLoop, NULL);
 }
 
-void igs_disableMonitoring(void){
+void igs_monitoringDisable(void){
     if (monitor == NULL){
         igs_warn("monitor is not started");
         return;

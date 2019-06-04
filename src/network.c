@@ -1240,8 +1240,8 @@ initLoop (zsock_t *pipe, void *args){
     bool canContinue = true;
     //prepare zyre
     agentElements->node = zyre_new (igsAgentName);
-//    zyre_set_verbose(agentElements->node);
     if (strlen(agentElements->brokerEndPoint) > 0){
+        zyre_set_verbose(agentElements->node);
         zyre_gossip_connect(agentElements->node,
                             "%s", agentElements->brokerEndPoint);
     }else{
@@ -1751,9 +1751,9 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
     return 1;
 }
 
-int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpAddress){
+int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint){
     //TODO: manage a list of brokers instead of just one
-    if ((brokerIpAddress == NULL) || (strlen(brokerIpAddress) == 0)){
+    if ((brokerEndpoint == NULL) || (strlen(brokerEndpoint) == 0)){
         igs_error("brokerIpAddress cannot be NULL or empty");
         return 0;
     }
@@ -1769,7 +1769,7 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
     forcedStop = false;
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
-    strncpy(agentElements->brokerEndPoint, brokerIpAddress, IP_ADDRESS_LENGTH-1);
+    strncpy(agentElements->brokerEndPoint, brokerEndpoint, IP_ADDRESS_LENGTH-1);
     strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH-1);
     agentElements->ipAddress[0] = '\0';
     
@@ -1794,6 +1794,7 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
                       agentElements->ipAddress,
                       networkDevice,
                       agentElements->brokerEndPoint);
+            break;
         }
         name = ziflist_next (iflist);
     }

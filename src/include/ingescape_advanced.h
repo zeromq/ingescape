@@ -30,6 +30,12 @@ extern "C" {
 
 #define MAX_STRING_MSG_LENGTH 4096
 
+//Start the agent using a broker instead of selfdiscovery
+//NB: an ingescape broker must be running and available at the provided endpoint.
+//Endpoints have the form tcp://ip_address:port
+//Selected network device must be able to reach the endpoint address.
+//PUBLIC int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint);
+    
 //network configuration and monitoring
 //void igs_setBusEndpoint(const char *endpoint); //usefull only with gossip discovery - TODO
 //void igs_connectAgentOnEndpoint(const char *endpoint); //not officially supported in Zyre 2.0.x yet
@@ -38,9 +44,11 @@ PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 
 //IngeScape provides an integrated monitor to detect events relative to the network
-PUBLIC void igs_enableMonitoring(unsigned int period); //in milliseconds
-PUBLIC void igs_disableMonitoring(void);
-
+//Warning: once igs_monitoringEnable has been called, igs_monitoringDisable must be
+//called to actually stop the monitor. If not stopped, it may cause an error when
+//an agent terminates.
+PUBLIC void igs_monitoringEnable(unsigned int period); //in milliseconds
+PUBLIC void igs_monitoringDisable(void);
 //When the monitor is started and igs_monitoringShallStartStopAgent is set to true :
 // - IP change will cause the agent to restart on the new IP (same device, same port)
 // - Network device disappearance will cause the agent to stop. Agent will restart when device is back.
