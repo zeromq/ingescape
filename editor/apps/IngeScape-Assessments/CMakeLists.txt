@@ -139,7 +139,8 @@ add_ingescape_sources(ingescape_assessments_sources)
 
 source_group("Source Files" FILES ${ingescape_assessments_sources})
 
-set (ingescape_assessments_ressources qml.qrc)
+set (ingescape_assessments_ressources "${SOURCE_DIR}/qml.qrc")
+add_ingescape_common_ressources(ingescape_assessments_ressources)
 
 ########################################################################
 # dependencies

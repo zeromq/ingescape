@@ -148,7 +148,8 @@ add_ingescape_sources(ingescape_editor_sources)
 
 source_group("Source Files" FILES ${ingescape_editor_sources})
 
-set (ingescape_editor_ressources qml.qrc)
+set (ingescape_editor_ressources "${SOURCE_DIR}/qml.qrc")
+add_ingescape_common_ressources(ingescape_editor_ressources)
 
 ########################################################################
 # dependencies
