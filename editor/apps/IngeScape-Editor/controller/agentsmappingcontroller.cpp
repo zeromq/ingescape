@@ -2519,11 +2519,11 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
                     {
                         if (link->inputObject() != nullptr)
                         {
-                            AgentInMappingVM* inputAgent = qobject_cast<AgentInMappingVM*>(link->inputObject());
-                            if ((inputAgent != nullptr) && inputAgent->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid()))
+                            AgentInMappingVM* inputAgentFromLink = qobject_cast<AgentInMappingVM*>(link->inputObject());
+                            if ((inputAgentFromLink != nullptr) && inputAgentFromLink->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid()))
                             {
                                 qDebug() << "There is still the corresponding added Mapping Element" << link->uid() << "while the Mapping was UN-activated";
-                                inputAgent->mappingElementAdded_CorrespondingLinkAddedWhileMappingWasUNactivated(link->uid());
+                                inputAgentFromLink->mappingElementAdded_CorrespondingLinkAddedWhileMappingWasUNactivated(link->uid());
                             }
                         }
                     }
