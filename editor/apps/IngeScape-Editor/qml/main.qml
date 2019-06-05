@@ -294,6 +294,81 @@ ApplicationWindow {
                 }
             }
         }
+
+
+        // Debug
+        Menu {
+            title: qsTr("Debug Qt Quick")
+
+            visible: SHOW_DEBUG_MENU
+
+            ExclusiveGroup {
+                id: visualizeGroup
+            }
+
+            MenuItem {
+                id: visualizeNormal
+
+                text: qsTr("Normal rendering")
+                checkable: true
+                checked: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      DebugQuickInspector.currentWindowRenderingMode = DebugWindowRenderingMode.Normal;
+                }
+            }
+
+            MenuItem {
+                id: visualizeClipping
+
+                text: qsTr("Visualize clipping")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      DebugQuickInspector.currentWindowRenderingMode = DebugWindowRenderingMode.VisualizeClipping;
+                }
+            }
+
+            MenuItem {
+                id: visualizeBatches
+
+                text: qsTr("Visualize batches")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                     DebugQuickInspector.currentWindowRenderingMode = DebugWindowRenderingMode.VisualizeBatches;
+                }
+            }
+
+            MenuItem {
+                id: visualizeOverdraw
+
+                text: qsTr("Visualize overdraw")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      DebugQuickInspector.currentWindowRenderingMode = DebugWindowRenderingMode.VisualizeOverdraw;
+                }
+            }
+
+            MenuItem {
+                id: visualizeChanges
+
+                text: qsTr("Visualize changes")
+                checkable: true
+                exclusiveGroup: visualizeGroup
+
+                onTriggered: {
+                      DebugQuickInspector.currentWindowRenderingMode = DebugWindowRenderingMode.VisualizeChanges;
+                }
+            }
+        }
+
+
     }
 
 
@@ -304,6 +379,12 @@ ApplicationWindow {
     //----------------------------------
 
     Component.onCompleted: {
+        // Define the window associated to Qt Quick inspector
+        if (SHOW_DEBUG_MENU)
+        {
+            DebugQuickInspector.currentWindow = mainWindow;
+        }
+
         // Start our loader delay animation when our initial content is ready
         loaderDelayAnimation.start();
     }

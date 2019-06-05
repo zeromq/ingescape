@@ -1,4 +1,4 @@
-# CMake build script for IngeScape-Editor
+# CMake build script for IngeScape-Assessments
 
 # Macro for windows precompiled header
 MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
@@ -22,7 +22,7 @@ ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
 # Project setup
 ########################################################################
 cmake_minimum_required(VERSION 3.13.1)
-project(IngeScape-Editor HOMEPAGE_URL https://ingescape.com)
+project(IngeScape-Assessments HOMEPAGE_URL https://ingescape.com)
 
 enable_language(CXX)
 set(CMAKE_CXX_STANDARD 11)
@@ -83,23 +83,23 @@ endif()
 ########################################################################
 # version
 ########################################################################
-get_ingescape_editor_version(INGESCAPE_EDITOR_VERSION_MAJOR INGESCAPE_EDITOR_VERSION_MINOR INGESCAPE_EDITOR_VERSION_PATCH INGESCAPE_EDITOR_VERSION_BUILD)
+get_ingescape_assessments_version(INGESCAPE_ASSESSMENTS_VERSION_MAJOR INGESCAPE_ASSESSMENTS_VERSION_MINOR INGESCAPE_ASSESSMENTS_VERSION_PATCH INGESCAPE_ASSESSMENTS_VERSION_BUILD)
 
-set(INGESCAPE_EDITOR_VERSION "${INGESCAPE_EDITOR_VERSION_MAJOR}.${INGESCAPE_EDITOR_VERSION_MINOR}.${INGESCAPE_EDITOR_VERSION_PATCH}")
+set(INGESCAPE_ASSESSMENTS_VERSION "${INGESCAPE_ASSESSMENTS_VERSION_MAJOR}.${INGESCAPE_ASSESSMENTS_VERSION_MINOR}.${INGESCAPE_ASSESSMENTS_VERSION_PATCH}")
 if (WIN32)
-    add_definitions(-DVERSION="${INGESCAPE_EDITOR_VERSION}.${INGESCAPE_EDITOR_VERSION_BUILD}")
+    add_definitions(-DVERSION="${INGESCAPE_ASSESSMENTS_VERSION}.${INGESCAPE_ASSESSMENTS_VERSION_BUILD}")
 else (WIN32)
-    add_definitions(-DVERSION="${INGESCAPE_EDITOR_VERSION}")
+    add_definitions(-DVERSION="${INGESCAPE_ASSESSMENTS_VERSION}")
 endif (WIN32)
-message(STATUS "Detected INGESCAPE Editor Version - ${INGESCAPE_EDITOR_VERSION}")
+message(STATUS "Detected INGESCAPE Assessments Version - ${INGESCAPE_ASSESSMENTS_VERSION}")
 
 ########################################################################
 # includes
 ########################################################################
-file(GLOB_RECURSE ingescape_editor_headers "${SOURCE_DIR}/*.h")
-add_ingescape_common_headers(ingescape_editor_headers)
+file(GLOB_RECURSE ingescape_assessments_headers "${SOURCE_DIR}/*.h")
+add_ingescape_common_headers(ingescape_assessments_headers)
 
-source_group ("Header Files" FILES ${ingescape_editor_headers})
+source_group ("Header Files" FILES ${ingescape_assessments_headers})
 
 add_ingescape_include_directory(_INCLUDES_DIRECTORY)
 add_ingescape_common_include_directory(_INCLUDES_DIRECTORY)
@@ -117,39 +117,30 @@ include_directories(${_INCLUDES_DIRECTORY})
 
 # One glob by folder because cmake add cpp file in build folder to check compiler flags
 # And linker is not happy because he find two main
-file(GLOB_RECURSE ingescape_editor_sources_controller "${SOURCE_DIR}/controller/*.cpp")
-list(APPEND ingescape_editor_sources ${ingescape_editor_sources_controller})
+file(GLOB_RECURSE ingescape_assessments_sources_controller "${SOURCE_DIR}/controller/*.cpp")
+list(APPEND ingescape_assessments_sources ${ingescape_assessments_sources_controller})
 
-file(GLOB_RECURSE ingescape_editor_sources_misc "${SOURCE_DIR}/misc/*.cpp")
-list(APPEND ingescape_editor_sources ${ingescape_editor_sources_misc})
+file(GLOB_RECURSE ingescape_assessments_sources_model "${SOURCE_DIR}/model/*.cpp")
+list(APPEND ingescape_assessments_sources ${ingescape_assessments_sources_model})
 
-file(GLOB_RECURSE ingescape_editor_sources_model "${SOURCE_DIR}/model/*.cpp")
-list(APPEND ingescape_editor_sources ${ingescape_editor_sources_model})
+file(GLOB_RECURSE ingescape_assessments_sources_view_model "${SOURCE_DIR}/viewModel/*.cpp")
+list(APPEND ingescape_assessments_sources ${ingescape_assessments_sources_view_model})
 
-file(GLOB_RECURSE ingescape_editor_sources_sort_filter "${SOURCE_DIR}/sortFilter/*.cpp")
-list(APPEND ingescape_editor_sources ${ingescape_editor_sources_sort_filter})
+list(APPEND ingescape_assessments_sources "${SOURCE_DIR}/main.cpp")
 
-file(GLOB_RECURSE ingescape_editor_sources_uthash "${SOURCE_DIR}/uthash/*.cpp")
-list(APPEND ingescape_editor_sources ${ingescape_editor_sources_uthash})
-
-file(GLOB_RECURSE ingescape_editor_sources_view_model "${SOURCE_DIR}/viewModel/*.cpp")
-list(APPEND ingescape_editor_sources ${ingescape_editor_sources_view_model})
-
-list(APPEND ingescape_editor_sources "${SOURCE_DIR}/main.cpp")
-
-add_ingescape_common_sources(ingescape_editor_sources)
+add_ingescape_common_sources(ingescape_assessments_sources)
 
 if(MSVC)
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp "#include <stable.h>")
-    ADD_MSVC_PRECOMPILED_HEADER("stable.h" ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp ingescape_editor_sources)
+    ADD_MSVC_PRECOMPILED_HEADER("stable.h" ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp ingescape_assessments_sources)
 endif()
 
-add_ingescape_sources(ingescape_editor_sources)
+add_ingescape_sources(ingescape_assessments_sources)
 
-source_group("Source Files" FILES ${ingescape_editor_sources})
+source_group("Source Files" FILES ${ingescape_assessments_sources})
 
-set (ingescape_editor_ressources "${SOURCE_DIR}/qml.qrc")
-add_ingescape_common_ressources(ingescape_editor_ressources)
+set (ingescape_assessments_ressources "${SOURCE_DIR}/qml.qrc")
+add_ingescape_common_ressources(ingescape_assessments_ressources)
 
 ########################################################################
 # dependencies
@@ -203,20 +194,20 @@ endif ()
 ########################################################################
 # executable
 ########################################################################
-set(INGESCAPE_EDITOR_ICON)
+set(INGESCAPE_ASSESSMENTS_ICON)
 if (APPLE)
-    set(INGESCAPE_EDITOR_ICON "${SOURCE_DIR}/icon_IGS.icns")
-    set_source_files_properties("${INGESCAPE_EDITOR_ICON}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set(INGESCAPE_ASSESSMENTS_ICON "${SOURCE_DIR}/icon_IGS.icns")
+    set_source_files_properties("${INGESCAPE_ASSESSMENTS_ICON}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 elseif (WIN32)
-    set(INGESCAPE_EDITOR_ICON "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc")
-    file(WRITE ${INGESCAPE_EDITOR_ICON} "IDI_ICON1               ICON    DISCARDABLE     \"icon_IGS.ico\"")
+    set(INGESCAPE_ASSESSMENTS_ICON "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc")
+    file(WRITE ${INGESCAPE_ASSESSMENTS_ICON} "IDI_ICON1               ICON    DISCARDABLE     \"icon_IGS.ico\"")
 endif ()
 
 # Create target
 add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
-    ${ingescape_editor_sources}
-    ${ingescape_editor_ressources}
-    ${INGESCAPE_EDITOR_ICON}
+    ${ingescape_assessments_sources}
+    ${ingescape_assessments_ressources}
+    ${INGESCAPE_ASSESSMENTS_ICON}
     ${I2QUICK_LIB}
 )
 
@@ -245,10 +236,10 @@ if (APPLE)
     
     # Mac OS X bundle specific settings
     set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
-    set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${INGESCAPE_EDITOR_VERSION}")
-    set(MACOSX_BUNDLE_LONG_VERSION_STRING "${INGESCAPE_EDITOR_VERSION}")
-    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${INGESCAPE_EDITOR_VERSION_MAJOR}")
-    set(MACOSX_BUNDLE_BUNDLE_VERSION "${INGESCAPE_EDITOR_VERSION}")
+    set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${INGESCAPE_ASSESSMENTS_VERSION}")
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING "${INGESCAPE_ASSESSMENTS_VERSION}")
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${INGESCAPE_ASSESSMENTS_VERSION_MAJOR}")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "${INGESCAPE_ASSESSMENTS_VERSION}")
     set(MACOSX_BUNDLE_ICON_FILE "icon_IGS")
 
     add_custom_command(
@@ -302,10 +293,10 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME}")
     set(CPACK_PACKAGE_VENDOR "Ingenuity IO")
     set(CPACK_PACKAGE_CONTACT "contact@ingenuity.io")
-    set(CPACK_PACKAGE_VERSION ${INGESCAPE_EDITOR_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_EDITOR_VERSION_MAJOR}")
-    set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_EDITOR_VERSION_MINOR}")
-    set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_EDITOR_VERSION_PATCH}")
+    set(CPACK_PACKAGE_VERSION ${INGESCAPE_ASSESSMENTS_VERSION})
+    set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_ASSESSMENTS_VERSION_MAJOR}")
+    set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_ASSESSMENTS_VERSION_MINOR}")
+    set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_ASSESSMENTS_VERSION_PATCH}")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
     set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY ${PROJECT_NAME})
 
@@ -327,17 +318,17 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
     set(CPACK_NSIS_EXECUTABLES_DIRECTORY .)
 
-    set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/build/;${SOURCE_DIR}/IngeScape-Editor.pro.user")
+    set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/build/;${SOURCE_DIR}/IngeScape-Assessments.pro.user")
 
     if (WIN32)
         set(CPACK_GENERATOR "NSIS;ZIP")
         set(CPACK_SOURCE_GENERATOR "ZIP")
         # On windows we want to package dependencies with this library
-        set(IS_EDITOR TRUE)
-        install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
-        install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
-        install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
-        install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+        set(IS_ASSESSMENTS TRUE)
+        install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_ASSESSMENTS)
+        install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_ASSESSMENTS)
+        install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_ASSESSMENTS)
+        install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_ASSESSMENTS)
     elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
         set(CPACK_GENERATOR "DragNDrop")
         set(CPACK_SOURCE_GENERATOR "TGZ")

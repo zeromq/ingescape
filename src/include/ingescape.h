@@ -326,7 +326,7 @@ PUBLIC void igs_setAllowIpc(bool allow);
 PUBLIC bool igs_getAllowIpc(void);
 #endif
 
-#if !TARGET_OS_IOS
+#if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
 //////////////////////////////////////////////////
 //licenses
 // Default license path is empty and is automatically set to agent's executable path.

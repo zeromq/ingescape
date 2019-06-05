@@ -388,6 +388,13 @@ int main(int argc, char *argv[])
         
         // Version of our application
         qmlContext->setContextProperty("VERSION", app.applicationVersion());
+
+        // Debug menu
+#ifdef QT_DEBUG
+        qmlContext->setContextProperty("SHOW_DEBUG_MENU", true);
+#else
+        qmlContext->setContextProperty("SHOW_DEBUG_MENU", false);
+#endif
     }
 
 
