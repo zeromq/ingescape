@@ -341,7 +341,12 @@ PUBLIC bool igs_checkLicenseForAgent(const char *agentId);
 
 //use this callback mechanism to be notified when the timer
 //or number of agents or number of IOPs has been exceeded in demo mode
-typedef void (*igs_licenseCallback)(void *myData);
+typedef enum {
+    IGS_LICENSE_TIMEOUT = 0,
+    IGS_LICENSE_TOO_MANY_AGENTS,
+    IGS_LICENSE_TOO_MANY_IOPS
+} igs_license_limit_t;
+typedef void (*igs_licenseCallback)(igs_license_limit_t limit, void *myData);
 PUBLIC int igs_observeLicense(igs_licenseCallback cb, void *myData);
     
 #endif
