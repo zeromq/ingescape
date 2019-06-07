@@ -13,6 +13,10 @@ stages:
   - build-apps
   - installer-apps
   - deploy-lib
+  - delivery-lib
+
+variables:
+  DELIVERY_DIR: /var/local/ingescape/delivery
 
 # Define ingescape library files
 .build-lib-files: &build-lib-files
@@ -372,10 +376,11 @@ lib-installer-runtime-macos-x64:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i '' 's/DARWIN_PACKAGE_FILE_NAME=.*/DARWIN_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build macos_x64
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - macos_x64/ingescape-*
+      - macos_x64/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-macos-x64"
   dependencies:
     - lib-macos-release-x64
@@ -616,17 +621,17 @@ lib-deploy-linux-release-x64:
     - lib-linux-release-x64
 
 # Deploy ingescape in linux to be able to compile agents
-#lib-deploy-linux-release-armhf:
-#  <<: *build-lib-files
-#  stage: deploy-lib
-#  tags:
-#    - docker
-#  image: ingescape/raspbian-stretch-armhf
-#  script:
-#    - make -C build install DESTDIR=~/builds/release/armhf
-#    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
-#  dependencies:
-#    - lib-linux-release-armhf
+lib-deploy-linux-release-armhf:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - docker
+  image: ingescape/raspbian-stretch-armhf
+  script:
+    - make -C build install DESTDIR=~/builds/release/armhf
+    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
+  dependencies:
+    - lib-linux-release-armhf
 
 # Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-release-x64:
@@ -675,3 +680,44 @@ lib-deploy-windows-debug-x86:
     - copy /y build\DebugX86\Debug\* C:\Users\admin\dev\Builds\Debug\x86\
   dependencies:
     - lib-windows-debug-x86
+
+# Deliver installers so they can be downloaded from the website
+lib-delivery-all:
+  <<: *build-lib-files
+  stage: delivery-lib
+  tags:
+    - docker
+  image: ingescape/debian-with-zyre
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Deliver Windows x86"
+    - scp -i ssh_secret
+        build/ReleaseX86/ingescape-0.9.0-Source.zip
+        build/ReleaseX86/ingescape-0.9.0-win32.zip
+        build/ReleaseX86/ingescape-0.9.0-win32.exe
+        i2@rafale:${DELIVERY_DIR}/delivery/library/win32/
+    - echo "Deliver Windows x64"
+    - scp -i ssh_secret
+        build/ReleaseX64/ingescape-0.9.0-win64.exe
+        i2@rafale:${DELIVERY_DIR}/library/win64/
+    - echo "Deliver MacOS x64"
+    - scp -i ssh_secret
+        macos_x64/ingescape-0.9.0-Darwin.sh
+        i2@rafale:${DELIVERY_DIR}/library/macos/
+        # Do we need the installDependencies script and the ZIP archive here ?
+        # We already have a MacOS installer after all...
+  dependencies:
+    - lib-installer-runtime-windows-x86
+    - lib-installer-runtime-windows-x64
+    - lib-installer-runtime-macos-x64
+    - lib-installer-runtime-linux-x64
+    - lib-installer-runtime-debian-9-x64
+    - lib-installer-runtime-debian-10-x64
+    - lib-installer-runtime-centos-x64
+    - lib-installer-runtime-linux-armhf
+    - lib-installer-runtime-raspbian-9-armhf
