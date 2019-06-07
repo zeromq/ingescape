@@ -571,10 +571,11 @@ lib-installer-runtime-linux-armhf:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build linux_armhf
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - linux_armhf/ingescape-*
+      - linux_armhf/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-linux-armhf"
   dependencies:
     - lib-linux-release-armhf
@@ -591,10 +592,11 @@ lib-installer-runtime-raspbian-9-armhf:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build raspbian9_armhf
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - raspbian9_armhf/ingescape-*
+      - raspbian9_armhf/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-raspbian-9-armhf"
   dependencies:
     - lib-linux-release-armhf
@@ -738,6 +740,17 @@ lib-delivery-all:
         centos7_x64/ingescape-0.9.0-Linux.zip
         centos7_x64/installIngescapeAndDependencies.sh
         i2@rafale:${DELIVERY_DIR}/library/centos7/
+    - echo "Deliver generic Linux armhf"
+    - scp -i ssh_secret
+        linux_armhf/ingescape-0.9.0-Linux.zip
+        linux_armhf/installIngescapeAndDependencies.sh
+        i2@rafale:${DELIVERY_DIR}/library/linux_armhf/
+    - echo "Deliver Raspbian 9 armhf"
+    - scp -i ssh_secret
+        raspbian9_armhf/ingescape-0.9.0-Linux.deb
+        raspbian9_armhf/ingescape-0.9.0-Linux.zip
+        raspbian9_armhf/installIngescapeAndDependencies.sh
+        i2@rafale:${DELIVERY_DIR}/library/raspbian9/
   dependencies:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
