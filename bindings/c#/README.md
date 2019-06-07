@@ -4,11 +4,9 @@
 - Check and modify the path of the library : C:\\ingescape\\libs\\debug\\ingescape.dll
 - Build
 - You will find the 3 files composing the c# library : .\IngescapeCSharpWrapper\IngescapeCSharp\bin\Debug\netstandard2.0
-- IngescapeCSharp.deps.json
+	-IngescapeCSharp.deps.json
 	- IngescapeCSharp.dll
 	- IngescapeCSharp.pdb
+- You will find the sample into the sample project hiearchy 	.\IngescapeCSharpWrapper\CSharpSampleAgent\bin\Debug or Release depend of the build type
+- If you want to make your own project from the sample be carefull of the reference of the c# dll library 'ingescape'
 
-# To test it
-- Open the sample vs solution to build a c# sample agent : .\sample\CSharpSampleAgent\CSharpSampleAgent.sln
-- Check and modify the path of the reference to the Librairie IngescapeCSharp 
-- Build & run it
