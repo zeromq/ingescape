@@ -879,3 +879,6 @@ bindings/c#/examples/SendCSharpAgent/SendCSharpAgent/bin/
 bindings/c#/sample/CSharpSampleAgent/.vs/
 bindings/c#/sample/CSharpSampleAgent/CSharpSampleAgent/bin/Debug/
 bindings/c#/sample/CSharpSampleAgent/CSharpSampleAgent/bin/Release/
+bindings/c#/IngescapeCSharpWrapper/CSharpSampleAgent/obj/
+bindings/c#/IngescapeCSharpWrapper/CSharpSampleAgent/bin/Release/
+bindings/c#/IngescapeCSharpWrapper/CSharpSampleAgent/bin/Debug/
