@@ -21,7 +21,7 @@
 #define PUBLIC
 #endif
 
-#include <zyre.h>
+#include <czmq.h>
 #include "ingescape.h"
 
 #ifdef __cplusplus
@@ -62,14 +62,14 @@ typedef void (*igs_monitorCallback)(igs_monitorEvent_t event, const char *device
 PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
     
 //////////////////////////////////////////////////
-//data serialization using ZMQ
+//data serialization using ZeroMQ
 //TODO: give code examples here or link to documentation for zmsg and zframe
 PUBLIC int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg);
 PUBLIC int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
 
 //////////////////////////////////////////////////
-//ZMQ internal bus
+//internal bus
 typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *name,
                                          const char *address, const char *channel,
                                          zhash_t *headers, zmsg_t *msg, void *myData);
@@ -93,7 +93,7 @@ PUBLIC void igs_busRemoveServiceDescription(const char *key);
 //////////////////////////////////////////////////
 //Tokens Model : create, remove, call, react
 /*NOTES:
- - one and only one mandatory callback per token, set using igs_handleToken : warn if cb missing when loading definition or receiving token
+ - one and only one mandatory callback per token, set using igs_handleToken : generates warning if cb missing when loading definition or receiving token
  - one optional reply per token
  - reply shall be sent in callabck, using igs_sendToken with sender's UUID or name
  - token names shall be unique for a given agent
@@ -212,7 +212,7 @@ PUBLIC void igs_JSONparseFromString(const char *content, igs_JSONCallback cb, vo
 
 //////////////////////////////////////////////////
 //security
-//TODO when officially supported in Zyre 2.0.x
+//TODO when officially supported in Zyre 2.x.x
 
 #ifdef __cplusplus
 }
