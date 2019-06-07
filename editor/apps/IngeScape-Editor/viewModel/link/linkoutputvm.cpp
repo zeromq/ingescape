@@ -24,11 +24,12 @@
 LinkOutputVM::LinkOutputVM(OutputVM* output,
                            QObject *parent) : LinkConnectorVM(parent),
     _output(output),
-    _isPublishedNewValue(false)
+    _hasBeenActivated(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Agent
     if (_output != nullptr)
     {
         setname(_output->name());
@@ -37,8 +38,14 @@ LinkOutputVM::LinkOutputVM(OutputVM* output,
         // Connect to signals from the view model of output
         connect(_output, &OutputVM::currentValueChanged, this, &LinkOutputVM::_oncurrentValueChanged);
     }
+    // Action
+    else
+    {
+        setname(ACTION_LINK_OUTPUT_NAME);
+        setuid(QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(AgentIOPValueTypes::IMPULSION)));
+    }
 
-    // Init the timer to reset the flag "is Published New Value"
+    // Init the timer to reset the flag "has been activated"
     // Allows to play an animation when the value changed
     _timer.setInterval(500);
     connect(&_timer, &QTimer::timeout, this, &LinkOutputVM::_onTimeout);
@@ -68,11 +75,22 @@ LinkOutputVM::~LinkOutputVM()
 
 
 /**
- * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
+ * @brief Activate (allows to highlight the corresponding links)
  */
-void LinkOutputVM::simulateCurrentValueOfModelChanged()
+void LinkOutputVM::activate()
 {
-    _oncurrentValueChanged(QVariant());
+    // Check that the flag is not already to true
+    if (!_hasBeenActivated)
+    {
+        // Set the flag (allows to highlight the corresponding links)
+        sethasBeenActivated(true);
+
+        // Start the timer to reset the flag "has been activated"
+        _timer.start();
+    }
+
+    // Emit the signal "Activated"
+    Q_EMIT activated();
 }
 
 
@@ -83,16 +101,26 @@ void LinkOutputVM::simulateCurrentValueOfModelChanged()
  */
 bool LinkOutputVM::canLinkWith(LinkConnectorVM* linkConnector)
 {
+    bool canLink = false;
+
     LinkInputVM* linkInput = qobject_cast<LinkInputVM*>(linkConnector);
-    if ((linkInput != nullptr) && (linkInput->input() != nullptr) && (linkInput->input()->firstModel() != nullptr)
-            && (_output != nullptr) && (_output->firstModel() != nullptr))
+    if (linkInput != nullptr)
     {
-        // Call our mother class
-        return _canLinkOutputToInput(_output->firstModel()->agentIOPValueType(), linkInput->input()->firstModel()->agentIOPValueType());
+        // If the input OR the output is null, we try to link an action
+        if ((linkInput->input() == nullptr) || (_output == nullptr))
+        {
+            canLink = true;
+        }
+        //
+        else if ((linkInput->input() != nullptr) && (linkInput->input()->firstModel() != nullptr)
+                && (_output != nullptr) && (_output->firstModel() != nullptr))
+        {
+            // Call our mother class
+            canLink = _canLinkOutputToInput(_output->firstModel()->agentIOPValueType(), linkInput->input()->firstModel()->agentIOPValueType());
+        }
     }
-    else {
-        return false;
-    }
+
+    return canLink;
 }
 
 
@@ -108,14 +136,8 @@ void LinkOutputVM::_oncurrentValueChanged(QVariant value)
         qDebug() << "On Current Value of Output Changed" << _name << value.toString();
     }*/
 
-    // Check that the flag is not already to true
-    if (!_isPublishedNewValue)
-    {
-        setisPublishedNewValue(true);
-
-        // Start the timer to reset the flag "is Published New Value"
-        _timer.start();
-    }
+    // Activate our (link) output
+    activate();
 }
 
 
@@ -128,6 +150,5 @@ void LinkOutputVM::_onTimeout()
     _timer.stop();
 
     // Reset the flag
-    setisPublishedNewValue(false);
+    sethasBeenActivated(false);
 }
-

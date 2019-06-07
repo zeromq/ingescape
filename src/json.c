@@ -7,6 +7,8 @@
 //
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "ingescape_advanced.h"
 #include "yajl_parse.h"
 #include "yajl_gen.h"

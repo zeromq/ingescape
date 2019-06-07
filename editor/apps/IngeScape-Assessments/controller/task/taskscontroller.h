@@ -69,11 +69,11 @@ public:
 
 
     /**
-     * @brief Create a new task with an IngeScape platform file
+     * @brief Create a new task with an IngeScape platform file path
      * @param taskName
      * @param platformFilePath
      */
-    Q_INVOKABLE void createNewTaskWithIngeScapePlatformFile(QString taskName, QString platformFilePath);
+    Q_INVOKABLE void createNewTaskWithIngeScapePlatformFilePath(QString taskName, QString platformFilePath);
 
 
     /**
@@ -81,6 +81,13 @@ public:
      * @param task
      */
     Q_INVOKABLE void deleteTask(TaskM* task);
+
+
+    /**
+     * @brief Duplicate a task
+     * @param task
+     */
+    Q_INVOKABLE void duplicateTask(TaskM* task);
 
 
     /**
@@ -178,6 +185,14 @@ public Q_SLOTS:
 
 
 private:
+
+    /**
+     * @brief Create a new task with an IngeScape platform file URL
+     * @param taskName
+     * @param platformFileUrl
+     * @return
+     */
+    TaskM* _createNewTaskWithIngeScapePlatformFileUrl(QString taskName, QUrl platformFileUrl);
 
 
 private:

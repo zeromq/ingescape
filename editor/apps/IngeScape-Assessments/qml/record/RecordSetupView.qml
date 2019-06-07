@@ -42,7 +42,7 @@ Item {
 
     //property AssessmentsModelManager modelManager: null;
 
-    property ExperimentationRecordM record: controller ? controller.currentRecord : null;
+    property RecordSetupM recordSetup: controller ? controller.currentRecordSetup : null;
 
 
 
@@ -149,7 +149,7 @@ Item {
                 horizontalCenter: parent.horizontalCenter
             }
 
-            text: rootItem.record ? rootItem.record.name : ""
+            text: rootItem.recordSetup ? rootItem.recordSetup.name : ""
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -166,7 +166,7 @@ Item {
                 horizontalCenter: parent.horizontalCenter
             }
 
-            text: rootItem.record && rootItem.record.subject ? rootItem.record.subject.name : ""
+            text: rootItem.recordSetup && rootItem.recordSetup.subject ? rootItem.recordSetup.subject.name : ""
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -183,7 +183,7 @@ Item {
                 horizontalCenter: parent.horizontalCenter
             }
 
-            text: rootItem.record && rootItem.record.task ? rootItem.record.task.name : ""
+            text: rootItem.recordSetup && rootItem.recordSetup.task ? rootItem.recordSetup.task.name : ""
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -439,13 +439,13 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
 
             Repeater {
 
-                model: (rootItem.record && rootItem.record.task) ? rootItem.record.task.independentVariables : null
+                model: (rootItem.recordSetup && rootItem.recordSetup.task) ? rootItem.recordSetup.task.independentVariables : null
 
                 delegate: IndependentVariableValueEditor {
 
                     variable: model ? model.QtObject : null
 
-                    variableValue: (rootItem.record && rootItem.record.mapIndependentVariableValues && model) ? rootItem.record.mapIndependentVariableValues[model.name] : ""
+                    variableValue: (rootItem.recordSetup && rootItem.recordSetup.mapIndependentVariableValues && model) ? rootItem.recordSetup.mapIndependentVariableValues[model.name] : ""
 
                     isCurrentlyEditing: btnEditValuesOfIndependentVariable.checked
 
@@ -454,12 +454,12 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
                     // Slots
                     //
                     onIndependentVariableValueUpdated: {
-                        if (rootItem.record && rootItem.record.mapIndependentVariableValues && model)
+                        if (rootItem.recordSetup && rootItem.recordSetup.mapIndependentVariableValues && model)
                         {
                             //console.log("QML: on (IN-dependent) Variable Value Updated for " + model.name + ": " + value);
 
                             // Update the value (in C++)
-                            rootItem.record.mapIndependentVariableValues[model.name] = value;
+                            rootItem.recordSetup.mapIndependentVariableValues[model.name] = value;
                         }
                     }
                 }

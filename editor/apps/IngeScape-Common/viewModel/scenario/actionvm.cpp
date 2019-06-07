@@ -88,7 +88,9 @@ ActionVM::~ActionVM()
     _executionsList.deleteAllItems();
 
     // Reset model of action
-    setmodelM(nullptr);
+    if (_modelM != nullptr) {
+        setmodelM(nullptr);
+    }
 
     // Remove revert timer
     if (_timerToReverse != nullptr)

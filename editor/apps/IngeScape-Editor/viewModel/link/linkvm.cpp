@@ -19,39 +19,50 @@
  * @brief Constructor
  * @param name
  * @param mappingElement corresponding mapping element
- * @param outputAgent The link starts from this agent
+ * @param outputObject The link starts from this object (in the global mapping)
  * @param linkOutput The link starts from this output of the output agent
- * @param inputAgent The link ends to this agent
+ * @param inputObject The link ends to this object (in the global mapping)
  * @param linkInput The link ends to this input of the input agent
  * @param isTemporary
  * @param parent
  */
 LinkVM::LinkVM(QString name,
                MappingElementVM* mappingElement,
-               AgentInMappingVM* outputAgent,
+               ObjectInMappingVM* outputObject,
                LinkOutputVM* linkOutput,
-               AgentInMappingVM* inputAgent,
+               ObjectInMappingVM* inputObject,
                LinkInputVM* linkInput,
                bool isTemporary,
                QObject *parent) : QObject(parent),
     _name(name),
     _uid(""),
     _mappingElement(nullptr),
-    _outputAgent(outputAgent),
+    _outputObject(outputObject),
     _linkOutput(linkOutput),
-    _inputAgent(inputAgent),
+    _inputObject(inputObject),
     _linkInput(linkInput),
     _isTemporary(isTemporary)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if ((_outputAgent != nullptr) && (_linkOutput != nullptr) && (_inputAgent != nullptr) && (_linkInput != nullptr))
+    if ((_outputObject != nullptr) && (_linkOutput != nullptr) && (_inputObject != nullptr) && (_linkInput != nullptr))
     {
-        // Get our link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-        _uid = LinkVM::getLinkIdFromAgentNamesAndIOids(_outputAgent->name(), _linkOutput->uid(), _inputAgent->name(), _linkInput->uid());
+        // Get our link id (with format "outputObjectId##output::outputType-->inputObjectId##input::inputType") from object ids and Input/Output ids
+        _uid = LinkVM::getLinkIdFromObjectIdsAndIOids(_outputObject->uid(), _linkOutput->uid(), _inputObject->uid(), _linkInput->uid());
 
         //qInfo() << "New Link" << _uid << "in the global mapping (" << _name << ")";
+
+        // Output object or Input object is an action (in the global mapping)
+        if ((_outputObject->type() == ObjectInMappingTypes::ACTION) || (_inputObject->type() == ObjectInMappingTypes::ACTION))
+        {
+            // Connect to signal "activated" from the link output
+            connect(_linkOutput, &LinkOutputVM::activated, this, &LinkVM::_onOutputActivated);
+        }
+        // Output object and Input object are agents (in the global mapping)
+        /*else {
+            // Nothing to do because the library IngeScape already manage mappings between agents
+        }*/
     }
 
     setmappingElement(mappingElement);
@@ -67,9 +78,18 @@ LinkVM::~LinkVM()
 
     setmappingElement(nullptr);
 
-    setoutputAgent(nullptr);
-    setlinkOutput(nullptr);
-    setinputAgent(nullptr);
+    setoutputObject(nullptr);
+
+    if (_linkOutput != nullptr)
+    {
+        // DIS-connect to signal "activated" from the link output
+        disconnect(_linkOutput, &LinkOutputVM::activated, this, &LinkVM::_onOutputActivated);
+
+        setlinkOutput(nullptr);
+    }
+
+    setinputObject(nullptr);
+
     setlinkInput(nullptr);
 }
 
@@ -100,21 +120,34 @@ void LinkVM::setmappingElement(MappingElementVM *value)
 
 
 /**
- * @brief Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
- * @param outputAgent
- * @param output
- * @param inputAgent
- * @param input
- * @return link id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
+ * @brief Get the link id (with format "outputObjectId##output::outputType-->inputObjectId##input::inputType") from object ids and Input/Output ids
+ * @param outputObjectId
+ * @param outputId
+ * @param inputObjectId
+ * @param inputId
+ * @return link id with format "outputObjectId##output::outputType-->inputObjectId##input::inputType"
  */
-QString LinkVM::getLinkIdFromAgentNamesAndIOids(QString outputAgent, QString outputId, QString inputAgent, QString inputId)
+QString LinkVM::getLinkIdFromObjectIdsAndIOids(QString outputObjectId, QString outputId, QString inputObjectId, QString inputId)
 {
-    if (!inputAgent.isEmpty() && !inputId.isEmpty() && !outputAgent.isEmpty() && !outputId.isEmpty())
+    if (!outputObjectId.isEmpty() && !outputId.isEmpty() && !inputObjectId.isEmpty() && !inputId.isEmpty())
     {
-        // outputAgent##output::outputType-->inputAgent##input::inputType
-        return QString("%1%2%3%4%5%2%6").arg(outputAgent, SEPARATOR_AGENT_NAME_AND_IOP, outputId, SEPARATOR_LINK_OUTPUT_AND_LINK_INPUT, inputAgent, inputId);
+        // outputObjectId ## output :: outputType --> inputObjectId ## input :: inputType
+        return QString("%1%2%3%4%5%2%6").arg(outputObjectId, SEPARATOR_AGENT_NAME_AND_IOP, outputId, SEPARATOR_LINK_OUTPUT_AND_LINK_INPUT, inputObjectId, inputId);
     }
     else {
         return "";
+    }
+}
+
+
+/**
+ * @brief Slot called when the (link) output has been activated
+ */
+void LinkVM::_onOutputActivated()
+{
+    if ((_inputObject != nullptr) && (_linkInput != nullptr))
+    {
+        // Emit the signal "Activate Input of Object in Mapping"
+        Q_EMIT activateInputOfObjectInMapping(_inputObject, _linkInput);
     }
 }

@@ -319,7 +319,7 @@ Item {
 
                     drag.smoothed: false
                     drag.target: draggableItem
-                    cursorShape: mouseArea.drag.active ? Qt.PointingHandCursor : Qt.OpenHandCursor //Qt.OpenHandCursor
+                    cursorShape: mouseArea.drag.active ? Qt.PointingHandCursor : Qt.OpenHandCursor
 
                     onPressed: {
                         if (controller)
@@ -345,8 +345,10 @@ Item {
                     }
 
                     onPositionChanged: {
-                        itemDragged.x = mouseX - 12 - itemDragged.width;
-                        itemDragged.y = mouseY - 12 - itemDragged.height;
+                        //itemDragged.x = mouseX - 12 - itemDragged.width;
+                        //itemDragged.y = mouseY - 12 - itemDragged.height;
+                        itemDragged.x = mouseX - itemDragged.width / 2.0;
+                        itemDragged.y = mouseY - itemDragged.height - 20;
                     }
 
                     onCanceled: {
@@ -390,7 +392,11 @@ Item {
 
                         visible: !mouseArea.drag.active
 
-                        onNeedConfirmationtoDeleteAction: {
+
+                        //
+                        // Slot on signal "Need Confirmation to Delete Action"
+                        //
+                        onNeedConfirmationToDeleteAction: {
                             deleteConfirmationPopup.myAction = action;
                             deleteConfirmationPopup.open();
                         }
@@ -400,6 +406,7 @@ Item {
                         id: itemDragged
 
                         width: Math.max(IngeScapeTheme.timeWidth, nameAction.width + 10)
+                        //width: Math.min(Math.max(IngeScapeTheme.timeWidth, nameAction.width + 10), 250)
                         height: columnText.height + 8
 
                         color: IngeScapeTheme.darkBlueGreyColor
@@ -413,19 +420,26 @@ Item {
                         Column {
                             id: columnText
 
-                            height: temporaryStartTimeAction.visible ? (nameAction.height + temporaryStartTimeAction.height) + 3
-                                                                     : nameAction.height
                             anchors.centerIn: parent
+                            height: temporaryStartTimeAction.visible ? (nameAction.height + temporaryStartTimeAction.height + 3)
+                                                                     : nameAction.height
+
                             spacing: 6
 
                             Text {
                                 id: nameAction
 
-                                color: IngeScapeTheme.lightGreyColor
-                                text: model.name
-                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors {
+                                    horizontalCenter: parent.horizontalCenter
+                                    //left: parent.left
+                                    //right: parent.right
+                                }
                                 horizontalAlignment: Text.AlignHCenter
 
+                                text: model.name
+                                //elide: Text.ElideRight
+
+                                color: IngeScapeTheme.lightGreyColor
                                 font {
                                     family : IngeScapeTheme.textFontFamily
                                     pixelSize: 14
@@ -439,10 +453,10 @@ Item {
                                 horizontalAlignment: Text.AlignHCenter
 
                                 visible: (text !== "")
-                                color: IngeScapeTheme.lightGreyColor
                                 text: draggableItem.temporaryStartTime ? draggableItem.temporaryStartTime.toLocaleString(Qt.locale(), "HH:mm:ss.zzz")
                                                                        : ""
 
+                                color: IngeScapeTheme.lightGreyColor
                                 font {
                                     family : IngeScapeTheme.textFontFamily
                                     pixelSize: 14
@@ -467,7 +481,7 @@ Item {
 
         property var myAction: null
 
-        confirmationText: "This action is used in the scenario.\nDo you want to completely delete it?"
+        confirmationText: "This action is used in the platform.\nDo you want to completely delete it?"
 
         onDeleteConfirmed: {
             if (myAction && controller) {

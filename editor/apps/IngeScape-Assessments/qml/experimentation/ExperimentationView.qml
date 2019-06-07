@@ -387,28 +387,28 @@ Item {
                     }
 
                     Repeater {
-                        model: rootItem.experimentation ? rootItem.experimentation.allRecords : null
+                        model: rootItem.experimentation ? rootItem.experimentation.allRecordSetups : null
 
-                        delegate: RecordInList {
+                        delegate: RecordSetupInList {
 
                             modelM: model.QtObject
 
                             //
                             // Slots
                             //
-                            onOpenRecord: {
+                            onOpenRecordSetup: {
                                 if (rootItem.controller && modelM) {
-                                    //console.log("QML: onOpenRecord " + modelM.name);
+                                    //console.log("QML: openRecordSetup " + modelM.name);
 
-                                    rootItem.controller.openRecord(modelM);
+                                    rootItem.controller.openRecordSetup(modelM);
                                 }
                             }
 
-                            onDeleteRecord: {
+                            onDeleteRecordSetup: {
                                 if (rootItem.controller && modelM) {
-                                    //console.log("QML: onDeleteRecord " + modelM.name);
+                                    //console.log("QML: deleteRecordSetup " + modelM.name);
 
-                                    rootItem.controller.deleteRecord(modelM);
+                                    rootItem.controller.deleteRecordSetup(modelM);
                                 }
                             }
                         }

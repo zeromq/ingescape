@@ -150,7 +150,10 @@ Item {
             contentArea.contentX = 0;
             contentArea.contentY = 0;
         }
+
+        //ignoreUnknownSignals: true
     }
+
 
     //--------------------------------
     //
@@ -484,10 +487,16 @@ Item {
                                 keys: ["ActionsListItem", "ActionInTimeLine"]
 
                                 onEntered: {
-                                    var dragItem = drag.source;
-                                    // display ghost
-                                    if (typeof dragItem.action !== 'undefined') {
-                                        ghostAction.actionModelGhost = dragItem.action;
+                                    if (drag.source !== null)
+                                    {
+                                        var dragItem = drag.source;
+
+                                        // Check if our source has an "action" property
+                                        if (typeof dragItem.action !== 'undefined')
+                                        {
+                                            // display ghost
+                                            ghostAction.actionModelGhost = dragItem.action;
+                                        }
                                     }
                                 }
 
@@ -1181,7 +1190,7 @@ Item {
         }
         height: 14
 
-        color: mouseAreaResizeTimeLine.pressed? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.editorsBackgroundColor
+        color: mouseAreaResizeTimeLine.pressed ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.editorsBackgroundColor
 
         I2SvgItem {
             anchors.centerIn: parent
@@ -1377,10 +1386,10 @@ Item {
         target: contentArea
         property: "contentX"
         value: if (timeLineController) {
-                   (scrollBarHorizontal.x * timeLineController.timeTicksTotalWidth)/scrollTimeLine.width
+                   (scrollBarHorizontal.x * timeLineController.timeTicksTotalWidth) / scrollTimeLine.width;
                }
                else {
-                   0
+                   0;
                }
         when: mouseArea.drag.active
     }
@@ -1390,10 +1399,10 @@ Item {
         target: scrollBarHorizontal
         property: "x"
         value: if (timeLineController) {
-                   Math.max(0, (timeLineController.viewportX*scrollTimeLine.width)/timeLineController.timeTicksTotalWidth);
+                   Math.max(0, (timeLineController.viewportX * scrollTimeLine.width) / timeLineController.timeTicksTotalWidth);
                }
                else {
-                   0
+                   0;
                }
         when: !mouseArea.drag.active
     }

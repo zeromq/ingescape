@@ -21,6 +21,7 @@
 #include <I2PropertyHelpers.h>
 #include <controller/editormodelmanager.h>
 #include <viewModel/agentinmappingvm.h>
+#include <viewModel/mapping/actioninmappingvm.h>
 #include <viewModel/link/linkvm.h>
 
 
@@ -41,8 +42,11 @@ class AgentsMappingController : public QObject
     I2_QML_PROPERTY_FUZZY_COMPARE(double, xSpawnZoneOffset)
     I2_QML_PROPERTY_FUZZY_COMPARE(double, ySpawnZoneOffset)
 
-    // List of all agents in mapping
+    // List of all agents in the mapping
     I2_QOBJECT_LISTMODEL(AgentInMappingVM, allAgentsInMapping)
+
+    // List of all actions in the mapping
+    I2_QOBJECT_LISTMODEL(ActionInMappingVM, allActionsInMapping)
 
     // List of all links between agents in the global mapping
     I2_QOBJECT_LISTMODEL(LinkVM, allLinksInMapping)
@@ -52,6 +56,9 @@ class AgentsMappingController : public QObject
 
     // Selected agent in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
+
+    // Selected action in the mapping
+    I2_QML_PROPERTY_DELETE_PROOF(ActionInMappingVM*, selectedAction)
 
     // Selected link between agents in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(LinkVM*, selectedLink)
@@ -92,11 +99,17 @@ public:
 
 
     /**
-     * @brief Remove a link between two agents from the mapping
-     * @param link
-     * @return true if the link has been deleted during the call of our method
+     * @brief Remove the action from the mapping and delete the view model
+     * @param action
      */
-    Q_INVOKABLE bool removeLinkBetweenTwoAgents(LinkVM* link);
+    Q_INVOKABLE void deleteActionInMapping(ActionInMappingVM* action);
+
+
+    /**
+     * @brief Remove a link between two objects in the mapping
+     * @param link
+     */
+    Q_INVOKABLE void removeLinkBetweenTwoObjectsInMapping(LinkVM* link);
 
 
     /**
@@ -105,6 +118,14 @@ public:
      * @param position
      */
     Q_INVOKABLE void dropAgentNameToMappingAtPosition(const QString& agentName, QPointF position);
+
+
+    /**
+     * @brief Called when an action from the list is dropped on the current mapping at a position
+     * @param action
+     * @param position
+     */
+    Q_INVOKABLE void dropActionToMappingAtPosition(ActionM* action, QPointF position);
 
 
     /**
@@ -119,11 +140,32 @@ public:
 
 
     /**
+     * @brief Slot called when a link from an output is dropped over an input on the current mapping
+     * Or when a link to an input is dropped over an output
+     * @param outputAction
+     * @param linkOutput
+     * @param inputAction
+     * @param linkInput
+     */
+    Q_INVOKABLE void dropLinkBetweenTwoActions(ActionInMappingVM* outputAction, LinkOutputVM* linkOutput, ActionInMappingVM* inputAction, LinkInputVM* linkInput);
+    Q_INVOKABLE void dropLinkFromActionToAgent(ActionInMappingVM* outputAction, LinkOutputVM* linkOutput, AgentInMappingVM* inputAgent, LinkInputVM* linkInput);
+    Q_INVOKABLE void dropLinkFromAgentToAction(AgentInMappingVM* outputAgent, LinkOutputVM* linkOutput, ActionInMappingVM* inputAction, LinkInputVM* linkInput);
+
+
+    /**
      * @brief Get the (view model of) agent in the global mapping from an agent name
      * @param name
      * @return
      */
     Q_INVOKABLE AgentInMappingVM* getAgentInMappingFromName(const QString& name);
+
+
+    /**
+     * @brief Get the (view model of) action in the global mapping from a unique id
+     * @param uid
+     * @return
+     */
+    ActionInMappingVM* getActionInMappingFromUid(const QString& uid);
 
 
     /**
@@ -140,6 +182,14 @@ public:
      * @return
      */
     LinkVM* getLinkInMappingFromId(const QString& linkId);
+
+
+    /**
+     * @brief Check if an action has been inserted in the global mapping
+     * @param actionM
+     * @return
+     */
+    Q_INVOKABLE bool isActionInsertedInMapping(ActionM* actionM);
 
 
     /**
@@ -215,6 +265,23 @@ Q_SIGNALS:
     void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
 
 
+    /**
+     * @brief Signal emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
+     * @param peerIdsList
+     * @param command
+     * @param agentIOPName
+     * @param value
+     */
+    void commandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value);
+
+
+    /**
+     * @brief Signal emitted when an action has to be executed
+     * @param action
+     */
+    void executeAction(ActionM* action);
+
+
 public Q_SLOTS:
 
     /**
@@ -246,6 +313,28 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot called when a model of action will be deleted
+     * @param action
+     */
+    void onActionModelWillBeDeleted(ActionM* action);
+
+
+    /**
+     * @brief Slot called when we receive the command "highlight link" from a recorder
+     * @param parameters
+     */
+    void onHighlightLink(const QStringList& parameters);
+
+
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the list of all "Agents in Mapping" changed
+     */
+    void _onAllAgentsInMappingChanged();
+
+
+    /**
      * @brief Slot called when the flag "is ON" of an agent(s grouped by name) changed
      * @param isON
      */
@@ -263,29 +352,14 @@ public Q_SLOTS:
      * @brief Slot called when some view models of mapping elements have been added to an agent(s grouped by name)
      * @param newMappingElements
      */
-    void onMappingElementsHaveBeenAdded(QList<MappingElementVM*> newMappingElements);
+    void _onMappingElementsHaveBeenAdded(QList<MappingElementVM*> newMappingElements);
 
 
     /**
      * @brief Slot called when some view models of mapping elements will be removed from an agent(s grouped by name)
      * @param oldMappingElements
      */
-    void onMappingElementsWillBeRemoved(QList<MappingElementVM*> oldMappingElements);
-
-
-    /**
-     * @brief Slot called when we receive the command "highlight link" from a recorder
-     * @param parameters
-     */
-    void onHighlightLink(const QStringList& parameters);
-
-
-private Q_SLOTS:
-
-    /**
-     * @brief Slot called when the list of all "Agents in Mapping" changed
-     */
-    void _onAllAgentsInMappingChanged();
+    void _onMappingElementsWillBeRemoved(QList<MappingElementVM*> oldMappingElements);
 
 
     /**
@@ -316,10 +390,26 @@ private Q_SLOTS:
     void _onLinkOutputsListWillBeRemoved(const QList<LinkOutputVM*>& removedLinkOutputs);
 
 
+    /**
+     * @brief Slot called when an output has been activated, so we have to activate an input (of an action in the global mapping)
+     * @param inputObject
+     * @param linkInput
+     */
+    void _onActivateInputOfActionInMapping(ObjectInMappingVM* inputObject, LinkInputVM* linkInput);
+
+
+    /**
+     * @brief Slot called when an output has been activated, so we have to write on an input (of an input agent in the global mapping)
+     * @param inputObject
+     * @param linkInput
+     */
+    void _onWriteOnInputOfAgentInMapping(ObjectInMappingVM* inputObject, LinkInputVM* linkInput);
+
+
 private:
 
     /**
-     * @brief Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
+     * @brief Create a new agent in the global mapping with an "Agents Grouped by Name" and at a specific position
      * @param agentsGroupedByName
      * @param position
      * @return
@@ -328,30 +418,47 @@ private:
 
 
     /**
-     * @brief Create a link between two agents
+     * @brief Create a new action in the global mapping with a unique id, with a model of action and at a specific position
+     * @param uid
+     * @param action
+     * @param position
+     * @return
+     */
+    ActionInMappingVM* _createActionInMappingAtPosition(QString uid, ActionM* action, QPointF position);
+
+
+    /**
+     * @brief Create a link between two objects in the mapping
      * @param linkName
-     * @param outputAgent
+     * @param outputObject
      * @param linkOutput
-     * @param inputAgent
+     * @param inputObject
      * @param linkInput
      * @param mappingElement
      * @param isTemporary
      * @return
      */
-    LinkVM* _createLinkBetweenTwoAgents(const QString& linkName,
-                                        AgentInMappingVM* outputAgent,
-                                        LinkOutputVM* linkOutput,
-                                        AgentInMappingVM* inputAgent,
-                                        LinkInputVM* linkInput,
-                                        MappingElementVM* mappingElement,
-                                        bool isTemporary = false);
+    LinkVM* _createLinkBetweenTwoObjectsInMapping(const QString& linkName,
+                                                  ObjectInMappingVM* outputObject,
+                                                  LinkOutputVM* linkOutput,
+                                                  ObjectInMappingVM* inputObject,
+                                                  LinkInputVM* linkInput,
+                                                  MappingElementVM* mappingElement = nullptr,
+                                                  bool isTemporary = false);
 
 
     /**
-     * @brief Delete a link between two agents
+     * @brief Remove a link between two agents from the mapping
      * @param link
      */
-    void _deleteLinkBetweenTwoAgents(LinkVM* link);
+    void _removeLinkBetweenTwoAgents(LinkVM* link);
+
+
+    /**
+     * @brief Delete a link between two objects in the mapping
+     * @param link
+     */
+    void _deleteLinkBetweenTwoObjectsInMapping(LinkVM* link);
 
 
     /**
@@ -461,6 +568,11 @@ private:
 
     // Hash table from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;
+
+    // Hash table:
+    // - from unique id of action in the global mapping
+    // - to the (view model of) action in the global mapping
+    QHash<QString, ActionInMappingVM*> _hashFromUidToActionInMapping;
 
     // Link name as key is not unique (because the value type of the Input/Output can be different)
     // Hash table from link name to a list of view models of links between agents in mapping

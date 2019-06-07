@@ -21,7 +21,7 @@
 #include <model/subject/characteristicm.h>
 #include <model/subject/subjectm.h>
 #include <model/task/taskm.h>
-#include <model/experimentationrecordm.h>
+#include <model/recordsetupm.h>
 
 
 /**
@@ -46,8 +46,8 @@ class ExperimentationM : public QObject
     // List of all tasks of our experimentation
     I2_QOBJECT_LISTMODEL(TaskM, allTasks)
 
-    // List of all records of our experimentation
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ExperimentationRecordM, allRecords)
+    // List of all record setups of our experimentation
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(RecordSetupM, allRecordSetups)
 
 
 public:
@@ -112,17 +112,17 @@ public:
 
 
     /**
-     * @brief Add a record to our experimentation
+     * @brief Add a record setup to our experimentation
      * @param record
      */
-    void addRecord(ExperimentationRecordM* record);
+    void addRecordSetup(RecordSetupM* recordSetup);
 
 
     /**
-     * @brief Remove a record from our experimentation
+     * @brief Remove a record setup from our experimentation
      * @param record
      */
-    void removeRecord(ExperimentationRecordM* record);
+    void removeRecordSetup(RecordSetupM* recordSetup);
 
 
 

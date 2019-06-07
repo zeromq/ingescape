@@ -23,17 +23,16 @@
 
 /**
  * @brief Constructor
- * @param agentsGroupedByName Models of agents grouped by the same name
+ * @param agentsGroupedByName View model of agents grouped by the same name
  * @param position Position of the top left corner
  * @param parent
  */
 AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
                                    QPointF position,
-                                   QObject *parent) : QObject(parent),
-    _name(""),
+                                   QObject *parent) : ObjectInMappingVM(ObjectInMappingTypes::AGENT,
+                                                                        position,
+                                                                        parent),
     _agentsGroupedByName(agentsGroupedByName),
-    _position(position),
-    _isReduced(false),
     _isLockedReduced(false),
     _reducedLinkInputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
     _reducedLinkOutputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
@@ -46,6 +45,9 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     if (_agentsGroupedByName != nullptr)
     {
         _name = _agentsGroupedByName->name();
+
+        // Name of an agent in the mapping is unique
+        _uid = _name;
 
         qInfo() << "New Agent" << _name << "in the global mapping";
 
@@ -103,6 +105,9 @@ AgentInMappingVM::~AgentInMappingVM()
 
     if (_agentsGroupedByName != nullptr)
     {
+        // DIS-connect to signals from the agents grouped by name
+        disconnect(_agentsGroupedByName, nullptr, this, nullptr);
+
         // Deleted elsewhere
         setagentsGroupedByName(nullptr);
     }

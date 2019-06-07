@@ -40,7 +40,7 @@ Item {
     //
     //--------------------------------------------------------
 
-    property ExperimentationRecordM modelM: null;
+    property RecordSetupM modelM: null;
 
 
 
@@ -52,11 +52,11 @@ Item {
     //
     //--------------------------------
 
-    // Open Record
-    signal openRecord();
+    // Open Record Setup
+    signal openRecordSetup();
 
-    // Delete Record
-    signal deleteRecord();
+    // Delete Record Setup
+    signal deleteRecordSetup();
 
 
 
@@ -92,6 +92,7 @@ Item {
                 width: 250
 
                 text: rootItem.modelM ? rootItem.modelM.name : ""
+                elide: Text.ElideRight
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -185,8 +186,8 @@ Item {
                 height: parent.height
 
                 onClicked: {
-                    // Emit the signal "Open Record"
-                    rootItem.openRecord();
+                    // Emit the signal "Open Record Setup"
+                    rootItem.openRecordSetup();
                 }
             }
 
@@ -199,8 +200,8 @@ Item {
                 height: parent.height
 
                 onClicked: {
-                    // Emit the signal "Delete Record"
-                    rootItem.deleteRecord();
+                    // Emit the signal "Delete Record Setup"
+                    rootItem.deleteRecordSetup();
                 }
             }
         }

@@ -18,7 +18,9 @@
 #include <QObject>
 
 #include <I2PropertyHelpers.h>
-#include <viewModel/agentinmappingvm.h>
+#include <viewModel/mapping/mappingelementvm.h>
+//#include <viewModel/agentinmappingvm.h>
+#include <viewModel/mapping/objectinmappingvm.h>
 #include <viewModel/link/linkinputvm.h>
 #include <viewModel/link/linkoutputvm.h>
 
@@ -30,23 +32,23 @@ class LinkVM : public QObject
 {
     Q_OBJECT
 
-    // Name with all names formatted: "outputAgent##output-->inputAgent##input"
+    // Name with all names formatted: "outputObject##output-->inputObject##input"
     I2_CPP_NOSIGNAL_PROPERTY(QString, name)
 
-    // Unique identifier with agents names and Input/Output ids: "outputAgent##output::outputType-->inputAgent##input::inputType"
+    // Unique identifier with objects ids and Input/Output ids: "outputObject##output::outputType-->inputObject##input::inputType"
     I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
 
     // View model of the corresponding mapping element
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(MappingElementVM*, mappingElement)
 
-    // View model of the output agent of our link (link starts from this agent)
-    I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, outputAgent)
+    // View model of the output object of our link (link starts from this object)
+    I2_QML_PROPERTY_DELETE_PROOF(ObjectInMappingVM*, outputObject)
 
     // View model of the output slot associated to our link
     I2_QML_PROPERTY_DELETE_PROOF(LinkOutputVM*, linkOutput)
 
-    // View model of the input agent of our link (link ends to this agent)
-    I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, inputAgent)
+    // View model of the input object of our link (link ends to this object)
+    I2_QML_PROPERTY_DELETE_PROOF(ObjectInMappingVM*, inputObject)
 
     // View model of the input slot associated to our link
     I2_QML_PROPERTY_DELETE_PROOF(LinkInputVM*, linkInput)
@@ -61,18 +63,18 @@ public:
      * @brief Constructor
      * @param name
      * @param mappingElement corresponding mapping element
-     * @param outputAgent The link starts from this agent
+     * @param outputObject The link starts from this object (in the global mapping)
      * @param linkOutput The link starts from this output of the output agent
-     * @param inputAgent The link ends to this agent
+     * @param inputObject The link ends to this object (in the global mapping)
      * @param linkInput The link ends to this input of the input agent
      * @param isTemporary
      * @param parent
      */
     explicit LinkVM(QString name,
                     MappingElementVM* mappingElement,
-                    AgentInMappingVM* outputAgent,
+                    ObjectInMappingVM* outputObject,
                     LinkOutputVM* linkOutput,
-                    AgentInMappingVM* inputAgent,
+                    ObjectInMappingVM* inputObject,
                     LinkInputVM* linkInput,
                     bool isTemporary,
                     QObject *parent = nullptr);
@@ -86,14 +88,32 @@ public:
 
 
     /**
-     * @brief Get the link id (with format "outputAgent##output::outputType-->inputAgent##input::inputType") from agent names and Input/Output ids
-     * @param outputAgent
-     * @param output
-     * @param inputAgent
-     * @param input
-     * @return link id with format "outputAgent##output::outputType-->inputAgent##input::inputType"
+     * @brief Get the link id (with format "outputObjectId##output::outputType-->inputObjectId##input::inputType") from object ids and Input/Output ids
+     * @param outputObjectId
+     * @param outputId
+     * @param inputObjectId
+     * @param inputId
+     * @return link id with format "outputObjectId##output::outputType-->inputObjectId##input::inputType"
      */
-    static QString getLinkIdFromAgentNamesAndIOids(QString outputAgent, QString outputId, QString inputAgent, QString inputId);
+    static QString getLinkIdFromObjectIdsAndIOids(QString outputObjectId, QString outputId, QString inputObjectId, QString inputId);
+
+
+Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when the output has been activated, so we have to activate the input (of the input object in the global mapping)
+     * @param inputObject
+     * @param linkInput
+     */
+    void activateInputOfObjectInMapping(ObjectInMappingVM* inputObject, LinkInputVM* linkInput);
+
+
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the (link) output has been activated
+     */
+    void _onOutputActivated();
 
 };
 

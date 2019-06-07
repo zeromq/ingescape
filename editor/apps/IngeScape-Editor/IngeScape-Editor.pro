@@ -18,6 +18,10 @@ else:VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
 
 DEFINES += "VERSION=\\\"$$VERSION\\\""
 
+#disable the timeout in the library
+#(editor will stay connected even with invalid or expired license)
+DEFINES += DISABLE_LICENSE_TIMEOUT
+
 # Qt modules used by our application and/or its dependencies
 QT += qml quick quick-private svg xml concurrent sql core-private gui-private
 
@@ -45,6 +49,7 @@ SOURCES += main.cpp \
     controller/scenariocontroller.cpp \
     controller/valueshistorycontroller.cpp \
     misc/collapsiblecolumn.cpp \
+    model/actionmappingm.cpp \
     sortFilter/valueshistorysortfilter.cpp \
     controller/hostssupervisioncontroller.cpp \
     model/recordm.cpp \
@@ -63,9 +68,12 @@ SOURCES += main.cpp \
     viewModel/link/linkvm.cpp \
     viewModel/link/linkconnectorvm.cpp \
     model/editorenums.cpp \
-    controller/editormodelmanager.cpp
+    controller/editormodelmanager.cpp \
+    viewModel/mapping/objectinmappingvm.cpp \
+    viewModel/mapping/actioninmappingvm.cpp
 
 HEADERS += \
+    model/actionmappingm.h \
     controller/scenariocontroller.h \
     stable.h \
     uthash/libut.h \
@@ -102,7 +110,9 @@ HEADERS += \
     viewModel/link/linkvm.h \
     viewModel/link/linkconnectorvm.h \
     model/editorenums.h \
-    controller/editormodelmanager.h
+    controller/editormodelmanager.h \
+    viewModel/mapping/objectinmappingvm.h \
+    viewModel/mapping/actioninmappingvm.h
 
 
 RESOURCES += qml.qrc

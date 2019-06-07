@@ -21,7 +21,7 @@
 #define PUBLIC
 #endif
 
-#include <zyre.h>
+#include <czmq.h>
 #include "ingescape.h"
 
 #ifdef __cplusplus
@@ -30,6 +30,12 @@ extern "C" {
 
 #define MAX_STRING_MSG_LENGTH 4096
 
+//Start the agent using a broker instead of selfdiscovery
+//NB: an ingescape broker must be running and available at the provided endpoint.
+//Endpoints have the form tcp://ip_address:port
+//Selected network device must be able to reach the endpoint address.
+//PUBLIC int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint);
+    
 //network configuration and monitoring
 //void igs_setBusEndpoint(const char *endpoint); //usefull only with gossip discovery - TODO
 //void igs_connectAgentOnEndpoint(const char *endpoint); //not officially supported in Zyre 2.0.x yet
@@ -38,9 +44,11 @@ PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 
 //IngeScape provides an integrated monitor to detect events relative to the network
-PUBLIC void igs_enableMonitoring(unsigned int period); //in milliseconds
-PUBLIC void igs_disableMonitoring(void);
-
+//Warning: once igs_monitoringEnable has been called, igs_monitoringDisable must be
+//called to actually stop the monitor. If not stopped, it may cause an error when
+//an agent terminates.
+PUBLIC void igs_monitoringEnable(unsigned int period); //in milliseconds
+PUBLIC void igs_monitoringDisable(void);
 //When the monitor is started and igs_monitoringShallStartStopAgent is set to true :
 // - IP change will cause the agent to restart on the new IP (same device, same port)
 // - Network device disappearance will cause the agent to stop. Agent will restart when device is back.
@@ -54,14 +62,14 @@ typedef void (*igs_monitorCallback)(igs_monitorEvent_t event, const char *device
 PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
     
 //////////////////////////////////////////////////
-//data serialization using ZMQ
+//data serialization using ZeroMQ
 //TODO: give code examples here or link to documentation for zmsg and zframe
 PUBLIC int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg);
 PUBLIC int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
 
 //////////////////////////////////////////////////
-//ZMQ internal bus
+//internal bus
 typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *name,
                                          const char *address, const char *channel,
                                          zhash_t *headers, zmsg_t *msg, void *myData);
@@ -85,7 +93,7 @@ PUBLIC void igs_busRemoveServiceDescription(const char *key);
 //////////////////////////////////////////////////
 //Tokens Model : create, remove, call, react
 /*NOTES:
- - one and only one mandatory callback per token, set using igs_handleToken : warn if cb missing when loading definition or receiving token
+ - one and only one mandatory callback per token, set using igs_handleToken : generates warning if cb missing when loading definition or receiving token
  - one optional reply per token
  - reply shall be sent in callabck, using igs_sendToken with sender's UUID or name
  - token names shall be unique for a given agent
@@ -204,7 +212,7 @@ PUBLIC void igs_JSONparseFromString(const char *content, igs_JSONCallback cb, vo
 
 //////////////////////////////////////////////////
 //security
-//TODO when officially supported in Zyre 2.0.x
+//TODO when officially supported in Zyre 2.x.x
 
 #ifdef __cplusplus
 }

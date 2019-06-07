@@ -371,8 +371,8 @@ I2PopupBase {
 
                     if (controller)
                     {
-                        // Create a new task with an IngeScape platform file
-                        controller.createNewTaskWithIngeScapePlatformFile(txtTaskName.text, txtPlatformUrl.text);
+                        // Create a new task with an IngeScape platform file path
+                        controller.createNewTaskWithIngeScapePlatformFilePath(txtTaskName.text, txtPlatformUrl.text);
                     }
 
                     // Reset all user inputs and close the popup
@@ -390,8 +390,8 @@ I2PopupBase {
         title: "Select an IngeScape platform file"
 
         //folder: shortcuts.home
-        folder: shortcuts.documents
-        //folder: shortcuts.documents + "IngeScape"
+        //folder: shortcuts.documents
+        folder: shortcuts.documents + "/IngeScape/Platforms"
 
         //defaultSuffix: ".json"
         nameFilters: [ "JSON files (*.json)" ]

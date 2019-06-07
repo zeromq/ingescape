@@ -724,7 +724,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         igs_license("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", license->platformNbIOPs);
                         license_callback_t *el = NULL;
                         DL_FOREACH(licenseCallbacks, el){
-                            el->callback_ptr(el->data);
+                            el->callback_ptr(IGS_LICENSE_TOO_MANY_IOPS, el->data);
                         }
                         return -1;
                     }
@@ -733,7 +733,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         igs_license("Maximum number of allowed agents (%d) is exceeded : agent will stop", license->platformNbAgents);
                         license_callback_t *el = NULL;
                         DL_FOREACH(licenseCallbacks, el){
-                            el->callback_ptr(el->data);
+                            el->callback_ptr(IGS_LICENSE_TOO_MANY_AGENTS, el->data);
                         }
                         return -1;
                     }
@@ -1190,7 +1190,7 @@ int triggerLicenseStop(zloop_t *loop, int timer_id, void *arg){
     igs_license("License has expired and runtime duration limit is reached : stopping loop.");
     license_callback_t *el = NULL;
     DL_FOREACH(licenseCallbacks, el){
-        el->callback_ptr(el->data);
+        el->callback_ptr(IGS_LICENSE_TIMEOUT, el->data);
     }
     return -1;
 }
@@ -1240,8 +1240,8 @@ initLoop (zsock_t *pipe, void *args){
     bool canContinue = true;
     //prepare zyre
     agentElements->node = zyre_new (igsAgentName);
-//    zyre_set_verbose(agentElements->node);
     if (strlen(agentElements->brokerEndPoint) > 0){
+        zyre_set_verbose(agentElements->node);
         zyre_gossip_connect(agentElements->node,
                             "%s", agentElements->brokerEndPoint);
     }else{
@@ -1451,7 +1451,7 @@ initLoop (zsock_t *pipe, void *args){
     zloop_timer(agentElements->loop, 1000, 0, triggerDefinitionUpdate, NULL);
     zloop_timer(agentElements->loop, 1000, 0, triggerMappingUpdate, NULL);
     
-#if ENABLE_LICENSE_ENFORCEMENT
+#if ENABLE_LICENSE_ENFORCEMENT && !(defined DISABLE_LICENSE_TIMEOUT)
     if (license != NULL && license->isLicenseExpired){
         igs_license("License is not valid : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
         zloop_timer(agentElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, NULL);
@@ -1751,9 +1751,9 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
     return 1;
 }
 
-int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpAddress){
+int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint){
     //TODO: manage a list of brokers instead of just one
-    if ((brokerIpAddress == NULL) || (strlen(brokerIpAddress) == 0)){
+    if ((brokerEndpoint == NULL) || (strlen(brokerEndpoint) == 0)){
         igs_error("brokerIpAddress cannot be NULL or empty");
         return 0;
     }
@@ -1769,7 +1769,7 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
     forcedStop = false;
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
-    strncpy(agentElements->brokerEndPoint, brokerIpAddress, IP_ADDRESS_LENGTH-1);
+    strncpy(agentElements->brokerEndPoint, brokerEndpoint, IP_ADDRESS_LENGTH-1);
     strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH-1);
     agentElements->ipAddress[0] = '\0';
     
@@ -1794,6 +1794,7 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
                       agentElements->ipAddress,
                       networkDevice,
                       agentElements->brokerEndPoint);
+            break;
         }
         name = ziflist_next (iflist);
     }

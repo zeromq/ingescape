@@ -40,7 +40,7 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property var controller : null;
+    property var controller: null;
 
     // Minimum scale factor
     readonly property real minimumScale: 0.25;
@@ -427,7 +427,7 @@ Item {
             anchors.fill: parent
 
             // Only accept drag events from AgentsListItem
-            keys: ["AgentsListItem"]
+            keys: ["AgentsListItem", "ActionsListItem"]
 
 
             // To save the opacity of our source
@@ -447,7 +447,6 @@ Item {
                     var dragItem = drag.source;
 
                     // Check if our source has an "agent" property
-                    // NB: it should be useless because we only accept drag events with key AgentsListItem
                     if (typeof dragItem.agent !== 'undefined')
                     {
                         // Hide our source to avoid visual artifacts
@@ -457,9 +456,18 @@ Item {
                         // Configure our ghost
                         dropGhost.agent = dragItem.agent;
                     }
+                    // Check if our source has an "action" property
+                    else if (typeof dragItem.action !== 'undefined')
+                    {
+                        console.log("ENTER action... " + dragItem.action.name);
+
+                        // display ghost
+                        //dropGhost.action = dragItem.action;
+                    }
                     else
                     {
                         dropGhost.agent = null;
+                        //dropGhost.action = null;
                     }
                 }
             }
@@ -471,29 +479,42 @@ Item {
                     dropGhost.x = drag.x;
                     dropGhost.y = drag.y;
                 }
+                /*else if (dropGhost.action)
+                {
+
+                }*/
             }
 
 
             onExited: {
                 var dragItem = drag.source;
+
+                // Check if our source has an "agent" property
                 if (typeof dragItem.agent !== 'undefined')
                 {
                     // Restore opacity of our source
                     drag.source.opacity = _previousOpacityOfSource;
                 }
-
+                // Check if our source has an "action" property
+                else if (typeof dragItem.action !== 'undefined')
+                {
+                    console.log("EXIT action... " + dragItem.action.name);
+                }
 
                 // Clean-up ghost
                 dropGhost.agent = null;
+                //dropGhost.action = null;
             }
 
 
             onDropped: {
                 var dragItem = drag.source;
+
+                var dropPosition = getDropCoordinates();
+
+                // Check if our source has an "agent" property
                 if (typeof dragItem.agent !== 'undefined')
                 {
-                    var dropPosition = getDropCoordinates();
-
                     if (IngeScapeEditorC.agentsMappingC)
                     {
                         IngeScapeEditorC.agentsMappingC.dropAgentNameToMappingAtPosition(dragItem.agent.name, dropPosition);
@@ -502,8 +523,25 @@ Item {
                     // Restore opacity of our source
                     drag.source.opacity = _previousOpacityOfSource;
                 }
+                // Check if our source has an "action" property
+                else if (typeof dragItem.action !== 'undefined')
+                {
+                    console.log("DROP action... " + dragItem.action.name);
 
+                    if (IngeScapeEditorC.agentsMappingC)
+                    {
+                        //IngeScapeEditorC.agentsMappingC.dropActionToMappingAtPosition(dragItem.action, dropPosition);
+
+                        // 110 = ActionInMapping.width / 2
+                        // 48 = ActionInMapping.height
+                        var center = Qt.point(dropPosition.x - 110, dropPosition.y - 48);
+                        IngeScapeEditorC.agentsMappingC.dropActionToMappingAtPosition(dragItem.action, center);
+                    }
+                }
+
+                // Clean-up ghost
                 dropGhost.agent = null;
+                //dropGhost.action = null;
             }
         }
 
@@ -743,7 +781,7 @@ Item {
                 // Nodes
                 //
                 Repeater {
-                    model: controller ? controller.allAgentsInMapping : 0;
+                    model: controller ? controller.allAgentsInMapping : null;
 
                     AgentNodeView {
                         id: agent
@@ -752,14 +790,6 @@ Item {
 
                         controller: rootItem.controller
 
-                        /*onNeedConfirmationToDeleteAgentInMapping: {
-                            // Set the agent
-                            deleteConfirmationPopup.myAgent = agent.agentMappingVM
-
-                            // Open the popup
-                            deleteConfirmationPopup.open();
-                        }*/
-
                         // When the agent is created, the worspace's scale is reset to 100% if it was superior.
                         // This shows the entire spawn zone, ensuring that the new poped agent is visible.
                         Component.onCompleted: {
@@ -767,6 +797,22 @@ Item {
                                 setZoomLevel(1)
                             }
                         }
+                    }
+                }
+
+
+                //
+                // Actions
+                //
+                Repeater {
+                    model: controller ? controller.allActionsInMapping : null;
+
+                    ActionInMapping {
+                        id: action
+
+                        actionInMappingVM: model.QtObject
+
+                        controller: rootItem.controller
                     }
                 }
             }
@@ -783,6 +829,7 @@ Item {
             id: dropGhost
 
             property var agent: null
+            //property var action: null
 
             opacity: (agent && workspaceDropArea.containsDrag ? 1 : 0)
             visible: (opacity != 0)
@@ -808,28 +855,11 @@ Item {
     }
 
 
-    //
-    // Delete Confirmation
-    //
-    /*Editor.DeleteConfirmationPopup {
-        id: deleteConfirmationPopup
-
-        property var myAgent: null;
-
-        confirmationText: "This agent is used in the actions.\nDo you want to delete it?"
-
-        onDeleteConfirmed: {
-            if (controller) {
-                // Delete our agent
-                controller.deleteAgentInMapping(deleteConfirmationPopup.myAgent);
-            }
-        }
-    }*/
-
-
+    //----------------------------------------------------------------------------------
     //
     // Mapping Modifications Popup
     //
+    //----------------------------------------------------------------------------------
     Popups.MappingModificationsPopup {
         id: mappingModificationsPopup
 

@@ -105,6 +105,5 @@ QStringList MappingElementM::getNamesListFromLinkName(QString linkName)
             }
         }
     }
-
     return namesList;
 }

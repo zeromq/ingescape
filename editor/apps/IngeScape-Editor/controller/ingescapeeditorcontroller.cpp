@@ -200,6 +200,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_modelManager, &EditorModelManager::addInputsToOurApplicationForAgentOutputs, _networkC, &NetworkController::onAddInputsToOurApplicationForAgentOutputs);
     connect(_modelManager, &EditorModelManager::removeInputsFromOurApplicationForAgentOutputs, _networkC, &NetworkController::onRemoveInputsFromOurApplicationForAgentOutputs);
 
+    connect(_modelManager, &EditorModelManager::actionModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onActionModelWillBeDeleted);
+
 
     // Connect to signals from the controller for supervision of agents
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);
@@ -215,7 +217,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Connect to signals from the controller for mapping of agents
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
-
+    connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutSettingValue, _networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
+    connect(_agentsMappingC, &AgentsMappingController::executeAction, _scenarioC, &ScenarioController::onExecuteAction);
 
     // Connect to signals from the controller of the scenario
     connect(_scenarioC, &ScenarioController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);
@@ -353,6 +356,16 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = nullptr;
     }
 
+    if (_scenarioC != nullptr)
+    {
+        disconnect(_scenarioC);
+
+        ScenarioController* temp = _scenarioC;
+        setscenarioC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
+
     if (_modelManager != nullptr)
     {
         disconnect(_modelManager);
@@ -369,16 +382,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
 
         NetworkController* temp = _networkC;
         setnetworkC(nullptr);
-        delete temp;
-        temp = nullptr;
-    }
-
-    if (_scenarioC != nullptr)
-    {
-        disconnect(_scenarioC);
-
-        ScenarioController* temp = _scenarioC;
-        setscenarioC(nullptr);
         delete temp;
         temp = nullptr;
     }
@@ -491,8 +494,12 @@ void IngeScapeEditorController::clearCurrentPlatform()
         _scenarioC->clearScenario();
     }
 
-    // Delete agents OFF
-    if (_modelManager != nullptr) {
+    if (_modelManager != nullptr)
+    {
+        // Delete all actions
+        _modelManager->deleteAllActions();
+
+        // Delete agents OFF
         _modelManager->deleteAgentsOFF();
     }
 
@@ -967,16 +974,16 @@ void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
             _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
         }
 
-        // Import the global mapping (of agents) from JSON
-        if ((_agentsMappingC != nullptr) && jsonRoot.contains("mapping"))
-        {
-            _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
-        }
-
         // Import the scenario from JSON
         if ((_scenarioC != nullptr) && jsonRoot.contains("scenario"))
         {
             _scenarioC->importScenarioFromJson(jsonRoot.value("scenario").toObject());
+        }
+
+        // Import the global mapping (of agents) from JSON
+        if ((_agentsMappingC != nullptr) && jsonRoot.contains("mapping"))
+        {
+            _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
         }
     }
 }

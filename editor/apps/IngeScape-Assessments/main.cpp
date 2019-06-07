@@ -159,7 +159,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<ExperimentationM>("INGESCAPE", 1, 0, "ExperimentationM", "Internal class");
     //qmlRegisterUncreatableType<IndependentVariableEnumM>("INGESCAPE", 1, 0, "IndependentVariableEnumM", "Internal class");
     qmlRegisterUncreatableType<IndependentVariableM>("INGESCAPE", 1, 0, "IndependentVariableM", "Internal class");
-    qmlRegisterUncreatableType<ExperimentationRecordM>("INGESCAPE", 1, 0, "ExperimentationRecordM", "Internal class");
+    qmlRegisterUncreatableType<RecordSetupM>("INGESCAPE", 1, 0, "RecordSetupM", "Internal class");
     qmlRegisterUncreatableType<SubjectM>("INGESCAPE", 1, 0, "SubjectM", "Internal class");
     qmlRegisterUncreatableType<TaskM>("INGESCAPE", 1, 0, "TaskM", "Internal class");
 

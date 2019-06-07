@@ -10,8 +10,8 @@
 stages:
   - build-lib
   - installer-lib
-  - build-editor
-  - installer-editor
+  - build-apps
+  - installer-apps
   - deploy-lib
 
 # Define ingescape library files
@@ -44,6 +44,22 @@ stages:
     refs:
       - master
 
+# Define ingescape assessments files
+.build-assessments-files: &build-assessments-files
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - src/**/*
+      - builds/cmake/**/*
+      - dependencies/yajl/**/*
+      - dependencies/unix/*
+      - dependencies/windows/unix/*
+      - editor/frameworks/**/*
+      - editor/apps/IngeScape-Common/**/*
+      - editor/apps/IngeScape-Assessments/**/*
+    refs:
+      - master
+
 # Create ingescape library for linux (x86_64)
 lib-linux-release-x64:
   <<: *build-lib-files
@@ -69,11 +85,11 @@ lib-linux-release-armhf:
   stage: build-lib
   tags:
     - docker
-  image: ingescape/raspbian-stretch-armhf
+  image: ingescape/ubuntu-x-compil-rpi
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake
     - make -C build
   artifacts:
     paths:
@@ -103,7 +119,7 @@ lib-macos-release-x64:
 # Create ingescape editor for macos
 editor-macos-release-x64:
   <<: *build-editor-files
-  stage: build-editor
+  stage: build-apps
   variables:
     Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
   tags:
@@ -117,6 +133,26 @@ editor-macos-release-x64:
     paths:
       - editor/apps/IngeScape-Editor/build
     name: "editor-macos-release-x64"
+    expire_in: 1 week
+  dependencies: []
+
+# Create ingescape assessments for macos
+assessments-macos-release-x64:
+  <<: *build-assessments-files
+  stage: build-apps
+  variables:
+    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
+  tags:
+    - osx
+  script:
+    - git clean -xfd
+    - mkdir editor/apps/IngeScape-Assessments/build
+    - cmake -S editor/apps/IngeScape-Assessments/ -B editor/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release
+    - make -C editor/apps/IngeScape-Assessments/build
+  artifacts:
+    paths:
+      - editor/apps/IngeScape-Assessments/build
+    name: "assessments-macos-release-x64"
     expire_in: 1 week
   dependencies: []
 
@@ -207,7 +243,7 @@ lib-windows-debug-x86:
 # Create ingescape editor for windows
 editor-windows-release-x86:
   <<: *build-editor-files
-  stage: build-editor
+  stage: build-apps
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
@@ -229,7 +265,7 @@ editor-windows-release-x86:
 # Create ingescape editor for windows
 editor-windows-release-x64:
   <<: *build-editor-files
-  stage: build-editor
+  stage: build-apps
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
@@ -245,6 +281,50 @@ editor-windows-release-x64:
     paths:
       - editor\apps\IngeScape-Editor\build
     name: "editor-windows-release-x64"
+    expire_in: 1 week
+  dependencies: []
+
+# Create ingescape assessments for windows
+assessments-windows-release-x86:
+  <<: *build-assessments-files
+  stage: build-apps
+  variables:
+    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+  tags:
+    - windows
+  script:
+    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
+    - git clean -xfd
+    - mkdir editor\apps\IngeScape-Assessments\build\ReleaseX86
+    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release  -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib"
+    - cmake --build editor\apps\IngeScape-Assessments\build\ReleaseX86 --target ALL_BUILD --config Release
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Assessments\build
+    name: "assessments-windows-release-x86"
+    expire_in: 1 week
+  dependencies: []
+
+# Create ingescape assessments for windows
+assessments-windows-release-x64:
+  <<: *build-assessments-files
+  stage: build-apps
+  variables:
+    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
+  tags:
+    - windows
+  script:
+    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - git clean -xfd
+    - mkdir editor\apps\IngeScape-Assessments\build\ReleaseX64
+    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_BUILD_TYPE=Release -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libzmq-v140-mt-4_3_1.lib"
+    - cmake --build editor\apps\IngeScape-Assessments\build\ReleaseX64 --target ALL_BUILD --config Release
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Assessments\build
+    name: "assessments-windows-release-x64"
     expire_in: 1 week
   dependencies: []
 
@@ -303,7 +383,7 @@ lib-installer-runtime-macos-x64:
 # Create editor install for macos 64 bits
 editor-installer-macos-x64:
   <<: *build-editor-files
-  stage: installer-editor
+  stage: installer-apps
   tags:
     - osx
   script:
@@ -319,7 +399,7 @@ editor-installer-macos-x64:
 # Create editor install for windows 32 bits
 editor-installer-windows-x86:
   <<: *build-editor-files
-  stage: installer-editor
+  stage: installer-apps
   tags:
     - windows
   script:
@@ -334,7 +414,7 @@ editor-installer-windows-x86:
 # Create editor install for windows 64 bits
 editor-installer-windows-x64:
   <<: *build-editor-files
-  stage: installer-editor
+  stage: installer-apps
   tags:
     - windows
   script:
@@ -345,6 +425,52 @@ editor-installer-windows-x64:
     name: "editor-installer-windows-x64"
   dependencies:
     - editor-windows-release-x64
+
+# Create assessments install for macos 64 bits
+assessments-installer-macos-x64:
+  <<: *build-assessments-files
+  stage: installer-apps
+  tags:
+    - osx
+  script:
+    - make -C editor/apps/IngeScape-Assessments/build package
+  #  - make -C editor/apps/IngeScape-Assessments/build package_source
+  artifacts:
+    paths:
+      - editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+    name: "assessments-installer-macos-x64"
+  dependencies:
+    - assessments-macos-release-x64
+
+# Create assessments install for windows 32 bits
+assessments-installer-windows-x86:
+  <<: *build-assessments-files
+  stage: installer-apps
+  tags:
+    - windows
+  script:
+    - cd editor\apps\IngeScape-Assessments\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Assessments\build\ReleaseX86\IngeScape-Assessments-*
+    name: "assessments-installer-windows-x86"
+  dependencies:
+    - assessments-windows-release-x86
+
+# Create assessments install for windows 64 bits
+assessments-installer-windows-x64:
+  <<: *build-assessments-files
+  stage: installer-apps
+  tags:
+    - windows
+  script:
+    - cd editor\apps\IngeScape-Assessments\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Assessments\build\ReleaseX64\IngeScape-Assessments-*
+    name: "assessments-installer-windows-x64"
+  dependencies:
+    - assessments-windows-release-x64
 
 # Create runtime install for linux 64 bits - Generic ZIP
 lib-installer-runtime-linux-x64:
@@ -431,7 +557,7 @@ lib-installer-runtime-linux-armhf:
   stage: installer-lib
   tags:
     - docker
-  image: ingescape/raspbian-stretch-armhf
+  image: ingescape/ubuntu-x-compil-rpi
   script:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
@@ -450,7 +576,7 @@ lib-installer-runtime-raspbian-9-armhf:
   stage: installer-lib
   tags:
     - docker
-  image: ingescape/raspbian-stretch-armhf
+  image: ingescape/ubuntu-x-compil-rpi
   script:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Raspbian 9 (stretch)"
     - make -C build package
@@ -490,17 +616,17 @@ lib-deploy-linux-release-x64:
     - lib-linux-release-x64
 
 # Deploy ingescape in linux to be able to compile agents
-lib-deploy-linux-release-armhf:
-  <<: *build-lib-files
-  stage: deploy-lib
-  tags:
-    - docker
-  image: ingescape/raspbian-stretch-armhf
-  script:
-    - make -C build install DESTDIR=~/builds/release/armhf
-    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
-  dependencies:
-    - lib-linux-release-armhf
+#lib-deploy-linux-release-armhf:
+#  <<: *build-lib-files
+#  stage: deploy-lib
+#  tags:
+#    - docker
+#  image: ingescape/raspbian-stretch-armhf
+#  script:
+#    - make -C build install DESTDIR=~/builds/release/armhf
+#    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
+#  dependencies:
+#    - lib-linux-release-armhf
 
 # Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-release-x64:

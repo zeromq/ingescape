@@ -58,7 +58,7 @@ bool LinkConnectorVM::_canLinkOutputToInput(AgentIOPValueTypes::Value outputValu
     {
         switch (outputValueType)
         {
-        case AgentIOPValueTypes::INTEGER: {
+        /*case AgentIOPValueTypes::INTEGER: {
             if (inputValueType != AgentIOPValueTypes::DATA) {
                 result = true;
             }
@@ -72,15 +72,15 @@ bool LinkConnectorVM::_canLinkOutputToInput(AgentIOPValueTypes::Value outputValu
             break;
         }
 
-        case AgentIOPValueTypes::BOOL: {
-            if (inputValueType != AgentIOPValueTypes::DATA) {
+        case AgentIOPValueTypes::STRING: {
+            if (inputValueType == AgentIOPValueTypes::IMPULSION) {
                 result = true;
             }
             break;
         }
 
-        case AgentIOPValueTypes::STRING: {
-            if (inputValueType == AgentIOPValueTypes::IMPULSION) {
+        case AgentIOPValueTypes::BOOL: {
+            if (inputValueType != AgentIOPValueTypes::DATA) {
                 result = true;
             }
             break;
@@ -91,11 +91,30 @@ bool LinkConnectorVM::_canLinkOutputToInput(AgentIOPValueTypes::Value outputValu
                 result = true;
             }
             break;
+        }*/
+
+        case AgentIOPValueTypes::INTEGER:
+        case AgentIOPValueTypes::DOUBLE:
+        case AgentIOPValueTypes::STRING:
+        case AgentIOPValueTypes::BOOL:
+        case AgentIOPValueTypes::IMPULSION:
+            if ((inputValueType != AgentIOPValueTypes::MIXED) && (inputValueType != AgentIOPValueTypes::UNKNOWN)) {
+                result = true;
+            }
+            break;
+
+        case AgentIOPValueTypes::DATA: {
+            if (inputValueType == AgentIOPValueTypes::IMPULSION) {
+                result = true;
+            }
+            break;
         }
 
-        /*case AgentIOPValueTypes::DATA: {
-            break;
-        }*/
+        //case AgentIOPValueTypes::MIXED:
+        //    break;
+
+        //case AgentIOPValueTypes::UNKNOWN:
+        //    break;
 
         default:
             break;
