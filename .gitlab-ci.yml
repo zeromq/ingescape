@@ -488,10 +488,11 @@ lib-installer-runtime-linux-x64:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build linux_x64
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - linux_x64/ingescape-*
+      - linux_x64/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-linux-x64"
   dependencies:
     - lib-linux-release-x64
@@ -508,10 +509,11 @@ lib-installer-runtime-debian-9-x64:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build debian9_x64
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - debian9_x64/ingescape-*
+      - debian9_x64/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-debian-9-x64"
   dependencies:
     - lib-linux-release-x64
@@ -528,10 +530,11 @@ lib-installer-runtime-debian-10-x64:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build debian10_x64
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - debian10_x64/ingescape-*
+      - debian10_x64/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-debian-10-x64"
   dependencies:
     - lib-linux-release-x64
@@ -548,10 +551,11 @@ lib-installer-runtime-centos-x64:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build centos7_x64
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - centos7_x64/ingescape-*
+      - centos7_x64/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-centos-x64"
   dependencies:
     - lib-linux-release-x64
@@ -626,7 +630,7 @@ lib-deploy-linux-release-armhf:
   stage: deploy-lib
   tags:
     - docker
-  image: ingescape/raspbian-stretch-armhf
+  image: ingescape/ubuntu-x-compil-rpi
   script:
     - make -C build install DESTDIR=~/builds/release/armhf
     - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
@@ -708,9 +712,32 @@ lib-delivery-all:
     - echo "Deliver MacOS x64"
     - scp -i ssh_secret
         macos_x64/ingescape-0.9.0-Darwin.sh
+        macos_x64/ingescape-0.9.0-Darwin.zip
+        macos_x64/installIngescapeAndDependencies.sh
         i2@rafale:${DELIVERY_DIR}/library/macos/
-        # Do we need the installDependencies script and the ZIP archive here ?
-        # We already have a MacOS installer after all...
+    - echo "Deliver generic Linux x64"
+    - scp -i ssh_secret
+        linux_x64/ingescape-0.9.0-Linux.zip
+        linux_x64/installIngescapeAndDependencies.sh
+        i2@rafale:${DELIVERY_DIR}/library/linux_x64/
+    - echo "Deliver Debian 9 x64"
+    - scp -i ssh_secret
+        debian9_x64/ingescape-0.9.0-Linux.deb
+        debian9_x64/ingescape-0.9.0-Linux.zip
+        debian9_x64/installIngescapeAndDependencies.sh
+        i2@rafale:${DELIVERY_DIR}/library/debian9/
+    - echo "Deliver Debian 10 x64"
+    - scp -i ssh_secret
+        debian10_x64/ingescape-0.9.0-Linux.deb
+        debian10_x64/ingescape-0.9.0-Linux.zip
+        debian10_x64/installIngescapeAndDependencies.sh
+        i2@rafale:${DELIVERY_DIR}/library/debian10/
+    - echo "Deliver CentOS 7 x64"
+    - scp -i ssh_secret
+        centos7_x64/ingescape-0.9.0-Linux.rpm
+        centos7_x64/ingescape-0.9.0-Linux.zip
+        centos7_x64/installIngescapeAndDependencies.sh
+        i2@rafale:${DELIVERY_DIR}/library/centos7/
   dependencies:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
