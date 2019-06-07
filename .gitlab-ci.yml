@@ -15,8 +15,12 @@ stages:
   - deploy-lib
   - delivery-lib
 
+#NOTE These variables may be moved to the project configuration instead of being here...
+# Doing so could avoid a complete CI process when changing these variables.
 variables:
-  DELIVERY_DIR: /var/local/ingescape/delivery
+  DELIVERY_DESTINATION: /var/local/ingescape/delivery
+  DELIVERY_USER: i2
+  DELIVERY_HOST: rafale
 
 # Define ingescape library files
 .build-lib-files: &build-lib-files
@@ -702,51 +706,50 @@ lib-delivery-all:
     - echo ${SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
     - echo "Deliver Windows x86"
-    - scp -i ssh_secret
-        build/ReleaseX86/ingescape-0.9.0-Source.zip
-        build/ReleaseX86/ingescape-0.9.0-win32.zip
-        build/ReleaseX86/ingescape-0.9.0-win32.exe
-        i2@rafale:${DELIVERY_DIR}/library/win32/
+    - mkdir --parents library/win32
+    - mv build/ReleaseX86/ingescape-*
+         library/win32/
     - echo "Deliver Windows x64"
-    - scp -i ssh_secret
-        build/ReleaseX64/ingescape-0.9.0-win64.exe
-        i2@rafale:${DELIVERY_DIR}/library/win64/
+    - mkdir --parents library/win64
+    - mv build/ReleaseX64/ingescape-*
+         library/win64/
     - echo "Deliver MacOS x64"
-    - scp -i ssh_secret
-        macos_x64/ingescape-0.9.0-Darwin.sh
-        macos_x64/ingescape-0.9.0-Darwin.zip
-        macos_x64/installIngescapeAndDependencies.sh
-        i2@rafale:${DELIVERY_DIR}/library/macos/
+    - mkdir --parents --parents library/macos
+    - mv macos_x64/ingescape-*
+         macos_x64/installIngescapeAndDependencies.sh
+         library/macos/
     - echo "Deliver generic Linux x64"
-    - scp -i ssh_secret
-        linux_x64/ingescape-0.9.0-Linux.zip
-        linux_x64/installIngescapeAndDependencies.sh
-        i2@rafale:${DELIVERY_DIR}/library/linux_x64/
+    - mkdir --parents library/linux_x64/
+    - mv linux_x64/ingescape-*
+         linux_x64/installIngescapeAndDependencies.sh
+         library/linux_x64/
     - echo "Deliver Debian 9 x64"
-    - scp -i ssh_secret
-        debian9_x64/ingescape-0.9.0-Linux.deb
-        debian9_x64/installIngescapeAndDependencies.sh
-        i2@rafale:${DELIVERY_DIR}/library/debian9/
+    - mkdir --parents library/debian9/
+    - mv debian9_x64/ingescape-*
+         debian9_x64/installIngescapeAndDependencies.sh
+         library/debian9/
     - echo "Deliver Debian 10 x64"
-    - scp -i ssh_secret
-        debian10_x64/ingescape-0.9.0-Linux.deb
-        debian10_x64/installIngescapeAndDependencies.sh
-        i2@rafale:${DELIVERY_DIR}/library/debian10/
+    - mkdir --parents library/debian10/
+    - mv debian10_x64/ingescape-*
+         debian10_x64/installIngescapeAndDependencies.sh
+         library/debian10/
     - echo "Deliver CentOS 7 x64"
-    - scp -i ssh_secret
-        centos7_x64/ingescape-0.9.0-Linux.rpm
-        centos7_x64/installIngescapeAndDependencies.sh
-        i2@rafale:${DELIVERY_DIR}/library/centos7/
+    - mkdir --parents library/centos7
+    - mv centos7_x64/ingescape-*
+         centos7_x64/installIngescapeAndDependencies.sh
+         library/centos7/
     - echo "Deliver generic Linux armhf"
-    - scp -i ssh_secret
-        linux_armhf/ingescape-0.9.0-Linux.zip
-        linux_armhf/installIngescapeAndDependencies.sh
-        i2@rafale:${DELIVERY_DIR}/library/linux_armhf/
+    - mkdir --parents library/linux_armhf
+    - mv linux_armhf/ingescape-*
+         linux_armhf/installIngescapeAndDependencies.sh
+         library/linux_armhf/
     - echo "Deliver Raspbian 9 armhf"
-    - scp -i ssh_secret
-        raspbian9_armhf/ingescape-0.9.0-Linux.deb
-        raspbian9_armhf/installIngescapeAndDependencies.sh
-        i2@rafale:${DELIVERY_DIR}/library/raspbian9/
+    - mkdir --parents library/raspbian9
+    - mv raspbian9_armhf/ingescape-*
+         raspbian9_armhf/installIngescapeAndDependencies.sh
+         library/raspbian9/
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after library ${DELIVERY_USER}@{DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
