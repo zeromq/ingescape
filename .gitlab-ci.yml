@@ -706,7 +706,7 @@ lib-delivery-all:
         build/ReleaseX86/ingescape-0.9.0-Source.zip
         build/ReleaseX86/ingescape-0.9.0-win32.zip
         build/ReleaseX86/ingescape-0.9.0-win32.exe
-        i2@rafale:${DELIVERY_DIR}/delivery/library/win32/
+        i2@rafale:${DELIVERY_DIR}/library/win32/
     - echo "Deliver Windows x64"
     - scp -i ssh_secret
         build/ReleaseX64/ingescape-0.9.0-win64.exe
@@ -725,19 +725,16 @@ lib-delivery-all:
     - echo "Deliver Debian 9 x64"
     - scp -i ssh_secret
         debian9_x64/ingescape-0.9.0-Linux.deb
-        debian9_x64/ingescape-0.9.0-Linux.zip
         debian9_x64/installIngescapeAndDependencies.sh
         i2@rafale:${DELIVERY_DIR}/library/debian9/
     - echo "Deliver Debian 10 x64"
     - scp -i ssh_secret
         debian10_x64/ingescape-0.9.0-Linux.deb
-        debian10_x64/ingescape-0.9.0-Linux.zip
         debian10_x64/installIngescapeAndDependencies.sh
         i2@rafale:${DELIVERY_DIR}/library/debian10/
     - echo "Deliver CentOS 7 x64"
     - scp -i ssh_secret
         centos7_x64/ingescape-0.9.0-Linux.rpm
-        centos7_x64/ingescape-0.9.0-Linux.zip
         centos7_x64/installIngescapeAndDependencies.sh
         i2@rafale:${DELIVERY_DIR}/library/centos7/
     - echo "Deliver generic Linux armhf"
@@ -748,7 +745,6 @@ lib-delivery-all:
     - echo "Deliver Raspbian 9 armhf"
     - scp -i ssh_secret
         raspbian9_armhf/ingescape-0.9.0-Linux.deb
-        raspbian9_armhf/ingescape-0.9.0-Linux.zip
         raspbian9_armhf/installIngescapeAndDependencies.sh
         i2@rafale:${DELIVERY_DIR}/library/raspbian9/
   dependencies:
