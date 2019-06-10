@@ -176,7 +176,7 @@ lib-windows-release-x64:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libzmq-v140-mt-4_3_1.lib"
+    - cmake -S . -B build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -197,7 +197,7 @@ lib-windows-release-x86:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib"
+    - cmake -S . -B build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -218,7 +218,7 @@ lib-windows-debug-x64:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Debug -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\libzmq-v140-mt-gd-4_3_1.lib"
+    - cmake -S . -B build\DebugX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Debug
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -239,7 +239,7 @@ lib-windows-debug-x86:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Debug -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\libzmq-v140-mt-gd-4_3_1.lib"
+    - cmake -S . -B build\DebugX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Debug
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -261,7 +261,7 @@ editor-windows-release-x86:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir editor\apps\IngeScape-Editor\build\ReleaseX86
-    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release  -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib"
+    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release
     - cmake --build editor\apps\IngeScape-Editor\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -283,7 +283,7 @@ editor-windows-release-x64:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir editor\apps\IngeScape-Editor\build\ReleaseX64
-    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_BUILD_TYPE=Release -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libzmq-v140-mt-4_3_1.lib"
+    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release
     - cmake --build editor\apps\IngeScape-Editor\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -305,7 +305,7 @@ assessments-windows-release-x86:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir editor\apps\IngeScape-Assessments\build\ReleaseX86
-    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release  -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib"
+    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release
     - cmake --build editor\apps\IngeScape-Assessments\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -327,7 +327,7 @@ assessments-windows-release-x64:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir editor\apps\IngeScape-Assessments\build\ReleaseX64
-    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_BUILD_TYPE=Release -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libzmq-v140-mt-4_3_1.lib"
+    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release
     - cmake --build editor\apps\IngeScape-Assessments\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
