@@ -749,7 +749,7 @@ lib-delivery-all:
          raspbian9_armhf/installIngescapeAndDependencies.sh
          library/raspbian9/
     - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after library ${DELIVERY_USER}@{DELIVERY_HOST}:${DELIVERY_DESTINATION}
+    - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
