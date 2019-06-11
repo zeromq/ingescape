@@ -128,13 +128,13 @@ macro(install_ingescape_dependencies _LIB _HEADERS_PATH _IS_EDITOR)
     get_filename_component(_FILE_NAME ${${_LIB}} NAME)
     string(REGEX REPLACE "\\.[^.]*$" "" _FILE_WITHOUT_EXT ${_FILE_NAME})
     # Check if file exist
-    find_file(${_FILE_WITHOUT_EXT}_DLL_FILE "${_FILE_WITHOUT_EXT}.dll" PATHS ${_PATH_TO_FILE} NO_DEFAULT_PATH)
+    find_file(${_FILE_WITHOUT_EXT}_DLL_FILE "${_FILE_WITHOUT_EXT}${CMAKE_SHARED_LIBRARY_SUFFIX}" PATHS ${_PATH_TO_FILE} NO_DEFAULT_PATH)
     if (${${_FILE_WITHOUT_EXT}_DLL_FILE} STREQUAL ${_FILE_WITHOUT_EXT}_DLL_FILE-NOTFOUND)
-        message("File ${_PATH_TO_FILE}/${_FILE_WITHOUT_EXT}.dll not found")
-        find_file(${_FILE_WITHOUT_EXT}_DLL_FILE "lib${_FILE_WITHOUT_EXT}.dll" PATHS ${_PATH_TO_FILE} NO_DEFAULT_PATH)
+        message("File ${_PATH_TO_FILE}/${_FILE_WITHOUT_EXT}${CMAKE_SHARED_LIBRARY_SUFFIX} not found")
+        find_file(${_FILE_WITHOUT_EXT}_DLL_FILE "lib${_FILE_WITHOUT_EXT}${CMAKE_SHARED_LIBRARY_SUFFIX}" PATHS ${_PATH_TO_FILE} NO_DEFAULT_PATH)
 
         if (${${_FILE_WITHOUT_EXT}_DLL_FILE} STREQUAL ${_FILE_WITHOUT_EXT}_DLL_FILE-NOTFOUND)
-            message("File ${_PATH_TO_FILE}/lib${_FILE_WITHOUT_EXT}.dll not found")
+            message("File ${_PATH_TO_FILE}/lib${_FILE_WITHOUT_EXT}${CMAKE_SHARED_LIBRARY_SUFFIX} not found")
         endif()
     endif()
 
