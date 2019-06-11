@@ -106,6 +106,25 @@ lib-linux-release-armhf:
     name: "lib-linux-release-armhf"
     expire_in: 1 week
   dependencies: []
+  
+# Create ingescape library for Android (armv7a softfp)
+lib-android-release-armv7a-softfp:
+  <<: *build-lib-files
+  stage: build-lib
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE}
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-android-release-armv7a-softfp"
+    expire_in: 1 week
+  dependencies: []
 
 # Create ingescape library for macos
 lib-macos-release-x64:
@@ -606,6 +625,23 @@ lib-installer-runtime-raspbian-9-armhf:
   dependencies:
     - lib-linux-release-armhf
 
+# Create runtime install for Android (armv7a softfp) - Generic ZIP
+lib-installer-runtime-android-armv7a-softfp:
+  <<: *build-lib-files
+  stage: installer-lib
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android
+  script:
+    - make -C build package
+    - mv build android
+  artifacts:
+    paths:
+      - android/ingescape-*
+    name: "lib-installer-runtime-android-armv7a-softfp"
+  dependencies:
+    - lib-android-release-armv7a-softfp
+
 # Deploy ingescape in mac os X to be able to compile agents
 lib-deploy-macos-release-x64:
   <<: *build-lib-files
@@ -749,6 +785,10 @@ lib-delivery-all:
     - mv raspbian9_armhf/ingescape-*
          raspbian9_armhf/installIngescapeAndDependencies.sh
          library/raspbian9/
+    - echo "Deliver Android armv7a (softfp)"
+    - mkdir --parents library/android
+    - mv android/ingescape-*
+         library/android/
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
@@ -761,6 +801,7 @@ lib-delivery-all:
     - lib-installer-runtime-centos-x64
     - lib-installer-runtime-linux-armhf
     - lib-installer-runtime-raspbian-9-armhf
+    - lib-installer-runtime-android-armv7a-softfp
 
 # Deliver installers so they can be downloaded from the website
 apps-delivery-all:
