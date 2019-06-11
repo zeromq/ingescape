@@ -14,6 +14,7 @@ stages:
   - installer-apps
   - deploy-lib
   - delivery-lib
+  - delivery-apps
 
 #NOTE These variables may be moved to the project configuration instead of being here...
 # Doing so could avoid a complete CI process when changing these variables.
@@ -760,3 +761,52 @@ lib-delivery-all:
     - lib-installer-runtime-centos-x64
     - lib-installer-runtime-linux-armhf
     - lib-installer-runtime-raspbian-9-armhf
+
+# Deliver installers so they can be downloaded from the website
+apps-delivery-all:
+  <<: *build-editor-files
+  <<: *build-assessments-files
+  stage: delivery-apps
+  tags:
+    - docker
+  image: ingescape/debian-with-zyre
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Deliver Mac OS x64 editor"
+    - mkdir --parents editor/macos
+    - mv editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
+         editor/macos/
+    - echo "Deliver Windows x86 editor"
+    - mkdir --parents editor/win32
+    - mv editor/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
+         editor/win32/
+    - echo "Deliver Windows x64 editor"
+    - mkdir --parents --parents editor/win64
+    - mv editor/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
+         editor/win64/
+    - echo "Deliver Mac OS x64 assessments"
+    - mkdir --parents assessments/macos
+    - mv editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+         assessments/macos/
+    - echo "Deliver Windows x86 assessments"
+    - mkdir --parents editassessmentsor/win32
+    - mv editor/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
+         assessments/win32/
+    - echo "Deliver Windows x64 assessments"
+    - mkdir --parents --parents assessments/win64
+    - mv editor/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
+         assessments/win64/
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after editor assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - editor-installer-macos-x64
+    - editor-installer-windows-x86
+    - editor-installer-windows-x64
+    - assessments-installer-macos-x64
+    - assessments-installer-windows-x86
+    - assessments-installer-windows-x64
