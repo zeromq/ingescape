@@ -751,7 +751,7 @@ lib-delivery-all:
     - mv build/ReleaseX64/ingescape-*
          library/win64/
     - echo "Deliver MacOS x64"
-    - mkdir --parents --parents library/macos
+    - mkdir --parents library/macos
     - mv macos_x64/ingescape-*
          macos_x64/installIngescapeAndDependencies.sh
          library/macos/
@@ -827,7 +827,7 @@ apps-delivery-all:
     - mv editor/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
          editor/win32/
     - echo "Deliver Windows x64 editor"
-    - mkdir --parents --parents editor/win64
+    - mkdir --parents editor/win64
     - mv editor/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
          editor/win64/
     - echo "Deliver Mac OS x64 assessments"
@@ -835,11 +835,11 @@ apps-delivery-all:
     - mv editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
          assessments/macos/
     - echo "Deliver Windows x86 assessments"
-    - mkdir --parents editassessmentsor/win32
+    - mkdir --parents assessments/win32
     - mv editor/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
          assessments/win32/
     - echo "Deliver Windows x64 assessments"
-    - mkdir --parents --parents assessments/win64
+    - mkdir --parents assessments/win64
     - mv editor/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
          assessments/win64/
     - echo "Synchronization"
