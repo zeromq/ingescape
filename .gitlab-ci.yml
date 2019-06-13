@@ -890,29 +890,30 @@ apps-delivery-all:
     - umask 077
     - echo ${SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
+    - mv editor _editor
     - echo "Deliver Mac OS x64 editor"
     - mkdir --parents editor/macos
-    - mv editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
+    - mv _editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
          editor/macos/
     - echo "Deliver Windows x86 editor"
     - mkdir --parents editor/win32
-    - mv editor/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
+    - mv _editor/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
          editor/win32/
     - echo "Deliver Windows x64 editor"
     - mkdir --parents editor/win64
-    - mv editor/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
+    - mv _editor/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
          editor/win64/
     - echo "Deliver Mac OS x64 assessments"
     - mkdir --parents assessments/macos
-    - mv editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+    - mv _editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
          assessments/macos/
     - echo "Deliver Windows x86 assessments"
     - mkdir --parents assessments/win32
-    - mv editor/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
+    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
          assessments/win32/
     - echo "Deliver Windows x64 assessments"
     - mkdir --parents assessments/win64
-    - mv editor/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
+    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
          assessments/win64/
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after editor assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
