@@ -61,7 +61,14 @@ function _clone_and_build {
 
     $git_cmd
     cd $dirname
-    ./autogen.sh && ./configure && make --jobs=${JOBS}
+    ./autogen.sh
+    if [[ $dirname == "libzmq" ]]
+    then
+        ./configure --with-sodium
+    else
+        ./configure
+    fi
+    make --jobs=${JOBS}
     _check_sudo make --jobs=${JOBS} install
     _check_sudo ldconfig
 }
@@ -133,31 +140,20 @@ function install_deps_raspbian {
 function install_deps_debian {
     local lib_list=""
 
-    # ZeroMQ reposirory does not provide packages for armv7l (aka. armhf). Hence the build-dependencies required for armv7.
-    if [[ "$ARCH" == "armhf" ]]
+    # ZeroMQ reposirory does not provide packages for armv7a (aka. armhf). Hence the build-dependencies required for armv7.
+    if [[ "$ARCH" == "armhf" || $VER =~ "9" ]]
     then
         lib_list="build-essential git autoconf automake libtool pkg-config unzip"
     else
-        lib_list="libzmq5 czmq zyre"
-    fi
-
-    # libsodium is provided by the official debian repository so it is available for every arch
-    if [[ "$VER" =~ "9" ]]
-    then
-        lib_list="${lib_list} libsodium18"
-    elif [[ "$VER" =~ "10" ]]
-    then
-        lib_list="${lib_list} libsodium23"
+        lib_list="libzmq5 libsodium23 czmq zyre"
     fi
 
     # Check if development libs are requested by user
     if [[ "$DEVEL_LIBS" == "YES" ]]
     then
         # Again, only libsodium is available through the official repository
-        if [[ "$ARCH" == "armhf" ]]
+        if [[ "$ARCH" != "armhf" && $VER =~ "10" ]]
         then
-            lib_list="${lib_list} libsodium-dev"
-        else
             lib_list="${lib_list} libzmq3-dev libzyre-dev libczmq-dev libsodium-dev"
         fi
     fi
@@ -166,8 +162,11 @@ function install_deps_debian {
     _check_sudo apt install -y $lib_list
 
     # Installing missing packages for armv7l (aka. armhf)
-    if [[ "$ARCH" == "armhf" ]]
+    if [[ "$ARCH" == "armhf" || $VER =~ "9" ]]
     then
+        ( # libsodium
+            _clone_and_build libsodium git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
+        )
         ( # libzmq
             _clone_and_build libzmq git clone git://github.com/zeromq/libzmq.git
         )
