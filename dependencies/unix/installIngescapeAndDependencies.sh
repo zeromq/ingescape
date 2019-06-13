@@ -159,7 +159,7 @@ function install_deps_debian {
     fi
 
     # Install available packages
-    _check_sudo apt install -y $lib_list
+    _check_sudo apt-get update && apt-get install -y $lib_list
 
     # Installing missing packages for armv7l (aka. armhf)
     if [[ "$ARCH" == "armhf" || $VER =~ "9" ]]
@@ -180,14 +180,8 @@ function install_deps_debian {
 }
 
 function install_deps_centos {
-    local lib_list="libzmq5 czmq zyre libsodium18"
-
-    if [[ "$DEVEL_LIBS" == "YES" ]]
-    then
-        lib_list="${lib_list} zeromq-devel zyre-devel czmq-devel libsodium-devel"
-    fi
-
-    yum install -y ${lib_list}
+    # Falling back to compiling dependencies from sources
+    install_deps_from_git
 }
 
 function install_deps_darwin {
