@@ -223,6 +223,55 @@ function setup_repos {
             then
                 echo "ZeroMQ package repository already present in /etc/apt/sources.list"
             else
+		    unset wget_missing
+		    unset gnupg_missing
+		    command -v wget > /dev/null 2>&1 || export wget_missing=1
+		    command -v gpg > /dev/null 2>&1 || export gnupg_missing=1
+
+		    if [[ -n ${wget_missing+x} ]]
+		    then
+			    if [[ -n ${gnupg_missing+x} ]]
+			    then
+				    echo "Commands 'gnupg' and 'wget' are missing. You need them to install all the dependencies."
+				    echo -n "Install 'gnupg' and 'wget' now (yes|no)? [no] "
+				    read response
+				    if [[ $response == "yes" ]]
+				    then
+					    _check_sudo apt-get update && apt-get install -y wget gnupg
+				    else
+					    echo "Installation stopped by user."
+					    echo "You can try to install ingescape alone (without dependencies) with the option '--no-deps'."
+					    return 1
+				    fi
+			    else
+				    echo "Command and 'wget' is missing. You need it to install all the dependencies."
+				    echo -n "Install 'wget' now (yes|no)? [no] "
+				    read response
+				    if [[ $response == "yes" ]]
+				    then
+					    _check_sudo apt-get update && apt-get install -y wget
+				    else
+					    echo "Installation stopped by user."
+					    echo "You can try to install ingescape alone (without dependencies) with the option '--no-deps'."
+					    return 1
+				    fi
+			    fi
+		    elif [[ -n ${gnupg_missing+x} ]]
+		    then
+			    echo "Command 'gnupg' are missing. You need it to install all the dependencies."
+			    echo -n "Install 'gnupg' now (yes|no)? [no] "
+			    read response
+			    if [[ $response == "yes" ]]
+			    then
+				    _check_sudo apt-get update && apt-get install -y gnupg
+			    else
+				    echo "Installation stopped by user."
+				    echo "You can try to install ingescape alone (without dependencies) with the option '--no-deps'."
+				    return 1
+			    fi
+		    fi
+		    unset wget_missing
+		    unset gnupg_missing
                 case $VER in
                     *10*)
                         ## Debian buster
@@ -243,7 +292,7 @@ function setup_repos {
             fi
 
             # Update package index
-            apt update
+            apt-get update
 
             ;;
         *CentOS*)
