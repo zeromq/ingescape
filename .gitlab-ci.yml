@@ -94,11 +94,11 @@ lib-debian-9-release-x64:
   stage: build-lib
   tags:
     - docker
-  image: ingescape/debian-with-zyre
+  image: ingescape/debian-9-with-zyre
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Debian 9 (stretch)"
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
     - make -C build
   artifacts:
     paths:
@@ -113,11 +113,11 @@ lib-debian-10-release-x64:
   stage: build-lib
   tags:
     - docker
-  image: ingescape/debian-with-zyre
+  image: ingescape/debian-10-with-zyre
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Debian 10 (buster)"
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
     - make -C build
   artifacts:
     paths:
@@ -132,16 +132,16 @@ lib-centos-7-release-x64:
   stage: build-lib
   tags:
     - docker
-  image: ingescape/debian-with-zyre
+  image: ingescape/centos-7-with-zyre
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="CentOS 7"
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
     - make -C build
   artifacts:
     paths:
       - build
-    name: "lib-debian-10-release-x64"
+    name: "lib-centos-7-release-x64"
     expire_in: 1 week
   dependencies: []
   
@@ -174,7 +174,7 @@ lib-raspbian-9-release-armhf:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DLINUX_FLAVOR="Raspbian 9 (stretch)"
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake
     - make -C build
   artifacts:
     paths:
@@ -603,7 +603,7 @@ lib-installer-runtime-debian-9-x64:
   stage: installer-lib
   tags:
     - docker
-  image: ingescape/debian-with-zyre
+  image: ingescape/debian-9-with-zyre
   script:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
@@ -623,7 +623,7 @@ lib-installer-runtime-debian-10-x64:
   stage: installer-lib
   tags:
     - docker
-  image: ingescape/debian-with-zyre
+  image: ingescape/debian-10-with-zyre
   script:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
@@ -643,7 +643,7 @@ lib-installer-runtime-centos-x64:
   stage: installer-lib
   tags:
     - docker
-  image: ingescape/debian-with-zyre
+  image: ingescape/centos-7-with-zyre
   script:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
