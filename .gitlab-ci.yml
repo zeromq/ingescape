@@ -806,7 +806,7 @@ lib-delivery-all:
   stage: delivery-lib
   tags:
     - docker
-  image: ingescape/debian-with-zyre
+  image: ingescape/alpine-deployment
   script:
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
@@ -882,7 +882,7 @@ apps-delivery-all:
   stage: delivery-apps
   tags:
     - docker
-  image: ingescape/debian-with-zyre
+  image: ingescape/alpine-deployment
   script:
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
