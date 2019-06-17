@@ -16,13 +16,6 @@ stages:
   - delivery-lib
   - delivery-apps
 
-#NOTE These variables may be moved to the project configuration instead of being here...
-# Doing so could avoid a complete CI process when changing these variables.
-variables:
-  DELIVERY_DESTINATION: /var/local/ingescape/delivery
-  DELIVERY_USER: i2
-  DELIVERY_HOST: rafale
-
 # Define ingescape library files
 .build-lib-files: &build-lib-files
   only:
