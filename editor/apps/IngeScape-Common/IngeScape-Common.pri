@@ -92,10 +92,6 @@ HEADERS += \
     $$PWD/sortFilter/abstracttimerangefilter.h
 
 
-#RESOURCES += \
-#    $$PWD/ingescapecommon_qml.qrc
-
-
 # This variable only makes sense in a subdirs project.
 # It lists the directories to build. If it is absent the build system will attempt to build projects underneath this directory.
 # Note that this behavior does not work for the project at the top of a tree, which must use the second notation to build all projects.

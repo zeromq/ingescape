@@ -13,6 +13,15 @@ stages:
   - build-apps
   - installer-apps
   - deploy-lib
+  - delivery-lib
+  - delivery-apps
+
+#NOTE These variables may be moved to the project configuration instead of being here...
+# Doing so could avoid a complete CI process when changing these variables.
+variables:
+  DELIVERY_DESTINATION: /var/local/ingescape/delivery
+  DELIVERY_USER: i2
+  DELIVERY_HOST: rafale
 
 # Define ingescape library files
 .build-lib-files: &build-lib-files
@@ -79,6 +88,63 @@ lib-linux-release-x64:
     expire_in: 1 week
   dependencies: []
   
+# Create ingescape library for Debian 9 (x86_64)
+lib-debian-9-release-x64:
+  <<: *build-lib-files
+  stage: build-lib
+  tags:
+    - docker
+  image: ingescape/debian-9-with-zyre
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-debian-9-release-x64"
+    expire_in: 1 week
+  dependencies: []
+  
+# Create ingescape library for Debian 10 (x86_64)
+lib-debian-10-release-x64:
+  <<: *build-lib-files
+  stage: build-lib
+  tags:
+    - docker
+  image: ingescape/debian-10-with-zyre
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-debian-10-release-x64"
+    expire_in: 1 week
+  dependencies: []
+  
+# Create ingescape library for CentOS 7 (x86_64)
+lib-centos-7-release-x64:
+  <<: *build-lib-files
+  stage: build-lib
+  tags:
+    - docker
+  image: ingescape/centos-7-with-zyre
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-centos-7-release-x64"
+    expire_in: 1 week
+  dependencies: []
+  
 # Create ingescape library for linux (armv7/armhf)
 lib-linux-release-armhf:
   <<: *build-lib-files
@@ -95,6 +161,44 @@ lib-linux-release-armhf:
     paths:
       - build
     name: "lib-linux-release-armhf"
+    expire_in: 1 week
+  dependencies: []
+  
+# Create ingescape library for Raspbian 9 (armv7/armhf)
+lib-raspbian-9-release-armhf:
+  <<: *build-lib-files
+  stage: build-lib
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-rpi
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-raspbian-9-release-armhf"
+    expire_in: 1 week
+  dependencies: []
+  
+# Create ingescape library for Android (armv7a softfp)
+lib-android-release-armv7a-softfp:
+  <<: *build-lib-files
+  stage: build-lib
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE}
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-android-release-armv7a-softfp"
     expire_in: 1 week
   dependencies: []
 
@@ -168,7 +272,7 @@ lib-windows-release-x64:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libzmq-v140-mt-4_3_1.lib"
+    - cmake -S . -B build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -189,7 +293,7 @@ lib-windows-release-x86:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib"
+    - cmake -S . -B build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -210,7 +314,7 @@ lib-windows-debug-x64:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Debug -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x64\libzmq-v140-mt-gd-4_3_1.lib"
+    - cmake -S . -B build\DebugX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Debug
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -231,7 +335,7 @@ lib-windows-debug-x86:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Debug -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Debug\x86\libzmq-v140-mt-gd-4_3_1.lib"
+    - cmake -S . -B build\DebugX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Debug
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -253,7 +357,7 @@ editor-windows-release-x86:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir editor\apps\IngeScape-Editor\build\ReleaseX86
-    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release  -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib"
+    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release
     - cmake --build editor\apps\IngeScape-Editor\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -275,7 +379,7 @@ editor-windows-release-x64:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir editor\apps\IngeScape-Editor\build\ReleaseX64
-    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_BUILD_TYPE=Release -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libzmq-v140-mt-4_3_1.lib"
+    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release
     - cmake --build editor\apps\IngeScape-Editor\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -297,7 +401,7 @@ assessments-windows-release-x86:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir editor\apps\IngeScape-Assessments\build\ReleaseX86
-    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release  -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x86\libzmq-v140-mt-4_3_1.lib"
+    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release
     - cmake --build editor\apps\IngeScape-Assessments\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -319,7 +423,7 @@ assessments-windows-release-x64:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
     - mkdir editor\apps\IngeScape-Assessments\build\ReleaseX64
-    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_BUILD_TYPE=Release -DLIBZMQ_LIBRARIES="%DEPENDENCIES_BUILDS_ROOT%\Release\x64\libzmq-v140-mt-4_3_1.lib"
+    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release
     - cmake --build editor\apps\IngeScape-Assessments\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -372,10 +476,11 @@ lib-installer-runtime-macos-x64:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i '' 's/DARWIN_PACKAGE_FILE_NAME=.*/DARWIN_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build macos_x64
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - macos_x64/ingescape-*
+      - macos_x64/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-macos-x64"
   dependencies:
     - lib-macos-release-x64
@@ -483,10 +588,11 @@ lib-installer-runtime-linux-x64:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build linux_x64
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - linux_x64/ingescape-*
+      - linux_x64/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-linux-x64"
   dependencies:
     - lib-linux-release-x64
@@ -497,19 +603,19 @@ lib-installer-runtime-debian-9-x64:
   stage: installer-lib
   tags:
     - docker
-  image: ingescape/debian-with-zyre
+  image: ingescape/debian-9-with-zyre
   script:
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Debian 9 (stretch)"
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build debian9_x64
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - debian9_x64/ingescape-*
+      - debian9_x64/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-debian-9-x64"
   dependencies:
-    - lib-linux-release-x64
+    - lib-debian-9-release-x64
 
 # Create runtime install for linux 64 bits - Debian 10 (buster)
 lib-installer-runtime-debian-10-x64:
@@ -517,19 +623,19 @@ lib-installer-runtime-debian-10-x64:
   stage: installer-lib
   tags:
     - docker
-  image: ingescape/debian-with-zyre
+  image: ingescape/debian-10-with-zyre
   script:
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Debian 10 (buster)"
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build debian10_x64
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - debian10_x64/ingescape-*
+      - debian10_x64/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-debian-10-x64"
   dependencies:
-    - lib-linux-release-x64
+    - lib-debian-10-release-x64
 
 # Create runtime install for linux 64 bits - CentOS
 lib-installer-runtime-centos-x64:
@@ -537,19 +643,19 @@ lib-installer-runtime-centos-x64:
   stage: installer-lib
   tags:
     - docker
-  image: ingescape/debian-with-zyre
+  image: ingescape/centos-7-with-zyre
   script:
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="CentOS"
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build centos7_x64
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - centos7_x64/ingescape-*
+      - centos7_x64/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-centos-x64"
   dependencies:
-    - lib-linux-release-x64
+    - lib-centos-7-release-x64
 
 # Create runtime install for linux ARMv7 (armhf) - Generic ZIP
 lib-installer-runtime-linux-armhf:
@@ -562,10 +668,11 @@ lib-installer-runtime-linux-armhf:
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build linux_armhf
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - linux_armhf/ingescape-*
+      - linux_armhf/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-linux-armhf"
   dependencies:
     - lib-linux-release-armhf
@@ -578,17 +685,34 @@ lib-installer-runtime-raspbian-9-armhf:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
   script:
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLINUX_FLAVOR="Raspbian 9 (stretch)"
     - make -C build package
     - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
     - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mv build raspbian9_armhf
   artifacts:
     paths:
-      - build/ingescape-*
-      - build/installIngescapeAndDependencies.sh
+      - raspbian9_armhf/ingescape-*
+      - raspbian9_armhf/installIngescapeAndDependencies.sh
     name: "lib-installer-runtime-raspbian-9-armhf"
   dependencies:
-    - lib-linux-release-armhf
+    - lib-raspbian-9-release-armhf
+
+# Create runtime install for Android (armv7a softfp) - Generic ZIP
+lib-installer-runtime-android-armv7a-softfp:
+  <<: *build-lib-files
+  stage: installer-lib
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android
+  script:
+    - make -C build package
+    - mv build android
+  artifacts:
+    paths:
+      - android/ingescape-*
+    name: "lib-installer-runtime-android-armv7a-softfp"
+  dependencies:
+    - lib-android-release-armv7a-softfp
 
 # Deploy ingescape in mac os X to be able to compile agents
 lib-deploy-macos-release-x64:
@@ -616,17 +740,17 @@ lib-deploy-linux-release-x64:
     - lib-linux-release-x64
 
 # Deploy ingescape in linux to be able to compile agents
-#lib-deploy-linux-release-armhf:
-#  <<: *build-lib-files
-#  stage: deploy-lib
-#  tags:
-#    - docker
-#  image: ingescape/raspbian-stretch-armhf
-#  script:
-#    - make -C build install DESTDIR=~/builds/release/armhf
-#    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
-#  dependencies:
-#    - lib-linux-release-armhf
+lib-deploy-linux-release-armhf:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-rpi
+  script:
+    - make -C build install DESTDIR=~/builds/release/armhf
+    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
+  dependencies:
+    - lib-linux-release-armhf
 
 # Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows-release-x64:
@@ -675,3 +799,146 @@ lib-deploy-windows-debug-x86:
     - copy /y build\DebugX86\Debug\* C:\Users\admin\dev\Builds\Debug\x86\
   dependencies:
     - lib-windows-debug-x86
+
+# Deliver installers so they can be downloaded from the website
+lib-delivery-all:
+  <<: *build-lib-files
+  stage: delivery-lib
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Deliver Windows x86"
+    - mkdir --parents library/win32
+    - mv build/ReleaseX86/ingescape-*
+         library/win32/
+    - echo "Deliver Windows x64"
+    - mkdir --parents library/win64
+    - mv build/ReleaseX64/ingescape-*
+         library/win64/
+    - echo "Deliver MacOS x64"
+    - mkdir --parents library/macos
+    - mv macos_x64/ingescape-*
+         macos_x64/installIngescapeAndDependencies.sh
+         library/macos/
+    - echo "Deliver generic Linux x64"
+    - mkdir --parents library/linux_x64/
+    - mv linux_x64/ingescape-*
+         linux_x64/installIngescapeAndDependencies.sh
+         library/linux_x64/
+    - echo "Deliver Debian 9 x64"
+    - mkdir --parents library/debian9/
+    - mv debian9_x64/ingescape-*
+         debian9_x64/installIngescapeAndDependencies.sh
+         library/debian9/
+    - echo "Deliver Debian 10 x64"
+    - mkdir --parents library/debian10/
+    - mv debian10_x64/ingescape-*
+         debian10_x64/installIngescapeAndDependencies.sh
+         library/debian10/
+    - echo "Deliver CentOS 7 x64"
+    - mkdir --parents library/centos7
+    - mv centos7_x64/ingescape-*
+         centos7_x64/installIngescapeAndDependencies.sh
+         library/centos7/
+    - echo "Deliver generic Linux armhf"
+    - mkdir --parents library/linux_armhf
+    - mv linux_armhf/ingescape-*
+         linux_armhf/installIngescapeAndDependencies.sh
+         library/linux_armhf/
+    - echo "Deliver Raspbian 9 armhf"
+    - mkdir --parents library/raspbian9
+    - mv raspbian9_armhf/ingescape-*
+         raspbian9_armhf/installIngescapeAndDependencies.sh
+         library/raspbian9/
+    - echo "Deliver Android armv7a (softfp)"
+    - mkdir --parents library/android
+    - mv android/ingescape-*
+         library/android/
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - lib-installer-runtime-windows-x86
+    - lib-installer-runtime-windows-x64
+    - lib-installer-runtime-macos-x64
+    - lib-installer-runtime-linux-x64
+    - lib-installer-runtime-debian-9-x64
+    - lib-installer-runtime-debian-10-x64
+    - lib-installer-runtime-centos-x64
+    - lib-installer-runtime-linux-armhf
+    - lib-installer-runtime-raspbian-9-armhf
+    - lib-installer-runtime-android-armv7a-softfp
+
+# Deliver installers so they can be downloaded from the website
+editor-delivery-all:
+  <<: *build-editor-files
+  stage: delivery-apps
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - mv editor _editor
+    - echo "Deliver Mac OS x64 editor"
+    - mkdir --parents editor/macos
+    - mv _editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
+         editor/macos/
+    - echo "Deliver Windows x86 editor"
+    - mkdir --parents editor/win32
+    - mv _editor/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
+         editor/win32/
+    - echo "Deliver Windows x64 editor"
+    - mkdir --parents editor/win64
+    - mv _editor/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
+         editor/win64/
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after editor ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - editor-installer-macos-x64
+    - editor-installer-windows-x86
+    - editor-installer-windows-x64
+
+# Deliver installers so they can be downloaded from the website
+assessments-delivery-all:
+  <<: *build-assessments-files
+  stage: delivery-apps
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - mv editor _editor
+    - echo "Deliver Mac OS x64 assessments"
+    - mkdir --parents assessments/macos
+    - mv _editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+         assessments/macos/
+    - echo "Deliver Windows x86 assessments"
+    - mkdir --parents assessments/win32
+    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
+         assessments/win32/
+    - echo "Deliver Windows x64 assessments"
+    - mkdir --parents assessments/win64
+    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
+         assessments/win64/
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - assessments-installer-macos-x64
+    - assessments-installer-windows-x86
+    - assessments-installer-windows-x64

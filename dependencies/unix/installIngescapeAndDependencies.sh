@@ -61,7 +61,14 @@ function _clone_and_build {
 
     $git_cmd
     cd $dirname
-    ./autogen.sh && ./configure && make --jobs=${JOBS}
+    ./autogen.sh
+    if [[ $dirname == "libzmq" ]]
+    then
+        ./configure --with-sodium
+    else
+        ./configure
+    fi
+    make --jobs=${JOBS}
     _check_sudo make --jobs=${JOBS} install
     _check_sudo ldconfig
 }
@@ -133,41 +140,33 @@ function install_deps_raspbian {
 function install_deps_debian {
     local lib_list=""
 
-    # ZeroMQ reposirory does not provide packages for armv7l (aka. armhf). Hence the build-dependencies required for armv7.
-    if [[ "$ARCH" == "armhf" ]]
+    # ZeroMQ reposirory does not provide packages for armv7a (aka. armhf). Hence the build-dependencies required for armv7.
+    if [[ "$ARCH" == "armhf" || $VER =~ "9" ]]
     then
         lib_list="build-essential git autoconf automake libtool pkg-config unzip"
     else
-        lib_list="libzmq5 czmq zyre"
-    fi
-
-    # libsodium is provided by the official debian repository so it is available for every arch
-    if [[ "$VER" =~ "9" ]]
-    then
-        lib_list="${lib_list} libsodium18"
-    elif [[ "$VER" =~ "10" ]]
-    then
-        lib_list="${lib_list} libsodium23"
+        lib_list="libzmq5 libsodium23 czmq zyre"
     fi
 
     # Check if development libs are requested by user
     if [[ "$DEVEL_LIBS" == "YES" ]]
     then
         # Again, only libsodium is available through the official repository
-        if [[ "$ARCH" == "armhf" ]]
+        if [[ "$ARCH" != "armhf" && $VER =~ "10" ]]
         then
-            lib_list="${lib_list} libsodium-dev"
-        else
             lib_list="${lib_list} libzmq3-dev libzyre-dev libczmq-dev libsodium-dev"
         fi
     fi
 
     # Install available packages
-    _check_sudo apt install -y $lib_list
+    _check_sudo apt-get update && apt-get install -y $lib_list
 
     # Installing missing packages for armv7l (aka. armhf)
-    if [[ "$ARCH" == "armhf" ]]
+    if [[ "$ARCH" == "armhf" || $VER =~ "9" ]]
     then
+        ( # libsodium
+            _clone_and_build libsodium git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
+        )
         ( # libzmq
             _clone_and_build libzmq git clone git://github.com/zeromq/libzmq.git
         )
@@ -181,14 +180,8 @@ function install_deps_debian {
 }
 
 function install_deps_centos {
-    local lib_list="libzmq5 czmq zyre libsodium18"
-
-    if [[ "$DEVEL_LIBS" == "YES" ]]
-    then
-        lib_list="${lib_list} zeromq-devel zyre-devel czmq-devel libsodium-devel"
-    fi
-
-    yum install -y ${lib_list}
+    # Falling back to compiling dependencies from sources
+    install_deps_from_git
 }
 
 function install_deps_darwin {
@@ -223,6 +216,55 @@ function setup_repos {
             then
                 echo "ZeroMQ package repository already present in /etc/apt/sources.list"
             else
+		    unset wget_missing
+		    unset gnupg_missing
+		    command -v wget > /dev/null 2>&1 || export wget_missing=1
+		    command -v gpg > /dev/null 2>&1 || export gnupg_missing=1
+
+		    if [[ -n ${wget_missing+x} ]]
+		    then
+			    if [[ -n ${gnupg_missing+x} ]]
+			    then
+				    echo "Commands 'gnupg' and 'wget' are missing. You need them to install all the dependencies."
+				    echo -n "Install 'gnupg' and 'wget' now (yes|no)? [no] "
+				    read response
+				    if [[ $response == "yes" ]]
+				    then
+					    _check_sudo apt-get update && apt-get install -y wget gnupg
+				    else
+					    echo "Installation stopped by user."
+					    echo "You can try to install ingescape alone (without dependencies) with the option '--no-deps'."
+					    return 1
+				    fi
+			    else
+				    echo "Command and 'wget' is missing. You need it to install all the dependencies."
+				    echo -n "Install 'wget' now (yes|no)? [no] "
+				    read response
+				    if [[ $response == "yes" ]]
+				    then
+					    _check_sudo apt-get update && apt-get install -y wget
+				    else
+					    echo "Installation stopped by user."
+					    echo "You can try to install ingescape alone (without dependencies) with the option '--no-deps'."
+					    return 1
+				    fi
+			    fi
+		    elif [[ -n ${gnupg_missing+x} ]]
+		    then
+			    echo "Command 'gnupg' are missing. You need it to install all the dependencies."
+			    echo -n "Install 'gnupg' now (yes|no)? [no] "
+			    read response
+			    if [[ $response == "yes" ]]
+			    then
+				    _check_sudo apt-get update && apt-get install -y gnupg
+			    else
+				    echo "Installation stopped by user."
+				    echo "You can try to install ingescape alone (without dependencies) with the option '--no-deps'."
+				    return 1
+			    fi
+		    fi
+		    unset wget_missing
+		    unset gnupg_missing
                 case $VER in
                     *10*)
                         ## Debian buster
@@ -243,7 +285,7 @@ function setup_repos {
             fi
 
             # Update package index
-            apt update
+            apt-get update
 
             ;;
         *CentOS*)

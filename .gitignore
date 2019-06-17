@@ -9,6 +9,7 @@
 *.qmlproject.user.*
 *.qbs.user
 *.qbs.user.*
+CMakeLists.txt.user
 
 
 # Ignore Qt generated files
@@ -28,6 +29,7 @@ build-xcode
 #Ignore Xcode User Pref
 xcuserdata
 
+build/
 .deps
 .libs
 zyreprobe/zyreprobe/*.o
