@@ -929,7 +929,6 @@ assessments-delivery-all:
          assessments/win64/
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
-    - 
   dependencies:
     - assessments-installer-macos-x64
     - assessments-installer-windows-x86
