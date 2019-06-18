@@ -33,10 +33,14 @@ ExperimentationsListController::ExperimentationsListController(AssessmentsModelM
     _allExperimentationsGroups.setSortProperty("name");
 
 
+    //
     // Create the default group "Other"
-    _defaultGroupOther = new ExperimentationsGroupVM(tr("Others"), nullptr);
+    //
+    _defaultGroupOther = new ExperimentationsGroupVM("Others", nullptr);
 
     _allExperimentationsGroups.append(_defaultGroupOther);
+
+    _hashFromNameToExperimentationsGroup.insert(_defaultGroupOther->name(), _defaultGroupOther);
 
 
     // Create the (fake) group "New"
@@ -68,6 +72,86 @@ ExperimentationsListController::ExperimentationsListController(AssessmentsModelM
         }
     }*/
 
+
+    // Create the query
+    QString query = QString("SELECT * FROM ingescape.experimentation;");
+
+    // Creates the new query statement
+    CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 0);
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qDebug() << "Get all experimentations succeeded";
+
+        // Retrieve result set and iterate over the rows
+        const CassResult* cassResult = cass_future_get_result(cassFuture);
+
+        if (cassResult != nullptr)
+        {
+            CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+
+            while(cass_iterator_next(cassIterator))
+            {
+                const CassRow* row = cass_iterator_get_row(cassIterator);
+
+                // For all records put all information into the JSON file
+                //jsonDumpRecord(&g, row);
+
+                CassUuid experimentationId;
+                cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &experimentationId);
+                char chrExperimentationId[CASS_UUID_STRING_LENGTH];
+                cass_uuid_string(experimentationId, chrExperimentationId);
+
+                const char *chrExperimentationName = "";
+                size_t nameLength;
+                cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrExperimentationName, &nameLength);
+                QString experimentationName = QString::fromUtf8(chrExperimentationName, static_cast<int>(nameLength));
+
+                cass_uint32_t creationDate;
+                cass_value_get_uint32(cass_row_get_column_by_name(row, "creation_date"), &creationDate);
+
+                cass_int64_t creationTime;
+                cass_value_get_int64(cass_row_get_column_by_name(row, "creation_time"), &creationTime);
+
+                time_t secCreationDateTime = cass_date_time_to_epoch(creationDate, creationTime);
+                QDateTime creationDateTime;
+                creationDateTime.setSecsSinceEpoch(secCreationDateTime);
+
+                const char *chrExperimentationsGroupName = "";
+                size_t experimentationsGroupNameLength;
+                cass_value_get_string(cass_row_get_column_by_name(row, "group_name"), &chrExperimentationsGroupName, &experimentationsGroupNameLength);
+                QString experimentationsGroupName = QString::fromUtf8(chrExperimentationsGroupName, static_cast<int>(experimentationsGroupNameLength));
+
+                // Create the new experimentation
+                ExperimentationM* experimentation = new ExperimentationM(experimentationName, creationDateTime, nullptr);
+
+                ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentationsGroupName);
+                if (experimentationsGroup == nullptr)
+                {
+                    // FIXME TODO: create the group but not create the expe, just add
+                    //createNewExperimentationInNewGroup(experimentationName, experimentationsGroupName);
+                }
+
+                if (experimentationsGroup != nullptr)
+                {
+                    // Add to the group
+                    experimentationsGroup->experimentations()->append(experimentation);
+                }
+            }
+
+            cass_iterator_free(cassIterator);
+        }
+    }
+    else {
+        qCritical() << "Could not get all experimentations from the DataBase:" << cass_error_desc(cassError);
+    }
+
+    cass_statement_free(cassStatement);
+    cass_future_free(cassFuture);
 }
 
 
@@ -111,13 +195,19 @@ void ExperimentationsListController::createNewExperimentationInNewGroup(QString 
 {
     if (!experimentationName.isEmpty() && !newExperimentationsGroupName.isEmpty())
     {
-        // Create a new experimentations group
-        ExperimentationsGroupVM* newExperimentationsGroup = new ExperimentationsGroupVM(newExperimentationsGroupName, nullptr);
+        ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(newExperimentationsGroupName);
+        if (experimentationsGroup == nullptr)
+        {
+            // Create a new experimentations group
+            experimentationsGroup = new ExperimentationsGroupVM(newExperimentationsGroupName, nullptr);
 
-        _allExperimentationsGroups.append(newExperimentationsGroup);
+            _allExperimentationsGroups.append(experimentationsGroup);
 
-        // Create a new experimentation in this new group
-        createNewExperimentationInGroup(experimentationName, newExperimentationsGroup);
+            _hashFromNameToExperimentationsGroup.insert(newExperimentationsGroupName, experimentationsGroup);
+
+            // Create a new experimentation in this new group
+            createNewExperimentationInGroup(experimentationName, experimentationsGroup);
+        }
     }
 }
 
@@ -139,10 +229,10 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
         time_t now = QDateTime::currentSecsSinceEpoch();
 
         // Converts the time since the Epoch in seconds to the 'date' type
-        cass_uint32_t creation_date = cass_date_from_epoch(now);
+        cass_uint32_t creationDate = cass_date_from_epoch(now);
 
         // Converts the time since the Epoch in seconds to the 'time' type
-        cass_int64_t creation_time = cass_time_from_epoch(now);
+        cass_int64_t creationTime = cass_time_from_epoch(now);
 
         // Create the query
         QString query = QString("INSERT INTO ingescape.experimentation (id, name, creation_date, creation_time, group_name) VALUES (?, ?, ?, ?, ?);");
@@ -151,8 +241,8 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
         CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 5);
         cass_statement_bind_uuid(cassStatement, 0, experimentationId);
         cass_statement_bind_string(cassStatement, 1, experimentationName.toStdString().c_str());
-        cass_statement_bind_uint32(cassStatement, 2, creation_date);
-        cass_statement_bind_int64(cassStatement, 3, creation_time);
+        cass_statement_bind_uint32(cassStatement, 2, creationDate);
+        cass_statement_bind_int64(cassStatement, 3, creationTime);
         cass_statement_bind_string(cassStatement, 4, experimentationsGroup->name().toStdString().c_str());
 
         // Execute the query or bound statement
@@ -173,6 +263,7 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
             qCritical() << "Could not insert the experimentation" << experimentationName << "into the DataBase:" << cass_error_desc(cassError);
         }
 
+        cass_statement_free(cassStatement);
         cass_future_free(cassFuture);
     }
     else {
@@ -191,14 +282,12 @@ bool ExperimentationsListController::canCreateExperimentationsGroupWithName(QStr
 {
     if (!experimentationsGroupName.isEmpty())
     {
-        for (ExperimentationsGroupVM* experimentationsGroup : _allExperimentationsGroups.toList())
-        {
-            if ((experimentationsGroup != nullptr) && (experimentationsGroup->name() == experimentationsGroupName))
-            {
-                return false;
-            }
+        if (_getExperimentationsGroupFromName(experimentationsGroupName) != nullptr) {
+            return false;
         }
-        return true;
+        else {
+            return true;
+        }
     }
     else {
         return false;
@@ -242,5 +331,21 @@ void ExperimentationsListController::deleteExperimentationOfGroup(Experimentatio
 
         // Free memory
         delete experimentation;
+    }
+}
+
+
+/**
+ * @brief Get the group of experimentations from a name
+ * @param experimentationsGroupName
+ * @return
+ */
+ExperimentationsGroupVM* ExperimentationsListController::_getExperimentationsGroupFromName(QString experimentationsGroupName)
+{
+    if (_hashFromNameToExperimentationsGroup.contains(experimentationsGroupName)) {
+        return _hashFromNameToExperimentationsGroup.value(experimentationsGroupName);
+    }
+    else {
+        return nullptr;
     }
 }

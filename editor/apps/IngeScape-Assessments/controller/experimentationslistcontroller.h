@@ -111,8 +111,21 @@ public Q_SLOTS:
 
 private:
 
+    /**
+     * @brief Get the group of experimentations from a name
+     * @param experimentationsGroupName
+     * @return
+     */
+    ExperimentationsGroupVM* _getExperimentationsGroupFromName(QString experimentationsGroupName);
+
+
+private:
+
     // Manager for the data model of our IngeScape Assessments application
     AssessmentsModelManager* _modelManager;
+
+    // Hash table from a name to the group of experimentations
+    QHash<QString, ExperimentationsGroupVM*> _hashFromNameToExperimentationsGroup;
 
 };
 
