@@ -433,7 +433,6 @@ lib-installer-runtime-windows-x86:
     - windows
   script:
     - cd build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..
-    - cd build\ReleaseX86 && cpack --config CPackSourceConfig.cmake && cd ..\..
   artifacts:
     paths:
       - build\ReleaseX86\ingescape-*.exe
@@ -450,7 +449,6 @@ lib-installer-runtime-windows-x64:
     - windows
   script:
     - cd build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..
-    - cd build\ReleaseX64 && cpack --config CPackSourceConfig.cmake && cd ..\..
   artifacts:
     paths:
       - build\ReleaseX64\ingescape-*.exe
@@ -811,49 +809,59 @@ lib-delivery-all:
     - mkdir --parents library/win32
     - mv build/ReleaseX86/ingescape-*
          library/win32/
+    - ls library/win32/ | grep -v 'latest_delivery' > library/win32/latest_delivery
     - echo "Deliver Windows x64"
     - mkdir --parents library/win64
     - mv build/ReleaseX64/ingescape-*
          library/win64/
+    - ls library/win64/ | grep -v 'latest_delivery' > library/win64/latest_delivery
     - echo "Deliver MacOS x64"
     - mkdir --parents library/macos
     - mv macos_x64/ingescape-*
          macos_x64/installIngescapeAndDependencies.sh
          library/macos/
+    - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
     - echo "Deliver generic Linux x64"
     - mkdir --parents library/linux_x64/
     - mv linux_x64/ingescape-*
          linux_x64/installIngescapeAndDependencies.sh
          library/linux_x64/
+    - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
     - echo "Deliver Debian 9 x64"
     - mkdir --parents library/debian9/
     - mv debian9_x64/ingescape-*
          debian9_x64/installIngescapeAndDependencies.sh
          library/debian9/
+    - ls library/debian9/ | grep -v 'latest_delivery' > library/debian9/latest_delivery
     - echo "Deliver Debian 10 x64"
     - mkdir --parents library/debian10/
     - mv debian10_x64/ingescape-*
          debian10_x64/installIngescapeAndDependencies.sh
          library/debian10/
+    - ls library/debian10/ | grep -v 'latest_delivery' > library/debian10/latest_delivery
     - echo "Deliver CentOS 7 x64"
     - mkdir --parents library/centos7
     - mv centos7_x64/ingescape-*
          centos7_x64/installIngescapeAndDependencies.sh
          library/centos7/
+    - ls library/centos7/ | grep -v 'latest_delivery' > library/centos7/latest_delivery
     - echo "Deliver generic Linux armhf"
     - mkdir --parents library/linux_armhf
     - mv linux_armhf/ingescape-*
          linux_armhf/installIngescapeAndDependencies.sh
          library/linux_armhf/
+    - ls library/linux_armhf/ | grep -v 'latest_delivery' > library/linux_armhf/latest_delivery
     - echo "Deliver Raspbian 9 armhf"
     - mkdir --parents library/raspbian9
     - mv raspbian9_armhf/ingescape-*
          raspbian9_armhf/installIngescapeAndDependencies.sh
          library/raspbian9/
+    - ls library/raspbian9/ | grep -v 'latest_delivery' > library/raspbian9/latest_delivery
     - echo "Deliver Android armv7a (softfp)"
     - mkdir --parents library/android
     - mv android/ingescape-*
          library/android/
+    - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
@@ -887,14 +895,17 @@ editor-delivery-all:
     - mkdir --parents editor/macos
     - mv _editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
          editor/macos/
+    - ls editor/macos/ | grep -v 'latest_delivery' > editor/macos/latest_delivery
     - echo "Deliver Windows x86 editor"
     - mkdir --parents editor/win32
     - mv _editor/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
          editor/win32/
+    - ls editor/win32/ | grep -v 'latest_delivery' > editor/win32/latest_delivery
     - echo "Deliver Windows x64 editor"
     - mkdir --parents editor/win64
     - mv _editor/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
          editor/win64/
+    - ls editor/win64/ | grep -v 'latest_delivery' > editor/win64/latest_delivery
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive editor ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
@@ -921,14 +932,17 @@ assessments-delivery-all:
     - mkdir --parents assessments/macos
     - mv _editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
          assessments/macos/
+    - ls assessments/macos/ | grep -v 'latest_delivery' > assessments/macos/latest_delivery
     - echo "Deliver Windows x86 assessments"
     - mkdir --parents assessments/win32
     - mv _editor/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
          assessments/win32/
+    - ls assessments/win32/ | grep -v 'latest_delivery' > assessments/win32/latest_delivery
     - echo "Deliver Windows x64 assessments"
     - mkdir --parents assessments/win64
     - mv _editor/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
          assessments/win64/
+    - ls assessments/win64/ | grep -v 'latest_delivery' > assessments/win64/latest_delivery
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
