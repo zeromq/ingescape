@@ -809,49 +809,59 @@ lib-delivery-all:
     - mkdir --parents library/win32
     - mv build/ReleaseX86/ingescape-*
          library/win32/
+    - ls library/win32/ > library/win32/latest_delivery
     - echo "Deliver Windows x64"
     - mkdir --parents library/win64
     - mv build/ReleaseX64/ingescape-*
          library/win64/
+    - ls library/win64/ > library/win64/latest_delivery
     - echo "Deliver MacOS x64"
     - mkdir --parents library/macos
     - mv macos_x64/ingescape-*
          macos_x64/installIngescapeAndDependencies.sh
          library/macos/
+    - ls library/macos/ > library/macos/latest_delivery
     - echo "Deliver generic Linux x64"
     - mkdir --parents library/linux_x64/
     - mv linux_x64/ingescape-*
          linux_x64/installIngescapeAndDependencies.sh
          library/linux_x64/
+    - ls library/linux_x64/ > library/linux_x64/latest_delivery
     - echo "Deliver Debian 9 x64"
     - mkdir --parents library/debian9/
     - mv debian9_x64/ingescape-*
          debian9_x64/installIngescapeAndDependencies.sh
          library/debian9/
+    - ls library/debian9/ > library/debian9/latest_delivery
     - echo "Deliver Debian 10 x64"
     - mkdir --parents library/debian10/
     - mv debian10_x64/ingescape-*
          debian10_x64/installIngescapeAndDependencies.sh
          library/debian10/
+    - ls library/debian10/ > library/debian10/latest_delivery
     - echo "Deliver CentOS 7 x64"
     - mkdir --parents library/centos7
     - mv centos7_x64/ingescape-*
          centos7_x64/installIngescapeAndDependencies.sh
          library/centos7/
+    - ls library/centos7/ > library/centos7/latest_delivery
     - echo "Deliver generic Linux armhf"
     - mkdir --parents library/linux_armhf
     - mv linux_armhf/ingescape-*
          linux_armhf/installIngescapeAndDependencies.sh
          library/linux_armhf/
+    - ls library/linux_armhf/ > library/linux_armhf/latest_delivery
     - echo "Deliver Raspbian 9 armhf"
     - mkdir --parents library/raspbian9
     - mv raspbian9_armhf/ingescape-*
          raspbian9_armhf/installIngescapeAndDependencies.sh
          library/raspbian9/
+    - ls library/raspbian9/ > library/raspbian9/latest_delivery
     - echo "Deliver Android armv7a (softfp)"
     - mkdir --parents library/android
     - mv android/ingescape-*
          library/android/
+    - ls library/android/ > library/android/latest_delivery
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
