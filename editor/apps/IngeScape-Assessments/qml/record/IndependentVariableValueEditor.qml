@@ -17,7 +17,7 @@ import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 
 // Needed to access to ToolTip (https://doc.qt.io/qt-5.11/qml-qtquick-controls2-tooltip.html)
-import QtQuick.Controls 2.5 as Controls2
+import QtQuick.Controls 2.0 as Controls2
 
 import I2Quick 1.0
 
