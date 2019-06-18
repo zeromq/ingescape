@@ -22,6 +22,7 @@
 #include <controller/ingescapemodelmanager.h>
 //#include <model/experimentationm.h>
 #include <viewModel/experimentationsgroupvm.h>
+#include "cassandra.h"
 
 
 /**
@@ -30,6 +31,9 @@
 class AssessmentsModelManager : public IngeScapeModelManager
 {
     Q_OBJECT
+
+    // Cassandra server
+    I2_QML_PROPERTY(QString, cassServer)
 
     // The experimentations group currently selected
     I2_QML_PROPERTY(ExperimentationsGroupVM*, currentExperimentationsGroup)
@@ -58,6 +62,27 @@ public:
     //~AssessmentsModelManager() Q_DECL_OVERRIDE;
 
 
+    /**
+     * @brief Get the Cassandra Cluster
+     * @return
+     */
+    CassCluster* getCassCluster();
+
+
+    /**
+     * @brief Get the Cassandra Session
+     * @return
+     */
+    CassSession* getCassSession();
+
+
+    /**
+     * @brief Get the Cassandra UUID generator
+     * @return
+     */
+    CassUuidGen* getCassUuidGen();
+
+
 Q_SIGNALS:
 
 
@@ -65,6 +90,26 @@ public Q_SLOTS:
 
 
 private:
+
+    /**
+     * @brief A cluster object describes the configuration of the Cassandra cluster and is used
+     * to construct a session instance. Unlike other DataStax drivers the cluster object
+     * does not maintain the control connection.
+     */
+    CassCluster* _cassCluster = nullptr;
+
+
+    /**
+     * @brief A session object is used to execute queries and maintains cluster state through
+     * the control connection. The control connection is used to auto-discover nodes and
+     * monitor cluster changes (topology and schema). Each session also maintains multiple
+     * pools of connections to cluster nodes which are used to query the cluster.
+     */
+    CassSession* _cassSession = nullptr;
+
+
+    // A UUID generator object
+    CassUuidGen* _cassUuidGen = nullptr;
 
 };
 

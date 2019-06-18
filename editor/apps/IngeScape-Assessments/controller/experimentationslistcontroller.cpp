@@ -46,7 +46,7 @@ ExperimentationsListController::ExperimentationsListController(AssessmentsModelM
     //
     // FIXME for tests
     //
-    int nbExpes = 1;
+    /*int nbExpes = 1;
 
     for (int i = 0; i < 3; i++)
     {
@@ -66,7 +66,7 @@ ExperimentationsListController::ExperimentationsListController(AssessmentsModelM
 
             nbExpes++;
         }
-    }
+    }*/
 
 }
 
@@ -129,13 +129,51 @@ void ExperimentationsListController::createNewExperimentationInNewGroup(QString 
  */
 void ExperimentationsListController::createNewExperimentationInGroup(QString experimentationName, ExperimentationsGroupVM* experimentationsGroup)
 {
-    if (!experimentationName.isEmpty() && (experimentationsGroup != nullptr))
+    if (!experimentationName.isEmpty() && (experimentationsGroup != nullptr)
+            && (_modelManager != nullptr))
     {
-        // Create the new experimentation
-        ExperimentationM* experimentation = new ExperimentationM(experimentationName, QDateTime::currentDateTime(), nullptr);
+        CassUuid experimentationId;
+        cass_uuid_gen_time(_modelManager->getCassUuidGen(), &experimentationId);
 
-        // Add to the group
-        experimentationsGroup->experimentations()->append(experimentation);
+        // Returns the number of seconds since 1970-01-01T00:00:00 Universal Coordinated Time.
+        time_t now = QDateTime::currentSecsSinceEpoch();
+
+        // Converts the time since the Epoch in seconds to the 'date' type
+        cass_uint32_t creation_date = cass_date_from_epoch(now);
+
+        // Converts the time since the Epoch in seconds to the 'time' type
+        cass_int64_t creation_time = cass_time_from_epoch(now);
+
+        // Create the query
+        QString query = QString("INSERT INTO ingescape.experimentation (id, name, creation_date, creation_time, group_name) VALUES (?, ?, ?, ?, ?);");
+
+        // Creates the new query statement
+        CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 5);
+        cass_statement_bind_uuid(cassStatement, 0, experimentationId);
+        cass_statement_bind_string(cassStatement, 1, experimentationName.toStdString().c_str());
+        cass_statement_bind_uint32(cassStatement, 2, creation_date);
+        cass_statement_bind_int64(cassStatement, 3, creation_time);
+        cass_statement_bind_string(cassStatement, 4, experimentationsGroup->name().toStdString().c_str());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "Experimentation" << experimentationName << "inserted into the DataBase";
+
+            // Create the new experimentation
+            ExperimentationM* experimentation = new ExperimentationM(experimentationName, QDateTime::currentDateTime(), nullptr);
+
+            // Add to the group
+            experimentationsGroup->experimentations()->append(experimentation);
+        }
+        else {
+            qCritical() << "Could not insert the experimentation" << experimentationName << "into the DataBase:" << cass_error_desc(cassError);
+        }
+
+        cass_future_free(cassFuture);
     }
     else {
         qWarning() << "Cannot create new experimentation because name is empty (" << experimentationName << ") or group is null !";

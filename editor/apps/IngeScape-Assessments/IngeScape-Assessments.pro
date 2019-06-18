@@ -155,6 +155,8 @@ mac {
     # Compute the LFLAG associated to our frameworks
     LIBS += -L../../frameworks/I2Quick/Mac -lI2Quick
 
+    LIBS += -L/usr/local/lib -lcassandra
+
 
     # Copy libraries into the MacOS directory of our application
     librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB}

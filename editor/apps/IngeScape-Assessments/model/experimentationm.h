@@ -31,6 +31,9 @@ class ExperimentationM : public QObject
 {
     Q_OBJECT
 
+    // Cassandra (Unique) Identifier of our experimentation
+    //I2_CPP_NOSIGNAL_PROPERTY(CassUuid, uid)
+
     // Name of our experimentation
     I2_QML_PROPERTY(QString, name)
 
