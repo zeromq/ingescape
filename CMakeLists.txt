@@ -325,7 +325,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
       install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
 
   elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-      set(CPACK_GENERATOR "STGZ;ZIP")
+      set(CPACK_GENERATOR "STGZ")
       #set(CPACK_SOURCE_GENERATOR "TGZ")
       #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
   else ()
