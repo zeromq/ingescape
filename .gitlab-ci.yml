@@ -433,7 +433,6 @@ lib-installer-runtime-windows-x86:
     - windows
   script:
     - cd build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..
-    - cd build\ReleaseX86 && cpack --config CPackSourceConfig.cmake && cd ..\..
   artifacts:
     paths:
       - build\ReleaseX86\ingescape-*.exe
@@ -450,7 +449,6 @@ lib-installer-runtime-windows-x64:
     - windows
   script:
     - cd build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..
-    - cd build\ReleaseX64 && cpack --config CPackSourceConfig.cmake && cd ..\..
   artifacts:
     paths:
       - build\ReleaseX64\ingescape-*.exe
@@ -931,6 +929,7 @@ assessments-delivery-all:
          assessments/win64/
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+    - 
   dependencies:
     - assessments-installer-macos-x64
     - assessments-installer-windows-x86
