@@ -855,7 +855,7 @@ lib-delivery-all:
     - mv android/ingescape-*
          library/android/
     - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+    - rsync --rsh="ssh -i ssh_secret" --recursive library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
@@ -896,7 +896,7 @@ editor-delivery-all:
     - mv _editor/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
          editor/win64/
     - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after editor ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+    - rsync --rsh="ssh -i ssh_secret" --recursive editor ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
     - editor-installer-macos-x64
     - editor-installer-windows-x86
@@ -930,7 +930,7 @@ assessments-delivery-all:
     - mv _editor/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
          assessments/win64/
     - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive --delete-after assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+    - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
     - assessments-installer-macos-x64
     - assessments-installer-windows-x86
