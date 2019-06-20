@@ -24,14 +24,16 @@ namespace CSharpSampleAgent
             //Add inputs, output & parameter dynamically
             igsAgent.createDefDynamically();
 
-            //Observe all inputs
-            igsAgent.observeInputs();
+
 
             //Add mapping dynamically
             igsAgent.createMappingDynamically();
 
             //Write on outputs
             igsAgent.writeOnInputs();
+
+            //Observe all inputs
+            igsAgent.observeInputs();
 
             //Read inputs
             igsAgent.readGenericFunctions();
