@@ -10,11 +10,14 @@ TEMPLATE = app
 # Application version
 VERSION_MAJOR = 0
 VERSION_MINOR = 1
+VERSION_PATCH = 1
 VERSION_BUILD = 0
-VERSION_PATCH = 0
 
-VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}.$${VERSION_PATCH}
 
+win32:VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}.$${VERSION_BUILD}
+else:VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
+
+DEFINES += "VERSION=\\\"$$VERSION\\\""
 
 # Qt modules used by our application and/or its dependencies
 QT += qml quick quick-private svg xml concurrent sql core-private gui-private

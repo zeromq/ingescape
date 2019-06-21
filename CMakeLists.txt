@@ -128,18 +128,36 @@ ENDIF (NOT MSVC)
 if (INGESCAPE_BUILD_SHARED)
   IF (MSVC)
     add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
+
+    IF (CMAKE_BUILD_TYPE STREQUAL "Release")
+      set_target_properties (${PROJECT_NAME} PROPERTIES
+        PUBLIC_HEADER "${public_headers}"
+        DEFINE_SYMBOL "INGESCAPE_EXPORTS"
+        SOVERSION "${INGESCAPE_VERSION_MAJOR}"
+        VERSION "${INGESCAPE_VERSION}"
+        OUTPUT_NAME "ingescape"
+      )
+    ELSE ()
+      set_target_properties (${PROJECT_NAME} PROPERTIES
+        PUBLIC_HEADER "${public_headers}"
+        DEFINE_SYMBOL "INGESCAPE_EXPORTS"
+        SOVERSION "${INGESCAPE_VERSION_MAJOR}"
+        VERSION "${INGESCAPE_VERSION}"
+        OUTPUT_NAME "ingescaped"
+      )
+    ENDIF()
   ELSE (MSVC)
     add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:ingescape_objects>)
-  ENDIF (MSVC)
 
-  set_target_properties (${PROJECT_NAME} PROPERTIES
-    PUBLIC_HEADER "${public_headers}"
-    DEFINE_SYMBOL "INGESCAPE_EXPORTS"
-    SOVERSION "${INGESCAPE_VERSION_MAJOR}"
-    VERSION "${INGESCAPE_VERSION}"
-    OUTPUT_NAME "ingescape"
-    PREFIX "lib"
-  )
+    set_target_properties (${PROJECT_NAME} PROPERTIES
+      PUBLIC_HEADER "${public_headers}"
+      DEFINE_SYMBOL "INGESCAPE_EXPORTS"
+      SOVERSION "${INGESCAPE_VERSION_MAJOR}"
+      VERSION "${INGESCAPE_VERSION}"
+      OUTPUT_NAME "ingescape"
+      PREFIX "lib"
+    )
+  ENDIF (MSVC)
 
   target_link_libraries(${PROJECT_NAME} PRIVATE ${MORE_LIBRARIES})
 
@@ -161,16 +179,31 @@ endif()
 if (INGESCAPE_BUILD_STATIC)
   IF (MSVC)
     add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
+
+    IF (CMAKE_BUILD_TYPE STREQUAL "Release")
+      set_target_properties (${PROJECT_NAME}-static PROPERTIES
+        PUBLIC_HEADER "${public_headers}"
+        COMPILE_DEFINITIONS "INGESCAPE_STATIC"
+        OUTPUT_NAME "ingescape_static"
+      )
+    ELSE ()
+      set_target_properties (${PROJECT_NAME}-static PROPERTIES
+        PUBLIC_HEADER "${public_headers}"
+        COMPILE_DEFINITIONS "INGESCAPE_STATIC"
+        OUTPUT_NAME "ingescaped_static"
+      )
+    ENDIF()
   ELSE (MSVC)
     add_library(${PROJECT_NAME}-static STATIC $<TARGET_OBJECTS:ingescape_objects>)
+
+    set_target_properties(${PROJECT_NAME}-static PROPERTIES
+      PUBLIC_HEADER "${public_headers}"
+      COMPILE_DEFINITIONS "INGESCAPE_STATIC"
+      OUTPUT_NAME "ingescape"
+      PREFIX "lib"
+    )
   ENDIF (MSVC)
 
-  set_target_properties(${PROJECT_NAME}-static PROPERTIES
-    PUBLIC_HEADER "${public_headers}"
-    COMPILE_DEFINITIONS "INGESCAPE_STATIC"
-    OUTPUT_NAME "ingescape"
-    PREFIX "lib"
-  )
 
   target_link_libraries(${PROJECT_NAME}-static PRIVATE ${MORE_LIBRARIES})
 
@@ -325,25 +358,21 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
       install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
 
   elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-      set(CPACK_GENERATOR "STGZ;ZIP")
+      set(CPACK_GENERATOR "STGZ")
       #set(CPACK_SOURCE_GENERATOR "TGZ")
       #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
   else ()
-      if ( CMAKE_OS_NAME )
-          if ( ${CMAKE_OS_NAME} STREQUAL "Debian" AND ${CMAKE_OS_VERSION} STREQUAL "10" )
-              set(CPACK_GENERATOR "DEB")
-              set(CPACK_DEBIAN_PACKAGE_DEPENDS "libczmq4, libsodium23 (>= 1.0.14), libzmq5, libzyre2")
-          else ()
-              # Unsupported Linux flavor. Fallback to ZIP
-              set(CPACK_GENERATOR "ZIP")
-          endif ()
-      elseif( ANDROID )
+      if ( CMAKE_OS_NAME AND ${CMAKE_OS_NAME} STREQUAL "Debian" AND ${CMAKE_OS_VERSION} STREQUAL "10" )
+          set(CPACK_GENERATOR "DEB")
+          set(CPACK_DEBIAN_PACKAGE_DEPENDS "libczmq4, libsodium23 (>= 1.0.14), libzmq5, libzyre2")
+      elseif ( ANDROID )
+          set(IS_EDITOR FALSE)
           install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
           install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
           install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
           install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
           set(CPACK_GENERATOR "ZIP")
-      else()
+      else ()
           set(CPACK_GENERATOR "ZIP")
       endif ()
 

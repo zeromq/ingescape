@@ -42,13 +42,12 @@ namespace CSharpSampleAgent
                     break;
 
                 case iopType_t.IGS_INTEGER_T:
-                    int valueReceived = Igs.readInputAsInt("integer");
-                    Console.WriteLine("Callback sur 'integer' input : " + valueReceived.ToString());
+                    //int valueReceived = Igs.readInputAsInt("integer");
+                    //Console.WriteLine("Callback sur 'integer' input : " + valueReceived.ToString());
                     break;
 
                 case iopType_t.IGS_STRING_T:
-                    IntPtr intPtr = Igs.readInputAsString("string");
-                    string msg = Marshal.PtrToStringAnsi(intPtr);
+                    string msg = Igs.readInputAsString("string");
                     Console.WriteLine("Callback sur 'string' input : " + msg);
                     break;
 
@@ -61,16 +60,17 @@ namespace CSharpSampleAgent
         public IgsAgent()
         {
             //Load a definition from file
-            Igs.loadDefinitionFromPath("../igs-csharp-sample-def.json");
+            Igs.loadDefinitionFromPath("../../../data/igs-csharp-sample-def.json");
 
             //Load mapping from file
-            Igs.loadMappingFromPath("../igs-csharp-sample-mapping.json");
+            Igs.loadMappingFromPath("../../../data/igs-csharp-sample-mapping.json");
 
             //Get mapping version 
             string mappingVersion = Igs.getMappingVersion();
 
             //Get agent name
             string agentName = Igs.getAgentName();
+            Igs.igs_setAgentName("test");
 
             //Get agent state
             string agentState = Igs.getAgentState();
@@ -216,7 +216,8 @@ namespace CSharpSampleAgent
         {
             //Integer
             int value = 100;
-            int result = Igs.writeInputAsInt("integer", value);
+            int result = -1;
+            result = Igs.writeInputAsInt("integer", value);
 
             //Double
             double val = 100.111;

@@ -884,6 +884,9 @@ bindings/c#/sample/CSharpSampleAgent/CSharpSampleAgent/bin/Release/
 bindings/c#/IngescapeCSharpWrapper/CSharpSampleAgent/obj/
 bindings/c#/IngescapeCSharpWrapper/CSharpSampleAgent/bin/Release/
 bindings/c#/IngescapeCSharpWrapper/CSharpSampleAgent/bin/Debug/
+bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ingescape.exp
+bindings/c#/IngescapeCSharpWrapper/CSharpSampleAgent/bin/
+
 doc/backend/node_modules/.bin/mime
 doc/backend/node_modules/.bin/uuid
 doc/backend/node_modules/accepts/HISTORY.md
