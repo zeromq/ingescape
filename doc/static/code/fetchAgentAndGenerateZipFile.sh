@@ -1,5 +1,5 @@
 #!/bin/sh
-cp -R ../../../../agents/learning/firstFullAgent .
+cp -R ../../../../allagents/learning/firstFullAgent .
 find . -name ".DS_Store" -type f -delete
 find . -name ".vc" -type d -delete
 find . -name ".git" -type f -delete
