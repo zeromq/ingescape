@@ -13,7 +13,7 @@ namespace Ingescape
     public enum iopType_t { IGS_INTEGER_T = 1, IGS_DOUBLE_T, IGS_STRING_T, IGS_BOOL_T, IGS_IMPULSION_T, IGS_DATA_T };
     public enum igs_logLevel_t{IGS_LOG_TRACE = 0,IGS_LOG_DEBUG,IGS_LOG_INFO,IGS_LOG_WARN,IGS_LOG_ERROR,IGS_LOG_FATAL};
 
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void igs_observeCallback(iop_t iopType,
                                         [MarshalAs(UnmanagedType.LPStr)] string name,
                                         iopType_t valueType,
@@ -22,21 +22,26 @@ namespace Ingescape
                                         IntPtr myData);
 
 
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void igs_forcedStopCallback(IntPtr myData);
 
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void igs_muteCallback(bool isMuted, IntPtr myData);
 
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void igs_freezeCallback(bool isPaused, IntPtr myData);
 
 
     public class Igs
     {
-
-    //Librairie x86 debug
-    private const string ingescapeDLLPath = "C:\\ingescape\\libs\\debug\\ingescape.dll";
+        //Librairie x86 debug
+        //private const string ingescapeDLLPath = "C:\\ingescape\\libs\\debug\\ingescape.dll";
+        
+        // Library 32 bits (x86)
+        //private const string ingescapeDLLPath = "C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll";
+        
+        // Library 64 bits
+        private const string ingescapeDLLPath = "C:\\Program Files\\ingescape\\lib\\libingescape.dll";
 
         //////////////////////////////////////////////////
         // Initialization and control
