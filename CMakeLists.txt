@@ -128,18 +128,36 @@ ENDIF (NOT MSVC)
 if (INGESCAPE_BUILD_SHARED)
   IF (MSVC)
     add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
+
+    IF (CMAKE_BUILD_TYPE STREQUAL "Release")
+      set_target_properties (${PROJECT_NAME} PROPERTIES
+        PUBLIC_HEADER "${public_headers}"
+        DEFINE_SYMBOL "INGESCAPE_EXPORTS"
+        SOVERSION "${INGESCAPE_VERSION_MAJOR}"
+        VERSION "${INGESCAPE_VERSION}"
+        OUTPUT_NAME "ingescape"
+      )
+    ELSE ()
+      set_target_properties (${PROJECT_NAME} PROPERTIES
+        PUBLIC_HEADER "${public_headers}"
+        DEFINE_SYMBOL "INGESCAPE_EXPORTS"
+        SOVERSION "${INGESCAPE_VERSION_MAJOR}"
+        VERSION "${INGESCAPE_VERSION}"
+        OUTPUT_NAME "ingescaped"
+      )
+    ENDIF()
   ELSE (MSVC)
     add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:ingescape_objects>)
-  ENDIF (MSVC)
 
-  set_target_properties (${PROJECT_NAME} PROPERTIES
-    PUBLIC_HEADER "${public_headers}"
-    DEFINE_SYMBOL "INGESCAPE_EXPORTS"
-    SOVERSION "${INGESCAPE_VERSION_MAJOR}"
-    VERSION "${INGESCAPE_VERSION}"
-    OUTPUT_NAME "ingescape"
-    PREFIX "lib"
-  )
+    set_target_properties (${PROJECT_NAME} PROPERTIES
+      PUBLIC_HEADER "${public_headers}"
+      DEFINE_SYMBOL "INGESCAPE_EXPORTS"
+      SOVERSION "${INGESCAPE_VERSION_MAJOR}"
+      VERSION "${INGESCAPE_VERSION}"
+      OUTPUT_NAME "ingescape"
+      PREFIX "lib"
+    )
+  ENDIF (MSVC)
 
   target_link_libraries(${PROJECT_NAME} PRIVATE ${MORE_LIBRARIES})
 
@@ -161,16 +179,31 @@ endif()
 if (INGESCAPE_BUILD_STATIC)
   IF (MSVC)
     add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
+
+    IF (CMAKE_BUILD_TYPE STREQUAL "Release")
+      set_target_properties (${PROJECT_NAME}-static PROPERTIES
+        PUBLIC_HEADER "${public_headers}"
+        COMPILE_DEFINITIONS "INGESCAPE_STATIC"
+        OUTPUT_NAME "ingescape_static"
+      )
+    ELSE ()
+      set_target_properties (${PROJECT_NAME}-static PROPERTIES
+        PUBLIC_HEADER "${public_headers}"
+        COMPILE_DEFINITIONS "INGESCAPE_STATIC"
+        OUTPUT_NAME "ingescaped_static"
+      )
+    ENDIF()
   ELSE (MSVC)
     add_library(${PROJECT_NAME}-static STATIC $<TARGET_OBJECTS:ingescape_objects>)
+
+    set_target_properties(${PROJECT_NAME}-static PROPERTIES
+      PUBLIC_HEADER "${public_headers}"
+      COMPILE_DEFINITIONS "INGESCAPE_STATIC"
+      OUTPUT_NAME "ingescape"
+      PREFIX "lib"
+    )
   ENDIF (MSVC)
 
-  set_target_properties(${PROJECT_NAME}-static PROPERTIES
-    PUBLIC_HEADER "${public_headers}"
-    COMPILE_DEFINITIONS "INGESCAPE_STATIC"
-    OUTPUT_NAME "ingescape"
-    PREFIX "lib"
-  )
 
   target_link_libraries(${PROJECT_NAME}-static PRIVATE ${MORE_LIBRARIES})
 

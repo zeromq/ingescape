@@ -225,10 +225,10 @@ namespace CSharpSampleAgent
 
             //String
             string msg = "Helloword";
-            result = Igs.writeOutputAsString("string", msg);
+            result = Igs.writeInputAsString("string", msg);
 
             //Impulsion
-            result = Igs.writeOutputAsImpulsion("impulsion");
+            result = Igs.writeInputAsImpulsion("impulsion");
         }
 
         public void writeAndReadData()
