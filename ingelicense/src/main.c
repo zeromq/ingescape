@@ -30,17 +30,16 @@
 
 #define DEFAULT_CUSTOMER "Ingescape"
 #define DEFAULT_ORDER "for internal use only"
-#define DEFAULT_EXPIRATION 2524608000 //January 1st 2050
 #define DEFAULT_AGENTS_NB 500
 #define DEFAULT_IOP_NB 5000
 #define DEFAULT_EDITOR_OWNER "Ingescape"
-#define DEFAULT_EDITOR_EXPIRATION 2524608000 //January 1st 2050
 #define DEFAULT_FEATURES_FILE "features.txt"
 #define DEFAULT_AGENTS_FILE "agents.txt"
 #define DEFAULT_OUTPUT_FILE "new.igslicense"
 
 uint8_t secretEncryptionKey[crypto_secretstream_xchacha20poly1305_KEYBYTES] = {1,255,34,41,58,63,47,183,134,223,33,41,25,16,87,38,211,27,183,124,185,196,107,128,34,92,83,54,35,60,37,28};
 
+//here is how to create and display new public and private keys:
 //crypto_sign_keypair(publicSignKey, privateSignKey);
 //printf("public key : ");
 //for (int i = 0; i<32; i++){
@@ -61,10 +60,12 @@ char editorOwner[BUFFER] = DEFAULT_EDITOR_OWNER;
 char features[BUFFER] = DEFAULT_FEATURES_FILE;
 char agents[BUFFER] = DEFAULT_AGENTS_FILE;
 char output[BUFFER*8] = DEFAULT_OUTPUT_FILE;
-long expiration = DEFAULT_EXPIRATION;
 int maxAgents = DEFAULT_AGENTS_NB;
 int maxIOPs = DEFAULT_IOP_NB;
-long editorExpiration = DEFAULT_EDITOR_EXPIRATION;
+char expirationString[BUFFER] = "";
+long expiration = 0;
+char editorExpirationString[BUFFER] = "";
+long editorExpiration = 0;
 
 void encryptLicenseToFile(const char *target_file, const char *source_string,
                          const unsigned char secretEncryptionKey[crypto_secretstream_xchacha20poly1305_KEYBYTES]){
@@ -197,7 +198,7 @@ void printLicenseLine(const char *line){
             struct tm  ts = *localtime(&editorExpirationDate);
             char       buf[80];
             strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", &ts);
-            printf("license expriation date : %s\n", buf);
+            printf("license expiration date : %s\n", buf);
         }else if (strcmp(command, "feature") == 0){
             printf("allowed feature: %s\n", data);
         }else if (strcmp(command, "agent") == 0){
@@ -305,18 +306,18 @@ char* generateLicense(void){
 void print_usage() {
     printf("Usage example: ingelicense \n");
     printf("\nthese parameters have default value (indicated here above):\n");
-    printf("--customer : (default: %s)\n", DEFAULT_CUSTOMER);
-    printf("--order : (default: %s)\n", DEFAULT_ORDER);
-    printf("--expiration : (default: %ld)\n", DEFAULT_EXPIRATION);
-    printf("--maxAgents : (default: %d)\n", DEFAULT_AGENTS_NB);
-    printf("--maxIOPs : (default: %d)\n", DEFAULT_IOP_NB);
-    printf("--editorOwner : (default: %s)\n", DEFAULT_EDITOR_OWNER);
-    printf("--editorExpiration : (default: %ld)\n", DEFAULT_EDITOR_EXPIRATION);
-    printf("--features : (default: %s)\n", DEFAULT_FEATURES_FILE);
-    printf("--agents : (default: %s)\n", DEFAULT_AGENTS_FILE);
-    printf("--output : (default: %s)\n", DEFAULT_OUTPUT_FILE);
+    printf("--customer : customer name (default: %s)\n", DEFAULT_CUSTOMER);
+    printf("--order : order identification (default: %s)\n", DEFAULT_ORDER);
+    printf("--expiration : license expiration date expressed as yyyy/mm/dd (default: 4 weeks from now)\n");
+    printf("--maxAgents : maximum number of agents in the platform (default: %d)\n", DEFAULT_AGENTS_NB);
+    printf("--maxIOPs : maximum number of IOPs for all the agents in the platform (default: %d)\n", DEFAULT_IOP_NB);
+    printf("--editorOwner : name of the license owner (default: %s)\n", DEFAULT_EDITOR_OWNER);
+    printf("--editorExpiration : editor license expiration date expressed as yyyy/mm/dd (default: 4 weeks from now)\n");
+    printf("--features : path to file listing the allowed features (default: %s)\n", DEFAULT_FEATURES_FILE);
+    printf("--agents : path to file listing the allowed agents (default: %s)\n", DEFAULT_AGENTS_FILE);
+    printf("--output : path to the generated license file (default: %s)\n", DEFAULT_OUTPUT_FILE);
     printf("\n");
-    printf("--read : read an existing license file\n");
+    printf("--read : path to license file to be read and displayed\n");
 }
 
 //helper to convert paths starting with ~ to absolute paths
@@ -344,7 +345,6 @@ void makeFilePath(char *from, char *to, size_t size_of_to) {
 int main(int argc, const char * argv[]) {
     //manage options
     int opt = 0;
-//    char *readFile = NULL;
     char *readFile = NULL;
     
     static struct option long_options[] = {
@@ -368,38 +368,101 @@ int main(int argc, const char * argv[]) {
         switch (opt) {
             case 'c':
                 strncpy(customer, optarg, BUFFER - 1);
+                break;
             case 'r':
                 strncpy(order, optarg, BUFFER - 1);
+                break;
             case 'w':
                 strncpy(editorOwner, optarg, BUFFER - 1);
+                break;
             case 'f':
                 strncpy(features, optarg, BUFFER - 1);
+                break;
             case 'a':
                 strncpy(agents, optarg, BUFFER - 1);
+                break;
             case 'o':
                 strncpy(output, optarg, BUFFER - 1);
+                break;
             case 'e':
-                expiration = atol(optarg);
+                strncpy(expirationString, optarg, BUFFER - 1);
+                break;
             case 'x':
-                editorExpiration = atol(optarg);
+                strncpy(editorExpirationString, optarg, BUFFER - 1);
+                break;
             case 't':
                 maxAgents = atoi(optarg);
+                break;
             case 'i':
                 maxIOPs = atoi(optarg);
+                break;
             case 'l':
                 readFile = optarg;
+                break;
             case 'h':
                 print_usage();
+                printf("plop\n");
                 exit(0);
             default:
                 print_usage();
+                printf("plip : %c\n", opt);
                 exit(1);
         }
     }
     
     if (sodium_init() != 0) {
+        printf("could not initiate encryption : aborting\n");
         return 1;
     }
+    
+    if (strlen(expirationString) > 0){
+        int year = 0;
+        int month = 0;
+        int day = 0;
+        int res = sscanf(expirationString, "%d/%d/%d", &year, &month, &day);
+        if (res == 3){
+            struct tm t;
+            t.tm_year = year - 1900;
+            t.tm_mon = month - 1; // Month, 0 - jan
+            t.tm_mday = day;
+            t.tm_hour = 23;
+            t.tm_min = 59;
+            t.tm_sec = 59;
+            t.tm_isdst = -1; // Is DST on? 1 = yes, 0 = no, -1 = unknown
+            expiration = mktime(&t);
+        }
+    }
+    if (expiration == 0){
+        time_t     now;
+        time(&now);
+        expiration = now + 4 * 7 * 24 * 60 * 60; //add 4 weeks to now
+    }
+    
+    
+    
+    if (strlen(editorExpirationString) > 0){
+        int year = 0;
+        int month = 0;
+        int day = 0;
+        int res = sscanf(editorExpirationString, "%d/%d/%d", &year, &month, &day);
+        if (res == 3){
+            struct tm t;
+            t.tm_year = year - 1900;
+            t.tm_mon = month - 1; // Month, 0 - jan
+            t.tm_mday = day;
+            t.tm_hour = 23;
+            t.tm_min = 59;
+            t.tm_sec = 59;
+            t.tm_isdst = -1; // Is DST on? 1 = yes, 0 = no, -1 = unknown
+            editorExpiration = mktime(&t);
+        }
+    }
+    if (editorExpiration == 0){
+        time_t     now;
+        time(&now);
+        editorExpiration = now + 4 * 7 * 24 * 60 * 60; //add 4 weeks to now
+    }
+    
     if (readFile != NULL){
         char *license = NULL;
         decryptLicenseFromFile(&license, readFile, secretEncryptionKey);
