@@ -41,8 +41,8 @@ namespace CSharpSampleAgent
             //Write & Read data
             igsAgent.writeAndReadData();
 
-            int iteration = 0;
-            string msg = null;
+            //int iteration = 0;
+            //string msg = null;
             while (true)
             {
                 Console.Write("Press  'X' to quit \n Press  'A' to write in log \n");
