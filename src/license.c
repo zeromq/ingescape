@@ -76,38 +76,6 @@ void license_readWriteUnlock(void) {
     }
 }
 
-void encryptLicenseToFile(const char *target_file, const char *source_string,
-                          const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]){
-    unsigned char  buf_in[CHUNK_SIZE];
-    unsigned char  buf_out[CHUNK_SIZE + crypto_secretstream_xchacha20poly1305_ABYTES];
-    unsigned char  header[crypto_secretstream_xchacha20poly1305_HEADERBYTES];
-    crypto_secretstream_xchacha20poly1305_state st;
-    FILE          *fp_t;
-    unsigned long long out_len;
-    unsigned char  tag;
-    
-    fp_t = fopen(target_file, "wb");
-    crypto_secretstream_xchacha20poly1305_init_push(&st, header, key);
-    fwrite(header, 1, sizeof header, fp_t);
-    
-    const char *source_index = source_string;
-    while (source_index < source_string + strlen(source_string)){
-        size_t sizeToCopy = 0;
-        if (strlen(source_index) > CHUNK_SIZE){
-            sizeToCopy = CHUNK_SIZE;
-        }else{
-            sizeToCopy = strlen(source_index);
-        }
-        memcpy(buf_in, source_index, sizeToCopy);
-        source_index += sizeToCopy;
-        tag = (*source_index == '\0') ? crypto_secretstream_xchacha20poly1305_TAG_FINAL : 0;
-        crypto_secretstream_xchacha20poly1305_push(&st, buf_out, &out_len, buf_in, sizeToCopy,
-                                                   NULL, 0, tag);
-        fwrite(buf_out, 1, (size_t) out_len, fp_t);
-    }
-    fclose(fp_t);
-}
-
 int decryptLicenseFromFile(char **target_string, const char *source_file,
                            const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]){
     //decrypt signed string
@@ -129,23 +97,28 @@ int decryptLicenseFromFile(char **target_string, const char *source_file,
     fp_s = fopen(source_file, "rb");
     if (fp_s == NULL){
         printf("%s file not found\n", source_file);
-        goto ret;
+        return -1;
     }
+    bool decryptionWentOK = true;
     fread(header, 1, sizeof header, fp_s);
     if (crypto_secretstream_xchacha20poly1305_init_pull(&st, header, key) != 0) {
-        goto ret; /* incomplete header */
+        igs_license("license file %s header is incomplete : file will be ignored", source_file);
+        decryptionWentOK = false;
+        goto ret;
     }
     do {
         rlen = fread(buf_in, 1, sizeof buf_in, fp_s);
         eof = feof(fp_s);
         if (crypto_secretstream_xchacha20poly1305_pull(&st, buf_out, &out_len, &tag,
                                                        buf_in, rlen, NULL, 0) != 0) {
-            igs_license("license file is corrupted and will be ignored");
-            goto ret; /* corrupted chunk */
+            igs_license("license file %s is corrupted and will be ignored", source_file);
+            decryptionWentOK = false;
+            goto ret;
         }
         if (tag == crypto_secretstream_xchacha20poly1305_TAG_FINAL && ! eof) {
-            igs_license("license file size is incorrect : file will be ignored");
-            goto ret; /* premature end (end of file reached before the end of the stream) */
+            igs_license("license file %s size is too short : file will be ignored", source_file);
+            decryptionWentOK = false;
+            goto ret;
         }
         if (targetSize == 0){
             targetSize = out_len + 1; //+1 to reserve space for final \0
@@ -160,19 +133,22 @@ int decryptLicenseFromFile(char **target_string, const char *source_file,
     } while (! eof);
     ret = 0;
 ret:
-    fclose(fp_s);
+    if (fp_s != NULL)
+        fclose(fp_s);
     
-    //verify signed string
-    //    printf("decrypted string is %zu bytes long:\n%s***\n", targetSize - 1, signed_target_string);
-    *target_string = calloc(targetSize, sizeof(char));
-    unsigned long long target_string_len;
-    if (crypto_sign_open((unsigned char*)(*target_string), &target_string_len,
-                         (const unsigned char *)signed_target_string, targetSize - 1, publicSignKey) != 0) {
-        igs_license("license signature is incorrect");
-        ret = -1;
+    if (decryptionWentOK){//verify signed string
+        //    printf("decrypted string is %zu bytes long:\n%s***\n", targetSize - 1, signed_target_string);
+        *target_string = calloc(targetSize, sizeof(char));
+        unsigned long long target_string_len;
+        if (crypto_sign_open((unsigned char*)(*target_string), &target_string_len,
+                             (const unsigned char *)signed_target_string, targetSize - 1, publicSignKey) != 0) {
+            igs_license("license signature is incorrect");
+            ret = -1;
+        }
     }
     
-    free(signed_target_string);
+    if (signed_target_string != NULL)
+        free(signed_target_string);
     return ret;
 }
 
@@ -212,10 +188,29 @@ void switchToBundlePath(char **path){
 //takes the least restricting values found in the files
 //NB: license informations are not cumulated : first file found gives customer, owner, etc.
 void license_parseLine(const char *command, const char *data){
-    if (strcmp(command, "customer") == 0 && license->customer == NULL){
-        license->customer = strdup(data);
-    }else if (strcmp(command, "order") == 0 && license->order == NULL){
-        license->order = strdup(data);
+    //FIXME: id, customer, order and editorOwner should concatenate all values found
+    //in the various licenses (and not overwrite as it is done now).
+    if (strcmp(command, "id") == 0 && data != NULL){
+        if (license->id == NULL){
+            license->id = strdup(data);
+        }else{
+            license->id = realloc(license->id, strlen(license->id) + strlen(data) + 3);
+            sprintf(license->id, "%s, %s", license->id, data);
+        }
+    }else if (strcmp(command, "customer") == 0  && data != NULL){
+        if (license->customer == NULL){
+            license->customer = strdup(data);
+        }else{
+            license->customer = realloc(license->customer, strlen(license->customer) + strlen(data) + 3);
+            sprintf(license->customer, "%s, %s", license->customer, data);
+        }
+    }else if (strcmp(command, "order") == 0  && data != NULL){
+        if (license->order == NULL){
+            license->order = strdup(data);
+        }else{
+            license->order = realloc(license->order, strlen(license->order) + strlen(data) + 3);
+            sprintf(license->order, "%s, %s", license->order, data);
+        }
     }else if (strcmp(command, "expiration") == 0){
         long licenseExpirationDate = atol(data);
         if (license->licenseExpirationDate < licenseExpirationDate){
@@ -235,8 +230,13 @@ void license_parseLine(const char *command, const char *data){
         if (license->platformNbIOPs < platformNbIOPs){
             license->platformNbIOPs = platformNbIOPs;
         }
-    }else if (strcmp(command, "editorOwner") == 0 && license->editorOwner == NULL){
-        license->editorOwner = strdup(data);
+    }else if (strcmp(command, "editorOwner") == 0  && data != NULL){
+        if (license->editorOwner == NULL){
+            license->editorOwner = strdup(data);
+        }else{
+            license->editorOwner = realloc(license->editorOwner, strlen(license->editorOwner) + strlen(data) + 3);
+            sprintf(license->editorOwner, "%s, %s", license->editorOwner, data);
+        }
     }else if (strcmp(command, "editorExpiration") == 0){
         long editorExpirationDate = atol(data);
         if (license->editorExpirationDate < editorExpirationDate){
@@ -265,6 +265,9 @@ void license_parseLine(const char *command, const char *data){
 void license_cleanLicense(void){
     license_readWriteLock();
     if (license != NULL){
+        if (license->id != NULL){
+            free(license->id);
+        }
         if (license->customer != NULL){
             free(license->customer);
         }
@@ -391,7 +394,7 @@ void license_readLicense(void){
             //decrypt file
             char *licenseText = NULL;
             decryptLicenseFromFile(&licenseText, zfile_filename(file, NULL), secretEncryptionKey);
-            //igs_debug("raw license file:\n%s", license);
+            //igs_license("raw license file:\n%s", licenseText);
             //parse file
             char * curLine = licenseText;
             while(curLine){
@@ -420,6 +423,8 @@ void license_readLicense(void){
         license->agents = zlist_new();
     }
     //set license parameters to default for uninitialized values
+    if (license->id == NULL)
+        license->id = strdup("Unregistered");
     if (license->customer == NULL)
         license->customer = strdup("Unregistered");
     if (license->order == NULL)
