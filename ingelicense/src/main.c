@@ -26,8 +26,9 @@
 #include <sodium.h>
 
 #define BUFFER 1024
-#define CHUNK_SIZE 4096
+#define CHUNK_SIZE 4096 //must be at least 256 for encryption to work
 
+#define DEFAULT_ID "IngescapeInternalID"
 #define DEFAULT_CUSTOMER "Ingescape"
 #define DEFAULT_ORDER "for internal use only"
 #define DEFAULT_AGENTS_NB 500
@@ -54,6 +55,7 @@ uint8_t secretEncryptionKey[crypto_secretstream_xchacha20poly1305_KEYBYTES] = {1
 unsigned char publicSignKey[crypto_sign_PUBLICKEYBYTES] = {47,20,1,206,112,73,169,19,31,67,21,116,192,151,109,34,215,117,250,86,247,235,53,159,208,126,234,177,133,49,103,111};
 unsigned char privateSignKey[crypto_sign_SECRETKEYBYTES] = {140,185,190,199,185,123,212,117,31,178,102,139,248,172,108,215,177,185,214,240,241,228,181,187,87,169,65,180,215,169,66,90,47,20,1,206,112,73,169,19,31,67,21,116,192,151,109,34,215,117,250,86,247,235,53,159,208,126,234,177,133,49,103,111};
 
+char id[BUFFER] = DEFAULT_ID;
 char customer[BUFFER] = DEFAULT_CUSTOMER;
 char order[BUFFER] = DEFAULT_ORDER;
 char editorOwner[BUFFER] = DEFAULT_EDITOR_OWNER;
@@ -70,6 +72,7 @@ long editorExpiration = 0;
 void encryptLicenseToFile(const char *target_file, const char *source_string,
                          const unsigned char secretEncryptionKey[crypto_secretstream_xchacha20poly1305_KEYBYTES]){
     //sign source string
+//    printf("source string: %s***\n%lu bytes\n", source_string, strlen(source_string));
     unsigned char *signed_string = calloc(strlen(source_string) + 1 + crypto_sign_BYTES, sizeof(char));
     unsigned long long signed_string_length = 0;
     crypto_sign(signed_string, &signed_string_length, (const unsigned char*)source_string, strlen(source_string), privateSignKey);
@@ -89,9 +92,11 @@ void encryptLicenseToFile(const char *target_file, const char *source_string,
     fwrite(header, 1, sizeof header, fp);
     
     const unsigned char *source_index = signed_string;
-    while (source_index < signed_string + strlen((char *)signed_string)){
-        size_t sizeToCopy = MIN(CHUNK_SIZE, strlen((char *)source_index));
-//        printf("encoding %zu bytes\n", sizeToCopy);
+    size_t remaining_string_size = signed_string_length;
+    while (source_index < signed_string + signed_string_length){
+        size_t sizeToCopy = MIN(CHUNK_SIZE, remaining_string_size);
+        remaining_string_size -= sizeToCopy;
+//        printf("encoding %zu bytes (remaining %zu bytes)\n", sizeToCopy, remaining_string_size);
         memcpy(buf_in, source_index, sizeToCopy);
         source_index += sizeToCopy;
         tag = (*source_index == '\0') ? crypto_secretstream_xchacha20poly1305_TAG_FINAL : 0;
@@ -122,24 +127,32 @@ int decryptLicenseFromFile(char **target_string, const char *source_file,
     char *target_index = NULL;
     char *signed_target_string = NULL;
     
+    printf("opening %s\n", source_file);
     fp_s = fopen(source_file, "rb");
     if (fp_s == NULL){
-        printf("%s file not found\n", source_file);
-        goto ret;
+        printf("%s file not found : aborting\n", source_file);
+        return -1;
     }
+    bool decryptionWentOK = true;
     fread(header, 1, sizeof header, fp_s);
     if (crypto_secretstream_xchacha20poly1305_init_pull(&st, header, secretEncryptionKey) != 0) {
-        goto ret; /* incomplete header */
+        printf("incomplete header\n");
+        decryptionWentOK = false;
+        goto ret;
     }
     do {
         rlen = fread(buf_in, 1, sizeof buf_in, fp_s);
         eof = feof(fp_s);
         if (crypto_secretstream_xchacha20poly1305_pull(&st, buf_out, &out_len, &tag,
                                                        buf_in, rlen, NULL, 0) != 0) {
-            goto ret; /* corrupted chunk */
+            printf("corrupted chunk in file\n");
+            decryptionWentOK = false;
+            goto ret;
         }
         if (tag == crypto_secretstream_xchacha20poly1305_TAG_FINAL && ! eof) {
-            goto ret; /* premature end (end of file reached before the end of the stream) */
+            printf("premature end (end of file reached before the end of the stream)\n");
+            decryptionWentOK = false;
+            goto ret;
         }
         if (targetSize == 0){
             targetSize = out_len + 1; //+1 to reserve space for final \0
@@ -155,19 +168,23 @@ int decryptLicenseFromFile(char **target_string, const char *source_file,
     } while (! eof);
     ret = 0;
 ret:
-    fclose(fp_s);
+    if (fp_s != NULL)
+        fclose(fp_s);
     
-    //verify signed string
-//    printf("decrypted string is %zu bytes long:\n%s***\n", targetSize - 1, signed_target_string);
-    *target_string = calloc(targetSize, sizeof(char));
-    unsigned long long target_string_len;
-    if (crypto_sign_open((unsigned char*)(*target_string), &target_string_len,
-                         (const unsigned char *)signed_target_string, targetSize - 1, publicSignKey) != 0) {
-        printf("license signature is incorrect\n");
-        ret = -1;
+    if (decryptionWentOK){
+        //verify signed string
+        //    printf("decrypted string is %zu bytes long:\n%s***\n", targetSize - 1, signed_target_string);
+        *target_string = calloc(targetSize, sizeof(char));
+        unsigned long long target_string_len = 0;
+        if (crypto_sign_open((unsigned char*)(*target_string), &target_string_len,
+                             (const unsigned char *)signed_target_string, targetSize - 1, publicSignKey) != 0) {
+            printf("license signature is incorrect\n");
+            ret = -1;
+        }
     }
     
-    free(signed_target_string);
+    if (signed_target_string != NULL)
+        free(signed_target_string);
     return ret;
 }
 
@@ -176,7 +193,9 @@ void printLicenseLine(const char *line){
     char command[256] = "";
     char data[256] = "";
     if (sscanf(line, ":%s %[\001-\377]", command, data) == 2){
-        if (strcmp(command, "customer") == 0){
+        if (strcmp(command, "id") == 0){
+            printf("id: %s\n", data);
+        }else if (strcmp(command, "customer") == 0){
             printf("customer: %s\n", data);
         }else if (strcmp(command, "order") == 0){
             printf("order: %s\n", data);
@@ -206,9 +225,11 @@ void printLicenseLine(const char *line){
             char agentName[256] = "";
             sscanf(data, "%255s %255s", agentId, agentName);
             printf("allowed agent : %s with id %s\n", agentName, agentId);
+        }else{
+            printf("unknown entry -> %s\n", line);
         }
     }else{
-        printf("%s\n", line);
+        printf("unformatted line -> %s\n", line);
     }
     
 }
@@ -226,9 +247,13 @@ void readLicense(char *license){
 
 char* generateLicense(void){
     char line[BUFFER] = "";
-    snprintf(line, BUFFER, ":customer %s\n", customer);
+    snprintf(line, BUFFER, ":id %s\n", id);
     char *license = calloc(1, strlen(line)+1);
     memcpy(license, line, strlen(line)+1);
+    
+    snprintf(line, BUFFER, ":customer %s\n", customer);
+    license = realloc(license, strlen(license) + strlen(line) + 1);
+    strcat(license, line);
     
     snprintf(line, BUFFER, ":order %s\n", order);
     license = realloc(license, strlen(license) + strlen(line) + 1);
@@ -295,7 +320,7 @@ char* generateLicense(void){
     }else{
         printf("file %s does not exist : agents won't be added\n", features);
     }
-    
+    license[strlen(license)-1] = '\0'; //remove last return char
     printf("generated license file:\n%s\n", license);
     return license;
 }
@@ -306,6 +331,7 @@ char* generateLicense(void){
 void print_usage() {
     printf("Usage example: ingelicense \n");
     printf("\nthese parameters have default value (indicated here above):\n");
+    printf("--id : license id (default: %s)\n", DEFAULT_ID);
     printf("--customer : customer name (default: %s)\n", DEFAULT_CUSTOMER);
     printf("--order : order identification (default: %s)\n", DEFAULT_ORDER);
     printf("--expiration : license expiration date expressed as yyyy/mm/dd (default: 4 weeks from now)\n");
@@ -349,6 +375,7 @@ int main(int argc, const char * argv[]) {
     
     static struct option long_options[] = {
         {"help",     no_argument, 0,  'h' },
+        {"id",     required_argument, 0,  'd' },
         {"customer",     required_argument, 0,  'c' },
         {"order",     required_argument, 0,  'r' },
         {"expiration",     required_argument, 0,  'e' },
@@ -366,6 +393,9 @@ int main(int argc, const char * argv[]) {
     int long_index = 0;
     while ((opt = getopt_long(argc, (char *const *)argv, "p", long_options, &long_index)) != -1) {
         switch (opt) {
+            case 'd':
+                strncpy(id, optarg, BUFFER - 1);
+                break;
             case 'c':
                 strncpy(customer, optarg, BUFFER - 1);
                 break;
