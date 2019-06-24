@@ -205,6 +205,7 @@ typedef struct licenseForAgent {
 } licenseForAgent_t;
 
 typedef struct license {
+    char *id;
     char *customer;
     char *order;
     long licenseExpirationDate;

@@ -329,7 +329,8 @@ PUBLIC bool igs_getAllowIpc(void);
 #if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
 //////////////////////////////////////////////////
 //licenses
-// Default license path is empty and is automatically set to agent's executable path.
+// Default licenses path is empty and is automatically set to agent's executable path.
+// All licenses in path will be examined and used if valid
 // When path is set manually, it takes priority to agent's executable path.
 PUBLIC void igs_setLicensePath(const char *path);
 PUBLIC char *igs_getLicensePath(void);

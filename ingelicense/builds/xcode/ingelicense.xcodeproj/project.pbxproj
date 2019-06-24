@@ -7,81 +7,82 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		979C1DE2224944BF0048E9F3 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 979C1DE1224944BF0048E9F3 /* main.c */; };
-		979C1DEA224947BF0048E9F3 /* libsodium.23.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 979C1DE9224947BF0048E9F3 /* libsodium.23.dylib */; };
-		979C1DEC224960F10048E9F3 /* libczmq.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 979C1DEB224960F10048E9F3 /* libczmq.4.dylib */; };
-		979C1DEF224968450048E9F3 /* features.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979C1DED224965790048E9F3 /* features.txt */; };
-		979C1DF0224968450048E9F3 /* agents.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979C1DEE2249658A0048E9F3 /* agents.txt */; };
+		976FFCBB22BD5729000876BF /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 976FFCBA22BD5729000876BF /* main.c */; };
+		976FFCBC22BD5744000876BF /* agents.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 976FFCB822BD5729000876BF /* agents.txt */; };
+		976FFCBD22BD5744000876BF /* features.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 976FFCB922BD5729000876BF /* features.txt */; };
+		976FFCC122BD5783000876BF /* libsodium.23.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 976FFCBF22BD5783000876BF /* libsodium.23.dylib */; };
+		976FFCC222BD5783000876BF /* libczmq.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 976FFCC022BD5783000876BF /* libczmq.4.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		979C1DDC224944BF0048E9F3 /* CopyFiles */ = {
+		976FFCAB22BD5708000876BF /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				979C1DEF224968450048E9F3 /* features.txt in CopyFiles */,
-				979C1DF0224968450048E9F3 /* agents.txt in CopyFiles */,
+				976FFCBC22BD5744000876BF /* agents.txt in CopyFiles */,
+				976FFCBD22BD5744000876BF /* features.txt in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		979C1DDE224944BF0048E9F3 /* ingelicense */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ingelicense; sourceTree = BUILT_PRODUCTS_DIR; };
-		979C1DE1224944BF0048E9F3 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		979C1DE9224947BF0048E9F3 /* libsodium.23.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.23.dylib; path = ../../../../../../../../usr/local/Cellar/libsodium/1.0.17/lib/libsodium.23.dylib; sourceTree = "<group>"; };
-		979C1DEB224960F10048E9F3 /* libczmq.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libczmq.4.dylib; path = ../../../../../../../../usr/local/Cellar/czmq/4.2.0/lib/libczmq.4.dylib; sourceTree = "<group>"; };
-		979C1DED224965790048E9F3 /* features.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = features.txt; sourceTree = "<group>"; };
-		979C1DEE2249658A0048E9F3 /* agents.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = agents.txt; sourceTree = "<group>"; };
+		976FFCAD22BD5708000876BF /* ingelicense */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ingelicense; sourceTree = BUILT_PRODUCTS_DIR; };
+		976FFCB822BD5729000876BF /* agents.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = agents.txt; sourceTree = "<group>"; };
+		976FFCB922BD5729000876BF /* features.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = features.txt; sourceTree = "<group>"; };
+		976FFCBA22BD5729000876BF /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		976FFCBF22BD5783000876BF /* libsodium.23.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.23.dylib; path = ../../../../../../../../../../usr/local/Cellar/libsodium/1.0.17/lib/libsodium.23.dylib; sourceTree = "<group>"; };
+		976FFCC022BD5783000876BF /* libczmq.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libczmq.4.dylib; path = ../../../../../../../../../../usr/local/Cellar/czmq/4.2.0/lib/libczmq.4.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		979C1DDB224944BF0048E9F3 /* Frameworks */ = {
+		976FFCAA22BD5708000876BF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				979C1DEC224960F10048E9F3 /* libczmq.4.dylib in Frameworks */,
-				979C1DEA224947BF0048E9F3 /* libsodium.23.dylib in Frameworks */,
+				976FFCC122BD5783000876BF /* libsodium.23.dylib in Frameworks */,
+				976FFCC222BD5783000876BF /* libczmq.4.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		979C1DD5224944BF0048E9F3 = {
+		976FFCA422BD5708000876BF = {
 			isa = PBXGroup;
 			children = (
-				979C1DE0224944BF0048E9F3 /* src */,
-				979C1DDF224944BF0048E9F3 /* Products */,
-				979C1DE8224947BE0048E9F3 /* Frameworks */,
+				976FFCB722BD5729000876BF /* src */,
+				976FFCAE22BD5708000876BF /* Products */,
+				976FFCBE22BD5782000876BF /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
-		979C1DDF224944BF0048E9F3 /* Products */ = {
+		976FFCAE22BD5708000876BF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				979C1DDE224944BF0048E9F3 /* ingelicense */,
+				976FFCAD22BD5708000876BF /* ingelicense */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		979C1DE0224944BF0048E9F3 /* src */ = {
+		976FFCB722BD5729000876BF /* src */ = {
 			isa = PBXGroup;
 			children = (
-				979C1DE1224944BF0048E9F3 /* main.c */,
-				979C1DED224965790048E9F3 /* features.txt */,
-				979C1DEE2249658A0048E9F3 /* agents.txt */,
+				976FFCB822BD5729000876BF /* agents.txt */,
+				976FFCB922BD5729000876BF /* features.txt */,
+				976FFCBA22BD5729000876BF /* main.c */,
 			);
-			path = src;
+			name = src;
+			path = ../../src;
 			sourceTree = "<group>";
 		};
-		979C1DE8224947BE0048E9F3 /* Frameworks */ = {
+		976FFCBE22BD5782000876BF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				979C1DEB224960F10048E9F3 /* libczmq.4.dylib */,
-				979C1DE9224947BF0048E9F3 /* libsodium.23.dylib */,
+				976FFCC022BD5783000876BF /* libczmq.4.dylib */,
+				976FFCBF22BD5783000876BF /* libsodium.23.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -89,13 +90,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		979C1DDD224944BF0048E9F3 /* ingelicense */ = {
+		976FFCAC22BD5708000876BF /* ingelicense */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 979C1DE5224944BF0048E9F3 /* Build configuration list for PBXNativeTarget "ingelicense" */;
+			buildConfigurationList = 976FFCB422BD5708000876BF /* Build configuration list for PBXNativeTarget "ingelicense" */;
 			buildPhases = (
-				979C1DDA224944BF0048E9F3 /* Sources */,
-				979C1DDB224944BF0048E9F3 /* Frameworks */,
-				979C1DDC224944BF0048E9F3 /* CopyFiles */,
+				976FFCA922BD5708000876BF /* Sources */,
+				976FFCAA22BD5708000876BF /* Frameworks */,
+				976FFCAB22BD5708000876BF /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -103,54 +104,53 @@
 			);
 			name = ingelicense;
 			productName = ingelicense;
-			productReference = 979C1DDE224944BF0048E9F3 /* ingelicense */;
+			productReference = 976FFCAD22BD5708000876BF /* ingelicense */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		979C1DD6224944BF0048E9F3 /* Project object */ = {
+		976FFCA522BD5708000876BF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1010;
-				ORGANIZATIONNAME = Ingescape;
+				LastUpgradeCheck = 1020;
+				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
-					979C1DDD224944BF0048E9F3 = {
-						CreatedOnToolsVersion = 10.1;
+					976FFCAC22BD5708000876BF = {
+						CreatedOnToolsVersion = 10.2.1;
 					};
 				};
 			};
-			buildConfigurationList = 979C1DD9224944BF0048E9F3 /* Build configuration list for PBXProject "ingelicense" */;
+			buildConfigurationList = 976FFCA822BD5708000876BF /* Build configuration list for PBXProject "ingelicense" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
-				Base,
 			);
-			mainGroup = 979C1DD5224944BF0048E9F3;
-			productRefGroup = 979C1DDF224944BF0048E9F3 /* Products */;
+			mainGroup = 976FFCA422BD5708000876BF;
+			productRefGroup = 976FFCAE22BD5708000876BF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				979C1DDD224944BF0048E9F3 /* ingelicense */,
+				976FFCAC22BD5708000876BF /* ingelicense */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		979C1DDA224944BF0048E9F3 /* Sources */ = {
+		976FFCA922BD5708000876BF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				979C1DE2224944BF0048E9F3 /* main.c in Sources */,
+				976FFCBB22BD5729000876BF /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		979C1DE3224944BF0048E9F3 /* Debug */ = {
+		976FFCB222BD5708000876BF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -209,7 +209,7 @@
 			};
 			name = Debug;
 		};
-		979C1DE4224944BF0048E9F3 /* Release */ = {
+		976FFCB322BD5708000876BF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -261,32 +261,24 @@
 			};
 			name = Release;
 		};
-		979C1DE6224944BF0048E9F3 /* Debug */ = {
+		976FFCB522BD5708000876BF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = (
-					/usr/local/lib,
-					/usr/local/Cellar/libsodium/1.0.17/lib,
-					/usr/local/Cellar/czmq/4.2.0/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
-		979C1DE7224944BF0048E9F3 /* Release */ = {
+		976FFCB622BD5708000876BF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = (
-					/usr/local/lib,
-					/usr/local/Cellar/libsodium/1.0.17/lib,
-					/usr/local/Cellar/czmq/4.2.0/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -294,25 +286,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		979C1DD9224944BF0048E9F3 /* Build configuration list for PBXProject "ingelicense" */ = {
+		976FFCA822BD5708000876BF /* Build configuration list for PBXProject "ingelicense" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				979C1DE3224944BF0048E9F3 /* Debug */,
-				979C1DE4224944BF0048E9F3 /* Release */,
+				976FFCB222BD5708000876BF /* Debug */,
+				976FFCB322BD5708000876BF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		979C1DE5224944BF0048E9F3 /* Build configuration list for PBXNativeTarget "ingelicense" */ = {
+		976FFCB422BD5708000876BF /* Build configuration list for PBXNativeTarget "ingelicense" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				979C1DE6224944BF0048E9F3 /* Debug */,
-				979C1DE7224944BF0048E9F3 /* Release */,
+				976FFCB522BD5708000876BF /* Debug */,
+				976FFCB622BD5708000876BF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 979C1DD6224944BF0048E9F3 /* Project object */;
+	rootObject = 976FFCA522BD5708000876BF /* Project object */;
 }
