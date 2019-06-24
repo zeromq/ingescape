@@ -70,7 +70,7 @@ namespace CSharpSampleAgent
 
             //Get agent name
             string agentName = Igs.getAgentName();
-            Igs.igs_setAgentName("test");
+            Igs.setAgentName("test");
 
             //Get agent state
             string agentState = Igs.getAgentState();

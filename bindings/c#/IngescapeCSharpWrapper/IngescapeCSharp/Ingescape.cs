@@ -41,7 +41,11 @@ namespace Ingescape
         //private const string ingescapeDLLPath = "C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll";
         
         // Library 64 bits
-        private const string ingescapeDLLPath = "C:\\Program Files\\ingescape\\lib\\libingescape.dll";
+        //private const string ingescapeDLLPath = "C:\\Program Files\\ingescape\\lib\\libingescape.dll";
+
+        // Library MAC OS
+        private const string ingescapeDLLPath = "/usr/local/lib/libingescape.dylib";
+
 
         //////////////////////////////////////////////////
         // Initialization and control
@@ -77,7 +81,9 @@ namespace Ingescape
 
         //agent name set and get
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int igs_setAgentName([MarshalAs(UnmanagedType.LPStr)]  string name);
+        private static extern int igs_setAgentName([MarshalAs(UnmanagedType.LPStr)]  string name);
+        public static int setAgentName(string name) { return igs_setAgentName(name); }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getAgentName();
         public static string getAgentName()
