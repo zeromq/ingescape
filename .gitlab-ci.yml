@@ -725,10 +725,49 @@ lib-deploy-linux-release-x64:
     - docker
   image: ingescape/debian-with-zyre
   script:
-    - make -C build install DESTDIR=~/builds/release/x64
-    - cp src/include/ingescape_private.h ~/builds/release/x64/usr/local/include/ingescape/
+    - make -C build install DESTDIR=~/builds/release/linux_x64
+    - cp src/include/ingescape_private.h ~/builds/release/linux_x64/usr/local/include/ingescape/
   dependencies:
     - lib-linux-release-x64
+
+# Deploy ingescape in linux to be able to compile agents
+lib-deploy-debian-9-release-x64:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - docker
+  image: ingescape/debian-9-with-zyre
+  script:
+    - make -C build install DESTDIR=~/builds/release/debian9
+    - cp src/include/ingescape_private.h ~/builds/release/debian9/usr/local/include/ingescape/
+  dependencies:
+    - lib-debian-9-release-x64
+
+# Deploy ingescape in linux to be able to compile agents
+lib-deploy-debian-10-release-x64:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - docker
+  image: ingescape/debian-10-with-zyre
+  script:
+    - make -C build install DESTDIR=~/builds/release/debian10
+    - cp src/include/ingescape_private.h ~/builds/release/debian10/usr/local/include/ingescape/
+  dependencies:
+    - lib-debian-10-release-x64
+
+# Deploy ingescape in linux to be able to compile agents
+lib-deploy-centos-7-release-x64:
+  <<: *build-lib-files
+  stage: deploy-lib
+  tags:
+    - docker
+  image: ingescape/centos-7-with-zyre
+  script:
+    - make -C build install DESTDIR=~/builds/release/centos7
+    - cp src/include/ingescape_private.h ~/builds/release/centos7/usr/local/include/ingescape/
+  dependencies:
+    - lib-centos-7-release-x64
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-linux-release-armhf:
