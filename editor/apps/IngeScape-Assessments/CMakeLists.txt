@@ -12,7 +12,7 @@ MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar
                                            OBJECT_OUTPUTS "${PrecompiledBinary}")
     SET_SOURCE_FILES_PROPERTIES(${Sources}
                                 PROPERTIES COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
-                                           OBJECT_DEPENDS "${PrecompiledBinary}")  
+                                           OBJECT_DEPENDS "${PrecompiledBinary}")
     # Add precompiled header to SourcesVar
     LIST(APPEND ${SourcesVar} ${PrecompiledSource})
   ENDIF(MSVC)
@@ -104,9 +104,10 @@ source_group ("Header Files" FILES ${ingescape_assessments_headers})
 add_ingescape_include_directory(_INCLUDES_DIRECTORY)
 add_ingescape_common_include_directory(_INCLUDES_DIRECTORY)
 
-list(APPEND _INCLUDES_DIRECTORY 
+list(APPEND _INCLUDES_DIRECTORY
     "${SOURCE_DIR}"
     "${SOURCE_DIR}/../../frameworks/I2Quick/include"
+    "${SOURCE_DIR}/../../dependencies/cassandra-cpp-driver/include"
 )
 
 include_directories(${_INCLUDES_DIRECTORY})
@@ -151,7 +152,7 @@ if (DEFINED ENV{Qt5_DIR} AND NOT DEFINED Qt5_DIR)
 endif ()
 
 # Find QT dependencies
-find_package(Qt5 NO_MODULE COMPONENTS 
+find_package(Qt5 NO_MODULE COMPONENTS
     Qml
     Quick
     Svg
@@ -159,13 +160,15 @@ find_package(Qt5 NO_MODULE COMPONENTS
     Concurrent
     Sql
     Core
-    Gui 
+    Gui
     REQUIRED
 )
+
 
 # Find ingescape dependencies
 set(pkg_config_libs_private "")
 add_ingescape_libraries_dependencies(_INDESCAPE_LIBS pkg_config_libs_private)
+
 
 # Find I2 Quick dependencies
 add_library(I2Quick SHARED IMPORTED)
@@ -190,6 +193,36 @@ elseif (WIN32)
 else ()
     #TODO Add so for unix
 endif ()
+
+
+# Find Cassandra dependencies
+if(UNIX)
+  include(ExternalProject)
+  set(CASS_SOURCE_DIR ${SOURCE_DIR}/../../dependencies/cassandra-cpp-driver)
+  ExternalProject_Add(cassandra_external
+    SOURCE_DIR ${CASS_SOURCE_DIR}
+    CMAKE_ARGS
+        ${GLOBAL_DEFAULT_ARGS}
+        ${GLOBAL_THIRDPARTY_LIB_ARGS}
+        -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/build/
+    BUILD_COMMAND make
+    )
+
+    add_dependencies(${PROJECT_NAME} cassandra_external)
+    #add_library(cassandra SHARED IMPORTED)
+
+    set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/lib")
+
+    if(APPLE)
+        set(CASSANDRA_LIBRARIES "${LIB_DIR}/libcassandra.dylib")
+        install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.dylib" )
+    else(APPLE)
+        set(CASSANDRA_LIBRARIES "${LIB_DIR}/libcassandra.so")
+        install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.so" )
+    endif(APPLE)
+    target_link_libraries(${PROJECT_NAME} ${CASSANDRA_LIBRARIES})
+endif(UNIX)
+
 
 ########################################################################
 # executable
@@ -233,7 +266,7 @@ get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
 
 if (APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE YES)
-    
+
     # Mac OS X bundle specific settings
     set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${INGESCAPE_ASSESSMENTS_VERSION}")
