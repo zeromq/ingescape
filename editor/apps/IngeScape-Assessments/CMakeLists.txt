@@ -195,35 +195,6 @@ else ()
 endif ()
 
 
-# Find Cassandra dependencies
-if(UNIX)
-  include(ExternalProject)
-  set(CASS_SOURCE_DIR ${SOURCE_DIR}/../../dependencies/cassandra-cpp-driver)
-  ExternalProject_Add(cassandra_external
-    SOURCE_DIR ${CASS_SOURCE_DIR}
-    CMAKE_ARGS
-        ${GLOBAL_DEFAULT_ARGS}
-        ${GLOBAL_THIRDPARTY_LIB_ARGS}
-        -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/build/
-    BUILD_COMMAND make
-    )
-
-    add_dependencies(${PROJECT_NAME} cassandra_external)
-    #add_library(cassandra SHARED IMPORTED)
-
-    set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/lib")
-
-    if(APPLE)
-        set(CASSANDRA_LIBRARIES "${LIB_DIR}/libcassandra.dylib")
-        install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.dylib" )
-    else(APPLE)
-        set(CASSANDRA_LIBRARIES "${LIB_DIR}/libcassandra.so")
-        install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.so" )
-    endif(APPLE)
-    target_link_libraries(${PROJECT_NAME} ${CASSANDRA_LIBRARIES})
-endif(UNIX)
-
-
 ########################################################################
 # executable
 ########################################################################
@@ -258,6 +229,46 @@ target_link_libraries(
     ${_INGESCAPE_LIBS}
     I2Quick
 )
+
+# Find Cassandra dependencies
+if(UNIX)
+  include(ExternalProject)
+  set(CASS_SOURCE_DIR ${SOURCE_DIR}/../../dependencies/cassandra-cpp-driver)
+  ExternalProject_Add(cassandra_external
+    SOURCE_DIR ${CASS_SOURCE_DIR}
+    CMAKE_ARGS
+        ${GLOBAL_DEFAULT_ARGS}
+        ${GLOBAL_THIRDPARTY_LIB_ARGS}
+        -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/build/
+    BUILD_COMMAND make
+    INSTALL_COMMAND make install
+    )
+
+    add_dependencies(${PROJECT_NAME} cassandra_external)
+
+    set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/lib")
+    set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/include")
+
+    if(APPLE)
+        set(CASSANDRA_LIBRARIES "${LIB_DIR}/libcassandra.dylib")
+        install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.dylib" )
+    else(APPLE)
+        set(CASSANDRA_LIBRARIES "${LIB_DIR}/libcassandra.so")
+        install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.so" )
+    endif(APPLE)
+    target_link_libraries(${PROJECT_NAME} ${CASSANDRA_LIBRARIES})
+elseif (WIN32)
+    add_library(cassandra SHARED IMPORTED)
+    if (MSVC)
+        math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
+        set_target_properties(cassandra PROPERTIES IMPORTED_IMPLIB "${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/cassandra.lib")
+        set_target_properties(cassandra PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/cassandra.dll")
+        install(DIRECTORY ${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/ DESTINATION lib FILES_MATCHING PATTERN "*.dll")
+    endif()
+    target_link_libraries(${PROJECT_NAME} cassandra)
+else ()
+    message(FATAL_ERROR "UNIX or WIN32 not defined, can not create make file")
+endif(UNIX)
 
 # Retrieve the absolute path to qmake and then use that path to find
 # the binaries
