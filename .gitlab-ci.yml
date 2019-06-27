@@ -239,6 +239,7 @@ assessments-macos-release-x64:
   stage: build-apps
   variables:
     Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
+    GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - osx
   script:
@@ -388,6 +389,7 @@ assessments-windows-release-x86:
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+    GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - windows
   script:
@@ -410,6 +412,7 @@ assessments-windows-release-x64:
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
+    GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - windows
   script:
