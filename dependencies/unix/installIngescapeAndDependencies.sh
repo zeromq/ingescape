@@ -17,6 +17,9 @@ VER=""
 # Current architecture. Set by discover_arch.
 ARCH=""
 
+# Directory the script is in (base direcotry)
+SCRIPT_DIR="$(dirname $0)"
+
 # Checks whether the current user is root or not and make use of 'sudo' if needed.
 #FIXME What if the user does not have sudo access rights ?
 function _check_sudo {
@@ -353,21 +356,23 @@ function install_ingescape {
         # We do not yet build a package for Debian armv7. Falling back to a ZIP installtion.
         if [[ $ARCH == "armhf" ]]
         then
-            unzip ${LINUX_PACKAGE_FILE_NAME}.zip
-            _check_sudo cp -rv ${LINUX_PACKAGE_FILE_NAME}/* /usr/local/
+            unzip ${SCRIPT_DIR}/${LINUX_PACKAGE_FILE_NAME}.zip
+            _check_sudo cp -rv ${SCRIPT_DIR}/${LINUX_PACKAGE_FILE_NAME}/* /usr/local/
+            rm -rf ${SCRIPT_DIR}/${LINUX_PACKAGE_FILE_NAME}
         else
-            _check_sudo dpkg -i ${LINUX_PACKAGE_FILE_NAME}.deb
+            _check_sudo dpkg -i ${SCRIPT_DIR}/${LINUX_PACKAGE_FILE_NAME}.deb
             _check_sudo apt install -fy
         fi
     elif [[ "$OS" =~ "CentOS" ]]
     then
-        _check_sudo rpm -Uvh ${LINUX_PACKAGE_FILE_NAME}.rpm
+        _check_sudo rpm -Uvh ${SCRIPT_DIR}/${LINUX_PACKAGE_FILE_NAME}.rpm
     elif [[ "$OS" =~ "Darwin" ]]
     then
-        _check_sudo ./${DARWIN_PACKAGE_FILE_NAME}.sh --prefix=/usr/local/
+        _check_sudo ${SCRIPT_DIR}/${DARWIN_PACKAGE_FILE_NAME}.sh --prefix=/usr/local/
     else # Falling back to ZIP installation
-        unzip ${LINUX_PACKAGE_FILE_NAME}.zip
-        _check_sudo cp -rv ${LINUX_PACKAGE_FILE_NAME}/* /usr/local/
+        unzip ${SCRIPT_DIR}/${LINUX_PACKAGE_FILE_NAME}.zip
+        _check_sudo cp -rv ${SCRIPT_DIR}/${LINUX_PACKAGE_FILE_NAME}/* /usr/local/
+        rm -rf ${SCRIPT_DIR}/${LINUX_PACKAGE_FILE_NAME}
     fi
 }
 
