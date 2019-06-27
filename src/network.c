@@ -149,6 +149,11 @@ zyreCallback_t *zyreCallbacks = NULL;
 PUBLIC zyreAgent_t *zyreAgents = NULL;
 forcedStopCalback_t *forcedStopCalbacks = NULL;
 
+//licenses
+//NB: licenseCallbacks are defined here because on IOS, we do not compile
+// license.c which would be the proper place to host this declaration.
+license_callback_t *licenseCallbacks = NULL;
+
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL API
 ////////////////////////////////////////////////////////////////////////

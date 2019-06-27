@@ -38,7 +38,6 @@ pthread_mutex_t license_readWriteMutex = NULL;
 
 license_t *license = NULL;
 char *licensePath = NULL;
-license_callback_t *licenseCallbacks = NULL;
 
 uint8_t secretEncryptionKey[crypto_secretstream_xchacha20poly1305_KEYBYTES] = {1,255,34,41,58,63,47,183,134,223,33,41,25,16,87,38,211,27,183,124,185,196,107,128,34,92,83,54,35,60,37,28};
 unsigned char publicSignKey[crypto_sign_PUBLICKEYBYTES] = {47,20,1,206,112,73,169,19,31,67,21,116,192,151,109,34,215,117,250,86,247,235,53,159,208,126,234,177,133,49,103,111};
