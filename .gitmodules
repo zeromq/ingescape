@@ -3,4 +3,4 @@
 	url = https://github.com/devcows/hugo-universal-theme
 [submodule "editor/dependencies/cassandra-cpp-driver"]
 	path = editor/dependencies/cassandra-cpp-driver
-	url = ssh://git@gitlab.ingescape.com:22222/third-party/cassandra-cpp-driver.git
+	url = ../../third-party/cassandra-cpp-driver.git
