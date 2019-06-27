@@ -167,7 +167,7 @@ find_package(Qt5 NO_MODULE COMPONENTS
 
 # Find ingescape dependencies
 set(pkg_config_libs_private "")
-add_ingescape_libraries_dependencies(_INDESCAPE_LIBS pkg_config_libs_private)
+add_ingescape_libraries_dependencies(_INGESCAPE_LIBS pkg_config_libs_private)
 
 
 # Find I2 Quick dependencies
@@ -255,7 +255,7 @@ target_link_libraries(
     Qt5::Sql
     Qt5::Core
     Qt5::Gui
-    ${_INDESCAPE_LIBS}
+    ${_INGESCAPE_LIBS}
     I2Quick
 )
 

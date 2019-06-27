@@ -12,7 +12,7 @@ MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar
                                            OBJECT_OUTPUTS "${PrecompiledBinary}")
     SET_SOURCE_FILES_PROPERTIES(${Sources}
                                 PROPERTIES COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
-                                           OBJECT_DEPENDS "${PrecompiledBinary}")  
+                                           OBJECT_DEPENDS "${PrecompiledBinary}")
     # Add precompiled header to SourcesVar
     LIST(APPEND ${SourcesVar} ${PrecompiledSource})
   ENDIF(MSVC)
@@ -104,7 +104,7 @@ source_group ("Header Files" FILES ${ingescape_editor_headers})
 add_ingescape_include_directory(_INCLUDES_DIRECTORY)
 add_ingescape_common_include_directory(_INCLUDES_DIRECTORY)
 
-list(APPEND _INCLUDES_DIRECTORY 
+list(APPEND _INCLUDES_DIRECTORY
     "${SOURCE_DIR}"
     "${SOURCE_DIR}/../../frameworks/I2Quick/include"
 )
@@ -160,7 +160,7 @@ if (DEFINED ENV{Qt5_DIR} AND NOT DEFINED Qt5_DIR)
 endif ()
 
 # Find QT dependencies
-find_package(Qt5 NO_MODULE COMPONENTS 
+find_package(Qt5 NO_MODULE COMPONENTS
     Qml
     Quick
     Svg
@@ -168,13 +168,13 @@ find_package(Qt5 NO_MODULE COMPONENTS
     Concurrent
     Sql
     Core
-    Gui 
+    Gui
     REQUIRED
 )
 
 # Find ingescape dependencies
 set(pkg_config_libs_private "")
-add_ingescape_libraries_dependencies(_INDESCAPE_LIBS pkg_config_libs_private)
+add_ingescape_libraries_dependencies(_INGESCAPE_LIBS pkg_config_libs_private)
 
 # Find I2 Quick dependencies
 add_library(I2Quick SHARED IMPORTED)
@@ -231,7 +231,7 @@ target_link_libraries(
     Qt5::Sql
     Qt5::Core
     Qt5::Gui
-    ${_INDESCAPE_LIBS}
+    ${_INGESCAPE_LIBS}
     I2Quick
 )
 
@@ -242,7 +242,7 @@ get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
 
 if (APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE YES)
-    
+
     # Mac OS X bundle specific settings
     set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${INGESCAPE_EDITOR_VERSION}")
