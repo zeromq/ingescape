@@ -326,9 +326,18 @@ PUBLIC void igs_setAllowIpc(bool allow);
 PUBLIC bool igs_getAllowIpc(void);
 #endif
 
-#if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
+
 //////////////////////////////////////////////////
 //licenses
+
+typedef enum {
+    IGS_LICENSE_TIMEOUT = 0,
+    IGS_LICENSE_TOO_MANY_AGENTS,
+    IGS_LICENSE_TOO_MANY_IOPS
+} igs_license_limit_t;
+typedef void (*igs_licenseCallback)(igs_license_limit_t limit, void *myData);
+
+#if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
 // Default licenses path is empty and is automatically set to agent's executable path.
 // All licenses in path will be examined and used if valid
 // When path is set manually, it takes priority to agent's executable path.
@@ -342,12 +351,6 @@ PUBLIC bool igs_checkLicenseForAgent(const char *agentId);
 
 //use this callback mechanism to be notified when the timer
 //or number of agents or number of IOPs has been exceeded in demo mode
-typedef enum {
-    IGS_LICENSE_TIMEOUT = 0,
-    IGS_LICENSE_TOO_MANY_AGENTS,
-    IGS_LICENSE_TOO_MANY_IOPS
-} igs_license_limit_t;
-typedef void (*igs_licenseCallback)(igs_license_limit_t limit, void *myData);
 PUBLIC int igs_observeLicense(igs_licenseCallback cb, void *myData);
     
 #endif
