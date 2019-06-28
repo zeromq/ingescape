@@ -2938,7 +2938,7 @@
 					"$(SRCROOT)/../../src/include/",
 					"$(SRCROOT)/../../dependencies/yajl/src/api",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../dependencies/ios/ios/lib/";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = ingescape;
@@ -2955,7 +2955,7 @@
 					"$(SRCROOT)/../../dependencies/ios/ios/include/",
 					"$(SRCROOT)/../../src/include/",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../dependencies/ios/ios/lib/";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = ingescape;
