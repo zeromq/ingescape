@@ -197,9 +197,10 @@ namespace CSharpSampleAgent
         {
             Igs.createInput("string", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
             Igs.createInput("impulsion", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
+            Igs.createInput("data", iopType_t.IGS_DATA_T, IntPtr.Zero, 0);
 
             Igs.createParameter("string-param", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
-            Igs.createParameter("impulsion-param", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
+            //Igs.createParameter("impulsion-param", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
 
             Igs.createOutput("string-out", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
             Igs.createOutput("impulsion-out", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
@@ -273,8 +274,8 @@ namespace CSharpSampleAgent
                 result = Igs.writeInputAsDouble("double", val);
 
                 //String
-                string msg = "Helloword", outputName = "string-out";
-                result = Igs.writeOutputAsString(outputName, msg);
+                string msg = string.Format("Helloword {0}", i);
+                result = Igs.writeOutputAsString("string-out", msg);
 
                 //Impulsion
                 result = Igs.writeOutputAsImpulsion("impulsion-out");

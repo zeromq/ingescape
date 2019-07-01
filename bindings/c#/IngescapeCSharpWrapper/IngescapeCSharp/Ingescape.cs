@@ -38,16 +38,16 @@ namespace Ingescape
         //private const string ingescapeDLLPath = "C:\\ingescape\\libs\\debug\\ingescape.dll";
         
         // Library 32 bits (x86)
-        //private const string ingescapeDLLPath = "C:\\Program Files (x86)\\ingescape\\lib\\libingescape.dll";
+        private const string ingescapeDLLPath = "C:\\Program Files (x86)\\ingescape\\lib\\ingescape.dll";
         
         // Library 64 bits
-        //private const string ingescapeDLLPath = "C:\\Program Files\\ingescape\\lib\\libingescape.dll";
+        //private const string ingescapeDLLPath = "C:\\Program Files\\ingescape\\lib\\ingescape.dll";
 
         // Library MAC OS
         //private const string ingescapeDLLPath = "/usr/local/lib/libingescape.dylib";
 
         // Library iOS
-        private const string ingescapeDLLPath = "__Internal";
+        //private const string ingescapeDLLPath = "__Internal";
 
 
         //////////////////////////////////////////////////
