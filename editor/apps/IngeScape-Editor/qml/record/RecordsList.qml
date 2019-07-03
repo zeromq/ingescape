@@ -373,7 +373,7 @@ Item {
 
                 running: true
 
-                visible: controller.isLoadingRecord && controller.playingRecord && controller.playingRecord.modelM && (controller.playingRecord.modelM.id === model.modelM.id)
+                visible: controller.isLoadingRecord && controller.playingRecord && controller.playingRecord.modelM && (controller.playingRecord.modelM.uid === model.modelM.uid)
             }
 
             // Play record button
@@ -389,7 +389,7 @@ Item {
                 visible: !loadingRecordIndicator.visible
                 opacity: !enabled ? 0.3 : 1
                 enabled: !controller.isRecording && (   (controller.playingRecord === null)
-                                                     || (controller.playingRecord.modelM && (controller.playingRecord.modelM.id === model.modelM.id)) )
+                                                     || (controller.playingRecord.modelM && (controller.playingRecord.modelM.uid === model.modelM.uid)) )
 
                 style: I2SvgToggleButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
@@ -408,7 +408,7 @@ Item {
 
                 onClicked: {
                     if (controller) {
-                        controller.controlRecord(model.modelM.id, checked)
+                        controller.controlRecord(model.modelM.uid, checked)
                     }
                 }
 
@@ -416,7 +416,7 @@ Item {
                     target: controller
 
                     onPlayingRecordChanged: {
-                        if (controller.playingRecord && controller.playingRecord.modelM && (controller.playingRecord.modelM.id === model.modelM.id))
+                        if (controller.playingRecord && controller.playingRecord.modelM && (controller.playingRecord.modelM.uid === model.modelM.uid))
                         {
                             playPauseRecordButton.checked = true;
                         }
