@@ -36,8 +36,8 @@ RecordsSupervisionController::RecordsSupervisionController(EditorModelManager* m
     _selectedRecord(nullptr),
     _isRecording(false),
     _isRecordingTimeLine(false),
-    _isLoadingRecord(false),
-    _playingRecord(nullptr),
+    _replayState(ReplayStates::UNLOADED),
+    _currentReplay(nullptr),
     _currentRecordTime(QDateTime(QDate::currentDate())),
     _modelManager(modelManager)
 {
@@ -107,7 +107,7 @@ void RecordsSupervisionController::startOrStopToRecord(bool isStart, bool withTi
                 _timerToDisplayTime.stop();
                 setcurrentRecordTime(QDateTime(QDate::currentDate()));
 
-                Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, command_StopToRecord);
+                Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, command_StopRecord);
             }
         }
     }
@@ -136,32 +136,86 @@ void RecordsSupervisionController::deleteRecord(RecordVM* record)
 
 
 /**
- * @brief Controls the selected record from the list
+ * @brief Load a record
  * @param recordId
- * @param startPlaying
  */
-void RecordsSupervisionController::controlRecord(QString recordId, bool startPlaying)
+void RecordsSupervisionController::loadRecord(QString recordId)
 {
     if (_isRecorderON && _hashFromRecordIdToViewModel.contains(recordId))
     {
         RecordVM* recordVM = _hashFromRecordIdToViewModel.value(recordId);
         if (recordVM != nullptr)
         {
-            QString commandAndParameters = "";
+            // Update the current state of the replay
+            setreplayState(ReplayStates::UNLOADED);
 
-            if (startPlaying)
-            {
-                commandAndParameters = QString("%1=%2").arg(command_LoadReplay, recordId);
-                setplayingRecord(recordVM);
-            }
-            else
-            {
-                commandAndParameters = QString("%1=%2").arg(command_StopTheReplay, recordId);
-                setplayingRecord(nullptr);
-            }
+            // Set the current replay (loading record)
+            setcurrentReplay(recordVM);
+
+            QString commandAndParameters = QString("%1=%2").arg(command_LoadReplay, recordId);
 
             Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
         }
+    }
+}
+
+
+/**
+ * @brief Start or Stop the current loaded record (replay)
+ * @param isStart
+ */
+void RecordsSupervisionController::startOrStopReplay(bool isStart)
+{
+    if (_isRecorderON && (_currentReplay != nullptr) && (_currentReplay->modelM() != nullptr))
+    {
+        QString commandAndParameters = "";
+
+        if (isStart)
+        {
+            // Update the current state of the replay
+            setreplayState(ReplayStates::PLAYING);
+
+            commandAndParameters = QString("%1=%2").arg(command_StartReplay, _currentReplay->modelM()->uid());
+        }
+        else
+        {
+            // Update the current state of the replay
+            setreplayState(ReplayStates::LOADED);
+
+            commandAndParameters = QString("%1=%2").arg(command_StopReplay, _currentReplay->modelM()->uid());
+        }
+
+        Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+    }
+}
+
+
+/**
+ * @brief Pause or Resume the current loaded record (replay)
+ * @param isPause
+ */
+void RecordsSupervisionController::pauseOrResumeReplay(bool isPause)
+{
+    if (_isRecorderON && (_currentReplay != nullptr) && (_currentReplay->modelM() != nullptr))
+    {
+        QString commandAndParameters = "";
+
+        if (isPause)
+        {
+            // Update the current state of the replay
+            setreplayState(ReplayStates::PAUSED);
+
+            commandAndParameters = QString("%1=%2").arg(command_PauseReplay, _currentReplay->modelM()->uid());
+        }
+        else
+        {
+            // Update the current state of the replay
+            setreplayState(ReplayStates::RESUMING);
+
+            commandAndParameters = QString("%1=%2").arg(command_UNpauseReplay, _currentReplay->modelM()->uid());
+        }
+
+        Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
     }
 }
 
@@ -324,7 +378,8 @@ void RecordsSupervisionController::onLoadingRecord(int deltaTimeFromTimeLine, QS
     Q_UNUSED(jsonPlatform)
     Q_UNUSED(jsonExecutedActions)
 
-    setisLoadingRecord(true);
+    // Update the current state of the replay
+    setreplayState(ReplayStates::LOADING);
 }
 
 
@@ -333,7 +388,8 @@ void RecordsSupervisionController::onLoadingRecord(int deltaTimeFromTimeLine, QS
  */
 void RecordsSupervisionController::onLoadedRecord()
 {
-    setisLoadingRecord(false);
+    // Update the current state of the replay
+    setreplayState(ReplayStates::LOADED);
 }
 
 
@@ -342,10 +398,16 @@ void RecordsSupervisionController::onLoadedRecord()
  */
 void RecordsSupervisionController::onEndOfRecord()
 {
-    setisLoadingRecord(false);
+    // Update the current state of the replay
+    //setreplayState(ReplayStates::LOADED);
 
-    if (_playingRecord != nullptr) {
-        setplayingRecord(nullptr);
+    // Update the current state of the replay
+    // FIXME
+    setreplayState(ReplayStates::UNLOADED);
+
+    if (_currentReplay != nullptr) {
+        // FIXME
+        setcurrentReplay(nullptr);
     }
 }
 
@@ -437,9 +499,10 @@ void RecordsSupervisionController::_deleteRecordVMwithModel(RecordM* model)
         {
             _hashFromRecordIdToViewModel.remove(model->uid());
 
-            if (_playingRecord != nullptr) {
-                setplayingRecord(nullptr);
+            if (_currentReplay != nullptr) {
+                setcurrentReplay(nullptr);
             }
+
             if (_selectedRecord == vm) {
                 setselectedRecord(nullptr);
             }

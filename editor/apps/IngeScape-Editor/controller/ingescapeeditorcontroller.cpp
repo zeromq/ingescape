@@ -813,7 +813,7 @@ void IngeScapeEditorController::_onStartToRecord()
         QStringList commandAndParameters;
 
         // Add the command
-        commandAndParameters.append(command_StartToRecord);
+        commandAndParameters.append(command_StartRecord);
 
         // Add the delta of the start time from the Time Line
         int deltaTimeFromTimeLine = 0;

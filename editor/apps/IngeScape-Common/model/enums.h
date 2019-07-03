@@ -78,13 +78,14 @@ static const QString command_UnmapAgents = "UNMAP";
 
 static const QString command_ExecutedAction = "EXECUTED_ACTION";
 
-static const QString command_StartToRecord = "START_RECORD";
-static const QString command_StopToRecord = "STOP_RECORD";
+static const QString command_StartRecord = "START_RECORD";
+static const QString command_StopRecord = "STOP_RECORD";
 static const QString command_DeleteRecord = "DELETE_RECORD";
 static const QString command_LoadReplay = "LOAD_REPLAY";
-static const QString command_StartReplay = "START_REPLAY"; //TODO: implement this command
-static const QString command_StopTheReplay = "STOP_REPLAY";
-static const QString command_PauseTheReplay = "PAUSE_REPLAY"; //TODO: implement this command
+static const QString command_StartReplay = "START_REPLAY";
+static const QString command_StopReplay = "STOP_REPLAY";
+static const QString command_PauseReplay = "PAUSE_REPLAY";
+static const QString command_UNpauseReplay = "UNPAUSE_REPLAY";
 
 
 // Date date of our application

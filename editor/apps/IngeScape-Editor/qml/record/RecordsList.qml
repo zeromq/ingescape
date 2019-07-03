@@ -94,7 +94,7 @@ Item {
             }
 
             opacity: !enabled ? 0.3 : 1
-            enabled: controller.playingRecord === null
+            enabled: controller.currentReplay === null
 
             style: I2SvgToggleButtonStyle {
                 fileCache: IngeScapeTheme.svgFileIngeScape
@@ -256,8 +256,8 @@ Item {
                     bottomMargin: 1
                 }
 
-                width : 6
-                color : IngeScapeTheme.selectionColor
+                width: 6
+                color: IngeScapeTheme.selectionColor
             }
 
 
@@ -266,8 +266,9 @@ Item {
                 anchors {
                     fill: parent
                 }
-                visible: playPauseRecordButton.checked
                 color: IngeScapeTheme.orangeColor
+
+                visible: playPauseRecordButton.checked
             }
 
             // Separator
@@ -373,7 +374,33 @@ Item {
 
                 running: true
 
-                visible: controller.isLoadingRecord && controller.playingRecord && controller.playingRecord.modelM && (controller.playingRecord.modelM.uid === model.modelM.uid)
+                visible: controller && controller.isLoadingRecord
+                         && controller.currentReplay && controller.currentReplay.modelM && (controller.currentReplay.modelM.uid === model.modelM.uid)
+            }
+
+            // Load record button
+            Button {
+                id: loadRecordButton
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    leftMargin: 25
+                }
+
+                width: 50
+                height: 30
+                text: "LOAD"
+
+                //visible: !loadingRecordIndicator.visible
+                visible: controller && (controller.replayState === ReplayStates.UNLOADED)
+
+                onClicked: {
+                    if (controller && model && model.modelM) {
+                        //console.log("Load record " + model.modelM.uid);
+                        controller.loadRecord(model.modelM.uid);
+                    }
+                }
             }
 
             // Play record button
@@ -386,10 +413,13 @@ Item {
                     leftMargin: 25
                 }
 
-                visible: !loadingRecordIndicator.visible
+                //visible: !loadingRecordIndicator.visible
+                visible: controller && ((controller.replayState !== ReplayStates.UNLOADED) || (controller.replayState !== ReplayStates.LOADED))
+                         && controller.currentReplay && controller.currentReplay.modelM && (controller.currentReplay.modelM.uid === model.modelM.uid)
+
                 opacity: !enabled ? 0.3 : 1
-                enabled: !controller.isRecording && (   (controller.playingRecord === null)
-                                                     || (controller.playingRecord.modelM && (controller.playingRecord.modelM.uid === model.modelM.uid)) )
+                /*enabled: !controller.isRecording && (   (controller.currentReplay === null)
+                                                     || (controller.currentReplay.modelM && (controller.currentReplay.modelM.uid === model.modelM.uid)) )*/
 
                 style: I2SvgToggleButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
@@ -408,19 +438,20 @@ Item {
 
                 onClicked: {
                     if (controller) {
-                        controller.controlRecord(model.modelM.uid, checked)
+                        controller.startOrStopReplay(checked);
                     }
                 }
 
                 Connections {
                     target: controller
 
-                    onPlayingRecordChanged: {
-                        if (controller.playingRecord && controller.playingRecord.modelM && (controller.playingRecord.modelM.uid === model.modelM.uid))
+                    onCurrentReplayChanged: {
+                        if (controller.currentReplay && controller.currentReplay.modelM && (controller.currentReplay.modelM.uid === model.modelM.uid))
                         {
-                            playPauseRecordButton.checked = true;
+                            playPauseRecordButton.checked = controller.isPlayingReplay;
                         }
-                        else {
+                        else
+                        {
                             playPauseRecordButton.checked = false;
                         }
                     }

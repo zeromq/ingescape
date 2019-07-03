@@ -109,7 +109,7 @@ void registerCustomQmlTypes()
     // Enums
     //
     //---------------
-
+    qmlRegisterSingletonType<ReplayStates>("INGESCAPE", 1, 0, "ReplayStates", &ReplayStates::qmlSingleton);
 
 
     //----------------

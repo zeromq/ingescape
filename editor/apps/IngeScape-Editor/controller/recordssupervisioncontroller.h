@@ -26,6 +26,12 @@
 
 
 /**
+  * States for the replay
+  */
+I2_ENUM(ReplayStates, UNLOADED, LOADING, LOADED, PLAYING, PAUSED, RESUMING)
+
+
+/**
  * @brief The RecordsSupervisionController class defines the controller for Records supervision
  */
 class RecordsSupervisionController : public QObject
@@ -53,11 +59,11 @@ class RecordsSupervisionController : public QObject
     // Flag indicating if the actions in the timeline are currently recorded
     I2_QML_PROPERTY(bool, isRecordingTimeLine)
 
-    // Indicating if a record is being loaded
-    I2_QML_PROPERTY(bool, isLoadingRecord)
+    // Current state of the replay
+    I2_QML_PROPERTY(ReplayStates::Value, replayState)
 
-    // Stores the currently played record
-    I2_QML_PROPERTY(RecordVM*, playingRecord)
+    // Current replay (loaded record)
+    I2_QML_PROPERTY(RecordVM*, currentReplay)
 
     // Current elapsed time of our record
     I2_QML_PROPERTY(QDateTime, currentRecordTime)
@@ -95,11 +101,24 @@ public:
 
 
     /**
-     * @brief Controls the selected record from the list
+     * @brief Load a record
      * @param recordId
-     * @param startPlaying
      */
-    Q_INVOKABLE void controlRecord(QString recordId, bool startPlaying);
+    Q_INVOKABLE void loadRecord(QString recordId);
+
+
+    /**
+     * @brief Start or Stop the current loaded record (replay)
+     * @param isStart
+     */
+    Q_INVOKABLE void startOrStopReplay(bool isStart);
+
+
+    /**
+     * @brief Pause or Resume the current loaded record (replay)
+     * @param isPause
+     */
+    Q_INVOKABLE void pauseOrResumeReplay(bool isPause);
 
 
 Q_SIGNALS:
