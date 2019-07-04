@@ -161,10 +161,10 @@ void RecordsSupervisionController::loadRecord(QString recordId)
 
 
 /**
- * @brief Start or Stop the current loaded record (replay)
+ * @brief Start or Resume the current loaded record (replay)
  * @param isStart
  */
-void RecordsSupervisionController::startOrStopReplay(bool isStart)
+void RecordsSupervisionController::startOrResumeReplay(bool isStart)
 {
     if (_isRecorderON && (_currentReplay != nullptr) && (_currentReplay->modelM() != nullptr))
     {
@@ -180,9 +180,9 @@ void RecordsSupervisionController::startOrStopReplay(bool isStart)
         else
         {
             // Update the current state of the replay
-            setreplayState(ReplayStates::LOADED);
+            setreplayState(ReplayStates::RESUMING);
 
-            commandAndParameters = QString("%1=%2").arg(command_StopReplay, _currentReplay->modelM()->uid());
+            commandAndParameters = QString("%1=%2").arg(command_UNpauseReplay, _currentReplay->modelM()->uid());
         }
 
         Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
@@ -191,28 +191,28 @@ void RecordsSupervisionController::startOrStopReplay(bool isStart)
 
 
 /**
- * @brief Pause or Resume the current loaded record (replay)
- * @param isPause
+ * @brief Stop or Pause the current loaded record (replay)
+ * @param isStop
  */
-void RecordsSupervisionController::pauseOrResumeReplay(bool isPause)
+void RecordsSupervisionController::stopOrPauseReplay(bool isStop)
 {
     if (_isRecorderON && (_currentReplay != nullptr) && (_currentReplay->modelM() != nullptr))
     {
         QString commandAndParameters = "";
 
-        if (isPause)
+        if (isStop)
+        {
+            // Update the current state of the replay
+            setreplayState(ReplayStates::LOADED);
+
+            commandAndParameters = QString("%1=%2").arg(command_StopReplay, _currentReplay->modelM()->uid());
+        }
+        else
         {
             // Update the current state of the replay
             setreplayState(ReplayStates::PAUSED);
 
             commandAndParameters = QString("%1=%2").arg(command_PauseReplay, _currentReplay->modelM()->uid());
-        }
-        else
-        {
-            // Update the current state of the replay
-            setreplayState(ReplayStates::RESUMING);
-
-            commandAndParameters = QString("%1=%2").arg(command_UNpauseReplay, _currentReplay->modelM()->uid());
         }
 
         Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
@@ -402,11 +402,9 @@ void RecordsSupervisionController::onEndOfRecord()
     //setreplayState(ReplayStates::LOADED);
 
     // Update the current state of the replay
-    // FIXME
     setreplayState(ReplayStates::UNLOADED);
 
     if (_currentReplay != nullptr) {
-        // FIXME
         setcurrentReplay(nullptr);
     }
 }

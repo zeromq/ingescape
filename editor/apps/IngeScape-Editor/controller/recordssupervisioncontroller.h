@@ -108,17 +108,17 @@ public:
 
 
     /**
-     * @brief Start or Stop the current loaded record (replay)
+     * @brief Start or Resume the current loaded record (replay)
      * @param isStart
      */
-    Q_INVOKABLE void startOrStopReplay(bool isStart);
+    Q_INVOKABLE void startOrResumeReplay(bool isStart);
 
 
     /**
-     * @brief Pause or Resume the current loaded record (replay)
-     * @param isPause
+     * @brief Stop or Pause the current loaded record (replay)
+     * @param isStop
      */
-    Q_INVOKABLE void pauseOrResumeReplay(bool isPause);
+    Q_INVOKABLE void stopOrPauseReplay(bool isStop);
 
 
 Q_SIGNALS:

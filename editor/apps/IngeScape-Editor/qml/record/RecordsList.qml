@@ -41,8 +41,11 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property var controller: null;
+    //property var controller: null;
+    property RecordsSupervisionController controller: null;
 
+    // Flag indicating if we are playing (or resuming) the current replay
+    property bool _isPlayingOrResumingReplay: controller && ((controller.replayState === ReplayStates.PLAYING) || (controller.replayState === ReplayStates.RESUMING));
 
 
 
@@ -238,6 +241,9 @@ Item {
         Item {
             id: recordItem
 
+            //property var model_record: model.QtObject
+            property bool _isCurrentReplay: controller && controller.currentReplay && controller.currentReplay.modelM && (controller.currentReplay.modelM.uid === model.modelM.uid)
+
             anchors {
                 left: parent.left
                 right: parent.right
@@ -250,8 +256,8 @@ Item {
                 visible: controller && (controller.selectedRecord === model.QtObject);
 
                 anchors {
-                    left : parent.left
-                    top : parent.top
+                    left: parent.left
+                    top: parent.top
                     bottom: parent.bottom
                     bottomMargin: 1
                 }
@@ -268,7 +274,7 @@ Item {
                 }
                 color: IngeScapeTheme.orangeColor
 
-                visible: playPauseRecordButton.checked
+                visible: rootItem._isPlayingOrResumingReplay && recordItem._isCurrentReplay
             }
 
             // Separator
@@ -309,7 +315,7 @@ Item {
                     elide: Text.ElideRight
 
                     text: model.modelM.name
-                    color: playPauseRecordButton.checked ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
+                    color: rootItem._isPlayingOrResumingReplay && recordItem._isCurrentReplay ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
                     font: IngeScapeTheme.headingFont
                 }
 
@@ -332,7 +338,7 @@ Item {
                     .arg(Qt.formatTime(model.modelM.beginDateTime, "HH:mm:ss"))
                     .arg(Qt.formatDateTime(model.modelM.duration, "HH:mm:ss"))
 
-                    color: playPauseRecordButton.checked ? IngeScapeTheme.veryDarkGreyColor :IngeScapeTheme.lightBlueGreyColor
+                    color: rootItem._isPlayingOrResumingReplay && recordItem._isCurrentReplay ? IngeScapeTheme.veryDarkGreyColor :IngeScapeTheme.lightBlueGreyColor
                     font: IngeScapeTheme.normalFont
                 }
             }
@@ -374,8 +380,8 @@ Item {
 
                 running: true
 
-                visible: controller && controller.isLoadingRecord
-                         && controller.currentReplay && controller.currentReplay.modelM && (controller.currentReplay.modelM.uid === model.modelM.uid)
+                visible: controller && (controller.replayState === ReplayStates.LOADING)
+                         && recordItem._isCurrentReplay
             }
 
             // Load record button
@@ -392,20 +398,23 @@ Item {
                 height: 30
                 text: "LOAD"
 
-                //visible: !loadingRecordIndicator.visible
                 visible: controller && (controller.replayState === ReplayStates.UNLOADED)
 
                 onClicked: {
-                    if (controller && model && model.modelM) {
-                        //console.log("Load record " + model.modelM.uid);
+                    if (controller && model && model.modelM)
+                    {
+                        //console.log("QML: Load record " + model.modelM.uid);
+
+                        // Load record
                         controller.loadRecord(model.modelM.uid);
                     }
                 }
             }
 
-            // Play record button
+
+            // Button "Play"
             Button {
-                id: playPauseRecordButton
+                id: playButton
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -413,51 +422,70 @@ Item {
                     leftMargin: 25
                 }
 
-                //visible: !loadingRecordIndicator.visible
-                visible: controller && ((controller.replayState !== ReplayStates.UNLOADED) || (controller.replayState !== ReplayStates.LOADED))
-                         && controller.currentReplay && controller.currentReplay.modelM && (controller.currentReplay.modelM.uid === model.modelM.uid)
+                visible: controller && ((controller.replayState === ReplayStates.LOADED) || (controller.replayState === ReplayStates.PAUSED))
+                          && recordItem._isCurrentReplay
 
-                opacity: !enabled ? 0.3 : 1
-                /*enabled: !controller.isRecording && (   (controller.currentReplay === null)
-                                                     || (controller.currentReplay.modelM && (controller.currentReplay.modelM.uid === model.modelM.uid)) )*/
+                activeFocusOnPress: true
 
-                style: I2SvgToggleButtonStyle {
+                style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
 
-                    toggleCheckedReleasedID: "pause";
-                    toggleCheckedPressedID: "pause-pressed";
-                    toggleUncheckedReleasedID: "list-play";
-                    toggleUncheckedPressedID: "list-play-pressed";
-
-                    // No disabled states
-                    toggleCheckedDisabledID: "list-play-pressed"
-                    toggleUncheckedDisabledID: toggleCheckedDisabledID
-
-                    labelMargin: 0
+                    releasedID: "list-play"
+                    pressedID: releasedID + "-pressed"
+                    disabledID: releasedID
                 }
 
                 onClicked: {
                     if (controller) {
-                        controller.startOrStopReplay(checked);
-                    }
-                }
-
-                Connections {
-                    target: controller
-
-                    onCurrentReplayChanged: {
-                        if (controller.currentReplay && controller.currentReplay.modelM && (controller.currentReplay.modelM.uid === model.modelM.uid))
+                        if (controller.replayState === ReplayStates.LOADED)
                         {
-                            playPauseRecordButton.checked = controller.isPlayingReplay;
+                            // Start the current loaded record (replay)
+                            controller.startOrResumeReplay(true);
                         }
-                        else
+                        else if (controller.replayState === ReplayStates.PAUSED)
                         {
-                            playPauseRecordButton.checked = false;
+                            // Resume the current loaded record (replay)
+                            controller.startOrResumeReplay(false);
                         }
                     }
                 }
             }
 
+
+            // Button "Pause"
+            Button {
+                id: pauseButton
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    leftMargin: 25
+                }
+
+                visible: rootItem._isPlayingOrResumingReplay
+                         && recordItem._isCurrentReplay
+
+                activeFocusOnPress: true
+
+                style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
+
+                    releasedID: "pause"
+                    pressedID: releasedID + "-pressed"
+                    disabledID: releasedID
+                }
+
+                onClicked: {
+                    if (controller)
+                    {
+                        // Pause the current loaded record (replay)
+                        controller.stopOrPauseReplay(false);
+                    }
+                }
+            }
+
+
+            // Button "Remove"
             Button {
                 id: removeButton
 
