@@ -108,6 +108,12 @@ public:
 
 
     /**
+     * @brief UN-load the current loaded record (replay)
+     */
+    Q_INVOKABLE void unloadRecord();
+
+
+    /**
      * @brief Start or Resume the current loaded record (replay)
      * @param isStart
      */

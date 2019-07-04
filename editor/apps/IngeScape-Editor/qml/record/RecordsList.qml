@@ -384,9 +384,8 @@ Item {
                          && recordItem._isCurrentReplay
             }
 
-            // Load record button
-            Button {
-                id: loadRecordButton
+            Row {
+                id: rowButtons
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -394,7 +393,20 @@ Item {
                     leftMargin: 25
                 }
 
-                width: 50
+                spacing: 5
+
+
+            // Load record button
+            Button {
+                id: loadRecordButton
+
+                /*anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    leftMargin: 25
+                }*/
+
+                width: 75
                 height: 30
                 text: "LOAD"
 
@@ -412,18 +424,43 @@ Item {
             }
 
 
+            // Load record button
+            Button {
+                id: unloadRecordButton
+
+                width: 75
+                height: 30
+                text: "UNLOAD"
+
+                visible: controller && (controller.replayState !== ReplayStates.UNLOADED) && (controller.replayState !== ReplayStates.LOADING)
+                         && recordItem._isCurrentReplay
+
+                enabled: !rootItem._isPlayingOrResumingReplay
+
+                onClicked: {
+                    if (controller && model && model.modelM)
+                    {
+                        //console.log("QML: UN-load record " + model.modelM.uid);
+
+                        // UN-load record
+                        controller.unloadRecord();
+                    }
+                }
+            }
+
+
             // Button "Play"
             Button {
                 id: playButton
 
-                anchors {
+                /*anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
                     leftMargin: 25
-                }
+                }*/
 
                 visible: controller && ((controller.replayState === ReplayStates.LOADED) || (controller.replayState === ReplayStates.PAUSED))
-                          && recordItem._isCurrentReplay
+                         && recordItem._isCurrentReplay
 
                 activeFocusOnPress: true
 
@@ -456,11 +493,11 @@ Item {
             Button {
                 id: pauseButton
 
-                anchors {
+                /*anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
                     leftMargin: 25
-                }
+                }*/
 
                 visible: rootItem._isPlayingOrResumingReplay
                          && recordItem._isCurrentReplay
@@ -482,6 +519,8 @@ Item {
                         controller.stopOrPauseReplay(false);
                     }
                 }
+            }
+
             }
 
 

@@ -161,6 +161,26 @@ void RecordsSupervisionController::loadRecord(QString recordId)
 
 
 /**
+ * @brief UN-load the current loaded record (replay)
+ */
+void RecordsSupervisionController::unloadRecord()
+{
+    if (_isRecorderON && (_currentReplay != nullptr) && (_currentReplay->modelM() != nullptr))
+    {
+        // Update the current state of the replay
+        //setreplayState(ReplayStates::UNLOADED);
+
+        // Reset the current replay (loaded record)
+        //setcurrentReplay(nullptr);
+
+        QString commandAndParameters = QString("%1=%2").arg(command_StopReplay, _currentReplay->modelM()->uid());
+
+        Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+    }
+}
+
+
+/**
  * @brief Start or Resume the current loaded record (replay)
  * @param isStart
  */
@@ -404,6 +424,7 @@ void RecordsSupervisionController::onEndOfRecord()
     // Update the current state of the replay
     setreplayState(ReplayStates::UNLOADED);
 
+    // Reset the current replay (loaded record)
     if (_currentReplay != nullptr) {
         setcurrentReplay(nullptr);
     }
