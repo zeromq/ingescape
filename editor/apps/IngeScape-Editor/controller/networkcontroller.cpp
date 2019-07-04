@@ -50,6 +50,8 @@ static const QString prefix_EndedRecord = "REPLAY_ENDED";
 static const QString prefix_HighlightLink = "HIGHLIGHT_LINK=";
 static const QString prefix_RunAction = "RUN_THIS_ACTION#";
 
+static const QString prefix_LoadPlatformFile = "LOAD_PLATFORM_FROM_PATH=";
+
 
 /**
  * @brief Callback for incomming messages on the bus
@@ -485,6 +487,13 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 message.remove(0, prefix_RunAction.length());
 
                 Q_EMIT networkController->runAction(message);
+            }
+            // LOAD PLATFORM FROM PATH
+            else if (message.startsWith(prefix_LoadPlatformFile))
+            {
+                message.remove(0, prefix_LoadPlatformFile.length());
+
+                Q_EMIT networkController->loadPlatformFileFromPath(message);
             }
             else
             {

@@ -261,6 +261,13 @@ private Q_SLOTS:
 
 
     /**
+     * @brief Slot called when we receive the command "Load Platform File From Path"
+     * @param platformFilePath
+     */
+    void _onLoadPlatformFileFromPath(QString platformFilePath);
+
+
+    /**
      * @brief Slot called when a command must be sent on the network to a recorder
      * @param commandAndParameters
      */
@@ -270,10 +277,11 @@ private Q_SLOTS:
 private:
 
     /**
-      * @brief Load the platform from a JSON file
-      * @param platformFilePath
-      */
-    void _loadPlatformFromFile(QString platformFilePath);
+     * @brief Load the platform from a JSON file
+     * @param platformFilePath
+     * @return
+     */
+    bool _loadPlatformFromFile(QString platformFilePath);
 
 
     /**
@@ -284,10 +292,11 @@ private:
 
 
     /**
-      * @brief Load the platform from JSON
-      * @param jsonDocument
-      */
-    void _loadPlatformFromJSON(QJsonDocument jsonDocument);
+     * @brief Load the platform from JSON
+     * @param jsonDocument
+     * @return
+     */
+    bool _loadPlatformFromJSON(QJsonDocument jsonDocument);
 
 
     /**

@@ -359,6 +359,13 @@ Q_SIGNALS:
     void runAction(QString actionID);
 
 
+    /**
+     * @brief Signal emitted when we receive the command "Load Platform File From Path"
+     * @param platformFilePath
+     */
+    void loadPlatformFileFromPath(QString platformFilePath);
+
+
 public Q_SLOTS:
 
     /**

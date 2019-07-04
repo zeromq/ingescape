@@ -172,6 +172,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::deletedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onDeletedRecord);
     connect(_networkC, &NetworkController::loadingRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadingRecord);
     connect(_networkC, &NetworkController::loadingRecordReceived, this, &IngeScapeEditorController::_onLoadingRecord);
+    connect(_networkC, &NetworkController::loadPlatformFileFromPath, this, &IngeScapeEditorController::_onLoadPlatformFileFromPath);
     connect(_networkC, &NetworkController::loadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadedRecord);
     connect(_networkC, &NetworkController::endOfRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onEndOfRecord);
 
@@ -240,7 +241,11 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     {
         // Load the platform (agents, mappings, actions, palette, timeline actions)
         // from the default file "last.json"
-        _loadPlatformFromFile(_platformDefaultFilePath);
+        bool success = _loadPlatformFromFile(_platformDefaultFilePath);
+
+        if (!success) {
+            qCritical() << "The loading of the last platform failed !";
+        }
     }
 
 
@@ -432,7 +437,11 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
         clearCurrentPlatform();
 
         // Load the platform from JSON file
-        _loadPlatformFromFile(platformFilePath);
+        bool success = _loadPlatformFromFile(platformFilePath);
+
+        if (!success) {
+            qCritical() << "The loading of the selected platform failed !";
+        }
 
         // Force our global mapping to CONTROLLED
         if (_modelManager != nullptr) {
@@ -848,22 +857,57 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
         QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonPlatform.toUtf8());
 
         // Load the platform from JSON
-        _loadPlatformFromJSON(jsonDocument);
-
-        if (_scenarioC != nullptr)
+        bool success = _loadPlatformFromJSON(jsonDocument);
+        if (success)
         {
-            // Update the current time
-            _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLine));
+            if (_scenarioC != nullptr)
+            {
+                // Update the current time
+                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLine));
 
-            // FIXME TODO jsonExecutedActions
-            //qDebug() << "jsonExecutedActions" << jsonExecutedActions;
+                // FIXME TODO jsonExecutedActions
+                //qDebug() << "jsonExecutedActions" << jsonExecutedActions;
 
-            // Import the executed actions for this scenario from JSON
-            _scenarioC->importExecutedActionsFromJson(jsonExecutedActions.toUtf8());
+                // Import the executed actions for this scenario from JSON
+                _scenarioC->importExecutedActionsFromJson(jsonExecutedActions.toUtf8());
+            }
+
+            // Notify QML to reset view
+            Q_EMIT resetMappindAndTimeLineViews();
         }
+        else
+        {
+            qCritical() << "The loading of the record failed !";
+        }
+    }
+}
 
-        // Notify QML to reset view
-        Q_EMIT resetMappindAndTimeLineViews();
+
+/**
+ * @brief Slot called when we receive the command "Load Platform File From Path"
+ * @param platformFilePath
+ */
+void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFilePath)
+{
+    qInfo() << "Received the command 'Load Platform file from path'" << platformFilePath;
+
+    // Load the platform from a JSON file
+    bool success = _loadPlatformFromFile(platformFilePath);
+
+    if (success) {
+        qDebug() << "The loading of the asked platform succeeded !";
+    }
+    else {
+        qCritical() << "The loading of the asked platform failed !";
+    }
+
+    if (_networkC != nullptr)
+    {
+        // FIXME TODO sendPlatformLoadingStatusToExpe
+        //_networkC->sendPlatformLoadingStatusToExpe(platformFilePath, success);
+        // success = 1
+        // fail = 0
+        // StringList of agents names ?
     }
 }
 
@@ -884,9 +928,12 @@ void IngeScapeEditorController::_onCommandAskedToRecorder(QString commandAndPara
 /**
  * @brief Load the platform from a JSON file
  * @param platformFilePath
+ * @return
  */
-void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
+bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
 {
+    bool success = false;
+
     if (!platformFilePath.isEmpty())
     {
         qInfo() << "Load the platform from JSON file" << platformFilePath;
@@ -902,7 +949,7 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                 QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
 
                 // Load the platform from JSON
-                _loadPlatformFromJSON(jsonDocument);
+                success = _loadPlatformFromJSON(jsonDocument);
 
                 // Notify QML to reset view
                 Q_EMIT resetMappindAndTimeLineViews();
@@ -915,6 +962,7 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
             qWarning() << "There is no file" << platformFilePath;
         }
     }
+    return success;
 }
 
 
@@ -947,11 +995,14 @@ void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
 
 
 /**
-  * @brief Load the platform from JSON
-  * @param jsonDocument
-  */
-void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument)
+ * @brief Load the platform from JSON
+ * @param jsonDocument
+ * @return
+ */
+bool IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument)
 {
+    bool success = false;
+
     if (jsonDocument.isObject())
     {
         QJsonObject jsonRoot = jsonDocument.object();
@@ -985,7 +1036,11 @@ void IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
         {
             _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
         }
+
+        success = true;
     }
+
+    return success;
 }
 
 
