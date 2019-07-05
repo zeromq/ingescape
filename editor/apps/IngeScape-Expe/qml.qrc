@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/main.qml</file>
+        <file>qml/HomeForm.ui.qml</file>
+        <file>qml/Page1Form.ui.qml</file>
+        <file>qml/Page2Form.ui.qml</file>
+        <file>settings/IngeScape-Expe.ini</file>
+        <file>qml/theme/IngeScapeExpeTheme.qml</file>
+        <file>qml/IngeScapeExpe.qml</file>
+        <file>qml/LoadingScreen.qml</file>
+    </qresource>
+</RCC>
