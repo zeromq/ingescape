@@ -140,10 +140,6 @@ INCLUDEPATH += ../../frameworks/I2Quick/include
 #####################################################################
 
 
-#DISTFILES += \
-#    icon_IGS.icns
-
-
 #------------------------
 #
 # OSX specific rules

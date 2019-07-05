@@ -1,5 +1,5 @@
 /*
- *	IngeScape Assessments
+ *	IngeScape Common
  *
  *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *

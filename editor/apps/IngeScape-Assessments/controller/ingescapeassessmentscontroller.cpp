@@ -171,7 +171,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
 
     // Sleep to display our loading screen
-    QThread::msleep(2000);
+    //QThread::msleep(2000);
 }
 
 

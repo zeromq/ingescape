@@ -76,15 +76,6 @@ HEADERS += \
     model/actionmappingm.h \
     controller/scenariocontroller.h \
     stable.h \
-    uthash/libut.h \
-    uthash/ringbuf.h \
-    uthash/utarray.h \
-    uthash/uthash.h \
-    uthash/utlist.h \
-    uthash/utmm.h \
-    uthash/utringbuffer.h \
-    uthash/utstring.h \
-    uthash/utvector.h \
     controller/agentssupervisioncontroller.h \
     controller/agentsmappingcontroller.h \
     controller/ingescapeeditorcontroller.h \
