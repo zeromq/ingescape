@@ -890,6 +890,9 @@ void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFile
 {
     qInfo() << "Received the command 'Load Platform file from path'" << platformFilePath;
 
+    // First, clear the current platform by deleting all existing data
+    clearCurrentPlatform();
+
     // Load the platform from a JSON file
     bool success = _loadPlatformFromFile(platformFilePath);
 
