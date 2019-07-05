@@ -56,13 +56,21 @@ class IngeScapeExpeController : public QObject
     // Controller for network communication
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
 
+    // Current directory path
+    I2_QML_PROPERTY_READONLY(QString, currentDirectoryPath)
+
+    // List of platform names
+    I2_QML_PROPERTY_READONLY(QStringList, platformNamesList)
+
 
 public:
+
     /**
      * @brief Constructor
      * @param parent
      */
     explicit IngeScapeExpeController(QObject *parent = nullptr);
+
 
     /**
      * @brief Destructor
@@ -85,6 +93,19 @@ public:
     Q_INVOKABLE void processBeforeClosing();
 
 
+    /**
+     * @brief Select a directory
+     */
+    Q_INVOKABLE void selectDirectory();
+
+
+    /**
+     * @brief Open a platform (at index)
+     * @param index
+     */
+    Q_INVOKABLE void openPlatform(int index);
+
+
 public Q_SLOTS:
 
     /**
@@ -100,6 +121,15 @@ private:
 
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
+
+    // Path to the directory containing JSON files about platforms
+    QString _platformDirectoryPath;
+
+    // Path to the default file containing the last platform
+    //QString _platformDefaultFilePath;
+
+    // List of platform paths
+    QStringList _platformPathsList;
 
 };
 

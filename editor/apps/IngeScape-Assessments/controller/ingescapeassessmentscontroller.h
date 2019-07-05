@@ -129,6 +129,8 @@ private:
 
     // Path to the directory containing JSON files about platforms
     //QString _platformDirectoryPath;
+
+    // Path to the default file containing the last platform
     //QString _platformDefaultFilePath;
 
 };

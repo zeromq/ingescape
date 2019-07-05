@@ -15,6 +15,7 @@
 #include "ingescapeexpecontroller.h"
 
 #include <QApplication>
+#include <QFileDialog>
 
 #include <misc/ingescapeutils.h>
 #include <settings/ingescapesettings.h>
@@ -32,8 +33,13 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     _snapshotDirectory(""),
     _modelManager(nullptr),
     _networkC(nullptr),
-    _terminationSignalWatcher(nullptr)
-    //_jsonHelper(nullptr)
+    _currentDirectoryPath(""),
+    _platformNamesList(QStringList()),
+    _terminationSignalWatcher(nullptr),
+    _jsonHelper(nullptr),
+    _platformDirectoryPath(""),
+    //_platformDefaultFilePath("")
+    _platformPathsList(QStringList())
 {
     qInfo() << "New IngeScape Expe Controller";
 
@@ -71,6 +77,18 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     QDir rootDir(rootPath);
     if (!rootDir.exists()) {
         qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
+    }
+
+    // Directory for platform files
+    QString platformPath = IngeScapeUtils::getPlatformsPath();
+
+    QDir platformDir(platformPath);
+    if (!platformDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << platformPath << "' !";
+    }
+    else
+    {
+        _platformDirectoryPath = platformPath;
     }
 
 
@@ -207,10 +225,79 @@ void IngeScapeExpeController::processBeforeClosing()
 
 
 /**
+ * @brief Select a directory
+ */
+void IngeScapeExpeController::selectDirectory()
+{
+    _platformNamesList.clear();
+    _platformPathsList.clear();
+
+    // Open a directory dialog box
+    QString directoryPath = QFileDialog::getExistingDirectory(nullptr,
+                                                              "Open a directory with IngeScape platform files",
+                                                              _platformDirectoryPath);
+
+    // Update the property
+    setcurrentDirectoryPath(directoryPath);
+
+    QStringList tempPlatformNamesList;
+
+    if (!directoryPath.isEmpty())
+    {
+        QDir dir(directoryPath);
+        if (dir.exists())
+        {
+            dir.setFilter(QDir::Files);
+
+            // FIXME: Don't merge UpperCase / LowerCase
+            dir.setSorting(QDir::Name);
+
+            qDebug() << "There are" << dir.count() << "entries in the directory" << directoryPath;
+
+            QFileInfoList fileInfoList = dir.entryInfoList();
+            for (QFileInfo fileInfo : fileInfoList)
+            {
+                //qDebug() << fileInfo.fileName();
+
+                // "toLower" allows to manage both extensions: "json" and "JSON"
+                if (fileInfo.completeSuffix().toLower() == "json")
+                {
+                    tempPlatformNamesList.append(fileInfo.baseName());
+                    _platformPathsList.append(fileInfo.absoluteFilePath());
+                }
+            }
+        }
+    }
+
+    setplatformNamesList(tempPlatformNamesList);
+}
+
+
+/**
+ * @brief Open a platform (at index)
+ * @param index
+ */
+void IngeScapeExpeController::openPlatform(int index)
+{
+    if (_platformPathsList.count() == _platformNamesList.count())
+    {
+        if (index < _platformPathsList.count())
+        {
+            QString platformFileName = _platformNamesList.at(index);
+            QString platformFilePath = _platformPathsList.at(index);
+
+            qInfo() << "Open platform" << platformFileName << "(" << platformFilePath << ")";
+        }
+    }
+}
+
+
+/**
  * @brief Method used to force the creation of our singleton from QML
  */
 void IngeScapeExpeController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
 }
+
 

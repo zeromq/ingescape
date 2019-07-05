@@ -93,7 +93,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
     }
 
-
     // Directory for platform files
     QString platformPath = IngeScapeUtils::getPlatformsPath();
 
