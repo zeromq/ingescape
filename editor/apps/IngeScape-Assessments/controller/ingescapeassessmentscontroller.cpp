@@ -38,8 +38,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _tasksC(nullptr),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr)
-  //_platformDirectoryPath(""),
-  //_platformDefaultFilePath("")
+  //_platformDirectoryPath("")
 {
     qInfo() << "New IngeScape Assessments Controller";
 
@@ -90,9 +89,6 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     else
     {
         _platformDirectoryPath = platformPath;
-
-        // Init the path to the JSON file to load the last platform
-        _platformDefaultFilePath = QString("%1last.json").arg(_platformDirectoryPath);
     }*/
 
 

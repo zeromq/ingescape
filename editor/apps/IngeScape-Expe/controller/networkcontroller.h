@@ -17,6 +17,7 @@
 
 #include <QObject>
 #include "I2PropertyHelpers.h"
+#include <model/enums.h>
 
 
 /**
@@ -61,12 +62,61 @@ public:
 
 
     /**
+     * @brief Get the IngeScape type of a peer id
+     * @param peerId
+     * @return
+     */
+    IngeScapeTypes::Value getIngeScapeTypeOfPeerId(QString peerId);
+
+
+    /**
+     * @brief Manage a peer id which entered the network
+     * @param peerId
+     * @param ingeScapeType
+     */
+    void manageEnteredPeerId(QString peerId, IngeScapeTypes::Value ingeScapeType);
+
+
+    /**
+     * @brief Manage a peer id which exited the network
+     * @param peerId
+     */
+    void manageExitedPeerId(QString peerId);
+
+
+    /**
      * @brief Update the list of available network devices
      */
     Q_INVOKABLE void updateAvailableNetworkDevices();
 
 
+    /**
+     * @brief Send a command and parameters to the editor
+     * @param peerIdOfEditor
+     * @param commandAndParameters
+     */
+    void sendCommandToEditor(QString peerIdOfEditor, QString commandAndParameters);
+
+
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when an editor enter the network
+     * @param peerId
+     * @param peerName
+     * @param ipAddress
+     * @param hostname
+     */
+    void editorEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
+
+
+    /**
+     * @brief Signal emitted when an editor quit the network
+     * @param peerId
+     * @param peerName
+     */
+    void editorExited(QString peerId, QString peerName);
+
 
 public Q_SLOTS:
 
@@ -80,7 +130,7 @@ private:
     int _isIngeScapeAgentStarted;
 
     // Hash table from a peer id to a type of IngeScape elements on the network
-    //QHash<QString, IngeScapeTypes::Value> _hashFromPeerIdToIngeScapeType;
+    QHash<QString, IngeScapeTypes::Value> _hashFromPeerIdToIngeScapeType;
 
 };
 

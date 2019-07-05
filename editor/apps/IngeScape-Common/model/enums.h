@@ -87,6 +87,8 @@ static const QString command_StopReplay = "STOP_REPLAY";
 static const QString command_PauseReplay = "PAUSE_REPLAY";
 static const QString command_UNpauseReplay = "UNPAUSE_REPLAY";
 
+static const QString command_LoadPlatformFile = "LOAD_PLATFORM_FROM_PATH";
+
 
 // Date date of our application
 static const QDate APPLICATION_START_DATE = QDate::currentDate();

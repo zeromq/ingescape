@@ -97,9 +97,8 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             bool isIngeScapeEditor = false;
             bool isIngeScapeLauncher = false;
             bool isIngeScapeRecorder = false;
-            bool isIngeScapePlayer = false;
-            //bool isIngeScapeAssessments = false;
-            //bool isIngeScapeExpe = false;
+            bool isIngeScapeAssessments = false;
+            bool isIngeScapeExpe = false;
             QString hostname = "";
             bool canBeFrozen = false;
             QString commandLine = "";
@@ -135,9 +134,16 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     else if (key == "isRecorder") {
                         if (value == "1") {
                             isIngeScapeRecorder = true;
-
-                            // FIXME flag isIngeScapePlayer
-                            isIngeScapePlayer = true;
+                        }
+                    }
+                    else if (key == "isAssessments") {
+                        if (value == "1") {
+                            isIngeScapeAssessments = true;
+                        }
+                    }
+                    else if (key == "isExpe") {
+                        if (value == "1") {
+                            isIngeScapeExpe = true;
                         }
                     }
                     else if (key == "hostname") {
@@ -190,6 +196,28 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Emit the signal "Recorder Entered"
                 Q_EMIT networkController->recorderEntered(peerId, peerName, ipAddress, hostname);
+            }
+            // IngeScape ASSESSMENTS
+            else if (isIngeScapeAssessments)
+            {
+                qDebug() << "Our zyre event is about IngeScape ASSESSMENTS";
+
+                // Save the peer id of this recorder
+                networkController->manageEnteredPeerId(peerId, IngeScapeTypes::ASSESSMENTS);
+
+                // Emit the signal "Assessments Entered"
+                //Q_EMIT networkController->assessmentsEntered(peerId, peerName, ipAddress, hostname);
+            }
+            // IngeScape EXPE
+            else if (isIngeScapeExpe)
+            {
+                qDebug() << "Our zyre event is about IngeScape EXPE";
+
+                // Save the peer id of this recorder
+                networkController->manageEnteredPeerId(peerId, IngeScapeTypes::EXPE);
+
+                // Emit the signal "Expe Entered"
+                //Q_EMIT networkController->expeEntered(peerId, peerName, ipAddress, hostname);
             }
             // IngeScape AGENT
             else if ((nbKeys > 0) && !isIngeScapeEditor)
@@ -535,6 +563,22 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 break;
             }
+            // IngeScape ASSESSMENTS
+            case IngeScapeTypes::ASSESSMENTS:
+            {
+                // Emit the signal "Assessments Exited"
+                //Q_EMIT networkController->assessmentsExited(peerId, peerName);
+
+                break;
+            }
+            // IngeScape EXPE
+            case IngeScapeTypes::EXPE:
+            {
+                // Emit the signal "Expe Exited"
+                //Q_EMIT networkController->expeExited(peerId, peerName);
+
+                break;
+            }
             // IngeScape AGENT
             case IngeScapeTypes::AGENT:
             {
@@ -713,6 +757,7 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
 
     // Add  header to declare ourselves as an editor
     igs_busAddServiceDescription("isEditor", "1");
+
 
     //
     // Create our internal definition

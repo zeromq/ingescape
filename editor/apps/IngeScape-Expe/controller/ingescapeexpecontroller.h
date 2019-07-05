@@ -62,6 +62,15 @@ class IngeScapeExpeController : public QObject
     // List of platform names
     I2_QML_PROPERTY_READONLY(QStringList, platformNamesList)
 
+    // Peer id of the editor
+    I2_CPP_NOSIGNAL_PROPERTY(QString, peerIdOfEditor)
+
+    // Peer name of the editor
+    I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfEditor)
+
+    // Flag indicating is there is an editor with state ON
+    I2_QML_PROPERTY_READONLY(bool, isEditorON)
+
 
 public:
 
@@ -114,6 +123,26 @@ public Q_SLOTS:
     void forceCreation();
 
 
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when an editor enter the network
+     * @param peerId
+     * @param peerName
+     * @param ipAddress
+     * @param hostname
+     */
+    void _onEditorEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
+
+
+    /**
+     * @brief Slot called when an editor quit the network
+     * @param peerId
+     * @param peerName
+     */
+    void _onEditorExited(QString peerId, QString peerName);
+
+
 private:
 
     // To subscribe to termination signals
@@ -124,9 +153,6 @@ private:
 
     // Path to the directory containing JSON files about platforms
     QString _platformDirectoryPath;
-
-    // Path to the default file containing the last platform
-    //QString _platformDefaultFilePath;
 
     // List of platform paths
     QStringList _platformPathsList;

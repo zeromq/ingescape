@@ -68,9 +68,8 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             bool isIngeScapeEditor = false;
             bool isIngeScapeLauncher = false;
             bool isIngeScapeRecorder = false;
-            bool isIngeScapePlayer = false;
-            //bool isIngeScapeAssessments = false;
-            //bool isIngeScapeExpe = false;
+            bool isIngeScapeAssessments = false;
+            bool isIngeScapeExpe = false;
             QString hostname = "";
             bool canBeFrozen = false;
             QString commandLine = "";
@@ -106,9 +105,16 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     else if (key == "isRecorder") {
                         if (value == "1") {
                             isIngeScapeRecorder = true;
-
-                            // FIXME flag isIngeScapePlayer
-                            isIngeScapePlayer = true;
+                        }
+                    }
+                    else if (key == "isAssessments") {
+                        if (value == "1") {
+                            isIngeScapeAssessments = true;
+                        }
+                    }
+                    else if (key == "isExpe") {
+                        if (value == "1") {
+                            isIngeScapeExpe = true;
                         }
                     }
                     else if (key == "hostname") {
@@ -213,48 +219,11 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
         {
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
 
-            /*// Get the IngeScape type of a peer id
-            IngeScapeTypes::Value ingeScapeType = networkController->getIngeScapeTypeOfPeerId(peerId);
-
-            switch (ingeScapeType)
-            {
-            // IngeScape LAUNCHER
-            case IngeScapeTypes::LAUNCHER:
-            {
-                QString hostname = "";
-
-                if (peerName.endsWith(suffix_Launcher)) {
-                    hostname = peerName.left(peerName.length() - suffix_Launcher.length());
-                }
-
-                // Emit the signal "Launcher Exited"
-                Q_EMIT networkController->launcherExited(peerId, hostname);
-
-                break;
-            }
-            // IngeScape RECORDER
-            case IngeScapeTypes::RECORDER:
-            {
-                // Emit the signal "Recorder Exited"
-                Q_EMIT networkController->recorderExited(peerId, peerName);
-
-                break;
-            }
-            // IngeScape AGENT
-            case IngeScapeTypes::AGENT:
-            {
-                // Emit the signal "Agent Exited"
-                Q_EMIT networkController->agentExited(peerId, peerName);
-
-                break;
-            }
-            default:
-                qWarning() << "Unknown peer id" << peerId << "(" << peerName << ")";
-                break;
-            }
+            // Get the IngeScape type of a peer id
+            //IngeScapeTypes::Value ingeScapeType = networkController->getIngeScapeTypeOfPeerId(peerId);
 
             // Manage the peer id which exited the network
-            networkController->manageExitedPeerId(peerId);*/
+            //networkController->manageExitedPeerId(peerId);
         }
     }
 }
@@ -290,7 +259,7 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     igs_setAgentName(_assessmentsAgentName.toStdString().c_str());
 
     // Add  header to declare ourselves as assessments
-    //igs_busAddServiceDescription("isAssessments", "1");
+    igs_busAddServiceDescription("isAssessments", "1");
 
     //
     // Create our internal definition

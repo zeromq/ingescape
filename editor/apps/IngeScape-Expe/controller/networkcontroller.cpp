@@ -68,9 +68,8 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             bool isIngeScapeEditor = false;
             bool isIngeScapeLauncher = false;
             bool isIngeScapeRecorder = false;
-            bool isIngeScapePlayer = false;
-            //bool isIngeScapeAssessments = false;
-            //bool isIngeScapeExpe = false;
+            bool isIngeScapeAssessments = false;
+            bool isIngeScapeExpe = false;
             QString hostname = "";
             bool canBeFrozen = false;
             QString commandLine = "";
@@ -106,9 +105,16 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     else if (key == "isRecorder") {
                         if (value == "1") {
                             isIngeScapeRecorder = true;
-
-                            // FIXME flag isIngeScapePlayer
-                            isIngeScapePlayer = true;
+                        }
+                    }
+                    else if (key == "isAssessments") {
+                        if (value == "1") {
+                            isIngeScapeAssessments = true;
+                        }
+                    }
+                    else if (key == "isExpe") {
+                        if (value == "1") {
+                            isIngeScapeExpe = true;
                         }
                     }
                     else if (key == "hostname") {
@@ -139,6 +145,12 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             if (isIngeScapeEditor)
             {
                 qDebug() << "Our zyre event is about IngeScape EDITOR";
+
+                // Save the peer id of this editor
+                networkController->manageEnteredPeerId(peerId, IngeScapeTypes::EDITOR);
+
+                // Emit the signal "Editor Entered"
+                Q_EMIT networkController->editorEntered(peerId, peerName, ipAddress, hostname);
             }
             /*else {
                 qDebug() << "Our zyre event is about an element without headers, we ignore it !";
@@ -213,48 +225,17 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
         {
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
 
-            /*// Get the IngeScape type of a peer id
+            // Get the IngeScape type of a peer id
             IngeScapeTypes::Value ingeScapeType = networkController->getIngeScapeTypeOfPeerId(peerId);
 
-            switch (ingeScapeType)
+            if (ingeScapeType == IngeScapeTypes::EDITOR)
             {
-            // IngeScape LAUNCHER
-            case IngeScapeTypes::LAUNCHER:
-            {
-                QString hostname = "";
-
-                if (peerName.endsWith(suffix_Launcher)) {
-                    hostname = peerName.left(peerName.length() - suffix_Launcher.length());
-                }
-
-                // Emit the signal "Launcher Exited"
-                Q_EMIT networkController->launcherExited(peerId, hostname);
-
-                break;
-            }
-            // IngeScape RECORDER
-            case IngeScapeTypes::RECORDER:
-            {
-                // Emit the signal "Recorder Exited"
-                Q_EMIT networkController->recorderExited(peerId, peerName);
-
-                break;
-            }
-            // IngeScape AGENT
-            case IngeScapeTypes::AGENT:
-            {
-                // Emit the signal "Agent Exited"
-                Q_EMIT networkController->agentExited(peerId, peerName);
-
-                break;
-            }
-            default:
-                qWarning() << "Unknown peer id" << peerId << "(" << peerName << ")";
-                break;
+                // Emit the signal "Editor Exited"
+                Q_EMIT networkController->editorExited(peerId, peerName);
             }
 
             // Manage the peer id which exited the network
-            networkController->manageExitedPeerId(peerId);*/
+            networkController->manageExitedPeerId(peerId);
         }
     }
 }
@@ -290,7 +271,8 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     igs_setAgentName(_expeAgentName.toStdString().c_str());
 
     // Add  header to declare ourselves as expe
-    //igs_busAddServiceDescription("isExpe", "1");
+    igs_busAddServiceDescription("isExpe", "1");
+
 
     //
     // Create our internal definition
@@ -390,6 +372,47 @@ void NetworkController::stop()
 
 
 /**
+ * @brief Get the IngeScape type of a peer id
+ * @param peerId
+ * @return
+ */
+IngeScapeTypes::Value NetworkController::getIngeScapeTypeOfPeerId(QString peerId)
+{
+    if (_hashFromPeerIdToIngeScapeType.contains(peerId)) {
+        return _hashFromPeerIdToIngeScapeType.value(peerId);
+    }
+    else {
+        return IngeScapeTypes::UNKNOWN;
+    }
+}
+
+
+/**
+ * @brief Manage a peer id which entered the network
+ * @param peerId
+ * @param ingeScapeType
+ */
+void NetworkController::manageEnteredPeerId(QString peerId, IngeScapeTypes::Value ingeScapeType)
+{
+    if (!_hashFromPeerIdToIngeScapeType.contains(peerId)) {
+        _hashFromPeerIdToIngeScapeType.insert(peerId, ingeScapeType);
+    }
+}
+
+
+/**
+ * @brief Manage a peer id which exited the network
+ * @param peerId
+ */
+void NetworkController::manageExitedPeerId(QString peerId)
+{
+    if (_hashFromPeerIdToIngeScapeType.contains(peerId)) {
+        _hashFromPeerIdToIngeScapeType.remove(peerId);
+    }
+}
+
+
+/**
  * @brief Update the list of available network devices
  */
 void NetworkController::updateAvailableNetworkDevices()
@@ -410,4 +433,21 @@ void NetworkController::updateAvailableNetworkDevices()
     setavailableNetworkDevices(networkDevices);
 
     qInfo() << "Update available Network Devices:" << _availableNetworkDevices;
+}
+
+
+/**
+ * @brief Send a command and parameters to the editor
+ * @param peerIdOfEditor
+ * @param commandAndParameters
+ */
+void NetworkController::sendCommandToEditor(QString peerIdOfEditor, QString commandAndParameters)
+{
+    if (!peerIdOfEditor.isEmpty() && !commandAndParameters.isEmpty())
+    {
+        // Send the command (and parameters) to the peer id of the editor
+        int success = igs_busSendStringToAgent(peerIdOfEditor.toStdString().c_str(), "%s", commandAndParameters.toStdString().c_str());
+
+        qInfo() << "Send command (and parameters)" << commandAndParameters << "to editor" << peerIdOfEditor << "with success ?" << success;
+    }
 }

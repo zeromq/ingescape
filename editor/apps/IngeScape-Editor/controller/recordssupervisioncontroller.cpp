@@ -249,7 +249,7 @@ void RecordsSupervisionController::stopOrPauseReplay(bool isStop)
  */
 void RecordsSupervisionController::onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
 {
-    qDebug() << "Recorder Entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
+    qInfo() << "Recorder Entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
 
     if (!_isRecorderON && !peerId.isEmpty() && !peerName.isEmpty())
     {
@@ -263,6 +263,9 @@ void RecordsSupervisionController::onRecorderEntered(QString peerId, QString pee
         // Get all records
         Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, "GET_RECORDS");
     }
+    else {
+        qCritical() << "We are already connected to a recorder:" << _peerNameOfRecorder << "(" << _peerIdOfRecorder << ")";
+    }
 }
 
 
@@ -273,7 +276,7 @@ void RecordsSupervisionController::onRecorderEntered(QString peerId, QString pee
  */
 void RecordsSupervisionController::onRecorderExited(QString peerId, QString peerName)
 {
-    qDebug() << "Recorder Exited (" << peerId << ")" << peerName;
+    qInfo() << "Recorder Exited (" << peerId << ")" << peerName;
 
     if (_isRecorderON && (_peerIdOfRecorder == peerId))
     {

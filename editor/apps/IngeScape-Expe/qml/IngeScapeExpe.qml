@@ -105,13 +105,27 @@ Item {
 
         color: IngeScapeTheme.whiteColor
         font: IngeScapeTheme.headingFont
+    }
 
-        /*color: IngeScapeTheme.whiteColor
-        font {
-            family: IngeScapeTheme.textFontFamily
-            weight: Font.Medium
-            pixelSize: 16
-        }*/
+    Rectangle {
+        anchors {
+            top: parent.top
+            right: parent.right
+            margins: 15
+        }
+        width: 120
+        height: 40
+
+        radius: 5
+
+        color: IngeScapeExpeC.isEditorON ? "green" : "orange"
+
+        Label {
+            anchors.centerIn: parent
+            color: IngeScapeTheme.whiteColor
+            font: IngeScapeTheme.headingFont
+            text: "EDITOR"
+        }
     }
 
 
@@ -287,6 +301,8 @@ Item {
                             bottom: parent.bottom
                             margins: 2
                         }
+
+                        enabled: IngeScapeExpeC.isEditorON
 
                         text: qsTr("Open platform");
 

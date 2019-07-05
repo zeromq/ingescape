@@ -35,10 +35,12 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     _networkC(nullptr),
     _currentDirectoryPath(""),
     _platformNamesList(QStringList()),
+    _peerIdOfEditor(""),
+    _peerNameOfEditor(),
+    _isEditorON(false),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
     _platformDirectoryPath(""),
-    //_platformDefaultFilePath("")
     _platformPathsList(QStringList())
 {
     qInfo() << "New IngeScape Expe Controller";
@@ -105,6 +107,12 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
 
     // Create the controller for network communications
     _networkC = new NetworkController(this);
+
+
+    // Connect to signals from the network controller
+    connect(_networkC, &NetworkController::editorEntered, this, &IngeScapeExpeController::_onEditorEntered);
+    connect(_networkC, &NetworkController::editorExited, this, &IngeScapeExpeController::_onEditorExited);
+
 
     // Update the list of available network devices
     _networkC->updateAvailableNetworkDevices();
@@ -287,6 +295,14 @@ void IngeScapeExpeController::openPlatform(int index)
             QString platformFilePath = _platformPathsList.at(index);
 
             qInfo() << "Open platform" << platformFileName << "(" << platformFilePath << ")";
+
+            if (_isEditorON && (_networkC != nullptr))
+            {
+                QString commandAndParameters = QString("%1=%2").arg(command_LoadPlatformFile, platformFilePath);
+
+                // Send the command and parameters to the editor
+                _networkC->sendCommandToEditor(_peerIdOfEditor, commandAndParameters);
+            }
         }
     }
 }
@@ -298,6 +314,49 @@ void IngeScapeExpeController::openPlatform(int index)
 void IngeScapeExpeController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
+}
+
+
+/**
+ * @brief Slot called when an editor enter the network
+ * @param peerId
+ * @param peerName
+ * @param ipAddress
+ * @param hostname
+ */
+void IngeScapeExpeController::_onEditorEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
+{
+    qInfo() << "Editor Entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
+
+    if (!_isEditorON  && !peerId.isEmpty() && !peerName.isEmpty())
+    {
+        setpeerIdOfEditor(peerId);
+        setpeerNameOfEditor(peerName);
+
+        setisEditorON(true);
+    }
+    else {
+        qCritical() << "We are already connected to an editor:" << _peerNameOfEditor << "(" << _peerIdOfEditor << ")";
+    }
+}
+
+
+/**
+ * @brief Slot called when an editor quit the network
+ * @param peerId
+ * @param peerName
+ */
+void IngeScapeExpeController::_onEditorExited(QString peerId, QString peerName)
+{
+    qInfo() << "Editor Exited (" << peerId << ")" << peerName;
+
+    if (_isEditorON && (_peerIdOfEditor == peerId))
+    {
+        setpeerIdOfEditor("");
+        setpeerNameOfEditor("");
+
+        setisEditorON(false);
+    }
 }
 
 
