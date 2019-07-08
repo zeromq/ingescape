@@ -139,6 +139,15 @@ public:
     void sendCommandWithJsonToRecorder(QString peerIdOfRecorder, QStringList commandAndParameters);
 
 
+    /**
+     * @brief Send a command execution status to the expe
+     * @param command
+     * @param commandParameters
+     * @param status
+     */
+    void sendCommandExecutionStatusToExpe(QString peerIdOfExpe, QString command, QString commandParameters, int status);
+
+
 Q_SIGNALS:
 
     /**

@@ -253,7 +253,7 @@ Item {
 
             // Selection feedback
             Rectangle {
-                visible: controller && (controller.selectedRecord === model.QtObject);
+                visible: controller && (controller.selectedRecord === model.QtObject)
 
                 anchors {
                     left: parent.left
@@ -274,7 +274,7 @@ Item {
                 }
                 color: IngeScapeTheme.orangeColor
 
-                visible: rootItem._isPlayingOrResumingReplay && recordItem._isCurrentReplay
+                visible: recordItem._isCurrentReplay && controller && ((controller.replayState === ReplayStates.LOADING) || rootItem._isPlayingOrResumingReplay)
             }
 
             // Separator
@@ -293,16 +293,16 @@ Item {
             Column {
                 id: recordInfos
 
-                y: 5
-
                 anchors {
-                    left : parent.left
-                    right : parent.right
-                    leftMargin: 70
-                    rightMargin: 12
+                    top: parent.top
+                    topMargin: 5
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: 75
+                    rightMargin: 65
                 }
 
-                spacing : 4
+                spacing: 4
 
                 // Name
                 Text {
@@ -384,33 +384,45 @@ Item {
                          && recordItem._isCurrentReplay
             }
 
-            Row {
-                id: rowButtons
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                    left: parent.left
-                    leftMargin: 25
-                }
-
-                spacing: 5
-
 
             // Load record button
             Button {
                 id: loadRecordButton
 
-                /*anchors {
+                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+                anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
-                    leftMargin: 25
-                }*/
+                    leftMargin: 15
+                }
+                height: boundingBox.height
+                //width: boundingBox.width
+                width: 50
 
-                width: 75
-                height: 30
-                text: "LOAD"
+                activeFocusOnPress: true
+
+                text: "Load"
 
                 visible: controller && (controller.replayState === ReplayStates.UNLOADED)
+
+                style: I2SvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
+
+                    releasedID: "button"
+                    pressedID: releasedID + "-pressed"
+                    disabledID: releasedID + "-disabled"
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+
+                    labelColorReleased: IngeScapeTheme.whiteColor
+                    labelColorPressed: IngeScapeTheme.blackColor
+                    labelColorDisabled: IngeScapeTheme.whiteColor
+                }
 
                 onClicked: {
                     if (controller && model && model.modelM)
@@ -428,14 +440,43 @@ Item {
             Button {
                 id: unloadRecordButton
 
-                width: 75
-                height: 30
-                text: "UNLOAD"
+                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    leftMargin: 15
+                }
+                height: boundingBox.height
+                //width: boundingBox.width
+                width: 50
+
+                activeFocusOnPress: true
+
+                text: "Quit"
 
                 visible: controller && (controller.replayState !== ReplayStates.UNLOADED) && (controller.replayState !== ReplayStates.LOADING)
                          && recordItem._isCurrentReplay
 
                 enabled: !rootItem._isPlayingOrResumingReplay
+
+                style: I2SvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
+
+                    releasedID: "button"
+                    pressedID: releasedID + "-pressed"
+                    disabledID: releasedID + "-disabled"
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+
+                    labelColorReleased: IngeScapeTheme.whiteColor
+                    labelColorPressed: IngeScapeTheme.blackColor
+                    labelColorDisabled: IngeScapeTheme.whiteColor
+                }
 
                 onClicked: {
                     if (controller && model && model.modelM)
@@ -453,16 +494,18 @@ Item {
             Button {
                 id: playButton
 
-                /*anchors {
-                    verticalCenter: parent.verticalCenter
-                    left: parent.left
-                    leftMargin: 25
-                }*/
+                anchors {
+                    //verticalCenter: parent.verticalCenter
+                    right: parent.right
+                    rightMargin: 25
+                    bottom: parent.bottom
+                    bottomMargin: 12
+                }
+
+                activeFocusOnPress: true
 
                 visible: controller && ((controller.replayState === ReplayStates.LOADED) || (controller.replayState === ReplayStates.PAUSED))
                          && recordItem._isCurrentReplay
-
-                activeFocusOnPress: true
 
                 style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
@@ -493,11 +536,13 @@ Item {
             Button {
                 id: pauseButton
 
-                /*anchors {
-                    verticalCenter: parent.verticalCenter
-                    left: parent.left
-                    leftMargin: 25
-                }*/
+                anchors {
+                    //verticalCenter: parent.verticalCenter
+                    right: parent.right
+                    rightMargin: 25
+                    bottom: parent.bottom
+                    bottomMargin: 12
+                }
 
                 visible: rootItem._isPlayingOrResumingReplay
                          && recordItem._isCurrentReplay
@@ -519,8 +564,6 @@ Item {
                         controller.stopOrPauseReplay(false);
                     }
                 }
-            }
-
             }
 
 

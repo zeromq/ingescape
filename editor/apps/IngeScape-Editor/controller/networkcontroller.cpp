@@ -1042,6 +1042,28 @@ void NetworkController::sendCommandWithJsonToRecorder(QString peerIdOfRecorder, 
 
 
 /**
+ * @brief Send a command execution status to the expe
+ * @param command
+ * @param commandParameters
+ * @param status
+ */
+void NetworkController::sendCommandExecutionStatusToExpe(QString peerIdOfExpe, QString command, QString commandParameters, int status)
+{
+    if (!peerIdOfExpe.isEmpty())
+    {
+        // Send the execution status of command with parameters to the peer id of the expe
+        int success = igs_busSendStringToAgent(peerIdOfExpe.toStdString().c_str(),
+                                               "%s %s %d",
+                                               command.toStdString().c_str(),
+                                               commandParameters.toStdString().c_str(),
+                                               status);
+
+        qInfo() << "Send execution status" << status << "of command" << command << "with parameters" << commandParameters << "to expe" << peerIdOfExpe << "with success ?" << success;
+    }
+}
+
+
+/**
  * @brief Slot called when a command must be sent on the network to a launcher
  * @param peerIdOfLauncher
  * @param command

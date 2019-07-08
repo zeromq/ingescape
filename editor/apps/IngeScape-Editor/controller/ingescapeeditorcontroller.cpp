@@ -905,8 +905,10 @@ void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFile
 
     if (_networkC != nullptr)
     {
-        // FIXME TODO sendPlatformLoadingStatusToExpe
-        //_networkC->sendPlatformLoadingStatusToExpe(platformFilePath, success);
+        // Reply by sending the command execution status to Expe
+        //_networkC->sendCommandExecutionStatusToExpe(command_LoadPlatformFile, platformFilePath, success);
+
+        // FIXME sendCommandExecutionStatusToExpe
         // success = 1
         // fail = 0
         // StringList of agents names ?
