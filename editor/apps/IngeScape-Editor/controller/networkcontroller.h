@@ -207,6 +207,24 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when an expe enter the network
+     * @param peerId
+     * @param peerName
+     * @param ipAddress
+     * @param hostname
+     */
+    void expeEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
+
+
+    /**
+     * @brief Signal emitted when an expe quit the network
+     * @param peerId
+     * @param peerName
+     */
+    void expeExited(QString peerId, QString peerName);
+
+
+    /**
      * @brief Signal emitted when an agent definition has been received
      * @param peer id
      * @param peer name

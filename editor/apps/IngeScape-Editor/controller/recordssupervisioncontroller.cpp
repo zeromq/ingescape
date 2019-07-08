@@ -249,7 +249,7 @@ void RecordsSupervisionController::stopOrPauseReplay(bool isStop)
  */
 void RecordsSupervisionController::onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
 {
-    qInfo() << "Recorder Entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
+    qInfo() << "Recorder entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
 
     if (!_isRecorderON && !peerId.isEmpty() && !peerName.isEmpty())
     {
@@ -276,7 +276,7 @@ void RecordsSupervisionController::onRecorderEntered(QString peerId, QString pee
  */
 void RecordsSupervisionController::onRecorderExited(QString peerId, QString peerName)
 {
-    qInfo() << "Recorder Exited (" << peerId << ")" << peerName;
+    qInfo() << "Recorder exited (" << peerId << ")" << peerName;
 
     if (_isRecorderON && (_peerIdOfRecorder == peerId))
     {

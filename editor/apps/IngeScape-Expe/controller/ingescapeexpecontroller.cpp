@@ -112,6 +112,7 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::editorEntered, this, &IngeScapeExpeController::_onEditorEntered);
     connect(_networkC, &NetworkController::editorExited, this, &IngeScapeExpeController::_onEditorExited);
+    connect(_networkC, &NetworkController::statusReceivedAbout_LoadPlatformFile, this, &IngeScapeExpeController::_onStatusReceivedAbout_LoadPlatformFile);
 
 
     // Update the list of available network devices
@@ -326,7 +327,7 @@ void IngeScapeExpeController::forceCreation()
  */
 void IngeScapeExpeController::_onEditorEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
 {
-    qInfo() << "Editor Entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
+    qInfo() << "Editor entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
 
     if (!_isEditorON  && !peerId.isEmpty() && !peerName.isEmpty())
     {
@@ -348,7 +349,7 @@ void IngeScapeExpeController::_onEditorEntered(QString peerId, QString peerName,
  */
 void IngeScapeExpeController::_onEditorExited(QString peerId, QString peerName)
 {
-    qInfo() << "Editor Exited (" << peerId << ")" << peerName;
+    qInfo() << "Editor exited (" << peerId << ")" << peerName;
 
     if (_isEditorON && (_peerIdOfEditor == peerId))
     {
@@ -356,6 +357,25 @@ void IngeScapeExpeController::_onEditorExited(QString peerId, QString peerName)
         setpeerNameOfEditor("");
 
         setisEditorON(false);
+    }
+}
+
+
+/**
+ * @brief Slot called when an editor reply to our command "Load Platform File" with a status
+ * @param commandStatus
+ * @param commandParameters
+ */
+void IngeScapeExpeController::_onStatusReceivedAbout_LoadPlatformFile(bool commandStatus, QString commandParameters)
+{
+    if (commandStatus)
+    {
+         qDebug() << "Platform" << commandParameters << "Loaded";
+
+         // FIXME TODO
+    }
+    else {
+        qCritical() << "Editor failed to load the platform" << commandParameters;
     }
 }
 

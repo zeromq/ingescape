@@ -118,6 +118,14 @@ Q_SIGNALS:
     void editorExited(QString peerId, QString peerName);
 
 
+    /**
+     * @brief Signal emitted when an editor reply to our command "Load Platform File" with a status
+     * @param commandStatus
+     * @param commandParameters
+     */
+    void statusReceivedAbout_LoadPlatformFile(bool commandStatus, QString commandParameters);
+
+
 public Q_SLOTS:
 
 

@@ -23,6 +23,11 @@ extern "C" {
 #include <czmq.h>
 }
 
+static const QString prefix_Definition = "EXTERNAL_DEFINITION#";
+static const QString prefix_Mapping = "EXTERNAL_MAPPING#";
+
+static const QString prefix_LoadPlatformFile = "LOAD_PLATFORM_FROM_PATH";
+
 
 /**
  * @brief Callback for incomming messages on the bus
@@ -198,25 +203,46 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             QString message = zmsg_popstr(msg_dup);
 
             // Definition
-            /*if (message.startsWith(prefix_Definition))
+            if (message.startsWith(prefix_Definition))
             {
-                message.remove(0, prefix_Definition.length());
-
-                // Emit the signal "Definition Received"
-                Q_EMIT networkController->definitionReceived(peerId, peerName, message);
+                // Nothing to do
             }
             // Mapping
             else if (message.startsWith(prefix_Mapping))
             {
-                message.remove(0, prefix_Mapping.length());
+                // Nothing to do
+            }
+            // Status of command "LOAD PLATFORM FROM PATH"
+            else if (message.startsWith(prefix_LoadPlatformFile))
+            {
+                //message.remove(0, prefix_LoadPlatformFile.length());
 
-                // Emit the signal "Mapping Received"
-                Q_EMIT networkController->mappingReceived(peerId, peerName, message);
+                // Starts with the prefix, followed by parameters
+                // Ends with white space followed by "STATUS=" and a digit
+                QString pattern = QString("^%1=(.*)\\sSTATUS=(\\d)$").arg(prefix_LoadPlatformFile);
+                QRegularExpression regExp(pattern);
+                QRegularExpressionMatch regExpMatch = regExp.match(message);
+
+                if (regExpMatch.hasMatch())
+                {
+                    //QString matched = regExpMatch.captured(0);
+                    QString commandParameters = regExpMatch.captured(1);
+                    QString strStatus = regExpMatch.captured(2);
+
+                    bool successConvertStringToInt = false;
+                    int status = strStatus.toInt(&successConvertStringToInt);
+
+                    if (successConvertStringToInt)
+                    {
+                        // Emit the signal "Status Received about LoadPlatformFile"
+                        Q_EMIT networkController->statusReceivedAbout_LoadPlatformFile(static_cast<bool>(status), commandParameters);
+                    }
+                }
             }
             else
-            {*/
+            {
                 qWarning() << "Not yet managed (WHISPER) message '" << message << "' for agent" << peerName << "(" << peerId << ")";
-            //}
+            }
 
             zmsg_destroy(&msg_dup);
         }

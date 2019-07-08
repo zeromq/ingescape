@@ -151,6 +151,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::launcherExited, _modelManager, &EditorModelManager::onLauncherExited);
     connect(_networkC, &NetworkController::recorderEntered, _recordsSupervisionC, &RecordsSupervisionController::onRecorderEntered);
     connect(_networkC, &NetworkController::recorderExited, _recordsSupervisionC, &RecordsSupervisionController::onRecorderExited);
+    connect(_networkC, &NetworkController::expeEntered, this, &IngeScapeEditorController::_onExpeEntered);
+    connect(_networkC, &NetworkController::expeExited, this, &IngeScapeEditorController::_onExpeExited);
 
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &EditorModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &EditorModelManager::onMappingReceived);
@@ -896,22 +898,22 @@ void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFile
     // Load the platform from a JSON file
     bool success = _loadPlatformFromFile(platformFilePath);
 
-    if (success) {
+    if (success)
+    {
         qDebug() << "The loading of the asked platform succeeded !";
     }
     else {
         qCritical() << "The loading of the asked platform failed !";
     }
 
-    if (_networkC != nullptr)
+    if ((_networkC != nullptr) && !_peerIdOfExpe.isEmpty())
     {
         // Reply by sending the command execution status to Expe
-        //_networkC->sendCommandExecutionStatusToExpe(command_LoadPlatformFile, platformFilePath, success);
-
-        // FIXME sendCommandExecutionStatusToExpe
+        _networkC->sendCommandExecutionStatusToExpe(_peerIdOfExpe, command_LoadPlatformFile, platformFilePath, static_cast<int>(success));
         // success = 1
         // fail = 0
-        // StringList of agents names ?
+
+        // Reply with StringList of agents names ? or Sender have to parse "platform (File Path)" to get agents ?
     }
 }
 
@@ -925,6 +927,48 @@ void IngeScapeEditorController::_onCommandAskedToRecorder(QString commandAndPara
     if ((_networkC != nullptr) && (_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
     {
         _networkC->onCommandAskedToRecorder(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
+    }
+}
+
+
+/**
+ * @brief Slot called when an expe enter the network
+ * @param peerId
+ * @param peerName
+ * @param ipAddress
+ * @param hostname
+ */
+void IngeScapeEditorController::_onExpeEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
+{
+    qInfo() << "Expe entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
+
+    // Check that the peer id of the Expe is empty
+    if (_peerIdOfExpe.isEmpty() && !peerId.isEmpty() && !peerName.isEmpty())
+    {
+        setpeerIdOfExpe(peerId);
+        setpeerNameOfExpe(peerName);
+    }
+    else {
+        qCritical() << "We are already connected to an expe:" << _peerNameOfExpe << "(" << _peerIdOfExpe << ")";
+    }
+}
+
+
+/**
+ * @brief Slot called when an expe quit the network
+ * @param peerId
+ * @param peerName
+ */
+void IngeScapeEditorController::_onExpeExited(QString peerId, QString peerName)
+{
+    qInfo() << "Expe exited (" << peerId << ")" << peerName;
+
+    // Check that the peer id matches
+    if (_peerIdOfExpe == peerId)
+    {
+        // Clear
+        setpeerIdOfExpe("");
+        setpeerNameOfExpe("");
     }
 }
 

@@ -217,7 +217,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 networkController->manageEnteredPeerId(peerId, IngeScapeTypes::EXPE);
 
                 // Emit the signal "Expe Entered"
-                //Q_EMIT networkController->expeEntered(peerId, peerName, ipAddress, hostname);
+                Q_EMIT networkController->expeEntered(peerId, peerName, ipAddress, hostname);
             }
             // IngeScape AGENT
             else if ((nbKeys > 0) && !isIngeScapeEditor)
@@ -575,7 +575,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             case IngeScapeTypes::EXPE:
             {
                 // Emit the signal "Expe Exited"
-                //Q_EMIT networkController->expeExited(peerId, peerName);
+                Q_EMIT networkController->expeExited(peerId, peerName);
 
                 break;
             }
@@ -1053,7 +1053,7 @@ void NetworkController::sendCommandExecutionStatusToExpe(QString peerIdOfExpe, Q
     {
         // Send the execution status of command with parameters to the peer id of the expe
         int success = igs_busSendStringToAgent(peerIdOfExpe.toStdString().c_str(),
-                                               "%s %s %d",
+                                               "%s=%s STATUS=%d",
                                                command.toStdString().c_str(),
                                                commandParameters.toStdString().c_str(),
                                                status);

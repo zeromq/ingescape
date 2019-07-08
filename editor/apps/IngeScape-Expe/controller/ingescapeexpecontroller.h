@@ -143,6 +143,14 @@ private Q_SLOTS:
     void _onEditorExited(QString peerId, QString peerName);
 
 
+    /**
+     * @brief Slot called when an editor reply to our command "Load Platform File" with a status
+     * @param commandStatus
+     * @param commandParameters
+     */
+    void _onStatusReceivedAbout_LoadPlatformFile(bool commandStatus, QString commandParameters);
+
+
 private:
 
     // To subscribe to termination signals
