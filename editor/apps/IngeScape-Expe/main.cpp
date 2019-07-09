@@ -145,8 +145,7 @@ void registerCustomQmlTypes()
     // Models
     //
     //----------------
-    //qmlRegisterUncreatableType<AgentNameAndOutputsM>("INGESCAPE", 1, 0, "AgentNameAndOutputsM", "Internal class");
-    //qmlRegisterUncreatableType<CharacteristicM>("INGESCAPE", 1, 0, "CharacteristicM", "Internal class");
+    qmlRegisterUncreatableType<PlatformM>("INGESCAPE", 1, 0, "PlatformM", "Internal class");
 
 
     //---------------

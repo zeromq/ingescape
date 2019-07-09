@@ -47,7 +47,7 @@ class RecordsSupervisionController : public QObject
     // Flag indicating is there is a recorder with state ON
     I2_QML_PROPERTY_READONLY(bool, isRecorderON)
 
-    // Sorted list of Record
+    // List of records
     I2_QOBJECT_LISTMODEL(RecordVM, recordsList)
 
     // Selected Record in the Records list

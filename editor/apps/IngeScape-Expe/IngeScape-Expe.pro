@@ -41,13 +41,15 @@ SOURCES += \
         controller/expemodelmanager.cpp \
         controller/ingescapeexpecontroller.cpp \
         controller/networkcontroller.cpp \
-        main.cpp
+        main.cpp \
+        model/platformm.cpp
 
 
 HEADERS += \
     controller/expemodelmanager.h \
     controller/ingescapeexpecontroller.h \
     controller/networkcontroller.h \
+    model/platformm.h \
     stable.h
 
 

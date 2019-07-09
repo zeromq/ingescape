@@ -118,7 +118,7 @@ Item {
 
         radius: 5
 
-        color: IngeScapeExpeC.isEditorON ? "green" : "orange"
+        color: (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON) ? "green" : "orange"
 
         Label {
             anchors.centerIn: parent
@@ -182,7 +182,7 @@ Item {
                 height: 30
                 width: 400
 
-                text: IngeScapeExpeC.currentDirectoryPath
+                text: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.currentDirectoryPath : ""
 
                 style: I2TextFieldStyle {
                     backgroundColor: IngeScapeTheme.darkBlueGreyColor
@@ -202,7 +202,6 @@ Item {
                         family: IngeScapeTheme.textFontFamily
                     }
                 }
-
             }
         }
 
@@ -211,7 +210,8 @@ Item {
             spacing: 10
 
             Text {
-                text: IngeScapeExpeC.platformNamesList.length + " platforms:"
+                text: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.platformsList.count + " platforms:"
+                                                  : ""
 
                 height: 30
 
@@ -257,12 +257,10 @@ Item {
             }*/
 
             Repeater {
-                model: IngeScapeExpeC.platformNamesList
+                model: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.platformsList : null
 
                 delegate: Rectangle {
                     id: platformItem
-
-                    property int nb: index + 1
 
                     //width: 350
                     width: scrollView.width
@@ -283,7 +281,7 @@ Item {
                         }
                         //width: 150
 
-                        text: platformItem.nb + ": " + modelData
+                        text: model.name
 
                         color: IngeScapeTheme.whiteColor
                         font {
@@ -302,15 +300,15 @@ Item {
                             margins: 2
                         }
 
-                        enabled: IngeScapeExpeC.isEditorON
+                        enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON
 
                         text: qsTr("Open platform");
 
                         onClicked: {
-                            console.log("QML: Open platform " + modelData);
+                            console.log("QML: Open platform " + model.name);
 
                             // Open platform
-                            IngeScapeExpeC.openPlatform(index);
+                            IngeScapeExpeC.openPlatform(model.QtObject);
                         }
                     }
                 }

@@ -26,10 +26,10 @@ class RecordM : public QObject
 {
     Q_OBJECT
 
-    // Record id
+    // Unique identifier of our record
     I2_QML_PROPERTY_READONLY(QString, uid)
 
-    // Record name
+    // Name of our record
     I2_QML_PROPERTY_READONLY(QString, name)
 
     // Date of the beginning of the record

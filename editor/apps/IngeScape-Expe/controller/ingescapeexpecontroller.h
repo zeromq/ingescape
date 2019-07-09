@@ -56,21 +56,6 @@ class IngeScapeExpeController : public QObject
     // Controller for network communication
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
 
-    // Current directory path
-    I2_QML_PROPERTY_READONLY(QString, currentDirectoryPath)
-
-    // List of platform names
-    I2_QML_PROPERTY_READONLY(QStringList, platformNamesList)
-
-    // Peer id of the editor
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerIdOfEditor)
-
-    // Peer name of the editor
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfEditor)
-
-    // Flag indicating is there is an editor with state ON
-    I2_QML_PROPERTY_READONLY(bool, isEditorON)
-
 
 public:
 
@@ -109,10 +94,10 @@ public:
 
 
     /**
-     * @brief Open a platform (at index)
-     * @param index
+     * @brief Open a platform
+     * @param platform
      */
-    Q_INVOKABLE void openPlatform(int index);
+    Q_INVOKABLE void openPlatform(PlatformM* platform);
 
 
 public Q_SLOTS:
@@ -125,31 +110,6 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 
-    /**
-     * @brief Slot called when an editor enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void _onEditorEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
-
-
-    /**
-     * @brief Slot called when an editor quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void _onEditorExited(QString peerId, QString peerName);
-
-
-    /**
-     * @brief Slot called when an editor reply to our command "Load Platform File" with a status
-     * @param commandStatus
-     * @param commandParameters
-     */
-    void _onStatusReceivedAbout_LoadPlatformFile(bool commandStatus, QString commandParameters);
-
 
 private:
 
@@ -161,9 +121,6 @@ private:
 
     // Path to the directory containing JSON files about platforms
     QString _platformDirectoryPath;
-
-    // List of platform paths
-    QStringList _platformPathsList;
 
 };
 

@@ -33,15 +33,9 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     _snapshotDirectory(""),
     _modelManager(nullptr),
     _networkC(nullptr),
-    _currentDirectoryPath(""),
-    _platformNamesList(QStringList()),
-    _peerIdOfEditor(""),
-    _peerNameOfEditor(),
-    _isEditorON(false),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
-    _platformDirectoryPath(""),
-    _platformPathsList(QStringList())
+    _platformDirectoryPath("")
 {
     qInfo() << "New IngeScape Expe Controller";
 
@@ -110,9 +104,9 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
 
 
     // Connect to signals from the network controller
-    connect(_networkC, &NetworkController::editorEntered, this, &IngeScapeExpeController::_onEditorEntered);
-    connect(_networkC, &NetworkController::editorExited, this, &IngeScapeExpeController::_onEditorExited);
-    connect(_networkC, &NetworkController::statusReceivedAbout_LoadPlatformFile, this, &IngeScapeExpeController::_onStatusReceivedAbout_LoadPlatformFile);
+    connect(_networkC, &NetworkController::editorEntered, _modelManager, &ExpeModelManager::onEditorEntered);
+    connect(_networkC, &NetworkController::editorExited, _modelManager, &ExpeModelManager::onEditorExited);
+    connect(_networkC, &NetworkController::statusReceivedAbout_LoadPlatformFile, _modelManager, &ExpeModelManager::onStatusReceivedAbout_LoadPlatformFile);
 
 
     // Update the list of available network devices
@@ -238,72 +232,35 @@ void IngeScapeExpeController::processBeforeClosing()
  */
 void IngeScapeExpeController::selectDirectory()
 {
-    _platformNamesList.clear();
-    _platformPathsList.clear();
-
     // Open a directory dialog box
     QString directoryPath = QFileDialog::getExistingDirectory(nullptr,
                                                               "Open a directory with IngeScape platform files",
                                                               _platformDirectoryPath);
 
-    // Update the property
-    setcurrentDirectoryPath(directoryPath);
-
-    QStringList tempPlatformNamesList;
-
-    if (!directoryPath.isEmpty())
+    if (_modelManager)
     {
-        QDir dir(directoryPath);
-        if (dir.exists())
-        {
-            dir.setFilter(QDir::Files);
-
-            // FIXME: Don't merge UpperCase / LowerCase
-            dir.setSorting(QDir::Name);
-
-            qDebug() << "There are" << dir.count() << "entries in the directory" << directoryPath;
-
-            QFileInfoList fileInfoList = dir.entryInfoList();
-            for (QFileInfo fileInfo : fileInfoList)
-            {
-                //qDebug() << fileInfo.fileName();
-
-                // "toLower" allows to manage both extensions: "json" and "JSON"
-                if (fileInfo.completeSuffix().toLower() == "json")
-                {
-                    tempPlatformNamesList.append(fileInfo.baseName());
-                    _platformPathsList.append(fileInfo.absoluteFilePath());
-                }
-            }
-        }
+        // List all IngeScape platforms in this directory
+        _modelManager->listPlatformsInDirectory(directoryPath);
     }
-
-    setplatformNamesList(tempPlatformNamesList);
 }
 
 
 /**
- * @brief Open a platform (at index)
- * @param index
+ * @brief Open a platform
+ * @param platform
  */
-void IngeScapeExpeController::openPlatform(int index)
+void IngeScapeExpeController::openPlatform(PlatformM* platform)
 {
-    if (_platformPathsList.count() == _platformNamesList.count())
+    if ((platform != nullptr) && (_modelManager != nullptr) && (_networkC != nullptr))
     {
-        if (index < _platformPathsList.count())
+        qInfo() << "Open platform" << platform->name() << "at" << platform->filePath();
+
+        if (_modelManager->isEditorON())
         {
-            QString platformFileName = _platformNamesList.at(index);
-            QString platformFilePath = _platformPathsList.at(index);
+            QString commandAndParameters = QString("%1=%2").arg(command_LoadPlatformFile, platform->filePath());
 
-            qInfo() << "Open platform" << platformFileName << "(" << platformFilePath << ")";
-
-            if (_isEditorON && (_networkC != nullptr))
-            {
-                QString commandAndParameters = QString("%1=%2").arg(command_LoadPlatformFile, platformFilePath);
-
-                // Send the command and parameters to the editor
-                _networkC->sendCommandToEditor(_peerIdOfEditor, commandAndParameters);
-            }
+            // Send the command and parameters to the editor
+            _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
         }
     }
 }
@@ -316,67 +273,4 @@ void IngeScapeExpeController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
 }
-
-
-/**
- * @brief Slot called when an editor enter the network
- * @param peerId
- * @param peerName
- * @param ipAddress
- * @param hostname
- */
-void IngeScapeExpeController::_onEditorEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
-{
-    qInfo() << "Editor entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
-
-    if (!_isEditorON  && !peerId.isEmpty() && !peerName.isEmpty())
-    {
-        setpeerIdOfEditor(peerId);
-        setpeerNameOfEditor(peerName);
-
-        setisEditorON(true);
-    }
-    else {
-        qCritical() << "We are already connected to an editor:" << _peerNameOfEditor << "(" << _peerIdOfEditor << ")";
-    }
-}
-
-
-/**
- * @brief Slot called when an editor quit the network
- * @param peerId
- * @param peerName
- */
-void IngeScapeExpeController::_onEditorExited(QString peerId, QString peerName)
-{
-    qInfo() << "Editor exited (" << peerId << ")" << peerName;
-
-    if (_isEditorON && (_peerIdOfEditor == peerId))
-    {
-        setpeerIdOfEditor("");
-        setpeerNameOfEditor("");
-
-        setisEditorON(false);
-    }
-}
-
-
-/**
- * @brief Slot called when an editor reply to our command "Load Platform File" with a status
- * @param commandStatus
- * @param commandParameters
- */
-void IngeScapeExpeController::_onStatusReceivedAbout_LoadPlatformFile(bool commandStatus, QString commandParameters)
-{
-    if (commandStatus)
-    {
-         qDebug() << "Platform" << commandParameters << "Loaded";
-
-         // FIXME TODO
-    }
-    else {
-        qCritical() << "Editor failed to load the platform" << commandParameters;
-    }
-}
-
 

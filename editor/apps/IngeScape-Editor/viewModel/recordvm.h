@@ -21,6 +21,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <model/recordm.h>
+#include <model/enums.h>
 
 
 /**
@@ -32,6 +33,10 @@ class RecordVM : public QObject
 
     // Model of our record
     I2_QML_PROPERTY_DELETE_PROOF(RecordM*, modelM)
+
+    // Elapsed time (from the beginning of the current replay)
+    // Define a QTime and a QDateTime: Manage a date in addition to the time to prevent a delta in hours between JS (QML) and C++
+    I2_QML_PROPERTY_QTime(elapsedTime)
 
 
 public:

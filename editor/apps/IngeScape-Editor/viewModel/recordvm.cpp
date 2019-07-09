@@ -26,7 +26,8 @@
  */
 RecordVM::RecordVM(RecordM* model,
                    QObject *parent) : QObject(parent),
-    _modelM(model)
+    _modelM(model),
+    _elapsedTime(QTime::fromMSecsSinceStartOfDay(0))
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
