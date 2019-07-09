@@ -279,6 +279,12 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when a record has been UN-loaded
+     */
+    void unloadedRecordReceived();
+
+
+    /**
      * @brief Signal emitted when a record playing has ended
      */
     void endOfRecordReceived();

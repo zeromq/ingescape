@@ -567,6 +567,43 @@ Item {
             }
 
 
+            // Button "Stop"
+            Button {
+                id: stopButton
+
+                anchors {
+                    //verticalCenter: parent.verticalCenter
+                    right: parent.right
+                    rightMargin: 25
+                    bottom: parent.bottom
+                    bottomMargin: -5
+                }
+
+                visible: controller && ((controller.replayState === ReplayStates.PAUSED) || rootItem._isPlayingOrResumingReplay)
+                         && recordItem._isCurrentReplay
+
+                activeFocusOnPress: true
+
+                text: "STOP"
+
+                /*style: LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
+
+                    releasedID: "pause"
+                    pressedID: releasedID + "-pressed"
+                    disabledID: releasedID
+                }*/
+
+                onClicked: {
+                    if (controller)
+                    {
+                        // Stop the current loaded record (replay)
+                        controller.stopOrPauseReplay(true);
+                    }
+                }
+            }
+
+
             // Button "Remove"
             Button {
                 id: removeButton

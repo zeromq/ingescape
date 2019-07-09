@@ -200,6 +200,12 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot called when a record has been UN-loaded
+     */
+    void onUNloadedRecord();
+
+
+    /**
      * @brief Slot called when a record playing has ended
      */
     void onEndOfRecord();

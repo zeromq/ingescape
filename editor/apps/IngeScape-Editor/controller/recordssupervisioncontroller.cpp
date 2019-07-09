@@ -146,7 +146,7 @@ void RecordsSupervisionController::loadRecord(QString recordId)
         RecordVM* recordVM = _hashFromRecordIdToViewModel.value(recordId);
         if (recordVM != nullptr)
         {
-            // Update the current state of the replay
+            // To be sure, init the current state of the replay
             setreplayState(ReplayStates::UNLOADED);
 
             // Set the current replay (loading record)
@@ -167,13 +167,7 @@ void RecordsSupervisionController::unloadRecord()
 {
     if (_isRecorderON && (_currentReplay != nullptr) && (_currentReplay->modelM() != nullptr))
     {
-        // Update the current state of the replay
-        //setreplayState(ReplayStates::UNLOADED);
-
-        // Reset the current replay (loaded record)
-        //setcurrentReplay(nullptr);
-
-        QString commandAndParameters = QString("%1=%2").arg(command_StopReplay, _currentReplay->modelM()->uid());
+        QString commandAndParameters = QString("%1=%2").arg(command_UNloadReplay, _currentReplay->modelM()->uid());
 
         Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
     }
@@ -223,7 +217,7 @@ void RecordsSupervisionController::stopOrPauseReplay(bool isStop)
         if (isStop)
         {
             // Update the current state of the replay
-            setreplayState(ReplayStates::LOADED);
+            //setreplayState(ReplayStates::LOADED);
 
             commandAndParameters = QString("%1=%2").arg(command_StopReplay, _currentReplay->modelM()->uid());
         }
@@ -417,13 +411,10 @@ void RecordsSupervisionController::onLoadedRecord()
 
 
 /**
- * @brief Slot called when a record playing has ended
+ * @brief Slot called when a record has been UN-loaded
  */
-void RecordsSupervisionController::onEndOfRecord()
+void RecordsSupervisionController::onUNloadedRecord()
 {
-    // Update the current state of the replay
-    //setreplayState(ReplayStates::LOADED);
-
     // Update the current state of the replay
     setreplayState(ReplayStates::UNLOADED);
 
@@ -431,6 +422,16 @@ void RecordsSupervisionController::onEndOfRecord()
     if (_currentReplay != nullptr) {
         setcurrentReplay(nullptr);
     }
+}
+
+
+/**
+ * @brief Slot called when a record playing has ended
+ */
+void RecordsSupervisionController::onEndOfRecord()
+{
+    // Update the current state of the replay
+    setreplayState(ReplayStates::LOADED);
 }
 
 
@@ -521,8 +522,12 @@ void RecordsSupervisionController::_deleteRecordVMwithModel(RecordM* model)
         {
             _hashFromRecordIdToViewModel.remove(model->uid());
 
-            if (_currentReplay != nullptr) {
+            if (_currentReplay == vm)
+            {
                 setcurrentReplay(nullptr);
+
+                // Reset the current state of the replay
+                setreplayState(ReplayStates::UNLOADED);
             }
 
             if (_selectedRecord == vm) {

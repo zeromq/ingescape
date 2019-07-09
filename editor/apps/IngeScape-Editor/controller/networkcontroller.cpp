@@ -46,6 +46,7 @@ static const QString prefix_AddedRecord = "ADD_RECORD=";
 static const QString prefix_DeletedRecord = "DELETED_RECORD=";
 static const QString prefix_LoadingRecord = "REPLAY_LOADING=";
 static const QString prefix_LoadedRecord = "REPLAY_LOADED";
+static const QString prefix_UNloadedRecord = "REPLAY_UNLOADED";
 static const QString prefix_EndedRecord = "REPLAY_ENDED";
 static const QString prefix_HighlightLink = "HIGHLIGHT_LINK=";
 static const QString prefix_RunAction = "RUN_THIS_ACTION#";
@@ -411,6 +412,14 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Emit the signal "Loaded record received"
                 Q_EMIT networkController->loadedRecordReceived();
+            }
+            // UN-loaded record
+            else if (message == prefix_UNloadedRecord)
+            {
+                qDebug() << prefix_UNloadedRecord;
+
+                // Emit the signal "UN-loaded record received"
+                Q_EMIT networkController->unloadedRecordReceived();
             }
             // End of record
             else if (message == prefix_EndedRecord)

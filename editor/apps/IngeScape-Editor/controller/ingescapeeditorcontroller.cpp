@@ -175,6 +175,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::loadingRecordReceived, this, &IngeScapeEditorController::_onLoadingRecord);
     connect(_networkC, &NetworkController::loadPlatformFileFromPath, this, &IngeScapeEditorController::_onLoadPlatformFileFromPath);
     connect(_networkC, &NetworkController::loadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadedRecord);
+    connect(_networkC, &NetworkController::unloadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onUNloadedRecord);
     connect(_networkC, &NetworkController::endOfRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onEndOfRecord);
 
     connect(_networkC, &NetworkController::runAction, _scenarioC, &ScenarioController::onRunAction);
