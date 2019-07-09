@@ -65,6 +65,11 @@ ExpeModelManager::~ExpeModelManager()
  */
 void ExpeModelManager::listPlatformsInDirectory(QString directoryPath)
 {
+    // First, reset the current loaded platform if needed
+    if (_currentLoadedPlatform != nullptr) {
+        setcurrentLoadedPlatform(nullptr);
+    }
+
     // Clear the list and delete all platforms
     _platformsList.deleteAllItems();
 
@@ -158,14 +163,26 @@ void ExpeModelManager::onEditorExited(QString peerId, QString peerName)
  */
 void ExpeModelManager::onStatusReceivedAbout_LoadPlatformFile(bool commandStatus, QString commandParameters)
 {
+    PlatformM* loadedPlatform = nullptr;
+
     if (commandStatus)
     {
          qDebug() << "Platform" << commandParameters << "Loaded";
 
-         // FIXME TODO
+         for (PlatformM* iterator : _platformsList)
+         {
+             if ((iterator != nullptr) && (iterator->filePath() == commandParameters))
+             {
+                 loadedPlatform = iterator;
+                 break;
+             }
+         }
     }
     else {
         qCritical() << "Editor failed to load the platform" << commandParameters;
     }
+
+    // Update property "Current Loaded Platform"
+    setcurrentLoadedPlatform(loadedPlatform);
 }
 

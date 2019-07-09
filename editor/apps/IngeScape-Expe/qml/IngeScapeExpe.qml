@@ -36,6 +36,17 @@ Item {
     //--------------------------------------------------------
 
 
+    property PlatformM currentLoadedPlatform: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.currentLoadedPlatform : null;
+
+
+    //--------------------------------------------------------
+    //
+    //
+    // Content
+    //
+    //
+    //--------------------------------------------------------
+
     /*header: ToolBar {
         contentHeight: toolButton.implicitHeight
 
@@ -210,7 +221,7 @@ Item {
             spacing: 10
 
             Text {
-                text: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.platformsList.count + " platforms:"
+                text: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.platformsList.count + " platforms"
                                                   : ""
 
                 height: 30
@@ -262,11 +273,15 @@ Item {
                 delegate: Rectangle {
                     id: platformItem
 
+                    property var isLoaded: rootItem.currentLoadedPlatform && (rootItem.currentLoadedPlatform === model.QtObject)
+
                     //width: 350
                     width: scrollView.width
                     height: 36
 
-                    color: "transparent"
+                    //color: rootItem.currentLoadedPlatform && (rootItem.currentLoadedPlatform === model.QtObject) ? IngeScapeTheme.orangeColor : "transparent"
+                    color: platformItem.isLoaded ? IngeScapeTheme.orangeColor : "transparent"
+
                     border {
                         color: "darkgray"
                         width: 1
@@ -300,12 +315,13 @@ Item {
                             margins: 2
                         }
 
+                        visible: !platformItem.isLoaded
                         enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON
 
-                        text: qsTr("Open platform");
+                        text: qsTr("LOAD");
 
                         onClicked: {
-                            console.log("QML: Open platform " + model.name);
+                            console.log("QML: Load platform " + model.name);
 
                             // Open platform
                             IngeScapeExpeC.openPlatform(model.QtObject);
