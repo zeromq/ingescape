@@ -60,6 +60,33 @@ ExpeModelManager::~ExpeModelManager()
 
 
 /**
+ * @brief Setter for property "Current Loaded Platform"
+ * @param value
+ */
+void ExpeModelManager::setcurrentLoadedPlatform(PlatformM *value)
+{
+    if (_currentLoadedPlatform != value)
+    {
+        if (_currentLoadedPlatform != nullptr)
+        {
+            // Clear agents of previous platform
+            qDebug() << "Clear agents of previous platform" << _currentLoadedPlatform->name();
+        }
+
+        _currentLoadedPlatform = value;
+
+        if (_currentLoadedPlatform != nullptr)
+        {
+            // Load agents of new platform
+            qDebug() << "Load agents of new platform" << _currentLoadedPlatform->name();
+        }
+
+        Q_EMIT currentLoadedPlatformChanged(value);
+    }
+}
+
+
+/**
  * @brief List all IngeScape platforms in a directory
  * @param directoryPath
  */

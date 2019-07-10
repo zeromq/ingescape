@@ -45,7 +45,7 @@ class ExpeModelManager : public IngeScapeModelManager
     I2_QOBJECT_LISTMODEL(PlatformM, platformsList)
 
     // Current loaded platform
-    I2_QML_PROPERTY(PlatformM*, currentLoadedPlatform)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(PlatformM*, currentLoadedPlatform)
 
 
 public:
