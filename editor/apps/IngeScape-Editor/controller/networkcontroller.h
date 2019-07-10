@@ -21,6 +21,7 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
+#include <controller/ingescapenetworkcontroller.h>
 #include <model/agent/agentm.h>
 #include <model/publishedvaluem.h>
 
@@ -28,21 +29,18 @@
 /**
  * @brief The NetworkController class defines the controller for network communications
  */
-class NetworkController: public QObject
+class NetworkController: public IngeScapeNetworkController
 {
     Q_OBJECT
 
     // Model of our agent "IngeScape Editor"
     I2_QML_PROPERTY_READONLY(AgentM*, agentEditor)
 
-    // List of available network devices
-    I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
-
 
 public:
 
     /**
-     * @brief Default constructor
+     * @brief Constructor
      * @param parent
      */
     explicit NetworkController(QObject *parent = nullptr);
@@ -51,84 +49,25 @@ public:
     /**
       * @brief Destructor
       */
-    ~NetworkController();
+    ~NetworkController() Q_DECL_OVERRIDE;
 
 
     /**
-     * @brief Start our INGESCAPE agent with a network device (or an IP address) and a port
-     * @param networkDevice
-     * @param ipAddress
-     * @param port
-     * @return
-     */
-    bool start(QString networkDevice, QString ipAddress, uint port);
-
-
-    /**
-     * @brief Stop our INGESCAPE agent
-     */
-    void stop();
-
-
-    /**
-     * @brief Get the IngeScape type of a peer id
+     * @brief Manage a "Shouted" message
      * @param peerId
-     * @return
+     * @param peerName
+     * @param zMessage
      */
-    IngeScapeTypes::Value getIngeScapeTypeOfPeerId(QString peerId);
+    void manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage) Q_DECL_OVERRIDE;
 
 
     /**
-     * @brief Manage a peer id which entered the network
+     * @brief Manage a "Whispered" message
      * @param peerId
-     * @param ingeScapeType
+     * @param peerName
+     * @param zMessage
      */
-    void manageEnteredPeerId(QString peerId, IngeScapeTypes::Value ingeScapeType);
-
-
-    /**
-     * @brief Manage a peer id which exited the network
-     * @param peerId
-     */
-    void manageExitedPeerId(QString peerId);
-
-
-    /**
-     * @brief Manage the message "MUTED / UN-MUTED"
-     * @param peerId
-     * @param message
-     */
-    void manageMessageMutedUnmuted(QString peerId, QString message);
-
-
-    /**
-     * @brief Manage the message "CAN BE FROZEN / CAN NOT BE FROZEN"
-     * @param peerId
-     * @param message
-     */
-    void manageMessageCanBeFrozenOrNot(QString peerId, QString message);
-
-
-    /**
-     * @brief Manage the message "FROZEN / UN-FROZEN"
-     * @param peerId
-     * @param message
-     */
-    void manageMessageFrozenUnfrozen(QString peerId, QString message);
-
-
-    /**
-     * @brief Update the list of available network devices
-     */
-    Q_INVOKABLE void updateAvailableNetworkDevices();
-
-
-    /**
-     * @brief Return true if the network device is available
-     * @param networkDevice
-     * @return
-     */
-    Q_INVOKABLE bool isAvailableNetworkDevice(QString networkDevice);
+    void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage) Q_DECL_OVERRIDE;
 
 
     /**
@@ -151,95 +90,10 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when an agent enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     * @param commandLine
-     * @param canBeFrozen
-     * @param loggerPort
+     * @brief Signal emitted when a new value is published
+     * @param publishedValue
      */
-    void agentEntered(QString peerId, QString peerName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort);
-
-
-    /**
-     * @brief Signal emitted when an agent quit the network
-     * @param peer id
-     * @param peer name
-     */
-    void agentExited(QString peerId, QString peerName);
-
-
-    /**
-     * @brief Signal emitted when a launcher enter the network
-     * @param peerId
-     * @param hostname
-     * @param ipAddress
-     */
-    void launcherEntered(QString peerId, QString hostname, QString ipAddress, QString streamingPort);
-
-
-    /**
-     * @brief Signal emitted when a launcher quit the network
-     * @param peerId
-     * @param hostname
-     */
-    void launcherExited(QString peerId, QString hostname);
-
-
-    /**
-     * @brief Signal emitted when a recorder enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void recorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
-
-
-    /**
-     * @brief Signal emitted when a recorder quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void recorderExited(QString peerId, QString peerName);
-
-
-    /**
-     * @brief Signal emitted when an expe enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void expeEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
-
-
-    /**
-     * @brief Signal emitted when an expe quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void expeExited(QString peerId, QString peerName);
-
-
-    /**
-     * @brief Signal emitted when an agent definition has been received
-     * @param peer id
-     * @param peer name
-     * @param definitionJSON
-     */
-    void definitionReceived(QString peerId, QString peerName, QString definitionJSON);
-
-
-    /**
-     * @brief Signal emitted when an agent mapping has been received
-     * @param peerId
-     * @param peerName
-     * @param mappingJSON
-     */
-    void mappingReceived(QString peerId, QString peerName, QString mappingJSON);
+    void valuePublished(PublishedValueM* publishedValue);
 
 
     /**
@@ -288,13 +142,6 @@ Q_SIGNALS:
      * @brief Signal emitted when a record playing has ended
      */
     void endOfRecordReceived();
-
-
-    /**
-     * @brief Signal emitted when a new value is published
-     * @param publishedValue
-     */
-    void valuePublished(PublishedValueM* publishedValue);
 
 
     /**
@@ -483,14 +330,6 @@ public Q_SLOTS:
 
 private:
 
-    // Name of our agent "IngeScape Editor"
-    QString _editorAgentName;
-
-    // Our IngeScape agent is successfully started if the result of igs_startWithDevice / igs_startWithIP is 1 (O otherwise)
-    int _isIngeScapeAgentStarted;
-
-    // Hash table from a peer id to a type of IngeScape elements on the network
-    QHash<QString, IngeScapeTypes::Value> _hashFromPeerIdToIngeScapeType;
 
 };
 

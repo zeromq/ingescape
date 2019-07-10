@@ -183,7 +183,7 @@ private:
 
 private:
 
-    // Manager for the data model of INGESCAPE
+    // Manager for the data model of IngeScape
     EditorModelManager* _modelManager;
 
     // Helper to manage JSON files

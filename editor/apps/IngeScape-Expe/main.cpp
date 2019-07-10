@@ -32,12 +32,6 @@
 #include <misc/ingescapeutils.h>
 
 
-// FIXME: Why this include is not needed in the IngeScape Editor ?
-extern "C" {
-    #include <ingescape.h>
-}
-
-
 /**
  * @brief Handler for "Log Message"
  * @param type

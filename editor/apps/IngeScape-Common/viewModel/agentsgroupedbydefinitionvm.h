@@ -57,7 +57,7 @@ class AgentsGroupedByDefinitionVM : public QObject
     // Hostname(s) on the network of our agent(s)
     I2_QML_PROPERTY_READONLY(QString, hostnames)
 
-    // Flag indicating if our agent can be restarted (by an INGESCAPE launcher)
+    // Flag indicating if our agent can be restarted (by an IngeScape launcher)
     I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
 
     // Flag indicating if our agent is muted

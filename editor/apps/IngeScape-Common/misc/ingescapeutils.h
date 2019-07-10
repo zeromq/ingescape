@@ -52,7 +52,7 @@ public:
 
     /**
      * @brief Get (and create if needed) the root path of our application
-     * "[DocumentsLocation]/INGESCAPE/"
+     * "[DocumentsLocation]/IngeScape/"
      * @return
      */
     static QString getRootPath();
@@ -60,7 +60,7 @@ public:
 
     /**
      * @brief Get (and create if needed) the settings path of our application
-     * "[DocumentsLocation]/INGESCAPE/settings/"
+     * "[DocumentsLocation]/IngeScape/settings/"
      * @return
      */
     static QString getSettingsPath();
@@ -68,7 +68,7 @@ public:
 
     /**
      * @brief Get (and create if needed) the snapshots path of our application
-     * "[DocumentsLocation]/INGESCAPE/snapshots/"
+     * "[DocumentsLocation]/IngeScape/snapshots/"
      * @return
      */
     static QString getSnapshotsPath();
@@ -76,7 +76,7 @@ public:
 
     /**
      * @brief Get (and create if needed) the path with files about platforms
-     * "[DocumentsLocation]/INGESCAPE/platforms/"
+     * "[DocumentsLocation]/IngeScape/platforms/"
      * @return
      */
     static QString getPlatformsPath();

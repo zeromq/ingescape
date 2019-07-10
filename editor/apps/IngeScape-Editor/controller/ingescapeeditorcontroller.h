@@ -38,7 +38,7 @@
 
 
 /**
- * @brief The IngeScapeEditorController class defines the main controller of the INGESCAPE editor
+ * @brief The IngeScapeEditorController class defines the main controller of the IngeScape editor
  */
 class IngeScapeEditorController : public QObject
 {

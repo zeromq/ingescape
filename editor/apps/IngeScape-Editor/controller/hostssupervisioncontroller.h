@@ -122,7 +122,7 @@ private:
 
 private:
 
-    // Manager for the data model of INGESCAPE
+    // Manager for the data model of IngeScape
     EditorModelManager* _modelManager;
 
     // Hash table from "(host)Name" to the "(view model of) Host"

@@ -1,5 +1,5 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
  *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
@@ -29,7 +29,7 @@ static const QString VERSION_JSON_PLATFORM = QString("1.0");
 
 
 /**
- * @brief The IngeScapeModelManager class defines the manager for the data model of INGESCAPE
+ * @brief The IngeScapeModelManager class defines the manager for the data model of IngeScape
  */
 class IngeScapeModelManager : public QObject
 {
@@ -412,7 +412,7 @@ protected:
     // Hash table from a name to the group of agents with this name
     QHash<QString, AgentsGroupedByNameVM*> _hashFromNameToAgentsGrouped;
 
-    // Hash table from name to a model of host (corresponding to an INGESCAPE launcher)
+    // Hash table from name to a model of host (corresponding to an IngeScape launcher)
     QHash<QString, HostM*> _hashFromNameToHost;
 
     // Hash table from an action (Unique) ID to the corresponding model of action

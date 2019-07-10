@@ -5,7 +5,6 @@ QT += qml quick svg xml sql quick-private core-private gui-private concurrent
 
 
 SOURCES += \
-    $$PWD/controller/abstractscenariocontroller.cpp \
     $$PWD/ingescapecommon.cpp \
     $$PWD/settings/ingescapesettings.cpp \
     $$PWD/misc/terminationsignalwatcher.cpp \
@@ -43,12 +42,13 @@ SOURCES += \
     $$PWD/viewModel/scenario/actioneffectvm.cpp \
     $$PWD/viewModel/scenario/actioninpalettevm.cpp \
     $$PWD/viewModel/scenario/actionexecutionvm.cpp \
-    $$PWD/controller/ingescapemodelmanager.cpp \
+    $$PWD/controller/abstractscenariocontroller.cpp \
     $$PWD/controller/abstracttimeactionslinescenarioviewcontroller.cpp \
+    $$PWD/controller/ingescapemodelmanager.cpp \
+    $$PWD/controller/ingescapenetworkcontroller.cpp \
     $$PWD/sortFilter/abstracttimerangefilter.cpp
 
 HEADERS += \
-    $$PWD/controller/abstractscenariocontroller.h \
     $$PWD/ingescapecommon.h \
     $$PWD/ingescape-common_global.h \
     $$PWD/settings/ingescapesettings.h \
@@ -87,8 +87,10 @@ HEADERS += \
     $$PWD/viewModel/scenario/actioneffectvm.h \
     $$PWD/viewModel/scenario/actioninpalettevm.h \
     $$PWD/viewModel/scenario/actionexecutionvm.h \
-    $$PWD/controller/ingescapemodelmanager.h \
+    $$PWD/controller/abstractscenariocontroller.h \
     $$PWD/controller/abstracttimeactionslinescenarioviewcontroller.h \
+    $$PWD/controller/ingescapemodelmanager.h \
+    $$PWD/controller/ingescapenetworkcontroller.h \
     $$PWD/sortFilter/abstracttimerangefilter.h
 
 

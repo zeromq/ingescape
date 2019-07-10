@@ -265,7 +265,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         _networkDevice = _networkC->availableNetworkDevices().at(0);
     }
 
-    // Start our INGESCAPE agent with a network device (or an IP address) and a port
+    // Start our IngeScape agent with a network device (or an IP address) and a port
     bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
     if (isStarted)
@@ -609,7 +609,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 _modelManager->setisMappingConnected(false);
                 _modelManager->setisMappingControlled(false);
 
-                // Stop our INGESCAPE agent
+                // Stop our IngeScape agent
                 _networkC->stop();
 
                 // Update properties
@@ -639,7 +639,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                     clearCurrentPlatform();
                 }
 
-                // Start our INGESCAPE agent with the network device and the port
+                // Start our IngeScape agent with the network device and the port
                 success = _networkC->start(networkDevice, "", port);
 
                 if (success) {
