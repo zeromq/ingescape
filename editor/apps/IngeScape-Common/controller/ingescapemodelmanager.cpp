@@ -399,83 +399,99 @@ QHash<QString, AgentsGroupedByNameVM*> IngeScapeModelManager::getHashTableFromNa
 
 
 /**
- * @brief Import an agent or an agents list from selected file (definition)
+ * @brief Import an agent (with only its definition) or an agents list from a selected file
+ * @return
  */
 bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
 {
     bool success = true;
 
-    if (_jsonHelper != nullptr)
+    // "File Dialog" to get the file (path) to open
+    QString filePath = QFileDialog::getOpenFileName(nullptr,
+                                                    "Open an agent(s) definition",
+                                                    _rootDirectoryPath,
+                                                    "JSON (*.json)");
+
+    if (!filePath.isEmpty())
     {
-        // "File Dialog" to get the file (path) to open
-        QString agentFilePath = QFileDialog::getOpenFileName(nullptr,
-                                                             "Open an agent(s) definition",
-                                                             _rootDirectoryPath,
-                                                             "JSON (*.json)");
+        // Import an agent (with only its definition) or an agents list from the file path
+        success = importAgentOrAgentsListFromFilePath(filePath);
+    }
+    return success;
+}
 
-        if (!agentFilePath.isEmpty())
+
+/**
+ * @brief Import an agent (with only its definition) or an agents list from a file path
+ * @param filePath
+ * @return
+ */
+bool IngeScapeModelManager::importAgentOrAgentsListFromFilePath(QString filePath)
+{
+    bool success = true;
+
+    if (!filePath.isEmpty())
+    {
+        QFile jsonFile(filePath);
+        if (jsonFile.open(QIODevice::ReadOnly))
         {
-            QFile jsonFile(agentFilePath);
-            if (jsonFile.open(QIODevice::ReadOnly))
+            QByteArray byteArrayOfJson = jsonFile.readAll();
+            jsonFile.close();
+
+            QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+            //if (jsonDocument.isObject())
+
+            QJsonObject jsonRoot = jsonDocument.object();
+
+            // List of agents
+            if (jsonRoot.contains("agents"))
             {
-                QByteArray byteArrayOfJson = jsonFile.readAll();
-                jsonFile.close();
-
-                QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
-                //if (jsonDocument.isObject())
-
-                QJsonObject jsonRoot = jsonDocument.object();
-
-                // List of agents
-                if (jsonRoot.contains("agents"))
+                // Version
+                QString versionJsonPlatform = "";
+                if (jsonRoot.contains("version"))
                 {
-                    // Version
-                    QString versionJsonPlatform = "";
-                    if (jsonRoot.contains("version"))
-                    {
-                        versionJsonPlatform = jsonRoot.value("version").toString();
+                    versionJsonPlatform = jsonRoot.value("version").toString();
 
-                        qDebug() << "Version of JSON platform is" << versionJsonPlatform;
-                    }
-                    else {
-                        qDebug() << "UNDEFINED version of JSON platform";
-                    }
-
-                    // Import the agents list from a json byte content
-                    success = importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
-                }
-                // One agent
-                else if (jsonRoot.contains("definition"))
-                {
-                    QJsonValue jsonDefinition = jsonRoot.value("definition");
-                    if (jsonDefinition.isObject())
-                    {
-                        // Create a model of agent definition from the JSON
-                        DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
-                        if (agentDefinition != nullptr)
-                        {
-                            // Create a new model of agent with the name of the definition
-                            createAgentModel(agentDefinition->name(), agentDefinition);
-                        }
-                        // An error occured, the definition is NULL
-                        else {
-                            qWarning() << "The file" << agentFilePath << "does not contain an agent definition !";
-
-                            success = false;
-                        }
-                    }
+                    qDebug() << "Version of JSON platform is" << versionJsonPlatform;
                 }
                 else {
-                    qWarning() << "The file" << agentFilePath << "does not contain one or several agent definition(s) !";
+                    qDebug() << "UNDEFINED version of JSON platform";
+                }
 
-                    success = false;
+                // Import the agents list from a json byte content
+                success = importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
+            }
+            // One agent
+            else if (jsonRoot.contains("definition"))
+            {
+                QJsonValue jsonDefinition = jsonRoot.value("definition");
+                if (jsonDefinition.isObject() && (_jsonHelper != nullptr))
+                {
+                    // Create a model of agent definition from the JSON
+                    DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
+                    if (agentDefinition != nullptr)
+                    {
+                        // Create a new model of agent with the name of the definition
+                        createAgentModel(agentDefinition->name(), agentDefinition);
+                    }
+                    // An error occured, the definition is NULL
+                    else {
+                        qWarning() << "The file" << filePath << "does not contain an agent definition !";
+
+                        success = false;
+                    }
                 }
             }
             else {
-                qCritical() << "Can not open file" << agentFilePath;
+                qWarning() << "The file" << filePath << "does not contain one or several agent definition(s) !";
 
                 success = false;
             }
+        }
+        else {
+            qCritical() << "Can not open file" << filePath;
+
+            success = false;
         }
     }
     return success;

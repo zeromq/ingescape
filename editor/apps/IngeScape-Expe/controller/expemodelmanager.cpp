@@ -71,6 +71,15 @@ void ExpeModelManager::setcurrentLoadedPlatform(PlatformM *value)
         {
             // Clear agents of previous platform
             qDebug() << "Clear agents of previous platform" << _currentLoadedPlatform->name();
+
+            // If there are some agents
+            if (!_allAgentsGroupsByName.isEmpty())
+            {
+                // Delete agents OFF
+                deleteAgentsOFF();
+
+                qDebug() << _allAgentsGroupsByName.count() << "agents after the call to 'delete Agents OFF'";
+            }
         }
 
         _currentLoadedPlatform = value;
@@ -79,6 +88,16 @@ void ExpeModelManager::setcurrentLoadedPlatform(PlatformM *value)
         {
             // Load agents of new platform
             qDebug() << "Load agents of new platform" << _currentLoadedPlatform->name();
+
+            // Import agents list from the file path
+            bool success = importAgentOrAgentsListFromFilePath(_currentLoadedPlatform->filePath());
+            if (success)
+            {
+                qDebug() << _allAgentsGroupsByName.count() << "imported agents";
+            }
+            else {
+                qCritical() << "Error while importing the agents list from" << _currentLoadedPlatform->filePath();
+            }
         }
 
         Q_EMIT currentLoadedPlatformChanged(value);

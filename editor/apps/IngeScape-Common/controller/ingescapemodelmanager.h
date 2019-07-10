@@ -165,9 +165,18 @@ public:
 
 
     /**
-     * @brief Import an agent or an agents list from selected file (definition)
+     * @brief Import an agent (with only its definition) or an agents list from a selected file
+     * @return
      */
     Q_INVOKABLE bool importAgentOrAgentsListFromSelectedFile();
+
+
+    /**
+     * @brief Import an agent (with only its definition) or an agents list from a file path
+     * @param filePath
+     * @return
+     */
+    bool importAgentOrAgentsListFromFilePath(QString filePath);
 
 
     /**

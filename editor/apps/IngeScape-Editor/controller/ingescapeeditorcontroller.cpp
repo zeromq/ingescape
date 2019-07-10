@@ -916,6 +916,9 @@ void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFile
 
         // Reply with StringList of agents names ? or Sender have to parse "platform (File Path)" to get agents ?
     }
+    else {
+        qWarning() << "Peer Id of Expe is empty" << _peerIdOfExpe;
+    }
 }
 
 

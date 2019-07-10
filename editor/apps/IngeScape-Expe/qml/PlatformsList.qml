@@ -58,7 +58,7 @@ Item {
     }
 
     Column {
-        id: columnHeaders
+        id: column
 
         anchors {
             left: parent.left
@@ -105,7 +105,6 @@ Item {
                     leftMargin: 10
                 }
                 width: 150
-                //height: 30
 
                 onClicked: {
                     console.log("QML: Select directory with platform files...");
@@ -116,7 +115,7 @@ Item {
             }
 
             TextField {
-                id: txtPlatformUrl
+                id: txtCurrentDirectoryPath
 
                 anchors {
                     top: parent.top
@@ -125,8 +124,6 @@ Item {
                     leftMargin: 10
                     right: parent.right
                 }
-                //width: 400
-                //height: 30
 
                 text: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.currentDirectoryPath : ""
 
@@ -173,16 +170,15 @@ Item {
         id: scrollView
 
         anchors {
-            top: columnHeaders.bottom
+            top: column.bottom
             topMargin: 5
             bottom: parent.bottom
             left: parent.left
             right: parent.right
         }
-        //height: 400
 
         /*style: IngeScapeScrollViewStyle {
-            }*/
+        }*/
 
         // Prevent drag overshoot on Windows
         flickableItem.boundsBehavior: Flickable.OvershootBounds
@@ -198,7 +194,6 @@ Item {
 
                     property var isLoaded: rootItem.currentLoadedPlatform ? (rootItem.currentLoadedPlatform === model.QtObject) : false
 
-                    //width: 350
                     width: scrollView.width
                     height: 36
 
@@ -216,9 +211,8 @@ Item {
                             leftMargin: 5
                             verticalCenter: parent.verticalCenter
                         }
-                        //width: 150
 
-                        text: model.name
+                        text: model ? model.name : ""
 
                         color: IngeScapeTheme.whiteColor
                         font {
