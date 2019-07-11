@@ -42,11 +42,11 @@ NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkControll
 /**
  * @brief Destructor
  */
-/*NetworkController::~NetworkController()
+NetworkController::~NetworkController()
 {
     // Mother class is automatically called
     //IngeScapeNetworkController::~IngeScapeNetworkController();
-}*/
+}
 
 
 /**

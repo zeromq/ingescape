@@ -172,16 +172,18 @@ Item {
                 delegate: Rectangle {
                     id: agentItem
 
-                    //property var isON: rootItem.currentLoadedPlatform ? (rootItem.currentLoadedPlatform === model.QtObject) : false
+                    property var isONandAlone: model && model.isON && (model.numberOfAgentsON === 1)
 
                     width: scrollView.width
                     height: 36
 
-                    color: (model && model.isON) ? IngeScapeTheme.orangeColor : "transparent"
+                    //color: (model && model.isON) ? IngeScapeTheme.orangeColor : "transparent"
+                    color: (model && model.isON) ? "transparent" : "darkgray"
 
                     border {
-                        color: "darkgray"
-                        width: 1
+                        //color: "darkgray"
+                        color: agentItem.isONandAlone ? "darkgray" : IngeScapeTheme.redColor
+                        width: agentItem.isONandAlone ? 1 : 2
                     }
 
                     Label {
@@ -199,6 +201,37 @@ Item {
                             family: IngeScapeTheme.textFontFamily
                             //weight: Font.Medium
                             pixelSize: 16
+                        }
+                    }
+
+                    Rectangle {
+                        id: warningManyAgentsWithSameName
+
+                        anchors {
+                            right: parent.right
+                            rightMargin: 5
+                            verticalCenter: parent.verticalCenter
+                        }
+                        height: 20
+                        width: height
+                        radius: height / 2
+
+                        //visible: model ? (model.numberOfAgentsON > 1) : false
+
+                        color: model && (model.numberOfAgentsON === 1) ? "transparent" : IngeScapeTheme.redColor
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            text: model ? model.numberOfAgentsON : ""
+
+                            color: IngeScapeTheme.whiteColor
+
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                weight: Font.Black
+                                pixelSize: 13
+                            }
                         }
                     }
 

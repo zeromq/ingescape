@@ -125,9 +125,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
     // Connect to signals from the network controller
     /*connect(_networkC, &NetworkController::agentEntered, _modelManager, &AssessmentsModelManager::onAgentEntered);
-    connect(_networkC, &NetworkController::agentExited, _modelManager, &AssessmentsModelManager::onAgentExited);
-    connect(_networkC, &NetworkController::launcherEntered, _modelManager, &AssessmentsModelManager::onLauncherEntered);
-    connect(_networkC, &NetworkController::launcherExited, _modelManager, &AssessmentsModelManager::onLauncherExited);*/
+    connect(_networkC, &NetworkController::agentExited, _modelManager, &AssessmentsModelManager::onAgentExited);*/
 
 
     // Update the list of available network devices

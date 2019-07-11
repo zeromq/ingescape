@@ -39,8 +39,7 @@ public:
     /**
       * @brief Destructor
       */
-    //~NetworkController();
-    //~NetworkController() Q_DECL_OVERRIDE;
+    ~NetworkController() Q_DECL_OVERRIDE;
 
 
     /**
