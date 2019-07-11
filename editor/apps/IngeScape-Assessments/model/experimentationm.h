@@ -23,6 +23,8 @@
 #include <model/task/taskm.h>
 #include <model/recordsetupm.h>
 
+#include "cassandra.h"
+
 
 /**
  * @brief The ExperimentationM class defines a model of experimentation
@@ -30,9 +32,6 @@
 class ExperimentationM : public QObject
 {
     Q_OBJECT
-
-    // Cassandra (Unique) Identifier of our experimentation
-    //I2_CPP_NOSIGNAL_PROPERTY(CassUuid, uid)
 
     // Name of our experimentation
     I2_QML_PROPERTY(QString, name)
@@ -61,7 +60,8 @@ public:
      * @param creationDate
      * @param parent
      */
-    explicit ExperimentationM(QString name,
+    explicit ExperimentationM(CassUuid cassUuid,
+                              QString name,
                               QDateTime creationDate,
                               QObject *parent = nullptr);
 
@@ -70,6 +70,13 @@ public:
      * @brief Destructor
      */
     ~ExperimentationM();
+
+
+    /**
+     * @brief Get the unique identifier in Cassandra Data Base
+     * @return
+     */
+    CassUuid getCassUuid();
 
 
     /**
@@ -137,6 +144,8 @@ public Q_SLOTS:
 
 private:
 
+    // Unique identifier in Cassandra Data Base
+    CassUuid _cassUuid;
 
 };
 

@@ -98,9 +98,6 @@ ExperimentationsListController::ExperimentationsListController(AssessmentsModelM
             {
                 const CassRow* row = cass_iterator_get_row(cassIterator);
 
-                // For all records put all information into the JSON file
-                //jsonDumpRecord(&g, row);
-
                 CassUuid experimentationId;
                 cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &experimentationId);
                 char chrExperimentationId[CASS_UUID_STRING_LENGTH];
@@ -127,7 +124,7 @@ ExperimentationsListController::ExperimentationsListController(AssessmentsModelM
                 QString experimentationsGroupName = QString::fromUtf8(chrExperimentationsGroupName, static_cast<int>(experimentationsGroupNameLength));
 
                 // Create the new experimentation
-                ExperimentationM* experimentation = new ExperimentationM(experimentationName, creationDateTime, nullptr);
+                ExperimentationM* experimentation = new ExperimentationM(experimentationId, experimentationName, creationDateTime, nullptr);
 
                 ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentationsGroupName);
                 if (experimentationsGroup == nullptr)
@@ -254,7 +251,7 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
             qInfo() << "Experimentation" << experimentationName << "inserted into the DataBase";
 
             // Create the new experimentation
-            ExperimentationM* experimentation = new ExperimentationM(experimentationName, QDateTime::currentDateTime(), nullptr);
+            ExperimentationM* experimentation = new ExperimentationM(experimentationId, experimentationName, QDateTime::currentDateTime(), nullptr);
 
             // Add to the group
             experimentationsGroup->experimentations()->append(experimentation);

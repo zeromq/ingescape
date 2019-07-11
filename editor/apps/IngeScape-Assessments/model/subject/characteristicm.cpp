@@ -21,14 +21,16 @@
  * @param isSubjectName
  * @param parent
  */
-CharacteristicM::CharacteristicM(QString name,
+CharacteristicM::CharacteristicM(CassUuid cassUuid,
+                                 QString name,
                                  CharacteristicValueTypes::Value valueType,
                                  bool isSubjectName,
                                  QObject *parent) : QObject(parent),
     _name(name),
     _valueType(valueType),
     _isSubjectName(isSubjectName),
-    _enumValues(QStringList())
+    _enumValues(QStringList()),
+    _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -44,4 +46,14 @@ CharacteristicM::~CharacteristicM()
 {
     qInfo() << "Delete Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType);
 
+}
+
+
+/**
+ * @brief Get the unique identifier in Cassandra Data Base
+ * @return
+ */
+CassUuid CharacteristicM::getCassUuid()
+{
+    return _cassUuid;
 }

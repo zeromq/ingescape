@@ -64,7 +64,7 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
     //
     // FIXME for tests
     //
-
+    /*
     QStringList enumBool = { tr("FALSE"), tr("TRUE") };
     //QStringList enumBool_French = { "FAUX", "VRAI" };
 
@@ -82,6 +82,7 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
 
     CharacteristicM *characteristicGender = new CharacteristicM("Genre", CharacteristicValueTypes::CHARACTERISTIC_ENUM);
     characteristicGender->setenumValues(enumGender);
+    */
 }
 
 

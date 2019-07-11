@@ -18,6 +18,7 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
+#include <controller/assessmentsmodelmanager.h>
 #include <model/assessmentsenums.h>
 #include <model/experimentationm.h>
 
@@ -33,7 +34,7 @@ class SubjectsController : public QObject
     I2_ENUM_LISTMODEL(CharacteristicValueTypes, allCharacteristicValueTypes)
 
     // Model of the current experimentation
-    I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
 
 
 public:
@@ -43,7 +44,7 @@ public:
      * @param modelManager
      * @param parent
      */
-    explicit SubjectsController(//IngeScapeModelManager* modelManager,
+    explicit SubjectsController(AssessmentsModelManager* modelManager,
                                 QObject *parent = nullptr);
 
 
@@ -104,10 +105,19 @@ Q_SIGNALS:
 public Q_SLOTS:
 
 
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the current experimentation changed
+     * @param currentExperimentation
+     */
+    void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
+
+
 private:
 
     // Manager for the data model of our IngeScape Assessments application
-    //IngeScapeModelManager* _modelManager;
+    AssessmentsModelManager* _modelManager;
 
 };
 

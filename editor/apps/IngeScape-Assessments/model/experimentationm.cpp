@@ -21,11 +21,13 @@
  * @param creationDate
  * @param parent
  */
-ExperimentationM::ExperimentationM(QString name,
+ExperimentationM::ExperimentationM(CassUuid cassUuid,
+                                   QString name,
                                    QDateTime creationDate,
                                    QObject *parent) : QObject(parent),
     _name(name),
-    _creationDate(creationDate)
+    _creationDate(creationDate),
+    _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -38,8 +40,8 @@ ExperimentationM::ExperimentationM(QString name,
 
 
     // Characteristic "Subject Name"
-    CharacteristicM* characteristicName = new CharacteristicM(CHARACTERISTIC_SUBJECT_NAME, CharacteristicValueTypes::TEXT, true, this);
-    _allCharacteristics.append(characteristicName);
+    //CharacteristicM* characteristicName = new CharacteristicM(CHARACTERISTIC_SUBJECT_NAME, CharacteristicValueTypes::TEXT, true, this);
+    //_allCharacteristics.append(characteristicName);
 
 
     //
@@ -89,6 +91,16 @@ ExperimentationM::~ExperimentationM()
     // Delete all record setups of our experimentation
     _allRecordSetups.deleteAllItems();
 
+}
+
+
+/**
+ * @brief Get the unique identifier in Cassandra Data Base
+ * @return
+ */
+CassUuid ExperimentationM::getCassUuid()
+{
+    return _cassUuid;
 }
 
 
