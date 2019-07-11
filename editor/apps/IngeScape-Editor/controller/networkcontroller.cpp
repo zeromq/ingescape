@@ -189,6 +189,8 @@ NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkControll
     // Add  header to declare ourselves as an editor
     igs_busAddServiceDescription("isEditor", "1");
 
+    // We don't see itself
+    setnumberOfEditors(1);
 
     // Create the model of our agent "IngeScape Editor"
     _agentEditor = new AgentM(_igsAgentApplicationName);

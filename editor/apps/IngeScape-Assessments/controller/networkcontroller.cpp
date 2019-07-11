@@ -34,6 +34,9 @@ NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkControll
 
     // Add  header to declare ourselves as assessments
     igs_busAddServiceDescription("isAssessments", "1");
+
+    // We don't see itself
+    setnumberOfAssessments(1);
 }
 
 

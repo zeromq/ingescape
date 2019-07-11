@@ -42,16 +42,117 @@ Rectangle {
     visible: IngeScapeEditorC.isVisibleModelVisualizer
 
 
+    Rectangle {
+        id: rctGlobalNumbers
+
+        anchors {
+            left: parent.left
+            top: parent.top
+            bottom: parent.bottom
+            //margins: 5
+        }
+        width: 140
+
+        color: "transparent"
+        /*border {
+            width: 1
+            color: IngeScapeTheme.editorsBackgroundBorderColor
+        }*/
+
+        Column {
+            spacing: 5
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+                margins: 5
+            }
+
+            Text {
+                text: "IGS app ON:"
+
+                color: "white"
+                font {
+                    pointSize: 18
+                    weight: Font.Bold
+                }
+            }
+
+            Text {
+                text: "- " + IngeScapeEditorC.networkC.numberOfAgents + " agents"
+
+                color: "white"
+                font {
+                    pointSize: 16
+                    weight: Font.Medium
+                }
+            }
+
+            Text {
+                text: "- " + IngeScapeEditorC.networkC.numberOfLaunchers + " launchers"
+
+                color: "white"
+                font {
+                    pointSize: 16
+                    weight: Font.Medium
+                }
+            }
+
+            Text {
+                text: "- " + IngeScapeEditorC.networkC.numberOfRecorders + " recorders"
+
+                color: "white"
+                font {
+                    pointSize: 16
+                    weight: Font.Medium
+                }
+            }
+
+            Text {
+                text: "- " + IngeScapeEditorC.networkC.numberOfEditors + " editors"
+
+                color: "white"
+                font {
+                    pointSize: 16
+                    weight: Font.Medium
+                }
+            }
+
+            Text {
+                text: "- " + IngeScapeEditorC.networkC.numberOfAssessments + " assessments"
+
+                color: "white"
+                font {
+                    pointSize: 16
+                    weight: Font.Medium
+                }
+            }
+
+            Text {
+                text: "- " + IngeScapeEditorC.networkC.numberOfExpes + " expes"
+
+                color: "white"
+                font {
+                    pointSize: 16
+                    weight: Font.Medium
+                }
+            }
+        }
+    }
+
     //
     // List of all "Agents Grouped by Name"
     //
     ListView {
+        id: list
+
         anchors {
-            left: parent.left
+            left: rctGlobalNumbers.right
             right: parent.right
             top: parent.top
             bottom: parent.bottom
-            margins: 2
+            margins: 5
         }
         //height: contentHeight
 
@@ -91,6 +192,7 @@ Rectangle {
                 Text {
                     text: groupByNameVM ? groupByNameVM.models.count + " M"
                                         : "0 M"
+                    width: 25
                     color: groupByNameVM && groupByNameVM.isON ? "white" : "#888888"
                     font.pointSize: 14
                 }
@@ -98,6 +200,7 @@ Rectangle {
                 Text {
                     text: groupByNameVM ? groupByNameVM.numberOfAgentsON + " ON"
                                         : "0 ON"
+                    width: 35
                     color: "green"
                     font {
                         pointSize: 14
@@ -108,6 +211,7 @@ Rectangle {
                 Text {
                     text: groupByNameVM ? groupByNameVM.numberOfAgentsOFF + " OFF"
                                         : "0 OFF"
+                    width: 35
                     color: "red"
                     font {
                         pointSize: 14
@@ -150,6 +254,7 @@ Rectangle {
                                 Text {
                                     text: groupByDefinitionVM.models.count + " M"
                                     color: groupByDefinitionVM.isON ? "white" : "#888888"
+                                    width: 25
                                     font.pointSize: 14
                                 }
 
@@ -167,15 +272,26 @@ Rectangle {
                                             property AgentM agentM: model.QtObject
 
                                             width: childrenRect.width
-                                            height: 25
+                                            height: 35
 
                                             color: agentM.isON ? "#2222CC" : "#222277"
+                                            border {
+                                                width: 1
+                                                color: IngeScapeTheme.editorsBackgroundBorderColor
+                                            }
 
                                             Row {
                                                 spacing: 15
 
+                                                anchors {
+                                                    left: parent.left
+                                                    top: parent.top
+                                                    margins: 2
+                                                }
+
                                                 Text {
                                                     text: agentM.hostname
+                                                    width: 150
                                                     color: agentM.isON ? "white" : "#888888"
                                                     font {
                                                         pointSize: 14
@@ -187,13 +303,19 @@ Rectangle {
                                                     text: agentM.peerId
                                                     color: agentM.isON ? "white" : "#888888"
                                                 }
+                                            }
 
-                                                Text {
-                                                    text: agentM.commandLine
-                                                    color: agentM.isON ? "white" : "#888888"
-                                                    width: 400
-                                                    elide: Text.ElideLeft
+                                            Text {
+                                                anchors {
+                                                    left: parent.left
+                                                    bottom: parent.bottom
+                                                    margins: 2
                                                 }
+
+                                                text: agentM.commandLine
+                                                color: agentM.isON ? "white" : "#888888"
+                                                width: 690
+                                                elide: Text.ElideLeft
                                             }
                                         }
                                     }

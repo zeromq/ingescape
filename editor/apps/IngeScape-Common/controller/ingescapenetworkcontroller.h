@@ -46,6 +46,14 @@ class IngeScapeNetworkController: public QObject
     // List of available network devices
     I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
 
+    // Number of each type of IngeScape applications
+    I2_QML_PROPERTY_READONLY(int, numberOfAgents)
+    I2_QML_PROPERTY_READONLY(int, numberOfLaunchers)
+    I2_QML_PROPERTY_READONLY(int, numberOfRecorders)
+    I2_QML_PROPERTY_READONLY(int, numberOfEditors)
+    I2_QML_PROPERTY_READONLY(int, numberOfAssessments)
+    I2_QML_PROPERTY_READONLY(int, numberOfExpes)
+
 
 public:
 

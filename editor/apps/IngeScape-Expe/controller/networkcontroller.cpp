@@ -36,6 +36,9 @@ NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkControll
 
     // Add  header to declare ourselves as expe
     igs_busAddServiceDescription("isExpe", "1");
+
+    // We don't see itself
+    setnumberOfExpes(1);
 }
 
 

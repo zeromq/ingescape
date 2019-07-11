@@ -146,6 +146,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Save the peer id of this launcher
                 networkController->manageEnteredPeerId(peerId, IngeScapeTypes::LAUNCHER);
+                networkController->setnumberOfLaunchers(networkController->numberOfLaunchers() + 1);
 
                 if (peerName.endsWith(suffix_Launcher)) {
                     hostname = peerName.left(peerName.length() - suffix_Launcher.length());
@@ -161,6 +162,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Save the peer id of this recorder
                 networkController->manageEnteredPeerId(peerId, IngeScapeTypes::RECORDER);
+                networkController->setnumberOfRecorders(networkController->numberOfRecorders() + 1);
 
                 // Emit the signal "Recorder Entered"
                 Q_EMIT networkController->recorderEntered(peerId, peerName, ipAddress, hostname);
@@ -172,6 +174,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Save the peer id of this editor
                 networkController->manageEnteredPeerId(peerId, IngeScapeTypes::EDITOR);
+                networkController->setnumberOfEditors(networkController->numberOfEditors() + 1);
 
                 // Emit the signal "Editor Entered"
                 Q_EMIT networkController->editorEntered(peerId, peerName, ipAddress, hostname);
@@ -183,6 +186,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Save the peer id of this recorder
                 networkController->manageEnteredPeerId(peerId, IngeScapeTypes::ASSESSMENTS);
+                networkController->setnumberOfAssessments(networkController->numberOfAssessments() + 1);
 
                 // Emit the signal "Assessments Entered"
                 Q_EMIT networkController->assessmentsEntered(peerId, peerName, ipAddress, hostname);
@@ -194,6 +198,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Save the peer id of this recorder
                 networkController->manageEnteredPeerId(peerId, IngeScapeTypes::EXPE);
+                networkController->setnumberOfExpes(networkController->numberOfExpes() + 1);
 
                 // Emit the signal "Expe Entered"
                 Q_EMIT networkController->expeEntered(peerId, peerName, ipAddress, hostname);
@@ -205,6 +210,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Save the peer id of this agent
                 networkController->manageEnteredPeerId(peerId, IngeScapeTypes::AGENT);
+                networkController->setnumberOfAgents(networkController->numberOfAgents() + 1);
 
                 // Emit the signal "Agent Entered"
                 Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, canBeFrozen, loggerPort);
@@ -259,6 +265,8 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 // Emit the signal "Agent Exited"
                 Q_EMIT networkController->agentExited(peerId, peerName);
 
+                networkController->setnumberOfAgents(networkController->numberOfAgents() - 1);
+
                 break;
             }
             // IngeScape LAUNCHER
@@ -273,6 +281,8 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 // Emit the signal "Launcher Exited"
                 Q_EMIT networkController->launcherExited(peerId, hostname);
 
+                networkController->setnumberOfLaunchers(networkController->numberOfLaunchers() - 1);
+
                 break;
             }
             // IngeScape RECORDER
@@ -280,6 +290,8 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             {
                 // Emit the signal "Recorder Exited"
                 Q_EMIT networkController->recorderExited(peerId, peerName);
+
+                networkController->setnumberOfRecorders(networkController->numberOfRecorders() - 1);
 
                 break;
             }
@@ -289,6 +301,8 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 // Emit the signal "Editor Exited"
                 Q_EMIT networkController->editorExited(peerId, peerName);
 
+                networkController->setnumberOfEditors(networkController->numberOfEditors() - 1);
+
                 break;
             }
             // IngeScape ASSESSMENTS
@@ -297,6 +311,8 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 // Emit the signal "Assessments Exited"
                 Q_EMIT networkController->assessmentsExited(peerId, peerName);
 
+                networkController->setnumberOfAssessments(networkController->numberOfAssessments() - 1);
+
                 break;
             }
             // IngeScape EXPE
@@ -304,6 +320,8 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             {
                 // Emit the signal "Expe Exited"
                 Q_EMIT networkController->expeExited(peerId, peerName);
+
+                networkController->setnumberOfExpes(networkController->numberOfExpes() - 1);
 
                 break;
             }
@@ -325,13 +343,18 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 //
 //--------------------------------------------------------------
 
-
 /**
  * @brief Constructor
  * @param igsServiceDescription
  * @param parent
  */
 IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObject(parent),
+    _numberOfAgents(0),
+    _numberOfLaunchers(0),
+    _numberOfRecorders(0),
+    _numberOfEditors(0),
+    _numberOfAssessments(0),
+    _numberOfExpes(0),
     _igsAgentApplicationName(""),
     _isIngeScapeAgentStarted(0)
 {
