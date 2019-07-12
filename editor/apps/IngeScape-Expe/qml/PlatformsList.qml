@@ -234,85 +234,114 @@ Item {
         // Prevent drag overshoot on Windows
         flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-        Column {
-            id: columnPlatforms
 
-            Repeater {
-                model: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.platformsList : null
+        ListView {
+            id: platformsListView
 
-                delegate: Rectangle {
-                    id: platformItem
+            model: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.platformsList : null
 
-                    property var isLoaded: rootItem.currentLoadedPlatform ? (rootItem.currentLoadedPlatform === model.QtObject) : false
+            //
+            // Transition animations
+            //
+            add: Transition {
+                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0 }
+                NumberAnimation { property: "scale"; from: 0.0; to: 1.0 }
+            }
 
-                    width: scrollView.width
-                    height: 36
+            displaced: Transition {
+                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
 
-                    color: platformItem.isLoaded ? IngeScapeTheme.orangeColor : "transparent"
+                // ensure opacity and scale values return to 1.0
+                NumberAnimation { property: "opacity"; to: 1.0 }
+                NumberAnimation { property: "scale"; to: 1.0 }
+            }
 
-                    border {
-                        color: "darkgray"
-                        width: 1
+            move: Transition {
+                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+
+                // ensure opacity and scale values return to 1.0
+                NumberAnimation { property: "opacity"; to: 1.0 }
+                NumberAnimation { property: "scale"; to: 1.0 }
+            }
+
+            remove: Transition {
+                // ensure opacity and scale values return to 0.0
+                NumberAnimation { property: "opacity"; to: 0.0 }
+                NumberAnimation { property: "scale"; to: 0.0 }
+            }
+
+            delegate: Rectangle {
+                id: platformItem
+
+                property var isLoaded: rootItem.currentLoadedPlatform ? (rootItem.currentLoadedPlatform === model.QtObject) : false
+
+                width: scrollView.width
+                height: 36
+
+                color: platformItem.isLoaded ? IngeScapeTheme.orangeColor : "transparent"
+
+                border {
+                    color: "darkgray"
+                    width: 1
+                }
+
+                Label {
+                    id: lblName
+
+                    anchors {
+                        left: parent.left
+                        leftMargin: 5
+                        verticalCenter: parent.verticalCenter
                     }
 
-                    Label {
-                        id: lblName
+                    text: model ? model.name : ""
 
-                        anchors {
-                            left: parent.left
-                            leftMargin: 5
-                            verticalCenter: parent.verticalCenter
-                        }
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        //weight: Font.Medium
+                        pixelSize: 16
+                    }
+                }
 
-                        text: model ? model.name : ""
+                Label {
 
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            //weight: Font.Medium
-                            pixelSize: 16
-                        }
+                    anchors {
+                        left: lblName.right
+                        leftMargin: 10
+                        verticalCenter: parent.verticalCenter
                     }
 
-                    Label {
+                    text: model ? model.currentIndex + " (" + model.indexOfAlphabeticOrder + ")"
+                                : ""
 
-                        anchors {
-                            left: lblName.right
-                            leftMargin: 10
-                            verticalCenter: parent.verticalCenter
-                        }
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        //weight: Font.Medium
+                        pixelSize: 12
+                    }
+                }
 
-                        text: model ? model.currentIndex + " (" + model.indexOfAlphabeticOrder + ")"
-                                    : ""
+                Button {
 
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            //weight: Font.Medium
-                            pixelSize: 12
-                        }
+                    anchors {
+                        right: parent.right
+                        top: parent.top
+                        bottom: parent.bottom
+                        margins: 2
                     }
 
-                    Button {
+                    visible: !platformItem.isLoaded
+                    enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON
 
-                        anchors {
-                            right: parent.right
-                            top: parent.top
-                            bottom: parent.bottom
-                            margins: 2
-                        }
+                    text: qsTr("LOAD");
 
-                        visible: !platformItem.isLoaded
-                        enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON
+                    onClicked: {
+                        console.log("QML: Load platform " + model.name);
 
-                        text: qsTr("LOAD");
-
-                        onClicked: {
-                            console.log("QML: Load platform " + model.name);
-
-                            // Open platform
-                            IngeScapeExpeC.openPlatform(model.QtObject);
-                        }
+                        // Open platform
+                        IngeScapeExpeC.openPlatform(model.QtObject);
                     }
                 }
             }
