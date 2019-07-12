@@ -97,7 +97,7 @@ Item {
             }
 
             opacity: !enabled ? 0.3 : 1
-            enabled: controller.currentReplay === null
+            enabled: (controller.currentReplay === null)
 
             style: I2SvgToggleButtonStyle {
                 fileCache: IngeScapeTheme.svgFileIngeScape

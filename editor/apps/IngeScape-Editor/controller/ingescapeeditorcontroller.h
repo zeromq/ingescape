@@ -281,6 +281,13 @@ private Q_SLOTS:
 
 
     /**
+     * @brief Slot called when we receive the command "Update Record State"
+     * @param state
+     */
+    void _onUpdateRecordState(QString state);
+
+
+    /**
      * @brief Slot called when a command must be sent on the network to a recorder
      * @param commandAndParameters
      */

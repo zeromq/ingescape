@@ -42,6 +42,7 @@ static const QString prefix_RunAction = "RUN_THIS_ACTION#";
 
 static const QString prefix_LoadPlatformFile = "LOAD_PLATFORM_FROM_PATH=";
 static const QString prefix_UpdateTimeLineState = "UPDATE_TIMELINE_STATE=";
+static const QString prefix_UpdateRecordState = "UPDATE_RECORD_STATE=";
 
 
 /**
@@ -545,10 +546,18 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
     // Update the state of the TimeLine (Play/Pause/Stop)
     else if (message.startsWith(prefix_UpdateTimeLineState))
     {
-        message.remove(0, prefix_UpdateTimeLineState.length());
+        QString state = message.remove(0, prefix_UpdateTimeLineState.length());
 
-        Q_EMIT updateTimeLineState(message);
+        Q_EMIT updateTimeLineState(state);
     }
+    // Update the state of the Record (Start/Stop)
+    else if (message.startsWith(prefix_UpdateRecordState))
+    {
+        QString state = message.remove(0, prefix_UpdateRecordState.length());
+
+        Q_EMIT updateRecordState(state);
+    }
+    // Unknown
     else
     {
         qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";

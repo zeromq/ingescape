@@ -113,6 +113,13 @@ public:
     Q_INVOKABLE void stopTimeLine();
 
 
+    /**
+     * @brief Start or Stop Recording
+     * @param isStart
+     */
+    Q_INVOKABLE void startOrStopRecording(bool isStart);
+
+
 public Q_SLOTS:
 
     /**

@@ -253,6 +253,13 @@ Q_SIGNALS:
     void updateTimeLineState(QString state);
 
 
+    /**
+     * @brief Signal emitted when we receive the command "Update Record State"
+     * @param state
+     */
+    void updateRecordState(QString state);
+
+
 public Q_SLOTS:
 
     /**

@@ -180,6 +180,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::runAction, _scenarioC, &ScenarioController::onRunAction);
     connect(_networkC, &NetworkController::loadPlatformFileFromPath, this, &IngeScapeEditorController::_onLoadPlatformFileFromPath);
     connect(_networkC, &NetworkController::updateTimeLineState, this, &IngeScapeEditorController::_onUpdateTimeLineState);
+    connect(_networkC, &NetworkController::updateRecordState, this, &IngeScapeEditorController::_onUpdateRecordState);
     connect(_networkC, &NetworkController::highlightLink, _agentsMappingC, &AgentsMappingController::onHighlightLink);
 
 
@@ -941,6 +942,39 @@ void IngeScapeEditorController::_onUpdateTimeLineState(QString state)
     else {
         qWarning() << "Peer Id of Expe is empty" << _peerIdOfExpe;
     }*/
+}
+
+
+/**
+ * @brief Slot called when we receive the command "Update Record State"
+ * @param state
+ */
+void IngeScapeEditorController::_onUpdateRecordState(QString state)
+{
+    qInfo() << "Received the command 'Update Record State'" << state;
+
+    /*if (_scenarioC != nullptr)
+    {
+        // Update the state of the record
+        _scenarioC->updateRecordState(state);
+    }*/
+
+    // START
+    if (state == "START")
+    {
+        // Call the private slot (called when the user wants to start to record)
+        _onStartToRecord();
+    }
+    // STOP
+    else if (state == "STOP")
+    {
+        // Call the private slot (called when a command must be sent on the network to a recorder)
+        _onCommandAskedToRecorder(command_StopRecord);
+    }
+    // Unknown
+    else {
+        qCritical() << "Unknown state" << state << "so we cannot update the Record !";
+    }
 }
 
 

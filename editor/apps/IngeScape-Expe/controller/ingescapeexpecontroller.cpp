@@ -310,6 +310,33 @@ void IngeScapeExpeController::stopTimeLine()
 
 
 /**
+ * @brief Start or Stop Recording
+ * @param isStart
+ */
+void IngeScapeExpeController::startOrStopRecording(bool isStart)
+{
+    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr) && (_networkC != nullptr))
+    {
+        QString commandAndParameters;
+
+        if (isStart) {
+            qInfo() << "Start recording the platform" << _modelManager->currentLoadedPlatform()->name();
+
+            commandAndParameters = QString("%1=START").arg(command_UpdateRecordState);
+        }
+        else {
+            qInfo() << "Stop recording the platform" << _modelManager->currentLoadedPlatform()->name();
+
+            commandAndParameters = QString("%1=STOP").arg(command_UpdateRecordState);
+        }
+
+        // Send the command and parameters to the editor
+        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+    }
+}
+
+
+/**
  * @brief Method used to force the creation of our singleton from QML
  */
 void IngeScapeExpeController::forceCreation()
