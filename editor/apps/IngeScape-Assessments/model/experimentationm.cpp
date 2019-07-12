@@ -40,7 +40,7 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
 
 
     // Characteristic "Subject Name"
-    //CharacteristicM* characteristicName = new CharacteristicM(CHARACTERISTIC_SUBJECT_NAME, CharacteristicValueTypes::TEXT, true, this);
+    //CharacteristicM* characteristicName = new CharacteristicM(CHARACTERISTIC_SUBJECT_ID, CharacteristicValueTypes::TEXT, true, this);
     //_allCharacteristics.append(characteristicName);
 
 
@@ -48,8 +48,8 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
     // FIXME for tests
     //
 
-    SubjectM* debugSubject = new SubjectM("S", this);
-    debugSubject->mapCharacteristicValues()->insert(CHARACTERISTIC_SUBJECT_NAME, QVariant("M. JEAN"));
+    /*SubjectM* debugSubject = new SubjectM("S", this);
+    debugSubject->mapCharacteristicValues()->insert(CHARACTERISTIC_SUBJECT_ID, QVariant("M. JEAN"));
 
     _allSubjects.append(debugSubject);
 
@@ -68,7 +68,7 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
         debugTask->setplatformFileUrl(platformFileUrl);
 
         _allTasks.append(debugTask);
-    }
+    }*/
 }
 
 
@@ -219,7 +219,7 @@ void ExperimentationM::addRecordSetup(RecordSetupM* recordSetup)
 
         if (recordSetup->subject() != nullptr)
         {
-            qDebug() << "Subject:" << recordSetup->subject()->name() << "(" << recordSetup->subject()->uid() << ")";
+            qDebug() << "Subject:" << recordSetup->subject()->displayedId();
 
             for (CharacteristicM* characteristic : _allCharacteristics)
             {

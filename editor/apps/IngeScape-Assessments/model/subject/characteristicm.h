@@ -22,6 +22,9 @@
 #include "cassandra.h"
 
 
+static const QString CHARACTERISTIC_SUBJECT_ID = "ID";
+
+
 /**
  * @brief The CharacteristicM class defines a model of characteristic for a subject
  */
@@ -38,8 +41,8 @@ class CharacteristicM : public QObject
     // Type of our characteristic value
     I2_QML_PROPERTY_READONLY(CharacteristicValueTypes::Value, valueType)
 
-    // Flag indicating if our characteristic is the subject name
-    I2_QML_PROPERTY_READONLY(bool, isSubjectName)
+    // Flag indicating if our characteristic is the subject id
+    I2_QML_PROPERTY_READONLY(bool, isSubjectId)
 
     // List of possible values if the value type is "CHARACTERISTIC_ENUM"
     I2_QML_PROPERTY_READONLY(QStringList, enumValues)
@@ -49,15 +52,14 @@ public:
 
     /**
      * @brief Constructor
+     * @param cassUuid
      * @param name
      * @param valueType
-     * @param isSubjectName
      * @param parent
      */
     explicit CharacteristicM(CassUuid cassUuid,
                              QString name,
                              CharacteristicValueTypes::Value valueType,
-                             bool isSubjectName = false,
                              QObject *parent = nullptr);
 
 

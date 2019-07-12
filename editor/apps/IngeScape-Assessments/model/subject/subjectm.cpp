@@ -21,17 +21,17 @@
  * @param name
  * @param parent
  */
-SubjectM::SubjectM(QString uid,
-                   //QString name,
+SubjectM::SubjectM(CassUuid cassUuid,
+                   QString displayedId,
                    QObject *parent) : QObject(parent),
-    _uid(uid),
-    _name(""), //_name(name),
-    _mapCharacteristicValues(nullptr)
+    _displayedId(displayedId),
+    _mapCharacteristicValues(nullptr),
+    _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Subject" << _name << "(" << _uid << ")";
+    qInfo() << "New Model of Subject" << _displayedId;
 
     // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
     _mapCharacteristicValues = new QQmlPropertyMap(this);
@@ -46,7 +46,7 @@ SubjectM::SubjectM(QString uid,
  */
 SubjectM::~SubjectM()
 {
-    qInfo() << "Delete Model of Subject" << _name << "(" << _uid << ")";
+    qInfo() << "Delete Model of Subject" << _displayedId;
 
     // Free memory
     if (_mapCharacteristicValues != nullptr)
@@ -61,6 +61,16 @@ SubjectM::~SubjectM()
         setmapCharacteristicValues(nullptr);
         delete temp;
     }
+}
+
+
+/**
+ * @brief Get the unique identifier in Cassandra Data Base
+ * @return
+ */
+CassUuid SubjectM::getCassUuid()
+{
+    return _cassUuid;
 }
 
 
@@ -129,9 +139,9 @@ void SubjectM::_onCharacteristicValueChanged(const QString &key, const QVariant 
 {
     qDebug() << key << "-->" << value.toString();
 
-    if (key == CHARACTERISTIC_SUBJECT_NAME)
+    if (key == CHARACTERISTIC_SUBJECT_ID)
     {
-        setname(value.toString());
+        setdisplayedId(value.toString());
     }
 }
 

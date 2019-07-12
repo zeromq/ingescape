@@ -20,9 +20,6 @@
 #include <model/subject/characteristicm.h>
 
 
-static const QString CHARACTERISTIC_SUBJECT_NAME = "Name";
-
-
 /**
  * @brief The SubjectM class defines a model of subject
  */
@@ -30,11 +27,8 @@ class SubjectM : public QObject
 {
     Q_OBJECT
 
-    // Unique identifier of our subject
-    I2_QML_PROPERTY_READONLY(QString, uid)
-
-    // Name of our subject
-    I2_QML_PROPERTY(QString, name)
+    // Displayed identifier of our subject
+    I2_QML_PROPERTY(QString, displayedId)
 
     // Values of the characteristics of our subject
     // "Qml Property Map" allows to set key-value pairs that can be used in QML bindings
@@ -48,12 +42,12 @@ public:
 
     /**
      * @brief Constructor
-     * @param uid
-     * @param name
+     * @param cassUuid
+     * @param displayedId
      * @param parent
      */
-    explicit SubjectM(QString uid,
-                      //QString name = "",
+    explicit SubjectM(CassUuid cassUuid,
+                      QString displayedId,
                       QObject *parent = nullptr);
 
 
@@ -61,6 +55,13 @@ public:
      * @brief Destructor
      */
     ~SubjectM();
+
+
+    /**
+     * @brief Get the unique identifier in Cassandra Data Base
+     * @return
+     */
+    CassUuid getCassUuid();
 
 
     /**
@@ -95,6 +96,8 @@ private Q_SLOTS:
 
 private:
 
+    // Unique identifier in Cassandra Data Base
+    CassUuid _cassUuid;
 
 };
 

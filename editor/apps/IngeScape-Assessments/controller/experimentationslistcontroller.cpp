@@ -98,10 +98,10 @@ ExperimentationsListController::ExperimentationsListController(AssessmentsModelM
             {
                 const CassRow* row = cass_iterator_get_row(cassIterator);
 
-                CassUuid experimentationId;
-                cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &experimentationId);
-                char chrExperimentationId[CASS_UUID_STRING_LENGTH];
-                cass_uuid_string(experimentationId, chrExperimentationId);
+                CassUuid experimentationUid;
+                cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &experimentationUid);
+                char chrExperimentationUid[CASS_UUID_STRING_LENGTH];
+                cass_uuid_string(experimentationUid, chrExperimentationUid);
 
                 const char *chrExperimentationName = "";
                 size_t nameLength;
@@ -124,7 +124,7 @@ ExperimentationsListController::ExperimentationsListController(AssessmentsModelM
                 QString experimentationsGroupName = QString::fromUtf8(chrExperimentationsGroupName, static_cast<int>(experimentationsGroupNameLength));
 
                 // Create the new experimentation
-                ExperimentationM* experimentation = new ExperimentationM(experimentationId, experimentationName, creationDateTime, nullptr);
+                ExperimentationM* experimentation = new ExperimentationM(experimentationUid, experimentationName, creationDateTime, nullptr);
 
                 ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentationsGroupName);
                 if (experimentationsGroup == nullptr)
@@ -219,8 +219,8 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
     if (!experimentationName.isEmpty() && (experimentationsGroup != nullptr)
             && (_modelManager != nullptr))
     {
-        CassUuid experimentationId;
-        cass_uuid_gen_time(_modelManager->getCassUuidGen(), &experimentationId);
+        CassUuid experimentationUid;
+        cass_uuid_gen_time(_modelManager->getCassUuidGen(), &experimentationUid);
 
         // Returns the number of seconds since 1970-01-01T00:00:00 Universal Coordinated Time.
         time_t now = QDateTime::currentSecsSinceEpoch();
@@ -236,7 +236,7 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
 
         // Creates the new query statement
         CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 5);
-        cass_statement_bind_uuid(cassStatement, 0, experimentationId);
+        cass_statement_bind_uuid(cassStatement, 0, experimentationUid);
         cass_statement_bind_string(cassStatement, 1, experimentationName.toStdString().c_str());
         cass_statement_bind_uint32(cassStatement, 2, creationDate);
         cass_statement_bind_int64(cassStatement, 3, creationTime);
@@ -251,7 +251,7 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
             qInfo() << "Experimentation" << experimentationName << "inserted into the DataBase";
 
             // Create the new experimentation
-            ExperimentationM* experimentation = new ExperimentationM(experimentationId, experimentationName, QDateTime::currentDateTime(), nullptr);
+            ExperimentationM* experimentation = new ExperimentationM(experimentationUid, experimentationName, QDateTime::currentDateTime(), nullptr);
 
             // Add to the group
             experimentationsGroup->experimentations()->append(experimentation);

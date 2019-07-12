@@ -171,14 +171,17 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
  */
 void SubjectsController::createNewSubject()
 {
-    if (_currentExperimentation != nullptr)
+    if ((_currentExperimentation != nullptr) && (_modelManager != nullptr))
     {
         QDateTime now = QDateTime::currentDateTime();
 
-        QString subjectUID = now.toString("S-yyMMdd-hhmmss-zzz");
+        QString displayedId = now.toString("S-yyMMdd-hhmmss-zzz");
+
+        CassUuid subjectUid;
+        cass_uuid_gen_time(_modelManager->getCassUuidGen(), &subjectUid);
 
         // Create a new subject
-        SubjectM* subject = new SubjectM(subjectUID, nullptr);
+        SubjectM* subject = new SubjectM(subjectUid, displayedId, nullptr);
 
         // For each existing characteristic
         for (CharacteristicM* characteristic : _currentExperimentation->allCharacteristics()->toList())
@@ -251,20 +254,18 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
                 {
                     qDebug() << "There is NO characteristic...create the special characteristic 'id'";
 
-                    CassUuid characteristicId;
-                    cass_uuid_gen_time(_modelManager->getCassUuidGen(), &characteristicId);
+                    CassUuid characteristicUid;
+                    cass_uuid_gen_time(_modelManager->getCassUuidGen(), &characteristicUid);
 
-                    QString characteristicName = "Id";
+                    QString characteristicName = CHARACTERISTIC_SUBJECT_ID;
                     CharacteristicValueTypes::Value characteristicValueType = CharacteristicValueTypes::TEXT;
 
                     // Create the query
                     QString queryInsertCharacteristic = QString("INSERT INTO ingescape.characteristic (id, id_experimentation, name, value_type, enum_values) VALUES (?, ?, ?, ?, ?);");
 
-                    //id timeuuid, id_experimentation timeuuid, name text, value_type tinyint, enum_values text
-
                     // Creates the new query statement
                     CassStatement* cassStatementInsertCharacteristic = cass_statement_new(queryInsertCharacteristic.toStdString().c_str(), 5);
-                    cass_statement_bind_uuid(cassStatementInsertCharacteristic, 0, characteristicId);
+                    cass_statement_bind_uuid(cassStatementInsertCharacteristic, 0, characteristicUid);
                     cass_statement_bind_uuid(cassStatementInsertCharacteristic, 1, uidExperimentation);
                     cass_statement_bind_string(cassStatementInsertCharacteristic, 2, characteristicName.toStdString().c_str());
                     cass_statement_bind_int8(cassStatementInsertCharacteristic, 3, characteristicValueType);
@@ -279,7 +280,7 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
                         qInfo() << "CharacteristicM" << characteristicName << "inserted into the DataBase";
 
                         // Create the new characteristic
-                        CharacteristicM* characteristic = new CharacteristicM(characteristicId, characteristicName, characteristicValueType, true, nullptr);
+                        CharacteristicM* characteristic = new CharacteristicM(characteristicUid, characteristicName, characteristicValueType, nullptr);
 
                         // Add the characteristic to the current experimentation
                         _currentExperimentation->addCharacteristic(characteristic);
@@ -298,9 +299,29 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
                     CassIterator* cassIterator = cass_iterator_from_result(cassResult);
 
                     while(cass_iterator_next(cassIterator))
-                    {
-                        //const CassRow* row = cass_iterator_get_row(cassIterator);
+                    {      
+                        const CassRow* row = cass_iterator_get_row(cassIterator);
 
+                        CassUuid characteristicUid;
+                        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &characteristicUid);
+                        char chrCharacteristicUid[CASS_UUID_STRING_LENGTH];
+                        cass_uuid_string(characteristicUid, chrCharacteristicUid);
+
+                        const char *chrCharacteristicName = "";
+                        size_t nameLength;
+                        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrCharacteristicName, &nameLength);
+                        QString characteristicName = QString::fromUtf8(chrCharacteristicName, static_cast<int>(nameLength));
+
+                        CharacteristicValueTypes::Value characteristicValueType = CharacteristicValueTypes::UNKNOWN;
+                        int8_t type;
+                        cass_value_get_int8(cass_row_get_column_by_name(row, "value_type"), &type);
+                        characteristicValueType = static_cast<CharacteristicValueTypes::Value>(type);
+
+                        // Create the characteristic
+                        CharacteristicM* characteristic = new CharacteristicM(characteristicUid, characteristicName, characteristicValueType, nullptr);
+
+                        // Add the characteristic to the current experimentation
+                        _currentExperimentation->addCharacteristic(characteristic);
                     }
 
                     cass_iterator_free(cassIterator);

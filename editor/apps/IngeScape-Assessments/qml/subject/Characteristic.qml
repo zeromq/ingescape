@@ -168,7 +168,7 @@ Item {
 
         text: "DEL"
 
-        visible: !rootItem.modelM.isSubjectName
+        visible: !rootItem.modelM.isSubjectId
 
         onClicked: {
             if (rootItem.modelM)

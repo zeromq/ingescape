@@ -18,17 +18,15 @@
  * @brief Constructor
  * @param name
  * @param valueType
- * @param isSubjectName
  * @param parent
  */
 CharacteristicM::CharacteristicM(CassUuid cassUuid,
                                  QString name,
                                  CharacteristicValueTypes::Value valueType,
-                                 bool isSubjectName,
                                  QObject *parent) : QObject(parent),
     _name(name),
     _valueType(valueType),
-    _isSubjectName(isSubjectName),
+    _isSubjectId(false),
     _enumValues(QStringList()),
     _cassUuid(cassUuid)
 {
@@ -36,6 +34,10 @@ CharacteristicM::CharacteristicM(CassUuid cassUuid,
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType);
+
+    if (_name == CHARACTERISTIC_SUBJECT_ID) {
+        _isSubjectId = true;
+    }
 }
 
 

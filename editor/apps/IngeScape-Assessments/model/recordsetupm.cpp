@@ -44,7 +44,7 @@ RecordSetupM::RecordSetupM(QString uid,
 
     if ((_subject != nullptr) && (_task != nullptr))
     {
-        qInfo() << "New Model of Record" << _name << "(" << _uid << ") for subject" << _subject->name() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
+        qInfo() << "New Model of Record" << _name << "(" << _uid << ") for subject" << _subject->displayedId() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
 
         // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
         _mapIndependentVariableValues = new QQmlPropertyMap(this);
@@ -100,7 +100,7 @@ RecordSetupM::~RecordSetupM()
 {
     if ((_subject != nullptr) && (_task != nullptr))
     {
-        qInfo() << "Delete Model of Record" << _name << "(" << _uid << ") for subject" << _subject->name() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
+        qInfo() << "Delete Model of Record" << _name << "(" << _uid << ") for subject" << _subject->displayedId() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
 
         // For debug purpose: Print the value of all independent variables
         _printIndependentVariableValues();

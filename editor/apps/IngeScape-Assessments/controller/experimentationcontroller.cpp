@@ -102,7 +102,7 @@ void ExperimentationController::createNewRecordForSubjectAndTask(QString recordN
 {
     if (!recordName.isEmpty() && (subject != nullptr) && (task != nullptr) && (_currentExperimentation != nullptr))
     {
-        qInfo() << "Create new record" << recordName << "for subject" << subject->name() << "and task" << task->name();
+        qInfo() << "Create new record" << recordName << "for subject" << subject->displayedId() << "and task" << task->name();
 
         QDateTime now = QDateTime::currentDateTime();
 
