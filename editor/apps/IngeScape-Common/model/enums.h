@@ -89,6 +89,7 @@ static const QString command_PauseReplay = "PAUSE_REPLAY";
 static const QString command_UNpauseReplay = "UNPAUSE_REPLAY";
 
 static const QString command_LoadPlatformFile = "LOAD_PLATFORM_FROM_PATH";
+static const QString command_UpdateTimeLineState = "UPDATE_TIMELINE_STATE";
 
 
 // Date date of our application

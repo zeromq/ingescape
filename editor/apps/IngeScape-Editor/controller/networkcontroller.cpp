@@ -41,6 +41,7 @@ static const QString prefix_HighlightLink = "HIGHLIGHT_LINK=";
 static const QString prefix_RunAction = "RUN_THIS_ACTION#";
 
 static const QString prefix_LoadPlatformFile = "LOAD_PLATFORM_FROM_PATH=";
+static const QString prefix_UpdateTimeLineState = "UPDATE_TIMELINE_STATE=";
 
 
 /**
@@ -540,6 +541,13 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
         message.remove(0, prefix_LoadPlatformFile.length());
 
         Q_EMIT loadPlatformFileFromPath(message);
+    }
+    // Update the state of the TimeLine (Play/Pause/Stop)
+    else if (message.startsWith(prefix_UpdateTimeLineState))
+    {
+        message.remove(0, prefix_UpdateTimeLineState.length());
+
+        Q_EMIT updateTimeLineState(message);
     }
     else
     {

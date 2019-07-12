@@ -151,11 +151,11 @@ Item {
 
         anchors {
             left: parent.left
-            leftMargin: 20
+            leftMargin: 10
             top: title.bottom
             topMargin: 20
         }
-        width: (parent.width / 2.0) - 30
+        width: (parent.width / 2.0) - 20
         height: parent.height * 0.75
     }
 
@@ -168,12 +168,51 @@ Item {
 
         anchors {
             right: parent.right
-            rightMargin: 20
+            rightMargin: 10
             top: title.bottom
             topMargin: 20
         }
-        width: (parent.width / 2.0) - 30
+        width: (parent.width / 2.0) - 20
         height: parent.height * 0.75
+    }
+
+    Item {
+        id: itemCommands
+
+        anchors {
+            left: loadedPlatform.left
+            right: loadedPlatform.right
+            top: loadedPlatform.bottom
+            topMargin: 10
+            bottom: parent.bottom
+            bottomMargin: 10
+        }
+
+        Rectangle {
+            id: bgCommands
+
+            anchors.fill: parent
+
+            color: "transparent"
+            border {
+                color: "darkgray"
+                width: 1
+            }
+
+            Row {
+                spacing: 10
+
+                Button {
+                    text: "Play/Pause"
+                }
+
+                Button {
+                    text: "STOP"
+                }
+            }
+        }
+
+        //command_UpdateTimeLineState
     }
 
 }

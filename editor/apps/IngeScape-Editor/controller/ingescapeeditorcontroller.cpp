@@ -173,12 +173,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::deletedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onDeletedRecord);
     connect(_networkC, &NetworkController::loadingRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadingRecord);
     connect(_networkC, &NetworkController::loadingRecordReceived, this, &IngeScapeEditorController::_onLoadingRecord);
-    connect(_networkC, &NetworkController::loadPlatformFileFromPath, this, &IngeScapeEditorController::_onLoadPlatformFileFromPath);
     connect(_networkC, &NetworkController::loadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadedRecord);
     connect(_networkC, &NetworkController::unloadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onUNloadedRecord);
     connect(_networkC, &NetworkController::endOfRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onEndOfRecord);
 
     connect(_networkC, &NetworkController::runAction, _scenarioC, &ScenarioController::onRunAction);
+    connect(_networkC, &NetworkController::loadPlatformFileFromPath, this, &IngeScapeEditorController::_onLoadPlatformFileFromPath);
+    connect(_networkC, &NetworkController::updateTimeLineState, this, &IngeScapeEditorController::_onUpdateTimeLineState);
     connect(_networkC, &NetworkController::highlightLink, _agentsMappingC, &AgentsMappingController::onHighlightLink);
 
 
@@ -911,14 +912,35 @@ void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFile
     {
         // Reply by sending the command execution status to Expe
         _networkC->sendCommandExecutionStatusToExpe(_peerIdOfExpe, command_LoadPlatformFile, platformFilePath, static_cast<int>(success));
-        // success = 1
-        // fail = 0
-
-        // Reply with StringList of agents names ? or Sender have to parse "platform (File Path)" to get agents ?
     }
     else {
         qWarning() << "Peer Id of Expe is empty" << _peerIdOfExpe;
     }
+}
+
+
+/**
+ * @brief Slot called when we receive the command "Update TimeLine State"
+ * @param state
+ */
+void IngeScapeEditorController::_onUpdateTimeLineState(QString state)
+{
+    qInfo() << "Received the command 'Update TimeLine State'" << state;
+
+    if (_scenarioC != nullptr)
+    {
+        // Update the state of the timeline
+        _scenarioC->updateTimeLineState(state);
+    }
+
+    /*if ((_networkC != nullptr) && !_peerIdOfExpe.isEmpty())
+    {
+        // Reply by sending the command execution status to Expe
+        _networkC->sendCommandExecutionStatusToExpe(_peerIdOfExpe, command_LoadPlatformFile, platformFilePath, static_cast<int>(success));
+    }
+    else {
+        qWarning() << "Peer Id of Expe is empty" << _peerIdOfExpe;
+    }*/
 }
 
 

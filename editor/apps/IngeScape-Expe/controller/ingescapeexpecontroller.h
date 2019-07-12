@@ -100,6 +100,10 @@ public:
     Q_INVOKABLE void openPlatform(PlatformM* platform);
 
 
+    // FIXME TODO
+    //void playOrPauseTimeLineState(bool isPlay);
+
+
 public Q_SLOTS:
 
     /**

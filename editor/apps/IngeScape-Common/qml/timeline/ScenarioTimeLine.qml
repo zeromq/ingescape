@@ -1271,9 +1271,9 @@ Item {
             style: LabellessSvgButtonStyle {
                 fileCache: IngeScapeTheme.svgFileIngeScape
 
-                pressedID: releasedID + "-pressed"
                 releasedID: (scenarioController && scenarioController.isPlaying) ? "timeline-pause" : "timeline-play"
-                disabledID : releasedID
+                pressedID: releasedID + "-pressed"
+                disabledID: releasedID
             }
 
             onClicked: {

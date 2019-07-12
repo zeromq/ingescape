@@ -246,6 +246,13 @@ Q_SIGNALS:
     void loadPlatformFileFromPath(QString platformFilePath);
 
 
+    /**
+     * @brief Signal emitted when we receive the command "Update TimeLine State"
+     * @param state
+     */
+    void updateTimeLineState(QString state);
+
+
 public Q_SLOTS:
 
     /**

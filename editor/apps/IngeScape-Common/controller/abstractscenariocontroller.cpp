@@ -93,16 +93,16 @@ AbstractScenarioController::~AbstractScenarioController()
 
 
 /**
- * @brief Custom setter on is playing command for the scenario
- * @param is playing flag
+ * @brief Setter for property "is Playing" (command the TimeLine)
+ * @param value
  */
-void AbstractScenarioController::setisPlaying(bool isPlaying)
+void AbstractScenarioController::setisPlaying(bool value)
 {
-    if (_isPlaying != isPlaying)
+    if (_isPlaying != value)
     {
-        _isPlaying = isPlaying;
+        _isPlaying = value;
 
-        // Start/Stop scenario according to the flag
+        // Start/Stop scenario according to our flag
         if (_isPlaying) {
             _startScenario();
         }
@@ -110,7 +110,7 @@ void AbstractScenarioController::setisPlaying(bool isPlaying)
             _stopScenario();
         }
 
-        Q_EMIT isPlayingChanged(_isPlaying);
+        Q_EMIT isPlayingChanged(value);
     }
 }
 
@@ -455,6 +455,29 @@ void AbstractScenarioController::resetConditionsConnectionsOfAllActions()
         if (actionM != nullptr) {
             actionM->resetConditionsConnections();
         }
+    }
+}
+
+
+/**
+ * @brief Update the state of our TimeLine
+ * @param state
+ */
+void AbstractScenarioController::updateTimeLineState(QString state)
+{
+    qDebug() << state << "the timeline";
+
+    if (state == "PLAY") {
+        setisPlaying(true);
+    }
+    else if (state == "PAUSE") {
+        setisPlaying(false);
+    }
+    else if (state == "STOP") {
+
+    }
+    else {
+        qCritical() << "Unknown state" << state << "so we cannot update the TimeLine !";
     }
 }
 
