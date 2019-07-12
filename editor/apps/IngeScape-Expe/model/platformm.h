@@ -32,6 +32,12 @@ class PlatformM : public QObject
     // File path of our platform
     I2_QML_PROPERTY_READONLY(QString, filePath)
 
+    // Current index of our platform in the list (for sorting)
+    I2_QML_PROPERTY_READONLY(int, currentIndex)
+
+    // Index of our platform in the list while sorted by alphabetical order
+    I2_QML_PROPERTY_READONLY(int, indexOfAlphabeticOrder)
+
 
 public:
 
@@ -43,6 +49,7 @@ public:
      */
     explicit PlatformM(QString name,
                        QString filePath,
+                       int indexOfAlphabeticOrder,
                        QObject *parent = nullptr);
 
 
@@ -50,6 +57,9 @@ public:
      * @brief Destructor
      */
     ~PlatformM();
+
+
+private:
 
 
 };

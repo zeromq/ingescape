@@ -148,19 +148,70 @@ Item {
             }
         }
 
-        Text {
-            text: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.platformsList.count + " platforms"
-                                              : ""
-
+        Row {
             height: 30
+            spacing: 10
 
-            verticalAlignment: Text.AlignVCenter
+            Text {
+                id: txtPlatformsNumber
 
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 16
+                text: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.platformsList.count + " platforms"
+                                                  : ""
+
+                height: 30
+
+                verticalAlignment: Text.AlignVCenter
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Medium
+                    pixelSize: 16
+                }
+            }
+
+            Button {
+                id: btnRandomizePlatformsList
+
+                text: qsTr("Randomize")
+
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                width: 100
+
+                onClicked: {
+                    console.log("QML: Randomize the list of platforms...");
+
+                    if (IngeScapeExpeC.modelManager)
+                    {
+                        // Randomize the list of platforms
+                        IngeScapeExpeC.modelManager.randomizePlatformsList();
+                    }
+                }
+            }
+
+            Button {
+                id: btnSortInAlphabeticOrder
+
+                text: qsTr("Sort in alphabetical order")
+
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                width: 200
+
+                onClicked: {
+                    console.log("QML: Sort the list of platforms in alphabetical order...");
+
+                    if (IngeScapeExpeC.modelManager)
+                    {
+                        // Sort the list of platforms in alphabetical order
+                        IngeScapeExpeC.modelManager.sortPlatformsListInAlphabeticOrder();
+                    }
+                }
             }
         }
     }
@@ -205,6 +256,7 @@ Item {
                     }
 
                     Label {
+                        id: lblName
 
                         anchors {
                             left: parent.left
@@ -219,6 +271,25 @@ Item {
                             family: IngeScapeTheme.textFontFamily
                             //weight: Font.Medium
                             pixelSize: 16
+                        }
+                    }
+
+                    Label {
+
+                        anchors {
+                            left: lblName.right
+                            leftMargin: 10
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        text: model ? model.currentIndex + " (" + model.indexOfAlphabeticOrder + ")"
+                                    : ""
+
+                        color: IngeScapeTheme.whiteColor
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            //weight: Font.Medium
+                            pixelSize: 12
                         }
                     }
 

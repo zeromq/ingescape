@@ -22,14 +22,17 @@
  */
 PlatformM::PlatformM(QString name,
                      QString filePath,
+                     int indexOfAlphabeticOrder,
                      QObject *parent) : QObject(parent),
     _name(name),
-    _filePath(filePath)
+    _filePath(filePath),
+    _currentIndex(indexOfAlphabeticOrder),
+    _indexOfAlphabeticOrder(indexOfAlphabeticOrder)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Platform" << _name << "at" << _filePath;
+    qInfo() << "New Model of Platform" << _name << "at" << _filePath << "[" << _currentIndex << "]";
 }
 
 
@@ -38,6 +41,6 @@ PlatformM::PlatformM(QString name,
  */
 PlatformM::~PlatformM()
 {
-    qInfo() << "Delete Model of Platform" << _name << "at" << _filePath;
+    qInfo() << "Delete Model of Platform" << _name << "at" << _filePath << "[" << _currentIndex << "]";
 
 }

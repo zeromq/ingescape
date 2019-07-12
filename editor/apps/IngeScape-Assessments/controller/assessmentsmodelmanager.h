@@ -57,8 +57,7 @@ public:
     /**
      * @brief Destructor
      */
-    ~AssessmentsModelManager();
-    //~AssessmentsModelManager() Q_DECL_OVERRIDE;
+    ~AssessmentsModelManager() Q_DECL_OVERRIDE;
 
 
     /**

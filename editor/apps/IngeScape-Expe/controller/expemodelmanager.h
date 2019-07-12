@@ -42,7 +42,8 @@ class ExpeModelManager : public IngeScapeModelManager
     I2_QML_PROPERTY_READONLY(QString, currentDirectoryPath)
 
     // List of platforms
-    I2_QOBJECT_LISTMODEL(PlatformM, platformsList)
+    //I2_QOBJECT_LISTMODEL(PlatformM, platformsList)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(PlatformM, platformsList)
 
     // Current loaded platform
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(PlatformM*, currentLoadedPlatform)
@@ -64,8 +65,7 @@ public:
     /**
      * @brief Destructor
      */
-    ~ExpeModelManager();
-    //~ExpeModelManager() Q_DECL_OVERRIDE;
+    ~ExpeModelManager() Q_DECL_OVERRIDE;
 
 
     /**
@@ -73,6 +73,18 @@ public:
      * @param directoryPath
      */
     void listPlatformsInDirectory(QString directoryPath);
+
+
+    /**
+     * @brief Randomize the list of platforms
+     */
+    Q_INVOKABLE void randomizePlatformsList();
+
+
+    /**
+     * @brief Sort the list of platforms in alphabetical order
+     */
+    Q_INVOKABLE void sortPlatformsListInAlphabeticOrder();
 
 
 Q_SIGNALS:
@@ -108,7 +120,19 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 
+
 private:
+
+    /**
+     * @brief Get a list of random indexes
+     * @param max
+     * @return
+     */
+    QList<int> _getRandomIndexes(int max);
+
+
+private:
+
 
 };
 

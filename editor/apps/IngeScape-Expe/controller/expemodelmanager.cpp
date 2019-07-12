@@ -13,6 +13,7 @@
  */
 
 #include "expemodelmanager.h"
+#include <QRandomGenerator>
 
 /**
  * @brief Constructor
@@ -35,6 +36,9 @@ ExpeModelManager::ExpeModelManager(JsonHelper* jsonHelper,
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New IngeScape Expe Model Manager";
+
+    // Platforms are sorted on their name (alphabetical order)
+    _platformsList.setSortProperty("currentIndex");
 
 }
 
@@ -127,34 +131,118 @@ void ExpeModelManager::listPlatformsInDirectory(QString directoryPath)
         QDir dir(directoryPath);
         if (dir.exists())
         {
-            dir.setFilter(QDir::Files);
+            QStringList nameFilters = { "*.json", "*.JSON" };
 
-            // FIXME: Don't merge UpperCase / LowerCase
-            dir.setSorting(QDir::Name);
+            // Only JSON files and Ignore Case (Upper/Lower case)
+            QFileInfoList fileInfoList = dir.entryInfoList(nameFilters, QDir::Files, QDir::IgnoreCase);
 
-            qDebug() << "There are" << dir.count() << "entries in the directory" << directoryPath;
-
-            QFileInfoList fileInfoList = dir.entryInfoList();
+            int nbJsonFiles = fileInfoList.length();
+            qDebug() << "There are" << nbJsonFiles << "entries in the directory" << directoryPath;
 
             QList<PlatformM*> tempPlatformsList;
 
-            for (QFileInfo fileInfo : fileInfoList)
+            for (int i = 0; i < nbJsonFiles; i++)
             {
+                QFileInfo fileInfo = fileInfoList.at(i);
+
                 //qDebug() << fileInfo.fileName();
 
-                // "toLower" allows to manage both extensions: "json" and "JSON"
-                if (fileInfo.completeSuffix().toLower() == "json")
-                {
-                    // Create a new IngeScape platform
-                    PlatformM* platform = new PlatformM(fileInfo.baseName(), fileInfo.absoluteFilePath(), this);
+                // Create a new IngeScape platform
+                PlatformM* platform = new PlatformM(fileInfo.baseName(), fileInfo.absoluteFilePath(), i, this);
 
-                    tempPlatformsList.append(platform);
-                }
+                tempPlatformsList.append(platform);
             }
 
             // QML updated only once
             _platformsList.append(tempPlatformsList);
         }
+    }
+}
+
+
+/**
+ * @brief Randomize the list of platforms
+ */
+void ExpeModelManager::randomizePlatformsList()
+{
+    if (!_platformsList.isEmpty())
+    {
+        int nbPlatforms = _platformsList.count();
+
+        qDebug() << "Randomize the" << nbPlatforms << "platforms";
+
+        // Get a list of random indexes
+        QList<int> randomIndexes = _getRandomIndexes(nbPlatforms);
+
+        qDebug() << "Random indexes:" << randomIndexes;
+
+        // Copy the list
+        QList<PlatformM*> copyOfPlatformsList = _platformsList.toList();
+        QList<PlatformM*> tempPlatformsList;
+
+        // Clear to prevent QML update
+        _platformsList.clear();
+
+        int newIndex = 0;
+
+        // For each platform, set the current index to the random index
+        for (int i = 0; i < nbPlatforms; i++)
+        {
+            int randomIndex = randomIndexes.at(i);
+
+            if (randomIndex < copyOfPlatformsList.count())
+            {
+                PlatformM* platform = copyOfPlatformsList.takeAt(randomIndex);
+                if (platform != nullptr)
+                {
+                    //_platformsList.append(platform);
+                    tempPlatformsList.append(platform);
+
+                    platform->setcurrentIndex(newIndex);
+
+                    //qDebug() << "new index" << newIndex << "random index" << randomIndex << "index of Alphabetic Order" << platform->indexOfAlphabeticOrder();
+
+                    newIndex++;
+                }
+            }
+            else {
+                qCritical() <<  "Random index" << randomIndex << "> platforms list count()" << copyOfPlatformsList.count();
+            }
+        }
+
+        // QML updated only once
+        _platformsList.append(tempPlatformsList);
+    }
+}
+
+
+/**
+ * @brief Sort the list of platforms in alphabetical order
+ */
+void ExpeModelManager::sortPlatformsListInAlphabeticOrder()
+{
+    if (!_platformsList.isEmpty())
+    {
+        int nbPlatforms = _platformsList.count();
+
+        qDebug() << "Sort the" << nbPlatforms << "platforms in alphabetical order";
+
+        // Copy the list
+        QList<PlatformM*> tempPlatformsList = _platformsList.toList();
+
+        // Clear to prevent QML update
+        _platformsList.clear();
+
+        // For each platform, reset the current index to the alphabetical index
+        for (PlatformM* platform : tempPlatformsList)
+        {
+            if (platform != nullptr) {
+                platform->setcurrentIndex(platform->indexOfAlphabeticOrder());
+            }
+        }
+
+        // QML updated only once
+        _platformsList.append(tempPlatformsList);
     }
 }
 
@@ -215,7 +303,7 @@ void ExpeModelManager::onStatusReceivedAbout_LoadPlatformFile(bool commandStatus
     {
          qDebug() << "Platform" << commandParameters << "Loaded";
 
-         for (PlatformM* iterator : _platformsList)
+         for (PlatformM* iterator : _platformsList.toList())
          {
              if ((iterator != nullptr) && (iterator->filePath() == commandParameters))
              {
@@ -232,3 +320,70 @@ void ExpeModelManager::onStatusReceivedAbout_LoadPlatformFile(bool commandStatus
     setcurrentLoadedPlatform(loadedPlatform);
 }
 
+
+/**
+ * @brief Get a list of random indexes
+ * @param max
+ * @return
+ */
+QList<int> ExpeModelManager::_getRandomIndexes(int max)
+{
+    QList<int> randomIndexes;
+
+    if (max > 0)
+    {
+        QRandomGenerator* randomGenerator = QRandomGenerator::global();
+
+        QVector<quint32> vector = QVector<quint32>(max);
+
+        randomGenerator->fillRange(vector.data(), vector.size());
+
+        for (int i = max; i > 0; i--)
+        {
+            quint32 randomUint32 = vector.at(i - 1);
+
+            quint32 randomIndex = randomUint32 % static_cast<quint32>(i);
+
+            randomIndexes.append(static_cast<int>(randomIndex));
+
+            //qDebug() << i << ":" << randomIndex;
+        }
+
+        /*QStringList data1 = QStringList();
+        QStringList data2 = QStringList();
+
+        for (int i = 1; i <= 20; i++)
+        {
+            data1.append(QString("igs-%1").arg(i));
+        }
+        qDebug() << "AVANT: data1" << data1;
+
+        QVector<quint32> vector = QVector<quint32>(20);
+        //qDebug() << "AVANT vector" << vector;
+        randomGenerator->fillRange(vector.data(), vector.size());
+        qDebug() << "Randoms:" << vector;
+
+        for (int i = 20; i > 0; i--)
+        {
+            quint32 randomUint32 = vector.at(i - 1);
+            int randomIndex = randomUint32 % i;
+
+            if (randomIndex < data1.length())
+            {
+                QString item = data1.takeAt(randomIndex);
+                data2.append(item);
+
+                qDebug() << i << ":" << randomIndex << item;
+                //qDebug() << "data1" << data1;
+                //qDebug() << "data2" << data2;
+            }
+            else {
+                qCritical() <<  "random index" << randomIndex << "too high for 'data1'" << data1.length();
+            }
+        }
+
+        //qDebug() << "APRES: data1" << data1;
+        qDebug() << "APRES: data2" << data2;*/
+    }
+    return randomIndexes;
+}
