@@ -253,17 +253,58 @@ void IngeScapeExpeController::selectDirectory()
  */
 void IngeScapeExpeController::openPlatform(PlatformM* platform)
 {
-    if ((platform != nullptr) && (_modelManager != nullptr) && (_networkC != nullptr))
+    if ((platform != nullptr) && (_modelManager != nullptr) && _modelManager->isEditorON() && (_networkC != nullptr))
     {
         qInfo() << "Open platform" << platform->name() << "at" << platform->filePath();
 
-        if (_modelManager->isEditorON())
-        {
-            QString commandAndParameters = QString("%1=%2").arg(command_LoadPlatformFile, platform->filePath());
+        QString commandAndParameters = QString("%1=%2").arg(command_LoadPlatformFile, platform->filePath());
 
-            // Send the command and parameters to the editor
-            _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+        // Send the command and parameters to the editor
+        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+    }
+}
+
+
+/**
+ * @brief Play or Pause the TimeLine
+ * @param isPlay
+ */
+void IngeScapeExpeController::playOrPauseTimeLine(bool isPlay)
+{
+    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr) && (_networkC != nullptr))
+    {
+        QString commandAndParameters;
+
+        if (isPlay) {
+            qInfo() << "Play the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
+
+            commandAndParameters = QString("%1=PLAY").arg(command_UpdateTimeLineState);
         }
+        else {
+            qInfo() << "Pause the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
+
+            commandAndParameters = QString("%1=PAUSE").arg(command_UpdateTimeLineState);
+        }
+
+        // Send the command and parameters to the editor
+        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+    }
+}
+
+
+/**
+ * @brief Stop the TimeLine
+ */
+void IngeScapeExpeController::stopTimeLine()
+{
+    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr) && (_networkC != nullptr))
+    {
+        qInfo() << "STOP the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
+
+        QString commandAndParameters = QString("%1=STOP").arg(command_UpdateTimeLineState);
+
+        // Send the command and parameters to the editor
+        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
     }
 }
 

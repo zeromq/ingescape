@@ -467,14 +467,23 @@ void AbstractScenarioController::updateTimeLineState(QString state)
 {
     qDebug() << state << "the timeline";
 
-    if (state == "PLAY") {
+    // PLAY
+    if (state == "PLAY")
+    {
         setisPlaying(true);
     }
-    else if (state == "PAUSE") {
+    // PAUSE
+    else if (state == "PAUSE")
+    {
         setisPlaying(false);
     }
-    else if (state == "STOP") {
+    // STOP
+    else if (state == "STOP")
+    {
+        setisPlaying(false);
 
+        // Reset current time
+        setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
     }
     else {
         qCritical() << "Unknown state" << state << "so we cannot update the TimeLine !";

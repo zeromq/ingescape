@@ -100,8 +100,17 @@ public:
     Q_INVOKABLE void openPlatform(PlatformM* platform);
 
 
-    // FIXME TODO
-    //void playOrPauseTimeLineState(bool isPlay);
+    /**
+     * @brief Play or Pause the TimeLine
+     * @param isPlay
+     */
+    Q_INVOKABLE void playOrPauseTimeLine(bool isPlay);
+
+
+    /**
+     * @brief Stop the TimeLine
+     */
+    Q_INVOKABLE void stopTimeLine();
 
 
 public Q_SLOTS:

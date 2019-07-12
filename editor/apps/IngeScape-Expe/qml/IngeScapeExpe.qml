@@ -200,14 +200,57 @@ Item {
             }
 
             Row {
+                anchors {
+                    left: parent.left
+                    top: parent.top
+                    margins: 5
+                }
+                height: 30
+
                 spacing: 10
 
                 Button {
-                    text: "Play/Pause"
+                    id: btnPlayOrPause
+
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+
+                    visible: true
+                    enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.currentLoadedPlatform
+                    checkable: true
+                    checked: false
+
+                    text: checked ? qsTr("PAUSE") : qsTr("PLAY")
+
+                    onClicked: {
+                        //console.log("QML: Play or Pause the timeline (checked = " + checked + ")");
+
+                        // Play or Pause the TimeLine
+                        IngeScapeExpeC.playOrPauseTimeLine(checked);
+                    }
                 }
 
                 Button {
-                    text: "STOP"
+                    id: btnStop
+
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+
+                    visible: true
+                    enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.currentLoadedPlatform
+
+                    text: qsTr("STOP")
+
+                    onClicked: {
+                        //console.log("QML: Stop the timeline");
+
+                        // Stop the TimeLine
+                        IngeScapeExpeC.stopTimeLine();
+                    }
                 }
             }
         }
