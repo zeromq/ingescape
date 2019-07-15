@@ -48,9 +48,7 @@ public:
      * @param jsonHelper
      * @param parent
      */
-    explicit TasksController(//AssessmentsModelManager* modelManager,
-                             //JsonHelper* jsonHelper,
-                             QObject *parent = nullptr);
+    explicit TasksController(AssessmentsModelManager* modelManager, /*JsonHelper* jsonHelper, */QObject *parent = nullptr);
 
 
     /**
@@ -194,11 +192,17 @@ private:
      */
     TaskM* _createNewTaskWithIngeScapePlatformFileUrl(QString taskName, QUrl platformFileUrl);
 
+    /**
+     * @brief Write the given task to the cassandra DB
+     * @param task
+     */
+    void _writeTaskToCassandra(TaskM* task);
+
 
 private:
 
     // Manager for the data model of our IngeScape Assessments application
-    //AssessmentsModelManager* _modelManager;
+    AssessmentsModelManager* _modelManager;
 
     // Helper to manage JSON files
     //JsonHelper* _jsonHelper;

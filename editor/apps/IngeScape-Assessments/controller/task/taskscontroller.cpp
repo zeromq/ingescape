@@ -20,13 +20,12 @@
  * @param jsonHelper
  * @param parent
  */
-TasksController::TasksController(//AssessmentsModelManager* modelManager,
-                                 //JsonHelper* jsonHelper,
-                                 QObject *parent) : QObject(parent),
-    _currentExperimentation(nullptr),
-    _selectedTask(nullptr)
-    //_modelManager(modelManager),
-    //_jsonHelper(jsonHelper)
+TasksController::TasksController(AssessmentsModelManager* modelManager, /*JsonHelper* jsonHelper, */QObject *parent)
+    : QObject(parent)
+    , _currentExperimentation(nullptr)
+    , _selectedTask(nullptr)
+    , _modelManager(modelManager)
+    //, _jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -58,7 +57,7 @@ TasksController::~TasksController()
     }
 
     // Reset pointers
-    //_modelManager = nullptr;
+    _modelManager = nullptr;
     //_jsonHelper = nullptr;
 }
 
@@ -438,6 +437,9 @@ TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskN
         // Set the URL of the IngeScape platform file (JSON)
         task->setplatformFileUrl(platformFileUrl);
 
+        // Write ne task to Cassandra
+        _writeTaskToCassandra(task);
+
         // Add the task to the current experimentation
         _currentExperimentation->addTask(task);
 
@@ -446,4 +448,18 @@ TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskN
     }
 
     return task;
+}
+
+
+/**
+ * @brief Write the given task to the cassandra DB
+ * @param task
+ */
+void TasksController::_writeTaskToCassandra(TaskM* task)
+{
+    if ((task != nullptr) && (_modelManager != nullptr))
+    {
+        //TODO
+
+    }
 }
