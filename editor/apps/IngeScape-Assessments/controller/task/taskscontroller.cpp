@@ -431,14 +431,33 @@ TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskN
 
     if (!taskName.isEmpty() && platformFileUrl.isValid() && (_currentExperimentation != nullptr))
     {
-        // Create the new task
-        task = new TaskM(taskName);
+        CassUuid taskUuid;
+        cass_uuid_gen_time(_modelManager->getCassUuidGen(), &taskUuid);
 
-        // Set the URL of the IngeScape platform file (JSON)
-        task->setplatformFileUrl(platformFileUrl);
+        const char* query = "INSERT INTO ingescape.task (id_experimentation, id, name, platform_file) VALUES (?, ?, ?, ?);";
+        CassStatement* cassStatement = cass_statement_new(query, 4);
+        cass_statement_bind_uuid(cassStatement, 0, _currentExperimentation->getCassUuid());
+        cass_statement_bind_uuid(cassStatement, 1, taskUuid);
+        cass_statement_bind_string(cassStatement, 2, taskName.toStdString().c_str());
+        cass_statement_bind_string(cassStatement, 3, platformFileUrl.toString().toStdString().c_str());
 
-        // Write ne task to Cassandra
-        _writeTaskToCassandra(task);
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "Experimentation" << taskName << "inserted into the DataBase";
+
+            // Create the new task
+            task = new TaskM(_currentExperimentation->getCassUuid(), taskUuid, taskName, platformFileUrl);
+
+        }
+        else {
+            qCritical() << "Could not insert the experimentation" << taskName << "into the DataBase:" << cass_error_desc(cassError);
+        }
+
+        cass_statement_free(cassStatement);
+        cass_future_free(cassFuture);
 
         // Add the task to the current experimentation
         _currentExperimentation->addTask(task);
@@ -446,20 +465,9 @@ TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskN
         // Select this new task
         setselectedTask(task);
     }
+    else {
+        qWarning() << "Cannot create new experimentation because name is empty (" << task->name() << ") or group is null !";
+    }
 
     return task;
-}
-
-
-/**
- * @brief Write the given task to the cassandra DB
- * @param task
- */
-void TasksController::_writeTaskToCassandra(TaskM* task)
-{
-    if ((task != nullptr) && (_modelManager != nullptr))
-    {
-        //TODO
-
-    }
 }

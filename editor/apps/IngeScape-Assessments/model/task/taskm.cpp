@@ -19,12 +19,14 @@
  * @param name
  * @param parent
  */
-TaskM::TaskM(QString name,
-             QObject *parent) : QObject(parent),
-    _name(name),
-    _platformFileUrl(QUrl()),
-    _platformFileName(QString(""))
-    //_agentNamesList(QStringList())
+TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QString& name, const QUrl& platformFile, QObject *parent)
+    : QObject(parent)
+      , _name(name)
+      , _platformFileUrl(platformFile)
+      , _platformFileName(platformFile.toString())
+      //, _agentNamesList(QStringList())
+      , _cassExperimentationUuid(experimentationUuid)
+      , _cassUuid(uid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

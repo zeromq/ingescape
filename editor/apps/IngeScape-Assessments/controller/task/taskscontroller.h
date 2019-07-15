@@ -192,12 +192,6 @@ private:
      */
     TaskM* _createNewTaskWithIngeScapePlatformFileUrl(QString taskName, QUrl platformFileUrl);
 
-    /**
-     * @brief Write the given task to the cassandra DB
-     * @param task
-     */
-    void _writeTaskToCassandra(TaskM* task);
-
 
 private:
 
