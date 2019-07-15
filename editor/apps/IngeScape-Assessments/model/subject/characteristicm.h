@@ -32,6 +32,9 @@ class CharacteristicM : public QObject
 {
     Q_OBJECT
 
+    // Unique identifier in Cassandra Data Base converted to string
+    I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
+
     // Name of our characteristic
     I2_QML_PROPERTY_READONLY(QString, name)
 

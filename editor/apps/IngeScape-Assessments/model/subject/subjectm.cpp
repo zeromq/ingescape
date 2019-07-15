@@ -24,6 +24,7 @@
 SubjectM::SubjectM(CassUuid cassUuid,
                    QString displayedId,
                    QObject *parent) : QObject(parent),
+    _uid(""),
     _displayedId(displayedId),
     _mapCharacteristicValues(nullptr),
     _cassUuid(cassUuid)
@@ -31,7 +32,11 @@ SubjectM::SubjectM(CassUuid cassUuid,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Subject" << _displayedId;
+    char chrCassUid[CASS_UUID_STRING_LENGTH];
+    cass_uuid_string(_cassUuid, chrCassUid);
+    _uid = QString(chrCassUid);
+
+    qInfo() << "New Model of Subject" << _displayedId << "(" << _uid << ")";
 
     // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
     _mapCharacteristicValues = new QQmlPropertyMap(this);
@@ -46,7 +51,7 @@ SubjectM::SubjectM(CassUuid cassUuid,
  */
 SubjectM::~SubjectM()
 {
-    qInfo() << "Delete Model of Subject" << _displayedId;
+    qInfo() << "Delete Model of Subject" << _displayedId << "(" << _uid << ")";
 
     // Free memory
     if (_mapCharacteristicValues != nullptr)

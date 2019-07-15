@@ -24,6 +24,7 @@ CharacteristicM::CharacteristicM(CassUuid cassUuid,
                                  QString name,
                                  CharacteristicValueTypes::Value valueType,
                                  QObject *parent) : QObject(parent),
+    _uid(""),
     _name(name),
     _valueType(valueType),
     _isSubjectId(false),
@@ -33,7 +34,11 @@ CharacteristicM::CharacteristicM(CassUuid cassUuid,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType);
+    char chrCassUid[CASS_UUID_STRING_LENGTH];
+    cass_uuid_string(_cassUuid, chrCassUid);
+    _uid = QString(chrCassUid);
+
+    qInfo() << "New Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType) << "(" << _uid << ")";
 
     if (_name == CHARACTERISTIC_SUBJECT_ID) {
         _isSubjectId = true;
@@ -46,7 +51,7 @@ CharacteristicM::CharacteristicM(CassUuid cassUuid,
  */
 CharacteristicM::~CharacteristicM()
 {
-    qInfo() << "Delete Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType);
+    qInfo() << "Delete Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType) << "(" << _uid << ")";
 
 }
 

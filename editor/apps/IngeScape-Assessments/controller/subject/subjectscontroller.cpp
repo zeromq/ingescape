@@ -307,21 +307,33 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
                         char chrCharacteristicUid[CASS_UUID_STRING_LENGTH];
                         cass_uuid_string(characteristicUid, chrCharacteristicUid);
 
-                        const char *chrCharacteristicName = "";
-                        size_t nameLength;
-                        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrCharacteristicName, &nameLength);
-                        QString characteristicName = QString::fromUtf8(chrCharacteristicName, static_cast<int>(nameLength));
+                        // Get the characteristic from its UID
+                        CharacteristicM* characteristic = currentExperimentation->getCharacteristicFromUID(chrCharacteristicUid);
 
-                        CharacteristicValueTypes::Value characteristicValueType = CharacteristicValueTypes::UNKNOWN;
-                        int8_t type;
-                        cass_value_get_int8(cass_row_get_column_by_name(row, "value_type"), &type);
-                        characteristicValueType = static_cast<CharacteristicValueTypes::Value>(type);
+                        // It does not yet exist
+                        if (characteristic == nullptr)
+                        {
+                            const char *chrCharacteristicName = "";
+                            size_t nameLength;
+                            cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrCharacteristicName, &nameLength);
+                            QString characteristicName = QString::fromUtf8(chrCharacteristicName, static_cast<int>(nameLength));
 
-                        // Create the characteristic
-                        CharacteristicM* characteristic = new CharacteristicM(characteristicUid, characteristicName, characteristicValueType, nullptr);
+                            CharacteristicValueTypes::Value characteristicValueType = CharacteristicValueTypes::UNKNOWN;
+                            int8_t type;
+                            cass_value_get_int8(cass_row_get_column_by_name(row, "value_type"), &type);
+                            characteristicValueType = static_cast<CharacteristicValueTypes::Value>(type);
 
-                        // Add the characteristic to the current experimentation
-                        _currentExperimentation->addCharacteristic(characteristic);
+                            // Create the characteristic
+                            characteristic = new CharacteristicM(characteristicUid, characteristicName, characteristicValueType, nullptr);
+
+                            // Add the characteristic to the current experimentation
+                            _currentExperimentation->addCharacteristic(characteristic);
+                        }
+                        // FIXME Update the existing characteristic ?
+                        else
+                        {
+
+                        }
                     }
 
                     cass_iterator_free(cassIterator);

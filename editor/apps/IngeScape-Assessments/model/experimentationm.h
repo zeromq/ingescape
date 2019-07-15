@@ -33,6 +33,9 @@ class ExperimentationM : public QObject
 {
     Q_OBJECT
 
+    // Unique identifier in Cassandra Data Base converted to string
+    I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
+
     // Name of our experimentation
     I2_QML_PROPERTY(QString, name)
 
@@ -135,6 +138,13 @@ public:
     void removeRecordSetup(RecordSetupM* recordSetup);
 
 
+    /**
+     * @brief Get a characteristic from its UID
+     * @param uid
+     * @return
+     */
+    CharacteristicM* getCharacteristicFromUID(QString uid);
+
 
 Q_SIGNALS:
 
@@ -146,6 +156,9 @@ private:
 
     // Unique identifier in Cassandra Data Base
     CassUuid _cassUuid;
+
+    // Hash table from an UID to a characteristic
+    QHash<QString, CharacteristicM*> _hashFromUIDtoCharacteristic;
 
 };
 

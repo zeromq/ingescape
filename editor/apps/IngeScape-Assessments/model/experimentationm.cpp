@@ -25,6 +25,7 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
                                    QString name,
                                    QDateTime creationDate,
                                    QObject *parent) : QObject(parent),
+    _uid(""),
     _name(name),
     _creationDate(creationDate),
     _cassUuid(cassUuid)
@@ -32,7 +33,11 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Experimentation" << _name << "(" << _creationDate.toString("dd/MM/yy hh:mm:ss") << ")";
+    char chrCassUid[CASS_UUID_STRING_LENGTH];
+    cass_uuid_string(_cassUuid, chrCassUid);
+    _uid = QString(chrCassUid);
+
+    qInfo() << "New Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << _uid << ")";
 
 
     // Record setups are sorted on their start date/time (chronological order)
@@ -77,7 +82,7 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
  */
 ExperimentationM::~ExperimentationM()
 {
-    qInfo() << "Delete Model of Experimentation" << _name;
+    qInfo() << "Delete Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << _uid << ")";
 
     // Delete all characteristics of our experimentation
     _allCharacteristics.deleteAllItems();
@@ -110,8 +115,11 @@ CassUuid ExperimentationM::getCassUuid()
  */
 void ExperimentationM::addCharacteristic(CharacteristicM* characteristic)
 {
-    if (characteristic != nullptr)
+    if ((characteristic != nullptr) && !_hashFromUIDtoCharacteristic.contains(characteristic->uid()))
     {
+        // Add to the hash
+        _hashFromUIDtoCharacteristic.insert(characteristic->uid(), characteristic);
+
         // Add to the list
         _allCharacteristics.append(characteristic);
 
@@ -133,8 +141,11 @@ void ExperimentationM::addCharacteristic(CharacteristicM* characteristic)
  */
 void ExperimentationM::removeCharacteristic(CharacteristicM* characteristic)
 {
-    if (characteristic != nullptr)
+    if ((characteristic != nullptr) && _hashFromUIDtoCharacteristic.contains(characteristic->uid()))
     {
+        // Remove from the hash
+        _hashFromUIDtoCharacteristic.remove(characteristic->uid());
+
         // Remove from the list
         _allCharacteristics.remove(characteristic);
 
@@ -243,6 +254,22 @@ void ExperimentationM::removeRecordSetup(RecordSetupM* recordSetup)
     {
         // Remove from the list
         _allRecordSetups.remove(recordSetup);
+    }
+}
+
+
+/**
+ * @brief Get a characteristic from its UID
+ * @param uid
+ * @return
+ */
+CharacteristicM* ExperimentationM::getCharacteristicFromUID(QString uid)
+{
+    if (_hashFromUIDtoCharacteristic.contains(uid)) {
+        return _hashFromUIDtoCharacteristic.value(uid);
+    }
+    else {
+        return nullptr;
     }
 }
 
