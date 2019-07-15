@@ -71,6 +71,42 @@ RecordsSupervisionController::~RecordsSupervisionController()
 
 
 /**
+ * @brief Setter for property "Selected Record"
+ * @param value
+ */
+void RecordsSupervisionController::setselectedRecord(RecordVM *value)
+{
+    if (_selectedRecord != value)
+    {
+        RecordVM* previousSelectedRecord = _selectedRecord;
+
+        _selectedRecord = value;
+
+        if ((previousSelectedRecord != nullptr) && (_selectedRecord == nullptr))
+        {
+            if (previousSelectedRecord->modelM() != nullptr) {
+                qDebug() << "UN-load the previous selected record" << previousSelectedRecord->modelM()->uid();
+            }
+
+            // UN-load the previous selected record
+            unloadRecord();
+        }
+        else if (_selectedRecord != nullptr)
+        {
+            if (_selectedRecord->modelM() != nullptr) {
+                qDebug() << "Load the new selected record" << _selectedRecord->modelM()->uid();
+            }
+
+            // Load the new selected record
+            loadRecord(_selectedRecord->modelM()->uid());
+        }
+
+        Q_EMIT selectedRecordChanged(value);
+    }
+}
+
+
+/**
  * @brief Start/Stop to record (optionaly with the actions in the timeline)
  * @param isStart flag indicating if we start to record or if we stop to record
  * @param withTimeLine flag indicating if the actions in the timeline must be recorded

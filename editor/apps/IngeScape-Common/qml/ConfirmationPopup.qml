@@ -1,7 +1,7 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Common
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -9,6 +9,8 @@
  *
  *	Contributors:
  *      Justine Limoges <limoges@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *
  */
 
 import QtQuick 2.8
@@ -43,11 +45,11 @@ I2PopupBase {
     //
     //--------------------------------
 
-    //
-    signal deleteConfirmed();
+    // Signal emitted when the user clicks on the "OK" button
+    signal confirmed();
 
-    //
-    signal deleteCancelled();
+    // Signal emitted when the user clicks on the "Cancel" button
+    signal cancelled();
 
 
     //--------------------------------
@@ -77,7 +79,7 @@ I2PopupBase {
                 verticalCenter: parent.verticalCenter
                 verticalCenterOffset: -18
             }
-            text: "This agent is used in the platform.\nDo you want to completely delete it?"
+            text: "TODO 1...\nDo you want to TODO 2?"
             horizontalAlignment: Text.AlignHCenter
             lineHeight: 24
             lineHeightMode: Text.FixedHeight
@@ -107,7 +109,7 @@ I2PopupBase {
                 height: boundingBox.height
                 width: boundingBox.width
 
-                enabled : visible
+                enabled: visible
                 text: "Cancel"
 
                 anchors {
@@ -117,8 +119,8 @@ I2PopupBase {
                 style: I2SvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
 
-                    pressedID: releasedID + "-pressed"
                     releasedID: "button"
+                    pressedID: releasedID + "-pressed"
                     disabledID: releasedID + "-disabled"
 
                     font {
@@ -136,8 +138,8 @@ I2PopupBase {
                     // Close our popup
                     rootItem.close();
 
-                    // Emit the signal "Delete Cancelled"
-                    rootItem.deleteCancelled();
+                    // Emit the signal "Cancelled"
+                    rootItem.cancelled();
                 }
             }
 
@@ -149,7 +151,7 @@ I2PopupBase {
                 height: boundingBox.height
                 width: boundingBox.width
 
-                enabled : visible
+                enabled: visible
                 activeFocusOnPress: true
                 text: "OK"
 
@@ -160,8 +162,8 @@ I2PopupBase {
                 style: I2SvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
 
-                    pressedID: releasedID + "-pressed"
                     releasedID: "button"
+                    pressedID: releasedID + "-pressed"
                     disabledID: releasedID + "-disabled"
 
                     font {
@@ -179,8 +181,8 @@ I2PopupBase {
                     // Close our popup
                     rootItem.close();
 
-                    // Emit the signal "Delete Confirmed"
-                    rootItem.deleteConfirmed();
+                    // Emit the signal "Confirmed"
+                    rootItem.confirmed();
                 }
             }
         }

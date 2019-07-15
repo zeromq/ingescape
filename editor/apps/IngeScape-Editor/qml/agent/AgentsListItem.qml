@@ -48,6 +48,12 @@ Item {
     height: 85
 
 
+    //--------------------------------
+    //
+    // Signals
+    //
+    //--------------------------------
+
     // signal emitted when the delete confirmation popup is needed because the agent is already used in the platform
     signal needConfirmationToDeleteAgentInList();
 

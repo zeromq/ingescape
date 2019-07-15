@@ -51,7 +51,8 @@ class RecordsSupervisionController : public QObject
     I2_QOBJECT_LISTMODEL(RecordVM, recordsList)
 
     // Selected Record in the Records list
-    I2_QML_PROPERTY_DELETE_PROOF(RecordVM*, selectedRecord)
+    //I2_QML_PROPERTY_DELETE_PROOF(RecordVM*, selectedRecord)
+    I2_QML_PROPERTY_CUSTOM_SETTER(RecordVM*, selectedRecord)
 
     // Flag indicating if a recorder is currently recording
     I2_QML_PROPERTY(bool, isRecording)

@@ -414,12 +414,16 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
     // Loaded record
     else if (message == prefix_LoadedRecord)
     {
+        qDebug() << prefix_LoadedRecord;
+
         // Emit the signal "Loaded record received"
         Q_EMIT loadedRecordReceived();
     }
     // UN-loaded record
     else if (message == prefix_UNloadedRecord)
     {
+        qDebug() << prefix_UNloadedRecord;
+
         // Emit the signal "UN-loaded record received"
         Q_EMIT unloadedRecordReceived();
     }

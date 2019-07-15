@@ -41,12 +41,17 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    //property var controller: null;
     property RecordsSupervisionController controller: null;
 
     // Flag indicating if we are playing (or resuming) the current replay
     property bool _isPlayingOrResumingReplay: controller && ((controller.replayState === ReplayStates.PLAYING) || (controller.replayState === ReplayStates.RESUMING));
 
+
+    //--------------------------------
+    //
+    // Signals
+    //
+    //--------------------------------
 
 
     //--------------------------------
@@ -298,7 +303,7 @@ Item {
                     topMargin: 5
                     left: parent.left
                     right: parent.right
-                    leftMargin: 75
+                    leftMargin: 28
                     rightMargin: 65
                 }
 
@@ -355,12 +360,31 @@ Item {
                 onPressed: {
                     if (controller)
                     {
-                        if (controller.selectedRecord === model.QtObject)
+                        // Replay in progress for the selected record...ask confirmation before to UN-load it
+                        if (controller.selectedRecord &&
+                                ((controller.replayState === ReplayStates.PLAYING) || (controller.replayState === ReplayStates.PAUSED) || (controller.replayState === ReplayStates.RESUMING)) )
                         {
-                            controller.selectedRecord = null;
+                            if (controller.selectedRecord === model.QtObject)
+                            {
+                                unloadReplayConfirmationPopup.myReplay = null;
+                            }
+                            else {
+                                unloadReplayConfirmationPopup.myReplay = model.QtObject;
+                            }
+
+                            // Open the popup
+                            unloadReplayConfirmationPopup.open();
                         }
-                        else {
-                            controller.selectedRecord = model.QtObject;
+                        // NO replay in progress
+                        else
+                        {
+                            if (controller.selectedRecord === model.QtObject)
+                            {
+                                controller.selectedRecord = null;
+                            }
+                            else {
+                                controller.selectedRecord = model.QtObject;
+                            }
                         }
                     }
                 }
@@ -372,8 +396,8 @@ Item {
 
                 anchors {
                     verticalCenter: parent.verticalCenter
-                    left: parent.left
-                    leftMargin: 25
+                    right: parent.right
+                    rightMargin: 40
                 }
                 width: 20
                 height: 20
@@ -386,7 +410,7 @@ Item {
 
 
             // Load record button
-            Button {
+            /*Button {
                 id: loadRecordButton
 
                 property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
@@ -433,11 +457,11 @@ Item {
                         controller.loadRecord(model.modelM.uid);
                     }
                 }
-            }
+            }*/
 
 
             // Load record button
-            Button {
+            /*Button {
                 id: unloadRecordButton
 
                 property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
@@ -487,7 +511,7 @@ Item {
                         controller.unloadRecord();
                     }
                 }
-            }
+            }*/
 
 
             // Button "Play"
@@ -496,10 +520,10 @@ Item {
 
                 anchors {
                     //verticalCenter: parent.verticalCenter
-                    right: parent.right
-                    rightMargin: 25
+                    right: rewindButton.left
+                    rightMargin: 5
                     bottom: parent.bottom
-                    bottomMargin: 12
+                    bottomMargin: 10
                 }
 
                 activeFocusOnPress: true
@@ -538,10 +562,10 @@ Item {
 
                 anchors {
                     //verticalCenter: parent.verticalCenter
-                    right: parent.right
-                    rightMargin: 25
+                    right: rewindButton.left
+                    rightMargin: 5
                     bottom: parent.bottom
-                    bottomMargin: 12
+                    bottomMargin: 10
                 }
 
                 visible: rootItem._isPlayingOrResumingReplay
@@ -567,32 +591,32 @@ Item {
             }
 
 
-            // Button "Stop"
+            // Button "Rewind"
             Button {
-                id: stopButton
+                id: rewindButton
 
                 anchors {
                     //verticalCenter: parent.verticalCenter
                     right: parent.right
-                    rightMargin: 25
+                    rightMargin: 20
                     bottom: parent.bottom
-                    bottomMargin: -5
+                    bottomMargin: 10
                 }
+                rotation: 180
 
                 visible: controller && ((controller.replayState === ReplayStates.PAUSED) || rootItem._isPlayingOrResumingReplay)
                          && recordItem._isCurrentReplay
 
                 activeFocusOnPress: true
 
-                text: "STOP"
-
-                /*style: LabellessSvgButtonStyle {
+                style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
 
-                    releasedID: "pause"
+                    //releasedID: "list-rewind"
+                    releasedID: "list-play"
                     pressedID: releasedID + "-pressed"
                     disabledID: releasedID
-                }*/
+                }
 
                 onClicked: {
                     if (controller)
@@ -612,7 +636,7 @@ Item {
                     top: parent.top
                     topMargin: 10
                     right: parent.right
-                    rightMargin: 12
+                    rightMargin: 10
                 }
 
                 visible: mouseAreaRecordItem.containsMouse || removeButton.hovered
@@ -637,8 +661,26 @@ Item {
             }
         }
     }
+
+
+    //
+    // Popup about "Unload Replay" confirmation
+    //
+    ConfirmationPopup {
+        id: unloadReplayConfirmationPopup
+
+        property var myReplay: null;
+
+        confirmationText: "This replay is in progress.\nDo you want to unload it?"
+
+        onConfirmed: {
+            if (controller)
+            {
+                // Select the replay
+                controller.selectedRecord = unloadReplayConfirmationPopup.myReplay;
+            }
+        }
+    }
 }
-
-
 
 
