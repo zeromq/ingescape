@@ -496,14 +496,14 @@ Item {
     //
     // Popup about Delete Confirmation
     //
-    Editor.DeleteConfirmationPopup {
+    ConfirmationPopup {
         id: deleteConfirmationPopup
 
         property var myAgent: null;
 
         confirmationText: "This agent is used in the platform.\nDo you want to completely delete it?"
 
-        onDeleteConfirmed: {
+        onConfirmed: {
             if (controller) {
                 controller.deleteAgentInList(deleteConfirmationPopup.myAgent);
             }

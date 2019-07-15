@@ -2507,12 +2507,12 @@ WindowBlockTouches {
     //
     // Delete Confirmation
     //
-    Editor.DeleteConfirmationPopup {
+    ConfirmationPopup {
         id: deleteConfirmationPopup
 
         confirmationText: "This action is used in the platform.\nDo you want to completely delete it?"
 
-        onDeleteConfirmed: {
+        onConfirmed: {
             if (panelController.originalAction) {
                 // Delete our action
                 controller.deleteAction(panelController.originalAction);
