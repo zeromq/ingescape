@@ -32,16 +32,6 @@ TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QSt
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New Model of Task" << _name;
-
-    //
-    // FIXME for tests
-    //
-    for (int i = 1; i < 5; i++)
-    {
-        IndependentVariableM* independentVariable = new IndependentVariableM(QString("Indep. Var. %1").arg(i), QString("description of VI %1").arg(i), IndependentVariableValueTypes::TEXT);
-
-        _independentVariables.append(independentVariable);
-    }
 }
 
 

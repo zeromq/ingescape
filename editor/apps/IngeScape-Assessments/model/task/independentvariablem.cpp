@@ -21,14 +21,22 @@
  * @param valueType
  * @param parent
  */
-IndependentVariableM::IndependentVariableM(QString name,
+IndependentVariableM::IndependentVariableM(CassUuid experimentationUuid,
+                                           CassUuid taskUuid,
+                                           CassUuid uuid,
+                                           QString name,
                                            QString description,
                                            IndependentVariableValueTypes::Value valueType,
+                                           QStringList enumValues,
                                            QObject *parent) : QObject(parent),
     _name(name),
     _description(description),
     _valueType(valueType),
-    _enumValues(QStringList())
+    _enumValues(enumValues),
+    _experimentationCassUuid(experimentationUuid),
+    _taskCassUuid(taskUuid),
+    _cassUuid(uuid)
+
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

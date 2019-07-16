@@ -169,6 +169,10 @@ void TasksController::deleteTask(TaskM* task)
             qCritical() << "Could not delete the task" << task->name() << "from the DB:" << cass_error_desc(cassError);
         }
 
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+
         // Remove the task from the current experimentation
         _currentExperimentation->removeTask(task);
 
@@ -199,12 +203,18 @@ void TasksController::duplicateTask(TaskM* task)
                 if (independentVariable != nullptr)
                 {
                     // Create the new independent variable
-                    IndependentVariableM* newIndependentVariable = new IndependentVariableM(independentVariable->name(),
-                                                                                            independentVariable->description(),
-                                                                                            independentVariable->valueType());
+                    IndependentVariableM* newIndependentVariable = _insertIndependentVariableIntoDB(newTask->getExperimentationCassUuid()
+                                                                                                    , newTask->getCassUuid()
+                                                                                                    , independentVariable->name()
+                                                                                                    , independentVariable->description()
+                                                                                                    , independentVariable->valueType()
+                                                                                                    , independentVariable->enumValues());
 
-                    // Add the independent variable to the new task
-                    newTask->addIndependentVariable(newIndependentVariable);
+                    if (newIndependentVariable != nullptr)
+                    {
+                        // Add the independent variable to the new task
+                        newTask->addIndependentVariable(newIndependentVariable);
+                    }
                 }
             }
 
@@ -238,6 +248,14 @@ void TasksController::duplicateTask(TaskM* task)
  */
 bool TasksController::canCreateIndependentVariableWithName(QString independentVariableName)
 {
+    //NOTE Oneliner
+//    const QList<IndependentVariableM*>& varList = _selectedTask->independentVariables()->toList();
+//    return !independentVariableName.isEmpty() && (_selectedTask != nullptr)
+//            && std::none_of(varList.begin(), varList.end(),
+//                            [independentVariableName](IndependentVariableM* independentVariable){
+//        return (independentVariable != nullptr) && (independentVariable->name() == independentVariableName);
+//    });
+
     if (!independentVariableName.isEmpty() && (_selectedTask != nullptr))
     {
         for (IndependentVariableM* independentVariable : _selectedTask->independentVariables()->toList())
@@ -264,6 +282,14 @@ bool TasksController::canCreateIndependentVariableWithName(QString independentVa
  */
 bool TasksController::canEditIndependentVariableWithName(IndependentVariableM* independentVariableCurrentlyEdited, QString independentVariableName)
 {
+    //NOTE Oneliner
+//    const QList<IndependentVariableM*>& varList = _selectedTask->independentVariables()->toList();
+//    return (independentVariableCurrentlyEdited != nullptr) && !independentVariableName.isEmpty() && (_selectedTask != nullptr)
+//            && std::none_of(varList.begin(), varList.end(),
+//                            [independentVariableName, independentVariableCurrentlyEdited](IndependentVariableM* independentVariable){
+//        return (independentVariable != nullptr) && (independentVariable != independentVariableCurrentlyEdited) && (independentVariable->name() == independentVariableName);
+//    });
+
     if ((independentVariableCurrentlyEdited != nullptr) && !independentVariableName.isEmpty() && (_selectedTask != nullptr))
     {
         for (IndependentVariableM* independentVariable : _selectedTask->independentVariables()->toList())
@@ -297,11 +323,13 @@ void TasksController::createNewIndependentVariable(QString independentVariableNa
 
         qInfo() << "Create new independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(independentVariableValueType);
 
-        // Create the new independent variable
-        IndependentVariableM* independentVariable = new IndependentVariableM(independentVariableName, independentVariableDescription, independentVariableValueType);
-
-        // Add the independent variable to the selected task
-        _selectedTask->addIndependentVariable(independentVariable);
+        // Create and insert the new independent variable
+        IndependentVariableM* independentVariable = _insertIndependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid(), independentVariableName, independentVariableDescription, independentVariableValueType, {});
+        if (independentVariable != nullptr)
+        {
+            // Add the independent variable to the selected task
+            _selectedTask->addIndependentVariable(independentVariable);
+        }
     }
 }
 
@@ -321,11 +349,12 @@ void TasksController::createNewIndependentVariableEnum(QString independentVariab
         qInfo() << "Create new independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM) << "with values:" << enumValues;
 
         // Create the new independent variable
-        IndependentVariableM* independentVariable = new IndependentVariableM(independentVariableName, independentVariableDescription, IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
-        independentVariable->setenumValues(enumValues);
-
-        // Add the independent variable to the selected task
-        _selectedTask->addIndependentVariable(independentVariable);
+        IndependentVariableM* independentVariable = _insertIndependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid(), independentVariableName, independentVariableDescription, IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM, enumValues);
+        if (independentVariable != nullptr)
+        {
+            // Add the independent variable to the selected task
+            _selectedTask->addIndependentVariable(independentVariable);
+        }
     }
 }
 
@@ -487,4 +516,57 @@ TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskN
     }
 
     return task;
+}
+
+
+/**
+ * @brief Creates a new independent variable with the given parameters and insert it into the Cassandra DB
+ * A nullptr is returned if the operation failed.
+ * @param experimentationUuid
+ * @param taskUuid
+ * @param name
+ * @param description
+ * @param valueType
+ * @param enumValues
+ * @return
+ */
+IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, QString variableName, QString variableDescription, IndependentVariableValueTypes::Value valueType, QStringList enumValues)
+{
+    IndependentVariableM* independentVariable = nullptr;
+
+    if (!variableName.isEmpty())
+    {
+        CassUuid independentVarUuid;
+        cass_uuid_gen_time(_modelManager->getCassUuidGen(), &independentVarUuid);
+
+        const char* query = "INSERT INTO ingescape.independent_var (id_experimentation, id_task, id, name, description, value_type, enum_values) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        CassStatement* cassStatement = cass_statement_new(query, 7);
+        cass_statement_bind_uuid  (cassStatement, 0, experimentationUuid);
+        cass_statement_bind_uuid  (cassStatement, 1, taskUuid);
+        cass_statement_bind_uuid  (cassStatement, 2, independentVarUuid);
+        cass_statement_bind_string(cassStatement, 3, variableName.toStdString().c_str());
+        cass_statement_bind_string(cassStatement, 4, variableDescription.toStdString().c_str());
+        cass_statement_bind_int8  (cassStatement, 5, static_cast<int8_t>(valueType));
+        cass_statement_bind_string(cassStatement, 6, enumValues.join(",").toStdString().c_str());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "Independent variable" << variableName << "inserted into the DB";
+
+            // Create the new task
+            independentVariable = new IndependentVariableM(experimentationUuid, taskUuid, independentVarUuid, variableName, variableDescription, valueType, enumValues);
+
+        }
+        else {
+            qCritical() << "Could not insert the independent variable" << variableName << "into the DB:" << cass_error_desc(cassError);
+        }
+
+        cass_statement_free(cassStatement);
+        cass_future_free(cassFuture);
+    }
+
+    return independentVariable;
 }

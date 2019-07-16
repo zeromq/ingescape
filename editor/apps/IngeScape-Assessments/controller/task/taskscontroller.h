@@ -21,6 +21,7 @@
 #include <controller/assessmentsmodelmanager.h>
 #include <model/jsonhelper.h>
 #include <model/experimentationm.h>
+#include <model/task/independentvariablem.h>
 
 
 /**
@@ -191,6 +192,20 @@ private:
      * @return
      */
     TaskM* _createNewTaskWithIngeScapePlatformFileUrl(QString taskName, QUrl platformFileUrl);
+
+
+    /**
+     * @brief Creates a new independent variable with the given parameters and insert it into the Cassandra DB
+     * A nullptr is returned if the operation failed.
+     * @param experimentationUuid
+     * @param taskUuid
+     * @param name
+     * @param description
+     * @param valueType
+     * @param enumValues
+     * @return
+     */
+    IndependentVariableM* _insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, QString name, QString description, IndependentVariableValueTypes::Value valueType, QStringList enumValues = {});
 
 
 private:
