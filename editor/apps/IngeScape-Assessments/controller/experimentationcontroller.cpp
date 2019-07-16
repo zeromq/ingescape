@@ -166,5 +166,59 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
         qDebug() << "_on Current Experimentation Changed" << currentExperimentation->name();
 
         // FIXME TODO: load data about this experimentation (subjects, tasks, ...)
+
+        const char* query = "SELECT * FROM ingescape.task;";
+
+        // Creates the new query statement
+        CassStatement* cassStatement = cass_statement_new(query, 0);
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qDebug() << "Get all tasks succeeded";
+
+            // Retrieve result set and iterate over the rows
+            const CassResult* cassResult = cass_future_get_result(cassFuture);
+
+            if (cassResult != nullptr)
+            {
+                CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+
+                while(cass_iterator_next(cassIterator))
+                {
+                    const CassRow* row = cass_iterator_get_row(cassIterator);
+
+                    CassUuid taskUuid, experimentationUuid;
+                    cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskUuid);
+                    cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
+
+                    const char *chrExperimentationName = "";
+                    size_t nameLength = 0;
+                    cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrExperimentationName, &nameLength);
+                    QString taskName = QString::fromUtf8(chrExperimentationName, static_cast<int>(nameLength));
+
+                    const char *chrPlatformUrl = "";
+                    size_t platformUrlLength = 0;
+                    cass_value_get_string(cass_row_get_column_by_name(row, "platform_file"), &chrPlatformUrl, &platformUrlLength);
+                    QUrl platformUrl(QString::fromUtf8(chrPlatformUrl, static_cast<int>(platformUrlLength)));
+
+                    TaskM* task = new TaskM(experimentationUuid, taskUuid, taskName, platformUrl);
+                    if (task != nullptr)
+                    {
+                        _currentExperimentation->addTask(task);
+                    }
+                }
+
+                cass_iterator_free(cassIterator);
+            }
+        }
+        else {
+            qCritical() << "Could not get all tasks for the current experiment from the database:" << cass_error_desc(cassError);
+        }
+
+        cass_statement_free(cassStatement);
+        cass_future_free(cassFuture);
     }
 }

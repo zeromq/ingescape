@@ -446,14 +446,14 @@ TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskN
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
-            qInfo() << "Experimentation" << taskName << "inserted into the DataBase";
+            qInfo() << "Task" << taskName << "inserted into the DataBase";
 
             // Create the new task
             task = new TaskM(_currentExperimentation->getCassUuid(), taskUuid, taskName, platformFileUrl);
 
         }
         else {
-            qCritical() << "Could not insert the experimentation" << taskName << "into the DataBase:" << cass_error_desc(cassError);
+            qCritical() << "Could not insert the task" << taskName << "into the DataBase:" << cass_error_desc(cassError);
         }
 
         cass_statement_free(cassStatement);
@@ -466,7 +466,7 @@ TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskN
         setselectedTask(task);
     }
     else {
-        qWarning() << "Cannot create new experimentation because name is empty (" << task->name() << ") or group is null !";
+        qWarning() << "Cannot create new task because name is empty (" << task->name() << ") or group is null !";
     }
 
     return task;
