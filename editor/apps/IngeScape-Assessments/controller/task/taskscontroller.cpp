@@ -173,7 +173,7 @@ void TasksController::deleteTask(TaskM* task)
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
-            qInfo() << "Independent variables for task" << task->name() << "has been successfuly deleted from the DB";
+            qInfo() << "Independent variables for task" << task->name() << "has been successfully deleted from the DB";
         }
         else {
             qCritical() << "Could not delete the task" << task->name() << "from the DB:" << cass_error_desc(cassError);
@@ -194,7 +194,7 @@ void TasksController::deleteTask(TaskM* task)
         cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
-            qInfo() << "Task" << task->name() << "has been successfuly delete from the DB";
+            qInfo() << "Task" << task->name() << "has been successfully deleted from the DB";
         }
         else {
             qCritical() << "Could not delete the task" << task->name() << "from the DB:" << cass_error_desc(cassError);
@@ -460,7 +460,7 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
-            qInfo() << "Independent variable" << independentVariable->name() << "has been successfuly delete from the DB";
+            qInfo() << "Independent variable" << independentVariable->name() << "has been successfully deleted from the DB";
         }
         else {
             qCritical() << "Could not delete the independent variable" << independentVariable->name() << "from the DB:" << cass_error_desc(cassError);
