@@ -22,6 +22,8 @@
 #include <model/task/independentvariablem.h>
 #include <model/task/agentnameandoutputsm.h>
 
+#include "cassandra.h"
+
 
 /**
  * @brief The TaskM class defines a model of task
@@ -29,6 +31,12 @@
 class TaskM : public QObject
 {
     Q_OBJECT
+
+    // Reference to experimentation's UUID from Cassandra DB (converted to string)
+    I2_CPP_NOSIGNAL_PROPERTY(QString, experimentationUuid)
+
+    // Unique identifier from Cassandra Data Base (converted to string)
+    I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
 
     // Name of our task
     I2_QML_PROPERTY(QString, name)
@@ -56,14 +64,27 @@ public:
      * @param name
      * @param parent
      */
-    explicit TaskM(QString name,
-                   QObject *parent = nullptr);
+    explicit TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QString& name, const QUrl& platformFile, QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
     ~TaskM();
+
+
+    /**
+     * @brief Accessor for this task UUID in the Cassandra DB
+     * @return
+     */
+    CassUuid getCassUuid() const { return _cassUuid; }
+
+
+    /**
+     * @brief Accessor for the task's experimentation UUID in the Cassandra DB
+     * @return
+     */
+    CassUuid getExperimentationCassUuid() const { return _cassExperimentationUuid; }
 
 
     /**
@@ -101,6 +122,12 @@ private Q_SLOTS:
 
 
 private:
+
+    // Experimentation's UUID from Cassandra DB
+    CassUuid _cassExperimentationUuid;
+
+    // Unique identifier in Cassandra Data Base
+    CassUuid _cassUuid;
 
     /**
      * @brief Update the list of agents from a platform file path

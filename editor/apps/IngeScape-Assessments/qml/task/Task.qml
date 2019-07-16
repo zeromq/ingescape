@@ -270,7 +270,7 @@ Item {
 
             TableViewColumn {
                 role: "name"
-                title: qsTr("Nom")
+                title: qsTr("Name")
                 width: 200
 
                 delegate: IndependentVariableTableCell {
@@ -303,8 +303,19 @@ Item {
                 width: 200
 
                 delegate: IndependentVariableTableCell {
-                    cellText: IndependentVariableValueTypes.enumToString(styleData.value) + ((styleData.value === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM) ? " {" + tableIndependentVariable.model.get(styleData.row).enumValues + "}"
-                                                                                                                                                                           : "" )
+                    cellText: {
+                        if (tableIndependentVariable.model) {
+                            var entry = tableIndependentVariable.model.get(styleData.row)
+                            if (entry) {
+                                IndependentVariableValueTypes.enumToString(styleData.value) + ((styleData.value === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
+                                                                                               ? " { " + tableIndependentVariable.model.get(styleData.row).enumValues.join(", ") + " }"
+                                                                                               : "" )
+                            } else {
+                                ""
+                            }
+                        }
+                    }
+
                 }
             }
 

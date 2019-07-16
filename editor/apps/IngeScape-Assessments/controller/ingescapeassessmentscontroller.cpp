@@ -116,7 +116,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _subjectsC = new SubjectsController(_modelManager, this);
 
     // Create the controller to manage the tasks of the current experimentation
-    _tasksC = new TasksController(this);
+    _tasksC = new TasksController(_modelManager, this);
 
 
     // Connect to signals from the data model manager of our IngeScape Assessments application

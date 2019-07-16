@@ -19,6 +19,8 @@
 #include <I2PropertyHelpers.h>
 #include <model/assessmentsenums.h>
 
+#include "cassandra.h"
+
 
 /**
  * @brief The IndependentVariableM class defines a model of independent variable
@@ -51,27 +53,47 @@ public:
      * @param valueType
      * @param parent
      */
-    explicit IndependentVariableM(QString name,
+    explicit IndependentVariableM(CassUuid experimentationUuid,
+                                  CassUuid taskUuid,
+                                  CassUuid uuid,
+                                  QString name,
                                   QString description,
                                   IndependentVariableValueTypes::Value valueType,
+                                  QStringList enumValues = {},
                                   QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~IndependentVariableM();
+    virtual ~IndependentVariableM();
 
 
-Q_SIGNALS:
+    /**
+     * @brief Accessor for this independent variable's task's experiment UUID in the Cassandra DB
+     * @return
+     */
+    CassUuid getExperimentationCassUuid() const { return _experimentationCassUuid; }
 
+    /**
+     * @brief Accessor for this independent variable's task UUID in the Cassandra DB
+     * @return
+     */
+    CassUuid getTaskCassUuid() const { return _taskCassUuid; }
 
-public Q_SLOTS:
-
+    /**
+     * @brief Accessor for this independent variable UUID in the Cassandra DB
+     * @return
+     */
+    CassUuid getCassUuid() const { return _cassUuid; }
 
 private:
-
-
+    // Task's experimentation's UUID from Cassandra DB
+    CassUuid _experimentationCassUuid;
+    // Task's UUID from Cassandra DB
+    CassUuid _taskCassUuid;
+    // Independent variable's UUID from Cassandra DB
+    CassUuid _cassUuid;
 };
 
 QML_DECLARE_TYPE(IndependentVariableM)
