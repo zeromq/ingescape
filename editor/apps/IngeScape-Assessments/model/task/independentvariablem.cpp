@@ -53,3 +53,49 @@ IndependentVariableM::~IndependentVariableM()
     qInfo() << "Delete Model of Independent Variable" << _name << "of type" << IndependentVariableValueTypes::staticEnumToString(_valueType);
 
 }
+
+
+/**
+ * @brief Static factory method to create an independent variable from a CassandraDB record
+ * @param row
+ * @return
+ */
+IndependentVariableM* IndependentVariableM::createIndependentVariableFromCassandraRow(const CassRow* row)
+{
+    IndependentVariableM* independentVariable = nullptr;
+
+    if (row != nullptr)
+    {
+        CassUuid experimentationUuid, taskUuid, independentVarUuid;
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &independentVarUuid);
+
+        const char *chrVariableName = "";
+        size_t varNameLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrVariableName, &varNameLength);
+        QString variableName = QString::fromUtf8(chrVariableName, static_cast<int>(varNameLength));
+
+        const char *chrVariableDescription = "";
+        size_t varDescriptionLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "description"), &chrVariableDescription, &varDescriptionLength);
+        QString variableDescription(QString::fromUtf8(chrVariableDescription, static_cast<int>(varDescriptionLength)));
+
+        int8_t i8ValueType = 0;
+        cass_value_get_int8(cass_row_get_column_by_name(row, "value_type"), &i8ValueType);
+        IndependentVariableValueTypes::Value valueType = static_cast<IndependentVariableValueTypes::Value>(i8ValueType);
+
+        const char* chrEnumValues = "";
+        size_t enumValuesLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "enum_values"), &chrEnumValues, &enumValuesLength);
+        QStringList enumValues;
+        if (enumValuesLength > 0)
+        {
+            enumValues = (QString::fromUtf8(chrEnumValues).split(";"));
+        }
+
+        independentVariable = new IndependentVariableM(experimentationUuid, taskUuid, independentVarUuid, variableName, variableDescription, valueType, enumValues);
+    }
+
+    return independentVariable;
+}

@@ -87,6 +87,13 @@ public:
      */
     CassUuid getCassUuid() const { return _cassUuid; }
 
+    /**
+     * @brief Static factory method to create an independent variable from a CassandraDB record
+     * @param row
+     * @return
+     */
+    static IndependentVariableM* createIndependentVariableFromCassandraRow(const CassRow* row);
+
 private:
     // Task's experimentation's UUID from Cassandra DB
     CassUuid _experimentationCassUuid;

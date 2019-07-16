@@ -227,7 +227,6 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
 
                         // Retrieve result set and iterate over the rows
                         const CassResult* indeVarCassResult = cass_future_get_result(indeVarCassFuture);
-
                         if (indeVarCassResult != nullptr)
                         {
                             CassIterator* indeVarCassIterator = cass_iterator_from_result(indeVarCassResult);
@@ -235,34 +234,11 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
                             while(cass_iterator_next(indeVarCassIterator))
                             {
                                 const CassRow* indeVarRow = cass_iterator_get_row(indeVarCassIterator);
-
-                                CassUuid independentVarUuid;
-                                cass_value_get_uuid(cass_row_get_column_by_name(indeVarRow, "id"), &independentVarUuid);
-
-                                const char *chrVariableName = "";
-                                size_t varNameLength = 0;
-                                cass_value_get_string(cass_row_get_column_by_name(indeVarRow, "name"), &chrVariableName, &varNameLength);
-                                QString variableName = QString::fromUtf8(chrVariableName, static_cast<int>(varNameLength));
-
-                                const char *chrVariableDescription = "";
-                                size_t varDescriptionLength = 0;
-                                cass_value_get_string(cass_row_get_column_by_name(indeVarRow, "description"), &chrVariableDescription, &varDescriptionLength);
-                                QString variableDescription(QString::fromUtf8(chrVariableDescription, static_cast<int>(varDescriptionLength)));
-
-                                int8_t i8ValueType = 0;
-                                cass_value_get_int8(cass_row_get_column_by_name(indeVarRow, "value_type"), &i8ValueType);
-                                IndependentVariableValueTypes::Value valueType = static_cast<IndependentVariableValueTypes::Value>(i8ValueType);
-
-                                const char* chrEnumValues = "";
-                                size_t enumValuesLength = 0;
-                                cass_value_get_string(cass_row_get_column_by_name(indeVarRow, "enum_values"), &chrEnumValues, &enumValuesLength);
-                                QStringList enumValues;
-                                if (enumValuesLength > 0)
+                                IndependentVariableM* independentVariable = IndependentVariableM::createIndependentVariableFromCassandraRow(indeVarRow);
+                                if (independentVariable != nullptr)
                                 {
-                                    enumValues = (QString::fromUtf8(chrEnumValues).split(";"));
+                                    task->addIndependentVariable(independentVariable);
                                 }
-
-                                task->addIndependentVariable(new IndependentVariableM(experimentationUuid, taskUuid, independentVarUuid, variableName, variableDescription, valueType, enumValues));
                             }
 
                             cass_iterator_free(indeVarCassIterator);
