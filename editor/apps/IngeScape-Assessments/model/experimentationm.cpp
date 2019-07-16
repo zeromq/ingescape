@@ -273,3 +273,35 @@ CharacteristicM* ExperimentationM::getCharacteristicFromUID(QString uid)
     }
 }
 
+ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const CassRow* row)
+{
+    ExperimentationM* experimentation = nullptr;
+
+    if (row != nullptr)
+    {
+        CassUuid experimentationUid;
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &experimentationUid);
+        char chrExperimentationUid[CASS_UUID_STRING_LENGTH];
+        cass_uuid_string(experimentationUid, chrExperimentationUid);
+
+        const char *chrExperimentationName = "";
+        size_t nameLength;
+        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrExperimentationName, &nameLength);
+        QString experimentationName = QString::fromUtf8(chrExperimentationName, static_cast<int>(nameLength));
+
+        cass_uint32_t creationDate;
+        cass_value_get_uint32(cass_row_get_column_by_name(row, "creation_date"), &creationDate);
+
+        cass_int64_t creationTime;
+        cass_value_get_int64(cass_row_get_column_by_name(row, "creation_time"), &creationTime);
+
+        time_t secCreationDateTime = cass_date_time_to_epoch(creationDate, creationTime);
+        QDateTime creationDateTime;
+        creationDateTime.setSecsSinceEpoch(secCreationDateTime);
+
+        experimentation = new ExperimentationM(experimentationUid, experimentationName, creationDateTime, nullptr);
+    }
+
+    return experimentation;
+}
+

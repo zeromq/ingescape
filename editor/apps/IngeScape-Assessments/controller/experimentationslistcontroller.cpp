@@ -98,45 +98,27 @@ ExperimentationsListController::ExperimentationsListController(AssessmentsModelM
             {
                 const CassRow* row = cass_iterator_get_row(cassIterator);
 
-                CassUuid experimentationUid;
-                cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &experimentationUid);
-                char chrExperimentationUid[CASS_UUID_STRING_LENGTH];
-                cass_uuid_string(experimentationUid, chrExperimentationUid);
-
-                const char *chrExperimentationName = "";
-                size_t nameLength;
-                cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrExperimentationName, &nameLength);
-                QString experimentationName = QString::fromUtf8(chrExperimentationName, static_cast<int>(nameLength));
-
-                cass_uint32_t creationDate;
-                cass_value_get_uint32(cass_row_get_column_by_name(row, "creation_date"), &creationDate);
-
-                cass_int64_t creationTime;
-                cass_value_get_int64(cass_row_get_column_by_name(row, "creation_time"), &creationTime);
-
-                time_t secCreationDateTime = cass_date_time_to_epoch(creationDate, creationTime);
-                QDateTime creationDateTime;
-                creationDateTime.setSecsSinceEpoch(secCreationDateTime);
-
-                const char *chrExperimentationsGroupName = "";
-                size_t experimentationsGroupNameLength;
-                cass_value_get_string(cass_row_get_column_by_name(row, "group_name"), &chrExperimentationsGroupName, &experimentationsGroupNameLength);
-                QString experimentationsGroupName = QString::fromUtf8(chrExperimentationsGroupName, static_cast<int>(experimentationsGroupNameLength));
-
                 // Create the new experimentation
-                ExperimentationM* experimentation = new ExperimentationM(experimentationUid, experimentationName, creationDateTime, nullptr);
-
-                ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentationsGroupName);
-                if (experimentationsGroup == nullptr)
+                ExperimentationM* experimentation = ExperimentationM::createExperimentationFromCassandraRow(row);
+                if (experimentation != nullptr)
                 {
-                    // FIXME TODO: create the group but not create the expe, just add
-                    //createNewExperimentationInNewGroup(experimentationName, experimentationsGroupName);
-                }
+                    const char *chrExperimentationsGroupName = "";
+                    size_t experimentationsGroupNameLength;
+                    cass_value_get_string(cass_row_get_column_by_name(row, "group_name"), &chrExperimentationsGroupName, &experimentationsGroupNameLength);
+                    QString experimentationsGroupName = QString::fromUtf8(chrExperimentationsGroupName, static_cast<int>(experimentationsGroupNameLength));
 
-                if (experimentationsGroup != nullptr)
-                {
-                    // Add to the group
-                    experimentationsGroup->experimentations()->append(experimentation);
+                    ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentationsGroupName);
+                    if (experimentationsGroup == nullptr)
+                    {
+                        // FIXME TODO: create the group but not create the expe, just add
+                        //createNewExperimentationInNewGroup(experimentationName, experimentationsGroupName);
+                    }
+
+                    if (experimentationsGroup != nullptr)
+                    {
+                        // Add to the group
+                        experimentationsGroup->experimentations()->append(experimentation);
+                    }
                 }
             }
 

@@ -146,6 +146,14 @@ public:
     CharacteristicM* getCharacteristicFromUID(QString uid);
 
 
+    /**
+     * @brief Static factory method to create an experiment from a CassandraDB record
+     * @param row
+     * @return
+     */
+    static ExperimentationM* createExperimentationFromCassandraRow(const CassRow* row);
+
+
 Q_SIGNALS:
 
 
