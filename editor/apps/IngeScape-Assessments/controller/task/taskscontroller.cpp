@@ -417,6 +417,28 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
 {
     if ((independentVariable != nullptr) && (_selectedTask != nullptr))
     {
+        // Remove independent variable from DB
+        const char* query = "DELETE FROM ingescape.independent_var WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
+        CassStatement* cassStatement = cass_statement_new(query, 3);
+        cass_statement_bind_uuid(cassStatement, 0, independentVariable->getExperimentationCassUuid());
+        cass_statement_bind_uuid(cassStatement, 1, independentVariable->getTaskCassUuid());
+        cass_statement_bind_uuid(cassStatement, 2, independentVariable->getCassUuid());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "Independent variable" << independentVariable->name() << "has been successfuly delete from the DB";
+        }
+        else {
+            qCritical() << "Could not delete the independent variable" << independentVariable->name() << "from the DB:" << cass_error_desc(cassError);
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+
         // Remove the independent variable from the selected task
         _selectedTask->removeIndependentVariable(independentVariable);
 

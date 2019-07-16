@@ -73,19 +73,19 @@ public:
      * @brief Accessor for this independent variable's task's experiment UUID in the Cassandra DB
      * @return
      */
-    CassUuid getExperimentationCassUiud() const { return _experimentationCassUuid; }
+    CassUuid getExperimentationCassUuid() const { return _experimentationCassUuid; }
 
     /**
      * @brief Accessor for this independent variable's task UUID in the Cassandra DB
      * @return
      */
-    CassUuid getTaskCassUiud() const { return _taskCassUuid; }
+    CassUuid getTaskCassUuid() const { return _taskCassUuid; }
 
     /**
      * @brief Accessor for this independent variable UUID in the Cassandra DB
      * @return
      */
-    CassUuid getCassUiud() const { return _cassUuid; }
+    CassUuid getCassUuid() const { return _cassUuid; }
 
 private:
     // Task's experimentation's UUID from Cassandra DB
