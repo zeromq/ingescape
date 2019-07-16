@@ -74,6 +74,20 @@ public:
 
 
     /**
+     * @brief Accessor for this task UUID in the Cassandra DB
+     * @return
+     */
+    CassUuid getCassUuid() const { return _cassUuid; }
+
+
+    /**
+     * @brief Accessor for the task's experimentation UUID in the Cassandra DB
+     * @return
+     */
+    CassUuid getExperimentationCassUuid() const { return _cassExperimentationUuid; }
+
+
+    /**
      * @brief Add an Independent Variable to our task
      * @param independentVariable
      */
