@@ -270,7 +270,7 @@ Item {
 
             TableViewColumn {
                 role: "name"
-                title: qsTr("Nom")
+                title: qsTr("Name")
                 width: 200
 
                 delegate: IndependentVariableTableCell {
