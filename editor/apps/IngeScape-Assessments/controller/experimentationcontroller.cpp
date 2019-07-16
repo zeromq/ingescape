@@ -189,22 +189,7 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
                 while(cass_iterator_next(cassIterator))
                 {
                     const CassRow* row = cass_iterator_get_row(cassIterator);
-
-                    CassUuid taskUuid, experimentationUuid;
-                    cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskUuid);
-                    cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
-
-                    const char *chrTaskName = "";
-                    size_t nameLength = 0;
-                    cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
-                    QString taskName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
-
-                    const char *chrPlatformUrl = "";
-                    size_t platformUrlLength = 0;
-                    cass_value_get_string(cass_row_get_column_by_name(row, "platform_file"), &chrPlatformUrl, &platformUrlLength);
-                    QUrl platformUrl(QString::fromUtf8(chrPlatformUrl, static_cast<int>(platformUrlLength)));
-
-                    TaskM* task = new TaskM(experimentationUuid, taskUuid, taskName, platformUrl);
+                    TaskM* task = TaskM::createTaskFromCassandraRow(row);
                     if (task != nullptr)
                     {
                         // Load variables
@@ -212,8 +197,8 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
 
                         // Creates the new query statement
                         CassStatement* indeVarCassStatement = cass_statement_new(query, 2);
-                        cass_statement_bind_uuid(indeVarCassStatement, 0, experimentationUuid);
-                        cass_statement_bind_uuid(indeVarCassStatement, 1, taskUuid);
+                        cass_statement_bind_uuid(indeVarCassStatement, 0, task->getExperimentationCassUuid());
+                        cass_statement_bind_uuid(indeVarCassStatement, 1, task->getCassUuid());
                         // Execute the query or bound statement
                         CassFuture* indeVarCassFuture = cass_session_execute(_modelManager->getCassSession(), indeVarCassStatement);
                         CassError indeVarCassError = cass_future_error_code(indeVarCassFuture);

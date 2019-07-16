@@ -134,6 +134,38 @@ void TaskM::removeDependentVariable(DependentVariableM* dependentVariable)
 
 
 /**
+ * @brief Static factory method to create a task from a CassandraDB record
+ * @param row
+ * @return
+ */
+TaskM* TaskM::createTaskFromCassandraRow(const CassRow* row)
+{
+    TaskM* task = nullptr;
+
+    if (row != nullptr)
+    {
+        CassUuid experimentationUuid, taskUuid;
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskUuid);
+
+        const char *chrTaskName = "";
+        size_t nameLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
+        QString taskName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
+
+        const char *chrPlatformUrl = "";
+        size_t platformUrlLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "platform_file"), &chrPlatformUrl, &platformUrlLength);
+        QUrl platformUrl(QString::fromUtf8(chrPlatformUrl, static_cast<int>(platformUrlLength)));
+
+        task = new TaskM(experimentationUuid, taskUuid, taskName, platformUrl);
+    }
+
+    return task;
+}
+
+
+/**
  * @brief Update the list of agents from a platform file path
  * Update the hash table from an agent name to a (simplified) model of agent with its name and its outputs
  * @param platformFilePath

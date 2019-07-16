@@ -115,6 +115,14 @@ public:
     void removeDependentVariable(DependentVariableM* dependentVariable);
 
 
+    /**
+     * @brief Static factory method to create a task from a CassandraDB record
+     * @param row
+     * @return
+     */
+    static TaskM* createTaskFromCassandraRow(const CassRow* row);
+
+
 Q_SIGNALS:
 
 
