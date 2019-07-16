@@ -98,6 +98,14 @@ TasksController::~TasksController()
  */
 bool TasksController::canCreateTaskWithName(QString taskName)
 {
+    //NOTE Oneliner
+//    const QList<TaskM*>& taskList = _currentExperimentation->allTasks()->toList();
+//    return !taskName.isEmpty() && (_currentExperimentation != nullptr)
+//            && std::none_of(taskList.begin(), taskList.end(),
+//                            [taskName](IndependentVariableM* task){
+//        return (task != nullptr) && (task->name() == taskName);
+//    });
+
     if (!taskName.isEmpty() && (_currentExperimentation != nullptr))
     {
         for (TaskM* task : _currentExperimentation->allTasks()->toList())
@@ -151,6 +159,8 @@ void TasksController::deleteTask(TaskM* task)
         if (task == _selectedTask) {
             setselectedTask(nullptr);
         }
+
+        //FIXME Delete variables too
 
         // Remove task from DB
         const char* query = "DELETE FROM ingescape.task WHERE id_experimentation = ? AND id = ?;";
@@ -569,7 +579,7 @@ IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid
         cass_statement_bind_string(cassStatement, 3, variableName.toStdString().c_str());
         cass_statement_bind_string(cassStatement, 4, variableDescription.toStdString().c_str());
         cass_statement_bind_int8  (cassStatement, 5, static_cast<int8_t>(valueType));
-        cass_statement_bind_string(cassStatement, 6, enumValues.join(",").toStdString().c_str());
+        cass_statement_bind_string(cassStatement, 6, enumValues.join(";").toStdString().c_str());
 
         // Execute the query or bound statement
         CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);

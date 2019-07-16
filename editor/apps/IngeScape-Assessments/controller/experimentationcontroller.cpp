@@ -194,10 +194,10 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
                     cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskUuid);
                     cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
 
-                    const char *chrExperimentationName = "";
+                    const char *chrTaskName = "";
                     size_t nameLength = 0;
-                    cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrExperimentationName, &nameLength);
-                    QString taskName = QString::fromUtf8(chrExperimentationName, static_cast<int>(nameLength));
+                    cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
+                    QString taskName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
 
                     const char *chrPlatformUrl = "";
                     size_t platformUrlLength = 0;
@@ -207,6 +207,70 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
                     TaskM* task = new TaskM(experimentationUuid, taskUuid, taskName, platformUrl);
                     if (task != nullptr)
                     {
+                        // Load variables
+                        query = "SELECT * FROM ingescape.independent_var WHERE id_experimentation = ? AND id_task = ?;";
+
+                        // Creates the new query statement
+                        CassStatement* indeVarCassStatement = cass_statement_new(query, 2);
+                        cass_statement_bind_uuid(indeVarCassStatement, 0, experimentationUuid);
+                        cass_statement_bind_uuid(indeVarCassStatement, 1, taskUuid);
+                        // Execute the query or bound statement
+                        CassFuture* indeVarCassFuture = cass_session_execute(_modelManager->getCassSession(), indeVarCassStatement);
+                        CassError indeVarCassError = cass_future_error_code(indeVarCassFuture);
+                        if (indeVarCassError == CASS_OK)
+                        {
+                            qDebug() << "Get all independent variables for task" << task->name() << "succeeded";
+                        }
+                        else {
+                            qCritical() << "Could not get all independent variables for task" << task->name() << "from the database:" << cass_error_desc(indeVarCassError);
+                        }
+
+                        // Retrieve result set and iterate over the rows
+                        const CassResult* indeVarCassResult = cass_future_get_result(indeVarCassFuture);
+
+                        if (indeVarCassResult != nullptr)
+                        {
+                            CassIterator* indeVarCassIterator = cass_iterator_from_result(indeVarCassResult);
+
+                            while(cass_iterator_next(indeVarCassIterator))
+                            {
+                                const CassRow* indeVarRow = cass_iterator_get_row(indeVarCassIterator);
+
+                                CassUuid independentVarUuid;
+                                cass_value_get_uuid(cass_row_get_column_by_name(indeVarRow, "id"), &independentVarUuid);
+
+                                const char *chrVariableName = "";
+                                size_t varNameLength = 0;
+                                cass_value_get_string(cass_row_get_column_by_name(indeVarRow, "name"), &chrVariableName, &varNameLength);
+                                QString variableName = QString::fromUtf8(chrVariableName, static_cast<int>(varNameLength));
+
+                                const char *chrVariableDescription = "";
+                                size_t varDescriptionLength = 0;
+                                cass_value_get_string(cass_row_get_column_by_name(indeVarRow, "description"), &chrVariableDescription, &varDescriptionLength);
+                                QString variableDescription(QString::fromUtf8(chrVariableDescription, static_cast<int>(varDescriptionLength)));
+
+                                int8_t i8ValueType = 0;
+                                cass_value_get_int8(cass_row_get_column_by_name(indeVarRow, "value_type"), &i8ValueType);
+                                IndependentVariableValueTypes::Value valueType = static_cast<IndependentVariableValueTypes::Value>(i8ValueType);
+
+                                const char* chrEnumValues = "";
+                                size_t enumValuesLength = 0;
+                                cass_value_get_string(cass_row_get_column_by_name(indeVarRow, "enum_values"), &chrEnumValues, &enumValuesLength);
+                                QStringList enumValues;
+                                if (enumValuesLength > 0)
+                                {
+                                    enumValues = (QString::fromUtf8(chrEnumValues).split(";"));
+                                }
+
+                                task->addIndependentVariable(new IndependentVariableM(experimentationUuid, taskUuid, independentVarUuid, variableName, variableDescription, valueType, enumValues));
+                            }
+
+                            cass_iterator_free(indeVarCassIterator);
+                        }
+
+                        cass_future_free(indeVarCassFuture);
+                        cass_statement_free(indeVarCassStatement);
+
                         _currentExperimentation->addTask(task);
                     }
                 }
@@ -218,7 +282,7 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
             qCritical() << "Could not get all tasks for the current experiment from the database:" << cass_error_desc(cassError);
         }
 
-        cass_statement_free(cassStatement);
         cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
     }
 }
