@@ -602,7 +602,6 @@ Item {
                     bottom: parent.bottom
                     bottomMargin: 10
                 }
-                rotation: 180
 
                 visible: controller && ((controller.replayState === ReplayStates.PAUSED) || rootItem._isPlayingOrResumingReplay)
                          && recordItem._isCurrentReplay
@@ -612,8 +611,7 @@ Item {
                 style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
 
-                    //releasedID: "list-rewind"
-                    releasedID: "list-play"
+                    releasedID: "list-rewind"
                     pressedID: releasedID + "-pressed"
                     disabledID: releasedID
                 }
