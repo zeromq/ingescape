@@ -22,14 +22,16 @@
 TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QString& name, const QUrl& platformFile, QObject *parent)
     : QObject(parent)
       , _name(name)
-      , _platformFileUrl(platformFile)
-      , _platformFileName(platformFile.toString())
+      , _platformFileUrl(QUrl())
+      , _platformFileName("")
       //, _agentNamesList(QStringList())
       , _cassExperimentationUuid(experimentationUuid)
       , _cassUuid(uid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    setplatformFileUrl(platformFile);
 
     qInfo() << "New Model of Task" << _name;
 }
