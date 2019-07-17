@@ -34,12 +34,6 @@ class AssessmentsModelManager : public IngeScapeModelManager
     // Cassandra server
     I2_QML_PROPERTY(QString, cassServer)
 
-    // The experimentations group currently selected
-    I2_QML_PROPERTY(ExperimentationsGroupVM*, currentExperimentationsGroup)
-
-    // The experimentation currently selected
-    I2_QML_PROPERTY(ExperimentationM*, currentExperimentation)
-
 
 public:
 

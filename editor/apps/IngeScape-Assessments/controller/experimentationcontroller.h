@@ -34,10 +34,7 @@ class ExperimentationController : public QObject
     I2_QML_PROPERTY_READONLY(RecordController*, recordC)
 
     // Model of the current experimentation
-    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
-
-    // Model of the current experimentation
-    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ExperimentationsGroupVM*, currentExperimentationGroup)
+    I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
 
 
 public:
@@ -80,11 +77,6 @@ public:
      * @param record
      */
     Q_INVOKABLE void deleteRecordSetup(RecordSetupM* recordSetup);
-    
-Q_SIGNALS:
-
-
-public Q_SLOTS:
 
 
 private Q_SLOTS:

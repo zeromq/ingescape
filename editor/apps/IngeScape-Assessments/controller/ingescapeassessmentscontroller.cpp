@@ -119,9 +119,9 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _tasksC = new TasksController(_modelManager, this);
 
 
-    // Connect to signals from the data model manager of our IngeScape Assessments application
-    connect(_modelManager, &AssessmentsModelManager::currentExperimentationChanged, this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
-
+    // Connect to signals from the experimentation controller to the rest of the controllers
+    connect(_experimentationC, &ExperimentationController::currentExperimentationChanged,
+            this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
 
     // Connect to signals from the network controller
     /*connect(_networkC, &NetworkController::agentEntered, _modelManager, &AssessmentsModelManager::onAgentEntered);
@@ -304,10 +304,6 @@ void IngeScapeAssessmentsController::_onCurrentExperimentationChanged(Experiment
     if (currentExperimentation != nullptr)
     {
         qDebug() << "Current Experimentation = " << currentExperimentation->name();
-
-        if (_experimentationC != nullptr) {
-            _experimentationC->setcurrentExperimentation(currentExperimentation);
-        }
 
         if (_subjectsC != nullptr) {
             _subjectsC->setcurrentExperimentation(currentExperimentation);

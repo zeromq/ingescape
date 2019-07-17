@@ -88,22 +88,11 @@ public:
 
 
     /**
-     * @brief Open an experimentation of a group
-     * @param experimentation
-     * @param experimentationsGroup
-     */
-    Q_INVOKABLE void openExperimentationOfGroup(ExperimentationM* experimentation, ExperimentationsGroupVM* experimentationsGroup);
-
-
-    /**
      * @brief Delete an experimentation of a group
      * @param experimentation
      * @param experimentationsGroup
      */
     Q_INVOKABLE void deleteExperimentationOfGroup(ExperimentationM* experimentation, ExperimentationsGroupVM* experimentationsGroup);
-
-
-Q_SIGNALS:
 
 
 public Q_SLOTS:

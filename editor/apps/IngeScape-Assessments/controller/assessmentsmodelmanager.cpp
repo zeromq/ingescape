@@ -26,8 +26,6 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
                                                                                           rootDirectoryPath,
                                                                                           parent),
     _cassServer("localhost"),
-    _currentExperimentationsGroup(nullptr),
-    _currentExperimentation(nullptr),
     _cassCluster(nullptr),
     _cassSession(nullptr),
     _cassUuidGen(nullptr)
@@ -92,14 +90,6 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
 AssessmentsModelManager::~AssessmentsModelManager()
 {
     qInfo() << "Delete IngeScape Assessments Model Manager";
-
-    if (_currentExperimentationsGroup != nullptr) {
-        setcurrentExperimentationsGroup(nullptr);
-    }
-
-    if (_currentExperimentation != nullptr) {
-        setcurrentExperimentation(nullptr);
-    }
 
 
     //

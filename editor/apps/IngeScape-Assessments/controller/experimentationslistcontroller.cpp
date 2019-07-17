@@ -264,26 +264,6 @@ bool ExperimentationsListController::canCreateExperimentationsGroupWithName(QStr
 
 
 /**
- * @brief Open an experimentation of a group
- * @param experimentation
- */
-void ExperimentationsListController::openExperimentationOfGroup(ExperimentationM* experimentation, ExperimentationsGroupVM* experimentationsGroup)
-{
-    if ((experimentation != nullptr) && (experimentationsGroup != nullptr))
-    {
-        qInfo() << "Open the experimentation" << experimentation->name() << "of the group" << experimentationsGroup->name();
-
-        // Update the model manager
-        if (_modelManager != nullptr)
-        {
-            _modelManager->setcurrentExperimentation(experimentation);
-            _modelManager->setcurrentExperimentationsGroup(experimentationsGroup);
-        }
-    }
-}
-
-
-/**
  * @brief Delete an experimentation of a group
  * @param experimentation
  * @param experimentationsGroup
