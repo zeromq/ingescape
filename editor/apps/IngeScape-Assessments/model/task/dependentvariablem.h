@@ -74,6 +74,13 @@ public:
      */
     virtual ~DependentVariableM();
 
+    /**
+     * @brief Static factory method to create an dependent variable from a CassandraDB record
+     * @param row
+     * @return
+     */
+    static DependentVariableM* createDependentVariableFromCassandraRow(const CassRow* row);
+
 
 protected:
 

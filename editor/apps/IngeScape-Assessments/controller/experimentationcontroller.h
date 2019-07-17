@@ -77,8 +77,7 @@ public:
      * @param record
      */
     Q_INVOKABLE void deleteRecordSetup(RecordSetupM* recordSetup);
-
-
+    
 Q_SIGNALS:
 
 
@@ -93,9 +92,22 @@ private Q_SLOTS:
      */
     void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
 
+protected: // Methods
+    /**
+     * @brief Retrieve all independent variables from the Cassandra DB for the given task.
+     * The task will be updated by this method.
+     * @param task
+     */
+    void _retrieveIndependentVariableForTask(TaskM* task);
 
-private:
+    /**
+     * @brief Retrieve all dependent variables from the Cassandra DB for the given task.
+     * The task will be updated by this method.
+     * @param task
+     */
+    void _retrieveDependentVariableForTask(TaskM* task);
 
+protected: // Attributes
     // Manager for the data model of our IngeScape Assessments application
     AssessmentsModelManager* _modelManager;
 
