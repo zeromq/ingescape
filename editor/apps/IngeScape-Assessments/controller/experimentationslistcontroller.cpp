@@ -259,18 +259,7 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
  */
 bool ExperimentationsListController::canCreateExperimentationsGroupWithName(QString experimentationsGroupName)
 {
-    if (!experimentationsGroupName.isEmpty())
-    {
-        if (_getExperimentationsGroupFromName(experimentationsGroupName) != nullptr) {
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-    else {
-        return false;
-    }
+    return !experimentationsGroupName.isEmpty() && !_hashFromNameToExperimentationsGroup.contains(experimentationsGroupName);
 }
 
 
@@ -321,10 +310,5 @@ void ExperimentationsListController::deleteExperimentationOfGroup(Experimentatio
  */
 ExperimentationsGroupVM* ExperimentationsListController::_getExperimentationsGroupFromName(QString experimentationsGroupName)
 {
-    if (_hashFromNameToExperimentationsGroup.contains(experimentationsGroupName)) {
-        return _hashFromNameToExperimentationsGroup.value(experimentationsGroupName);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromNameToExperimentationsGroup.value(experimentationsGroupName, nullptr);
 }
