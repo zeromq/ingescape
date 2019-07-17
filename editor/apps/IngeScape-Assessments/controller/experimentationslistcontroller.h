@@ -18,7 +18,6 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
-#include <controller/assessmentsmodelmanager.h>
 #include <viewModel/experimentationsgroupvm.h>
 
 
@@ -52,8 +51,7 @@ public:
      * @param modelManager
      * @param parent
      */
-    explicit ExperimentationsListController(AssessmentsModelManager* modelManager,
-                                            QObject *parent = nullptr);
+    explicit ExperimentationsListController(QObject *parent = nullptr);
 
 
     /**
@@ -109,9 +107,6 @@ private:
 
 
 private:
-
-    // Manager for the data model of our IngeScape Assessments application
-    AssessmentsModelManager* _modelManager;
 
     // Hash table from a name to the group of experimentations
     QHash<QString, ExperimentationsGroupVM*> _hashFromNameToExperimentationsGroup;

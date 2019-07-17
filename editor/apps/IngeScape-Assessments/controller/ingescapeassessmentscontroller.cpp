@@ -16,6 +16,7 @@
 
 #include <QApplication>
 
+#include <controller/assessmentsmodelmanager.h>
 #include <misc/ingescapeutils.h>
 #include <settings/ingescapesettings.h>
 
@@ -30,7 +31,6 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _port(0),
     _errorMessageWhenConnectionFailed(""),
     _snapshotDirectory(""),
-    _modelManager(nullptr),
     _networkC(nullptr),
     _experimentationsListC(nullptr),
     _experimentationC(nullptr),
@@ -101,22 +101,22 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     //
 
     // Create the manager for the data model of our IngeScape Assessments application
-    _modelManager = new AssessmentsModelManager(_jsonHelper, rootPath, this);
+    AssessmentsModelManager::initInstance(_jsonHelper, rootPath, this);
 
     // Create the controller for network communications
     _networkC = new NetworkController(this);
 
     // Create the controller to manage the list of experimentations
-    _experimentationsListC = new ExperimentationsListController(_modelManager, this);
+    _experimentationsListC = new ExperimentationsListController(this);
 
     // Create the controller to manage the current experimentation
-    _experimentationC = new ExperimentationController(_modelManager, _jsonHelper, this);
+    _experimentationC = new ExperimentationController(_jsonHelper, this);
 
     // Create the controller to manage the subjects of the current experimentation
-    _subjectsC = new SubjectsController(_modelManager, this);
+    _subjectsC = new SubjectsController(this);
 
     // Create the controller to manage the tasks of the current experimentation
-    _tasksC = new TasksController(_modelManager, this);
+    _tasksC = new TasksController(this);
 
 
     // Connect to signals from the experimentation controller to the rest of the controllers
@@ -139,10 +139,10 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     // Start our INGESCAPE agent with a network device (or an IP address) and a port
     bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
-    if (isStarted)
+    if (isStarted && (AssessmentsModelManager::Instance() != nullptr))
     {
         // Initialize platform from online mapping
-        _modelManager->setisMappingConnected(true);
+        AssessmentsModelManager::Instance()->setisMappingConnected(true);
     }
     else {
         seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
@@ -229,15 +229,7 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
         temp = nullptr;
     }
 
-    if (_modelManager != nullptr)
-    {
-        disconnect(_modelManager);
-
-        AssessmentsModelManager* temp = _modelManager;
-        setmodelManager(nullptr);
-        delete temp;
-        temp = nullptr;
-    }
+    AssessmentsModelManager::destroyInstance();
 
     if (_networkC != nullptr)
     {

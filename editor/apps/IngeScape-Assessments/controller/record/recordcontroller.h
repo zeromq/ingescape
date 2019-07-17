@@ -19,7 +19,6 @@
 #include <I2PropertyHelpers.h>
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/abstractscenariocontroller.h>
-#include <controller/assessmentsmodelmanager.h>
 #include <model/jsonhelper.h>
 #include <model/recordsetupm.h>
 
@@ -49,8 +48,7 @@ public:
      * @param jsonHelper
      * @param parent
      */
-    explicit RecordController(AssessmentsModelManager* modelManager,
-                              JsonHelper* jsonHelper,
+    explicit RecordController(JsonHelper* jsonHelper,
                               QObject *parent = nullptr);
 
 
@@ -74,10 +72,6 @@ private Q_SLOTS:
 
 
 private:
-
-    // Manager for the data model of our IngeScape Assessments application
-    AssessmentsModelManager* _modelManager;
-
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 

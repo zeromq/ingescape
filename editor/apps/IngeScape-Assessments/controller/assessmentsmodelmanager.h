@@ -17,10 +17,8 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <model/assessmentsenums.h>
 #include <controller/ingescapemodelmanager.h>
-//#include <model/experimentationm.h>
-#include <viewModel/experimentationsgroupvm.h>
+
 #include "cassandra.h"
 
 
@@ -31,28 +29,42 @@ class AssessmentsModelManager : public IngeScapeModelManager
 {
     Q_OBJECT
 
-    // Cassandra server
-    I2_QML_PROPERTY(QString, cassServer)
-
 
 public:
 
+    // ------------------------
+    //
+    //  Singleton logic
+    //
+    // ------------------------
+
     /**
-     * @brief Constructor
+     * @brief Initialize the singleton instance, destroying any previous instance if any
      * @param jsonHelper
      * @param rootDirectoryPath
      * @param parent
      */
-    explicit AssessmentsModelManager(JsonHelper* jsonHelper,
-                                     QString rootDirectoryPath,
-                                     QObject *parent = nullptr);
-
+    static void initInstance(JsonHelper* jsonHelper,
+                             QString rootDirectoryPath,
+                             QObject *parent = nullptr);
 
     /**
-     * @brief Destructor
+     * @brief Destroy the current singleton instance
      */
-    ~AssessmentsModelManager() Q_DECL_OVERRIDE;
+    static void destroyInstance();
 
+    /**
+     * @brief Accessor to the singleton instance
+     * @return
+     */
+    static AssessmentsModelManager* Instance();
+
+
+    // ------------------------
+    //
+    //  Model manager logic
+    //
+    // ------------------------
 
     /**
      * @brief Get the Cassandra Cluster
@@ -75,21 +87,35 @@ public:
     CassUuidGen* getCassUuidGen();
 
 
-Q_SIGNALS:
+private:
+    /**
+     * @brief The singleton instance.
+     * NOTE: We hold a pointer here and not a plain value to be able to initialize it from the main controller without a "default value".
+     */
+    static AssessmentsModelManager* _instance;
 
+    /**
+     * @brief Constructor
+     * @param jsonHelper
+     * @param rootDirectoryPath
+     * @param parent
+     */
+    explicit AssessmentsModelManager(JsonHelper* jsonHelper,
+                                     QString rootDirectoryPath,
+                                     QObject *parent = nullptr);
 
-public Q_SLOTS:
-
+    /**
+     * @brief Destructor
+     */
+    ~AssessmentsModelManager() Q_DECL_OVERRIDE;
 
 private:
-
     /**
      * @brief A cluster object describes the configuration of the Cassandra cluster and is used
      * to construct a session instance. Unlike other DataStax drivers the cluster object
      * does not maintain the control connection.
      */
     CassCluster* _cassCluster = nullptr;
-
 
     /**
      * @brief A session object is used to execute queries and maintains cluster state through
@@ -99,8 +125,14 @@ private:
      */
     CassSession* _cassSession = nullptr;
 
+    /**
+     * @brief The Cassandra server URL
+     */
+    QString _cassServer;
 
-    // A UUID generator object
+    /**
+     * @brief A UUID generator privoded by Cassandra
+     */
     CassUuidGen* _cassUuidGen = nullptr;
 
 };

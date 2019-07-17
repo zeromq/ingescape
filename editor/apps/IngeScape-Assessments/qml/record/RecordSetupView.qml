@@ -40,8 +40,6 @@ Item {
 
     property RecordController controller: null;
 
-    //property AssessmentsModelManager modelManager: null;
-
     property RecordSetupM recordSetup: controller ? controller.currentRecordSetup : null;
 
 

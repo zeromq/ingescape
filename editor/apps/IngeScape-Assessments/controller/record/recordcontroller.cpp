@@ -14,19 +14,19 @@
 
 #include "recordcontroller.h"
 
+#include <controller/assessmentsmodelmanager.h>
+
 /**
  * @brief Constructor
  * @param modelManager
  * @param jsonHelper
  * @param parent
  */
-RecordController::RecordController(AssessmentsModelManager* modelManager,
-                                   JsonHelper* jsonHelper,
+RecordController::RecordController(JsonHelper* jsonHelper,
                                    QObject *parent) : QObject(parent),
     _timeLineC(nullptr),
     _scenarioC(nullptr),
     _currentRecordSetup(nullptr),
-    _modelManager(modelManager),
     _jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -38,7 +38,7 @@ RecordController::RecordController(AssessmentsModelManager* modelManager,
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
 
     // Create the controller for scenario management
-    _scenarioC = new AbstractScenarioController(_modelManager, _jsonHelper, this);
+    _scenarioC = new AbstractScenarioController(AssessmentsModelManager::Instance(), _jsonHelper, this);
 
 
     // Connect to the signal "time range changed" from the time line
@@ -87,7 +87,6 @@ RecordController::~RecordController()
 
 
     // Reset pointers
-    _modelManager = nullptr;
     _jsonHelper = nullptr;
 }
 
@@ -119,7 +118,7 @@ void RecordController::setcurrentRecordSetup(RecordSetupM *value)
  */
 void RecordController::_onCurrentRecordSetupChanged(RecordSetupM* previousRecordSetup, RecordSetupM* currentRecordSetup)
 {
-    if ((_modelManager != nullptr) && (_scenarioC != nullptr))
+    if ((AssessmentsModelManager::Instance() != nullptr) && (_scenarioC != nullptr))
     {
         // Clean the previous record setup
         if (previousRecordSetup != nullptr)
@@ -128,7 +127,7 @@ void RecordController::_onCurrentRecordSetupChanged(RecordSetupM* previousRecord
             _scenarioC->clearScenario();
 
             // Delete all (models of) actions
-            _modelManager->deleteAllActions();
+            AssessmentsModelManager::Instance()->deleteAllActions();
         }
 
         // Manage the new (current) record

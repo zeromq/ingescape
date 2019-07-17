@@ -14,16 +14,16 @@
 
 #include "subjectscontroller.h"
 
+#include <controller/assessmentsmodelmanager.h>
+
 
 /**
  * @brief Constructor
  * @param modelManager
  * @param parent
  */
-SubjectsController::SubjectsController(AssessmentsModelManager* modelManager,
-                                       QObject *parent) : QObject(parent),
-    _currentExperimentation(nullptr),
-    _modelManager(modelManager)
+SubjectsController::SubjectsController(QObject *parent) : QObject(parent),
+    _currentExperimentation(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -171,14 +171,14 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
  */
 void SubjectsController::createNewSubject()
 {
-    if ((_currentExperimentation != nullptr) && (_modelManager != nullptr))
+    if ((_currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
         QDateTime now = QDateTime::currentDateTime();
 
         QString displayedId = now.toString("S-yyMMdd-hhmmss-zzz");
 
         CassUuid subjectUid;
-        cass_uuid_gen_time(_modelManager->getCassUuidGen(), &subjectUid);
+        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &subjectUid);
 
         // Create a new subject
         SubjectM* subject = new SubjectM(subjectUid, displayedId, nullptr);
@@ -221,7 +221,7 @@ void SubjectsController::deleteSubject(SubjectM* subject)
  */
 void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* currentExperimentation)
 {
-    if ((currentExperimentation != nullptr) && (_modelManager != nullptr))
+    if ((currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
         qDebug() << "Subjects Controller: on Current Experimentation changed" << currentExperimentation->name();
 
@@ -237,7 +237,7 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
         cass_statement_bind_uuid(cassStatementGetCharacteristics, 0, uidExperimentation);
 
         // Execute the query or bound statement
-        CassFuture* cassFutureGetCharacteristics = cass_session_execute(_modelManager->getCassSession(), cassStatementGetCharacteristics);
+        CassFuture* cassFutureGetCharacteristics = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatementGetCharacteristics);
 
         CassError cassErrorGetCharacteristics = cass_future_error_code(cassFutureGetCharacteristics);
         if (cassErrorGetCharacteristics == CASS_OK)
@@ -255,7 +255,7 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
                     qDebug() << "There is NO characteristic...create the special characteristic 'id'";
 
                     CassUuid characteristicUid;
-                    cass_uuid_gen_time(_modelManager->getCassUuidGen(), &characteristicUid);
+                    cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &characteristicUid);
 
                     QString characteristicName = CHARACTERISTIC_SUBJECT_ID;
                     CharacteristicValueTypes::Value characteristicValueType = CharacteristicValueTypes::TEXT;
@@ -272,7 +272,7 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
                     cass_statement_bind_string(cassStatementInsertCharacteristic, 4, "");
 
                     // Execute the query or bound statement
-                    CassFuture* cassFutureInsertCharacteristic = cass_session_execute(_modelManager->getCassSession(), cassStatementInsertCharacteristic);
+                    CassFuture* cassFutureInsertCharacteristic = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatementInsertCharacteristic);
 
                     CassError cassErrorInsertCharacteristic = cass_future_error_code(cassFutureInsertCharacteristic);
                     if (cassErrorInsertCharacteristic == CASS_OK)

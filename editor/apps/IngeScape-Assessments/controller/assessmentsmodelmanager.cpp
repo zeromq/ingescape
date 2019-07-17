@@ -15,6 +15,49 @@
 #include "assessmentsmodelmanager.h"
 
 /**
+ * @brief The singleton instance.
+ * NOTE: We hold a pointer here and not a plain value to be able to initialize it from the main controller without a "default value".
+ */
+AssessmentsModelManager* AssessmentsModelManager::_instance = nullptr;
+
+/**
+ * @brief Initialize the singleton instance, destroying any previous instance if any
+ * @param jsonHelper
+ * @param rootDirectoryPath
+ * @param parent
+ */
+void AssessmentsModelManager::initInstance(JsonHelper* jsonHelper, QString rootDirectoryPath, QObject* parent)
+{
+    if (AssessmentsModelManager::_instance != nullptr)
+    {
+        AssessmentsModelManager::destroyInstance();
+    }
+
+    AssessmentsModelManager::_instance = new AssessmentsModelManager(jsonHelper, rootDirectoryPath, parent);
+}
+
+/**
+ * @brief Destroy the current singleton instance
+ */
+void AssessmentsModelManager::destroyInstance()
+{
+    if (AssessmentsModelManager::_instance != nullptr)
+    {
+        delete AssessmentsModelManager::_instance;
+        AssessmentsModelManager::_instance = nullptr;
+    }
+}
+
+/**
+ * @brief Accessor to the singleton instance
+ * @return
+ */
+AssessmentsModelManager* AssessmentsModelManager::Instance()
+{
+    return AssessmentsModelManager::_instance;
+}
+
+/**
  * @brief Constructor
  * @param jsonHelper
  * @param rootDirectoryPath
@@ -25,9 +68,9 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
                                                  QObject *parent) : IngeScapeModelManager(jsonHelper,
                                                                                           rootDirectoryPath,
                                                                                           parent),
-    _cassServer("localhost"),
     _cassCluster(nullptr),
     _cassSession(nullptr),
+    _cassServer("localhost"),
     _cassUuidGen(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -47,7 +90,6 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
 
     // Connects a session
     CassFuture* cassFuture = cass_session_connect(_cassSession, _cassCluster);
-
     CassError cassError = cass_future_error_code(cassFuture);
     if (cassError == CASS_OK) {
         qInfo() << "Connected to the Cassandra DataBase on" << _cassServer;
@@ -57,30 +99,6 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
     }
 
     cass_future_free(cassFuture);
-
-
-    //
-    // FIXME for tests
-    //
-    /*
-    QStringList enumBool = { tr("FALSE"), tr("TRUE") };
-    //QStringList enumBool_French = { "FAUX", "VRAI" };
-
-    QStringList enumYesNo = { tr("NO"), tr("YES") };
-    //QStringList enumYesNo_French = { "NON", "OUI" };
-
-    QStringList enumGender = { tr("NEUTRAL"), tr("WOMAN"), tr("MAN") };
-    //QStringList enumGender_French = { "NEUTRE", "FEMME", "HOMME" };
-
-    CharacteristicM *characteristicBool = new CharacteristicM("Booléen", CharacteristicValueTypes::CHARACTERISTIC_ENUM);
-    characteristicBool->setenumValues(enumBool);
-
-    CharacteristicM *characteristicYesNo = new CharacteristicM("Oui/Non", CharacteristicValueTypes::CHARACTERISTIC_ENUM);
-    characteristicYesNo->setenumValues(enumYesNo);
-
-    CharacteristicM *characteristicGender = new CharacteristicM("Genre", CharacteristicValueTypes::CHARACTERISTIC_ENUM);
-    characteristicGender->setenumValues(enumGender);
-    */
 }
 
 
@@ -90,7 +108,6 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
 AssessmentsModelManager::~AssessmentsModelManager()
 {
     qInfo() << "Delete IngeScape Assessments Model Manager";
-
 
     //
     // Cleaning about Cassandra DataBase
