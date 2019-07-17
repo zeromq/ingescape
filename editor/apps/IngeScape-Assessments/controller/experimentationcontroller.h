@@ -36,6 +36,9 @@ class ExperimentationController : public QObject
     // Model of the current experimentation
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
 
+    // Model of the current experimentation
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ExperimentationsGroupVM*, currentExperimentationGroup)
+
 
 public:
 

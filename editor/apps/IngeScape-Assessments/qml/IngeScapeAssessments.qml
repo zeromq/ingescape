@@ -200,8 +200,6 @@ Item {
             //id: experimentationView
 
             controller: IngeScapeAssessmentsC.experimentationC
-            modelManager: IngeScapeAssessmentsC.modelManager
-
 
             //
             // Slots

@@ -233,7 +233,7 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
             qInfo() << "Experimentation" << experimentationName << "inserted into the DataBase";
 
             // Create the new experimentation
-            ExperimentationM* experimentation = new ExperimentationM(experimentationUid, experimentationName, QDateTime::currentDateTime(), nullptr);
+            ExperimentationM* experimentation = new ExperimentationM(experimentationUid, experimentationName, experimentationsGroup->name(), QDateTime::currentDateTime(), nullptr);
 
             // Add to the group
             experimentationsGroup->experimentations()->append(experimentation);
