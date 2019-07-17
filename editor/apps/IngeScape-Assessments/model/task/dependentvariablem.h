@@ -18,6 +18,8 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
+#include "cassandra.h"
+
 
 /**
  * @brief The DependentVariableM class defines a model of dependent variable
@@ -46,26 +48,43 @@ class DependentVariableM : public QObject
 
 
 public:
-    /**
-     * @brief Constructor
-     * @param parent
-     */
-    explicit DependentVariableM(QObject *parent = nullptr);
+   /**
+    * @brief DependentVariableM
+    * @param experimentationUuid
+    * @param taskUuid
+    * @param cassUuid
+    * @param name
+    * @param description
+    * @param agentName
+    * @param outputName
+    * @param parent
+    */
+    explicit DependentVariableM(CassUuid experimentationUuid
+                                , CassUuid taskUuid
+                                , CassUuid cassUuid
+                                , const QString& name
+                                , const QString& description
+                                , const QString& agentName
+                                , const QString& outputName
+                                , QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~DependentVariableM();
+    virtual ~DependentVariableM();
 
 
-Q_SIGNALS:
+protected:
 
+    // Task's experimentation's UUID from Cassandra DB
+    CassUuid _experimentationCassUuid;
 
-public Q_SLOTS:
+    // Task's UUID from Cassandra DB
+    CassUuid _taskCassUuid;
 
-
-private:
+    // Unique identifier in Cassandra Data Base
+    CassUuid _cassUuid;
 
 
 };

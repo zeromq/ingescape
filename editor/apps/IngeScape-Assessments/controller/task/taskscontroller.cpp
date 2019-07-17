@@ -239,7 +239,8 @@ void TasksController::duplicateTask(TaskM* task)
                                                                                                     , independentVariable->name()
                                                                                                     , independentVariable->description()
                                                                                                     , independentVariable->valueType()
-                                                                                                    , independentVariable->enumValues());
+                                                                                                    , independentVariable->enumValues()
+                                                                                                    );
 
                     if (newIndependentVariable != nullptr)
                     {
@@ -255,15 +256,20 @@ void TasksController::duplicateTask(TaskM* task)
                 if (dependentVariable != nullptr)
                 {
                     // Create the new dependent variable
-                    DependentVariableM* newDependentVariable = new DependentVariableM();
+                    DependentVariableM* newDependentVariable = _insertDependentVariableIntoDB(newTask->getExperimentationCassUuid()
+                                                                                              , newTask->getCassUuid()
+                                                                                              , dependentVariable->name()
+                                                                                              , dependentVariable->description()
+                                                                                              , dependentVariable->agentName()
+                                                                                              , dependentVariable->outputName()
+                                                                                              );
 
-                    newDependentVariable->setname(dependentVariable->name());
-                    newDependentVariable->setdescription(dependentVariable->description());
-                    newDependentVariable->setagentName(dependentVariable->agentName());
-                    newDependentVariable->setoutputName(dependentVariable->outputName());
+                    if (newDependentVariable != nullptr)
+                    {
+                        // Add the dependent variable to the new task
+                        newTask->addDependentVariable(newDependentVariable);
+                    }
 
-                    // Add the dependent variable to the new task
-                    newTask->addDependentVariable(newDependentVariable);
                 }
             }
         }
@@ -488,15 +494,16 @@ void TasksController::createNewDependentVariable()
     {
         qDebug() << "Create a new dependent variable";
 
-        DependentVariableM* dependentVariable = new DependentVariableM();
+        CassUuid dependentVarUuid;
+        cass_uuid_gen_time(_modelManager->getCassUuidGen(), &dependentVarUuid);
 
-        dependentVariable->setname("Dep. Var.");
-        //dependentVariable->setdescription("");
-        //dependentVariable->setagentName("");
-        //dependentVariable->setoutputName("");
+        DependentVariableM* dependentVariable = _insertDependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid(), "Dep. Var.", "", "", "");
 
-        // Add the dependent variable to the selected task
-        _selectedTask->addDependentVariable(dependentVariable);
+        if (dependentVariable != nullptr)
+        {
+            // Add the dependent variable to the selected task
+            _selectedTask->addDependentVariable(dependentVariable);
+        }
     }
 }
 
@@ -583,7 +590,7 @@ TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskN
  * @param enumValues
  * @return
  */
-IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, QString variableName, QString variableDescription, IndependentVariableValueTypes::Value valueType, QStringList enumValues)
+IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& variableName, const QString& variableDescription, IndependentVariableValueTypes::Value valueType, const QStringList& enumValues)
 {
     IndependentVariableM* independentVariable = nullptr;
 
@@ -622,4 +629,42 @@ IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid
     }
 
     return independentVariable;
+}
+
+DependentVariableM* TasksController::_insertDependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, const QString& agentName, const QString& outputName)
+{
+    DependentVariableM* dependentVariable = nullptr;
+
+    CassUuid dependentVarUuid;
+    cass_uuid_gen_time(_modelManager->getCassUuidGen(), &dependentVarUuid);
+
+    const char* query = "INSERT INTO ingescape.dependent_var (id_experimentation, id_task, id, name, description, agent_name, output_name) VALUES (?, ?, ?, ?, ?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(query, 7);
+    cass_statement_bind_uuid  (cassStatement, 0, experimentationUuid);
+    cass_statement_bind_uuid  (cassStatement, 1, taskUuid);
+    cass_statement_bind_uuid  (cassStatement, 2, dependentVarUuid);
+    cass_statement_bind_string(cassStatement, 3, name.toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 4, description.toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 5, agentName.toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 6, outputName.toStdString().c_str());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qInfo() << "New dependent variable inserted into the DB";
+
+        // Create the new task
+        dependentVariable = new DependentVariableM(experimentationUuid, taskUuid, dependentVarUuid, name, description, agentName, outputName);
+
+    }
+    else {
+        qCritical() << "Could not insert the new dependent variable into the DB:" << cass_error_desc(cassError);
+    }
+
+    cass_statement_free(cassStatement);
+    cass_future_free(cassFuture);
+
+    return dependentVariable;
 }

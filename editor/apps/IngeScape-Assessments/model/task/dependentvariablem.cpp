@@ -18,11 +18,22 @@
  * @brief Constructor
  * @param parent
  */
-DependentVariableM::DependentVariableM(QObject *parent) : QObject(parent),
-    _name(""),
-    _description(""),
-    _agentName(""),
-    _outputName("")
+DependentVariableM::DependentVariableM(CassUuid experimentationUuid
+                                       , CassUuid taskUuid
+                                       , CassUuid cassUuid
+                                       , const QString& name
+                                       , const QString& description
+                                       , const QString& agentName
+                                       , const QString& outputName
+                                       , QObject *parent)
+    : QObject(parent)
+    , _name(name)
+    , _description(description)
+    , _agentName(agentName)
+    , _outputName(outputName)
+    , _experimentationCassUuid(experimentationUuid)
+    , _taskCassUuid(taskUuid)
+    , _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

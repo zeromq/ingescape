@@ -205,7 +205,9 @@ private:
      * @param enumValues
      * @return
      */
-    IndependentVariableM* _insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, QString name, QString description, IndependentVariableValueTypes::Value valueType, QStringList enumValues = {});
+    IndependentVariableM* _insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, IndependentVariableValueTypes::Value valueType, const QStringList& enumValues = {});
+
+    DependentVariableM* _insertDependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, const QString& agentName, const QString& outputName);
 
 
 private:
