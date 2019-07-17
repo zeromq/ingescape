@@ -597,13 +597,10 @@ Item {
                     onVariableValueUpdated: {
                         if (model)
                         {
-                            //console.log("QML: on (Dependent) Variable Value Updated for 'Agent Name' " + value);
+                            console.log("QML: on (Dependent) Variable Value Updated for 'Agent Name' " + value);
 
                             // Update the agent name
                             model.agentName = value;
-
-                            // Reset the output name
-                            model.outputName = "";
                         }
                     }
                 }
@@ -637,7 +634,7 @@ Item {
                     onVariableValueUpdated: {
                         if (model)
                         {
-                            //console.log("QML: on (Dependent) Variable Value Updated for 'Output Name' " + value);
+                            console.log("QML: on (Dependent) Variable Value Updated for 'Output Name' " + value);
 
                             // Update the output name
                             model.outputName = value;
