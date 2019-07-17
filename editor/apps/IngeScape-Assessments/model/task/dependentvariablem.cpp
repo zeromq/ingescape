@@ -14,6 +14,8 @@
 
 #include "dependentvariablem.h"
 
+#include <controller/assessmentsmodelmanager.h>
+
 /**
  * @brief Constructor
  * @param parent
@@ -51,6 +53,109 @@ DependentVariableM::~DependentVariableM()
 
 }
 
+/**
+ * @brief Custom setter for the 'name' property that also update the DB entry
+ * @param value
+ */
+void DependentVariableM::setname(QString value)
+{
+    if ((value != _name) && (AssessmentsModelManager::Instance() != nullptr))
+    {
+        CassError cassError = _updateDBEntry(value, "name");
+        if (cassError != CASS_OK) {
+            qCritical() << "Could not update dependent variable" << _name << "in the DB:" << cass_error_desc(cassError);
+        } else {
+            _name = value;
+            Q_EMIT nameChanged(value);
+        }
+    }
+}
+
+
+/**
+ * @brief Custom setter for the 'description' property that also update the DB entry
+ * @param value
+ */
+void DependentVariableM::setdescription(QString value)
+{
+    if ((value != _name) && (AssessmentsModelManager::Instance() != nullptr))
+    {
+        CassError cassError = _updateDBEntry(value, "description");
+        if (cassError != CASS_OK) {
+            qCritical() << "Could not update dependent variable" << _name << "in the DB:" << cass_error_desc(cassError);
+        } else {
+            _description = value;
+            Q_EMIT descriptionChanged(value);
+        }
+    }
+}
+
+
+/**
+ * @brief Custom setter for the 'agentName' property that also update the DB entry
+ * @param value
+ */
+void DependentVariableM::setagentName(QString value)
+{
+    if ((value != _name) && (AssessmentsModelManager::Instance() != nullptr))
+    {
+        CassError cassError = _updateDBEntry(value, "agent_name");
+        if (cassError != CASS_OK) {
+            qCritical() << "Could not update dependent variable" << _name << "in the DB:" << cass_error_desc(cassError);
+        } else {
+            _agentName = value;
+            Q_EMIT agentNameChanged(value);
+        }
+    }
+}
+
+
+/**
+ * @brief Custom setter for the 'outputName' property that also update the DB entry
+ * @param value
+ */
+void DependentVariableM::setoutputName(QString value)
+{
+    if ((value != _name) && (AssessmentsModelManager::Instance() != nullptr))
+    {
+        CassError cassError = _updateDBEntry(value, "output_name");
+        if (cassError != CASS_OK) {
+            qCritical() << "Could not update dependent variable" << _name << "in the DB:" << cass_error_desc(cassError);
+        } else {
+            _outputName = value;
+            Q_EMIT outputNameChanged(value);
+        }
+    }
+}
+
+
+/**
+ * @brief Update the given field with the given value in the corresponding DB entry
+ * @param value
+ * @param dbField
+ * @return
+ */
+CassError DependentVariableM::_updateDBEntry(const QString& value, const QString& dbField)
+{
+    QString query = QString("UPDATE ingescape.dependent_var SET %1 = ? WHERE id_experimentation = ? AND id_task = ? AND id = ?;").arg(dbField);
+    CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 4);
+    cass_statement_bind_string(cassStatement, 0, value.toStdString().c_str());
+    cass_statement_bind_uuid  (cassStatement, 1, _experimentationCassUuid);
+    cass_statement_bind_uuid  (cassStatement, 2, _taskCassUuid);
+    cass_statement_bind_uuid  (cassStatement, 3, _cassUuid);
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+
+    return cassError;
+}
+
+
+/**
+ * @brief Static factory method to create an dependent variable from a CassandraDB record
+ * @param row
+ * @return
+ */
 DependentVariableM* DependentVariableM::createDependentVariableFromCassandraRow(const CassRow* row)
 {
     DependentVariableM* dependentVariable = nullptr;
