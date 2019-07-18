@@ -151,7 +151,7 @@ public:
 
 
     /**
-     * @brief Stop the timeline (current scenario)
+     * @brief Stop/Reset the timeline (current scenario)
      */
     Q_INVOKABLE void stopTimeLine();
 

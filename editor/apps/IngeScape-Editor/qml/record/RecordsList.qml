@@ -101,16 +101,16 @@ Item {
                 leftMargin: 15
             }
 
-            opacity: !enabled ? 0.3 : 1
             enabled: (controller.currentReplay === null)
+            opacity: enabled ? 1.0 : 0.3
 
             style: I2SvgToggleButtonStyle {
                 fileCache: IngeScapeTheme.svgFileIngeScape
 
                 toggleCheckedReleasedID: "record-stop";
-                toggleCheckedPressedID: "record-stop-pressed";
+                toggleCheckedPressedID: toggleCheckedReleasedID + "-pressed";
                 toggleUncheckedReleasedID: "record-start";
-                toggleUncheckedPressedID: "record-start-pressed";
+                toggleUncheckedPressedID: toggleUncheckedReleasedID + "-pressed";
 
                 // No disabled states
                 toggleCheckedDisabledID: "record-start-pressed"

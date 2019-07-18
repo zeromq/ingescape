@@ -56,6 +56,12 @@ class IngeScapeExpeController : public QObject
     // Controller for network communication
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
 
+    // Flag indicating if the timeline (scenario) is currently playing in the "Editor app"
+    I2_QML_PROPERTY_READONLY(bool, isPlayingTimeLine)
+
+    // Flag indicating if the "Recorder app" is currently recording
+    I2_QML_PROPERTY_READONLY(bool, isRecording)
+
 
 public:
 

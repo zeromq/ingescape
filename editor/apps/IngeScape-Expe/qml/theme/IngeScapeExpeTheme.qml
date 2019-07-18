@@ -46,12 +46,12 @@ Item {
     //-----------------------------------------
 
     // - Main SVG file
-    /*property var svgFileIngeScapeExpe : svgFileCacheIngeScapeExpe
+    property var svgFileIngeScapeExpe : svgFileCacheIngeScapeExpe
 
     I2SvgFileCache {
         id: svgFileCacheIngeScapeExpe
         svgFile: "qrc:/resources/SVG/ingescape-expe.svg"
-    }*/
+    }
 
 
     //-----------------------------------------

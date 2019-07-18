@@ -33,6 +33,7 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     _snapshotDirectory(""),
     _modelManager(nullptr),
     _networkC(nullptr),
+    _isPlayingTimeLine(false),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
     _platformDirectoryPath("")
@@ -302,7 +303,8 @@ void IngeScapeExpeController::stopTimeLine()
     {
         qInfo() << "STOP the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
 
-        QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, STOP);
+        //QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, STOP);
+        QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, RESET);
 
         // Send the command and parameters to the editor
         _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
@@ -352,7 +354,22 @@ void IngeScapeExpeController::forceCreation()
  */
 void IngeScapeExpeController::_onTimeLineStateUpdated(QString state)
 {
-    // FIXME TODO
-    qDebug() << "_onTimeLineStateUpdated" << state;
+    qDebug() << state << "the timeline";
+
+    // PLAY
+    if (state == PLAY) {
+        setisPlayingTimeLine(true);
+    }
+    // PAUSE
+    else if (state == PAUSE) {
+        setisPlayingTimeLine(false);
+    }
+    // RESET
+    else if (state == RESET) {
+        setisPlayingTimeLine(false);
+    }
+    else {
+        qCritical() << "Unknown state" << state << "of the TimeLine !";
+    }
 }
 

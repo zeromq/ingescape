@@ -54,7 +54,7 @@ class RecordsSupervisionController : public QObject
     //I2_QML_PROPERTY_DELETE_PROOF(RecordVM*, selectedRecord)
     I2_QML_PROPERTY_CUSTOM_SETTER(RecordVM*, selectedRecord)
 
-    // Flag indicating if a recorder is currently recording
+    // Flag indicating if the recorder is currently recording
     I2_QML_PROPERTY(bool, isRecording)
 
     // Flag indicating if the actions in the timeline are currently recorded

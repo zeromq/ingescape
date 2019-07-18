@@ -10,5 +10,6 @@
         <file>qml/LoadingScreen.qml</file>
         <file>qml/PlatformsList.qml</file>
         <file>qml/LoadedPlatform.qml</file>
+        <file>resources/SVG/ingescape-expe.svg</file>
     </qresource>
 </RCC>
