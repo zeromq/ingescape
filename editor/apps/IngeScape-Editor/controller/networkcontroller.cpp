@@ -338,6 +338,7 @@ void NetworkController::manageShoutedMessage(QString peerId, QString peerName, z
 
         Q_EMIT agentMappingFilePath(peerId, mappingFilePath);
     }
+    // Unknown
     else
     {
         qDebug() << "Not yet managed SHOUTED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
@@ -355,21 +356,19 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
 {
     QString message = zmsg_popstr(zMessage);
 
-    // Definition
+    // An agent DEFINITION has been received
     if (message.startsWith(prefix_Definition))
     {
-        message.remove(0, prefix_Definition.length());
+        QString definitionJSON = message.remove(0, prefix_Definition.length());
 
-        // Emit the signal "Definition Received"
-        Q_EMIT definitionReceived(peerId, peerName, message);
+        Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
     }
-    // Mapping
+    // An agent MAPPING has been received
     else if (message.startsWith(prefix_Mapping))
     {
-        message.remove(0, prefix_Mapping.length());
+        QString mappingJSON = message.remove(0, prefix_Mapping.length());
 
-        // Emit the signal "Mapping Received"
-        Q_EMIT mappingReceived(peerId, peerName, message);
+        Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
     }
     // All records
     else if (message.startsWith(prefix_AllRecords))
@@ -622,6 +621,25 @@ void NetworkController::sendCommandExecutionStatusToExpe(QString peerIdOfExpe, Q
                                                status);
 
         qInfo() << "Send execution status" << status << "of command" << command << "with parameters" << commandParameters << "to expe" << peerIdOfExpe << "with success ?" << success;
+    }
+}
+
+
+/**
+ * @brief Send a (string) message to a peer id
+ * @param peerId
+ * @param message
+ */
+void NetworkController::sendMessageToPeerId(QString peerId, QString message)
+{
+    if (!peerId.isEmpty())
+    {
+        // Send the message to the peer id
+        int success = igs_busSendStringToAgent(peerId.toStdString().c_str(),
+                                               "%s",
+                                               message.toStdString().c_str());
+
+        qInfo() << "Send message" << message << "to peer" << peerId << "with success ?" << success;
     }
 }
 

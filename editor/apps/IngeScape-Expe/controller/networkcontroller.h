@@ -78,6 +78,13 @@ Q_SIGNALS:
     void statusReceivedAbout_LoadPlatformFile(bool commandStatus, QString commandParameters);
 
 
+    /**
+     * @brief Signal emitted when the state of the TimeLine updated (in Editor app)
+     * @param state
+     */
+    void timeLineStateUpdated(QString state);
+
+
 public Q_SLOTS:
 
 

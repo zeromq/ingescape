@@ -385,7 +385,7 @@ void AbstractScenarioController::playOrResumeTimeLine()
     // Udpate flag "is Playing"
     setisPlaying(true);
 
-    Q_EMIT timeLineStateUpdated("PLAY");
+    Q_EMIT timeLineStateUpdated(PLAY);
 
     // Initialize actions and play (or resume) the scenario
     // (make connections for actions conditions and start the action evaluation timer)
@@ -401,7 +401,7 @@ void AbstractScenarioController::pauseTimeLine()
     // Udpate flag "is Playing"
     setisPlaying(false);
 
-    Q_EMIT timeLineStateUpdated("PAUSE");
+    Q_EMIT timeLineStateUpdated(PAUSE);
 
     // Pause the scenario and associated actions
     // (disconnect actions conditions and stop the action evaluation timer)
@@ -417,7 +417,7 @@ void AbstractScenarioController::stopTimeLine()
     // Udpate flag "is Playing"
     setisPlaying(false);
 
-    Q_EMIT timeLineStateUpdated("RESET");
+    Q_EMIT timeLineStateUpdated(RESET);
 
     // Pause the scenario and associated actions (disconnect actions conditions and stop the action evaluation timer)
     _pauseScenarioAndActions();
@@ -465,15 +465,15 @@ void AbstractScenarioController::updateTimeLineState(QString state)
     qDebug() << state << "the timeline";
 
     // PLAY
-    if (state == "PLAY") {
+    if (state == PLAY) {
         playOrResumeTimeLine();
     }
     // PAUSE
-    else if (state == "PAUSE") {
+    else if (state == PAUSE) {
         pauseTimeLine();
     }
     // STOP
-    else if (state == "STOP") {
+    else if (state == STOP) {
         stopTimeLine();
     }
     else {

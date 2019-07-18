@@ -109,6 +109,7 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &ExpeModelManager::onAgentEntered);
     connect(_networkC, &NetworkController::agentExited, _modelManager, &ExpeModelManager::onAgentExited);
     connect(_networkC, &NetworkController::statusReceivedAbout_LoadPlatformFile, _modelManager, &ExpeModelManager::onStatusReceivedAbout_LoadPlatformFile);
+    connect(_networkC, &NetworkController::timeLineStateUpdated, this, &IngeScapeExpeController::_onTimeLineStateUpdated);
 
 
     // Update the list of available network devices
@@ -278,12 +279,12 @@ void IngeScapeExpeController::playOrPauseTimeLine(bool isPlay)
         if (isPlay) {
             qInfo() << "Play the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
 
-            commandAndParameters = QString("%1=PLAY").arg(command_UpdateTimeLineState);
+            commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, PLAY);
         }
         else {
             qInfo() << "Pause the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
 
-            commandAndParameters = QString("%1=PAUSE").arg(command_UpdateTimeLineState);
+            commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, PAUSE);
         }
 
         // Send the command and parameters to the editor
@@ -301,7 +302,7 @@ void IngeScapeExpeController::stopTimeLine()
     {
         qInfo() << "STOP the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
 
-        QString commandAndParameters = QString("%1=STOP").arg(command_UpdateTimeLineState);
+        QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, STOP);
 
         // Send the command and parameters to the editor
         _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
@@ -322,12 +323,12 @@ void IngeScapeExpeController::startOrStopRecording(bool isStart)
         if (isStart) {
             qInfo() << "Start recording the platform" << _modelManager->currentLoadedPlatform()->name();
 
-            commandAndParameters = QString("%1=START").arg(command_UpdateRecordState);
+            commandAndParameters = QString("%1=%2").arg(command_UpdateRecordState, START);
         }
         else {
             qInfo() << "Stop recording the platform" << _modelManager->currentLoadedPlatform()->name();
 
-            commandAndParameters = QString("%1=STOP").arg(command_UpdateRecordState);
+            commandAndParameters = QString("%1=%2").arg(command_UpdateRecordState, STOP);
         }
 
         // Send the command and parameters to the editor
@@ -342,5 +343,16 @@ void IngeScapeExpeController::startOrStopRecording(bool isStart)
 void IngeScapeExpeController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
+}
+
+
+/**
+ * @brief Slot called when the state of the TimeLine updated (in Editor app)
+ * @param state
+ */
+void IngeScapeExpeController::_onTimeLineStateUpdated(QString state)
+{
+    // FIXME TODO
+    qDebug() << "_onTimeLineStateUpdated" << state;
 }
 

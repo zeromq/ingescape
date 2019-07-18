@@ -87,6 +87,14 @@ public:
     void sendCommandExecutionStatusToExpe(QString peerIdOfExpe, QString command, QString commandParameters, int status);
 
 
+    /**
+     * @brief Send a (string) message to a peer id
+     * @param peerId
+     * @param message
+     */
+    void sendMessageToPeerId(QString peerId, QString message);
+
+
 Q_SIGNALS:
 
     /**

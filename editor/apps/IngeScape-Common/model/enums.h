@@ -73,6 +73,12 @@ static const QString ACTION_LINK_INPUT_NAME = QString("IN");
 static const QString ACTION_LINK_OUTPUT_NAME = QString("OUT");
 static const QString HOSTNAME_NOT_DEFINED = QString("HOSTNAME NOT DEFINED");
 
+static const QString PLAY = QString("PLAY");
+static const QString PAUSE = QString("PAUSE");
+static const QString START = QString("START");
+static const QString STOP = QString("STOP");
+static const QString RESET = QString("RESET");
+
 
 static const QString command_StartAgent = "RUN";
 static const QString command_StopAgent = "STOP";

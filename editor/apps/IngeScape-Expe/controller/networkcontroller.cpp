@@ -16,6 +16,7 @@
 
 
 static const QString prefix_LoadPlatformFile = "LOAD_PLATFORM_FROM_PATH";
+static const QString prefix_TimeLineState = "TIMELINE_STATE=";
 
 
 //--------------------------------------------------------------
@@ -62,21 +63,19 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
 {
     QString message = zmsg_popstr(zMessage);
 
-    // Definition
+    // An agent DEFINITION has been received
     if (message.startsWith(prefix_Definition))
     {
-        message.remove(0, prefix_Definition.length());
+        QString definitionJSON = message.remove(0, prefix_Definition.length());
 
-        // Emit the signal "Definition Received"
-        Q_EMIT definitionReceived(peerId, peerName, message);
+        Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
     }
-    // Mapping
+    // An agent MAPPING has been received
     else if (message.startsWith(prefix_Mapping))
     {
-        message.remove(0, prefix_Mapping.length());
+        QString mappingJSON = message.remove(0, prefix_Mapping.length());
 
-        // Emit the signal "Mapping Received"
-        Q_EMIT mappingReceived(peerId, peerName, message);
+        Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
     }
     // Status of command "LOAD PLATFORM FROM PATH"
     else if (message.startsWith(prefix_LoadPlatformFile))
@@ -103,6 +102,14 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
             }
         }
     }
+    // The state of the TimeLine updated (in Editor app)
+    else if (message.startsWith(prefix_TimeLineState))
+    {
+        QString state = message.remove(0, prefix_TimeLineState.length());
+
+        Q_EMIT timeLineStateUpdated(state);
+    }
+    // Unknown
     else {
         qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
     }

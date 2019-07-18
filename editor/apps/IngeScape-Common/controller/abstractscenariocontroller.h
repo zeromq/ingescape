@@ -207,7 +207,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
+     * @brief Signal emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
      * @param peerIdsList
      * @param command
      * @param agentIOPName
@@ -217,7 +217,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Emitted when a command must be sent on the network to an agent about mapping one of its input
+     * @brief Signal emitted when a command must be sent on the network to an agent about mapping one of its input
      * @param peerIdsList
      * @param command
      * @param inputName
@@ -228,7 +228,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Emitted when the state of the TimeLine updated
+     * @brief Signal emitted when the state of the TimeLine updated
      * @param state
      */
     void timeLineStateUpdated(QString state);

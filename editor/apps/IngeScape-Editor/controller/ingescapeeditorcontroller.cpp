@@ -958,12 +958,12 @@ void IngeScapeEditorController::_onTimeLineStateUpdated(QString state)
 
         if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
         {
-            _networkC->sendMessageToRecorder(_recordsSupervisionC->peerIdOfRecorder(), notificationAndParameters);
+            _networkC->sendMessageToPeerId(_recordsSupervisionC->peerIdOfRecorder(), notificationAndParameters);
         }
 
         if (!_peerIdOfExpe.isEmpty())
         {
-            _networkC->sendMessageToExpe(_peerIdOfExpe, notificationAndParameters);
+            _networkC->sendMessageToPeerId(_peerIdOfExpe, notificationAndParameters);
         }
     }
 }
@@ -984,13 +984,13 @@ void IngeScapeEditorController::_onUpdateRecordState(QString state)
     }*/
 
     // START
-    if (state == "START")
+    if (state == START)
     {
         // Call the private slot (called when the user wants to start to record)
         _onStartToRecord();
     }
     // STOP
-    else if (state == "STOP")
+    else if (state == STOP)
     {
         // Call the private slot (called when a command must be sent on the network to a recorder)
         _onCommandAskedToRecorder(command_StopRecord);

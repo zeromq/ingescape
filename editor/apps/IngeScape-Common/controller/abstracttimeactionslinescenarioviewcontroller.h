@@ -169,6 +169,7 @@ public Q_SLOTS:
      */
     qreal convertDurationInMillisecondsToLengthInCoordinateSystem(int durationInMilliseconds, qreal extraQmlUpdateField);
 
+
 Q_SIGNALS:
     /**
      * @brief Will be triggered when the abscissa axis of our coordinate system changes
@@ -176,13 +177,15 @@ Q_SIGNALS:
      */
     void coordinateSystemAbscissaAxisChanged();
 
+
     /**
     * @brief Will be triggered when both the abscissa axis and the ordinate axis of our coordinate system change
     */
     void coordinateSystemAbscissaAndOrdinateAxesChanged();
 
+
     /**
-     * @brief Emitted when the visible time range of our timeline has changed
+     * @brief Signal emitted when the visible time range of our timeline has changed
      */
     void timeRangeChanged(int viewportTimeRangeStartInMilliseconds, int viewportTimeRangeEndInMilliseconds);
 
@@ -193,6 +196,7 @@ protected:
      */
     void _updateCoordinateSystemAbscissaAxis();
 
+
     /**
      * @brief Update the filtered list of time ticks by computing the visible windows
      */
@@ -200,6 +204,7 @@ protected:
 
 
 protected:
+
     // Our origin date-time value (T0) i.e. the first time tick
     QTime _startTime;
 
@@ -211,7 +216,6 @@ protected:
 
     // Total time period in minutes (Tend - T0)
     qreal _totalTimePeriodInMinutes;
-
 
     // Time in seconds between two time ticks in X axis
     int _timeRangeBetweenTimeTicksInMilliSeconds;

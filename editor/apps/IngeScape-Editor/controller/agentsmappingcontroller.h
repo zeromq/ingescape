@@ -255,7 +255,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Emitted when a command must be sent on the network to an agent about mapping one of its input
+     * @brief Signal emitted when a command must be sent on the network to an agent about mapping one of its input
      * @param peerIdsList
      * @param command
      * @param inputName
