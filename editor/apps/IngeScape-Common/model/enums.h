@@ -21,6 +21,12 @@
 #include <I2PropertyHelpers.h>
 
 
+//--------------------------------
+//
+// Enums
+//
+//--------------------------------
+
 /**
   * Types of IngeScape elements on the network
   */
@@ -53,6 +59,12 @@ I2_ENUM(AgentIOPValueTypeGroups, NUMBER, STRING, IMPULSION, DATA, MIXED, UNKNOWN
   */
 I2_ENUM_CUSTOM(LogTypes, IGS_LOG_TRACE, IGS_LOG_DEBUG, IGS_LOG_INFO, IGS_LOG_WARNING, IGS_LOG_ERROR, IGS_LOG_FATAL)
 
+
+//--------------------------------
+//
+// Commands
+//
+//--------------------------------
 
 static const QString SEPARATOR_AGENT_NAME_AND_IOP = QString("##");
 static const QString SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE = QString("::");
@@ -93,6 +105,22 @@ static const QString command_UpdateTimeLineState = "UPDATE_TIMELINE_STATE";
 static const QString command_UpdateRecordState = "UPDATE_RECORD_STATE";
 
 
+//--------------------------------
+//
+// Notifications
+//
+//--------------------------------
+
+static const QString notif_TimeLineState = "TIMELINE_STATE";
+
+
+
+//--------------------------------
+//
+// I2_QML_PROPERTY_QTime
+//
+//--------------------------------
+
 // Date date of our application
 static const QDate APPLICATION_START_DATE = QDate::currentDate();
 
@@ -104,36 +132,43 @@ static const QDate APPLICATION_START_DATE = QDate::currentDate();
  * The date used is the current date.
  */
 #define I2_QML_PROPERTY_QTime(name) \
-        Q_PROPERTY (QDateTime name READ qmlGet##name WRITE qmlSet##name NOTIFY name##Changed) \
-    public: \
-        QDateTime qmlGet##name () const { \
-            return QDateTime(_##name##_Date, _##name); \
+Q_PROPERTY (QDateTime name READ qmlGet##name WRITE qmlSet##name NOTIFY name##Changed) \
+public: \
+    QDateTime qmlGet##name () const { \
+        return QDateTime(_##name##_Date, _##name); \
+    } \
+    QTime name () const { \
+        return _##name; \
+    } \
+    virtual bool qmlSet##name (QDateTime value) { \
+        bool hasChanged = false; \
+        if (_##name != value.time()) { \
+            _##name = value.time(); \
+            _##name##_Date = value.date(); \
+            hasChanged = true; \
+            Q_EMIT name##Changed(value); \
         } \
-        QTime name () const { \
-            return _##name; \
+        return hasChanged; \
+    } \
+    void set##name(QTime value) { \
+        if (_##name != value) { \
+            _##name = value; \
+            Q_EMIT name##Changed(QDateTime(_##name##_Date, _##name)); \
         } \
-        virtual bool qmlSet##name (QDateTime value) { \
-            bool hasChanged = false; \
-            if (_##name != value.time()) { \
-                _##name = value.time(); \
-                _##name##_Date = value.date(); \
-                hasChanged = true; \
-                Q_EMIT name##Changed(value); \
-            } \
-            return hasChanged; \
-        } \
-        void set##name(QTime value) { \
-            if (_##name != value) { \
-                _##name = value; \
-                Q_EMIT name##Changed(QDateTime(_##name##_Date, _##name)); \
-            } \
-        } \
-    Q_SIGNALS: \
-        void name##Changed (QDateTime value); \
-    protected: \
-        QTime _##name; \
-        QDate _##name##_Date = APPLICATION_START_DATE;
+    } \
+Q_SIGNALS: \
+    void name##Changed (QDateTime value); \
+protected: \
+    QTime _##name; \
+    QDate _##name##_Date = APPLICATION_START_DATE;
 
+
+
+//--------------------------------
+//
+// Class "Enums"
+//
+//--------------------------------
 
 
 /**

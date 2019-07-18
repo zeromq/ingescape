@@ -1268,17 +1268,29 @@ Item {
             activeFocusOnPress: true
             checkable: true
 
-            style: LabellessSvgButtonStyle {
+            style: I2SvgToggleButtonStyle {
                 fileCache: IngeScapeTheme.svgFileIngeScape
 
-                releasedID: (scenarioController && scenarioController.isPlaying) ? "timeline-pause" : "timeline-play"
-                pressedID: releasedID + "-pressed"
-                disabledID: releasedID
+                toggleCheckedReleasedID: "timeline-pause"
+                toggleCheckedPressedID: toggleCheckedReleasedID + "-pressed"
+                toggleUncheckedReleasedID: "timeline-play"
+                toggleUncheckedPressedID: toggleUncheckedReleasedID + "-pressed"
+
+                // No disabled states
+                toggleCheckedDisabledID: ""
+                toggleUncheckedDisabledID: ""
+
+                labelMargin: 0;
             }
 
             onClicked: {
                 if (scenarioController) {
-                    scenarioController.isPlaying = checked;
+                    if (checked) {
+                        scenarioController.playOrResumeTimeLine();
+                    }
+                    else {
+                        scenarioController.pauseTimeLine();
+                    }
                 }
             }
 

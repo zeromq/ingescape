@@ -231,6 +231,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_scenarioC, &ScenarioController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutSettingValue, _networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
     connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
+    connect(_scenarioC, &ScenarioController::timeLineStateUpdated, this, &IngeScapeEditorController::_onTimeLineStateUpdated);
 
     // Connect to the signal "time range changed" from the time line
     // to the scenario controller to filter the action view models
@@ -942,6 +943,29 @@ void IngeScapeEditorController::_onUpdateTimeLineState(QString state)
     else {
         qWarning() << "Peer Id of Expe is empty" << _peerIdOfExpe;
     }*/
+}
+
+
+/**
+ * @brief Slot called when the state of the TimeLine updated
+ * @param state
+ */
+void IngeScapeEditorController::_onTimeLineStateUpdated(QString state)
+{
+    if (_networkC != nullptr)
+    {
+        QString notificationAndParameters = QString("%1=%2").arg(notif_TimeLineState, state);
+
+        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
+        {
+            _networkC->sendMessageToRecorder(_recordsSupervisionC->peerIdOfRecorder(), notificationAndParameters);
+        }
+
+        if (!_peerIdOfExpe.isEmpty())
+        {
+            _networkC->sendMessageToExpe(_peerIdOfExpe, notificationAndParameters);
+        }
+    }
 }
 
 

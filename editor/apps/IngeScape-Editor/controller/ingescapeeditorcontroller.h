@@ -281,6 +281,13 @@ private Q_SLOTS:
 
 
     /**
+     * @brief Slot called when the state of the TimeLine updated
+     * @param state
+     */
+    void _onTimeLineStateUpdated(QString state);
+
+
+    /**
      * @brief Slot called when we receive the command "Update Record State"
      * @param state
      */

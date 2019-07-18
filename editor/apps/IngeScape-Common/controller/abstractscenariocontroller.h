@@ -64,8 +64,8 @@ class AbstractScenarioController: public QObject
     // Number of lines in our timeline
     I2_QML_PROPERTY(int, linesNumberInTimeLine)
 
-    // Flag indicating if our scenario is currently playing
-    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isPlaying)
+    // Flag indicating if our timeline (scenario) is currently playing
+    I2_QML_PROPERTY_READONLY(bool, isPlaying)
 
     // Current time (from the beginning of our scenario)
     // Define a QTime and a QDateTime: Manage a date in addition to the time to prevent a delta in hours between JS (QML) and C++
@@ -139,22 +139,28 @@ public:
 
 
     /**
+     * @brief Play (or Resume) the timeline (current scenario)
+     */
+    Q_INVOKABLE void playOrResumeTimeLine();
+
+
+    /**
+     * @brief Pause the timeline (current scenario)
+     */
+    Q_INVOKABLE void pauseTimeLine();
+
+
+    /**
+     * @brief Stop the timeline (current scenario)
+     */
+    Q_INVOKABLE void stopTimeLine();
+
+
+    /**
      * @brief Clear the current scenario
      * (clear the list of actions in the list, in the palette and in the timeline)
      */
     virtual Q_INVOKABLE void clearScenario();
-
-
-    /**
-     * @brief Initialize the connections for conditions of all actions
-     */
-    void initializeConditionsConnectionsOfAllActions();
-
-
-    /**
-     * @brief Reset the connections for conditions of all actions
-     */
-    void resetConditionsConnectionsOfAllActions();
 
 
     /**
@@ -221,6 +227,13 @@ Q_SIGNALS:
     void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
 
 
+    /**
+     * @brief Emitted when the state of the TimeLine updated
+     * @param state
+     */
+    void timeLineStateUpdated(QString state);
+
+
 public Q_SLOTS:
 
     /**
@@ -275,19 +288,19 @@ protected Q_SLOTS:
 protected:
 
     /**
-     * @brief Start the scenario by
-     *        making connections for the actions conditions
-     *        starting the action evaluation timer
+     * @brief Initialize actions and play (or resume) the scenario
+     * - make connections for actions conditions
+     * - start the action evaluation timer
      */
-    void _startScenario();
+    void _initActionsAndPlayOrResumeScenario();
 
 
     /**
-     * @brief Stop the scenario by
-     *        disconnecting the actions conditions
-     *        stoping the action evaluation timer
+     * @brief Pause the scenario and associated actions
+     * - disconnect actions conditions
+     * - stop the action evaluation timer
      */
-    void _stopScenario();
+    void _pauseScenarioAndActions();
 
 
     /**

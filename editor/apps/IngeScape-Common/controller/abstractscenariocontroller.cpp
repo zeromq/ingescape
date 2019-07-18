@@ -93,29 +93,6 @@ AbstractScenarioController::~AbstractScenarioController()
 
 
 /**
- * @brief Setter for property "is Playing" (command the TimeLine)
- * @param value
- */
-void AbstractScenarioController::setisPlaying(bool value)
-{
-    if (_isPlaying != value)
-    {
-        _isPlaying = value;
-
-        // Start/Stop scenario according to our flag
-        if (_isPlaying) {
-            _startScenario();
-        }
-        else {
-            _stopScenario();
-        }
-
-        Q_EMIT isPlayingChanged(value);
-    }
-}
-
-
-/**
   * @brief Import the scenario from JSON
   * @param jsonScenario
   */
@@ -401,6 +378,56 @@ void AbstractScenarioController::removeActionVMfromTimeLine(ActionVM* actionVM)
 
 
 /**
+ * @brief Play (or Resume) the timeline (current scenario)
+ */
+void AbstractScenarioController::playOrResumeTimeLine()
+{
+    // Udpate flag "is Playing"
+    setisPlaying(true);
+
+    Q_EMIT timeLineStateUpdated("PLAY");
+
+    // Initialize actions and play (or resume) the scenario
+    // (make connections for actions conditions and start the action evaluation timer)
+    _initActionsAndPlayOrResumeScenario();
+}
+
+
+/**
+ * @brief Pause the timeline (current scenario)
+ */
+void AbstractScenarioController::pauseTimeLine()
+{
+    // Udpate flag "is Playing"
+    setisPlaying(false);
+
+    Q_EMIT timeLineStateUpdated("PAUSE");
+
+    // Pause the scenario and associated actions
+    // (disconnect actions conditions and stop the action evaluation timer)
+    _pauseScenarioAndActions();
+}
+
+
+/**
+ * @brief Stop the timeline (current scenario)
+ */
+void AbstractScenarioController::stopTimeLine()
+{
+    // Udpate flag "is Playing"
+    setisPlaying(false);
+
+    Q_EMIT timeLineStateUpdated("RESET");
+
+    // Pause the scenario and associated actions (disconnect actions conditions and stop the action evaluation timer)
+    _pauseScenarioAndActions();
+
+    // Reset current time (to 00:00:00.000)
+    setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
+}
+
+
+/**
  * @brief Clear the current scenario
  * (clear the list of actions in the list, in the palette and in the timeline)
  */
@@ -408,7 +435,8 @@ void AbstractScenarioController::clearScenario()
 {
     qInfo() << "Abstract Scenario Controller: Clear the current scenario";
 
-    _stopScenario();
+    // Stop the timeline (current scenario)
+    stopTimeLine();
 
     // Clean-up current selection
     setselectedAction(nullptr);
@@ -425,37 +453,6 @@ void AbstractScenarioController::clearScenario()
 
     // Clear names list
     _allActionNames.clear();
-
-    // Reset current time
-    setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
-}
-
-
-/**
- * @brief Initialize the connections for conditions of all actions
- */
-void AbstractScenarioController::initializeConditionsConnectionsOfAllActions()
-{
-    for (ActionM* actionM : _actionsList.toList())
-    {
-        if (actionM != nullptr) {
-            actionM->initializeConditionsConnections();
-        }
-    }
-}
-
-
-/**
- * @brief Reset the connections for conditions of all actions
- */
-void AbstractScenarioController::resetConditionsConnectionsOfAllActions()
-{
-    for (ActionM* actionM : _actionsList.toList())
-    {
-        if (actionM != nullptr) {
-            actionM->resetConditionsConnections();
-        }
-    }
 }
 
 
@@ -468,22 +465,16 @@ void AbstractScenarioController::updateTimeLineState(QString state)
     qDebug() << state << "the timeline";
 
     // PLAY
-    if (state == "PLAY")
-    {
-        setisPlaying(true);
+    if (state == "PLAY") {
+        playOrResumeTimeLine();
     }
     // PAUSE
-    else if (state == "PAUSE")
-    {
-        setisPlaying(false);
+    else if (state == "PAUSE") {
+        pauseTimeLine();
     }
     // STOP
-    else if (state == "STOP")
-    {
-        setisPlaying(false);
-
-        // Reset current time
-        setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
+    else if (state == "STOP") {
+        stopTimeLine();
     }
     else {
         qCritical() << "Unknown state" << state << "so we cannot update the TimeLine !";
@@ -838,11 +829,11 @@ void AbstractScenarioController::_onTimeout_DelayOrExecuteActions()
 
 
 /**
- * @brief Start the scenario by
- *        making connections for the actions conditions
- *        starting the action evaluation timer
+ * @brief Initialize actions and play (or resume) the scenario
+ * - make connections for actions conditions
+ * - start the action evaluation timer
  */
-void AbstractScenarioController::_startScenario()
+void AbstractScenarioController::_initActionsAndPlayOrResumeScenario()
 {
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
@@ -924,12 +915,17 @@ void AbstractScenarioController::_startScenario()
     }
 
     // Initialize the connections for conditions of all actions
-    initializeConditionsConnectionsOfAllActions();
+    for (ActionM* actionM : _actionsList.toList())
+    {
+        if (actionM != nullptr) {
+            actionM->initializeConditionsConnections();
+        }
+    }
 
     // Save the time of the day
     _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut = QTime::currentTime().msecsSinceStartOfDay();
 
-    //qDebug() << "_startScenario:" << _currentTime << QTime::currentTime();
+    //qDebug() << "Play (or Resume) Scenario:" << _currentTime << QTime::currentTime();
 
     // Start timers
     // init the timer with the time of the next action execution
@@ -942,11 +938,11 @@ void AbstractScenarioController::_startScenario()
 
 
 /**
- * @brief Stop the scenario by
- *        disconnecting the actions conditions
- *        stoping the action evaluation timer
+ * @brief Pause the scenario and associated actions
+ * - disconnect actions conditions
+ * - stop the action evaluation timer
  */
-void AbstractScenarioController::_stopScenario()
+void AbstractScenarioController::_pauseScenarioAndActions()
 {
     // Stop timers
     if (_timerToExecuteActions.isActive()) {
@@ -979,7 +975,12 @@ void AbstractScenarioController::_stopScenario()
     setnextActionToActivate(nullptr);
 
     // Reset the connections for conditions of all actions
-    resetConditionsConnectionsOfAllActions();
+    for (ActionM* actionM : _actionsList.toList())
+    {
+        if (actionM != nullptr) {
+            actionM->resetConditionsConnections();
+        }
+    }
 }
 
 
