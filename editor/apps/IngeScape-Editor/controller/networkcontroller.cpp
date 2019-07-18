@@ -372,6 +372,20 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
 
         Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
     }
+    // The "Recorder app" Started to record
+    else if (message.startsWith(prefix_RecordStarted))
+    {
+        qInfo() << prefix_RecordStarted;
+
+        Q_EMIT recordStartedReceived();
+    }
+    // The "Recorder app" Stopped to record
+    else if (message.startsWith(prefix_RecordStopped))
+    {
+        qInfo() << prefix_RecordStopped;
+
+        Q_EMIT recordStoppedReceived();
+    }
     // All records
     else if (message.startsWith(prefix_AllRecords))
     {
@@ -431,6 +445,8 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
     // End of record
     else if (message == prefix_EndedRecord)
     {
+        qDebug() << prefix_EndedRecord;
+
         // Emit the signal "End of record Received"
         Q_EMIT endOfRecordReceived();
     }

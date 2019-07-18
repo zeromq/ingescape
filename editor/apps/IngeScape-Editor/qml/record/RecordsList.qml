@@ -93,7 +93,7 @@ Item {
 
 
         Button {
-            id: startStopRecordButton
+            id: startOrStopRecordButton
 
             anchors {
                 verticalCenter: parent.verticalCenter
@@ -113,8 +113,8 @@ Item {
                 toggleUncheckedPressedID: toggleUncheckedReleasedID + "-pressed";
 
                 // No disabled states
-                toggleCheckedDisabledID: "record-start-pressed"
-                toggleUncheckedDisabledID: toggleCheckedDisabledID
+                toggleCheckedDisabledID: toggleCheckedPressedID
+                toggleUncheckedDisabledID: toggleUncheckedPressedID
 
                 labelMargin: 0;
             }
@@ -122,9 +122,15 @@ Item {
             onCheckedChanged: {
                 if (controller) {
                     // FIXME TEST
-                    //controller.startOrStopToRecord(checked, false);
-                    controller.startOrStopToRecord(checked, true);
+                    //controller.startOrStopToRecord(false);
+                    controller.startOrStopToRecord(true);
                 }
+            }
+
+            Binding {
+                target: startOrStopRecordButton
+                property: "checked"
+                value: controller ? controller.isRecording : false
             }
         }
 
@@ -132,7 +138,7 @@ Item {
             id: currentTimeText
 
             anchors {
-                left: startStopRecordButton.right
+                left: startOrStopRecordButton.right
                 leftMargin: 10
                 verticalCenter: parent.verticalCenter
             }

@@ -108,43 +108,27 @@ void RecordsSupervisionController::setselectedRecord(RecordVM *value)
 
 /**
  * @brief Start/Stop to record (optionaly with the actions in the timeline)
- * @param isStart flag indicating if we start to record or if we stop to record
  * @param withTimeLine flag indicating if the actions in the timeline must be recorded
  */
-void RecordsSupervisionController::startOrStopToRecord(bool isStart, bool withTimeLine)
+void RecordsSupervisionController::startOrStopToRecord(bool withTimeLine)
 {
     if (_isRecorderON)
     {
-        // Start to record
-        if (isStart)
-        {
-            if (!_isRecording)
-            {
-                // Update flags
-                setisRecording(true);
-                setisRecordingTimeLine(withTimeLine);
-
-                // Start the timer for feedback
-                _timerToDisplayTime.start();
-
-                Q_EMIT startToRecord();
-            }
-        }
         // Stop to record
+        if (_isRecording)
+        {
+            // Update the flag
+            setisRecordingTimeLine(false);
+
+            Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, command_StopRecord);
+        }
+        // Start to record
         else
         {
-            if (_isRecording)
-            {
-                // Update the flag
-                setisRecording(false);
-                setisRecordingTimeLine(false);
+            // Update flags
+            setisRecordingTimeLine(withTimeLine);
 
-                // Stop the timer for feedback
-                _timerToDisplayTime.stop();
-                setcurrentRecordTime(QDateTime(QDate::currentDate()));
-
-                Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, command_StopRecord);
-            }
+            Q_EMIT startToRecord();
         }
     }
 }
@@ -361,6 +345,33 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
             }
         }
     }
+}
+
+
+/**
+ * @brief Slot called when the "Recorder app" started to record
+ */
+void RecordsSupervisionController::onRecordStartedReceived()
+{
+    // Update the flag
+    setisRecording(true);
+
+    // Start the timer for feedback
+    _timerToDisplayTime.start();
+}
+
+
+/**
+ * @brief Slot called when the "Recorder app" stopped to record
+ */
+void RecordsSupervisionController::onRecordStoppedReceived()
+{
+    // Update the flag
+    setisRecording(false);
+
+    // Stop the timer for feedback
+    _timerToDisplayTime.stop();
+    setcurrentRecordTime(QDateTime(QDate::currentDate()));
 }
 
 
