@@ -14,18 +14,18 @@
 
 #include "experimentationcontroller.h"
 
+#include <controller/assessmentsmodelmanager.h>
+
 /**
  * @brief Constructor
  * @param modelManager
  * @param jsonHelper
  * @param parent
  */
-ExperimentationController::ExperimentationController(AssessmentsModelManager* modelManager,
-                                                     JsonHelper* jsonHelper,
+ExperimentationController::ExperimentationController(JsonHelper* jsonHelper,
                                                      QObject *parent) : QObject(parent),
     _recordC(nullptr),
     _currentExperimentation(nullptr),
-    _modelManager(modelManager),
     _jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -34,7 +34,7 @@ ExperimentationController::ExperimentationController(AssessmentsModelManager* mo
     qInfo() << "New Experimentation Controller";
 
     // Create the controller to manage a record of the current experimentation
-    _recordC = new RecordController(_modelManager, _jsonHelper, this);
+    _recordC = new RecordController(_jsonHelper, this);
 }
 
 
@@ -69,7 +69,6 @@ ExperimentationController::~ExperimentationController()
     }*/
 
     // Reset pointers
-    _modelManager = nullptr;
     _jsonHelper = nullptr;
 }
 
@@ -161,7 +160,7 @@ void ExperimentationController::deleteRecordSetup(RecordSetupM* recordSetup)
  */
 void ExperimentationController::_onCurrentExperimentationChanged(ExperimentationM* currentExperimentation)
 {
-    if (currentExperimentation != nullptr)
+    if (currentExperimentation != nullptr && AssessmentsModelManager::Instance() != nullptr)
     {
         qDebug() << "_on Current Experimentation Changed" << currentExperimentation->name();
 
@@ -173,7 +172,7 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
         CassStatement* cassStatement = cass_statement_new(query, 0);
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
@@ -193,45 +192,12 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
                     if (task != nullptr)
                     {
                         // Load variables
-                        query = "SELECT * FROM ingescape.independent_var WHERE id_experimentation = ? AND id_task = ?;";
+                        _retrieveIndependentVariableForTask(task);
 
-                        // Creates the new query statement
-                        CassStatement* indeVarCassStatement = cass_statement_new(query, 2);
-                        cass_statement_bind_uuid(indeVarCassStatement, 0, task->getExperimentationCassUuid());
-                        cass_statement_bind_uuid(indeVarCassStatement, 1, task->getCassUuid());
-                        // Execute the query or bound statement
-                        CassFuture* indeVarCassFuture = cass_session_execute(_modelManager->getCassSession(), indeVarCassStatement);
-                        CassError indeVarCassError = cass_future_error_code(indeVarCassFuture);
-                        if (indeVarCassError == CASS_OK)
-                        {
-                            qDebug() << "Get all independent variables for task" << task->name() << "succeeded";
-                        }
-                        else {
-                            qCritical() << "Could not get all independent variables for task" << task->name() << "from the database:" << cass_error_desc(indeVarCassError);
-                        }
+                        // Load variables
+                        _retrieveDependentVariableForTask(task);
 
-                        // Retrieve result set and iterate over the rows
-                        const CassResult* indeVarCassResult = cass_future_get_result(indeVarCassFuture);
-                        if (indeVarCassResult != nullptr)
-                        {
-                            CassIterator* indeVarCassIterator = cass_iterator_from_result(indeVarCassResult);
-
-                            while(cass_iterator_next(indeVarCassIterator))
-                            {
-                                const CassRow* indeVarRow = cass_iterator_get_row(indeVarCassIterator);
-                                IndependentVariableM* independentVariable = IndependentVariableM::createIndependentVariableFromCassandraRow(indeVarRow);
-                                if (independentVariable != nullptr)
-                                {
-                                    task->addIndependentVariable(independentVariable);
-                                }
-                            }
-
-                            cass_iterator_free(indeVarCassIterator);
-                        }
-
-                        cass_future_free(indeVarCassFuture);
-                        cass_statement_free(indeVarCassStatement);
-
+                        // Add the task to the experimentation
                         _currentExperimentation->addTask(task);
                     }
                 }
@@ -241,6 +207,106 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
         }
         else {
             qCritical() << "Could not get all tasks for the current experiment from the database:" << cass_error_desc(cassError);
+        }
+
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+    }
+}
+
+/**
+ * @brief Retrieve all independent variables from the Cassandra DB for the given task.
+ * The task will be updated by this method
+ * @param task
+ */
+void ExperimentationController::_retrieveIndependentVariableForTask(TaskM* task)
+{
+    if (AssessmentsModelManager::Instance() != nullptr)
+    {
+        const char* query = "SELECT * FROM ingescape.independent_var WHERE id_experimentation = ? AND id_task = ?;";
+
+        // Creates the new query statement
+        CassStatement* cassStatement = cass_statement_new(query, 2);
+        cass_statement_bind_uuid(cassStatement, 0, task->getExperimentationCassUuid());
+        cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qDebug() << "Get all independent variables for task" << task->name() << "succeeded";
+        }
+        else {
+            qCritical() << "Could not get all independent variables for task" << task->name() << "from the database:" << cass_error_desc(cassError);
+        }
+
+        // Retrieve result set and iterate over the rows
+        const CassResult* cassResult = cass_future_get_result(cassFuture);
+        if (cassResult != nullptr)
+        {
+            CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+
+            while(cass_iterator_next(cassIterator))
+            {
+                const CassRow* row = cass_iterator_get_row(cassIterator);
+                IndependentVariableM* independentVariable = IndependentVariableM::createIndependentVariableFromCassandraRow(row);
+                if (independentVariable != nullptr)
+                {
+                    task->addIndependentVariable(independentVariable);
+                }
+            }
+
+            cass_iterator_free(cassIterator);
+        }
+
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+    }
+}
+
+/**
+ * @brief Retrieve all dependent variables from the Cassandra DB for the given task.
+ * The task will be updated by this method.
+ * @param task
+ */
+void ExperimentationController::_retrieveDependentVariableForTask(TaskM* task)
+{
+    if (AssessmentsModelManager::Instance() != nullptr)
+    {
+        const char* query = "SELECT * FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ?;";
+
+        // Creates the new query statement
+        CassStatement* cassStatement = cass_statement_new(query, 2);
+        cass_statement_bind_uuid(cassStatement, 0, task->getExperimentationCassUuid());
+        cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qDebug() << "Get all independent variables for task" << task->name() << "succeeded";
+        }
+        else {
+            qCritical() << "Could not get all independent variables for task" << task->name() << "from the database:" << cass_error_desc(cassError);
+        }
+
+        // Retrieve result set and iterate over the rows
+        const CassResult* cassResult = cass_future_get_result(cassFuture);
+        if (cassResult != nullptr)
+        {
+            CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+
+            while(cass_iterator_next(cassIterator))
+            {
+                const CassRow* row = cass_iterator_get_row(cassIterator);
+                DependentVariableM* dependentVariable = DependentVariableM::createDependentVariableFromCassandraRow(row);
+                if (dependentVariable != nullptr)
+                {
+                    task->addDependentVariable(dependentVariable);
+                }
+            }
+
+            cass_iterator_free(cassIterator);
         }
 
         cass_future_free(cassFuture);

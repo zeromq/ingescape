@@ -217,6 +217,8 @@ typedef struct license {
     bool isEditorLicenseExpired;
     zlist_t *features;
     zlist_t *agents;
+    zlist_t *licenceDetails; //license struct for each detected license file
+    char *fileName; //used only in each detail
 } license_t;
     
 typedef struct licenseEnforcement {

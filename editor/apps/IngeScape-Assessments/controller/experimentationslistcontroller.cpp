@@ -14,15 +14,15 @@
 
 #include "experimentationslistcontroller.h"
 
+#include <controller/assessmentsmodelmanager.h>
+
 /**
  * @brief Constructor
  * @param parent
  */
-ExperimentationsListController::ExperimentationsListController(AssessmentsModelManager* modelManager,
-                                                               QObject *parent) : QObject(parent),
+ExperimentationsListController::ExperimentationsListController(QObject *parent) : QObject(parent),
     _defaultGroupOther(nullptr),
-    _newGroup(nullptr),
-    _modelManager(modelManager)
+    _newGroup(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -72,65 +72,67 @@ ExperimentationsListController::ExperimentationsListController(AssessmentsModelM
         }
     }*/
 
+    AssessmentsModelManager* modelManager = AssessmentsModelManager::Instance();
+    if (modelManager != nullptr) {
+        // Create the query
+        QString query = QString("SELECT * FROM ingescape.experimentation;");
 
-    // Create the query
-    QString query = QString("SELECT * FROM ingescape.experimentation;");
+        // Creates the new query statement
+        CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 0);
 
-    // Creates the new query statement
-    CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 0);
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(modelManager->getCassSession(), cassStatement);
 
-    // Execute the query or bound statement
-    CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
-
-    CassError cassError = cass_future_error_code(cassFuture);
-    if (cassError == CASS_OK)
-    {
-        qDebug() << "Get all experimentations succeeded";
-
-        // Retrieve result set and iterate over the rows
-        const CassResult* cassResult = cass_future_get_result(cassFuture);
-
-        if (cassResult != nullptr)
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
         {
-            CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+            qDebug() << "Get all experimentations succeeded";
 
-            while(cass_iterator_next(cassIterator))
+            // Retrieve result set and iterate over the rows
+            const CassResult* cassResult = cass_future_get_result(cassFuture);
+
+            if (cassResult != nullptr)
             {
-                const CassRow* row = cass_iterator_get_row(cassIterator);
+                CassIterator* cassIterator = cass_iterator_from_result(cassResult);
 
-                // Create the new experimentation
-                ExperimentationM* experimentation = ExperimentationM::createExperimentationFromCassandraRow(row);
-                if (experimentation != nullptr)
+                while(cass_iterator_next(cassIterator))
                 {
-                    const char *chrExperimentationsGroupName = "";
-                    size_t experimentationsGroupNameLength;
-                    cass_value_get_string(cass_row_get_column_by_name(row, "group_name"), &chrExperimentationsGroupName, &experimentationsGroupNameLength);
-                    QString experimentationsGroupName = QString::fromUtf8(chrExperimentationsGroupName, static_cast<int>(experimentationsGroupNameLength));
+                    const CassRow* row = cass_iterator_get_row(cassIterator);
 
-                    ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentationsGroupName);
-                    if (experimentationsGroup == nullptr)
+                    // Create the new experimentation
+                    ExperimentationM* experimentation = ExperimentationM::createExperimentationFromCassandraRow(row);
+                    if (experimentation != nullptr)
                     {
-                        // FIXME TODO: create the group but not create the expe, just add
-                        //createNewExperimentationInNewGroup(experimentationName, experimentationsGroupName);
-                    }
+                        const char *chrExperimentationsGroupName = "";
+                        size_t experimentationsGroupNameLength;
+                        cass_value_get_string(cass_row_get_column_by_name(row, "group_name"), &chrExperimentationsGroupName, &experimentationsGroupNameLength);
+                        QString experimentationsGroupName = QString::fromUtf8(chrExperimentationsGroupName, static_cast<int>(experimentationsGroupNameLength));
 
-                    if (experimentationsGroup != nullptr)
-                    {
-                        // Add to the group
-                        experimentationsGroup->experimentations()->append(experimentation);
+                        ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentationsGroupName);
+                        if (experimentationsGroup == nullptr)
+                        {
+                            // FIXME TODO: create the group but not create the expe, just add
+                            //createNewExperimentationInNewGroup(experimentationName, experimentationsGroupName);
+                        }
+
+                        if (experimentationsGroup != nullptr)
+                        {
+                            // Add to the group
+                            experimentationsGroup->experimentations()->append(experimentation);
+                        }
                     }
                 }
+
+                cass_iterator_free(cassIterator);
             }
-
-            cass_iterator_free(cassIterator);
         }
-    }
-    else {
-        qCritical() << "Could not get all experimentations from the DataBase:" << cass_error_desc(cassError);
-    }
+        else {
+            qCritical() << "Could not get all experimentations from the DataBase:" << cass_error_desc(cassError);
+        }
 
-    cass_statement_free(cassStatement);
-    cass_future_free(cassFuture);
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+    }
 }
 
 
@@ -156,11 +158,6 @@ ExperimentationsListController::~ExperimentationsListController()
         ExperimentationsGroupVM* temp = _newGroup;
         setnewGroup(nullptr);
         delete temp;
-    }
-
-    if (_modelManager != nullptr)
-    {
-        _modelManager = nullptr;
     }
 }
 
@@ -199,10 +196,10 @@ void ExperimentationsListController::createNewExperimentationInNewGroup(QString 
 void ExperimentationsListController::createNewExperimentationInGroup(QString experimentationName, ExperimentationsGroupVM* experimentationsGroup)
 {
     if (!experimentationName.isEmpty() && (experimentationsGroup != nullptr)
-            && (_modelManager != nullptr))
+            && (AssessmentsModelManager::Instance() != nullptr))
     {
         CassUuid experimentationUid;
-        cass_uuid_gen_time(_modelManager->getCassUuidGen(), &experimentationUid);
+        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &experimentationUid);
 
         // Returns the number of seconds since 1970-01-01T00:00:00 Universal Coordinated Time.
         time_t now = QDateTime::currentSecsSinceEpoch();
@@ -225,7 +222,7 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
         cass_statement_bind_string(cassStatement, 4, experimentationsGroup->name().toStdString().c_str());
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
 
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
@@ -233,7 +230,7 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
             qInfo() << "Experimentation" << experimentationName << "inserted into the DataBase";
 
             // Create the new experimentation
-            ExperimentationM* experimentation = new ExperimentationM(experimentationUid, experimentationName, QDateTime::currentDateTime(), nullptr);
+            ExperimentationM* experimentation = new ExperimentationM(experimentationUid, experimentationName, experimentationsGroup->name(), QDateTime::currentDateTime(), nullptr);
 
             // Add to the group
             experimentationsGroup->experimentations()->append(experimentation);
@@ -259,38 +256,7 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
  */
 bool ExperimentationsListController::canCreateExperimentationsGroupWithName(QString experimentationsGroupName)
 {
-    if (!experimentationsGroupName.isEmpty())
-    {
-        if (_getExperimentationsGroupFromName(experimentationsGroupName) != nullptr) {
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-    else {
-        return false;
-    }
-}
-
-
-/**
- * @brief Open an experimentation of a group
- * @param experimentation
- */
-void ExperimentationsListController::openExperimentationOfGroup(ExperimentationM* experimentation, ExperimentationsGroupVM* experimentationsGroup)
-{
-    if ((experimentation != nullptr) && (experimentationsGroup != nullptr))
-    {
-        qInfo() << "Open the experimentation" << experimentation->name() << "of the group" << experimentationsGroup->name();
-
-        // Update the model manager
-        if (_modelManager != nullptr)
-        {
-            _modelManager->setcurrentExperimentation(experimentation);
-            _modelManager->setcurrentExperimentationsGroup(experimentationsGroup);
-        }
-    }
+    return !experimentationsGroupName.isEmpty() && !_hashFromNameToExperimentationsGroup.contains(experimentationsGroupName);
 }
 
 
@@ -321,10 +287,5 @@ void ExperimentationsListController::deleteExperimentationOfGroup(Experimentatio
  */
 ExperimentationsGroupVM* ExperimentationsListController::_getExperimentationsGroupFromName(QString experimentationsGroupName)
 {
-    if (_hashFromNameToExperimentationsGroup.contains(experimentationsGroupName)) {
-        return _hashFromNameToExperimentationsGroup.value(experimentationsGroupName);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromNameToExperimentationsGroup.value(experimentationsGroupName, nullptr);
 }

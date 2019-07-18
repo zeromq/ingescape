@@ -54,10 +54,9 @@ Item {
      */
     function resetCurrentExperimentation()
     {
-        if (IngeScapeAssessmentsC.modelManager)
+        if (IngeScapeAssessmentsC.experimentationC)
         {
-            IngeScapeAssessmentsC.modelManager.currentExperimentation = null;
-            IngeScapeAssessmentsC.modelManager.currentExperimentationsGroup = null;
+            IngeScapeAssessmentsC.experimentationC.currentExperimentation = null;
         }
     }
 
@@ -82,12 +81,10 @@ Item {
     //--------------------------------------------------------
 
     Connections {
-        target: IngeScapeAssessmentsC.modelManager
-        //target: IngeScapeAssessmentsC.experimentationC
+        target: IngeScapeAssessmentsC.experimentationC
 
         onCurrentExperimentationChanged: {
-
-            if (IngeScapeAssessmentsC.modelManager.currentExperimentation)
+            if (IngeScapeAssessmentsC.experimentationC.currentExperimentation)
             {
                 //console.log("QML: on Current Experimentation changed: " + IngeScapeAssessmentsC.modelManager.currentExperimentation.name);
 
@@ -200,8 +197,6 @@ Item {
             //id: experimentationView
 
             controller: IngeScapeAssessmentsC.experimentationC
-            modelManager: IngeScapeAssessmentsC.modelManager
-
 
             //
             // Slots

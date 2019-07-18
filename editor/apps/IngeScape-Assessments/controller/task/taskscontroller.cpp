@@ -14,18 +14,18 @@
 
 #include "taskscontroller.h"
 
+#include <controller/assessmentsmodelmanager.h>
+
 /**
  * @brief Constructor
  * @param modelManager
  * @param jsonHelper
  * @param parent
  */
-TasksController::TasksController(AssessmentsModelManager* modelManager, /*JsonHelper* jsonHelper, */QObject *parent)
+TasksController::TasksController(/*JsonHelper* jsonHelper, */QObject *parent)
     : QObject(parent)
     , _currentExperimentation(nullptr)
     , _selectedTask(nullptr)
-    , _modelManager(modelManager)
-    //, _jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -55,10 +55,6 @@ TasksController::~TasksController()
     {
         setcurrentExperimentation(nullptr);
     }
-
-    // Reset pointers
-    _modelManager = nullptr;
-    //_jsonHelper = nullptr;
 }
 
 
@@ -154,7 +150,7 @@ void TasksController::createNewTaskWithIngeScapePlatformFilePath(QString taskNam
  */
 void TasksController::deleteTask(TaskM* task)
 {
-    if ((task != nullptr) && (_currentExperimentation != nullptr))
+    if ((task != nullptr) && (_currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
         if (task == _selectedTask) {
             setselectedTask(nullptr);
@@ -169,7 +165,7 @@ void TasksController::deleteTask(TaskM* task)
         cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
@@ -190,7 +186,7 @@ void TasksController::deleteTask(TaskM* task)
         cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
 
         // Execute the query or bound statement
-        cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+        cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
         cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
@@ -239,7 +235,8 @@ void TasksController::duplicateTask(TaskM* task)
                                                                                                     , independentVariable->name()
                                                                                                     , independentVariable->description()
                                                                                                     , independentVariable->valueType()
-                                                                                                    , independentVariable->enumValues());
+                                                                                                    , independentVariable->enumValues()
+                                                                                                    );
 
                     if (newIndependentVariable != nullptr)
                     {
@@ -255,15 +252,20 @@ void TasksController::duplicateTask(TaskM* task)
                 if (dependentVariable != nullptr)
                 {
                     // Create the new dependent variable
-                    DependentVariableM* newDependentVariable = new DependentVariableM();
+                    DependentVariableM* newDependentVariable = _insertDependentVariableIntoDB(newTask->getExperimentationCassUuid()
+                                                                                              , newTask->getCassUuid()
+                                                                                              , dependentVariable->name()
+                                                                                              , dependentVariable->description()
+                                                                                              , dependentVariable->agentName()
+                                                                                              , dependentVariable->outputName()
+                                                                                              );
 
-                    newDependentVariable->setname(dependentVariable->name());
-                    newDependentVariable->setdescription(dependentVariable->description());
-                    newDependentVariable->setagentName(dependentVariable->agentName());
-                    newDependentVariable->setoutputName(dependentVariable->outputName());
+                    if (newDependentVariable != nullptr)
+                    {
+                        // Add the dependent variable to the new task
+                        newTask->addDependentVariable(newDependentVariable);
+                    }
 
-                    // Add the dependent variable to the new task
-                    newTask->addDependentVariable(newDependentVariable);
                 }
             }
         }
@@ -446,7 +448,7 @@ void TasksController::saveModificationsOfIndependentVariableEnum(IndependentVari
  */
 void TasksController::deleteIndependentVariable(IndependentVariableM* independentVariable)
 {
-    if ((independentVariable != nullptr) && (_selectedTask != nullptr))
+    if ((independentVariable != nullptr) && (_selectedTask != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
         // Remove independent variable from DB
         const char* query = "DELETE FROM ingescape.independent_var WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
@@ -456,7 +458,7 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
         cass_statement_bind_uuid(cassStatement, 2, independentVariable->getCassUuid());
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
@@ -484,19 +486,20 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
  */
 void TasksController::createNewDependentVariable()
 {
-    if (_selectedTask != nullptr)
+    if ((_selectedTask != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
         qDebug() << "Create a new dependent variable";
 
-        DependentVariableM* dependentVariable = new DependentVariableM();
+        CassUuid dependentVarUuid;
+        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &dependentVarUuid);
 
-        dependentVariable->setname("Dep. Var.");
-        //dependentVariable->setdescription("");
-        //dependentVariable->setagentName("");
-        //dependentVariable->setoutputName("");
+        DependentVariableM* dependentVariable = _insertDependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid(), "Dep. Var.", "", "", "");
 
-        // Add the dependent variable to the selected task
-        _selectedTask->addDependentVariable(dependentVariable);
+        if (dependentVariable != nullptr)
+        {
+            // Add the dependent variable to the selected task
+            _selectedTask->addDependentVariable(dependentVariable);
+        }
     }
 }
 
@@ -528,10 +531,10 @@ TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskN
 {
     TaskM* task = nullptr;
 
-    if (!taskName.isEmpty() && platformFileUrl.isValid() && (_currentExperimentation != nullptr))
+    if (!taskName.isEmpty() && platformFileUrl.isValid() && (_currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
         CassUuid taskUuid;
-        cass_uuid_gen_time(_modelManager->getCassUuidGen(), &taskUuid);
+        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &taskUuid);
 
         const char* query = "INSERT INTO ingescape.task (id_experimentation, id, name, platform_file) VALUES (?, ?, ?, ?);";
         CassStatement* cassStatement = cass_statement_new(query, 4);
@@ -541,7 +544,7 @@ TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskN
         cass_statement_bind_string(cassStatement, 3, platformFileUrl.toString().toStdString().c_str());
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
@@ -583,14 +586,14 @@ TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskN
  * @param enumValues
  * @return
  */
-IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, QString variableName, QString variableDescription, IndependentVariableValueTypes::Value valueType, QStringList enumValues)
+IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& variableName, const QString& variableDescription, IndependentVariableValueTypes::Value valueType, const QStringList& enumValues)
 {
     IndependentVariableM* independentVariable = nullptr;
 
-    if (!variableName.isEmpty())
+    if (!variableName.isEmpty() && (AssessmentsModelManager::Instance() != nullptr))
     {
         CassUuid independentVarUuid;
-        cass_uuid_gen_time(_modelManager->getCassUuidGen(), &independentVarUuid);
+        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &independentVarUuid);
 
         const char* query = "INSERT INTO ingescape.independent_var (id_experimentation, id_task, id, name, description, value_type, enum_values) VALUES (?, ?, ?, ?, ?, ?, ?);";
         CassStatement* cassStatement = cass_statement_new(query, 7);
@@ -603,7 +606,7 @@ IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid
         cass_statement_bind_string(cassStatement, 6, enumValues.join(";").toStdString().c_str());
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(_modelManager->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
@@ -622,4 +625,42 @@ IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid
     }
 
     return independentVariable;
+}
+
+DependentVariableM* TasksController::_insertDependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, const QString& agentName, const QString& outputName)
+{
+    DependentVariableM* dependentVariable = nullptr;
+
+    CassUuid dependentVarUuid;
+    cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &dependentVarUuid);
+
+    const char* query = "INSERT INTO ingescape.dependent_var (id_experimentation, id_task, id, name, description, agent_name, output_name) VALUES (?, ?, ?, ?, ?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(query, 7);
+    cass_statement_bind_uuid  (cassStatement, 0, experimentationUuid);
+    cass_statement_bind_uuid  (cassStatement, 1, taskUuid);
+    cass_statement_bind_uuid  (cassStatement, 2, dependentVarUuid);
+    cass_statement_bind_string(cassStatement, 3, name.toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 4, description.toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 5, agentName.toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 6, outputName.toStdString().c_str());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qInfo() << "New dependent variable inserted into the DB";
+
+        // Create the new task
+        dependentVariable = new DependentVariableM(experimentationUuid, taskUuid, dependentVarUuid, name, description, agentName, outputName);
+
+    }
+    else {
+        qCritical() << "Could not insert the new dependent variable into the DB:" << cass_error_desc(cassError);
+    }
+
+    cass_statement_free(cassStatement);
+    cass_future_free(cassFuture);
+
+    return dependentVariable;
 }

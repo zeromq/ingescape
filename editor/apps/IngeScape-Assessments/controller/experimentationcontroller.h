@@ -17,7 +17,6 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <controller/assessmentsmodelmanager.h>
 #include <model/jsonhelper.h>
 #include <controller/record/recordcontroller.h>
 #include <model/experimentationm.h>
@@ -34,7 +33,7 @@ class ExperimentationController : public QObject
     I2_QML_PROPERTY_READONLY(RecordController*, recordC)
 
     // Model of the current experimentation
-    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
+    I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
 
 
 public:
@@ -45,8 +44,7 @@ public:
      * @param jsonHelper
      * @param parent
      */
-    explicit ExperimentationController(AssessmentsModelManager* modelManager,
-                                       JsonHelper* jsonHelper,
+    explicit ExperimentationController(JsonHelper* jsonHelper,
                                        QObject *parent = nullptr);
 
 
@@ -79,12 +77,6 @@ public:
     Q_INVOKABLE void deleteRecordSetup(RecordSetupM* recordSetup);
 
 
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
-
 private Q_SLOTS:
 
     /**
@@ -93,12 +85,22 @@ private Q_SLOTS:
      */
     void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
 
+protected: // Methods
+    /**
+     * @brief Retrieve all independent variables from the Cassandra DB for the given task.
+     * The task will be updated by this method.
+     * @param task
+     */
+    void _retrieveIndependentVariableForTask(TaskM* task);
 
-private:
+    /**
+     * @brief Retrieve all dependent variables from the Cassandra DB for the given task.
+     * The task will be updated by this method.
+     * @param task
+     */
+    void _retrieveDependentVariableForTask(TaskM* task);
 
-    // Manager for the data model of our IngeScape Assessments application
-    AssessmentsModelManager* _modelManager;
-
+protected: // Attributes
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 

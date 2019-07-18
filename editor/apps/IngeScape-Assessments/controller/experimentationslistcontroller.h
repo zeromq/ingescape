@@ -18,7 +18,6 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
-#include <controller/assessmentsmodelmanager.h>
 #include <viewModel/experimentationsgroupvm.h>
 
 
@@ -52,8 +51,7 @@ public:
      * @param modelManager
      * @param parent
      */
-    explicit ExperimentationsListController(AssessmentsModelManager* modelManager,
-                                            QObject *parent = nullptr);
+    explicit ExperimentationsListController(QObject *parent = nullptr);
 
 
     /**
@@ -88,22 +86,11 @@ public:
 
 
     /**
-     * @brief Open an experimentation of a group
-     * @param experimentation
-     * @param experimentationsGroup
-     */
-    Q_INVOKABLE void openExperimentationOfGroup(ExperimentationM* experimentation, ExperimentationsGroupVM* experimentationsGroup);
-
-
-    /**
      * @brief Delete an experimentation of a group
      * @param experimentation
      * @param experimentationsGroup
      */
     Q_INVOKABLE void deleteExperimentationOfGroup(ExperimentationM* experimentation, ExperimentationsGroupVM* experimentationsGroup);
-
-
-Q_SIGNALS:
 
 
 public Q_SLOTS:
@@ -120,9 +107,6 @@ private:
 
 
 private:
-
-    // Manager for the data model of our IngeScape Assessments application
-    AssessmentsModelManager* _modelManager;
 
     // Hash table from a name to the group of experimentations
     QHash<QString, ExperimentationsGroupVM*> _hashFromNameToExperimentationsGroup;

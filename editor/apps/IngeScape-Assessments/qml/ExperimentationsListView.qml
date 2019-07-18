@@ -257,12 +257,12 @@ Item {
                                 height: parent.height
 
                                 onClicked: {
-                                    if (rootExperimentation.experimentation && rootItem.controller)
+                                    if (rootExperimentation.experimentation && IngeScapeAssessmentsC.experimentationC)
                                     {
                                         console.log("QML: Open " + rootExperimentation.experimentation.name);
 
                                         // Open the experimentation of the group
-                                        rootItem.controller.openExperimentationOfGroup(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup);
+                                        IngeScapeAssessmentsC.experimentationC.currentExperimentation = rootExperimentation.experimentation;
                                     }
                                 }
                             }

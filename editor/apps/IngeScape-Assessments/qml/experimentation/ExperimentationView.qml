@@ -42,8 +42,6 @@ Item {
 
     property ExperimentationController controller: null;
 
-    property AssessmentsModelManager modelManager: null;
-
     property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
 
 
@@ -130,7 +128,7 @@ Item {
                 horizontalCenter: parent.horizontalCenter
             }
 
-            text: (rootItem.modelManager && rootItem.modelManager.currentExperimentationsGroup) ? rootItem.modelManager.currentExperimentationsGroup.name : ""
+            text: rootItem.experimentation ? rootItem.experimentation.groupName : ""
 
             color: IngeScapeTheme.whiteColor
             font {

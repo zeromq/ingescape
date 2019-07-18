@@ -185,68 +185,65 @@ void switchToBundlePath(char **path){
 //parse license file content
 //NB: because several license files can be parsed, this function
 //takes the least restricting values found in the files
-//NB: license informations are not cumulated : first file found gives customer, owner, etc.
-void license_parseLine(const char *command, const char *data){
-    //FIXME: id, customer, order and editorOwner should concatenate all values found
-    //in the various licenses (and not overwrite as it is done now).
+void license_parseLine(const char *command, const char *data, license_t *myLicense){
     if (strcmp(command, "id") == 0 && data != NULL){
-        if (license->id == NULL){
-            license->id = strdup(data);
+        if (myLicense->id == NULL){
+            myLicense->id = strdup(data);
         }else{
-            license->id = realloc(license->id, strlen(license->id) + strlen(data) + 3);
-            sprintf(license->id, "%s, %s", license->id, data);
+            myLicense->id = realloc(myLicense->id, strlen(myLicense->id) + strlen(data) + 3);
+            sprintf(myLicense->id, "%s, %s", myLicense->id, data);
         }
     }else if (strcmp(command, "customer") == 0  && data != NULL){
-        if (license->customer == NULL){
-            license->customer = strdup(data);
+        if (myLicense->customer == NULL){
+            myLicense->customer = strdup(data);
         }else{
-            license->customer = realloc(license->customer, strlen(license->customer) + strlen(data) + 3);
-            sprintf(license->customer, "%s, %s", license->customer, data);
+            myLicense->customer = realloc(myLicense->customer, strlen(myLicense->customer) + strlen(data) + 3);
+            sprintf(myLicense->customer, "%s, %s", myLicense->customer, data);
         }
     }else if (strcmp(command, "order") == 0  && data != NULL){
-        if (license->order == NULL){
-            license->order = strdup(data);
+        if (myLicense->order == NULL){
+            myLicense->order = strdup(data);
         }else{
-            license->order = realloc(license->order, strlen(license->order) + strlen(data) + 3);
-            sprintf(license->order, "%s, %s", license->order, data);
+            myLicense->order = realloc(myLicense->order, strlen(myLicense->order) + strlen(data) + 3);
+            sprintf(myLicense->order, "%s, %s", myLicense->order, data);
         }
     }else if (strcmp(command, "expiration") == 0){
         long licenseExpirationDate = atol(data);
-        if (license->licenseExpirationDate < licenseExpirationDate){
-            license->licenseExpirationDate = licenseExpirationDate;
+        if (myLicense->licenseExpirationDate < licenseExpirationDate){
+            myLicense->licenseExpirationDate = licenseExpirationDate;
         }
         long t = (long)time(NULL);
-        if (license->licenseExpirationDate < t){
-            license->isLicenseExpired = true;
+        if (myLicense->licenseExpirationDate < t){
+            myLicense->isLicenseExpired = true;
         }
     }else if (strcmp(command, "platform") == 0){
         int platformNbAgents = 0;
         int platformNbIOPs = 0;
         sscanf(data, "%d %d", &platformNbAgents, &platformNbIOPs);
-        if (license->platformNbAgents < platformNbAgents){
-            license->platformNbAgents = platformNbAgents;
+        if (myLicense->platformNbAgents < platformNbAgents){
+            myLicense->platformNbAgents = platformNbAgents;
         }
-        if (license->platformNbIOPs < platformNbIOPs){
-            license->platformNbIOPs = platformNbIOPs;
+        if (myLicense->platformNbIOPs < platformNbIOPs){
+            myLicense->platformNbIOPs = platformNbIOPs;
         }
     }else if (strcmp(command, "editorOwner") == 0  && data != NULL){
-        if (license->editorOwner == NULL){
-            license->editorOwner = strdup(data);
+        if (myLicense->editorOwner == NULL){
+            myLicense->editorOwner = strdup(data);
         }else{
-            license->editorOwner = realloc(license->editorOwner, strlen(license->editorOwner) + strlen(data) + 3);
-            sprintf(license->editorOwner, "%s, %s", license->editorOwner, data);
+            myLicense->editorOwner = realloc(myLicense->editorOwner, strlen(myLicense->editorOwner) + strlen(data) + 3);
+            sprintf(myLicense->editorOwner, "%s, %s", myLicense->editorOwner, data);
         }
     }else if (strcmp(command, "editorExpiration") == 0){
         long editorExpirationDate = atol(data);
-        if (license->editorExpirationDate < editorExpirationDate){
-            license->editorExpirationDate = editorExpirationDate;
+        if (myLicense->editorExpirationDate < editorExpirationDate){
+            myLicense->editorExpirationDate = editorExpirationDate;
         }
         time_t t = time(NULL);
-        if (license->editorExpirationDate < t){
-            license->isEditorLicenseExpired = true;
+        if (myLicense->editorExpirationDate < t){
+            myLicense->isEditorLicenseExpired = true;
         }
     }else if (strcmp(command, "feature") == 0){
-        zlist_append(license->features, strdup(data));
+        zlist_append(myLicense->features, strdup(data));
     }else if (strcmp(command, "agent") == 0){
         licenseForAgent_t *l = calloc(1, sizeof(licenseForAgent_t));
         char agentId[256] = "";
@@ -254,7 +251,7 @@ void license_parseLine(const char *command, const char *data){
         sscanf(data, "%255s %255s", agentId, agentName);
         l->agentId = strdup(agentId);
         l->agentName = strdup(agentName);
-        zlist_append(license->agents, l);
+        zlist_append(myLicense->agents, l);
     }
 }
 
@@ -294,6 +291,47 @@ void license_cleanLicense(void){
                 l = zlist_next(license->agents);
             }
             zlist_destroy(&license->agents);
+        }
+        if (license->licenceDetails != NULL){
+            license_t *detail = zlist_first(license->licenceDetails);
+            while (detail != NULL){
+                if (detail->id != NULL){
+                    free(detail->id);
+                }
+                if (detail->fileName != NULL){
+                    free(detail->fileName);
+                }
+                if (detail->customer != NULL){
+                    free(detail->customer);
+                }
+                if (detail->order != NULL){
+                    free(detail->order);
+                }
+                if (detail->editorOwner != NULL){
+                    free(detail->editorOwner);
+                }
+                if (detail->features != NULL){
+                    char *feat = zlist_first(detail->features);
+                    while (feat != NULL){
+                        free(feat);
+                        feat = zlist_next(detail->features);
+                    }
+                    zlist_destroy(&detail->features);
+                }
+                if (detail->agents != NULL){
+                    licenseForAgent_t *l = zlist_first(detail->agents);
+                    while (l != NULL){
+                        if (l->agentId != NULL)
+                            free(l->agentId);
+                        if (l->agentName)
+                            free(l->agentName);
+                        l = zlist_next(detail->agents);
+                    }
+                    zlist_destroy(&detail->agents);
+                }
+                detail = zlist_next(license->licenceDetails);
+            }
+            zlist_destroy(&license->licenceDetails);
         }
         license = NULL;
     }
@@ -387,8 +425,15 @@ void license_readLicense(void){
                 license = calloc(1, sizeof(license_t));
                 license->features = zlist_new();
                 license->agents = zlist_new();
+                license->licenceDetails = zlist_new();
             }
+            license_t *detail = calloc(1, sizeof(license_t));
+            zlist_append(license->licenceDetails, detail);
+            detail->features = zlist_new();
+            detail->agents = zlist_new();
+            
             const char *name = zfile_filename(file, NULL);
+            detail->fileName = strdup(name);
             igs_debug("parsing license file %s", name);
             //decrypt file
             char *licenseText = NULL;
@@ -404,11 +449,15 @@ void license_readLicense(void){
                     char type[256] = "";
                     char data[256] = "";
                     if (sscanf(curLine, ":%s %[\001-\377]", type, data) == 2){
-                        license_parseLine(type, data);
+                        //parse into main license to define least restricting conditions
+                        license_parseLine(type, data, license);
+                        //parse into detail to keep trace of each file detail
+                        license_parseLine(type, data, detail);
                     }
                 }
-                if (nextLine) *nextLine = '\n';  // then restore newline-char, just to be tidy
-                curLine = nextLine ? (nextLine+1) : NULL;
+                if (nextLine)
+                    *nextLine = '\n';  // then restore newline-char, just to be tidy
+                curLine = nextLine ? (nextLine + 1) : NULL;
             }
             zfile_destroy(&file);
             file = zlist_next(filesList);
@@ -420,6 +469,7 @@ void license_readLicense(void){
         license = calloc(1, sizeof(license_t));
         license->features = zlist_new();
         license->agents = zlist_new();
+        license->licenceDetails = NULL;
     }
     //set license parameters to default for uninitialized values
     if (license->id == NULL)

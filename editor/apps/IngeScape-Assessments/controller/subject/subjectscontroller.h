@@ -18,7 +18,6 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
-#include <controller/assessmentsmodelmanager.h>
 #include <model/assessmentsenums.h>
 #include <model/experimentationm.h>
 
@@ -44,8 +43,7 @@ public:
      * @param modelManager
      * @param parent
      */
-    explicit SubjectsController(AssessmentsModelManager* modelManager,
-                                QObject *parent = nullptr);
+    explicit SubjectsController(QObject *parent = nullptr);
 
 
     /**
@@ -115,9 +113,6 @@ private Q_SLOTS:
 
 
 private:
-
-    // Manager for the data model of our IngeScape Assessments application
-    AssessmentsModelManager* _modelManager;
 
 };
 

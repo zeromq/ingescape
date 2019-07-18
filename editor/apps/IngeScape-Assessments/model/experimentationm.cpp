@@ -23,10 +23,12 @@
  */
 ExperimentationM::ExperimentationM(CassUuid cassUuid,
                                    QString name,
+                                   QString groupeName,
                                    QDateTime creationDate,
                                    QObject *parent) : QObject(parent),
     _uid(""),
     _name(name),
+    _groupName(groupeName),
     _creationDate(creationDate),
     _cassUuid(cassUuid)
 {
@@ -265,12 +267,7 @@ void ExperimentationM::removeRecordSetup(RecordSetupM* recordSetup)
  */
 CharacteristicM* ExperimentationM::getCharacteristicFromUID(QString uid)
 {
-    if (_hashFromUIDtoCharacteristic.contains(uid)) {
-        return _hashFromUIDtoCharacteristic.value(uid);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromUIDtoCharacteristic.value(uid, nullptr);
 }
 
 ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const CassRow* row)
@@ -289,6 +286,11 @@ ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const 
         cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrExperimentationName, &nameLength);
         QString experimentationName = QString::fromUtf8(chrExperimentationName, static_cast<int>(nameLength));
 
+        const char *chrGroupName = "";
+        size_t groupNameLength;
+        cass_value_get_string(cass_row_get_column_by_name(row, "group_name"), &chrGroupName, &groupNameLength);
+        QString groupName = QString::fromUtf8(chrGroupName, static_cast<int>(groupNameLength));
+
         cass_uint32_t creationDate;
         cass_value_get_uint32(cass_row_get_column_by_name(row, "creation_date"), &creationDate);
 
@@ -299,7 +301,7 @@ ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const 
         QDateTime creationDateTime;
         creationDateTime.setSecsSinceEpoch(secCreationDateTime);
 
-        experimentation = new ExperimentationM(experimentationUid, experimentationName, creationDateTime, nullptr);
+        experimentation = new ExperimentationM(experimentationUid, experimentationName, groupName, creationDateTime, nullptr);
     }
 
     return experimentation;
