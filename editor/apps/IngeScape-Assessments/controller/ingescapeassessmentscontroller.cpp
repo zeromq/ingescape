@@ -36,6 +36,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _experimentationC(nullptr),
     _subjectsC(nullptr),
     _tasksC(nullptr),
+    _exportC(nullptr),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr)
   //_platformDirectoryPath("")
@@ -117,6 +118,9 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
     // Create the controller to manage the tasks of the current experimentation
     _tasksC = new TasksController(this);
+
+    // Create the controller to export data from the database
+    _exportC = new ExportController(this);
 
 
     // Connect to signals from the experimentation controller to the rest of the controllers
@@ -229,6 +233,16 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
         temp = nullptr;
     }
 
+    if (_exportC != nullptr)
+    {
+        disconnect(_exportC);
+
+        ExportController* temp = _exportC;
+        setexportC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
+
     AssessmentsModelManager::destroyInstance();
 
     if (_networkC != nullptr)
@@ -303,6 +317,10 @@ void IngeScapeAssessmentsController::_onCurrentExperimentationChanged(Experiment
 
         if (_tasksC != nullptr) {
             _tasksC->setcurrentExperimentation(currentExperimentation);
+        }
+
+        if (_exportC != nullptr) {
+            _exportC->setcurrentExperimentation(currentExperimentation);
         }
 
     }

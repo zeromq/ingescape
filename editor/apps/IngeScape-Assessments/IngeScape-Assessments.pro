@@ -38,6 +38,7 @@ RCC_DIR = tmp
 
 
 SOURCES += main.cpp \
+    controller/export/exportcontroller.cpp \
     controller/ingescapeassessmentscontroller.cpp \
     controller/networkcontroller.cpp \
     model/assessmentsenums.cpp \
@@ -60,6 +61,7 @@ SOURCES += main.cpp \
 
 
 HEADERS += \
+    controller/export/exportcontroller.h \
     controller/ingescapeassessmentscontroller.h \
     model/assessmentsenums.h \
     model/recordsetupm.h \

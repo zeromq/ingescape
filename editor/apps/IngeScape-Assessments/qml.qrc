@@ -26,5 +26,6 @@
         <file>qml/record/IndependentVariableValueEditor.qml</file>
         <file>qml/task/IndependentVariableTableCell.qml</file>
         <file>resources/SVG/ingescape-assessments.svg</file>
+        <file>qml/export/ExportView.qml</file>
     </qresource>
 </RCC>
