@@ -14,9 +14,11 @@
 
 #include "exportcontroller.h"
 
-/*extern "C" {
-#include <cqlexporter.h>
-}*/
+#include "cassandra.h"
+
+extern "C" {
+    #include <../../dependencies/cqlExporter/cqlexporter.h>
+}
 
 
 /**
@@ -54,8 +56,29 @@ void ExportController::exportExperimentation()
 {
     if (_currentExperimentation != nullptr)
     {
-        qDebug() << "Export the experimentation" << _currentExperimentation->name();
+        CassUuid experimentationUid = _currentExperimentation->getCassUuid();
+        char chrExperimentationUid[CASS_UUID_STRING_LENGTH];
+        cass_uuid_string(experimentationUid, chrExperimentationUid);
 
-        //_currentExperimentation->getCassUuid();
+        qInfo() << "Export the experimentation" << _currentExperimentation->name() << "(" << chrExperimentationUid << ")";
+
+        QString ipAddress = "127.0.0.1";
+        QString exportFileName = QString("export_%1.csv").arg(_currentExperimentation->name());
+
+        // Connect to the BDD
+        connectToBDD((char*)ipAddress.toStdString().c_str());
+
+        // Open the file to save the export
+        openFile((char*)exportFileName.toStdString().c_str());
+
+        // Export a full dump of the current experimentation
+        exportAllRecordsFromIdExpAndTableRecordSetup(experimentationUid);
+
+        // Disconnect from the BDD
+        disconnectToBDD();
+
+        // Close the opening file
+        closeFileOpened();
+
     }
 }
