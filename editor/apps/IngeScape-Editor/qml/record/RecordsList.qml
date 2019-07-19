@@ -119,11 +119,13 @@ Item {
                 labelMargin: 0;
             }
 
-            onCheckedChanged: {
+            onClicked: {
                 if (controller) {
-                    // FIXME TEST
-                    //controller.startOrStopToRecord(false);
-                    controller.startOrStopToRecord(true);
+                    console.log("QML: Start or Stop to Record");
+
+                    // FIXME TEST: parameter "withTimeLine" of "startOrStopToRecord"
+                    controller.startOrStopToRecord(false);
+                    //controller.startOrStopToRecord(true);
                 }
             }
 

@@ -232,29 +232,6 @@ Item {
                         }
                     }
 
-                    /*Button {
-                        id: btnPlayOrPauseTL
-
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                        }
-
-                        visible: true
-                        enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON && IngeScapeExpeC.modelManager.currentLoadedPlatform
-                        checkable: true
-                        checked: false
-
-                        text: checked ? qsTr("PAUSE") : qsTr("PLAY")
-
-                        onClicked: {
-                            //console.log("QML: Play or Pause the timeline");
-
-                            // Play or Pause the TimeLine
-                            IngeScapeExpeC.playOrPauseTimeLine(checked);
-                        }
-                    }*/
-
                     Button {
                         id: btnPlayOrPauseTL
 
@@ -351,29 +328,6 @@ Item {
                             pixelSize: 16
                         }
                     }
-
-                    /*Button {
-                        id: btnStartOrStopRecord
-
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                        }
-
-                        visible: true
-                        enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON && IngeScapeExpeC.modelManager.currentLoadedPlatform
-                        checkable: true
-                        checked: false
-
-                        text: checked ? qsTr("STOP RECORD") : qsTr("RECORD")
-
-                        onClicked: {
-                            console.log("QML: Start or Stop Recording");
-
-                            // Start or Stop Recording
-                            IngeScapeExpeC.startOrStopRecording(checked);
-                        }
-                    }*/
 
                     Button {
                         id: btnStartOrStopRecord

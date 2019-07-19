@@ -34,6 +34,7 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     _modelManager(nullptr),
     _networkC(nullptr),
     _isPlayingTimeLine(false),
+    _isRecording(false),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
     _platformDirectoryPath("")
@@ -356,15 +357,15 @@ void IngeScapeExpeController::_onTimeLineStateUpdated(QString state)
 {
     qDebug() << state << "the timeline";
 
-    // PLAY
+    // PLAY (the TimeLine)
     if (state == PLAY) {
         setisPlayingTimeLine(true);
     }
-    // PAUSE
+    // PAUSE (the TimeLine)
     else if (state == PAUSE) {
         setisPlayingTimeLine(false);
     }
-    // RESET
+    // RESET (the TimeLine)
     else if (state == RESET) {
         setisPlayingTimeLine(false);
     }

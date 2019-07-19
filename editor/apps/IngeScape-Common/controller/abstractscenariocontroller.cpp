@@ -464,15 +464,15 @@ void AbstractScenarioController::updateTimeLineState(QString state)
 {
     qDebug() << state << "the timeline";
 
-    // PLAY
+    // PLAY (the TimeLine)
     if (state == PLAY) {
         playOrResumeTimeLine();
     }
-    // PAUSE
+    // PAUSE (the TimeLine)
     else if (state == PAUSE) {
         pauseTimeLine();
     }
-    // RESET
+    // RESET (the TimeLine)
     else if (state == RESET) {
         stopTimeLine();
     }

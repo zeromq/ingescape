@@ -104,10 +104,12 @@ private:
                                      QString rootDirectoryPath,
                                      QObject *parent = nullptr);
 
+
     /**
      * @brief Destructor
      */
     ~AssessmentsModelManager() Q_DECL_OVERRIDE;
+
 
 private:
     /**
