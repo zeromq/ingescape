@@ -15,7 +15,7 @@ void connectToBDD(char* bddName);
 void disconnectToBDD(void);
 
 ////File management
-void openFile(char* fileName);
+void openFile(char* fileFullPath);
 void writeIntoFile(char * content, int saveIntoCurrentLine);
 void closeFileOpened(void);
 
