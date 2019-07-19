@@ -69,7 +69,7 @@ win32:{
     HEADERS += $$PWD/../dependencies/windows/unix/unixfunctions.h
 
     #Add librairies
-    LIBS += -L$$(ProgramFiles)/ingescape/lib/ -lzyre -lczmq -lsodium
+    LIBS += -L$$(ProgramFiles)/ingescape/lib/ -lzyre -lczmq -llibsodium
 
     #To get the Ip address into the network.c
     LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
@@ -134,6 +134,6 @@ unix:!mac {
         libs_path = $$PWD/../dependencies/android/libs-armeabi-v7a
 
         #LIBS += $$quote(-L$$libs_path/) -lzmq -lczmq -lzyre -lsodium
-        LIBS += $$quote(-L$$libs_path/) -lczmq -lzyre -lsodium \
+        LIBS += $$quote(-L$$libs_path/) -lczmq -lzyre -llibsodium \
     }
 }
