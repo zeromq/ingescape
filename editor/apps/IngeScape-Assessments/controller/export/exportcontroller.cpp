@@ -14,7 +14,6 @@
 
 #include "exportcontroller.h"
 
-#include "cassandra.h"
 
 extern "C" {
     #include <../../dependencies/cqlExporter/cqlexporter.h>
