@@ -59,6 +59,8 @@ void connectToBDD(char* bddHost)
     }
 }
 
+void setCassSession(CassSession * cassSession){session = cassSession;}
+
 void disconnectToBDD(void)
 {
     cass_future_free(connect_future);
@@ -1137,10 +1139,10 @@ void exportAllRecordsFromIdExpAndTableRecordSetup(CassUuid idExp){
  * File management : create, close, write
  */
 
-void openFile(char* fileName){
-    fp = fopen(fileName, "w+");
+void openFile(char* fileFullPath){
+    fp = fopen(fileFullPath, "w+");
     if ( fp == NULL ) {
-            fprintf( stderr, "Cannot open file %s\n", fileName);
+            fprintf( stderr, "Cannot open file %s\n", fileFullPath);
             exit( 0 );
         }
 }

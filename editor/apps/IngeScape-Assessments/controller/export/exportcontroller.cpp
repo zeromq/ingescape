@@ -13,8 +13,7 @@
  */
 
 #include "exportcontroller.h"
-
-//#include "cassandra.h"
+#include <controller/assessmentsmodelmanager.h>
 
 extern "C" {
     #include "cqlexporter.h"
@@ -66,16 +65,20 @@ void ExportController::exportExperimentation()
         QString exportFileName = QString("export_%1.csv").arg(_currentExperimentation->name());
 
         // Connect to the BDD
-        connectToBDD((char*)ipAddress.toStdString().c_str());
+//        connectToBDD((char*)ipAddress.toStdString().c_str());
 
         // Open the file to save the export
         openFile((char*)exportFileName.toStdString().c_str());
+
+        //Set the cassandra session for the exporting layer
+        setCassSession(AssessmentsModelManager::Instance()->getCassSession());
+
 
         // Export a full dump of the current experimentation
         exportAllRecordsFromIdExpAndTableRecordSetup(experimentationUid);
 
         // Disconnect from the BDD
-        disconnectToBDD();
+//        disconnectToBDD();
 
         // Close the opening file
         closeFileOpened();
