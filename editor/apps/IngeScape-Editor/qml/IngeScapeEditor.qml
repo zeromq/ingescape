@@ -331,7 +331,7 @@ Item {
             left: leftPanel.right
             right: parent.right
         }
-        height: 200
+        height: 250
 
         source: IngeScapeEditorC.isAvailableModelVisualizer ? "ModelVisualizer.qml" : ""
     }
