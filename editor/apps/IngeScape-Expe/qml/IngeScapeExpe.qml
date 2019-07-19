@@ -232,7 +232,7 @@ Item {
                         }
                     }
 
-                    Button {
+                    /*Button {
                         id: btnPlayOrPauseTL
 
                         anchors {
@@ -253,6 +253,49 @@ Item {
                             // Play or Pause the TimeLine
                             IngeScapeExpeC.playOrPauseTimeLine(checked);
                         }
+                    }*/
+
+                    Button {
+                        id: btnPlayOrPauseTL
+
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+
+                        visible: true
+                        activeFocusOnPress: true
+                        enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON && IngeScapeExpeC.modelManager.currentLoadedPlatform
+                        checkable: true
+                        checked: false
+
+                        style: I2SvgToggleButtonStyle {
+                            fileCache: IngeScapeExpeTheme.svgFileIngeScapeExpe
+
+                            toggleCheckedReleasedID: "timeline-pause"
+                            toggleCheckedPressedID: toggleCheckedReleasedID + "-pressed"
+                            toggleUncheckedReleasedID: "timeline-play"
+                            toggleUncheckedPressedID: toggleUncheckedReleasedID + "-pressed"
+
+                            // No disabled states
+                            toggleCheckedDisabledID: toggleCheckedPressedID
+                            toggleUncheckedDisabledID: toggleUncheckedPressedID
+
+                            labelMargin: 0;
+                        }
+
+                        onClicked: {
+                            //console.log("QML: Play or Pause the timeline");
+
+                            // Play or Pause the TimeLine
+                            IngeScapeExpeC.playOrPauseTimeLine(checked);
+                        }
+
+                        Binding {
+                            target: btnPlayOrPauseTL
+                            property: "checked"
+                            value: IngeScapeExpeC.isPlayingTimeLine
+                        }
                     }
 
                     Button {
@@ -265,8 +308,17 @@ Item {
 
                         visible: true
                         enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.currentLoadedPlatform
+                        opacity: enabled ? 1.0 : 0.3
 
-                        text: qsTr("STOP")
+                        //text: qsTr("STOP")
+
+                        style: LabellessSvgButtonStyle {
+                            fileCache: IngeScapeExpeTheme.svgFileIngeScapeExpe
+
+                            releasedID: "record-stop"
+                            pressedID: releasedID + "-pressed"
+                            disabledID: pressedID
+                        }
 
                         onClicked: {
                             //console.log("QML: Stop the timeline");
@@ -300,7 +352,7 @@ Item {
                         }
                     }
 
-                    Button {
+                    /*Button {
                         id: btnStartOrStopRecord
 
                         anchors {
@@ -320,6 +372,51 @@ Item {
 
                             // Start or Stop Recording
                             IngeScapeExpeC.startOrStopRecording(checked);
+                        }
+                    }*/
+
+                    Button {
+                        id: btnStartOrStopRecord
+
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+
+                        visible: true
+                        activeFocusOnPress: true
+                        opacity: enabled ? 1.0 : 0.3
+                        enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON && IngeScapeExpeC.modelManager.currentLoadedPlatform
+                        checkable: true
+                        checked: false
+
+                        style: I2SvgToggleButtonStyle {
+                            fileCache: IngeScapeExpeTheme.svgFileIngeScapeExpe
+
+                            toggleCheckedReleasedID: "record-stop";
+                            toggleCheckedPressedID: toggleCheckedReleasedID + "-pressed";
+                            toggleUncheckedReleasedID: "record-start";
+                            toggleUncheckedPressedID: toggleUncheckedReleasedID + "-pressed";
+
+                            // No disabled states
+                            toggleCheckedDisabledID: "record-start-pressed"
+                            toggleUncheckedDisabledID: toggleCheckedDisabledID
+
+                            labelMargin: 0;
+                        }
+
+                        onCheckedChanged: {
+
+                            console.log("QML: Start or Stop Recording");
+
+                            // Start or Stop Recording
+                            IngeScapeExpeC.startOrStopRecording(checked);
+                        }
+
+                        Binding {
+                            target: btnStartOrStopRecord
+                            property: "checked"
+                            value: IngeScapeExpeC.isRecording
                         }
                     }
                 }

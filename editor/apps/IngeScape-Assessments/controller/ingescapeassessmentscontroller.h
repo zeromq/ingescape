@@ -23,11 +23,11 @@
 #include <I2PropertyHelpers.h>
 
 #include <controller/networkcontroller.h>
-#include <controller/assessmentsmodelmanager.h>
 #include <controller/experimentationslistcontroller.h>
 #include <controller/experimentationcontroller.h>
 #include <controller/subject/subjectscontroller.h>
 #include <controller/task/taskscontroller.h>
+#include <controller/export/exportcontroller.h>
 
 #include <misc/terminationsignalwatcher.h>
 
@@ -54,9 +54,6 @@ class IngeScapeAssessmentsController : public QObject
     // Snapshot Directory
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 
-    // Manager for the data model of our IngeScape Assessments application
-    I2_QML_PROPERTY_READONLY(AssessmentsModelManager*, modelManager)
-
     // Controller for network communication
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
 
@@ -71,6 +68,9 @@ class IngeScapeAssessmentsController : public QObject
 
     // Controller to manage the tasks of the current experimentation
     I2_QML_PROPERTY_READONLY(TasksController*, tasksC)
+
+    // Controller to export data from the database
+    I2_QML_PROPERTY_READONLY(ExportController*, exportC)
 
 
 public:

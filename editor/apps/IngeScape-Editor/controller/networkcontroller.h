@@ -105,6 +105,18 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when the "Recorder app" started to record
+     */
+    void recordStartedReceived();
+
+
+    /**
+     * @brief Signal emitted when the "Recorder app" stopped to record
+     */
+    void recordStoppedReceived();
+
+
+    /**
      * @brief Signal emitted when all records from DB have been received
      * @param recordsJSON
      */

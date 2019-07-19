@@ -443,7 +443,7 @@ Item {
 
                     anchors {
                         fill: parent
-                        leftMargin: (styleData.column === 0) ? 55 : 5
+                        leftMargin: (styleData.column === 0) ? 126 : 5
                     }
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: styleData.textAlignment
@@ -460,7 +460,7 @@ Item {
 
                     anchors {
                         left: parent.left
-                        leftMargin: 50
+                        leftMargin: 121
                         top: parent.top
                         bottom: parent.bottom
                     }
@@ -489,7 +489,7 @@ Item {
                 role: "name"
                 title: qsTr("Nom")
 
-                width: tableDependentVariable.width / 4.0
+                width: (tableDependentVariable.width / 5.0) * 2.0
 
                 delegate: VariableTextEditor {
 
@@ -542,7 +542,7 @@ Item {
                 role: "description"
                 title: qsTr("Description")
 
-                width: tableDependentVariable.width / 4.0
+                width: tableDependentVariable.width / 5.0
 
                 delegate: VariableTextEditor {
 
@@ -576,7 +576,7 @@ Item {
                 role: "agentName"
                 title: qsTr("Agent")
 
-                width: tableDependentVariable.width / 4.0
+                width: tableDependentVariable.width / 5.0
 
                 delegate: VariableComboBoxEditor {
 
@@ -597,13 +597,10 @@ Item {
                     onVariableValueUpdated: {
                         if (model)
                         {
-                            //console.log("QML: on (Dependent) Variable Value Updated for 'Agent Name' " + value);
+                            console.log("QML: on (Dependent) Variable Value Updated for 'Agent Name' " + value);
 
                             // Update the agent name
                             model.agentName = value;
-
-                            // Reset the output name
-                            model.outputName = "";
                         }
                     }
                 }
@@ -615,7 +612,7 @@ Item {
                 role: "outputName"
                 title: qsTr("Sortie")
 
-                width: tableDependentVariable.width / 4.0
+                width: tableDependentVariable.width / 5.0
 
                 delegate: VariableComboBoxEditor {
 
@@ -637,7 +634,7 @@ Item {
                     onVariableValueUpdated: {
                         if (model)
                         {
-                            //console.log("QML: on (Dependent) Variable Value Updated for 'Output Name' " + value);
+                            console.log("QML: on (Dependent) Variable Value Updated for 'Output Name' " + value);
 
                             // Update the output name
                             model.outputName = value;

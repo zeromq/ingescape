@@ -123,12 +123,34 @@ Item {
         }
     }
 
+    Button {
+        id: btnApplyChanges
+
+        anchors {
+            left: btnDeleteDependentVariable.right
+            leftMargin: 2
+            top: parent.top
+        }
+        width: 70
+        height: 30
+
+        text: qsTr("APPLY")
+
+        visible: styleData.selected && rootItem.isFirstColumn
+
+        onClicked: {
+            //TODO
+            console.log("Not implemented yet")
+            stopEditionOfVariable()
+        }
+    }
+
     Rectangle {
         id: leftSeparator
 
         anchors {
             left: parent.left
-            leftMargin: 50
+            leftMargin: 121
             top: parent.top
             bottom: parent.bottom
         }
@@ -155,7 +177,7 @@ Item {
     Text {
         anchors {
             fill: parent
-            leftMargin: rootItem.isFirstColumn ? 55 : 5
+            leftMargin: rootItem.isFirstColumn ? 126 : 5
         }
 
         visible: !rootItem.isCurrentlyEditing
@@ -176,7 +198,7 @@ Item {
 
         anchors {
             fill: parent
-            leftMargin: rootItem.isFirstColumn ? 50 : 0
+            leftMargin: rootItem.isFirstColumn ? 121 : 0
         }
 
         visible: rootItem.isCurrentlyEditing

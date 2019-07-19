@@ -30,6 +30,8 @@ static const QString prefix_LogFilePath = "LOG_FILE_PATH=";
 static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
 static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH=";
 
+static const QString prefix_RecordStarted = "RECORD_STARTED";
+static const QString prefix_RecordStopped = "RECORD_STOPPED";
 static const QString prefix_AllRecords = "RECORDS_LIST=";
 static const QString prefix_AddedRecord = "ADD_RECORD=";
 static const QString prefix_DeletedRecord = "DELETED_RECORD=";
@@ -370,6 +372,20 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
 
         Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
     }
+    // The "Recorder app" Started to record
+    else if (message.startsWith(prefix_RecordStarted))
+    {
+        qInfo() << prefix_RecordStarted;
+
+        Q_EMIT recordStartedReceived();
+    }
+    // The "Recorder app" Stopped to record
+    else if (message.startsWith(prefix_RecordStopped))
+    {
+        qInfo() << prefix_RecordStopped;
+
+        Q_EMIT recordStoppedReceived();
+    }
     // All records
     else if (message.startsWith(prefix_AllRecords))
     {
@@ -429,6 +445,8 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
     // End of record
     else if (message == prefix_EndedRecord)
     {
+        qDebug() << prefix_EndedRecord;
+
         // Emit the signal "End of record Received"
         Q_EMIT endOfRecordReceived();
     }

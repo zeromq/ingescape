@@ -24,6 +24,7 @@ import INGESCAPE 1.0
 import "../popup" as Popup
 import "../subject" as Subject
 import "../task" as Task
+import "../export" as Export
 
 
 Item {
@@ -41,8 +42,6 @@ Item {
     //--------------------------------------------------------
 
     property ExperimentationController controller: null;
-
-    property AssessmentsModelManager modelManager: null;
 
     property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
 
@@ -130,7 +129,7 @@ Item {
                 horizontalCenter: parent.horizontalCenter
             }
 
-            text: (rootItem.modelManager && rootItem.modelManager.currentExperimentationsGroup) ? rootItem.modelManager.currentExperimentationsGroup.name : ""
+            text: rootItem.experimentation ? rootItem.experimentation.groupName : ""
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -305,7 +304,10 @@ Item {
                         height: 30
 
                         onClicked: {
-                            console.log("QML: Export...");
+                            console.log("QML: Add the 'Export View' to the stack");
+
+                            // Add the "Export View" to the stack
+                            stackview.push(componentExportView);
                         }
                     }
                 }
@@ -479,6 +481,32 @@ Item {
                 console.log("QML: on Close Tasks view");
 
                 // Remove the "Tasks View" from the stack
+                stackview.pop();
+            }
+        }
+    }
+
+
+    //
+    // Export View
+    //
+    Component {
+        id: componentExportView
+
+        Export.ExportView {
+            id: exportView
+
+            controller: IngeScapeAssessmentsC.exportC
+
+
+            //
+            // Slots
+            //
+
+            onCloseExportView: {
+                console.log("QML: on Close Export view");
+
+                // Remove the "Export View" from the stack
                 stackview.pop();
             }
         }

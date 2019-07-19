@@ -410,7 +410,7 @@ void AbstractScenarioController::pauseTimeLine()
 
 
 /**
- * @brief Stop the timeline (current scenario)
+ * @brief Stop/Reset the timeline (current scenario)
  */
 void AbstractScenarioController::stopTimeLine()
 {
@@ -435,7 +435,7 @@ void AbstractScenarioController::clearScenario()
 {
     qInfo() << "Abstract Scenario Controller: Clear the current scenario";
 
-    // Stop the timeline (current scenario)
+    // Stop/Reset the timeline (current scenario)
     stopTimeLine();
 
     // Clean-up current selection
@@ -472,8 +472,8 @@ void AbstractScenarioController::updateTimeLineState(QString state)
     else if (state == PAUSE) {
         pauseTimeLine();
     }
-    // STOP
-    else if (state == STOP) {
+    // RESET
+    else if (state == RESET) {
         stopTimeLine();
     }
     else {

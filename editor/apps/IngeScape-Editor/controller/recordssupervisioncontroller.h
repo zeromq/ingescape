@@ -54,7 +54,7 @@ class RecordsSupervisionController : public QObject
     //I2_QML_PROPERTY_DELETE_PROOF(RecordVM*, selectedRecord)
     I2_QML_PROPERTY_CUSTOM_SETTER(RecordVM*, selectedRecord)
 
-    // Flag indicating if a recorder is currently recording
+    // Flag indicating if the recorder is currently recording
     I2_QML_PROPERTY(bool, isRecording)
 
     // Flag indicating if the actions in the timeline are currently recorded
@@ -88,10 +88,9 @@ public:
 
     /**
      * @brief Start/Stop to record (optionaly with the actions in the timeline)
-     * @param isStart flag indicating if we start to record or if we stop to record
      * @param withTimeLine flag indicating if the actions in the timeline must be recorded
      */
-    Q_INVOKABLE void startOrStopToRecord(bool isStart, bool withTimeLine = false);
+    Q_INVOKABLE void startOrStopToRecord(bool withTimeLine = false);
 
 
     /**
@@ -169,6 +168,18 @@ public Q_SLOTS:
      * @param list of records in JSON format
      */
     void onAllRecordsReceived(QString records);
+
+
+    /**
+     * @brief Slot called when the "Recorder app" started to record
+     */
+    void onRecordStartedReceived();
+
+
+    /**
+     * @brief Slot called when the "Recorder app" stopped to record
+     */
+    void onRecordStoppedReceived();
 
 
     /**

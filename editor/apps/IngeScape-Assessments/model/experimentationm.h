@@ -39,6 +39,9 @@ class ExperimentationM : public QObject
     // Name of our experimentation
     I2_QML_PROPERTY(QString, name)
 
+    // Group name to which the experimentation belongs
+    I2_QML_PROPERTY(QString, groupName)
+
     // Date of the creation of our experimentation
     I2_QML_PROPERTY(QDateTime, creationDate)
 
@@ -65,6 +68,7 @@ public:
      */
     explicit ExperimentationM(CassUuid cassUuid,
                               QString name,
+                              QString groupeName,
                               QDateTime creationDate,
                               QObject *parent = nullptr);
 

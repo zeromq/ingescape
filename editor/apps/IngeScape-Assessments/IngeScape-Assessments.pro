@@ -38,6 +38,7 @@ RCC_DIR = tmp
 
 
 SOURCES += main.cpp \
+    controller/export/exportcontroller.cpp \
     controller/ingescapeassessmentscontroller.cpp \
     controller/networkcontroller.cpp \
     model/assessmentsenums.cpp \
@@ -48,7 +49,6 @@ SOURCES += main.cpp \
     model/task/taskm.cpp \
     model/experimentationm.cpp \
     model/task/independentvariablem.cpp \
-    model/task/independentvariableenumm.cpp \
     model/task/dependentvariablem.cpp \
     controller/experimentationslistcontroller.cpp \
     controller/subject/subjectscontroller.cpp \
@@ -61,6 +61,7 @@ SOURCES += main.cpp \
 
 
 HEADERS += \
+    controller/export/exportcontroller.h \
     controller/ingescapeassessmentscontroller.h \
     model/assessmentsenums.h \
     model/recordsetupm.h \
@@ -72,7 +73,6 @@ HEADERS += \
     model/task/taskm.h \
     model/experimentationm.h \
     model/task/independentvariablem.h \
-    model/task/independentvariableenumm.h \
     model/task/dependentvariablem.h \
     controller/experimentationslistcontroller.h \
     controller/subject/subjectscontroller.h \
@@ -130,6 +130,11 @@ INCLUDEPATH += ../../frameworks/I2Quick/include
 # Include IngeScape-Common library
 !include(../IngeScape-Common/IngeScape-Common.pri) {
     error(Could not load IngeScape-Common.pri)
+}
+
+# Include cql exporter library
+!include(../../dependencies/cqlExporter/cqlexporter.pri) {
+    error(Could not load cqlExporter.pri)
 }
 
 

@@ -150,6 +150,9 @@ Item {
                 // Emit the signal "Characteristic Value Updated"
                 rootItem.variableValueUpdated(comboboxEditor.selectedItem);
             }
+            else {
+                rootItem.variableValueUpdated("");
+            }
         }
 
         onVisibleChanged: {

@@ -16,6 +16,7 @@
 
 #include <QApplication>
 
+#include <controller/assessmentsmodelmanager.h>
 #include <misc/ingescapeutils.h>
 #include <settings/ingescapesettings.h>
 
@@ -30,12 +31,12 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _port(0),
     _errorMessageWhenConnectionFailed(""),
     _snapshotDirectory(""),
-    _modelManager(nullptr),
     _networkC(nullptr),
     _experimentationsListC(nullptr),
     _experimentationC(nullptr),
     _subjectsC(nullptr),
     _tasksC(nullptr),
+    _exportC(nullptr),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr)
   //_platformDirectoryPath("")
@@ -101,27 +102,30 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     //
 
     // Create the manager for the data model of our IngeScape Assessments application
-    _modelManager = new AssessmentsModelManager(_jsonHelper, rootPath, this);
+    AssessmentsModelManager::initInstance(_jsonHelper, rootPath, this);
 
     // Create the controller for network communications
     _networkC = new NetworkController(this);
 
     // Create the controller to manage the list of experimentations
-    _experimentationsListC = new ExperimentationsListController(_modelManager, this);
+    _experimentationsListC = new ExperimentationsListController(this);
 
     // Create the controller to manage the current experimentation
-    _experimentationC = new ExperimentationController(_modelManager, _jsonHelper, this);
+    _experimentationC = new ExperimentationController(_jsonHelper, this);
 
     // Create the controller to manage the subjects of the current experimentation
-    _subjectsC = new SubjectsController(_modelManager, this);
+    _subjectsC = new SubjectsController(this);
 
     // Create the controller to manage the tasks of the current experimentation
-    _tasksC = new TasksController(_modelManager, this);
+    _tasksC = new TasksController(this);
+
+    // Create the controller to export data from the database
+    _exportC = new ExportController(this);
 
 
-    // Connect to signals from the data model manager of our IngeScape Assessments application
-    connect(_modelManager, &AssessmentsModelManager::currentExperimentationChanged, this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
-
+    // Connect to signals from the experimentation controller to the rest of the controllers
+    connect(_experimentationC, &ExperimentationController::currentExperimentationChanged,
+            this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
 
     // Connect to signals from the network controller
     /*connect(_networkC, &NetworkController::agentEntered, _modelManager, &AssessmentsModelManager::onAgentEntered);
@@ -139,10 +143,10 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     // Start our INGESCAPE agent with a network device (or an IP address) and a port
     bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
-    if (isStarted)
+    if (isStarted && (AssessmentsModelManager::Instance() != nullptr))
     {
         // Initialize platform from online mapping
-        _modelManager->setisMappingConnected(true);
+        AssessmentsModelManager::Instance()->setisMappingConnected(true);
     }
     else {
         seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
@@ -229,15 +233,17 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
         temp = nullptr;
     }
 
-    if (_modelManager != nullptr)
+    if (_exportC != nullptr)
     {
-        disconnect(_modelManager);
+        disconnect(_exportC);
 
-        AssessmentsModelManager* temp = _modelManager;
-        setmodelManager(nullptr);
+        ExportController* temp = _exportC;
+        setexportC(nullptr);
         delete temp;
         temp = nullptr;
     }
+
+    AssessmentsModelManager::destroyInstance();
 
     if (_networkC != nullptr)
     {
@@ -305,16 +311,16 @@ void IngeScapeAssessmentsController::_onCurrentExperimentationChanged(Experiment
     {
         qDebug() << "Current Experimentation = " << currentExperimentation->name();
 
-        if (_experimentationC != nullptr) {
-            _experimentationC->setcurrentExperimentation(currentExperimentation);
-        }
-
         if (_subjectsC != nullptr) {
             _subjectsC->setcurrentExperimentation(currentExperimentation);
         }
 
         if (_tasksC != nullptr) {
             _tasksC->setcurrentExperimentation(currentExperimentation);
+        }
+
+        if (_exportC != nullptr) {
+            _exportC->setcurrentExperimentation(currentExperimentation);
         }
 
     }

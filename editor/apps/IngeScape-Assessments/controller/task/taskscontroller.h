@@ -18,8 +18,6 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
-#include <controller/assessmentsmodelmanager.h>
-#include <model/jsonhelper.h>
 #include <model/experimentationm.h>
 #include <model/task/independentvariablem.h>
 
@@ -49,7 +47,7 @@ public:
      * @param jsonHelper
      * @param parent
      */
-    explicit TasksController(AssessmentsModelManager* modelManager, /*JsonHelper* jsonHelper, */QObject *parent = nullptr);
+    explicit TasksController(QObject *parent = nullptr);
 
 
     /**
@@ -176,13 +174,6 @@ public:
     Q_INVOKABLE void deleteDependentVariable(DependentVariableM* dependentVariable);
 
 
-
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
-
 private:
 
     /**
@@ -205,17 +196,9 @@ private:
      * @param enumValues
      * @return
      */
-    IndependentVariableM* _insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, QString name, QString description, IndependentVariableValueTypes::Value valueType, QStringList enumValues = {});
+    IndependentVariableM* _insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, IndependentVariableValueTypes::Value valueType, const QStringList& enumValues = {});
 
-
-private:
-
-    // Manager for the data model of our IngeScape Assessments application
-    AssessmentsModelManager* _modelManager;
-
-    // Helper to manage JSON files
-    //JsonHelper* _jsonHelper;
-
+    DependentVariableM* _insertDependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, const QString& agentName, const QString& outputName);
 };
 
 QML_DECLARE_TYPE(TasksController)
