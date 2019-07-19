@@ -12,6 +12,7 @@ CREATE TABLE ingescape.bool (time timeuuid, value boolean, PRIMARY KEY (time));
 CREATE TABLE ingescape.data (time timeuuid, value blob, PRIMARY KEY (time));
 CREATE TABLE ingescape.action (time timeuuid, id_action int, line_tl int, PRIMARY KEY (time));
 CREATE TABLE ingescape.mapping (time timeuuid, mapping text, PRIMARY KEY(time));
+CREATE TABLE ingescape.timeline (time timeuuid, state text, PRIMARY KEY(time));
 CREATE TABLE ingescape.experimentation (id timeuuid, name text, creation_date date, creation_time time, group_name text, PRIMARY KEY (id));
 CREATE TABLE ingescape.characteristic (id timeuuid, id_experimentation timeuuid, name text, value_type tinyint, enum_values text, PRIMARY KEY (id_experimentation, id) );
 CREATE TABLE ingescape.subject (id timeuuid, id_experimentation timeuuid, name text, PRIMARY KEY (id_experimentation, id));
