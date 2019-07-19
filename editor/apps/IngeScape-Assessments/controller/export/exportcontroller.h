@@ -50,6 +50,11 @@ public:
      */
     Q_INVOKABLE void exportExperimentation();
 
+    /**
+     * @brief Export the current experimentation function test
+     */
+    Q_INVOKABLE void exportExperimentationTest(QString uuidIdExp);
+
 
 private:
 
