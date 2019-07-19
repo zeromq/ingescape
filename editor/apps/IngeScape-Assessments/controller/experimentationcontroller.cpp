@@ -166,10 +166,11 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
 
         // FIXME TODO: load data about this experimentation (subjects, tasks, ...)
 
-        const char* query = "SELECT * FROM ingescape.task;";
+        const char* query = "SELECT * FROM ingescape.task WHERE id_experimentation = ?;";
 
         // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(query, 0);
+        CassStatement* cassStatement = cass_statement_new(query, 1);
+        cass_statement_bind_uuid(cassStatement, 0, currentExperimentation->getCassUuid());
 
         // Execute the query or bound statement
         CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);

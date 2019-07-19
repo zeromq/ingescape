@@ -108,6 +108,7 @@ list(APPEND _INCLUDES_DIRECTORY
     "${SOURCE_DIR}"
     "${SOURCE_DIR}/../../frameworks/I2Quick/include"
     "${SOURCE_DIR}/../../dependencies/cassandra-cpp-driver/include"
+    "${SOURCE_DIR}/../../dependencies/cqlexporter"
 )
 
 include_directories(${_INCLUDES_DIRECTORY})
@@ -131,14 +132,16 @@ list(APPEND ingescape_assessments_sources "${SOURCE_DIR}/main.cpp")
 
 add_ingescape_common_sources(ingescape_assessments_sources)
 
-if(MSVC)
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp "#include <stable.h>")
-    ADD_MSVC_PRECOMPILED_HEADER("stable.h" ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp ingescape_assessments_sources)
-endif()
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp "#include <stable.h>")
+ADD_MSVC_PRECOMPILED_HEADER("stable.h" ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp ingescape_assessments_sources)
 
 add_ingescape_sources(ingescape_assessments_sources)
 
-source_group("Source Files" FILES ${ingescape_assessments_sources})
+# CQL exporter is written in C and is separated from the rest of the sources to avoid issues with precompiled headers
+file(GLOB_RECURSE ingescape_assessments_sources_view_model "${SOURCE_DIR}/../../dependencies/cqlexporter/*.c")
+list(APPEND ingescape_assessments_cqlexporter_sources ${ingescape_assessments_sources_view_model})
+
+source_group("Source Files" FILES ${ingescape_assessments_sources} ${ingescape_assessments_cqlexporter_sources})
 
 set (ingescape_assessments_ressources "${SOURCE_DIR}/qml.qrc")
 add_ingescape_common_ressources(ingescape_assessments_ressources)
@@ -210,6 +213,7 @@ endif ()
 # Create target
 add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
     ${ingescape_assessments_sources}
+    ${ingescape_assessments_cqlexporter_sources}
     ${ingescape_assessments_ressources}
     ${INGESCAPE_ASSESSMENTS_ICON}
     ${I2QUICK_LIB}
