@@ -959,18 +959,18 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         ts = *localtime(&license->editorExpirationDate);
                         strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", &ts);
                         zmsg_addstr(resp, buf);
-                        char *feature = zlist_first(license->features);
+                        char *feature = zhash_first(license->features);
                         while (feature != NULL) {
                             zmsg_addstr(resp, "feature");
                             zmsg_addstr(resp, feature);
-                            feature = zlist_next(license->features);
+                            feature = zhash_next(license->features);
                         }
-                        licenseForAgent_t *agent = zlist_first(license->agents);
+                        licenseForAgent_t *agent = zhash_first(license->agents);
                         while (agent != NULL) {
                             zmsg_addstr(resp, "agent");
                             zmsg_addstr(resp, agent->agentId);
                             zmsg_addstr(resp, agent->agentName);
-                            agent = zlist_next(license->agents);
+                            agent = zhash_next(license->agents);
                         }
                     }
                     zyre_whisper(node, peer, &resp);
