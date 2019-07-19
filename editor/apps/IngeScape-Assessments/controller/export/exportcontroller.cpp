@@ -14,6 +14,8 @@
 
 #include "exportcontroller.h"
 #include <controller/assessmentsmodelmanager.h>
+#include <misc/ingescapeutils.h>
+
 
 extern "C" {
     #include "cqlexporter.h"
@@ -25,12 +27,17 @@ extern "C" {
  * @param parent
  */
 ExportController::ExportController(QObject *parent) : QObject(parent),
-    _currentExperimentation(nullptr)
+    _currentExperimentation(nullptr),
+    _exportsDirectoryPath("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New Export Controller";
+
+    // Init the path to the directory containing CSV files about exports
+    _exportsDirectoryPath = IngeScapeUtils::getExportsPath();
+
 }
 
 
@@ -61,24 +68,16 @@ void ExportController::exportExperimentation()
 
         qInfo() << "Export the experimentation" << _currentExperimentation->name() << "(" << chrExperimentationUid << ")";
 
-        QString ipAddress = "127.0.0.1";
-        QString exportFileName = QString("export_%1.csv").arg(_currentExperimentation->name());
-
-        // Connect to the BDD
-//        connectToBDD((char*)ipAddress.toStdString().c_str());
+        QString exportFilePath = QString("%1export_%2.csv").arg(_exportsDirectoryPath, _currentExperimentation->name());
 
         // Open the file to save the export
-        openFile((char*)exportFileName.toStdString().c_str());
+        openFile((char*)exportFilePath.toStdString().c_str());
 
-        //Set the cassandra session for the exporting layer
+        // Set the cassandra session for the exporting layer
         setCassSession(AssessmentsModelManager::Instance()->getCassSession());
-
 
         // Export a full dump of the current experimentation
         exportAllRecordsFromIdExpAndTableRecordSetup(experimentationUid);
-
-        // Disconnect from the BDD
-//        disconnectToBDD();
 
         // Close the opening file
         closeFileOpened();

@@ -840,7 +840,8 @@ void IngeScapeEditorController::_onStartToRecord()
         commandAndParameters.append(command_StartRecord);
 
         // Add the record name
-        commandAndParameters.append(QString("Record-%1").arg(_currentPlatformName));
+        //commandAndParameters.append(QString("Record-%1").arg(_currentPlatformName));
+        commandAndParameters.append(_currentPlatformName);
 
         // Add the delta of the start time from the Time Line
         int deltaTimeFromTimeLine = 0;

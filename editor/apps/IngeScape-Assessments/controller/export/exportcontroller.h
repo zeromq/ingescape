@@ -58,6 +58,8 @@ public:
 
 private:
 
+    // Path to the directory containing CSV files about exports
+    QString _exportsDirectoryPath;
 
 };
 
