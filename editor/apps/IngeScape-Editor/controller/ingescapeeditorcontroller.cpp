@@ -44,6 +44,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _scenarioC(nullptr),
     _valuesHistoryC(nullptr),
     _timeLineC(nullptr),
+    _peerIdOfExpe(""),
+    _peerNameOfExpe(""),
+    _currentPlatformName("last"),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
     _platformDirectoryPath(""),
@@ -105,7 +108,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         _platformDirectoryPath = platformPath;
 
         // Init the path to the JSON file to load the last platform
-        _platformDefaultFilePath = QString("%1last.json").arg(_platformDirectoryPath);
+        _platformDefaultFilePath = QString("%1%2.json").arg(_platformDirectoryPath, _currentPlatformName);
     }
 
 
@@ -500,6 +503,11 @@ void IngeScapeEditorController::savePlatformToDefaultFile()
  */
 void IngeScapeEditorController::clearCurrentPlatform()
 {
+    qInfo() << "Clear Current Platform (" << _currentPlatformName << ")";
+
+    // Update the current platform name
+    setcurrentPlatformName("new");
+
     // Clear the current mapping
     if (_agentsMappingC != nullptr) {
         _agentsMappingC->clearMapping();
@@ -831,6 +839,9 @@ void IngeScapeEditorController::_onStartToRecord()
         // Add the command
         commandAndParameters.append(command_StartRecord);
 
+        // Add the record name
+        commandAndParameters.append(QString("Record-%1").arg(_currentPlatformName));
+
         // Add the delta of the start time from the Time Line
         int deltaTimeFromTimeLine = 0;
 
@@ -985,13 +996,13 @@ void IngeScapeEditorController::_onUpdateRecordState(QString state)
         _scenarioC->updateRecordState(state);
     }*/
 
-    // START
+    // START (to Record)
     if (state == START)
     {
         // Call the private slot (called when the user wants to start to record)
         _onStartToRecord();
     }
-    // STOP
+    // STOP (to Record)
     else if (state == STOP)
     {
         // Call the private slot (called when a command must be sent on the network to a recorder)
@@ -1077,6 +1088,10 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
         {
             if (jsonFile.open(QIODevice::ReadOnly))
             {
+                // Update the current platform name
+                QFileInfo fileInfo = QFileInfo(jsonFile);
+                setcurrentPlatformName(fileInfo.baseName());
+
                 QByteArray byteArrayOfJson = jsonFile.readAll();
                 jsonFile.close();
 
@@ -1117,6 +1132,10 @@ void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
             QFile jsonFile(platformFilePath);
             if (jsonFile.open(QIODevice::WriteOnly))
             {
+                // Update the current platform name
+                QFileInfo fileInfo = QFileInfo(jsonFile);
+                setcurrentPlatformName(fileInfo.baseName());
+
                 jsonFile.write(jsonDocument.toJson(QJsonDocument::Indented));
                 jsonFile.close();
             }

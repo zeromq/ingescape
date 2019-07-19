@@ -104,6 +104,9 @@ class IngeScapeEditorController : public QObject
     // Peer name of the IngeScape agent "Expe"
     I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfExpe)
 
+    // Name of the current IngeScape platform
+    I2_QML_PROPERTY_READONLY(QString, currentPlatformName)
+
 
 public:
 

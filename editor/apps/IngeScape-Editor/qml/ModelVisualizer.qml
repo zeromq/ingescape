@@ -70,11 +70,37 @@ Rectangle {
             }
 
             Text {
-                text: "IGS app ON:"
+                text: "Platform:"
+
+                color: "gray"
+                font {
+                    pointSize: 16
+                    weight: Font.Bold
+                }
+            }
+
+            Text {
+                text: IngeScapeEditorC.currentPlatformName
 
                 color: "white"
                 font {
-                    pointSize: 18
+                    pointSize: 16
+                    weight: Font.Bold
+                }
+            }
+
+            Item {
+                id: space
+                width: 10
+                height: 10
+            }
+
+            Text {
+                text: "IGS app ON:"
+
+                color: "gray"
+                font {
+                    pointSize: 16
                     weight: Font.Bold
                 }
             }
