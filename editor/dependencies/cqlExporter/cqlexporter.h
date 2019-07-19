@@ -12,6 +12,7 @@
 
 ////BDD
 void connectToBDD(char* bddName);
+void setCassSession(CassSession * cassSession);
 void disconnectToBDD(void);
 
 ////File management
