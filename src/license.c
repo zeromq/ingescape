@@ -187,31 +187,23 @@ void switchToBundlePath(char **path){
 //takes the least restricting values found in the files
 void license_parseLine(const char *command, const char *data, license_t *myLicense){
     if (strcmp(command, "id") == 0 && data != NULL){
-        if (myLicense->id == NULL){
-            myLicense->id = strdup(data);
-        }else{
-            myLicense->id = realloc(myLicense->id, strlen(myLicense->id) + strlen(data) + 3);
-            sprintf(myLicense->id, "%s, %s", myLicense->id, data);
+        if (myLicense->id != NULL){
+            free(myLicense->id);
         }
+        myLicense->id = strdup(data);
     }else if (strcmp(command, "customer") == 0  && data != NULL){
-        if (myLicense->customer == NULL){
-            myLicense->customer = strdup(data);
-        }else{
-            myLicense->customer = realloc(myLicense->customer, strlen(myLicense->customer) + strlen(data) + 3);
-            sprintf(myLicense->customer, "%s, %s", myLicense->customer, data);
+        if (myLicense->customer != NULL){
+            free(myLicense->customer);
         }
+        myLicense->customer = strdup(data);
     }else if (strcmp(command, "order") == 0  && data != NULL){
-        if (myLicense->order == NULL){
-            myLicense->order = strdup(data);
-        }else{
-            myLicense->order = realloc(myLicense->order, strlen(myLicense->order) + strlen(data) + 3);
-            sprintf(myLicense->order, "%s, %s", myLicense->order, data);
+        if (myLicense->order != NULL){
+            free(myLicense->order);
         }
+        myLicense->order = strdup(data);
     }else if (strcmp(command, "expiration") == 0){
         long licenseExpirationDate = atol(data);
-        if (myLicense->licenseExpirationDate < licenseExpirationDate){
-            myLicense->licenseExpirationDate = licenseExpirationDate;
-        }
+        myLicense->licenseExpirationDate = licenseExpirationDate;
         long t = (long)time(NULL);
         if (myLicense->licenseExpirationDate < t){
             myLicense->isLicenseExpired = true;
@@ -220,30 +212,22 @@ void license_parseLine(const char *command, const char *data, license_t *myLicen
         int platformNbAgents = 0;
         int platformNbIOPs = 0;
         sscanf(data, "%d %d", &platformNbAgents, &platformNbIOPs);
-        if (myLicense->platformNbAgents < platformNbAgents){
-            myLicense->platformNbAgents = platformNbAgents;
-        }
-        if (myLicense->platformNbIOPs < platformNbIOPs){
-            myLicense->platformNbIOPs = platformNbIOPs;
-        }
+        myLicense->platformNbAgents = platformNbAgents;
+        myLicense->platformNbIOPs = platformNbIOPs;
     }else if (strcmp(command, "editorOwner") == 0  && data != NULL){
-        if (myLicense->editorOwner == NULL){
-            myLicense->editorOwner = strdup(data);
-        }else{
-            myLicense->editorOwner = realloc(myLicense->editorOwner, strlen(myLicense->editorOwner) + strlen(data) + 3);
-            sprintf(myLicense->editorOwner, "%s, %s", myLicense->editorOwner, data);
+        if (myLicense->editorOwner != NULL){
+            free(myLicense->editorOwner);
         }
+        myLicense->editorOwner = strdup(data);
     }else if (strcmp(command, "editorExpiration") == 0){
         long editorExpirationDate = atol(data);
-        if (myLicense->editorExpirationDate < editorExpirationDate){
-            myLicense->editorExpirationDate = editorExpirationDate;
-        }
+        myLicense->editorExpirationDate = editorExpirationDate;
         time_t t = time(NULL);
         if (myLicense->editorExpirationDate < t){
             myLicense->isEditorLicenseExpired = true;
         }
     }else if (strcmp(command, "feature") == 0){
-        zlist_append(myLicense->features, strdup(data));
+        zhash_insert(myLicense->features, data, NULL);
     }else if (strcmp(command, "agent") == 0){
         licenseForAgent_t *l = calloc(1, sizeof(licenseForAgent_t));
         char agentId[256] = "";
@@ -251,7 +235,7 @@ void license_parseLine(const char *command, const char *data, license_t *myLicen
         sscanf(data, "%255s %255s", agentId, agentName);
         l->agentId = strdup(agentId);
         l->agentName = strdup(agentName);
-        zlist_append(myLicense->agents, l);
+        zhash_insert(myLicense->agents, agentId, l);
     }
 }
 
@@ -274,23 +258,18 @@ void license_cleanLicense(void){
             free(license->editorOwner);
         }
         if (license->features != NULL){
-            char *feat = zlist_first(license->features);
-            while (feat != NULL){
-                free(feat);
-                feat = zlist_next(license->features);
-            }
-            zlist_destroy(&license->features);
+            zhash_destroy(&license->features);
         }
         if (license->agents != NULL){
-            licenseForAgent_t *l = zlist_first(license->agents);
+            licenseForAgent_t *l = zhash_first(license->agents);
             while (l != NULL){
                 if (l->agentId != NULL)
                     free(l->agentId);
                 if (l->agentName)
                     free(l->agentName);
-                l = zlist_next(license->agents);
+                l = zhash_next(license->agents);
             }
-            zlist_destroy(&license->agents);
+            zhash_destroy(&license->agents);
         }
         if (license->licenceDetails != NULL){
             license_t *detail = zlist_first(license->licenceDetails);
@@ -311,23 +290,18 @@ void license_cleanLicense(void){
                     free(detail->editorOwner);
                 }
                 if (detail->features != NULL){
-                    char *feat = zlist_first(detail->features);
-                    while (feat != NULL){
-                        free(feat);
-                        feat = zlist_next(detail->features);
-                    }
-                    zlist_destroy(&detail->features);
+                    zhash_destroy(&detail->features);
                 }
                 if (detail->agents != NULL){
-                    licenseForAgent_t *l = zlist_first(detail->agents);
+                    licenseForAgent_t *l = zhash_first(detail->agents);
                     while (l != NULL){
                         if (l->agentId != NULL)
                             free(l->agentId);
                         if (l->agentName)
                             free(l->agentName);
-                        l = zlist_next(detail->agents);
+                        l = zhash_next(detail->agents);
                     }
-                    zlist_destroy(&detail->agents);
+                    zhash_destroy(&detail->agents);
                 }
                 detail = zlist_next(license->licenceDetails);
             }
@@ -418,19 +392,19 @@ void license_readLicense(void){
         } else {
             // could not open directory
         }
+        
+        license = calloc(1, sizeof(license_t));
+        license->features = zhash_new();
+        license->agents = zhash_new();
+        license->licenceDetails = zlist_new();
+        
         //iterate on license files in folder
         zfile_t *file = zlist_first(filesList);
         while (file != NULL) {
-            if (license == NULL){
-                license = calloc(1, sizeof(license_t));
-                license->features = zlist_new();
-                license->agents = zlist_new();
-                license->licenceDetails = zlist_new();
-            }
             license_t *detail = calloc(1, sizeof(license_t));
             zlist_append(license->licenceDetails, detail);
-            detail->features = zlist_new();
-            detail->agents = zlist_new();
+            detail->features = zhash_new();
+            detail->agents = zhash_new();
             
             const char *name = zfile_filename(file, NULL);
             detail->fileName = strdup(name);
@@ -449,9 +423,7 @@ void license_readLicense(void){
                     char type[256] = "";
                     char data[256] = "";
                     if (sscanf(curLine, ":%s %[\001-\377]", type, data) == 2){
-                        //parse into main license to define least restricting conditions
-                        license_parseLine(type, data, license);
-                        //parse into detail to keep trace of each file detail
+                        //parse into detail to keep trace of each file
                         license_parseLine(type, data, detail);
                     }
                 }
@@ -463,12 +435,98 @@ void license_readLicense(void){
             file = zlist_next(filesList);
         }
         zlist_destroy(&filesList);
+        
+        //go through details to apply least contraining values in main licence struct
+        license_t *detail = zlist_first(license->licenceDetails);
+        while (detail != NULL){
+            if (!detail->isLicenseExpired){
+                if (detail->id != NULL){
+                    if (license->id == NULL){
+                        license->id = strdup(detail->id);
+                    }else{
+                        license->id = realloc(license->id, strlen(license->id) + strlen(detail->id) + 3);
+                        sprintf(license->id, "%s, %s", license->id, detail->id);
+                    }
+                }
+                if (detail->customer != NULL){
+                    if (license->customer == NULL){
+                        license->customer = strdup(detail->customer);
+                    }else{
+                        license->customer = realloc(license->customer, strlen(license->customer) + strlen(detail->customer) + 3);
+                        sprintf(license->customer, "%s, %s", license->customer, detail->customer);
+                    }
+                }
+                if (detail->order != NULL){
+                    if (license->order == NULL){
+                        license->order = strdup(detail->order);
+                    }else{
+                        license->order = realloc(license->order, strlen(license->order) + strlen(detail->order) + 3);
+                        sprintf(license->order, "%s, %s", license->order, detail->order);
+                    }
+                }
+                if (license->licenseExpirationDate < detail->licenseExpirationDate){
+                    license->licenseExpirationDate = detail->licenseExpirationDate;
+                }
+                long t = (long)time(NULL);
+                if (license->licenseExpirationDate < t){
+                    license->isLicenseExpired = true;
+                }
+                if (license->platformNbAgents < detail->platformNbAgents){
+                    license->platformNbAgents = detail->platformNbAgents;
+                }
+                if (license->platformNbIOPs < detail->platformNbIOPs){
+                    license->platformNbIOPs = detail->platformNbIOPs;
+                }
+                
+                //add new features that are not in the list yet
+                zlist_t *features = zhash_keys(detail->features);
+                char *k = zlist_first(features);
+                while (k != NULL){
+                    if (zhash_lookup(license->features, k) == NULL){
+                        zhash_insert(license->features, k, NULL);
+                    }
+                    k = zlist_next(features);
+                }
+                
+                //add new agents that are not in the list yet
+                zlist_t *agents = zhash_keys(detail->agents);
+                k = zlist_first(agents);
+                while (k != NULL){
+                    if (zhash_lookup(license->agents, k) == NULL){
+                        licenseForAgent_t *l = zhash_lookup(detail->agents, k);
+                        licenseForAgent_t *l_dup = calloc(1, sizeof(licenseForAgent_t));
+                        l_dup->agentId = strdup(l->agentId);
+                        l_dup->agentName = strdup(l->agentName);
+                        zhash_insert(license->agents, k, l_dup);
+                    }
+                    k = zlist_next(agents);
+                }
+            }
+            if (!detail->isEditorLicenseExpired){
+                if (detail->editorOwner != NULL){
+                    if (license->editorOwner == NULL){
+                        license->editorOwner = strdup(detail->editorOwner);
+                    }else{
+                        license->editorOwner = realloc(license->editorOwner, strlen(license->editorOwner) + strlen(detail->editorOwner) + 3);
+                        sprintf(license->editorOwner, "%s, %s", license->editorOwner, detail->editorOwner);
+                    }
+                }
+                if (license->editorExpirationDate < detail->editorExpirationDate){
+                    license->editorExpirationDate = detail->editorExpirationDate;
+                }
+                time_t t = time(NULL);
+                if (license->editorExpirationDate < t){
+                    license->isEditorLicenseExpired = true;
+                }
+            }
+            detail = zlist_next(license->licenceDetails);
+        }
     }
     if (license == NULL){
         igs_license("no license found in %s : switching to demo mode", licensePath);
         license = calloc(1, sizeof(license_t));
-        license->features = zlist_new();
-        license->agents = zlist_new();
+        license->features = zhash_new();
+        license->agents = zhash_new();
         license->licenceDetails = NULL;
     }
     //set license parameters to default for uninitialized values
@@ -517,12 +575,13 @@ bool igs_checkLicenseForAgent(const char *agentId){
     if (license == NULL){
         license_readLicense();
     }
-    licenseForAgent_t *l = zlist_first(license->agents);
+    licenseForAgent_t *l = zhash_first(license->agents);
     while (l != NULL) {
         if (l->agentId != NULL
             && strcmp(agentId, l->agentId) == 0){
             return true;
         }
+        l = zhash_next(license->agents);
     }
     return false;
 }

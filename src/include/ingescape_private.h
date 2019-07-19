@@ -215,8 +215,8 @@ typedef struct license {
     char *editorOwner;
     long editorExpirationDate;
     bool isEditorLicenseExpired;
-    zlist_t *features;
-    zlist_t *agents;
+    zhash_t *features;
+    zhash_t *agents;
     zlist_t *licenceDetails; //license struct for each detected license file
     char *fileName; //used only in each detail
 } license_t;
