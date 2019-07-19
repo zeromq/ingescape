@@ -35,13 +35,13 @@ static const QString prefix_RecordStopped = "RECORD_STOPPED";
 static const QString prefix_AllRecords = "RECORDS_LIST=";
 static const QString prefix_AddedRecord = "ADDED_RECORD=";
 static const QString prefix_DeletedRecord = "DELETED_RECORD=";
-static const QString prefix_LoadingRecord = "REPLAY_LOADING=";
-static const QString prefix_LoadedRecord = "REPLAY_LOADED";
-static const QString prefix_UNloadedRecord = "REPLAY_UNLOADED";
-static const QString prefix_EndedRecord = "REPLAY_ENDED";
+static const QString prefix_ReplayLoading = "REPLAY_LOADING=";
+static const QString prefix_ReplayLoaded = "REPLAY_LOADED";
+static const QString prefix_ReplayUNloaded = "REPLAY_UNLOADED";
+static const QString prefix_ReplayEnded = "REPLAY_ENDED";
+
 static const QString prefix_HighlightLink = "HIGHLIGHT_LINK=";
 static const QString prefix_RunAction = "RUN_THIS_ACTION#";
-
 static const QString prefix_LoadPlatformFile = "LOAD_PLATFORM_FROM_PATH=";
 static const QString prefix_UpdateTimeLineState = "UPDATE_TIMELINE_STATE=";
 static const QString prefix_UpdateRecordState = "UPDATE_RECORD_STATE=";
@@ -407,13 +407,12 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
     {
         message.remove(0, prefix_DeletedRecord.length());
 
-        // Emit the signal "Deleted record received"
         Q_EMIT deletedRecordReceived(message);
     }
-    // Loading record
-    else if (message == prefix_LoadingRecord)
+    // A replay is currently loading
+    else if (message == prefix_ReplayLoading)
     {
-        qDebug() << prefix_LoadingRecord << zmsg_size(zMessage) << "frames";
+        qDebug() << prefix_ReplayLoading << zmsg_size(zMessage) << "frames";
 
         // Check that there are still 3 frames
         if (zmsg_size(zMessage) == 3)
@@ -422,33 +421,30 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
             QString jsonPlatform = zmsg_popstr(zMessage);
             QString jsonExecutedActions = zmsg_popstr(zMessage);
 
-            // Emit the signal "Loading record received"
-            Q_EMIT loadingRecordReceived(deltaTimeFromTimeLine.toInt(), jsonPlatform, jsonExecutedActions);
+            // Emit the signal "Replay Loading received"
+            Q_EMIT replayLoadingReceived(deltaTimeFromTimeLine.toInt(), jsonPlatform, jsonExecutedActions);
         }
     }
-    // Loaded record
-    else if (message == prefix_LoadedRecord)
+    // A replay has been loaded
+    else if (message == prefix_ReplayLoaded)
     {
-        qDebug() << prefix_LoadedRecord;
+        qDebug() << prefix_ReplayLoaded;
 
-        // Emit the signal "Loaded record received"
-        Q_EMIT loadedRecordReceived();
+        Q_EMIT replayLoadedReceived();
     }
-    // UN-loaded record
-    else if (message == prefix_UNloadedRecord)
+    // A replay has been UN-loaded
+    else if (message == prefix_ReplayUNloaded)
     {
-        qDebug() << prefix_UNloadedRecord;
+        qDebug() << prefix_ReplayUNloaded;
 
-        // Emit the signal "UN-loaded record received"
-        Q_EMIT unloadedRecordReceived();
+        Q_EMIT replayUNloadedReceived();
     }
-    // End of record
-    else if (message == prefix_EndedRecord)
+    // A replay has ended
+    else if (message == prefix_ReplayEnded)
     {
-        qDebug() << prefix_EndedRecord;
+        qDebug() << prefix_ReplayEnded;
 
-        // Emit the signal "End of record Received"
-        Q_EMIT endOfRecordReceived();
+        Q_EMIT replayEndedReceived();
     }
     // MUTED / UN-MUTED
     else if (message.startsWith(prefix_Muted))

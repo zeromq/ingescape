@@ -50,10 +50,11 @@ Item {
         id: bg
         anchors.fill: parent
         color: "transparent"
+        radius: 5
 
         border {
             color: "darkgray"
-            width: 1
+            width: 2
         }
     }
 
@@ -64,10 +65,26 @@ Item {
             left: parent.left
             right: parent.right
             top: parent.top
-            margins: 5
+            margins: 10
         }
 
         spacing: 10
+
+        Text {
+            id: titlePlatforms
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            height: 30
+
+            text: "Platforms"
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Bold
+                pixelSize: 18
+            }
+        }
 
         Item {
             anchors {
@@ -75,23 +92,6 @@ Item {
                 right: parent.right
             }
             height: 30
-
-            Text {
-                id: txtPlatforms
-
-                text: qsTr("Platforms:")
-
-                height: 30
-
-                verticalAlignment: Text.AlignVCenter
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
 
             Button {
                 id: btnSelectDirectory
@@ -101,8 +101,7 @@ Item {
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
-                    left: txtPlatforms.right
-                    leftMargin: 10
+                    left: parent.left
                 }
                 width: 150
 
@@ -148,72 +147,24 @@ Item {
             }
         }
 
-        Row {
+        Text {
+            id: txtPlatformsNumber
+
+            text: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.platformsList.count + " platforms in this directory"
+                                              : ""
+
             height: 30
-            spacing: 10
 
-            Text {
-                id: txtPlatformsNumber
+            verticalAlignment: Text.AlignVCenter
 
-                text: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.platformsList.count + " platforms"
-                                                  : ""
-
-                height: 30
-
-                verticalAlignment: Text.AlignVCenter
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
-
-            Button {
-                id: btnRandomizePlatformsList
-
-                text: qsTr("Randomize")
-
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                }
-                width: 100
-
-                onClicked: {
-                    console.log("QML: Randomize the list of platforms...");
-
-                    if (IngeScapeExpeC.modelManager)
-                    {
-                        // Randomize the list of platforms
-                        IngeScapeExpeC.modelManager.randomizePlatformsList();
-                    }
-                }
-            }
-
-            Button {
-                id: btnSortInAlphabeticOrder
-
-                text: qsTr("Sort in alphabetical order")
-
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                }
-                width: 200
-
-                onClicked: {
-                    console.log("QML: Sort the list of platforms in alphabetical order...");
-
-                    if (IngeScapeExpeC.modelManager)
-                    {
-                        // Sort the list of platforms in alphabetical order
-                        IngeScapeExpeC.modelManager.sortPlatformsListInAlphabeticOrder();
-                    }
-                }
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 16
             }
         }
+
     }
 
 
@@ -222,10 +173,10 @@ Item {
 
         anchors {
             top: column.bottom
-            topMargin: 5
-            bottom: parent.bottom
+            bottom: sorts.top
             left: parent.left
             right: parent.right
+            margins: 10
         }
 
         /*style: IngeScapeScrollViewStyle {
@@ -273,12 +224,10 @@ Item {
             delegate: Rectangle {
                 id: platformItem
 
-                property var isLoaded: rootItem.currentLoadedPlatform ? (rootItem.currentLoadedPlatform === model.QtObject) : false
-
                 width: scrollView.width
                 height: 36
 
-                color: platformItem.isLoaded ? IngeScapeTheme.orangeColor : "transparent"
+                color: model.isLoaded ? IngeScapeTheme.orangeColor : "transparent"
 
                 border {
                     color: "darkgray"
@@ -332,7 +281,7 @@ Item {
                         margins: 2
                     }
 
-                    visible: !platformItem.isLoaded
+                    visible: !model.isLoaded
                     enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON
 
                     text: qsTr("LOAD");
@@ -348,4 +297,80 @@ Item {
         }
     }
 
+
+    Row {
+        id: sorts
+
+        anchors {
+            bottom: parent.bottom
+            bottomMargin: 10
+            left: parent.left
+            leftMargin: 10
+            right: parent.right
+            rightMargin: 10
+        }
+        height: 30
+
+        spacing: 10
+
+        Text {
+
+            text: "Sort"
+
+            height: 30
+
+            verticalAlignment: Text.AlignVCenter
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 16
+            }
+        }
+
+        Button {
+            id: btnRandomizePlatformsList
+
+            text: "Random"
+
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+            }
+            width: 120
+
+            onClicked: {
+                console.log("QML: Randomize the list of platforms...");
+
+                if (IngeScapeExpeC.modelManager)
+                {
+                    // Randomize the list of platforms
+                    IngeScapeExpeC.modelManager.randomizePlatformsList();
+                }
+            }
+        }
+
+        Button {
+            id: btnSortInAlphabeticOrder
+
+            text: "Alphabetical"
+
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+            }
+            width: 120
+
+            onClicked: {
+                console.log("QML: Sort the list of platforms in alphabetical order...");
+
+                if (IngeScapeExpeC.modelManager)
+                {
+                    // Sort the list of platforms in alphabetical order
+                    IngeScapeExpeC.modelManager.sortPlatformsListInAlphabeticOrder();
+                }
+            }
+        }
+    }
 }

@@ -50,10 +50,11 @@ Item {
         id: bg
         anchors.fill: parent
         color: "transparent"
+        radius: 5
 
         border {
             color: "darkgray"
-            width: 1
+            width: 2
         }
     }
 
@@ -64,10 +65,26 @@ Item {
             left: parent.left
             right: parent.right
             top: parent.top
-            margins: 5
+            margins: 10
         }
 
         spacing: 10
+
+        Text {
+            id: titlePlatform
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            height: 30
+
+            text: "Current Platform"
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Bold
+                pixelSize: 18
+            }
+        }
 
         Item {
             anchors {
@@ -151,10 +168,10 @@ Item {
 
         anchors {
             top: column.bottom
-            topMargin: 5
             bottom: parent.bottom
             left: parent.left
             right: parent.right
+            margins: 10
         }
 
         /*style: IngeScapeScrollViewStyle {

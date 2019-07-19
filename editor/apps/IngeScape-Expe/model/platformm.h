@@ -18,6 +18,11 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
+/**
+  * States for the record
+  */
+I2_ENUM(RecordStates, NOT_RECORDED, RECORDING, RECORDED)
+
 
 /**
  * @brief The PlatformM class defines a model of IngeScape platform
@@ -31,6 +36,12 @@ class PlatformM : public QObject
 
     // File path of our platform
     I2_QML_PROPERTY_READONLY(QString, filePath)
+
+    // Flag indicating if our platform is loaded (in the "Editor app")
+    I2_QML_PROPERTY_READONLY(bool, isLoaded)
+
+    // Current state about record
+    I2_QML_PROPERTY_READONLY(RecordStates::Value, recordState)
 
     // Current index of our platform in the list (for sorting)
     I2_QML_PROPERTY_READONLY(int, currentIndex)

@@ -197,30 +197,21 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when a record is loading
-     * @param deltaTimeFromTimeLine
-     * @param jsonPlatform
-     * @param jsonExecutedActions
+     * @brief Slot called when a replay has been loaded
      */
-    void onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions);
+    void onReplayLoaded();
 
 
     /**
-     * @brief Slot called when a record has been loaded
+     * @brief Slot called when a replay has been UN-loaded
      */
-    void onLoadedRecord();
+    void onReplayUNloaded();
 
 
     /**
-     * @brief Slot called when a record has been UN-loaded
+     * @brief Slot called when a replay has ended
      */
-    void onUNloadedRecord();
-
-
-    /**
-     * @brief Slot called when a record playing has ended
-     */
-    void onEndOfRecord();
+    void onReplayEnded();
 
 
 private Q_SLOTS:

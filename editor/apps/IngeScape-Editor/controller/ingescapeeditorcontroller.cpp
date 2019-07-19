@@ -176,11 +176,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::recordStoppedReceived, _recordsSupervisionC, &RecordsSupervisionController::onRecordStoppedReceived);
     connect(_networkC, &NetworkController::addedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onAddedRecord);
     connect(_networkC, &NetworkController::deletedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onDeletedRecord);
-    connect(_networkC, &NetworkController::loadingRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadingRecord);
-    connect(_networkC, &NetworkController::loadingRecordReceived, this, &IngeScapeEditorController::_onLoadingRecord);
-    connect(_networkC, &NetworkController::loadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadedRecord);
-    connect(_networkC, &NetworkController::unloadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onUNloadedRecord);
-    connect(_networkC, &NetworkController::endOfRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onEndOfRecord);
+    connect(_networkC, &NetworkController::replayLoadingReceived, this, &IngeScapeEditorController::_onReplayLoading);
+    connect(_networkC, &NetworkController::replayLoadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayLoaded);
+    connect(_networkC, &NetworkController::replayUNloadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayUNloaded);
+    connect(_networkC, &NetworkController::replayEndedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayEnded);
 
     connect(_networkC, &NetworkController::runAction, _scenarioC, &ScenarioController::onRunAction);
     connect(_networkC, &NetworkController::loadPlatformFileFromPath, this, &IngeScapeEditorController::_onLoadPlatformFileFromPath);
@@ -861,13 +860,19 @@ void IngeScapeEditorController::_onStartToRecord()
 
 
 /**
- * @brief Slot called when a record is loading
+ * @brief Slot called when a replay is currently loading
  * @param deltaTimeFromTimeLine
  * @param jsonPlatform
  * @param jsonExecutedActions
  */
-void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions)
+void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions)
 {
+    if (_recordsSupervisionC != nullptr)
+    {
+        // Update the current state of the replay
+        _recordsSupervisionC->setreplayState(ReplayStates::LOADING);
+    }
+
     if ((deltaTimeFromTimeLine >= 0) && !jsonPlatform.isEmpty())
     {
         // First, clear the current platform by deleting all existing data
@@ -896,7 +901,7 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
         }
         else
         {
-            qCritical() << "The loading of the record failed !";
+            qCritical() << "The loading of the replay failed !";
         }
     }
 }

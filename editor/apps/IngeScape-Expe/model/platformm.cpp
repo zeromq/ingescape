@@ -26,6 +26,8 @@ PlatformM::PlatformM(QString name,
                      QObject *parent) : QObject(parent),
     _name(name),
     _filePath(filePath),
+    _isLoaded(false),
+    _recordState(RecordStates::NOT_RECORDED),
     _currentIndex(indexOfAlphabeticOrder),
     _indexOfAlphabeticOrder(indexOfAlphabeticOrder)
 {

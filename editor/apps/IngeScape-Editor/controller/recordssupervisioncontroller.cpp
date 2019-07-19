@@ -431,26 +431,9 @@ void RecordsSupervisionController::onDeletedRecord(QString recordId)
 
 
 /**
- * @brief Slot called when a record is loading
- * @param deltaTimeFromTimeLine
- * @param jsonPlatform
- * @param jsonExecutedActions
+ * @brief Slot called when a replay has been loaded
  */
-void RecordsSupervisionController::onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions)
-{
-    Q_UNUSED(deltaTimeFromTimeLine)
-    Q_UNUSED(jsonPlatform)
-    Q_UNUSED(jsonExecutedActions)
-
-    // Update the current state of the replay
-    setreplayState(ReplayStates::LOADING);
-}
-
-
-/**
- * @brief Slot called when a record has been loaded
- */
-void RecordsSupervisionController::onLoadedRecord()
+void RecordsSupervisionController::onReplayLoaded()
 {
     // Update the current state of the replay
     setreplayState(ReplayStates::LOADED);
@@ -458,9 +441,9 @@ void RecordsSupervisionController::onLoadedRecord()
 
 
 /**
- * @brief Slot called when a record has been UN-loaded
+ * @brief Slot called when a replay has been UN-loaded
  */
-void RecordsSupervisionController::onUNloadedRecord()
+void RecordsSupervisionController::onReplayUNloaded()
 {
     // Update the current state of the replay
     setreplayState(ReplayStates::UNLOADED);
@@ -473,9 +456,9 @@ void RecordsSupervisionController::onUNloadedRecord()
 
 
 /**
- * @brief Slot called when a record playing has ended
+ * @brief Slot called when a replay has ended
  */
-void RecordsSupervisionController::onEndOfRecord()
+void RecordsSupervisionController::onReplayEnded()
 {
     // Update the current state of the replay
     setreplayState(ReplayStates::LOADED);

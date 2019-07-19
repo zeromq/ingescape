@@ -138,30 +138,30 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a record is loading
+     * @brief Signal emitted when a replay is currently loading
      * @param deltaTimeFromTimeLine
      * @param jsonPlatform
      * @param jsonExecutedActions
      */
-    void loadingRecordReceived(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions);
+    void replayLoadingReceived(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions);
 
 
     /**
-     * @brief Signal emitted when a record has been loaded
+     * @brief Signal emitted when a replay has been loaded
      */
-    void loadedRecordReceived();
+    void replayLoadedReceived();
 
 
     /**
-     * @brief Signal emitted when a record has been UN-loaded
+     * @brief Signal emitted when a replay has been UN-loaded
      */
-    void unloadedRecordReceived();
+    void replayUNloadedReceived();
 
 
     /**
-     * @brief Signal emitted when a record playing has ended
+     * @brief Signal emitted when a replay has ended
      */
-    void endOfRecordReceived();
+    void replayEndedReceived();
 
 
     /**
