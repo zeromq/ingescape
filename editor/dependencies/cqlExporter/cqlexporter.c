@@ -59,6 +59,8 @@ void connectToBDD(char* bddHost)
     }
 }
 
+void setCassSession(CassSession * cassSession){session = cassSession;}
+
 void disconnectToBDD(void)
 {
     cass_future_free(connect_future);
