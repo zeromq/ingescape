@@ -86,6 +86,15 @@ ExperimentationM::~ExperimentationM()
 {
     qInfo() << "Delete Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << _uid << ")";
 
+    clearData();
+}
+
+
+/**
+ * @brief Clear the attribute lists
+ */
+void ExperimentationM::clearData()
+{
     // Delete all characteristics of our experimentation
     _allCharacteristics.deleteAllItems();
 
@@ -97,7 +106,6 @@ ExperimentationM::~ExperimentationM()
 
     // Delete all record setups of our experimentation
     _allRecordSetups.deleteAllItems();
-
 }
 
 

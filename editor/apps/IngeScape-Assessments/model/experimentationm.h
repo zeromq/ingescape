@@ -80,6 +80,12 @@ public:
 
 
     /**
+     * @brief Clear the attribute lists
+     */
+    void clearData();
+
+
+    /**
      * @brief Get the unique identifier in Cassandra Data Base
      * @return
      */
@@ -156,12 +162,6 @@ public:
      * @return
      */
     static ExperimentationM* createExperimentationFromCassandraRow(const CassRow* row);
-
-
-Q_SIGNALS:
-
-
-public Q_SLOTS:
 
 
 private:

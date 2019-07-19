@@ -81,6 +81,12 @@ void ExperimentationController::setcurrentExperimentation(ExperimentationM *valu
 {
     if (_currentExperimentation != value)
     {
+        if (_currentExperimentation != nullptr)
+        {
+            // Unload any previous experimentation
+            _currentExperimentation->clearData();
+        }
+
         _currentExperimentation = value;
 
         // Manage changes
