@@ -212,6 +212,16 @@ int main(int argc, char *argv[])
     // - behavior when our last window is closed
     app.setQuitOnLastWindowClosed(true);
 
+    //------------------------------
+    //
+    // Snippet to test the integration of the exporting code
+    // TOREMOVE : only for ESTIA you can remove it when you want
+    //
+    //------------------------------
+
+    ExportController exportControllerTest;
+    exportControllerTest.exportExperimentationTest("cf113ce0-9bda-11e9-9d27-8dfc860aae8b");
+
 
     //------------------------------
     //
@@ -359,6 +369,7 @@ int main(int argc, char *argv[])
     // Mainloop
     //
     //------------------------------
+
 
     qInfo() << "Starting" << app.applicationName() << app.applicationVersion() << "with processID" << QApplication::applicationPid();
     int exitReturnCode = app.exec();
