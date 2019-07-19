@@ -6,9 +6,8 @@
 #include <string.h>
 #include <time.h>
 
+
 #include "cassandra.h"
-
-
 
 
 ////BDD

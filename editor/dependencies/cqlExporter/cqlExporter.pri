@@ -6,6 +6,8 @@
 
 DEFINES += CQL_EXPORTER_FROM_PRI
 
+INCLUDEPATH += $$PWD \
+
 SOURCES += \
     $$PWD/cqlexporter.c
 

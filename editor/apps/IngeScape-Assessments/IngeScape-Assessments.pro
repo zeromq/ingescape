@@ -224,6 +224,13 @@ win32 {
        librariesToCopy.files += ../../frameworks/I2Quick/Win$${ARCHITECTURE}/I2Quick.$${QMAKE_EXTENSION_SHLIB}
     }
 
+    #Cassandra
+    INCLUDEPATH += $$PWD/../../dependencies/cassandra-cpp-driver/include \
+
+    message($$INCLUDEPATH)
+
+    LIBS += -L../../dependencies/windows/lib$${ARCHITECTURE} -lcassandra \
+
 
     # Copy libraries in our application directory
     librariesToCopy.path = $${DESTDIR}
