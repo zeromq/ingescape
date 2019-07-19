@@ -38,6 +38,15 @@ class ExpeModelManager : public IngeScapeModelManager
     // Flag indicating is there is an editor with state ON
     I2_QML_PROPERTY_READONLY(bool, isEditorON)
 
+    // Peer id of the recorder
+    I2_CPP_NOSIGNAL_PROPERTY(QString, peerIdOfRecorder)
+
+    // Peer name of the recorder
+    I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfRecorder)
+
+    // Flag indicating is there is a recorder with state ON
+    I2_QML_PROPERTY_READONLY(bool, isRecorderON)
+
     // Current directory path
     I2_QML_PROPERTY_READONLY(QString, currentDirectoryPath)
 
@@ -108,6 +117,24 @@ public Q_SLOTS:
      * @param peerName
      */
     void onEditorExited(QString peerId, QString peerName);
+
+
+    /**
+     * @brief Slot called when a recorder enter the network
+     * @param peerId
+     * @param peerName
+     * @param ipAddress
+     * @param hostname
+     */
+    void onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
+
+
+    /**
+     * @brief Slot called when a recorder quit the network
+     * @param peerId
+     * @param peerName
+     */
+    void onRecorderExited(QString peerId, QString peerName);
 
 
     /**

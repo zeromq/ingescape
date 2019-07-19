@@ -29,6 +29,9 @@ ExpeModelManager::ExpeModelManager(JsonHelper* jsonHelper,
     _peerIdOfEditor(""),
     _peerNameOfEditor(),
     _isEditorON(false),
+    _peerIdOfRecorder(""),
+    _peerNameOfRecorder(""),
+    _isRecorderON(false),
     _currentDirectoryPath(""),
     _currentLoadedPlatform(nullptr)
 {
@@ -286,6 +289,49 @@ void ExpeModelManager::onEditorExited(QString peerId, QString peerName)
         setpeerNameOfEditor("");
 
         setisEditorON(false);
+    }
+}
+
+
+/**
+ * @brief Slot called when a recorder enter the network
+ * @param peerId
+ * @param peerName
+ * @param ipAddress
+ * @param hostname
+ */
+void ExpeModelManager::onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
+{
+    qInfo() << "Recorder entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
+
+    if (!_isRecorderON  && !peerId.isEmpty() && !peerName.isEmpty())
+    {
+        setpeerIdOfRecorder(peerId);
+        setpeerNameOfRecorder(peerName);
+
+        setisRecorderON(true);
+    }
+    else {
+        qCritical() << "We are already connected to a recorder:" << _peerNameOfRecorder << "(" << _peerIdOfRecorder << ")";
+    }
+}
+
+
+/**
+ * @brief Slot called when a recorder quit the network
+ * @param peerId
+ * @param peerName
+ */
+void ExpeModelManager::onRecorderExited(QString peerId, QString peerName)
+{
+    qInfo() << "Recorder exited (" << peerId << ")" << peerName;
+
+    if (_isRecorderON && (_peerIdOfRecorder == peerId))
+    {
+        setpeerIdOfRecorder("");
+        setpeerNameOfRecorder("");
+
+        setisRecorderON(false);
     }
 }
 

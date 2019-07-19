@@ -104,41 +104,81 @@ Item {
 
 
     // Title
-    Label {
+    Rectangle {
         id: title
 
         anchors {
             horizontalCenter: parent.horizontalCenter
             top: parent.top
-            topMargin: 20
+            topMargin: 15
+        }
+        width: 100
+        height: 40
+
+        radius: 5
+        color: "transparent"
+        border {
+            color: "darkgray"
+            width: 1
         }
 
-        text: "EXPE"
+        Label {
+            anchors.centerIn: parent
 
-        color: IngeScapeTheme.whiteColor
-        font: IngeScapeTheme.headingFont
+            text: "EXPE"
+            color: IngeScapeTheme.whiteColor
+
+            //font: IngeScapeTheme.headingFont
+            font {
+                family: IngeScapeTheme.labelFontFamily
+                pixelSize: 24
+                weight: Font.Black
+            }
+        }
     }
 
 
-    // Feedback about IngeScape Editor ON/OFF
-    Rectangle {
+    Row {
         anchors {
             top: parent.top
             right: parent.right
             margins: 15
         }
-        width: 120
-        height: 40
 
-        radius: 5
+        spacing: 5
 
-        color: (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON) ? "green" : "orange"
+        // Feedback about IngeScape Editor ON/OFF
+        Rectangle {
+            width: 100
+            height: 40
 
-        Label {
-            anchors.centerIn: parent
-            color: IngeScapeTheme.whiteColor
-            font: IngeScapeTheme.headingFont
-            text: "EDITOR"
+            radius: 5
+
+            color: (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON) ? "green" : "orange"
+
+            Label {
+                anchors.centerIn: parent
+                color: IngeScapeTheme.whiteColor
+                font: IngeScapeTheme.headingFont
+                text: "Editor"
+            }
+        }
+
+        // Feedback about IngeScape Recorder ON/OFF
+        Rectangle {
+            width: 100
+            height: 40
+
+            radius: 5
+
+            color: (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isRecorderON) ? "green" : "orange"
+
+            Label {
+                anchors.centerIn: parent
+                color: IngeScapeTheme.whiteColor
+                font: IngeScapeTheme.headingFont
+                text: "Recorder"
+            }
         }
     }
 
@@ -176,6 +216,10 @@ Item {
         height: parent.height * 0.75
     }
 
+
+    //
+    // Commands
+    //
     Item {
         id: itemCommands
 
@@ -301,7 +345,10 @@ Item {
                             //console.log("QML: Stop the timeline");
 
                             // Stop the TimeLine
-                            IngeScapeExpeC.stopTimeLine();
+                            //IngeScapeExpeC.stopTimeLine();
+
+                            // Open the "Stop" confirmation popup
+                            stopConfirmationPopup.open();
                         }
                     }
                 }
@@ -375,6 +422,25 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+
+    //
+    // Popup about Stop Confirmation
+    //
+    ConfirmationPopup {
+        id: stopConfirmationPopup
+
+        width: 400
+
+        confirmationText: "The record will be stopped and the timeline will be reseted.\nDo you want to stop the record?"
+
+        onConfirmed: {
+            console.log("QML: Stop record confirmed");
+
+            // Stop the TimeLine
+            IngeScapeExpeC.stopTimeLine();
         }
     }
 }

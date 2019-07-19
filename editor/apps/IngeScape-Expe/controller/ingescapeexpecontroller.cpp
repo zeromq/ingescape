@@ -108,6 +108,8 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::editorEntered, _modelManager, &ExpeModelManager::onEditorEntered);
     connect(_networkC, &NetworkController::editorExited, _modelManager, &ExpeModelManager::onEditorExited);
+    connect(_networkC, &NetworkController::recorderEntered, _modelManager, &ExpeModelManager::onRecorderEntered);
+    connect(_networkC, &NetworkController::recorderExited, _modelManager, &ExpeModelManager::onRecorderExited);
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &ExpeModelManager::onAgentEntered);
     connect(_networkC, &NetworkController::agentExited, _modelManager, &ExpeModelManager::onAgentExited);
     connect(_networkC, &NetworkController::statusReceivedAbout_LoadPlatformFile, _modelManager, &ExpeModelManager::onStatusReceivedAbout_LoadPlatformFile);
