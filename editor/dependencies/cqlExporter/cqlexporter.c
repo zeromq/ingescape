@@ -1,6 +1,9 @@
 #include "cqlexporter.h"
 
-#define MAX_PATH 256
+#define INT64_MAX_CHARACT 65
+#define INT32_MAX_CHARACT 33
+#define DOUBLE_MAX_CHARACT 65 //TOCHECK
+#define CASS
 
 #ifdef WIN32
     #define strdup _strdup
@@ -164,9 +167,8 @@ void writeHeaderEvent(void){
 void writeHeaderCharacteristic(CassUuid id_experimentation){
     char uuidStr[CASS_UUID_STRING_LENGTH];
     cass_uuid_string ( id_experimentation, uuidStr);
-    char output[MAX_PATH];
 
-    printf("WRITE all characteristic name from id_experimentation : ", uuidStr);
+    printf("WRITE all characteristic name from id_experimentation : %s \n", uuidStr);
 
     /* Create a statement with zero parameters */
     CassStatement* statement = cass_statement_new("SELECT * FROM ingescape.characteristic  WHERE id_experimentation = ? ORDER BY id ASC;", 1);
@@ -272,11 +274,9 @@ void writeRecordInfoFromIdRecord(CassUuid id_record){
 
             cass_int64_t offset_tl;
             cass_value_get_int64(cass_row_get_column_by_name(row_record, "offset_tl"), &offset_tl);
-            char offset_tl_str[MAX_PATH];
+            char offset_tl_str[INT64_MAX_CHARACT];
 
-            //itoa(offset_tl, offset_tl_str, 10);
-            sprintf(offset_tl_str, "%d", offset_tl);
-            //snprintf(target_string, size_of_target_string_in_bytes, "%d", source_int);
+            snprintf(offset_tl_str,INT64_MAX_CHARACT-1, "%lld", offset_tl);
 
             writeIntoFile(offset_tl_str, 1);
             writeIntoFile(";", 1);
@@ -419,8 +419,8 @@ void writeValueOfEvent( CassUuid time, cass_int8_t type){
                 cass_value_get_int32(cass_row_get_column_by_name(row, "line_tl"), &line_tl);
 
                 //Convert the value into char *
-                strToWrite = (char *) malloc(MAX_PATH + 1);
-                sprintf(strToWrite, "%d", line_tl);
+                strToWrite = (char *) malloc(INT32_MAX_CHARACT);
+                snprintf(strToWrite,INT32_MAX_CHARACT-1, "%d", line_tl);
                 break;
             }
             case REC_MAPPING_T:
@@ -444,8 +444,8 @@ void writeValueOfEvent( CassUuid time, cass_int8_t type){
                 cass_value_get_int32(cass_row_get_column_by_name(row, "value"), &intNumber);
 
                 //Convert the value into char *
-                strToWrite = (char *) malloc(MAX_PATH + 1);
-                sprintf(strToWrite, "%d", intNumber);
+                strToWrite = (char *) malloc(INT32_MAX_CHARACT);
+                snprintf(strToWrite,INT32_MAX_CHARACT-1, "%d", intNumber);
                 break;
             }
             case REC_DOUBLE_T:
@@ -454,8 +454,8 @@ void writeValueOfEvent( CassUuid time, cass_int8_t type){
                 cass_value_get_double(cass_row_get_column_by_name(row, "value"), &doubleNumber);
 
                 //Convert the value into char *
-                strToWrite = (char *) malloc(MAX_PATH + 1);
-                sprintf(strToWrite, "%f", doubleNumber);
+                strToWrite = (char *) malloc(DOUBLE_MAX_CHARACT);
+                snprintf(strToWrite,DOUBLE_MAX_CHARACT-1, "%f", doubleNumber);
                 break;
             }
             case REC_STRING_T:
