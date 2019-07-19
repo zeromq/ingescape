@@ -108,6 +108,7 @@ list(APPEND _INCLUDES_DIRECTORY
     "${SOURCE_DIR}"
     "${SOURCE_DIR}/../../frameworks/I2Quick/include"
     "${SOURCE_DIR}/../../dependencies/cassandra-cpp-driver/include"
+    "${SOURCE_DIR}/../../dependencies/cqlexporter"
 )
 
 include_directories(${_INCLUDES_DIRECTORY})
@@ -125,6 +126,9 @@ file(GLOB_RECURSE ingescape_assessments_sources_model "${SOURCE_DIR}/model/*.cpp
 list(APPEND ingescape_assessments_sources ${ingescape_assessments_sources_model})
 
 file(GLOB_RECURSE ingescape_assessments_sources_view_model "${SOURCE_DIR}/viewModel/*.cpp")
+list(APPEND ingescape_assessments_sources ${ingescape_assessments_sources_view_model})
+
+file(GLOB_RECURSE ingescape_assessments_sources_view_model "${SOURCE_DIR}/../../dependencies/cqlexporter/*.c")
 list(APPEND ingescape_assessments_sources ${ingescape_assessments_sources_view_model})
 
 list(APPEND ingescape_assessments_sources "${SOURCE_DIR}/main.cpp")
