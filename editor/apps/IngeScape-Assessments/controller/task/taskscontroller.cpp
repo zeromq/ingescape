@@ -646,6 +646,18 @@ IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid
     return independentVariable;
 }
 
+
+/**
+ * @brief Creates a new dependent variable with the given parameters and insert it into the Cassandra DB
+ * A nullptr is returned if the operation failed.
+ * @param experimentationUuid
+ * @param taskUuid
+ * @param name
+ * @param description
+ * @param valueType
+ * @param enumValues
+ * @return
+ */
 DependentVariableM* TasksController::_insertDependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, const QString& agentName, const QString& outputName)
 {
     DependentVariableM* dependentVariable = nullptr;
