@@ -119,17 +119,18 @@ void SubjectsController::createNewCharacteristic(QString characteristicName, int
 {
     if (!characteristicName.isEmpty() && (nCharacteristicValueType > -1) && (_currentExperimentation != nullptr))
     {
-        // FIXME TODO createNewCharacteristic
+        // Generate a new UUID
+        CassUuid characteristicUuid;
+        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &characteristicUuid);
 
-        /*CharacteristicValueTypes::Value characteristicValueType = static_cast<CharacteristicValueTypes::Value>(nCharacteristicValueType);
-
-        //qInfo() << "Create new characteristic" << characteristicName << "of type" << CharacteristicValueTypes::staticEnumToString(characteristicValueType);
+        CharacteristicValueTypes::Value characteristicValueType = static_cast<CharacteristicValueTypes::Value>(nCharacteristicValueType);
+        qInfo() << "Create new characteristic" << characteristicName << "of type" << CharacteristicValueTypes::staticEnumToString(characteristicValueType);
 
         // Create the new characteristic
-        CharacteristicM* characteristic = new CharacteristicM(characteristicName, characteristicValueType);
+        CharacteristicM* characteristic = new CharacteristicM(characteristicUuid, characteristicName, characteristicValueType);
 
         // Add the characteristic to the current experimentation
-        _currentExperimentation->addCharacteristic(characteristic);*/
+        _currentExperimentation->addCharacteristic(characteristic);
     }
 }
 
@@ -288,7 +289,7 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
                         qInfo() << "CharacteristicM" << characteristicName << "inserted into the DataBase";
 
                         // Create the new characteristic
-                        CharacteristicM* characteristic = new CharacteristicM(characteristicUid, characteristicName, characteristicValueType, nullptr);
+                        CharacteristicM* characteristic = new CharacteristicM(characteristicUid, characteristicName, characteristicValueType);
 
                         // Add the characteristic to the current experimentation
                         _currentExperimentation->addCharacteristic(characteristic);
@@ -332,7 +333,7 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
                             characteristicValueType = static_cast<CharacteristicValueTypes::Value>(type);
 
                             // Create the characteristic
-                            characteristic = new CharacteristicM(characteristicUid, characteristicName, characteristicValueType, nullptr);
+                            characteristic = new CharacteristicM(characteristicUid, characteristicName, characteristicValueType);
 
                             // Add the characteristic to the current experimentation
                             _currentExperimentation->addCharacteristic(characteristic);

@@ -22,7 +22,7 @@
 #include "cassandra.h"
 
 
-static const QString CHARACTERISTIC_SUBJECT_ID = "ID";
+extern const QString CHARACTERISTIC_SUBJECT_ID;
 
 
 /**
@@ -61,8 +61,9 @@ public:
      * @param parent
      */
     explicit CharacteristicM(CassUuid cassUuid,
-                             QString name,
+                             const QString& name,
                              CharacteristicValueTypes::Value valueType,
+                             const QStringList& enumValues = {},
                              QObject *parent = nullptr);
 
 

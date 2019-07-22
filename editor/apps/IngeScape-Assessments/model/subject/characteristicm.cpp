@@ -14,6 +14,8 @@
 
 #include "characteristicm.h"
 
+const QString CHARACTERISTIC_SUBJECT_ID = "ID";
+
 /**
  * @brief Constructor
  * @param name
@@ -21,14 +23,15 @@
  * @param parent
  */
 CharacteristicM::CharacteristicM(CassUuid cassUuid,
-                                 QString name,
+                                 const QString& name,
                                  CharacteristicValueTypes::Value valueType,
+                                 const QStringList& enumValues,
                                  QObject *parent) : QObject(parent),
     _uid(""),
     _name(name),
     _valueType(valueType),
-    _isSubjectId(false),
-    _enumValues(QStringList()),
+    _isSubjectId(name == CHARACTERISTIC_SUBJECT_ID),
+    _enumValues(enumValues),
     _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -39,10 +42,6 @@ CharacteristicM::CharacteristicM(CassUuid cassUuid,
     _uid = QString(chrCassUid);
 
     qInfo() << "New Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType) << "(" << _uid << ")";
-
-    if (_name == CHARACTERISTIC_SUBJECT_ID) {
-        _isSubjectId = true;
-    }
 }
 
 
