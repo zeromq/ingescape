@@ -15,7 +15,7 @@ CREATE TABLE ingescape.mapping (time timeuuid, mapping text, PRIMARY KEY(time));
 CREATE TABLE ingescape.timeline (time timeuuid, state text, PRIMARY KEY(time));
 CREATE TABLE ingescape.experimentation (id timeuuid, name text, creation_date date, creation_time time, group_name text, PRIMARY KEY (id));
 CREATE TABLE ingescape.characteristic (id timeuuid, id_experimentation timeuuid, name text, value_type tinyint, enum_values text, PRIMARY KEY (id_experimentation, id) );
-CREATE TABLE ingescape.subject (id timeuuid, id_experimentation timeuuid, name text, PRIMARY KEY (id_experimentation, id));
+CREATE TABLE ingescape.subject (id timeuuid, id_experimentation timeuuid, displayed_id text, PRIMARY KEY (id_experimentation, id));
 CREATE TABLE ingescape.task (id timeuuid, id_experimentation timeuuid, name text, platform_file text, PRIMARY KEY (id_experimentation, id));
 CREATE TABLE ingescape.independent_var (id timeuuid, id_experimentation timeuuid, id_task timeuuid, name text, description text, value_type tinyint, enum_values text, PRIMARY KEY (id_experimentation, id_task, id));
 CREATE TABLE ingescape.dependent_var (id timeuuid, id_experimentation timeuuid, id_task timeuuid, name text, description text, agent_name text, output_name text, PRIMARY KEY (id_experimentation, id_task, id));
