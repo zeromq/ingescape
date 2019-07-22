@@ -89,12 +89,6 @@ public:
     void removeCharacteristic(CharacteristicM* characteristic);
 
 
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
-
 private Q_SLOTS:
 
     /**
@@ -106,7 +100,6 @@ private Q_SLOTS:
 
 
 private:
-
     // Experimentation's unique identifier in Cassandra Data Base
     CassUuid _experimentationCassUuid;
 

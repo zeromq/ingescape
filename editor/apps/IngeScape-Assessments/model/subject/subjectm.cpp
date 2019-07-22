@@ -79,36 +79,28 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
 {
     if ((characteristic != nullptr) && (_mapCharacteristicValues != nullptr))
     {
-        // It is not possible to remove keys from the map;
-        // once a key has been added, you can only modify or clear its associated value
-        // --> Do not test if the map contains this key
-        //if (!_mapCharacteristicValues->contains(characteristic->name()))
-
-        /*switch (characteristic->valueType())
+        switch (characteristic->valueType())
         {
-        case CharacteristicValueTypes::INTEGER:
-            _mapCharacteristicValues->insert(characteristic->name(), QVariant(0));
-            break;
+            case CharacteristicValueTypes::INTEGER:
+                _mapCharacteristicValues->insert(characteristic->name(), QVariant(0));
+                break;
 
-        case CharacteristicValueTypes::DOUBLE:
-            _mapCharacteristicValues->insert(characteristic->name(), QVariant(0.0));
-            break;
+            case CharacteristicValueTypes::DOUBLE:
+                _mapCharacteristicValues->insert(characteristic->name(), QVariant(0.0));
+                break;
 
-        case CharacteristicValueTypes::TEXT:
-            _mapCharacteristicValues->insert(characteristic->name(), QVariant(""));
-            break;
+            case CharacteristicValueTypes::TEXT:
+                _mapCharacteristicValues->insert(characteristic->name(), QVariant(""));
+                break;
 
-        case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-            _mapCharacteristicValues->insert(characteristic->name(), QVariant(""));
-            break;
+            case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
+                _mapCharacteristicValues->insert(characteristic->name(), QVariant(""));
+                break;
 
-        default:
-            qWarning() << "We cannot add the characteristic" << characteristic->name() << "because the type" <<  characteristic->valueType() << "is wrong !";
-            break;
-        }*/
-
-        // Insert an (invalid) not initialized QVariant
-        _mapCharacteristicValues->insert(characteristic->name(), QVariant());
+            default:
+                qWarning() << "We cannot add the characteristic" << characteristic->name() << "because the type" <<  characteristic->valueType() << "is wrong !";
+                break;
+        }
     }
 }
 

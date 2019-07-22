@@ -66,7 +66,7 @@ public:
      * @param characteristicName
      * @param nCharacteristicValueType
      */
-    Q_INVOKABLE void createNewCharacteristic(QString characteristicName, int nCharacteristicValueType);
+    Q_INVOKABLE void createNewCharacteristic(const QString& characteristicName, int nCharacteristicValueType, const QStringList& enumValues = {});
 
 
     /**
@@ -125,6 +125,15 @@ private Q_SLOTS:
      * @return
      */
     SubjectM* _insertSubjectIntoDB(CassUuid experimentationUuid, const QString& name);
+
+
+    /**
+     * @brief Insert a new value for the given subject and characteristic into the DB
+     * A default value is written in DB according to the characterystic's type
+     * @param subject
+     * @param characteristic
+     */
+    void _insertCharacteristicValueForSubjectIntoDB(SubjectM* subject, CharacteristicM* characteristic);
 
 
 private:

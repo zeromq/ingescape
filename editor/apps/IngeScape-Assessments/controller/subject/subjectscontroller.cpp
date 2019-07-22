@@ -115,7 +115,7 @@ bool SubjectsController::canCreateCharacteristicWithName(QString characteristicN
  * @param characteristicName
  * @param nCharacteristicValueType
  */
-void SubjectsController::createNewCharacteristic(QString characteristicName, int nCharacteristicValueType)
+void SubjectsController::createNewCharacteristic(const QString& characteristicName, int nCharacteristicValueType, const QStringList& enumValues)
 {
     if (!characteristicName.isEmpty() && (nCharacteristicValueType > -1) && (_currentExperimentation != nullptr))
     {
@@ -123,10 +123,28 @@ void SubjectsController::createNewCharacteristic(QString characteristicName, int
         qInfo() << "Create new characteristic" << characteristicName << "of type" << CharacteristicValueTypes::staticEnumToString(characteristicValueType);
 
         // Create the new characteristic
-        CharacteristicM* characteristic = _insertCharacteristicIntoDB(_currentExperimentation->getCassUuid(), characteristicName, characteristicValueType);
+        CharacteristicM* characteristic = _insertCharacteristicIntoDB(_currentExperimentation->getCassUuid(), characteristicName, characteristicValueType, enumValues);
 
         if (characteristic != nullptr)
         {
+            // Add characteristic to every existing agent and add the corresponding DB entry
+            // Avoid trying to add an existing characteristic to the DB when one exists with the same name
+            bool notFound = std::none_of(_currentExperimentation->allCharacteristics()->begin(),
+                                         _currentExperimentation->allCharacteristics()->end(),
+                                         [characteristicName](CharacteristicM* characteristic) { return (characteristic != nullptr) && (characteristic->name() == characteristicName); });
+            if (notFound)
+            {
+                for (auto subjectIt = _currentExperimentation->allSubjects()->begin() ; subjectIt != _currentExperimentation->allSubjects()->end() ; ++subjectIt)
+                {
+                    SubjectM* subject = *subjectIt;
+                    if (subject != nullptr)
+                    {
+                        _insertCharacteristicValueForSubjectIntoDB(subject, characteristic);
+                        subject->addCharacteristic(characteristic);
+                    }
+                }
+            }
+
             // Add the characteristic to the current experimentation
             _currentExperimentation->addCharacteristic(characteristic);
         }
@@ -141,19 +159,7 @@ void SubjectsController::createNewCharacteristic(QString characteristicName, int
  */
 void SubjectsController::createNewCharacteristicEnum(QString characteristicName, QStringList enumValues)
 {
-    if (!characteristicName.isEmpty() && !enumValues.isEmpty() && (_currentExperimentation != nullptr))
-    {
-        qInfo() << "Create new characteristic" << characteristicName << "of type" << CharacteristicValueTypes::staticEnumToString(CharacteristicValueTypes::CHARACTERISTIC_ENUM);
-
-        // Create the new characteristic
-        CharacteristicM* characteristic = _insertCharacteristicIntoDB(_currentExperimentation->getCassUuid(), characteristicName, CharacteristicValueTypes::CHARACTERISTIC_ENUM, enumValues);
-
-        if (characteristic != nullptr)
-        {
-            // Add the characteristic to the current experimentation
-            _currentExperimentation->addCharacteristic(characteristic);
-        }
-    }
+    createNewCharacteristic(characteristicName, CharacteristicValueTypes::CHARACTERISTIC_ENUM, enumValues);
 }
 
 
@@ -195,6 +201,7 @@ void SubjectsController::createNewSubject()
             {
                 if (characteristic != nullptr)
                 {
+                    _insertCharacteristicValueForSubjectIntoDB(subject, characteristic);
                     subject->addCharacteristic(characteristic);
                 }
             }
@@ -438,5 +445,57 @@ SubjectM* SubjectsController::_insertSubjectIntoDB(CassUuid experimentationUuid,
     cass_future_free(cassFuture);
 
     return subject;
+}
+
+
+/**
+ * @brief Insert a new value for the given subject and characteristic into the DB
+ * A default value is written in DB according to the characterystic's type
+ * @param subject
+ * @param characteristic
+ */
+void SubjectsController::_insertCharacteristicValueForSubjectIntoDB(SubjectM* subject, CharacteristicM* characteristic)
+{
+    if ((subject != nullptr) && (characteristic != nullptr))
+    {
+        const char* query = "INSERT INTO ingescape.characteristic_value_of_subject (id_experimentation, id_subject, id_characteristic, characteristic_value) VALUES (?, ?, ?, ?);";
+        CassStatement* cassStatement = cass_statement_new(query, 4);
+        cass_statement_bind_uuid  (cassStatement, 0, subject->getExperimentationCassUuid());
+        cass_statement_bind_uuid  (cassStatement, 1, subject->getCassUuid());
+        cass_statement_bind_uuid  (cassStatement, 2, characteristic->getCassUuid());
+        const char* value;
+        switch(characteristic->valueType())
+        {
+            case CharacteristicValueTypes::INTEGER:
+                value = "0";
+                break;
+            case CharacteristicValueTypes::DOUBLE:
+                value = "0.0";
+                break;
+            case CharacteristicValueTypes::TEXT:
+            case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
+                value = "";
+                break;
+            default:
+                // Unknown characteristic value type
+                value = "";
+                break;
+        }
+        cass_statement_bind_string(cassStatement, 3, value);
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "New characteristic value inserted into the DB";
+        }
+        else {
+            qCritical() << "Could not insert the new subject into the DB:" << cass_error_desc(cassError);
+        }
+
+        cass_statement_free(cassStatement);
+        cass_future_free(cassFuture);
+    }
 }
 

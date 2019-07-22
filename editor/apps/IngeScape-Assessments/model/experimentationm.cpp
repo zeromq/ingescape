@@ -99,15 +99,6 @@ void ExperimentationM::addCharacteristic(CharacteristicM* characteristic)
 
         // Add to the list
         _allCharacteristics.append(characteristic);
-
-        // Add this characteristic for all existing subjects
-        for (SubjectM* subject : _allSubjects)
-        {
-            if (subject != nullptr)
-            {
-                subject->addCharacteristic(characteristic);
-            }
-        }
     }
 }
 
@@ -125,15 +116,6 @@ void ExperimentationM::removeCharacteristic(CharacteristicM* characteristic)
 
         // Remove from the list
         _allCharacteristics.remove(characteristic);
-
-        // Remove this characteristic for all existing subjects
-        for (SubjectM* subject : _allSubjects)
-        {
-            if (subject != nullptr)
-            {
-                subject->removeCharacteristic(characteristic);
-            }
-        }
     }
 }
 
