@@ -37,10 +37,10 @@ class RecordSetupM : public QObject
     I2_QML_PROPERTY(QString, name)
 
     // Subject of our record
-    I2_QML_PROPERTY(SubjectM*, subject)
+    I2_QML_PROPERTY_DELETE_PROOF(SubjectM*, subject)
 
     // Task of our record
-    I2_QML_PROPERTY(TaskM*, task)
+    I2_QML_PROPERTY_DELETE_PROOF(TaskM*, task)
 
     // Start date and time of our record
     I2_QML_PROPERTY(QDateTime, startDateTime)
@@ -74,7 +74,7 @@ public:
      * @param startDateTime
      * @param parent
      */
-    explicit RecordSetupM(QString uid,
+    explicit RecordSetupM(CassUuid cassUuid,
                                     QString name,
                                     SubjectM* subject,
                                     TaskM* task,
@@ -100,6 +100,9 @@ private:
      * @brief For debug purpose: Print the value of all independent variables
      */
     void _printIndependentVariableValues();
+
+private:
+    CassUuid _cassUuid;
 
 
 };

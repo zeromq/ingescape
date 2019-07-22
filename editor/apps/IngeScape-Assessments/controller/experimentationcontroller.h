@@ -87,6 +87,16 @@ private Q_SLOTS:
 
 protected: // Methods
     /**
+     * @brief Create and insert a new record setup into the DB.
+     * A nullptr is returned if the record setup could not be created
+     * @param recordName
+     * @param subject
+     * @param task
+     * @return
+     */
+    RecordSetupM* _insertRecordSetupIntoDB(const QString& recordName, SubjectM* subject, TaskM* task);
+
+    /**
      * @brief Retrieve all independent variables from the Cassandra DB for the given task.
      * The task will be updated by this method.
      * @param task

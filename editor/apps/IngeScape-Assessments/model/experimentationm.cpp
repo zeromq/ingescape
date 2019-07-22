@@ -62,6 +62,9 @@ ExperimentationM::~ExperimentationM()
  */
 void ExperimentationM::clearData()
 {
+    // Delete all record setups of our experimentation
+    _allRecordSetups.deleteAllItems();
+
     // Delete all characteristics of our experimentation
     _allCharacteristics.deleteAllItems();
 
@@ -70,9 +73,6 @@ void ExperimentationM::clearData()
 
     // Delete all tasks of our experimentation
     _allTasks.deleteAllItems();
-
-    // Delete all record setups of our experimentation
-    _allRecordSetups.deleteAllItems();
 }
 
 

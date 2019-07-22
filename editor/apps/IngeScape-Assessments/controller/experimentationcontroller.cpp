@@ -14,6 +14,8 @@
 
 #include "experimentationcontroller.h"
 
+#include <ctime>
+
 #include <controller/assessmentsmodelmanager.h>
 
 /**
@@ -109,18 +111,17 @@ void ExperimentationController::createNewRecordForSubjectAndTask(QString recordN
     {
         qInfo() << "Create new record" << recordName << "for subject" << subject->displayedId() << "and task" << task->name();
 
-        QDateTime now = QDateTime::currentDateTime();
-
-        QString recordUID = now.toString("R-yyMMdd-hhmmss-zzz");
-
         // Create a new (experimentation) record setup
-        RecordSetupM* recordSetup = new RecordSetupM(recordUID, recordName, subject, task, now, nullptr);
+        RecordSetupM* recordSetup = _insertRecordSetupIntoDB(recordName, subject, task);
 
-        // Add the record to the current experimentation
-        _currentExperimentation->addRecordSetup(recordSetup);
+        if (recordSetup != nullptr)
+        {
+            // Add the record to the current experimentation
+            _currentExperimentation->addRecordSetup(recordSetup);
 
-        // Open this new record
-        openRecordSetup(recordSetup);
+            // Open this new record
+            openRecordSetup(recordSetup);
+        }
     }
 }
 
@@ -219,6 +220,61 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
         cass_future_free(cassFuture);
         cass_statement_free(cassStatement);
     }
+}
+
+/**
+ * @brief Create and insert a new record setup into the DB.
+ * A nullptr is returned if the record setup could not be created
+ * @param recordName
+ * @param subject
+ * @param task
+ * @return
+ */
+RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString& recordName, SubjectM* subject, TaskM* task)
+{
+    RecordSetupM* recordSetup = nullptr;
+
+    if (subject != nullptr && task != nullptr)
+    {
+        CassUuid recordUuid;
+        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &recordUuid);
+
+        time_t now = std::time(nullptr);
+
+        cass_uint32_t yearMonthDay = cass_date_from_epoch(now);
+        cass_int64_t timeOfDay = cass_time_from_epoch(now);
+
+        const char* query = "INSERT INTO ingescape.record_setup (id_experimentation, id_subject, id_task, id, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        CassStatement* cassStatement = cass_statement_new(query, 9);
+        cass_statement_bind_uuid  (cassStatement, 0, subject->getExperimentationCassUuid());
+        cass_statement_bind_uuid  (cassStatement, 1, subject->getCassUuid());
+        cass_statement_bind_uuid  (cassStatement, 2, task->getCassUuid());
+        cass_statement_bind_uuid  (cassStatement, 3, recordUuid);
+        cass_statement_bind_string(cassStatement, 4, recordName.toStdString().c_str());
+        cass_statement_bind_uint32(cassStatement, 5, yearMonthDay);
+        cass_statement_bind_int64 (cassStatement, 6, timeOfDay);
+        cass_statement_bind_uint32(cassStatement, 7, yearMonthDay); //FIXME current date/time to have all values filled with something for test purposes.
+        cass_statement_bind_int64 (cassStatement, 8, timeOfDay); //FIXME current date/time to have all values filled with something for test purposes.
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "New dependent variable inserted into the DB";
+
+            // Create the new record setup
+            recordSetup = new RecordSetupM(recordUuid, recordName, subject, task, QDateTime::currentDateTime());
+        }
+        else {
+            qCritical() << "Could not insert the new dependent variable into the DB:" << cass_error_desc(cassError);
+        }
+
+        cass_statement_free(cassStatement);
+        cass_future_free(cassFuture);
+    }
+
+    return recordSetup;
 }
 
 /**
