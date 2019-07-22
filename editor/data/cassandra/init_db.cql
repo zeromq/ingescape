@@ -19,3 +19,4 @@ CREATE TABLE ingescape.subject (id timeuuid, id_experimentation timeuuid, displa
 CREATE TABLE ingescape.task (id timeuuid, id_experimentation timeuuid, name text, platform_file text, PRIMARY KEY (id_experimentation, id));
 CREATE TABLE ingescape.independent_var (id timeuuid, id_experimentation timeuuid, id_task timeuuid, name text, description text, value_type tinyint, enum_values text, PRIMARY KEY (id_experimentation, id_task, id));
 CREATE TABLE ingescape.dependent_var (id timeuuid, id_experimentation timeuuid, id_task timeuuid, name text, description text, agent_name text, output_name text, PRIMARY KEY (id_experimentation, id_task, id));
+CREATE TABLE ingescape.characteristic_value_of_subject (id_experimentation timeuuid, id_subject timeuuid, id_characteristic timeuuid, characteristic_value text, PRIMARY KEY (id_experimentation, id_subject, id_characteristic));
