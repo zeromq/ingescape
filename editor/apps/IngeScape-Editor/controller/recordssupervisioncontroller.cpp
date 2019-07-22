@@ -58,6 +58,8 @@ RecordsSupervisionController::~RecordsSupervisionController()
     // Clean-up current selection
     setselectedRecord(nullptr);
 
+    setcurrentReplay(nullptr);
+
     _hashFromRecordIdToViewModel.clear();
 
     disconnect(&_timerToDisplayTime, &QTimer::timeout, this, &RecordsSupervisionController::_onTimeout_DisplayTime);

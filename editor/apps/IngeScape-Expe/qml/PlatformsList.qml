@@ -227,11 +227,34 @@ Item {
                 width: scrollView.width
                 height: 36
 
-                color: model.isLoaded ? IngeScapeTheme.orangeColor : "transparent"
+                //color: model.isLoaded ? IngeScapeTheme.orangeColor : "transparent"
+                color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.darkGreyColor : "transparent"
 
                 border {
-                    color: "darkgray"
-                    width: 1
+                    color: model.isLoaded ? IngeScapeTheme.orangeColor : "darkgray"
+                    width: model.isLoaded ? 3 : 1
+                }
+
+                Button {
+
+                    anchors {
+                        left: parent.left
+                        top: parent.top
+                        bottom: parent.bottom
+                        margins: 2
+                    }
+
+                    visible: !model.isLoaded
+                    enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON
+
+                    text: qsTr("LOAD");
+
+                    onClicked: {
+                        console.log("QML: Load platform " + model.name);
+
+                        // Open platform
+                        IngeScapeExpeC.openPlatform(model.QtObject);
+                    }
                 }
 
                 Label {
@@ -239,13 +262,13 @@ Item {
 
                     anchors {
                         left: parent.left
-                        leftMargin: 5
+                        leftMargin: 100
                         verticalCenter: parent.verticalCenter
                     }
 
                     text: model ? model.name : ""
 
-                    color: IngeScapeTheme.whiteColor
+                    color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
                     font {
                         family: IngeScapeTheme.textFontFamily
                         //weight: Font.Medium
@@ -264,7 +287,7 @@ Item {
                     text: model ? model.currentIndex + " (" + model.indexOfAlphabeticOrder + ")"
                                 : ""
 
-                    color: IngeScapeTheme.whiteColor
+                    color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
                     font {
                         family: IngeScapeTheme.textFontFamily
                         //weight: Font.Medium
@@ -272,25 +295,25 @@ Item {
                     }
                 }
 
-                Button {
+                Rectangle {
+                    id: feedbackRecording
 
                     anchors {
                         right: parent.right
-                        top: parent.top
-                        bottom: parent.bottom
-                        margins: 2
+                        rightMargin: 10
+                        verticalCenter: parent.verticalCenter
                     }
+                    width: 20
+                    height: 20
+                    radius: 10
 
-                    visible: !model.isLoaded
-                    enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON
+                    visible: (model.recordState === RecordStates.RECORDING)
 
-                    text: qsTr("LOAD");
+                    color: IngeScapeTheme.redColor
 
-                    onClicked: {
-                        console.log("QML: Load platform " + model.name);
-
-                        // Open platform
-                        IngeScapeExpeC.openPlatform(model.QtObject);
+                    border {
+                        color: "darkgray"
+                        width: 1
                     }
                 }
             }

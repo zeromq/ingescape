@@ -100,7 +100,7 @@ void registerCustomQmlTypes()
     // Enums
     //
     //---------------
-    //qmlRegisterSingletonType<CharacteristicValueTypes>("INGESCAPE", 1, 0, "CharacteristicValueTypes", &CharacteristicValueTypes::qmlSingleton);
+    qmlRegisterSingletonType<RecordStates>("INGESCAPE", 1, 0, "RecordStates", &RecordStates::qmlSingleton);
 
 
     //----------------

@@ -338,6 +338,19 @@ void IngeScapeExpeController::startOrStopRecording(bool isStart)
 
         // Send the command and parameters to the editor
         _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+
+
+        //
+        // FIXME: get state from recorder messages
+        //
+        if (isStart)
+        {
+            _modelManager->currentLoadedPlatform()->setrecordState(RecordStates::RECORDING);
+        }
+        else
+        {
+            _modelManager->currentLoadedPlatform()->setrecordState(RecordStates::RECORDED);
+        }
     }
 }
 
