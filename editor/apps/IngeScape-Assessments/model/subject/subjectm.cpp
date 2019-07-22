@@ -120,6 +120,33 @@ void SubjectM::removeCharacteristic(CharacteristicM* characteristic)
 
 
 /**
+ * @brief Static factory method to create a subject from a CassandraDB record
+ * @param row
+ * @return
+ */
+SubjectM* SubjectM::createTaskFromCassandraRow(const CassRow* row)
+{
+    SubjectM* subject = nullptr;
+
+    if (row != nullptr)
+    {
+        CassUuid experimentationUuid, taskUuid;
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskUuid);
+
+        const char *chrDisplayedId = "";
+        size_t displayedIdLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "displayed_id"), &chrDisplayedId, &displayedIdLength);
+        QString displayedId = QString::fromUtf8(chrDisplayedId, static_cast<int>(displayedIdLength));
+
+        subject = new SubjectM(experimentationUuid, taskUuid, displayedId);
+    }
+
+    return subject;
+}
+
+
+/**
  * @brief Slot called when the value of a characteristic changed
  * @param key
  * @param value

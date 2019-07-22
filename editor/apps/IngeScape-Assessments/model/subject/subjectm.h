@@ -89,6 +89,14 @@ public:
     void removeCharacteristic(CharacteristicM* characteristic);
 
 
+    /**
+     * @brief Static factory method to create a subject from a CassandraDB record
+     * @param row
+     * @return
+     */
+    static SubjectM* createTaskFromCassandraRow(const CassRow* row);
+
+
 private Q_SLOTS:
 
     /**

@@ -110,10 +110,23 @@ protected: // Methods
      */
     void _retrieveDependentVariableForTask(TaskM* task);
 
+    /**
+     * @brief Retrieve all subjects from the Cassandra DB for the given experimentaion.
+     * The experimentation will be updated by this method
+     * @param experimentation
+     */
+    void _retrieveSubjectsForExperimentation(ExperimentationM* experimentation);
+
+    /**
+     * @brief Retrieve all tasks from the Cassandra DB for the given experimentaion.
+     * The experimentation will be updated by this method
+     * @param experimentation
+     */
+    void _retrieveTasksForExperimentation(ExperimentationM* experimentation);
+
 protected: // Attributes
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
-
 };
 
 QML_DECLARE_TYPE(ExperimentationController)

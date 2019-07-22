@@ -173,52 +173,9 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
 
         // FIXME TODO: load data about this experimentation (subjects, tasks, ...)
 
-        const char* query = "SELECT * FROM ingescape.task WHERE id_experimentation = ?;";
+        _retrieveTasksForExperimentation(currentExperimentation);
 
-        // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(query, 1);
-        cass_statement_bind_uuid(cassStatement, 0, currentExperimentation->getCassUuid());
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qDebug() << "Get all tasks succeeded";
-
-            // Retrieve result set and iterate over the rows
-            const CassResult* cassResult = cass_future_get_result(cassFuture);
-
-            if (cassResult != nullptr)
-            {
-                CassIterator* cassIterator = cass_iterator_from_result(cassResult);
-
-                while(cass_iterator_next(cassIterator))
-                {
-                    const CassRow* row = cass_iterator_get_row(cassIterator);
-                    TaskM* task = TaskM::createTaskFromCassandraRow(row);
-                    if (task != nullptr)
-                    {
-                        // Load variables
-                        _retrieveIndependentVariableForTask(task);
-
-                        // Load variables
-                        _retrieveDependentVariableForTask(task);
-
-                        // Add the task to the experimentation
-                        _currentExperimentation->addTask(task);
-                    }
-                }
-
-                cass_iterator_free(cassIterator);
-            }
-        }
-        else {
-            qCritical() << "Could not get all tasks for the current experiment from the database:" << cass_error_desc(cassError);
-        }
-
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
+        _retrieveSubjectsForExperimentation(currentExperimentation);
     }
 }
 
@@ -375,4 +332,110 @@ void ExperimentationController::_retrieveDependentVariableForTask(TaskM* task)
         cass_future_free(cassFuture);
         cass_statement_free(cassStatement);
     }
+}
+
+
+/**
+ * @brief Retrieve all subjects from the Cassandra DB for the given experimentaion.
+ * The experimentation will be updated by this method
+ * @param experimentation
+ */
+void ExperimentationController::_retrieveSubjectsForExperimentation(ExperimentationM* experimentation)
+{
+    const char* query = "SELECT * FROM ingescape.subject WHERE id_experimentation = ?;";
+
+    // Creates the new query statement
+    CassStatement* cassStatement = cass_statement_new(query, 1);
+    cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qDebug() << "Get all subjects succeeded";
+
+        // Retrieve result set and iterate over the rows
+        const CassResult* cassResult = cass_future_get_result(cassFuture);
+
+        if (cassResult != nullptr)
+        {
+            CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+
+            while(cass_iterator_next(cassIterator))
+            {
+                const CassRow* row = cass_iterator_get_row(cassIterator);
+                SubjectM* task = SubjectM::createTaskFromCassandraRow(row);
+                if (task != nullptr)
+                {
+                    // Add the subject to the experimentation
+                    experimentation->addSubject(task);
+                }
+            }
+
+            cass_iterator_free(cassIterator);
+        }
+    }
+    else {
+        qCritical() << "Could not get all subjects for the current experiment from the database:" << cass_error_desc(cassError);
+    }
+
+    cass_future_free(cassFuture);
+    cass_statement_free(cassStatement);
+}
+
+
+/**
+ * @brief Retrieve all tasks from the Cassandra DB for the given experimentaion.
+ * The experimentation will be updated by this method
+ * @param experimentation
+ */
+void ExperimentationController::_retrieveTasksForExperimentation(ExperimentationM* experimentation)
+{
+    const char* query = "SELECT * FROM ingescape.task WHERE id_experimentation = ?;";
+
+    // Creates the new query statement
+    CassStatement* cassStatement = cass_statement_new(query, 1);
+    cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qDebug() << "Get all tasks succeeded";
+
+        // Retrieve result set and iterate over the rows
+        const CassResult* cassResult = cass_future_get_result(cassFuture);
+
+        if (cassResult != nullptr)
+        {
+            CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+
+            while(cass_iterator_next(cassIterator))
+            {
+                const CassRow* row = cass_iterator_get_row(cassIterator);
+                TaskM* task = TaskM::createTaskFromCassandraRow(row);
+                if (task != nullptr)
+                {
+                    // Load variables
+                    _retrieveIndependentVariableForTask(task);
+
+                    // Load variables
+                    _retrieveDependentVariableForTask(task);
+
+                    // Add the task to the experimentation
+                    experimentation->addTask(task);
+                }
+            }
+
+            cass_iterator_free(cassIterator);
+        }
+    }
+    else {
+        qCritical() << "Could not get all tasks for the current experiment from the database:" << cass_error_desc(cassError);
+    }
+
+    cass_future_free(cassFuture);
+    cass_statement_free(cassStatement);
 }
