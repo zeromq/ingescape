@@ -108,13 +108,23 @@ private Q_SLOTS:
 
     /**
      * @brief Creates a new characteristic with the given parameters and insert it into the Cassandra DB
-     * A nullptr is returned if the operation failed.
+     * A nullptr is returned if the operation fails
      * @param experimentationUuid
      * @param name
      * @param valueType
      * @param enumValues
      */
     CharacteristicM* _insertCharacteristicIntoDB(CassUuid experimentationUuid, const QString& name, CharacteristicValueTypes::Value valueType, const QStringList& enumValues = {});
+
+
+    /**
+     * @brief Creates a new subject with the given parameters an insert it into the Cassandra DB
+     * a nullptr is returned if the operation fails
+     * @param experimentationUuid
+     * @param name
+     * @return
+     */
+    SubjectM* _insertSubjectIntoDB(CassUuid experimentationUuid, const QString& name);
 
 
 private:

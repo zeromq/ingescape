@@ -22,11 +22,13 @@
  * @param parent
  */
 SubjectM::SubjectM(CassUuid cassUuid,
+                   CassUuid experimentationUuid,
                    QString displayedId,
                    QObject *parent) : QObject(parent),
     _uid(""),
     _displayedId(displayedId),
     _mapCharacteristicValues(nullptr),
+    _experimentationCassUuid(experimentationUuid),
     _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -66,16 +68,6 @@ SubjectM::~SubjectM()
         setmapCharacteristicValues(nullptr);
         delete temp;
     }
-}
-
-
-/**
- * @brief Get the unique identifier in Cassandra Data Base
- * @return
- */
-CassUuid SubjectM::getCassUuid()
-{
-    return _cassUuid;
 }
 
 

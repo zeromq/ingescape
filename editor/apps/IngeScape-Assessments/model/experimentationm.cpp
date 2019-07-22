@@ -41,41 +41,8 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
 
     qInfo() << "New Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << _uid << ")";
 
-
     // Record setups are sorted on their start date/time (chronological order)
     _allRecordSetups.setSortProperty("startDateTime");
-
-
-    // Characteristic "Subject Name"
-    //CharacteristicM* characteristicName = new CharacteristicM(CHARACTERISTIC_SUBJECT_ID, CharacteristicValueTypes::TEXT, true, this);
-    //_allCharacteristics.append(characteristicName);
-
-
-    //
-    // FIXME for tests
-    //
-
-    /*SubjectM* debugSubject = new SubjectM("S", this);
-    debugSubject->mapCharacteristicValues()->insert(CHARACTERISTIC_SUBJECT_ID, QVariant("M. JEAN"));
-
-    _allSubjects.append(debugSubject);
-
-
-    // Directory for platform files
-    QString platformPath = IngeScapeUtils::getPlatformsPath();
-
-    for (int i = 0; i < 2; i++)
-    {
-        QString taskName = QString("Task for test %1").arg(i + 1);
-
-        TaskM* debugTask = new TaskM(taskName, this);
-
-        QString platformFilePath = QString("%1i2.json").arg(platformPath);
-        QUrl platformFileUrl = QUrl(platformFilePath);
-        debugTask->setplatformFileUrl(platformFileUrl);
-
-        _allTasks.append(debugTask);
-    }*/
 }
 
 

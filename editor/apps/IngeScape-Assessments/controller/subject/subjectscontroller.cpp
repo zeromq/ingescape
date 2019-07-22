@@ -185,23 +185,23 @@ void SubjectsController::createNewSubject()
 
         QString displayedId = now.toString("S-yyMMdd-hhmmss-zzz");
 
-        CassUuid subjectUid;
-        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &subjectUid);
-
         // Create a new subject
-        SubjectM* subject = new SubjectM(subjectUid, displayedId, nullptr);
+        SubjectM* subject = _insertSubjectIntoDB(_currentExperimentation->getCassUuid(), displayedId);
 
-        // For each existing characteristic
-        for (CharacteristicM* characteristic : _currentExperimentation->allCharacteristics()->toList())
+        if (subject != nullptr)
         {
-            if (characteristic != nullptr)
+            // For each existing characteristic
+            for (CharacteristicM* characteristic : _currentExperimentation->allCharacteristics()->toList())
             {
-                subject->addCharacteristic(characteristic);
+                if (characteristic != nullptr)
+                {
+                    subject->addCharacteristic(characteristic);
+                }
             }
-        }
 
-        // Add the subject to the current experimentation
-        _currentExperimentation->addSubject(subject);
+            // Add the subject to the current experimentation
+            _currentExperimentation->addSubject(subject);
+        }
     }
 }
 
@@ -397,5 +397,46 @@ CharacteristicM* SubjectsController::_insertCharacteristicIntoDB(CassUuid experi
     cass_future_free(cassFuture);
 
     return characteristic;
+}
+
+
+/**
+ * @brief Creates a new subject with the given parameters an insert it into the Cassandra DB
+ * a nullptr is returned if the operation fails
+ * @param experimentationUuid
+ * @param name
+ * @return
+ */
+SubjectM* SubjectsController::_insertSubjectIntoDB(CassUuid experimentationUuid, const QString& displayed_id)
+{
+    SubjectM* subject = nullptr;
+
+    CassUuid subjectUuid;
+    cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &subjectUuid);
+
+    const char* query = "INSERT INTO ingescape.subject (id_experimentation, id, displayed_id) VALUES (?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(query, 3);
+    cass_statement_bind_uuid  (cassStatement, 0, experimentationUuid);
+    cass_statement_bind_uuid  (cassStatement, 1, subjectUuid);
+    cass_statement_bind_string(cassStatement, 2, displayed_id.toStdString().c_str());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qInfo() << "New subject inserted into the DB";
+
+        // Create the new task
+        subject = new SubjectM(subjectUuid, experimentationUuid, displayed_id);
+    }
+    else {
+        qCritical() << "Could not insert the new subject into the DB:" << cass_error_desc(cassError);
+    }
+
+    cass_statement_free(cassStatement);
+    cass_future_free(cassFuture);
+
+    return subject;
 }
 

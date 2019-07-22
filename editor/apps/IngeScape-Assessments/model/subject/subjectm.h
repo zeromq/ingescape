@@ -50,6 +50,7 @@ public:
      * @param parent
      */
     explicit SubjectM(CassUuid cassUuid,
+                      CassUuid experimentationUuid,
                       QString displayedId,
                       QObject *parent = nullptr);
 
@@ -64,7 +65,14 @@ public:
      * @brief Get the unique identifier in Cassandra Data Base
      * @return
      */
-    CassUuid getCassUuid();
+    CassUuid getCassUuid() { return _cassUuid; }
+
+
+    /**
+     * @brief Get the experimentation's unique identifier in Cassandra Data Base
+     * @return
+     */
+    CassUuid getExperimentationCassUuid() { return _experimentationCassUuid; }
 
 
     /**
@@ -98,6 +106,9 @@ private Q_SLOTS:
 
 
 private:
+
+    // Experimentation's unique identifier in Cassandra Data Base
+    CassUuid _experimentationCassUuid;
 
     // Unique identifier in Cassandra Data Base
     CassUuid _cassUuid;
