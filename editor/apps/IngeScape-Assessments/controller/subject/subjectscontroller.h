@@ -97,12 +97,6 @@ public:
     Q_INVOKABLE void deleteSubject(SubjectM* subject);
 
 
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
-
 private Q_SLOTS:
 
     /**
@@ -110,6 +104,17 @@ private Q_SLOTS:
      * @param currentExperimentation
      */
     void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
+
+
+    /**
+     * @brief Creates a new characteristic with the given parameters and insert it into the Cassandra DB
+     * A nullptr is returned if the operation failed.
+     * @param experimentationUuid
+     * @param name
+     * @param valueType
+     * @param enumValues
+     */
+    CharacteristicM* _insertCharacteristicIntoDB(CassUuid experimentationUuid, const QString& name, CharacteristicValueTypes::Value valueType, const QStringList& enumValues = {});
 
 
 private:

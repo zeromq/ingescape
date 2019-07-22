@@ -23,6 +23,7 @@ const QString CHARACTERISTIC_SUBJECT_ID = "ID";
  * @param parent
  */
 CharacteristicM::CharacteristicM(CassUuid cassUuid,
+                                 CassUuid experimentationUuid,
                                  const QString& name,
                                  CharacteristicValueTypes::Value valueType,
                                  const QStringList& enumValues,
@@ -32,6 +33,7 @@ CharacteristicM::CharacteristicM(CassUuid cassUuid,
     _valueType(valueType),
     _isSubjectId(name == CHARACTERISTIC_SUBJECT_ID),
     _enumValues(enumValues),
+    _experimentationCassUuid(experimentationUuid),
     _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -52,14 +54,4 @@ CharacteristicM::~CharacteristicM()
 {
     qInfo() << "Delete Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType) << "(" << _uid << ")";
 
-}
-
-
-/**
- * @brief Get the unique identifier in Cassandra Data Base
- * @return
- */
-CassUuid CharacteristicM::getCassUuid()
-{
-    return _cassUuid;
 }
