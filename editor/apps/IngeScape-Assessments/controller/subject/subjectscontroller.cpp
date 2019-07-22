@@ -85,6 +85,14 @@ void SubjectsController::setcurrentExperimentation(ExperimentationM *value)
  */
 bool SubjectsController::canCreateCharacteristicWithName(QString characteristicName)
 {
+    //NOTE Oneliner
+//    const QList<CharacteristicM*>& characteristicList = _currentExperimentation->allCharacteristics()->toList();
+//    return !characteristicName.isEmpty() && (_currentExperimentation != nullptr)
+//            && std::none_of(characteristicList.begin(), characteristicList.end(),
+//                            [characteristicName](CharacteristicM* characteristic){
+//        return (characteristic != nullptr) && (characteristic->name() == characteristicName);
+//    });
+
     if (!characteristicName.isEmpty() && (_currentExperimentation != nullptr))
     {
         for (CharacteristicM* characteristic : _currentExperimentation->allCharacteristics()->toList())
