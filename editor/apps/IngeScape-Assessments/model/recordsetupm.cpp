@@ -14,6 +14,8 @@
 
 #include "recordsetupm.h"
 
+#include "controller/assessmentsmodelmanager.h"
+
 
 /**
  * @brief Constructor
@@ -29,7 +31,7 @@ RecordSetupM::RecordSetupM(CassUuid cassUuid,
                            TaskM* task,
                            QDateTime startDateTime,
                            QObject *parent) : QObject(parent),
-    _uid(""),
+    _uid(AssessmentsModelManager::cassUuidToQString(cassUuid)),
     _name(name),
     _subject(subject),
     _task(task),
@@ -42,10 +44,6 @@ RecordSetupM::RecordSetupM(CassUuid cassUuid,
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    char chrCassUid[CASS_UUID_STRING_LENGTH];
-    cass_uuid_string(_cassUuid, chrCassUid);
-    _uid = QString(chrCassUid);
 
     if ((_subject != nullptr) && (_task != nullptr))
     {

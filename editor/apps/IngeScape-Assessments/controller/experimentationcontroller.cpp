@@ -575,15 +575,11 @@ void ExperimentationController::_retrieveRecordSetupsForExperimentation(Experime
                     {
                         CassUuid subjectUuid;
                         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
-                        char chrSubjectUuid[CASS_UUID_STRING_LENGTH];
-                        cass_uuid_string(subjectUuid, chrSubjectUuid);
-                        recordSetup->setsubject(experimentation->getSubjectFromUID(chrSubjectUuid));
+                        recordSetup->setsubject(experimentation->getSubjectFromUID(AssessmentsModelManager::cassUuidToQString(subjectUuid)));
 
                         CassUuid taskUuid;
                         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
-                        char chrTaskUuid[CASS_UUID_STRING_LENGTH];
-                        cass_uuid_string(taskUuid, chrTaskUuid);
-                        recordSetup->settask(experimentation->getTaskFromUID(chrTaskUuid));
+                        recordSetup->settask(experimentation->getTaskFromUID(AssessmentsModelManager::cassUuidToQString(taskUuid)));
 
                         // Add the record setup to the experimentation
                         experimentation->addRecordSetup(recordSetup);

@@ -15,6 +15,8 @@
 #include "experimentationm.h"
 #include <misc/ingescapeutils.h>
 
+#include "controller/assessmentsmodelmanager.h"
+
 /**
  * @brief Constructor
  * @param name
@@ -26,7 +28,7 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
                                    QString groupeName,
                                    QDateTime creationDate,
                                    QObject *parent) : QObject(parent),
-    _uid(""),
+    _uid(AssessmentsModelManager::cassUuidToQString(cassUuid)),
     _name(name),
     _groupName(groupeName),
     _creationDate(creationDate),
@@ -34,10 +36,6 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    char chrCassUid[CASS_UUID_STRING_LENGTH];
-    cass_uuid_string(_cassUuid, chrCassUid);
-    _uid = QString(chrCassUid);
 
     qInfo() << "New Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << _uid << ")";
 
@@ -264,8 +262,6 @@ ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const 
     {
         CassUuid experimentationUid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &experimentationUid);
-        char chrExperimentationUid[CASS_UUID_STRING_LENGTH];
-        cass_uuid_string(experimentationUid, chrExperimentationUid);
 
         const char *chrExperimentationName = "";
         size_t nameLength;

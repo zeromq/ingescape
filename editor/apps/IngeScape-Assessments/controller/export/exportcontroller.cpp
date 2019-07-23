@@ -63,15 +63,14 @@ void ExportController::exportExperimentation()
     if (_currentExperimentation != nullptr)
     {
         CassUuid experimentationUid = _currentExperimentation->getCassUuid();
-        char chrExperimentationUid[CASS_UUID_STRING_LENGTH];
-        cass_uuid_string(experimentationUid, chrExperimentationUid);
+        QString expeUuidString = AssessmentsModelManager::cassUuidToQString(experimentationUid);
 
-        qInfo() << "Export the experimentation" << _currentExperimentation->name() << "(" << chrExperimentationUid << ")";
+        qInfo() << "Export the experimentation" << _currentExperimentation->name() << "(" << expeUuidString << ")";
 
         QString exportFilePath = QString("%1export_%2.csv").arg(_exportsDirectoryPath, _currentExperimentation->name());
 
         // Open the file to save the export
-        openFile((char*)exportFilePath.toStdString().c_str());
+        openFile(const_cast<char*>(exportFilePath.toStdString().c_str()));
 
         // Set the cassandra session for the exporting layer
         setCassSession(AssessmentsModelManager::Instance()->getCassSession());
@@ -92,8 +91,7 @@ void ExportController::exportExperimentationTest(QString uuidIdExp)
 {
     CassUuid experimentationUid;
     cass_uuid_from_string(uuidIdExp.toLatin1().constData(), &experimentationUid);
-    char chrExperimentationUid[CASS_UUID_STRING_LENGTH];
-    cass_uuid_string(experimentationUid, chrExperimentationUid);
+    QString expeUuidString = AssessmentsModelManager::cassUuidToQString(experimentationUid);
 
     qInfo() << "Export the experimentation from UUID : "<< uuidIdExp;
 
@@ -101,10 +99,10 @@ void ExportController::exportExperimentationTest(QString uuidIdExp)
     QString exportFileName = QString("export_test.csv");
 
     // Connect to the BDD
-    connectToBDD((char*)ipAddress.toStdString().c_str());
+    connectToBDD(const_cast<char*>(ipAddress.toStdString().c_str()));
 
     // Open the file to save the export
-    openFile((char*)exportFileName.toStdString().c_str());
+    openFile(const_cast<char*>(exportFileName.toStdString().c_str()));
 
     // Export a full dump of the current experimentation
     exportAllRecordsFromIdExpAndTableRecordSetup(experimentationUid);

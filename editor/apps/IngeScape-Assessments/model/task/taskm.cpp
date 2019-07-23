@@ -14,6 +14,8 @@
 
 #include "taskm.h"
 
+#include "controller/assessmentsmodelmanager.h"
+
 /**
  * @brief Constructor
  * @param name
@@ -21,8 +23,8 @@
  */
 TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QString& name, const QUrl& platformFile, QObject *parent)
     : QObject(parent)
-    , _experimentationUuid("")
-    , _uid("")
+    , _experimentationUuid(AssessmentsModelManager::cassUuidToQString(experimentationUuid))
+    , _uid(AssessmentsModelManager::cassUuidToQString(uid))
     , _name(name)
     , _platformFileUrl(QUrl())
     , _platformFileName("")
@@ -32,14 +34,6 @@ TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QSt
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    char chrExperimentationUuid[CASS_UUID_STRING_LENGTH];
-    cass_uuid_string(experimentationUuid, chrExperimentationUuid);
-    setexperimentationUuid(chrExperimentationUuid);
-
-    char chrTaskUuid[CASS_UUID_STRING_LENGTH];
-    cass_uuid_string(uid, chrTaskUuid);
-    setuid(chrTaskUuid);
 
     setplatformFileUrl(platformFile);
 

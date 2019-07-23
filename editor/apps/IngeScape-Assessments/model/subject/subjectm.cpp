@@ -14,6 +14,8 @@
 
 #include "subjectm.h"
 
+#include "controller/assessmentsmodelmanager.h"
+
 
 /**
  * @brief Constructor
@@ -25,7 +27,7 @@ SubjectM::SubjectM(CassUuid experimentationUuid,
                    CassUuid cassUuid,
                    QString displayedId,
                    QObject *parent) : QObject(parent),
-    _uid(""),
+    _uid(AssessmentsModelManager::cassUuidToQString(cassUuid)),
     _displayedId(displayedId),
     _mapCharacteristicValues(nullptr),
     _experimentationCassUuid(experimentationUuid),
@@ -33,10 +35,6 @@ SubjectM::SubjectM(CassUuid experimentationUuid,
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    char chrCassUid[CASS_UUID_STRING_LENGTH];
-    cass_uuid_string(_cassUuid, chrCassUid);
-    _uid = QString(chrCassUid);
 
     qInfo() << "New Model of Subject" << _displayedId << "(" << _uid << ")";
 
