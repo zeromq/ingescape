@@ -314,7 +314,7 @@ Item {
             id: platformBackground
 
             width: scrollView.width
-            height: 36
+            height: model.isLoaded ? 55 : 40
 
             color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.darkGreyColor : "transparent"
 
@@ -323,20 +323,50 @@ Item {
                 width: model.isLoaded ? 3 : 1
             }
 
+            Behavior on height {
+                NumberAnimation {
+                    duration: 300
+                }
+            }
+
             Button {
                 id: btnLoad
 
+                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+                height: boundingBox.height
+                width: boundingBox.width
+
                 anchors {
                     left: parent.left
-                    top: parent.top
-                    bottom: parent.bottom
-                    margins: 2
+                    leftMargin: 5
+                    verticalCenter: parent.verticalCenter
                 }
 
                 visible: !model.isLoaded
                 enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON
+                opacity: (model.recordState === RecordStates.RECORDED) ? 0.75 : 1.0
+                activeFocusOnPress: true
 
-                text: qsTr("LOAD");
+                text: (model.recordState === RecordStates.RECORDED) ? "Re-load" : "Load"
+
+                style: I2SvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
+
+                    releasedID: "button"
+                    pressedID: releasedID + "-pressed"
+                    disabledID: releasedID + "-disabled"
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+                    labelColorPressed: IngeScapeTheme.blackColor
+                    labelColorReleased: IngeScapeTheme.whiteColor
+                    labelColorDisabled: IngeScapeTheme.lightGreyColor
+
+                }
 
                 onClicked: {
                     console.log("QML: Load platform " + model.name);
@@ -359,7 +389,7 @@ Item {
                 text: model ? model.currentIndex + " (" + model.indexOfAlphabeticOrder + ")"
                             : ""
 
-                color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
+                color: IngeScapeTheme.lightGreyColor //(model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
                     //weight: Font.Medium
@@ -382,12 +412,12 @@ Item {
                 color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
+                    //weight: Font.Medium
                     pixelSize: 16
                 }
             }
 
-            Rectangle {
+            /*Rectangle {
                 id: feedbackRecording
 
                 anchors {
@@ -406,6 +436,97 @@ Item {
                 border {
                     color: "darkgray"
                     width: 1
+                }
+            }*/
+
+            Row {
+                id: commands
+
+                anchors {
+                    right: parent.right
+                    rightMargin: 10
+                    verticalCenter: parent.verticalCenter
+                }
+                height: 30
+
+                visible: model.isLoaded
+
+                spacing: 10
+
+                Button {
+                    id: btnPlayOrPauseTL
+
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+
+                    visible: true
+                    activeFocusOnPress: true
+                    enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON && IngeScapeExpeC.modelManager.currentLoadedPlatform
+                    checkable: true
+                    checked: false
+
+                    style: I2SvgToggleButtonStyle {
+                        fileCache: IngeScapeExpeTheme.svgFileIngeScapeExpe
+
+                        toggleCheckedReleasedID: "timeline-pause"
+                        toggleCheckedPressedID: toggleCheckedReleasedID + "-pressed"
+                        toggleUncheckedReleasedID: "timeline-play"
+                        toggleUncheckedPressedID: toggleUncheckedReleasedID + "-pressed"
+
+                        // No disabled states
+                        toggleCheckedDisabledID: toggleCheckedPressedID
+                        toggleUncheckedDisabledID: toggleUncheckedPressedID
+
+                        labelMargin: 0;
+                    }
+
+                    onClicked: {
+                        //console.log("QML: Play or Pause the timeline");
+
+                        // Play or Pause the TimeLine
+                        IngeScapeExpeC.playOrPauseTimeLine(checked);
+                    }
+
+                    Binding {
+                        target: btnPlayOrPauseTL
+                        property: "checked"
+                        value: IngeScapeExpeC.isPlayingTimeLine
+                    }
+                }
+
+                Button {
+                    id: btnStopTL
+
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+
+                    visible: true
+                    enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.currentLoadedPlatform
+                    opacity: enabled ? 1.0 : 0.3
+
+                    //text: qsTr("STOP")
+
+                    style: LabellessSvgButtonStyle {
+                        fileCache: IngeScapeExpeTheme.svgFileIngeScapeExpe
+
+                        releasedID: "record-stop"
+                        pressedID: releasedID + "-pressed"
+                        disabledID: pressedID
+                    }
+
+                    onClicked: {
+                        //console.log("QML: Stop the timeline");
+
+                        // Stop the TimeLine
+                        //IngeScapeExpeC.stopTimeLine();
+
+                        // Open the "Stop" confirmation popup
+                        stopConfirmationPopup.open();
+                    }
                 }
             }
         }
