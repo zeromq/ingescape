@@ -59,34 +59,6 @@ TasksController::~TasksController()
 
 
 /**
- * @brief Setter for property "Selected Task"
- * @param value
- */
-/*void TasksController::setselectedTask(TaskM *value)
-{
-    if (_selectedTask != value)
-    {
-        // Previous selected task was defined
-        if (_selectedTask != nullptr)
-        {
-
-        }
-
-        // Update the selected task
-        _selectedTask = value;
-
-        // New selected task is defined
-        if (_selectedTask != nullptr)
-        {
-
-        }
-
-        Q_EMIT selectedTaskChanged(value);
-    }
-}*/
-
-
-/**
  * @brief Return true if the user can create a task with the name
  * Check if the name is not empty and if a task with the same name does not already exist
  * @param taskName
@@ -533,6 +505,27 @@ void TasksController::deleteDependentVariable(DependentVariableM* dependentVaria
     {
         // Remove the dependent variable from the selected task
         _selectedTask->removeDependentVariable(dependentVariable);
+
+        // Remove from DB
+        const char* query = "DELETE FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ?;";
+        CassStatement* cassStatement = cass_statement_new(query, 2);
+        cass_statement_bind_uuid(cassStatement, 0, _selectedTask->getExperimentationCassUuid());
+        cass_statement_bind_uuid(cassStatement, 1, _selectedTask->getCassUuid());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "Dependent variables" << dependentVariable->name() << "has been successfully deleted from the DB";
+        }
+        else {
+            qCritical() << "Could not delete the dependent variables" << dependentVariable->name() << "from the DB:" << cass_error_desc(cassError);
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
 
         // Free memory
         delete dependentVariable;
