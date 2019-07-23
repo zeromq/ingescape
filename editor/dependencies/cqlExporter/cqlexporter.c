@@ -929,7 +929,6 @@ void writeAllIndepentVarFromIdExpAndIdRecord(CassUuid id_experimentation, CassUu
                 cass_value_get_string(cass_row_get_column_by_name(current_row, "independent_var_value"), &independent_var_value, &size_independent_var_value);
 
                 //FIXME: we need to force ending \0 on output, certainly a bug in cassandra
-                free(strToWrite);
                 strToWrite = (char *) malloc(size_independent_var_value + 1);
                 strncpy(strToWrite, independent_var_value, size_independent_var_value);
                 strToWrite[size_independent_var_value] = '\0';
