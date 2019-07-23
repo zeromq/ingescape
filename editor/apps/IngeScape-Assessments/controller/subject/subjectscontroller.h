@@ -78,7 +78,7 @@ public:
 
 
     /**
-     * @brief Delete a characteristic
+     * @brief Delete the given characteristic from the current experimentation and from the Cassandra DB
      * @param characteristic
      */
     Q_INVOKABLE void deleteCharacteristic(CharacteristicM* characteristic);
@@ -91,7 +91,7 @@ public:
 
 
     /**
-     * @brief Delete a subject
+     * @brief Delete the given subject from the current experimentation and from the Cassandra DB
      * @param subject
      */
     Q_INVOKABLE void deleteSubject(SubjectM* subject);

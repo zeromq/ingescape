@@ -164,7 +164,7 @@ void SubjectsController::createNewCharacteristicEnum(QString characteristicName,
 
 
 /**
- * @brief Delete a characteristic
+ * @brief Delete the given characteristic from the current experimentation and from the Cassandra DB
  * @param characteristic
  */
 void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
@@ -173,6 +173,27 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
     {
         // Remove the characteristic from the current experimentation
         _currentExperimentation->removeCharacteristic(characteristic);
+
+        // Remove characteristic from DB
+        const char* query = "DELETE FROM ingescape.characteristic WHERE id_experimentation = ? AND id = ?;";
+        CassStatement* cassStatement = cass_statement_new(query, 2);
+        cass_statement_bind_uuid(cassStatement, 0, characteristic->getExperimentationCassUuid());
+        cass_statement_bind_uuid(cassStatement, 1, characteristic->getCassUuid());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "Characteristic" << characteristic->name() << "has been successfully deleted from the DB";
+        }
+        else {
+            qCritical() << "Could not delete the characteristic" << characteristic->name() << "from the DB:" << cass_error_desc(cassError);
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
 
         // Free memory
         delete characteristic;
@@ -214,7 +235,7 @@ void SubjectsController::createNewSubject()
 
 
 /**
- * @brief Delete a subject
+ * @brief Delete the given subject from the current experimentation and from the Cassandra DB
  * @param subject
  */
 void SubjectsController::deleteSubject(SubjectM* subject)
@@ -223,6 +244,27 @@ void SubjectsController::deleteSubject(SubjectM* subject)
     {
         // Remove the subject from the current experimentation
         _currentExperimentation->removeSubject(subject);
+
+        // Remove subject from DB
+        const char* query = "DELETE FROM ingescape.subject WHERE id_experimentation = ? AND id = ?;";
+        CassStatement* cassStatement = cass_statement_new(query, 2);
+        cass_statement_bind_uuid(cassStatement, 0, subject->getExperimentationCassUuid());
+        cass_statement_bind_uuid(cassStatement, 1, subject->getCassUuid());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "Subject" << subject->displayedId() << "has been successfully deleted from the DB";
+        }
+        else {
+            qCritical() << "Could not delete the subject" << subject->displayedId() << "from the DB:" << cass_error_desc(cassError);
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
 
         // Free memory
         delete subject;
