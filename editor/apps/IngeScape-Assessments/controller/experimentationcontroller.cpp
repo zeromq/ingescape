@@ -100,12 +100,12 @@ void ExperimentationController::setcurrentExperimentation(ExperimentationM *valu
 
 
 /**
- * @brief Create a new record for a subject and a task
+ * @brief Create a new record setup for a subject and a task
  * @param recordName
  * @param subject
  * @param task
  */
-void ExperimentationController::createNewRecordForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task)
+void ExperimentationController::createNewRecordSetupForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task)
 {
     if (!recordName.isEmpty() && (subject != nullptr) && (task != nullptr) && (_currentExperimentation != nullptr))
     {
@@ -227,13 +227,42 @@ RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString&
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
-            qInfo() << "New dependent variable inserted into the DB";
+            qInfo() << "New record_setup inserted into the DB";
 
             // Create the new record setup
             recordSetup = new RecordSetupM(recordSetupUuid, recordName, subject, task, QDateTime::currentDateTime());
+
+            for (auto indeVarIt = task->independentVariables()->begin() ; indeVarIt != task->independentVariables()->end() ; ++indeVarIt)
+            {
+                IndependentVariableM* independentVar = *indeVarIt;
+                if (independentVar != nullptr)
+                {
+                    // Insert an instance of every independent variable for this record setup into DB
+                    const char* innerQuery = "INSERT INTO ingescape.independent_var_value_of_record_setup (id_experimentation, id_record_setup, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
+                    CassStatement* innerCassStatement = cass_statement_new(innerQuery, 4);
+                    cass_statement_bind_uuid  (innerCassStatement, 0, subject->getExperimentationCassUuid());
+                    cass_statement_bind_uuid  (innerCassStatement, 1, recordSetup->getCassUuid());
+                    cass_statement_bind_uuid  (innerCassStatement, 2, independentVar->getCassUuid());
+                    cass_statement_bind_string(innerCassStatement, 3, "");
+
+                    // Execute the query or bound statement
+                    CassFuture* innerCassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), innerCassStatement);
+                    CassError innerCassError = cass_future_error_code(innerCassFuture);
+                    if (innerCassError == CASS_OK)
+                    {
+                        qInfo() << "New independent value for record_setup inserted into the DB";
+                    }
+                    else {
+                        qCritical() << "Could not insert the new independent value for record_setup into the DB:" << cass_error_desc(innerCassError);
+                    }
+
+                    cass_statement_free(innerCassStatement);
+                    cass_future_free(innerCassFuture);
+                }
+            }
         }
         else {
-            qCritical() << "Could not insert the new dependent variable into the DB:" << cass_error_desc(cassError);
+            qCritical() << "Could not insert the new record_setup into the DB:" << cass_error_desc(cassError);
         }
 
         cass_statement_free(cassStatement);

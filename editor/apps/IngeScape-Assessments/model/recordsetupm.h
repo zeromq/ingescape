@@ -75,11 +75,11 @@ public:
      * @param parent
      */
     explicit RecordSetupM(CassUuid cassUuid,
-                                    QString name,
-                                    SubjectM* subject,
-                                    TaskM* task,
-                                    QDateTime startDateTime,
-                                    QObject *parent = nullptr);
+                          QString name,
+                          SubjectM* subject,
+                          TaskM* task,
+                          QDateTime startDateTime,
+                          QObject *parent = nullptr);
 
 
     /**
@@ -87,12 +87,11 @@ public:
      */
     ~RecordSetupM();
 
-
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
+    /**
+     * @brief Accessor for the Cassandra UUID of this entry
+     * @return
+     */
+    CassUuid getCassUuid() const { return _cassUuid; }
 
 private:
 

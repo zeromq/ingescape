@@ -431,7 +431,7 @@ I2PopupBase {
                     if (controller && comboSubjects.selectedItem && comboTasks.selectedItem)
                     {
                         // Create a new record for a subject and a task
-                        controller.createNewRecordForSubjectAndTask(txtRecordName.text, comboSubjects.selectedItem, comboTasks.selectedItem);
+                        controller.createNewRecordSetupForSubjectAndTask(txtRecordName.text, comboSubjects.selectedItem, comboTasks.selectedItem);
                     }
 
                     // Reset all user inputs and close the popup

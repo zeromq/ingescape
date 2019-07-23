@@ -55,12 +55,12 @@ public:
 
 
     /**
-     * @brief Create a new record for a subject and a task
+     * @brief Create a new record setup for a subject and a task
      * @param recordName
      * @param subject
      * @param task
      */
-    Q_INVOKABLE void createNewRecordForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task);
+    Q_INVOKABLE void createNewRecordSetupForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task);
 
 
     /**
