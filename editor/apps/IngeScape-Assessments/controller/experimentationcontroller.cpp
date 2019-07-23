@@ -573,6 +573,18 @@ void ExperimentationController::_retrieveRecordSetupsForExperimentation(Experime
                     RecordSetupM* recordSetup = RecordSetupM::createRecordSetupFromCassandraRow(row);
                     if (recordSetup != nullptr)
                     {
+                        CassUuid subjectUuid;
+                        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
+                        char chrSubjectUuid[CASS_UUID_STRING_LENGTH];
+                        cass_uuid_string(subjectUuid, chrSubjectUuid);
+                        recordSetup->setsubject(experimentation->getSubjectFromUID(chrSubjectUuid));
+
+                        CassUuid taskUuid;
+                        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
+                        char chrTaskUuid[CASS_UUID_STRING_LENGTH];
+                        cass_uuid_string(taskUuid, chrTaskUuid);
+                        recordSetup->settask(experimentation->getTaskFromUID(chrTaskUuid));
+
                         // Add the record setup to the experimentation
                         experimentation->addRecordSetup(recordSetup);
                     }

@@ -222,11 +222,40 @@ void ExperimentationM::removeRecordSetup(RecordSetupM* recordSetup)
  * @param uid
  * @return
  */
-CharacteristicM* ExperimentationM::getCharacteristicFromUID(QString uid)
+CharacteristicM* ExperimentationM::getCharacteristicFromUID(const QString& uid)
 {
     return _hashFromUIDtoCharacteristic.value(uid, nullptr);
 }
 
+/**
+ * @brief Get a task from its UID
+ * @param uid
+ * @return
+ */
+SubjectM* ExperimentationM::getSubjectFromUID(const QString& uid)
+{
+    auto subjectIt = std::find_if(_allSubjects.begin(), _allSubjects.end(), [uid](SubjectM* subject) { return (subject != nullptr) && (subject->uid() == uid); });
+    return (subjectIt != _allSubjects.end()) ? *subjectIt : nullptr;
+}
+
+
+/**
+ * @brief Get a task from its UID
+ * @param uid
+ * @return
+ */
+TaskM* ExperimentationM::getTaskFromUID(const QString& uid)
+{
+    auto taskIt = std::find_if(_allTasks.begin(), _allTasks.end(), [uid](TaskM* task) { return (task != nullptr) && (task->uid() == uid); });
+    return (taskIt != _allTasks.end()) ? *taskIt : nullptr;
+}
+
+
+/**
+ * @brief Static factory method to create an experiment from a CassandraDB record
+ * @param row
+ * @return
+ */
 ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const CassRow* row)
 {
     ExperimentationM* experimentation = nullptr;
