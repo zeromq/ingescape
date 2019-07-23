@@ -377,7 +377,10 @@ Item {
 
                         characteristic: column.characteristic
 
-                        characteristicValue: model ? model.mapCharacteristicValues[column.role] : ""
+                        characteristicValue: {
+                            if (model) { console.log("column.role:" + column.role) }
+                            model ? (column.role === "ID" ? model.displayedId : model.mapCharacteristicValues[column.role]) : ""
+                        }
 
                         isSelected: styleData.selected
 

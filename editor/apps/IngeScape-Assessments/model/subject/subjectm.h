@@ -49,8 +49,8 @@ public:
      * @param displayedId
      * @param parent
      */
-    explicit SubjectM(CassUuid cassUuid,
-                      CassUuid experimentationUuid,
+    explicit SubjectM(CassUuid experimentationUuid,
+                      CassUuid cassUuid,
                       QString displayedId,
                       QObject *parent = nullptr);
 
@@ -80,6 +80,9 @@ public:
      * @param characteristic
      */
     void addCharacteristic(CharacteristicM* characteristic);
+
+
+    void setCharacteristicValue(CharacteristicM* characteristic, const QVariant& value);
 
 
     /**

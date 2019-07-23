@@ -118,11 +118,25 @@ protected: // Methods
     void _retrieveSubjectsForExperimentation(ExperimentationM* experimentation);
 
     /**
+     * @brief Retrieve all characteristics from the Cassandra DB for the given experimentaion.
+     * The experimentation will be updated by this method
+     * @param experimentation
+     */
+    void _retrieveCharacteristicsForExperimentation(ExperimentationM* experimentation);
+
+    /**
      * @brief Retrieve all tasks from the Cassandra DB for the given experimentaion.
      * The experimentation will be updated by this method
      * @param experimentation
      */
     void _retrieveTasksForExperimentation(ExperimentationM* experimentation);
+
+    /**
+     * @brief Retrieve all characteristic values from the Cassandra DB for each given subjects.
+     * The subjects will be updated by this method
+     * @param experimentation
+     */
+    void _retrieveCharacteristicValuesForSubjectsInExperimentation(ExperimentationM* experimentation);
 
 protected: // Attributes
     // Helper to manage JSON files
