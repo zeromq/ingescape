@@ -132,6 +132,13 @@ protected: // Methods
     void _retrieveTasksForExperimentation(ExperimentationM* experimentation);
 
     /**
+     * @brief Retrieve all record setups from the Cassandra DB for the given experimentaion.
+     * The experimentation will be updated by this method
+     * @param experimentation
+     */
+    void _retrieveRecordSetupsForExperimentation(ExperimentationM* experimentation);
+
+    /**
      * @brief Retrieve all characteristic values from the Cassandra DB for each given subjects.
      * The subjects will be updated by this method
      * @param experimentation

@@ -93,8 +93,14 @@ public:
      */
     CassUuid getCassUuid() const { return _cassUuid; }
 
-private:
+    /**
+     * @brief Static factory method to create a record setup from a CassandraDB record
+     * @param row
+     * @return
+     */
+    static RecordSetupM* createRecordSetupFromCassandraRow(const CassRow* row);
 
+private:
     /**
      * @brief For debug purpose: Print the value of all independent variables
      */

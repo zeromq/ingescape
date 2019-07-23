@@ -180,6 +180,8 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
         _retrieveCharacteristicsForExperimentation(currentExperimentation);
 
         _retrieveCharacteristicValuesForSubjectsInExperimentation(currentExperimentation);
+
+        _retrieveRecordSetupsForExperimentation(currentExperimentation);
     }
 }
 
@@ -537,6 +539,62 @@ void ExperimentationController::_retrieveTasksForExperimentation(Experimentation
     }
 }
 
+/**
+ * @brief Retrieve all record setups from the Cassandra DB for the given experimentaion.
+ * The experimentation will be updated by this method
+ * @param experimentation
+ */
+void ExperimentationController::_retrieveRecordSetupsForExperimentation(ExperimentationM* experimentation)
+{
+    if (experimentation != nullptr)
+    {const char* query = "SELECT * FROM ingescape.record_setup WHERE id_experimentation = ?;";
+
+        // Creates the new query statement
+        CassStatement* cassStatement = cass_statement_new(query, 1);
+        cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qDebug() << "Get all record setup succeeded";
+
+            // Retrieve result set and iterate over the rows
+            const CassResult* cassResult = cass_future_get_result(cassFuture);
+
+            if (cassResult != nullptr)
+            {
+                CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+
+                while(cass_iterator_next(cassIterator))
+                {
+                    const CassRow* row = cass_iterator_get_row(cassIterator);
+                    RecordSetupM* recordSetup = RecordSetupM::createRecordSetupFromCassandraRow(row);
+                    if (recordSetup != nullptr)
+                    {
+                        // Add the record setup to the experimentation
+                        experimentation->addRecordSetup(recordSetup);
+                    }
+                }
+
+                cass_iterator_free(cassIterator);
+            }
+        }
+        else {
+            qCritical() << "Could not get all record setup for the current experiment from the database:" << cass_error_desc(cassError);
+        }
+
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+    }
+}
+
+/**
+ * @brief Retrieve all characteristic values from the Cassandra DB for each given subjects.
+ * The subjects will be updated by this method
+ * @param experimentation
+ */
 void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperimentation(ExperimentationM* experimentation)
 {
     if (experimentation != nullptr)
