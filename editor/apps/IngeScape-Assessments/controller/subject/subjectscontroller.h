@@ -136,6 +136,9 @@ private Q_SLOTS:
     void _insertCharacteristicValueForSubjectIntoDB(SubjectM* subject, CharacteristicM* characteristic);
 
 
+    void _deleteCharacteristicValuesForSubject(SubjectM* subject);
+
+
 private:
 
 };
