@@ -105,7 +105,7 @@ Item {
             Text {
                 width: 125
 
-                text: (rootItem.modelM && rootItem.modelM.subject) ? rootItem.modelM.subject.name : ""
+                text: (rootItem.modelM && rootItem.modelM.subject) ? rootItem.modelM.subject.displayedId : ""
 
                 color: IngeScapeTheme.whiteColor
                 font {

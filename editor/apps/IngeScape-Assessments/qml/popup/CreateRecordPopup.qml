@@ -222,11 +222,11 @@ I2PopupBase {
 
                     // the subject and the task are defined
                     text: if (comboSubjects.selectedItem && comboTasks.selectedItem) {
-                              String("Record-%1-%2-%3").arg(comboSubjects.selectedItem.name).arg(comboTasks.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+                              String("Record-%1-%2-%3").arg(comboSubjects.selectedItem.displayedId).arg(comboTasks.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
                           }
                     // Only the subject is defined
                           else if (comboSubjects.selectedItem) {
-                              String("Record-%1-???-%2").arg(comboSubjects.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+                              String("Record-%1-???-%2").arg(comboSubjects.selectedItem.displayedId).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
                           }
                     // Only the task is defined
                           else if (comboTasks.selectedItem) {
@@ -277,7 +277,7 @@ I2PopupBase {
 
                     function modelToString(_model) {
                         if (_model) {
-                            return _model.name;
+                            return _model.displayedId;
                         }
                         else {
                             return "";

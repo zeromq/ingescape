@@ -164,7 +164,7 @@ Item {
                 horizontalCenter: parent.horizontalCenter
             }
 
-            text: rootItem.recordSetup && rootItem.recordSetup.subject ? rootItem.recordSetup.subject.name : ""
+            text: rootItem.recordSetup && rootItem.recordSetup.subject ? rootItem.recordSetup.subject.displayedId : ""
 
             color: IngeScapeTheme.whiteColor
             font {
