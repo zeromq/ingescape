@@ -724,7 +724,7 @@ void writeOneSubjectNameFromIdExpAndIdSubject(CassUuid id_experimentation, CassU
 
             const char* name;
             size_t size_name;
-            cass_value_get_string(cass_row_get_column_by_name(row_record, "name"), &name, &size_name);
+            cass_value_get_string(cass_row_get_column_by_name(row_record, "displayed_id"), &name, &size_name);
             //FIXME: we need to force ending \0 on output, certainly a bug in cassandra
             free(strToWrite);
             strToWrite = (char *) malloc(size_name + 1);
@@ -861,7 +861,6 @@ void writeAllCharactValuesFromIdExpAndIdSubject(CassUuid id_exp, CassUuid id_sub
                 cass_value_get_string(cass_row_get_column_by_name(current_row, "characteristic_value"), &characteristic_value, &size_characteristic_value);
 
                 //FIXME: we need to force ending \0 on output, certainly a bug in cassandra
-                free(strToWrite);
                 strToWrite = (char *) malloc(size_characteristic_value + 1);
                 strncpy(strToWrite, characteristic_value, size_characteristic_value);
                 strToWrite[size_characteristic_value] = '\0';
