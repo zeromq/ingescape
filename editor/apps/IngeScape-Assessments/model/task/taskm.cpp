@@ -21,15 +21,25 @@
  */
 TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QString& name, const QUrl& platformFile, QObject *parent)
     : QObject(parent)
-      , _name(name)
-      , _platformFileUrl(QUrl())
-      , _platformFileName("")
-      //, _agentNamesList(QStringList())
-      , _cassExperimentationUuid(experimentationUuid)
-      , _cassUuid(uid)
+    , _experimentationUuid("")
+    , _uid("")
+    , _name(name)
+    , _platformFileUrl(QUrl())
+    , _platformFileName("")
+    //, _agentNamesList(QStringList())
+    , _cassExperimentationUuid(experimentationUuid)
+    , _cassUuid(uid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    char chrExperimentationUuid[CASS_UUID_STRING_LENGTH];
+    cass_uuid_string(experimentationUuid, chrExperimentationUuid);
+    setexperimentationUuid(chrExperimentationUuid);
+
+    char chrTaskUuid[CASS_UUID_STRING_LENGTH];
+    cass_uuid_string(uid, chrTaskUuid);
+    setuid(chrTaskUuid);
 
     setplatformFileUrl(platformFile);
 
