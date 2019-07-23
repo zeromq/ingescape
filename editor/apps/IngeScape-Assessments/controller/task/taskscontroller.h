@@ -36,7 +36,7 @@ class TasksController : public QObject
     I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)
 
     // Model of the selected task
-    I2_QML_PROPERTY(TaskM*, selectedTask)
+    I2_QML_PROPERTY_DELETE_PROOF(TaskM*, selectedTask)
 
 
 public:
