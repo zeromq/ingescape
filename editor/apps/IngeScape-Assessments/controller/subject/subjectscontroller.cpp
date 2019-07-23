@@ -435,7 +435,7 @@ SubjectM* SubjectsController::_insertSubjectIntoDB(CassUuid experimentationUuid,
         qInfo() << "New subject inserted into the DB";
 
         // Create the new task
-        subject = new SubjectM(subjectUuid, experimentationUuid, displayed_id);
+        subject = new SubjectM(experimentationUuid, subjectUuid, displayed_id);
     }
     else {
         qCritical() << "Could not insert the new subject into the DB:" << cass_error_desc(cassError);
