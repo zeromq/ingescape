@@ -108,7 +108,6 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
 
 void SubjectM::setCharacteristicValue(CharacteristicM* characteristic, const QVariant& value)
 {
-    qDebug() << "Setting" << characteristic->name() << "=" << value.toString();
     _mapCharacteristicValues->insert(characteristic->name(), value);
 }
 

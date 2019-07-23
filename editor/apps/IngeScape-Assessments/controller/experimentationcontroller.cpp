@@ -518,8 +518,6 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
 
                 // Creates the new query statement
                 CassStatement* cassStatement = cass_statement_new(query, 2);
-                qDebug() << "Expe id:" << experimentation->uid();
-                qDebug() << "Subject id:" << subject->uid();
                 cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
                 cass_statement_bind_uuid(cassStatement, 1, subject->getCassUuid());
 
@@ -558,7 +556,6 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
                             CharacteristicM* characteristic = _currentExperimentation->getCharacteristicFromUID(chrCharacteristicUid);
                             if (characteristic != nullptr)
                             {
-                                qDebug() << "Setting" << characteristic->name() << "=" << valueString;
                                 switch (characteristic->valueType()) {
                                     case CharacteristicValueTypes::INTEGER:
                                         subject->setCharacteristicValue(characteristic, valueString.toInt());
@@ -572,10 +569,8 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
                                     case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
                                         subject->setCharacteristicValue(characteristic, valueString);
                                         break;
-                                    default:
-                                        // UNKNOWN
+                                    default: // UNKNOWN
                                         break;
-
                                 }
                             }
 

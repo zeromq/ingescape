@@ -378,7 +378,7 @@ Item {
                         characteristic: column.characteristic
 
                         characteristicValue: {
-                            if (model) { console.log("column.role:" + column.role) }
+                            // FIXME rendering based on litteral string is a source of error
                             model ? (column.role === "ID" ? model.displayedId : model.mapCharacteristicValues[column.role]) : ""
                         }
 
