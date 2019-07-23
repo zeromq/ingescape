@@ -191,6 +191,9 @@ Item {
 
             model: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.platformsList : null
 
+            delegate: componentPlatform
+
+
             //
             // Transition animations
             //
@@ -219,103 +222,6 @@ Item {
                 // ensure opacity and scale values return to 0.0
                 NumberAnimation { property: "opacity"; to: 0.0 }
                 NumberAnimation { property: "scale"; to: 0.0 }
-            }
-
-            delegate: Rectangle {
-                id: platformItem
-
-                width: scrollView.width
-                height: 36
-
-                //color: model.isLoaded ? IngeScapeTheme.orangeColor : "transparent"
-                color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.darkGreyColor : "transparent"
-
-                border {
-                    color: model.isLoaded ? IngeScapeTheme.orangeColor : "darkgray"
-                    width: model.isLoaded ? 3 : 1
-                }
-
-                Button {
-
-                    anchors {
-                        left: parent.left
-                        top: parent.top
-                        bottom: parent.bottom
-                        margins: 2
-                    }
-
-                    visible: !model.isLoaded
-                    enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON
-
-                    text: qsTr("LOAD");
-
-                    onClicked: {
-                        console.log("QML: Load platform " + model.name);
-
-                        // Open platform
-                        IngeScapeExpeC.openPlatform(model.QtObject);
-                    }
-                }
-
-                Label {
-                    id: lblName
-
-                    anchors {
-                        left: parent.left
-                        leftMargin: 100
-                        verticalCenter: parent.verticalCenter
-                    }
-
-                    text: model ? model.name : ""
-
-                    color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        //weight: Font.Medium
-                        pixelSize: 16
-                    }
-                }
-
-                Label {
-
-                    anchors {
-                        left: lblName.right
-                        leftMargin: 10
-                        verticalCenter: parent.verticalCenter
-                    }
-
-                    text: model ? model.currentIndex + " (" + model.indexOfAlphabeticOrder + ")"
-                                : ""
-
-                    color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        //weight: Font.Medium
-                        pixelSize: 12
-                    }
-                }
-
-                Rectangle {
-                    id: feedbackRecording
-
-                    anchors {
-                        right: parent.right
-                        rightMargin: 10
-                        verticalCenter: parent.verticalCenter
-                    }
-                    width: 20
-                    height: 20
-                    radius: 10
-
-                    visible: (model.recordState === RecordStates.RECORDING)
-
-                    color: IngeScapeTheme.redColor
-
-                    border {
-                        color: "darkgray"
-                        width: 1
-                    }
-                }
             }
         }
     }
@@ -392,6 +298,110 @@ Item {
                 {
                     // Sort the list of platforms in alphabetical order
                     IngeScapeExpeC.modelManager.sortPlatformsListInAlphabeticOrder();
+                }
+            }
+        }
+    }
+
+
+    //
+    // Component Platform
+    //
+    Component {
+        id: componentPlatform
+
+        Rectangle {
+            id: platformBackground
+
+            width: scrollView.width
+            height: 36
+
+            color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.darkGreyColor : "transparent"
+
+            border {
+                color: model.isLoaded ? IngeScapeTheme.orangeColor : "darkgray"
+                width: model.isLoaded ? 3 : 1
+            }
+
+            Button {
+
+                anchors {
+                    left: parent.left
+                    top: parent.top
+                    bottom: parent.bottom
+                    margins: 2
+                }
+
+                visible: !model.isLoaded
+                enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON
+
+                text: qsTr("LOAD");
+
+                onClicked: {
+                    console.log("QML: Load platform " + model.name);
+
+                    // Open platform
+                    IngeScapeExpeC.openPlatform(model.QtObject);
+                }
+            }
+
+            Label {
+                id: lblName
+
+                anchors {
+                    left: parent.left
+                    leftMargin: 100
+                    verticalCenter: parent.verticalCenter
+                }
+
+                text: model ? model.name : ""
+
+                color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    //weight: Font.Medium
+                    pixelSize: 16
+                }
+            }
+
+            Label {
+
+                anchors {
+                    left: lblName.right
+                    leftMargin: 10
+                    verticalCenter: parent.verticalCenter
+                }
+
+                text: model ? model.currentIndex + " (" + model.indexOfAlphabeticOrder + ")"
+                            : ""
+
+                color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    //weight: Font.Medium
+                    pixelSize: 12
+                }
+            }
+
+            Rectangle {
+                id: feedbackRecording
+
+                anchors {
+                    right: parent.right
+                    rightMargin: 10
+                    verticalCenter: parent.verticalCenter
+                }
+                width: 20
+                height: 20
+                radius: 10
+
+                visible: (model.recordState === RecordStates.RECORDING)
+
+                color: IngeScapeTheme.redColor
+
+                border {
+                    color: "darkgray"
+                    width: 1
                 }
             }
         }

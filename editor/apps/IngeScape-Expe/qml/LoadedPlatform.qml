@@ -180,81 +180,119 @@ Item {
         // Prevent drag overshoot on Windows
         flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-        Column {
-            id: columnAgents
 
-            Repeater {
-                model: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.allAgentsGroupsByName : null
+        ListView {
+            id: agentsListView
 
-                delegate: Rectangle {
-                    id: agentItem
+            model: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.allAgentsGroupsByName : null
 
-                    property var isONandAlone: model && model.isON && (model.numberOfAgentsON === 1)
+            delegate: componentAgent
 
-                    width: scrollView.width
-                    height: 36
 
-                    //color: (model && model.isON) ? IngeScapeTheme.orangeColor : "transparent"
-                    color: (model && model.isON) ? "transparent" : "darkgray"
-
-                    border {
-                        //color: "darkgray"
-                        color: agentItem.isONandAlone ? "darkgray" : IngeScapeTheme.redColor
-                        width: agentItem.isONandAlone ? 1 : 2
-                    }
-
-                    Label {
-
-                        anchors {
-                            left: parent.left
-                            leftMargin: 5
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        text: model ? model.name : ""
-
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            //weight: Font.Medium
-                            pixelSize: 16
-                        }
-                    }
-
-                    Rectangle {
-                        id: warningManyAgentsWithSameName
-
-                        anchors {
-                            right: parent.right
-                            rightMargin: 5
-                            verticalCenter: parent.verticalCenter
-                        }
-                        height: 20
-                        width: height
-                        radius: height / 2
-
-                        //visible: model ? (model.numberOfAgentsON > 1) : false
-
-                        color: model && (model.numberOfAgentsON === 1) ? "transparent" : IngeScapeTheme.redColor
-
-                        Text {
-                            anchors.centerIn: parent
-
-                            text: model ? model.numberOfAgentsON : ""
-
-                            color: IngeScapeTheme.whiteColor
-
-                            font {
-                                family: IngeScapeTheme.labelFontFamily
-                                weight: Font.Black
-                                pixelSize: 13
-                            }
-                        }
-                    }
-
-                }
+            //
+            // Transition animations
+            //
+            add: Transition {
+                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0 }
+                NumberAnimation { property: "scale"; from: 0.0; to: 1.0 }
             }
+
+            displaced: Transition {
+                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+
+                // ensure opacity and scale values return to 1.0
+                NumberAnimation { property: "opacity"; to: 1.0 }
+                NumberAnimation { property: "scale"; to: 1.0 }
+            }
+
+            move: Transition {
+                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+
+                // ensure opacity and scale values return to 1.0
+                NumberAnimation { property: "opacity"; to: 1.0 }
+                NumberAnimation { property: "scale"; to: 1.0 }
+            }
+
+            remove: Transition {
+                // ensure opacity and scale values return to 0.0
+                NumberAnimation { property: "opacity"; to: 0.0 }
+                NumberAnimation { property: "scale"; to: 0.0 }
+            }
+
         }
     }
 
+
+    //
+    // Component Agent
+    //
+    Component {
+        id: componentAgent
+
+        Rectangle {
+            id: agentBackground
+
+            property var isONandAlone: model && model.isON && (model.numberOfAgentsON === 1)
+
+            width: scrollView.width
+            height: 36
+
+            color: (model && model.isON) ? "transparent" : IngeScapeTheme.darkGreyColor
+
+            border {
+                color: agentBackground.isONandAlone ? "darkgray" : IngeScapeTheme.redColor
+                width: agentBackground.isONandAlone ? 1 : 3
+            }
+
+            Label {
+
+                anchors {
+                    left: parent.left
+                    leftMargin: 10
+                    verticalCenter: parent.verticalCenter
+                }
+
+                text: model ? model.name : ""
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    //weight: Font.Medium
+                    pixelSize: 16
+                }
+            }
+
+            Rectangle {
+                id: warningManyAgentsWithSameName
+
+                anchors {
+                    right: parent.right
+                    rightMargin: 5
+                    verticalCenter: parent.verticalCenter
+                }
+                height: 20
+                width: height
+                radius: height / 2
+
+                //visible: model ? (model.numberOfAgentsON > 1) : false
+
+                color: model && (model.numberOfAgentsON === 1) ? "transparent" : IngeScapeTheme.redColor
+
+                Text {
+                    anchors.centerIn: parent
+
+                    text: model ? model.numberOfAgentsON : ""
+
+                    color: IngeScapeTheme.whiteColor
+
+                    font {
+                        family: IngeScapeTheme.labelFontFamily
+                        weight: Font.Black
+                        pixelSize: 13
+                    }
+                }
+            }
+
+        }
+    }
 }
