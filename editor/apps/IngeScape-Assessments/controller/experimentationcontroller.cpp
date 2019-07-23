@@ -201,17 +201,19 @@ RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString&
         cass_uint32_t yearMonthDay = cass_date_from_epoch(now);
         cass_int64_t timeOfDay = cass_time_from_epoch(now);
 
-        const char* query = "INSERT INTO ingescape.record_setup (id_experimentation, id_subject, id_task, id, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        CassStatement* cassStatement = cass_statement_new(query, 9);
+        //const char* query = "INSERT INTO ingescape.record_setup (id_experimentation, id_subject, id_task, id, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        const char* query = "INSERT INTO ingescape.record_setup (id_experimentation, id_subject, id_task, id, id_records, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        CassStatement* cassStatement = cass_statement_new(query, 10);
         cass_statement_bind_uuid  (cassStatement, 0, subject->getExperimentationCassUuid());
         cass_statement_bind_uuid  (cassStatement, 1, subject->getCassUuid());
         cass_statement_bind_uuid  (cassStatement, 2, task->getCassUuid());
         cass_statement_bind_uuid  (cassStatement, 3, recordUuid);
-        cass_statement_bind_string(cassStatement, 4, recordName.toStdString().c_str());
-        cass_statement_bind_uint32(cassStatement, 5, yearMonthDay);
-        cass_statement_bind_int64 (cassStatement, 6, timeOfDay);
-        cass_statement_bind_uint32(cassStatement, 7, yearMonthDay); //FIXME current date/time to have all values filled with something for test purposes.
-        cass_statement_bind_int64 (cassStatement, 8, timeOfDay); //FIXME current date/time to have all values filled with something for test purposes.
+        cass_statement_bind_uuid  (cassStatement, 4, recordUuid);
+        cass_statement_bind_string(cassStatement, 5, recordName.toStdString().c_str());
+        cass_statement_bind_uint32(cassStatement, 6, yearMonthDay);
+        cass_statement_bind_int64 (cassStatement, 7, timeOfDay);
+        cass_statement_bind_uint32(cassStatement, 8, yearMonthDay); //FIXME current date/time to have all values filled with something for test purposes.
+        cass_statement_bind_int64 (cassStatement, 9, timeOfDay); //FIXME current date/time to have all values filled with something for test purposes.
 
         // Execute the query or bound statement
         CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
