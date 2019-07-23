@@ -29,6 +29,12 @@
 
 
 /**
+  * States of the TimeLine
+  */
+I2_ENUM(TimeLineStates, STOPPED, PLAYING, PAUSED)
+
+
+/**
  * @brief The IngeScapeExpeController class defines the main controller of the IngeScape Expe application
  */
 class IngeScapeExpeController : public QObject
@@ -57,10 +63,13 @@ class IngeScapeExpeController : public QObject
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
 
     // Flag indicating if the timeline (scenario) is currently playing in the "Editor app"
-    I2_QML_PROPERTY_READONLY(bool, isPlayingTimeLine)
+    //I2_QML_PROPERTY_READONLY(bool, isPlayingTimeLine)
+
+    // Current state of the TimeLine
+    I2_QML_PROPERTY_READONLY(TimeLineStates::Value, timeLineState)
 
     // Flag indicating if the "Recorder app" is currently recording
-    I2_QML_PROPERTY_READONLY(bool, isRecording)
+    //I2_QML_PROPERTY_READONLY(bool, isRecording)
 
 
 public:
@@ -107,23 +116,22 @@ public:
 
 
     /**
-     * @brief Play or Pause the TimeLine
-     * @param isPlay
+     * @brief Play the TimeLine
+     * @param withRecord
      */
-    Q_INVOKABLE void playOrPauseTimeLine(bool isPlay);
+    Q_INVOKABLE void playTimeLine(bool withRecord);
+
+
+    /**
+     * @brief Pause the TimeLine
+     */
+    Q_INVOKABLE void pauseTimeLine();
 
 
     /**
      * @brief Stop the TimeLine
      */
     Q_INVOKABLE void stopTimeLine();
-
-
-    /**
-     * @brief Start or Stop Recording
-     * @param isStart
-     */
-    Q_INVOKABLE void startOrStopRecording(bool isStart);
 
 
 public Q_SLOTS:
@@ -145,6 +153,20 @@ private Q_SLOTS:
 
 private:
 
+    /**
+     * @brief Start Recording
+     */
+    void _startRecording();
+
+
+    /**
+     * @brief Stop Recording
+     */
+    void _stopRecording();
+
+
+private:
+
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
 
@@ -153,6 +175,9 @@ private:
 
     // Path to the directory containing JSON files about platforms
     QString _platformDirectoryPath;
+
+    // Flag indicating if the timeline is played with record or not
+    bool _withRecord;
 
 };
 

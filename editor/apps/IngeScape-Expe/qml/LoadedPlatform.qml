@@ -285,8 +285,6 @@ Item {
                 width: height
                 radius: height / 2
 
-                //visible: model ? (model.numberOfAgentsON > 1) : false
-
                 color: model && (model.numberOfAgentsON === 1) ? "transparent" : IngeScapeTheme.redColor
 
                 Text {

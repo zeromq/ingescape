@@ -345,6 +345,8 @@ Item {
 
                 visible: !model.isLoaded
                 enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON
+                         && (IngeScapeExpeC.timeLineState === TimeLineStates.STOPPED)
+
                 opacity: (model.recordState === RecordStates.RECORDED) ? 0.75 : 1.0
                 activeFocusOnPress: true
 
@@ -417,48 +419,25 @@ Item {
                 }
             }
 
-            /*Rectangle {
-                id: feedbackRecording
-
-                anchors {
-                    right: parent.right
-                    rightMargin: 10
-                    verticalCenter: parent.verticalCenter
-                }
-                width: 20
-                height: 20
-                radius: 10
-
-                visible: (model.recordState === RecordStates.RECORDING)
-
-                color: IngeScapeTheme.redColor
-
-                border {
-                    color: "darkgray"
-                    width: 1
-                }
-            }*/
-
-            Row {
+            Item {
                 id: commands
 
                 anchors {
                     right: parent.right
-                    rightMargin: 10
+                    rightMargin: 0
                     verticalCenter: parent.verticalCenter
                 }
                 height: 30
 
                 visible: model.isLoaded
 
-                spacing: 10
-
                 Button {
                     id: btnPlayOrPauseTL
 
                     anchors {
-                        top: parent.top
-                        bottom: parent.bottom
+                        right: parent.right
+                        rightMargin: 200
+                        verticalCenter: parent.verticalCenter
                     }
 
                     visible: true
@@ -485,14 +464,113 @@ Item {
                     onClicked: {
                         //console.log("QML: Play or Pause the timeline");
 
-                        // Play or Pause the TimeLine
-                        IngeScapeExpeC.playOrPauseTimeLine(checked);
+                        if (btnPlayOrPauseTL.checked)
+                        {
+                            // Play the TimeLine
+                            IngeScapeExpeC.playTimeLine(checkBoxWithRecord.checked);
+                        }
+                        else
+                        {
+                            // Pause the TimeLine
+                            IngeScapeExpeC.pauseTimeLine();
+                        }
                     }
 
                     Binding {
                         target: btnPlayOrPauseTL
                         property: "checked"
-                        value: IngeScapeExpeC.isPlayingTimeLine
+                        //value: IngeScapeExpeC.isPlayingTimeLine
+                        value: (IngeScapeExpeC.timeLineState === TimeLineStates.PLAYING)
+                    }
+                }
+
+                CheckBox {
+                    id: checkBoxWithRecord
+
+                    anchors {
+                        right: parent.right
+                        rightMargin: 100
+                        verticalCenter: parent.verticalCenter
+                    }
+                    width: 90
+
+                    checked: true
+
+                    enabled: (IngeScapeExpeC.timeLineState === TimeLineStates.STOPPED)
+
+                    style: CheckBoxStyle {
+                        label: Text {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                                verticalCenterOffset: 2
+                            }
+
+                            color: control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+
+                            text: "with record"
+
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                pixelSize: 16
+                            }
+                        }
+
+                        indicator: Rectangle {
+                            implicitWidth: 14
+                            implicitHeight: 14
+                            border.width: 0
+                            color: IngeScapeTheme.darkBlueGreyColor
+
+                            I2SvgItem {
+                                visible: control.checked
+                                anchors.centerIn: parent
+
+                                svgFileCache: IngeScapeTheme.svgFileIngeScape
+                                svgElementId: "check";
+
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    id: feedbackRecording
+
+                    anchors {
+                        right: parent.right
+                        rightMargin: 70
+                        verticalCenter: parent.verticalCenter
+                    }
+                    width: 20
+                    height: 20
+                    radius: 10
+
+                    visible: (model.recordState === RecordStates.RECORDING)
+                    opacity: 1.0
+
+                    color: IngeScapeTheme.redColor
+
+                    SequentialAnimation {
+                        //running: true
+                        running: (model.recordState === RecordStates.RECORDING)
+                        loops: Animation.Infinite
+
+                        NumberAnimation {
+                            target: feedbackRecording
+                            property: "opacity";
+                            from: 0.7
+                            to: 1.0
+                            duration: 700
+                        }
+                        NumberAnimation {
+                            target: feedbackRecording
+                            property: "opacity";
+                            to: 0.0
+                            duration: 50
+                        }
+                        PauseAnimation {
+                            duration: 500
+                        }
                     }
                 }
 
@@ -500,15 +578,13 @@ Item {
                     id: btnStopTL
 
                     anchors {
-                        top: parent.top
-                        bottom: parent.bottom
+                        right: parent.right
+                        rightMargin: 10
+                        verticalCenter: parent.verticalCenter
                     }
 
-                    visible: true
-                    enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.currentLoadedPlatform
+                    enabled: (IngeScapeExpeC.timeLineState !== TimeLineStates.STOPPED)
                     opacity: enabled ? 1.0 : 0.3
-
-                    //text: qsTr("STOP")
 
                     style: LabellessSvgButtonStyle {
                         fileCache: IngeScapeExpeTheme.svgFileIngeScapeExpe
@@ -521,14 +597,39 @@ Item {
                     onClicked: {
                         //console.log("QML: Stop the timeline");
 
-                        // Stop the TimeLine
-                        //IngeScapeExpeC.stopTimeLine();
+                        if (model.recordState === RecordStates.RECORDING)
+                        {
+                            // Open the "Stop" confirmation popup
+                            stopConfirmationPopup.open();
+                        }
+                        else
+                        {
+                            // Stop the TimeLine
+                            IngeScapeExpeC.stopTimeLine();
+                        }
 
-                        // Open the "Stop" confirmation popup
-                        stopConfirmationPopup.open();
                     }
                 }
             }
+        }
+    }
+
+
+    //
+    // Popup about Stop Confirmation
+    //
+    ConfirmationPopup {
+        id: stopConfirmationPopup
+
+        width: 400
+
+        confirmationText: "The record will be stopped and the timeline will be reseted.\nDo you want to stop the record?"
+
+        onConfirmed: {
+            console.log("QML: Stop record confirmed");
+
+            // Stop the TimeLine
+            IngeScapeExpeC.stopTimeLine();
         }
     }
 }

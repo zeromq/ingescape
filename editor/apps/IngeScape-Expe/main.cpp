@@ -101,6 +101,7 @@ void registerCustomQmlTypes()
     //
     //---------------
     qmlRegisterSingletonType<RecordStates>("INGESCAPE", 1, 0, "RecordStates", &RecordStates::qmlSingleton);
+    qmlRegisterSingletonType<TimeLineStates>("INGESCAPE", 1, 0, "TimeLineStates", &TimeLineStates::qmlSingleton);
 
 
     //----------------

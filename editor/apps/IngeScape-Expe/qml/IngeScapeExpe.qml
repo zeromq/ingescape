@@ -203,158 +203,20 @@ Item {
 
 
     //
-    // Commands
-    //
-    Rectangle {
-        id: commandsPanel
-
-        anchors {
-            right: parent.right
-            rightMargin: 10
-            top: title.bottom
-            topMargin: 20
-        }
-        width: 350
-        height: 200
-
-        color: "transparent"
-        radius: 5
-        border {
-            color: "darkgray"
-            width: 2
-        }
-
-        Column {
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.top
-                margins: 10
-            }
-
-            spacing: 10
-
-            Text {
-                id: titleCommands
-
-                anchors.horizontalCenter: parent.horizontalCenter
-                height: 30
-
-                text: "Commands"
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Bold
-                    pixelSize: 18
-                }
-            }
-
-            Row {
-
-                height: 30
-
-                spacing: 10
-
-                Text {
-                    id: txtRecord
-
-                    text: "Record:"
-
-                    height: 30
-
-                    verticalAlignment: Text.AlignVCenter
-
-                    color: IngeScapeTheme.whiteColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                }
-
-                Button {
-                    id: btnStartOrStopRecord
-
-                    anchors {
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-
-                    visible: true
-                    activeFocusOnPress: true
-                    opacity: enabled ? 1.0 : 0.3
-                    enabled: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON && IngeScapeExpeC.modelManager.currentLoadedPlatform
-                    checkable: true
-                    checked: false
-
-                    style: I2SvgToggleButtonStyle {
-                        fileCache: IngeScapeExpeTheme.svgFileIngeScapeExpe
-
-                        toggleCheckedReleasedID: "record-stop";
-                        toggleCheckedPressedID: toggleCheckedReleasedID + "-pressed";
-                        toggleUncheckedReleasedID: "record-start";
-                        toggleUncheckedPressedID: toggleUncheckedReleasedID + "-pressed";
-
-                        // No disabled states
-                        toggleCheckedDisabledID: "record-start-pressed"
-                        toggleUncheckedDisabledID: toggleCheckedDisabledID
-
-                        labelMargin: 0;
-                    }
-
-                    onCheckedChanged: {
-
-                        console.log("QML: Start or Stop Recording");
-
-                        // Start or Stop Recording
-                        IngeScapeExpeC.startOrStopRecording(checked);
-                    }
-
-                    Binding {
-                        target: btnStartOrStopRecord
-                        property: "checked"
-                        value: IngeScapeExpeC.isRecording
-                    }
-                }
-            }
-        }
-    }
-
-
-    //
     // Loaded Platform
     //
     LoadedPlatform {
         id: loadedPlatform
 
         anchors {
+            top: title.bottom
+            topMargin: 20
             right: parent.right
             rightMargin: 10
-            top: commandsPanel.bottom
-            topMargin: 20
             bottom: parent.bottom
             bottomMargin: 10
         }
         width: 350
     }
 
-
-    //
-    // Popup about Stop Confirmation
-    //
-    ConfirmationPopup {
-        id: stopConfirmationPopup
-
-        width: 400
-
-        confirmationText: "The record will be stopped and the timeline will be reseted.\nDo you want to stop the record?"
-
-        onConfirmed: {
-            console.log("QML: Stop record confirmed");
-
-            // Stop the TimeLine
-            IngeScapeExpeC.stopTimeLine();
-        }
-    }
 }

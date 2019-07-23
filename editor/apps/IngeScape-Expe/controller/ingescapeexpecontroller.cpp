@@ -33,11 +33,13 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     _snapshotDirectory(""),
     _modelManager(nullptr),
     _networkC(nullptr),
-    _isPlayingTimeLine(false),
-    _isRecording(false),
+    //_isPlayingTimeLine(false),
+    _timeLineState(TimeLineStates::STOPPED),
+    //_isRecording(false),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
-    _platformDirectoryPath("")
+    _platformDirectoryPath(""),
+    _withRecord(true)
 {
     qInfo() << "New IngeScape Expe Controller";
 
@@ -271,25 +273,43 @@ void IngeScapeExpeController::openPlatform(PlatformM* platform)
 
 
 /**
- * @brief Play or Pause the TimeLine
- * @param isPlay
+ * @brief Play the TimeLine
+ * @param withRecord
  */
-void IngeScapeExpeController::playOrPauseTimeLine(bool isPlay)
+void IngeScapeExpeController::playTimeLine(bool withRecord)
 {
-    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr) && (_networkC != nullptr))
+    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
+            && (_networkC != nullptr))
     {
-        QString commandAndParameters;
+        // Update flag
+        _withRecord = withRecord;
 
-        if (isPlay) {
-            qInfo() << "Play the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
-
-            commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, PLAY);
+        if (_withRecord) {
+            // Start recording
+            _startRecording();
         }
-        else {
-            qInfo() << "Pause the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
 
-            commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, PAUSE);
-        }
+        qInfo() << "Play the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
+
+        QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, PLAY);
+
+        // Send the command and parameters to the editor
+        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+    }
+}
+
+
+/**
+ * @brief Pause the TimeLine
+ */
+void IngeScapeExpeController::pauseTimeLine()
+{
+    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
+            && (_networkC != nullptr))
+    {
+        qInfo() << "Pause the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
+
+        QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, PAUSE);
 
         // Send the command and parameters to the editor
         _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
@@ -302,55 +322,69 @@ void IngeScapeExpeController::playOrPauseTimeLine(bool isPlay)
  */
 void IngeScapeExpeController::stopTimeLine()
 {
-    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr) && (_networkC != nullptr))
+    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
+            && (_networkC != nullptr))
     {
         qInfo() << "STOP the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
 
-        //QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, STOP);
         QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, RESET);
 
         // Send the command and parameters to the editor
         _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+
+
+        if (_withRecord)
+        {
+            // Stop recording
+            _stopRecording();
+
+            // Reset flag
+            _withRecord = false;
+        }
     }
 }
 
 
 /**
- * @brief Start or Stop Recording
- * @param isStart
+ * @brief Start Recording
  */
-void IngeScapeExpeController::startOrStopRecording(bool isStart)
+void IngeScapeExpeController::_startRecording()
 {
-    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr) && (_networkC != nullptr))
+    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
+            && (_networkC != nullptr))
     {
-        QString commandAndParameters;
+        qInfo() << "Start recording the platform" << _modelManager->currentLoadedPlatform()->name();
 
-        if (isStart) {
-            qInfo() << "Start recording the platform" << _modelManager->currentLoadedPlatform()->name();
-
-            commandAndParameters = QString("%1=%2").arg(command_UpdateRecordState, START);
-        }
-        else {
-            qInfo() << "Stop recording the platform" << _modelManager->currentLoadedPlatform()->name();
-
-            commandAndParameters = QString("%1=%2").arg(command_UpdateRecordState, STOP);
-        }
+        QString commandAndParameters = QString("%1=%2").arg(command_UpdateRecordState, START);
 
         // Send the command and parameters to the editor
         _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
 
 
-        //
         // FIXME: get state from recorder messages
-        //
-        if (isStart)
-        {
-            _modelManager->currentLoadedPlatform()->setrecordState(RecordStates::RECORDING);
-        }
-        else
-        {
-            _modelManager->currentLoadedPlatform()->setrecordState(RecordStates::RECORDED);
-        }
+        _modelManager->currentLoadedPlatform()->setrecordState(RecordStates::RECORDING);
+    }
+}
+
+
+/**
+ * @brief Stop Recording
+ */
+void IngeScapeExpeController::_stopRecording()
+{
+    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
+            && (_networkC != nullptr))
+    {
+        qInfo() << "Stop recording the platform" << _modelManager->currentLoadedPlatform()->name();
+
+        QString commandAndParameters = QString("%1=%2").arg(command_UpdateRecordState, STOP);
+
+        // Send the command and parameters to the editor
+        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+
+
+        // FIXME: get state from recorder messages
+        _modelManager->currentLoadedPlatform()->setrecordState(RecordStates::RECORDED);
     }
 }
 
@@ -374,15 +408,18 @@ void IngeScapeExpeController::_onTimeLineStateUpdated(QString state)
 
     // PLAY (the TimeLine)
     if (state == PLAY) {
-        setisPlayingTimeLine(true);
+        //setisPlayingTimeLine(true);
+        settimeLineState(TimeLineStates::PLAYING);
     }
     // PAUSE (the TimeLine)
     else if (state == PAUSE) {
-        setisPlayingTimeLine(false);
+        //setisPlayingTimeLine(false);
+        settimeLineState(TimeLineStates::PAUSED);
     }
     // RESET (the TimeLine)
     else if (state == RESET) {
-        setisPlayingTimeLine(false);
+        //setisPlayingTimeLine(false);
+        settimeLineState(TimeLineStates::STOPPED);
     }
     else {
         qCritical() << "Unknown state" << state << "of the TimeLine !";
