@@ -220,8 +220,8 @@ int main(int argc, char *argv[])
     //
     //------------------------------
 
-    ExportController exportControllerTest;
-    exportControllerTest.exportExperimentationTest("cf113ce0-9bda-11e9-9d27-8dfc860aae8b");
+    //ExportController exportControllerTest;
+    //exportControllerTest.exportExperimentationTest("cf113ce0-9bda-11e9-9d27-8dfc860aae8b");
 
 
     //------------------------------
