@@ -654,7 +654,6 @@ void writeOneExpInfoFromId(CassUuid id_experimentation){
             size_t size_name = 0;
             cass_value_get_string(cass_row_get_column_by_name(row, "name"), &name, &size_name);
             //FIXME: we need to force ending \0 on output, certainly a bug in cassandra
-            free(strToWrite);
             strToWrite = (char *) malloc(size_name + 1);
             strncpy(strToWrite, name, size_name);
             strToWrite[size_name] = '\0';
@@ -730,7 +729,6 @@ void writeOneSubjectNameFromIdExpAndIdSubject(CassUuid id_experimentation, CassU
             size_t size_name;
             cass_value_get_string(cass_row_get_column_by_name(row_record, "displayed_id"), &name, &size_name);
             //FIXME: we need to force ending \0 on output, certainly a bug in cassandra
-            free(strToWrite);
             strToWrite = (char *) malloc(size_name + 1);
             strncpy(strToWrite, name, size_name);
             strToWrite[size_name] = '\0';
@@ -792,7 +790,6 @@ void writeOneTaskInfoById(CassUuid id_experimentation, CassUuid id_task){
             cass_value_get_string(cass_row_get_column_by_name(row, "platform_file"), &platform_file, &size_platform_file);
 
             //FIXME: we need to force ending \0 on output, certainly a bug in cassandra
-            free(strToWrite);
             strToWrite = (char *) malloc(size_platform_file + 1);
             strncpy(strToWrite, platform_file, size_platform_file);
             strToWrite[size_platform_file] = '\0';
