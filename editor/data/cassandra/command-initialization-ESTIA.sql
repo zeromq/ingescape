@@ -18,7 +18,7 @@ CREATE TABLE ingescape.mapping (time timeuuid, mapping text, PRIMARY KEY(time));
 CREATE TABLE ingescape.record_setup (id timeuuid, id_experimentation timeuuid, id_subject timeuuid, id_task timeuuid, id_records timeuuid, name text, start_date date, start_time time, end_date date, end_time time, PRIMARY KEY (id_experimentation, id_subject, id_task, id_records, id));
 CREATE TABLE ingescape.experimentation (id timeuuid, name text, group_name text, creation_date date,creation_time time, PRIMARY KEY(id));
 CREATE TABLE ingescape.characteristic (id timeuuid, id_experimentation timeuuid,name text, value_type tinyint, enum_values text, PRIMARY KEY (id_experimentation, id));
-CREATE TABLE ingescape.subject (id timeuuid, id_experimentation timeuuid, name text, PRIMARY KEY (id_experimentation, id) ) WITH CLUSTERING ORDER BY (id ASC);
+CREATE TABLE ingescape.subject (id timeuuid, id_experimentation timeuuid, displayed_id text, PRIMARY KEY (id_experimentation, id) ) WITH CLUSTERING ORDER BY (id ASC);
 CREATE TABLE ingescape.task (id timeuuid, id_experimentation timeuuid, name text,platform_file text, PRIMARY KEY (id_experimentation, id) ) WITH CLUSTERING ORDER BY (id ASC);
 CREATE TABLE ingescape.independent_var (id timeuuid, id_experimentation timeuuid, id_task timeuuid, name text, description text, value_type tinyint, enum_values text, PRIMARY KEY (id_experimentation, id_task, id)) WITH CLUSTERING ORDER BY (id_task ASC);
 
