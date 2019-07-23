@@ -64,6 +64,7 @@ void ExperimentationM::clearData()
     _allRecordSetups.deleteAllItems();
 
     // Delete all characteristics of our experimentation
+    _hashFromUIDtoCharacteristic.clear();
     _allCharacteristics.deleteAllItems();
 
     // Delete all subjects of our experimentation
