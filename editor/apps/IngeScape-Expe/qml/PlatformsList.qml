@@ -324,6 +324,7 @@ Item {
             }
 
             Button {
+                id: btnLoad
 
                 anchors {
                     left: parent.left
@@ -346,31 +347,14 @@ Item {
             }
 
             Label {
-                id: lblName
+                id: lblIndex
 
                 anchors {
-                    left: parent.left
-                    leftMargin: 100
-                    verticalCenter: parent.verticalCenter
-                }
-
-                text: model ? model.name : ""
-
-                color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    //weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
-
-            Label {
-
-                anchors {
-                    left: lblName.right
+                    left: btnLoad.right
                     leftMargin: 10
                     verticalCenter: parent.verticalCenter
                 }
+                width: 50
 
                 text: model ? model.currentIndex + " (" + model.indexOfAlphabeticOrder + ")"
                             : ""
@@ -380,6 +364,26 @@ Item {
                     family: IngeScapeTheme.textFontFamily
                     //weight: Font.Medium
                     pixelSize: 12
+                }
+            }
+
+            Label {
+                id: lblName
+
+                anchors {
+                    left: lblIndex.right
+                    //leftMargin: 10
+                    verticalCenter: parent.verticalCenter
+                }
+                width: 250
+
+                text: model ? model.name : ""
+
+                color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Medium
+                    pixelSize: 16
                 }
             }
 

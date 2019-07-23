@@ -1,7 +1,7 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Expe
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -12,25 +12,23 @@
  *
  */
 
-#ifndef VALUESHISTORYSORTFILTER_H
-#define VALUESHISTORYSORTFILTER_H
+#ifndef PLATFORMAGENTSORTFILTER_H
+#define PLATFORMAGENTSORTFILTER_H
 
 #include <QObject>
-#include <QtQml>
-
 #include <I2PropertyHelpers.h>
 #include <I2Quick.h>
 
 
 /**
- * @brief The ValuesHistorySortFilter class defines a specific filter for the history of values
+ * @brief The PlatformAgentSortFilter class defines a specific filter for the agents of a platform
  */
-class ValuesHistorySortFilter : public I2SortFilterProxyModel
+class PlatformAgentSortFilter : public I2SortFilterProxyModel
 {
     Q_OBJECT
 
-    // List with names of selected agents
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, selectedAgentNamesList)
+    // List with agent names of the platform
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, agentNamesOfPlatform)
 
 
 public:
@@ -38,13 +36,12 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit ValuesHistorySortFilter(QObject *parent = nullptr);
-
+    explicit PlatformAgentSortFilter(QObject *parent = nullptr);
 
     /**
       * @brief Destructor
       */
-    //~ValuesHistorySortFilter();
+    //~PlatformAgentSortFilter();
 
 
     /**
@@ -80,6 +77,6 @@ protected:
 
 };
 
-QML_DECLARE_TYPE(ValuesHistorySortFilter)
+QML_DECLARE_TYPE(PlatformAgentSortFilter)
 
-#endif // VALUESHISTORYSORTFILTER_H
+#endif // PLATFORMAGENTSORTFILTER_H

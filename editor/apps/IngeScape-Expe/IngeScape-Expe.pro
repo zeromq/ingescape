@@ -42,7 +42,8 @@ SOURCES += \
         controller/ingescapeexpecontroller.cpp \
         controller/networkcontroller.cpp \
         main.cpp \
-        model/platformm.cpp
+        model/platformm.cpp \
+        sortFilter/platformagentsortfilter.cpp
 
 
 HEADERS += \
@@ -50,6 +51,7 @@ HEADERS += \
     controller/ingescapeexpecontroller.h \
     controller/networkcontroller.h \
     model/platformm.h \
+    sortFilter/platformagentsortfilter.h \
     stable.h
 
 

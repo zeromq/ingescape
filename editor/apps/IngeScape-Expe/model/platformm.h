@@ -37,6 +37,9 @@ class PlatformM : public QObject
     // File path of our platform
     I2_QML_PROPERTY_READONLY(QString, filePath)
 
+    // List of agent names of our platform
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, agentNamesList)
+
     // Flag indicating if our platform is loaded (in the "Editor app")
     I2_QML_PROPERTY_READONLY(bool, isLoaded)
 
@@ -72,6 +75,10 @@ public:
 
 private:
 
+    /**
+     * @brief Initialize the list of agent names from our platform file path
+     */
+    void _initAgentNamesList();
 
 };
 

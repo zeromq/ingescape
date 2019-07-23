@@ -1,7 +1,7 @@
 /*
- *	IngeScape Editor
+ *	IngeScape Expe
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -12,14 +12,16 @@
  *
  */
 
-#include "valueshistorysortfilter.h"
-#include <model/publishedvaluem.h>
+
+#include "platformagentsortfilter.h"
+#include <viewModel/agentsgroupedbynamevm.h>
+
 
 /**
  * @brief Constructor
  * @param parent
  */
-ValuesHistorySortFilter::ValuesHistorySortFilter(QObject *parent) : I2SortFilterProxyModel(parent)
+PlatformAgentSortFilter::PlatformAgentSortFilter(QObject *parent) : I2SortFilterProxyModel(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -29,7 +31,7 @@ ValuesHistorySortFilter::ValuesHistorySortFilter(QObject *parent) : I2SortFilter
 /**
   * @brief Destructor
   */
-/*ValuesHistorySortFilter::~ValuesHistorySortFilter()
+/*PlatformAgentSortFilter::~PlatformAgentSortFilter()
 {
 
 }*/
@@ -38,7 +40,7 @@ ValuesHistorySortFilter::ValuesHistorySortFilter(QObject *parent) : I2SortFilter
 /**
  * @brief Update the filter
  */
-void ValuesHistorySortFilter::updateFilter()
+void PlatformAgentSortFilter::updateFilter()
 {
     // Invalidates the current filtering
     invalidateFilter();
@@ -53,17 +55,17 @@ void ValuesHistorySortFilter::updateFilter()
  *
  * @return True if the item should be included in the result, false otherwise (i.e. the item is removed from our list)
  */
-bool ValuesHistorySortFilter::filterAccepts(QObject* item, int index) const
+bool PlatformAgentSortFilter::filterAccepts(QObject* item, int index) const
 {
     Q_UNUSED(index)
 
     bool result = false;
 
-    // Try to cast our item as a model of "Published Value"
-    PublishedValueM* publishedValue = qobject_cast<PublishedValueM*>(item);
-    if (publishedValue != nullptr)
+    // Try to cast our item as a view model of "Agents Grouped by Name"
+    AgentsGroupedByNameVM* agent = qobject_cast<AgentsGroupedByNameVM*>(item);
+    if (agent != nullptr)
     {
-        result = _selectedAgentNamesList.contains(publishedValue->agentName());
+        result = _agentNamesOfPlatform.contains(agent->name());
     }
 
     return result;
@@ -80,7 +82,7 @@ bool ValuesHistorySortFilter::filterAccepts(QObject* item, int index) const
  *
  * @return True if item1 is smaller than item2, false otherwise
  */
-bool ValuesHistorySortFilter::isLessThan(QObject* item1, int indexItem1, QObject* item2, int indexItem2) const
+bool PlatformAgentSortFilter::isLessThan(QObject* item1, int indexItem1, QObject* item2, int indexItem2) const
 {
     Q_UNUSED(item1)
     Q_UNUSED(item2)

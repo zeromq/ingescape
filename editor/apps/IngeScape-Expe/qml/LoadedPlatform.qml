@@ -146,7 +146,7 @@ Item {
         }
 
         Text {
-            text: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.allAgentsGroupsByName.count + " agents"
+            text: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.filteredPlatformAgents.count + " agents"
                                               : ""
 
             height: 30
@@ -184,7 +184,7 @@ Item {
         ListView {
             id: agentsListView
 
-            model: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.allAgentsGroupsByName : null
+            model: IngeScapeExpeC.modelManager ? IngeScapeExpeC.modelManager.filteredPlatformAgents : null
 
             delegate: componentAgent
 

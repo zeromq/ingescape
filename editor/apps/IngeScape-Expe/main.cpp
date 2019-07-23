@@ -121,8 +121,7 @@ void registerCustomQmlTypes()
     // Sort and Filter
     //
     //----------------
-    //qmlRegisterUncreatableType<LogsSortFilter>("INGESCAPE", 1, 0, "LogsSortFilter", "Internal class");
-    //qmlRegisterUncreatableType<ValuesHistorySortFilter>("INGESCAPE", 1, 0, "ValuesHistorySortFilter", "Internal class");
+    qmlRegisterUncreatableType<PlatformAgentSortFilter>("INGESCAPE", 1, 0, "PlatformAgentSortFilter", "Internal class");
 
 
     //----------------

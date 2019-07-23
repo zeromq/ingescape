@@ -43,6 +43,11 @@ ExpeModelManager::ExpeModelManager(JsonHelper* jsonHelper,
     // Platforms are sorted on their name (alphabetical order)
     _platformsList.setSortProperty("currentIndex");
 
+
+    //
+    // Link our filtered list to the list of all agents grouped by name
+    //
+    _filteredPlatformAgents.setSourceModel(_allAgentsGroupsByName.sourceModel());
 }
 
 
@@ -90,6 +95,9 @@ void ExpeModelManager::setcurrentLoadedPlatform(PlatformM *value)
 
                 qDebug() << _allAgentsGroupsByName.count() << "agents after the call to 'delete Agents OFF'";
             }
+
+            // Reset the list of agent names of the filter
+            _filteredPlatformAgents.setagentNamesOfPlatform(QStringList());
         }
 
         _currentLoadedPlatform = value;
@@ -102,6 +110,9 @@ void ExpeModelManager::setcurrentLoadedPlatform(PlatformM *value)
             // Udpate the flag "is Loaded"
             _currentLoadedPlatform->setisLoaded(true);
 
+            // Update the list of agent names of the filter
+            _filteredPlatformAgents.setagentNamesOfPlatform(_currentLoadedPlatform->agentNamesList());
+
             // Import agents list from the file path
             bool success = importAgentOrAgentsListFromFilePath(_currentLoadedPlatform->filePath());
             if (success)
@@ -112,6 +123,9 @@ void ExpeModelManager::setcurrentLoadedPlatform(PlatformM *value)
                 qCritical() << "Error while importing the agents list from" << _currentLoadedPlatform->filePath();
             }
         }
+
+        // Update the filter
+        _filteredPlatformAgents.updateFilter();
 
         Q_EMIT currentLoadedPlatformChanged(value);
     }
@@ -439,3 +453,4 @@ QList<int> ExpeModelManager::_getRandomIndexes(int max)
     }
     return randomIndexes;
 }
+

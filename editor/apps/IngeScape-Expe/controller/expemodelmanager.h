@@ -20,6 +20,7 @@
 //#include <model/expeenums.h>
 #include <controller/ingescapemodelmanager.h>
 #include <model/platformm.h>
+#include <sortFilter/platformagentsortfilter.h>
 
 
 /**
@@ -57,6 +58,9 @@ class ExpeModelManager : public IngeScapeModelManager
     // Current loaded platform
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(PlatformM*, currentLoadedPlatform)
 
+    // List of filtered (and sorted) platform agents
+    Q_PROPERTY(PlatformAgentSortFilter* filteredPlatformAgents READ filteredPlatformAgents CONSTANT)
+
 
 public:
 
@@ -75,6 +79,16 @@ public:
      * @brief Destructor
      */
     ~ExpeModelManager() Q_DECL_OVERRIDE;
+
+
+    /**
+     * @brief Get our filtered list of platform agents
+     * @return
+     */
+    PlatformAgentSortFilter* filteredPlatformAgents()
+    {
+        return &_filteredPlatformAgents;
+    }
 
 
     /**
@@ -160,6 +174,8 @@ private:
 
 private:
 
+    // List of filtered (and sorted) platform agents
+    PlatformAgentSortFilter _filteredPlatformAgents;
 
 };
 
