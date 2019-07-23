@@ -79,7 +79,7 @@ void writeHeaderExperimentation(void){
 }
 
 void writeHeaderSubject(void){
-    writeIntoFile("subject name;", 0);
+    writeIntoFile("subject id;", 0);
 }
 
 void writeHeaderIndependentVar(CassUuid id_experimentation){
@@ -687,11 +687,15 @@ void writeOneExpInfoFromId(CassUuid id_experimentation){
     }
 }
 
-void writeOneSubjectNameFromIdExpAndIdSubject(CassUuid id_experimentation, CassUuid id_subject){
-    char uuidStr[CASS_UUID_STRING_LENGTH];
-    cass_uuid_string ( id_subject, uuidStr);
+void writeOneSubjectNameFromIdExpAndIdSubject(CassUuid id_experimentation, CassUuid id_subject)
+{
+    char uuidExpStr[CASS_UUID_STRING_LENGTH];
+    cass_uuid_string ( id_experimentation, uuidExpStr);
 
-    printf("WRITE one subject name from id experimentation & id subject : %s \n", uuidStr);
+    char uuidSubjectStr[CASS_UUID_STRING_LENGTH];
+    cass_uuid_string ( id_subject, uuidSubjectStr);
+
+    printf("WRITE one subject id from id experimentation: %s & id subject: %s \n", uuidExpStr, uuidSubjectStr);
 
     /* Create a statement with zero parameters */
     CassStatement* statement = cass_statement_new("SELECT * FROM ingescape.subject  WHERE id_experimentation = ? AND id = ?;", 2);
