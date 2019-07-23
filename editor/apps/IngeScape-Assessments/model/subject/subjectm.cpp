@@ -21,8 +21,8 @@
  * @param name
  * @param parent
  */
-SubjectM::SubjectM(CassUuid cassUuid,
-                   CassUuid experimentationUuid,
+SubjectM::SubjectM(CassUuid experimentationUuid,
+                   CassUuid cassUuid,
                    QString displayedId,
                    QObject *parent) : QObject(parent),
     _uid(""),
@@ -102,6 +102,13 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
                 break;
         }
     }
+
+    qDebug() << "Subject" << _displayedId << "has characteristics:" << _mapCharacteristicValues;
+}
+
+void SubjectM::setCharacteristicValue(CharacteristicM* characteristic, const QVariant& value)
+{
+    _mapCharacteristicValues->insert(characteristic->name(), value);
 }
 
 
@@ -130,16 +137,16 @@ SubjectM* SubjectM::createTaskFromCassandraRow(const CassRow* row)
 
     if (row != nullptr)
     {
-        CassUuid experimentationUuid, taskUuid;
+        CassUuid experimentationUuid, subjectUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &subjectUuid);
 
         const char *chrDisplayedId = "";
         size_t displayedIdLength = 0;
         cass_value_get_string(cass_row_get_column_by_name(row, "displayed_id"), &chrDisplayedId, &displayedIdLength);
         QString displayedId = QString::fromUtf8(chrDisplayedId, static_cast<int>(displayedIdLength));
 
-        subject = new SubjectM(experimentationUuid, taskUuid, displayedId);
+        subject = new SubjectM(experimentationUuid, subjectUuid, displayedId);
     }
 
     return subject;

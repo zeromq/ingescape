@@ -377,7 +377,10 @@ Item {
 
                         characteristic: column.characteristic
 
-                        characteristicValue: model ? model.mapCharacteristicValues[column.role] : ""
+                        characteristicValue: {
+                            // FIXME rendering based on litteral string is a source of error
+                            model ? (column.role === "ID" ? model.displayedId : model.mapCharacteristicValues[column.role]) : ""
+                        }
 
                         isSelected: styleData.selected
 

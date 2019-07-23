@@ -55,3 +55,39 @@ CharacteristicM::~CharacteristicM()
     qInfo() << "Delete Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType) << "(" << _uid << ")";
 
 }
+
+
+/**
+ * @brief Static factory method to create a characteristic from a CassandraDB record
+ * @param row
+ * @return
+ */
+CharacteristicM* CharacteristicM::createCharacteristicFromCassandraRow(const CassRow* row)
+{
+    CharacteristicM* characteristic = nullptr;
+
+    if (row != nullptr)
+    {
+        CassUuid experimentationUuid, characteristicUuid;
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &characteristicUuid);
+
+        const char *chrTaskName = "";
+        size_t nameLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
+        QString characteristicName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
+
+        const char *chrEnumValues = "";
+        size_t enumValuesLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "enum_values"), &chrEnumValues, &enumValuesLength);
+        QStringList enumValues(QString::fromUtf8(chrEnumValues, static_cast<int>(enumValuesLength)).split(";"));
+
+        int8_t i8ValueType = 0;
+        cass_value_get_int8(cass_row_get_column_by_name(row, "value_type"), &i8ValueType);
+        CharacteristicValueTypes::Value valueType = static_cast<CharacteristicValueTypes::Value>(i8ValueType);
+
+        characteristic = new CharacteristicM(characteristicUuid, experimentationUuid, characteristicName, valueType, enumValues);
+    }
+
+    return characteristic;
+}

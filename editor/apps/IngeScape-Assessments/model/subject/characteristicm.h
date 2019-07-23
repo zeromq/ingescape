@@ -88,14 +88,14 @@ public:
     CassUuid getExperimentationCassUuid() { return _experimentationCassUuid; }
 
 
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
+    /**
+     * @brief Static factory method to create a characteristic from a CassandraDB record
+     * @param row
+     * @return
+     */
+    static CharacteristicM* createCharacteristicFromCassandraRow(const CassRow* row);
 
 private:
-
     // Experimentation's unique identifier in Cassandra Data Base
     CassUuid _experimentationCassUuid;
 
