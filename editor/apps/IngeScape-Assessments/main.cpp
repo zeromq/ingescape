@@ -156,6 +156,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<RecordSetupM>("INGESCAPE", 1, 0, "RecordSetupM", "Internal class");
     qmlRegisterUncreatableType<SubjectM>("INGESCAPE", 1, 0, "SubjectM", "Internal class");
     qmlRegisterUncreatableType<TaskM>("INGESCAPE", 1, 0, "TaskM", "Internal class");
+    qmlRegisterUncreatableType<QQmlPropertyMap>("INGESCAPE", 1, 0, "QQmlPropertyMap", "Internal class");
 
 
     //---------------

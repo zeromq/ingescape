@@ -23,13 +23,13 @@
  * @param startDateTime
  * @param parent
  */
-RecordSetupM::RecordSetupM(QString uid,
+RecordSetupM::RecordSetupM(CassUuid cassUuid,
                            QString name,
                            SubjectM* subject,
                            TaskM* task,
                            QDateTime startDateTime,
                            QObject *parent) : QObject(parent),
-    _uid(uid),
+    _uid(""),
     _name(name),
     _subject(subject),
     _task(task),
@@ -37,10 +37,15 @@ RecordSetupM::RecordSetupM(QString uid,
     _endDateTime(QDateTime()),
     //_duration(QDateTime())
     _duration(QTime()),
-    _mapIndependentVariableValues(nullptr)
+    _mapIndependentVariableValues(nullptr),
+    _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    char chrCassUid[CASS_UUID_STRING_LENGTH];
+    cass_uuid_string(_cassUuid, chrCassUid);
+    _uid = QString(chrCassUid);
 
     if ((_subject != nullptr) && (_task != nullptr))
     {

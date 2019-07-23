@@ -66,7 +66,7 @@ public:
      * @param characteristicName
      * @param nCharacteristicValueType
      */
-    Q_INVOKABLE void createNewCharacteristic(QString characteristicName, int nCharacteristicValueType);
+    Q_INVOKABLE void createNewCharacteristic(const QString& characteristicName, int nCharacteristicValueType, const QStringList& enumValues = {});
 
 
     /**
@@ -97,12 +97,6 @@ public:
     Q_INVOKABLE void deleteSubject(SubjectM* subject);
 
 
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
-
 private Q_SLOTS:
 
     /**
@@ -110,6 +104,36 @@ private Q_SLOTS:
      * @param currentExperimentation
      */
     void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
+
+
+    /**
+     * @brief Creates a new characteristic with the given parameters and insert it into the Cassandra DB
+     * A nullptr is returned if the operation fails
+     * @param experimentationUuid
+     * @param name
+     * @param valueType
+     * @param enumValues
+     */
+    CharacteristicM* _insertCharacteristicIntoDB(CassUuid experimentationUuid, const QString& name, CharacteristicValueTypes::Value valueType, const QStringList& enumValues = {});
+
+
+    /**
+     * @brief Creates a new subject with the given parameters an insert it into the Cassandra DB
+     * a nullptr is returned if the operation fails
+     * @param experimentationUuid
+     * @param name
+     * @return
+     */
+    SubjectM* _insertSubjectIntoDB(CassUuid experimentationUuid, const QString& name);
+
+
+    /**
+     * @brief Insert a new value for the given subject and characteristic into the DB
+     * A default value is written in DB according to the characterystic's type
+     * @param subject
+     * @param characteristic
+     */
+    void _insertCharacteristicValueForSubjectIntoDB(SubjectM* subject, CharacteristicM* characteristic);
 
 
 private:

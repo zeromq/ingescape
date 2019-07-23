@@ -22,11 +22,13 @@
  * @param parent
  */
 SubjectM::SubjectM(CassUuid cassUuid,
+                   CassUuid experimentationUuid,
                    QString displayedId,
                    QObject *parent) : QObject(parent),
     _uid(""),
     _displayedId(displayedId),
     _mapCharacteristicValues(nullptr),
+    _experimentationCassUuid(experimentationUuid),
     _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -70,16 +72,6 @@ SubjectM::~SubjectM()
 
 
 /**
- * @brief Get the unique identifier in Cassandra Data Base
- * @return
- */
-CassUuid SubjectM::getCassUuid()
-{
-    return _cassUuid;
-}
-
-
-/**
  * @brief Add the characteristic to our experimentation
  * @param characteristic
  */
@@ -87,36 +79,28 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
 {
     if ((characteristic != nullptr) && (_mapCharacteristicValues != nullptr))
     {
-        // It is not possible to remove keys from the map;
-        // once a key has been added, you can only modify or clear its associated value
-        // --> Do not test if the map contains this key
-        //if (!_mapCharacteristicValues->contains(characteristic->name()))
-
-        /*switch (characteristic->valueType())
+        switch (characteristic->valueType())
         {
-        case CharacteristicValueTypes::INTEGER:
-            _mapCharacteristicValues->insert(characteristic->name(), QVariant(0));
-            break;
+            case CharacteristicValueTypes::INTEGER:
+                _mapCharacteristicValues->insert(characteristic->name(), QVariant(0));
+                break;
 
-        case CharacteristicValueTypes::DOUBLE:
-            _mapCharacteristicValues->insert(characteristic->name(), QVariant(0.0));
-            break;
+            case CharacteristicValueTypes::DOUBLE:
+                _mapCharacteristicValues->insert(characteristic->name(), QVariant(0.0));
+                break;
 
-        case CharacteristicValueTypes::TEXT:
-            _mapCharacteristicValues->insert(characteristic->name(), QVariant(""));
-            break;
+            case CharacteristicValueTypes::TEXT:
+                _mapCharacteristicValues->insert(characteristic->name(), QVariant(""));
+                break;
 
-        case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-            _mapCharacteristicValues->insert(characteristic->name(), QVariant(""));
-            break;
+            case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
+                _mapCharacteristicValues->insert(characteristic->name(), QVariant(""));
+                break;
 
-        default:
-            qWarning() << "We cannot add the characteristic" << characteristic->name() << "because the type" <<  characteristic->valueType() << "is wrong !";
-            break;
-        }*/
-
-        // Insert an (invalid) not initialized QVariant
-        _mapCharacteristicValues->insert(characteristic->name(), QVariant());
+            default:
+                qWarning() << "We cannot add the characteristic" << characteristic->name() << "because the type" <<  characteristic->valueType() << "is wrong !";
+                break;
+        }
     }
 }
 
@@ -132,6 +116,33 @@ void SubjectM::removeCharacteristic(CharacteristicM* characteristic)
         // Clears the value (if any) associated with key
         _mapCharacteristicValues->clear(characteristic->name());
     }
+}
+
+
+/**
+ * @brief Static factory method to create a subject from a CassandraDB record
+ * @param row
+ * @return
+ */
+SubjectM* SubjectM::createTaskFromCassandraRow(const CassRow* row)
+{
+    SubjectM* subject = nullptr;
+
+    if (row != nullptr)
+    {
+        CassUuid experimentationUuid, taskUuid;
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskUuid);
+
+        const char *chrDisplayedId = "";
+        size_t displayedIdLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "displayed_id"), &chrDisplayedId, &displayedIdLength);
+        QString displayedId = QString::fromUtf8(chrDisplayedId, static_cast<int>(displayedIdLength));
+
+        subject = new SubjectM(experimentationUuid, taskUuid, displayedId);
+    }
+
+    return subject;
 }
 
 

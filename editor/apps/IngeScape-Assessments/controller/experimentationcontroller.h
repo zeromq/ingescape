@@ -87,6 +87,16 @@ private Q_SLOTS:
 
 protected: // Methods
     /**
+     * @brief Create and insert a new record setup into the DB.
+     * A nullptr is returned if the record setup could not be created
+     * @param recordName
+     * @param subject
+     * @param task
+     * @return
+     */
+    RecordSetupM* _insertRecordSetupIntoDB(const QString& recordName, SubjectM* subject, TaskM* task);
+
+    /**
      * @brief Retrieve all independent variables from the Cassandra DB for the given task.
      * The task will be updated by this method.
      * @param task
@@ -100,10 +110,23 @@ protected: // Methods
      */
     void _retrieveDependentVariableForTask(TaskM* task);
 
+    /**
+     * @brief Retrieve all subjects from the Cassandra DB for the given experimentaion.
+     * The experimentation will be updated by this method
+     * @param experimentation
+     */
+    void _retrieveSubjectsForExperimentation(ExperimentationM* experimentation);
+
+    /**
+     * @brief Retrieve all tasks from the Cassandra DB for the given experimentaion.
+     * The experimentation will be updated by this method
+     * @param experimentation
+     */
+    void _retrieveTasksForExperimentation(ExperimentationM* experimentation);
+
 protected: // Attributes
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
-
 };
 
 QML_DECLARE_TYPE(ExperimentationController)

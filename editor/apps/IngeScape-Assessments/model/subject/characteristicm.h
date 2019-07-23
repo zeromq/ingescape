@@ -22,7 +22,7 @@
 #include "cassandra.h"
 
 
-static const QString CHARACTERISTIC_SUBJECT_ID = "ID";
+extern const QString CHARACTERISTIC_SUBJECT_ID;
 
 
 /**
@@ -61,8 +61,10 @@ public:
      * @param parent
      */
     explicit CharacteristicM(CassUuid cassUuid,
-                             QString name,
+                             CassUuid experimentationUuid,
+                             const QString& name,
                              CharacteristicValueTypes::Value valueType,
+                             const QStringList& enumValues = {},
                              QObject *parent = nullptr);
 
 
@@ -76,7 +78,14 @@ public:
      * @brief Get the unique identifier in Cassandra Data Base
      * @return
      */
-    CassUuid getCassUuid();
+    CassUuid getCassUuid() { return _cassUuid; }
+
+
+    /**
+     * @brief Get the experimentation's unique identifier in Cassandra Data Base
+     * @return
+     */
+    CassUuid getExperimentationCassUuid() { return _experimentationCassUuid; }
 
 
 Q_SIGNALS:
@@ -86,6 +95,9 @@ public Q_SLOTS:
 
 
 private:
+
+    // Experimentation's unique identifier in Cassandra Data Base
+    CassUuid _experimentationCassUuid;
 
     // Unique identifier in Cassandra Data Base
     CassUuid _cassUuid;
