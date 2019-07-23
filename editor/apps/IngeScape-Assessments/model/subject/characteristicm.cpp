@@ -14,6 +14,8 @@
 
 #include "characteristicm.h"
 
+#include "controller/assessmentsmodelmanager.h"
+
 const QString CHARACTERISTIC_SUBJECT_ID = "ID";
 
 /**
@@ -28,7 +30,7 @@ CharacteristicM::CharacteristicM(CassUuid cassUuid,
                                  CharacteristicValueTypes::Value valueType,
                                  const QStringList& enumValues,
                                  QObject *parent) : QObject(parent),
-    _uid(""),
+    _uid(AssessmentsModelManager::cassUuidToQString(cassUuid)),
     _name(name),
     _valueType(valueType),
     _isSubjectId(name == CHARACTERISTIC_SUBJECT_ID),
@@ -38,10 +40,6 @@ CharacteristicM::CharacteristicM(CassUuid cassUuid,
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    char chrCassUid[CASS_UUID_STRING_LENGTH];
-    cass_uuid_string(_cassUuid, chrCassUid);
-    _uid = QString(chrCassUid);
 
     qInfo() << "New Model of Characteristic" << _name << "of type" << CharacteristicValueTypes::staticEnumToString(_valueType) << "(" << _uid << ")";
 }

@@ -153,7 +153,22 @@ public:
      * @param uid
      * @return
      */
-    CharacteristicM* getCharacteristicFromUID(QString uid);
+    CharacteristicM* getCharacteristicFromUID(const QString& uid);
+
+    /**
+     * @brief Get a task from its UID
+     * @param uid
+     * @return
+     */
+    SubjectM* getSubjectFromUID(const QString& uid);
+
+
+    /**
+     * @brief Get a task from its UID
+     * @param uid
+     * @return
+     */
+    TaskM* getTaskFromUID(const QString& uid);
 
 
     /**

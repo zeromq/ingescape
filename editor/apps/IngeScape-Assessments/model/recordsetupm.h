@@ -75,11 +75,11 @@ public:
      * @param parent
      */
     explicit RecordSetupM(CassUuid cassUuid,
-                                    QString name,
-                                    SubjectM* subject,
-                                    TaskM* task,
-                                    QDateTime startDateTime,
-                                    QObject *parent = nullptr);
+                          QString name,
+                          SubjectM* subject,
+                          TaskM* task,
+                          QDateTime startDateTime,
+                          QObject *parent = nullptr);
 
 
     /**
@@ -87,15 +87,20 @@ public:
      */
     ~RecordSetupM();
 
+    /**
+     * @brief Accessor for the Cassandra UUID of this entry
+     * @return
+     */
+    CassUuid getCassUuid() const { return _cassUuid; }
 
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
+    /**
+     * @brief Static factory method to create a record setup from a CassandraDB record
+     * @param row
+     * @return
+     */
+    static RecordSetupM* createRecordSetupFromCassandraRow(const CassRow* row);
 
 private:
-
     /**
      * @brief For debug purpose: Print the value of all independent variables
      */

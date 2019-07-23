@@ -55,12 +55,12 @@ public:
 
 
     /**
-     * @brief Create a new record for a subject and a task
+     * @brief Create a new record setup for a subject and a task
      * @param recordName
      * @param subject
      * @param task
      */
-    Q_INVOKABLE void createNewRecordForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task);
+    Q_INVOKABLE void createNewRecordSetupForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task);
 
 
     /**
@@ -130,6 +130,13 @@ protected: // Methods
      * @param experimentation
      */
     void _retrieveTasksForExperimentation(ExperimentationM* experimentation);
+
+    /**
+     * @brief Retrieve all record setups from the Cassandra DB for the given experimentaion.
+     * The experimentation will be updated by this method
+     * @param experimentation
+     */
+    void _retrieveRecordSetupsForExperimentation(ExperimentationM* experimentation);
 
     /**
      * @brief Retrieve all characteristic values from the Cassandra DB for each given subjects.

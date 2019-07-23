@@ -14,6 +14,8 @@
 
 #include "recordsetupm.h"
 
+#include "controller/assessmentsmodelmanager.h"
+
 
 /**
  * @brief Constructor
@@ -29,7 +31,7 @@ RecordSetupM::RecordSetupM(CassUuid cassUuid,
                            TaskM* task,
                            QDateTime startDateTime,
                            QObject *parent) : QObject(parent),
-    _uid(""),
+    _uid(AssessmentsModelManager::cassUuidToQString(cassUuid)),
     _name(name),
     _subject(subject),
     _task(task),
@@ -42,10 +44,6 @@ RecordSetupM::RecordSetupM(CassUuid cassUuid,
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    char chrCassUid[CASS_UUID_STRING_LENGTH];
-    cass_uuid_string(_cassUuid, chrCassUid);
-    _uid = QString(chrCassUid);
 
     if ((_subject != nullptr) && (_task != nullptr))
     {
@@ -128,6 +126,49 @@ RecordSetupM::~RecordSetupM()
         setsubject(nullptr);
         settask(nullptr);
     }
+}
+
+
+/**
+ * @brief Static factory method to create a record setup from a CassandraDB record
+ * @param row
+ * @return
+ */
+RecordSetupM* RecordSetupM::createRecordSetupFromCassandraRow(const CassRow* row)
+{
+    RecordSetupM* recordSetup = nullptr;
+
+    if (row != nullptr)
+    {
+        CassUuid /*experimentationUuid, subjectUuid, taskUuid, recordUuid, */recordSetupUuid;
+//        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
+//        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
+//        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
+//        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_records"), &recordUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &recordSetupUuid);
+
+        const char *chrTaskName = "";
+        size_t nameLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
+        QString taskName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
+
+        const char *chrPlatformUrl = "";
+        size_t platformUrlLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "platform_file"), &chrPlatformUrl, &platformUrlLength);
+        QUrl platformUrl(QString::fromUtf8(chrPlatformUrl, static_cast<int>(platformUrlLength)));
+
+        cass_uint32_t yearMonthDay;
+        cass_value_get_uint32(cass_row_get_column_by_name(row, "start_date"), &yearMonthDay);
+      cass_int64_t timeOfDay;
+        cass_value_get_int64(cass_row_get_column_by_name(row, "start_time"), &timeOfDay);
+
+        /* Convert 'date' and 'time' to Epoch time */
+        time_t time = static_cast<time_t>(cass_date_time_to_epoch(yearMonthDay, timeOfDay));
+
+        recordSetup = new RecordSetupM(recordSetupUuid, taskName, nullptr, nullptr, QDateTime::fromTime_t(static_cast<uint>(time)));
+    }
+
+    return recordSetup;
 }
 
 

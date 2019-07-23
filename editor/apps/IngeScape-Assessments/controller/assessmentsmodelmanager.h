@@ -87,6 +87,15 @@ public:
     CassUuidGen* getCassUuidGen();
 
 
+    /**
+     * @brief Converts the given CassUuid into a readable QString
+     * This is a static utility function and does not interact with the Cassandra server
+     * @param cassUuid
+     * @return
+     */
+    static QString cassUuidToQString(CassUuid cassUuid);
+
+
 private:
     /**
      * @brief The singleton instance.

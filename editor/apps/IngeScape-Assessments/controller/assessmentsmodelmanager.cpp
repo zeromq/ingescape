@@ -162,3 +162,17 @@ CassUuidGen* AssessmentsModelManager::getCassUuidGen()
 {
     return _cassUuidGen;
 }
+
+
+/**
+ * @brief Converts the given CassUuid into a readable QString
+ * This is a static utility function and does not interact with the Cassandra server
+ * @param cassUuid
+ * @return
+ */
+QString AssessmentsModelManager::cassUuidToQString(CassUuid cassUuid)
+{
+    char chrTaskUuid[CASS_UUID_STRING_LENGTH];
+    cass_uuid_string(cassUuid, chrTaskUuid);
+    return QString(chrTaskUuid);
+}

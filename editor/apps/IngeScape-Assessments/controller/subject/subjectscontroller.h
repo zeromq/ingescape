@@ -78,7 +78,7 @@ public:
 
 
     /**
-     * @brief Delete a characteristic
+     * @brief Delete the given characteristic from the current experimentation and from the Cassandra DB
      * @param characteristic
      */
     Q_INVOKABLE void deleteCharacteristic(CharacteristicM* characteristic);
@@ -91,7 +91,7 @@ public:
 
 
     /**
-     * @brief Delete a subject
+     * @brief Delete the given subject from the current experimentation and from the Cassandra DB
      * @param subject
      */
     Q_INVOKABLE void deleteSubject(SubjectM* subject);
@@ -134,6 +134,20 @@ private Q_SLOTS:
      * @param characteristic
      */
     void _insertCharacteristicValueForSubjectIntoDB(SubjectM* subject, CharacteristicM* characteristic);
+
+
+    /**
+     * @brief Delete every characteristic value associated with the given subject
+     * @param subject
+     */
+    void _deleteCharacteristicValuesForSubject(SubjectM* subject);
+
+
+    /**
+     * @brief Delete evert characteris value assciated with the given characteristic
+     * @param characteristic
+     */
+    void _deleteCharacteristicValuesForCharacteristic(CharacteristicM* characteristic);
 
 
 private:

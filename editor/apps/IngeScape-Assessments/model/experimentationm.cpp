@@ -15,6 +15,8 @@
 #include "experimentationm.h"
 #include <misc/ingescapeutils.h>
 
+#include "controller/assessmentsmodelmanager.h"
+
 /**
  * @brief Constructor
  * @param name
@@ -26,7 +28,7 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
                                    QString groupeName,
                                    QDateTime creationDate,
                                    QObject *parent) : QObject(parent),
-    _uid(""),
+    _uid(AssessmentsModelManager::cassUuidToQString(cassUuid)),
     _name(name),
     _groupName(groupeName),
     _creationDate(creationDate),
@@ -34,10 +36,6 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    char chrCassUid[CASS_UUID_STRING_LENGTH];
-    cass_uuid_string(_cassUuid, chrCassUid);
-    _uid = QString(chrCassUid);
 
     qInfo() << "New Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << _uid << ")";
 
@@ -66,6 +64,7 @@ void ExperimentationM::clearData()
     _allRecordSetups.deleteAllItems();
 
     // Delete all characteristics of our experimentation
+    _hashFromUIDtoCharacteristic.clear();
     _allCharacteristics.deleteAllItems();
 
     // Delete all subjects of our experimentation
@@ -222,11 +221,40 @@ void ExperimentationM::removeRecordSetup(RecordSetupM* recordSetup)
  * @param uid
  * @return
  */
-CharacteristicM* ExperimentationM::getCharacteristicFromUID(QString uid)
+CharacteristicM* ExperimentationM::getCharacteristicFromUID(const QString& uid)
 {
     return _hashFromUIDtoCharacteristic.value(uid, nullptr);
 }
 
+/**
+ * @brief Get a task from its UID
+ * @param uid
+ * @return
+ */
+SubjectM* ExperimentationM::getSubjectFromUID(const QString& uid)
+{
+    auto subjectIt = std::find_if(_allSubjects.begin(), _allSubjects.end(), [uid](SubjectM* subject) { return (subject != nullptr) && (subject->uid() == uid); });
+    return (subjectIt != _allSubjects.end()) ? *subjectIt : nullptr;
+}
+
+
+/**
+ * @brief Get a task from its UID
+ * @param uid
+ * @return
+ */
+TaskM* ExperimentationM::getTaskFromUID(const QString& uid)
+{
+    auto taskIt = std::find_if(_allTasks.begin(), _allTasks.end(), [uid](TaskM* task) { return (task != nullptr) && (task->uid() == uid); });
+    return (taskIt != _allTasks.end()) ? *taskIt : nullptr;
+}
+
+
+/**
+ * @brief Static factory method to create an experiment from a CassandraDB record
+ * @param row
+ * @return
+ */
 ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const CassRow* row)
 {
     ExperimentationM* experimentation = nullptr;
@@ -235,8 +263,6 @@ ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const 
     {
         CassUuid experimentationUid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &experimentationUid);
-        char chrExperimentationUid[CASS_UUID_STRING_LENGTH];
-        cass_uuid_string(experimentationUid, chrExperimentationUid);
 
         const char *chrExperimentationName = "";
         size_t nameLength;

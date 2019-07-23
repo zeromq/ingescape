@@ -100,12 +100,12 @@ void ExperimentationController::setcurrentExperimentation(ExperimentationM *valu
 
 
 /**
- * @brief Create a new record for a subject and a task
+ * @brief Create a new record setup for a subject and a task
  * @param recordName
  * @param subject
  * @param task
  */
-void ExperimentationController::createNewRecordForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task)
+void ExperimentationController::createNewRecordSetupForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task)
 {
     if (!recordName.isEmpty() && (subject != nullptr) && (task != nullptr) && (_currentExperimentation != nullptr))
     {
@@ -180,6 +180,8 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
         _retrieveCharacteristicsForExperimentation(currentExperimentation);
 
         _retrieveCharacteristicValuesForSubjectsInExperimentation(currentExperimentation);
+
+        _retrieveRecordSetupsForExperimentation(currentExperimentation);
     }
 }
 
@@ -227,13 +229,42 @@ RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString&
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
-            qInfo() << "New dependent variable inserted into the DB";
+            qInfo() << "New record_setup inserted into the DB";
 
             // Create the new record setup
             recordSetup = new RecordSetupM(recordSetupUuid, recordName, subject, task, QDateTime::currentDateTime());
+
+            for (auto indeVarIt = task->independentVariables()->begin() ; indeVarIt != task->independentVariables()->end() ; ++indeVarIt)
+            {
+                IndependentVariableM* independentVar = *indeVarIt;
+                if (independentVar != nullptr)
+                {
+                    // Insert an instance of every independent variable for this record setup into DB
+                    const char* innerQuery = "INSERT INTO ingescape.independent_var_value_of_record_setup (id_experimentation, id_record_setup, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
+                    CassStatement* innerCassStatement = cass_statement_new(innerQuery, 4);
+                    cass_statement_bind_uuid  (innerCassStatement, 0, subject->getExperimentationCassUuid());
+                    cass_statement_bind_uuid  (innerCassStatement, 1, recordSetup->getCassUuid());
+                    cass_statement_bind_uuid  (innerCassStatement, 2, independentVar->getCassUuid());
+                    cass_statement_bind_string(innerCassStatement, 3, "");
+
+                    // Execute the query or bound statement
+                    CassFuture* innerCassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), innerCassStatement);
+                    CassError innerCassError = cass_future_error_code(innerCassFuture);
+                    if (innerCassError == CASS_OK)
+                    {
+                        qInfo() << "New independent value for record_setup inserted into the DB";
+                    }
+                    else {
+                        qCritical() << "Could not insert the new independent value for record_setup into the DB:" << cass_error_desc(innerCassError);
+                    }
+
+                    cass_statement_free(innerCassStatement);
+                    cass_future_free(innerCassFuture);
+                }
+            }
         }
         else {
-            qCritical() << "Could not insert the new dependent variable into the DB:" << cass_error_desc(cassError);
+            qCritical() << "Could not insert the new record_setup into the DB:" << cass_error_desc(cassError);
         }
 
         cass_statement_free(cassStatement);
@@ -508,6 +539,70 @@ void ExperimentationController::_retrieveTasksForExperimentation(Experimentation
     }
 }
 
+/**
+ * @brief Retrieve all record setups from the Cassandra DB for the given experimentaion.
+ * The experimentation will be updated by this method
+ * @param experimentation
+ */
+void ExperimentationController::_retrieveRecordSetupsForExperimentation(ExperimentationM* experimentation)
+{
+    if (experimentation != nullptr)
+    {const char* query = "SELECT * FROM ingescape.record_setup WHERE id_experimentation = ?;";
+
+        // Creates the new query statement
+        CassStatement* cassStatement = cass_statement_new(query, 1);
+        cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qDebug() << "Get all record setup succeeded";
+
+            // Retrieve result set and iterate over the rows
+            const CassResult* cassResult = cass_future_get_result(cassFuture);
+
+            if (cassResult != nullptr)
+            {
+                CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+
+                while(cass_iterator_next(cassIterator))
+                {
+                    const CassRow* row = cass_iterator_get_row(cassIterator);
+                    RecordSetupM* recordSetup = RecordSetupM::createRecordSetupFromCassandraRow(row);
+                    if (recordSetup != nullptr)
+                    {
+                        CassUuid subjectUuid;
+                        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
+                        recordSetup->setsubject(experimentation->getSubjectFromUID(AssessmentsModelManager::cassUuidToQString(subjectUuid)));
+
+                        CassUuid taskUuid;
+                        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
+                        recordSetup->settask(experimentation->getTaskFromUID(AssessmentsModelManager::cassUuidToQString(taskUuid)));
+
+                        // Add the record setup to the experimentation
+                        experimentation->addRecordSetup(recordSetup);
+                    }
+                }
+
+                cass_iterator_free(cassIterator);
+            }
+        }
+        else {
+            qCritical() << "Could not get all record setup for the current experiment from the database:" << cass_error_desc(cassError);
+        }
+
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+    }
+}
+
+/**
+ * @brief Retrieve all characteristic values from the Cassandra DB for each given subjects.
+ * The subjects will be updated by this method
+ * @param experimentation
+ */
 void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperimentation(ExperimentationM* experimentation)
 {
     if (experimentation != nullptr)
