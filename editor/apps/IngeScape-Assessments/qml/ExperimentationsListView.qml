@@ -79,13 +79,34 @@ Item {
         id: btnNewExpe
 
         anchors {
-            top: title.bottom
-            topMargin: 20
-            horizontalCenter: parent.horizontalCenter
+            right: columnExperimentationsGroups.right
+            bottom: columnExperimentationsGroups.top
+            bottomMargin: 9
         }
-        height: 30
+        height: 40
+        width: 200
 
-        text: "New Experimentation"
+        style: ButtonStyle {
+            label: Text {
+                text: "NEW EXPERIMENT"
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                color: IngeScapeTheme.whiteColor
+
+                //FIXME derived from headerFont
+                font {
+                    family: IngeScapeTheme.labelFontFamily
+                    pixelSize: 18
+                    weight: Font.Black
+                }
+            }
+
+            background: Rectangle {
+                //FIXME Move colors to IngeScapeTheme
+                color: btnNewExpe.hovered ? "#239eb3" : "#007b90"
+                radius: 5
+            }
+        }
 
         onClicked: {
             // Open the popup
@@ -98,8 +119,8 @@ Item {
         id: columnExperimentationsGroups
 
         anchors {
-            top: btnNewExpe.bottom
-            topMargin: 20
+            top: title.bottom
+            topMargin: 74
             left: parent.left
             leftMargin: 20
             right: parent.right
@@ -192,7 +213,7 @@ Item {
                         property ExperimentationM experimentation: model.QtObject
 
                         width: parent.width
-                        height: 40
+                        height: 38
 
                         Row {
                             anchors {
@@ -256,6 +277,7 @@ Item {
                                     }
 
                                     background: Rectangle {
+                                        //FIXME Move colors to IngeScapeTheme
                                         color: btnDelete.hovered ? "#239eb3" : "#007b90"
                                         radius: 5
                                     }
@@ -311,6 +333,7 @@ Item {
                                     }
 
                                     background: Rectangle {
+                                        //FIXME Move colors to IngeScapeTheme
                                         color: btnOpen.hovered ? "#239eb3" : "#007b90"
                                         radius: 5
                                     }
@@ -325,7 +348,8 @@ Item {
                                 right: parent.right
                                 bottom: parent.bottom
                             }
-                            height: 1
+                            height: 2
+                            color: IngeScapeTheme.veryLightGreyColor
                         }
                     }
                 }
