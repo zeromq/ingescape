@@ -97,7 +97,7 @@ public:
      * @param row
      * @return
      */
-    static SubjectM* createTaskFromCassandraRow(const CassRow* row);
+    static SubjectM* createSubjectFromCassandraRow(const CassRow* row);
 
 
 private Q_SLOTS:

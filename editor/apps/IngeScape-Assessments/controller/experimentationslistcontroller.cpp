@@ -46,32 +46,6 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
     // Create the (fake) group "New"
     _newGroup = new ExperimentationsGroupVM(tr("New Group"), nullptr);
 
-
-    //
-    // FIXME for tests
-    //
-    /*int nbExpes = 1;
-
-    for (int i = 0; i < 3; i++)
-    {
-        QString groupName = QString("Group for test %1").arg(i + 1);
-
-        ExperimentationsGroupVM* group = new ExperimentationsGroupVM(groupName, nullptr);
-
-        _allExperimentationsGroups.append(group);
-
-        for (int j = 0; j < 2; j++)
-        {
-            QString expeName = QString("Expe for test %1").arg(nbExpes);
-
-            ExperimentationM* experimentation = new ExperimentationM(expeName, QDateTime::currentDateTime(), nullptr);
-
-            group->experimentations()->append(experimentation);
-
-            nbExpes++;
-        }
-    }*/
-
     AssessmentsModelManager* modelManager = AssessmentsModelManager::Instance();
     if (modelManager != nullptr) {
         // Create the query
@@ -273,6 +247,35 @@ void ExperimentationsListController::deleteExperimentationOfGroup(Experimentatio
 
         // Remove from the group
         experimentationsGroup->experimentations()->remove(experimentation);
+
+        // Remove from DB
+        // TODO Make static methods in TaskM, SubjectM, CharacteristicM (and the rest maybe ?) to delete from DB.
+        for(auto taskIt = experimentation->allTasks()->begin() ; taskIt != experimentation->allTasks()->end() ; ++taskIt)
+        {
+            TaskM* task = *taskIt;
+            if (task != nullptr)
+            {
+                TaskM::deleteTaskFromCassandra(*task);
+            }
+        }
+
+        for(auto subjectIt = experimentation->allSubjects()->begin() ; subjectIt != experimentation->allSubjects()->end() ; ++subjectIt)
+        {
+            SubjectM* subject = *subjectIt;
+            if (subject != nullptr)
+            {
+                // TODO Delete subject. Static method.
+            }
+        }
+
+        for(auto characteristicIt = experimentation->allCharacteristics()->begin() ; characteristicIt != experimentation->allCharacteristics()->end() ; ++characteristicIt)
+        {
+            CharacteristicM* characteristic = *characteristicIt;
+            if (characteristic != nullptr)
+            {
+                // TODO Delete characteristic. Static method.
+            }
+        }
 
         // Free memory
         delete experimentation;

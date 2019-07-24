@@ -407,7 +407,7 @@ void ExperimentationController::_retrieveSubjectsForExperimentation(Experimentat
                 while(cass_iterator_next(cassIterator))
                 {
                     const CassRow* row = cass_iterator_get_row(cassIterator);
-                    SubjectM* subject = SubjectM::createTaskFromCassandraRow(row);
+                    SubjectM* subject = SubjectM::createSubjectFromCassandraRow(row);
                     if (subject != nullptr)
                     {
                         // Add the subject to the experimentation

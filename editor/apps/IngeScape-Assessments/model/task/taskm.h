@@ -122,6 +122,8 @@ public:
      */
     static TaskM* createTaskFromCassandraRow(const CassRow* row);
 
+    static void deleteTaskFromCassandra(const TaskM& task);
+
 
 Q_SIGNALS:
 

@@ -128,68 +128,8 @@ void TasksController::deleteTask(TaskM* task)
             setselectedTask(nullptr);
         }
 
-        // Remove independent_var from DB
-        const char* query = "DELETE FROM ingescape.independent_var WHERE id_experimentation = ? AND id_task = ?;";
-        CassStatement* cassStatement = cass_statement_new(query, 2);
-        cass_statement_bind_uuid(cassStatement, 0, task->getExperimentationCassUuid());
-        cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "Independent variables for task" << task->name() << "has been successfully deleted from the DB";
-        }
-        else {
-            qCritical() << "Could not delete the independent variables for the task" << task->name() << "from the DB:" << cass_error_desc(cassError);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
-
-        // Remove dependent_var from DB
-        query = "DELETE FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ?;";
-        cassStatement = cass_statement_new(query, 2);
-        cass_statement_bind_uuid(cassStatement, 0, task->getExperimentationCassUuid());
-        cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
-
-        // Execute the query or bound statement
-        cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "Dependent variables for task" << task->name() << "has been successfully deleted from the DB";
-        }
-        else {
-            qCritical() << "Could not delete the dependent variables for the task" << task->name() << "from the DB:" << cass_error_desc(cassError);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
-
-        // Remove task from DB
-        query = "DELETE FROM ingescape.task WHERE id_experimentation = ? AND id = ?;";
-        cassStatement = cass_statement_new(query, 2);
-        cass_statement_bind_uuid(cassStatement, 0, task->getExperimentationCassUuid());
-        cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
-
-        // Execute the query or bound statement
-        cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "Task" << task->name() << "has been successfully deleted from the DB";
-        }
-        else {
-            qCritical() << "Could not delete the task" << task->name() << "from the DB:" << cass_error_desc(cassError);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
+        // Remove from DB
+        TaskM::deleteTaskFromCassandra(*task);
 
         // Remove the task from the current experimentation
         _currentExperimentation->removeTask(task);
