@@ -21,6 +21,9 @@
 
 #include "cassandra.h"
 
+// Forward declaration
+class ExperimentationM;
+
 
 extern const QString CHARACTERISTIC_SUBJECT_ID;
 
@@ -78,14 +81,14 @@ public:
      * @brief Get the unique identifier in Cassandra Data Base
      * @return
      */
-    CassUuid getCassUuid() { return _cassUuid; }
+    CassUuid getCassUuid() const { return _cassUuid; }
 
 
     /**
      * @brief Get the experimentation's unique identifier in Cassandra Data Base
      * @return
      */
-    CassUuid getExperimentationCassUuid() { return _experimentationCassUuid; }
+    CassUuid getExperimentationCassUuid() const { return _experimentationCassUuid; }
 
 
     /**
@@ -94,6 +97,23 @@ public:
      * @return
      */
     static CharacteristicM* createCharacteristicFromCassandraRow(const CassRow* row);
+
+    /**
+     * @brief Delete a characteristic from Cassandra DB
+     * @param characteristic The characteristic to delete
+     * @param experimentation The experimentation its associated with for back reference to subjects
+     */
+    static void deleteCharacteristicFromCassandra(const CharacteristicM& characteristic, ExperimentationM* experimentation);
+
+private:
+    /**
+     * @brief Delete every characteric value associated with the given characteristic
+     * FIXME Sending a request for each subject does not seem very efficient...
+     *       It would be nice if we could just have a WHERE clause on id_experimentation and id_characteristic, wouldn't it?
+     * @param characteristic The characteristic to delete
+     * @param experimentation The experimentation its associated with for back reference to subjects
+     */
+    static void _deleteCharacteristicValuesForCharacteristic(const CharacteristicM& characteristic, ExperimentationM* experimentation);
 
 private:
     // Experimentation's unique identifier in Cassandra Data Base

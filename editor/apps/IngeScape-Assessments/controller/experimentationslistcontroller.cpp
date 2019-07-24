@@ -273,7 +273,7 @@ void ExperimentationsListController::deleteExperimentationOfGroup(Experimentatio
             CharacteristicM* characteristic = *characteristicIt;
             if (characteristic != nullptr)
             {
-                // TODO Delete characteristic. Static method.
+                CharacteristicM::deleteCharacteristicFromCassandra(*characteristic, experimentation);
             }
         }
 
