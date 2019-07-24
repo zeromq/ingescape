@@ -201,7 +201,7 @@ void SubjectM::_onCharacteristicValueChanged(const QString &key, const QVariant 
         setdisplayedId(value.toString());
     }
 
-    characteristic = _mapCharacteristicsByName.value(key);
+    characteristic = _mapCharacteristicsByName.value(key, nullptr);
     if (characteristic != nullptr)
     {
         const char* query = "UPDATE ingescape.characteristic_value_of_subject SET characteristic_value = ? WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ?;";

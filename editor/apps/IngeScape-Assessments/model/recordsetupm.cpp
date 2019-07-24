@@ -25,7 +25,8 @@
  * @param startDateTime
  * @param parent
  */
-RecordSetupM::RecordSetupM(CassUuid cassUuid,
+RecordSetupM::RecordSetupM(CassUuid experimentationUuid,
+                           CassUuid cassUuid,
                            QString name,
                            SubjectM* subject,
                            TaskM* task,
@@ -40,12 +41,13 @@ RecordSetupM::RecordSetupM(CassUuid cassUuid,
     //_duration(QDateTime())
     _duration(QTime()),
     _mapIndependentVariableValues(nullptr),
+    _experimentationCassUuid(experimentationUuid),
     _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if ((_subject != nullptr) && (_task != nullptr))
+    if ((subject != nullptr) && (task != nullptr))
     {
         qInfo() << "New Model of Record" << _name << "(" << _uid << ") for subject" << _subject->displayedId() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
 
@@ -56,42 +58,14 @@ RecordSetupM::RecordSetupM(CassUuid cassUuid,
         {
             if (independentVariable != nullptr)
             {
-                /*switch (independentVariable->valueType())
-                {
-                case IndependentVariableValueTypes::INTEGER:
-                    _mapIndependentVariableValues->insert(independentVariable->name(), QVariant(0));
-                    break;
-
-                case IndependentVariableValueTypes::DOUBLE:
-                    _mapIndependentVariableValues->insert(independentVariable->name(), QVariant(0.0));
-                    break;
-
-                case IndependentVariableValueTypes::TEXT:
-                    _mapIndependentVariableValues->insert(independentVariable->name(), QVariant(""));
-                    break;
-
-                case IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM:
-                    _mapIndependentVariableValues->insert(independentVariable->name(), QVariant(""));
-                    break;
-
-                default:
-                    qWarning() << "We cannot add the independent variable" << independentVariable->name() << "because the type" <<  independentVariable->valueType() << "is wrong !";
-                    break;
-                }*/
-
                 // Insert an (invalid) not initialized QVariant
                 _mapIndependentVariableValues->insert(independentVariable->name(), QVariant());
+                _mapIndependentVarByName.insert(independentVariable->name(), independentVariable);
             }
         }
 
-        // FIXME TODO: connect to changes from the list _task->independentVariables()
-        // Useless because "rootItem.recordSetup.mapIndependentVariableValues[model.name] = value" in QML/JS works...
-        // ...even if the key was not inserted in C++ first (_mapIndependentVariableValues->insert(independentVariable->name(), QVariant()))
-        //connect(_task->independentVariables(), &AbstractI2CustomItemListModel::countChanged, this, &RecordSetupM::_onIndependentVariablesListChanged);
-
-
         // Connect to signal "Value Changed" fro the "Qml Property Map"
-        //connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &RecordSetupM::_onIndependentVariableValueChanged);
+        connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &RecordSetupM::_onIndependentVariableValueChanged);
     }
 }
 
@@ -107,6 +81,9 @@ RecordSetupM::~RecordSetupM()
 
         // For debug purpose: Print the value of all independent variables
         _printIndependentVariableValues();
+
+        // Clean-up independent variable map (by name). No deletion.
+        _mapIndependentVarByName.clear();
 
         // Free memory
         if (_mapIndependentVariableValues != nullptr)
@@ -134,17 +111,18 @@ RecordSetupM::~RecordSetupM()
  * @param row
  * @return
  */
-RecordSetupM* RecordSetupM::createRecordSetupFromCassandraRow(const CassRow* row)
+//NOTE Same note as CharacteristicM::_deleteCharacteristicValuesForCharacteristic
+RecordSetupM* RecordSetupM::createRecordSetupFromCassandraRow(const CassRow* row, SubjectM* subject, TaskM* task)
 {
     RecordSetupM* recordSetup = nullptr;
 
     if (row != nullptr)
     {
-        CassUuid /*experimentationUuid, subjectUuid, taskUuid, recordUuid, */recordSetupUuid;
-//        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
-//        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
-//        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
-//        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_records"), &recordUuid);
+        CassUuid experimentationUuid, subjectUuid, taskUuid, recordUuid, recordSetupUuid;
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_records"), &recordUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &recordSetupUuid);
 
         const char *chrTaskName = "";
@@ -159,16 +137,41 @@ RecordSetupM* RecordSetupM::createRecordSetupFromCassandraRow(const CassRow* row
 
         cass_uint32_t yearMonthDay;
         cass_value_get_uint32(cass_row_get_column_by_name(row, "start_date"), &yearMonthDay);
-      cass_int64_t timeOfDay;
+        cass_int64_t timeOfDay;
         cass_value_get_int64(cass_row_get_column_by_name(row, "start_time"), &timeOfDay);
 
         /* Convert 'date' and 'time' to Epoch time */
         time_t time = static_cast<time_t>(cass_date_time_to_epoch(yearMonthDay, timeOfDay));
 
-        recordSetup = new RecordSetupM(recordSetupUuid, taskName, nullptr, nullptr, QDateTime::fromTime_t(static_cast<uint>(time)));
+        recordSetup = new RecordSetupM(experimentationUuid, recordSetupUuid, taskName, subject, task, QDateTime::fromTime_t(static_cast<uint>(time)));
     }
 
     return recordSetup;
+}
+
+
+void RecordSetupM::_onIndependentVariableValueChanged(const QString& key, const QVariant& value)
+{
+    IndependentVariableM* indeVar = _mapIndependentVarByName.value(key, nullptr);
+    if (indeVar != nullptr)
+    {
+        const char* query = "UPDATE ingescape.independent_var_value_of_record_setup SET independent_var_value = ? WHERE id_experimentation = ? AND id_record_setup = ? AND id_independent_var = ?;";
+        CassStatement* cassStatement = cass_statement_new(query, 4);
+        cass_statement_bind_string(cassStatement, 0, value.toString().toStdString().c_str());
+        cass_statement_bind_uuid  (cassStatement, 1, _experimentationCassUuid);
+        cass_statement_bind_uuid  (cassStatement, 2, _cassUuid);
+        cass_statement_bind_uuid  (cassStatement, 3, indeVar->getCassUuid());
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError != CASS_OK)
+        {
+            qCritical() << "Could not update the value of independent variable" << indeVar->name() << "for record_setup" << name();
+        }
+    }
+    else {
+        qCritical() << "Unknown independent variable" << key;
+    }
 }
 
 

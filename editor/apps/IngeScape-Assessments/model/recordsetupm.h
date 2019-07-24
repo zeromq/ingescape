@@ -74,7 +74,8 @@ public:
      * @param startDateTime
      * @param parent
      */
-    explicit RecordSetupM(CassUuid cassUuid,
+    explicit RecordSetupM(CassUuid experimentationUuid,
+                          CassUuid cassUuid,
                           QString name,
                           SubjectM* subject,
                           TaskM* task,
@@ -98,7 +99,10 @@ public:
      * @param row
      * @return
      */
-    static RecordSetupM* createRecordSetupFromCassandraRow(const CassRow* row);
+    static RecordSetupM* createRecordSetupFromCassandraRow(const CassRow* row, SubjectM* subject, TaskM* task);
+
+private Q_SLOTS:
+    void _onIndependentVariableValueChanged(const QString& key, const QVariant& value);
 
 private:
     /**
@@ -107,6 +111,9 @@ private:
     void _printIndependentVariableValues();
 
 private:
+    QHash<QString, IndependentVariableM*> _mapIndependentVarByName;
+    CassUuid _experimentationCassUuid;
+
     CassUuid _cassUuid;
 
 

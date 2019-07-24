@@ -43,6 +43,39 @@ Item {
     //--------------------------------------------------------
     //
     //
+    // Functions
+    //
+    //
+    //--------------------------------------------------------
+
+    function openExperimentation(experimentation)
+    {
+        if (experimentation && IngeScapeAssessmentsC.experimentationC)
+        {
+            console.log("QML: Open " + experimentation.name);
+
+            // Open the experimentation of the group
+            IngeScapeAssessmentsC.experimentationC.currentExperimentation = experimentation;
+        }
+    }
+
+
+    function deleteExperimentation(experimentation, group)
+    {
+        if (experimentation && rootItem.controller)
+        {
+            console.log("QML: Delete " + experimentation.name);
+
+            // Delete the experimentation of the group
+            rootItem.controller.deleteExperimentationOfGroup(experimentation, group);
+        }
+    }
+
+
+
+    //--------------------------------------------------------
+    //
+    //
     // Content
     //
     //
@@ -69,7 +102,7 @@ Item {
 
         color: IngeScapeTheme.whiteColor
         font {
-            family: IngeScapeTheme.textFontFamily
+            family: IngeScapeTheme.headingFont
             weight : Font.Medium
             pixelSize : 20
         }
@@ -79,13 +112,34 @@ Item {
         id: btnNewExpe
 
         anchors {
-            top: title.bottom
-            topMargin: 20
-            horizontalCenter: parent.horizontalCenter
+            right: columnExperimentationsGroups.right
+            bottom: columnExperimentationsGroups.top
+            bottomMargin: 9
         }
-        height: 30
+        height: 40
+        width: 200
 
-        text: "New Experimentation"
+        style: ButtonStyle {
+            label: Text {
+                text: "NEW EXPERIMENT"
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                color: IngeScapeTheme.whiteColor
+
+                //FIXME derived from headerFont
+                font {
+                    family: IngeScapeTheme.labelFontFamily
+                    pixelSize: 18
+                    weight: Font.Black
+                }
+            }
+
+            background: Rectangle {
+                //FIXME Move colors to IngeScapeTheme
+                color: btnNewExpe.hovered ? "#239eb3" : "#007b90"
+                radius: 5
+            }
+        }
 
         onClicked: {
             // Open the popup
@@ -98,8 +152,8 @@ Item {
         id: columnExperimentationsGroups
 
         anchors {
-            top: btnNewExpe.bottom
-            topMargin: 20
+            top: title.bottom
+            topMargin: 74
             left: parent.left
             leftMargin: 20
             right: parent.right
@@ -134,38 +188,43 @@ Item {
     Component {
         id: componentExperimentationsGroup
 
-        Rectangle {
+        Item {
             id: rootExperimentationsGroup
 
             property ExperimentationsGroupVM experimentationsGroup: model.QtObject
 
             width: parent.width
-            height: txtName.anchors.topMargin + txtName.height + columnExperimentations.anchors.topMargin + columnExperimentations.height + 5
+            height: childrenRect.height
 
-            color: "transparent"
-            radius: 5
-            border {
-                color: IngeScapeTheme.darkGreyColor
-                width: 1
-            }
-
-            Text {
-                id: txtName
+            //FIXME Rounded only on top corners
+            Rectangle {
+                id: headerBackground
 
                 anchors {
-                    left: parent.left
-                    leftMargin: 5
                     top: parent.top
-                    topMargin: 5
+                    left: parent.left
+                    right: parent.right
                 }
 
-                text: rootExperimentationsGroup.experimentationsGroup ? rootExperimentationsGroup.experimentationsGroup.name : ""
+                height: 40
 
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
+                color: "#38444F" //TODO Move to IngeScapeTheme.qml
+
+                Text {
+                    id: textGoupName
+
+                    anchors {
+                        left: parent.left
+                        leftMargin: 25
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+
+                    text: rootExperimentationsGroup.experimentationsGroup ? rootExperimentationsGroup.experimentationsGroup.name : ""
+                    verticalAlignment: Text.AlignVCenter
+
+                    color: IngeScapeTheme.whiteColor
+                    font: IngeScapeTheme.headingFont
                 }
             }
 
@@ -173,10 +232,8 @@ Item {
                 id: columnExperimentations
 
                 anchors {
-                    top: txtName.bottom
-                    topMargin: 10
+                    top: headerBackground.bottom
                     left: parent.left
-                    leftMargin: 30
                     right: parent.right
                 }
 
@@ -187,30 +244,33 @@ Item {
                         id: rootExperimentation
 
                         property ExperimentationM experimentation: model.QtObject
+                        property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.hovered || btnOpen.hovered
 
                         width: parent.width
-                        height: 30
+                        height: 38
+                        color: rootExperimentation.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
 
-                        color: "transparent"
-                        //radius: 5
-                        border {
-                            color: IngeScapeTheme.darkGreyColor
-                            width: 1
+                        MouseArea {
+                            id: itemMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onDoubleClicked: {
+                                rootItem.openExperimentation(rootExperimentation.experimentation)
+                            }
                         }
 
                         Row {
-                            spacing: 10
-
                             anchors {
                                 left: parent.left
-                                leftMargin: 5
+                                leftMargin: 25
                                 verticalCenter: parent.verticalCenter
                             }
 
                             Text {
                                 text: rootExperimentation.experimentation ? rootExperimentation.experimentation.name : ""
 
-                                color: IngeScapeTheme.whiteColor
+                                width: 350
+                                color: IngeScapeTheme.blackColor
                                 font {
                                     family: IngeScapeTheme.textFontFamily
                                     weight: Font.Medium
@@ -219,9 +279,9 @@ Item {
                             }
 
                             Text {
-                                text: rootExperimentation.experimentation ? rootExperimentation.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy hh:mm:ss") : ""
+                                text: rootExperimentation.experimentation ? rootExperimentation.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy - hh:mm:ss") : ""
 
-                                color: IngeScapeTheme.whiteColor
+                                color: IngeScapeTheme.blackColor
                                 font {
                                     family: IngeScapeTheme.textFontFamily
                                     //weight: Font.Medium
@@ -230,63 +290,114 @@ Item {
                             }
                         }
 
-                        /*MouseArea {
-                            id: mouseAreaExperimentation
-
-                            anchors.fill: parent
-
-                            hoverEnabled: true
-                        }*/
-
                         Row {
-                            spacing: 0
+                            spacing: 14
 
                             anchors {
                                 right: parent.right
+                                rightMargin: 18
                             }
+
                             height: parent.height
-
-                            //visible: mouseAreaExperimentation.containsMouse
-
-                            Button {
-                                id: btnOpen
-
-                                text: "OPEN"
-
-                                //width: 100
-                                height: parent.height
-
-                                onClicked: {
-                                    if (rootExperimentation.experimentation && IngeScapeAssessmentsC.experimentationC)
-                                    {
-                                        console.log("QML: Open " + rootExperimentation.experimentation.name);
-
-                                        // Open the experimentation of the group
-                                        IngeScapeAssessmentsC.experimentationC.currentExperimentation = rootExperimentation.experimentation;
-                                    }
-                                }
-                            }
 
                             Button {
                                 id: btnDelete
 
-                                text: "DEL"
+                                anchors.verticalCenter: parent.verticalCenter
 
-                                //width: 100
-                                height: parent.height
+                                //FIXME replace with trash can picto
+                                style: ButtonStyle {
+                                    label: Text {
+                                        verticalAlignment: Text.AlignVCenter
+                                        horizontalAlignment: Text.AlignHCenter
+                                        color: IngeScapeTheme.whiteColor
+                                        font {
+                                            family: IngeScapeTheme.textFontFamily
+                                            //weight: Font.Medium
+                                            pixelSize: 14
+                                            bold: true
+                                        }
+                                        text: "DEL"
+                                    }
+
+                                    background: Rectangle {
+                                        //FIXME Move colors to IngeScapeTheme
+                                        color: btnDelete.hovered ? "#239eb3" : "#007b90"
+                                        radius: 5
+                                    }
+                                }
+
+                                width: 40
+                                height: 30
 
                                 onClicked: {
-                                    if (rootExperimentation.experimentation && rootItem.controller)
-                                    {
-                                        console.log("QML: Delete " + rootExperimentation.experimentation.name);
+                                    rootItem.deleteExperimentation(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup)
+                                }
+                            }
 
-                                        // Delete the experimentation of the group
-                                        rootItem.controller.deleteExperimentationOfGroup(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup);
+                            Button {
+                                id: btnOpen
+
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                width: 86
+                                height: 30
+
+                                onClicked: {
+                                    rootItem.openExperimentation(rootExperimentation.experimentation)
+                                }
+
+
+                                //FIXME correct font
+                                style: ButtonStyle {
+                                    label: Text {
+                                        text: "OPEN"
+                                        verticalAlignment: Text.AlignVCenter
+                                        horizontalAlignment: Text.AlignHCenter
+                                        color: IngeScapeTheme.whiteColor
+
+                                        //FIXME derived from headerFont
+                                        font {
+                                            family: IngeScapeTheme.labelFontFamily
+                                            pixelSize: 18
+                                            weight: Font.Black
+                                        }
+                                    }
+
+                                    background: Rectangle {
+                                        //FIXME Move colors to IngeScapeTheme
+                                        color: btnOpen.hovered ? "#239eb3" : "#007b90"
+                                        radius: 5
                                     }
                                 }
                             }
                         }
+
+                        Rectangle {
+                            id: bottomSeparator
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                bottom: parent.bottom
+                            }
+                            height: 2
+                            color: IngeScapeTheme.veryLightGreyColor
+                        }
                     }
+                }
+            }
+
+            Rectangle {
+                id: bottomShade
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    bottom: parent.bottom
+                }
+                height: 4
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
+                    GradientStop { position: 1.0; color: IngeScapeTheme.blackColor; }
                 }
             }
         }
