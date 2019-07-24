@@ -79,7 +79,7 @@ void ExperimentationM::clearData()
  * @brief Get the unique identifier in Cassandra Data Base
  * @return
  */
-CassUuid ExperimentationM::getCassUuid()
+CassUuid ExperimentationM::getCassUuid() const
 {
     return _cassUuid;
 }
@@ -288,5 +288,122 @@ ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const 
     }
 
     return experimentation;
+}
+
+/**
+ * @brief Delete the given experimentation from Cassandra DB
+ * Also deletes its associated taks, subjects, characteristics and characteristics values
+ * @param experimentation
+ */
+void ExperimentationM::deleteExperimentationFromCassandra(const ExperimentationM& experimentation)
+{
+    _deleteAllTasksForExperimentation(experimentation);
+    _deleteAllSubjectsForExperimentation(experimentation);
+    _deleteAllCharacteristicsForExperimentation(experimentation);
+    _deleteAllCharacteristicsValuesForExperimentation(experimentation);
+}
+
+/**
+ * @brief Delete all tasks associated with the given experimentation
+ * @param experimentation
+ */
+void ExperimentationM::_deleteAllTasksForExperimentation(const ExperimentationM& experimentation)
+{
+    const char* query = "DELETE FROM ingescape.task WHERE id_experimentation = ?;";
+    CassStatement* cassStatement = cass_statement_new(query, 1);
+    cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qInfo() << "Tasks from" << experimentation.name() << "has been successfully deleted from the DB";
+    }
+    else {
+        qCritical() << "Could not delete the tasks from" << experimentation.name() << "from the DB:" << cass_error_desc(cassError);
+    }
+
+    // Clean-up cassandra objects
+    cass_future_free(cassFuture);
+    cass_statement_free(cassStatement);
+}
+
+/**
+ * @brief Delete all subjects associated with the given experimentation
+ * @param experimentation
+ */
+void ExperimentationM::_deleteAllSubjectsForExperimentation(const ExperimentationM& experimentation)
+{
+    const char* query = "DELETE FROM ingescape.subject WHERE id_experimentation = ?;";
+    CassStatement* cassStatement = cass_statement_new(query, 1);
+    cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qInfo() << "Subjects from" << experimentation.name() << "has been successfully deleted from the DB";
+    }
+    else {
+        qCritical() << "Could not delete the subjects from" << experimentation.name() << "from the DB:" << cass_error_desc(cassError);
+    }
+
+    // Clean-up cassandra objects
+    cass_future_free(cassFuture);
+    cass_statement_free(cassStatement);
+}
+
+/**
+ * @brief Delete all characteristics associated with the given experimentation
+ * @param experimentation
+ */
+void ExperimentationM::_deleteAllCharacteristicsForExperimentation(const ExperimentationM& experimentation)
+{
+    const char* query = "DELETE FROM ingescape.characteristic WHERE id_experimentation = ?;";
+    CassStatement* cassStatement = cass_statement_new(query, 1);
+    cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qInfo() << "Characteristics from" << experimentation.name() << "has been successfully deleted from the DB";
+    }
+    else {
+        qCritical() << "Could not delete the characteristics from" << experimentation.name() << "from the DB:" << cass_error_desc(cassError);
+    }
+
+    // Clean-up cassandra objects
+    cass_future_free(cassFuture);
+    cass_statement_free(cassStatement);
+}
+
+/**
+ * @brief Delete all tasks characteristics values with the given experimentation
+ * @param experimentation
+ */
+void ExperimentationM::_deleteAllCharacteristicsValuesForExperimentation(const ExperimentationM& experimentation)
+{
+    const char* query = "DELETE FROM ingescape.characteristic_value_of_subject WHERE id_experimentation = ?;";
+    CassStatement* cassStatement = cass_statement_new(query, 1);
+    cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qInfo() << "Characteristics values from" << experimentation.name() << "has been successfully deleted from the DB";
+    }
+    else {
+        qCritical() << "Could not delete the characteristics values from" << experimentation.name() << "from the DB:" << cass_error_desc(cassError);
+    }
+
+    // Clean-up cassandra objects
+    cass_future_free(cassFuture);
+    cass_statement_free(cassStatement);
 }
 

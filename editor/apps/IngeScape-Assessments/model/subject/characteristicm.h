@@ -106,10 +106,16 @@ public:
     static void deleteCharacteristicFromCassandra(const CharacteristicM& characteristic, ExperimentationM* experimentation);
 
 private:
+
     /**
      * @brief Delete every characteric value associated with the given characteristic
      * FIXME Sending a request for each subject does not seem very efficient...
      *       It would be nice if we could just have a WHERE clause on id_experimentation and id_characteristic, wouldn't it?
+     * NOTE Having a model manager handling the model instances would allow a characteristic to get its experimentation from
+     *      the CassUuid (which it already knows) without having to pass a pointer to said experimentation.
+     *      Another solution would be to create ViewModels that holds pointers to the model instance and models that only handle UUIDs.
+     *      This way, models are a match for what's ion the Cassandra DB and view models have access the linked instances for display purposes
+     *      (cf. ItemVM in ENEDIS)
      * @param characteristic The characteristic to delete
      * @param experimentation The experimentation its associated with for back reference to subjects
      */

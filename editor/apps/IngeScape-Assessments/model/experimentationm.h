@@ -89,7 +89,7 @@ public:
      * @brief Get the unique identifier in Cassandra Data Base
      * @return
      */
-    CassUuid getCassUuid();
+    CassUuid getCassUuid() const;
 
 
     /**
@@ -178,9 +178,37 @@ public:
      */
     static ExperimentationM* createExperimentationFromCassandraRow(const CassRow* row);
 
+    /**
+     * @brief Delete the given experimentation from Cassandra DB
+     * Also deletes its associated taks, subjects, characteristics and characteristics values
+     * @param experimentation
+     */
+    static void deleteExperimentationFromCassandra(const ExperimentationM& experimentation);
+
+
+private: // Methods
+    /**
+     * @brief Delete all tasks associated with the given experimentation
+     * @param experimentation
+     */
+    static void _deleteAllTasksForExperimentation(const ExperimentationM& experimentation);
+    /**
+     * @brief Delete all subjects associated with the given experimentation
+     * @param experimentation
+     */
+    static void _deleteAllSubjectsForExperimentation(const ExperimentationM& experimentation);
+    /**
+     * @brief Delete all characteristics associated with the given experimentation
+     * @param experimentation
+     */
+    static void _deleteAllCharacteristicsForExperimentation(const ExperimentationM& experimentation);
+    /**
+     * @brief Delete all tasks characteritics values with the given experimentation
+     * @param experimentation
+     */
+    static void _deleteAllCharacteristicsValuesForExperimentation(const ExperimentationM& experimentation);
 
 private:
-
     // Unique identifier in Cassandra Data Base
     CassUuid _cassUuid;
 
