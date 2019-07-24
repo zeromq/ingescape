@@ -264,7 +264,7 @@ void ExperimentationsListController::deleteExperimentationOfGroup(Experimentatio
             SubjectM* subject = *subjectIt;
             if (subject != nullptr)
             {
-                // TODO Delete subject. Static method.
+                SubjectM::deleteSubjectFromCassandra(*subject);
             }
         }
 

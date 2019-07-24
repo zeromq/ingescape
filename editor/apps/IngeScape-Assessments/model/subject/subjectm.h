@@ -65,14 +65,14 @@ public:
      * @brief Get the unique identifier in Cassandra Data Base
      * @return
      */
-    CassUuid getCassUuid() { return _cassUuid; }
+    CassUuid getCassUuid() const { return _cassUuid; }
 
 
     /**
      * @brief Get the experimentation's unique identifier in Cassandra Data Base
      * @return
      */
-    CassUuid getExperimentationCassUuid() { return _experimentationCassUuid; }
+    CassUuid getExperimentationCassUuid() const { return _experimentationCassUuid; }
 
 
     /**
@@ -100,6 +100,13 @@ public:
     static SubjectM* createSubjectFromCassandraRow(const CassRow* row);
 
 
+    /**
+     * @brief Delete the given subject from Cassandra DB
+     * @param subject
+     */
+    static void deleteSubjectFromCassandra(const SubjectM& subject);
+
+
 private Q_SLOTS:
 
     /**
@@ -108,6 +115,14 @@ private Q_SLOTS:
      * @param value
      */
     void _onCharacteristicValueChanged(const QString &key, const QVariant &value);
+
+private: // Methods
+
+    /**
+     * @brief Delete every characteristic value associated with the given subject
+     * @param subject
+     */
+    static void _deleteCharacteristicValuesForSubject(const SubjectM& subject);
 
 
 private:

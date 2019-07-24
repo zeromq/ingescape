@@ -137,13 +137,6 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Delete every characteristic value associated with the given subject
-     * @param subject
-     */
-    void _deleteCharacteristicValuesForSubject(SubjectM* subject);
-
-
-    /**
      * @brief Delete evert characteris value assciated with the given characteristic
      * @param characteristic
      */
