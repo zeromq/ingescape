@@ -43,6 +43,39 @@ Item {
     //--------------------------------------------------------
     //
     //
+    // Functions
+    //
+    //
+    //--------------------------------------------------------
+
+    function openExperimentation(experimentation)
+    {
+        if (experimentation && IngeScapeAssessmentsC.experimentationC)
+        {
+            console.log("QML: Open " + experimentation.name);
+
+            // Open the experimentation of the group
+            IngeScapeAssessmentsC.experimentationC.currentExperimentation = experimentation;
+        }
+    }
+
+
+    function deleteExperimentation(experimentation, group)
+    {
+        if (experimentation && rootItem.controller)
+        {
+            console.log("QML: Delete " + experimentation.name);
+
+            // Delete the experimentation of the group
+            rootItem.controller.deleteExperimentationOfGroup(experimentation, group);
+        }
+    }
+
+
+
+    //--------------------------------------------------------
+    //
+    //
     // Content
     //
     //
@@ -221,6 +254,9 @@ Item {
                             id: itemMouseArea
                             anchors.fill: parent
                             hoverEnabled: true
+                            onDoubleClicked: {
+                                rootItem.openExperimentation(rootExperimentation.experimentation)
+                            }
                         }
 
                         Row {
@@ -295,13 +331,7 @@ Item {
                                 height: 30
 
                                 onClicked: {
-                                    if (rootExperimentation.experimentation && rootItem.controller)
-                                    {
-                                        console.log("QML: Delete " + rootExperimentation.experimentation.name);
-
-                                        // Delete the experimentation of the group
-                                        rootItem.controller.deleteExperimentationOfGroup(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup);
-                                    }
+                                    rootItem.deleteExperimentation(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup)
                                 }
                             }
 
@@ -314,13 +344,7 @@ Item {
                                 height: 30
 
                                 onClicked: {
-                                    if (rootExperimentation.experimentation && IngeScapeAssessmentsC.experimentationC)
-                                    {
-                                        console.log("QML: Open " + rootExperimentation.experimentation.name);
-
-                                        // Open the experimentation of the group
-                                        IngeScapeAssessmentsC.experimentationC.currentExperimentation = rootExperimentation.experimentation;
-                                    }
+                                    rootItem.openExperimentation(rootExperimentation.experimentation)
                                 }
 
 
