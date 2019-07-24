@@ -53,15 +53,12 @@ SubjectM::~SubjectM()
 {
     qInfo() << "Delete Model of Subject" << _displayedId << "(" << _uid << ")";
 
+    // Clean-up characteristic map. No deletion.
+    _mapCharacteristicsByName.clear();
+
     // Free memory
     if (_mapCharacteristicValues != nullptr)
     {
-        /*// Clear each value
-        for (QString key : _mapCharacteristicValues->keys())
-        {
-            _mapCharacteristicValues->clear(key);
-        }*/
-
         QQmlPropertyMap* temp = _mapCharacteristicValues;
         setmapCharacteristicValues(nullptr);
         delete temp;
@@ -99,6 +96,8 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
                 qWarning() << "We cannot add the characteristic" << characteristic->name() << "because the type" <<  characteristic->valueType() << "is wrong !";
                 break;
         }
+
+        _mapCharacteristicsByName.insert(characteristic->name(), characteristic);
     }
 
     qDebug() << "Subject" << _displayedId << "has characteristics:" << _mapCharacteristicValues;
@@ -107,6 +106,7 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
 void SubjectM::setCharacteristicValue(CharacteristicM* characteristic, const QVariant& value)
 {
     _mapCharacteristicValues->insert(characteristic->name(), value);
+    _mapCharacteristicsByName.insert(characteristic->name(), characteristic);
 }
 
 
@@ -120,6 +120,9 @@ void SubjectM::removeCharacteristic(CharacteristicM* characteristic)
     {
         // Clears the value (if any) associated with key
         _mapCharacteristicValues->clear(characteristic->name());
+
+        // Remove the characteristic from the name map
+        _mapCharacteristicsByName.remove(characteristic->name());
     }
 }
 
@@ -192,9 +195,33 @@ void SubjectM::_onCharacteristicValueChanged(const QString &key, const QVariant 
 {
     qDebug() << key << "-->" << value.toString();
 
+    CharacteristicM* characteristic = nullptr;
     if (key == CHARACTERISTIC_SUBJECT_ID)
     {
         setdisplayedId(value.toString());
+    }
+
+    characteristic = _mapCharacteristicsByName.value(key);
+    if (characteristic != nullptr)
+    {
+        const char* query = "UPDATE ingescape.characteristic_value_of_subject SET characteristic_value = ? WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ?;";
+        CassStatement* cassStatement = cass_statement_new(query, 4);
+        cass_statement_bind_string(cassStatement, 0, value.toString().toStdString().c_str());
+        cass_statement_bind_uuid  (cassStatement, 1, _experimentationCassUuid);
+        cass_statement_bind_uuid  (cassStatement, 2, _cassUuid);
+        cass_statement_bind_uuid  (cassStatement, 3, characteristic->getCassUuid());
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+
+        if (cassError != CASS_OK)
+        {
+            qCritical() << "Could not update the characteristic value of" << characteristic->name() << "for subject" << displayedId();
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
     }
 }
 

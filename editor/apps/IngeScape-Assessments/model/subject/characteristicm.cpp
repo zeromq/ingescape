@@ -93,7 +93,8 @@ CharacteristicM* CharacteristicM::createCharacteristicFromCassandraRow(const Cas
 
 /**
  * @brief Delete a characteristic from Cassandra DB
- * @param characteristic
+ * @param characteristic The characteristic to delete
+ * @param experimentation The experimentation it's associated with for back reference to subjects
  */
 void CharacteristicM::deleteCharacteristicFromCassandra(const CharacteristicM& characteristic, ExperimentationM* experimentation)
 {
@@ -130,7 +131,7 @@ void CharacteristicM::deleteCharacteristicFromCassandra(const CharacteristicM& c
  *      This way, models are a match for what's ion the Cassandra DB and view models have access the linked instances for display purposes
  *      (cf. ItemVM in ENEDIS)
  * @param characteristic The characteristic to delete
- * @param experimentation The experimentation its associated with for back reference to subjects
+ * @param experimentation The experimentation it's associated with for back reference to subjects
  */
 void CharacteristicM::_deleteCharacteristicValuesForCharacteristic(const CharacteristicM& characteristic, ExperimentationM* experimentation)
 {

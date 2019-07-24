@@ -126,6 +126,8 @@ private: // Methods
 
 
 private:
+    QHash<QString, CharacteristicM*> _mapCharacteristicsByName;
+
     // Experimentation's unique identifier in Cassandra Data Base
     CassUuid _experimentationCassUuid;
 

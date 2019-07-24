@@ -101,7 +101,7 @@ public:
     /**
      * @brief Delete a characteristic from Cassandra DB
      * @param characteristic The characteristic to delete
-     * @param experimentation The experimentation its associated with for back reference to subjects
+     * @param experimentation The experimentation it's associated with for back reference to subjects
      */
     static void deleteCharacteristicFromCassandra(const CharacteristicM& characteristic, ExperimentationM* experimentation);
 
@@ -117,7 +117,7 @@ private:
      *      This way, models are a match for what's ion the Cassandra DB and view models have access the linked instances for display purposes
      *      (cf. ItemVM in ENEDIS)
      * @param characteristic The characteristic to delete
-     * @param experimentation The experimentation its associated with for back reference to subjects
+     * @param experimentation The experimentation it's associated with for back reference to subjects
      */
     static void _deleteCharacteristicValuesForCharacteristic(const CharacteristicM& characteristic, ExperimentationM* experimentation);
 
