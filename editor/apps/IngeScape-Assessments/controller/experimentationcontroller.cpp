@@ -232,7 +232,7 @@ RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString&
             qInfo() << "New record_setup inserted into the DB";
 
             // Create the new record setup
-            recordSetup = new RecordSetupM(recordSetupUuid, recordName, subject, task, QDateTime::currentDateTime());
+            recordSetup = new RecordSetupM(_currentExperimentation->getCassUuid(), recordSetupUuid, recordName, subject, task, QDateTime::currentDateTime());
 
             for (auto indeVarIt = task->independentVariables()->begin() ; indeVarIt != task->independentVariables()->end() ; ++indeVarIt)
             {
@@ -570,17 +570,18 @@ void ExperimentationController::_retrieveRecordSetupsForExperimentation(Experime
                 while(cass_iterator_next(cassIterator))
                 {
                     const CassRow* row = cass_iterator_get_row(cassIterator);
-                    RecordSetupM* recordSetup = RecordSetupM::createRecordSetupFromCassandraRow(row);
+
+                    CassUuid subjectUuid;
+                    cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
+                    SubjectM* subject = experimentation->getSubjectFromUID(AssessmentsModelManager::cassUuidToQString(subjectUuid));
+
+                    CassUuid taskUuid;
+                    cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
+                    TaskM* task = experimentation->getTaskFromUID(AssessmentsModelManager::cassUuidToQString(taskUuid));
+
+                    RecordSetupM* recordSetup = RecordSetupM::createRecordSetupFromCassandraRow(row, subject, task);
                     if (recordSetup != nullptr)
                     {
-                        CassUuid subjectUuid;
-                        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
-                        recordSetup->setsubject(experimentation->getSubjectFromUID(AssessmentsModelManager::cassUuidToQString(subjectUuid)));
-
-                        CassUuid taskUuid;
-                        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
-                        recordSetup->settask(experimentation->getTaskFromUID(AssessmentsModelManager::cassUuidToQString(taskUuid)));
-
                         // Add the record setup to the experimentation
                         experimentation->addRecordSetup(recordSetup);
                     }
