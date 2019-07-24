@@ -211,9 +211,17 @@ Item {
                         id: rootExperimentation
 
                         property ExperimentationM experimentation: model.QtObject
+                        property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.hovered || btnOpen.hovered
 
                         width: parent.width
                         height: 38
+                        color: rootExperimentation.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
+
+                        MouseArea {
+                            id: itemMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                        }
 
                         Row {
                             anchors {
