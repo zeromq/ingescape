@@ -232,15 +232,13 @@ int main(int argc, char *argv[])
     qputenv("QML_DISABLE_DISK_CACHE", "1");
 
 
-    // Automatic high-DPI scaling
+    // Enable automatic High-DPI scaling
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 
-    // Enable anti-aliasing (2x MSAA) if needed
-    // TODO: check device pixel ratio first
-    //QSurfaceFormat currentSurfaceFormat = QSurfaceFormat::defaultFormat();
-    //currentSurfaceFormat.setSamples(2);
-    //QSurfaceFormat::setDefaultFormat(currentSurfaceFormat);
+    // Print out general information about various parts of the scene graph and the graphics stack
+    QLoggingCategory::setFilterRules("qt.scenegraph.general = true");
+
 
 
     //------------------------------

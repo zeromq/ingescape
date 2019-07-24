@@ -15,8 +15,12 @@
 #include "debugquickinspector.h"
 
 #include <QDebug>
+#include <QOpenGLContext>
+#include <QOpenGLFunctions>
+
 
 #include <private/qquickwindow_p.h>
+#include <private/qsgrenderloop_p.h>
 
 
 /**
@@ -25,7 +29,15 @@
  */
 DebugQuickInspector::DebugQuickInspector(QObject *parent) : QObject(parent),
     _currentWindow(nullptr),
-    _currentWindowRenderingMode(DebugWindowRenderingMode::Normal)
+    _currentWindowRenderingMode(DebugWindowRenderingMode::Normal),
+    _qtCompilationVersion(QT_VERSION_STR),
+    _qtRuntimeVersion(qVersion()),
+    _sceneGraphBackend(""),
+    _renderLoop(""),
+    _useOpenGL(false),
+    _openGLVendor(""),
+    _openGLRenderer(""),
+    _openGLVersion("")
 {
 }
 
@@ -77,6 +89,7 @@ void DebugQuickInspector::setcurrentWindow(QQuickWindow *value)
         if (_currentWindow != nullptr)
         {
             disconnect(_currentWindow, &QQuickWindow::destroyed, this, &DebugQuickInspector::_onCurrentWindowDestroyed);
+            disconnect(_currentWindow, &QQuickWindow::beforeRendering, this, &DebugQuickInspector::_onCurrentWindowBeforeRendering);
         }
 
         // Save our new value
@@ -87,8 +100,15 @@ void DebugQuickInspector::setcurrentWindow(QQuickWindow *value)
         {
             connect(_currentWindow, &QQuickWindow::destroyed, this, &DebugQuickInspector::_onCurrentWindowDestroyed);
 
+            // Init Qt Quick infos
+            connect(_currentWindow, &QQuickWindow::beforeRendering, this, &DebugQuickInspector::_onCurrentWindowBeforeRendering, Qt::DirectConnection);
+
             // Update the rendering mode of our window
             _updateCurrentWindowRenderingMode();
+        }
+        else
+        {
+            _resetQtQuickInfos();
         }
 
         // Notify change
@@ -118,7 +138,6 @@ void DebugQuickInspector::setcurrentWindowRenderingMode(DebugWindowRenderingMode
 }
 
 
-
 /**
  * @brief Called when our current window is destroyed
  */
@@ -128,6 +147,51 @@ void DebugQuickInspector::_onCurrentWindowDestroyed()
 
     _currentWindow = nullptr;
     Q_EMIT currentWindowChanged(nullptr);
+}
+
+
+/**
+ * @briefCalled when our window emits a beforeRendering signal
+ */
+void DebugQuickInspector::_onCurrentWindowBeforeRendering()
+{
+    _initQtQuickInfos();
+
+    disconnect(_currentWindow, &QQuickWindow::beforeRendering, this, &DebugQuickInspector::_onCurrentWindowBeforeRendering);
+}
+
+
+/**
+ * @brief Convert a DebugWindowRenderingMode::Value into a QByteArray
+ * @param value
+ * @return
+ */
+QByteArray DebugQuickInspector::_windowRenderingModeToByteArray(DebugWindowRenderingMode::Value value)
+{
+    QByteArray newRenderingMode;
+    switch (value)
+    {
+        case DebugWindowRenderingMode::VisualizeBatches:
+            newRenderingMode = QByteArray("batches");
+            break;
+
+        case DebugWindowRenderingMode::VisualizeClipping:
+            newRenderingMode = QByteArray("clip");
+            break;
+
+        case DebugWindowRenderingMode::VisualizeChanges:
+           newRenderingMode = QByteArray("changes");
+            break;
+
+        case DebugWindowRenderingMode::VisualizeOverdraw:
+           newRenderingMode = QByteArray("overdraw");
+           break;
+
+        default:
+           break;
+    }
+
+    return newRenderingMode;
 }
 
 
@@ -149,35 +213,11 @@ void DebugQuickInspector::_applyCurrentWindowRenderingMode()
     if (_currentWindow != nullptr)
     {
         // Get the private API of our window
-        QQuickWindowPrivate *windowPrivate = QQuickWindowPrivate::get(_currentWindow);
+        QQuickWindowPrivate* windowPrivate = QQuickWindowPrivate::get(_currentWindow);
         if (windowPrivate != nullptr)
         {
             // Required rendering mode
-            QByteArray newRenderingMode;
-            switch (_currentWindowRenderingMode)
-            {
-               case DebugWindowRenderingMode::Normal:
-                   break;
-
-                case DebugWindowRenderingMode::VisualizeBatches:
-                    newRenderingMode = QByteArray("batches");
-                    break;
-
-                case DebugWindowRenderingMode::VisualizeClipping:
-                    newRenderingMode = QByteArray("clip");
-                    break;
-
-                case DebugWindowRenderingMode::VisualizeChanges:
-                   newRenderingMode = QByteArray("changes");
-                    break;
-
-                case DebugWindowRenderingMode::VisualizeOverdraw:
-                   newRenderingMode = QByteArray("overdraw");
-                   break;
-
-                default:
-                   break;
-            }
+            QByteArray newRenderingMode = _windowRenderingModeToByteArray(_currentWindowRenderingMode);
 
             // Check if rendering mode will change
             if (windowPrivate->customRenderMode != newRenderingMode)
@@ -234,3 +274,117 @@ void DebugQuickInspector::_updateCurrentWindowRenderingMode()
         QMetaObject::invokeMethod(_currentWindow, "update", Qt::QueuedConnection);
     }
 }
+
+
+/**
+ * @brief Init Qt Quick infos
+ */
+void DebugQuickInspector::_initQtQuickInfos()
+{
+    if (_currentWindow != nullptr)
+    {
+        // Render loop
+        QSGRenderLoop* qsgRenderLoop = QSGRenderLoop::instance();
+        if ((qsgRenderLoop != nullptr) && (qsgRenderLoop->metaObject() != nullptr))
+        {
+            QString renderLoopClass = qsgRenderLoop->metaObject()->className();
+
+            if (QString::compare(renderLoopClass, "QSGThreadedRenderLoop", Qt::CaseInsensitive) == 0)
+            {
+                setrenderLoop("threaded");
+            }
+            else if (QString::compare(renderLoopClass, "QSGWindowsRenderLoop", Qt::CaseInsensitive) == 0)
+            {
+                setrenderLoop("window");
+            }
+            else if (QString::compare(renderLoopClass, "QSGGuiThreadRenderLoop", Qt::CaseInsensitive) == 0)
+            {
+                setrenderLoop("basic");
+            }
+            else
+            {
+                setrenderLoop("unknown");
+            }
+        }
+        else
+        {
+            setrenderLoop("unknown");
+        }
+
+
+        // Scene graph backend
+        if (_currentWindow->rendererInterface() != nullptr)
+        {
+            QSGRendererInterface::GraphicsApi graphicsApi = _currentWindow->rendererInterface()->graphicsApi();
+            switch (graphicsApi)
+            {
+                case QSGRendererInterface::Software:
+                    setsceneGraphBackend("software");
+                    break;
+
+                case QSGRendererInterface::OpenGL:
+                    setsceneGraphBackend("OpenGL");
+                    break;
+
+                case QSGRendererInterface::Direct3D12:
+                    setsceneGraphBackend("DirectX 12");
+                    break;
+
+                case QSGRendererInterface::OpenVG:
+                    setsceneGraphBackend("OpenVG");
+                    break;
+
+                default:
+                    setsceneGraphBackend("unknown");
+                    break;
+            }
+        }
+        else
+        {
+            setsceneGraphBackend("unknown");
+        }
+
+
+        // OpenGL infos
+        if (_currentWindow->openglContext())
+        {
+            QOpenGLFunctions* functions = _currentWindow->openglContext()->functions();
+            if (functions != nullptr)
+            {
+                setopenGLVendor( QString(reinterpret_cast<const char*>(functions->glGetString(GL_VENDOR))) );
+                setopenGLRenderer( QString(reinterpret_cast<const char*>(functions->glGetString(GL_RENDERER))) );
+                setopenGLVersion( QString(reinterpret_cast<const char*>(functions->glGetString(GL_VERSION))) );
+            }
+            else
+            {
+                setopenGLVendor("");
+                setopenGLRenderer("");
+                setopenGLVersion("");
+            }
+
+            setuseOpenGL(true);
+        }
+        else
+        {
+            setuseOpenGL(false);
+            setopenGLVendor("");
+            setopenGLRenderer("");
+            setopenGLVersion("");
+        }
+    }
+}
+
+
+/**
+ * @brief Reset Qt Quick infos
+ */
+void DebugQuickInspector::_resetQtQuickInfos()
+{
+    setsceneGraphBackend("");
+    setrenderLoop("");
+    setuseOpenGL(false);
+    setopenGLVendor("");
+    setopenGLRenderer("");
+    setopenGLVersion("");
+}
+

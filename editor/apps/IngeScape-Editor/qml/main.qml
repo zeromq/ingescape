@@ -369,6 +369,16 @@ ApplicationWindow {
         }
 
 
+        // Help
+        Menu {
+            title: qsTr("&Help")
+
+            MenuItem {
+                text: qsTr("Qt Quick infos")
+
+                onTriggered: qtQuickInfoPopup.open();
+            }
+        }
     }
 
 
@@ -380,10 +390,7 @@ ApplicationWindow {
 
     Component.onCompleted: {
         // Define the window associated to Qt Quick inspector
-        if (SHOW_DEBUG_MENU)
-        {
-            DebugQuickInspector.currentWindow = mainWindow;
-        }
+        DebugQuickInspector.currentWindow = mainWindow;
 
         // Start our loader delay animation when our initial content is ready
         loaderDelayAnimation.start();
@@ -523,6 +530,12 @@ ApplicationWindow {
         }
 
 
+        //----------------------------------
+        //
+        // Layers
+        //
+        //----------------------------------
+
         // Overlay layer used to display popups above the content of our window
         I2Layer {
             id: overlayLayer
@@ -542,6 +555,7 @@ ApplicationWindow {
             }
         }
 
+
         // Overlay layer used to display draggable agent item above the content of our window and the popups
         I2Layer {
             id: overlayLayerDraggableItem
@@ -549,6 +563,7 @@ ApplicationWindow {
 
             anchors.fill: parent
         }
+
 
         // Overlay layer used by comboboxes
         I2Layer {
@@ -559,5 +574,15 @@ ApplicationWindow {
         }
 
 
+        //----------------------------------
+        //
+        // Popups
+        //
+        //----------------------------------
+
+        // Qt Quick infos
+        QtQuickInfoPopup {
+            id: qtQuickInfoPopup
+        }
     }
 }

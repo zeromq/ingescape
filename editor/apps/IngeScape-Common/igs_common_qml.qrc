@@ -24,5 +24,6 @@
         <file>qml/timeline/ActionInTimeLine.qml</file>
         <file>qml/timeline/ScenarioTimeLine.qml</file>
         <file>qml/ConfirmationPopup.qml</file>
+        <file>qml/QtQuickInfoPopup.qml</file>
     </qresource>
 </RCC>

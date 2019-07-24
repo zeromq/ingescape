@@ -20,6 +20,7 @@
 #include <QtQml>
 #include <QQuickWindow>
 
+
 #include "I2PropertyHelpers.h"
 
 
@@ -48,6 +49,29 @@ class DebugQuickInspector : public QObject
     // Rendering mode of our current window
     I2_QML_PROPERTY_CUSTOM_SETTER(DebugWindowRenderingMode::Value, currentWindowRenderingMode)
 
+    // Version of Qt used to compile the application
+    I2_QML_PROPERTY_READONLY(QString, qtCompilationVersion)
+
+    // Version of Qt used at runtime
+    I2_QML_PROPERTY_READONLY(QString, qtRuntimeVersion)
+
+    // Scene graph backend
+    I2_QML_PROPERTY_READONLY(QString, sceneGraphBackend)
+
+    // Render loop
+    I2_QML_PROPERTY_READONLY(QString, renderLoop)
+
+    // Flag indicating if we use OpenGL
+    I2_QML_PROPERTY_READONLY(bool, useOpenGL)
+
+    // OpenGL vendor
+    I2_QML_PROPERTY_READONLY(QString, openGLVendor)
+
+    // OpenGL renderer
+    I2_QML_PROPERTY_READONLY(QString, openGLRenderer)
+
+    // OpenGL version
+    I2_QML_PROPERTY_READONLY(QString, openGLVersion)
 
 public:
     /**
@@ -79,6 +103,12 @@ protected Q_SLOTS:
      void _onCurrentWindowDestroyed();
 
 
+     /**
+      * @briefCalled when our window emits a beforeRendering signal
+      */
+     void _onCurrentWindowBeforeRendering();
+
+
     /**
      * @brief Called by QQuickWindow::afterRendering to change the visualize mode of our window when it is possible
      */
@@ -91,14 +121,31 @@ protected Q_SLOTS:
     void _applyCurrentWindowRenderingModeFinished();
 
 
-
 protected:
+    /**
+     * @brief Convert a DebugWindowRenderingMode::Value into a QByteArray
+     * @param value
+     * @return
+     */
+    QByteArray _windowRenderingModeToByteArray(DebugWindowRenderingMode::Value value);
+
+
     /**
      * @brief Update rendering of our window
      */
     void _updateCurrentWindowRenderingMode();
 
 
+    /**
+     * @brief Init Qt Quick infos
+     */
+    void _initQtQuickInfos();
+
+
+    /**
+     * @brief Reset Qt Quick infos
+     */
+    void _resetQtQuickInfos();
 
 protected:
     // Mutex used to update the rendering mode of our window
