@@ -86,7 +86,7 @@ Item {
 
         anchors.fill: parent
 
-        color: IngeScapeTheme.veryDarkGreyColor
+        color: IngeScapeTheme.veryLightGreyColor
     }
 
     Text {
@@ -100,7 +100,7 @@ Item {
 
         text: "Experimentations"
 
-        color: IngeScapeTheme.whiteColor
+        color: IngeScapeTheme.blackColor
         font {
             family: IngeScapeTheme.headingFont
             weight : Font.Medium
