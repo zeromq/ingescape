@@ -506,11 +506,125 @@ Item {
                     }
                 }
 
-                Rectangle {
-
+                IngeScapeAssessmentsListHeader {
+                    id: listHeader
                     anchors {
                         top: btnNewRecord.bottom
                         topMargin: 12
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    Row {
+                        anchors {
+                            top: parent.top
+                            left: parent.left
+                            leftMargin: 15
+                            right: parent.right
+                            bottom: parent.bottom
+                        }
+
+                        Text {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            width: mainView.recordNameColumnWidth
+
+                            text: qsTr("Record's name")
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 16
+                                weight: Font.Black
+                            }
+                        }
+
+                        Text {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            width: mainView.taskColumnWidth
+
+                            text: qsTr("Task's name")
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 16
+                                weight: Font.Black
+                            }
+                        }
+
+                        Text {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            width: mainView.subjectColumnWidth
+
+                            text: qsTr("Subject's ID")
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 16
+                                weight: Font.Black
+                            }
+                        }
+
+                        Text {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            width: mainView.startDateColumnWidth
+
+                            text: qsTr("Start date")
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 16
+                                weight: Font.Black
+                            }
+                        }
+
+                        Text {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            width: mainView.startTimeColumnWidth
+
+                            text: qsTr("Start time")
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 16
+                                weight: Font.Black
+                            }
+                        }
+
+                        Text {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            width: mainView.durationColumnWidth
+
+                            text: qsTr("Duration")
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 16
+                                weight: Font.Black
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    anchors {
+                        top: listHeader.bottom
                         bottom: parent.bottom
                         left: parent.left
                         right: parent.right
@@ -522,119 +636,6 @@ Item {
                         id: recordsColumn
                         anchors.fill: parent
                         spacing: 0
-
-                        IngeScapeAssessmentsListHeader {
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                            }
-
-                            Row {
-                                anchors {
-                                    top: parent.top
-                                    left: parent.left
-                                    leftMargin: 15
-                                    right: parent.right
-                                    bottom: parent.bottom
-                                }
-
-                                Text {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                    }
-
-                                    width: mainView.recordNameColumnWidth
-
-                                    text: qsTr("Record's name")
-                                    color: IngeScapeTheme.whiteColor
-                                    font {
-                                        family: IngeScapeTheme.labelFontFamily
-                                        pixelSize: 16
-                                        weight: Font.Black
-                                    }
-                                }
-
-                                Text {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                    }
-
-                                    width: mainView.taskColumnWidth
-
-                                    text: qsTr("Task's name")
-                                    color: IngeScapeTheme.whiteColor
-                                    font {
-                                        family: IngeScapeTheme.labelFontFamily
-                                        pixelSize: 16
-                                        weight: Font.Black
-                                    }
-                                }
-
-                                Text {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                    }
-
-                                    width: mainView.subjectColumnWidth
-
-                                    text: qsTr("Subject's ID")
-                                    color: IngeScapeTheme.whiteColor
-                                    font {
-                                        family: IngeScapeTheme.labelFontFamily
-                                        pixelSize: 16
-                                        weight: Font.Black
-                                    }
-                                }
-
-                                Text {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                    }
-
-                                    width: mainView.startDateColumnWidth
-
-                                    text: qsTr("Start date")
-                                    color: IngeScapeTheme.whiteColor
-                                    font {
-                                        family: IngeScapeTheme.labelFontFamily
-                                        pixelSize: 16
-                                        weight: Font.Black
-                                    }
-                                }
-
-                                Text {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                    }
-
-                                    width: mainView.startTimeColumnWidth
-
-                                    text: qsTr("Start time")
-                                    color: IngeScapeTheme.whiteColor
-                                    font {
-                                        family: IngeScapeTheme.labelFontFamily
-                                        pixelSize: 16
-                                        weight: Font.Black
-                                    }
-                                }
-
-                                Text {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                    }
-
-                                    width: mainView.durationColumnWidth
-
-                                    text: qsTr("Duration")
-                                    color: IngeScapeTheme.whiteColor
-                                    font {
-                                        family: IngeScapeTheme.labelFontFamily
-                                        pixelSize: 16
-                                        weight: Font.Black
-                                    }
-                                }
-                            }
-                        }
 
                         Repeater {
                             model: rootItem.experimentation ? rootItem.experimentation.allRecordSetups : null
