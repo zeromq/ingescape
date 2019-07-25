@@ -292,7 +292,7 @@ Item {
                                     }
 
                                     background: Rectangle {
-                                        color: btnDelete.hovered ? IngeScapeAssessmentsTheme.blueButton_hovered : IngeScapeAssessmentsTheme.blueButton
+                                        color: btnDelete.hovered ? IngeScapeAssessmentsTheme.blueButton_pressed : IngeScapeAssessmentsTheme.blueButton
                                         radius: 5
                                     }
                                 }

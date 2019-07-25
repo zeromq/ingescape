@@ -45,6 +45,8 @@ Item {
 
     property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
 
+    property bool isEditingName: false
+
     //--------------------------------
     //
     //
@@ -108,8 +110,72 @@ Item {
             }
         }
 
-        Column {
-            id: header
+        MouseArea {
+            id: expeNameMouseArea
+            anchors {
+                fill: expeNameEditBackground
+            }
+
+            hoverEnabled: true
+        }
+
+        Rectangle {
+            id: expeNameEditBackground
+            anchors {
+                left: expeName.left
+                leftMargin: -10
+                verticalCenter: expeName.verticalCenter
+            }
+
+            radius: 5
+
+            width: expeName.width + 76
+            height: 40
+
+            color: IngeScapeTheme.middleLightGreyColor
+
+            visible: expeNameMouseArea.containsMouse || editButton.hovered || rootItem.isEditingName
+
+            Button {
+                id: editButton
+
+                anchors {
+                    right: parent.right
+                    rightMargin: 5
+                    verticalCenter: parent.verticalCenter
+                }
+
+                width: 42
+                height: 30
+
+                //FIXME Edition picto
+                style: IngeScapeAssessmentsButtonStyle {
+                    text: "E"
+                }
+
+                onClicked: {
+                    rootItem.isEditingName = !rootItem.isEditingName
+                    if (rootItem.isEditingName)
+                    {
+                        // Entering edition mode
+                        expeNameEditionTextField.text = expeName.text;
+                    }
+                    else
+                    {
+                        // Exiting edition mode
+                        if (rootItem.experimentation)
+                        {
+                            expeName.text = expeNameEditionTextField.text
+                            rootItem.experimentation.name = expeName.text
+                        }
+
+                    }
+                }
+            }
+        }
+
+        Text {
+            id: expeName
             anchors {
                 top: parent.top
                 topMargin: 30
@@ -117,59 +183,72 @@ Item {
                 leftMargin: 92
             }
 
-            spacing: 10
+            text: rootItem.experimentation ? rootItem.experimentation.name : ""
+
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+
+            visible: !rootItem.isEditingName
+
+            //FIXME Proper font
+            color: IngeScapeAssessmentsTheme.blueButton
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 22
+                bold: true
+            }
+        }
+
+        //FIXME Style !!
+        TextField {
+            id: expeNameEditionTextField
+            anchors.fill: expeName
+
+            visible: rootItem.isEditingName
+            enabled: visible
+        }
+
+        Row {
+            anchors {
+                top: expeName.bottom
+                topMargin: 15
+                left: expeName.left
+            }
+
+            spacing: 0
 
             Text {
-                text: rootItem.experimentation ? rootItem.experimentation.name : ""
+                id: expeGroupNameText
+                text: rootItem.experimentation ? rootItem.experimentation.groupName : ""
 
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
 
                 //FIXME Proper font
-                color: IngeScapeAssessmentsTheme.blueButton
+                color: IngeScapeTheme.blackColor
                 font {
                     family: IngeScapeTheme.textFontFamily
                     weight: Font.Medium
-                    pixelSize: 22
-                    bold: true
+                    pixelSize: 20
                 }
             }
 
-            Row {
-                spacing: 0
+            Text {
+                height: expeGroupNameText.height
 
-                Text {
-                    id: expeGroupNameText
-                    text: rootItem.experimentation ? rootItem.experimentation.groupName : ""
+                text: rootItem.experimentation ? rootItem.experimentation.creationDate.toLocaleString(Qt.locale(), " - dd/MM/yyyy - hh:mm:ss") : ""
 
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
 
-                    //FIXME Proper font
-                    color: IngeScapeTheme.blackColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 20
-                    }
-                }
-
-                Text {
-                    height: expeGroupNameText.height
-
-                    text: rootItem.experimentation ? rootItem.experimentation.creationDate.toLocaleString(Qt.locale(), " - dd/MM/yyyy - hh:mm:ss") : ""
-
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
-
-                    //FIXME Proper font
-                    color: IngeScapeTheme.blackColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                        italic: true
-                    }
+                //FIXME Proper font
+                color: IngeScapeTheme.blackColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Medium
+                    pixelSize: 16
+                    italic: true
                 }
             }
         }
