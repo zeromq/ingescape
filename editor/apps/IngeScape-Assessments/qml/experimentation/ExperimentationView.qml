@@ -76,87 +76,122 @@ Item {
         color: IngeScapeTheme.veryDarkGreyColor
     }
 
-    Button {
-        id: btnGoBackToHome
+    Item {
+        id: headerItem
 
         anchors {
+            top: parent.top
             left: parent.left
-            top: parent.top
+            right: parent.right
         }
-        height: 30
 
-        text: "HOME"
+        height: 110
 
-        onClicked: {
-            console.log("QML: Go back to 'Home'");
+        Button {
+            id: btnGoBackToHome
 
-            // Emit the signal the "Go Back To Home"
-            rootItem.goBackToHome();
+            anchors {
+                left: parent.left
+                leftMargin: 26
+                top: parent.top
+                topMargin: 20
+            }
+
+            height: 42
+            width: 42
+
+            text: "<--"
+
+            onClicked: {
+                console.log("QML: Go back to 'Home'");
+
+                // Emit the signal the "Go Back To Home"
+                rootItem.goBackToHome();
+            }
+        }
+
+        Column {
+            id: header
+            anchors {
+                top: parent.top
+                topMargin: 30
+                left: parent.left
+                leftMargin: 92
+            }
+
+            spacing: 10
+
+            Text {
+                text: rootItem.experimentation ? rootItem.experimentation.name : ""
+
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+
+                //FIXME Proper font
+                color: IngeScapeTheme.blueButton
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Medium
+                    pixelSize: 22
+                    bold: true
+                }
+            }
+
+            Row {
+                spacing: 0
+
+                Text {
+                    id: expeGroupNameText
+                    text: rootItem.experimentation ? rootItem.experimentation.groupName : ""
+
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+
+                    //FIXME Proper font
+                    color: IngeScapeTheme.blackColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight: Font.Medium
+                        pixelSize: 20
+                    }
+                }
+
+                Text {
+                    height: expeGroupNameText.height
+
+                    text: rootItem.experimentation ? rootItem.experimentation.creationDate.toLocaleString(Qt.locale(), " - dd/MM/yyyy - hh:mm:ss") : ""
+
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+
+                    //FIXME Proper font
+                    color: IngeScapeTheme.blackColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight: Font.Medium
+                        pixelSize: 16
+                        italic: true
+                    }
+                }
+            }
         }
     }
 
-    Column {
-        id: header
-
+    Rectangle {
         anchors {
-            top: parent.top
-            topMargin: 10
-            horizontalCenter: parent.horizontalCenter
-        }
-        spacing: 10
-
-        Text {
-            //id: title
-
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-            }
-
-            text: rootItem.experimentation ? rootItem.experimentation.name : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 18
-            }
+            top: headerItem.bottom
+            left: headerItem.left
+            right: headerItem.right
         }
 
-        Text {
-            //id: title
+        height: 4
 
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-            }
-
-            text: rootItem.experimentation ? rootItem.experimentation.groupName : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 16
-            }
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: IngeScapeTheme.blackColor; }
+            GradientStop { position: 1.0; color: IngeScapeTheme.whiteColor; }
         }
 
-        Text {
-            //id: title
-
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-            }
-
-            text: rootItem.experimentation ? rootItem.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy hh:mm:ss") : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 16
-            }
-        }
     }
-
 
     //
     // Main view
@@ -165,8 +200,7 @@ Item {
         id: stackview
 
         anchors {
-            top: header.bottom
-            topMargin: 20
+            top: headerItem.bottom
             bottom: parent.bottom
             left: parent.left
             right: parent.right
