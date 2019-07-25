@@ -73,7 +73,7 @@ Item {
 
         anchors.fill: parent
 
-        color: IngeScapeTheme.veryDarkGreyColor
+        color: IngeScapeTheme.veryLightGreyColor
     }
 
     Item {
