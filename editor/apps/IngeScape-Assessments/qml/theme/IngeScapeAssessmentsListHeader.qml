@@ -37,7 +37,7 @@ Item {
 
         radius: 5
         height: headerTop.radius * 2
-        color: IngeScapeTheme.darkBlueHeader
+        color: IngeScapeAssessmentsTheme.darkBlueHeader
     }
 
     Rectangle {
@@ -49,6 +49,6 @@ Item {
         }
 
         height: root.height - (headerTop.height / 2)
-        color: IngeScapeTheme.darkBlueHeader
+        color: IngeScapeAssessmentsTheme.darkBlueHeader
     }
 }

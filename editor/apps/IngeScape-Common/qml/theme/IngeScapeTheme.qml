@@ -87,13 +87,6 @@ Item {
 
     readonly property color orangeColor: "#F07F0A"
 
-    //
-    // Assessments
-    //
-    readonly property color darkBlueHeader: "#38444F"
-    readonly property color blueButton: "#007b90"
-    readonly property color blueButton_hovered: "#239eb3"
-
     //-----------------------------------------
     //
     // Window

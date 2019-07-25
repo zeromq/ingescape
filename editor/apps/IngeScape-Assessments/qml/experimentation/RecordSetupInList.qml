@@ -23,13 +23,9 @@ import INGESCAPE 1.0
 //import "theme" as Theme
 
 
-Item {
+Rectangle {
     id: rootItem
-
-    //anchors.fill: parent
-
-    width: parent.width
-    height: 30
+    height: 40
 
 
     //--------------------------------------------------------
@@ -59,6 +55,16 @@ Item {
     signal deleteRecordSetup();
 
 
+    property alias taskColumnWidth: taskName.width
+    property alias subjectColumnWidth: subjectId.width
+    property alias startDateColumnWidth: startDate.width
+    property alias startTimeColumnWidth: startTime.width
+    property alias durationColumnWidth: duration.width
+    property alias buttonColumnWidth: buttonRow.width
+
+    property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.hovered || btnOpen.hovered
+
+    color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
 
     //--------------------------------------------------------
     //
@@ -68,142 +74,192 @@ Item {
     //
     //--------------------------------------------------------
 
-    Rectangle {
-        id: background
-
+    MouseArea {
+        id: itemMouseArea
         anchors.fill: parent
+        hoverEnabled: true
+        onDoubleClicked: {
+            if (rootItem.modelM)
+            {
+                rootItem.openRecordSetup(rootItem.modelM)
+            }
+        }
+    }
 
-        color: "transparent"
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
+    Row {
+        spacing: 0
+
+        anchors {
+            left: parent.left
+            leftMargin: 15
+            verticalCenter: parent.verticalCenter
         }
 
-        Row {
-            spacing: 10
+        Text {
+            id: recordName
+            width: rootItem.width
+                   - taskColumnWidth
+                   - subjectColumnWidth
+                   - startDateColumnWidth
+                   - startTimeColumnWidth
+                   - durationColumnWidth
+                   - buttonColumnWidth
 
-            anchors {
-                left: parent.left
-                leftMargin: 5
-                verticalCenter: parent.verticalCenter
+            text: rootItem.modelM ? rootItem.modelM.name : ""
+            elide: Text.ElideRight
+
+            color: IngeScapeTheme.blackColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 14
             }
+        }
 
-            Text {
-                width: 250
+        Text {
+            id: taskName
 
-                text: rootItem.modelM ? rootItem.modelM.name : ""
-                elide: Text.ElideRight
+            text: (rootItem.modelM && rootItem.modelM.task) ? rootItem.modelM.task.name : ""
 
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 14
-                }
+            color: IngeScapeTheme.blackColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                //weight: Font.Medium
+                pixelSize: 14
             }
+        }
 
-            Text {
-                width: 125
+        Text {
+            id: subjectId
 
-                text: (rootItem.modelM && rootItem.modelM.subject) ? rootItem.modelM.subject.displayedId : ""
+            text: (rootItem.modelM && rootItem.modelM.subject) ? rootItem.modelM.subject.displayedId : ""
 
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    //weight: Font.Medium
-                    pixelSize: 14
-                }
+            color: IngeScapeTheme.blackColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                //weight: Font.Medium
+                pixelSize: 14
             }
+        }
 
-            Text {
-                width: 125
+        Text {
+            id: startDate
 
-                text: (rootItem.modelM && rootItem.modelM.task) ? rootItem.modelM.task.name : ""
+            text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "dd/MM/yyyy")
+                                  : "../../...."
 
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    //weight: Font.Medium
-                    pixelSize: 14
-                }
+            color: IngeScapeTheme.blackColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                //weight: Font.Medium
+                pixelSize: 14
             }
+        }
 
-            Text {
-                width: 125
+        Text {
+            id: startTime
 
-                text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "dd/MM/yyyy hh:mm:ss")
-                                      : "../../.... ..:..:.."
+            text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "hh:mm:ss")
+                                  : "..:..:.."
 
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    //weight: Font.Medium
-                    pixelSize: 14
-                }
+            color: IngeScapeTheme.blackColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                //weight: Font.Medium
+                pixelSize: 14
             }
+        }
 
-            // FIXME TODO: record.duration
-            Text {
-                width: 125
+        // FIXME TODO: record.duration
+        Text {
+            id: duration
 
-                /*text: rootItem.modelM ? rootItem.modelM.duration.toLocaleString(Qt.locale(), "hh:mm:ss.zzz")
+            /*text: rootItem.modelM ? rootItem.modelM.duration.toLocaleString(Qt.locale(), "hh:mm:ss.zzz")
                                         : "00:00:00.000"*/
-                text: "00:00:00.000"
+            text: "00:00:00.000"
 
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    //weight: Font.Medium
-                    pixelSize: 14
-                }
+            color: IngeScapeTheme.blackColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                //weight: Font.Medium
+                pixelSize: 14
             }
         }
 
-        /*MouseArea {
-            id: mouseAreaRecord
+    }
 
-            anchors.fill: parent
+    Row {
+        id: buttonRow
+        spacing: 14
 
-            hoverEnabled: true
-        }*/
+        anchors {
+            right: parent.right
+        }
+        height: parent.height
 
-        Row {
-            spacing: 0
+        //visible: mouseAreaRecord.containsMouse
 
-            anchors {
-                right: parent.right
+        Button {
+            id: btnDelete
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            //FIXME replace with trash can picto
+            style: ButtonStyle {
+                label: Text {
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        //weight: Font.Medium
+                        pixelSize: 14
+                        bold: true
+                    }
+                    text: "DEL"
+                }
+
+                background: Rectangle {
+                    color: btnDelete.hovered ? IngeScapeAssessmentsTheme.blueButton_hovered : IngeScapeAssessmentsTheme.blueButton
+                    radius: 5
+                }
             }
-            height: parent.height
 
-            //visible: mouseAreaRecord.containsMouse
+            width: 40
+            height: 30
 
-            Button {
-                id: btnOpen
+            onClicked: {
+                rootItem.openRecordSetup();
+            }
+        }
 
+        Button {
+            id: btnOpen
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            width: 86
+            height: 30
+
+            onClicked: {
+                rootItem.deleteRecordSetup();
+            }
+
+            //FIXME correct font
+            style: IngeScapeAssessmentsButtonStyle {
                 text: "OPEN"
-
-                //width: 100
-                height: parent.height
-
-                onClicked: {
-                    // Emit the signal "Open Record Setup"
-                    rootItem.openRecordSetup();
-                }
-            }
-
-            Button {
-                id: btnDelete
-
-                text: "DEL"
-
-                //width: 100
-                height: parent.height
-
-                onClicked: {
-                    // Emit the signal "Delete Record Setup"
-                    rootItem.deleteRecordSetup();
-                }
             }
         }
+    }
+
+    Rectangle {
+        id: bottomSeparator
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+        height: 2
+        color: IngeScapeTheme.veryLightGreyColor
     }
 }

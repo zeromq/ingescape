@@ -40,7 +40,7 @@ ButtonStyle {
     }
 
     background: Rectangle {
-        color: control.hovered ? IngeScapeTheme.blueButton_hovered : IngeScapeTheme.blueButton
+        color: control.hovered ? IngeScapeAssessmentsTheme.blueButton_hovered : IngeScapeAssessmentsTheme.blueButton
         radius: 5
     }
 }

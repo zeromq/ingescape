@@ -45,8 +45,6 @@ Item {
 
     property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
 
-
-
     //--------------------------------
     //
     //
@@ -128,7 +126,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
 
                 //FIXME Proper font
-                color: IngeScapeTheme.blueButton
+                color: IngeScapeAssessmentsTheme.blueButton
                 font {
                     family: IngeScapeTheme.textFontFamily
                     weight: Font.Medium
@@ -178,17 +176,19 @@ Item {
     }
 
     Rectangle {
+        id: headerBottomShadow
+
         anchors {
             top: headerItem.bottom
             left: headerItem.left
             right: headerItem.right
         }
 
-        height: 4
+        height: 6
 
         gradient: Gradient {
-            GradientStop { position: 0.0; color: IngeScapeTheme.blackColor; }
-            GradientStop { position: 1.0; color: IngeScapeTheme.whiteColor; }
+            GradientStop { position: 0.0; color: IngeScapeTheme.darkGreyColor; }
+            GradientStop { position: 1.0; color: IngeScapeTheme.veryLightGreyColor; }
         }
 
     }
@@ -253,43 +253,54 @@ Item {
         Item {
             id: mainView
 
+            //FIXME Minimum size not handled
+            property real taskColumnWidth: 280
+            property real subjectColumnWidth: 216
+            property real startDateColumnWidth: 138
+            property real startTimeColumnWidth: 138
+            property real durationColumnWidth: 126
+            property real buttonColumnWidth: 158
+            property real recordNameColumnWidth: recordsPanel.width
+                                                 - taskColumnWidth
+                                                 - subjectColumnWidth
+                                                 - startDateColumnWidth
+                                                 - startTimeColumnWidth
+                                                 - durationColumnWidth
+                                                 - buttonColumnWidth
+
             //
             // Configuration Panel
             //
-            Rectangle {
+            Item {
                 id: configurationPanel
 
                 anchors {
                     top: parent.top
+                    topMargin: 24
                     bottom: parent.bottom
                     left: parent.left
+                    leftMargin: 26
                 }
-                width: 120
 
-                color: "transparent"
-                border {
-                    color: IngeScapeTheme.darkGreyColor
-                    width: 1
-                }
+                width: 182
 
                 Column {
 
                     anchors {
                         left: parent.left
-                        leftMargin: 10
+                        right: parent.right
                         top: parent.top
-                        topMargin: 10
                     }
 
-                    width: 100
-
-                    spacing: 10
+                    spacing: 18
 
                     Button {
-                        text: "Subjects"
-
                         width: parent.width
-                        height: 30
+                        height: 62
+
+                        style: IngeScapeAssessmentsButtonStyle {
+                            text: "SUBJECTS"
+                        }
 
                         onClicked: {
                             console.log("QML: Add the 'Subjects View' to the stack");
@@ -300,10 +311,12 @@ Item {
                     }
 
                     Button {
-                        text: "Tasks"
-
                         width: parent.width
-                        height: 30
+                        height: 62
+
+                        style: IngeScapeAssessmentsButtonStyle {
+                            text: "TASKS"
+                        }
 
                         onClicked: {
                             console.log("QML: Add the 'Tasks View' to the stack");
@@ -314,28 +327,34 @@ Item {
                     }
 
                     Button {
-                        text: "Coding"
-
                         width: parent.width
-                        height: 30
+                        height: 62
 
                         enabled: false
+
+                        style: IngeScapeAssessmentsButtonStyle {
+                            text: "CODING"
+                        }
                     }
 
                     Button {
-                        text: "Clean"
-
                         width: parent.width
-                        height: 30
+                        height: 62
 
                         enabled: false
+
+                        style: IngeScapeAssessmentsButtonStyle {
+                            text: "CLEANING"
+                        }
                     }
 
                     Button {
-                        text: "Export"
-
                         width: parent.width
-                        height: 30
+                        height: 62
+
+                        style: IngeScapeAssessmentsButtonStyle {
+                            text: "EXPORT"
+                        }
 
                         onClicked: {
                             console.log("QML: Add the 'Export View' to the stack");
@@ -351,102 +370,246 @@ Item {
             //
             // Records Panel
             //
-            Rectangle {
+            Item {
                 id: recordsPanel
 
                 anchors {
                     top: parent.top
+                    topMargin: 34
                     bottom: parent.bottom
+                    bottomMargin: 49
                     left: configurationPanel.right
+                    leftMargin: 30
                     right: parent.right
+                    rightMargin: 28
                 }
 
-                color: "transparent"
-                border {
-                    color: IngeScapeTheme.darkGreyColor
-                    width: 1
-                }
-
-                Row {
-                    id: recordsHeader
+                Text {
+                    id: titleRecords
 
                     anchors {
+                        verticalCenter: btnNewRecord.verticalCenter
                         left: parent.left
-                        leftMargin: 10
+                    }
+
+                    text: qsTr("RECORDS")
+
+                    height: parent.height
+                    verticalAlignment: Text.AlignVCenter
+
+                    color: IngeScapeTheme.blackColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight: Font.Medium
+                        pixelSize: 20
+                    }
+                }
+
+                Button {
+                    id: btnNewRecord
+
+                    anchors {
                         top: parent.top
-                        topMargin: 10
-                    }
-                    height: 30
-
-                    spacing: 20
-
-                    Text {
-                        id: titleRecords
-
-                        text: qsTr("Records")
-
-                        height: parent.height
-                        verticalAlignment: Text.AlignVCenter
-
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            weight: Font.Medium
-                            pixelSize: 20
-                        }
+                        right: parent.right
                     }
 
-                    Button {
-                        id: btnNewRecord
+                    height: 39
+                    width: 182
 
-                        height: parent.height
+                    text: qsTr("NEW RECORD")
 
-                        text: "New Record"
+                    onClicked: {
+                        // Open the popup
+                        createRecordPopup.open();
+                    }
 
-                        onClicked: {
-                            // Open the popup
-                            createRecordPopup.open();
-                        }
+                    //FIXME correct font
+                    style: IngeScapeAssessmentsButtonStyle {
+                        text: qsTr("NEW RECORD")
                     }
                 }
 
-
-                Column {
+                Rectangle {
 
                     anchors {
-                        top: recordsHeader.bottom
-                        topMargin: 20
+                        top: btnNewRecord.bottom
+                        topMargin: 12
+                        bottom: parent.bottom
                         left: parent.left
-                        leftMargin: 10
                         right: parent.right
-                        rightMargin: 10
                     }
 
-                    Repeater {
-                        model: rootItem.experimentation ? rootItem.experimentation.allRecordSetups : null
+                    color: IngeScapeTheme.whiteColor
 
-                        delegate: RecordSetupInList {
+                    Column {
+                        id: recordsColumn
+                        anchors.fill: parent
+                        spacing: 0
 
-                            modelM: model.QtObject
-
-                            //
-                            // Slots
-                            //
-                            onOpenRecordSetup: {
-                                if (rootItem.controller && modelM) {
-                                    //console.log("QML: openRecordSetup " + modelM.name);
-
-                                    rootItem.controller.openRecordSetup(modelM);
-                                }
+                        IngeScapeAssessmentsListHeader {
+                            anchors {
+                                left: parent.left
+                                right: parent.right
                             }
 
-                            onDeleteRecordSetup: {
-                                if (rootItem.controller && modelM) {
-                                    //console.log("QML: deleteRecordSetup " + modelM.name);
+                            Row {
+                                anchors {
+                                    top: parent.top
+                                    left: parent.left
+                                    leftMargin: 15
+                                    right: parent.right
+                                    bottom: parent.bottom
+                                }
 
-                                    rootItem.controller.deleteRecordSetup(modelM);
+                                Text {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    width: mainView.recordNameColumnWidth
+
+                                    text: qsTr("Record's name")
+                                    color: IngeScapeTheme.whiteColor
+                                    font {
+                                        family: IngeScapeTheme.labelFontFamily
+                                        pixelSize: 16
+                                        weight: Font.Black
+                                    }
+                                }
+
+                                Text {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    width: mainView.taskColumnWidth
+
+                                    text: qsTr("Task's name")
+                                    color: IngeScapeTheme.whiteColor
+                                    font {
+                                        family: IngeScapeTheme.labelFontFamily
+                                        pixelSize: 16
+                                        weight: Font.Black
+                                    }
+                                }
+
+                                Text {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    width: mainView.subjectColumnWidth
+
+                                    text: qsTr("Subject's ID")
+                                    color: IngeScapeTheme.whiteColor
+                                    font {
+                                        family: IngeScapeTheme.labelFontFamily
+                                        pixelSize: 16
+                                        weight: Font.Black
+                                    }
+                                }
+
+                                Text {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    width: mainView.startDateColumnWidth
+
+                                    text: qsTr("Start date")
+                                    color: IngeScapeTheme.whiteColor
+                                    font {
+                                        family: IngeScapeTheme.labelFontFamily
+                                        pixelSize: 16
+                                        weight: Font.Black
+                                    }
+                                }
+
+                                Text {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    width: mainView.startTimeColumnWidth
+
+                                    text: qsTr("Start time")
+                                    color: IngeScapeTheme.whiteColor
+                                    font {
+                                        family: IngeScapeTheme.labelFontFamily
+                                        pixelSize: 16
+                                        weight: Font.Black
+                                    }
+                                }
+
+                                Text {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    width: mainView.durationColumnWidth
+
+                                    text: qsTr("Duration")
+                                    color: IngeScapeTheme.whiteColor
+                                    font {
+                                        family: IngeScapeTheme.labelFontFamily
+                                        pixelSize: 16
+                                        weight: Font.Black
+                                    }
                                 }
                             }
+                        }
+
+                        Repeater {
+                            model: rootItem.experimentation ? rootItem.experimentation.allRecordSetups : null
+
+                            delegate: RecordSetupInList {
+                                taskColumnWidth: mainView.taskColumnWidth
+                                subjectColumnWidth: mainView.subjectColumnWidth
+                                startDateColumnWidth: mainView.startDateColumnWidth
+                                startTimeColumnWidth: mainView.startTimeColumnWidth
+                                durationColumnWidth: mainView.durationColumnWidth
+                                buttonColumnWidth: mainView.buttonColumnWidth
+
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                }
+
+                                modelM: model.QtObject
+
+                                //
+                                // Slots
+                                //
+                                onOpenRecordSetup: {
+                                    if (rootItem.controller && modelM) {
+                                        //console.log("QML: openRecordSetup " + modelM.name);
+
+                                        rootItem.controller.openRecordSetup(modelM);
+                                    }
+                                }
+
+                                onDeleteRecordSetup: {
+                                    if (rootItem.controller && modelM) {
+                                        //console.log("QML: deleteRecordSetup " + modelM.name);
+
+                                        rootItem.controller.deleteRecordSetup(modelM);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        id: bottomShadow
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            bottom: parent.bottom
+                        }
+                        height: 4
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
+                            GradientStop { position: 1.0; color: IngeScapeTheme.darkGreyColor; }
                         }
                     }
                 }

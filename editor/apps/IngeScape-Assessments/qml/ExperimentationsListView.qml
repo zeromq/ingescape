@@ -292,7 +292,7 @@ Item {
                                     }
 
                                     background: Rectangle {
-                                        color: btnDelete.hovered ? IngeScapeTheme.blueButton_hovered : IngeScapeTheme.blueButton
+                                        color: btnDelete.hovered ? IngeScapeAssessmentsTheme.blueButton_hovered : IngeScapeAssessmentsTheme.blueButton
                                         radius: 5
                                     }
                                 }
@@ -339,7 +339,7 @@ Item {
             }
 
             Rectangle {
-                id: bottomShade
+                id: bottomShadow
                 anchors {
                     left: parent.left
                     right: parent.right
@@ -348,7 +348,7 @@ Item {
                 height: 4
                 gradient: Gradient {
                     GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
-                    GradientStop { position: 1.0; color: IngeScapeTheme.blackColor; }
+                    GradientStop { position: 1.0; color: IngeScapeTheme.darkGreyColor; }
                 }
             }
         }

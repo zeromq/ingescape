@@ -31,7 +31,7 @@ Item {
     //-----------------------------------------
 
     // Minimum size of our application (Window)
-    readonly property int appMinWidth: 1024
+    readonly property int appMinWidth: 1530
     readonly property int appMinHeight: 768
 
     // Default size of our application (Window)
@@ -59,6 +59,10 @@ Item {
     // Colors
     //
     //-----------------------------------------
+
+    readonly property color darkBlueHeader: "#38444F"
+    readonly property color blueButton: "#007b90"
+    readonly property color blueButton_hovered: "#239eb3"
 
 
 
