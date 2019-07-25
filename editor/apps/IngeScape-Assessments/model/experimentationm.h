@@ -37,7 +37,7 @@ class ExperimentationM : public QObject
     I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
 
     // Name of our experimentation
-    I2_QML_PROPERTY(QString, name)
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, name)
 
     // Group name to which the experimentation belongs
     I2_QML_PROPERTY(QString, groupName)

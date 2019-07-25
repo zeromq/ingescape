@@ -75,6 +75,32 @@ void ExperimentationM::clearData()
 }
 
 
+void ExperimentationM::setname(QString value)
+{
+    if (_name != value)
+    {
+        _name = value;
+
+        const char* query = "UPDATE ingescape.experimentation SET name = ? WHERE id = ?;";
+        CassStatement* cassStatement = cass_statement_new(query, 2);
+        cass_statement_bind_string(cassStatement, 0, value.toStdString().c_str());
+        cass_statement_bind_uuid  (cassStatement, 1, _cassUuid);
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "Experimentation renamed successfully";
+        }
+        else {
+            qCritical() << "Could not update the name of the experimentation" << cass_error_desc(cassError);
+        }
+
+        Q_EMIT nameChanged(value);
+    }
+}
+
+
 /**
  * @brief Get the unique identifier in Cassandra Data Base
  * @return
