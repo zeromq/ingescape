@@ -433,7 +433,13 @@ bool IngeScapeNetworkController::start(QString networkDevice, QString ipAddress,
         // Start service with network device
         if (!networkDevice.isEmpty())
         {
+#ifdef Q_OS_WIN
+            // igs_startWithDevice compares networkDevice with latin1 values to get the IP address of the network device
+            _isIngeScapeAgentStarted = igs_startWithDevice(networkDevice.toLatin1().toStdString().c_str(), port);
+
+#else
             _isIngeScapeAgentStarted = igs_startWithDevice(networkDevice.toStdString().c_str(), port);
+#endif
         }
 
         // Start service with ip address (if start with network device has failed)
@@ -524,7 +530,13 @@ void IngeScapeNetworkController::updateAvailableNetworkDevices()
 
     for (int i = 0; i < nb; i++)
     {
+#ifdef Q_OS_WIN
+        // igs_getNetdevicesList return latin1 values
+        QString availableNetworkDevice = QString::fromLatin1(devices[i]);
+#else
         QString availableNetworkDevice = QString(devices[i]);
+#endif
+
         networkDevices.append(availableNetworkDevice);
     }
     igs_freeNetdevicesList(devices, nb);
@@ -542,12 +554,7 @@ void IngeScapeNetworkController::updateAvailableNetworkDevices()
  */
 bool IngeScapeNetworkController::isAvailableNetworkDevice(QString networkDevice)
 {
-    if (!networkDevice.isEmpty() && _availableNetworkDevices.contains(networkDevice)) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (!networkDevice.isEmpty() && _availableNetworkDevices.contains(networkDevice));
 }
 
 
