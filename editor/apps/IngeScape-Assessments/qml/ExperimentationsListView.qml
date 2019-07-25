@@ -209,7 +209,7 @@ Item {
                 }
 
                 Repeater {
-                    model: experimentationsGroup ? experimentationsGroup.experimentations : null
+                    model: rootExperimentationsGroup.experimentationsGroup ? rootExperimentationsGroup.experimentationsGroup.experimentations : null
 
                     delegate: Rectangle {
                         id: rootExperimentation
