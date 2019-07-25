@@ -196,8 +196,7 @@ Item {
             width: parent.width
             height: childrenRect.height
 
-            //FIXME Rounded only on top corners
-            Rectangle {
+            Item {
                 id: headerBackground
 
                 anchors {
@@ -208,7 +207,31 @@ Item {
 
                 height: 40
 
-                color: "#38444F" //TODO Move to IngeScapeTheme.qml
+                Rectangle {
+                    id: headerTop
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    radius: 5
+                    height: 10
+                    color: "#38444F" //TODO Move to IngeScapeTheme.qml
+                }
+
+                Rectangle {
+                    id: headerBody
+                    anchors {
+                        top: headerTop.verticalCenter
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    height: 35
+                    color: "#38444F" //TODO Move to IngeScapeTheme.qml
+                }
+
 
                 Text {
                     id: textGoupName
