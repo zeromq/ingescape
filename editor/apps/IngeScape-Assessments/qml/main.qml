@@ -39,8 +39,8 @@ ApplicationWindow {
 
 
     // Default size
-    width: IngeScapeAssessmentsTheme.appMinWidth // IngeScapeAssessmentsTheme.appDefaultWidth
-    height: IngeScapeAssessmentsTheme.appMinHeight // IngeScapeAssessmentsTheme.appDefaultHeight
+    width: IngeScapeAssessmentsTheme.appDefaultWidth
+    height: IngeScapeAssessmentsTheme.appDefaultHeight
 
     // Minimum size
     minimumWidth: IngeScapeAssessmentsTheme.appMinWidth
