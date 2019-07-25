@@ -27,5 +27,7 @@
         <file>qml/task/IndependentVariableTableCell.qml</file>
         <file>resources/SVG/ingescape-assessments.svg</file>
         <file>qml/export/ExportView.qml</file>
+        <file>qml/theme/IngeScapeAssessmentsButtonStyle.qml</file>
+        <file>qml/theme/IngeScapeAssessmentsListHeader.qml</file>
     </qresource>
 </RCC>

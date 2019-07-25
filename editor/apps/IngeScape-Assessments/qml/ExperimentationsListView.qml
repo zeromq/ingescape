@@ -119,30 +119,8 @@ Item {
         height: 40
         width: 200
 
-        style: ButtonStyle {
-            label: Text {
-                text: "NEW EXPERIMENT"
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                color: IngeScapeTheme.whiteColor
-
-                //FIXME derived from headerFont
-                font {
-                    family: IngeScapeTheme.labelFontFamily
-                    pixelSize: 18
-                    weight: Font.Black
-                }
-            }
-
-            background: Rectangle {
-                color: btnNewExpe.hovered ? IngeScapeTheme.blueButton_hovered : IngeScapeTheme.blueButton
-                radius: 5
-            }
-        }
-
-        onClicked: {
-            // Open the popup
-            createExperimentationPopup.open();
+        style: IngeScapeAssessmentsButtonStyle {
+            text: "NEW EXPERIMENT"
         }
     }
 
@@ -195,42 +173,13 @@ Item {
             width: parent.width
             height: childrenRect.height
 
-            Item {
+            IngeScapeAssessmentsListHeader {
                 id: headerBackground
-
                 anchors {
                     top: parent.top
                     left: parent.left
                     right: parent.right
                 }
-
-                height: 40
-
-                Rectangle {
-                    id: headerTop
-                    anchors {
-                        top: parent.top
-                        left: parent.left
-                        right: parent.right
-                    }
-
-                    radius: 5
-                    height: 10
-                    color: IngeScapeTheme.darkBlueHeader
-                }
-
-                Rectangle {
-                    id: headerBody
-                    anchors {
-                        top: headerTop.verticalCenter
-                        left: parent.left
-                        right: parent.right
-                    }
-
-                    height: 35
-                    color: IngeScapeTheme.darkBlueHeader
-                }
-
 
                 Text {
                     id: textGoupName
@@ -368,27 +317,9 @@ Item {
                                     rootItem.openExperimentation(rootExperimentation.experimentation)
                                 }
 
-
                                 //FIXME correct font
-                                style: ButtonStyle {
-                                    label: Text {
-                                        text: "OPEN"
-                                        verticalAlignment: Text.AlignVCenter
-                                        horizontalAlignment: Text.AlignHCenter
-                                        color: IngeScapeTheme.whiteColor
-
-                                        //FIXME derived from headerFont
-                                        font {
-                                            family: IngeScapeTheme.labelFontFamily
-                                            pixelSize: 18
-                                            weight: Font.Black
-                                        }
-                                    }
-
-                                    background: Rectangle {
-                                        color: btnOpen.hovered ? IngeScapeTheme.blueButton_hovered : IngeScapeTheme.blueButton
-                                        radius: 5
-                                    }
+                                style: IngeScapeAssessmentsButtonStyle {
+                                    text: "OPEN"
                                 }
                             }
                         }
