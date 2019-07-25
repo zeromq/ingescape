@@ -529,22 +529,6 @@ Item {
                                 verticalCenter: parent.verticalCenter
                             }
 
-                            width: mainView.recordNameColumnWidth
-
-                            text: qsTr("Record's name")
-                            color: IngeScapeTheme.whiteColor
-                            font {
-                                family: IngeScapeTheme.labelFontFamily
-                                pixelSize: 16
-                                weight: Font.Black
-                            }
-                        }
-
-                        Text {
-                            anchors {
-                                verticalCenter: parent.verticalCenter
-                            }
-
                             width: mainView.taskColumnWidth
 
                             text: qsTr("Task's name")

@@ -45,6 +45,8 @@ Item {
     property int indexPreviousSelectedSubject: -1;
     property int indexSubjectCurrentlyEditing: -1;
 
+    property real characteristicValueColumnWidth: 228
+
 
     //--------------------------------
     //
@@ -331,7 +333,35 @@ Item {
                 right: parent.right
             }
 
-            //TODO Column headers
+            Row {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    leftMargin: 15
+                    right: parent.right
+                    bottom: parent.bottom
+                }
+
+                Repeater {
+                    model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
+
+                    Text {
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        width: rootItem.characteristicValueColumnWidth
+
+                        text: model ? model.name : ""
+                        color: IngeScapeTheme.whiteColor
+                        font {
+                            family: IngeScapeTheme.labelFontFamily
+                            pixelSize: 16
+                            weight: Font.Black
+                        }
+                    }
+                }
+            }
         }
 
         Rectangle {
@@ -357,11 +387,13 @@ Item {
                     }
 
                     delegate: Rectangle {
+                        id: subjectDelegate
                         anchors {
                             left: parent.left
                             right: parent.right
                         }
 
+                        property var subject: model ? model.QtObject : null
                         property bool isMouseHovering: itemMouseArea.containsMouse
 
                         height: 40
@@ -372,6 +404,34 @@ Item {
                             id: itemMouseArea
                             anchors.fill: parent
                             hoverEnabled: true
+                        }
+
+                        Row {
+                            anchors {
+                                fill: parent
+                                leftMargin: 15
+                            }
+
+                            Repeater {
+                                model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
+
+                                delegate: Text {
+                                    id: startDate
+
+                                    text: subjectDelegate.subject && subjectDelegate.subject.mapCharacteristicValues ? subjectDelegate.subject.mapCharacteristicValues[model.name] : ""
+                                    width: rootItem.characteristicValueColumnWidth
+                                    height: subjectDelegate.height
+
+                                    verticalAlignment: Text.AlignVCenter
+
+                                    color: IngeScapeTheme.blackColor
+                                    font {
+                                        family: IngeScapeTheme.textFontFamily
+                                        //weight: Font.Medium
+                                        pixelSize: 14
+                                    }
+                                }
+                            }
                         }
 
                         Rectangle {
