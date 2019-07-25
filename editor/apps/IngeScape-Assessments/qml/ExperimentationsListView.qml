@@ -135,8 +135,7 @@ Item {
             }
 
             background: Rectangle {
-                //FIXME Move colors to IngeScapeTheme
-                color: btnNewExpe.hovered ? "#239eb3" : "#007b90"
+                color: btnNewExpe.hovered ? IngeScapeTheme.blueButton_hovered : IngeScapeTheme.blueButton
                 radius: 5
             }
         }
@@ -217,7 +216,7 @@ Item {
 
                     radius: 5
                     height: 10
-                    color: "#38444F" //TODO Move to IngeScapeTheme.qml
+                    color: IngeScapeTheme.darkBlueHeader
                 }
 
                 Rectangle {
@@ -229,7 +228,7 @@ Item {
                     }
 
                     height: 35
-                    color: "#38444F" //TODO Move to IngeScapeTheme.qml
+                    color: IngeScapeTheme.darkBlueHeader
                 }
 
 
@@ -344,8 +343,7 @@ Item {
                                     }
 
                                     background: Rectangle {
-                                        //FIXME Move colors to IngeScapeTheme
-                                        color: btnDelete.hovered ? "#239eb3" : "#007b90"
+                                        color: btnDelete.hovered ? IngeScapeTheme.blueButton_hovered : IngeScapeTheme.blueButton
                                         radius: 5
                                     }
                                 }
@@ -388,8 +386,7 @@ Item {
                                     }
 
                                     background: Rectangle {
-                                        //FIXME Move colors to IngeScapeTheme
-                                        color: btnOpen.hovered ? "#239eb3" : "#007b90"
+                                        color: btnOpen.hovered ? IngeScapeTheme.blueButton_hovered : IngeScapeTheme.blueButton
                                         radius: 5
                                     }
                                 }
