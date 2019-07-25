@@ -118,8 +118,8 @@ Item {
             rightMargin: 21
         }
 
-        height: 20
-        width: 20
+        height: 40
+        width: 40
 
         text: "X"
 
