@@ -112,10 +112,14 @@ Item {
         id: btnClose
 
         anchors {
-            right: parent.right
             top: parent.top
+            topMargin: 21
+            right: parent.right
+            rightMargin: 21
         }
-        height: 30
+
+        height: 20
+        width: 20
 
         text: "X"
 
@@ -239,45 +243,148 @@ Item {
         }
     }
 
-
-    Row {
-        id: header
-
+    // Subjects
+    Item {
         anchors {
             top: parent.top
-            topMargin: 10
-            horizontalCenter: parent.horizontalCenter
+            topMargin: 80
+            left: characteristicsItem.right
+            leftMargin: 26
+            right: parent.right
+            rightMargin: 26
         }
-        height: 30
-
-        spacing: 20
 
         Text {
-            id: title
+            id: titleSubjects
 
-            text: "Subjects"
+            anchors {
+                verticalCenter: btnDownloadSubjects.verticalCenter
+                left: parent.left
+            }
+
+            text: qsTr("SUBJECTS")
 
             height: parent.height
             verticalAlignment: Text.AlignVCenter
 
-            color: IngeScapeTheme.whiteColor
+            color: IngeScapeTheme.blackColor
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 20
+                weight: Font.Medium
+                pixelSize: 20
             }
         }
 
         Button {
-            text: "New Subject"
+            id: btnDownloadSubjects
 
-            height: parent.height
+            anchors {
+                top: parent.top
+                right: btnNewSubject.left
+                rightMargin: 12
+            }
+
+            height: 40
+            width: 182
 
             onClicked: {
-                //console.log("QML: New Subject");
+                console.log("Not implemented yet")
+            }
 
-                if (rootItem.controller) {
-                    rootItem.controller.createNewSubject();
+            //FIXME correct font
+            style: IngeScapeAssessmentsButtonStyle {
+                text: qsTr("DOWNLOAD LIST")
+            }
+        }
+
+        Button {
+            id: btnNewSubject
+
+            anchors {
+                top: parent.top
+                right: parent.right
+            }
+
+            height: 40
+            width: 182
+
+            onClicked: {
+                // Open the popup
+                if (rootItem.controller)
+                {
+                    rootItem.controller.createNewSubject()
+                }
+            }
+
+            //FIXME correct font
+            style: IngeScapeAssessmentsButtonStyle {
+                text: qsTr("NEW SUBJECT")
+            }
+        }
+
+        IngeScapeAssessmentsListHeader {
+            id: subjectListHeader
+            anchors {
+                top: btnDownloadSubjects.bottom
+                topMargin: 12
+                left: parent.left
+                right: parent.right
+            }
+
+            //TODO Column headers
+        }
+
+        Rectangle {
+            anchors {
+                top: subjectListHeader.bottom
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+
+            color: IngeScapeTheme.whiteColor
+
+            Column {
+                id: subjectsColumn
+                anchors.fill: parent
+                spacing: 0
+
+                Repeater {
+                    model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+
+                    onModelChanged: {
+                        console.log("Model cound: " + model.count)
+                    }
+
+                    delegate: Rectangle {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                        }
+
+                        property bool isMouseHovering: itemMouseArea.containsMouse
+
+                        height: 40
+
+                        color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
+
+                        MouseArea {
+                            id: itemMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                        }
+
+                        Rectangle {
+                            id: bottomSeparator
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                bottom: parent.bottom
+                            }
+                            height: 2
+                            color: IngeScapeTheme.veryLightGreyColor
+                        }
+                    }
                 }
             }
         }
@@ -286,212 +393,212 @@ Item {
     //
     // Subjects Panel
     //
-    Rectangle {
-        id: subjectsPanel
+//    Rectangle {
+//        id: subjectsPanel
 
-        anchors {
-            left: characteristicsPanel.right
-            right: parent.right
-            top: header.bottom
-            topMargin: 30
-            bottom: parent.bottom
-        }
+//        anchors {
+//            left: characteristicsItem.right
+//            right: parent.right
+//            top: header.bottom
+//            topMargin: 30
+//            bottom: parent.bottom
+//        }
 
-        color: "transparent"
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
-        }
-
-
-        TableView {
-            id: tableSubjects
-
-            anchors {
-                fill: parent
-                margins: 10
-            }
-
-            rowDelegate: Rectangle {
-                width: childrenRect.width
-                height: styleData.selected ? 30 : 20
-
-                color: styleData.selected ? "lightblue"
-                                          : (styleData.alternate ? "lightgray" : "white")
-            }
-
-            headerDelegate: Rectangle {
-                height: 30
-                width: parent.width
-
-                color: "darkgray"
-
-                Text {
-                    id: txtColumnHeader
-
-                    anchors {
-                        fill: parent
-                        leftMargin: (styleData.column === 0) ? 110 : 5
-                    }
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: styleData.textAlignment
-
-                    text: styleData.value
-                    elide: Text.ElideRight
-                    color: IngeScapeTheme.blackColor
-                }
-
-                Rectangle {
-                    id: leftSeparator
-
-                    visible: (styleData.column === 0)
-
-                    anchors {
-                        left: parent.left
-                        leftMargin: 105
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-                    width: 1
-                    color: "silver"
-                }
-
-                Rectangle {
-                    id: rightSeparator
-
-                    anchors {
-                        right: parent.right
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-                    width: 1
-                    color: "silver"
-                }
-            }
-
-            model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
-
-            Instantiator {
-                id: columnsInstantiator
-
-                model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
-
-                delegate: TableViewColumn {
-                    id: column
-
-                    property CharacteristicM characteristic: model.QtObject
-
-                    role: model.name
-                    title: model.name
-
-                    width: (index === 0) ? 250 : 150
-
-                    delegate: CharacteristicValueEditor {
-                        id: characteristicValueEditor
-
-                        characteristic: column.characteristic
-
-                        characteristicValue: {
-                            // FIXME rendering based on litteral string is a source of error
-                            model ? (column.role === "ID" ? model.displayedId : model.mapCharacteristicValues[column.role]) : ""
-                        }
-
-                        isSelected: styleData.selected
-
-                        isCurrentlyEditing: (rootItem.indexSubjectCurrentlyEditing === styleData.row)
+//        color: "transparent"
+//        border {
+//            color: IngeScapeTheme.darkGreyColor
+//            width: 1
+//        }
 
 
-                        //
-                        // Slots
-                        //
+//        TableView {
+//            id: tableSubjects
 
-                        onEditSubject: {
-                            // Edit the subject at the row index
-                            rootItem.editSubjectAtRowIndex(styleData.row);
-                        }
+//            anchors {
+//                fill: parent
+//                margins: 10
+//            }
 
-                        onStopEditionOfSubject: {
-                            // Stop the current edition of the subject
-                            rootItem.stopCurrentEditionOfSubject();
-                        }
+//            rowDelegate: Rectangle {
+//                width: childrenRect.width
+//                height: styleData.selected ? 30 : 20
 
-                        onCharacteristicValueUpdated: {
-                            if (model)
-                            {
-                                //console.log("QML: on Characteristic Value Updated " + value);
+//                color: styleData.selected ? "lightblue"
+//                                          : (styleData.alternate ? "lightgray" : "white")
+//            }
 
-                                // Update the value (in C++)
-                                model.mapCharacteristicValues[column.role] = value;
-                            }
-                        }
+//            headerDelegate: Rectangle {
+//                height: 30
+//                width: parent.width
 
-                        onDeleteSubject: {
+//                color: "darkgray"
 
-                            if (rootItem.controller && model)
-                            {
-                                //console.log("QML: Delete Subject " + model.name);
+//                Text {
+//                    id: txtColumnHeader
 
-                                // Stop the current edition of the subject
-                                stopCurrentEditionOfSubject();
+//                    anchors {
+//                        fill: parent
+//                        leftMargin: (styleData.column === 0) ? 110 : 5
+//                    }
+//                    verticalAlignment: Text.AlignVCenter
+//                    horizontalAlignment: styleData.textAlignment
 
-                                // Delete the subject
-                                rootItem.controller.deleteSubject(model.QtObject);
+//                    text: styleData.value
+//                    elide: Text.ElideRight
+//                    color: IngeScapeTheme.blackColor
+//                }
 
-                                // Clear the selection
-                                tableSubjects.selection.clear();
-                            }
-                        }
-                    }
-                }
+//                Rectangle {
+//                    id: leftSeparator
 
-                onObjectAdded: {
-                    //console.log("onObjectAdded " + index);
-                    //tableSubjects.insertColumn(index, object);
-                    tableSubjects.addColumn(object);
-                }
-                onObjectRemoved: {
-                    //console.log("onObjectRemoved " + index);
-                    tableSubjects.removeColumn(index);
-                }
-            }
+//                    visible: (styleData.column === 0)
 
-            onDoubleClicked: {
-                //console.log("onDoubleClicked " + row);
+//                    anchors {
+//                        left: parent.left
+//                        leftMargin: 105
+//                        top: parent.top
+//                        bottom: parent.bottom
+//                    }
+//                    width: 1
+//                    color: "silver"
+//                }
 
-                // Edit the subject at the row index
-                editSubjectAtRowIndex(row);
-            }
+//                Rectangle {
+//                    id: rightSeparator
+
+//                    anchors {
+//                        right: parent.right
+//                        top: parent.top
+//                        bottom: parent.bottom
+//                    }
+//                    width: 1
+//                    color: "silver"
+//                }
+//            }
+
+//            model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+
+//            Instantiator {
+//                id: columnsInstantiator
+
+//                model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
+
+//                delegate: TableViewColumn {
+//                    id: column
+
+//                    property CharacteristicM characteristic: model.QtObject
+
+//                    role: model.name
+//                    title: model.name
+
+//                    width: (index === 0) ? 250 : 150
+
+//                    delegate: CharacteristicValueEditor {
+//                        id: characteristicValueEditor
+
+//                        characteristic: column.characteristic
+
+//                        characteristicValue: {
+//                            // FIXME rendering based on litteral string is a source of error
+//                            model ? (column.role === "ID" ? model.displayedId : model.mapCharacteristicValues[column.role]) : ""
+//                        }
+
+//                        isSelected: styleData.selected
+
+//                        isCurrentlyEditing: (rootItem.indexSubjectCurrentlyEditing === styleData.row)
 
 
-            // NOT Called
-            //onSelectionChanged: {
-            //}
-            // --> Workaround
-            Connections {
-                target: tableSubjects.selection
+//                        //
+//                        // Slots
+//                        //
 
-                onSelectionChanged: {
-                    //console.log("onSelectionChanged:");
+//                        onEditSubject: {
+//                            // Edit the subject at the row index
+//                            rootItem.editSubjectAtRowIndex(styleData.row);
+//                        }
 
-                    if ((rootItem.indexPreviousSelectedSubject === rootItem.indexSubjectCurrentlyEditing) && (rootItem.indexSubjectCurrentlyEditing > -1))
-                    {
-                        // Stop the current edition of the subject
-                        stopCurrentEditionOfSubject();
-                    }
+//                        onStopEditionOfSubject: {
+//                            // Stop the current edition of the subject
+//                            rootItem.stopCurrentEditionOfSubject();
+//                        }
 
-                    // Reset
-                    rootItem.indexPreviousSelectedSubject = -1;
+//                        onCharacteristicValueUpdated: {
+//                            if (model)
+//                            {
+//                                //console.log("QML: on Characteristic Value Updated " + value);
 
-                    tableSubjects.selection.forEach(function(rowIndex) {
-                        //console.log("row " + rowIndex + " is selected");
+//                                // Update the value (in C++)
+//                                model.mapCharacteristicValues[column.role] = value;
+//                            }
+//                        }
 
-                        // Update
-                        rootItem.indexPreviousSelectedSubject = rowIndex;
-                    })
-                }
-            }
-        }
-    }
+//                        onDeleteSubject: {
+
+//                            if (rootItem.controller && model)
+//                            {
+//                                //console.log("QML: Delete Subject " + model.name);
+
+//                                // Stop the current edition of the subject
+//                                stopCurrentEditionOfSubject();
+
+//                                // Delete the subject
+//                                rootItem.controller.deleteSubject(model.QtObject);
+
+//                                // Clear the selection
+//                                tableSubjects.selection.clear();
+//                            }
+//                        }
+//                    }
+//                }
+
+//                onObjectAdded: {
+//                    //console.log("onObjectAdded " + index);
+//                    //tableSubjects.insertColumn(index, object);
+//                    tableSubjects.addColumn(object);
+//                }
+//                onObjectRemoved: {
+//                    //console.log("onObjectRemoved " + index);
+//                    tableSubjects.removeColumn(index);
+//                }
+//            }
+
+//            onDoubleClicked: {
+//                //console.log("onDoubleClicked " + row);
+
+//                // Edit the subject at the row index
+//                editSubjectAtRowIndex(row);
+//            }
+
+
+//            // NOT Called
+//            //onSelectionChanged: {
+//            //}
+//            // --> Workaround
+//            Connections {
+//                target: tableSubjects.selection
+
+//                onSelectionChanged: {
+//                    //console.log("onSelectionChanged:");
+
+//                    if ((rootItem.indexPreviousSelectedSubject === rootItem.indexSubjectCurrentlyEditing) && (rootItem.indexSubjectCurrentlyEditing > -1))
+//                    {
+//                        // Stop the current edition of the subject
+//                        stopCurrentEditionOfSubject();
+//                    }
+
+//                    // Reset
+//                    rootItem.indexPreviousSelectedSubject = -1;
+
+//                    tableSubjects.selection.forEach(function(rowIndex) {
+//                        //console.log("row " + rowIndex + " is selected");
+
+//                        // Update
+//                        rootItem.indexPreviousSelectedSubject = rowIndex;
+//                    })
+//                }
+//            }
+//        }
+//    }
 
 
     //
