@@ -104,14 +104,8 @@ Item {
 
     Rectangle {
         id: background
-
         anchors.fill: parent
-
-        color: IngeScapeTheme.veryDarkGreyColor
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
-        }
+        color: IngeScapeTheme.veryLightGreyColor
     }
 
     Button {
@@ -126,12 +120,125 @@ Item {
         text: "X"
 
         onClicked: {
-            //console.log("QML: close Subjects view");
-
             // Emit the signal "closeSubjectsView"
             rootItem.closeSubjectsView();
         }
     }
+
+    // Characteristics
+    Item {
+        id: characteristicsItem
+        anchors {
+            top: parent.top
+            topMargin: 24
+            left: parent.left
+            leftMargin: 26
+            bottom: parent.bottom
+            bottomMargin: 24
+        }
+
+        width: 360
+
+        Text {
+            id: titleCharacteristics
+
+            anchors {
+                verticalCenter: btnNewCharacteristic.verticalCenter
+                left: parent.left
+            }
+
+            text: qsTr("CHARACTERISTICS")
+
+            height: parent.height
+            verticalAlignment: Text.AlignVCenter
+
+            color: IngeScapeTheme.blackColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 20
+            }
+        }
+
+        Button {
+            id: btnNewCharacteristic
+
+            anchors {
+                top: parent.top
+                right: parent.right
+            }
+
+            height: 40
+            width: 134
+
+            onClicked: {
+                // Open the popup
+                createCharacteristicPopup.open();
+            }
+
+            //FIXME correct font
+            style: IngeScapeAssessmentsButtonStyle {
+                text: qsTr("ADD NEW")
+            }
+        }
+
+        Rectangle {
+            id: characteristicsList
+            anchors {
+                top: btnNewCharacteristic.bottom
+                topMargin: 14
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+
+            color: IngeScapeTheme.whiteColor
+
+            Column {
+                id: characteristicsColumn
+                anchors.fill: parent
+                spacing: 0
+
+                Repeater {
+                    model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
+
+                    delegate: Characteristic {
+
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                        }
+
+                        modelM: model.QtObject
+
+                        //
+                        // Slots
+                        //
+                        onDeleteCharacteristic: {
+                            if (rootItem.controller) {
+                                rootItem.controller.deleteCharacteristic(model.QtObject);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            id: bottomShadow
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+            height: 4
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
+                GradientStop { position: 1.0; color: IngeScapeTheme.darkGreyColor; }
+            }
+        }
+    }
+
 
     Row {
         id: header
@@ -175,99 +282,6 @@ Item {
             }
         }
     }
-
-
-    //
-    // Characteristics Panel
-    //
-    Rectangle {
-        id: characteristicsPanel
-
-        anchors {
-            left: parent.left
-            top: header.bottom
-            topMargin: 30
-            bottom: parent.bottom
-        }
-        width: 300
-
-        color: "transparent"
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
-        }
-
-        Row {
-            id: characteristicsHeader
-
-            anchors {
-                left: parent.left
-                leftMargin: 5
-                top: parent.top
-                topMargin: 5
-            }
-            height: 30
-
-            spacing: 20
-
-            Text {
-                id: titleCharacteristics
-
-                text: "Characteristics"
-
-                height: parent.height
-                verticalAlignment: Text.AlignVCenter
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
-
-            Button {
-                text: "New Characteristic"
-
-                height: parent.height
-
-                onClicked: {
-                    // Open the popup
-                    createCharacteristicPopup.open();
-                }
-            }
-        }
-
-        Column {
-            anchors {
-                top: characteristicsHeader.bottom
-                topMargin: 20
-                left: parent.left
-                leftMargin: 5
-                right: parent.right
-                rightMargin: 5
-            }
-
-            Repeater {
-                model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
-
-                delegate: Characteristic {
-
-                    modelM: model.QtObject
-
-                    //
-                    // Slots
-                    //
-                    onDeleteCharacteristic: {
-                        if (rootItem.controller) {
-                            rootItem.controller.deleteCharacteristic(model.QtObject);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 
     //
     // Subjects Panel

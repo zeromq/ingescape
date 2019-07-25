@@ -254,24 +254,6 @@ Item {
         }
     }
 
-    Rectangle {
-        id: headerBottomShadow
-
-        anchors {
-            top: headerItem.bottom
-            left: headerItem.left
-            right: headerItem.right
-        }
-
-        height: 6
-
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: IngeScapeTheme.darkGreyColor; }
-            GradientStop { position: 1.0; color: IngeScapeTheme.veryLightGreyColor; }
-        }
-
-    }
-
     //
     // Main view
     //
@@ -323,6 +305,24 @@ Item {
                 }
             }
         }
+    }
+
+    Rectangle {
+        id: headerBottomShadow
+
+        anchors {
+            top: headerItem.bottom
+            left: headerItem.left
+            right: headerItem.right
+        }
+
+        height: 6
+
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: IngeScapeTheme.darkGreyColor; }
+            GradientStop { position: 1.0; color: IngeScapeTheme.veryLightGreyColor; }
+        }
+
     }
 
 
@@ -494,8 +494,6 @@ Item {
 
                     height: 39
                     width: 182
-
-                    text: qsTr("NEW RECORD")
 
                     onClicked: {
                         // Open the popup

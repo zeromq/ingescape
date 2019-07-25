@@ -26,10 +26,7 @@ import INGESCAPE 1.0
 Item {
     id: rootItem
 
-    //anchors.fill: parent
-
-    width: parent.width
-    height: rowHeader.height + columnEnumValues.anchors.topMargin + columnEnumValues.height
+    height: 73
 
 
     //--------------------------------------------------------
@@ -41,6 +38,7 @@ Item {
     //--------------------------------------------------------
 
     property CharacteristicM modelM: null;
+    property bool isMouseHovering: mouseArea.containsMouse || btnDelete.hovered;
 
 
 
@@ -67,108 +65,68 @@ Item {
 
     Rectangle {
         id: background
-
         anchors.fill: parent
-
-        color: "transparent"
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
-        }
+        color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
     }
 
-    Row {
-        id: rowHeader
-
-        height: 30
-
-        spacing: 20
-
-        anchors {
-            left: parent.left
-            leftMargin: 5
-            top: parent.top
-        }
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-
-            text: rootItem.modelM ? rootItem.modelM.name : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 14
-            }
-        }
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-
-            text: rootItem.modelM ? CharacteristicValueTypes.enumToString(rootItem.modelM.valueType) : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                //weight: Font.Medium
-                pixelSize: 12
-            }
-        }
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+        hoverEnabled: true
     }
 
     Column {
-        id: columnEnumValues
+        id: rowHeader
 
         anchors {
+            verticalCenter: parent.verticalCenter
             left: parent.left
-            leftMargin: 5
-            top: rowHeader.bottom
-            topMargin: 5
+            right: parent.right
+            leftMargin: 28
         }
 
-        visible: (rootItem.modelM && (rootItem.modelM.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM))
+        spacing: 8
 
-        spacing: 3
+        Text {
+            text: rootItem.modelM ? rootItem.modelM.name : ""
 
-        Repeater {
-            model: rootItem.modelM ? rootItem.modelM.enumValues : null
+            color: IngeScapeTheme.blackColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 18
+            }
+        }
 
-            delegate: Text {
-                text: "- " + modelData
+        Text {
+            text: rootItem.modelM
+                  ? CharacteristicValueTypes.enumToString(rootItem.modelM.valueType)
+                    + ((rootItem.modelM.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM) ? "{ " + rootItem.modelM.enumValues.join(" ; ") + " }"
+                                                                                                 : "")
+                  : ""
 
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    //weight: Font.Medium
-                    pixelSize: 12
-                }
+            color: IngeScapeTheme.blackColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                pixelSize: 16
             }
         }
     }
-
-    /*MouseArea {
-            id: mouseArea
-
-            anchors.fill: parent
-
-            hoverEnabled: true
-        }*/
 
     Button {
         id: btnDelete
 
         anchors {
-            top: parent.top
-            topMargin: 2
+            verticalCenter: parent.verticalCenter
             right: parent.right
-            rightMargin: 2
+            rightMargin: 16
         }
         height: 30
+        width: 40
 
         text: "DEL"
 
-        visible: !rootItem.modelM.isSubjectId
+        visible: !rootItem.modelM.isSubjectId && rootItem.isMouseHovering
 
         onClicked: {
             if (rootItem.modelM)
@@ -179,5 +137,16 @@ Item {
                 rootItem.deleteCharacteristic();
             }
         }
+    }
+
+    Rectangle {
+        id: bottomSeparator
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+        height: 2
+        color: IngeScapeTheme.veryLightGreyColor
     }
 }
