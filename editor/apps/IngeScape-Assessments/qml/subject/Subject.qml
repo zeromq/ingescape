@@ -56,7 +56,6 @@ Rectangle {
     Row {
         anchors {
             fill: parent
-            leftMargin: 15
         }
 
         Repeater {
@@ -70,7 +69,10 @@ Rectangle {
                 property var characteristic: model ? model.QtObject : null
 
                 Text {
-                    anchors.fill: parent
+                    anchors{
+                        fill: parent
+                        leftMargin: 15
+                    }
                     text: rootItem.subject && rootItem.subject.mapCharacteristicValues ? rootItem.subject.mapCharacteristicValues[model.name] : ""
 
                     verticalAlignment: Text.AlignVCenter
@@ -89,7 +91,8 @@ Rectangle {
 
                     anchors {
                         fill: parent
-                        margins: 4
+                        margins: 5
+                        rightMargin: 33
                     }
 
                     visible: rootItem.isCurrentlyEditing
@@ -113,6 +116,16 @@ Rectangle {
 
                         model: characteristicDelegate.characteristic ? characteristicDelegate.characteristic.enumValues : null
 
+                        style: I2ComboboxStyle {
+                            borderColorIdle: IngeScapeTheme.veryLightGreyColor
+                            currentTextColorIdle: IngeScapeTheme.blackColor
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                //weight: Font.Medium
+                                pixelSize: 14
+                            }
+                        }
+
                         Binding {
                             target: comboboxEditor
                             property: "selectedItem"
@@ -120,7 +133,6 @@ Rectangle {
                         }
 
                         onSelectedItemChanged: {
-
                             if (comboboxEditor.selectedItem && rootItem.subject)
                             {
                                 rootItem.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] = comboboxEditor.selectedItem
@@ -174,17 +186,17 @@ Rectangle {
                             backgroundColor: IngeScapeTheme.whiteColor
                             borderColor: IngeScapeTheme.lightGreyColor
                             borderErrorColor: IngeScapeTheme.redColor
-                            radiusTextBox: 1
+                            radiusTextBox: 5
                             borderWidth: 0
                             borderWidthActive: 1
                             textIdleColor: IngeScapeTheme.blackColor
                             textDisabledColor: IngeScapeTheme.veryLightGreyColor
 
-                            padding.left: 3
-                            padding.right: 3
+                            padding.left: 10
+                            padding.right: 5
 
                             font {
-                                pixelSize:15
+                                pixelSize: 14
                                 family: IngeScapeTheme.textFontFamily
                             }
                         }
@@ -312,7 +324,7 @@ Rectangle {
             bottom: parent.bottom
         }
         height: 2
-        color: IngeScapeTheme.veryLightGreyColor
+        color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.veryLightGreyColor
     }
 }
 
