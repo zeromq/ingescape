@@ -29,5 +29,6 @@
         <file>qml/export/ExportView.qml</file>
         <file>qml/theme/IngeScapeAssessmentsButtonStyle.qml</file>
         <file>qml/theme/IngeScapeAssessmentsListHeader.qml</file>
+        <file>qml/subject/Subject.qml</file>
     </qresource>
 </RCC>

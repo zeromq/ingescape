@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Mathieu Soum <soum@ingenuity.io>
  *
  */
 
@@ -384,292 +385,26 @@ Item {
                 Repeater {
                     model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
-                    delegate: Rectangle {
+                    delegate: Subject {
                         id: subjectDelegate
+
+                        height: 40
+
                         anchors {
                             left: parent.left
                             right: parent.right
                         }
 
-                        height: 40
+                        experimentation: rootItem.experimentation
+                        subject: model ? model.QtObject : null
 
-                        property var subject: model ? model.QtObject : null
-                        property bool isMouseHovering: itemMouseArea.containsMouse || editSubjectButton.containsMouse || deleteSubjectButton.containsMouse
-                        property bool isCurrentlyEditing: false
+                        characteristicValueColumnWidth: rootItem.characteristicValueColumnWidth
+                        subjectEditionInProgress: rootItem.subjectEditionInProgress
 
-                        color: subjectDelegate.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor
-                                                                  : (subjectDelegate.isMouseHovering ? IngeScapeTheme.veryLightGreyColor
-                                                                                                     : IngeScapeTheme.whiteColor)
-
-                        MouseArea {
-                            id: itemMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                        }
-
-                        Row {
-                            anchors {
-                                fill: parent
-                                leftMargin: 15
-                            }
-
-                            Repeater {
-                                model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
-
-                                delegate: Item {
-                                    id: characteristicDelegate
-                                    width: rootItem.characteristicValueColumnWidth
-                                    height: subjectDelegate.height
-
-                                    property var characteristic: model ? model.QtObject : null
-
-                                    Text {
-                                        anchors.fill: parent
-                                        text: subjectDelegate.subject && subjectDelegate.subject.mapCharacteristicValues ? subjectDelegate.subject.mapCharacteristicValues[model.name] : ""
-
-                                        verticalAlignment: Text.AlignVCenter
-                                        visible: !subjectDelegate.isCurrentlyEditing
-
-                                        color: IngeScapeTheme.blackColor
-                                        font {
-                                            family: IngeScapeTheme.textFontFamily
-                                            //weight: Font.Medium
-                                            pixelSize: 14
-                                        }
-                                    }
-
-                                    Loader {
-                                        id: loaderEditor
-
-                                        anchors {
-                                            fill: parent
-                                            margins: 4
-                                        }
-
-                                        visible: subjectDelegate.isCurrentlyEditing
-
-                                        // Load editor in function of the value type:
-                                        // - Enum --> combobox
-                                        // - NOT enum --> text field
-                                        sourceComponent: (model && (model.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)) ? componentComboboxEditor
-                                                                                                                                       : componentTextFieldEditor
-                                    }
-
-
-                                    //
-                                    // component Combobox Editor
-                                    //
-                                    Component {
-                                        id: componentComboboxEditor
-
-                                        I2ComboboxStringList {
-                                            id: comboboxEditor
-
-                                            model: characteristicDelegate.characteristic ? characteristicDelegate.characteristic.enumValues : null
-
-                                            Binding {
-                                                target: comboboxEditor
-                                                property: "selectedItem"
-                                                value: subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name]
-                                            }
-
-                                            onSelectedItemChanged: {
-
-                                                if (comboboxEditor.selectedItem && subjectDelegate.subject)
-                                                {
-                                                    subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] = comboboxEditor.selectedItem
-                                                }
-                                            }
-
-                                            onVisibleChanged: {
-                                                if (visible && subjectDelegate.subject)
-                                                {
-                                                    var index = comboboxEditor.model.indexOf(subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name]);
-                                                    if (index > -1) {
-                                                        comboboxEditor.selectedIndex = index;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-
-                                    //
-                                    // component TextField Editor
-                                    //
-                                    Component {
-                                        id: componentTextFieldEditor
-
-                                        TextField {
-                                            id: textFieldEditor
-
-                                            property var intValidator: IntValidator {}
-                                            property var doubleValidator: DoubleValidator {}
-
-                                            text: subjectDelegate.subject && characteristicDelegate.characteristic && subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] ? subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] : ""
-
-                                            validator: if (characteristicDelegate.characteristic)
-                                                       {
-                                                           if (characteristicDelegate.characteristic.valueType === CharacteristicValueTypes.INTEGER) {
-                                                               return textFieldEditor.intValidator;
-                                                           }
-                                                           else if (characteristicDelegate.characteristic.valueType === CharacteristicValueTypes.DOUBLE) {
-                                                               return textFieldEditor.doubleValidator;
-                                                           }
-                                                           else {
-                                                               return null;
-                                                           }
-                                                       }
-                                                       else {
-                                                           return null;
-                                                       }
-
-                                            style: I2TextFieldStyle {
-                                                backgroundColor: IngeScapeTheme.whiteColor
-                                                borderColor: IngeScapeTheme.lightGreyColor
-                                                borderErrorColor: IngeScapeTheme.redColor
-                                                radiusTextBox: 1
-                                                borderWidth: 0
-                                                borderWidthActive: 1
-                                                textIdleColor: IngeScapeTheme.blackColor
-                                                textDisabledColor: IngeScapeTheme.veryLightGreyColor
-
-                                                padding.left: 3
-                                                padding.right: 3
-
-                                                font {
-                                                    pixelSize:15
-                                                    family: IngeScapeTheme.textFontFamily
-                                                }
-                                            }
-
-                                            onTextChanged: {
-                                                if (subjectDelegate.subject && characteristicDelegate.characteristic)
-                                                {
-                                                    subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] = text
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        Row {
-                            spacing: 12
-
-                            anchors {
-                                right: parent.right
-                                rightMargin: 18
-                                verticalCenter: parent.verticalCenter
-                            }
-
-                            Button {
-                                id: aplpyEditionSubjectButton
-                                height: 30
-                                width: 86
-
-                                opacity: subjectDelegate.isCurrentlyEditing ? 1 : 0
-                                enabled: opacity > 0
-
-                                style: IngeScapeAssessmentsButtonStyle {
-                                    text: "APPLY"
-                                }
-
-                                onClicked: {
-                                    if (subjectDelegate.subject)
-                                    {
-                                        subjectDelegate.subject.applyTemporaryPropertyValues()
-                                    }
-
-                                    subjectDelegate.isCurrentlyEditing = false
-                                    rootItem.subjectEditionInProgress = false
-                                }
-                            }
-
-                            Button {
-                                id: cancelEditionSubjectButton
-                                height: 30
-                                width: 40
-
-                                opacity: subjectDelegate.isCurrentlyEditing ? 1 : 0
-                                enabled: opacity > 0
-
-                                style: IngeScapeAssessmentsButtonStyle {
-                                    text: "C"
-                                }
-
-                                onClicked: {
-                                    subjectDelegate.isCurrentlyEditing = false
-                                    rootItem.subjectEditionInProgress = false
-                                }
-                            }
-                        }
-
-                        Row {
-                            spacing: 12
-
-                            anchors {
-                                right: parent.right
-                                rightMargin: 18
-                                verticalCenter: parent.verticalCenter
-                            }
-
-                            Button {
-                                id: deleteSubjectButton
-                                height: 30
-                                width: 40
-
-                                property bool containsMouse: __behavior.containsMouse
-
-                                opacity: subjectDelegate.isMouseHovering && !rootItem.subjectEditionInProgress ? 1 : 0
-                                enabled: opacity > 0
-
-                                style: IngeScapeAssessmentsButtonStyle {
-                                    text: "D"
-                                }
-
-                                onClicked: {
-                                    console.log("Not implemented yet")
-                                }
-                            }
-
-                            Button {
-                                id: editSubjectButton
-                                height: 30
-                                width: 40
-
-                                property bool containsMouse: __behavior.containsMouse
-
-                                opacity: subjectDelegate.isMouseHovering && !rootItem.subjectEditionInProgress ? 1 : 0
-                                enabled: opacity > 0
-
-                                style: IngeScapeAssessmentsButtonStyle {
-                                    text: "E"
-                                }
-
-                                onClicked: {
-                                    // Clean previous temporary
-                                    if (subjectDelegate.subject)
-                                    {
-                                        subjectDelegate.subject.resetTemporaryPropertyValues()
-                                    }
-
-                                    subjectDelegate.isCurrentlyEditing = true
-                                    rootItem.subjectEditionInProgress = true
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            id: bottomSeparator
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                bottom: parent.bottom
-                            }
-                            height: 2
-                            color: IngeScapeTheme.veryLightGreyColor
+                        Binding {
+                            target: rootItem
+                            property: "subjectEditionInProgress"
+                            value: subjectDelegate.isCurrentlyEditing
                         }
                     }
                 }
