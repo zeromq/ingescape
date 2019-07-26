@@ -415,8 +415,11 @@ Item {
                                 model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
 
                                 delegate: Item {
+                                    id: characteristicDelegate
                                     width: rootItem.characteristicValueColumnWidth
                                     height: subjectDelegate.height
+
+                                    property var characteristic: model ? model.QtObject : null
 
                                     Text {
                                         anchors.fill: parent
@@ -460,35 +463,24 @@ Item {
                                         I2ComboboxStringList {
                                             id: comboboxEditor
 
-                                            model: rootItem.characteristic ? rootItem.characteristic.enumValues : null
+                                            model: characteristicDelegate.characteristic ? characteristicDelegate.characteristic.enumValues : null
 
                                             onSelectedItemChanged: {
 
-                                                if (comboboxEditor.selectedItem)
+                                                if (comboboxEditor.selectedItem && subjectDelegate.subject)
                                                 {
-
-                                                    //TODO
-
-
-                                                    //console.log("QML: on Selected Item Changed " + comboboxEditor.selectedItem);
-
-                                                    // Emit the signal "Characteristic Value Updated"
-//                                                    rootItem.characteristicValueUpdated(comboboxEditor.selectedItem);
+                                                    subjectDelegate.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name] = comboboxEditor.selectedItem
                                                 }
                                             }
 
                                             onVisibleChanged: {
-
-                                                //TODO
-
-
-//                                                if (visible && (comboboxEditor.selectedIndex < 0) && (typeof rootItem.characteristicValue !== 'undefined'))
-//                                                {
-//                                                    var index = comboboxEditor.model.indexOf(rootItem.characteristicValue);
-//                                                    if (index > -1) {
-//                                                        comboboxEditor.selectedIndex = index;
-//                                                    }
-//                                                }
+                                                if (visible && (comboboxEditor.selectedIndex < 0))
+                                                {
+                                                    var index = comboboxEditor.model.indexOf(subjectDelegate.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name]);
+                                                    if (index > -1) {
+                                                        comboboxEditor.selectedIndex = index;
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -506,14 +498,14 @@ Item {
                                             property var intValidator: IntValidator {}
                                             property var doubleValidator: DoubleValidator {}
 
-                                            text: ""//TODO (typeof rootItem.characteristicValue !== 'undefined') ? rootItem.characteristicValue : ""
+                                            text: subjectDelegate.subject && characteristicDelegate.characteristic ? subjectDelegate.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name] : ""
 
-                                            validator: if (rootItem.characteristic)
+                                            validator: if (characteristicDelegate.characteristic)
                                                        {
-                                                           if (model.valueType === CharacteristicValueTypes.INTEGER) {
+                                                           if (characteristicDelegate.characteristic.valueType === CharacteristicValueTypes.INTEGER) {
                                                                return textFieldEditor.intValidator;
                                                            }
-                                                           else if (model.valueType === CharacteristicValueTypes.DOUBLE) {
+                                                           else if (characteristicDelegate.characteristic.valueType === CharacteristicValueTypes.DOUBLE) {
                                                                return textFieldEditor.doubleValidator;
                                                            }
                                                            else {
@@ -524,16 +516,15 @@ Item {
                                                            return null;
                                                        }
 
-
                                             style: I2TextFieldStyle {
-                                                backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                                                borderColor: IngeScapeTheme.whiteColor
+                                                backgroundColor: IngeScapeTheme.whiteColor
+                                                borderColor: IngeScapeTheme.lightGreyColor
                                                 borderErrorColor: IngeScapeTheme.redColor
                                                 radiusTextBox: 1
-                                                borderWidth: 0;
+                                                borderWidth: 0
                                                 borderWidthActive: 1
-                                                textIdleColor: IngeScapeTheme.whiteColor;
-                                                textDisabledColor: IngeScapeTheme.darkGreyColor
+                                                textIdleColor: IngeScapeTheme.blackColor
+                                                textDisabledColor: IngeScapeTheme.veryLightGreyColor
 
                                                 padding.left: 3
                                                 padding.right: 3
