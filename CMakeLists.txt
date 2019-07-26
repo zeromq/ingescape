@@ -357,6 +357,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
       install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
       install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
 
+      file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.txt "The bin directory is empty after installation on purpose.\r\n"
+                                                        "It will contain agents' executables once installed.")
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/README.txt DESTINATION bin)
   elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
       set(CPACK_GENERATOR "STGZ")
       #set(CPACK_SOURCE_GENERATOR "TGZ")
