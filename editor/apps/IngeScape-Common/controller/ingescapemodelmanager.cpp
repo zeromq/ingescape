@@ -989,15 +989,20 @@ void IngeScapeModelManager::onValuePublished(PublishedValueM* publishedValue)
 
             qDebug() << _publishedValues.count() << "values: we delete the" << numberOfDeletedValues << "oldest values and kept the" << numberOfKeptValues << "newest values";
 
-            // FIXME: More efficient ?
-            //_publishedValues.removeRows()
-            //_publishedValues.removeColumns()
-
-            while (_publishedValues.count() > numberOfKeptValues)
+            // Get values to delete
+            QList<PublishedValueM*> valuesToDelete;
+            for (int index = numberOfKeptValues; index < _publishedValues.count(); index++)
             {
-                PublishedValueM* tempPublishedValue = _publishedValues.takeAt(_publishedValues.count() - 1);
-                delete tempPublishedValue;
+                valuesToDelete.append(_publishedValues.at(index));
             }
+
+            // Remove all values from our list at once
+            // => our QML list and associated filters will only be updated once
+            _publishedValues.removeRows(numberOfKeptValues, valuesToDelete.count());
+
+            // Delete values
+            qDeleteAll(valuesToDelete);
+            valuesToDelete.clear();
         }
 
 

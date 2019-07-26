@@ -443,12 +443,7 @@ WindowBlockTouches {
 
                 // Content of our scrollview
                 ListView {
-                    model: if (controller) {
-                               controller.filteredValues
-                           }
-                           else {
-                               0
-                           }
+                    model: (controller) ? controller.filteredValues : null
 
                     delegate: Item {
                         anchors {
