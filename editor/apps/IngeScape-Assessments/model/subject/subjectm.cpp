@@ -19,8 +19,9 @@
 
 /**
  * @brief Constructor
- * @param uid
- * @param name
+ * @param experimentationUuid
+ * @param cassUuid
+ * @param displayedId
  * @param parent
  */
 SubjectM::SubjectM(CassUuid experimentationUuid,
@@ -30,6 +31,7 @@ SubjectM::SubjectM(CassUuid experimentationUuid,
     _uid(AssessmentsModelManager::cassUuidToQString(cassUuid)),
     _displayedId(displayedId),
     _mapCharacteristicValues(nullptr),
+    _tempMapCharacteristicValues(nullptr),
     _experimentationCassUuid(experimentationUuid),
     _cassUuid(cassUuid)
 {
@@ -40,6 +42,7 @@ SubjectM::SubjectM(CassUuid experimentationUuid,
 
     // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
     _mapCharacteristicValues = new QQmlPropertyMap(this);
+    _tempMapCharacteristicValues = new QQmlPropertyMap(this);
 
     // Connect to signal "Value Changed" fro the "Qml Property Map"
     connect(_mapCharacteristicValues, &QQmlPropertyMap::valueChanged, this, &SubjectM::_onCharacteristicValueChanged);
@@ -61,6 +64,12 @@ SubjectM::~SubjectM()
     {
         QQmlPropertyMap* temp = _mapCharacteristicValues;
         setmapCharacteristicValues(nullptr);
+        delete temp;
+    }
+    if (_tempMapCharacteristicValues != nullptr)
+    {
+        QQmlPropertyMap* temp = _tempMapCharacteristicValues;
+        settempMapCharacteristicValues(nullptr);
         delete temp;
     }
 }
@@ -183,6 +192,38 @@ void SubjectM::deleteSubjectFromCassandra(const SubjectM& subject)
     // Clean-up cassandra objects
     cass_future_free(cassFuture);
     cass_statement_free(cassStatement);
+}
+
+/**
+ * @brief Restore the temporary map values wih the ones from the actual value map
+ */
+void SubjectM::resetTemporaryPropertyValues()
+{
+    for(const QString& propertyName : _mapCharacteristicValues->keys())
+    {
+        _tempMapCharacteristicValues->insert(propertyName, _mapCharacteristicValues->value(propertyName));
+    }
+}
+
+/**
+ * @brief Apply the values from the temporary to the actual value map
+ * The DB will be update on the fly
+ */
+void SubjectM::applyTemporaryPropertyValues()
+{
+    for(const QString& propertyName : _tempMapCharacteristicValues->keys())
+    {
+        const QVariant& oldValue = _mapCharacteristicValues->value(propertyName);
+        const QVariant& value = _tempMapCharacteristicValues->value(propertyName);
+
+        if (oldValue != value)
+        {
+            _mapCharacteristicValues->insert(propertyName, value);
+
+            // Need to call manually the slot because the valueChanged signal is only emitted from QML
+            _onCharacteristicValueChanged(propertyName, value);
+        }
+    }
 }
 
 

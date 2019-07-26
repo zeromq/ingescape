@@ -37,6 +37,11 @@ class SubjectM : public QObject
     // "Qml Property Map" allows to set key-value pairs that can be used in QML bindings
     I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, mapCharacteristicValues)
 
+    // Temporary map holding edited values of the characteristics of our subject
+    // User modifications are stored here before applying them to the actual value map
+    // in case a rollback is requested
+    I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, tempMapCharacteristicValues)
+
     // Hash table from a (unique) id of characteristic to the characteristic value
     //I2_QOBJECT_HASHMODEL(QVariant, hashFromCharacteristicIdToValue)
 
@@ -45,6 +50,7 @@ public:
 
     /**
      * @brief Constructor
+     * @param experimentationUuid
      * @param cassUuid
      * @param displayedId
      * @param parent
@@ -105,6 +111,17 @@ public:
      * @param subject
      */
     static void deleteSubjectFromCassandra(const SubjectM& subject);
+
+    /**
+     * @brief Restore the temporary map values wih the ones from the actual value map
+     */
+    Q_INVOKABLE void resetTemporaryPropertyValues();
+
+    /**
+     * @brief Apply the values from the temporary to the actual value map
+     * The DB will be update on the fly
+     */
+    Q_INVOKABLE void applyTemporaryPropertyValues();
 
 
 private Q_SLOTS:

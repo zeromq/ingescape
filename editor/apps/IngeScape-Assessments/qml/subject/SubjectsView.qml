@@ -467,18 +467,24 @@ Item {
 
                                             model: characteristicDelegate.characteristic ? characteristicDelegate.characteristic.enumValues : null
 
+                                            Binding {
+                                                target: comboboxEditor
+                                                property: "selectedItem"
+                                                value: subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name]
+                                            }
+
                                             onSelectedItemChanged: {
 
                                                 if (comboboxEditor.selectedItem && subjectDelegate.subject)
                                                 {
-                                                    subjectDelegate.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name] = comboboxEditor.selectedItem
+                                                    subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] = comboboxEditor.selectedItem
                                                 }
                                             }
 
                                             onVisibleChanged: {
-                                                if (visible && (comboboxEditor.selectedIndex < 0))
+                                                if (visible && subjectDelegate.subject)
                                                 {
-                                                    var index = comboboxEditor.model.indexOf(subjectDelegate.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name]);
+                                                    var index = comboboxEditor.model.indexOf(subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name]);
                                                     if (index > -1) {
                                                         comboboxEditor.selectedIndex = index;
                                                     }
@@ -500,7 +506,7 @@ Item {
                                             property var intValidator: IntValidator {}
                                             property var doubleValidator: DoubleValidator {}
 
-                                            text: subjectDelegate.subject && characteristicDelegate.characteristic ? subjectDelegate.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name] : ""
+                                            text: subjectDelegate.subject && characteristicDelegate.characteristic && subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] ? subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] : ""
 
                                             validator: if (characteristicDelegate.characteristic)
                                                        {
@@ -540,7 +546,7 @@ Item {
                                             onTextChanged: {
                                                 if (subjectDelegate.subject && characteristicDelegate.characteristic)
                                                 {
-                                                    subjectDelegate.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name] = text
+                                                    subjectDelegate.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] = text
                                                 }
                                             }
                                         }
@@ -571,7 +577,11 @@ Item {
                                 }
 
                                 onClicked: {
-                                    console.log("Not implemented yet")
+                                    if (subjectDelegate.subject)
+                                    {
+                                        subjectDelegate.subject.applyTemporaryPropertyValues()
+                                    }
+
                                     subjectDelegate.isCurrentlyEditing = false
                                     rootItem.subjectEditionInProgress = false
                                 }
@@ -590,7 +600,6 @@ Item {
                                 }
 
                                 onClicked: {
-                                    console.log("Not implemented yet")
                                     subjectDelegate.isCurrentlyEditing = false
                                     rootItem.subjectEditionInProgress = false
                                 }
@@ -640,7 +649,12 @@ Item {
                                 }
 
                                 onClicked: {
-                                    console.log("Not implemented yet")
+                                    // Clean previous temporary
+                                    if (subjectDelegate.subject)
+                                    {
+                                        subjectDelegate.subject.resetTemporaryPropertyValues()
+                                    }
+
                                     subjectDelegate.isCurrentlyEditing = true
                                     rootItem.subjectEditionInProgress = true
                                 }
