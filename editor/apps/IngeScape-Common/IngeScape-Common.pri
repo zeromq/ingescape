@@ -46,7 +46,8 @@ SOURCES += \
     $$PWD/controller/abstracttimeactionslinescenarioviewcontroller.cpp \
     $$PWD/controller/ingescapemodelmanager.cpp \
     $$PWD/controller/ingescapenetworkcontroller.cpp \
-    $$PWD/sortFilter/abstracttimerangefilter.cpp
+    $$PWD/sortFilter/abstracttimerangefilter.cpp \
+    $$PWD/graphics/dashedbar.cpp
 
 HEADERS += \
     $$PWD/ingescapecommon.h \
@@ -91,7 +92,8 @@ HEADERS += \
     $$PWD/controller/abstracttimeactionslinescenarioviewcontroller.h \
     $$PWD/controller/ingescapemodelmanager.h \
     $$PWD/controller/ingescapenetworkcontroller.h \
-    $$PWD/sortFilter/abstracttimerangefilter.h
+    $$PWD/sortFilter/abstracttimerangefilter.h \
+    $$PWD/graphics/dashedbar.h
 
 
 # This variable only makes sense in a subdirs project.

@@ -26,6 +26,8 @@
 #include <model/scenario/scenariom.h>
 #include <model/scenario/timetickm.h>
 
+#include <graphics/dashedbar.h>
+
 
 /**
  * @brief Constructor
@@ -123,6 +125,19 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterUncreatableType<OutputVM>("INGESCAPE", 1, 0, "OutputVM", "Internal class");
     qmlRegisterUncreatableType<MappingElementVM>("INGESCAPE", 1, 0, "MappingElementVM", "Internal class");
     qmlRegisterUncreatableType<ParameterVM>("INGESCAPE", 1, 0, "ParameterVM", "Internal class");
+
+
+
+
+    //---------------
+    //
+    // Views
+    //
+    //---------------
+
+    qmlRegisterType<DashedBar>("INGESCAPE", 1, 0, "DashedBar");
+
+
 
 
     //------------------
