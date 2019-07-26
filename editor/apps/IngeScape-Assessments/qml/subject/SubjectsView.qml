@@ -47,6 +47,8 @@ Item {
 
     property real characteristicValueColumnWidth: 228
 
+    property bool isEditingSubject: false
+
 
     //--------------------------------
     //
@@ -536,14 +538,10 @@ Item {
                                             }
 
                                             onTextChanged: {
-
-                                                //TODO
-
-
-                                                //console.log("QML: on Text Changed " + textFieldEditor.text);
-
-                                                // Emit the signal "Characteristic Value Updated"
-//                                                rootItem.characteristicValueUpdated(textFieldEditor.text);
+                                                if (subjectDelegate.subject && characteristicDelegate.characteristic)
+                                                {
+                                                    subjectDelegate.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name] = text
+                                                }
                                             }
                                         }
                                     }
@@ -575,6 +573,7 @@ Item {
                                 onClicked: {
                                     console.log("Not implemented yet")
                                     subjectDelegate.isCurrentlyEditing = false
+                                    rootItem.isEditingSubject = false
                                 }
                             }
 
@@ -593,6 +592,7 @@ Item {
                                 onClicked: {
                                     console.log("Not implemented yet")
                                     subjectDelegate.isCurrentlyEditing = false
+                                    rootItem.isEditingSubject = false
                                 }
                             }
                         }
@@ -642,6 +642,7 @@ Item {
                                 onClicked: {
                                     console.log("Not implemented yet")
                                     subjectDelegate.isCurrentlyEditing = true
+                                    rootItem.isEditingSubject = true
                                 }
                             }
                         }
