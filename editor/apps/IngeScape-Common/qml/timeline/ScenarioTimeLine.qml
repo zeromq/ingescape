@@ -282,16 +282,26 @@ Item {
                         x: timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInMilliSeconds, timeLineController.pixelsPerMinute)
                         y: 0
 
-                        I2Line {
-                            useSvgGeometry: true
-                            x1: 0
-                            x2: 0
-                            y1: 0
-                            y2: timeLinesContent.height
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+
+
+                        DashedBar {
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                                horizontalCenter: parent.left
+                            }
+
+                            width: 1
+
                             visible: model.isBigTick
-                            stroke: IngeScapeTheme.veryDarkGreyColor
-                            strokeWidth: 1
-                            strokeDashArray: "3, 3"
+
+                            color: IngeScapeTheme.veryDarkGreyColor
+
+                            dashArray: "3, 3"
                         }
                     }
                 }
