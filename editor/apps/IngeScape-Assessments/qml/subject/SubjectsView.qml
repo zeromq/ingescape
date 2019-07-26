@@ -47,7 +47,7 @@ Item {
 
     property real characteristicValueColumnWidth: 228
 
-    property bool isEditingSubject: false
+    property bool subjectEditionInProgress: false
 
 
     //--------------------------------
@@ -573,7 +573,7 @@ Item {
                                 onClicked: {
                                     console.log("Not implemented yet")
                                     subjectDelegate.isCurrentlyEditing = false
-                                    rootItem.isEditingSubject = false
+                                    rootItem.subjectEditionInProgress = false
                                 }
                             }
 
@@ -592,7 +592,7 @@ Item {
                                 onClicked: {
                                     console.log("Not implemented yet")
                                     subjectDelegate.isCurrentlyEditing = false
-                                    rootItem.isEditingSubject = false
+                                    rootItem.subjectEditionInProgress = false
                                 }
                             }
                         }
@@ -613,7 +613,7 @@ Item {
 
                                 property bool containsMouse: __behavior.containsMouse
 
-                                opacity: subjectDelegate.isMouseHovering && !subjectDelegate.isCurrentlyEditing ? 1 : 0
+                                opacity: subjectDelegate.isMouseHovering && !rootItem.subjectEditionInProgress ? 1 : 0
                                 enabled: opacity > 0
 
                                 style: IngeScapeAssessmentsButtonStyle {
@@ -632,7 +632,7 @@ Item {
 
                                 property bool containsMouse: __behavior.containsMouse
 
-                                opacity: subjectDelegate.isMouseHovering && !subjectDelegate.isCurrentlyEditing ? 1 : 0
+                                opacity: subjectDelegate.isMouseHovering && !rootItem.subjectEditionInProgress ? 1 : 0
                                 enabled: opacity > 0
 
                                 style: IngeScapeAssessmentsButtonStyle {
@@ -642,7 +642,7 @@ Item {
                                 onClicked: {
                                     console.log("Not implemented yet")
                                     subjectDelegate.isCurrentlyEditing = true
-                                    rootItem.isEditingSubject = true
+                                    rootItem.subjectEditionInProgress = true
                                 }
                             }
                         }
