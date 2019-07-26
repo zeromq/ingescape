@@ -393,8 +393,11 @@ Item {
 
                         property var subject: model ? model.QtObject : null
                         property bool isMouseHovering: itemMouseArea.containsMouse || editSubjectButton.containsMouse || deleteSubjectButton.containsMouse
+                        property bool isCurrentlyEditing: false
 
-                        color: subjectDelegate.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
+                        color: subjectDelegate.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor
+                                                                  : (subjectDelegate.isMouseHovering ? IngeScapeTheme.veryLightGreyColor
+                                                                                                     : IngeScapeTheme.whiteColor)
 
                         MouseArea {
                             id: itemMouseArea
@@ -411,21 +414,194 @@ Item {
                             Repeater {
                                 model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
 
-                                delegate: Text {
-                                    id: startDate
-
-                                    text: subjectDelegate.subject && subjectDelegate.subject.mapCharacteristicValues ? subjectDelegate.subject.mapCharacteristicValues[model.name] : ""
+                                delegate: Item {
                                     width: rootItem.characteristicValueColumnWidth
                                     height: subjectDelegate.height
 
-                                    verticalAlignment: Text.AlignVCenter
+                                    Text {
+                                        anchors.fill: parent
+                                        text: subjectDelegate.subject && subjectDelegate.subject.mapCharacteristicValues ? subjectDelegate.subject.mapCharacteristicValues[model.name] : ""
 
-                                    color: IngeScapeTheme.blackColor
-                                    font {
-                                        family: IngeScapeTheme.textFontFamily
-                                        //weight: Font.Medium
-                                        pixelSize: 14
+                                        verticalAlignment: Text.AlignVCenter
+                                        visible: !subjectDelegate.isCurrentlyEditing
+
+                                        color: IngeScapeTheme.blackColor
+                                        font {
+                                            family: IngeScapeTheme.textFontFamily
+                                            //weight: Font.Medium
+                                            pixelSize: 14
+                                        }
                                     }
+
+                                    Loader {
+                                        id: loaderEditor
+
+                                        anchors {
+                                            fill: parent
+                                            margins: 4
+                                        }
+
+                                        visible: subjectDelegate.isCurrentlyEditing
+
+                                        // Load editor in function of the value type:
+                                        // - Enum --> combobox
+                                        // - NOT enum --> text field
+                                        sourceComponent: (model && (model.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)) ? componentComboboxEditor
+                                                                                                                                       : componentTextFieldEditor
+                                    }
+
+
+                                    //
+                                    // component Combobox Editor
+                                    //
+                                    Component {
+                                        id: componentComboboxEditor
+
+                                        I2ComboboxStringList {
+                                            id: comboboxEditor
+
+                                            model: rootItem.characteristic ? rootItem.characteristic.enumValues : null
+
+                                            onSelectedItemChanged: {
+
+                                                if (comboboxEditor.selectedItem)
+                                                {
+
+                                                    //TODO
+
+
+                                                    //console.log("QML: on Selected Item Changed " + comboboxEditor.selectedItem);
+
+                                                    // Emit the signal "Characteristic Value Updated"
+//                                                    rootItem.characteristicValueUpdated(comboboxEditor.selectedItem);
+                                                }
+                                            }
+
+                                            onVisibleChanged: {
+
+                                                //TODO
+
+
+//                                                if (visible && (comboboxEditor.selectedIndex < 0) && (typeof rootItem.characteristicValue !== 'undefined'))
+//                                                {
+//                                                    var index = comboboxEditor.model.indexOf(rootItem.characteristicValue);
+//                                                    if (index > -1) {
+//                                                        comboboxEditor.selectedIndex = index;
+//                                                    }
+//                                                }
+                                            }
+                                        }
+                                    }
+
+
+                                    //
+                                    // component TextField Editor
+                                    //
+                                    Component {
+                                        id: componentTextFieldEditor
+
+                                        TextField {
+                                            id: textFieldEditor
+
+                                            property var intValidator: IntValidator {}
+                                            property var doubleValidator: DoubleValidator {}
+
+                                            text: ""//TODO (typeof rootItem.characteristicValue !== 'undefined') ? rootItem.characteristicValue : ""
+
+                                            validator: if (rootItem.characteristic)
+                                                       {
+                                                           if (model.valueType === CharacteristicValueTypes.INTEGER) {
+                                                               return textFieldEditor.intValidator;
+                                                           }
+                                                           else if (model.valueType === CharacteristicValueTypes.DOUBLE) {
+                                                               return textFieldEditor.doubleValidator;
+                                                           }
+                                                           else {
+                                                               return null;
+                                                           }
+                                                       }
+                                                       else {
+                                                           return null;
+                                                       }
+
+
+                                            style: I2TextFieldStyle {
+                                                backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                                                borderColor: IngeScapeTheme.whiteColor
+                                                borderErrorColor: IngeScapeTheme.redColor
+                                                radiusTextBox: 1
+                                                borderWidth: 0;
+                                                borderWidthActive: 1
+                                                textIdleColor: IngeScapeTheme.whiteColor;
+                                                textDisabledColor: IngeScapeTheme.darkGreyColor
+
+                                                padding.left: 3
+                                                padding.right: 3
+
+                                                font {
+                                                    pixelSize:15
+                                                    family: IngeScapeTheme.textFontFamily
+                                                }
+                                            }
+
+                                            onTextChanged: {
+
+                                                //TODO
+
+
+                                                //console.log("QML: on Text Changed " + textFieldEditor.text);
+
+                                                // Emit the signal "Characteristic Value Updated"
+//                                                rootItem.characteristicValueUpdated(textFieldEditor.text);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Row {
+                            spacing: 12
+
+                            anchors {
+                                right: parent.right
+                                rightMargin: 18
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            Button {
+                                id: aplpyEditionSubjectButton
+                                height: 30
+                                width: 86
+
+                                opacity: subjectDelegate.isCurrentlyEditing ? 1 : 0
+                                enabled: opacity > 0
+
+                                style: IngeScapeAssessmentsButtonStyle {
+                                    text: "APPLY"
+                                }
+
+                                onClicked: {
+                                    console.log("Not implemented yet")
+                                    subjectDelegate.isCurrentlyEditing = false
+                                }
+                            }
+
+                            Button {
+                                id: cancelEditionSubjectButton
+                                height: 30
+                                width: 40
+
+                                opacity: subjectDelegate.isCurrentlyEditing ? 1 : 0
+                                enabled: opacity > 0
+
+                                style: IngeScapeAssessmentsButtonStyle {
+                                    text: "C"
+                                }
+
+                                onClicked: {
+                                    console.log("Not implemented yet")
+                                    subjectDelegate.isCurrentlyEditing = false
                                 }
                             }
                         }
@@ -446,7 +622,8 @@ Item {
 
                                 property bool containsMouse: __behavior.containsMouse
 
-                                opacity: subjectDelegate.isMouseHovering ? 1 : 0
+                                opacity: subjectDelegate.isMouseHovering && !subjectDelegate.isCurrentlyEditing ? 1 : 0
+                                enabled: opacity > 0
 
                                 style: IngeScapeAssessmentsButtonStyle {
                                     text: "D"
@@ -464,7 +641,8 @@ Item {
 
                                 property bool containsMouse: __behavior.containsMouse
 
-                                opacity: subjectDelegate.isMouseHovering ? 1 : 0
+                                opacity: subjectDelegate.isMouseHovering && !subjectDelegate.isCurrentlyEditing ? 1 : 0
+                                enabled: opacity > 0
 
                                 style: IngeScapeAssessmentsButtonStyle {
                                     text: "E"
@@ -472,6 +650,7 @@ Item {
 
                                 onClicked: {
                                     console.log("Not implemented yet")
+                                    subjectDelegate.isCurrentlyEditing = true
                                 }
                             }
                         }
