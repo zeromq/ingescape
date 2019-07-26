@@ -382,10 +382,6 @@ Item {
                 Repeater {
                     model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
-                    onModelChanged: {
-                        console.log("Model cound: " + model.count)
-                    }
-
                     delegate: Rectangle {
                         id: subjectDelegate
                         anchors {
@@ -393,12 +389,12 @@ Item {
                             right: parent.right
                         }
 
-                        property var subject: model ? model.QtObject : null
-                        property bool isMouseHovering: itemMouseArea.containsMouse
-
                         height: 40
 
-                        color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
+                        property var subject: model ? model.QtObject : null
+                        property bool isMouseHovering: itemMouseArea.containsMouse || editSubjectButton.containsMouse || deleteSubjectButton.containsMouse
+
+                        color: subjectDelegate.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
 
                         MouseArea {
                             id: itemMouseArea
@@ -430,6 +426,52 @@ Item {
                                         //weight: Font.Medium
                                         pixelSize: 14
                                     }
+                                }
+                            }
+                        }
+
+                        Row {
+                            spacing: 12
+
+                            anchors {
+                                right: parent.right
+                                rightMargin: 18
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            Button {
+                                id: deleteSubjectButton
+                                height: 30
+                                width: 40
+
+                                property bool containsMouse: __behavior.containsMouse
+
+                                opacity: subjectDelegate.isMouseHovering ? 1 : 0
+
+                                style: IngeScapeAssessmentsButtonStyle {
+                                    text: "D"
+                                }
+
+                                onClicked: {
+                                    console.log("Not implemented yet")
+                                }
+                            }
+
+                            Button {
+                                id: editSubjectButton
+                                height: 30
+                                width: 40
+
+                                property bool containsMouse: __behavior.containsMouse
+
+                                opacity: subjectDelegate.isMouseHovering ? 1 : 0
+
+                                style: IngeScapeAssessmentsButtonStyle {
+                                    text: "E"
+                                }
+
+                                onClicked: {
+                                    console.log("Not implemented yet")
                                 }
                             }
                         }
