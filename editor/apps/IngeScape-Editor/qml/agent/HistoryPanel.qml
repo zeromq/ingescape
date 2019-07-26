@@ -469,7 +469,7 @@ WindowBlockTouches {
                                     verticalCenter: parent.verticalCenter
                                 }
                                 verticalAlignment: Text.AlignVCenter
-                                width : rootItem.widthsOfColumns[0]
+                                width : rootItem.widthColumnName
                                 elide: Text.ElideRight
                                 height: parent.height
                                 color: IngeScapeTheme.whiteColor
@@ -487,7 +487,7 @@ WindowBlockTouches {
                                     verticalCenter: parent.verticalCenter
                                 }
                                 verticalAlignment: Text.AlignVCenter
-                                width : rootItem.widthsOfColumns[1]
+                                width : rootItem.widthColumnAgent
                                 elide: Text.ElideRight
                                 height: parent.height
                                 color: IngeScapeTheme.lightGreyColor
@@ -504,7 +504,7 @@ WindowBlockTouches {
                                     verticalCenter: parent.verticalCenter
                                 }
                                 height: parent.height
-                                width : rootItem.widthsOfColumns[2]
+                                width : rootItem.widthColumnType
 
                                 Rectangle {
                                     id : circle
@@ -565,7 +565,7 @@ WindowBlockTouches {
                                 }
                                 //verticalAlignment: TextInput.AlignVCenter
                                 //horizontalAlignment: TextInput.AlignLeft
-                                width : rootItem.widthsOfColumns[3]
+                                width : rootItem.widthColumnValue
                                 height: parent.height
 
                                 text: model.displayableValue
@@ -597,7 +597,7 @@ WindowBlockTouches {
                                     verticalCenter: parent.verticalCenter
                                 }
                                 verticalAlignment: Text.AlignVCenter
-                                width : rootItem.widthsOfColumns[4]
+                                width: rootItem.widthColumnDate
                                 height: parent.height
                                 color: IngeScapeTheme.whiteColor
                                 elide: Text.ElideRight
