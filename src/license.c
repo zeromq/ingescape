@@ -393,10 +393,12 @@ void license_readLicense(void){
             // could not open directory
         }
         
-        license = calloc(1, sizeof(license_t));
-        license->features = zhash_new();
-        license->agents = zhash_new();
-        license->licenceDetails = zlist_new();
+        if (zlist_size(filesList) > 0){
+            license = calloc(1, sizeof(license_t));
+            license->features = zhash_new();
+            license->agents = zhash_new();
+            license->licenceDetails = zlist_new();
+        }
         
         //iterate on license files in folder
         zfile_t *file = zlist_first(filesList);
@@ -437,7 +439,10 @@ void license_readLicense(void){
         zlist_destroy(&filesList);
         
         //go through details to apply least contraining values in main licence struct
-        license_t *detail = zlist_first(license->licenceDetails);
+        license_t *detail = NULL;
+        if (license != NULL && license->licenceDetails != NULL){
+            detail = zlist_first(license->licenceDetails);
+        }
         while (detail != NULL){
             if (!detail->isLicenseExpired){
                 if (detail->id != NULL){
