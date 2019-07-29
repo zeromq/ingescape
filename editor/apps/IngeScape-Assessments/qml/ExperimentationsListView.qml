@@ -204,8 +204,8 @@ Item {
                 }
             }
 
-            Column {
-                id: columnExperimentations
+            ListView {
+                id: listViewExperimentations
 
                 anchors {
                     top: headerBackground.bottom
@@ -213,132 +213,135 @@ Item {
                     right: parent.right
                 }
 
-                Repeater {
-                    model: rootExperimentationsGroup.experimentationsGroup ? rootExperimentationsGroup.experimentationsGroup.experimentations : null
+                property real itemHeight: 38
+                property real bottomSeparatorHeight: 2
 
-                    delegate: Rectangle {
-                        id: rootExperimentation
+                height: (count > 0) ? (itemHeight * count) - bottomSeparatorHeight : 0
 
-                        property ExperimentationM experimentation: model.QtObject
-                        property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.hovered || btnOpen.hovered
+                model: rootExperimentationsGroup.experimentationsGroup ? rootExperimentationsGroup.experimentationsGroup.experimentations : null
 
-                        width: parent.width
-                        height: 38
-                        color: rootExperimentation.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
+                delegate: Rectangle {
+                    id: rootExperimentation
 
-                        MouseArea {
-                            id: itemMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onDoubleClicked: {
+                    property ExperimentationM experimentation: model.QtObject
+                    property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.hovered || btnOpen.hovered
+
+                    width: parent.width
+                    height: listViewExperimentations.itemHeight
+                    color: rootExperimentation.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
+
+                    MouseArea {
+                        id: itemMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onDoubleClicked: {
+                            rootItem.openExperimentation(rootExperimentation.experimentation)
+                        }
+                    }
+
+                    Row {
+                        anchors {
+                            left: parent.left
+                            leftMargin: 25
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: rootExperimentation.experimentation ? rootExperimentation.experimentation.name : ""
+
+                            width: 350
+                            color: IngeScapeTheme.blackColor
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight: Font.Medium
+                                pixelSize: 14
+                            }
+                        }
+
+                        Text {
+                            text: rootExperimentation.experimentation ? rootExperimentation.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy - hh:mm:ss") : ""
+
+                            color: IngeScapeTheme.blackColor
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                //weight: Font.Medium
+                                pixelSize: 14
+                            }
+                        }
+                    }
+
+                    Row {
+                        spacing: 14
+
+                        anchors {
+                            right: parent.right
+                            rightMargin: 18
+                        }
+
+                        height: parent.height
+
+                        Button {
+                            id: btnDelete
+
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            //FIXME replace with trash can picto
+                            style: ButtonStyle {
+                                label: Text {
+                                    verticalAlignment: Text.AlignVCenter
+                                    horizontalAlignment: Text.AlignHCenter
+                                    color: IngeScapeTheme.whiteColor
+                                    font {
+                                        family: IngeScapeTheme.textFontFamily
+                                        //weight: Font.Medium
+                                        pixelSize: 14
+                                        bold: true
+                                    }
+                                    text: "DEL"
+                                }
+
+                                background: Rectangle {
+                                    color: btnDelete.hovered ? IngeScapeAssessmentsTheme.blueButton_pressed : IngeScapeAssessmentsTheme.blueButton
+                                    radius: 5
+                                }
+                            }
+
+                            width: 40
+                            height: 30
+
+                            onClicked: {
+                                rootItem.deleteExperimentation(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup)
+                            }
+                        }
+
+                        Button {
+                            id: btnOpen
+
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            width: 86
+                            height: 30
+
+                            onClicked: {
                                 rootItem.openExperimentation(rootExperimentation.experimentation)
                             }
-                        }
 
-                        Row {
-                            anchors {
-                                left: parent.left
-                                leftMargin: 25
-                                verticalCenter: parent.verticalCenter
-                            }
-
-                            Text {
-                                text: rootExperimentation.experimentation ? rootExperimentation.experimentation.name : ""
-
-                                width: 350
-                                color: IngeScapeTheme.blackColor
-                                font {
-                                    family: IngeScapeTheme.textFontFamily
-                                    weight: Font.Medium
-                                    pixelSize: 14
-                                }
-                            }
-
-                            Text {
-                                text: rootExperimentation.experimentation ? rootExperimentation.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy - hh:mm:ss") : ""
-
-                                color: IngeScapeTheme.blackColor
-                                font {
-                                    family: IngeScapeTheme.textFontFamily
-                                    //weight: Font.Medium
-                                    pixelSize: 14
-                                }
+                            //FIXME correct font
+                            style: IngeScapeAssessmentsButtonStyle {
+                                text: "OPEN"
                             }
                         }
+                    }
 
-                        Row {
-                            spacing: 14
-
-                            anchors {
-                                right: parent.right
-                                rightMargin: 18
-                            }
-
-                            height: parent.height
-
-                            Button {
-                                id: btnDelete
-
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                //FIXME replace with trash can picto
-                                style: ButtonStyle {
-                                    label: Text {
-                                        verticalAlignment: Text.AlignVCenter
-                                        horizontalAlignment: Text.AlignHCenter
-                                        color: IngeScapeTheme.whiteColor
-                                        font {
-                                            family: IngeScapeTheme.textFontFamily
-                                            //weight: Font.Medium
-                                            pixelSize: 14
-                                            bold: true
-                                        }
-                                        text: "DEL"
-                                    }
-
-                                    background: Rectangle {
-                                        color: btnDelete.hovered ? IngeScapeAssessmentsTheme.blueButton_pressed : IngeScapeAssessmentsTheme.blueButton
-                                        radius: 5
-                                    }
-                                }
-
-                                width: 40
-                                height: 30
-
-                                onClicked: {
-                                    rootItem.deleteExperimentation(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup)
-                                }
-                            }
-
-                            Button {
-                                id: btnOpen
-
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                width: 86
-                                height: 30
-
-                                onClicked: {
-                                    rootItem.openExperimentation(rootExperimentation.experimentation)
-                                }
-
-                                //FIXME correct font
-                                style: IngeScapeAssessmentsButtonStyle {
-                                    text: "OPEN"
-                                }
-                            }
+                    Rectangle {
+                        id: bottomSeparator
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            bottom: parent.bottom
                         }
-
-                        Rectangle {
-                            id: bottomSeparator
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                bottom: parent.bottom
-                            }
-                            height: 2
-                            color: IngeScapeTheme.veryLightGreyColor
-                        }
+                        height: listViewExperimentations.bottomSeparatorHeight
+                        color: IngeScapeTheme.veryLightGreyColor
                     }
                 }
             }
@@ -346,9 +349,9 @@ Item {
             Rectangle {
                 id: bottomShadow
                 anchors {
+                    top: listViewExperimentations.bottom
                     left: parent.left
                     right: parent.right
-                    bottom: parent.bottom
                 }
                 height: 4
                 gradient: Gradient {
