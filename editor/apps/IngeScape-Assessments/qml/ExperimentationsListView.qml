@@ -122,6 +122,11 @@ Item {
         style: IngeScapeAssessmentsButtonStyle {
             text: "NEW EXPERIMENT"
         }
+
+        onClicked: {
+            // Open the popup
+            createExperimentationPopup.open();
+        }
     }
 
 
