@@ -134,7 +134,8 @@ Item {
 
             color: IngeScapeTheme.middleLightGreyColor
 
-            visible: expeNameMouseArea.containsMouse || editButton.hovered || rootItem.isEditingName
+            opacity: (expeNameMouseArea.containsMouse || editButton.containsMouse || rootItem.isEditingName) ? 1 : 0
+            enabled: opacity > 0
 
             Button {
                 id: editButton
@@ -144,6 +145,8 @@ Item {
                     rightMargin: 5
                     verticalCenter: parent.verticalCenter
                 }
+
+                property bool containsMouse: __behavior.containsMouse
 
                 width: 42
                 height: 30
