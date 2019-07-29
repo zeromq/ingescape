@@ -1122,38 +1122,38 @@ assessments-delivery-all:
     - assessments-installer-windows-x64
 
 # Deliver installers so they can be downloaded from the website
-# expe-delivery-all:
-#   <<: *build-expe-files
-#   stage: delivery-apps
-#   tags:
-#     - docker
-#   image: ingescape/alpine-deployment
-#   script:
-#     - echo "Setting up SSH"
-#     - mkdir -p ~/.ssh/
-#     - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
-#     - umask 077
-#     - echo ${SSH_SECRET} | base64 -d > ssh_secret
-#     - umask 022
-#     - mv editor _editor
-#     - echo "Deliver Mac OS x64 expe"
-#     - mkdir --parents expe/macos
-#     - mv _editor/apps/IngeScape-Expe/build/IngeScape-Expe-*
-#          expe/macos/
-#     - ls expe/macos/ | grep -v 'latest_delivery' > expe/macos/latest_delivery
-#     - echo "Deliver Windows x86 expe"
-#     - mkdir --parents expe/win32
-#     - mv _editor/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
-#          expe/win32/
-#     - ls expe/win32/ | grep -v 'latest_delivery' > expe/win32/latest_delivery
-#     - echo "Deliver Windows x64 expe"
-#     - mkdir --parents expe/win64
-#     - mv _editor/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
-#          expe/win64/
-#     - ls expe/win64/ | grep -v 'latest_delivery' > expe/win64/latest_delivery
-#     - echo "Synchronization"
-#     - rsync --rsh="ssh -i ssh_secret" --recursive expe ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
-#   dependencies:
-#     - expe-installer-macos-x64
-#     - expe-installer-windows-x86
-#     - expe-installer-windows-x64
+expe-delivery-all:
+  <<: *build-expe-files
+  stage: delivery-apps
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - mv editor _editor
+    - echo "Deliver Mac OS x64 expe"
+    - mkdir --parents expe/macos
+    - mv _editor/apps/IngeScape-Expe/build/IngeScape-Expe-*
+         expe/macos/
+    - ls expe/macos/ | grep -v 'latest_delivery' > expe/macos/latest_delivery
+    - echo "Deliver Windows x86 expe"
+    - mkdir --parents expe/win32
+    - mv _editor/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
+         expe/win32/
+    - ls expe/win32/ | grep -v 'latest_delivery' > expe/win32/latest_delivery
+    - echo "Deliver Windows x64 expe"
+    - mkdir --parents expe/win64
+    - mv _editor/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
+         expe/win64/
+    - ls expe/win64/ | grep -v 'latest_delivery' > expe/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive expe ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - expe-installer-macos-x64
+    - expe-installer-windows-x86
+    - expe-installer-windows-x64
