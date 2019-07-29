@@ -44,8 +44,20 @@ Rectangle {
     property bool subjectEditionInProgress: false
 
     color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor
-                                              : (rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor
-                                                                                 : IngeScapeTheme.whiteColor)
+                                       : (rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor
+                                                                   : IngeScapeTheme.whiteColor)
+
+
+    //
+    // Signals
+    //
+
+    signal deleteSubject();
+
+
+    //
+    // Content
+    //
 
     MouseArea {
         id: itemMouseArea
@@ -73,7 +85,11 @@ Rectangle {
                         fill: parent
                         leftMargin: 15
                     }
-                    text: rootItem.subject && rootItem.subject.mapCharacteristicValues ? rootItem.subject.mapCharacteristicValues[model.name] : ""
+                    text: rootItem.subject
+                          && characteristicDelegate.characteristic
+                          && (typeof rootItem.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name] !== "undefined")
+                          ? rootItem.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name]
+                          : ""
 
                     verticalAlignment: Text.AlignVCenter
                     visible: !rootItem.isCurrentlyEditing
@@ -164,7 +180,14 @@ Rectangle {
                         property var intValidator: IntValidator {}
                         property var doubleValidator: DoubleValidator {}
 
-                        text: rootItem.subject && characteristicDelegate.characteristic && rootItem.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] ? rootItem.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] : ""
+                        text: {
+                            if (rootItem.subject
+                                    && characteristicDelegate.characteristic
+                                    && (typeof rootItem.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name]) !== "undefined") {
+                                return rootItem.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name]
+                            }
+                            return ""
+                        }
 
                         validator: if (characteristicDelegate.characteristic)
                                    {
@@ -286,7 +309,7 @@ Rectangle {
             }
 
             onClicked: {
-                console.log("Not implemented yet")
+                deleteSubject()
             }
         }
 

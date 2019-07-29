@@ -114,8 +114,14 @@ void SubjectM::addCharacteristic(CharacteristicM* characteristic)
 
 void SubjectM::setCharacteristicValue(CharacteristicM* characteristic, const QVariant& value)
 {
-    _mapCharacteristicValues->insert(characteristic->name(), value);
-    _mapCharacteristicsByName.insert(characteristic->name(), characteristic);
+    if (characteristic != nullptr)
+    {
+        _mapCharacteristicValues->insert(characteristic->name(), value);
+        _mapCharacteristicsByName.insert(characteristic->name(), characteristic);
+
+        // Need to call manually the slot because the valueChanged signal is only emitted from QML
+        _onCharacteristicValueChanged(characteristic->name(), value);
+    }
 }
 
 
@@ -236,13 +242,12 @@ void SubjectM::_onCharacteristicValueChanged(const QString &key, const QVariant 
 {
     qDebug() << key << "-->" << value.toString();
 
-    CharacteristicM* characteristic = nullptr;
     if (key == CHARACTERISTIC_SUBJECT_ID)
     {
         setdisplayedId(value.toString());
     }
 
-    characteristic = _mapCharacteristicsByName.value(key, nullptr);
+    CharacteristicM* characteristic = _mapCharacteristicsByName.value(key, nullptr);
     if (characteristic != nullptr)
     {
         const char* query = "UPDATE ingescape.characteristic_value_of_subject SET characteristic_value = ? WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ?;";

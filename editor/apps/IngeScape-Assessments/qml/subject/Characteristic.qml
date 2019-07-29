@@ -102,7 +102,7 @@ Item {
             text: rootItem.modelM
                   ? CharacteristicValueTypes.enumToString(rootItem.modelM.valueType)
                     + ((rootItem.modelM.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM) ? "{ " + rootItem.modelM.enumValues.join(" ; ") + " }"
-                                                                                                 : "")
+                                                                                                    : "")
                   : ""
 
             color: IngeScapeTheme.blackColor
