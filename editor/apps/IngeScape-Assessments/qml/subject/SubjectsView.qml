@@ -376,6 +376,15 @@ Item {
                             property: "subjectEditionInProgress"
                             value: subjectDelegate.isCurrentlyEditing
                         }
+
+                        onDeleteSubject: {
+                            if (rootItem.controller && subjectDelegate.subject)
+                            {
+                                subjectDelegate.isCurrentlyEditing = false
+                                rootItem.controller.deleteSubject(subjectDelegate.subject);
+                            }
+
+                        }
                     }
                 }
             }
