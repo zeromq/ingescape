@@ -323,10 +323,31 @@ ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const 
  */
 void ExperimentationM::deleteExperimentationFromCassandra(const ExperimentationM& experimentation)
 {
+    // Delete experimentations associations
     _deleteAllTasksForExperimentation(experimentation);
     _deleteAllSubjectsForExperimentation(experimentation);
     _deleteAllCharacteristicsForExperimentation(experimentation);
     _deleteAllCharacteristicsValuesForExperimentation(experimentation);
+
+    // Delete actual experimentation
+    const char* query = "DELETE FROM ingescape.experimentation WHERE id = ?;";
+    CassStatement* cassStatement = cass_statement_new(query, 1);
+    cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qInfo() << "Experimentation" << experimentation.name() << "has been successfully deleted from the DB";
+    }
+    else {
+        qCritical() << "Could not delete the experimentation" << experimentation.name() << "from the DB:" << cass_error_desc(cassError);
+    }
+
+    // Clean-up cassandra objects
+    cass_future_free(cassFuture);
+    cass_statement_free(cassStatement);
 }
 
 /**
