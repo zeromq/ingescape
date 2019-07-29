@@ -921,12 +921,13 @@ void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFile
     // Load the platform from a JSON file
     bool success = _loadPlatformFromFile(platformFilePath);
 
-    if (success)
-    {
-        qDebug() << "The loading of the asked platform succeeded !";
-    }
-    else {
+    if (!success) {
         qCritical() << "The loading of the asked platform failed !";
+    }
+
+    // Force our global mapping to CONTROLLED
+    if (_modelManager != nullptr) {
+        _modelManager->setisMappingControlled(true);
     }
 
     if ((_networkC != nullptr) && !_peerIdOfExpe.isEmpty())
@@ -950,8 +951,24 @@ void IngeScapeEditorController::_onUpdateTimeLineState(QString state)
 
     if (_scenarioC != nullptr)
     {
-        // Update the state of the timeline
-        _scenarioC->updateTimeLineState(state);
+        // PLAY (the TimeLine)
+        if (state == PLAY)
+        {
+            _scenarioC->playOrResumeTimeLine();
+        }
+        // PAUSE (the TimeLine)
+        else if (state == PAUSE)
+        {
+            _scenarioC->pauseTimeLine();
+        }
+        // RESET (the TimeLine)
+        else if (state == RESET)
+        {
+            _scenarioC->stopTimeLine();
+        }
+        else {
+            qCritical() << "Unknown state" << state << "so we cannot update the TimeLine !";
+        }
     }
 
     /*if ((_networkC != nullptr) && !_peerIdOfExpe.isEmpty())
@@ -975,11 +992,13 @@ void IngeScapeEditorController::_onTimeLineStateUpdated(QString state)
     {
         QString notificationAndParameters = QString("%1=%2").arg(notif_TimeLineState, state);
 
+        // Notify the Recorder app
         if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
         {
             _networkC->sendMessageToPeerId(_recordsSupervisionC->peerIdOfRecorder(), notificationAndParameters);
         }
 
+        // Notify the Expe app
         if (!_peerIdOfExpe.isEmpty())
         {
             _networkC->sendMessageToPeerId(_peerIdOfExpe, notificationAndParameters);

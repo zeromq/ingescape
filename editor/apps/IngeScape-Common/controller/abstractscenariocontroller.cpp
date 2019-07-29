@@ -457,32 +457,6 @@ void AbstractScenarioController::clearScenario()
 
 
 /**
- * @brief Update the state of our TimeLine
- * @param state
- */
-void AbstractScenarioController::updateTimeLineState(QString state)
-{
-    qDebug() << state << "the timeline";
-
-    // PLAY (the TimeLine)
-    if (state == PLAY) {
-        playOrResumeTimeLine();
-    }
-    // PAUSE (the TimeLine)
-    else if (state == PAUSE) {
-        pauseTimeLine();
-    }
-    // RESET (the TimeLine)
-    else if (state == RESET) {
-        stopTimeLine();
-    }
-    else {
-        qCritical() << "Unknown state" << state << "so we cannot update the TimeLine !";
-    }
-}
-
-
-/**
  * @brief Execute all effects of the action
  * Activate (connect) the mapping if necessary
  * Notify the recorder that the action has been executed

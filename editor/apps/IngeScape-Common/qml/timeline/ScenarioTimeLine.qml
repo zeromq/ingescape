@@ -1092,7 +1092,7 @@ Item {
                             when: !currentTimeMouseArea.drag.active
                         }
 
-                        // To prevent user to drag while the timeline is playing
+                        // To prevent user to drag while the timeline is playing (pause it first)
                         onPressed: {
                             if (scenarioController && scenarioController.isPlaying)
                             {

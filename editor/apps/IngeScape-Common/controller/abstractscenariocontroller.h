@@ -164,13 +164,6 @@ public:
 
 
     /**
-     * @brief Update the state of our TimeLine
-     * @param state
-     */
-    void updateTimeLineState(QString state);
-
-
-    /**
      * @brief Execute all effects of the action
      * Activate (connect) the mapping if necessary
      * Notify the recorder that the action has been executed
