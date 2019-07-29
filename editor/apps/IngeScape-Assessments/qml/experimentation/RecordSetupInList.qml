@@ -229,7 +229,7 @@ Rectangle {
             height: 30
 
             onClicked: {
-                rootItem.openRecordSetup();
+                rootItem.deleteRecordSetup();
             }
         }
 
@@ -242,7 +242,7 @@ Rectangle {
             height: 30
 
             onClicked: {
-                rootItem.deleteRecordSetup();
+                rootItem.openRecordSetup();
             }
 
             //FIXME correct font
