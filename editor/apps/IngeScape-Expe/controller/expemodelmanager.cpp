@@ -13,7 +13,7 @@
  */
 
 #include "expemodelmanager.h"
-#include <QRandomGenerator>
+//#include <QRandomGenerator>
 
 /**
  * @brief Constructor
@@ -398,7 +398,7 @@ QList<int> ExpeModelManager::_getRandomIndexes(int max)
 
     if (max > 0)
     {
-        QRandomGenerator* randomGenerator = QRandomGenerator::global();
+        /*QRandomGenerator* randomGenerator = QRandomGenerator::global();
 
         QVector<quint32> vector = QVector<quint32>(max);
 
@@ -412,44 +412,17 @@ QList<int> ExpeModelManager::_getRandomIndexes(int max)
 
             randomIndexes.append(static_cast<int>(randomIndex));
 
+            qDebug() << i << ":" << randomIndex;
+        }*/
+
+        for (int i = max; i > 0; i--)
+        {
+            int randomIndex = qrand() % i;
+
+            randomIndexes.append(randomIndex);
+
             //qDebug() << i << ":" << randomIndex;
         }
-
-        /*QStringList data1 = QStringList();
-        QStringList data2 = QStringList();
-
-        for (int i = 1; i <= 20; i++)
-        {
-            data1.append(QString("igs-%1").arg(i));
-        }
-        qDebug() << "AVANT: data1" << data1;
-
-        QVector<quint32> vector = QVector<quint32>(20);
-        //qDebug() << "AVANT vector" << vector;
-        randomGenerator->fillRange(vector.data(), vector.size());
-        qDebug() << "Randoms:" << vector;
-
-        for (int i = 20; i > 0; i--)
-        {
-            quint32 randomUint32 = vector.at(i - 1);
-            int randomIndex = randomUint32 % i;
-
-            if (randomIndex < data1.length())
-            {
-                QString item = data1.takeAt(randomIndex);
-                data2.append(item);
-
-                qDebug() << i << ":" << randomIndex << item;
-                //qDebug() << "data1" << data1;
-                //qDebug() << "data2" << data2;
-            }
-            else {
-                qCritical() <<  "random index" << randomIndex << "too high for 'data1'" << data1.length();
-            }
-        }
-
-        //qDebug() << "APRES: data1" << data1;
-        qDebug() << "APRES: data2" << data2;*/
     }
     return randomIndexes;
 }
