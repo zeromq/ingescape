@@ -96,7 +96,7 @@ lib-linux-release-x64:
     name: "lib-linux-release-x64"
     expire_in: 1 week
   dependencies: []
-  
+
 # Create ingescape library for Debian 9 (x86_64)
 lib-debian-9-release-x64:
   <<: *build-lib-files
@@ -115,7 +115,7 @@ lib-debian-9-release-x64:
     name: "lib-debian-9-release-x64"
     expire_in: 1 week
   dependencies: []
-  
+
 # Create ingescape library for Debian 10 (x86_64)
 lib-debian-10-release-x64:
   <<: *build-lib-files
@@ -134,7 +134,7 @@ lib-debian-10-release-x64:
     name: "lib-debian-10-release-x64"
     expire_in: 1 week
   dependencies: []
-  
+
 # Create ingescape library for CentOS 7 (x86_64)
 lib-centos-7-release-x64:
   <<: *build-lib-files
@@ -153,7 +153,7 @@ lib-centos-7-release-x64:
     name: "lib-centos-7-release-x64"
     expire_in: 1 week
   dependencies: []
-  
+
 # Create ingescape library for linux (armv7/armhf)
 lib-linux-release-armhf:
   <<: *build-lib-files
@@ -172,7 +172,7 @@ lib-linux-release-armhf:
     name: "lib-linux-release-armhf"
     expire_in: 1 week
   dependencies: []
-  
+
 # Create ingescape library for Raspbian 9 (armv7/armhf)
 lib-raspbian-9-release-armhf:
   <<: *build-lib-files
@@ -191,7 +191,7 @@ lib-raspbian-9-release-armhf:
     name: "lib-raspbian-9-release-armhf"
     expire_in: 1 week
   dependencies: []
-  
+
 # Create ingescape library for Android (armv7a softfp)
 lib-android-release-armv7a-softfp:
   <<: *build-lib-files
@@ -271,25 +271,25 @@ assessments-macos-release-x64:
   dependencies: []
 
 # Create ingescape expe for macos
-# expe-macos-release-x64:
-#   <<: *build-expe-files
-#   stage: build-apps
-#   variables:
-#     Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
-#     GIT_SUBMODULE_STRATEGY: recursive
-#   tags:
-#     - osx
-#   script:
-#     - git clean -xfd
-#     - mkdir editor/apps/IngeScape-Expe/build
-#     - cmake -S editor/apps/IngeScape-Expe/ -B editor/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release
-#     - make -C editor/apps/IngeScape-Expe/build
-#   artifacts:
-#     paths:
-#       - editor/apps/IngeScape-Expe/build
-#     name: "expe-macos-release-x64"
-#     expire_in: 1 week
-#   dependencies: []
+expe-macos-release-x64:
+  <<: *build-expe-files
+  stage: build-apps
+  variables:
+    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
+    GIT_SUBMODULE_STRATEGY: recursive
+  tags:
+    - osx
+  script:
+    - git clean -xfd
+    - mkdir editor/apps/IngeScape-Expe/build
+    - cmake -S editor/apps/IngeScape-Expe/ -B editor/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release
+    - make -C editor/apps/IngeScape-Expe/build
+  artifacts:
+    paths:
+      - editor/apps/IngeScape-Expe/build
+    name: "expe-macos-release-x64"
+    expire_in: 1 week
+  dependencies: []
 
 # Create ingescape library for windows 64 bits release
 lib-windows-release-x64:
@@ -465,51 +465,51 @@ assessments-windows-release-x64:
     expire_in: 1 week
   dependencies: []
 
-# Create ingescape expe for windows
-# expe-windows-release-x86:
-#   <<: *build-expe-files
-#   stage: build-apps
-#   variables:
-#     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
-#     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
-#     GIT_SUBMODULE_STRATEGY: recursive
-#   tags:
-#     - windows
-#   script:
-#     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
-#     - git clean -xfd
-#     - mkdir editor\apps\IngeScape-Expe\build\ReleaseX86
-#     - cmake editor\apps\IngeScape-Expe\ -B editor\apps\IngeScape-Expe\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release
-#     - cmake --build editor\apps\IngeScape-Expe\build\ReleaseX86 --target ALL_BUILD --config Release
-#   artifacts:
-#     paths:
-#       - editor\apps\IngeScape-Expe\build
-#     name: "expe-windows-release-x86"
-#     expire_in: 1 week
-#   dependencies: []
+# Create ingescape expe for windows (x86)
+expe-windows-release-x86:
+  <<: *build-expe-files
+  stage: build-apps
+  variables:
+    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+    GIT_SUBMODULE_STRATEGY: recursive
+  tags:
+    - windows
+  script:
+    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
+    - git clean -xfd
+    - mkdir editor\apps\IngeScape-Expe\build\ReleaseX86
+    - cmake editor\apps\IngeScape-Expe\ -B editor\apps\IngeScape-Expe\build\ReleaseX86 -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build editor\apps\IngeScape-Expe\build\ReleaseX86 --target ALL_BUILD --config Release
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Expe\build
+    name: "expe-windows-release-x86"
+    expire_in: 1 week
+  dependencies: []
 
-# Create ingescape expe for windows
-# expe-windows-release-x64:
-#   <<: *build-expe-files
-#   stage: build-apps
-#   variables:
-#     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
-#     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
-#     GIT_SUBMODULE_STRATEGY: recursive
-#   tags:
-#     - windows
-#   script:
-#     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
-#     - git clean -xfd
-#     - mkdir editor\apps\IngeScape-Expe\build\ReleaseX64
-#     - cmake editor\apps\IngeScape-Expe\ -B editor\apps\IngeScape-Expe\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release
-#     - cmake --build editor\apps\IngeScape-Expe\build\ReleaseX64 --target ALL_BUILD --config Release
-#   artifacts:
-#     paths:
-#       - editor\apps\IngeScape-Expe\build
-#     name: "expe-windows-release-x64"
-#     expire_in: 1 week
-#   dependencies: []
+# Create ingescape expe for windows (x64)
+expe-windows-release-x64:
+  <<: *build-expe-files
+  stage: build-apps
+  variables:
+    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
+    GIT_SUBMODULE_STRATEGY: recursive
+  tags:
+    - windows
+  script:
+    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - git clean -xfd
+    - mkdir editor\apps\IngeScape-Expe\build\ReleaseX64
+    - cmake editor\apps\IngeScape-Expe\ -B editor\apps\IngeScape-Expe\build\ReleaseX64 -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build editor\apps\IngeScape-Expe\build\ReleaseX64 --target ALL_BUILD --config Release
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Expe\build
+    name: "expe-windows-release-x64"
+    expire_in: 1 week
+  dependencies: []
 
 # Create runtime install for windows 32 bits
 lib-installer-runtime-windows-x86:
@@ -655,50 +655,50 @@ assessments-installer-windows-x64:
     - assessments-windows-release-x64
 
 # Create expe install for macos 64 bits
-# expe-installer-macos-x64:
-#   <<: *build-expe-files
-#   stage: installer-apps
-#   tags:
-#     - osx
-#   script:
-#     - make -C editor/apps/IngeScape-Expe/build package
-#   #  - make -C editor/apps/IngeScape-Expe/build package_source
-#   artifacts:
-#     paths:
-#       - editor/apps/IngeScape-Expe/build/IngeScape-Expe-*
-#     name: "expe-installer-macos-x64"
-#   dependencies:
-#     - expe-macos-release-x64
+expe-installer-macos-x64:
+  <<: *build-expe-files
+  stage: installer-apps
+  tags:
+    - osx
+  script:
+    - make -C editor/apps/IngeScape-Expe/build package
+  #  - make -C editor/apps/IngeScape-Expe/build package_source
+  artifacts:
+    paths:
+      - editor/apps/IngeScape-Expe/build/IngeScape-Expe-*
+    name: "expe-installer-macos-x64"
+  dependencies:
+    - expe-macos-release-x64
 
 # Create expe install for windows 32 bits
-# expe-installer-windows-x86:
-#   <<: *build-expe-files
-#   stage: installer-apps
-#   tags:
-#     - windows
-#   script:
-#     - cd editor\apps\IngeScape-Expe\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
-#   artifacts:
-#     paths:
-#       - editor\apps\IngeScape-Expe\build\ReleaseX86\IngeScape-Expe-*
-#     name: "expe-installer-windows-x86"
-#   dependencies:
-#     - expe-windows-release-x86
+expe-installer-windows-x86:
+  <<: *build-expe-files
+  stage: installer-apps
+  tags:
+    - windows
+  script:
+    - cd editor\apps\IngeScape-Expe\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Expe\build\ReleaseX86\IngeScape-Expe-*
+    name: "expe-installer-windows-x86"
+  dependencies:
+    - expe-windows-release-x86
 
 # Create expe install for windows 64 bits
-# expe-installer-windows-x64:
-#   <<: *build-expe-files
-#   stage: installer-apps
-#   tags:
-#     - windows
-#   script:
-#     - cd editor\apps\IngeScape-Expe\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
-#   artifacts:
-#     paths:
-#       - editor\apps\IngeScape-Expe\build\ReleaseX64\IngeScape-Expe-*
-#     name: "expe-installer-windows-x64"
-#   dependencies:
-#     - expe-windows-release-x64
+expe-installer-windows-x64:
+  <<: *build-expe-files
+  stage: installer-apps
+  tags:
+    - windows
+  script:
+    - cd editor\apps\IngeScape-Expe\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+  artifacts:
+    paths:
+      - editor\apps\IngeScape-Expe\build\ReleaseX64\IngeScape-Expe-*
+    name: "expe-installer-windows-x64"
+  dependencies:
+    - expe-windows-release-x64
 
 # Create runtime install for linux 64 bits - Generic ZIP
 lib-installer-runtime-linux-x64:
