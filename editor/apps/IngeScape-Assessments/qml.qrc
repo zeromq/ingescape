@@ -25,10 +25,10 @@
         <file>qml/record/RecordSetupView.qml</file>
         <file>qml/record/IndependentVariableValueEditor.qml</file>
         <file>qml/task/IndependentVariableTableCell.qml</file>
-        <file>resources/SVG/ingescape-assessments.svg</file>
         <file>qml/export/ExportView.qml</file>
         <file>qml/theme/IngeScapeAssessmentsButtonStyle.qml</file>
         <file>qml/theme/IngeScapeAssessmentsListHeader.qml</file>
         <file>qml/subject/Subject.qml</file>
+        <file>resources/SVG/ingescape_assesments-pictos-SVG.svg</file>
     </qresource>
 </RCC>
