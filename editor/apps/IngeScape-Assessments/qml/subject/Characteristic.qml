@@ -38,7 +38,7 @@ Item {
     //--------------------------------------------------------
 
     property CharacteristicM modelM: null;
-    property bool isMouseHovering: mouseArea.containsMouse || btnDelete.hovered;
+    property bool isMouseHovering: mouseArea.containsMouse || btnDelete.containsMouse;
 
 
 
@@ -124,9 +124,12 @@ Item {
         height: 30
         width: 40
 
+        property bool containsMouse: __behavior.containsMouse
+
         text: "DEL"
 
-        visible: !rootItem.modelM.isSubjectId && rootItem.isMouseHovering
+        opacity: rootItem.modelM && !rootItem.modelM.isSubjectId && rootItem.isMouseHovering ? 1 : 0
+        enabled: opacity > 0
 
         onClicked: {
             if (rootItem.modelM)
