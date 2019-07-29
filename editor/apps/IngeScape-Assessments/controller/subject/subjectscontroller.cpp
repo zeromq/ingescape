@@ -224,6 +224,10 @@ void SubjectsController::createNewSubject()
                 {
                     _insertCharacteristicValueForSubjectIntoDB(subject, characteristic);
                     subject->addCharacteristic(characteristic);
+                    if (characteristic->name() == CHARACTERISTIC_SUBJECT_ID)
+                    {
+                        subject->setCharacteristicValue(characteristic, displayedId);
+                    }
                 }
             }
 
