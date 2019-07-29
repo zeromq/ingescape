@@ -142,42 +142,120 @@ Item {
         anchors {
             top: parent.top
             right: parent.right
-            margins: 15
+            margins: 10
         }
 
-        spacing: 5
+        spacing: 10
+
 
         // Feedback about IngeScape Editor ON/OFF
         Rectangle {
-            width: 100
-            height: 40
+            width: 120
+            height: 35
 
             radius: 5
 
-            color: (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON) ? "green" : "orange"
+            color: "transparent"
+            border {
+                color: "darkgray"
+                width: 1
+            }
 
             Label {
                 anchors.centerIn: parent
-                color: IngeScapeTheme.whiteColor
-                font: IngeScapeTheme.headingFont
+
                 text: "Editor"
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.labelFontFamily
+                    //weight: Font.Normal
+                    pixelSize: 16
+                }
+            }
+
+            Rectangle {
+                id: warningNoEditor
+
+                anchors {
+                    right: parent.right
+                    rightMargin: 5
+                    verticalCenter: parent.verticalCenter
+                }
+                height: 20
+                width: height
+                radius: height / 2
+
+                color: (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON) ? "transparent" : IngeScapeTheme.redColor
+
+                Text {
+                    anchors.centerIn: parent
+
+                    text: (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isEditorON) ? "1" : "0"
+
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.labelFontFamily
+                        weight: Font.Black
+                        pixelSize: 13
+                    }
+                }
             }
         }
 
+
         // Feedback about IngeScape Recorder ON/OFF
         Rectangle {
-            width: 100
-            height: 40
+            width: 120
+            height: 35
 
             radius: 5
 
-            color: (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isRecorderON) ? "green" : "orange"
+            color: "transparent"
+            border {
+                color: "darkgray"
+                width: 1
+            }
 
             Label {
                 anchors.centerIn: parent
-                color: IngeScapeTheme.whiteColor
-                font: IngeScapeTheme.headingFont
+
                 text: "Recorder"
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.labelFontFamily
+                    //weight: Font.Normal
+                    pixelSize: 16
+                }
+            }
+
+            Rectangle {
+                id: warningNoRecorder
+
+                anchors {
+                    right: parent.right
+                    rightMargin: 5
+                    verticalCenter: parent.verticalCenter
+                }
+                height: 20
+                width: height
+                radius: height / 2
+
+                color: (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isRecorderON) ? "transparent" : IngeScapeTheme.redColor
+
+                Text {
+                    anchors.centerIn: parent
+
+                    text: (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isRecorderON) ? "1" : "0"
+
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.labelFontFamily
+                        weight: Font.Black
+                        pixelSize: 13
+                    }
+                }
             }
         }
     }

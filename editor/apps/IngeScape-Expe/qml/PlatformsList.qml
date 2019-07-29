@@ -105,6 +105,24 @@ Item {
                 }
                 width: 150
 
+                style: I2SvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
+
+                    releasedID: "button"
+                    pressedID: releasedID + "-pressed"
+                    disabledID: releasedID + "-disabled"
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+                    labelColorPressed: IngeScapeTheme.blackColor
+                    labelColorReleased: IngeScapeTheme.whiteColor
+                    labelColorDisabled: IngeScapeTheme.lightGreyColor
+
+                }
+
                 onClicked: {
                     console.log("QML: Select directory with platform files...");
 
@@ -240,7 +258,7 @@ Item {
         }
         height: 30
 
-        spacing: 10
+        spacing: 20
 
         Text {
 
@@ -269,6 +287,24 @@ Item {
             }
             width: 120
 
+            style: I2SvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
+
+                releasedID: "button"
+                pressedID: releasedID + "-pressed"
+                disabledID: releasedID + "-disabled"
+
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 16
+                }
+                labelColorPressed: IngeScapeTheme.blackColor
+                labelColorReleased: IngeScapeTheme.whiteColor
+                labelColorDisabled: IngeScapeTheme.lightGreyColor
+
+            }
+
             onClicked: {
                 console.log("QML: Randomize the list of platforms...");
 
@@ -290,6 +326,24 @@ Item {
                 bottom: parent.bottom
             }
             width: 120
+
+            style: I2SvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
+
+                releasedID: "button"
+                pressedID: releasedID + "-pressed"
+                disabledID: releasedID + "-disabled"
+
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 16
+                }
+                labelColorPressed: IngeScapeTheme.blackColor
+                labelColorReleased: IngeScapeTheme.whiteColor
+                labelColorDisabled: IngeScapeTheme.lightGreyColor
+
+            }
 
             onClicked: {
                 console.log("QML: Sort the list of platforms in alphabetical order...");
@@ -350,7 +404,7 @@ Item {
                 opacity: (model.recordState === RecordStates.RECORDED) ? 0.75 : 1.0
                 activeFocusOnPress: true
 
-                text: (model.recordState === RecordStates.RECORDED) ? "Re-load" : "Load"
+                text: (model.recordState === RecordStates.RECORDED) ? "Reload" : "Load"
 
                 style: I2SvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
@@ -378,7 +432,7 @@ Item {
                 }
             }
 
-            Label {
+            /*Label {
                 id: lblIndex
 
                 anchors {
@@ -391,20 +445,23 @@ Item {
                 text: model ? model.currentIndex + " (" + model.indexOfAlphabeticOrder + ")"
                             : ""
 
-                color: IngeScapeTheme.lightGreyColor //(model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
+                color: IngeScapeTheme.lightGreyColor
+                //color: (model.recordState === RecordStates.RECORDED) ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
+
                 font {
                     family: IngeScapeTheme.textFontFamily
                     //weight: Font.Medium
                     pixelSize: 12
                 }
-            }
+            }*/
 
             Label {
                 id: lblName
 
                 anchors {
-                    left: lblIndex.right
-                    //leftMargin: 10
+                    //left: lblIndex.right
+                    left: btnLoad.right
+                    leftMargin: 20
                     verticalCenter: parent.verticalCenter
                 }
                 width: 250
@@ -623,7 +680,7 @@ Item {
 
         width: 400
 
-        confirmationText: "The record will be stopped and the timeline will be reseted.\nDo you want to stop the record?"
+        confirmationText: "The record will be stopped and the timeline will be reset.\nDo you want to stop the record?"
 
         onConfirmed: {
             console.log("QML: Stop record confirmed");
