@@ -524,15 +524,64 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
             color: "#D3D3D3"
             border { width: 3; color: "#606060"; }
 
+            // Fake model with URLs of dropped files to see results in view
+            property var listModel: ListModel {}
+
+            ListView {
+                id: attechementsListView
+
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    right: parent.right
+                }
+
+                height: count * 38
+
+                // Fake model
+                model: dropZone.listModel
+
+                delegate: Rectangle {
+                    id: attachementDelegate
+
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    height: 38
+
+                    color: "#353535"
+
+                    Text {
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        text: model.text
+                        color: "white"
+                    }
+
+                }
+            }
+
             DropArea {
                 id: dropArea
 
                 anchors.fill: parent
 
                 onDropped: {
+                    //FIXME Only accepts URLs but no restrictions on the protocol yet (http://, ftp://, file://, etc.)
                     if (drop.hasUrls && rootItem.recordController)
                     {
                         rootItem.recordController.addNewAttachements(drop.urls)
+
+                        // Populate fake model to see results in view
+                        for (var index in drop.urls)
+                        {
+                            dropZone.listModel.append({"text": drop.urls[index]})
+                        }
                     }
                 }
             }
