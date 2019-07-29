@@ -149,6 +149,47 @@ RecordSetupM* RecordSetupM::createRecordSetupFromCassandraRow(const CassRow* row
     return recordSetup;
 }
 
+/**
+ * @brief Delete the given record setup from Cassandra DB
+ * @param experimentation
+ */
+void RecordSetupM::deleteRecordSetupFromCassandra(const RecordSetupM& recordSetup)
+{
+    if ((recordSetup.subject() != nullptr) && (recordSetup.task() != nullptr))
+    {
+        //TODO Clean-up associations if any ?
+
+        // Delete actual experimentation,
+
+        //FIXME Hard coded record UUID for test purposes
+        CassUuid recordUuid;
+        cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
+
+        const char* query = "DELETE FROM ingescape.record_setup WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;";
+        CassStatement* cassStatement = cass_statement_new(query, 5);
+        cass_statement_bind_uuid(cassStatement, 0, recordSetup.subject()->getExperimentationCassUuid());
+        cass_statement_bind_uuid(cassStatement, 1, recordSetup.subject()->getCassUuid());
+        cass_statement_bind_uuid(cassStatement, 2, recordSetup.task()->getCassUuid());
+        cass_statement_bind_uuid(cassStatement, 3, recordUuid);
+        cass_statement_bind_uuid(cassStatement, 4, recordSetup.getCassUuid());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "Experimentation" << recordSetup.name() << "has been successfully deleted from the DB";
+        }
+        else {
+            qCritical() << "Could not delete the experimentation" << recordSetup.name() << "from the DB:" << cass_error_desc(cassError);
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+    }
+}
+
 
 void RecordSetupM::_onIndependentVariableValueChanged(const QString& key, const QVariant& value)
 {

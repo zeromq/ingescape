@@ -101,6 +101,12 @@ public:
      */
     static RecordSetupM* createRecordSetupFromCassandraRow(const CassRow* row, SubjectM* subject, TaskM* task);
 
+    /**
+     * @brief Delete the given record setup from Cassandra DB
+     * @param experimentation
+     */
+    static void deleteRecordSetupFromCassandra(const RecordSetupM& recordSetup);
+
 private Q_SLOTS:
     void _onIndependentVariableValueChanged(const QString& key, const QVariant& value);
 

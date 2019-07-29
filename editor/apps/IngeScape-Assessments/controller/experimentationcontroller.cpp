@@ -152,6 +152,9 @@ void ExperimentationController::deleteRecordSetup(RecordSetupM* recordSetup)
     {
         qInfo() << "Delete the record" << recordSetup->name() << "of the experimentation" << _currentExperimentation->name();
 
+        // Delete record setup from DB
+        RecordSetupM::deleteRecordSetupFromCassandra(*recordSetup);
+
         // Remove the record from the current experimentation
         _currentExperimentation->removeRecordSetup(recordSetup);
 
@@ -207,6 +210,7 @@ RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString&
         cass_uint32_t yearMonthDay = cass_date_from_epoch(now);
         cass_int64_t timeOfDay = cass_time_from_epoch(now);
 
+        //FIXME Hard coded record UUID for test purposes
         CassUuid recordUuid;
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
