@@ -221,7 +221,7 @@ Item {
         Record.RecordSetupView {
             //id: recordSetupView
 
-            controller: IngeScapeAssessmentsC.experimentationC.recordC
+            recordController: IngeScapeAssessmentsC.experimentationC.recordC
             //modelManager: IngeScapeAssessmentsC.modelManager
 
 

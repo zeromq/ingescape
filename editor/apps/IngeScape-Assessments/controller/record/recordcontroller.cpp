@@ -170,3 +170,15 @@ void RecordController::_onCurrentRecordSetupChanged(RecordSetupM* previousRecord
     }
 }
 
+/**
+ * @brief Adds the given URLs as attachements for this record
+ * @param urlList
+ */
+void RecordController::addNewAttachements(const QList<QUrl>& urlList)
+{
+    for (QUrl url : urlList)
+    {
+        qDebug() << "New attachement:" << url.toString();
+    }
+}
+

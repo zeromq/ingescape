@@ -38,9 +38,9 @@ Item {
     //
     //--------------------------------------------------------
 
-    property RecordController controller: null;
+    property RecordController recordController: null;
 
-    property RecordSetupM recordSetup: controller ? controller.currentRecordSetup : null;
+    property RecordSetupM recordSetup: recordController ? recordController.currentRecordSetup : null;
 
 
 
@@ -252,7 +252,7 @@ Item {
 
             Repeater {
 
-                model: (rootItem.controller && rootItem.controller.scenarioC) ? rootItem.controller.scenarioC.actionsList : null
+                model: (rootItem.recordController && rootItem.recordController.scenarioC) ? rootItem.recordController.scenarioC.actionsList : null
 
                 delegate: MouseArea {
                     id: mouseArea
@@ -268,20 +268,20 @@ Item {
                         anchors.fill: parent
 
                         action: model.QtObject
-                        controller: rootItem.controller
+                        controller: rootItem.recordController
 
                         actionItemIsHovered: mouseArea.containsMouse
                         actionItemIsPressed: mouseArea.pressed
                     }
 
                     onPressed: {
-                        if (rootItem.controller && rootItem.controller.scenarioC)
+                        if (rootItem.recordController && rootItem.recordController.scenarioC)
                         {
-                            if (rootItem.controller.scenarioC.selectedAction === model.QtObject) {
-                                rootItem.controller.scenarioC.selectedAction = null;
+                            if (rootItem.recordController.scenarioC.selectedAction === model.QtObject) {
+                                rootItem.recordController.scenarioC.selectedAction = null;
                             }
                             else {
-                                rootItem.controller.scenarioC.selectedAction = model.QtObject;
+                                rootItem.recordController.scenarioC.selectedAction = model.QtObject;
                             }
                         }
                     }
@@ -510,6 +510,33 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
                 pixelSize: 18
             }
         }
+
+        Rectangle {
+            id: dropZone
+
+            anchors {
+                top: titleAttachments.bottom
+                bottom: parent.bottom
+                left: parent.left
+                right: parent.right
+            }
+
+            color: "#D3D3D3"
+            border { width: 3; color: "#606060"; }
+
+            DropArea {
+                id: dropArea
+
+                anchors.fill: parent
+
+                onDropped: {
+                    if (drop.hasUrls && rootItem.recordController)
+                    {
+                        rootItem.recordController.addNewAttachements(drop.urls)
+                    }
+                }
+            }
+        }
     }
 
 
@@ -526,7 +553,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
         }
         height: 0
 
-        scenarioController: rootItem.controller ? rootItem.controller.scenarioC : null;
-        timeLineController: rootItem.controller ? rootItem.controller.timeLineC : null;
+        scenarioController: rootItem.recordController ? rootItem.recordController.scenarioC : null;
+        timeLineController: rootItem.recordController ? rootItem.recordController.timeLineC : null;
     }
 }

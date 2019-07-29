@@ -57,8 +57,11 @@ public:
      */
     ~RecordController();
 
-
-Q_SIGNALS:
+    /**
+     * @brief Adds the given URLs as attachements for this record
+     * @param urlList
+     */
+    Q_INVOKABLE void addNewAttachements(const QList<QUrl>& urlList);
 
 
 private Q_SLOTS:
