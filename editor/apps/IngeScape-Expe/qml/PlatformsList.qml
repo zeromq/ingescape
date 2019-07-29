@@ -523,8 +523,16 @@ Item {
 
                         if (btnPlayOrPauseTL.checked)
                         {
-                            // Play the TimeLine
-                            IngeScapeExpeC.playTimeLine(checkBoxWithRecord.checked);
+                            if (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isRecorderON && checkBoxWithRecord.checked)
+                            {
+                                // Play the TimeLine and Record
+                                IngeScapeExpeC.playTimeLine(true);
+                            }
+                            else
+                            {
+                                // Play only the TimeLine (no record)
+                                IngeScapeExpeC.playTimeLine(false);
+                            }
                         }
                         else
                         {
@@ -553,6 +561,7 @@ Item {
 
                     checked: true
 
+                    visible: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isRecorderON && (model.recordState !== RecordStates.RECORDING)
                     enabled: (IngeScapeExpeC.timeLineState === TimeLineStates.STOPPED)
 
                     style: CheckBoxStyle {
@@ -590,6 +599,50 @@ Item {
                     }
                 }
 
+                Label {
+                    id: lblWarningNoRecorder
+
+                    anchors {
+                        right: parent.right
+                        rightMargin: 100
+                        verticalCenter: parent.verticalCenter
+                    }
+                    width: 90
+
+                    visible: IngeScapeExpeC.modelManager && !IngeScapeExpeC.modelManager.isRecorderON
+
+                    text: "Record unavailable"
+
+                    //color: IngeScapeTheme.redColor
+                    color: IngeScapeTheme.lightGreyColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        pixelSize: 16
+                    }
+                }
+
+                Label {
+                    id: lblRecording
+
+                    anchors {
+                        right: parent.right
+                        rightMargin: 90
+                        verticalCenter: parent.verticalCenter
+                    }
+                    width: 90
+
+                    visible: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isRecorderON && (model.recordState === RecordStates.RECORDING)
+
+                    text: "Recording..."
+
+                    //color: IngeScapeTheme.redColor
+                    color: IngeScapeTheme.lightGreyColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        pixelSize: 16
+                    }
+                }
+
                 Rectangle {
                     id: feedbackRecording
 
@@ -602,7 +655,7 @@ Item {
                     height: 20
                     radius: 10
 
-                    visible: (model.recordState === RecordStates.RECORDING)
+                    visible: IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isRecorderON && (model.recordState === RecordStates.RECORDING)
                     opacity: 1.0
 
                     color: IngeScapeTheme.redColor
