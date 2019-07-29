@@ -89,7 +89,7 @@ Item {
         color: IngeScapeTheme.veryLightGreyColor
     }
 
-    Text {
+    Item {
         id: title
 
         anchors {
@@ -98,13 +98,83 @@ Item {
             horizontalCenter: parent.horizontalCenter
         }
 
-        text: "Experimentations"
+        Rectangle {
+            anchors.fill: parent
+            border { color: "black"; width: 1; }
+            color: "transparent"
+        }
 
-        color: IngeScapeTheme.blackColor
-        font {
-            family: IngeScapeTheme.headingFont
-            weight : Font.Medium
-            pixelSize : 20
+        width: childrenRect.width
+        height: childrenRect.height
+
+        Row {
+            id: titleRow
+            spacing: 15
+            Row {
+                id: ingeRow
+                spacing: 0
+                Text {
+                    id: ingeText
+                    text: "INGE"
+
+                    color: "#666666" //FIXME Move to theme
+
+                    verticalAlignment: Text.AlignBottom
+
+                    font {
+                        family: IngeScapeTheme.loadingFontFamily
+                        pixelSize: 54
+                    }
+                }
+
+                Text {
+                    text: "SCAPE"
+
+                    color: "#999999" //FIXME Move to theme
+                    verticalAlignment: Text.AlignBottom
+
+                    font {
+                        family: IngeScapeTheme.loadingFontFamily
+                        pixelSize: 54
+                    }
+                }
+            }
+
+            Text {
+                anchors {
+                    leftMargin: 15
+                    top: ingeRow.top
+                    topMargin: 14
+
+                }
+
+                text: "ASSESSMENTS"
+                verticalAlignment: Text.AlignBottom
+
+                color: "#999999" //FIXME Move to theme
+
+                font {
+                    family: IngeScapeTheme.loadingFontFamily
+                    pixelSize: 36
+                }
+            }
+        }
+
+        Text {
+            anchors {
+                top: titleRow.bottom
+                topMargin: 24
+                horizontalCenter: titleRow.horizontalCenter
+            }
+
+            text: "FOR ERGONOMICS & HUMAN FACTORS"
+
+            color: "#B3B3B3" //FIXME Move to theme
+
+            font {
+                family: IngeScapeTheme.loadingFontFamily
+                pixelSize: 24
+            }
         }
     }
 
