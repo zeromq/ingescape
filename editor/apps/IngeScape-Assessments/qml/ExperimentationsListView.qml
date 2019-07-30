@@ -98,12 +98,6 @@ Item {
             horizontalCenter: parent.horizontalCenter
         }
 
-        Rectangle {
-            anchors.fill: parent
-            border { color: "black"; width: 1; }
-            color: "transparent"
-        }
-
         width: childrenRect.width
         height: childrenRect.height
 
@@ -117,7 +111,7 @@ Item {
                     id: ingeText
                     text: "INGE"
 
-                    color: "#666666" //FIXME Move to theme
+                    color: IngeScapeAssessmentsTheme.ingescapeTitleDarkGrey
 
                     verticalAlignment: Text.AlignBottom
 
@@ -130,7 +124,7 @@ Item {
                 Text {
                     text: "SCAPE"
 
-                    color: "#999999" //FIXME Move to theme
+                    color: IngeScapeAssessmentsTheme.ingescapeTitleMediumGrey
                     verticalAlignment: Text.AlignBottom
 
                     font {
@@ -151,7 +145,7 @@ Item {
                 text: "ASSESSMENTS"
                 verticalAlignment: Text.AlignBottom
 
-                color: "#999999" //FIXME Move to theme
+                color: IngeScapeAssessmentsTheme.ingescapeTitleMediumGrey
 
                 font {
                     family: IngeScapeTheme.loadingFontFamily
@@ -169,7 +163,7 @@ Item {
 
             text: "FOR ERGONOMICS & HUMAN FACTORS"
 
-            color: "#B3B3B3" //FIXME Move to theme
+            color: IngeScapeAssessmentsTheme.ingescapeTitleLightGrey
 
             font {
                 family: IngeScapeTheme.loadingFontFamily

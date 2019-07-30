@@ -63,6 +63,9 @@ Item {
     readonly property color darkBlueHeader: "#38444F"
     readonly property color blueButton: "#007b90"
     readonly property color blueButton_pressed: "#239eb3"
+    readonly property color ingescapeTitleDarkGrey: "#666666"
+    readonly property color ingescapeTitleMediumGrey: "#999999"
+    readonly property color ingescapeTitleLightGrey: "#B3B3B3"
 
 
 
