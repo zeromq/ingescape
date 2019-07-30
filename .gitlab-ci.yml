@@ -297,7 +297,7 @@ lib-windows-release-x64:
   stage: build-lib
   tags:
     - windows
-    - 1
+    - "1"
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
   script:
@@ -319,7 +319,7 @@ lib-windows-release-x86:
   stage: build-lib
   tags:
     - windows
-    - 2
+    - "2"
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
   script:
@@ -341,7 +341,7 @@ lib-windows-debug-x64:
   stage: build-lib
   tags:
     - windows
-    - 1
+    - "1"
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
   script:
@@ -363,7 +363,7 @@ lib-windows-debug-x86:
   stage: build-lib
   tags:
     - windows
-    - 2
+    - "2"
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
   script:
@@ -388,7 +388,7 @@ editor-windows-release-x86:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
   tags:
     - windows
-    - 2
+    - "2"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -411,7 +411,7 @@ editor-windows-release-x64:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
   tags:
     - windows
-    - 1
+    - "1"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -435,7 +435,7 @@ assessments-windows-release-x86:
     GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - windows
-    - 2
+    - "2"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -459,7 +459,7 @@ assessments-windows-release-x64:
     GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - windows
-    - 1
+    - "1"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -483,7 +483,7 @@ expe-windows-release-x86:
     GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - windows
-    - 2
+    - "2"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -507,7 +507,7 @@ expe-windows-release-x64:
     GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - windows
-    - 1
+    - "1"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -527,7 +527,7 @@ lib-installer-runtime-windows-x86:
   stage: installer-lib
   tags:
     - windows
-    - 2
+    - "2"
   script:
     - cd build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..
   artifacts:
@@ -544,7 +544,7 @@ lib-installer-runtime-windows-x64:
   stage: installer-lib
   tags:
     - windows
-    - 1
+    - "1"
   script:
     - cd build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..
   artifacts:
@@ -596,7 +596,7 @@ editor-installer-windows-x86:
   stage: installer-apps
   tags:
     - windows
-    - 2
+    - "2"
   script:
     - cd editor\apps\IngeScape-Editor\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
@@ -612,7 +612,7 @@ editor-installer-windows-x64:
   stage: installer-apps
   tags:
     - windows
-    - 1
+    - "1"
   script:
     - cd editor\apps\IngeScape-Editor\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
@@ -644,7 +644,7 @@ assessments-installer-windows-x86:
   stage: installer-apps
   tags:
     - windows
-    - 2
+    - "2"
   script:
     - cd editor\apps\IngeScape-Assessments\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
@@ -660,7 +660,7 @@ assessments-installer-windows-x64:
   stage: installer-apps
   tags:
     - windows
-    - 1
+    - "1"
   script:
     - cd editor\apps\IngeScape-Assessments\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
@@ -692,7 +692,7 @@ expe-installer-windows-x86:
   stage: installer-apps
   tags:
     - windows
-    - 2
+    - "2"
   script:
     - cd editor\apps\IngeScape-Expe\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
@@ -708,7 +708,7 @@ expe-installer-windows-x64:
   stage: installer-apps
   tags:
     - windows
-    - 1
+    - "1"
   script:
     - cd editor\apps\IngeScape-Expe\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
