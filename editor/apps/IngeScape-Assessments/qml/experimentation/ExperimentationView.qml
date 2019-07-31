@@ -154,8 +154,8 @@ Item {
                 height: 30
 
                 //FIXME Edition picto
-                style: IngeScapeAssessmentsButtonStyle {
-                    text: "E"
+                style: IngeScapeAssessmentsSvgButtonStyle {
+                    releasedID: "edit"
                 }
 
                 onClicked: {
