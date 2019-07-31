@@ -101,8 +101,26 @@ Item {
         width: childrenRect.width
         height: childrenRect.height
 
+        I2SvgItem {
+            id: logo
+
+            anchors {
+                top: parent.top
+                horizontalCenter: parent.horizontalCenter
+            }
+
+            svgFileCache: IngeScapeAssessmentsTheme.svgFileIngeScapeAssessments
+            svgElementId: "logo-home"
+        }
+
         Row {
             id: titleRow
+            anchors {
+                top: logo.bottom
+                topMargin: 36
+                horizontalCenter: parent.horizontalCenter
+            }
+
             spacing: 15
             Row {
                 id: ingeRow
