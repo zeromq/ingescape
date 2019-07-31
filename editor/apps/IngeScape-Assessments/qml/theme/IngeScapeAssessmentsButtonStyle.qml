@@ -22,7 +22,7 @@ import INGESCAPE 1.0
 ButtonStyle {
     id: root
     property string text: "BUTTON"
-    property int pixelSize: 18
+    property int pixelSize: 20
 
     label: Text {
         id: labelText
@@ -31,7 +31,6 @@ ButtonStyle {
         horizontalAlignment: Text.AlignHCenter
         color: IngeScapeTheme.whiteColor
 
-        //FIXME derived from headerFont
         font {
             family: IngeScapeTheme.labelFontFamily
             pixelSize: root.pixelSize
@@ -40,7 +39,7 @@ ButtonStyle {
     }
 
     background: Rectangle {
-        color: control.pressed ? IngeScapeAssessmentsTheme.blueButton_pressed : IngeScapeAssessmentsTheme.blueButton
+        color: control.pressed ? IngeScapeAssessmentsTheme.blueButton_pressed : (control.hovered ? IngeScapeAssessmentsTheme.blueButton_rollover : IngeScapeAssessmentsTheme.blueButton)
         radius: 5
     }
 }

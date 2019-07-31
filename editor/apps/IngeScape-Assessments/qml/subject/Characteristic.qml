@@ -126,7 +126,10 @@ Item {
 
         property bool containsMouse: __behavior.containsMouse
 
-        text: "DEL"
+
+        style: IngeScapeAssessmentsSvgButtonStyle {
+            releasedID: "delete"
+        }
 
         opacity: rootItem.modelM && !rootItem.modelM.isSubjectId && rootItem.isMouseHovering ? 1 : 0
         enabled: opacity > 0
@@ -134,8 +137,6 @@ Item {
         onClicked: {
             if (rootItem.modelM)
             {
-                //console.log("QML: Delete Characteristic " + rootItem.modelM.name);
-
                 // Emit the signal "Delete Characteristic"
                 rootItem.deleteCharacteristic();
             }

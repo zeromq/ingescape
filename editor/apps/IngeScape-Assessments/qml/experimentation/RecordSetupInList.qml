@@ -197,32 +197,13 @@ Rectangle {
         }
         height: parent.height
 
-        //visible: mouseAreaRecord.containsMouse
-
         Button {
             id: btnDelete
 
             anchors.verticalCenter: parent.verticalCenter
 
-            //FIXME replace with trash can picto
-            style: ButtonStyle {
-                label: Text {
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    color: IngeScapeTheme.whiteColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        //weight: Font.Medium
-                        pixelSize: 14
-                        bold: true
-                    }
-                    text: "DEL"
-                }
-
-                background: Rectangle {
-                    color: btnDelete.hovered ? IngeScapeAssessmentsTheme.blueButton_pressed : IngeScapeAssessmentsTheme.blueButton
-                    radius: 5
-                }
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "delete-blue"
             }
 
             width: 40
@@ -245,7 +226,6 @@ Rectangle {
                 rootItem.openRecordSetup();
             }
 
-            //FIXME correct font
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OPEN"
             }

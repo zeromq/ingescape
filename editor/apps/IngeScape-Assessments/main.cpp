@@ -180,6 +180,7 @@ void registerCustomQmlTypes()
 
     // - Button Style
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsButtonStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsButtonStyle");
+    qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsSvgButtonStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsSvgButtonStyle");
 
     // - List Header
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsListHeader.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsListHeader");

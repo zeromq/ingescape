@@ -304,8 +304,8 @@ Rectangle {
             opacity: rootItem.isMouseHovering && !rootItem.subjectEditionInProgress ? 1 : 0
             enabled: opacity > 0
 
-            style: IngeScapeAssessmentsButtonStyle {
-                text: "D"
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "delete-blue"
             }
 
             onClicked: {
@@ -323,8 +323,8 @@ Rectangle {
             opacity: rootItem.isMouseHovering && !rootItem.subjectEditionInProgress ? 1 : 0
             enabled: opacity > 0
 
-            style: IngeScapeAssessmentsButtonStyle {
-                text: "E"
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "edit"
             }
 
             onClicked: {

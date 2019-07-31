@@ -60,12 +60,17 @@ Item {
     //
     //-----------------------------------------
 
-    readonly property color darkBlueHeader: "#38444F"
-    readonly property color blueButton: "#007b90"
-    readonly property color blueButton_pressed: "#239eb3"
+    readonly property color darkBlueHeader: "#434B57"
+
+    readonly property color blueButton: "#0F8598"
+    readonly property color blueButton_pressed: "#13AEC7"
+    readonly property color blueButton_disabled: "#CBCBCA"
+    readonly property color blueButton_rollover: "#0A5A66"
+
     readonly property color ingescapeTitleDarkGrey: "#666666"
     readonly property color ingescapeTitleMediumGrey: "#999999"
     readonly property color ingescapeTitleLightGrey: "#B3B3B3"
+
 
 
 
