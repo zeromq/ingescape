@@ -368,6 +368,7 @@ Item {
 
                             style: IngeScapeAssessmentsSvgButtonStyle {
                                 releasedID: "delete-blue"
+                                disabledID: releasedID
                             }
 
                             width: 40

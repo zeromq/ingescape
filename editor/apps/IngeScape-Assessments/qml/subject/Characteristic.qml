@@ -129,6 +129,7 @@ Item {
 
         style: IngeScapeAssessmentsSvgButtonStyle {
             releasedID: "delete"
+            disabledID: releasedID
         }
 
         opacity: rootItem.modelM && !rootItem.modelM.isSubjectId && rootItem.isMouseHovering ? 1 : 0

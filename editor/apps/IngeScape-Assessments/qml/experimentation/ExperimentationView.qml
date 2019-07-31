@@ -155,6 +155,7 @@ Item {
 
                 style: IngeScapeAssessmentsSvgButtonStyle {
                     releasedID: "edit"
+                    disabledID: releasedID
                 }
 
                 onClicked: {

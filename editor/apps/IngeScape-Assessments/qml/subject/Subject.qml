@@ -281,6 +281,7 @@ Rectangle {
 
             style: IngeScapeAssessmentsSvgButtonStyle {
                 releasedID: "cancel-edition"
+                disabledID: releasedID
             }
 
             onClicked: {
@@ -310,6 +311,7 @@ Rectangle {
 
             style: IngeScapeAssessmentsSvgButtonStyle {
                 releasedID: "delete-blue"
+                disabledID: releasedID
             }
 
             onClicked: {
@@ -329,6 +331,7 @@ Rectangle {
 
             style: IngeScapeAssessmentsSvgButtonStyle {
                 releasedID: "edit"
+                disabledID: releasedID
             }
 
             onClicked: {
