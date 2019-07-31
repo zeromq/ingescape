@@ -269,14 +269,19 @@ Rectangle {
 
         Button {
             id: cancelEditionSubjectButton
-            height: 30
-            width: 40
+            anchors {
+                verticalCenter: parent.verticalCenter
+            }
+
+            height: 18
+            width: 18
 
             opacity: rootItem.isCurrentlyEditing ? 1 : 0
             enabled: opacity > 0
 
-            style: IngeScapeAssessmentsButtonStyle {
-                text: "C"
+            // FIXME Name in SVG is wrong
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "cancel-edition"
             }
 
             onClicked: {
