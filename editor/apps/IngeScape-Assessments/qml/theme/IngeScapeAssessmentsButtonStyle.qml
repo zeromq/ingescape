@@ -39,7 +39,7 @@ ButtonStyle {
     }
 
     background: Rectangle {
-        color: control.pressed ? IngeScapeAssessmentsTheme.blueButton_pressed : (control.hovered ? IngeScapeAssessmentsTheme.blueButton_rollover : IngeScapeAssessmentsTheme.blueButton)
+        color: control.enabled ? (control.pressed ? IngeScapeAssessmentsTheme.blueButton_pressed : (control.hovered ? IngeScapeAssessmentsTheme.blueButton_rollover : IngeScapeAssessmentsTheme.blueButton)) : IngeScapeAssessmentsTheme.blueButton_disabled
         radius: 5
     }
 }

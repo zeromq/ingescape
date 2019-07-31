@@ -382,8 +382,13 @@ Item {
                         width: parent.width
                         height: 62
 
-                        style: IngeScapeAssessmentsButtonStyle {
+                        style: IngeScapeAssessmentsSvgAndTextButtonStyle {
                             text: "SUBJECTS"
+
+                            releasedID: "subjects"
+                            pressedID: releasedID
+                            rolloverID: releasedID
+                            disabledID: releasedID
                         }
 
                         onClicked: {
@@ -398,8 +403,13 @@ Item {
                         width: parent.width
                         height: 62
 
-                        style: IngeScapeAssessmentsButtonStyle {
+                        style: IngeScapeAssessmentsSvgAndTextButtonStyle {
                             text: "TASKS"
+
+                            releasedID: "tasks"
+                            pressedID: releasedID
+                            rolloverID: releasedID
+                            disabledID: releasedID
                         }
 
                         onClicked: {
@@ -416,8 +426,13 @@ Item {
 
                         enabled: false
 
-                        style: IngeScapeAssessmentsButtonStyle {
+                        style: IngeScapeAssessmentsSvgAndTextButtonStyle {
                             text: "CODING"
+
+                            releasedID: "coding"
+                            pressedID: releasedID
+                            rolloverID: releasedID
+                            disabledID: releasedID
                         }
                     }
 
@@ -427,8 +442,13 @@ Item {
 
                         enabled: false
 
-                        style: IngeScapeAssessmentsButtonStyle {
+                        style: IngeScapeAssessmentsSvgAndTextButtonStyle {
                             text: "CLEANING"
+
+                            releasedID: "cleaning"
+                            pressedID: releasedID
+                            rolloverID: releasedID
+                            disabledID: releasedID
                         }
                     }
 
@@ -436,8 +456,13 @@ Item {
                         width: parent.width
                         height: 62
 
-                        style: IngeScapeAssessmentsButtonStyle {
+                        style: IngeScapeAssessmentsSvgAndTextButtonStyle {
                             text: "EXPORT"
+
+                            releasedID: "export"
+                            pressedID: releasedID
+                            rolloverID: releasedID
+                            disabledID: releasedID
                         }
 
                         onClicked: {
