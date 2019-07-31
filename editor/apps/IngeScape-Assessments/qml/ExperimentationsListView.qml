@@ -390,7 +390,6 @@ Item {
                                 rootItem.openExperimentation(rootExperimentation.experimentation)
                             }
 
-                            //FIXME correct font
                             style: IngeScapeAssessmentsButtonStyle {
                                 text: "OPEN"
                             }

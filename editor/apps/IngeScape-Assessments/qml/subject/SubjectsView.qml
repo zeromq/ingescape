@@ -157,7 +157,6 @@ Item {
                 createCharacteristicPopup.open();
             }
 
-            //FIXME correct font
             style: IngeScapeAssessmentsButtonStyle {
                 text: qsTr("ADD NEW")
             }
@@ -268,7 +267,6 @@ Item {
                 console.log("Not implemented yet")
             }
 
-            //FIXME correct font
             style: IngeScapeAssessmentsButtonStyle {
                 text: qsTr("DOWNLOAD LIST")
             }
@@ -293,7 +291,6 @@ Item {
                 }
             }
 
-            //FIXME correct font
             style: IngeScapeAssessmentsButtonStyle {
                 text: qsTr("NEW SUBJECT")
             }

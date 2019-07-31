@@ -60,7 +60,9 @@ Item {
     //
     //-----------------------------------------
 
-    readonly property color darkBlueHeader: "#434B57"
+    readonly property color lighterDarkBlueHeader: "#707D91"
+    readonly property color regularDarkBlueHeader: "#434B57"
+    readonly property color darkerDarkBlueHeader: "#2D333B"
 
     readonly property color blueButton: "#0F8598"
     readonly property color blueButton_pressed: "#13AEC7"

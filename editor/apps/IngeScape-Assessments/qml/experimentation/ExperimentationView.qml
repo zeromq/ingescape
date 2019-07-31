@@ -153,7 +153,6 @@ Item {
                 width: 42
                 height: 30
 
-                //FIXME Edition picto
                 style: IngeScapeAssessmentsSvgButtonStyle {
                     releasedID: "edit"
                 }
@@ -530,7 +529,6 @@ Item {
                         createRecordPopup.open();
                     }
 
-                    //FIXME correct font
                     style: IngeScapeAssessmentsButtonStyle {
                         text: qsTr("NEW RECORD")
                     }

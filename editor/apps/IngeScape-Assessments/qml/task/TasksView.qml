@@ -106,13 +106,14 @@ Item {
             right: parent.right
             top: parent.top
         }
-        height: 30
+        height: 18
+        width: 18
 
-        text: "X"
+        style: IngeScapeAssessmentsSvgButtonStyle {
+            releasedID: "close"
+        }
 
         onClicked: {
-            //console.log("QML: close Tasks view");
-
             if (controller) {
                 controller.selectedTask = null;
             }
@@ -122,23 +123,28 @@ Item {
         }
     }
 
-    Row {
-        id: header
+    Item {
+        id: leftPart
 
         anchors {
-            left: parent.left
-            leftMargin: 10
             top: parent.top
-            topMargin: 10
+            topMargin: 24
+            left: parent.left
+            bottom: parent.bottom
         }
-        height: 30
 
-        spacing: 20
+        width: 340
 
         Text {
-            id: title
+            id: titleCharacteristics
 
-            text: "Tasks"
+            anchors {
+                verticalCenter: btnNewTask.verticalCenter
+                left: parent.left
+                leftMargin: 28
+            }
+
+            text: qsTr("TASKS")
 
             height: parent.height
             verticalAlignment: Text.AlignVCenter
@@ -152,15 +158,84 @@ Item {
         }
 
         Button {
-            text: "New Task"
+            id: btnNewTask
 
-            height: parent.height
+            anchors {
+                top: parent.top
+                right: parent.right
+            }
+
+            height: 40
+            width: 134
 
             onClicked: {
-                //console.log("QML: New Task");
-
                 // Open the popup
                 createTaskPopup.open();
+            }
+
+            style: IngeScapeAssessmentsButtonStyle {
+                text: qsTr("ADD NEW")
+            }
+        }
+
+        Rectangle {
+            id: topSeparator
+            anchors {
+                bottom: taskList.top
+                left: parent.left
+                right: parent.right
+            }
+
+            height: 1
+            color: IngeScapeTheme.blackColor
+        }
+
+        ListView {
+            id: taskList
+
+            anchors {
+                top: btnNewTask.bottom
+                topMargin: 14
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+
+            model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
+
+            delegate: TaskInList {
+
+                modelM: model.QtObject
+
+                isSelected: rootItem.controller && rootItem.controller.selectedTask && (modelM === rootItem.controller.selectedTask)
+
+
+                //
+                // Slots
+                //
+                onSelectTask: {
+                    if (rootItem.controller)
+                    {
+                        // First, select the task
+                        rootItem.controller.selectedTask = model.QtObject;
+                    }
+                }
+
+                onDeleteTask: {
+                    if (rootItem.controller)
+                    {
+                        // Delete the task
+                        rootItem.controller.deleteTask(model.QtObject);
+                    }
+                }
+
+                onDuplicateTask: {
+                    if (rootItem.controller)
+                    {
+                        // Duplicate the task
+                        rootItem.controller.duplicateTask(model.QtObject);
+                    }
+                }
             }
         }
     }
@@ -238,7 +313,7 @@ Item {
         id: task
 
         anchors {
-            top: header.bottom
+            top: parent.top
             topMargin: 20
             bottom: parent.bottom
             bottomMargin: 5

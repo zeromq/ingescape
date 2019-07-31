@@ -279,7 +279,6 @@ Rectangle {
             opacity: rootItem.isCurrentlyEditing ? 1 : 0
             enabled: opacity > 0
 
-            // FIXME Name in SVG is wrong
             style: IngeScapeAssessmentsSvgButtonStyle {
                 releasedID: "cancel-edition"
             }

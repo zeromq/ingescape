@@ -88,34 +88,11 @@ Item {
     Rectangle {
         id: background
 
-        anchors.fill: parent
+        width: parent.width
+        height: 96
 
-        color: rootItem.isSelected ? "lightsteelblue" : "transparent"
+        color: rootItem.isSelected ? IngeScapeTheme.veryLightGreyColor : IngeScapeAssessmentsTheme.darkerDarkBlueHeader
 
-        Rectangle {
-            id: leftBorder
-
-            anchors {
-                left: parent.left
-                top: parent.top
-                bottom: parent.bottom
-            }
-            width: 1
-
-            color: IngeScapeTheme.darkGreyColor
-        }
-        Rectangle {
-            id: topBorder
-
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.top
-            }
-            height: 1
-
-            color: IngeScapeTheme.darkGreyColor
-        }
         Rectangle {
             id: bottomBorder
 
@@ -126,52 +103,43 @@ Item {
             }
             height: 1
 
-            color: IngeScapeTheme.darkGreyColor
+            color: IngeScapeTheme.blackColor
         }
 
-        Text {
-            id: txtTaskName
-
+        Column {
             anchors {
+                verticalCenter: parent.verticalCenter
                 left: parent.left
-                leftMargin: 5
-                top: parent.top
-                topMargin: 5
+                leftMargin: 28
             }
 
-            text: rootItem.modelM ? rootItem.modelM.name : ""
+            spacing: 6
 
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 16
-            }
-        }
+            Text {
+                text: rootItem.modelM ? rootItem.modelM.name : ""
 
-        Text {
-            id: txtPlatformFile
+                color: rootItem.isSelected ? IngeScapeAssessmentsTheme.darkerDarkBlueHeader : IngeScapeTheme.whiteColor
 
-            anchors {
-                left: parent.left
-                leftMargin: 5
-                bottom: parent.bottom
-                bottomMargin: 5
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Medium
+                    pixelSize: 20
+                }
             }
 
-            text: rootItem.modelM ? "Platform: " + rootItem.modelM.platformFileName
-                                  : ""
+            Text {
+                text: rootItem.modelM ? "Platform: " + rootItem.modelM.platformFileName : ""
 
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                //weight: Font.Medium
-                pixelSize: 14
+                color: IngeScapeTheme.lightGreyColor
+
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    pixelSize: 18
+                }
             }
         }
 
         MouseArea {
-
             anchors.fill: parent
 
             onClicked: {
@@ -181,44 +149,49 @@ Item {
         }
 
 
-        Row {
-            id: rowOptions
-
-            spacing: 0
+        Column {
+            id: buttonRow
 
             anchors {
                 right: parent.right
+                rightMargin: 12
                 top: parent.top
+                topMargin: 14
             }
-            height: 30
+
+            spacing: 8
 
             visible: rootItem.isSelected
 
             Button {
                 id: btnDuplicate
 
-                text: "COPY"
+                width: 41
+                height: 30
 
-                //width: 80
-                height: parent.height
+                style: IngeScapeAssessmentsSvgButtonStyle {
+                    releasedID: "delete"
+                }
 
                 onClicked: {
-                    // Emit the signal "Duplicate Task"
-                    rootItem.duplicateTask();
+                    // Emit the signal "Delete Task"
+                    rootItem.deleteTask();
                 }
             }
 
             Button {
                 id: btnDelete
 
-                text: "DEL"
+                width: 41
+                height: 30
 
-                //width: 50
-                height: parent.height
+                style: IngeScapeAssessmentsSvgButtonStyle {
+                    releasedID: "duplicate"
+                }
 
                 onClicked: {
-                    // Emit the signal "Delete Task"
-                    rootItem.deleteTask();
+                    // Emit the signal "Duplicate Task"
+                    rootItem.duplicateTask();
                 }
             }
         }
