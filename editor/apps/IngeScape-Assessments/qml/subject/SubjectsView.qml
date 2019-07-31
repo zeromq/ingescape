@@ -221,6 +221,7 @@ Item {
 
     // Subjects
     Item {
+        id: subjectsItem
         anchors {
             top: parent.top
             topMargin: 80
@@ -228,6 +229,8 @@ Item {
             leftMargin: 26
             right: parent.right
             rightMargin: 26
+            bottom: parent.bottom
+            bottomMargin: 24
         }
 
         Text {
@@ -346,46 +349,53 @@ Item {
 
             color: IngeScapeTheme.whiteColor
 
-            Column {
+            ListView {
                 id: subjectsColumn
                 anchors.fill: parent
-                spacing: 0
 
-                Repeater {
-                    model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+                model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
-                    delegate: Subject {
-                        id: subjectDelegate
+                delegate: Subject {
+                    id: subjectDelegate
 
-                        height: 40
+                    height: 40
+                    width: subjectsColumn.width
 
-                        anchors {
-                            left: parent.left
-                            right: parent.right
+                    experimentation: rootItem.experimentation
+                    subject: model ? model.QtObject : null
+
+                    characteristicValueColumnWidth: rootItem.characteristicValueColumnWidth
+                    subjectEditionInProgress: rootItem.subjectEditionInProgress
+
+                    Binding {
+                        target: rootItem
+                        property: "subjectEditionInProgress"
+                        value: subjectDelegate.isCurrentlyEditing
+                    }
+
+                    onDeleteSubject: {
+                        if (rootItem.controller && subjectDelegate.subject)
+                        {
+                            subjectDelegate.isCurrentlyEditing = false
+                            rootItem.controller.deleteSubject(subjectDelegate.subject);
                         }
 
-                        experimentation: rootItem.experimentation
-                        subject: model ? model.QtObject : null
-
-                        characteristicValueColumnWidth: rootItem.characteristicValueColumnWidth
-                        subjectEditionInProgress: rootItem.subjectEditionInProgress
-
-                        Binding {
-                            target: rootItem
-                            property: "subjectEditionInProgress"
-                            value: subjectDelegate.isCurrentlyEditing
-                        }
-
-                        onDeleteSubject: {
-                            if (rootItem.controller && subjectDelegate.subject)
-                            {
-                                subjectDelegate.isCurrentlyEditing = false
-                                rootItem.controller.deleteSubject(subjectDelegate.subject);
-                            }
-
-                        }
                     }
                 }
+            }
+        }
+
+        Rectangle {
+            id: subjectsBottomShadow
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+            height: 4
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
+                GradientStop { position: 1.0; color: IngeScapeTheme.darkGreyColor; }
             }
         }
     }
