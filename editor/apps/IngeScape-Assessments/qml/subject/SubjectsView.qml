@@ -93,10 +93,12 @@ Item {
             rightMargin: 21
         }
 
-        height: 40
-        width: 40
+        height: 18
+        width: 18
 
-        text: "X"
+        style: IngeScapeAssessmentsSvgButtonStyle {
+            releasedID: "close"
+        }
 
         onClicked: {
             // Emit the signal "closeSubjectsView"

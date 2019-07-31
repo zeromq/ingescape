@@ -100,7 +100,9 @@ Item {
             height: 42
             width: 42
 
-            text: "<--"
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "home-button"
+            }
 
             onClicked: {
                 console.log("QML: Go back to 'Home'");
