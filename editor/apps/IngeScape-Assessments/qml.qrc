@@ -29,6 +29,6 @@
         <file>qml/theme/IngeScapeAssessmentsButtonStyle.qml</file>
         <file>qml/theme/IngeScapeAssessmentsListHeader.qml</file>
         <file>qml/subject/Subject.qml</file>
-        <file>resources/SVG/ingescape_assesments-pictos-SVG.svg</file>
+        <file>resources/SVG/ingescape_assessments-pictos-SVG.svg</file>
     </qresource>
 </RCC>

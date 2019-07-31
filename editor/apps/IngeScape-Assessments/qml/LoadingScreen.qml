@@ -51,61 +51,15 @@ Item {
 
         anchors.centerIn: parent
 
-        width: 297
-        height: 297
+        width: 244
+        height: 244
 
-
-        Rectangle {
-            id: logoBackground
-
-            anchors.centerIn: parent
-
-            width: 218
-            height: width
-            radius: width/2
-
-            color: "transparent"
-
-            border {
-                color: "white"
-                width: 2
-            }
-        }
-
-        /*I2SvgItem {
+        I2SvgItem {
             id: logo
 
-            svgFileCache: IngeScapeTheme.svgFileIngeScape
-            svgElementId: "loader-ingescape"
-        }*/
-
-        Item {
-            id: logo
-
-            anchors {
-                left: parent.horizontalCenter
-                verticalCenter: parent.verticalCenter
-            }
-
-            transformOrigin: Item.Left
-
-            width: logoBackground.width/2 + height/2
-            height: 30
-
-            Rectangle {
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    right: parent.right
-                }
-
-                width: height
-                radius: width/2
-
-                color: "white"
-            }
+            svgFileCache: IngeScapeAssessmentsTheme.svgFileIngeScapeAssessments
+            svgElementId: "logo-loader"
         }
-
 
         RotationAnimator {
             target: logo
@@ -117,8 +71,6 @@ Item {
             loops: Animation.Infinite
             running: root.visible
         }
-
-
     }
 
 
