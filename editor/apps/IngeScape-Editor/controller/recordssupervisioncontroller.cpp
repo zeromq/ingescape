@@ -35,7 +35,7 @@ RecordsSupervisionController::RecordsSupervisionController(EditorModelManager* m
     _isRecorderON(false),
     _selectedRecord(nullptr),
     _isRecording(false),
-    _isRecordingTimeLine(false),
+    //_isRecordingTimeLine(false),
     _replayState(ReplayStates::UNLOADED),
     _currentReplay(nullptr),
     _currentRecordTime(QDateTime(QDate::currentDate())),
@@ -114,13 +114,15 @@ void RecordsSupervisionController::setselectedRecord(RecordVM *value)
  */
 void RecordsSupervisionController::startOrStopToRecord(bool withTimeLine)
 {
+    Q_UNUSED(withTimeLine)
+
     if (_isRecorderON)
     {
         // Stop to record
         if (_isRecording)
         {
             // Update the flag
-            setisRecordingTimeLine(false);
+            //setisRecordingTimeLine(false);
 
             Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, command_StopRecord);
         }
@@ -128,7 +130,7 @@ void RecordsSupervisionController::startOrStopToRecord(bool withTimeLine)
         else
         {
             // Update flags
-            setisRecordingTimeLine(withTimeLine);
+            //setisRecordingTimeLine(withTimeLine);
 
             Q_EMIT startToRecord();
         }

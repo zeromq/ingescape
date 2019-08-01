@@ -58,7 +58,7 @@ class RecordsSupervisionController : public QObject
     I2_QML_PROPERTY(bool, isRecording)
 
     // Flag indicating if the actions in the timeline are currently recorded
-    I2_QML_PROPERTY(bool, isRecordingTimeLine)
+    //I2_QML_PROPERTY(bool, isRecordingTimeLine)
 
     // Current state of the replay
     I2_QML_PROPERTY(ReplayStates::Value, replayState)

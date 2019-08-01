@@ -16,6 +16,7 @@ import QtQuick 2.8
 import QtQuick.Window 2.3
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Controls 2.0 as Controls2
 
 import I2Quick 1.0
 
@@ -102,7 +103,7 @@ Item {
             }
 
             enabled: (controller.currentReplay === null)
-            opacity: enabled ? 1.0 : 0.3
+            opacity: enabled ? 1.0 : 0.4
 
             style: I2SvgToggleButtonStyle {
                 fileCache: IngeScapeTheme.svgFileIngeScape
@@ -123,9 +124,7 @@ Item {
                 if (controller) {
                     console.log("QML: Start or Stop to Record");
 
-                    // FIXME TEST: parameter "withTimeLine" of "startOrStopToRecord"
-                    controller.startOrStopToRecord(false);
-                    //controller.startOrStopToRecord(true);
+                    controller.startOrStopToRecord();
                 }
             }
 
@@ -153,6 +152,8 @@ Item {
                 family: IngeScapeTheme.textFontFamily
                 pixelSize: 14
             }
+
+            opacity: startOrStopRecordButton.enabled ? 1.0 : 0.4
         }
     }
 
@@ -197,16 +198,18 @@ Item {
         ListView {
             id: recordsList
 
-            model: controller.recordsList
-
-            delegate: componentRecordListItem
-
-            height: contentHeight
-
             anchors {
                 left: parent.left
                 right: parent.right
             }
+            height: contentHeight
+
+            model: controller.recordsList
+
+            delegate: componentRecordListItem
+
+            enabled: !controller.isRecording
+            opacity: controller.isRecording ? 0.60 : 1.0
 
 
             //
@@ -396,6 +399,13 @@ Item {
                         }
                     }
                 }
+            }
+
+
+            Controls2.ToolTip {
+                delay: 400
+                visible: mouseAreaRecordItem.containsMouse
+                text: model ? model.modelM.name : ""
             }
 
 
