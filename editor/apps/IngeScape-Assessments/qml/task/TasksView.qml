@@ -89,23 +89,20 @@ Item {
 
     Rectangle {
         id: background
-
         anchors.fill: parent
-
-        color: IngeScapeTheme.veryDarkGreyColor
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
-        }
+        color: IngeScapeAssessmentsTheme.darkerDarkBlueHeader
     }
 
     Button {
         id: btnClose
 
         anchors {
-            right: parent.right
             top: parent.top
+            topMargin: 21
+            right: parent.right
+            rightMargin: 21
         }
+
         height: 18
         width: 18
 
@@ -151,8 +148,8 @@ Item {
 
             color: IngeScapeTheme.whiteColor
             font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
+                family: IngeScapeTheme.labelFontFamily
+                weight: Font.Black
                 pixelSize: 20
             }
         }
@@ -163,6 +160,7 @@ Item {
             anchors {
                 top: parent.top
                 right: parent.right
+                rightMargin: 12
             }
 
             height: 40
@@ -204,11 +202,8 @@ Item {
             model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
 
             delegate: TaskInList {
-
                 modelM: model.QtObject
-
                 isSelected: rootItem.controller && rootItem.controller.selectedTask && (modelM === rootItem.controller.selectedTask)
-
 
                 //
                 // Slots
@@ -240,72 +235,6 @@ Item {
         }
     }
 
-    ListView {
-
-        id: listOfTasks
-
-        anchors {
-            top: header.bottom
-            topMargin: 20
-            bottom: parent.bottom
-            bottomMargin: 5
-            left: parent.left
-            leftMargin: 5
-        }
-        width: 300
-
-        // In front of the Task (main view)
-        z: 1
-
-        model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
-
-        delegate: TaskInList {
-
-            modelM: model.QtObject
-
-            //isSelected: ListView.isCurrentItem
-            isSelected: rootItem.controller && rootItem.controller.selectedTask && (modelM === rootItem.controller.selectedTask)
-
-
-            //
-            // Slots
-            //
-            onSelectTask: {
-                if (rootItem.controller)
-                {
-                    //console.log("QML: on Select Task " + model.name + " at " + index);
-
-                    // First, select the task
-                    rootItem.controller.selectedTask = model.QtObject;
-                }
-            }
-
-            onDeleteTask: {
-                if (rootItem.controller)
-                {
-                    //console.log("QML: on Delete Task " + model.name);
-
-                    // First, un-select the task
-                    //rootItem.controller.selectedTask = null;
-
-                    // Delete the task
-                    rootItem.controller.deleteTask(model.QtObject);
-                }
-            }
-
-            onDuplicateTask: {
-                if (rootItem.controller)
-                {
-                    //console.log("QML: on Duplicate Task " + model.name);
-
-                    // Duplicate the task
-                    rootItem.controller.duplicateTask(model.QtObject);
-                }
-            }
-        }
-    }
-
-
     //
     // Task
     //
@@ -314,18 +243,12 @@ Item {
 
         anchors {
             top: parent.top
-            topMargin: 20
             bottom: parent.bottom
-            bottomMargin: 5
-            left: listOfTasks.right
-            leftMargin: -1
+            left: leftPart.right
             right: parent.right
-            rightMargin: 5
         }
-        // Behind the list of tasks
-        z: 0
 
-        controller: rootItem.controller
+        taskController: rootItem.controller
     }
 
 

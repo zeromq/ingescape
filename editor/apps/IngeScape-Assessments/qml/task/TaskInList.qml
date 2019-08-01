@@ -171,6 +171,7 @@ Item {
 
                 style: IngeScapeAssessmentsSvgButtonStyle {
                     releasedID: "delete"
+                    disabledID: releasedID
                 }
 
                 onClicked: {

@@ -27,9 +27,6 @@ import "../popup" as Popup
 Item {
     id: rootItem
 
-    //anchors.fill: parent
-
-
     //--------------------------------------------------------
     //
     //
@@ -38,14 +35,13 @@ Item {
     //
     //--------------------------------------------------------
 
-    property TasksController controller: null;
-
-    property TaskM modelM: controller ? controller.selectedTask : null;
+    property TasksController taskController: null;
+    property TaskM modelM: taskController ? taskController.selectedTask : null;
 
     property int indexPreviousSelectedDependentVariable: -1;
     property int indexDependentVariableCurrentlyEditing: -1;
 
-    visible: rootItem.modelM ? true : false
+    visible: rootItem.modelM
 
 
     //--------------------------------
@@ -105,36 +101,30 @@ Item {
 
     Rectangle {
         id: background
-
         anchors.fill: parent
-
-        color: "lightsteelblue"
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
-        }
+        color: IngeScapeTheme.veryLightGreyColor
     }
 
-
-    /*Text {
-        id: txtName
+    Text {
+        id: taskName
 
         anchors {
             top: parent.top
-            topMargin: 10
-            horizontalCenter: parent.horizontalCenter
+            topMargin: 34
+            left: parent.left
+            leftMargin: 26
         }
 
-        text: rootItem.modelM ? rootItem.modelM.name : "..."
+        text: rootItem.modelM ? "TASK : " + rootItem.modelM.name.toUpperCase() : "..."
+        verticalAlignment: Text.AlignVCenter
 
-        color: IngeScapeTheme.whiteColor
+        color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
         font {
-            family: IngeScapeTheme.textFontFamily
-            weight: Font.Medium
-            pixelSize: 18
+            family: IngeScapeTheme.labelFontFamily
+            weight: Font.Black
+            pixelSize: 20
         }
-    }*/
-
+    }
 
     //
     // Independent Variables Panel
@@ -143,201 +133,283 @@ Item {
         id: panelIndependentVariable
 
         anchors {
-            left: parent.left
+            top: taskName.bottom
+            topMargin: 18
+            left: taskName.left
             right: parent.right
-            top: parent.top
-            margins: 1
+            rightMargin: 27
         }
-        height: parent.height / 2
 
-        Row {
-            id: headerIndependentVariable
+        height: (parent.height - 18 - taskName.height - 34) / 2
 
+        Text {
+            text: "INDEPENDENT VARIABLES"
             anchors {
                 left: parent.left
-                leftMargin: 10
+                verticalCenter: newIndeVarButton.verticalCenter
+            }
+
+            verticalAlignment: Text.AlignVCenter
+
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+            font {
+                family: IngeScapeTheme.labelFontFamily
+                weight: Font.Black
+                pixelSize: 18
+            }
+        }
+
+        Button {
+            id: newIndeVarButton
+            anchors {
                 top: parent.top
-                topMargin: 5
+                right: parent.right
             }
-            height: 30
 
-            spacing: 20
+            height: 40
+            width: 263
 
-            Text {
-                text: "Independent Variables"
+            style: IngeScapeAssessmentsButtonStyle {
+                text: "NEW INDEPENDENT VARIABLE"
+            }
 
-                height: parent.height
-                verticalAlignment: Text.AlignVCenter
+            onClicked: {
+                console.log("QML: New Independent Variable");
 
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 18
+                // Open the popup
+                createIndependentVariablePopup.open();
+            }
+        }
+
+        IngeScapeAssessmentsListHeader {
+            id: indeVarListHeader
+            anchors {
+                top: newIndeVarButton.bottom
+                topMargin: 12
+                left: parent.left
+                right: parent.right
+            }
+
+            property var headerColumnWidths: [ 229, 336, width - 229 - 336]
+
+            Row {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    leftMargin: 15
+                    right: parent.right
+                    bottom: parent.bottom
                 }
-            }
 
-            Button {
-                text: "New Independent Variable"
+                Repeater {
+                    model: [ "Name", "Description", "Type" ]
 
-                height: parent.height
+                    Text {
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                        }
 
-                onClicked: {
-                    console.log("QML: New Independent Variable");
+                        width: indeVarListHeader.headerColumnWidths[index]
 
-                    // Update the independent variable currently edited
-                    //createIndependentVariablePopup.independentVariableCurrentlyEdited = null;
-
-                    // Open the popup
-                    createIndependentVariablePopup.open();
+                        text: modelData
+                        color: IngeScapeTheme.whiteColor
+                        font {
+                            family: IngeScapeTheme.labelFontFamily
+                            pixelSize: 16
+                            weight: Font.Black
+                        }
+                    }
                 }
             }
         }
 
+        Rectangle {
+            anchors {
+                top: indeVarListHeader.bottom
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
 
-        TableView {
-            id: tableIndependentVariable
+            color: IngeScapeTheme.whiteColor
 
+            ListView {
+                id: indeVarColumn
+                anchors.fill: parent
+
+                model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+
+                delegate: Rectangle {
+                    id: indeVarDelegate
+
+                    height: 40
+                    width: indeVarColumn.width
+
+                    // TODO
+                }
+            }
+        }
+
+        Rectangle {
+            id: indeVarBottomShadow
             anchors {
                 left: parent.left
-                leftMargin: 10
                 right: parent.right
-                rightMargin: 10
-                top: headerIndependentVariable.bottom
-                topMargin: 10
                 bottom: parent.bottom
-                bottomMargin: 10
             }
-
-            rowDelegate: Rectangle {
-                width: childrenRect.width
-                height: styleData.selected ? 30 : 20
-
-                color: styleData.selected ? "lightblue"
-                                          : (styleData.alternate ? "lightgray" : "white")
-            }
-
-            headerDelegate: Rectangle {
-                height: 30
-                width: parent.width
-
-                color: "darkgray"
-
-                Text {
-                    id: txtColumnHeader1
-
-                    anchors {
-                        fill: parent
-                        leftMargin: (styleData.column === 0) ? 55 : 5
-                    }
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: styleData.textAlignment
-
-                    text: styleData.value
-                    elide: Text.ElideRight
-                    color: IngeScapeTheme.blackColor
-                }
-
-                Rectangle {
-                    id: leftSeparator1
-
-                    visible: (styleData.column === 0)
-
-                    anchors {
-                        left: parent.left
-                        leftMargin: 50
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-                    width: 1
-                    color: "silver"
-                }
-
-                Rectangle {
-                    id: rightSeparator1
-
-                    anchors {
-                        right: parent.right
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-                    width: 1
-                    color: "silver"
-                }
-            }
-
-            model: rootItem.modelM ? rootItem.modelM.independentVariables : null
-
-            TableViewColumn {
-                role: "name"
-                title: qsTr("Name")
-                width: 200
-
-                delegate: IndependentVariableTableCell {
-                    cellText: styleData.value
-
-                    // Slot on signal "Delete Independent Variable"
-                    onDeleteIndependentVariable: {
-                        if (rootItem.controller && model)
-                        {
-                            //console.log("QML: Delete Independent Variable " + model.name);
-                            rootItem.controller.deleteIndependentVariable(model.QtObject);
-                        }
-                    }
-                }
-            }
-
-            TableViewColumn {
-                role: "description"
-                title: qsTr("Description")
-                width: 200
-
-                delegate: IndependentVariableTableCell {
-                    cellText: styleData.value
-                }
-            }
-
-            TableViewColumn {
-                role: "valueType"
-                title: qsTr("Type")
-                width: 200
-
-                delegate: IndependentVariableTableCell {
-                    cellText: {
-                        if (tableIndependentVariable.model) {
-                            var entry = tableIndependentVariable.model.get(styleData.row)
-                            if (entry) {
-                                IndependentVariableValueTypes.enumToString(styleData.value) + ((styleData.value === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
-                                                                                               ? " { " + tableIndependentVariable.model.get(styleData.row).enumValues.join(", ") + " }"
-                                                                                               : "" )
-                            } else {
-                                ""
-                            }
-                        }
-                    }
-
-                }
-            }
-
-            /*TableViewColumn {
-                role: "enumValues"
-                title: qsTr("")
-            }*/
-
-            onDoubleClicked: {
-                var independentVariable = tableIndependentVariable.model.get(row);
-                if (independentVariable)
-                {
-                    //console.log("on Double Clicked on row " + row + " (" + independentVariable.name + ")");
-
-                    // Update the independent variable currently edited
-                    createIndependentVariablePopup.independentVariableCurrentlyEdited = independentVariable;
-
-                    // Open the popup
-                    createIndependentVariablePopup.open();
-                }
+            height: 4
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
+                GradientStop { position: 1.0; color: IngeScapeTheme.darkGreyColor; }
             }
         }
+
+
+
+
+//        TableView {
+//            id: tableIndependentVariable
+
+//            anchors {
+//                left: parent.left
+//                leftMargin: 10
+//                right: parent.right
+//                rightMargin: 10
+//                top: headerIndependentVariable.bottom
+//                topMargin: 10
+//                bottom: parent.bottom
+//                bottomMargin: 10
+//            }
+
+//            rowDelegate: Rectangle {
+//                width: childrenRect.width
+//                height: styleData.selected ? 30 : 20
+
+//                color: styleData.selected ? "lightblue"
+//                                          : (styleData.alternate ? "lightgray" : "white")
+//            }
+
+//            headerDelegate: Rectangle {
+//                height: 30
+//                width: parent.width
+
+//                color: "darkgray"
+
+//                Text {
+//                    id: txtColumnHeader1
+
+//                    anchors {
+//                        fill: parent
+//                        leftMargin: (styleData.column === 0) ? 55 : 5
+//                    }
+//                    verticalAlignment: Text.AlignVCenter
+//                    horizontalAlignment: styleData.textAlignment
+
+//                    text: styleData.value
+//                    elide: Text.ElideRight
+//                    color: IngeScapeTheme.blackColor
+//                }
+
+//                Rectangle {
+//                    id: leftSeparator1
+
+//                    visible: (styleData.column === 0)
+
+//                    anchors {
+//                        left: parent.left
+//                        leftMargin: 50
+//                        top: parent.top
+//                        bottom: parent.bottom
+//                    }
+//                    width: 1
+//                    color: "silver"
+//                }
+
+//                Rectangle {
+//                    id: rightSeparator1
+
+//                    anchors {
+//                        right: parent.right
+//                        top: parent.top
+//                        bottom: parent.bottom
+//                    }
+//                    width: 1
+//                    color: "silver"
+//                }
+//            }
+
+//            model: rootItem.modelM ? rootItem.modelM.independentVariables : null
+
+//            TableViewColumn {
+//                role: "name"
+//                title: qsTr("Name")
+//                width: 200
+
+//                delegate: IndependentVariableTableCell {
+//                    cellText: styleData.value
+
+//                    // Slot on signal "Delete Independent Variable"
+//                    onDeleteIndependentVariable: {
+//                        if (rootItem.taskController && model)
+//                        {
+//                            //console.log("QML: Delete Independent Variable " + model.name);
+//                            rootItem.taskController.deleteIndependentVariable(model.QtObject);
+//                        }
+//                    }
+//                }
+//            }
+
+//            TableViewColumn {
+//                role: "description"
+//                title: qsTr("Description")
+//                width: 200
+
+//                delegate: IndependentVariableTableCell {
+//                    cellText: styleData.value
+//                }
+//            }
+
+//            TableViewColumn {
+//                role: "valueType"
+//                title: qsTr("Type")
+//                width: 200
+
+//                delegate: IndependentVariableTableCell {
+//                    cellText: {
+//                        if (tableIndependentVariable.model) {
+//                            var entry = tableIndependentVariable.model.get(styleData.row)
+//                            if (entry) {
+//                                IndependentVariableValueTypes.enumToString(styleData.value) + ((styleData.value === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
+//                                                                                               ? " { " + tableIndependentVariable.model.get(styleData.row).enumValues.join(", ") + " }"
+//                                                                                               : "" )
+//                            } else {
+//                                ""
+//                            }
+//                        }
+//                    }
+
+//                }
+//            }
+
+//            /*TableViewColumn {
+//                role: "enumValues"
+//                title: qsTr("")
+//            }*/
+
+//            onDoubleClicked: {
+//                var independentVariable = tableIndependentVariable.model.get(row);
+//                if (independentVariable)
+//                {
+//                    //console.log("on Double Clicked on row " + row + " (" + independentVariable.name + ")");
+
+//                    // Update the independent variable currently edited
+//                    createIndependentVariablePopup.independentVariableCurrentlyEdited = independentVariable;
+
+//                    // Open the popup
+//                    createIndependentVariablePopup.open();
+//                }
+//            }
+//        }
     }
 
 
@@ -403,8 +475,8 @@ Item {
                 onClicked: {
                     console.log("QML: New Dependent Variable");
 
-                    if (controller) {
-                        controller.createNewDependentVariable();
+                    if (taskController) {
+                        taskController.createNewDependentVariable();
                     }
                 }
             }
@@ -527,10 +599,10 @@ Item {
                     }
 
                     onDeleteDependentVariable: {
-                        if (rootItem.controller && model)
+                        if (rootItem.taskController && model)
                         {
                             //console.log("QML: Delete Dependent Variable " + model.name);
-                            rootItem.controller.deleteDependentVariable(model.QtObject);
+                            rootItem.taskController.deleteDependentVariable(model.QtObject);
                         }
                     }
                 }
@@ -690,7 +762,7 @@ Item {
 
         //anchors.centerIn: parent
 
-        controller: rootItem.controller
+        controller: rootItem.taskController
     }
 
 }
