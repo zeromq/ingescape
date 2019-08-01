@@ -20,7 +20,7 @@
 #include <QDebug>
 
 // Interval in milli-seconds to display current record elapsed time
-#define INTERVAL_ELAPSED_TIME 50
+#define INTERVAL_ELAPSED_TIME 250
 
 
 /**
@@ -39,7 +39,8 @@ RecordsSupervisionController::RecordsSupervisionController(EditorModelManager* m
     _replayState(ReplayStates::UNLOADED),
     _currentReplay(nullptr),
     _currentRecordTime(QDateTime(QDate::currentDate())),
-    _modelManager(modelManager)
+    _modelManager(modelManager),
+    _recordStartTime(QDateTime(QDate::currentDate()))
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -360,6 +361,9 @@ void RecordsSupervisionController::onRecordStartedReceived()
     // Update the flag
     setisRecording(true);
 
+    // Initialize the time when user started to record
+    _recordStartTime = QDateTime::currentDateTime();
+
     // Start the timer for feedback
     _timerToDisplayTime.start();
 }
@@ -375,6 +379,8 @@ void RecordsSupervisionController::onRecordStoppedReceived()
 
     // Stop the timer for feedback
     _timerToDisplayTime.stop();
+
+    // Reset the record time
     setcurrentRecordTime(QDateTime(QDate::currentDate()));
 }
 
@@ -474,7 +480,9 @@ void RecordsSupervisionController::onReplayEnded()
  */
 void RecordsSupervisionController::_onTimeout_DisplayTime()
 {
-    setcurrentRecordTime(_currentRecordTime.addMSecs(INTERVAL_ELAPSED_TIME));
+    qint64 recordDurationInMilliseconds = _recordStartTime.msecsTo(QDateTime::currentDateTime());
+
+    setcurrentRecordTime(QDateTime(APPLICATION_START_DATE).addMSecs(recordDurationInMilliseconds));
 }
 
 

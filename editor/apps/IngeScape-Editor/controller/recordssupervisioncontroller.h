@@ -260,6 +260,9 @@ private:
     // Timer to display elapsed time on current record
     QTimer _timerToDisplayTime;
 
+    // Time when user started to record
+    QDateTime _recordStartTime;
+
 };
 
 QML_DECLARE_TYPE(RecordsSupervisionController)
