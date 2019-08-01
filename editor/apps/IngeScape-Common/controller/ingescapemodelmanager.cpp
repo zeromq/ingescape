@@ -985,9 +985,8 @@ void IngeScapeModelManager::onValuePublished(PublishedValueM* publishedValue)
             // We kept 80% of the values
             int numberOfKeptValues = static_cast<int>(0.8 * TOO_MANY_VALUES);
 
-            int numberOfDeletedValues = _publishedValues.count() - numberOfKeptValues;
-
-            qDebug() << _publishedValues.count() << "values: we delete the" << numberOfDeletedValues << "oldest values and kept the" << numberOfKeptValues << "newest values";
+            //int numberOfDeletedValues = _publishedValues.count() - numberOfKeptValues;
+            //qDebug() << _publishedValues.count() << "values: we delete the" << numberOfDeletedValues << "oldest values and kept the" << numberOfKeptValues << "newest values";
 
             // Get values to delete
             QList<PublishedValueM*> valuesToDelete;

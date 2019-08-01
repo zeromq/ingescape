@@ -264,7 +264,7 @@ Item {
                 left: parent.left
                 right: parent.right
             }
-            height: 60
+            height: 85
 
 
             // Selection feedback
@@ -311,7 +311,7 @@ Item {
 
                 anchors {
                     top: parent.top
-                    topMargin: 5
+                    topMargin: 10
                     left: parent.left
                     right: parent.right
                     leftMargin: 28
@@ -427,109 +427,37 @@ Item {
             }
 
 
-            // Load record button
-            /*Button {
-                id: loadRecordButton
-
-                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+            // Button "Remove"
+            Button {
+                id: removeButton
 
                 anchors {
-                    verticalCenter: parent.verticalCenter
-                    left: parent.left
-                    leftMargin: 15
+                    top: parent.top
+                    topMargin: 10
+                    right: parent.right
+                    rightMargin: 10
                 }
-                height: boundingBox.height
-                //width: boundingBox.width
-                width: 50
+
+                visible: mouseAreaRecordItem.containsMouse || removeButton.hovered
 
                 activeFocusOnPress: true
 
-                text: "Load"
-
-                visible: controller && (controller.replayState === ReplayStates.UNLOADED)
-
-                style: I2SvgButtonStyle {
+                style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
 
-                    releasedID: "button"
+                    releasedID: "delete"
                     pressedID: releasedID + "-pressed"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
-                    }
-
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorDisabled: IngeScapeTheme.whiteColor
+                    disabledID: releasedID
                 }
 
                 onClicked: {
-                    if (controller && model && model.modelM)
+                    if (controller)
                     {
-                        //console.log("QML: Load record " + model.modelM.uid);
-
-                        // Load record
-                        controller.loadRecord(model.modelM.uid);
+                        // Delete the record
+                        controller.deleteRecord(model.QtObject);
                     }
                 }
-            }*/
-
-
-            // Load record button
-            /*Button {
-                id: unloadRecordButton
-
-                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                    left: parent.left
-                    leftMargin: 15
-                }
-                height: boundingBox.height
-                //width: boundingBox.width
-                width: 50
-
-                activeFocusOnPress: true
-
-                text: "Quit"
-
-                visible: controller && (controller.replayState !== ReplayStates.UNLOADED) && (controller.replayState !== ReplayStates.LOADING)
-                         && recordItem._isCurrentReplay
-
-                enabled: !rootItem._isPlayingOrResumingReplay
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    releasedID: "button"
-                    pressedID: releasedID + "-pressed"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
-                    }
-
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorDisabled: IngeScapeTheme.whiteColor
-                }
-
-                onClicked: {
-                    if (controller && model && model.modelM)
-                    {
-                        //console.log("QML: UN-load record " + model.modelM.uid);
-
-                        // UN-load record
-                        controller.unloadRecord();
-                    }
-                }
-            }*/
+            }
 
 
             // Button "Play"
@@ -537,11 +465,10 @@ Item {
                 id: playButton
 
                 anchors {
-                    //verticalCenter: parent.verticalCenter
                     right: rewindButton.left
                     rightMargin: 5
                     bottom: parent.bottom
-                    bottomMargin: 10
+                    bottomMargin: 35
                 }
 
                 activeFocusOnPress: true
@@ -579,11 +506,10 @@ Item {
                 id: pauseButton
 
                 anchors {
-                    //verticalCenter: parent.verticalCenter
                     right: rewindButton.left
                     rightMargin: 5
                     bottom: parent.bottom
-                    bottomMargin: 10
+                    bottomMargin: 35
                 }
 
                 visible: rootItem._isPlayingOrResumingReplay
@@ -614,11 +540,10 @@ Item {
                 id: rewindButton
 
                 anchors {
-                    //verticalCenter: parent.verticalCenter
                     right: parent.right
-                    rightMargin: 20
+                    rightMargin: 10
                     bottom: parent.bottom
-                    bottomMargin: 10
+                    bottomMargin: 35
                 }
 
                 visible: controller && ((controller.replayState === ReplayStates.PAUSED) || rootItem._isPlayingOrResumingReplay)
@@ -644,35 +569,32 @@ Item {
             }
 
 
-            // Button "Remove"
+            // Options button
             Button {
-                id: removeButton
+                id: btnOptions
 
                 anchors {
-                    top: parent.top
-                    topMargin: 10
                     right: parent.right
                     rightMargin: 10
+                    bottom: parent.bottom
+                    bottomMargin: 10
                 }
-
-                visible: mouseAreaRecordItem.containsMouse || removeButton.hovered
 
                 activeFocusOnPress: true
 
                 style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
 
+                    releasedID: "button-options"
                     pressedID: releasedID + "-pressed"
-                    releasedID: "delete"
-                    disabledID: releasedID
+                    disabledID : releasedID
                 }
 
                 onClicked: {
-                    if (controller)
-                    {
-                        // Delete the record
-                        controller.deleteRecord(model.QtObject);
-                    }
+                    console.log("QML: Open options...");
+
+                    // Open the popup with options
+                    //popupOptions.openInScreen();
                 }
             }
         }

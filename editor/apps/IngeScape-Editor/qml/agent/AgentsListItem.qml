@@ -120,7 +120,7 @@ Item {
                 top: parent.top
                 topMargin: 10
                 right: parent.right
-                rightMargin: 12
+                rightMargin: 10
             }
 
             visible: (model.isON === false)
@@ -131,8 +131,8 @@ Item {
             style: LabellessSvgButtonStyle {
                 fileCache: IngeScapeTheme.svgFileIngeScape
 
-                pressedID: releasedID + "-pressed"
                 releasedID: "delete"
+                pressedID: releasedID + "-pressed"
                 disabledID : releasedID
             }
 
@@ -483,7 +483,7 @@ Item {
                 }
             }
 
-            // Button Options
+            // Options button
             Button {
                 id: btnOptions
 
@@ -493,8 +493,8 @@ Item {
                 style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
 
-                    pressedID: releasedID + "-pressed"
                     releasedID: "button-options"
+                    pressedID: releasedID + "-pressed"
                     disabledID : releasedID
                 }
 

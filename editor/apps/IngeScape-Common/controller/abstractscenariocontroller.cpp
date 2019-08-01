@@ -620,7 +620,7 @@ void AbstractScenarioController::_onTimeout_ExecuteActions()
 {
     if (!_listOfActionsToEvaluate.isEmpty())
     {
-        //ActionVM* actionToExecute = _listOfActionsToEvaluate.at(0);
+        //qDebug() << "Timeout ExecuteActions" << _currentTime.toString();
 
         int currentTimeInMilliSeconds = 0;
         if (_nextActionToActivate != nullptr) {
@@ -628,6 +628,7 @@ void AbstractScenarioController::_onTimeout_ExecuteActions()
         }
         ActionVM* tmpNextActionToActivate = nullptr;
 
+        //qDebug() << "Time in ms of next action" << currentTimeInMilliSeconds;
 
         // Traverse the list of actions to evaluate
         for (ActionVM* actionVM : _listOfActionsToEvaluate.toList())
@@ -642,7 +643,10 @@ void AbstractScenarioController::_onTimeout_ExecuteActions()
                     // Check if an action execution exists and has not already been executed
                     if ((actionExecution != nullptr) && !actionExecution->isExecuted())
                     {
-                        if (actionVM->modelM()->isValid()) {
+                        if (actionVM->modelM()->isValid())
+                        {
+                            //qDebug() << "Execute action" << actionVM->modelM()->name();
+
                             // Execute action
                             _executeAction(actionVM, actionExecution, currentTimeInMilliSeconds);
                         }
@@ -682,6 +686,9 @@ void AbstractScenarioController::_onTimeout_ExecuteActions()
         {
             // Set the next action to activate
             setnextActionToActivate(tmpNextActionToActivate);
+
+            //int deltaMS = _nextActionToActivate->startTime() - currentTimeInMilliSeconds;
+            //qDebug() << "Set NEXT action to" << _nextActionToActivate->modelM()->name() << "in" << deltaMS << "ms";
 
             // Set the timer to the next action
             _timerToExecuteActions.start(_nextActionToActivate->startTime() - currentTimeInMilliSeconds);
