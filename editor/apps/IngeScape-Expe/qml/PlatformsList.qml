@@ -525,13 +525,14 @@ Item {
                         {
                             if (IngeScapeExpeC.modelManager && IngeScapeExpeC.modelManager.isRecorderON && checkBoxWithRecord.checked)
                             {
-                                // Play the TimeLine and Record
-                                IngeScapeExpeC.playTimeLine(true);
+                                // Play the TimeLine and Start to record
+                                // OR only resume the TimeLine
+                                IngeScapeExpeC.playOrResumeTimeLine(true);
                             }
                             else
                             {
-                                // Play only the TimeLine (no record)
-                                IngeScapeExpeC.playTimeLine(false);
+                                // Play or Resume the TimeLine (no record)
+                                IngeScapeExpeC.playOrResumeTimeLine(false);
                             }
                         }
                         else

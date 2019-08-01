@@ -273,23 +273,35 @@ void IngeScapeExpeController::openPlatform(PlatformM* platform)
 
 
 /**
- * @brief Play the TimeLine
+ * @brief Play the TimeLine and Start to record if flag "withRecord" is true
+ * OR only resume the TimeLine
  * @param withRecord
  */
-void IngeScapeExpeController::playTimeLine(bool withRecord)
+void IngeScapeExpeController::playOrResumeTimeLine(bool withRecord)
 {
     if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
             && (_networkC != nullptr))
     {
-        // Update flag
-        _withRecord = withRecord;
-
-        if (_withRecord) {
-            // Start recording
-            _startRecording();
+        // The current loaded platform is currently recording...
+        if (_modelManager->currentLoadedPlatform()->recordState() == RecordStates::RECORDING)
+        {
+            // RESUME TimeLine
+            qInfo() << "Resume the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
         }
+        else
+        {
+            // Update flag
+            _withRecord = withRecord;
 
-        qInfo() << "Play the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
+            if (_withRecord)
+            {
+                // Start recording
+                _startRecording();
+            }
+
+            // START TimeLine
+            qInfo() << "Play the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
+        }
 
         QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, PLAY);
 

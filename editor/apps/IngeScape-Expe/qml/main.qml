@@ -73,8 +73,8 @@ ApplicationWindow {
     menuBar: MenuBar {
 
         Menu {
-            id: menuToRename
-            title: qsTr("TO RENAME")
+            id: menuOptions
+            title: qsTr("Options")
 
             /*MenuItem {
                 text: qsTr("Start a new platform")

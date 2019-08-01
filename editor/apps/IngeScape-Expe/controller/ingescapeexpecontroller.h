@@ -116,10 +116,11 @@ public:
 
 
     /**
-     * @brief Play the TimeLine
+     * @brief Play the TimeLine and Start to record if flag "withRecord" is true
+     * OR only resume the TimeLine
      * @param withRecord
      */
-    Q_INVOKABLE void playTimeLine(bool withRecord);
+    Q_INVOKABLE void playOrResumeTimeLine(bool withRecord);
 
 
     /**
