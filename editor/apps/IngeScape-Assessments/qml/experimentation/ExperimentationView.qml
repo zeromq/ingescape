@@ -416,7 +416,7 @@ Item {
                             console.log("QML: Add the 'Tasks View' to the stack");
 
                             // Add the "Tasks View" to the stack
-                            stackview.push(componentTasksView);
+                            tasksViewPopup.open();
                         }
                     }
 
@@ -766,27 +766,27 @@ Item {
 
 
     //
-    // Tasks View
+    // Tasks View (popup)
     //
-    Component {
-        id: componentTasksView
+    Task.TasksView {
+        id: tasksViewPopup
 
-        Task.TasksView {
-            id: tasksView
+        anchors.centerIn: parent
 
-            controller: IngeScapeAssessmentsC.tasksC
+        width: parent.width - 78
+        height: parent.height - 78
 
+        controller: IngeScapeAssessmentsC.tasksC
 
-            //
-            // Slots
-            //
+        //
+        // Slots
+        //
 
-            onCloseTasksView: {
-                console.log("QML: on Close Tasks view");
+        onCloseTasksView: {
+            console.log("QML: on Close Tasks view");
 
-                // Remove the "Tasks View" from the stack
-                stackview.pop();
-            }
+            // Remove the "Tasks View" from the stack
+            close()
         }
     }
 

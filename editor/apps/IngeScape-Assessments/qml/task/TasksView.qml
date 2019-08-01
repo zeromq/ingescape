@@ -24,10 +24,8 @@ import INGESCAPE 1.0
 import "../popup" as Popup
 
 
-Item {
+I2PopupBase {
     id: rootItem
-
-    //anchors.fill: parent
 
 
     //--------------------------------------------------------
@@ -63,20 +61,6 @@ Item {
     //
     //
     //--------------------------------
-
-    /*Connections {
-        target: rootItem.controller
-
-        onSelectedTaskChanged: {
-            if (rootItem.controller.selectedTask)
-            {
-                console.log("QML: on Selected Task changed to " + rootItem.controller.selectedTask.name);
-            }
-            else {
-                console.log("QML: on Selected Task changed to NULL");
-            }
-        }
-    }*/
 
 
     //--------------------------------------------------------
@@ -253,7 +237,7 @@ Item {
 
 
     //
-    // Create Task@ Popup
+    // Create Task Popup
     //
     Popup.CreateTaskPopup {
         id: createTaskPopup
