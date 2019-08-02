@@ -25,7 +25,7 @@ import INGESCAPE 1.0
 import "../popup" as Popup
 
 
-Item {
+I2PopupBase {
     id: rootItem
 
     //--------------------------------------------------------

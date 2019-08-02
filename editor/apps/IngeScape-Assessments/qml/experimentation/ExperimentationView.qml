@@ -395,7 +395,7 @@ Item {
                             console.log("QML: Add the 'Subjects View' to the stack");
 
                             // Add the "Subjects View" to the stack
-                            stackview.push(componentSubjectsView);
+                            subjectsViewPopup.open()
                         }
                     }
 
@@ -739,28 +739,24 @@ Item {
     }
 
 
-    //
-    // Subjects View
-    //
-    Component {
-        id: componentSubjectsView
+    Subject.SubjectsView {
+        id: subjectsViewPopup
 
-        Subject.SubjectsView {
-            id: subjectsView
+        anchors.centerIn: parent
 
-            controller: IngeScapeAssessmentsC.subjectsC
+        width: parent.width - 78
+        height: parent.height - 78
 
+        controller: IngeScapeAssessmentsC.subjectsC
 
-            //
-            // Slots
-            //
+        //
+        // Slots
+        //
+        onCloseSubjectsView: {
+            console.log("QML: on Close Subjects view");
 
-            onCloseSubjectsView: {
-                console.log("QML: on Close Subjects view");
-
-                // Remove the "Subjects View" from the stack
-                stackview.pop();
-            }
+            // Remove the "Subjects View" from the stack
+            close()
         }
     }
 
