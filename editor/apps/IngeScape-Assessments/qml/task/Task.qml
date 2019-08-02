@@ -241,15 +241,16 @@ Item {
                 id: indeVarColumn
                 anchors.fill: parent
 
-                model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+                model: rootItem.modelM ? rootItem.modelM.independentVariables : null
 
-                delegate: Rectangle {
+                delegate: IndependentVariableDelegate {
                     id: indeVarDelegate
 
                     height: 40
                     width: indeVarColumn.width
+                    indeVarModel: model ? model.QtObject : null
 
-                    // TODO
+                    columnWidths: indeVarListHeader.headerColumnWidths
                 }
             }
         }

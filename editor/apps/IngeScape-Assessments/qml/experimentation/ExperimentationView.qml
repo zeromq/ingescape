@@ -340,8 +340,6 @@ Item {
                     }
 
                     onClicked: {
-                        console.log("QML: Add the 'Subjects View' to the stack");
-
                         // Add the "Subjects View" to the stack
                         subjectsViewPopup.open()
                     }
@@ -361,8 +359,6 @@ Item {
                     }
 
                     onClicked: {
-                        console.log("QML: Add the 'Tasks View' to the stack");
-
                         // Add the "Tasks View" to the stack
                         tasksViewPopup.open();
                     }

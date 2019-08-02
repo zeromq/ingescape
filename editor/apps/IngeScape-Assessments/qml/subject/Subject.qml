@@ -94,7 +94,7 @@ Rectangle {
                     verticalAlignment: Text.AlignVCenter
                     visible: !rootItem.isCurrentlyEditing
 
-                    color: IngeScapeTheme.blackColor
+                    color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                     font {
                         family: IngeScapeTheme.textFontFamily
                         //weight: Font.Medium
