@@ -281,7 +281,11 @@ Item {
                     verticalAlignment: Text.AlignVCenter
 
                     color: IngeScapeTheme.whiteColor
-                    font: IngeScapeTheme.headingFont
+                    font {
+                        family: IngeScapeTheme.labelFontFamily
+                        weight: Font.Black
+                        pixelSize: 20
+                    }
                 }
             }
 
@@ -334,19 +338,19 @@ Item {
                             color: IngeScapeTheme.blackColor
                             font {
                                 family: IngeScapeTheme.textFontFamily
-                                weight: Font.Medium
-                                pixelSize: 14
+                                weight: Font.Bold
+                                pixelSize: 16
                             }
                         }
 
                         Text {
                             text: rootExperimentation.experimentation ? rootExperimentation.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy - hh:mm:ss") : ""
 
-                            color: IngeScapeTheme.blackColor
+                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                             font {
                                 family: IngeScapeTheme.textFontFamily
-                                //weight: Font.Medium
-                                pixelSize: 14
+                                weight: Font.Medium
+                                pixelSize: 16
                             }
                         }
                     }
