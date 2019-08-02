@@ -75,6 +75,8 @@ I2PopupBase {
         id: background
         anchors.fill: parent
         color: IngeScapeAssessmentsTheme.darkerDarkBlueHeader
+
+        radius: 5
     }
 
     Item {
@@ -203,9 +205,23 @@ I2PopupBase {
             bottom: parent.bottom
             left: leftPart.right
             right: parent.right
+            rightMargin: 5
         }
 
         color: IngeScapeTheme.veryLightGreyColor
+
+        Rectangle {
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+                horizontalCenter: parent.right
+            }
+
+            width: 10
+
+            color: IngeScapeTheme.veryLightGreyColor
+            radius: 5
+        }
 
         Task {
             id: task
