@@ -28,7 +28,7 @@ TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QSt
     , _name(name)
     , _platformFileUrl(QUrl())
     , _platformFileName("")
-    //, _agentNamesList(QStringList())
+    , _temporaryDependentVariable(nullptr)
     , _cassExperimentationUuid(experimentationUuid)
     , _cassUuid(uid)
 {
@@ -36,6 +36,8 @@ TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QSt
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     setplatformFileUrl(platformFile);
+
+    _temporaryDependentVariable = new DependentVariableM(CassUuid(), CassUuid(), CassUuid(), "", "", "", "");
 
     qInfo() << "New Model of Task" << _name;
 }
@@ -52,6 +54,13 @@ TaskM::~TaskM()
     _independentVariables.deleteAllItems();
     _dependentVariables.deleteAllItems();
     _hashFromAgentNameToSimplifiedAgent.deleteAllItems();
+
+    if (_temporaryDependentVariable != nullptr)
+    {
+        DependentVariableM* tmp = _temporaryDependentVariable;
+        settemporaryDependentVariable(nullptr);
+        delete tmp;
+    }
 }
 
 
@@ -170,6 +179,10 @@ TaskM* TaskM::createTaskFromCassandraRow(const CassRow* row)
     return task;
 }
 
+/**
+ * @brief Delete the given task from the Cassandra DB
+ * @param task
+ */
 void TaskM::deleteTaskFromCassandra(const TaskM& task)
 {
 
@@ -241,6 +254,53 @@ void TaskM::deleteTaskFromCassandra(const TaskM& task)
     cass_statement_free(cassStatement);
 }
 
+/**
+ * @brief Initialize the temporary dependent variable with the given dependent variable
+ * @param baseVariable
+ */
+void TaskM::initTemporaryDependentVariable(DependentVariableM* baseVariable)
+{
+    if ((_temporaryDependentVariable != nullptr) && (baseVariable != nullptr))
+    {
+        _temporaryDependentVariable->setname(baseVariable->name());
+        _temporaryDependentVariable->setdescription(baseVariable->description());
+        _temporaryDependentVariable->setagentName(baseVariable->agentName());
+        _temporaryDependentVariable->setoutputName(baseVariable->outputName());
+    }
+}
+
+
+/**
+ * @brief Apply the values from the temporary dependent variable to the givend dependent variable.
+ * Update said dependent variable into the Cassandra DB
+ * @param variableToUpdate
+ */
+void TaskM::applyTemporaryDependentVariable(DependentVariableM* variableToUpdate)
+{
+    if ((variableToUpdate != nullptr) && (_temporaryDependentVariable != nullptr))
+    {
+        variableToUpdate->setname(_temporaryDependentVariable->name());
+        variableToUpdate->setdescription(_temporaryDependentVariable->description());
+        variableToUpdate->setagentName(_temporaryDependentVariable->agentName());
+        variableToUpdate->setoutputName(_temporaryDependentVariable->outputName());
+
+        DependentVariableM::updateDependentVariableIntoCassandraDB(*variableToUpdate);
+    }
+}
+
+/**
+ * @brief Delete the given dependent variable from the task and from the Cassandra DB
+ * @param variableToUpdate
+ */
+void TaskM::deleteDependentVariable(DependentVariableM* variableToDelete)
+{
+    if (variableToDelete != nullptr)
+    {
+        _dependentVariables.remove(variableToDelete);
+
+        DependentVariableM::deleteDependentVariableFromCassandraDB(*variableToDelete);
+    }
+}
 
 /**
  * @brief Update the list of agents from a platform file path

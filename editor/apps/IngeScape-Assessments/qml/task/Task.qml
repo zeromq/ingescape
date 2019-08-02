@@ -409,6 +409,7 @@ Item {
 
                     columnWidths: depVarListHeader.headerColumnWidths
 
+                    taskModel: rootItem.modelM
                     dependentVariableModel: model ? model.QtObject : null
 
                     depVarEditionInProgress: depVarTable.depVarEditionInProgress

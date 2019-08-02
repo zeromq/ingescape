@@ -29,16 +29,16 @@ class DependentVariableM : public QObject
     Q_OBJECT
 
     // Name of our dependent variable
-    I2_QML_PROPERTY_CUSTOM_SETTER(QString, name)
+    I2_QML_PROPERTY(QString, name)
 
     // Description of our dependent variable
-    I2_QML_PROPERTY_CUSTOM_SETTER(QString, description)
+    I2_QML_PROPERTY(QString, description)
 
     // Name of the agent in the platform associated to the task
-    I2_QML_PROPERTY_CUSTOM_SETTER(QString, agentName)
+    I2_QML_PROPERTY(QString, agentName)
 
     // Name of the (agent) output in the platform associated to the task
-    I2_QML_PROPERTY_CUSTOM_SETTER(QString, outputName)
+    I2_QML_PROPERTY(QString, outputName)
 
 
 public:
@@ -75,16 +75,37 @@ public:
      */
     static DependentVariableM* createDependentVariableFromCassandraRow(const CassRow* row);
 
+    /**
+     * @brief Delete the given dependent variable from the Cassandra DB
+     * @param row
+     * @return
+     */
+    static void deleteDependentVariableFromCassandraDB(const DependentVariableM& entry);
+
+    /**
+     * @brief Update the given DependentVariableM into the Cassandra DB
+     * @param entry
+     * @return
+     */
+    static bool updateDependentVariableIntoCassandraDB(const DependentVariableM& entry);
+
+
+    CassUuid getExperimentationCassUuid() const { return _experimentationCassUuid; }
+    CassUuid getTaskCassUuid() const { return _taskCassUuid; }
+    CassUuid getCassUuid() const { return _cassUuid; }
+
+    /**
+     * @brief Create a clone of the current object.
+     * Return nullptr in case of failure.
+     * Clone object does not have valid CassUuids.
+     * The caller is in charge of freeing the returned instance (if any).
+     * @return
+     */
+    DependentVariableM* clone() const;
+
 
 
 protected: // Methods
-    /**
-     * @brief Update the given field with the given value in the corresponding DB entry
-     * @param value
-     * @param dbField
-     * @return
-     */
-    CassError _updateDBEntry(const QString& value, const QString& dbField);
 
 protected: // Attributes
     // Task's experimentation's UUID from Cassandra DB

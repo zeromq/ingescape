@@ -53,101 +53,29 @@ DependentVariableM::~DependentVariableM()
 
 }
 
-/**
- * @brief Custom setter for the 'name' property that also update the DB entry
- * @param value
- */
-void DependentVariableM::setname(QString value)
-{
-    if ((value != _name) && (AssessmentsModelManager::Instance() != nullptr))
-    {
-        CassError cassError = _updateDBEntry(value, "name");
-        if (cassError != CASS_OK) {
-            qCritical() << "Could not update dependent variable" << _name << "in the DB:" << cass_error_desc(cassError);
-        } else {
-            _name = value;
-            Q_EMIT nameChanged(value);
-        }
-    }
-}
-
 
 /**
- * @brief Custom setter for the 'description' property that also update the DB entry
- * @param value
- */
-void DependentVariableM::setdescription(QString value)
-{
-    if ((value != _name) && (AssessmentsModelManager::Instance() != nullptr))
-    {
-        CassError cassError = _updateDBEntry(value, "description");
-        if (cassError != CASS_OK) {
-            qCritical() << "Could not update dependent variable" << _name << "in the DB:" << cass_error_desc(cassError);
-        } else {
-            _description = value;
-            Q_EMIT descriptionChanged(value);
-        }
-    }
-}
-
-
-/**
- * @brief Custom setter for the 'agentName' property that also update the DB entry
- * @param value
- */
-void DependentVariableM::setagentName(QString value)
-{
-    if ((value != _name) && (AssessmentsModelManager::Instance() != nullptr))
-    {
-        CassError cassError = _updateDBEntry(value, "agent_name");
-        if (cassError != CASS_OK) {
-            qCritical() << "Could not update dependent variable" << _name << "in the DB:" << cass_error_desc(cassError);
-        } else {
-            _agentName = value;
-            Q_EMIT agentNameChanged(value);
-        }
-    }
-}
-
-
-/**
- * @brief Custom setter for the 'outputName' property that also update the DB entry
- * @param value
- */
-void DependentVariableM::setoutputName(QString value)
-{
-    if ((value != _name) && (AssessmentsModelManager::Instance() != nullptr))
-    {
-        CassError cassError = _updateDBEntry(value, "output_name");
-        if (cassError != CASS_OK) {
-            qCritical() << "Could not update dependent variable" << _name << "in the DB:" << cass_error_desc(cassError);
-        } else {
-            _outputName = value;
-            Q_EMIT outputNameChanged(value);
-        }
-    }
-}
-
-
-/**
- * @brief Update the given field with the given value in the corresponding DB entry
- * @param value
- * @param dbField
+ * @brief Update the given DependentVariableM into the Cassandra DB
+ * @param entry
  * @return
  */
-CassError DependentVariableM::_updateDBEntry(const QString& value, const QString& dbField)
+bool DependentVariableM::updateDependentVariableIntoCassandraDB(const DependentVariableM& entry)
 {
-    QString query = QString("UPDATE ingescape.dependent_var SET %1 = ? WHERE id_experimentation = ? AND id_task = ? AND id = ?;").arg(dbField);
-    CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 4);
-    cass_statement_bind_string(cassStatement, 0, value.toStdString().c_str());
-    cass_statement_bind_uuid  (cassStatement, 1, _experimentationCassUuid);
-    cass_statement_bind_uuid  (cassStatement, 2, _taskCassUuid);
-    cass_statement_bind_uuid  (cassStatement, 3, _cassUuid);
+    const char* query = "UPDATE ingescape.dependent_var SET name = ?, description = ?, agent_name = ?, output_name = ? WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
+    CassStatement* cassStatement = cass_statement_new(query, 7);
+    cass_statement_bind_string(cassStatement, 0, entry.name().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 1, entry.description().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 2, entry.agentName().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 3, entry.outputName().toStdString().c_str());
+    cass_statement_bind_uuid  (cassStatement, 4, entry.getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 5, entry.getTaskCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 6, entry.getCassUuid());
+
     // Execute the query or bound statement
     CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
     CassError cassError = cass_future_error_code(cassFuture);
 
-    return cassError;
+    return cassError == CASS_OK;
 }
 
 
@@ -191,4 +119,45 @@ DependentVariableM* DependentVariableM::createDependentVariableFromCassandraRow(
     }
 
     return dependentVariable;
+}
+
+/**
+ * @brief Delete the given dependent variable from the Cassandra DB
+ * @param row
+ * @return
+ */
+void DependentVariableM::deleteDependentVariableFromCassandraDB(const DependentVariableM& entry)
+{
+    // Remove dependent_var from DB
+    const char* query = "DELETE FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
+    CassStatement* cassStatement = cass_statement_new(query, 3);
+    cass_statement_bind_uuid(cassStatement, 0, entry.getExperimentationCassUuid());
+    cass_statement_bind_uuid(cassStatement, 1, entry.getTaskCassUuid());
+    cass_statement_bind_uuid(cassStatement, 2, entry.getCassUuid());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qInfo() << "Dependent variable" << entry.name() << "has been successfully deleted from the DB";
+    }
+    else {
+        qCritical() << "Could not delete the dependent variable" << entry.name() << "from the DB:" << cass_error_desc(cassError);
+    }
+
+    // Clean-up cassandra objects
+    cass_future_free(cassFuture);
+    cass_statement_free(cassStatement);
+}
+
+/**
+ * @brief Create a clone of the current object.
+ * Return nullptr in case of failure.
+ * The caller is in charge of freeing the returned instance (if any).
+ * @return
+ */
+DependentVariableM* DependentVariableM::clone() const
+{
+    return new DependentVariableM(CassUuid(), CassUuid(), CassUuid(), _name, _description, _agentName, _outputName);
 }

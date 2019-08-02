@@ -27,6 +27,9 @@ Rectangle {
     // List with all the column widths
     property var columnWidths: []
 
+    // Task model the current dependent variable is in
+    property var taskModel: null
+
     // Current dependent variable model
     property var dependentVariableModel: null
 
@@ -103,7 +106,9 @@ Rectangle {
                     rightMargin: 33
                 }
 
-                text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.name : ""
+                text: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable
+                      ? rootItem.taskModel.temporaryDependentVariable.name
+                      : ""
                 visible: rootItem.isCurrentlyEditing
 
                 style: I2TextFieldStyle {
@@ -113,7 +118,7 @@ Rectangle {
                     radiusTextBox: 5
                     borderWidth: 0
                     borderWidthActive: 1
-                    textIdleColor: IngeScapeTheme.regularDarkBlueHeader
+                    textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                     textDisabledColor: IngeScapeTheme.veryLightGreyColor
 
                     padding.left: 10
@@ -127,10 +132,9 @@ Rectangle {
                 }
 
                 onTextChanged: {
-                    if (rootItem.dependentVariableModel)
+                    if (rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
                     {
-                        console.log("TODO Handle temporary")
-//                        rootItem.dependentVariableModel.name = text
+                        rootItem.taskModel.temporaryDependentVariable.name = text
                     }
                 }
             }
@@ -141,7 +145,6 @@ Rectangle {
             id: descriptionColumn
 
             anchors {
-                left: nameColumn.right
                 top: parent.top
                 bottom: parent.bottom
             }
@@ -173,7 +176,9 @@ Rectangle {
                     rightMargin: 33
                 }
 
-                text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.description : ""
+                text: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable
+                      ? rootItem.taskModel.temporaryDependentVariable.description
+                      : ""
                 visible: rootItem.isCurrentlyEditing
 
                 style: I2TextFieldStyle {
@@ -183,7 +188,7 @@ Rectangle {
                     radiusTextBox: 5
                     borderWidth: 0
                     borderWidthActive: 1
-                    textIdleColor: IngeScapeTheme.regularDarkBlueHeader
+                    textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                     textDisabledColor: IngeScapeTheme.veryLightGreyColor
 
                     padding.left: 10
@@ -197,10 +202,9 @@ Rectangle {
                 }
 
                 onTextChanged: {
-                    if (rootItem.dependentVariableModel)
+                    if (rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
                     {
-                        console.log("TODO Handle temporary")
-//                        rootItem.dependentVariableModel.description = text
+                        rootItem.taskModel.temporaryDependentVariable.description = text
                     }
                 }
             }
@@ -211,7 +215,6 @@ Rectangle {
             id: agentColumn
 
             anchors {
-                left: descriptionColumn.right
                 top: parent.top
                 bottom: parent.bottom
             }
@@ -239,7 +242,7 @@ Rectangle {
             I2ComboboxStringList {
                 id: agentComboboxEditor
 
-                model: null //TODO
+                model: rootItem.taskModel ? rootItem.taskModel.hashFromAgentNameToSimplifiedAgent.keys : []
 
                 anchors {
                     fill: parent
@@ -250,7 +253,7 @@ Rectangle {
 
                 style: I2ComboboxStyle {
                     borderColorIdle: IngeScapeTheme.veryLightGreyColor
-                    currentTextColorIdle: IngeScapeTheme.regularDarkBlueHeader
+                    currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                     font {
                         family: IngeScapeTheme.textFontFamily
                         weight: Font.Medium
@@ -261,15 +264,24 @@ Rectangle {
                 Binding {
                     target: agentComboboxEditor
                     property: "selectedItem"
-                    value: rootItem.dependentVariableModel.agentName
+                    value: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable ? rootItem.taskModel.temporaryDependentVariable.agentName : ""
                 }
 
                 onSelectedItemChanged: {
-                    console.log("TODO Handle temporary")
+                    if (agentComboboxEditor.selectedItem && rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
+                    {
+                        rootItem.taskModel.temporaryDependentVariable.agentName = agentComboboxEditor.selectedItem
+                    }
                 }
 
                 onVisibleChanged: {
-                    console.log("TODO Handle temporary")
+                    if (visible && rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
+                    {
+                        var index = agentComboboxEditor.model.indexOf(rootItem.taskModel.temporaryDependentVariable.agentName);
+                        if (index > -1) {
+                            agentComboboxEditor.selectedIndex = index;
+                        }
+                    }
                 }
             }
         }
@@ -279,7 +291,6 @@ Rectangle {
             id: optputNameColumn
 
             anchors {
-                left: agentColumn.right
                 top: parent.top
                 bottom: parent.bottom
             }
@@ -307,7 +318,12 @@ Rectangle {
             I2ComboboxStringList {
                 id: outputComboboxEditor
 
-                anchors.fill: parent
+                model: rootItem.taskModel
+                       && rootItem.taskModel.temporaryDependentVariable
+                       && (rootItem.taskModel.temporaryDependentVariable.agentName.length > 0)
+                       && rootItem.taskModel.hashFromAgentNameToSimplifiedAgent.containsKey(rootItem.taskModel.temporaryDependentVariable.agentName)
+                       ? rootItem.taskModel.hashFromAgentNameToSimplifiedAgent.value(rootItem.taskModel.temporaryDependentVariable.agentName).outputNamesList
+                       : []
 
                 anchors {
                     fill: parent
@@ -318,7 +334,7 @@ Rectangle {
 
                 style: I2ComboboxStyle {
                     borderColorIdle: IngeScapeTheme.veryLightGreyColor
-                    currentTextColorIdle: IngeScapeTheme.regularDarkBlueHeader
+                    currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                     font {
                         family: IngeScapeTheme.textFontFamily
                         weight: Font.Medium
@@ -329,15 +345,24 @@ Rectangle {
                 Binding {
                     target: outputComboboxEditor
                     property: "selectedItem"
-                    value: rootItem.dependentVariableModel.outputName
+                    value: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable ? rootItem.taskModel.temporaryDependentVariable.outputName : ""
                 }
 
                 onSelectedItemChanged: {
-                    console.log("TODO Handle temporary")
+                    if (outputComboboxEditor.selectedItem && rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
+                    {
+                        rootItem.taskModel.temporaryDependentVariable.outputName = outputComboboxEditor.selectedItem
+                    }
                 }
 
                 onVisibleChanged: {
-                    console.log("TODO Handle temporary")
+                    if (visible && rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
+                    {
+                        var index = outputComboboxEditor.model.indexOf(rootItem.taskModel.temporaryDependentVariable.outputName);
+                        if (index > -1) {
+                            outputComboboxEditor.selectedIndex = index;
+                        }
+                    }
                 }
             }
         }
@@ -365,7 +390,10 @@ Rectangle {
             }
 
             onClicked: {
-                console.log("TODO Handle temporary")
+                if (rootItem.taskModel && rootItem.dependentVariableModel)
+                {
+                    rootItem.taskModel.applyTemporaryDependentVariable(rootItem.dependentVariableModel);
+                }
 
                 rootItem.isCurrentlyEditing = false
             }
@@ -419,7 +447,10 @@ Rectangle {
             }
 
             onClicked: {
-                console.log("TODO Handle temporary")
+                if (rootItem.taskModel && rootItem.dependentVariableModel)
+                {
+                    rootItem.taskModel.deleteDependentVariable(rootItem.dependentVariableModel)
+                }
             }
         }
 
@@ -439,7 +470,9 @@ Rectangle {
             }
 
             onClicked: {
-                console.log("TODO Handle temporary")
+                if (rootItem.taskModel && rootItem.dependentVariableModel) {
+                    rootItem.taskModel.initTemporaryDependentVariable(rootItem.dependentVariableModel)
+                }
 
                 rootItem.isCurrentlyEditing = true
             }

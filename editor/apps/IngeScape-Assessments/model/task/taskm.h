@@ -57,6 +57,9 @@ class TaskM : public QObject
     // Found in the platform (JSON file) of our task
     I2_QOBJECT_HASHMODEL(AgentNameAndOutputsM, hashFromAgentNameToSimplifiedAgent)
 
+    // Temporary dependent variable used for edition rollbacks
+    I2_QML_PROPERTY(DependentVariableM*, temporaryDependentVariable)
+
 
 public:
     /**
@@ -122,13 +125,30 @@ public:
      */
     static TaskM* createTaskFromCassandraRow(const CassRow* row);
 
+    /**
+     * @brief Delete the given task from the Cassandra DB
+     * @param task
+     */
     static void deleteTaskFromCassandra(const TaskM& task);
 
+    /**
+     * @brief Initialize the temporary dependent variable with the given dependent variable
+     * @param baseVariable
+     */
+    Q_INVOKABLE void initTemporaryDependentVariable(DependentVariableM* baseVariable);
 
-Q_SIGNALS:
+    /**
+     * @brief Apply the values from the temporary dependent variable to the givend dependent variable.
+     * Update said dependent variable into the Cassandra DB
+     * @param variableToUpdate
+     */
+    Q_INVOKABLE void applyTemporaryDependentVariable(DependentVariableM* variableToUpdate);
 
-
-private Q_SLOTS:
+    /**
+     * @brief Delete the given dependent variable from the task and from the Cassandra DB
+     * @param variableToUpdate
+     */
+    Q_INVOKABLE void deleteDependentVariable(DependentVariableM* variableToDelete);
 
 
 private:
