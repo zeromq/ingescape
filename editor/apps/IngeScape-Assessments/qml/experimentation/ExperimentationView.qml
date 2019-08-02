@@ -94,8 +94,8 @@ Item {
                 topMargin: 20
             }
 
-            height: 42
-            width: 42
+            height: 50
+            width: 50
 
             style: IngeScapeAssessmentsSvgButtonStyle {
                 releasedID: "home-button"
@@ -128,7 +128,7 @@ Item {
 
             radius: 5
 
-            width: expeName.width + 76
+            width: expeName.width + 66
             height: 40
 
             color: IngeScapeTheme.middleLightGreyColor
@@ -185,20 +185,20 @@ Item {
                 leftMargin: 92
             }
 
+            width: 536
+
             text: rootItem.experimentation ? rootItem.experimentation.name : ""
 
             verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
+            horizontalAlignment: Text.AlignLeft
 
             visible: !rootItem.isEditingName
 
-            //FIXME Proper font
             color: IngeScapeAssessmentsTheme.blueButton
             font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 22
-                bold: true
+                family: IngeScapeTheme.labelFontFamily
+                weight: Font.Black
+                pixelSize: 24
             }
         }
 
@@ -209,6 +209,25 @@ Item {
 
             visible: rootItem.isEditingName
             enabled: visible
+
+            style: I2TextFieldStyle {
+                backgroundColor: IngeScapeTheme.whiteColor
+                borderColor: IngeScapeTheme.lightGreyColor
+                borderErrorColor: IngeScapeTheme.redColor
+                radiusTextBox: 5
+                borderWidth: 0
+                borderWidthActive: 1
+                textIdleColor: IngeScapeTheme.blackColor
+                textDisabledColor: IngeScapeTheme.veryLightGreyColor
+
+                padding.left: 10
+                padding.right: 5
+
+                font {
+                    pixelSize: 20
+                    family: IngeScapeTheme.textFontFamily
+                }
+            }
         }
 
         Row {
@@ -227,12 +246,11 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
 
-                //FIXME Proper font
-                color: IngeScapeTheme.blackColor
+                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
                     family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
                     pixelSize: 20
+                    bold: true
                 }
             }
 
@@ -244,12 +262,11 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
 
-                //FIXME Proper font
-                color: IngeScapeTheme.blackColor
+                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
                     family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
+                    pixelSize: 18
+                    bold: true
                     italic: true
                 }
             }
@@ -438,11 +455,11 @@ Item {
                 height: parent.height
                 verticalAlignment: Text.AlignVCenter
 
-                color: IngeScapeTheme.blackColor
+                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 20
+                    family: IngeScapeTheme.labelFontFamily
+                    weight: Font.Black
+                    pixelSize: 24
                 }
             }
 
