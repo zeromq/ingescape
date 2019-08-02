@@ -270,8 +270,13 @@ I2PopupBase {
                 console.log("Not implemented yet")
             }
 
-            style: IngeScapeAssessmentsButtonStyle {
+            style: IngeScapeAssessmentsSvgAndTextButtonStyle {
                 text: qsTr("DOWNLOAD LIST")
+
+                releasedID: "download-list"
+                pressedID: releasedID
+                rolloverID: releasedID
+                disabledID: releasedID
             }
         }
 
