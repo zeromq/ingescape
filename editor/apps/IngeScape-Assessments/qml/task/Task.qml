@@ -340,12 +340,10 @@ Item {
             }
 
             property var headerColumnWidths: [
-                229,                                 // Name
-                336,                                 // Description
-                231,                                 // Agent
-                227,                                 // Output
-                width - 229 - 336 - 231 - 227 - 144, // Frequency
-                144                                  // Buttons
+                229, // Name
+                336, // Description
+                231, // Agent
+                227  // Output
             ]
 
             Row {
@@ -362,9 +360,7 @@ Item {
                         "Name",
                         "Description",
                         "Agent",
-                        "Output",
-                        "Frequency",
-                        "" // Buttons' column has no headers
+                        "Output"
                     ]
 
                     Text {
@@ -378,8 +374,8 @@ Item {
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 16
                             weight: Font.Black
+                            pixelSize: 16
                         }
                     }
                 }
@@ -387,6 +383,7 @@ Item {
         }
 
         Rectangle {
+            id: depVarTable
             anchors {
                 top: depVarListHeader.bottom
                 left: parent.left
@@ -396,19 +393,32 @@ Item {
 
             color: IngeScapeTheme.whiteColor
 
+            property bool depVarEditionInProgress: false
+
             ListView {
                 id: depVarColumn
                 anchors.fill: parent
 
-                model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+                model: rootItem.modelM ? rootItem.modelM.dependentVariables : null
 
-                delegate: Rectangle {
+                delegate: DependentVariableDelegate {
                     id: depVarDelegate
 
                     height: 40
                     width: depVarColumn.width
 
-                    // TODO
+                    columnWidths: depVarListHeader.headerColumnWidths
+
+                    dependentVariableModel: model ? model.QtObject : null
+
+                    depVarEditionInProgress: depVarTable.depVarEditionInProgress
+
+                    Binding {
+                        target: depVarTable
+                        property: "depVarEditionInProgress"
+                        value: depVarDelegate.isCurrentlyEditing
+                    }
+
                 }
             }
         }

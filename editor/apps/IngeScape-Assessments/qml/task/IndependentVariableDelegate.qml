@@ -64,8 +64,9 @@ Rectangle {
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
                     family: IngeScapeTheme.textFontFamily
-                    weight: index == 0 ? Font.Bold : Font.Medium
+                    weight: Font.Medium
                     pixelSize: 16
+                    bold: index == 0
                 }
             }
         }
