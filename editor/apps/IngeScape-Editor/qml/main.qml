@@ -506,6 +506,10 @@ ApplicationWindow {
                     return ((applicationLoader.status === Loader.Ready) && (IngeScapeEditorC.modelManager !== null));
                 });
 
+                mainWindow.title = Qt.binding(function() {
+                    return qsTr("IngeScape Editor - v%1 - %2").arg(Qt.application.version).arg(IngeScapeEditorC.currentPlatformName);
+                });
+
                 menuPlugUNplugMapping.text = Qt.binding(function() {
                     return (((IngeScapeEditorC.modelManager !== null) && IngeScapeEditorC.modelManager.isMappingConnected) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
                 });

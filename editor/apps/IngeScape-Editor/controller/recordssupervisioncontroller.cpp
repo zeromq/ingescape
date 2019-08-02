@@ -260,6 +260,21 @@ void RecordsSupervisionController::stopOrPauseReplay(bool isStop)
 
 
 /**
+ * @brief Get the name of the current replay
+ * @return
+ */
+QString RecordsSupervisionController::getCurrentReplayName()
+{
+    if ((_currentReplay != nullptr) && (_currentReplay->modelM() != nullptr)) {
+        return _currentReplay->modelM()->name();
+    }
+    else {
+        return "";
+    }
+}
+
+
+/**
  * @brief Slot called when a recorder enter the network
  * @param peerId
  * @param peerName

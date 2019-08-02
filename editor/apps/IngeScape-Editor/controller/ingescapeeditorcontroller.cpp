@@ -867,10 +867,15 @@ void IngeScapeEditorController::_onStartToRecord()
  */
 void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions)
 {
+    QString recordName = "";
+
     if (_recordsSupervisionC != nullptr)
     {
         // Update the current state of the replay
         _recordsSupervisionC->setreplayState(ReplayStates::LOADING);
+
+        // Get the name of the current replay
+        recordName = _recordsSupervisionC->getCurrentReplayName();
     }
 
     if ((deltaTimeFromTimeLine >= 0) && !jsonPlatform.isEmpty())
@@ -884,6 +889,11 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLine, QStr
         bool success = _loadPlatformFromJSON(jsonDocument);
         if (success)
         {
+            // Update the current platform name
+            if (!recordName.isEmpty()) {
+                setcurrentPlatformName(recordName);
+            }
+
             if (_scenarioC != nullptr)
             {
                 // Update the current time

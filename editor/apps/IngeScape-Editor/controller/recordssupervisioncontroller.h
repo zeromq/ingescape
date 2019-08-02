@@ -127,6 +127,13 @@ public:
     Q_INVOKABLE void stopOrPauseReplay(bool isStop);
 
 
+    /**
+     * @brief Get the name of the current replay
+     * @return
+     */
+    QString getCurrentReplayName();
+
+
 Q_SIGNALS:
 
     /**
