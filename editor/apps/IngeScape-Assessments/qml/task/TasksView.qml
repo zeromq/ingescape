@@ -77,33 +77,6 @@ I2PopupBase {
         color: IngeScapeAssessmentsTheme.darkerDarkBlueHeader
     }
 
-    Button {
-        id: btnClose
-
-        anchors {
-            top: parent.top
-            topMargin: 21
-            right: parent.right
-            rightMargin: 21
-        }
-
-        height: 18
-        width: 18
-
-        style: IngeScapeAssessmentsSvgButtonStyle {
-            releasedID: "close"
-        }
-
-        onClicked: {
-            if (controller) {
-                controller.selectedTask = null;
-            }
-
-            // Emit the signal "closeTasksView"
-            rootItem.closeTasksView();
-        }
-    }
-
     Item {
         id: leftPart
 
@@ -222,8 +195,8 @@ I2PopupBase {
     //
     // Task
     //
-    Task {
-        id: task
+    Rectangle {
+        id: taskItem
 
         anchors {
             top: parent.top
@@ -232,7 +205,42 @@ I2PopupBase {
             right: parent.right
         }
 
-        taskController: rootItem.controller
+        color: IngeScapeTheme.veryLightGreyColor
+
+        Task {
+            id: task
+
+            anchors.fill: parent
+
+            taskController: rootItem.controller
+        }
+
+        Button {
+            id: btnClose
+
+            anchors {
+                top: parent.top
+                topMargin: 21
+                right: parent.right
+                rightMargin: 21
+            }
+
+            height: 18
+            width: 18
+
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "close"
+            }
+
+            onClicked: {
+                if (controller) {
+                    controller.selectedTask = null;
+                }
+
+                // Emit the signal "closeTasksView"
+                rootItem.closeTasksView();
+            }
+        }
     }
 
 
