@@ -309,7 +309,7 @@ Item {
                     id: rootExperimentation
 
                     property ExperimentationM experimentation: model.QtObject
-                    property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.hovered || btnOpen.hovered
+                    property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.containsMouse || btnOpen.containsMouse
 
                     width: parent.width
                     height: listViewExperimentations.itemHeight
@@ -370,13 +370,18 @@ Item {
 
                             anchors.verticalCenter: parent.verticalCenter
 
+                            property bool containsMouse: __behavior.containsMouse
+
+                            opacity: rootExperimentation.isMouseHovering ? 1 : 0
+                            enabled: opacity > 0
+
+                            width: 40
+                            height: 30
+
                             style: IngeScapeAssessmentsSvgButtonStyle {
                                 releasedID: "delete-blue"
                                 disabledID: releasedID
                             }
-
-                            width: 40
-                            height: 30
 
                             onClicked: {
                                 rootItem.deleteExperimentation(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup)
@@ -388,15 +393,20 @@ Item {
 
                             anchors.verticalCenter: parent.verticalCenter
 
+                            property bool containsMouse: __behavior.containsMouse
+
+                            opacity: rootExperimentation.isMouseHovering ? 1 : 0
+                            enabled: opacity > 0
+
                             width: 85
                             height: 30
 
-                            onClicked: {
-                                rootItem.openExperimentation(rootExperimentation.experimentation)
-                            }
-
                             style: IngeScapeAssessmentsButtonStyle {
                                 text: "OPEN"
+                            }
+
+                            onClicked: {
+                                rootItem.openExperimentation(rootExperimentation.experimentation)
                             }
                         }
                     }

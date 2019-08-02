@@ -230,7 +230,7 @@ Rectangle {
             opacity: rootItem.isMouseHovering ? 1 : 0
             enabled: opacity > 0
 
-            width: 86
+            width: 85
             height: 30
 
             style: IngeScapeAssessmentsButtonStyle {
