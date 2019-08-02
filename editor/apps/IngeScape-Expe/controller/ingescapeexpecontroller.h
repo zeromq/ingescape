@@ -147,9 +147,9 @@ private Q_SLOTS:
 
     /**
      * @brief Slot called when the state of the TimeLine updated (in Editor app)
-     * @param state
+     * @param parameters
      */
-    void _onTimeLineStateUpdated(QString state);
+    void _onTimeLineStateUpdated(QString parameters);
 
 
 private:

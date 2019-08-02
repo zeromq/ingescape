@@ -105,9 +105,9 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
     // The state of the TimeLine updated (in Editor app)
     else if (message.startsWith(prefix_TimeLineState))
     {
-        QString state = message.remove(0, prefix_TimeLineState.length());
+        QString parameters = message.remove(0, prefix_TimeLineState.length());
 
-        Q_EMIT timeLineStateUpdated(state);
+        Q_EMIT timeLineStateUpdated(parameters);
     }
     // Unknown
     else {

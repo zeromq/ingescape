@@ -412,29 +412,42 @@ void IngeScapeExpeController::forceCreation()
 
 /**
  * @brief Slot called when the state of the TimeLine updated (in Editor app)
- * @param state
+ * @param parameters
  */
-void IngeScapeExpeController::_onTimeLineStateUpdated(QString state)
+void IngeScapeExpeController::_onTimeLineStateUpdated(QString parameters)
 {
-    qDebug() << state << "the timeline";
+    if (!parameters.isEmpty())
+    {
+        QStringList parametersList = parameters.split("|");
+        if (parametersList.count() == 2)
+        {
+            QString state = parametersList.at(0);
+            QString deltaTimeFromTimeLineStart = parametersList.at(1);
 
-    // PLAY (the TimeLine)
-    if (state == PLAY) {
-        //setisPlayingTimeLine(true);
-        settimeLineState(TimeLineStates::PLAYING);
-    }
-    // PAUSE (the TimeLine)
-    else if (state == PAUSE) {
-        //setisPlayingTimeLine(false);
-        settimeLineState(TimeLineStates::PAUSED);
-    }
-    // RESET (the TimeLine)
-    else if (state == RESET) {
-        //setisPlayingTimeLine(false);
-        settimeLineState(TimeLineStates::STOPPED);
-    }
-    else {
-        qCritical() << "Unknown state" << state << "of the TimeLine !";
+            qDebug() << state << "the timeline at" << deltaTimeFromTimeLineStart;
+
+            // PLAY (the TimeLine)
+            if (state == PLAY) {
+                //setisPlayingTimeLine(true);
+                settimeLineState(TimeLineStates::PLAYING);
+            }
+            // PAUSE (the TimeLine)
+            else if (state == PAUSE) {
+                //setisPlayingTimeLine(false);
+                settimeLineState(TimeLineStates::PAUSED);
+            }
+            // RESET (the TimeLine)
+            else if (state == RESET) {
+                //setisPlayingTimeLine(false);
+                settimeLineState(TimeLineStates::STOPPED);
+            }
+            else {
+                qCritical() << "Unknown state" << state << "of the TimeLine !";
+            }
+        }
+        else {
+            qCritical() << parameters << "must have 2 parameters !";
+        }
     }
 }
 

@@ -417,12 +417,12 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
         // Check that there are still 3 frames
         if (zmsg_size(zMessage) == 3)
         {
-            QString deltaTimeFromTimeLine = zmsg_popstr(zMessage);
+            QString deltaTimeFromTimeLineStart = zmsg_popstr(zMessage);
             QString jsonPlatform = zmsg_popstr(zMessage);
             QString jsonExecutedActions = zmsg_popstr(zMessage);
 
             // Emit the signal "Replay Loading received"
-            Q_EMIT replayLoadingReceived(deltaTimeFromTimeLine.toInt(), jsonPlatform, jsonExecutedActions);
+            Q_EMIT replayLoadingReceived(deltaTimeFromTimeLineStart.toInt(), jsonPlatform, jsonExecutedActions);
         }
     }
     // A replay has been loaded

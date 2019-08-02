@@ -139,11 +139,11 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a replay is currently loading
-     * @param deltaTimeFromTimeLine
+     * @param deltaTimeFromTimeLineStart
      * @param jsonPlatform
      * @param jsonExecutedActions
      */
-    void replayLoadingReceived(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions);
+    void replayLoadingReceived(int deltaTimeFromTimeLineStart, QString jsonPlatform, QString jsonExecutedActions);
 
 
     /**

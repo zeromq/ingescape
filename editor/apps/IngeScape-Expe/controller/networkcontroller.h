@@ -80,9 +80,9 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when the state of the TimeLine updated (in Editor app)
-     * @param state
+     * @param parameters
      */
-    void timeLineStateUpdated(QString state);
+    void timeLineStateUpdated(QString parameters);
 
 
 public Q_SLOTS:

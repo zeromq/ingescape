@@ -842,13 +842,13 @@ void IngeScapeEditorController::_onStartToRecord()
         //commandAndParameters.append(QString("Record-%1").arg(_currentPlatformName));
         commandAndParameters.append(_currentPlatformName);
 
-        // Add the delta of the start time from the Time Line
-        int deltaTimeFromTimeLine = 0;
+        // Add the delta from the start time of the TimeLine
+        int deltaTimeFromTimeLineStart = 0;
 
         if (_scenarioC != nullptr) {
-            deltaTimeFromTimeLine = _scenarioC->currentTime().msecsSinceStartOfDay();
+            deltaTimeFromTimeLineStart = _scenarioC->currentTime().msecsSinceStartOfDay();
         }
-        commandAndParameters.append(QString::number(deltaTimeFromTimeLine));
+        commandAndParameters.append(QString::number(deltaTimeFromTimeLineStart));
 
         // Add the content of the JSON file
         commandAndParameters.append(jsonString);
@@ -861,11 +861,11 @@ void IngeScapeEditorController::_onStartToRecord()
 
 /**
  * @brief Slot called when a replay is currently loading
- * @param deltaTimeFromTimeLine
+ * @param deltaTimeFromTimeLineStart
  * @param jsonPlatform
  * @param jsonExecutedActions
  */
-void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions)
+void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart, QString jsonPlatform, QString jsonExecutedActions)
 {
     QString recordName = "";
 
@@ -878,7 +878,7 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLine, QStr
         recordName = _recordsSupervisionC->getCurrentReplayName();
     }
 
-    if ((deltaTimeFromTimeLine >= 0) && !jsonPlatform.isEmpty())
+    if ((deltaTimeFromTimeLineStart >= 0) && !jsonPlatform.isEmpty())
     {
         // First, clear the current platform by deleting all existing data
         clearCurrentPlatform();
@@ -897,7 +897,7 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLine, QStr
             if (_scenarioC != nullptr)
             {
                 // Update the current time
-                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLine));
+                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLineStart));
 
                 // FIXME TODO jsonExecutedActions
                 //qDebug() << "jsonExecutedActions" << jsonExecutedActions;
@@ -1000,7 +1000,14 @@ void IngeScapeEditorController::_onTimeLineStateUpdated(QString state)
 {
     if (_networkC != nullptr)
     {
-        QString notificationAndParameters = QString("%1=%2").arg(notif_TimeLineState, state);
+        // Add the delta from the start time of the TimeLine
+        int deltaTimeFromTimeLineStart = 0;
+
+        if (_scenarioC != nullptr) {
+            deltaTimeFromTimeLineStart = _scenarioC->currentTime().msecsSinceStartOfDay();
+        }
+
+        QString notificationAndParameters = QString("%1=%2|%3").arg(notif_TimeLineState, state, QString::number(deltaTimeFromTimeLineStart));
 
         // Notify the Recorder app
         if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())

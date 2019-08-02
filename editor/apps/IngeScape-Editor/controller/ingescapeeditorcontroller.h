@@ -262,11 +262,11 @@ private Q_SLOTS:
 
     /**
      * @brief Slot called when a replay is currently loading
-     * @param deltaTimeFromTimeLine
+     * @param deltaTimeFromTimeLineStart
      * @param jsonPlatform
      * @param jsonExecutedActions
      */
-    void _onReplayLoading(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions);
+    void _onReplayLoading(int deltaTimeFromTimeLineStart, QString jsonPlatform, QString jsonExecutedActions);
 
 
     /**
