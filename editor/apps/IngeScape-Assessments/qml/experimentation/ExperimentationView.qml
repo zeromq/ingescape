@@ -202,7 +202,6 @@ Item {
             }
         }
 
-        //FIXME Style !!
         TextField {
             id: expeNameEditionTextField
             anchors.fill: expeName
@@ -217,7 +216,7 @@ Item {
                 radiusTextBox: 5
                 borderWidth: 0
                 borderWidthActive: 1
-                textIdleColor: IngeScapeTheme.blackColor
+                textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 textDisabledColor: IngeScapeTheme.veryLightGreyColor
 
                 padding.left: 10
@@ -513,7 +512,7 @@ Item {
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 16
+                            pixelSize: 18
                             weight: Font.Black
                         }
                     }
@@ -529,7 +528,7 @@ Item {
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 16
+                            pixelSize: 18
                             weight: Font.Black
                         }
                     }
@@ -545,7 +544,7 @@ Item {
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 16
+                            pixelSize: 18
                             weight: Font.Black
                         }
                     }
@@ -561,7 +560,7 @@ Item {
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 16
+                            pixelSize: 18
                             weight: Font.Black
                         }
                     }
@@ -577,7 +576,7 @@ Item {
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 16
+                            pixelSize: 18
                             weight: Font.Black
                         }
                     }
@@ -593,7 +592,7 @@ Item {
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 16
+                            pixelSize: 18
                             weight: Font.Black
                         }
                     }

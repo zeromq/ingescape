@@ -62,7 +62,7 @@ Rectangle {
     property alias durationColumnWidth: duration.width
     property alias buttonColumnWidth: buttonRow.width
 
-    property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.hovered || btnOpen.hovered
+    property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.containsMouse || btnOpen.containsMouse
 
     color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
 
@@ -108,11 +108,11 @@ Rectangle {
             text: rootItem.modelM ? rootItem.modelM.name : ""
             elide: Text.ElideRight
 
-            color: IngeScapeTheme.blackColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 14
+                weight: Font.Bold
+                pixelSize: 16
             }
         }
 
@@ -121,11 +121,11 @@ Rectangle {
 
             text: (rootItem.modelM && rootItem.modelM.task) ? rootItem.modelM.task.name : ""
 
-            color: IngeScapeTheme.blackColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
                 family: IngeScapeTheme.textFontFamily
-                //weight: Font.Medium
-                pixelSize: 14
+                weight: Font.Bold
+                pixelSize: 16
             }
         }
 
@@ -134,11 +134,11 @@ Rectangle {
 
             text: (rootItem.modelM && rootItem.modelM.subject) ? rootItem.modelM.subject.displayedId : ""
 
-            color: IngeScapeTheme.blackColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
                 family: IngeScapeTheme.textFontFamily
-                //weight: Font.Medium
-                pixelSize: 14
+                weight: Font.Bold
+                pixelSize: 16
             }
         }
 
@@ -148,11 +148,11 @@ Rectangle {
             text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "dd/MM/yyyy")
                                   : "../../...."
 
-            color: IngeScapeTheme.blackColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
                 family: IngeScapeTheme.textFontFamily
-                //weight: Font.Medium
-                pixelSize: 14
+                weight: Font.Bold
+                pixelSize: 16
             }
         }
 
@@ -162,11 +162,11 @@ Rectangle {
             text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "hh:mm:ss")
                                   : "..:..:.."
 
-            color: IngeScapeTheme.blackColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
                 family: IngeScapeTheme.textFontFamily
-                //weight: Font.Medium
-                pixelSize: 14
+                weight: Font.Bold
+                pixelSize: 16
             }
         }
 
@@ -178,11 +178,11 @@ Rectangle {
                                         : "00:00:00.000"*/
             text: "00:00:00.000"
 
-            color: IngeScapeTheme.blackColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
                 family: IngeScapeTheme.textFontFamily
-                //weight: Font.Medium
-                pixelSize: 14
+                weight: Font.Bold
+                pixelSize: 16
             }
         }
 
@@ -202,13 +202,18 @@ Rectangle {
 
             anchors.verticalCenter: parent.verticalCenter
 
+            property bool containsMouse: __behavior.containsMouse
+
+            opacity: rootItem.isMouseHovering ? 1 : 0
+            enabled: opacity > 0
+
+            width: 40
+            height: 30
+
             style: IngeScapeAssessmentsSvgButtonStyle {
                 releasedID: "delete-blue"
                 disabledID: releasedID
             }
-
-            width: 40
-            height: 30
 
             onClicked: {
                 rootItem.deleteRecordSetup();
@@ -220,15 +225,20 @@ Rectangle {
 
             anchors.verticalCenter: parent.verticalCenter
 
+            property bool containsMouse: __behavior.containsMouse
+
+            opacity: rootItem.isMouseHovering ? 1 : 0
+            enabled: opacity > 0
+
             width: 86
             height: 30
 
-            onClicked: {
-                rootItem.openRecordSetup();
-            }
-
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OPEN"
+            }
+
+            onClicked: {
+                rootItem.openRecordSetup();
             }
         }
     }
