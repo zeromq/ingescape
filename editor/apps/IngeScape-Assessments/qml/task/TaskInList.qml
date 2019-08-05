@@ -20,14 +20,11 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
-//import "theme" as Theme
-//import "../popup" as Popup
+import "../popup" as Popup
 
 
 Item {
     id: rootItem
-
-    //anchors.fill: parent
 
     width: parent.width
     height: 60
@@ -175,8 +172,7 @@ Item {
                 }
 
                 onClicked: {
-                    // Emit the signal "Delete Task"
-                    rootItem.deleteTask();
+                    deleteTaskPopup.open()
                 }
             }
 
@@ -195,6 +191,30 @@ Item {
                     rootItem.duplicateTask();
                 }
             }
+        }
+    }
+
+    Popup.DeleteConfirmationPopup {
+        id: deleteTaskPopup
+
+        layerObjectName: "overlay2Layer"
+
+        showPopupTitle: false
+        anchors.centerIn: parent
+
+        text: rootItem.modelM ? qsTr("Are you sure you want to delete the task %1 ?").arg(rootItem.modelM.name) : ""
+
+        height: 160
+        width: 470
+
+        onValidated: {
+            // Emit the signal "Delete Task"
+            rootItem.deleteTask();
+            deleteTaskPopup.close()
+        }
+
+        onCanceled: {
+            deleteTaskPopup.close()
         }
     }
 

@@ -647,11 +647,8 @@ Item {
                             }
 
                             onDeleteRecordSetup: {
-                                if (rootItem.controller && modelM) {
-                                    //console.log("QML: deleteRecordSetup " + modelM.name);
-
-                                    rootItem.controller.deleteRecordSetup(modelM);
-                                }
+                                deleteRecordSetupPopup.recordSetup = modelM
+                                deleteRecordSetupPopup.open()
                             }
                         }
                     }
@@ -777,6 +774,33 @@ Item {
 //                stackview.pop();
             }
         }
+    }
+
+
+    Popup.DeleteConfirmationPopup {
+        id: deleteRecordSetupPopup
+
+        property var recordSetup: null
+
+        showPopupTitle: false
+        anchors.centerIn: parent
+
+        text: recordSetup ? qsTr("Are you sure you want to delete the record setup %1 ?").arg(recordSetup.name) : ""
+
+        height: 160
+        width: 470
+
+        onValidated: {
+            if (rootItem.controller && recordSetup) {
+                rootItem.controller.deleteRecordSetup(recordSetup);
+            }
+            close()
+        }
+
+        onCanceled: {
+            close()
+        }
+
     }
 
 }

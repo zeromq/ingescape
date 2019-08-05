@@ -20,6 +20,8 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
+import "../popup" as Popup
+
 
 Rectangle {
     id: rootItem
@@ -314,7 +316,7 @@ Rectangle {
             }
 
             onClicked: {
-                deleteSubject()
+                deleteSubjectPopup.open()
             }
         }
 
@@ -354,6 +356,29 @@ Rectangle {
         }
         height: 2
         color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.veryLightGreyColor
+    }
+
+    Popup.DeleteConfirmationPopup {
+        id: deleteSubjectPopup
+
+        layerObjectName: "overlay2Layer"
+
+        showPopupTitle: false
+        anchors.centerIn: parent
+
+        text: rootItem.subject ? qsTr("Are you sure you want to delete the subject %1 ?").arg(rootItem.subject.displayID) : ""
+
+        height: 160
+        width: 470
+
+        onValidated: {
+            deleteSubject()
+            deleteSubjectPopup.close()
+        }
+
+        onCanceled: {
+            deleteSubjectPopup.close()
+        }
     }
 }
 
