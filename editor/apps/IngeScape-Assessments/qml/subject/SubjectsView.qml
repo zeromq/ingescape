@@ -133,11 +133,11 @@ I2PopupBase {
             height: parent.height
             verticalAlignment: Text.AlignVCenter
 
-            color: IngeScapeTheme.blackColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 20
+                family: IngeScapeTheme.labelFontFamily
+                weight: Font.Black
+                pixelSize: 24
             }
         }
 
@@ -246,11 +246,11 @@ I2PopupBase {
             height: parent.height
             verticalAlignment: Text.AlignVCenter
 
-            color: IngeScapeTheme.blackColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 20
+                family: IngeScapeTheme.labelFontFamily
+                weight: Font.Black
+                pixelSize: 22
             }
         }
 

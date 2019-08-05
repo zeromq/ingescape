@@ -97,8 +97,8 @@ Rectangle {
                     color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                     font {
                         family: IngeScapeTheme.textFontFamily
-                        //weight: Font.Medium
-                        pixelSize: 14
+                        weight: index == 0 ? Font.Bold : Font.Medium
+                        pixelSize: 16
                     }
                 }
 
@@ -137,8 +137,7 @@ Rectangle {
                             currentTextColorIdle: IngeScapeTheme.blackColor
                             font {
                                 family: IngeScapeTheme.textFontFamily
-                                //weight: Font.Medium
-                                pixelSize: 14
+                                pixelSize: 16
                             }
                         }
 
@@ -219,8 +218,8 @@ Rectangle {
                             padding.right: 5
 
                             font {
-                                pixelSize: 14
                                 family: IngeScapeTheme.textFontFamily
+                                pixelSize: 16
                             }
                         }
 

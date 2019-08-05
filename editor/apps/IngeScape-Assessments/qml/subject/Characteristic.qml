@@ -90,11 +90,11 @@ Item {
         Text {
             text: rootItem.modelM ? rootItem.modelM.name : ""
 
-            color: IngeScapeTheme.blackColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 18
+                family: IngeScapeTheme.labelFontFamily
+                weight: Font.Black
+                pixelSize: 20
             }
         }
 
@@ -105,7 +105,7 @@ Item {
                                                                                                     : "")
                   : ""
 
-            color: IngeScapeTheme.blackColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
                 family: IngeScapeTheme.textFontFamily
                 pixelSize: 16
@@ -164,8 +164,8 @@ Item {
 
         text: rootItem.modelM ? qsTr("Are you sure you want to delete the characteristic %1 ?").arg(rootItem.modelM.name) : ""
 
-        height: 157
-        width: 419
+        height: 160
+        width: 470
 
         onValidated: {
             // Emit the signal "Delete Characteristic"

@@ -34,6 +34,8 @@ AssessmentsPopupBase {
             topMargin: 50
             left: parent.left
             leftMargin: 20
+            right: parent.right
+            rightMargin: 20
         }
 
         wrapMode: Text.WordWrap
