@@ -207,10 +207,6 @@ void TaskM::deleteTaskFromCassandra(const TaskM& task)
     cass_future_free(cassFuture);
     cass_statement_free(cassStatement);
 
-    // Clean-up cassandra objects
-    cass_future_free(cassFuture);
-    cass_statement_free(cassStatement);
-
     // Remove dependent_var from DB
     query = "DELETE FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ?;";
     cassStatement = cass_statement_new(query, 2);
