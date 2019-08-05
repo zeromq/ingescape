@@ -27,7 +27,7 @@ Item {
     id: rootItem
 
     width: parent.width
-    height: 60
+    height: 97
 
 
     //--------------------------------------------------------
