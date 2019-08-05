@@ -137,7 +137,9 @@ Item {
         }
 
         MouseArea {
+            id: mouseArea
             anchors.fill: parent
+            hoverEnabled: true
 
             onClicked: {
                 // Emit the signal "Select Task"
@@ -158,10 +160,13 @@ Item {
 
             spacing: 8
 
-            visible: rootItem.isSelected
+            opacity: rootItem.isSelected || mouseArea.containsMouse || btnDuplicate.containsMouse || btnDelete.containsMouse ? 1 : 0
+            enabled: opacity > 0
 
             Button {
                 id: btnDuplicate
+
+                property bool containsMouse: __behavior.containsMouse
 
                 width: 41
                 height: 30
@@ -178,6 +183,8 @@ Item {
 
             Button {
                 id: btnDelete
+
+                property bool containsMouse: __behavior.containsMouse
 
                 width: 41
                 height: 30
