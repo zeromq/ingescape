@@ -128,7 +128,7 @@ Item {
 
             radius: 5
 
-            width: expeName.width + 66
+            width: Math.max(expeName.width + 76, 450)
             height: 40
 
             color: IngeScapeTheme.middleLightGreyColor
@@ -184,8 +184,6 @@ Item {
                 left: parent.left
                 leftMargin: 92
             }
-
-            width: 536
 
             text: rootItem.experimentation ? rootItem.experimentation.name : ""
 
