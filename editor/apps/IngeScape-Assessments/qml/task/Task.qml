@@ -52,9 +52,6 @@ Item {
     //
     //--------------------------------
 
-    //
-    //signal todo();
-
 
 
     //--------------------------------
@@ -245,6 +242,8 @@ Item {
 
                 delegate: IndependentVariableDelegate {
                     id: indeVarDelegate
+
+                    taskController: rootItem.taskController
 
                     height: 40
                     width: indeVarColumn.width

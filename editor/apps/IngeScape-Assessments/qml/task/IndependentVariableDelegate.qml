@@ -23,17 +23,33 @@ import INGESCAPE 1.0
 Rectangle {
     id: rootItem
 
+    //--------------------------------------------------------
+    //
+    //
+    // Properties
+    //
+    //
+    //--------------------------------------------------------
 
+    // Model to diplay
     property var indeVarModel: null
-
-
+    // Task controller
+    property var taskController: null
     // Flag indicating if the mouse is hovering the item
     property bool isMouseHovering: itemMouseArea.containsMouse || deleteButton.containsMouse
-
+    // Width of the columns (bound by the parent)
     property var columnWidths: [ 0, 0, 0 ]
 
     color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
 
+
+    //--------------------------------------------------------
+    //
+    //
+    // Content
+    //
+    //
+    //--------------------------------------------------------
 
     MouseArea {
         id: itemMouseArea
@@ -95,7 +111,9 @@ Rectangle {
         }
 
         onClicked: {
-            console.log("Not implemented yet")
+            if (rootItem.taskController && rootItem.indeVarModel) {
+                rootItem.taskController.deleteIndependentVariable(rootItem.indeVarModel)
+            }
         }
     }
 
