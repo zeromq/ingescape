@@ -388,6 +388,15 @@ ApplicationWindow {
             anchors.fill: parent
         }
 
+        // Second overlay layer used to display popups above the content of another popup
+        I2Layer {
+            id: overlay2Layer
+
+            objectName: "overlay2Layer"
+
+            anchors.fill: parent
+        }
+
         // Overlay layer used to display draggable agent item above the content of our window and the popups
         /*I2Layer {
             id: overlayLayerDraggableItem

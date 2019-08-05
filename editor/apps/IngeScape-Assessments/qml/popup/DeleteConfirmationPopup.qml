@@ -22,8 +22,7 @@ import INGESCAPE 1.0
 
 AssessmentsPopupBase {
     id: rootPopup
-
-    property var characteristic: null
+    property alias text: popupText.text
 
     signal validated()
     signal canceled()
@@ -40,7 +39,6 @@ AssessmentsPopupBase {
         wrapMode: Text.WordWrap
 
         color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-        text: rootPopup.characteristic ? qsTr("Are you sure you want to delete the characteristic %1 ?").arg(rootPopup.characteristic.name) : ""
 
         font {
             family: IngeScapeTheme.textFontFamily

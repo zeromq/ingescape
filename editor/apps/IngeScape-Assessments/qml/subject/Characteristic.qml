@@ -156,17 +156,20 @@ Item {
 
     Popup.DeleteConfirmationPopup {
         id: deleteCharacteristicPopup
-        characteristic: rootItem.modelM
+
+        layerObjectName: "overlay2Layer"
 
         showPopupTitle: false
         anchors.centerIn: parent
+
+        text: rootItem.modelM ? qsTr("Are you sure you want to delete the characteristic %1 ?").arg(rootItem.modelM.name) : ""
 
         height: 157
         width: 419
 
         onValidated: {
             // Emit the signal "Delete Characteristic"
-            rootItem.deleteCharacteristic();
+            rootItem.deleteCharacteristic()
             deleteCharacteristicPopup.close()
         }
 
