@@ -20,8 +20,6 @@
         <file>qml/task/Task.qml</file>
         <file>qml/task/TaskInList.qml</file>
         <file>qml/popup/CreateIndependentVariablePopup.qml</file>
-        <file>qml/task/VariableTextEditor.qml</file>
-        <file>qml/task/VariableComboBoxEditor.qml</file>
         <file>qml/record/RecordSetupView.qml</file>
         <file>qml/record/IndependentVariableValueEditor.qml</file>
         <file>qml/task/IndependentVariableTableCell.qml</file>
