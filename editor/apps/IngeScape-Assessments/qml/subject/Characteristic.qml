@@ -20,7 +20,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
-//import "theme" as Theme
+import "../popup" as Popup
 
 
 Item {
@@ -138,8 +138,7 @@ Item {
         onClicked: {
             if (rootItem.modelM)
             {
-                // Emit the signal "Delete Characteristic"
-                rootItem.deleteCharacteristic();
+                deleteCharacteristicPopup.open()
             }
         }
     }
@@ -153,5 +152,26 @@ Item {
         }
         height: 2
         color: IngeScapeTheme.veryLightGreyColor
+    }
+
+    Popup.DeleteConfirmationPopup {
+        id: deleteCharacteristicPopup
+        characteristic: rootItem.modelM
+
+        showPopupTitle: false
+        anchors.centerIn: parent
+
+        height: 157
+        width: 419
+
+        onValidated: {
+            // Emit the signal "Delete Characteristic"
+            rootItem.deleteCharacteristic();
+            deleteCharacteristicPopup.close()
+        }
+
+        onCanceled: {
+            deleteCharacteristicPopup.close()
+        }
     }
 }

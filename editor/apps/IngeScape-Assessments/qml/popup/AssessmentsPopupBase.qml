@@ -41,6 +41,8 @@ I2PopupBase {
 
     // Popup title
     property alias title: titleText.text
+    // Show the title ?
+    property var showPopupTitle: true
 
 
     //--------------------------------------------------------
@@ -59,7 +61,10 @@ I2PopupBase {
             right: parent.right
         }
 
-        height: 52
+        visible: showPopupTitle
+        enabled: visible
+
+        height: visible ? 52 : 0
         color: IngeScapeAssessmentsTheme.blueButton
 
         Text {

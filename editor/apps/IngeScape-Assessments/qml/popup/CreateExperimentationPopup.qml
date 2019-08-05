@@ -378,8 +378,6 @@ AssessmentsPopupBase {
             }
 
             onClicked: {
-                //console.log("QML: cancel");
-
                 // Reset all user inputs and close the popup
                 rootPopup.resetInputsAndClosePopup();
             }
