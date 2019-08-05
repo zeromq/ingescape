@@ -18,17 +18,35 @@ import QtQuick.Controls.Styles 1.4
 
 import INGESCAPE 1.0
 
+import I2Quick 1.0
+
 RadioButtonStyle {
 
+    indicator: Item {
+        height: control.height
+        width: height
+
+        I2SvgItem {
+            id: logo
+
+            anchors.centerIn: parent
+
+            svgFileCache: IngeScapeAssessmentsTheme.svgFileIngeScapeAssessments
+            svgElementId: control.checked ? "radio-button-checked" : "radio-button-unchecked"
+        }
+    }
+
     label: Text {
+        height: control.height
 
         text: control.text
+        verticalAlignment: Text.AlignVCenter
 
-        color: IngeScapeTheme.whiteColor
+        color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
         font {
             family: IngeScapeTheme.textFontFamily
-            //weight: Font.Medium
-            pixelSize: 14
+            weight: Font.Medium
+            pixelSize: 16
         }
     }
 }

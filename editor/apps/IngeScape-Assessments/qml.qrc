@@ -32,5 +32,6 @@
         <file>qml/theme/IngeScapeAssessmentsSvgAndTextButtonStyle.qml</file>
         <file>qml/task/IndependentVariableDelegate.qml</file>
         <file>qml/task/DependentVariableDelegate.qml</file>
+        <file>qml/popup/AssessmentsPopupBase.qml</file>
     </qresource>
 </RCC>

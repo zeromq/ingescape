@@ -22,17 +22,15 @@ import INGESCAPE 1.0
 
 import "../theme" as Theme
 
-I2PopupBase {
+AssessmentsPopupBase {
     id: rootPopup
 
-    height: 500
-    width: 500
+    height: 395
+    width: 674
 
     anchors.centerIn: parent
 
-    isModal: true
-    dismissOnOutsideTap: false
-    keepRelativePositionToInitialParent: false
+    title: "NEW EXPERIMENT"
 
 
     //--------------------------------------------------------
@@ -107,360 +105,331 @@ I2PopupBase {
     //
     //--------------------------------
 
-    Rectangle {
+    Item {
+        id: rowName
 
         anchors {
-            fill: parent
+            top: parent.top
+            topMargin: 34
+            left: parent.left
+            leftMargin: 28
+            right: parent.right
+            rightMargin: 28
         }
-        radius: 5
-        border {
-            width: 2
-            color: IngeScapeTheme.editorsBackgroundBorderColor
-        }
-        color: IngeScapeTheme.editorsBackgroundColor
 
+        height: 30
 
         Text {
-            id: title
+            id: nameLabel
 
             anchors {
-                left: parent.left
-                right: parent.right
                 top: parent.top
-                topMargin: 20
+                bottom: parent.bottom
+                left: parent.left
             }
 
-            horizontalAlignment: Text.AlignHCenter
+            text: qsTr("Name :")
 
-            text: qsTr("New experimentation")
+            verticalAlignment: Text.AlignVCenter
 
-            color: IngeScapeTheme.whiteColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 20
+                pixelSize: 16
             }
         }
 
-        Row {
-            id: rowName
+        TextField {
+            id: txtExperimentationName
 
             anchors {
-                top: title.bottom
-                topMargin: 40
+                top: parent.top
+                bottom: parent.bottom
                 left: parent.left
-                leftMargin: 10
+                leftMargin: 132
+                right: parent.right
             }
 
-            spacing: 10
+            text: ""
 
-            Text {
-                width: 75
-                height: 30
+            style: I2TextFieldStyle {
+                backgroundColor: IngeScapeTheme.veryLightGreyColor
+                borderColor: IngeScapeAssessmentsTheme.blueButton
+                borderErrorColor: IngeScapeTheme.redColor
+                radiusTextBox: 5
+                borderWidth: 0;
+                borderWidthActive: 2
+                textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
+                textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
 
-                text: qsTr("Name:")
+                padding.left: 16
+                padding.right: 16
 
-                horizontalAlignment: Text.AlignRight
-                verticalAlignment: Text.AlignVCenter
-
-                color: IngeScapeTheme.whiteColor
                 font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
                     pixelSize: 16
+                    family: IngeScapeTheme.textFontFamily
                 }
             }
+        }
+    }
 
-            TextField {
-                id: txtExperimentationName
+    Rectangle {
+        anchors {
+            top: rowName.bottom
+            topMargin: 24
+            left: parent.left
+            leftMargin: 28
+            right: parent.right
+            rightMargin: 28
+        }
 
-                height: 30
-                width: 250
+        Text {
+            id: txtGroupsTitle
 
-                //verticalAlignment: TextInput.AlignVCenter
-                text: ""
+            anchors {
+                left: parent.left
+                top: parent.top
+            }
+            width: 75
+            height: 30
 
-                style: I2TextFieldStyle {
-                    backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                    borderColor: IngeScapeTheme.whiteColor
-                    borderErrorColor: IngeScapeTheme.redColor
-                    radiusTextBox: 1
-                    borderWidth: 0;
-                    borderWidthActive: 1
-                    textIdleColor: IngeScapeTheme.whiteColor;
-                    textDisabledColor: IngeScapeTheme.darkGreyColor
+            text: qsTr("Group :")
 
-                    padding.left: 3
-                    padding.right: 3
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 16
+            }
+        }
 
-                    font {
-                        pixelSize:15
-                        family: IngeScapeTheme.textFontFamily
+        Column {
+            anchors {
+                top: parent.top
+                left: parent.left
+                leftMargin: 160
+                right: parent.right
+            }
+            spacing: 4
+
+            ExclusiveGroup {
+                id: exclusiveExperimentationsGroup
+            }
+
+            Repeater {
+                model: controller ? controller.allExperimentationsGroups : null
+
+                delegate: RadioButton {
+                    id: radioExperimentationsGroup
+
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    height: 30
+
+                    text: model.name
+
+                    exclusiveGroup: exclusiveExperimentationsGroup
+
+                    checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
+
+                    style: Theme.IngeScapeRadioButtonStyle { }
+
+                    onCheckedChanged: {
+                        if (checked) {
+                            console.log("Select experimentations group: " + model.name);
+
+                            rootPopup.selectedExperimentationsGroup = model.QtObject;
+                        }
+                    }
+
+                    Binding {
+                        target: radioExperimentationsGroup
+                        property: "checked"
+                        value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
                     }
                 }
-
-                //Binding {
-                //    target: txtLogFilePath
-                //    property: "text"
-                //    value: rootItem.agent.logFilePath
-                //}
-
-                /*onTextChanged: {
-                    console.log("onTextChanged " + txtExperimentationName.text);
-                }*/
-            }
-        }
-
-        Rectangle {
-            anchors {
-                top: rowName.bottom
-                topMargin: 30
-                left: parent.left
-                leftMargin: 10
-                right: parent.right
-                rightMargin: 10
             }
 
-            Text {
-                id: txtGroupsTitle
+            Item {
 
                 anchors {
                     left: parent.left
-                    top: parent.top
-                }
-                width: 75
-                height: 30
-
-                text: qsTr("Groups:")
-
-                horizontalAlignment: Text.AlignRight
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
-
-            Column {
-                anchors {
-                    top: parent.top
-                    left: txtGroupsTitle.right
-                    leftMargin: 10
                     right: parent.right
                 }
-                spacing: 15
 
-                ExclusiveGroup {
-                    id: exclusiveExperimentationsGroup
-                }
+                height: 30
 
-                Repeater {
-                    model: controller ? controller.allExperimentationsGroups : null
+                RadioButton {
+                    id: radioNewExperimentationsGroup
 
-                    delegate: RadioButton {
-                        id: radioExperimentationsGroup
-
-                        text: model.name
-
-                        exclusiveGroup: exclusiveExperimentationsGroup
-
-                        checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
-
-                        style: Theme.IngeScapeRadioButtonStyle { }
-
-                        onCheckedChanged: {
-                            if (checked) {
-                                console.log("Select experimentations group: " + model.name);
-
-                                rootPopup.selectedExperimentationsGroup = model.QtObject;
-                            }
-                        }
-
-                        Binding {
-                            target: radioExperimentationsGroup
-                            property: "checked"
-                            value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
-                        }
+                    anchors {
+                        left: parent.left
+                        top: parent.top
+                        bottom: parent.bottom
                     }
-                }
 
-                Row {
+                    text: (controller && controller.newGroup) ? controller.newGroup.name : ""
 
-                    spacing: 10
+                    exclusiveGroup: exclusiveExperimentationsGroup
 
-                    RadioButton {
-                        id: radioNewExperimentationsGroup
+                    checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.newGroup))
 
-                        height: 30
+                    style: Theme.IngeScapeRadioButtonStyle { }
 
-                        text: (controller && controller.newGroup) ? controller.newGroup.name
-                                                                  : ""
+                    onCheckedChanged: {
+                        if (checked) {
+                            console.log("Select new experimentations group: ...");
 
-                        exclusiveGroup: exclusiveExperimentationsGroup
-
-                        checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.newGroup))
-
-                        style: Theme.IngeScapeRadioButtonStyle { }
-
-                        onCheckedChanged: {
-                            if (checked) {
-                                console.log("Select new experimentations group: ...");
-
-                                rootPopup.selectedExperimentationsGroup = controller.newGroup;
-                            }
-                        }
-
-                        Binding {
-                            target: radioNewExperimentationsGroup
-                            property: "checked"
-                            value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.newGroup))
+                            rootPopup.selectedExperimentationsGroup = controller.newGroup;
                         }
                     }
 
-                    TextField {
-                        id: txtNewExperimentationsGroupName
+                    Binding {
+                        target: radioNewExperimentationsGroup
+                        property: "checked"
+                        value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.newGroup))
+                    }
+                }
 
-                        height: 30
-                        width: 250
+                TextField {
+                    id: txtNewExperimentationsGroupName
 
-                        //verticalAlignment: TextInput.AlignVCenter
-                        text: ""
+                    anchors {
+                        left: radioNewExperimentationsGroup.right
+                        leftMargin: 20
+                        right: parent.right
+                        verticalCenter: radioNewExperimentationsGroup.verticalCenter
+                    }
 
-                        style: I2TextFieldStyle {
-                            backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                            borderColor: IngeScapeTheme.whiteColor
-                            borderErrorColor: IngeScapeTheme.redColor
-                            radiusTextBox: 1
-                            borderWidth: 0;
-                            borderWidthActive: 1
-                            textIdleColor: IngeScapeTheme.whiteColor;
-                            textDisabledColor: IngeScapeTheme.darkGreyColor
+                    height: 30
 
-                            padding.left: 3
-                            padding.right: 3
+                    text: ""
 
-                            font {
-                                pixelSize:15
-                                family: IngeScapeTheme.textFontFamily
-                            }
+                    style: I2TextFieldStyle {
+                        backgroundColor: IngeScapeTheme.veryLightGreyColor
+                        borderColor: IngeScapeAssessmentsTheme.blueButton
+                        borderErrorColor: IngeScapeTheme.redColor
+                        radiusTextBox: 5
+                        borderWidth: 0;
+                        borderWidthActive: 2
+                        textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
+                        textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
+
+                        padding.left: 16
+                        padding.right: 16
+
+                        font {
+                            pixelSize:16
+                            family: IngeScapeTheme.textFontFamily
                         }
                     }
                 }
             }
         }
-
-
-        Row {
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                bottom : parent.bottom
-                bottomMargin: 16
-            }
-            spacing : 15
-
-            Button {
-                id: cancelButton
-
-                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                height: boundingBox.height
-                width: boundingBox.width
-
-                activeFocusOnPress: true
-                text: "Cancel"
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.whiteColor
-
-                }
-
-                onClicked: {
-                    //console.log("QML: cancel");
-
-                    // Reset all user inputs and close the popup
-                    rootPopup.resetInputsAndClosePopup();
-                }
-            }
-
-            Button {
-                id: okButton
-
-                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                height: boundingBox.height
-                width: boundingBox.width
-
-                activeFocusOnPress: true
-                text: "OK"
-
-                enabled: ((txtExperimentationName.text.length > 0) && controller && controller.newGroup
-                          && ( (rootPopup.selectedExperimentationsGroup !== controller.newGroup)
-                               || controller.canCreateExperimentationsGroupWithName(txtNewExperimentationsGroupName.text) ) )
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.greyColor
-
-                }
-
-                onClicked: {
-                    //console.log("QML: create new Experimentation " + txtExperimentationName.text + " in group " + rootPopup.selectedExperimentationsGroup.name);
-
-                    if (controller)
-                    {
-                        // Selected group is the special one to create a new group
-                        if (rootPopup.selectedExperimentationsGroup === controller.newGroup)
-                        {
-                            controller.createNewExperimentationInNewGroup(txtExperimentationName.text, txtNewExperimentationsGroupName.text);
-                        }
-                        // Selected group already exist
-                        else
-                        {
-                            controller.createNewExperimentationInGroup(txtExperimentationName.text, rootPopup.selectedExperimentationsGroup);
-                        }
-                    }
-
-                    // Reset all user inputs and close the popup
-                    rootPopup.resetInputsAndClosePopup();
-                }
-            }
-        }
-
     }
+
+
+    Row {
+        anchors {
+            right: parent.right
+            rightMargin: 28
+            bottom : parent.bottom
+            bottomMargin: 28
+        }
+        spacing : 15
+
+        Button {
+            id: cancelButton
+
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+            anchors {
+                verticalCenter: parent.verticalCenter
+            }
+
+            height: boundingBox.height
+            width: boundingBox.width
+
+            activeFocusOnPress: true
+
+            style: ButtonStyle {
+                background: Rectangle {
+                    anchors.fill: parent
+                    radius: 5
+                    color: control.pressed ? IngeScapeTheme.lightGreyColor : (control.hovered ? IngeScapeTheme.veryLightGreyColor : "transparent")
+                }
+
+                label: Text {
+                    text: "Cancel"
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight: Font.Medium
+                        pixelSize: 16
+                    }
+                }
+            }
+
+            onClicked: {
+                //console.log("QML: cancel");
+
+                // Reset all user inputs and close the popup
+                rootPopup.resetInputsAndClosePopup();
+            }
+        }
+
+        Button {
+            id: okButton
+
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+            anchors {
+                verticalCenter: parent.verticalCenter
+            }
+
+            height: boundingBox.height
+            width: boundingBox.width
+
+            activeFocusOnPress: true
+            text: "OK"
+
+            enabled: ((txtExperimentationName.text.length > 0) && controller && controller.newGroup
+                      && ( (rootPopup.selectedExperimentationsGroup !== controller.newGroup)
+                          || controller.canCreateExperimentationsGroupWithName(txtNewExperimentationsGroupName.text) ) )
+
+            style: IngeScapeAssessmentsButtonStyle {
+                text: "OK"
+            }
+
+            onClicked: {
+                //console.log("QML: create new Experimentation " + txtExperimentationName.text + " in group " + rootPopup.selectedExperimentationsGroup.name);
+
+                if (controller)
+                {
+                    // Selected group is the special one to create a new group
+                    if (rootPopup.selectedExperimentationsGroup === controller.newGroup)
+                    {
+                        controller.createNewExperimentationInNewGroup(txtExperimentationName.text, txtNewExperimentationsGroupName.text);
+                    }
+                    // Selected group already exist
+                    else
+                    {
+                        controller.createNewExperimentationInGroup(txtExperimentationName.text, rootPopup.selectedExperimentationsGroup);
+                    }
+                }
+
+                // Reset all user inputs and close the popup
+                rootPopup.resetInputsAndClosePopup();
+            }
+        }
+    }
+
 
 }
