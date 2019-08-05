@@ -331,11 +331,14 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
 
+                        spacing: 10
+
                         Text {
                             text: rootExperimentation.experimentation ? rootExperimentation.experimentation.name : ""
 
                             width: 350
-                            color: IngeScapeTheme.blackColor
+                            elide: Text.ElideRight
+                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                             font {
                                 family: IngeScapeTheme.textFontFamily
                                 weight: Font.Bold
@@ -384,7 +387,8 @@ Item {
                             }
 
                             onClicked: {
-                                rootItem.deleteExperimentation(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup)
+                                deleteExperimentationPopup.experimentation = rootExperimentation.experimentation
+                                deleteExperimentationPopup.open()
                             }
                         }
 
@@ -438,5 +442,30 @@ Item {
                 }
             }
         }
+    }
+
+    Popup.DeleteConfirmationPopup {
+        id: deleteExperimentationPopup
+
+        property var experimentation: null
+
+        showPopupTitle: false
+        anchors.centerIn: parent
+
+        text: experimentation ? qsTr("Are you sure you want to delete the experimentation %1 ?").arg(experimentation.name) : ""
+
+        height: 160
+        width: 470
+
+        onValidated: {
+            // Emit the signal "Delete Characteristic"
+            rootItem.deleteExperimentation(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup)
+            deleteExperimentationPopup.close()
+        }
+
+        onCanceled: {
+            deleteExperimentationPopup.close()
+        }
+
     }
 }

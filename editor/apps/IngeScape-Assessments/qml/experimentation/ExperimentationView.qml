@@ -82,6 +82,15 @@ Item {
             right: parent.right
         }
 
+
+        Rectangle {
+            id: headerBackground
+
+            anchors.fill: parent
+
+            color: IngeScapeTheme.whiteColor
+        }
+
         height: 110
 
         Button {
@@ -131,7 +140,7 @@ Item {
             width: Math.max(expeName.width + 76, 450)
             height: 40
 
-            color: IngeScapeTheme.middleLightGreyColor
+            color: IngeScapeTheme.veryLightGreyColor
 
             opacity: (expeNameMouseArea.containsMouse || editButton.containsMouse || rootItem.isEditingName) ? 1 : 0
             enabled: opacity > 0

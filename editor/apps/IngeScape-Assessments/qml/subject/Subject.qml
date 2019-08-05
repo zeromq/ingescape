@@ -134,7 +134,7 @@ Rectangle {
 
                         style: I2ComboboxStyle {
                             borderColorIdle: IngeScapeTheme.veryLightGreyColor
-                            currentTextColorIdle: IngeScapeTheme.blackColor
+                            currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                             font {
                                 family: IngeScapeTheme.textFontFamily
                                 pixelSize: 16
