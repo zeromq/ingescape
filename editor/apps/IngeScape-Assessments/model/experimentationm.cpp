@@ -211,19 +211,6 @@ void ExperimentationM::addRecordSetup(RecordSetupM* recordSetup)
     {
         // Add to the list
         _allRecordSetups.append(recordSetup);
-
-        if (recordSetup->subject() != nullptr)
-        {
-            qDebug() << "Subject:" << recordSetup->subject()->displayedId();
-
-            for (CharacteristicM* characteristic : _allCharacteristics)
-            {
-                if ((characteristic != nullptr) && recordSetup->subject()->mapCharacteristicValues()->contains(characteristic->name()))
-                {
-                    qDebug() << characteristic->name() << ":" << recordSetup->subject()->mapCharacteristicValues()->value(characteristic->name());
-                }
-            }
-        }
     }
 }
 
