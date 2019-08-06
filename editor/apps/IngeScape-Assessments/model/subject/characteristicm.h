@@ -28,6 +28,14 @@ class ExperimentationM;
 extern const QString CHARACTERISTIC_SUBJECT_ID;
 
 
+// Special namespace to match the behavior of model classes without having a proper model class for this particular table.
+namespace CharacteristicValueM {
+
+const QString table = "ingescape.characteristic_value";
+
+}
+
+
 /**
  * @brief The CharacteristicM class defines a model of characteristic for a subject
  */

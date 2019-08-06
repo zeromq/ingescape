@@ -421,7 +421,8 @@ void ExperimentationM::_deleteAllCharacteristicsForExperimentation(const Experim
  */
 void ExperimentationM::_deleteAllCharacteristicsValuesForExperimentation(const ExperimentationM& experimentation)
 {
-    const char* query = "DELETE FROM ingescape.characteristic_value_of_subject WHERE id_experimentation = ?;";
+    QString queryString = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ?;";
+    const char* query = queryString.toStdString().c_str();
     CassStatement* cassStatement = cass_statement_new(query, 1);
     cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
 

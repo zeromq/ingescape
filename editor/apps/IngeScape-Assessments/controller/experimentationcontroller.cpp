@@ -214,8 +214,9 @@ RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString&
         CassUuid recordUuid;
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
-        //const char* query = "INSERT INTO ingescape.record_setup (id_experimentation, id_subject, id_task, id, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        const char* query = "INSERT INTO ingescape.record_setup (id, id_experimentation, id_subject, id_task, id_records, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        QString queryString = "INSERT INTO " + RecordSetupM::table + " (id, id_experimentation, id_subject, id_task, id_records, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        const char* query = queryString.toStdString().c_str();
         CassStatement* cassStatement = cass_statement_new(query, 10);
         cass_statement_bind_uuid  (cassStatement, 0, recordSetupUuid);
         cass_statement_bind_uuid  (cassStatement, 1, _currentExperimentation->getCassUuid());
@@ -551,7 +552,9 @@ void ExperimentationController::_retrieveTasksForExperimentation(Experimentation
 void ExperimentationController::_retrieveRecordSetupsForExperimentation(ExperimentationM* experimentation)
 {
     if (experimentation != nullptr)
-    {const char* query = "SELECT * FROM ingescape.record_setup WHERE id_experimentation = ?;";
+    {
+        QString queryString = "SELECT * FROM " + RecordSetupM::table + " WHERE id_experimentation = ?;";
+        const char* query = queryString.toStdString().c_str();
 
         // Creates the new query statement
         CassStatement* cassStatement = cass_statement_new(query, 1);
@@ -617,7 +620,8 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
             SubjectM* subject = *subjectIt;
             if (subject != nullptr)
             {
-                const char* query = "SELECT * FROM ingescape.characteristic_value_of_subject WHERE id_experimentation = ? AND id_subject = ?;";
+                QString queryString = "SELECT * FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ?;";
+                const char* query = queryString.toStdString().c_str();
 
                 // Creates the new query statement
                 CassStatement* cassStatement = cass_statement_new(query, 2);

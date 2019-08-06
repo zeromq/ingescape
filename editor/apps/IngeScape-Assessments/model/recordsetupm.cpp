@@ -16,6 +16,8 @@
 
 #include "controller/assessmentsmodelmanager.h"
 
+// RecordSetup table name
+const QString RecordSetupM::table = "ingescape.task_instance";
 
 /**
  * @brief Constructor
@@ -165,7 +167,8 @@ void RecordSetupM::deleteRecordSetupFromCassandra(const RecordSetupM& recordSetu
         CassUuid recordUuid;
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
-        const char* query = "DELETE FROM ingescape.record_setup WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;";
+        QString queryString = "DELETE FROM " + RecordSetupM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;";
+        const char* query = queryString.toStdString().c_str();
         CassStatement* cassStatement = cass_statement_new(query, 5);
         cass_statement_bind_uuid(cassStatement, 0, recordSetup.subject()->getExperimentationCassUuid());
         cass_statement_bind_uuid(cassStatement, 1, recordSetup.subject()->getCassUuid());

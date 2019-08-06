@@ -89,6 +89,11 @@ public:
     ~RecordSetupM();
 
     /**
+     * @brief RecordSetup table name
+     */
+    static const QString table;
+
+    /**
      * @brief Accessor for the Cassandra UUID of this entry
      * @return
      */
