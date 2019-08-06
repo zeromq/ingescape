@@ -15,10 +15,10 @@ CREATE TABLE ingescape.mapping (time timeuuid, id_record timeuuid, mapping text,
 CREATE TABLE ingescape.timeline (time timeuuid, id_record timeuuid, state text, PRIMARY KEY(id_record, time)) WITH CLUSTERING ORDER BY (time ASC) AND gc_grace_seconds = 0;
 
 CREATE TABLE ingescape.experimentation (id timeuuid, name text, creation_date date, creation_time time, group_name text, PRIMARY KEY (id)) WITH gc_grace_seconds = 0;
-CREATE TABLE ingescape.characteristic (id timeuuid, id_experimentation timeuuid, name text, value_type tinyint, enum_values set<text>, PRIMARY KEY (id_experimentation, id) ) WITH gc_grace_seconds = 0;
+CREATE TABLE ingescape.characteristic (id timeuuid, id_experimentation timeuuid, name text, value_type tinyint, enum_values list<text>, PRIMARY KEY (id_experimentation, id) ) WITH gc_grace_seconds = 0;
 CREATE TABLE ingescape.subject (id timeuuid, id_experimentation timeuuid, displayed_id text, PRIMARY KEY (id_experimentation, id)) WITH gc_grace_seconds = 0;
 CREATE TABLE ingescape.task (id timeuuid, id_experimentation timeuuid, name text, platform_file text, PRIMARY KEY (id_experimentation, id)) WITH gc_grace_seconds = 0;
-CREATE TABLE ingescape.independent_var (id timeuuid, id_experimentation timeuuid, id_task timeuuid, name text, description text, value_type tinyint, enum_values set<text>, PRIMARY KEY (id_experimentation, id_task, id)) WITH gc_grace_seconds = 0;
+CREATE TABLE ingescape.independent_var (id timeuuid, id_experimentation timeuuid, id_task timeuuid, name text, description text, value_type tinyint, enum_values list<text>, PRIMARY KEY (id_experimentation, id_task, id)) WITH gc_grace_seconds = 0;
 CREATE TABLE ingescape.dependent_var (id timeuuid, id_experimentation timeuuid, id_task timeuuid, name text, description text, agent_name text, output_name text, PRIMARY KEY (id_experimentation, id_task, id)) WITH gc_grace_seconds = 0;
 CREATE TABLE ingescape.characteristic_value (id_experimentation timeuuid, id_subject timeuuid, id_characteristic timeuuid, characteristic_value text, PRIMARY KEY (id_experimentation, id_subject, id_characteristic)) WITH gc_grace_seconds = 0;
 CREATE TABLE ingescape.task_instance (id timeuuid, id_experimentation timeuuid, id_subject timeuuid, id_task timeuuid, id_records timeuuid, name text, start_date date, start_time time, end_date date, end_time time, PRIMARY KEY (id_experimentation, id_subject, id_task, id_records, id)) WITH gc_grace_seconds = 0;
