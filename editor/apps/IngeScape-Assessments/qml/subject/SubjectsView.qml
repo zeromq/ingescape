@@ -332,6 +332,7 @@ I2PopupBase {
 
                         width: rootItem.characteristicValueColumnWidth
 
+                        elide: Text.ElideRight
                         text: model ? model.name : ""
                         color: IngeScapeTheme.whiteColor
                         font {

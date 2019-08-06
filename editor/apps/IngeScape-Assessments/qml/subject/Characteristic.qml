@@ -88,6 +88,13 @@ Item {
         spacing: 8
 
         Text {
+            anchors {
+                left: parent.left
+                right: parent.right
+                rightMargin: 18
+            }
+
+            elide: Text.ElideRight
             text: rootItem.modelM ? rootItem.modelM.name : ""
 
             color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
@@ -99,6 +106,13 @@ Item {
         }
 
         Text {
+            anchors {
+                left: parent.left
+                right: parent.right
+                rightMargin: 18
+            }
+
+            elide: Text.ElideRight
             text: rootItem.modelM
                   ? CharacteristicValueTypes.enumToString(rootItem.modelM.valueType)
                     + ((rootItem.modelM.valueType === CharacteristicValueTypes.CHARACTERISTIC_ENUM) ? "{ " + rootItem.modelM.enumValues.join(" ; ") + " }"
