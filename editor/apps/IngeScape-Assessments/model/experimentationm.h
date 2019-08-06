@@ -21,7 +21,7 @@
 #include <model/subject/characteristicm.h>
 #include <model/subject/subjectm.h>
 #include <model/task/taskm.h>
-#include <model/recordsetupm.h>
+#include <model/taskinstancem.h>
 
 #include "cassandra.h"
 
@@ -54,8 +54,8 @@ class ExperimentationM : public QObject
     // List of all tasks of our experimentation
     I2_QOBJECT_LISTMODEL(TaskM, allTasks)
 
-    // List of all record setups of our experimentation
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(RecordSetupM, allRecordSetups)
+    // List of all task instances of our experimentation
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(TaskInstanceM, allTaskInstances)
 
 
 public:
@@ -135,17 +135,17 @@ public:
 
 
     /**
-     * @brief Add a record setup to our experimentation
+     * @brief Add a task instance to our experimentation
      * @param record
      */
-    void addRecordSetup(RecordSetupM* recordSetup);
+    void addTaskInstance(TaskInstanceM* taskInstance);
 
 
     /**
-     * @brief Remove a record setup from our experimentation
+     * @brief Remove a task instance from our experimentation
      * @param record
      */
-    void removeRecordSetup(RecordSetupM* recordSetup);
+    void removeTaskInstance(TaskInstanceM* taskInstance);
 
 
     /**

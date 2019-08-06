@@ -36,7 +36,7 @@ Rectangle {
     //
     //--------------------------------------------------------
 
-    property RecordSetupM modelM: null;
+    property TaskInstanceM modelM: null;
 
 
 
@@ -48,11 +48,11 @@ Rectangle {
     //
     //--------------------------------
 
-    // Open Record Setup
-    signal openRecordSetup();
+    // Open Task Instance
+    signal openTaskInstance();
 
-    // Delete Record Setup
-    signal deleteRecordSetup();
+    // Delete Task Instance
+    signal deleteTaskInstance();
 
 
     property alias taskColumnWidth: taskName.width
@@ -81,7 +81,7 @@ Rectangle {
         onDoubleClicked: {
             if (rootItem.modelM)
             {
-                rootItem.openRecordSetup(rootItem.modelM)
+                rootItem.openTaskInstance(rootItem.modelM)
             }
         }
     }
@@ -96,7 +96,7 @@ Rectangle {
         }
 
         Text {
-            id: recordName
+            id: taskInstanceName
             width: rootItem.width
                    - taskColumnWidth
                    - subjectColumnWidth
@@ -216,7 +216,7 @@ Rectangle {
             }
 
             onClicked: {
-                rootItem.deleteRecordSetup();
+                rootItem.deleteTaskInstance();
             }
         }
 
@@ -238,7 +238,7 @@ Rectangle {
             }
 
             onClicked: {
-                rootItem.openRecordSetup();
+                rootItem.openTaskInstance();
             }
         }
     }

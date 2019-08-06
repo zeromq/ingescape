@@ -12,12 +12,12 @@
  *
  */
 
-#include "recordsetupm.h"
+#include "taskinstancem.h"
 
 #include "controller/assessmentsmodelmanager.h"
 
-// RecordSetup table name
-const QString RecordSetupM::table = "ingescape.task_instance";
+// TaskInstance table name
+const QString TaskInstanceM::table = "ingescape.task_instance";
 
 /**
  * @brief Constructor
@@ -27,7 +27,7 @@ const QString RecordSetupM::table = "ingescape.task_instance";
  * @param startDateTime
  * @param parent
  */
-RecordSetupM::RecordSetupM(CassUuid experimentationUuid,
+TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
                            CassUuid cassUuid,
                            QString name,
                            SubjectM* subject,
@@ -67,7 +67,7 @@ RecordSetupM::RecordSetupM(CassUuid experimentationUuid,
         }
 
         // Connect to signal "Value Changed" fro the "Qml Property Map"
-        connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &RecordSetupM::_onIndependentVariableValueChanged);
+        connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &TaskInstanceM::_onIndependentVariableValueChanged);
     }
 }
 
@@ -75,7 +75,7 @@ RecordSetupM::RecordSetupM(CassUuid experimentationUuid,
 /**
  * @brief Destructor
  */
-RecordSetupM::~RecordSetupM()
+TaskInstanceM::~TaskInstanceM()
 {
     if ((_subject != nullptr) && (_task != nullptr))
     {
@@ -109,23 +109,23 @@ RecordSetupM::~RecordSetupM()
 
 
 /**
- * @brief Static factory method to create a record setup from a CassandraDB record
+ * @brief Static factory method to create a task instance from a CassandraDB record
  * @param row
  * @return
  */
 //NOTE Same note as CharacteristicM::_deleteCharacteristicValuesForCharacteristic
-RecordSetupM* RecordSetupM::createRecordSetupFromCassandraRow(const CassRow* row, SubjectM* subject, TaskM* task)
+TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* row, SubjectM* subject, TaskM* task)
 {
-    RecordSetupM* recordSetup = nullptr;
+    TaskInstanceM* taskInstance = nullptr;
 
     if (row != nullptr)
     {
-        CassUuid experimentationUuid, subjectUuid, taskUuid, recordUuid, recordSetupUuid;
+        CassUuid experimentationUuid, subjectUuid, taskUuid, recordUuid, taskInstanceUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_records"), &recordUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &recordSetupUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskInstanceUuid);
 
         const char *chrTaskName = "";
         size_t nameLength = 0;
@@ -145,19 +145,19 @@ RecordSetupM* RecordSetupM::createRecordSetupFromCassandraRow(const CassRow* row
         /* Convert 'date' and 'time' to Epoch time */
         time_t time = static_cast<time_t>(cass_date_time_to_epoch(yearMonthDay, timeOfDay));
 
-        recordSetup = new RecordSetupM(experimentationUuid, recordSetupUuid, taskName, subject, task, QDateTime::fromTime_t(static_cast<uint>(time)));
+        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, taskName, subject, task, QDateTime::fromTime_t(static_cast<uint>(time)));
     }
 
-    return recordSetup;
+    return taskInstance;
 }
 
 /**
- * @brief Delete the given record setup from Cassandra DB
+ * @brief Delete the given task instance from Cassandra DB
  * @param experimentation
  */
-void RecordSetupM::deleteRecordSetupFromCassandra(const RecordSetupM& recordSetup)
+void TaskInstanceM::deleteTaskInstanceFromCassandra(const TaskInstanceM& taskInstance)
 {
-    if ((recordSetup.subject() != nullptr) && (recordSetup.task() != nullptr))
+    if ((taskInstance.subject() != nullptr) && (taskInstance.task() != nullptr))
     {
         //TODO Clean-up associations if any ?
 
@@ -167,24 +167,24 @@ void RecordSetupM::deleteRecordSetupFromCassandra(const RecordSetupM& recordSetu
         CassUuid recordUuid;
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
-        QString queryString = "DELETE FROM " + RecordSetupM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;";
+        QString queryString = "DELETE FROM " + TaskInstanceM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;";
         const char* query = queryString.toStdString().c_str();
         CassStatement* cassStatement = cass_statement_new(query, 5);
-        cass_statement_bind_uuid(cassStatement, 0, recordSetup.subject()->getExperimentationCassUuid());
-        cass_statement_bind_uuid(cassStatement, 1, recordSetup.subject()->getCassUuid());
-        cass_statement_bind_uuid(cassStatement, 2, recordSetup.task()->getCassUuid());
+        cass_statement_bind_uuid(cassStatement, 0, taskInstance.subject()->getExperimentationCassUuid());
+        cass_statement_bind_uuid(cassStatement, 1, taskInstance.subject()->getCassUuid());
+        cass_statement_bind_uuid(cassStatement, 2, taskInstance.task()->getCassUuid());
         cass_statement_bind_uuid(cassStatement, 3, recordUuid);
-        cass_statement_bind_uuid(cassStatement, 4, recordSetup.getCassUuid());
+        cass_statement_bind_uuid(cassStatement, 4, taskInstance.getCassUuid());
 
         // Execute the query or bound statement
         CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
-            qInfo() << "Experimentation" << recordSetup.name() << "has been successfully deleted from the DB";
+            qInfo() << "Task instance" << taskInstance.name() << "has been successfully deleted from the DB";
         }
         else {
-            qCritical() << "Could not delete the experimentation" << recordSetup.name() << "from the DB:" << cass_error_desc(cassError);
+            qCritical() << "Could not delete the task instance" << taskInstance.name() << "from the DB:" << cass_error_desc(cassError);
         }
 
         // Clean-up cassandra objects
@@ -194,7 +194,7 @@ void RecordSetupM::deleteRecordSetupFromCassandra(const RecordSetupM& recordSetu
 }
 
 
-void RecordSetupM::_onIndependentVariableValueChanged(const QString& key, const QVariant& value)
+void TaskInstanceM::_onIndependentVariableValueChanged(const QString& key, const QVariant& value)
 {
     IndependentVariableM* indeVar = _mapIndependentVarByName.value(key, nullptr);
     if (indeVar != nullptr)
@@ -224,7 +224,7 @@ void RecordSetupM::_onIndependentVariableValueChanged(const QString& key, const 
  * @brief Setter for property "End Date Time"
  * @param value
  */
-void RecordSetupM::setendDateTime(QDateTime value)
+void TaskInstanceM::setendDateTime(QDateTime value)
 {
     if (_endDateTime != value)
     {
@@ -245,7 +245,7 @@ void RecordSetupM::setendDateTime(QDateTime value)
 /**
  * @brief For debug purpose: Print the value of all independent variables
  */
-void RecordSetupM::_printIndependentVariableValues()
+void TaskInstanceM::_printIndependentVariableValues()
 {
     if ((_task != nullptr) && (_mapIndependentVariableValues != nullptr))
     {

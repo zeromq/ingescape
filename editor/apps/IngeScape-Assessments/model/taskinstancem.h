@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef RECORD_SETUP_M_H
-#define RECORD_SETUP_M_H
+#ifndef TASK_INSTANCE_M_H
+#define TASK_INSTANCE_M_H
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
@@ -24,9 +24,9 @@
 
 
 /**
- * @brief The RecordSetupM class defines a model of record setup
+ * @brief The TaskInstanceM class defines a model of task instance
  */
-class RecordSetupM : public QObject
+class TaskInstanceM : public QObject
 {
     Q_OBJECT
 
@@ -74,7 +74,7 @@ public:
      * @param startDateTime
      * @param parent
      */
-    explicit RecordSetupM(CassUuid experimentationUuid,
+    explicit TaskInstanceM(CassUuid experimentationUuid,
                           CassUuid cassUuid,
                           QString name,
                           SubjectM* subject,
@@ -86,10 +86,10 @@ public:
     /**
      * @brief Destructor
      */
-    ~RecordSetupM();
+    ~TaskInstanceM();
 
     /**
-     * @brief RecordSetup table name
+     * @brief TaskInstance table name
      */
     static const QString table;
 
@@ -100,17 +100,17 @@ public:
     CassUuid getCassUuid() const { return _cassUuid; }
 
     /**
-     * @brief Static factory method to create a record setup from a CassandraDB record
+     * @brief Static factory method to create a task instance from a CassandraDB record
      * @param row
      * @return
      */
-    static RecordSetupM* createRecordSetupFromCassandraRow(const CassRow* row, SubjectM* subject, TaskM* task);
+    static TaskInstanceM* createTaskInstanceFromCassandraRow(const CassRow* row, SubjectM* subject, TaskM* task);
 
     /**
-     * @brief Delete the given record setup from Cassandra DB
+     * @brief Delete the given task instance from Cassandra DB
      * @param experimentation
      */
-    static void deleteRecordSetupFromCassandra(const RecordSetupM& recordSetup);
+    static void deleteTaskInstanceFromCassandra(const TaskInstanceM& taskInstance);
 
 private Q_SLOTS:
     void _onIndependentVariableValueChanged(const QString& key, const QVariant& value);
@@ -130,6 +130,6 @@ private:
 
 };
 
-QML_DECLARE_TYPE(RecordSetupM)
+QML_DECLARE_TYPE(TaskInstanceM)
 
-#endif // RECORD_SETUP_M_H
+#endif // TASK_INSTANCE_M_H

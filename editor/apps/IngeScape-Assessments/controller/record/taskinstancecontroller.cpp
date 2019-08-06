@@ -12,7 +12,7 @@
  *
  */
 
-#include "recordcontroller.h"
+#include "taskinstancecontroller.h"
 
 #include <controller/assessmentsmodelmanager.h>
 
@@ -22,11 +22,11 @@
  * @param jsonHelper
  * @param parent
  */
-RecordController::RecordController(JsonHelper* jsonHelper,
+TaskInstanceController::TaskInstanceController(JsonHelper* jsonHelper,
                                    QObject *parent) : QObject(parent),
     _timeLineC(nullptr),
     _scenarioC(nullptr),
-    _currentRecordSetup(nullptr),
+    _currentTaskInstance(nullptr),
     _jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -50,15 +50,15 @@ RecordController::RecordController(JsonHelper* jsonHelper,
 /**
  * @brief Destructor
  */
-RecordController::~RecordController()
+TaskInstanceController::~TaskInstanceController()
 {
     qInfo() << "Delete Record Controller";
 
 
-    // Reset the model of the current record setup
-    if (_currentRecordSetup != nullptr)
+    // Reset the model of the current task instance
+    if (_currentTaskInstance != nullptr)
     {
-        setcurrentRecordSetup(nullptr);
+        setcurrentTaskInstance(nullptr);
     }
 
 
@@ -92,36 +92,36 @@ RecordController::~RecordController()
 
 
 /**
- * @brief Setter for property "Current Record"
+ * @brief Setter for property "Current Task Instance"
  * @param value
  */
-void RecordController::setcurrentRecordSetup(RecordSetupM *value)
+void TaskInstanceController::setcurrentTaskInstance(TaskInstanceM *value)
 {
-    if (_currentRecordSetup != value)
+    if (_currentTaskInstance != value)
     {
-        RecordSetupM *previousRecordSetup = _currentRecordSetup;
+        TaskInstanceM *previousTaskInstance = _currentTaskInstance;
 
-        _currentRecordSetup = value;
+        _currentTaskInstance = value;
 
         // Manage changes
-        _onCurrentRecordSetupChanged(previousRecordSetup, _currentRecordSetup);
+        _oncurrentTaskInstanceChanged(previousTaskInstance, _currentTaskInstance);
 
-        Q_EMIT currentRecordSetupChanged(value);
+        Q_EMIT currentTaskInstanceChanged(value);
     }
 }
 
 
 /**
- * @brief Slot called when the current record setup changed
- * @param previousRecordSetup
- * @param currentRecordSetup
+ * @brief Slot called when the current task instance changed
+ * @param previousTaskInstance
+ * @param currentTaskInstance
  */
-void RecordController::_onCurrentRecordSetupChanged(RecordSetupM* previousRecordSetup, RecordSetupM* currentRecordSetup)
+void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previousTaskInstance, TaskInstanceM* currentTaskInstance)
 {
     if ((AssessmentsModelManager::Instance() != nullptr) && (_scenarioC != nullptr))
     {
-        // Clean the previous record setup
-        if (previousRecordSetup != nullptr)
+        // Clean the previous task instance
+        if (previousTaskInstance != nullptr)
         {
             // Clear the previous scenario
             _scenarioC->clearScenario();
@@ -131,11 +131,11 @@ void RecordController::_onCurrentRecordSetupChanged(RecordSetupM* previousRecord
         }
 
         // Manage the new (current) record
-        if ((currentRecordSetup != nullptr) && (currentRecordSetup->task() != nullptr))
+        if ((currentTaskInstance != nullptr) && (currentTaskInstance->task() != nullptr))
         {
-            if (currentRecordSetup->task()->platformFileUrl().isValid())
+            if (currentTaskInstance->task()->platformFileUrl().isValid())
             {
-                QString platformFilePath = currentRecordSetup->task()->platformFileUrl().path();
+                QString platformFilePath = currentTaskInstance->task()->platformFileUrl().path();
 
                 QFile jsonFile(platformFilePath);
                 if (jsonFile.exists())
@@ -164,7 +164,7 @@ void RecordController::_onCurrentRecordSetupChanged(RecordSetupM* previousRecord
                 }
             }
             else {
-                qWarning() << "The URL of platform" << currentRecordSetup->task()->platformFileUrl() << "is not valid";
+                qWarning() << "The URL of platform" << currentTaskInstance->task()->platformFileUrl() << "is not valid";
             }
         }
     }
@@ -174,7 +174,7 @@ void RecordController::_onCurrentRecordSetupChanged(RecordSetupM* previousRecord
  * @brief Adds the given URLs as attachements for this record
  * @param urlList
  */
-void RecordController::addNewAttachements(const QList<QUrl>& urlList)
+void TaskInstanceController::addNewAttachements(const QList<QUrl>& urlList)
 {
     for (QUrl url : urlList)
     {
