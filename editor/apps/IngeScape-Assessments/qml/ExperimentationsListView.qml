@@ -194,8 +194,9 @@ Item {
         id: btnNewExpe
 
         anchors {
-            right: columnExperimentationsGroups.right
-            bottom: columnExperimentationsGroups.top
+            right: parent.right
+            rightMargin: 37
+            bottom: scrollViewExperimentationsGroups.top
             bottomMargin: 9
         }
         height: 40
@@ -212,8 +213,8 @@ Item {
     }
 
 
-    Column {
-        id: columnExperimentationsGroups
+    ScrollView {
+        id: scrollViewExperimentationsGroups
 
         anchors {
             top: title.bottom
@@ -222,13 +223,25 @@ Item {
             leftMargin: 20
             right: parent.right
             rightMargin: 20
+            bottom: parent.bottom
+            bottomMargin: 20
         }
-        spacing: 10
 
-        Repeater {
-            model: controller ? controller.allExperimentationsGroups : null
+        style: IngeScapeAssessmentsScrollViewStyle {}
 
-            delegate: componentExperimentationsGroup
+        // Prevent drag overshoot on Windows
+        flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+        contentItem: Column {
+            width: scrollViewExperimentationsGroups.width - 17
+            height: childrenRect.height
+            spacing: 10
+
+            Repeater {
+                model: controller ? controller.allExperimentationsGroups : null
+
+                delegate: componentExperimentationsGroup
+            }
         }
     }
 
