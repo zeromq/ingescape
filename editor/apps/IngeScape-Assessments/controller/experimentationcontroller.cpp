@@ -245,7 +245,8 @@ RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString&
                 if (independentVar != nullptr)
                 {
                     // Insert an instance of every independent variable for this record setup into DB
-                    const char* innerQuery = "INSERT INTO ingescape.independent_var_value_of_record_setup (id_experimentation, id_task_instance, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
+                    QString innerQueryString = "INSERT INTO " + IndependentVariableValueM::table + " (id_experimentation, id_task_instance, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
+                    const char* innerQuery = innerQueryString.toStdString().c_str();
                     CassStatement* innerCassStatement = cass_statement_new(innerQuery, 4);
                     cass_statement_bind_uuid  (innerCassStatement, 0, subject->getExperimentationCassUuid());
                     cass_statement_bind_uuid  (innerCassStatement, 1, recordSetup->getCassUuid());
