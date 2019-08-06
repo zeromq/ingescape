@@ -612,43 +612,57 @@ Item {
 
                 color: IngeScapeTheme.whiteColor
 
-                Column {
-                    id: recordsColumn
-                    anchors.fill: parent
-                    spacing: 0
+                ScrollView {
+                    id: recordSetupScrollView
+                    anchors {
+                        fill: parent
+                        rightMargin: -17
+                    }
 
-                    Repeater {
-                        model: rootItem.experimentation ? rootItem.experimentation.allRecordSetups : null
+                    style: IngeScapeAssessmentsScrollViewStyle {}
 
-                        delegate: RecordSetupInList {
-                            taskColumnWidth: mainView.taskColumnWidth
-                            subjectColumnWidth: mainView.subjectColumnWidth
-                            startDateColumnWidth: mainView.startDateColumnWidth
-                            startTimeColumnWidth: mainView.startTimeColumnWidth
-                            durationColumnWidth: mainView.durationColumnWidth
-                            buttonColumnWidth: mainView.buttonColumnWidth
+                    // Prevent drag overshoot on Windows
+                    flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                            }
+                    Column {
+                        id: recordSetupColumn
+                        width: recordSetupScrollView.width - 17
+                        height: childrenRect.height
+                        spacing: 0
 
-                            modelM: model.QtObject
+                        Repeater {
+                            model: rootItem.experimentation ? rootItem.experimentation.allRecordSetups : null
 
-                            //
-                            // Slots
-                            //
-                            onOpenRecordSetup: {
-                                if (rootItem.controller && modelM) {
-                                    //console.log("QML: openRecordSetup " + modelM.name);
+                            delegate: RecordSetupInList {
+                                taskColumnWidth: mainView.taskColumnWidth
+                                subjectColumnWidth: mainView.subjectColumnWidth
+                                startDateColumnWidth: mainView.startDateColumnWidth
+                                startTimeColumnWidth: mainView.startTimeColumnWidth
+                                durationColumnWidth: mainView.durationColumnWidth
+                                buttonColumnWidth: mainView.buttonColumnWidth
 
-                                    rootItem.controller.openRecordSetup(modelM);
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
                                 }
-                            }
 
-                            onDeleteRecordSetup: {
-                                deleteRecordSetupPopup.recordSetup = modelM
-                                deleteRecordSetupPopup.open()
+                                modelM: model.QtObject
+
+                                //
+                                // Slots
+                                //
+                                onOpenRecordSetup: {
+                                    if (rootItem.controller && modelM) {
+                                        //console.log("QML: openRecordSetup " + modelM.name);
+
+                                        rootItem.controller.openRecordSetup(modelM);
+                                    }
+                                }
+
+                                onDeleteRecordSetup: {
+                                    deleteRecordSetupPopup.recordSetup = modelM
+                                    deleteRecordSetupPopup.open()
+                                }
                             }
                         }
                     }
