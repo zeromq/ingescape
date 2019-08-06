@@ -289,7 +289,7 @@ Item {
                 }
             }
 
-            ListView {
+            Column {
                 id: listViewExperimentations
 
                 anchors {
@@ -301,129 +301,133 @@ Item {
                 property real itemHeight: 38
                 property real bottomSeparatorHeight: 2
 
-                height: (count > 0) ? (itemHeight * count) - bottomSeparatorHeight : 0
+                height: (expeRepeater.count > 0) ? (itemHeight * expeRepeater.count) - bottomSeparatorHeight : 0
 
-                model: rootExperimentationsGroup.experimentationsGroup ? rootExperimentationsGroup.experimentationsGroup.experimentations : null
+                Repeater {
+                    id: expeRepeater
+                    model: rootExperimentationsGroup.experimentationsGroup ? rootExperimentationsGroup.experimentationsGroup.experimentations : null
 
-                delegate: Rectangle {
-                    id: rootExperimentation
+                    delegate: Rectangle {
+                        id: rootExperimentation
 
-                    property ExperimentationM experimentation: model.QtObject
-                    property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.containsMouse || btnOpen.containsMouse
+                        property ExperimentationM experimentation: model.QtObject
+                        property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.containsMouse || btnOpen.containsMouse
 
-                    width: parent.width
-                    height: listViewExperimentations.itemHeight
-                    color: rootExperimentation.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
+                        width: parent.width
+                        height: listViewExperimentations.itemHeight
+                        color: rootExperimentation.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
 
-                    MouseArea {
-                        id: itemMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onDoubleClicked: {
-                            rootItem.openExperimentation(rootExperimentation.experimentation)
-                        }
-                    }
-
-                    Row {
-                        anchors {
-                            left: parent.left
-                            leftMargin: 25
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        spacing: 10
-
-                        Text {
-                            text: rootExperimentation.experimentation ? rootExperimentation.experimentation.name : ""
-
-                            width: 350
-                            elide: Text.ElideRight
-                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                            font {
-                                family: IngeScapeTheme.textFontFamily
-                                weight: Font.Bold
-                                pixelSize: 16
-                            }
-                        }
-
-                        Text {
-                            text: rootExperimentation.experimentation ? rootExperimentation.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy - hh:mm:ss") : ""
-
-                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                            font {
-                                family: IngeScapeTheme.textFontFamily
-                                weight: Font.Medium
-                                pixelSize: 16
-                            }
-                        }
-                    }
-
-                    Row {
-                        spacing: 14
-
-                        anchors {
-                            right: parent.right
-                            rightMargin: 18
-                        }
-
-                        height: parent.height
-
-                        Button {
-                            id: btnDelete
-
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            property bool containsMouse: __behavior.containsMouse
-
-                            opacity: rootExperimentation.isMouseHovering ? 1 : 0
-                            enabled: opacity > 0
-
-                            width: 40
-                            height: 30
-
-                            style: IngeScapeAssessmentsSvgButtonStyle {
-                                releasedID: "delete-blue"
-                                disabledID: releasedID
-                            }
-
-                            onClicked: {
-                                deleteExperimentationPopup.experimentation = rootExperimentation.experimentation
-                                deleteExperimentationPopup.open()
-                            }
-                        }
-
-                        Button {
-                            id: btnOpen
-
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            property bool containsMouse: __behavior.containsMouse
-
-                            opacity: rootExperimentation.isMouseHovering ? 1 : 0
-                            enabled: opacity > 0
-
-                            width: 85
-                            height: 30
-
-                            style: IngeScapeAssessmentsButtonStyle {
-                                text: "OPEN"
-                            }
-
-                            onClicked: {
+                        MouseArea {
+                            id: itemMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onDoubleClicked: {
                                 rootItem.openExperimentation(rootExperimentation.experimentation)
                             }
                         }
-                    }
 
-                    Rectangle {
-                        id: bottomSeparator
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                            bottom: parent.bottom
+                        Row {
+                            anchors {
+                                left: parent.left
+                                leftMargin: 25
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            spacing: 10
+
+                            Text {
+                                text: rootExperimentation.experimentation ? rootExperimentation.experimentation.name : ""
+
+                                width: 350
+                                elide: Text.ElideRight
+                                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    weight: Font.Bold
+                                    pixelSize: 16
+                                }
+                            }
+
+                            Text {
+                                text: rootExperimentation.experimentation ? rootExperimentation.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy - hh:mm:ss") : ""
+
+                                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    weight: Font.Medium
+                                    pixelSize: 16
+                                }
+                            }
                         }
-                        height: listViewExperimentations.bottomSeparatorHeight
-                        color: IngeScapeTheme.veryLightGreyColor
+
+                        Row {
+                            spacing: 14
+
+                            anchors {
+                                right: parent.right
+                                rightMargin: 18
+                            }
+
+                            height: parent.height
+
+                            Button {
+                                id: btnDelete
+
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                property bool containsMouse: __behavior.containsMouse
+
+                                opacity: rootExperimentation.isMouseHovering ? 1 : 0
+                                enabled: opacity > 0
+
+                                width: 40
+                                height: 30
+
+                                style: IngeScapeAssessmentsSvgButtonStyle {
+                                    releasedID: "delete-blue"
+                                    disabledID: releasedID
+                                }
+
+                                onClicked: {
+                                    deleteExperimentationPopup.experimentation = rootExperimentation.experimentation
+                                    deleteExperimentationPopup.open()
+                                }
+                            }
+
+                            Button {
+                                id: btnOpen
+
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                property bool containsMouse: __behavior.containsMouse
+
+                                opacity: rootExperimentation.isMouseHovering ? 1 : 0
+                                enabled: opacity > 0
+
+                                width: 85
+                                height: 30
+
+                                style: IngeScapeAssessmentsButtonStyle {
+                                    text: "OPEN"
+                                }
+
+                                onClicked: {
+                                    rootItem.openExperimentation(rootExperimentation.experimentation)
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            id: bottomSeparator
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                bottom: parent.bottom
+                            }
+                            height: listViewExperimentations.bottomSeparatorHeight
+                            color: IngeScapeTheme.veryLightGreyColor
+                            visible: index < (expeRepeater.count - 1)
+                        }
                     }
                 }
             }
