@@ -204,7 +204,7 @@ void printLicenseLine(const char *line){
             struct tm  ts = *localtime(&licenseExpirationDate);
             char       buf[80];
             strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", &ts);
-            printf("license expriation date : %s\n", buf);
+            printf("license expiration date : %s\n", buf);
         }else if (strcmp(command, "platform") == 0){
             int platformNbAgents = 0;
             int platformNbIOPs = 0;
