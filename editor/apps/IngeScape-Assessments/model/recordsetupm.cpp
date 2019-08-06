@@ -199,7 +199,7 @@ void RecordSetupM::_onIndependentVariableValueChanged(const QString& key, const 
     IndependentVariableM* indeVar = _mapIndependentVarByName.value(key, nullptr);
     if (indeVar != nullptr)
     {
-        const char* query = "UPDATE ingescape.independent_var_value_of_record_setup SET independent_var_value = ? WHERE id_experimentation = ? AND id_record_setup = ? AND id_independent_var = ?;";
+        const char* query = "UPDATE ingescape.independent_var_value_of_record_setup SET independent_var_value = ? WHERE id_experimentation = ? AND id_task_instance = ? AND id_independent_var = ?;";
         CassStatement* cassStatement = cass_statement_new(query, 4);
         cass_statement_bind_string(cassStatement, 0, value.toString().toStdString().c_str());
         cass_statement_bind_uuid  (cassStatement, 1, _experimentationCassUuid);
