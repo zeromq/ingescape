@@ -327,7 +327,9 @@ I2PopupBase {
                 right: parent.right
             }
 
-            Row {
+            Flickable {
+                id: headerFlickable
+
                 anchors {
                     top: parent.top
                     left: parent.left
@@ -336,27 +338,40 @@ I2PopupBase {
                     bottom: parent.bottom
                 }
 
-                Repeater {
-                    model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
+                clip: true
 
-                    Text {
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                        }
+                Row {
+                    height: parent.height
+                    width: childrenRect.height
 
-                        width: rootItem.characteristicValueColumnWidth
+                    Repeater {
+                        model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
 
-                        elide: Text.ElideRight
-                        text: model ? model.name : ""
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 16
-                            weight: Font.Black
+                        Text {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            width: rootItem.characteristicValueColumnWidth
+
+                            elide: Text.ElideRight
+                            text: model ? model.name : ""
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 16
+                                weight: Font.Black
+                            }
                         }
                     }
                 }
             }
+        }
+
+        Binding {
+            target: headerFlickable
+            property: "contentX"
+            value: subjectsScrollView.flickableItem.contentX
         }
 
         Rectangle {
@@ -373,10 +388,19 @@ I2PopupBase {
                 id: subjectsScrollView
                 anchors {
                     fill: parent
-                    rightMargin: -17
+                    bottomMargin: __horizontalScrollBar.visible ? -scrollBarSize - horizontalScrollbarMargin  : 0
+                    rightMargin: __verticalScrollBar.visible ? -scrollBarSize - verticalScrollbarMargin : 0
                 }
 
-                style: IngeScapeAssessmentsScrollViewStyle {}
+                property int scrollBarSize: 8
+                property int verticalScrollbarMargin: 3
+                property int horizontalScrollbarMargin: 3
+
+                style: IngeScapeAssessmentsScrollViewStyle {
+                    scrollBarSize: subjectsScrollView.scrollBarSize
+                    verticalScrollbarMargin: subjectsScrollView.verticalScrollbarMargin
+                    horizontalScrollbarMargin: subjectsScrollView.horizontalScrollbarMargin
+                }
 
                 // Prevent drag overshoot on Windows
                 flickableItem.boundsBehavior: Flickable.OvershootBounds
@@ -384,7 +408,7 @@ I2PopupBase {
                 Column {
                     id: subjectsColumn
 
-                    width: subjectsScrollView.width - 17
+                    width: childrenRect.width
                     height: childrenRect.height
                     spacing: 0
 
@@ -395,7 +419,7 @@ I2PopupBase {
                             id: subjectDelegate
 
                             height: 40
-                            width: subjectsColumn.width
+                            width: Math.max(characteristicValueColumnWidth * rootItem.experimentation.allCharacteristics.count, subjectsScrollView.width - (subjectsScrollView.__verticalScrollBar.visible ? scrollBarSize + verticalScrollbarMargin : 0))
 
                             experimentation: rootItem.experimentation
                             subject: model ? model.QtObject : null
