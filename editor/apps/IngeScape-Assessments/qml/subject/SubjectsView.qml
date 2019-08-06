@@ -174,29 +174,43 @@ I2PopupBase {
 
             color: IngeScapeTheme.whiteColor
 
-            Column {
-                id: characteristicsColumn
-                anchors.fill: parent
-                spacing: 0
+            ScrollView {
+                id: characteristicsScrillView
+                anchors {
+                    fill: parent
+                    rightMargin: -17
+                }
 
-                Repeater {
-                    model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
+                style: IngeScapeAssessmentsScrollViewStyle {}
 
-                    delegate: Characteristic {
+                // Prevent drag overshoot on Windows
+                flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                        }
+                Column {
+                    id: characteristicsColumn
+                    width: characteristicsScrillView.width - 17
+                    height: childrenRect.height
+                    spacing: 0
 
-                        modelM: model.QtObject
+                    Repeater {
+                        model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
 
-                        //
-                        // Slots
-                        //
-                        onDeleteCharacteristic: {
-                            if (rootItem.subjectController) {
-                                rootItem.subjectController.deleteCharacteristic(model.QtObject);
+                        delegate: Characteristic {
+
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                            }
+
+                            modelM: model.QtObject
+
+                            //
+                            // Slots
+                            //
+                            onDeleteCharacteristic: {
+                                if (rootItem.subjectController) {
+                                    rootItem.subjectController.deleteCharacteristic(model.QtObject);
+                                }
                             }
                         }
                     }
