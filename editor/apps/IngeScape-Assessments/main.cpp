@@ -183,6 +183,9 @@ void registerCustomQmlTypes()
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsSvgButtonStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsSvgButtonStyle");
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsSvgAndTextButtonStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsSvgAndTextButtonStyle");
 
+    // - ScrollView style
+    qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsScrollViewStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsScrollViewStyle");
+
     // - List Header
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsListHeader.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsListHeader");
 

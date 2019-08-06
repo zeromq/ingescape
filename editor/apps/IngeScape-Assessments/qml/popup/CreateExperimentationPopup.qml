@@ -49,18 +49,6 @@ AssessmentsPopupBase {
     //--------------------------------
     //
     //
-    // Signals
-    //
-    //
-    //--------------------------------
-
-    //
-    //signal cancelTODO();
-
-
-    //--------------------------------
-    //
-    //
     // Slots
     //
     //
@@ -396,7 +384,6 @@ AssessmentsPopupBase {
             width: boundingBox.width
 
             activeFocusOnPress: true
-            text: "OK"
 
             enabled: ((txtExperimentationName.text.length > 0) && controller && controller.newGroup
                       && ( (rootPopup.selectedExperimentationsGroup !== controller.newGroup)

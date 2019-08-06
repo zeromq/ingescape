@@ -191,6 +191,7 @@ Item {
 
                 style: IngeScapeAssessmentsSvgButtonStyle {
                     releasedID: "duplicate"
+                    disabledID: releasedID
                 }
 
                 onClicked: {

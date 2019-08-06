@@ -34,5 +34,6 @@
         <file>qml/task/DependentVariableDelegate.qml</file>
         <file>qml/popup/AssessmentsPopupBase.qml</file>
         <file>qml/popup/DeleteConfirmationPopup.qml</file>
+        <file>qml/theme/IngeScapeAssessmentsScrollViewStyle.qml</file>
     </qresource>
 </RCC>

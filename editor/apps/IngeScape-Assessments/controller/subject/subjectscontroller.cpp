@@ -30,9 +30,10 @@ SubjectsController::SubjectsController(QObject *parent) : QObject(parent),
 
     qInfo() << "New Subjects Controller";
 
-    // Fill without type "UNKNOWN"
+    // Fill without type "UNKNOWN" and "ENUM"
     _allCharacteristicValueTypes.fillWithAllEnumValues();
     _allCharacteristicValueTypes.removeEnumValue(CharacteristicValueTypes::UNKNOWN);
+    _allCharacteristicValueTypes.removeEnumValue(CharacteristicValueTypes::CHARACTERISTIC_ENUM);
 
 }
 

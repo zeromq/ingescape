@@ -36,9 +36,9 @@ I2PopupBase {
     //
     //--------------------------------------------------------
 
-    property SubjectsController controller: null;
+    property SubjectsController subjectController: null;
 
-    property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
+    property ExperimentationM experimentation: subjectController ? subjectController.currentExperimentation : null;
 
     // Width of the columns in the subject list view
     property real characteristicValueColumnWidth: 228
@@ -195,8 +195,8 @@ I2PopupBase {
                         // Slots
                         //
                         onDeleteCharacteristic: {
-                            if (rootItem.controller) {
-                                rootItem.controller.deleteCharacteristic(model.QtObject);
+                            if (rootItem.subjectController) {
+                                rootItem.subjectController.deleteCharacteristic(model.QtObject);
                             }
                         }
                     }
@@ -293,9 +293,9 @@ I2PopupBase {
 
             onClicked: {
                 // Open the popup
-                if (rootItem.controller)
+                if (rootItem.subjectController)
                 {
-                    rootItem.controller.createNewSubject()
+                    rootItem.subjectController.createNewSubject()
                 }
             }
 
@@ -379,10 +379,10 @@ I2PopupBase {
                     }
 
                     onDeleteSubject: {
-                        if (rootItem.controller && subjectDelegate.subject)
+                        if (rootItem.subjectController && subjectDelegate.subject)
                         {
                             subjectDelegate.isCurrentlyEditing = false
-                            rootItem.controller.deleteSubject(subjectDelegate.subject);
+                            rootItem.subjectController.deleteSubject(subjectDelegate.subject);
                         }
 
                     }
@@ -411,6 +411,8 @@ I2PopupBase {
     Popup.CreateCharacteristicPopup {
         id: createCharacteristicPopup
 
-        controller: rootItem.controller
+        layerObjectName: "overlay2Layer"
+
+        subjectController: rootItem.subjectController
     }
 }
