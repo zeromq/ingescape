@@ -355,37 +355,55 @@ I2PopupBase {
 
             color: IngeScapeTheme.whiteColor
 
-            ListView {
-                id: subjectsColumn
-                anchors.fill: parent
+            ScrollView {
+                id: subjectsScrollView
+                anchors {
+                    fill: parent
+                    rightMargin: -17
+                }
 
-                model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+                style: IngeScapeAssessmentsScrollViewStyle {}
 
-                delegate: Subject {
-                    id: subjectDelegate
+                // Prevent drag overshoot on Windows
+                flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                    height: 40
-                    width: subjectsColumn.width
+                Column {
+                    id: subjectsColumn
 
-                    experimentation: rootItem.experimentation
-                    subject: model ? model.QtObject : null
+                    width: subjectsScrollView.width - 17
+                    height: childrenRect.height
+                    spacing: 0
 
-                    characteristicValueColumnWidth: rootItem.characteristicValueColumnWidth
-                    subjectEditionInProgress: rootItem.subjectEditionInProgress
+                    Repeater {
+                        model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
-                    Binding {
-                        target: rootItem
-                        property: "subjectEditionInProgress"
-                        value: subjectDelegate.isCurrentlyEditing
-                    }
+                        delegate: Subject {
+                            id: subjectDelegate
 
-                    onDeleteSubject: {
-                        if (rootItem.subjectController && subjectDelegate.subject)
-                        {
-                            subjectDelegate.isCurrentlyEditing = false
-                            rootItem.subjectController.deleteSubject(subjectDelegate.subject);
+                            height: 40
+                            width: subjectsColumn.width
+
+                            experimentation: rootItem.experimentation
+                            subject: model ? model.QtObject : null
+
+                            characteristicValueColumnWidth: rootItem.characteristicValueColumnWidth
+                            subjectEditionInProgress: rootItem.subjectEditionInProgress
+
+                            Binding {
+                                target: rootItem
+                                property: "subjectEditionInProgress"
+                                value: subjectDelegate.isCurrentlyEditing
+                            }
+
+                            onDeleteSubject: {
+                                if (rootItem.subjectController && subjectDelegate.subject)
+                                {
+                                    subjectDelegate.isCurrentlyEditing = false
+                                    rootItem.subjectController.deleteSubject(subjectDelegate.subject);
+                                }
+
+                            }
                         }
-
                     }
                 }
             }
