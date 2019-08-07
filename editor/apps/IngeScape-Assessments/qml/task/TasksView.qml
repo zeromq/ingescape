@@ -36,9 +36,9 @@ I2PopupBase {
     //
     //--------------------------------------------------------
 
-    property TasksController controller: null;
+    property TasksController taskController: null;
 
-    property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
+    property ExperimentationM experimentation: taskController ? taskController.currentExperimentation : null;
 
 
     //--------------------------------
@@ -162,32 +162,32 @@ I2PopupBase {
 
             delegate: TaskInList {
                 modelM: model.QtObject
-                isSelected: rootItem.controller && rootItem.controller.selectedTask && (modelM === rootItem.controller.selectedTask)
+                isSelected: rootItem.taskController && rootItem.taskController.selectedTask && (modelM === rootItem.taskController.selectedTask)
 
                 //
                 // Slots
                 //
                 onSelectTask: {
-                    if (rootItem.controller)
+                    if (rootItem.taskController)
                     {
                         // First, select the task
-                        rootItem.controller.selectedTask = model.QtObject;
+                        rootItem.taskController.selectedTask = model.QtObject;
                     }
                 }
 
                 onDeleteTask: {
-                    if (rootItem.controller)
+                    if (rootItem.taskController)
                     {
                         // Delete the task
-                        rootItem.controller.deleteTask(model.QtObject);
+                        rootItem.taskController.deleteTask(model.QtObject);
                     }
                 }
 
                 onDuplicateTask: {
-                    if (rootItem.controller)
+                    if (rootItem.taskController)
                     {
                         // Duplicate the task
-                        rootItem.controller.duplicateTask(model.QtObject);
+                        rootItem.taskController.duplicateTask(model.QtObject);
                     }
                 }
             }
@@ -228,7 +228,7 @@ I2PopupBase {
 
             anchors.fill: parent
 
-            taskController: rootItem.controller
+            taskController: rootItem.taskController
         }
 
         Button {
@@ -249,8 +249,8 @@ I2PopupBase {
             }
 
             onClicked: {
-                if (controller) {
-                    controller.selectedTask = null;
+                if (taskController) {
+                    taskController.selectedTask = null;
                 }
 
                 // Emit the signal "closeTasksView"
@@ -266,9 +266,9 @@ I2PopupBase {
     Popup.CreateTaskPopup {
         id: createTaskPopup
 
-        //anchors.centerIn: parent
+        layerObjectName: "overlay2Layer"
 
-        controller: rootItem.controller
+        taskController: rootItem.taskController
     }
 
 }

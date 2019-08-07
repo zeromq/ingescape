@@ -22,17 +22,15 @@ import I2Quick 1.0
 import INGESCAPE 1.0
 
 
-I2PopupBase {
+AssessmentsPopupBase {
     id: rootPopup
 
-    height: 400
-    width: 500
+    height: 267
+    width: 625
 
     anchors.centerIn: parent
 
-    isModal: true
-    dismissOnOutsideTap: false
-    keepRelativePositionToInitialParent: false
+    title: "NEW TASK"
 
 
     //--------------------------------------------------------
@@ -43,7 +41,7 @@ I2PopupBase {
     //
     //--------------------------------------------------------
 
-    property TasksController controller: null;
+    property TasksController taskController: null;
 
     property url selectedPlatformUrl: "";
 
@@ -68,16 +66,6 @@ I2PopupBase {
     //
     //
     //--------------------------------
-
-    onOpened: {
-
-        /*if (experimentation) {
-            console.log(experimentation.name + " with " + experimentation.allTasks.count + " tasks");
-        }
-        else {
-            console.log("NO experimentation !!!");
-        }*/
-    }
 
 
     //--------------------------------
@@ -110,279 +98,254 @@ I2PopupBase {
     //
     //--------------------------------
 
-    Rectangle {
+    Item {
+        id: rowName
 
         anchors {
-            fill: parent
+            top: parent.top
+            topMargin: 30
+            left: parent.left
+            leftMargin: 28
+            right: parent.right
+            rightMargin: 28
         }
-        radius: 5
-        border {
-            width: 2
-            color: IngeScapeTheme.editorsBackgroundBorderColor
-        }
-        color: IngeScapeTheme.editorsBackgroundColor
 
+        height: 30
 
         Text {
-            id: title
+            text: qsTr("Name:")
 
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.top
-                topMargin: 20
-            }
+            height: 30
 
-            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
 
-            text: qsTr("New task")
-
-            color: IngeScapeTheme.whiteColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 20
+                pixelSize: 16
             }
         }
 
-        Column {
+        TextField {
+            id: txtTaskName
+
             anchors {
-                top: title.bottom
-                topMargin: 30
                 left: parent.left
-                leftMargin: 10
+                leftMargin: 96
+                right: parent.right
+                verticalCenter: parent.verticalCenter
             }
 
-            spacing: 30
+            height: 30
 
+            text: ""
 
-            Row {
-                id: rowName
+            style: I2TextFieldStyle {
+                backgroundColor: IngeScapeTheme.veryLightGreyColor
+                borderColor: IngeScapeAssessmentsTheme.blueButton
+                borderErrorColor: IngeScapeTheme.redColor
+                radiusTextBox: 5
+                borderWidth: 0;
+                borderWidthActive: 2
+                textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
+                textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
 
-                spacing: 10
+                padding.left: 16
+                padding.right: 16
 
-                Text {
-                    text: qsTr("Name:")
-
-                    width: 100
-                    height: 30
-
-                    horizontalAlignment: Text.AlignRight
-                    verticalAlignment: Text.AlignVCenter
-
-                    color: IngeScapeTheme.whiteColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                }
-
-                TextField {
-                    id: txtTaskName
-
-                    height: 30
-                    width: 250
-
-                    //verticalAlignment: TextInput.AlignVCenter
-                    text: ""
-
-                    style: I2TextFieldStyle {
-                        backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                        borderColor: IngeScapeTheme.whiteColor
-                        borderErrorColor: IngeScapeTheme.redColor
-                        radiusTextBox: 1
-                        borderWidth: 0;
-                        borderWidthActive: 1
-                        textIdleColor: IngeScapeTheme.whiteColor;
-                        textDisabledColor: IngeScapeTheme.darkGreyColor
-
-                        padding.left: 3
-                        padding.right: 3
-
-                        font {
-                            pixelSize:15
-                            family: IngeScapeTheme.textFontFamily
-                        }
-                    }
-                }
-
-            }
-
-            Row {
-                id: rowPlatform
-
-                spacing: 10
-
-                Text {
-                    text: qsTr("Platform:")
-
-                    width: 100
-                    height: 30
-
-                    horizontalAlignment: Text.AlignRight
-                    verticalAlignment: Text.AlignVCenter
-
-                    color: IngeScapeTheme.whiteColor
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                }
-
-                TextField {
-                    id: txtPlatformUrl
-
-                    height: 30
-                    width: 250
-
-                    //verticalAlignment: TextInput.AlignVCenter
-                    text: rootPopup.selectedPlatformUrl
-
-                    style: I2TextFieldStyle {
-                        backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                        borderColor: IngeScapeTheme.whiteColor
-                        borderErrorColor: IngeScapeTheme.redColor
-                        radiusTextBox: 1
-                        borderWidth: 0;
-                        borderWidthActive: 1
-                        textIdleColor: IngeScapeTheme.whiteColor;
-                        textDisabledColor: IngeScapeTheme.darkGreyColor
-
-                        padding.left: 3
-                        padding.right: 3
-
-                        font {
-                            pixelSize:15
-                            family: IngeScapeTheme.textFontFamily
-                        }
-                    }
-                }
-
-                Button {
-                    id: btnSelectPlatformFile
-
-                    text: qsTr("Select file...")
-
-                    width: 100
-                    height: 30
-
-                    onClicked: {
-                        //console.log("QML: Select platform file...");
-
-                        // Open the file dialog
-                        fileDialog.open();
-                    }
-                }
-
-            }
-
-        }
-
-
-        Row {
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                bottom : parent.bottom
-                bottomMargin: 16
-            }
-            spacing : 15
-
-            Button {
-                id: cancelButton
-
-                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                height: boundingBox.height
-                width: boundingBox.width
-
-                activeFocusOnPress: true
-                text: "Cancel"
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.whiteColor
-
-                }
-
-                onClicked: {
-                    console.log("QML: cancel");
-
-                    // Reset all user inputs and close the popup
-                    rootPopup.resetInputsAndClosePopup();
-                }
-            }
-
-            Button {
-                id: okButton
-
-                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                height: boundingBox.height
-                width: boundingBox.width
-
-                activeFocusOnPress: true
-                text: "OK"
-
-                enabled: ( (txtTaskName.text.length > 0) && (txtPlatformUrl.text.length > 0)
-                          && controller && controller.canCreateTaskWithName(txtTaskName.text) )
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.greyColor
-
-                }
-
-                onClicked: {
-                    //console.log("QML: create new Task " + txtTaskName.text + " with platform " + txtPlatformUrl.text);
-
-                    if (controller)
-                    {
-                        // Create a new task with an IngeScape platform file path
-                        controller.createNewTaskWithIngeScapePlatformFilePath(txtTaskName.text, txtPlatformUrl.text);
-                    }
-
-                    // Reset all user inputs and close the popup
-                    rootPopup.resetInputsAndClosePopup();
+                font {
+                    pixelSize: 16
+                    family: IngeScapeTheme.textFontFamily
                 }
             }
         }
-
     }
 
+    Item {
+        anchors {
+            top: rowName.bottom
+            topMargin: 24
+            left: parent.left
+            leftMargin: 28
+            right: parent.right
+            rightMargin: 28
+        }
+
+        height: 30
+
+        Text {
+            text: qsTr("Platform:")
+
+            anchors {
+                top: parent.top
+                left: parent.left
+            }
+
+            height: 30
+
+            verticalAlignment: Text.AlignVCenter
+
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 16
+            }
+        }
+
+        TextField {
+            id: txtPlatformUrl
+
+            anchors {
+                left: parent.left
+                leftMargin: 96
+                right: btnSelectPlatformFile.left
+                rightMargin: 7
+                verticalCenter: parent.verticalCenter
+            }
+
+            height: 30
+
+            //verticalAlignment: TextInput.AlignVCenter
+            text: rootPopup.selectedPlatformUrl
+
+            style: I2TextFieldStyle {
+                backgroundColor: IngeScapeTheme.veryLightGreyColor
+                borderColor: IngeScapeAssessmentsTheme.blueButton
+                borderErrorColor: IngeScapeTheme.redColor
+                radiusTextBox: 5
+                borderWidth: 0;
+                borderWidthActive: 2
+                textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
+                textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
+
+                placeholderCustomText: qsTr("Import a platform")
+                placeholderMarginLeft: 15
+                placeholderColor: IngeScapeTheme.lightGreyColor
+                placeholderFont {
+                    pixelSize: 16
+                    family: IngeScapeTheme.textFontFamily
+                    italic: true
+                }
+
+                padding.left: 16
+                padding.right: 16
+
+                font {
+                    pixelSize: 16
+                    family: IngeScapeTheme.textFontFamily
+                }
+            }
+        }
+
+        Button {
+            id: btnSelectPlatformFile
+
+            anchors {
+                verticalCenter: txtPlatformUrl.verticalCenter
+                right: parent.right
+            }
+
+            width: 40
+            height: 30
+
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "file"
+                disabledID: releasedID
+            }
+
+            onClicked: {
+                // Open the file dialog
+                fileDialog.open();
+            }
+        }
+    }
+
+
+    Row {
+        anchors {
+            right: parent.right
+            rightMargin: 28
+            bottom : parent.bottom
+            bottomMargin: 28
+        }
+        spacing : 15
+
+        Button {
+            id: cancelButton
+
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+            anchors {
+                verticalCenter: parent.verticalCenter
+            }
+
+            height: boundingBox.height
+            width: boundingBox.width
+
+            activeFocusOnPress: true
+
+            style: ButtonStyle {
+                background: Rectangle {
+                    anchors.fill: parent
+                    radius: 5
+                    color: control.pressed ? IngeScapeTheme.lightGreyColor : (control.hovered ? IngeScapeTheme.veryLightGreyColor : "transparent")
+                }
+
+                label: Text {
+                    text: "Cancel"
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight: Font.Medium
+                        pixelSize: 16
+                    }
+                }
+            }
+
+            onClicked: {
+                // Reset all user inputs and close the popup
+                rootPopup.resetInputsAndClosePopup();
+            }
+        }
+
+        Button {
+            id: okButton
+
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+            anchors {
+                verticalCenter: parent.verticalCenter
+            }
+
+            height: boundingBox.height
+            width: boundingBox.width
+
+            activeFocusOnPress: true
+
+            enabled: ( (txtTaskName.text.length > 0) && (txtPlatformUrl.text.length > 0)
+                      && rootPopup.taskController && rootPopup.taskController.canCreateTaskWithName(txtTaskName.text) )
+
+            style: IngeScapeAssessmentsButtonStyle {
+                text: "OK"
+            }
+
+            onClicked: {
+                if (rootPopup.taskController)
+                {
+                    // Create a new task with an IngeScape platform file path
+                    rootPopup.taskController.createNewTaskWithIngeScapePlatformFilePath(txtTaskName.text, txtPlatformUrl.text);
+                }
+
+                // Reset all user inputs and close the popup
+                rootPopup.resetInputsAndClosePopup();
+            }
+        }
+    }
 
     FileDialog {
         id: fileDialog
@@ -391,22 +354,11 @@ I2PopupBase {
 
         folder: shortcuts.documents + "/IngeScape/platforms"
 
-        //defaultSuffix: ".json"
         nameFilters: [ "JSON files (*.json)" ]
 
         onAccepted: {
-            //console.log("Selected Platform Url: " + fileDialog.fileUrl)
-
             // Set the selected platform URL
             rootPopup.selectedPlatformUrl = fileDialog.fileUrl;
-
-            //fileDialog.close();
-        }
-
-        onRejected: {
-            //console.log("Canceled");
-
-            //fileDialog.close();
         }
     }
 

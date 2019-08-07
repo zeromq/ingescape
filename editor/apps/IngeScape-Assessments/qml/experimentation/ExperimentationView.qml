@@ -748,7 +748,7 @@ Item {
         width: parent.width - 78
         height: parent.height - 78
 
-        controller: IngeScapeAssessmentsC.tasksC
+        taskController: IngeScapeAssessmentsC.tasksC
 
         //
         // Slots
