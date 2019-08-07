@@ -17,6 +17,9 @@
 
 #include "controller/assessmentsmodelmanager.h"
 
+// Experimentation table name
+const QString ExperimentationM::table = "ingescape.experimentation";
+
 /**
  * @brief Constructor
  * @param name
@@ -81,7 +84,8 @@ void ExperimentationM::setname(QString value)
     {
         _name = value;
 
-        const char* query = "UPDATE ingescape.experimentation SET name = ? WHERE id = ?;";
+        QString queryStr = "UPDATE " + ExperimentationM::table + " SET name = ? WHERE id = ?;";
+        const char* query = queryStr.toStdString().c_str();
         CassStatement* cassStatement = cass_statement_new(query, 2);
         cass_statement_bind_string(cassStatement, 0, value.toStdString().c_str());
         cass_statement_bind_uuid  (cassStatement, 1, _cassUuid);
@@ -317,7 +321,8 @@ void ExperimentationM::deleteExperimentationFromCassandra(const ExperimentationM
     _deleteAllCharacteristicsValuesForExperimentation(experimentation);
 
     // Delete actual experimentation
-    const char* query = "DELETE FROM ingescape.experimentation WHERE id = ?;";
+    QString queryStr = "DELETE FROM " + ExperimentationM::table + " WHERE id = ?;";
+    const char* query = queryStr.toStdString().c_str();
     CassStatement* cassStatement = cass_statement_new(query, 1);
     cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
 

@@ -49,7 +49,7 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
     AssessmentsModelManager* modelManager = AssessmentsModelManager::Instance();
     if (modelManager != nullptr) {
         // Create the query
-        QString query = QString("SELECT * FROM ingescape.experimentation;");
+        QString query = "SELECT * FROM " + ExperimentationM::table;
 
         // Creates the new query statement
         CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 0);
@@ -185,7 +185,7 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
         cass_int64_t creationTime = cass_time_from_epoch(now);
 
         // Create the query
-        QString query = QString("INSERT INTO ingescape.experimentation (id, name, creation_date, creation_time, group_name) VALUES (?, ?, ?, ?, ?);");
+        QString query = "INSERT INTO " + ExperimentationM::table + " (id, name, creation_date, creation_time, group_name) VALUES (?, ?, ?, ?, ?);";
 
         // Creates the new query statement
         CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 5);
