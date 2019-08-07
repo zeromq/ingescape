@@ -83,6 +83,7 @@ Rectangle {
                 property var characteristic: model ? model.QtObject : null
 
                 Text {
+                    id: characteristicText
                     anchors{
                         fill: parent
                         leftMargin: 15
@@ -94,7 +95,9 @@ Rectangle {
                           : ""
 
                     verticalAlignment: Text.AlignVCenter
-                    visible: !rootItem.isCurrentlyEditing
+
+                    // Subject's is never editable
+                    visible:characteristicDelegate.characteristic.name === CHARACTERISTIC_SUBJECT_ID || !rootItem.isCurrentlyEditing
 
                     color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                     font {
@@ -113,7 +116,7 @@ Rectangle {
                         rightMargin: 33
                     }
 
-                    visible: rootItem.isCurrentlyEditing
+                    visible: !characteristicText.visible
 
                     // Load editor in function of the value type:
                     // - Enum --> combobox

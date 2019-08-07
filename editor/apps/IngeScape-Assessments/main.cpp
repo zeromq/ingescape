@@ -367,6 +367,12 @@ int main(int argc, char *argv[])
 #else
         qmlContext->setContextProperty("SHOW_DEBUG_MENU", false);
 #endif
+
+
+        //
+        // Specific context properties
+        //
+        qmlContext->setContextProperty("CHARACTERISTIC_SUBJECT_ID", CHARACTERISTIC_SUBJECT_ID);
     }
 
 
