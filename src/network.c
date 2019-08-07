@@ -1232,9 +1232,10 @@ initLoop (zsock_t *pipe, void *args){
     IGS_UNUSED(args)
     
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
-    if (licEnforcement == NULL){
-        licEnforcement = calloc(1, sizeof(licenseEnforcement_t));
+    if (licEnforcement != NULL){
+        free(licEnforcement);
     }
+    licEnforcement = calloc(1, sizeof(licenseEnforcement_t));
     licEnforcement->currentAgentsNb = 0;
     licEnforcement->currentIOPNb = 0;
 #endif
@@ -1516,11 +1517,6 @@ initLoop (zsock_t *pipe, void *args){
         #endif
         //TODO : do that for windows also
     }
-#if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
-    if (licEnforcement != NULL){
-        free(licEnforcement);
-    }
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////
