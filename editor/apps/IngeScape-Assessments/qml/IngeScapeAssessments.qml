@@ -217,7 +217,7 @@ Item {
     // Network Configuration (Popup)
     //
     /*NetworkConfiguration {
-        id: networkConfigurationPopup
+        id: configurationPopup
 
         anchors.centerIn: parent
     }*/

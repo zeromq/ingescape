@@ -154,8 +154,9 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     // - Actions List Item
     qmlRegisterType(QUrl("qrc:/qml/ActionsListItem.qml"), "INGESCAPE", 1, 0, "ActionsListItem");
 
-    // - Confirmation Popup
+    // - Confirmation and Configuration Popup
     qmlRegisterType(QUrl("qrc:/qml/ConfirmationPopup.qml"), "INGESCAPE", 1, 0, "ConfirmationPopup");
+    qmlRegisterType(QUrl("qrc:/qml/ConfigurationPopup.qml"), "INGESCAPE", 1, 0, "ConfigurationPopup");
 
     // - Qt Quick info Popup
     qmlRegisterType(QUrl("qrc:/qml/QtQuickInfoPopup.qml"), "INGESCAPE", 1, 0, "QtQuickInfoPopup");

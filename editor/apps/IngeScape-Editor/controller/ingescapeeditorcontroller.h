@@ -53,6 +53,9 @@ class IngeScapeEditorController : public QObject
     // Network settings - port
     I2_QML_PROPERTY_READONLY(uint, port)
 
+    // Path to the directory with IngeScape licenses
+    I2_QML_PROPERTY_READONLY(QString, licensesPath)
+
     // Flag indicating if the Model/View Model Visualizer is available
     I2_QML_PROPERTY_READONLY(bool, isAvailableModelVisualizer)
 
@@ -181,7 +184,15 @@ public:
      * @param hasToClearPlatform
      * @return true when success
      */
-    Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform);
+    //Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform);
+    Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform, QString licensesPath);
+
+
+    /**
+     * @brief Select a directory with IngeScape licenses
+     * @return
+     */
+    Q_INVOKABLE QString selectLicensesDirectory();
 
 
     /**

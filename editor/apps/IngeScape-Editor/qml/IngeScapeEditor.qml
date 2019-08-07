@@ -77,12 +77,12 @@ Item {
     //
     // function allowing to open the network configuration popup
     //
-    function openNetworkConfiguration() {
+    function openConfiguration() {
         if (IngeScapeEditorC.networkC) {
             IngeScapeEditorC.networkC.updateAvailableNetworkDevices();
         }
 
-        networkConfigurationPopup.open();
+        configurationPopup.open();
     }
 
 
@@ -91,7 +91,7 @@ Item {
         if (IngeScapeEditorC.errorMessageWhenConnectionFailed !== "")
         {
             //console.error("On Completed: Error Message = " + IngeScapeEditorC.errorMessageWhenConnectionFailed);
-            networkConfigurationPopup.open();
+            configurationPopup.open();
         }
     }
 
@@ -462,7 +462,7 @@ Item {
     // Network Configuration (Popup)
     //
     NetworkConfiguration {
-        id: networkConfigurationPopup
+        id: configurationPopup
 
         anchors.centerIn: parent
     }

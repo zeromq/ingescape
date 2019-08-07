@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -15,7 +15,6 @@
 import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
-//import QtQuick.Dialogs 1.2
 
 import I2Quick 1.0
 
@@ -27,13 +26,13 @@ import QtQuick.Controls 2.0 as Controls2
 I2PopupBase {
     id: rootItem
 
-    width: 500
-    height: 500
+    width: 300
+    height: 350
 
     dismissOnOutsideTap: false
 
     // our main controller
-    //property var controller: null;
+    property var controller: null;
 
 
     //--------------------------------------------------------
@@ -59,11 +58,10 @@ I2PopupBase {
             selectedNetworkDevice = combobox.selectedItem.modelData;
         }
 
-        if (IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.isAvailableNetworkDevice(selectedNetworkDevice))
+        if (controller && controller.networkC && controller.networkC.isAvailableNetworkDevice(selectedNetworkDevice))
         {
             // Re-Start the Network
-            //var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked);
-            var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked, txtLicensesPath.text);
+            var success = controller.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked);
             if (success === true)
             {
                 rootItem.close();
@@ -84,10 +82,9 @@ I2PopupBase {
     //--------------------------------------------------------
 
     onOpened: {
-        txtPort.text = IngeScapeEditorC.port;
-        combobox.selectedIndex = IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices.indexOf(IngeScapeEditorC.networkDevice) : -1;
+        txtPort.text = controller.port;
+        combobox.selectedIndex = controller.networkC ? controller.networkC.availableNetworkDevices.indexOf(controller.networkDevice) : -1;
         clearPlatform.checked = true;
-        txtLicensesPath.text = IngeScapeEditorC.licensesPath;
 
         // Set the focus to catch keyboard press on Return/Escape
         rootItem.focus = true;
@@ -140,9 +137,9 @@ I2PopupBase {
         spacing: 6
 
         Text {
-            id: titleNetwork
+            id: title
 
-            text: qsTr("Network")
+            text: qsTr("Configure network")
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -159,11 +156,11 @@ I2PopupBase {
                 left: parent.left
                 right: parent.right
             }
-            height: 10
+            height: 13
         }
 
         Text {
-            text: qsTr("Port")
+            text: qsTr("Port:")
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -176,11 +173,14 @@ I2PopupBase {
         TextField {
             id: txtPort
 
-            width: 250
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
             height: 25
             verticalAlignment: TextInput.AlignVCenter
 
-            text: IngeScapeEditorC.port
+            text: controller.port
 
             validator: IntValidator {
                 bottom: 1;
@@ -210,7 +210,7 @@ I2PopupBase {
             Binding {
                 target: txtPort
                 property: "text"
-                value: IngeScapeEditorC.port
+                value: controller.port
             }
         }
 
@@ -221,11 +221,11 @@ I2PopupBase {
                 left: parent.left
                 right: parent.right
             }
-            height: 10
+            height: 13
         }
 
         Text {
-            text: qsTr("Network device")
+            text: qsTr("Network device:")
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -237,9 +237,12 @@ I2PopupBase {
 
         I2ComboboxStringList {
             id: combobox
-            model: IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices : 0
+            model: controller.networkC ? controller.networkC.availableNetworkDevices : 0
 
-            width: 250
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
             height : 25
 
             style: IngeScapeComboboxStyle {}
@@ -251,7 +254,7 @@ I2PopupBase {
                 {
                     selectedNetworkDevice = combobox.selectedItem;
                 }
-                okButton.enabled = IngeScapeEditorC.networkC.isAvailableNetworkDevice(selectedNetworkDevice);
+                okButton.enabled = controller.networkC.isAvailableNetworkDevice(selectedNetworkDevice);
             }
 
             _mouseArea.hoverEnabled: true
@@ -306,7 +309,7 @@ I2PopupBase {
                 }
                 wrapMode: Text.WordWrap
 
-                text: IngeScapeEditorC.errorMessageWhenConnectionFailed
+                text: controller.errorMessageWhenConnectionFailed
 
                 color: IngeScapeTheme.orangeColor
                 font {
@@ -358,139 +361,6 @@ I2PopupBase {
                         svgElementId: "check";
                     }
                 }
-            }
-        }
-
-        Item {
-            id: space4
-
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 30
-        }
-
-        Text {
-            id: titleLicenses
-
-            text: qsTr("Licenses")
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 23
-            }
-        }
-
-        Item {
-            id: space5
-
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 10
-        }
-
-        Row {
-            spacing: 10
-
-        Text {
-            text: qsTr("License path")
-
-            anchors {
-                verticalCenter: parent.verticalCenter
-            }
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
-            }
-        }
-
-        Button {
-            id: btnSelectLicencesDirectory
-
-            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-            activeFocusOnPress: true
-
-            height: boundingBox.height
-            width: boundingBox.width
-
-            text: "Change..."
-
-            style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileIngeScape
-
-                pressedID: releasedID + "-pressed"
-                releasedID: "button"
-                disabledID: releasedID + "-disabled"
-
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight : Font.Medium
-                    pixelSize : 16
-                }
-                labelColorPressed: IngeScapeTheme.blackColor
-                labelColorReleased: IngeScapeTheme.whiteColor
-                labelColorDisabled: IngeScapeTheme.whiteColor
-
-            }
-
-            onClicked: {
-                //fileDialog.open();
-
-                var directoryPath = IngeScapeEditorC.selectLicensesDirectory();
-                if (directoryPath) {
-                    txtLicensesPath.text = directoryPath;
-                }
-            }
-        }
-        }
-
-        TextField {
-            id: txtLicensesPath
-
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 25
-            verticalAlignment: TextInput.AlignVCenter
-
-            text: "" //IngeScapeEditorC.licensesPath
-
-            enabled: false
-
-            style: I2TextFieldStyle {
-                backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                backgroundDisabledColor: IngeScapeTheme.darkBlueGreyColor
-
-                borderColor: IngeScapeTheme.whiteColor
-                borderDisabledColor: IngeScapeTheme.whiteColor
-
-                borderErrorColor: IngeScapeTheme.redColor
-
-                radiusTextBox: 1
-                borderWidth: 0;
-                borderWidthActive: 1
-
-                textIdleColor: IngeScapeTheme.whiteColor
-                textDisabledColor: IngeScapeTheme.whiteColor
-
-                padding.left: 3
-                padding.right: 3
-
-                font {
-                    pixelSize:15
-                    family: IngeScapeTheme.textFontFamily
-                }
-
             }
         }
 
@@ -587,29 +457,4 @@ I2PopupBase {
             }
         }
     }
-
-
-    /*FileDialog {
-        id: fileDialog
-
-        title: "Select an IngeScape licenses directory"
-
-        folder: shortcuts.documents + "/IngeScape/licenses"
-
-        selectFolder: true
-
-        onAccepted: {
-            console.log("Selected Licenses Url: " + fileDialog.fileUrl)
-
-            txtLicensesPath.text = fileDialog.fileUrl;
-
-            //fileDialog.close();
-        }
-
-        onRejected: {
-            console.log("Canceled");
-
-            //fileDialog.close();
-        }
-    }*/
 }

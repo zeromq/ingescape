@@ -91,6 +91,14 @@ public:
 
 
     /**
+     * @brief Get (and create if needed) the path with files about licenses
+     * "[DocumentsLocation]/IngeScape/licenses/"
+     * @return
+     */
+    static QString getLicensesPath();
+
+
+    /**
      * @brief Get an UID for a new model of action
      * @return
      */

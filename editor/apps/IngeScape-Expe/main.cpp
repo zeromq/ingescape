@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
         //
         //------------------------------
 
-        // Get (and create if needed) the settings path of our application ([DocumentsLocation]/IngeScape/Settings/)
+        // Get (and create if needed) the settings path of our application ([DocumentsLocation]/IngeScape/settings/)
         QString settingsDirectoryPath = IngeScapeUtils::getSettingsPath();
         QString settingsFilePath = QString("%1IngeScape-Expe.ini").arg(settingsDirectoryPath);
 

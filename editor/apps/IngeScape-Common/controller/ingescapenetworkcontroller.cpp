@@ -366,9 +366,6 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
     QString organizationName = QApplication::instance()->organizationName();
     QString version = QApplication::instance()->applicationVersion();
 
-    // Set trace mode
-    igs_setVerbose(true);
-
     // Set the name of our agent
     igs_setAgentName(_igsAgentApplicationName.toStdString().c_str());
 

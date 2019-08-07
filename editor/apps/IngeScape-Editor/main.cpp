@@ -275,8 +275,9 @@ int main(int argc, char *argv[])
         QString logFilePath = QString("%1log-IngeScape-Editor.csv").arg(rootDirectoryPath);
 
         // Set the log level from which logs are printed in the console
-        //igs_setLogLevel(IGS_LOG_DEBUG);
-        igs_setLogLevel(IGS_LOG_INFO);
+        igs_setVerbose(true);
+        igs_setLogLevel(IGS_LOG_DEBUG);
+        //igs_setLogLevel(IGS_LOG_INFO);
 
         igs_setLogPath(logFilePath.toStdString().c_str());
         igs_setLogInFile(true);
@@ -298,7 +299,7 @@ int main(int argc, char *argv[])
         //
         //------------------------------
 
-        // Get (and create if needed) the settings path of our application ([DocumentsLocation]/IngeScape/Settings/)
+        // Get (and create if needed) the settings path of our application ([DocumentsLocation]/IngeScape/settings/)
         QString settingsDirectoryPath = IngeScapeUtils::getSettingsPath();
         QString settingsFilePath = QString("%1IngeScape-Editor.ini").arg(settingsDirectoryPath);
 

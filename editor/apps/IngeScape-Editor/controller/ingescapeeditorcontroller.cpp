@@ -33,6 +33,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _networkDevice(""),
     _ipAddress(""),
     _port(0),
+    _licensesPath(""),
     _isAvailableModelVisualizer(false),
     _isVisibleModelVisualizer(false),
     _errorMessageWhenConnectionFailed(""),
@@ -54,18 +55,21 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 {
     qInfo() << "New IngeScape Editor Controller";
 
-    //
-    // Snapshots directory
-    //
-    QString snapshotsDirectoryPath = IngeScapeUtils::getSnapshotsPath();
-    QDir snapshotsDirectory(snapshotsDirectoryPath);
-    if (snapshotsDirectory.exists())
-    {
-        _snapshotDirectory = snapshotsDirectoryPath;
+    // Root directory path
+    QString rootPath = IngeScapeUtils::getRootPath();
+    QDir rootDir(rootPath);
+    if (!rootDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
     }
-    else
-    {
-        qCritical() << "ERROR: could not create directory at '" << snapshotsDirectoryPath << "' !";
+
+    // Snapshots directory path
+    QString snapshotsPath = IngeScapeUtils::getSnapshotsPath();
+    QDir snapshotsDirectory(snapshotsPath);
+    if (snapshotsDirectory.exists()) {
+        _snapshotDirectory = snapshotsPath;
+    }
+    else {
+        qCritical() << "ERROR: could not create directory at '" << snapshotsPath << "' !";
     }
 
 
@@ -74,27 +78,46 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
     IngeScapeSettings &settings = IngeScapeSettings::Instance();
 
+    //
     // Settings about the "Network"
+    //
     settings.beginGroup("network");
+
     _networkDevice = settings.value("networkDevice", QVariant("")).toString();
     _ipAddress = settings.value("ipAddress", QVariant("")).toString();
     _port = settings.value("port", QVariant(0)).toUInt();
     qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
+
     settings.endGroup();
 
+
+    //
+    // Settings about the "Licenses"
+    //
+    settings.beginGroup("licenses");
+
+    // Get the default path for "Licenses"
+    QString defaultLicensesPath = IngeScapeUtils::getLicensesPath();
+
+    _licensesPath = settings.value("directoryPath", QVariant(defaultLicensesPath)).toString();
+    qDebug() << "Licenses path:" << _licensesPath;
+
+    // Set the IngeScape license path
+    igs_setLicensePath(_licensesPath.toStdString().c_str());
+
+    settings.endGroup();
+
+
+    //
     // Settings about "Debug"
+    //
     settings.beginGroup("debug");
+
     _isAvailableModelVisualizer = settings.value("modelVisualizer", QVariant(false)).toBool();
     qDebug() << "The Model/View Model Visualizer is available ?" << _isAvailableModelVisualizer;
+
     settings.endGroup();
 
-
-    // Root directory
-    QString rootPath = IngeScapeUtils::getRootPath();
-    QDir rootDir(rootPath);
-    if (!rootDir.exists()) {
-        qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
-    }
 
     // Directory for platform files
     QString platformPath = IngeScapeUtils::getPlatformsPath();
@@ -588,7 +611,7 @@ bool IngeScapeEditorController::isAgentUsedInPlatform(AgentsGroupedByDefinitionV
  * @param hasToClearPlatform
  * @return true when success
  */
-bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform)
+bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform, QString licensesPath)
 {
     bool success = false;
 
@@ -601,8 +624,8 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
         uint port = strPort.toUInt(&isUInt);
         if (isUInt && (port > 0))
         {
-            // Port and Network device have not changed...
-            if ((port == _port) && (networkDevice == _networkDevice))
+            // None changes (Same port, same network device and same licenses path)
+            if ((port == _port) && (networkDevice == _networkDevice) && (licensesPath == _licensesPath))
             {
                 // Nothing to do
                 success = true;
@@ -624,6 +647,28 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 // Stop our IngeScape agent
                 _networkC->stop();
 
+
+                // Licenses path has been changed
+                if (licensesPath != _licensesPath)
+                {
+                    qInfo() << "Licenses path changes from" << _licensesPath << "to" << licensesPath;
+
+                    // Update property
+                    setlicensesPath(licensesPath);
+
+                    // Set the IngeScape license path
+                    igs_setLicensePath(_licensesPath.toStdString().c_str());
+
+                    // Update settings file
+                    IngeScapeSettings &settings = IngeScapeSettings::Instance();
+                    settings.beginGroup("licenses");
+                    settings.setValue("directoryPath", _licensesPath);
+                    settings.endGroup();
+
+                    // Save new value
+                    settings.sync();
+                }
+
                 // Update properties
                 setnetworkDevice(networkDevice);
                 setport(port);
@@ -634,6 +679,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 settings.setValue("networkDevice", networkDevice);
                 settings.setValue("port", port);
                 settings.endGroup();
+
                 // Save new values
                 settings.sync();
 
@@ -674,6 +720,19 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
     }
 
     return success;
+}
+
+
+/**
+ * @brief Select a directory with IngeScape licenses
+ * @return
+ */
+QString IngeScapeEditorController::selectLicensesDirectory()
+{
+    // Open a directory dialog box
+    return QFileDialog::getExistingDirectory(nullptr,
+                                             "Select a directory with IngeScape licenses",
+                                             _licensesPath);
 }
 
 

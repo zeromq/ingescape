@@ -95,13 +95,13 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: qsTr("Platform network...")
+                text: qsTr("Configuratio n")
                 shortcut: StandardKey.Preferences
 
                 onTriggered: {
                     if (applicationLoader.item) {
-                        //console.log("QML: open network configuration");
-                        applicationLoader.item.openNetworkConfiguration();
+                        console.log("QML: open configuration");
+                        applicationLoader.item.openConfiguration();
                     }
                 }
             }

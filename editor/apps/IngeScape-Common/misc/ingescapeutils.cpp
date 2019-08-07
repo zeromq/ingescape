@@ -107,7 +107,7 @@ QString IngeScapeUtils::getRootPath()
 
 /**
  * @brief Get (and create if needed) the settings path of our application
- * "[DocumentsLocation]/IngeScape/Settings/"
+ * "[DocumentsLocation]/IngeScape/settings/"
  * @return
  */
 QString IngeScapeUtils::getSettingsPath()
@@ -118,7 +118,7 @@ QString IngeScapeUtils::getSettingsPath()
 
 /**
  * @brief Get (and create if needed) the snapshots path of our application
- * "[DocumentsLocation]/IngeScape/Snapshots/"
+ * "[DocumentsLocation]/IngeScape/snapshots/"
  * @return
  */
 QString IngeScapeUtils::getSnapshotsPath()
@@ -146,6 +146,17 @@ QString IngeScapeUtils::getPlatformsPath()
 QString IngeScapeUtils::getExportsPath()
 {
     return IngeScapeUtils::_getSubDirectoryPath("exports");
+}
+
+
+/**
+ * @brief Get (and create if needed) the path with files about licenses
+ * "[DocumentsLocation]/IngeScape/licenses/"
+ * @return
+ */
+QString IngeScapeUtils::getLicensesPath()
+{
+    return IngeScapeUtils::_getSubDirectoryPath("licenses");
 }
 
 
