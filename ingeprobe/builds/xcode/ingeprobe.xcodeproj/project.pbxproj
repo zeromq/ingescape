@@ -163,11 +163,11 @@
 			};
 			buildConfigurationList = 978D6DE81CB26F9B0082016E /* Build configuration list for PBXProject "ingeprobe" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
+				Base,
 			);
 			mainGroup = 978D6DE41CB26F9B0082016E;
 			productRefGroup = 978D6DEE1CB26F9B0082016E /* Products */;
