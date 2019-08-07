@@ -179,8 +179,8 @@ SubjectM* SubjectM::createSubjectFromCassandraRow(const CassRow* row)
 void SubjectM::deleteSubjectFromCassandra(const SubjectM& subject)
 {
     // Remove subject from DB
-    const char* query = "DELETE FROM ingescape.subject WHERE id_experimentation = ? AND id = ?;";
-    CassStatement* cassStatement = cass_statement_new(query, 2);
+    QString queryStr = "DELETE FROM " + SubjectM::table + " WHERE id_experimentation = ? AND id = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
     cass_statement_bind_uuid(cassStatement, 0, subject.getExperimentationCassUuid());
     cass_statement_bind_uuid(cassStatement, 1, subject.getCassUuid());
 

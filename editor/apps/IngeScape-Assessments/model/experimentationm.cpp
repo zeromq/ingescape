@@ -372,8 +372,8 @@ void ExperimentationM::_deleteAllTasksForExperimentation(const ExperimentationM&
  */
 void ExperimentationM::_deleteAllSubjectsForExperimentation(const ExperimentationM& experimentation)
 {
-    const char* query = "DELETE FROM ingescape.subject WHERE id_experimentation = ?;";
-    CassStatement* cassStatement = cass_statement_new(query, 1);
+    QString queryStr = "DELETE FROM " + CharacteristicM::table + " WHERE id_experimentation = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
     cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
 
     // Execute the query or bound statement
