@@ -403,6 +403,7 @@ Item {
 
                                 onClicked: {
                                     deleteExperimentationPopup.experimentation = rootExperimentation.experimentation
+                                    deleteExperimentationPopup.experimentationGroup = rootExperimentationsGroup.experimentationsGroup
                                     deleteExperimentationPopup.open()
                                 }
                             }
@@ -465,23 +466,24 @@ Item {
         id: deleteExperimentationPopup
 
         property var experimentation: null
+        property var experimentationGroup: null
 
         showPopupTitle: false
         anchors.centerIn: parent
 
-        text: experimentation ? qsTr("Are you sure you want to delete the experimentation %1 ?").arg(experimentation.name) : ""
+        text: deleteExperimentationPopup.experimentation ? qsTr("Are you sure you want to delete the experimentation %1 from the group %2 ?").arg(deleteExperimentationPopup.experimentation.name) : ""
 
         height: 160
         width: 470
 
         onValidated: {
             // Emit the signal "Delete Characteristic"
-            rootItem.deleteExperimentation(rootExperimentation.experimentation, rootExperimentationsGroup.experimentationsGroup)
-            deleteExperimentationPopup.close()
+            rootItem.deleteExperimentation(deleteExperimentationPopup.experimentation, deleteExperimentationPopup.experimentationGroup)
+            close()
         }
 
         onCanceled: {
-            deleteExperimentationPopup.close()
+            close()
         }
 
     }
