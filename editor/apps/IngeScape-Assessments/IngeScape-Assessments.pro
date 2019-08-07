@@ -42,7 +42,7 @@ SOURCES += main.cpp \
     controller/ingescapeassessmentscontroller.cpp \
     controller/networkcontroller.cpp \
     model/assessmentsenums.cpp \
-    model/recordsetupm.cpp \
+    model/taskinstancem.cpp \
     model/subject/subjectm.cpp \
     model/subject/characteristicm.cpp \
     model/subject/characteristicenumm.cpp \
@@ -54,7 +54,7 @@ SOURCES += main.cpp \
     controller/subject/subjectscontroller.cpp \
     controller/task/taskscontroller.cpp \
     controller/experimentationcontroller.cpp \
-    controller/record/recordcontroller.cpp \
+    controller/record/taskinstancecontroller.cpp \
     viewModel/experimentationsgroupvm.cpp \
     controller/assessmentsmodelmanager.cpp \
     model/task/agentnameandoutputsm.cpp
@@ -64,7 +64,7 @@ HEADERS += \
     controller/export/exportcontroller.h \
     controller/ingescapeassessmentscontroller.h \
     model/assessmentsenums.h \
-    model/recordsetupm.h \
+    model/taskinstancem.h \
     stable.h \
     controller/networkcontroller.h \
     model/subject/subjectm.h \
@@ -78,7 +78,7 @@ HEADERS += \
     controller/subject/subjectscontroller.h \
     controller/task/taskscontroller.h \
     controller/experimentationcontroller.h \
-    controller/record/recordcontroller.h \
+    controller/record/taskinstancecontroller.h \
     viewModel/experimentationsgroupvm.h \
     controller/assessmentsmodelmanager.h \
     model/task/agentnameandoutputsm.h

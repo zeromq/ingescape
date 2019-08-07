@@ -217,7 +217,7 @@ typedef struct license {
     bool isEditorLicenseExpired;
     zhash_t *features;
     zhash_t *agents;
-    zlist_t *licenceDetails; //license struct for each detected license file
+    zlist_t *licenseDetails; //license struct for each detected license file
     char *fileName; //used only in each detail
 } license_t;
     
@@ -293,7 +293,7 @@ bool token_addValuesToArgumentsFromMessage(const char *name, igs_tokenArgument_t
 int token_freeValuesInArguments(igs_tokenArgument_t *arg);
 
 //license
-#define ENABLE_LICENSE_ENFORCEMENT 0
+#define ENABLE_LICENSE_ENFORCEMENT 1
 #define MAX_NB_OF_AGENTS 50
 #define MAX_NB_OF_IOP 1000
 #define MAX_EXEC_DURATION_DURING_EVAL 300

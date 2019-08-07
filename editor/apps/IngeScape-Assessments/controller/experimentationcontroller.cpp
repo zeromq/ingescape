@@ -215,9 +215,8 @@ TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QStrin
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
 
-        QString queryString = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, id_records, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        const char* query = queryString.toStdString().c_str();
-        CassStatement* cassStatement = cass_statement_new(query, 10);
+        QString queryStr = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, id_records, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
         cass_statement_bind_uuid  (cassStatement, 0, taskInstanceUuid);
         cass_statement_bind_uuid  (cassStatement, 1, _currentExperimentation->getCassUuid());
         cass_statement_bind_uuid  (cassStatement, 2, subject->getCassUuid());
@@ -390,10 +389,9 @@ void ExperimentationController::_retrieveSubjectsForExperimentation(Experimentat
 {
     if (experimentation != nullptr)
     {
-        const char* query = "SELECT * FROM ingescape.subject WHERE id_experimentation = ?;";
-
+        QString queryStr = "SELECT * FROM "+ SubjectM::table + " WHERE id_experimentation = ?;";
         // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(query, 1);
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
         cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
 
         // Execute the query or bound statement
@@ -443,10 +441,9 @@ void ExperimentationController::_retrieveCharacteristicsForExperimentation(Exper
 {
     if (experimentation != nullptr)
     {
-        const char* query = "SELECT * FROM ingescape.characteristic WHERE id_experimentation = ?;";
-
+        QString queryStr = "SELECT * FROM " + CharacteristicM::table + " WHERE id_experimentation = ?;";
         // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(query, 1);
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
         cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
 
         // Execute the query or bound statement
@@ -478,7 +475,7 @@ void ExperimentationController::_retrieveCharacteristicsForExperimentation(Exper
             }
         }
         else {
-            qCritical() << "Could not get all tasks for the current experiment from the database:" << cass_error_desc(cassError);
+            qCritical() << "Could not get all characteristics for the current experiment from the database:" << cass_error_desc(cassError);
         }
 
         cass_future_free(cassFuture);
@@ -554,11 +551,9 @@ void ExperimentationController::_retrieveTaskInstancesForExperimentation(Experim
 {
     if (experimentation != nullptr)
     {
-        QString queryString = "SELECT * FROM " + TaskInstanceM::table + " WHERE id_experimentation = ?;";
-        const char* query = queryString.toStdString().c_str();
-
+        QString queryStr = "SELECT * FROM " + TaskInstanceM::table + " WHERE id_experimentation = ?;";
         // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(query, 1);
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
         cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
 
         // Execute the query or bound statement
@@ -621,11 +616,9 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
             SubjectM* subject = *subjectIt;
             if (subject != nullptr)
             {
-                QString queryString = "SELECT * FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ?;";
-                const char* query = queryString.toStdString().c_str();
-
+                QString queryStr = "SELECT * FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ?;";
                 // Creates the new query statement
-                CassStatement* cassStatement = cass_statement_new(query, 2);
+                CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
                 cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
                 cass_statement_bind_uuid(cassStatement, 1, subject->getCassUuid());
 

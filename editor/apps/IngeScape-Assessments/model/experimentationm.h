@@ -80,6 +80,12 @@ public:
 
 
     /**
+     * @brief Experimentation table name
+     */
+    static const QString table;
+
+
+    /**
      * @brief Clear the attribute lists
      */
     void clearData();

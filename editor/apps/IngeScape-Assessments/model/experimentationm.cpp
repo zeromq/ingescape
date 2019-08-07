@@ -17,6 +17,9 @@
 
 #include "controller/assessmentsmodelmanager.h"
 
+// Experimentation table name
+const QString ExperimentationM::table = "ingescape.experimentation";
+
 /**
  * @brief Constructor
  * @param name
@@ -81,8 +84,8 @@ void ExperimentationM::setname(QString value)
     {
         _name = value;
 
-        const char* query = "UPDATE ingescape.experimentation SET name = ? WHERE id = ?;";
-        CassStatement* cassStatement = cass_statement_new(query, 2);
+        QString queryStr = "UPDATE " + ExperimentationM::table + " SET name = ? WHERE id = ?;";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
         cass_statement_bind_string(cassStatement, 0, value.toStdString().c_str());
         cass_statement_bind_uuid  (cassStatement, 1, _cassUuid);
         // Execute the query or bound statement
@@ -317,8 +320,8 @@ void ExperimentationM::deleteExperimentationFromCassandra(const ExperimentationM
     _deleteAllCharacteristicsValuesForExperimentation(experimentation);
 
     // Delete actual experimentation
-    const char* query = "DELETE FROM ingescape.experimentation WHERE id = ?;";
-    CassStatement* cassStatement = cass_statement_new(query, 1);
+    QString queryStr = "DELETE FROM " + ExperimentationM::table + " WHERE id = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
     cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
 
     // Execute the query or bound statement
@@ -395,8 +398,8 @@ void ExperimentationM::_deleteAllSubjectsForExperimentation(const Experimentatio
  */
 void ExperimentationM::_deleteAllCharacteristicsForExperimentation(const ExperimentationM& experimentation)
 {
-    const char* query = "DELETE FROM ingescape.characteristic WHERE id_experimentation = ?;";
-    CassStatement* cassStatement = cass_statement_new(query, 1);
+    QString queryStr = "DELETE FROM " + CharacteristicM::table + " WHERE id_experimentation = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
     cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
 
     // Execute the query or bound statement
@@ -421,9 +424,8 @@ void ExperimentationM::_deleteAllCharacteristicsForExperimentation(const Experim
  */
 void ExperimentationM::_deleteAllCharacteristicsValuesForExperimentation(const ExperimentationM& experimentation)
 {
-    QString queryString = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ?;";
-    const char* query = queryString.toStdString().c_str();
-    CassStatement* cassStatement = cass_statement_new(query, 1);
+    QString queryStr = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
     cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
 
     // Execute the query or bound statement

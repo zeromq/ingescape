@@ -16,6 +16,9 @@
 
 #include "controller/assessmentsmodelmanager.h"
 
+// Subject table name
+const QString SubjectM::table = "ingescape.subject";
+
 
 /**
  * @brief Constructor
@@ -250,9 +253,8 @@ void SubjectM::_onCharacteristicValueChanged(const QString &key, const QVariant 
     CharacteristicM* characteristic = _mapCharacteristicsByName.value(key, nullptr);
     if (characteristic != nullptr)
     {
-        QString queryString = "UPDATE " + CharacteristicValueM::table + " SET characteristic_value = ? WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ?;";
-        const char* query = queryString.toStdString().c_str();
-        CassStatement* cassStatement = cass_statement_new(query, 4);
+        QString queryStr = "UPDATE " + CharacteristicValueM::table + " SET characteristic_value = ? WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ?;";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
         cass_statement_bind_string(cassStatement, 0, value.toString().toStdString().c_str());
         cass_statement_bind_uuid  (cassStatement, 1, _experimentationCassUuid);
         cass_statement_bind_uuid  (cassStatement, 2, _cassUuid);
@@ -279,9 +281,8 @@ void SubjectM::_onCharacteristicValueChanged(const QString &key, const QVariant 
  */
 void SubjectM::_deleteCharacteristicValuesForSubject(const SubjectM& subject)
 {
-    QString queryString = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ?;";
-    const char* query = queryString.toStdString().c_str();
-    CassStatement* cassStatement = cass_statement_new(query, 2);
+    QString queryStr = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
     cass_statement_bind_uuid(cassStatement, 0, subject.getExperimentationCassUuid());
     cass_statement_bind_uuid(cassStatement, 1, subject.getCassUuid());
 

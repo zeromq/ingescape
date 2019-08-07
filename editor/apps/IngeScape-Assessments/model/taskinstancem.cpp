@@ -167,9 +167,8 @@ void TaskInstanceM::deleteTaskInstanceFromCassandra(const TaskInstanceM& taskIns
         CassUuid recordUuid;
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
-        QString queryString = "DELETE FROM " + TaskInstanceM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;";
-        const char* query = queryString.toStdString().c_str();
-        CassStatement* cassStatement = cass_statement_new(query, 5);
+        QString queryStr = "DELETE FROM " + TaskInstanceM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 5);
         cass_statement_bind_uuid(cassStatement, 0, taskInstance.subject()->getExperimentationCassUuid());
         cass_statement_bind_uuid(cassStatement, 1, taskInstance.subject()->getCassUuid());
         cass_statement_bind_uuid(cassStatement, 2, taskInstance.task()->getCassUuid());
@@ -199,9 +198,8 @@ void TaskInstanceM::_onIndependentVariableValueChanged(const QString& key, const
     IndependentVariableM* indeVar = _mapIndependentVarByName.value(key, nullptr);
     if (indeVar != nullptr)
     {
-        QString queryString = "UPDATE " + IndependentVariableValueM::table + " SET independent_var_value = ? WHERE id_experimentation = ? AND id_task_instance = ? AND id_independent_var = ?;";
-        const char* query = queryString.toStdString().c_str();
-        CassStatement* cassStatement = cass_statement_new(query, 4);
+        QString queryStr = "UPDATE " + IndependentVariableValueM::table + " SET independent_var_value = ? WHERE id_experimentation = ? AND id_task_instance = ? AND id_independent_var = ?;";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
         cass_statement_bind_string(cassStatement, 0, value.toString().toStdString().c_str());
         cass_statement_bind_uuid  (cassStatement, 1, _experimentationCassUuid);
         cass_statement_bind_uuid  (cassStatement, 2, _cassUuid);
