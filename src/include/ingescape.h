@@ -329,7 +329,7 @@ PUBLIC bool igs_getAllowIpc(void);
 
 //////////////////////////////////////////////////
 //licenses
-
+#define igs_license(...) igs_log(IGS_LOG_FATAL+1, __func__, __VA_ARGS__)
 typedef enum {
     IGS_LICENSE_TIMEOUT = 0,
     IGS_LICENSE_TOO_MANY_AGENTS,

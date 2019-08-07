@@ -369,7 +369,7 @@ void license_readLicense(void){
         //this function scans all subdirectories which may time a very
         //long time to do, e.g. in /Applications/.
         //That's why we use dirent here.
-        igs_license("scan for licenses in %s", licensePath);
+        igs_debug("scan for licenses in %s", licensePath);
         zlist_t *filesList = zlist_new();
         DIR *dir;
         struct dirent *ent;
@@ -392,7 +392,7 @@ void license_readLicense(void){
         } else {
             // could not open directory
         }
-        
+        igs_debug("%zu license(s) found", zlist_size(filesList));
         if (zlist_size(filesList) > 0){
             license = calloc(1, sizeof(license_t));
             license->features = zhash_new();
@@ -528,7 +528,7 @@ void license_readLicense(void){
         }
     }
     if (license == NULL){
-        igs_license("no license found in %s : switching to demo mode", licensePath);
+        igs_license("no license found in %s : switching to demonstration mode", licensePath);
         license = calloc(1, sizeof(license_t));
         license->features = zhash_new();
         license->agents = zhash_new();

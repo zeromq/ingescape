@@ -87,7 +87,7 @@ bool network_RequestOutputsFromMappedAgents = false;
 bool forcedStop = false;
 bool allowIpc = true;
 
-#if ENABLE_LICENSE_ENFORCEMENT
+#if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
 licenseEnforcement_t *licEnforcement = NULL;
 #endif
 
@@ -281,7 +281,7 @@ void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
     igs_debug("cleaning subscription to %s\n", subscriber->agentName);
     // clean the agent definition
     if(subscriber->definition != NULL){
-#if ENABLE_LICENSE_ENFORCEMENT
+#if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
         licEnforcement->currentIOPNb -= (HASH_COUNT(subscriber->definition->inputs_table) +
                                          HASH_COUNT(subscriber->definition->outputs_table) +
                                          HASH_COUNT(subscriber->definition->params_table));
@@ -721,7 +721,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         subscriber->definition = NULL;
                     }
                     
-                    #if ENABLE_LICENSE_ENFORCEMENT
+                    #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
                     licEnforcement->currentIOPNb += (HASH_COUNT(newDefinition->inputs_table) +
                                                      HASH_COUNT(newDefinition->outputs_table) +
                                                      HASH_COUNT(newDefinition->params_table));
@@ -1192,7 +1192,7 @@ int triggerLicenseStop(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop);
     IGS_UNUSED(timer_id);
     IGS_UNUSED(arg);
-    igs_license("License has expired and runtime duration limit is reached : stopping loop.");
+    igs_license("Runtime duration limit has been reached : stopping ingescape now");
     license_callback_t *el = NULL;
     DL_FOREACH(licenseCallbacks, el){
         el->callback_ptr(IGS_LICENSE_TIMEOUT, el->data);
@@ -1231,7 +1231,7 @@ static void
 initLoop (zsock_t *pipe, void *args){
     IGS_UNUSED(args)
     
-#if ENABLE_LICENSE_ENFORCEMENT
+#if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     if (licEnforcement == NULL){
         licEnforcement = calloc(1, sizeof(licenseEnforcement_t));
     }
@@ -1456,7 +1456,7 @@ initLoop (zsock_t *pipe, void *args){
     zloop_timer(agentElements->loop, 1000, 0, triggerDefinitionUpdate, NULL);
     zloop_timer(agentElements->loop, 1000, 0, triggerMappingUpdate, NULL);
     
-#if ENABLE_LICENSE_ENFORCEMENT && !(defined DISABLE_LICENSE_TIMEOUT)
+#if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     if (license != NULL && license->isLicenseExpired){
         igs_license("License is not valid : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
         zloop_timer(agentElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, NULL);
@@ -1516,7 +1516,7 @@ initLoop (zsock_t *pipe, void *args){
         #endif
         //TODO : do that for windows also
     }
-#if ENABLE_LICENSE_ENFORCEMENT
+#if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     if (licEnforcement != NULL){
         free(licEnforcement);
     }
