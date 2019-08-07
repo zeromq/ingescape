@@ -19,6 +19,9 @@
 
 const QString CHARACTERISTIC_SUBJECT_ID = "ID";
 
+// Experimentation table name
+const QString CharacteristicM::table = "ingescape.characteristic";
+
 /**
  * @brief Constructor
  * @param name

@@ -86,6 +86,12 @@ public:
 
 
     /**
+     * @brief Characteristic table name
+     */
+    static const QString table;
+
+
+    /**
      * @brief Get the unique identifier in Cassandra Data Base
      * @return
      */

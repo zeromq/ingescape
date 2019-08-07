@@ -443,7 +443,8 @@ void ExperimentationController::_retrieveCharacteristicsForExperimentation(Exper
 {
     if (experimentation != nullptr)
     {
-        const char* query = "SELECT * FROM ingescape.characteristic WHERE id_experimentation = ?;";
+        QString queryStr = "SELECT * FROM " + CharacteristicM::table + " WHERE id_experimentation = ?;";
+        const char* query = queryStr.toStdString().c_str();
 
         // Creates the new query statement
         CassStatement* cassStatement = cass_statement_new(query, 1);
