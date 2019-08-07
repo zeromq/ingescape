@@ -176,8 +176,8 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
         _currentExperimentation->removeCharacteristic(characteristic);
 
         // Remove characteristic from DB
-        const char* query = "DELETE FROM ingescape.characteristic WHERE id_experimentation = ? AND id = ?;";
-        CassStatement* cassStatement = cass_statement_new(query, 2);
+        QString queryStr = "DELETE FROM " + CharacteristicM::table + " WHERE id_experimentation = ? AND id = ?;";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
         cass_statement_bind_uuid(cassStatement, 0, characteristic->getExperimentationCassUuid());
         cass_statement_bind_uuid(cassStatement, 1, characteristic->getCassUuid());
 
@@ -274,7 +274,7 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
         CassUuid uidExperimentation = currentExperimentation->getCassUuid();
 
         // Create the query
-        QString queryGetCharacteristics = QString("SELECT * FROM ingescape.characteristic WHERE id_experimentation = ?;");
+        QString queryGetCharacteristics = QString("SELECT * FROM " + CharacteristicM::table + " WHERE id_experimentation = ?;");
 
         // Creates the new query statement
         CassStatement* cassStatementGetCharacteristics = cass_statement_new(queryGetCharacteristics.toStdString().c_str(), 1);
@@ -305,7 +305,7 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
                     CharacteristicValueTypes::Value characteristicValueType = CharacteristicValueTypes::TEXT;
 
                     // Create the query
-                    QString queryInsertCharacteristic = QString("INSERT INTO ingescape.characteristic (id, id_experimentation, name, value_type, enum_values) VALUES (?, ?, ?, ?, ?);");
+                    QString queryInsertCharacteristic = QString("INSERT INTO " + CharacteristicM::table + " (id, id_experimentation, name, value_type, enum_values) VALUES (?, ?, ?, ?, ?);");
 
                     // Creates the new query statement
                     CassStatement* cassStatementInsertCharacteristic = cass_statement_new(queryInsertCharacteristic.toStdString().c_str(), 5);
@@ -313,7 +313,9 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
                     cass_statement_bind_uuid(cassStatementInsertCharacteristic, 1, uidExperimentation);
                     cass_statement_bind_string(cassStatementInsertCharacteristic, 2, characteristicName.toStdString().c_str());
                     cass_statement_bind_int8(cassStatementInsertCharacteristic, 3, characteristicValueType);
-                    cass_statement_bind_string(cassStatementInsertCharacteristic, 4, "");
+                    CassCollection* emptyList = cass_collection_new(CASS_COLLECTION_TYPE_LIST, 0);
+                    cass_statement_bind_collection(cassStatementInsertCharacteristic, 4, emptyList);
+                    cass_collection_free(emptyList);
 
                     // Execute the query or bound statement
                     CassFuture* cassFutureInsertCharacteristic = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatementInsertCharacteristic);
@@ -405,13 +407,18 @@ CharacteristicM* SubjectsController::_insertCharacteristicIntoDB(CassUuid experi
     CassUuid characteristicUuid;
     cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &characteristicUuid);
 
-    const char* query = "INSERT INTO ingescape.characteristic (id_experimentation, id, name, value_type, enum_values) VALUES (?, ?, ?, ?, ?);";
-    CassStatement* cassStatement = cass_statement_new(query, 5);
+    QString queryStr = "INSERT INTO " + CharacteristicM::table + " (id_experimentation, id, name, value_type, enum_values) VALUES (?, ?, ?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 5);
     cass_statement_bind_uuid  (cassStatement, 0, experimentationUuid);
     cass_statement_bind_uuid  (cassStatement, 1, characteristicUuid);
     cass_statement_bind_string(cassStatement, 2, name.toStdString().c_str());
     cass_statement_bind_int8  (cassStatement, 3, static_cast<int8_t>(valueType));
-    cass_statement_bind_string(cassStatement, 4, enumValues.join(";").toStdString().c_str());
+    CassCollection* enumValuesCassList = cass_collection_new(CASS_COLLECTION_TYPE_LIST, static_cast<size_t>(enumValues.size()));
+    for(QString enumValue : enumValues) {
+        cass_collection_append_string(enumValuesCassList, enumValue.toStdString().c_str());
+    }
+    cass_statement_bind_collection(cassStatement, 4, enumValuesCassList);
+    cass_collection_free(enumValuesCassList);
 
     // Execute the query or bound statement
     CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
@@ -449,8 +456,8 @@ SubjectM* SubjectsController::_insertSubjectIntoDB(CassUuid experimentationUuid,
     CassUuid subjectUuid;
     cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &subjectUuid);
 
-    const char* query = "INSERT INTO ingescape.subject (id_experimentation, id, displayed_id) VALUES (?, ?, ?);";
-    CassStatement* cassStatement = cass_statement_new(query, 3);
+    QString queryStr = "INSERT INTO " + SubjectM::table + " (id_experimentation, id, displayed_id) VALUES (?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
     cass_statement_bind_uuid  (cassStatement, 0, experimentationUuid);
     cass_statement_bind_uuid  (cassStatement, 1, subjectUuid);
     cass_statement_bind_string(cassStatement, 2, displayed_id.toStdString().c_str());
@@ -486,9 +493,8 @@ void SubjectsController::_insertCharacteristicValueForSubjectIntoDB(SubjectM* su
 {
     if ((subject != nullptr) && (characteristic != nullptr))
     {
-        QString queryString = "INSERT INTO " + CharacteristicValueM::table + " (id_experimentation, id_subject, id_characteristic, characteristic_value) VALUES (?, ?, ?, ?);";
-        const char* query = queryString.toStdString().c_str();
-        CassStatement* cassStatement = cass_statement_new(query, 4);
+        QString queryStr = "INSERT INTO " + CharacteristicValueM::table + " (id_experimentation, id_subject, id_characteristic, characteristic_value) VALUES (?, ?, ?, ?);";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
         cass_statement_bind_uuid  (cassStatement, 0, subject->getExperimentationCassUuid());
         cass_statement_bind_uuid  (cassStatement, 1, subject->getCassUuid());
         cass_statement_bind_uuid  (cassStatement, 2, characteristic->getCassUuid());
@@ -544,9 +550,8 @@ void SubjectsController::_deleteCharacteristicValuesForCharacteristic(Characteri
             SubjectM* subject = *subjectIt;
             if (subject != nullptr)
             {
-                QString queryString = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ;";
-                const char* query = queryString.toStdString().c_str();
-                CassStatement* cassStatement = cass_statement_new(query, 3);
+                QString queryStr = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ;";
+                CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
                 cass_statement_bind_uuid(cassStatement, 0, characteristic->getExperimentationCassUuid());
                 cass_statement_bind_uuid(cassStatement, 1, subject->getCassUuid());
                 cass_statement_bind_uuid(cassStatement, 2, characteristic->getCassUuid());

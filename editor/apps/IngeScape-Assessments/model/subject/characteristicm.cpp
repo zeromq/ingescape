@@ -79,10 +79,19 @@ CharacteristicM* CharacteristicM::createCharacteristicFromCassandraRow(const Cas
         cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
         QString characteristicName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
 
-        const char *chrEnumValues = "";
-        size_t enumValuesLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "enum_values"), &chrEnumValues, &enumValuesLength);
-        QStringList enumValues(QString::fromUtf8(chrEnumValues, static_cast<int>(enumValuesLength)).split(";"));
+        QStringList enumValues;
+        CassIterator* enumValuesIterator = cass_iterator_from_collection(cass_row_get_column_by_name(row, "enum_values"));
+        if (enumValuesIterator != nullptr) {
+            while(cass_iterator_next(enumValuesIterator)) {
+                const char *chrEnumValue = "";
+                size_t enumValueLength = 0;
+                cass_value_get_string(cass_iterator_get_value(enumValuesIterator), &chrEnumValue, &enumValueLength);
+                enumValues.append(QString::fromUtf8(chrEnumValue, static_cast<int>(enumValueLength)));
+            }
+
+            cass_iterator_free(enumValuesIterator);
+            enumValuesIterator = nullptr;
+        }
 
         int8_t i8ValueType = 0;
         cass_value_get_int8(cass_row_get_column_by_name(row, "value_type"), &i8ValueType);
@@ -101,8 +110,8 @@ CharacteristicM* CharacteristicM::createCharacteristicFromCassandraRow(const Cas
  */
 void CharacteristicM::deleteCharacteristicFromCassandra(const CharacteristicM& characteristic, ExperimentationM* experimentation)
 {
-    const char* query = "DELETE FROM ingescape.characteristic WHERE id_experimentation = ? AND id = ?;";
-    CassStatement* cassStatement = cass_statement_new(query, 2);
+    QString queryStr = "DELETE FROM " + CharacteristicM::table + " WHERE id_experimentation = ? AND id = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
     cass_statement_bind_uuid(cassStatement, 0, characteristic.getExperimentationCassUuid());
     cass_statement_bind_uuid(cassStatement, 1, characteristic.getCassUuid());
 
@@ -145,9 +154,8 @@ void CharacteristicM::_deleteCharacteristicValuesForCharacteristic(const Charact
             SubjectM* subject = *subjectIt;
             if (subject != nullptr)
             {
-                QString queryString = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ;";
-                const char* query = queryString.toStdString().c_str();
-                CassStatement* cassStatement = cass_statement_new(query, 3);
+                QString queryStr = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ;";
+                CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
                 cass_statement_bind_uuid(cassStatement, 0, characteristic.getExperimentationCassUuid());
                 cass_statement_bind_uuid(cassStatement, 1, subject->getCassUuid());
                 cass_statement_bind_uuid(cassStatement, 2, characteristic.getCassUuid());
