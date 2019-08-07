@@ -32,9 +32,10 @@ TasksController::TasksController(/*JsonHelper* jsonHelper, */QObject *parent)
 
     qInfo() << "New Tasks Controller";
 
-    // Fill without type "UNKNOWN"
+    // Fill without type "UNKNOWN" and "ENUM"
     _allIndependentVariableValueTypes.fillWithAllEnumValues();
     _allIndependentVariableValueTypes.removeEnumValue(IndependentVariableValueTypes::UNKNOWN);
+    _allIndependentVariableValueTypes.removeEnumValue(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
 
 }
 
@@ -555,7 +556,12 @@ IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid
         cass_statement_bind_string(cassStatement, 3, variableName.toStdString().c_str());
         cass_statement_bind_string(cassStatement, 4, variableDescription.toStdString().c_str());
         cass_statement_bind_int8  (cassStatement, 5, static_cast<int8_t>(valueType));
-        cass_statement_bind_string(cassStatement, 6, enumValues.join(";").toStdString().c_str());
+        CassCollection* enumValuesCassList = cass_collection_new(CASS_COLLECTION_TYPE_LIST, static_cast<size_t>(enumValues.size()));
+        for(QString enumValue : enumValues) {
+            cass_collection_append_string(enumValuesCassList, enumValue.toStdString().c_str());
+        }
+        cass_statement_bind_collection(cassStatement, 6, enumValuesCassList);
+        cass_collection_free(enumValuesCassList);
 
         // Execute the query or bound statement
         CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);

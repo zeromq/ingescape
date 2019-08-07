@@ -85,13 +85,18 @@ IndependentVariableM* IndependentVariableM::createIndependentVariableFromCassand
         cass_value_get_int8(cass_row_get_column_by_name(row, "value_type"), &i8ValueType);
         IndependentVariableValueTypes::Value valueType = static_cast<IndependentVariableValueTypes::Value>(i8ValueType);
 
-        const char* chrEnumValues = "";
-        size_t enumValuesLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "enum_values"), &chrEnumValues, &enumValuesLength);
         QStringList enumValues;
-        if (enumValuesLength > 0)
-        {
-            enumValues = (QString::fromUtf8(chrEnumValues).split(";"));
+        CassIterator* enumValuesIterator = cass_iterator_from_collection(cass_row_get_column_by_name(row, "enum_values"));
+        if (enumValuesIterator != nullptr) {
+            while(cass_iterator_next(enumValuesIterator)) {
+                const char *chrEnumValue = "";
+                size_t enumValueLength = 0;
+                cass_value_get_string(cass_iterator_get_value(enumValuesIterator), &chrEnumValue, &enumValueLength);
+                enumValues.append(QString::fromUtf8(chrEnumValue, static_cast<int>(enumValueLength)));
+            }
+
+            cass_iterator_free(enumValuesIterator);
+            enumValuesIterator = nullptr;
         }
 
         independentVariable = new IndependentVariableM(experimentationUuid, taskUuid, independentVarUuid, variableName, variableDescription, valueType, enumValues);
