@@ -84,6 +84,7 @@ Rectangle {
                 anchors{
                     fill: parent
                     leftMargin: 15
+                    rightMargin: 15
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.name : ""
@@ -91,6 +92,7 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter
                 visible: !rootItem.isCurrentlyEditing
 
+                elide: Text.ElideRight
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
                     family: IngeScapeTheme.textFontFamily
@@ -155,6 +157,7 @@ Rectangle {
                 anchors{
                     fill: parent
                     leftMargin: 15
+                    rightMargin: 15
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.description : ""
@@ -162,6 +165,7 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter
                 visible: !rootItem.isCurrentlyEditing
 
+                elide: Text.ElideRight
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
                     family: IngeScapeTheme.textFontFamily
@@ -225,6 +229,7 @@ Rectangle {
                 anchors{
                     fill: parent
                     leftMargin: 15
+                    rightMargin: 15
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.agentName : ""
@@ -232,6 +237,7 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter
                 visible: !rootItem.isCurrentlyEditing
 
+                elide: Text.ElideRight
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
                     family: IngeScapeTheme.textFontFamily
@@ -301,6 +307,7 @@ Rectangle {
                 anchors{
                     fill: parent
                     leftMargin: 15
+                    rightMargin: 15
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.outputName : ""
@@ -308,6 +315,7 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter
                 visible: !rootItem.isCurrentlyEditing
 
+                elide: Text.ElideRight
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
                     family: IngeScapeTheme.textFontFamily
