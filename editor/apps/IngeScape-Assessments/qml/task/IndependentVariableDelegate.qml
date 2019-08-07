@@ -61,13 +61,12 @@ Rectangle {
         id: row
         anchors {
             fill: parent
-            leftMargin: 15
         }
 
         Repeater {
             model: rootItem.indeVarModel ? [ rootItem.indeVarModel.name, rootItem.indeVarModel.description, IndependentVariableValueTypes.enumToString(rootItem.indeVarModel.valueType) ] : ["", "", ""]
 
-            delegate: Text {
+            delegate: Item {
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -75,14 +74,23 @@ Rectangle {
 
                 width: rootItem.columnWidths[index]
 
-                verticalAlignment: Text.AlignVCenter
-                text: modelData
-                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
-                    bold: index == 0
+                Text {
+                    anchors{
+                        fill: parent
+                        leftMargin: 15
+                        rightMargin: 15
+                    }
+
+                    verticalAlignment: Text.AlignVCenter
+                    elide: Text.ElideRight
+                    text: modelData
+                    color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight: Font.Medium
+                        pixelSize: 16
+                        bold: index == 0
+                    }
                 }
             }
         }
