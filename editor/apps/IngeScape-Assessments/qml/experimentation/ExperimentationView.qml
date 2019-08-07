@@ -299,13 +299,13 @@ Item {
         property real startTimeColumnWidth: 138
         property real durationColumnWidth: 126
         property real buttonColumnWidth: 158
-        property real recordNameColumnWidth: recordsPanel.width
-                                             - taskColumnWidth
-                                             - subjectColumnWidth
-                                             - startDateColumnWidth
-                                             - startTimeColumnWidth
-                                             - durationColumnWidth
-                                             - buttonColumnWidth
+        property real taskInstanceNameColumnWidth: taskInstancesPanel.width
+                                                   - taskColumnWidth
+                                                   - subjectColumnWidth
+                                                   - startDateColumnWidth
+                                                   - startTimeColumnWidth
+                                                   - durationColumnWidth
+                                                   - buttonColumnWidth
 
         //
         // Configuration Panel
@@ -428,10 +428,10 @@ Item {
 
 
         //
-        // Records Panel
+        // Task Instances Panel
         //
         Item {
-            id: recordsPanel
+            id: taskInstancesPanel
 
             anchors {
                 top: parent.top
@@ -445,14 +445,14 @@ Item {
             }
 
             Text {
-                id: titleRecords
+                id: titleTaskInstances
 
                 anchors {
                     verticalCenter: btnNewRecord.verticalCenter
                     left: parent.left
                 }
 
-                text: qsTr("RECORDS")
+                text: qsTr("TASK INSTANCES")
 
                 height: parent.height
                 verticalAlignment: Text.AlignVCenter
@@ -482,7 +482,7 @@ Item {
                 }
 
                 style: IngeScapeAssessmentsButtonStyle {
-                    text: qsTr("NEW RECORD")
+                    text: qsTr("NEW TASK INSTANCE")
                 }
             }
 
@@ -509,9 +509,9 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
 
-                        width: mainView.recordNameColumnWidth
+                        width: mainView.taskInstanceNameColumnWidth
 
-                        text: qsTr("Record's name")
+                        text: qsTr("Task instance's name")
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
@@ -612,43 +612,55 @@ Item {
 
                 color: IngeScapeTheme.whiteColor
 
-                Column {
-                    id: recordsColumn
-                    anchors.fill: parent
-                    spacing: 0
+                ScrollView {
+                    id: taskInstanceScrollView
+                    anchors {
+                        fill: parent
+                        rightMargin: -17
+                    }
 
-                    Repeater {
-                        model: rootItem.experimentation ? rootItem.experimentation.allRecordSetups : null
+                    style: IngeScapeAssessmentsScrollViewStyle {}
 
-                        delegate: RecordSetupInList {
-                            taskColumnWidth: mainView.taskColumnWidth
-                            subjectColumnWidth: mainView.subjectColumnWidth
-                            startDateColumnWidth: mainView.startDateColumnWidth
-                            startTimeColumnWidth: mainView.startTimeColumnWidth
-                            durationColumnWidth: mainView.durationColumnWidth
-                            buttonColumnWidth: mainView.buttonColumnWidth
+                    // Prevent drag overshoot on Windows
+                    flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                            }
+                    Column {
+                        id: taskInstanceColumn
+                        width: taskInstanceScrollView.width - 17
+                        height: childrenRect.height
+                        spacing: 0
 
-                            modelM: model.QtObject
+                        Repeater {
+                            model: rootItem.experimentation ? rootItem.experimentation.allTaskInstances : null
 
-                            //
-                            // Slots
-                            //
-                            onOpenRecordSetup: {
-                                if (rootItem.controller && modelM) {
-                                    //console.log("QML: openRecordSetup " + modelM.name);
+                            delegate: TaskInstanceInList {
+                                taskColumnWidth: mainView.taskColumnWidth
+                                subjectColumnWidth: mainView.subjectColumnWidth
+                                startDateColumnWidth: mainView.startDateColumnWidth
+                                startTimeColumnWidth: mainView.startTimeColumnWidth
+                                durationColumnWidth: mainView.durationColumnWidth
+                                buttonColumnWidth: mainView.buttonColumnWidth
 
-                                    rootItem.controller.openRecordSetup(modelM);
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
                                 }
-                            }
 
-                            onDeleteRecordSetup: {
-                                deleteRecordSetupPopup.recordSetup = modelM
-                                deleteRecordSetupPopup.open()
+                                modelM: model.QtObject
+
+                                //
+                                // Slots
+                                //
+                                onOpenTaskInstance: {
+                                    if (rootItem.controller && modelM) {
+                                        rootItem.controller.openTaskInstance(modelM);
+                                    }
+                                }
+
+                                onDeleteTaskInstance: {
+                                    deleteTaskInstancePopup.taskInstance = modelM
+                                    deleteTaskInstancePopup.open()
+                                }
                             }
                         }
                     }
@@ -778,21 +790,21 @@ Item {
 
 
     Popup.DeleteConfirmationPopup {
-        id: deleteRecordSetupPopup
+        id: deleteTaskInstancePopup
 
-        property var recordSetup: null
+        property var taskInstance: null
 
         showPopupTitle: false
         anchors.centerIn: parent
 
-        text: recordSetup ? qsTr("Are you sure you want to delete the record setup %1 ?").arg(recordSetup.name) : ""
+        text: taskInstance ? qsTr("Are you sure you want to delete the task instance %1 ?").arg(taskInstance.name) : ""
 
         height: 160
         width: 470
 
         onValidated: {
-            if (rootItem.controller && recordSetup) {
-                rootItem.controller.deleteRecordSetup(recordSetup);
+            if (rootItem.controller && taskInstance) {
+                rootItem.controller.deleteTaskInstance(taskInstance);
             }
             close()
         }

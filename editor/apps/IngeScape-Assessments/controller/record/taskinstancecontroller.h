@@ -20,13 +20,13 @@
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/abstractscenariocontroller.h>
 #include <model/jsonhelper.h>
-#include <model/recordsetupm.h>
+#include <model/taskinstancem.h>
 
 
 /**
- * @brief The RecordController class defines the controller to manage a record of the current experimentation
+ * @brief The TaskInstanceController class defines the controller to manage a record of the current experimentation
  */
-class RecordController : public QObject
+class TaskInstanceController : public QObject
 {
     Q_OBJECT
 
@@ -36,8 +36,8 @@ class RecordController : public QObject
     // Controller for scenario management
     I2_QML_PROPERTY_READONLY(AbstractScenarioController*, scenarioC)
 
-    // The (experimentation) record setup currently selected
-    I2_QML_PROPERTY_CUSTOM_SETTER(RecordSetupM*, currentRecordSetup)
+    // The (experimentation) task instance currently selected
+    I2_QML_PROPERTY_CUSTOM_SETTER(TaskInstanceM*, currentTaskInstance)
 
 
 public:
@@ -48,14 +48,14 @@ public:
      * @param jsonHelper
      * @param parent
      */
-    explicit RecordController(JsonHelper* jsonHelper,
+    explicit TaskInstanceController(JsonHelper* jsonHelper,
                               QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~RecordController();
+    ~TaskInstanceController();
 
     /**
      * @brief Adds the given URLs as attachements for this record
@@ -67,11 +67,11 @@ public:
 private Q_SLOTS:
 
     /**
-     * @brief Slot called when the current record setup changed
-     * @param previousRecordSetup
-     * @param currentRecordSetup
+     * @brief Slot called when the current task instance changed
+     * @param previousTaskInstance
+     * @param currentTaskInstance
      */
-    void _onCurrentRecordSetupChanged(RecordSetupM* previousRecordSetup, RecordSetupM* currentRecordSetup);
+    void _oncurrentTaskInstanceChanged(TaskInstanceM* previousTaskInstance, TaskInstanceM* currentTaskInstance);
 
 
 private:
@@ -80,6 +80,6 @@ private:
 
 };
 
-QML_DECLARE_TYPE(RecordController)
+QML_DECLARE_TYPE(TaskInstanceController)
 
 #endif // RECORDCONTROLLER_H

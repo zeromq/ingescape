@@ -142,7 +142,8 @@ void CharacteristicM::_deleteCharacteristicValuesForCharacteristic(const Charact
             SubjectM* subject = *subjectIt;
             if (subject != nullptr)
             {
-                const char* query = "DELETE FROM ingescape.characteristic_value_of_subject WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ;";
+                QString queryString = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ;";
+                const char* query = queryString.toStdString().c_str();
                 CassStatement* cassStatement = cass_statement_new(query, 3);
                 cass_statement_bind_uuid(cassStatement, 0, characteristic.getExperimentationCassUuid());
                 cass_statement_bind_uuid(cassStatement, 1, subject->getCassUuid());

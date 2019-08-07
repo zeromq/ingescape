@@ -39,8 +39,8 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
 
     qInfo() << "New Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << _uid << ")";
 
-    // Record setups are sorted on their start date/time (chronological order)
-    _allRecordSetups.setSortProperty("startDateTime");
+    // Task instances are sorted on their start date/time (chronological order)
+    _allTaskInstances.setSortProperty("startDateTime");
 }
 
 
@@ -60,8 +60,8 @@ ExperimentationM::~ExperimentationM()
  */
 void ExperimentationM::clearData()
 {
-    // Delete all record setups of our experimentation
-    _allRecordSetups.deleteAllItems();
+    // Delete all task instances of our experimentation
+    _allTaskInstances.deleteAllItems();
 
     // Delete all characteristics of our experimentation
     _hashFromUIDtoCharacteristic.clear();
@@ -202,29 +202,29 @@ void ExperimentationM::removeTask(TaskM* task)
 
 
 /**
- * @brief Add a record setup to our experimentation
+ * @brief Add a rtask instance to our experimentation
  * @param record
  */
-void ExperimentationM::addRecordSetup(RecordSetupM* recordSetup)
+void ExperimentationM::addTaskInstance(TaskInstanceM* taskInstance)
 {
-    if (recordSetup != nullptr)
+    if (taskInstance != nullptr)
     {
         // Add to the list
-        _allRecordSetups.append(recordSetup);
+        _allTaskInstances.append(taskInstance);
     }
 }
 
 
 /**
- * @brief Remove a record setup from our experimentation
+ * @brief Remove a task instance from our experimentation
  * @param record
  */
-void ExperimentationM::removeRecordSetup(RecordSetupM* recordSetup)
+void ExperimentationM::removeTaskInstance(TaskInstanceM* taskInstance)
 {
-    if (recordSetup != nullptr)
+    if (taskInstance != nullptr)
     {
         // Remove from the list
-        _allRecordSetups.remove(recordSetup);
+        _allTaskInstances.remove(taskInstance);
     }
 }
 
@@ -421,7 +421,8 @@ void ExperimentationM::_deleteAllCharacteristicsForExperimentation(const Experim
  */
 void ExperimentationM::_deleteAllCharacteristicsValuesForExperimentation(const ExperimentationM& experimentation)
 {
-    const char* query = "DELETE FROM ingescape.characteristic_value_of_subject WHERE id_experimentation = ?;";
+    QString queryString = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ?;";
+    const char* query = queryString.toStdString().c_str();
     CassStatement* cassStatement = cass_statement_new(query, 1);
     cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
 

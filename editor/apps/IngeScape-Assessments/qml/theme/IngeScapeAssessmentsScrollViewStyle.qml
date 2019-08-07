@@ -20,7 +20,7 @@ import INGESCAPE 1.0
 
 
 ScrollViewStyle {
-    id: ingescapeScrollViewStyle
+    id: rootStyle
 
 
     //--------------------------------
@@ -29,22 +29,24 @@ ScrollViewStyle {
     //
     //---------------------------------
 
+    property int scrollBarSize: 11
+    property int verticalScrollbarMargin: 3
+    property int horizontalScrollbarMargin: 3
+
     transientScrollBars: false
 
     // Handles of scrollbars
     handle: Item {
-        implicitWidth: 11
-        implicitHeight: 26
+        implicitWidth: rootStyle.scrollBarSize + rootStyle.verticalScrollbarMargin
+        implicitHeight: rootStyle.scrollBarSize + rootStyle.horizontalScrollbarMargin
 
         Rectangle {
             color: IngeScapeTheme.lightGreyColor
 
             anchors {
                 fill: parent
-                topMargin: 1
-                leftMargin: 1
-                rightMargin: 0
-                bottomMargin: 2
+                leftMargin: verticalScrollbarMargin
+                topMargin: horizontalScrollbarMargin
             }
 
             opacity : 0.8
@@ -52,11 +54,16 @@ ScrollViewStyle {
         }
     }
 
+    // Area between scrollbars
+    corner: Rectangle {
+        color: "transparent"
+    }
+
 
     // Background of our scrollbar
     scrollBarBackground: Item {
-        implicitWidth: 11
-        implicitHeight: 26
+        implicitWidth: rootStyle.scrollBarSize + rootStyle.verticalScrollbarMargin
+        implicitHeight: rootStyle.scrollBarSize + rootStyle.horizontalScrollbarMargin
     }
 
 

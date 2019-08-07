@@ -18,7 +18,7 @@
 #include <QObject>
 #include <I2PropertyHelpers.h>
 #include <model/jsonhelper.h>
-#include <controller/record/recordcontroller.h>
+#include <controller/record/taskinstancecontroller.h>
 #include <model/experimentationm.h>
 
 
@@ -29,8 +29,8 @@ class ExperimentationController : public QObject
 {
     Q_OBJECT
 
-    // Controller to manage a record of the current experimentation
-    I2_QML_PROPERTY_READONLY(RecordController*, recordC)
+    // Controller to manage a task instance of the current experimentation
+    I2_QML_PROPERTY_READONLY(TaskInstanceController*, taskInstanceC)
 
     // Model of the current experimentation
     I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
@@ -55,26 +55,26 @@ public:
 
 
     /**
-     * @brief Create a new record setup for a subject and a task
+     * @brief Create a new task instance for a subject and a task
      * @param recordName
      * @param subject
      * @param task
      */
-    Q_INVOKABLE void createNewRecordSetupForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task);
+    Q_INVOKABLE void createNewTaskInstanceForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task);
 
 
     /**
-     * @brief Open a record setup
+     * @brief Open a task instance
      * @param record
      */
-    Q_INVOKABLE void openRecordSetup(RecordSetupM* recordSetup);
+    Q_INVOKABLE void openTaskInstance(TaskInstanceM* taskInstance);
 
 
     /**
-     * @brief Delete a record setup
+     * @brief Delete a task instance
      * @param record
      */
-    Q_INVOKABLE void deleteRecordSetup(RecordSetupM* recordSetup);
+    Q_INVOKABLE void deleteTaskInstance(TaskInstanceM* taskInstance);
 
 
 private Q_SLOTS:
@@ -87,14 +87,14 @@ private Q_SLOTS:
 
 protected: // Methods
     /**
-     * @brief Create and insert a new record setup into the DB.
-     * A nullptr is returned if the record setup could not be created
+     * @brief Create and insert a new task instance into the DB.
+     * A nullptr is returned if the task instance could not be created
      * @param recordName
      * @param subject
      * @param task
      * @return
      */
-    RecordSetupM* _insertRecordSetupIntoDB(const QString& recordName, SubjectM* subject, TaskM* task);
+    TaskInstanceM* _insertTaskInstanceIntoDB(const QString& taskInstanceName, SubjectM* subject, TaskM* task);
 
     /**
      * @brief Retrieve all independent variables from the Cassandra DB for the given task.
@@ -132,11 +132,11 @@ protected: // Methods
     void _retrieveTasksForExperimentation(ExperimentationM* experimentation);
 
     /**
-     * @brief Retrieve all record setups from the Cassandra DB for the given experimentaion.
+     * @brief Retrieve all task instances from the Cassandra DB for the given experimentaion.
      * The experimentation will be updated by this method
      * @param experimentation
      */
-    void _retrieveRecordSetupsForExperimentation(ExperimentationM* experimentation);
+    void _retrieveTaskInstancesForExperimentation(ExperimentationM* experimentation);
 
     /**
      * @brief Retrieve all characteristic values from the Cassandra DB for each given subjects.

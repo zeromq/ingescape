@@ -38,9 +38,9 @@ Item {
     //
     //--------------------------------------------------------
 
-    property RecordController recordController: null;
+    property TaskInstanceController taskInstanceController: null;
 
-    property RecordSetupM recordSetup: recordController ? recordController.currentRecordSetup : null;
+    property TaskInstanceM taskInstance: taskInstanceController ? taskInstanceController.currentTaskInstance : null;
 
 
 
@@ -67,14 +67,6 @@ Item {
     //
     //
     //--------------------------------------------------------
-
-    /*Rectangle {
-        id: background
-
-        anchors.fill: parent
-
-        color: IngeScapeTheme.veryDarkGreyColor
-    }*/
 
     Row {
         id: breadcrumb
@@ -147,7 +139,7 @@ Item {
                 horizontalCenter: parent.horizontalCenter
             }
 
-            text: rootItem.recordSetup ? rootItem.recordSetup.name : ""
+            text: rootItem.taskInstance ? rootItem.taskInstance.name : ""
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -164,7 +156,7 @@ Item {
                 horizontalCenter: parent.horizontalCenter
             }
 
-            text: rootItem.recordSetup && rootItem.recordSetup.subject ? rootItem.recordSetup.subject.displayedId : ""
+            text: rootItem.taskInstance && rootItem.taskInstance.subject ? rootItem.taskInstance.subject.displayedId : ""
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -181,7 +173,7 @@ Item {
                 horizontalCenter: parent.horizontalCenter
             }
 
-            text: rootItem.recordSetup && rootItem.recordSetup.task ? rootItem.recordSetup.task.name : ""
+            text: rootItem.taskInstance && rootItem.taskInstance.task ? rootItem.taskInstance.task.name : ""
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -252,7 +244,7 @@ Item {
 
             Repeater {
 
-                model: (rootItem.recordController && rootItem.recordController.scenarioC) ? rootItem.recordController.scenarioC.actionsList : null
+                model: (rootItem.taskInstanceController && rootItem.taskInstanceController.scenarioC) ? rootItem.taskInstanceController.scenarioC.actionsList : null
 
                 delegate: MouseArea {
                     id: mouseArea
@@ -268,20 +260,20 @@ Item {
                         anchors.fill: parent
 
                         action: model.QtObject
-                        controller: rootItem.recordController
+                        controller: rootItem.taskInstanceController
 
                         actionItemIsHovered: mouseArea.containsMouse
                         actionItemIsPressed: mouseArea.pressed
                     }
 
                     onPressed: {
-                        if (rootItem.recordController && rootItem.recordController.scenarioC)
+                        if (rootItem.taskInstanceController && rootItem.taskInstanceController.scenarioC)
                         {
-                            if (rootItem.recordController.scenarioC.selectedAction === model.QtObject) {
-                                rootItem.recordController.scenarioC.selectedAction = null;
+                            if (rootItem.taskInstanceController.scenarioC.selectedAction === model.QtObject) {
+                                rootItem.taskInstanceController.scenarioC.selectedAction = null;
                             }
                             else {
-                                rootItem.recordController.scenarioC.selectedAction = model.QtObject;
+                                rootItem.taskInstanceController.scenarioC.selectedAction = model.QtObject;
                             }
                         }
                     }
@@ -437,13 +429,13 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
 
             Repeater {
 
-                model: (rootItem.recordSetup && rootItem.recordSetup.task) ? rootItem.recordSetup.task.independentVariables : null
+                model: (rootItem.taskInstance && rootItem.taskInstance.task) ? rootItem.taskInstance.task.independentVariables : null
 
                 delegate: IndependentVariableValueEditor {
 
                     variable: model ? model.QtObject : null
 
-                    variableValue: (rootItem.recordSetup && rootItem.recordSetup.mapIndependentVariableValues && model) ? rootItem.recordSetup.mapIndependentVariableValues[model.name] : ""
+                    variableValue: (rootItem.taskInstance && rootItem.taskInstance.mapIndependentVariableValues && model) ? rootItem.taskInstance.mapIndependentVariableValues[model.name] : ""
 
                     isCurrentlyEditing: btnEditValuesOfIndependentVariable.checked
 
@@ -452,12 +444,12 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
                     // Slots
                     //
                     onIndependentVariableValueUpdated: {
-                        if (rootItem.recordSetup && rootItem.recordSetup.mapIndependentVariableValues && model)
+                        if (rootItem.taskInstance && rootItem.taskInstance.mapIndependentVariableValues && model)
                         {
                             //console.log("QML: on (IN-dependent) Variable Value Updated for " + model.name + ": " + value);
 
                             // Update the value (in C++)
-                            rootItem.recordSetup.mapIndependentVariableValues[model.name] = value;
+                            rootItem.taskInstance.mapIndependentVariableValues[model.name] = value;
                         }
                     }
                 }
@@ -573,9 +565,9 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
 
                 onDropped: {
                     //FIXME Only accepts URLs but no restrictions on the protocol yet (http://, ftp://, file://, etc.)
-                    if (drop.hasUrls && rootItem.recordController)
+                    if (drop.hasUrls && rootItem.taskInstanceController)
                     {
-                        rootItem.recordController.addNewAttachements(drop.urls)
+                        rootItem.taskInstanceController.addNewAttachements(drop.urls)
 
                         // Populate fake model to see results in view
                         for (var index in drop.urls)
@@ -602,7 +594,7 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
         }
         height: 0
 
-        scenarioController: rootItem.recordController ? rootItem.recordController.scenarioC : null;
-        timeLineController: rootItem.recordController ? rootItem.recordController.timeLineC : null;
+        scenarioController: rootItem.taskInstanceController ? rootItem.taskInstanceController.scenarioC : null;
+        timeLineController: rootItem.taskInstanceController ? rootItem.taskInstanceController.timeLineC : null;
     }
 }

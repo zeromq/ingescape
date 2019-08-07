@@ -174,29 +174,43 @@ I2PopupBase {
 
             color: IngeScapeTheme.whiteColor
 
-            Column {
-                id: characteristicsColumn
-                anchors.fill: parent
-                spacing: 0
+            ScrollView {
+                id: characteristicsScrillView
+                anchors {
+                    fill: parent
+                    rightMargin: -17
+                }
 
-                Repeater {
-                    model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
+                style: IngeScapeAssessmentsScrollViewStyle {}
 
-                    delegate: Characteristic {
+                // Prevent drag overshoot on Windows
+                flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                        }
+                Column {
+                    id: characteristicsColumn
+                    width: characteristicsScrillView.width - 17
+                    height: childrenRect.height
+                    spacing: 0
 
-                        modelM: model.QtObject
+                    Repeater {
+                        model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
 
-                        //
-                        // Slots
-                        //
-                        onDeleteCharacteristic: {
-                            if (rootItem.subjectController) {
-                                rootItem.subjectController.deleteCharacteristic(model.QtObject);
+                        delegate: Characteristic {
+
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                            }
+
+                            modelM: model.QtObject
+
+                            //
+                            // Slots
+                            //
+                            onDeleteCharacteristic: {
+                                if (rootItem.subjectController) {
+                                    rootItem.subjectController.deleteCharacteristic(model.QtObject);
+                                }
                             }
                         }
                     }
@@ -313,7 +327,9 @@ I2PopupBase {
                 right: parent.right
             }
 
-            Row {
+            Flickable {
+                id: headerFlickable
+
                 anchors {
                     top: parent.top
                     left: parent.left
@@ -322,27 +338,40 @@ I2PopupBase {
                     bottom: parent.bottom
                 }
 
-                Repeater {
-                    model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
+                clip: true
 
-                    Text {
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                        }
+                Row {
+                    height: parent.height
+                    width: childrenRect.height
 
-                        width: rootItem.characteristicValueColumnWidth
+                    Repeater {
+                        model: rootItem.experimentation ? rootItem.experimentation.allCharacteristics : null
 
-                        elide: Text.ElideRight
-                        text: model ? model.name : ""
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 16
-                            weight: Font.Black
+                        Text {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            width: rootItem.characteristicValueColumnWidth
+
+                            elide: Text.ElideRight
+                            text: model ? model.name : ""
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 16
+                                weight: Font.Black
+                            }
                         }
                     }
                 }
             }
+        }
+
+        Binding {
+            target: headerFlickable
+            property: "contentX"
+            value: subjectsScrollView.flickableItem.contentX
         }
 
         Rectangle {
@@ -355,37 +384,64 @@ I2PopupBase {
 
             color: IngeScapeTheme.whiteColor
 
-            ListView {
-                id: subjectsColumn
-                anchors.fill: parent
+            ScrollView {
+                id: subjectsScrollView
+                anchors {
+                    fill: parent
+                    bottomMargin: __horizontalScrollBar.visible ? -scrollBarSize - horizontalScrollbarMargin  : 0
+                    rightMargin: __verticalScrollBar.visible ? -scrollBarSize - verticalScrollbarMargin : 0
+                }
 
-                model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+                property int scrollBarSize: 8
+                property int verticalScrollbarMargin: 3
+                property int horizontalScrollbarMargin: 3
 
-                delegate: Subject {
-                    id: subjectDelegate
+                style: IngeScapeAssessmentsScrollViewStyle {
+                    scrollBarSize: subjectsScrollView.scrollBarSize
+                    verticalScrollbarMargin: subjectsScrollView.verticalScrollbarMargin
+                    horizontalScrollbarMargin: subjectsScrollView.horizontalScrollbarMargin
+                }
 
-                    height: 40
-                    width: subjectsColumn.width
+                // Prevent drag overshoot on Windows
+                flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                    experimentation: rootItem.experimentation
-                    subject: model ? model.QtObject : null
+                Column {
+                    id: subjectsColumn
 
-                    characteristicValueColumnWidth: rootItem.characteristicValueColumnWidth
-                    subjectEditionInProgress: rootItem.subjectEditionInProgress
+                    width: childrenRect.width
+                    height: childrenRect.height
+                    spacing: 0
 
-                    Binding {
-                        target: rootItem
-                        property: "subjectEditionInProgress"
-                        value: subjectDelegate.isCurrentlyEditing
-                    }
+                    Repeater {
+                        model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
 
-                    onDeleteSubject: {
-                        if (rootItem.subjectController && subjectDelegate.subject)
-                        {
-                            subjectDelegate.isCurrentlyEditing = false
-                            rootItem.subjectController.deleteSubject(subjectDelegate.subject);
+                        delegate: Subject {
+                            id: subjectDelegate
+
+                            height: 40
+                            width: Math.max(characteristicValueColumnWidth * rootItem.experimentation.allCharacteristics.count, subjectsScrollView.width - (subjectsScrollView.__verticalScrollBar.visible ? scrollBarSize + verticalScrollbarMargin : 0))
+
+                            experimentation: rootItem.experimentation
+                            subject: model ? model.QtObject : null
+
+                            characteristicValueColumnWidth: rootItem.characteristicValueColumnWidth
+                            subjectEditionInProgress: rootItem.subjectEditionInProgress
+
+                            Binding {
+                                target: rootItem
+                                property: "subjectEditionInProgress"
+                                value: subjectDelegate.isCurrentlyEditing
+                            }
+
+                            onDeleteSubject: {
+                                if (rootItem.subjectController && subjectDelegate.subject)
+                                {
+                                    subjectDelegate.isCurrentlyEditing = false
+                                    rootItem.subjectController.deleteSubject(subjectDelegate.subject);
+                                }
+
+                            }
                         }
-
                     }
                 }
             }

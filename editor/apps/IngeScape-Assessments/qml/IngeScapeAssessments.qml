@@ -22,7 +22,7 @@ import QtQuick.Window 2.3
 import INGESCAPE 1.0
 
 import "experimentation" as Experimentation
-import "record" as Record
+import "task_instance" as TaskInstance
 
 
 Item {
@@ -61,13 +61,13 @@ Item {
     }
 
     /**
-     * Reset the current record setup
+     * Reset the current task instance
      */
-    function resetCurrentRecordSetup()
+    function resetCurrentTaskInstance()
     {
-        if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.recordC)
+        if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.taskInstanceC)
         {
-            IngeScapeAssessmentsC.experimentationC.recordC.currentRecordSetup = null;
+            IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentTaskInstance = null;
         }
     }
 
@@ -101,21 +101,21 @@ Item {
     }
 
     Connections {
-        target: IngeScapeAssessmentsC.experimentationC.recordC
+        target: IngeScapeAssessmentsC.experimentationC.taskInstanceC
 
-        onCurrentRecordSetupChanged: {
+        onCurrentTaskInstanceChanged: {
 
-            if (IngeScapeAssessmentsC.experimentationC.recordC.currentRecordSetup)
+            if (IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentTaskInstance)
             {
-                console.log("QML: on Current Record Setup changed: " + IngeScapeAssessmentsC.experimentationC.recordC.currentRecordSetup.name);
+                console.log("QML: on Current Task Instance changed: " + IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentTaskInstance.name);
 
-                // Add the "Record Setup View" to the stack
-                stackview.push(componentRecordSetupView);
+                // Add the "Task Instance View" to the stack
+                stackview.push(componentTaskInstanceView);
             }
             else {
-                console.log("QML: on Current Record Setup changed to NULL");
+                console.log("QML: on Current Task Instance changed to NULL");
 
-                // Remove the "Record Setup View" from the stack
+                // Remove the "Task Instance iew" from the stack
                 stackview.pop();
             }
         }
@@ -134,39 +134,6 @@ Item {
         id: stackview
 
         anchors.fill: parent
-
-        /*pushEnter: Transition {
-            PropertyAnimation {
-                property: "opacity"
-                from: 0
-                to:1
-                duration: 200
-            }
-        }
-        pushExit: Transition {
-            PropertyAnimation {
-                property: "opacity"
-                from: 1
-                to:0
-                duration: 200
-            }
-        }
-        popEnter: Transition {
-            PropertyAnimation {
-                property: "opacity"
-                from: 0
-                to:1
-                duration: 200
-            }
-        }
-        popExit: Transition {
-            PropertyAnimation {
-                property: "opacity"
-                from: 1
-                to:0
-                duration: 200
-            }
-        }*/
 
         initialItem: componentExperimentationsListView
     }
@@ -213,17 +180,13 @@ Item {
 
 
     //
-    // Record Setup View
+    // Task Instance View
     //
     Component {
-        id: componentRecordSetupView
+        id: componentTaskInstanceView
 
-        Record.RecordSetupView {
-            //id: recordSetupView
-
-            recordController: IngeScapeAssessmentsC.experimentationC.recordC
-            //modelManager: IngeScapeAssessmentsC.modelManager
-
+        TaskInstance.TaskInstanceView {
+            taskInstanceController: IngeScapeAssessmentsC.experimentationC.taskInstanceC
 
             //
             // Slots
@@ -233,7 +196,7 @@ Item {
                 console.log("QML: on Go Back to 'Home' (from 'Record' view)");
 
                 // Reset the current record
-                rootItem.resetCurrentRecord();
+                rootItem.resetCurrentTaskInstance();
 
                 // Reset the current experimentation
                 rootItem.resetCurrentExperimentation();
@@ -242,8 +205,8 @@ Item {
             onGoBackToExperimentation: {
                 console.log("QML: on Go Back to 'Experimentation' (from 'Record' view)");
 
-                // Reset the current record setup
-                rootItem.resetCurrentRecordSetup();
+                // Reset the current task instance
+                rootItem.resetCurrentTaskInstance();
             }
         }
     }

@@ -21,6 +21,12 @@
 
 #include "cassandra.h"
 
+// Special namespace to match the behavior of model classes without having a proper model class for this particular table.
+namespace IndependentVariableValueM {
+
+const QString table = "ingescape.independent_var_value";
+
+}
 
 /**
  * @brief The IndependentVariableM class defines a model of independent variable

@@ -26,7 +26,7 @@
  */
 ExperimentationController::ExperimentationController(JsonHelper* jsonHelper,
                                                      QObject *parent) : QObject(parent),
-    _recordC(nullptr),
+    _taskInstanceC(nullptr),
     _currentExperimentation(nullptr),
     _jsonHelper(jsonHelper)
 {
@@ -36,7 +36,7 @@ ExperimentationController::ExperimentationController(JsonHelper* jsonHelper,
     qInfo() << "New Experimentation Controller";
 
     // Create the controller to manage a record of the current experimentation
-    _recordC = new RecordController(_jsonHelper, this);
+    _taskInstanceC = new TaskInstanceController(_jsonHelper, this);
 }
 
 
@@ -53,12 +53,12 @@ ExperimentationController::~ExperimentationController()
         setcurrentExperimentation(nullptr);
     }
 
-    if (_recordC != nullptr)
+    if (_taskInstanceC != nullptr)
     {
-        disconnect(_recordC);
+        disconnect(_taskInstanceC);
 
-        RecordController* temp = _recordC;
-        setrecordC(nullptr);
+        TaskInstanceController* temp = _taskInstanceC;
+        settaskInstanceC(nullptr);
         delete temp;
         temp = nullptr;
     }
@@ -100,66 +100,66 @@ void ExperimentationController::setcurrentExperimentation(ExperimentationM *valu
 
 
 /**
- * @brief Create a new record setup for a subject and a task
+ * @brief Create a new task instance for a subject and a task
  * @param recordName
  * @param subject
  * @param task
  */
-void ExperimentationController::createNewRecordSetupForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task)
+void ExperimentationController::createNewTaskInstanceForSubjectAndTask(QString taskInstanceName, SubjectM* subject, TaskM* task)
 {
-    if (!recordName.isEmpty() && (subject != nullptr) && (task != nullptr) && (_currentExperimentation != nullptr))
+    if (!taskInstanceName.isEmpty() && (subject != nullptr) && (task != nullptr) && (_currentExperimentation != nullptr))
     {
-        qInfo() << "Create new record" << recordName << "for subject" << subject->displayedId() << "and task" << task->name();
+        qInfo() << "Create new record" << taskInstanceName << "for subject" << subject->displayedId() << "and task" << task->name();
 
-        // Create a new (experimentation) record setup
-        RecordSetupM* recordSetup = _insertRecordSetupIntoDB(recordName, subject, task);
+        // Create a new (experimentation) task instance
+        TaskInstanceM* taskInstance = _insertTaskInstanceIntoDB(taskInstanceName, subject, task);
 
-        if (recordSetup != nullptr)
+        if (taskInstance != nullptr)
         {
-            // Add the record to the current experimentation
-            _currentExperimentation->addRecordSetup(recordSetup);
+            // Add the task insatnce to the current experimentation
+            _currentExperimentation->addTaskInstance(taskInstance);
 
-            // Open this new record
-            openRecordSetup(recordSetup);
+            // Open this new task instance
+            openTaskInstance(taskInstance);
         }
     }
 }
 
 
 /**
- * @brief Open a record setup
+ * @brief Open a task instance
  * @param record
  */
-void ExperimentationController::openRecordSetup(RecordSetupM* recordSetup)
+void ExperimentationController::openTaskInstance(TaskInstanceM* taskInstance)
 {
-    if ((recordSetup != nullptr) && (_currentExperimentation != nullptr))
+    if ((taskInstance != nullptr) && (_currentExperimentation != nullptr))
     {
-        qInfo() << "Open the record" << recordSetup->name() << "of the experimentation" << _currentExperimentation->name();
+        qInfo() << "Open the record" << taskInstance->name() << "of the experimentation" << _currentExperimentation->name();
 
-        // Update the current record setup
-        _recordC->setcurrentRecordSetup(recordSetup);
+        // Update the current task instance
+        _taskInstanceC->setcurrentTaskInstance(taskInstance);
     }
 }
 
 
 /**
- * @brief Delete a record setup
+ * @brief Delete a task instance
  * @param record
  */
-void ExperimentationController::deleteRecordSetup(RecordSetupM* recordSetup)
+void ExperimentationController::deleteTaskInstance(TaskInstanceM* taskInstance)
 {
-    if ((recordSetup != nullptr) && (_currentExperimentation != nullptr))
+    if ((taskInstance != nullptr) && (_currentExperimentation != nullptr))
     {
-        qInfo() << "Delete the record" << recordSetup->name() << "of the experimentation" << _currentExperimentation->name();
+        qInfo() << "Delete the record" << taskInstance->name() << "of the experimentation" << _currentExperimentation->name();
 
-        // Delete record setup from DB
-        RecordSetupM::deleteRecordSetupFromCassandra(*recordSetup);
+        // Delete task instance from DB
+        TaskInstanceM::deleteTaskInstanceFromCassandra(*taskInstance);
 
-        // Remove the record from the current experimentation
-        _currentExperimentation->removeRecordSetup(recordSetup);
+        // Remove the task instance from the current experimentation
+        _currentExperimentation->removeTaskInstance(taskInstance);
 
         // Free memory
-        delete recordSetup;
+        delete taskInstance;
     }
 }
 
@@ -184,26 +184,26 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
 
         _retrieveCharacteristicValuesForSubjectsInExperimentation(currentExperimentation);
 
-        _retrieveRecordSetupsForExperimentation(currentExperimentation);
+        _retrieveTaskInstancesForExperimentation(currentExperimentation);
     }
 }
 
 /**
- * @brief Create and insert a new record setup into the DB.
- * A nullptr is returned if the record setup could not be created
+ * @brief Create and insert a new task instance into the DB.
+ * A nullptr is returned if the task instance could not be created
  * @param recordName
  * @param subject
  * @param task
  * @return
  */
-RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString& recordName, SubjectM* subject, TaskM* task)
+TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QString& taskInstanceName, SubjectM* subject, TaskM* task)
 {
-    RecordSetupM* recordSetup = nullptr;
+    TaskInstanceM* taskInstance = nullptr;
 
     if ((_currentExperimentation != nullptr) && (subject != nullptr) && (task != nullptr))
     {
-        CassUuid recordSetupUuid;
-        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &recordSetupUuid);
+        CassUuid taskInstanceUuid;
+        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &taskInstanceUuid);
 
         time_t now = std::time(nullptr);
 
@@ -214,15 +214,16 @@ RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString&
         CassUuid recordUuid;
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
-        //const char* query = "INSERT INTO ingescape.record_setup (id_experimentation, id_subject, id_task, id, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        const char* query = "INSERT INTO ingescape.record_setup (id, id_experimentation, id_subject, id_task, id_records, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        QString queryString = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, id_records, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        const char* query = queryString.toStdString().c_str();
         CassStatement* cassStatement = cass_statement_new(query, 10);
-        cass_statement_bind_uuid  (cassStatement, 0, recordSetupUuid);
+        cass_statement_bind_uuid  (cassStatement, 0, taskInstanceUuid);
         cass_statement_bind_uuid  (cassStatement, 1, _currentExperimentation->getCassUuid());
         cass_statement_bind_uuid  (cassStatement, 2, subject->getCassUuid());
         cass_statement_bind_uuid  (cassStatement, 3, task->getCassUuid());
         cass_statement_bind_uuid  (cassStatement, 4, recordUuid);
-        cass_statement_bind_string(cassStatement, 5, recordName.toStdString().c_str());
+        cass_statement_bind_string(cassStatement, 5, taskInstanceName.toStdString().c_str());
         cass_statement_bind_uint32(cassStatement, 6, yearMonthDay);
         cass_statement_bind_int64 (cassStatement, 7, timeOfDay);
         cass_statement_bind_uint32(cassStatement, 8, yearMonthDay); //FIXME current date/time to have all values filled with something for test purposes.
@@ -233,21 +234,22 @@ RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString&
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
-            qInfo() << "New record_setup inserted into the DB";
+            qInfo() << "New task_instance inserted into the DB";
 
-            // Create the new record setup
-            recordSetup = new RecordSetupM(_currentExperimentation->getCassUuid(), recordSetupUuid, recordName, subject, task, QDateTime::currentDateTime());
+            // Create the new task instance
+            taskInstance = new TaskInstanceM(_currentExperimentation->getCassUuid(), taskInstanceUuid, taskInstanceName, subject, task, QDateTime::currentDateTime());
 
             for (auto indeVarIt = task->independentVariables()->begin() ; indeVarIt != task->independentVariables()->end() ; ++indeVarIt)
             {
                 IndependentVariableM* independentVar = *indeVarIt;
                 if (independentVar != nullptr)
                 {
-                    // Insert an instance of every independent variable for this record setup into DB
-                    const char* innerQuery = "INSERT INTO ingescape.independent_var_value_of_record_setup (id_experimentation, id_record_setup, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
+                    // Insert an instance of every independent variable for this task instance into DB
+                    QString innerQueryString = "INSERT INTO " + IndependentVariableValueM::table + " (id_experimentation, id_task_instance, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
+                    const char* innerQuery = innerQueryString.toStdString().c_str();
                     CassStatement* innerCassStatement = cass_statement_new(innerQuery, 4);
                     cass_statement_bind_uuid  (innerCassStatement, 0, subject->getExperimentationCassUuid());
-                    cass_statement_bind_uuid  (innerCassStatement, 1, recordSetup->getCassUuid());
+                    cass_statement_bind_uuid  (innerCassStatement, 1, taskInstance->getCassUuid());
                     cass_statement_bind_uuid  (innerCassStatement, 2, independentVar->getCassUuid());
                     cass_statement_bind_string(innerCassStatement, 3, "");
 
@@ -256,10 +258,10 @@ RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString&
                     CassError innerCassError = cass_future_error_code(innerCassFuture);
                     if (innerCassError == CASS_OK)
                     {
-                        qInfo() << "New independent value for record_setup inserted into the DB";
+                        qInfo() << "New independent value for task_instance inserted into the DB";
                     }
                     else {
-                        qCritical() << "Could not insert the new independent value for record_setup into the DB:" << cass_error_desc(innerCassError);
+                        qCritical() << "Could not insert the new independent value for task_instance into the DB:" << cass_error_desc(innerCassError);
                     }
 
                     cass_statement_free(innerCassStatement);
@@ -268,14 +270,14 @@ RecordSetupM* ExperimentationController::_insertRecordSetupIntoDB(const QString&
             }
         }
         else {
-            qCritical() << "Could not insert the new record_setup into the DB:" << cass_error_desc(cassError);
+            qCritical() << "Could not insert the new task_instance into the DB:" << cass_error_desc(cassError);
         }
 
         cass_statement_free(cassStatement);
         cass_future_free(cassFuture);
     }
 
-    return recordSetup;
+    return taskInstance;
 }
 
 /**
@@ -544,14 +546,16 @@ void ExperimentationController::_retrieveTasksForExperimentation(Experimentation
 }
 
 /**
- * @brief Retrieve all record setups from the Cassandra DB for the given experimentaion.
+ * @brief Retrieve all task instances from the Cassandra DB for the given experimentaion.
  * The experimentation will be updated by this method
  * @param experimentation
  */
-void ExperimentationController::_retrieveRecordSetupsForExperimentation(ExperimentationM* experimentation)
+void ExperimentationController::_retrieveTaskInstancesForExperimentation(ExperimentationM* experimentation)
 {
     if (experimentation != nullptr)
-    {const char* query = "SELECT * FROM ingescape.record_setup WHERE id_experimentation = ?;";
+    {
+        QString queryString = "SELECT * FROM " + TaskInstanceM::table + " WHERE id_experimentation = ?;";
+        const char* query = queryString.toStdString().c_str();
 
         // Creates the new query statement
         CassStatement* cassStatement = cass_statement_new(query, 1);
@@ -562,7 +566,7 @@ void ExperimentationController::_retrieveRecordSetupsForExperimentation(Experime
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
-            qDebug() << "Get all record setup succeeded";
+            qDebug() << "Get all task instances succeeded";
 
             // Retrieve result set and iterate over the rows
             const CassResult* cassResult = cass_future_get_result(cassFuture);
@@ -583,11 +587,11 @@ void ExperimentationController::_retrieveRecordSetupsForExperimentation(Experime
                     cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
                     TaskM* task = experimentation->getTaskFromUID(AssessmentsModelManager::cassUuidToQString(taskUuid));
 
-                    RecordSetupM* recordSetup = RecordSetupM::createRecordSetupFromCassandraRow(row, subject, task);
-                    if (recordSetup != nullptr)
+                    TaskInstanceM* taskInstance = TaskInstanceM::createTaskInstanceFromCassandraRow(row, subject, task);
+                    if (taskInstance != nullptr)
                     {
-                        // Add the record setup to the experimentation
-                        experimentation->addRecordSetup(recordSetup);
+                        // Add the task instance to the experimentation
+                        experimentation->addTaskInstance(taskInstance);
                     }
                 }
 
@@ -595,7 +599,7 @@ void ExperimentationController::_retrieveRecordSetupsForExperimentation(Experime
             }
         }
         else {
-            qCritical() << "Could not get all record setup for the current experiment from the database:" << cass_error_desc(cassError);
+            qCritical() << "Could not get all task instances for the current experiment from the database:" << cass_error_desc(cassError);
         }
 
         cass_future_free(cassFuture);
@@ -617,7 +621,8 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
             SubjectM* subject = *subjectIt;
             if (subject != nullptr)
             {
-                const char* query = "SELECT * FROM ingescape.characteristic_value_of_subject WHERE id_experimentation = ? AND id_subject = ?;";
+                QString queryString = "SELECT * FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ?;";
+                const char* query = queryString.toStdString().c_str();
 
                 // Creates the new query statement
                 CassStatement* cassStatement = cass_statement_new(query, 2);
