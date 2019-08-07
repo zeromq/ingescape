@@ -22,17 +22,15 @@ import INGESCAPE 1.0
 
 import "../theme" as Theme
 
-I2PopupBase {
+AssessmentsPopupBase {
     id: rootPopup
 
-    height: 600
-    width: 500
+    height: 721
+    width: 674
 
     anchors.centerIn: parent
 
-    isModal: true
-    dismissOnOutsideTap: false
-    keepRelativePositionToInitialParent: false
+    title: "NEW INDEPENDENT VARIABLE"
 
 
     //--------------------------------------------------------
@@ -43,7 +41,7 @@ I2PopupBase {
     //
     //--------------------------------------------------------
 
-    property TasksController controller: null;
+    property TasksController taskController: null;
 
     // property IndependentVariableValueTypes selectedType
     property int selectedType: -1;
@@ -127,520 +125,423 @@ I2PopupBase {
     //
     //--------------------------------
 
-    Rectangle {
+
+    Item {
+        id: rowName
 
         anchors {
-            fill: parent
+            top: parent.top
+            topMargin: 34
+            left: parent.left
+            leftMargin: 28
+            right: parent.right
+            rightMargin: 28
         }
-        radius: 5
-        border {
-            width: 2
-            color: IngeScapeTheme.editorsBackgroundBorderColor
-        }
-        color: IngeScapeTheme.editorsBackgroundColor
 
+        height: 30
 
         Text {
-            id: title
+            text: qsTr("Name:")
 
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.top
-                topMargin: 20
-            }
+            height: 30
 
-            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
 
-            text: qsTr("New independent variable")
-
-            color: IngeScapeTheme.whiteColor
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
-                pixelSize: 20
+                pixelSize: 16
             }
         }
 
-        Row {
-            id: rowName
+        TextField {
+            id: txtIndependentVariableName
 
             anchors {
-                top: title.bottom
-                topMargin: 30
                 left: parent.left
-                leftMargin: 10
-            }
-
-            spacing: 10
-
-            Text {
-                width: 125
-                height: 30
-
-                text: qsTr("Name:")
-
-                horizontalAlignment: Text.AlignRight
-                verticalAlignment: Text.AlignVCenter
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
-
-            TextField {
-                id: txtIndependentVariableName
-
-                height: 30
-                width: 250
-
-                //verticalAlignment: TextInput.AlignVCenter
-                text: ""
-
-                style: I2TextFieldStyle {
-                    backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                    borderColor: IngeScapeTheme.whiteColor
-                    borderErrorColor: IngeScapeTheme.redColor
-                    radiusTextBox: 1
-                    borderWidth: 0;
-                    borderWidthActive: 1
-                    textIdleColor: IngeScapeTheme.whiteColor;
-                    textDisabledColor: IngeScapeTheme.darkGreyColor
-
-                    padding.left: 3
-                    padding.right: 3
-
-                    font {
-                        pixelSize:15
-                        family: IngeScapeTheme.textFontFamily
-                    }
-                }
-            }
-        }
-
-        Row {
-            id: rowDescription
-
-            anchors {
-                top: rowName.bottom
-                topMargin: 20
-                left: parent.left
-                leftMargin: 10
-            }
-
-            spacing: 10
-
-            Text {
-                width: 125
-                height: 30
-
-                text: qsTr("Description:")
-
-                horizontalAlignment: Text.AlignRight
-                verticalAlignment: Text.AlignVCenter
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
-
-            TextField {
-                id: txtIndependentVariableDescription
-
-                height: 30
-                width: 250
-
-                //verticalAlignment: TextInput.AlignVCenter
-                text: ""
-
-                style: I2TextFieldStyle {
-                    backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                    borderColor: IngeScapeTheme.whiteColor
-                    borderErrorColor: IngeScapeTheme.redColor
-                    radiusTextBox: 1
-                    borderWidth: 0;
-                    borderWidthActive: 1
-                    textIdleColor: IngeScapeTheme.whiteColor;
-                    textDisabledColor: IngeScapeTheme.darkGreyColor
-
-                    padding.left: 3
-                    padding.right: 3
-
-                    font {
-                        pixelSize:15
-                        family: IngeScapeTheme.textFontFamily
-                    }
-                }
-            }
-        }
-
-        Item {
-            anchors {
-                top: rowDescription.bottom
-                topMargin: 20
-                left: parent.left
-                leftMargin: 10
+                leftMargin: 112
                 right: parent.right
-                rightMargin: 10
+                verticalCenter: parent.verticalCenter
             }
 
-            Text {
-                id: txtTypesTitle
+            height: 30
 
+            text: ""
+
+            style: I2TextFieldStyle {
+                backgroundColor: IngeScapeTheme.veryLightGreyColor
+                borderColor: IngeScapeAssessmentsTheme.blueButton
+                borderErrorColor: IngeScapeTheme.redColor
+                radiusTextBox: 5
+                borderWidth: 0;
+                borderWidthActive: 2
+                textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
+                textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
+
+                padding.left: 16
+                padding.right: 16
+
+                font {
+                    pixelSize: 16
+                    family: IngeScapeTheme.textFontFamily
+                }
+            }
+        }
+    }
+
+    Item {
+        id: rowDescription
+
+        anchors {
+            top: rowName.bottom
+            topMargin: 31
+            left: parent.left
+            leftMargin: 28
+            right: parent.right
+            rightMargin: 28
+        }
+
+        height: 115
+
+        Text {
+            height: 30
+
+            text: qsTr("Description:")
+
+            verticalAlignment: Text.AlignVCenter
+
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 16
+            }
+        }
+
+        TextArea {
+            id: txtIndependentVariableDescription
+
+            anchors {
+                left: parent.left
+                leftMargin: 112
+                top: rowDescription.top
+                topMargin: -10
+                right: parent.right
+            }
+
+            height: 115
+            wrapMode: Text.WordWrap
+
+            text: ""
+
+            style: I2TextAreaStyle {
+                backgroundColor: IngeScapeTheme.veryLightGreyColor
+                borderColor: IngeScapeAssessmentsTheme.blueButton
+                borderErrorColor: IngeScapeTheme.redColor
+                radiusTextBox: 5
+                borderWidth: 0;
+                borderWidthActive: 2
+                textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
+                textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
+
+                padding.top: 10
+                padding.bottom: 10
+                padding.left: 12
+                padding.right: 12
+
+                font {
+                    pixelSize: 16
+                    family: IngeScapeTheme.textFontFamily
+                }
+            }
+        }
+    }
+
+    Item {
+        anchors {
+            top: rowDescription.bottom
+            topMargin: 21
+            left: parent.left
+            leftMargin: 28
+            right: parent.right
+            rightMargin: 50
+        }
+
+        height: 360
+
+        Text {
+            id: txtTypesTitle
+
+            anchors {
+                left: parent.left
+                top: parent.top
+            }
+            height: 30
+
+            text: qsTr("Type:")
+
+            horizontalAlignment: Text.AlignRight
+
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 16
+            }
+        }
+
+        Column {
+            id: columnTypes
+
+            anchors {
+                top: parent.top
+                topMargin: -6
+                left: parent.left
+                leftMargin: 112
+                right: parent.right
+            }
+
+            spacing: 4
+
+            ExclusiveGroup {
+                id: exclusiveGroupTypes
+            }
+
+            Repeater {
+                model: rootPopup.taskController ? rootPopup.taskController.allIndependentVariableValueTypes : null
+
+                delegate: RadioButton {
+                    id: radioIndependentVariableValueType
+
+                    text: model.name
+                    height: 28
+
+                    exclusiveGroup: exclusiveGroupTypes
+
+                    checked: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === model.value))
+
+                    style: Theme.IngeScapeRadioButtonStyle { }
+
+                    onCheckedChanged: {
+                        if (checked) {
+                            console.log("Select IndependentVariable Value Type: " + model.name + " (" + model.value + ")");
+
+                            rootPopup.selectedType = model.value;
+                        }
+                    }
+
+                    Binding {
+                        target: radioIndependentVariableValueType
+                        property: "checked"
+                        value: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === model.value))
+                    }
+                }
+            }
+
+
+            Item {
+                id: specialEnumItem
                 anchors {
                     left: parent.left
-                    top: parent.top
-                }
-                width: 125
-                height: 30
-
-                text: qsTr("Type:")
-
-                horizontalAlignment: Text.AlignRight
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
-
-            Column {
-                id: columnTypes
-
-                anchors {
-                    top: parent.top
-                    left: txtTypesTitle.right
-                    leftMargin: 10
+                    right: parent.right
                 }
 
-                spacing: 10
+                height: childrenRect.height
 
-                ExclusiveGroup {
-                    id: exclusiveGroupTypes
+                RadioButton {
+                    id: enumRadioButton
+
+                    height: 28
+                    text: "Enum"
+
+                    exclusiveGroup: exclusiveGroupTypes
+
+                    checked: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === CharacteristicValueTypes.CHARACTERISTIC_ENUM))
+
+                    style: Theme.IngeScapeRadioButtonStyle { }
+
+                    onCheckedChanged: {
+                        if (checked) {
+                            console.log("Select IndependentVariable Value Type: Enum (" + CharacteristicValueTypes.CHARACTERISTIC_ENUM + ")");
+
+                            rootPopup.selectedType = CharacteristicValueTypes.CHARACTERISTIC_ENUM;
+                        }
+                    }
+
+                    Binding {
+                        target: enumRadioButton
+                        property: "checked"
+                        value: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === CharacteristicValueTypes.CHARACTERISTIC_ENUM))
+                    }
                 }
 
-                Repeater {
-                    model: controller ? controller.allIndependentVariableValueTypes : null
+                Rectangle {
+                    anchors {
+                        top: enumRadioButton.top
+                        left: enumRadioButton.right
+                        leftMargin: 40
+                        right: parent.right
+                    }
 
-                    delegate: RadioButton {
-                        id: radioIndependentVariableValueType
+                    height: 264
+                    radius: 5
 
-                        text: model.name
+                    // Selected type is "Enum"
+                    visible: (rootPopup.selectedType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)
 
-                        exclusiveGroup: exclusiveGroupTypes
+                    Rectangle {
+                        id: enumValuesBackground
 
-                        checked: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === model.value))
+                        anchors {
+                            fill: parent
+                            topMargin: -10
+                            bottomMargin: -15
+                            leftMargin: -25
+                            rightMargin: -22
+                        }
+                        radius: 5
 
-                        style: Theme.IngeScapeRadioButtonStyle { }
+                        color: IngeScapeTheme.veryLightGreyColor
+                    }
 
-                        onCheckedChanged: {
-                            if (checked) {
-                                console.log("Select IndependentVariable Value Type: " + model.name + " (" + model.value + ")");
+                    Row {
+                        id: headerNewEnum
 
-                                rootPopup.selectedType = model.value;
+                        anchors {
+                            top: parent.top
+                            left: parent.left
+                        }
+
+                        height: 30
+                        spacing: 10
+
+                        Text {
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                            }
+
+                            text: "Number of values:"
+                            verticalAlignment: Text.AlignVCenter
+
+                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight: Font.Medium
+                                pixelSize: 16
                             }
                         }
 
-                        Binding {
-                            target: radioIndependentVariableValueType
-                            property: "checked"
-                            value: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === model.value))
-                        }
-                    }
-                }
-            }
-
-
-            // FIXME TODO
-            /*Loader {
-                id: loaderEnum
-            }*/
-
-            Rectangle {
-                anchors {
-                    //top: parent.top
-                    left: columnTypes.right
-                    leftMargin: 10
-                    right: parent.right
-                    rightMargin: 10
-                    top: columnTypes.bottom
-                    topMargin: -20
-                }
-                height: 200
-
-                // Selected type is "Enum"
-                visible: (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
-
-                color: "transparent"
-                border {
-                    color: "white"
-                    width: 1
-                }
-
-                Row {
-                    id: headerNewEnum
-
-                    anchors {
-                        top: parent.top
-                        topMargin: 10
-                        left: parent.left
-                        leftMargin: 10
-                    }
-
-                    spacing: 10
-
-                    Text {
-                        text: "Number of values:"
-
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            weight: Font.Medium
-                            pixelSize: 14
-                        }
-                    }
-
-                    SpinBox {
-                        id: spinBoxValuesNumber
-
-                        minimumValue: 2
-                        value: 2
-                    }
-                }
-
-                Column {
-                    anchors {
-                        top: headerNewEnum.bottom
-                        topMargin: 10
-                        left: parent.left
-                        leftMargin: 10
-                        right: parent.right
-                        rightMargin: 10
-                    }
-
-                    Repeater {
-                        model: spinBoxValuesNumber.value
-
-                        delegate: TextField {
-                            id: enumText
+                        SpinBox {
+                            id: spinBoxValuesNumber
 
                             anchors {
-                                left: parent.left
-                                right: parent.right
+                                top: parent.top
+                                bottom: parent.bottom
                             }
 
-                            text: rootPopup.enumTexts[index] ? rootPopup.enumTexts[index] : ""
+                            width: 44
 
-                            Component.onCompleted: {
-                                // If this index is not defined, initialize it with empty string
-                                if (typeof rootPopup.enumTexts[index] === 'undefined') {
-                                    rootPopup.enumTexts[index] = "";
+                            horizontalAlignment: Text.AlignHCenter
+
+                            style: SpinBoxStyle {
+                                textColor: control.enabled ? IngeScapeAssessmentsTheme.regularDarkBlueHeader : IngeScapeAssessmentsTheme.lighterDarkBlueHeader
+                                background: Rectangle {
+                                    radius: 5
+                                    border {
+                                        color: IngeScapeAssessmentsTheme.blueButton
+                                        width: control.enabled && control.activeFocus ? 2 : 0
+                                    }
+
+                                    color: IngeScapeTheme.whiteColor
                                 }
                             }
 
-                            onTextChanged: {
-                                //console.log(index + ": text changed to " + enumText.text);
+                            minimumValue: 2
+                            value: 2
 
-                                // Update the strings array for this index
-                                rootPopup.enumTexts[index] = enumText.text;
-                            }
                         }
                     }
-                }
 
-            }
-        }
+                    ScrollView {
+                        id: enumValueScrollView
 
-
-        Row {
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                bottom : parent.bottom
-                bottomMargin: 16
-            }
-            spacing : 15
-
-            Button {
-                id: cancelButton
-
-                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                height: boundingBox.height
-                width: boundingBox.width
-
-                activeFocusOnPress: true
-                text: "Cancel"
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.whiteColor
-
-                }
-
-                onClicked: {
-                    //console.log("QML: cancel");
-
-                    // Reset all user inputs and close the popup
-                    rootPopup.resetInputsAndClosePopup();
-                }
-            }
-
-            Button {
-                id: okButton
-
-                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                height: boundingBox.height
-                width: boundingBox.width
-
-                activeFocusOnPress: true
-                text: "OK"
-
-                enabled: if (rootPopup.controller && (txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > -1))
-                         {
-                             // Edit an existing independent variable
-                             if (rootPopup.independentVariableCurrentlyEdited)
-                             {
-                                 rootPopup.controller.canEditIndependentVariableWithName(rootPopup.independentVariableCurrentlyEdited, txtIndependentVariableName.text);
-                             }
-                             // Create a new independent variable
-                             else
-                             {
-                                 rootPopup.controller.canCreateIndependentVariableWithName(txtIndependentVariableName.text);
-                             }
-                         }
-                         else {
-                             false;
-                         }
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.greyColor
-
-                }
-
-                onClicked: {
-
-                    if (rootPopup.controller)
-                    {
-                        // Selected type is ENUM
-                        if (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
-                        {
-                            // Use only the N first elements of the array (the array may be longer than the number of displayed TextFields
-                            // if the user decreases the value of the spin box after edition the last TextField)
-                            // Where N = spinBoxValuesNumber.value (the value of the spin box)
-                            var displayedEnumTexts = rootPopup.enumTexts.slice(0, spinBoxValuesNumber.value);
-
-                            var isEmptyValue = false;
-                            var index = 0;
-
-                            displayedEnumTexts.forEach(function(element) {
-                                if (element === "") {
-                                    isEmptyValue = true;
-                                    console.log("value at " + index + " is empty, edit it !");
-                                }
-                                index++;
-                            });
-
-                            console.log("QML: Enum with " + spinBoxValuesNumber.value + " strings: " + displayedEnumTexts);
-
-                            if (isEmptyValue === true)
-                            {
-                                console.warn("Some values of the enum are empty, edit them !");
-
-                                // FIXME TODO: display warning message
-                            }
-                            else
-                            {
-                                // Edit an existing independent variable
-                                if (rootPopup.independentVariableCurrentlyEdited)
-                                {
-                                    //console.log("QML: edit an existing Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
-
-                                    rootPopup.controller.saveModificationsOfIndependentVariableEnum(rootPopup.independentVariableCurrentlyEdited,
-                                                                                                    txtIndependentVariableName.text,
-                                                                                                    txtIndependentVariableDescription.text,
-                                                                                                    displayedEnumTexts);
-                                }
-                                // Create a new independent variable
-                                else
-                                {
-                                    //console.log("QML: create a new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
-
-                                    rootPopup.controller.createNewIndependentVariableEnum(txtIndependentVariableName.text,
-                                                                                          txtIndependentVariableDescription.text,
-                                                                                          displayedEnumTexts);
-                                }
-
-                                // Reset all user inputs and close the popup
-                                rootPopup.resetInputsAndClosePopup();
-                            }
+                        anchors {
+                            top: headerNewEnum.bottom
+                            topMargin: 20
+                            left: parent.left
+                            right: parent.right
+                            rightMargin: -17
+                            bottom: parent.bottom
                         }
-                        // Selected type is NOT ENUM
-                        else
-                        {
-                            // Edit an existing independent variable
-                            if (rootPopup.independentVariableCurrentlyEdited)
-                            {
-                                //console.log("QML: edit an existing Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
 
-                                rootPopup.controller.saveModificationsOfIndependentVariable(rootPopup.independentVariableCurrentlyEdited,
-                                                                                            txtIndependentVariableName.text,
-                                                                                            txtIndependentVariableDescription.text,
-                                                                                            rootPopup.selectedType);
+                        style: IngeScapeAssessmentsScrollViewStyle {}
+
+                        // Prevent drag overshoot on Windows
+                        flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+                        contentItem: Column {
+                            width: enumValueScrollView.width - 17
+                            height: childrenRect.height
+                            spacing: 12
+
+                            Repeater {
+                                model: spinBoxValuesNumber.value
+
+                                delegate: TextField {
+                                    id: enumText
+
+                                    anchors {
+                                        left: parent.left
+                                        right: parent.right
+                                    }
+
+                                    height: 30
+
+                                    text: rootPopup.enumTexts[index] ? rootPopup.enumTexts[index] : ""
+
+                                    style: I2TextFieldStyle {
+                                        backgroundColor: IngeScapeTheme.whiteColor
+                                        borderColor: IngeScapeAssessmentsTheme.blueButton
+                                        borderErrorColor: IngeScapeTheme.redColor
+                                        radiusTextBox: 5
+                                        borderWidth: 0;
+                                        borderWidthActive: 2
+                                        textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
+                                        textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
+
+                                        placeholderCustomText: qsTr("Name of the value %1").arg(index + 1)
+                                        placeholderMarginLeft: 15
+                                        placeholderColor: IngeScapeTheme.lightGreyColor
+                                        placeholderFont {
+                                            pixelSize: 16
+                                            family: IngeScapeTheme.textFontFamily
+                                            italic: true
+                                        }
+
+                                        padding.left: 15
+                                        padding.right: 15
+
+                                        font {
+                                            pixelSize: 16
+                                            family: IngeScapeTheme.textFontFamily
+                                        }
+                                    }
+
+                                    Component.onCompleted: {
+                                        // If this index is not defined, initialize it with empty string
+                                        if (typeof rootPopup.enumTexts[index] === 'undefined') {
+                                            rootPopup.enumTexts[index] = "";
+                                        }
+                                    }
+
+                                    onTextChanged: {
+                                        // Update the strings array for this index
+                                        rootPopup.enumTexts[index] = enumText.text;
+                                    }
+                                }
                             }
-                            // Create a new independent variable
-                            else
-                            {
-                                //console.log("QML: create a new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
-
-                                rootPopup.controller.createNewIndependentVariable(txtIndependentVariableName.text,
-                                                                                  txtIndependentVariableDescription.text,
-                                                                                  rootPopup.selectedType);
-                            }
-
-                            // Reset all user inputs and close the popup
-                            rootPopup.resetInputsAndClosePopup();
                         }
                     }
                 }
@@ -648,5 +549,175 @@ I2PopupBase {
         }
 
     }
+    Row {
+        anchors {
+            right: parent.right
+            rightMargin: 28
+            bottom : parent.bottom
+            bottomMargin: 28
+        }
+        spacing : 15
 
+        Button {
+            id: cancelButton
+
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+            anchors {
+                verticalCenter: parent.verticalCenter
+            }
+
+            height: boundingBox.height
+            width: boundingBox.width
+
+            activeFocusOnPress: true
+
+            style: ButtonStyle {
+                background: Rectangle {
+                    anchors.fill: parent
+                    radius: 5
+                    color: control.pressed ? IngeScapeTheme.lightGreyColor : (control.hovered ? IngeScapeTheme.veryLightGreyColor : "transparent")
+                }
+
+                label: Text {
+                    text: "Cancel"
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight: Font.Medium
+                        pixelSize: 16
+                    }
+                }
+            }
+
+            onClicked: {
+                // Reset all user inputs and close the popup
+                rootPopup.resetInputsAndClosePopup();
+            }
+        }
+
+        Button {
+            id: okButton
+
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+            anchors {
+                verticalCenter: parent.verticalCenter
+            }
+
+            height: boundingBox.height
+            width: boundingBox.width
+
+            activeFocusOnPress: true
+
+            enabled: if (rootPopup.taskController && (txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > -1))
+                     {
+                         // Edit an existing independent variable
+                         if (rootPopup.independentVariableCurrentlyEdited)
+                         {
+                             rootPopup.taskController.canEditIndependentVariableWithName(rootPopup.independentVariableCurrentlyEdited, txtIndependentVariableName.text);
+                         }
+                         // Create a new independent variable
+                         else
+                         {
+                             rootPopup.taskController.canCreateIndependentVariableWithName(txtIndependentVariableName.text);
+                         }
+                     }
+                     else {
+                         false;
+                     }
+
+            style: IngeScapeAssessmentsButtonStyle {
+                text: "OK"
+            }
+
+            onClicked: {
+                if (rootPopup.taskController)
+                {
+                    // Selected type is ENUM
+                    if (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
+                    {
+                        // Use only the N first elements of the array (the array may be longer than the number of displayed TextFields
+                        // if the user decreases the value of the spin box after edition the last TextField)
+                        // Where N = spinBoxValuesNumber.value (the value of the spin box)
+                        var displayedEnumTexts = rootPopup.enumTexts.slice(0, spinBoxValuesNumber.value);
+
+                        var isEmptyValue = false;
+                        var index = 0;
+
+                        displayedEnumTexts.forEach(function(element) {
+                            if (element === "") {
+                                isEmptyValue = true;
+                                console.log("value at " + index + " is empty, edit it !");
+                            }
+                            index++;
+                        });
+
+                        console.log("QML: Enum with " + spinBoxValuesNumber.value + " strings: " + displayedEnumTexts);
+
+                        if (isEmptyValue === true)
+                        {
+                            console.warn("Some values of the enum are empty, edit them !");
+
+                            // FIXME TODO: display warning message
+                        }
+                        else
+                        {
+                            // Edit an existing independent variable
+                            if (rootPopup.independentVariableCurrentlyEdited)
+                            {
+                                //console.log("QML: edit an existing Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
+
+                                rootPopup.taskController.saveModificationsOfIndependentVariableEnum(rootPopup.independentVariableCurrentlyEdited,
+                                                                                                    txtIndependentVariableName.text,
+                                                                                                    txtIndependentVariableDescription.text,
+                                                                                                    displayedEnumTexts);
+                            }
+                            // Create a new independent variable
+                            else
+                            {
+                                //console.log("QML: create a new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
+
+                                rootPopup.taskController.createNewIndependentVariableEnum(txtIndependentVariableName.text,
+                                                                                          txtIndependentVariableDescription.text,
+                                                                                          displayedEnumTexts);
+                            }
+
+                            // Reset all user inputs and close the popup
+                            rootPopup.resetInputsAndClosePopup();
+                        }
+                    }
+                    // Selected type is NOT ENUM
+                    else
+                    {
+                        // Edit an existing independent variable
+                        if (rootPopup.independentVariableCurrentlyEdited)
+                        {
+                            //console.log("QML: edit an existing Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
+
+                            rootPopup.taskController.saveModificationsOfIndependentVariable(rootPopup.independentVariableCurrentlyEdited,
+                                                                                            txtIndependentVariableName.text,
+                                                                                            txtIndependentVariableDescription.text,
+                                                                                            rootPopup.selectedType);
+                        }
+                        // Create a new independent variable
+                        else
+                        {
+                            //console.log("QML: create a new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
+
+                            rootPopup.taskController.createNewIndependentVariable(txtIndependentVariableName.text,
+                                                                                  txtIndependentVariableDescription.text,
+                                                                                  rootPopup.selectedType);
+                        }
+
+                        // Reset all user inputs and close the popup
+                        rootPopup.resetInputsAndClosePopup();
+                    }
+                }
+            }
+        }
+    }
 }

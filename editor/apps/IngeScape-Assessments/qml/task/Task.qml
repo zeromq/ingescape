@@ -445,9 +445,9 @@ Item {
     Popup.CreateIndependentVariablePopup {
         id: createIndependentVariablePopup
 
-        //anchors.centerIn: parent
+        layerObjectName: "overlay2Layer"
 
-        controller: rootItem.taskController
+        taskController: rootItem.taskController
     }
 
 }
