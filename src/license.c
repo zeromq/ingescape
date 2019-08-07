@@ -271,8 +271,8 @@ void license_cleanLicense(void){
             }
             zhash_destroy(&license->agents);
         }
-        if (license->licenceDetails != NULL){
-            license_t *detail = zlist_first(license->licenceDetails);
+        if (license->licenseDetails != NULL){
+            license_t *detail = zlist_first(license->licenseDetails);
             while (detail != NULL){
                 if (detail->id != NULL){
                     free(detail->id);
@@ -303,9 +303,9 @@ void license_cleanLicense(void){
                     }
                     zhash_destroy(&detail->agents);
                 }
-                detail = zlist_next(license->licenceDetails);
+                detail = zlist_next(license->licenseDetails);
             }
-            zlist_destroy(&license->licenceDetails);
+            zlist_destroy(&license->licenseDetails);
         }
         license = NULL;
     }
@@ -397,14 +397,14 @@ void license_readLicense(void){
             license = calloc(1, sizeof(license_t));
             license->features = zhash_new();
             license->agents = zhash_new();
-            license->licenceDetails = zlist_new();
+            license->licenseDetails = zlist_new();
         }
         
         //iterate on license files in folder
         zfile_t *file = zlist_first(filesList);
         while (file != NULL) {
             license_t *detail = calloc(1, sizeof(license_t));
-            zlist_append(license->licenceDetails, detail);
+            zlist_append(license->licenseDetails, detail);
             detail->features = zhash_new();
             detail->agents = zhash_new();
             
@@ -438,10 +438,10 @@ void license_readLicense(void){
         }
         zlist_destroy(&filesList);
         
-        //go through details to apply least contraining values in main licence struct
+        //go through details to apply least contraining values in main license struct
         license_t *detail = NULL;
-        if (license != NULL && license->licenceDetails != NULL){
-            detail = zlist_first(license->licenceDetails);
+        if (license != NULL && license->licenseDetails != NULL){
+            detail = zlist_first(license->licenseDetails);
         }
         while (detail != NULL){
             if (!detail->isLicenseExpired){
@@ -524,7 +524,7 @@ void license_readLicense(void){
                     license->isEditorLicenseExpired = true;
                 }
             }
-            detail = zlist_next(license->licenceDetails);
+            detail = zlist_next(license->licenseDetails);
         }
     }
     if (license == NULL){
@@ -532,7 +532,7 @@ void license_readLicense(void){
         license = calloc(1, sizeof(license_t));
         license->features = zhash_new();
         license->agents = zhash_new();
-        license->licenceDetails = NULL;
+        license->licenseDetails = NULL;
     }
     //set license parameters to default for uninitialized values
     if (license->id == NULL)
