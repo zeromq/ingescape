@@ -532,10 +532,13 @@ Item {
 
                 anchors {
                     fill: parent
-                    margins: 5
+                    leftMargin: 16
+                    topMargin: 5
+                    rightMargin: 16
+                    bottomMargin: 5
                 }
 
-                spacing: 5
+                spacing: 15
 
                 Repeater {
 
@@ -543,12 +546,14 @@ Item {
 
                     delegate: IndependentVariableValueEditor {
 
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                        }
+
                         variable: model ? model.QtObject : null
 
                         variableValue: (rootItem.taskInstance && rootItem.taskInstance.mapIndependentVariableValues && model) ? rootItem.taskInstance.mapIndependentVariableValues[model.name] : ""
-
-                        isCurrentlyEditing: btnEditValuesOfIndependentVariable.checked
-
 
                         //
                         // Slots
