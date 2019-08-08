@@ -193,7 +193,7 @@ Item {
             //
 
             onGoBackToHome: {
-                console.log("QML: on Go Back to 'Home' (from 'Record' view)");
+                console.log("QML: on Go Back to 'Home' (from 'TaskInstance' view)");
 
                 // Reset the current record
                 rootItem.resetCurrentTaskInstance();
@@ -203,24 +203,11 @@ Item {
             }
 
             onGoBackToExperimentation: {
-                console.log("QML: on Go Back to 'Experimentation' (from 'Record' view)");
+                console.log("QML: on Go Back to 'Experimentation' (from 'TaskInstance' view)");
 
                 // Reset the current task instance
                 rootItem.resetCurrentTaskInstance();
             }
         }
     }
-
-
-
-    //
-    // Network Configuration (Popup)
-    //
-    /*NetworkConfiguration {
-        id: configurationPopup
-
-        anchors.centerIn: parent
-    }*/
-
-
 }

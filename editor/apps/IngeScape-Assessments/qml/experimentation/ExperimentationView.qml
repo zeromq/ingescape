@@ -478,7 +478,7 @@ Item {
 
                 onClicked: {
                     // Open the popup
-                    createRecordPopup.open();
+                    createTaskInstancePopup.open();
                 }
 
                 style: IngeScapeAssessmentsButtonStyle {
@@ -692,12 +692,10 @@ Item {
         //
         // Create Experimentation Popup
         //
-        Popup.CreateRecordPopup {
-            id: createRecordPopup
+        Popup.CreateTaskInstancePopup {
+            id: createTaskInstancePopup
 
-            //anchors.centerIn: parent
-
-            controller: rootItem.controller
+            experimentationController: rootItem.controller
             experimentation: rootItem.experimentation
         }
     }
