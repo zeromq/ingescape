@@ -245,8 +245,7 @@ TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QStrin
                 {
                     // Insert an instance of every independent variable for this task instance into DB
                     QString innerQueryString = "INSERT INTO " + IndependentVariableValueM::table + " (id_experimentation, id_task_instance, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
-                    const char* innerQuery = innerQueryString.toStdString().c_str();
-                    CassStatement* innerCassStatement = cass_statement_new(innerQuery, 4);
+                    CassStatement* innerCassStatement = cass_statement_new(innerQueryString.toStdString().c_str(), 4);
                     cass_statement_bind_uuid  (innerCassStatement, 0, subject->getExperimentationCassUuid());
                     cass_statement_bind_uuid  (innerCassStatement, 1, taskInstance->getCassUuid());
                     cass_statement_bind_uuid  (innerCassStatement, 2, independentVar->getCassUuid());
