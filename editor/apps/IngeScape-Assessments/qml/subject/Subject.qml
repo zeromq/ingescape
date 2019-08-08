@@ -369,7 +369,7 @@ Rectangle {
         showPopupTitle: false
         anchors.centerIn: parent
 
-        text: rootItem.subject ? qsTr("Are you sure you want to delete the subject %1 ?").arg(rootItem.subject.displayedID) : ""
+        text: qsTr("Are you sure you want to delete the subject %1 ?").arg(rootItem.subject ? rootItem.subject.displayedId : "")
 
         height: 160
         width: 470

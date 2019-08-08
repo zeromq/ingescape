@@ -803,7 +803,7 @@ Item {
         showPopupTitle: false
         anchors.centerIn: parent
 
-        text: taskInstance ? qsTr("Are you sure you want to delete the task instance %1 ?").arg(taskInstance.name) : ""
+        text: qsTr("Are you sure you want to delete the task instance %1 ?").arg(taskInstance ? taskInstance.name : "")
 
         height: 160
         width: 470

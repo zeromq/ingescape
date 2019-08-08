@@ -477,7 +477,7 @@ Item {
         showPopupTitle: false
         anchors.centerIn: parent
 
-        text: deleteExperimentationPopup.experimentation ? qsTr("Are you sure you want to delete the experimentation %1 from the group %2 ?").arg(deleteExperimentationPopup.experimentation.name) : ""
+        text: qsTr("Are you sure you want to delete the experimentation %1 from the group %2 ?").arg(deleteExperimentationPopup.experimentation ? deleteExperimentationPopup.experimentation.name : "").arg(deleteExperimentationPopup.experimentationGroup ? deleteExperimentationPopup.experimentationGroup.name : "")
 
         height: 160
         width: 470
