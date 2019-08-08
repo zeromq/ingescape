@@ -35,10 +35,10 @@
                     "value": 3.14
                     }],
         "categories": [],
-        "tokens": [
+        "calls": [
                    {
-                   "name": "MY_TOKEN",
-                   "description": "this token is used to blah blah blah",
+                   "name": "MY_CALL",
+                   "description": "this call is used to blah blah blah",
                    "arguments": [
                                  {
                                  "name": "param1",
