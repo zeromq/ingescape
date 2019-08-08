@@ -29,6 +29,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _networkDevice(""),
     _ipAddress(""),
     _port(0),
+    _licensesPath(""),
     _errorMessageWhenConnectionFailed(""),
     _snapshotDirectory(""),
     _networkC(nullptr),
@@ -39,21 +40,23 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _exportC(nullptr),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr)
-  //_platformDirectoryPath("")
 {
     qInfo() << "New IngeScape Assessments Controller";
 
-    //
+    // Root directory
+    QString rootPath = IngeScapeUtils::getRootPath();
+    QDir rootDir(rootPath);
+    if (!rootDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
+    }
+
     // Snapshots directory
-    //
     QString snapshotsDirectoryPath = IngeScapeUtils::getSnapshotsPath();
     QDir snapshotsDirectory(snapshotsDirectoryPath);
-    if (snapshotsDirectory.exists())
-    {
+    if (snapshotsDirectory.exists()) {
         _snapshotDirectory = snapshotsDirectoryPath;
     }
-    else
-    {
+    else {
         qCritical() << "ERROR: could not create directory at '" << snapshotsDirectoryPath << "' !";
     }
 
@@ -65,32 +68,30 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
     // Settings about the "Network"
     settings.beginGroup("network");
+
     _networkDevice = settings.value("networkDevice", QVariant("")).toString();
     _ipAddress = settings.value("ipAddress", QVariant("")).toString();
     _port = settings.value("port", QVariant(0)).toUInt();
     qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
+
     settings.endGroup();
 
 
-    // Root directory
-    QString rootPath = IngeScapeUtils::getRootPath();
-    QDir rootDir(rootPath);
-    if (!rootDir.exists()) {
-        qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
-    }
+    //
+    // Settings about the "Licenses"
+    //
+    settings.beginGroup("licenses");
 
+    // Get the default path for "Licenses"
+    QString defaultLicensesPath = IngeScapeUtils::getLicensesPath();
 
-    // Directory for platform files
-    /*QString platformPath = IngeScapeUtils::getPlatformsPath();
+    _licensesPath = settings.value("directoryPath", QVariant(defaultLicensesPath)).toString();
+    qDebug() << "Licenses path:" << _licensesPath;
 
-    QDir platformDir(platformPath);
-    if (!platformDir.exists()) {
-        qCritical() << "ERROR: could not create directory at '" << platformPath << "' !";
-    }
-    else
-    {
-        _platformDirectoryPath = platformPath;
-    }*/
+    // Set the IngeScape license path
+    igs_setLicensePath(_licensesPath.toStdString().c_str());
+
+    settings.endGroup();
 
 
     // Create the helper to manage JSON files
