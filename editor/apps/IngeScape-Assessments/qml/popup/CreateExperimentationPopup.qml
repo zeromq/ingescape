@@ -373,7 +373,6 @@ AssessmentsPopupBase {
 
         Button {
             id: okButton
-
             property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
 
             anchors {

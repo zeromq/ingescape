@@ -93,9 +93,6 @@ public:
     Q_INVOKABLE void deleteExperimentationOfGroup(ExperimentationM* experimentation, ExperimentationsGroupVM* experimentationsGroup);
 
 
-public Q_SLOTS:
-
-
 private:
 
     /**
@@ -104,6 +101,14 @@ private:
      * @return
      */
     ExperimentationsGroupVM* _getExperimentationsGroupFromName(QString experimentationsGroupName);
+
+
+    /**
+     * @brief Creates a new experimentation group and returns it
+     * @param experimentationsGroup
+     * @param newExperimentationsGroupName
+     */
+    ExperimentationsGroupVM* _createNewExperimentationGroup(const QString& newExperimentationsGroupName);
 
 
 private:

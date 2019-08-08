@@ -11,7 +11,7 @@
         <file>qml/subject/SubjectsView.qml</file>
         <file>qml/task/TasksView.qml</file>
         <file>qml/popup/CreateExperimentationPopup.qml</file>
-        <file>qml/popup/CreateRecordPopup.qml</file>
+        <file>qml/popup/CreateTaskInstancePopup.qml</file>
         <file>qml/popup/CreateCharacteristicPopup.qml</file>
         <file>qml/subject/Characteristic.qml</file>
         <file>qml/subject/CharacteristicValueEditor.qml</file>

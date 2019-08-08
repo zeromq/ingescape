@@ -472,17 +472,23 @@ AssessmentsPopupBase {
                             topMargin: 20
                             left: parent.left
                             right: parent.right
-                            rightMargin: -17
+                            rightMargin: -scrollBarSize - verticalScrollbarMargin
                             bottom: parent.bottom
                         }
 
-                        style: IngeScapeAssessmentsScrollViewStyle {}
+                        property int scrollBarSize: 11
+                        property int verticalScrollbarMargin: 3
+
+                        style: IngeScapeAssessmentsScrollViewStyle {
+                            scrollBarSize: enumValueScrollView.scrollBarSize
+                            verticalScrollbarMargin: enumValueScrollView.verticalScrollbarMargin
+                        }
 
                         // Prevent drag overshoot on Windows
                         flickableItem.boundsBehavior: Flickable.OvershootBounds
 
                         contentItem: Column {
-                            width: enumValueScrollView.width - 17
+                            width: enumValueScrollView.width - enumValueScrollView.scrollBarSize - enumValueScrollView.verticalScrollbarMargin
                             height: childrenRect.height
                             spacing: 12
 

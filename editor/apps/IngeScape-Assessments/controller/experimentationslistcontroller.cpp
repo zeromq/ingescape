@@ -85,8 +85,8 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
                         ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentationsGroupName);
                         if (experimentationsGroup == nullptr)
                         {
-                            // FIXME TODO: create the group but not create the expe, just add
-                            //createNewExperimentationInNewGroup(experimentationName, experimentationsGroupName);
+                            // Create the ExperimentationGroupVM
+                            experimentationsGroup = _createNewExperimentationGroup(experimentationsGroupName);
                         }
 
                         if (experimentationsGroup != nullptr)
@@ -141,6 +141,7 @@ ExperimentationsListController::~ExperimentationsListController()
  * @param experimentationName
  * @param newExperimentationsGroupName
  */
+
 void ExperimentationsListController::createNewExperimentationInNewGroup(QString experimentationName, QString newExperimentationsGroupName)
 {
     if (!experimentationName.isEmpty() && !newExperimentationsGroupName.isEmpty())
@@ -149,12 +150,11 @@ void ExperimentationsListController::createNewExperimentationInNewGroup(QString 
         if (experimentationsGroup == nullptr)
         {
             // Create a new experimentations group
-            experimentationsGroup = new ExperimentationsGroupVM(newExperimentationsGroupName, nullptr);
+            experimentationsGroup = _createNewExperimentationGroup(newExperimentationsGroupName);
+        }
 
-            _allExperimentationsGroups.append(experimentationsGroup);
-
-            _hashFromNameToExperimentationsGroup.insert(newExperimentationsGroupName, experimentationsGroup);
-
+        if (experimentationsGroup != nullptr)
+        {
             // Create a new experimentation in this new group
             createNewExperimentationInGroup(experimentationName, experimentationsGroup);
         }
@@ -265,4 +265,16 @@ void ExperimentationsListController::deleteExperimentationOfGroup(Experimentatio
 ExperimentationsGroupVM* ExperimentationsListController::_getExperimentationsGroupFromName(QString experimentationsGroupName)
 {
     return _hashFromNameToExperimentationsGroup.value(experimentationsGroupName, nullptr);
+}
+
+
+ExperimentationsGroupVM* ExperimentationsListController::_createNewExperimentationGroup(const QString& newExperimentationsGroupName)
+{
+    ExperimentationsGroupVM* expeGroupVM = new ExperimentationsGroupVM(newExperimentationsGroupName, nullptr);
+    if (expeGroupVM != nullptr)
+    {
+        _allExperimentationsGroups.append(expeGroupVM);
+        _hashFromNameToExperimentationsGroup.insert(newExperimentationsGroupName, expeGroupVM);
+    }
+    return expeGroupVM;
 }

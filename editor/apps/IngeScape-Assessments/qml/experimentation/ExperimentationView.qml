@@ -478,7 +478,7 @@ Item {
 
                 onClicked: {
                     // Open the popup
-                    createRecordPopup.open();
+                    createTaskInstancePopup.open();
                 }
 
                 style: IngeScapeAssessmentsButtonStyle {
@@ -616,17 +616,23 @@ Item {
                     id: taskInstanceScrollView
                     anchors {
                         fill: parent
-                        rightMargin: -17
+                        rightMargin: -taskInstanceScrollView.scrollBarSize -taskInstanceScrollView.verticalScrollbarMargin
                     }
 
-                    style: IngeScapeAssessmentsScrollViewStyle {}
+                    property int scrollBarSize: 11
+                    property int verticalScrollbarMargin: 3
+
+                    style: IngeScapeAssessmentsScrollViewStyle {
+                        scrollBarSize: taskInstanceScrollView.scrollBarSize
+                        verticalScrollbarMargin: taskInstanceScrollView.verticalScrollbarMargin
+                    }
 
                     // Prevent drag overshoot on Windows
                     flickableItem.boundsBehavior: Flickable.OvershootBounds
 
                     Column {
                         id: taskInstanceColumn
-                        width: taskInstanceScrollView.width - 17
+                        width: taskInstanceScrollView.width - (taskInstanceScrollView.scrollBarSize + taskInstanceScrollView.verticalScrollbarMargin)
                         height: childrenRect.height
                         spacing: 0
 
@@ -686,12 +692,10 @@ Item {
         //
         // Create Experimentation Popup
         //
-        Popup.CreateRecordPopup {
-            id: createRecordPopup
+        Popup.CreateTaskInstancePopup {
+            id: createTaskInstancePopup
 
-            //anchors.centerIn: parent
-
-            controller: rootItem.controller
+            experimentationController: rootItem.controller
             experimentation: rootItem.experimentation
         }
     }
@@ -797,7 +801,7 @@ Item {
         showPopupTitle: false
         anchors.centerIn: parent
 
-        text: taskInstance ? qsTr("Are you sure you want to delete the task instance %1 ?").arg(taskInstance.name) : ""
+        text: qsTr("Are you sure you want to delete the task instance %1 ?").arg(taskInstance ? taskInstance.name : "")
 
         height: 160
         width: 470

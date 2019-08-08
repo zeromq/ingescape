@@ -210,7 +210,7 @@ Item {
         showPopupTitle: false
         anchors.centerIn: parent
 
-        text: rootItem.modelM ? qsTr("Are you sure you want to delete the task %1 ?").arg(rootItem.modelM.name) : ""
+        text: qsTr("Are you sure you want to delete the task %1 ?").arg(rootItem.modelM ? rootItem.modelM.name : "")
 
         height: 160
         width: 470

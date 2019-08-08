@@ -100,6 +100,13 @@ public:
     CassUuid getCassUuid() const { return _cassUuid; }
 
     /**
+     * @brief Set the value of the given independent variable into the QQmlPropertyMap
+     * @param indeVar
+     * @param value
+     */
+    void setIndependentVariableValue(IndependentVariableM* indeVar, const QString& value);
+
+    /**
      * @brief Static factory method to create a task instance from a CassandraDB record
      * @param row
      * @return
