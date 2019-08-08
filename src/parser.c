@@ -24,7 +24,7 @@
 #define STR_PARAMETERS "parameters"
 #define STR_OUTPUTS "outputs"
 #define STR_INPUTS "inputs"
-#define STR_TOKENS "tokens"
+#define STR_CALLS "calls"
 #define STR_ARGUMENTS "arguments"
 #define STR_REPLY "reply"
 #define STR_CATEGORIES "categories"
@@ -209,9 +209,9 @@ static void json_add_iops (igsyajl_val node, const char** path, iop_t type,
 }
 
 ////////////////////////////////////////
-// tokens parsing
+// calls parsing
 
-static void json_parse_token_arguments (igs_token_t *token, igsyajl_val arguments){
+static void json_parse_call_arguments (igs_call_t *call, igsyajl_val arguments){
     if (IGSYAJL_IS_ARRAY(arguments)){
         size_t nbArgs = arguments->u.array.len;
         size_t i = 0;
@@ -246,13 +246,13 @@ static void json_parse_token_arguments (igs_token_t *token, igsyajl_val argument
                         }
                     }
                     if (spaceInName){
-                        igs_warn("Spaces are not allowed in token argument name: %s has been renamed to %s", name, n);
+                        igs_warn("Spaces are not allowed in call argument name: %s has been renamed to %s", name, n);
                     }
                     if (valType != IGS_UNKNOWN_T){
-                        igs_tokenArgument_t *tokenArg = calloc(1, sizeof(igs_tokenArgument_t));
-                        tokenArg->name = n;
-                        tokenArg->type = valType;
-                        LL_APPEND(token->arguments, tokenArg);
+                        igs_callArgument_t *callArg = calloc(1, sizeof(igs_callArgument_t));
+                        callArg->name = n;
+                        callArg->type = valType;
+                        LL_APPEND(call->arguments, callArg);
                     }else{
                         free(n);
                     }
@@ -266,8 +266,8 @@ static void json_parse_token_arguments (igs_token_t *token, igsyajl_val argument
     }
 }
 
-//parse a token and add it to the corresponding hash table
-static void json_add_token_to_hash (igs_token_t **hasht, igsyajl_val obj){
+//parse a call and add it to the corresponding hash table
+static void json_add_call_to_hash (igs_call_t **hasht, igsyajl_val obj){
     
     const char *name = NULL;
     const char *description = NULL;
@@ -303,32 +303,32 @@ static void json_add_token_to_hash (igs_token_t **hasht, igsyajl_val obj){
             }
         }
         if (spaceInName){
-            igs_warn("Spaces are not allowed in token name: %s has been renamed to %s", name, n);
+            igs_warn("Spaces are not allowed in call name: %s has been renamed to %s", name, n);
         }
     }else{
-        igs_warn("parsed token with NULL name");
+        igs_warn("parsed call with NULL name");
     }
     
-    igs_token_t *token = NULL;
-    HASH_FIND_STR(*hasht, n, token);
-    if (token == NULL){
-        token = calloc(1, sizeof(igs_token_t));
-        token->name = n;
+    igs_call_t *call = NULL;
+    HASH_FIND_STR(*hasht, n, call);
+    if (call == NULL){
+        call = calloc(1, sizeof(igs_call_t));
+        call->name = n;
         if (description != NULL)
-            token->description = strndup(description, MAX_DESCRIPTION_LENGTH);
+            call->description = strndup(description, MAX_DESCRIPTION_LENGTH);
         if (arguments != NULL){
-            json_parse_token_arguments(token, arguments);
+            json_parse_call_arguments(call, arguments);
         }
         //TODO: parse reply
         IGS_UNUSED(reply)
-        HASH_ADD_STR(*hasht, name, token);
+        HASH_ADD_STR(*hasht, name, call);
     }else{
         igs_warn("%s already exists", name);
     }
 }
 
-//parse a tab of tokens and add them into the corresponding hash table
-static void json_add_tokens (igsyajl_val node, const char **path, igs_token_t **hasht){
+//parse a tab of calls and add them into the corresponding hash table
+static void json_add_calls (igsyajl_val node, const char **path, igs_call_t **hasht){
     igsyajl_val v;
     v = igsyajl_tree_get(node, path, igsyajl_t_array);
     
@@ -337,7 +337,7 @@ static void json_add_tokens (igsyajl_val node, const char **path, igs_token_t **
         for (i = 0; i < v->u.array.len; i++ ){
             igsyajl_val obj = v->u.array.values[i];
             if( obj && IGSYAJL_IS_OBJECT(obj))
-                json_add_token_to_hash (hasht, obj);
+                json_add_call_to_hash (hasht, obj);
         }
     }
 }
@@ -388,7 +388,7 @@ static char* json_fetch (const char* path) {
 }
 
 // convert JSON string into DOM
-static int json_tokenize (const char* json_str, igsyajl_val *node) {
+static int json_callize (const char* json_str, igsyajl_val *node) {
 
     char errbuf[BUFSIZ] = "unknown error";
     /* we have the whole config file in memory.  let's parse it ... */
@@ -437,8 +437,8 @@ static definition* json_parse_definition (igsyajl_val node) {
     path[1] = STR_PARAMETERS;
     json_add_iops (node, path, IGS_PARAMETER_T, &def->params_table);
     
-    path[1] = STR_TOKENS;
-    json_add_tokens (node, path, &def->tokens_table);
+    path[1] = STR_CALLS;
+    json_add_calls (node, path, &def->calls_table);
 
 //    path[1] = STR_CATEGORIES;
 //    v = igsyajl_tree_get(node, path, igsyajl_t_array);
@@ -654,26 +654,26 @@ static mapping_t* json_parse_mapping (igsyajl_val node) {
 // Dumping functions
 
 
-// convert a token into json string
-static void json_dump_token (igsyajl_gen *g, igs_token_t *token) {
+// convert a call into json string
+static void json_dump_call (igsyajl_gen *g, igs_call_t *call) {
     
     igsyajl_gen_map_open(*g);
     
     igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-    igsyajl_gen_string(*g, (const unsigned char *) token->name, strlen (token->name));
+    igsyajl_gen_string(*g, (const unsigned char *) call->name, strlen (call->name));
     
-    if (token->description != NULL){
+    if (call->description != NULL){
         igsyajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
-        igsyajl_gen_string(*g, (const unsigned char *) token->description, strlen (token->description));
+        igsyajl_gen_string(*g, (const unsigned char *) call->description, strlen (call->description));
     }
     
-    igs_tokenArgument_t *arg = NULL;
+    igs_callArgument_t *arg = NULL;
     int nbArgs = 0;
-    DL_COUNT(token->arguments, arg, nbArgs);
-    if ((token->arguments != NULL) && (nbArgs > 0)){
+    DL_COUNT(call->arguments, arg, nbArgs);
+    if ((call->arguments != NULL) && (nbArgs > 0)){
         igsyajl_gen_string(*g, (const unsigned char *) STR_ARGUMENTS, strlen(STR_ARGUMENTS));
         igsyajl_gen_array_open(*g);
-        DL_FOREACH(token->arguments, arg){
+        DL_FOREACH(call->arguments, arg){
             igsyajl_gen_map_open(*g);
             igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
             igsyajl_gen_string(*g, (const unsigned char *) arg->name, strlen(arg->name));
@@ -804,13 +804,13 @@ static void json_dump_definition (igsyajl_gen *g, definition* def) {
         igsyajl_gen_array_close(*g);
     }
     
-    hashCount = HASH_COUNT(def->tokens_table);
+    hashCount = HASH_COUNT(def->calls_table);
     if (hashCount) {
-        igsyajl_gen_string(*g, (const unsigned char *) STR_TOKENS, strlen(STR_TOKENS));
+        igsyajl_gen_string(*g, (const unsigned char *) STR_CALLS, strlen(STR_CALLS));
         igsyajl_gen_array_open(*g);
-        igs_token_t *t = NULL, *tmp = NULL;
-        HASH_ITER(hh, def->tokens_table, t, tmp){
-            json_dump_token (g, t);
+        igs_call_t *t = NULL, *tmp = NULL;
+        HASH_ITER(hh, def->calls_table, t, tmp){
+            json_dump_call (g, t);
         }
         igsyajl_gen_array_close(*g);
     }
@@ -940,7 +940,7 @@ definition* parser_loadDefinition (const char* json_str) {
     definition *def = NULL;
     igsyajl_val node;
     
-    json_tokenize(json_str, &node);
+    json_callize(json_str, &node);
     def = json_parse_definition(node);
     
     igsyajl_tree_free(node);
@@ -1070,7 +1070,7 @@ mapping_t* parser_LoadMap(const char* json_str){
     mapping_t *mapp = NULL;
     igsyajl_val node;
     
-    json_tokenize(json_str, &node);
+    json_callize(json_str, &node);
     mapp = json_parse_mapping (node);
     
     //Copy the mapp structure to the global variable map

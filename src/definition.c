@@ -180,10 +180,10 @@ void definition_freeDefinition (definition* def) {
         current_iop = NULL;
     }
     model_readWriteUnlock();
-    igs_token_t *token, *tmpToken;
-    HASH_ITER(hh, def->tokens_table, token, tmpToken) {
-        HASH_DEL(def->tokens_table,token);
-        token_freeToken(token);
+    igs_call_t *call, *tmpCall;
+    HASH_ITER(hh, def->calls_table, call, tmpCall) {
+        HASH_DEL(def->calls_table,call);
+        call_freeCall(call);
     }
     free(def);
 }
@@ -219,7 +219,7 @@ int igs_clearDefinition(){
     igs_internal_definition->params_table = NULL;
     igs_internal_definition->inputs_table = NULL;
     igs_internal_definition->outputs_table = NULL;
-    igs_internal_definition->tokens_table = NULL;
+    igs_internal_definition->calls_table = NULL;
     network_needToSendDefinitionUpdate = true;
     return 1;
 }

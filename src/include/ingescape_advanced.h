@@ -91,17 +91,17 @@ PUBLIC void igs_busAddServiceDescription(const char *key, const char *value);
 PUBLIC void igs_busRemoveServiceDescription(const char *key);
 
 //////////////////////////////////////////////////
-//Tokens Model : create, remove, call, react
+//Calls Model : create, remove, call, react
 /*NOTES:
- - one and only one mandatory callback per token, set using igs_handleToken : generates warning if cb missing when loading definition or receiving token
- - one optional reply per token
- - reply shall be sent in callabck, using igs_sendToken with sender's UUID or name
- - token names shall be unique for a given agent
+ - one and only one mandatory callback per call, set using igs_handleCall : generates warning if cb missing when loading definition or receiving call
+ - one optional reply per call
+ - reply shall be sent in callabck, using igs_sendCall with sender's UUID or name
+ - call names shall be unique for a given agent
  */
 
-//SEND TOKENS to other agents
-//token arguments are provided as a chained list
-typedef struct igs_tokenArgument{
+//SEND CALLS to other agents
+//call arguments are provided as a chained list
+typedef struct igs_callArgument{
     char *name;
     iopType_t type;
     union{
@@ -112,67 +112,67 @@ typedef struct igs_tokenArgument{
         void *data;
     };
     size_t size;
-    struct igs_tokenArgument *next;
-} igs_tokenArgument_t;
+    struct igs_callArgument *next;
+} igs_callArgument_t;
 
 //Arguments management
 //arguments list shall be initialized to NULL and filled by calling igs_add*ToArgumentsList
 //Example:
-// igs_tokenArgument_t *list = NULL;
+// igs_callArgument_t *list = NULL;
 // igs_addIntToArgumentsList(&list, 10);
-PUBLIC void igs_addIntToArgumentsList(igs_tokenArgument_t **list, int value);
-PUBLIC void igs_addBoolToArgumentsList(igs_tokenArgument_t **list, bool value);
-PUBLIC void igs_addDoubleToArgumentsList(igs_tokenArgument_t **list, double value);
-PUBLIC void igs_addStringToArgumentsList(igs_tokenArgument_t **list, const char *value);
-PUBLIC void igs_addDataToArgumentsList(igs_tokenArgument_t **list, void *value, size_t size);
-PUBLIC void igs_destroyArgumentsList(igs_tokenArgument_t **list);
-PUBLIC igs_tokenArgument_t *igs_cloneArgumentsList(igs_tokenArgument_t *list);
+PUBLIC void igs_addIntToArgumentsList(igs_callArgument_t **list, int value);
+PUBLIC void igs_addBoolToArgumentsList(igs_callArgument_t **list, bool value);
+PUBLIC void igs_addDoubleToArgumentsList(igs_callArgument_t **list, double value);
+PUBLIC void igs_addStringToArgumentsList(igs_callArgument_t **list, const char *value);
+PUBLIC void igs_addDataToArgumentsList(igs_callArgument_t **list, void *value, size_t size);
+PUBLIC void igs_destroyArgumentsList(igs_callArgument_t **list);
+PUBLIC igs_callArgument_t *igs_cloneArgumentsList(igs_callArgument_t *list);
 
-//send a token to another agent
-//requires to pass agent name or UUID, token name and a list of arguments
+//send a call to another agent
+//requires to pass agent name or UUID, call name and a list of arguments
 //passed arguments list will be deallocated and destroyed
-PUBLIC int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenArgument_t **list);
+PUBLIC int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
 
 
-//CREATE TOKENS for our agent
-//callback model to handle tokens received by our agent
-typedef void (*igs_tokenCallback)(const char *senderAgentName, const char *senderAgentUUID,
-                                  const char *tokenName, igs_tokenArgument_t *firstArgument, size_t nbArgs,
-                                  void* myData);
+//CREATE CALLS for our agent
+//callback model to handle calls received by our agent
+typedef void (*igs_callFunction)(const char *senderAgentName, const char *senderAgentUUID,
+                                 const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
+                                 void* myData);
 
 
-//manage tokens supported by our agent
-//Tokens can be created either by code or by loading a definition. The function below will
-//create a token if it does not exist or will attach callback and data if they are
-//stil undefined. Warning: only one callback can be attached to a token (further attempts
+//manage calls supported by our agent
+//Calls can be created either by code or by loading a definition. The function below will
+//create a call if it does not exist or will attach callback and data if they are
+//stil undefined. Warning: only one callback can be attached to a call (further attempts
 //will be ignored and signaled by an error log).
-PUBLIC int igs_initToken(const char *name, igs_tokenCallback cb, void *myData);
-PUBLIC int igs_removeToken(const char *name);
-PUBLIC int igs_addArgumentToToken(const char *tokenName, const char *argName, iopType_t type);
-PUBLIC int igs_removeArgumentFromToken(const char *tokenName, const char *argName); //removes first occurence with this name
+PUBLIC int igs_initCall(const char *name, igs_callFunction cb, void *myData);
+PUBLIC int igs_removeCall(const char *name);
+PUBLIC int igs_addArgumentToCall(const char *callName, const char *argName, iopType_t type);
+PUBLIC int igs_removeArgumentFromCall(const char *callName, const char *argName); //removes first occurence with this name
 
 
 //manage optional reply
-//NB: a reply can be seen as a subtoken used to answer to sender upon token reception.
-//PUBLIC int igs_addReplyToToken(const char *tokenName, const char *replyName);
-//PUBLIC int igs_addArgumentToReplyForToken(const char *tokeName, const char *argName, iopType_t type);
-//PUBLIC int igs_removeArgumentFromReplyForToken(const char *tokeName, const char *argName);
-//PUBLIC int igs_removeReplyFromToken(const char *tokenName); //reply elements will be destroyed as well
+//NB: a reply can be seen as a subcall used to answer to sender upon call reception.
+//PUBLIC int igs_addReplyToCall(const char *callName, const char *replyName);
+//PUBLIC int igs_addArgumentToReplyForCall(const char *callName, const char *argName, iopType_t type);
+//PUBLIC int igs_removeArgumentFromReplyForCall(const char *callName, const char *argName);
+//PUBLIC int igs_removeReplyFromCall(const char *callName); //reply elements will be destroyed as well
 
-//introspection for tokens, arguments and replies
-PUBLIC size_t igs_getNumberOfTokens(void);
-PUBLIC bool igs_checkTokenExistence(const char *name);
-PUBLIC char** igs_getTokensList(size_t *nbOfElements); //returned char** shall be freed by caller
-PUBLIC void igs_freeTokensList(char **list, size_t nbOfTokens);
+//introspection for calls, arguments and replies
+PUBLIC size_t igs_getNumberOfCalls(void);
+PUBLIC bool igs_checkCallExistence(const char *name);
+PUBLIC char** igs_getCallsList(size_t *nbOfElements); //returned char** shall be freed by caller
+PUBLIC void igs_freeCallsList(char **list, size_t nbOfCalls);
 
-PUBLIC igs_tokenArgument_t* igs_getFirstArgumentForToken(const char *tokenName);
-PUBLIC size_t igs_getNumberOfArgumentsForToken(const char *tokenName);
-PUBLIC bool igs_checkTokenArgumentExistence(const char *tokenName, const char *argName);
-//PUBLIC igs_tokenArgument_t* igs_getFirstArgumentForReplyInToken(const char *tokenName);
-//PUBLIC size_t igs_getNumberOfArgumentsForReplyInToken(const char *tokenName);
-//PUBLIC char* igs_getReplyNameInToken(const char *tokenName); //returned char* must be freed by caller, NULL if no reply
-//PUBLIC bool igs_isReplyAddedForToken(const char *name);
-//PUBLIC bool igs_checkTokenReplyArgumentExistence(const char *tokenName, const char *argName);
+PUBLIC igs_callArgument_t* igs_getFirstArgumentForCall(const char *callName);
+PUBLIC size_t igs_getNumberOfArgumentsForCall(const char *callName);
+PUBLIC bool igs_checkCallArgumentExistence(const char *callName, const char *argName);
+//PUBLIC igs_callArgument_t* igs_getFirstArgumentForReplyInCall(const char *callName);
+//PUBLIC size_t igs_getNumberOfArgumentsForReplyInCall(const char *callName);
+//PUBLIC char* igs_getReplyNameInCall(const char *callName); //returned char* must be freed by caller, NULL if no reply
+//PUBLIC bool igs_isReplyAddedForCall(const char *name);
+//PUBLIC bool igs_checkCallReplyArgumentExistence(const char *callName, const char *argName);
 
 //////////////////////////////////////////////////
 //JSON facilities

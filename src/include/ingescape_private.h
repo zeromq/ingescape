@@ -84,14 +84,14 @@ typedef struct agent_iop {
     UT_hash_handle hh;         /* makes this structure hashable */
 } agent_iop_t;
 
-typedef struct token{
+typedef struct call{
     char * name;
     char * description;
-    igs_tokenCallback cb;
+    igs_callFunction cb;
     void *cbData;
-    igs_tokenArgument_t *arguments;
+    igs_callArgument_t *arguments;
     UT_hash_handle hh;
-} igs_token_t;
+} igs_call_t;
 
 /*
  * Define the structure DEFINITION :
@@ -110,7 +110,7 @@ typedef struct definition {
     agent_iop_t* params_table;
     agent_iop_t* inputs_table;
     agent_iop_t* outputs_table;
-    igs_token_t *tokens_table;
+    igs_call_t *calls_table;
     UT_hash_handle hh;
 } definition;
 
@@ -287,10 +287,10 @@ extern char admin_logFile[4096];
 //bus
 extern serviceHeader_t *serviceHeaders;
 
-//token
-void token_freeToken(igs_token_t *t);
-bool token_addValuesToArgumentsFromMessage(const char *name, igs_tokenArgument_t *arg, zmsg_t *msg);
-int token_freeValuesInArguments(igs_tokenArgument_t *arg);
+//call
+void call_freeCall(igs_call_t *t);
+bool call_addValuesToArgumentsFromMessage(const char *name, igs_callArgument_t *arg, zmsg_t *msg);
+int call_freeValuesInArguments(igs_callArgument_t *arg);
 
 //license
 #define ENABLE_LICENSE_ENFORCEMENT 1
