@@ -260,7 +260,7 @@ TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QStrin
                         qInfo() << "New independent value for task_instance inserted into the DB";
                     }
                     else {
-                        qCritical() << "Could not insert the new independent value for task_instance into the DB:" << cass_error_desc(innerCassError);
+                        qCritical() << "Could not insert the new independent value for task_instance" << taskInstanceName << "into the DB:" << cass_error_desc(innerCassError);
                     }
 
                     cass_statement_free(innerCassStatement);
@@ -587,6 +587,9 @@ void ExperimentationController::_retrieveTaskInstancesForExperimentation(Experim
                     {
                         // Add the task instance to the experimentation
                         experimentation->addTaskInstance(taskInstance);
+
+                        // Retrieve independent variables values for the task instance
+                        _retrieveIndependentVariableValuesForTaskInstance(taskInstance);
                     }
                 }
 
@@ -603,7 +606,7 @@ void ExperimentationController::_retrieveTaskInstancesForExperimentation(Experim
 }
 
 /**
- * @brief Retrieve all characteristic values from the Cassandra DB for each given subjects.
+ * @brief Retrieve all characteristic values from the Cassandra DB for each subjects in the given experimentation
  * The subjects will be updated by this method
  * @param experimentation
  */
@@ -688,5 +691,70 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
                 cass_statement_free(cassStatement);
             }
         }
+    }
+}
+
+/**
+ * @brief Retrieve all independent variable values Cassandra DB for the given task instance.
+ * The task instance will be updated by this method
+ * @param taskInstance
+ */
+void ExperimentationController::_retrieveIndependentVariableValuesForTaskInstance(TaskInstanceM* taskInstance)
+{
+    if ((taskInstance != nullptr) && (taskInstance->task() != nullptr)) {
+
+        QString queryStr = "SELECT * FROM " + IndependentVariableValueM::table + " WHERE id_experimentation = ? AND id_task_instance = ?;";
+        // Creates the new query statement
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
+        cass_statement_bind_uuid(cassStatement, 0, taskInstance->task()->getExperimentationCassUuid());
+        cass_statement_bind_uuid(cassStatement, 1, taskInstance->getCassUuid());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qDebug() << "Get all independent variables values for task instance" << taskInstance->name() << "succeeded";
+
+            // Retrieve result set and iterate over the rows
+            const CassResult* cassResult = cass_future_get_result(cassFuture);
+
+            if (cassResult != nullptr)
+            {
+                CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+
+                while(cass_iterator_next(cassIterator))
+                {
+                    const CassRow* row = cass_iterator_get_row(cassIterator);
+
+                    // Get independent variable uuid
+                    CassUuid indeVarUuid;
+                    cass_value_get_uuid(cass_row_get_column_by_name(row, "id_independent_var"), &indeVarUuid);
+                    char chrIndeVarUid[CASS_UUID_STRING_LENGTH];
+                    cass_uuid_string(indeVarUuid, chrIndeVarUid);
+
+                    // Get value as a string
+                    const char *chrValueString = "";
+                    size_t valueStringLength = 0;
+                    cass_value_get_string(cass_row_get_column_by_name(row, "independent_var_value"), &chrValueString, &valueStringLength);
+                    QString valueString = QString::fromUtf8(chrValueString, static_cast<int>(valueStringLength));
+
+                    // Get corresponding independent variable
+                    IndependentVariableM* indeVar = taskInstance->task()->getIndependentVariableFromUuid(indeVarUuid);
+                    if (indeVar != nullptr)
+                    {
+                        taskInstance->setIndependentVariableValue(indeVar, valueString);
+                    }
+                }
+
+                cass_iterator_free(cassIterator);
+            }
+        }
+        else {
+            qCritical() << "Could not get all independent variable values for the task instance" << taskInstance->name() << "from the database:" << cass_error_desc(cassError);
+        }
+
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
     }
 }

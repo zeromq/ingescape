@@ -107,6 +107,22 @@ TaskInstanceM::~TaskInstanceM()
     }
 }
 
+/**
+ * @brief Set the value of the given independent variable into the QQmlPropertyMap
+ * @param indeVar
+ * @param value
+ */
+void TaskInstanceM::setIndependentVariableValue(IndependentVariableM* indeVar, const QString& value)
+{
+    if (indeVar != nullptr)
+    {
+        _mapIndependentVariableValues->insert(indeVar->name(), value);
+
+        // Call SLOT manually since valueChanged() signal is only emitted from QML
+        _onIndependentVariableValueChanged(indeVar->name(), value);
+    }
+}
+
 
 /**
  * @brief Static factory method to create a task instance from a CassandraDB record
@@ -159,16 +175,32 @@ void TaskInstanceM::deleteTaskInstanceFromCassandra(const TaskInstanceM& taskIns
 {
     if ((taskInstance.subject() != nullptr) && (taskInstance.task() != nullptr))
     {
-        //TODO Clean-up associations if any ?
+        QString queryStr = "DELETE FROM " + IndependentVariableValueM::table + " WHERE id_experimentation = ? AND id_task_instance = ?;";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
+        cass_statement_bind_uuid(cassStatement, 0, taskInstance.subject()->getExperimentationCassUuid());
+        cass_statement_bind_uuid(cassStatement, 1, taskInstance.getCassUuid());
 
-        // Delete actual experimentation,
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "IndependentVar values for task instance" << taskInstance.name() << "has been successfully deleted from the DB";
+        }
+        else {
+            qCritical() << "Could not delete the independentVar values for task instance" << taskInstance.name() << "from the DB:" << cass_error_desc(cassError);
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
 
         //FIXME Hard coded record UUID for test purposes
         CassUuid recordUuid;
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
-        QString queryStr = "DELETE FROM " + TaskInstanceM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 5);
+        queryStr = "DELETE FROM " + TaskInstanceM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;";
+        cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 5);
         cass_statement_bind_uuid(cassStatement, 0, taskInstance.subject()->getExperimentationCassUuid());
         cass_statement_bind_uuid(cassStatement, 1, taskInstance.subject()->getCassUuid());
         cass_statement_bind_uuid(cassStatement, 2, taskInstance.task()->getCassUuid());
@@ -176,8 +208,8 @@ void TaskInstanceM::deleteTaskInstanceFromCassandra(const TaskInstanceM& taskIns
         cass_statement_bind_uuid(cassStatement, 4, taskInstance.getCassUuid());
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
+        cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
             qInfo() << "Task instance" << taskInstance.name() << "has been successfully deleted from the DB";

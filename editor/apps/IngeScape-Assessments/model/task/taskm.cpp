@@ -124,6 +124,29 @@ void TaskM::removeIndependentVariable(IndependentVariableM* independentVariable)
 
 
 /**
+ * @brief Return the independent variable instance corresponding to the given UUID
+ * @param cassUuid
+ * @return
+ */
+IndependentVariableM* TaskM::getIndependentVariableFromUuid(const CassUuid& cassUuid) const
+{
+    IndependentVariableM* indeVar = nullptr;
+    auto indeVarIt = std::find_if(_independentVariables.begin(),
+                                  _independentVariables.end(),
+                                  [&cassUuid](IndependentVariableM* indeVar){
+            return AssessmentsModelManager::cassUuidToQString(cassUuid) == AssessmentsModelManager::cassUuidToQString(indeVar->getCassUuid());
+    });
+
+    if (indeVarIt != _independentVariables.end())
+    {
+        indeVar = *indeVarIt;
+    }
+
+    return indeVar;
+}
+
+
+/**
  * @brief Add a Dependent Variable to our task
  * @param dependentVariable
  */

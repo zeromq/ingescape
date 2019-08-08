@@ -105,6 +105,14 @@ public:
 
 
     /**
+     * @brief Return the independent variable instance corresponding to the given UUID
+     * @param cassUuid
+     * @return
+     */
+    IndependentVariableM* getIndependentVariableFromUuid(const CassUuid& cassUuid) const;
+
+
+    /**
      * @brief Add a Dependent Variable to our task
      * @param dependentVariable
      */
