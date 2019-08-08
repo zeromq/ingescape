@@ -187,6 +187,7 @@ Item {
 
         TaskInstance.TaskInstanceView {
             taskInstanceController: IngeScapeAssessmentsC.experimentationC.taskInstanceC
+            experimentationController: IngeScapeAssessmentsC.experimentationC
 
             //
             // Slots

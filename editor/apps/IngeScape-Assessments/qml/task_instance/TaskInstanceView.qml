@@ -20,15 +20,9 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
-//import "theme" as Theme
-//import "popup" as Popup
-
 
 Item {
     id: rootItem
-
-    //anchors.fill: parent
-
 
     //--------------------------------------------------------
     //
@@ -40,7 +34,11 @@ Item {
 
     property TaskInstanceController taskInstanceController: null;
 
+    property ExperimentationController experimentationController: null;
+
     property TaskInstanceM taskInstance: taskInstanceController ? taskInstanceController.currentTaskInstance : null;
+
+    property bool isEditingName: false
 
 
 
@@ -68,21 +66,50 @@ Item {
     //
     //--------------------------------------------------------
 
-    Row {
-        id: breadcrumb
+    Rectangle {
+        id: background
+
+        anchors.fill: parent
+
+        color: IngeScapeTheme.veryLightGreyColor
+    }
+
+    Item {
+        id: headerItem
 
         anchors {
-            left: parent.left
             top: parent.top
+            left: parent.left
+            right: parent.right
         }
-        height: 30
+
+
+        Rectangle {
+            id: headerBackground
+
+            anchors.fill: parent
+
+            color: IngeScapeTheme.whiteColor
+        }
+
+        height: 110
 
         Button {
             id: btnGoBackToHome
 
-            height: parent.height
+            anchors {
+                left: parent.left
+                leftMargin: 26
+                top: parent.top
+                topMargin: 20
+            }
 
-            text: "HOME"
+            height: 50
+            width: 50
+
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "home-button"
+            }
 
             onClicked: {
                 console.log("QML: Go back to 'Home'");
@@ -92,98 +119,145 @@ Item {
             }
         }
 
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-
-            text: ">"
-            verticalAlignment: Text.AlignVCenter
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Bold
-                pixelSize: 18
-            }
-        }
-
-        Button {
-            id: btnGoBackToExperimentation
-
-            height: parent.height
-
-            text: "EXPE"
-
-            onClicked: {
-                console.log("QML: Go back to 'Experimentation'");
-
-                // Emit the signal the "Go Back To Experimentation"
-                rootItem.goBackToExperimentation();
-            }
-        }
-    }
-
-    Column {
-        id: header
-
-        anchors {
-            top: parent.top
-            topMargin: 10
-            horizontalCenter: parent.horizontalCenter
-        }
-        spacing: 10
-
-        Text {
-            //id: title
-
+        MouseArea {
+            id: taskInstanceMouseArea
             anchors {
-                horizontalCenter: parent.horizontalCenter
+                fill: taskInstanceNameEditBackground
+            }
+
+            hoverEnabled: true
+        }
+
+        Rectangle {
+            id: taskInstanceNameEditBackground
+            anchors {
+                left: taskInstanceName.left
+                leftMargin: -10
+                verticalCenter: taskInstanceName.verticalCenter
+            }
+
+            radius: 5
+
+            width: Math.max(taskInstanceName.width + 76, 450)
+            height: 40
+
+            color: IngeScapeTheme.veryLightGreyColor
+
+            opacity: (taskInstanceMouseArea.containsMouse || editButton.containsMouse || rootItem.isEditingName) ? 1 : 0
+            enabled: opacity > 0
+
+            Button {
+                id: editButton
+
+                anchors {
+                    right: parent.right
+                    rightMargin: 5
+                    verticalCenter: parent.verticalCenter
+                }
+
+                property bool containsMouse: __behavior.containsMouse
+
+                width: 42
+                height: 30
+
+                style: IngeScapeAssessmentsSvgButtonStyle {
+                    releasedID: "edit"
+                    disabledID: releasedID
+                }
+
+                onClicked: {
+                    rootItem.isEditingName = !rootItem.isEditingName
+                    if (rootItem.isEditingName)
+                    {
+                        // Entering edition mode
+                        taskInstanceNameEditionTextField.text = taskInstanceName.text;
+                    }
+                    else
+                    {
+                        // Exiting edition mode
+                        if (rootItem.experimentation)
+                        {
+                            taskInstanceName.text = taskInstanceNameEditionTextField.text
+                            rootItem.taskInstance.name = taskInstanceName.text
+                        }
+                    }
+                }
+            }
+        }
+
+        Text {
+            id: taskInstanceName
+            anchors {
+                top: parent.top
+                topMargin: 30
+                left: parent.left
+                leftMargin: 92
             }
 
             text: rootItem.taskInstance ? rootItem.taskInstance.name : ""
 
-            color: IngeScapeTheme.whiteColor
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignLeft
+
+            visible: !rootItem.isEditingName
+
+            color: IngeScapeAssessmentsTheme.blueButton
             font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 16
+                family: IngeScapeTheme.labelFontFamily
+                weight: Font.Black
+                pixelSize: 24
+            }
+        }
+
+        TextField {
+            id: taskInstanceNameEditionTextField
+            anchors.fill: taskInstanceName
+
+            visible: rootItem.isEditingName
+            enabled: visible
+
+            style: I2TextFieldStyle {
+                backgroundColor: IngeScapeTheme.whiteColor
+                borderColor: IngeScapeTheme.lightGreyColor
+                borderErrorColor: IngeScapeTheme.redColor
+                radiusTextBox: 5
+                borderWidth: 0
+                borderWidthActive: 1
+                textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                textDisabledColor: IngeScapeTheme.veryLightGreyColor
+
+                padding.left: 10
+                padding.right: 5
+
+                font {
+                    pixelSize: 20
+                    family: IngeScapeTheme.textFontFamily
+                }
             }
         }
 
         Text {
-            //id: title
+            id: expeNameText
 
             anchors {
-                horizontalCenter: parent.horizontalCenter
+                top: taskInstanceName.bottom
+                topMargin: 15
+                left: taskInstanceName.left
             }
 
-            text: rootItem.taskInstance && rootItem.taskInstance.subject ? rootItem.taskInstance.subject.displayedId : ""
+            text: rootItem.experimentationController && rootItem.experimentationController.currentExperimentation ? rootItem.experimentationController.currentExperimentation.name : ""
 
-            color: IngeScapeTheme.whiteColor
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
                 family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 16
-            }
-        }
-
-        Text {
-            //id: title
-
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-            }
-
-            text: rootItem.taskInstance && rootItem.taskInstance.task ? rootItem.taskInstance.task.name : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 16
+                pixelSize: 20
+                bold: true
             }
         }
     }
-
 
     //
     // Actions panel
@@ -193,14 +267,14 @@ Item {
 
         anchors {
             left: parent.left
-            top: header.bottom
+            top: headerItem.bottom
             topMargin: 20
             bottom: timeline.top
             bottomMargin: 5
         }
-        width: parent.width / 4.0
+        width: 319
 
-        color: "transparent"
+        color: IngeScapeTheme.veryDarkGreyColor
         border {
             color: IngeScapeTheme.darkGreyColor
             width: 1
@@ -286,173 +360,224 @@ Item {
     //
     // Comments panel
     //
-    Rectangle {
+    Item {
         id: commentsPanel
 
         anchors {
             left: actionsPanel.right
-            top: header.bottom
-            topMargin: 20
+            leftMargin: 16
+            top: headerItem.bottom
+            topMargin: 16
             bottom: timeline.top
-            bottomMargin: 5
-        }
-        width: parent.width / 4.0
-
-        color: "transparent"
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
+            bottomMargin: 56
         }
 
-        Text {
-            id: titleComments
+        height: 519
+        width: 495
 
+        IngeScapeAssessmentsListHeader {
+            id: commentsHeader
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+
+            Text {
+                anchors {
+                    left: parent.left
+                    leftMargin: 25
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+
+                text: "COMMENTS"
+                verticalAlignment: Text.AlignVCenter
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.labelFontFamily
+                    weight: Font.Black
+                    pixelSize: 20
+                }
+            }
+        }
+
+        Rectangle {
             anchors {
                 left: parent.left
-                leftMargin: 5
-                top: parent.top
-                topMargin: 5
+                right: parent.right
+                top: commentsHeader.bottom
+                bottom: parent.bottom
             }
-            height: 30
-
-            text: qsTr("Comments:")
-
-            verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 18
+
+            TextArea {
+                id: txtComments
+
+                anchors {
+                    fill: parent
+                    margins: 18
+                }
+
+                wrapMode: Text.WordWrap
+
+                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    Nam lobortis augue pellentesque mattis tincidunt. Nunc efficitur faucibus nunc,
+    nec facilisis augue semper vitae.Proin consequat nulla at risus lacinia
+    sollicitudin. Nunc efficitur commodo leo at fringilla. Quisque ullamcorper
+    aliquet nulla, ut molestie ipsum placerat sed. Proin pretium sodales semper.
+    Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis,
+    porttitor tellus nec, ultrices erat. Mauris nibh metus, facilisis et diam
+    quis, posuere faucibus lorem."
+
+                style: I2TextAreaStyle {
+                    backgroundColor: IngeScapeTheme.veryLightGreyColor
+                    borderColor: IngeScapeAssessmentsTheme.blueButton
+                    borderErrorColor: IngeScapeTheme.redColor
+                    radiusTextBox: 5
+                    borderWidth: 0;
+                    borderWidthActive: 2
+                    textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
+                    textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
+
+                    padding.top: 10
+                    padding.bottom: 10
+                    padding.left: 12
+                    padding.right: 12
+
+                    font {
+                        pixelSize: 16
+                        family: IngeScapeTheme.textFontFamily
+                    }
+                }
             }
         }
 
-        TextArea {
-            id: txtComments
-
+        // Bottom shadow
+        Rectangle {
             anchors {
+                top: parent.bottom
                 left: parent.left
-                leftMargin: 5
                 right: parent.right
-                rightMargin: 5
-                top: titleComments.bottom
-                topMargin: 5
-                bottom: parent.bottom
-                bottomMargin: 5
             }
-
-            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam lobortis augue pellentesque mattis tincidunt. Nunc efficitur faucibus nunc, nec facilisis augue semper vitae.
-Proin consequat nulla at risus lacinia sollicitudin. Nunc efficitur commodo leo at fringilla. Quisque ullamcorper aliquet nulla, ut molestie ipsum placerat sed. Proin pretium sodales semper.
-Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, porttitor tellus nec, ultrices erat. Mauris nibh metus, facilisis et diam quis, posuere faucibus lorem."
+            height: 4
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
+                GradientStop { position: 1.0; color: IngeScapeTheme.darkGreyColor; }
+            }
         }
     }
-
 
     //
     // Independent Variable panel
     //
-    Rectangle {
-        id: independentVariablePanel
+    Item {
+        id: indeVarPanel
 
         anchors {
             left: commentsPanel.right
-            top: header.bottom
-            topMargin: 20
+            leftMargin: 38
+            top: headerItem.bottom
+            topMargin: 16
             bottom: timeline.top
-            bottomMargin: 5
-        }
-        width: parent.width / 4.0
-
-        color: "transparent"
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
+            bottomMargin: 56
         }
 
-        Text {
-            id: titleIndependentVariable
+        height: 519
+        width: 495
 
+        IngeScapeAssessmentsListHeader {
+            id: indeVarHeader
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+
+            Text {
+                anchors {
+                    left: parent.left
+                    leftMargin: 25
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+
+                text: "INDEPENDENT VARIABLES"
+                verticalAlignment: Text.AlignVCenter
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.labelFontFamily
+                    weight: Font.Black
+                    pixelSize: 20
+                }
+            }
+        }
+
+        Rectangle {
             anchors {
                 left: parent.left
-                leftMargin: 5
-                top: parent.top
-                topMargin: 5
+                right: parent.right
+                top: indeVarHeader.bottom
+                bottom: parent.bottom
             }
-            height: 30
-
-            text: qsTr("Independent Variable:")
-
-            verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 18
-            }
-        }
-
-        Button {
-            id: btnEditValuesOfIndependentVariable
-
-            anchors {
-                top: parent.top
-                topMargin: 5
-                right: parent.right
-                rightMargin: 5
-            }
-            width: 50
-            height: 30
-
-            checkable: true
-
-            checked: false
-
-            text: checked ? "SAVE" : "EDIT"
-        }
-
-        Column {
-            id: listIndependentVariable
-
-            anchors {
-                left: parent.left
-                leftMargin: 5
-                right: parent.right
-                rightMargin: 5
-                top: titleIndependentVariable.bottom
-                topMargin: 5
-                bottom: parent.bottom
-                bottomMargin: 5
-            }
-
-            spacing: 5
-
-            Repeater {
-
-                model: (rootItem.taskInstance && rootItem.taskInstance.task) ? rootItem.taskInstance.task.independentVariables : null
-
-                delegate: IndependentVariableValueEditor {
-
-                    variable: model ? model.QtObject : null
-
-                    variableValue: (rootItem.taskInstance && rootItem.taskInstance.mapIndependentVariableValues && model) ? rootItem.taskInstance.mapIndependentVariableValues[model.name] : ""
-
-                    isCurrentlyEditing: btnEditValuesOfIndependentVariable.checked
 
 
-                    //
-                    // Slots
-                    //
-                    onIndependentVariableValueUpdated: {
-                        if (rootItem.taskInstance && rootItem.taskInstance.mapIndependentVariableValues && model)
-                        {
-                            //console.log("QML: on (IN-dependent) Variable Value Updated for " + model.name + ": " + value);
+            Column {
+                id: listIndependentVariable
 
-                            // Update the value (in C++)
-                            rootItem.taskInstance.mapIndependentVariableValues[model.name] = value;
+                anchors {
+                    fill: parent
+                    margins: 5
+                }
+
+                spacing: 5
+
+                Repeater {
+
+                    model: (rootItem.taskInstance && rootItem.taskInstance.task) ? rootItem.taskInstance.task.independentVariables : null
+
+                    delegate: IndependentVariableValueEditor {
+
+                        variable: model ? model.QtObject : null
+
+                        variableValue: (rootItem.taskInstance && rootItem.taskInstance.mapIndependentVariableValues && model) ? rootItem.taskInstance.mapIndependentVariableValues[model.name] : ""
+
+                        isCurrentlyEditing: btnEditValuesOfIndependentVariable.checked
+
+
+                        //
+                        // Slots
+                        //
+                        onIndependentVariableValueUpdated: {
+                            if (rootItem.taskInstance && rootItem.taskInstance.mapIndependentVariableValues && model)
+                            {
+                                //console.log("QML: on (IN-dependent) Variable Value Updated for " + model.name + ": " + value);
+
+                                // Update the value (in C++)
+                                rootItem.taskInstance.mapIndependentVariableValues[model.name] = value;
+                            }
                         }
                     }
                 }
+            }
+        }
+
+        // Bottom shadow
+        Rectangle {
+            anchors {
+                top: parent.bottom
+                left: parent.left
+                right: parent.right
+            }
+            height: 4
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
+                GradientStop { position: 1.0; color: IngeScapeTheme.darkGreyColor; }
             }
         }
     }
@@ -465,116 +590,142 @@ Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis, portt
         id: attachmentsPanel
 
         anchors {
-            left: independentVariablePanel.right
-            //right: parent.right
-            top: header.bottom
-            topMargin: 20
+            left: indeVarPanel.right
+            leftMargin: 38
+            top: headerItem.bottom
+            topMargin: 16
             bottom: timeline.top
-            bottomMargin: 5
-        }
-        width: parent.width / 4.0
-
-        color: "transparent"
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
+            bottomMargin: 56
         }
 
-        Text {
-            id: titleAttachments
+        height: 519
+        width: 495
 
+        IngeScapeAssessmentsListHeader {
+            id: attachementsHeader
             anchors {
-                left: parent.left
-                leftMargin: 5
                 top: parent.top
-                topMargin: 5
-            }
-            height: 30
-
-            text: qsTr("Attachments:")
-
-            verticalAlignment: Text.AlignVCenter
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 18
-            }
-        }
-
-        Rectangle {
-            id: dropZone
-
-            anchors {
-                top: titleAttachments.bottom
-                bottom: parent.bottom
                 left: parent.left
                 right: parent.right
             }
 
-            color: "#D3D3D3"
-            border { width: 3; color: "#606060"; }
+            Text {
+                anchors {
+                    left: parent.left
+                    leftMargin: 25
+                    top: parent.top
+                    bottom: parent.bottom
+                }
 
-            // Fake model with URLs of dropped files to see results in view
-            property var listModel: ListModel {}
+                text: "INDEPENDENT VARIABLES"
+                verticalAlignment: Text.AlignVCenter
 
-            ListView {
-                id: attechementsListView
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.labelFontFamily
+                    weight: Font.Black
+                    pixelSize: 20
+                }
+            }
+        }
+
+        Rectangle {
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: attachementsHeader.bottom
+                bottom: parent.bottom
+            }
+
+            color: IngeScapeTheme.whiteColor
+
+            Rectangle {
+                id: dropZone
 
                 anchors {
-                    top: parent.top
+                    top: titleAttachments.bottom
+                    bottom: parent.bottom
                     left: parent.left
                     right: parent.right
                 }
 
-                height: count * 38
+                color: "#D3D3D3"
+                border { width: 3; color: "#606060"; }
 
-                // Fake model
-                model: dropZone.listModel
+                // Fake model with URLs of dropped files to see results in view
+                property var listModel: ListModel {}
 
-                delegate: Rectangle {
-                    id: attachementDelegate
+                ListView {
+                    id: attechementsListView
 
                     anchors {
+                        top: parent.top
                         left: parent.left
                         right: parent.right
                     }
 
-                    height: 38
+                    height: count * 38
 
-                    color: "#353535"
+                    // Fake model
+                    model: dropZone.listModel
 
-                    Text {
+                    delegate: Rectangle {
+                        id: attachementDelegate
+
                         anchors {
                             left: parent.left
-                            verticalCenter: parent.verticalCenter
+                            right: parent.right
                         }
 
-                        text: model.text
-                        color: "white"
-                    }
+                        height: 38
 
+                        color: "#353535"
+
+                        Text {
+                            anchors {
+                                left: parent.left
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            text: model.text
+                            color: "white"
+                        }
+
+                    }
+                }
+
+                DropArea {
+                    id: dropArea
+
+                    anchors.fill: parent
+
+                    onDropped: {
+                        //FIXME Only accepts URLs but no restrictions on the protocol yet (http://, ftp://, file://, etc.)
+                        if (drop.hasUrls && rootItem.taskInstanceController)
+                        {
+                            rootItem.taskInstanceController.addNewAttachements(drop.urls)
+
+                            // Populate fake model to see results in view
+                            for (var index in drop.urls)
+                            {
+                                dropZone.listModel.append({"text": drop.urls[index]})
+                            }
+                        }
+                    }
                 }
             }
 
-            DropArea {
-                id: dropArea
-
-                anchors.fill: parent
-
-                onDropped: {
-                    //FIXME Only accepts URLs but no restrictions on the protocol yet (http://, ftp://, file://, etc.)
-                    if (drop.hasUrls && rootItem.taskInstanceController)
-                    {
-                        rootItem.taskInstanceController.addNewAttachements(drop.urls)
-
-                        // Populate fake model to see results in view
-                        for (var index in drop.urls)
-                        {
-                            dropZone.listModel.append({"text": drop.urls[index]})
-                        }
-                    }
+            // Bottom shadow
+            Rectangle {
+                anchors {
+                    top: parent.bottom
+                    left: parent.left
+                    right: parent.right
+                }
+                height: 4
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
+                    GradientStop { position: 1.0; color: IngeScapeTheme.darkGreyColor; }
                 }
             }
         }
