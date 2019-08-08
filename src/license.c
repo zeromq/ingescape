@@ -207,6 +207,8 @@ void license_parseLine(const char *command, const char *data, license_t *myLicen
         long t = (long)time(NULL);
         if (myLicense->licenseExpirationDate < t){
             myLicense->isLicenseExpired = true;
+        }else{
+            myLicense->isLicenseExpired = false;
         }
     }else if (strcmp(command, "platform") == 0){
         int platformNbAgents = 0;
@@ -225,6 +227,8 @@ void license_parseLine(const char *command, const char *data, license_t *myLicen
         time_t t = time(NULL);
         if (myLicense->editorExpirationDate < t){
             myLicense->isEditorLicenseExpired = true;
+        }else{
+            myLicense->isEditorLicenseExpired = false;
         }
     }else if (strcmp(command, "feature") == 0){
         zhash_insert(myLicense->features, data, NULL);
@@ -395,6 +399,8 @@ void license_readLicense(void){
         igs_debug("%zu license(s) found", zlist_size(filesList));
         if (zlist_size(filesList) > 0){
             license = calloc(1, sizeof(license_t));
+            license->isLicenseExpired = true;
+            license->isEditorLicenseExpired = true;
             license->features = zhash_new();
             license->agents = zhash_new();
             license->licenseDetails = zlist_new();
@@ -405,6 +411,8 @@ void license_readLicense(void){
         while (file != NULL) {
             license_t *detail = calloc(1, sizeof(license_t));
             zlist_append(license->licenseDetails, detail);
+            detail->isLicenseExpired = true;
+            detail->isEditorLicenseExpired = true;
             detail->features = zhash_new();
             detail->agents = zhash_new();
             
@@ -473,8 +481,9 @@ void license_readLicense(void){
                     license->licenseExpirationDate = detail->licenseExpirationDate;
                 }
                 long t = (long)time(NULL);
-                if (license->licenseExpirationDate < t){
-                    license->isLicenseExpired = true;
+                if (license->isLicenseExpired && license->licenseExpirationDate >= t){
+                    //license was expired but this detail is valid : make license valid
+                    license->isLicenseExpired = false;
                 }
                 if (license->platformNbAgents < detail->platformNbAgents){
                     license->platformNbAgents = detail->platformNbAgents;
@@ -520,8 +529,8 @@ void license_readLicense(void){
                     license->editorExpirationDate = detail->editorExpirationDate;
                 }
                 time_t t = time(NULL);
-                if (license->editorExpirationDate < t){
-                    license->isEditorLicenseExpired = true;
+                if (license->isEditorLicenseExpired && license->editorExpirationDate >= t){
+                    license->isEditorLicenseExpired = false;
                 }
             }
             detail = zlist_next(license->licenseDetails);
@@ -530,6 +539,8 @@ void license_readLicense(void){
     if (license == NULL){
         igs_license("no license found in %s : switching to demonstration mode", licensePath);
         license = calloc(1, sizeof(license_t));
+        license->isLicenseExpired = true;
+        license->isEditorLicenseExpired = true;
         license->features = zhash_new();
         license->agents = zhash_new();
         license->licenseDetails = NULL;
@@ -543,7 +554,6 @@ void license_readLicense(void){
         license->order = strdup("none");
     if (license->licenseExpirationDate == 0){
         license->licenseExpirationDate = -1;
-        license->isLicenseExpired = true;
     }
     if (license->platformNbAgents == 0)
         license->platformNbAgents = MAX_NB_OF_AGENTS;
@@ -553,7 +563,6 @@ void license_readLicense(void){
         license->editorOwner = strdup("Unregistered");
     if (license->editorExpirationDate == 0){
         license->editorExpirationDate = -1;
-        license->isEditorLicenseExpired = true;
     }
     license_readWriteUnlock();
 }
