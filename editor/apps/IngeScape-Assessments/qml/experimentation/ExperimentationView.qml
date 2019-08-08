@@ -616,17 +616,23 @@ Item {
                     id: taskInstanceScrollView
                     anchors {
                         fill: parent
-                        rightMargin: -17
+                        rightMargin: -taskInstanceScrollView.scrollBarSize -taskInstanceScrollView.verticalScrollbarMargin
                     }
 
-                    style: IngeScapeAssessmentsScrollViewStyle {}
+                    property int scrollBarSize: 11
+                    property int verticalScrollbarMargin: 3
+
+                    style: IngeScapeAssessmentsScrollViewStyle {
+                        scrollBarSize: taskInstanceScrollView.scrollBarSize
+                        verticalScrollbarMargin: taskInstanceScrollView.verticalScrollbarMargin
+                    }
 
                     // Prevent drag overshoot on Windows
                     flickableItem.boundsBehavior: Flickable.OvershootBounds
 
                     Column {
                         id: taskInstanceColumn
-                        width: taskInstanceScrollView.width - 17
+                        width: taskInstanceScrollView.width - (taskInstanceScrollView.scrollBarSize + taskInstanceScrollView.verticalScrollbarMargin)
                         height: childrenRect.height
                         spacing: 0
 

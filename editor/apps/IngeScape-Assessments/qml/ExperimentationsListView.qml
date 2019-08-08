@@ -227,13 +227,19 @@ Item {
             bottomMargin: 20
         }
 
-        style: IngeScapeAssessmentsScrollViewStyle {}
+        property int scrollBarSize: 11
+        property int verticalScrollbarMargin: 3
+
+        style: IngeScapeAssessmentsScrollViewStyle {
+            scrollBarSize: scrollViewExperimentationsGroups.scrollBarSize
+            verticalScrollbarMargin: scrollViewExperimentationsGroups.verticalScrollbarMargin
+        }
 
         // Prevent drag overshoot on Windows
         flickableItem.boundsBehavior: Flickable.OvershootBounds
 
         contentItem: Column {
-            width: scrollViewExperimentationsGroups.width - 17
+            width: scrollViewExperimentationsGroups.width - (scrollViewExperimentationsGroups.scrollBarSize + scrollViewExperimentationsGroups.verticalScrollbarMargin)
             height: childrenRect.height
             spacing: 10
 
