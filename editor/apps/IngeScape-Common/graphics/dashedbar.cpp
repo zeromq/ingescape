@@ -231,7 +231,7 @@ QSGNode* DashedBar::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* paint
                         for (int index = 0; index < _vertices.count(); index++)
                         {
                             QPointF point = _vertices[index];
-                            geometryVertices[index].set(point.x(), point.y());
+                            geometryVertices[index].set(static_cast<float>(point.x()), static_cast<float>(point.y()));
                         }
                     }
 
