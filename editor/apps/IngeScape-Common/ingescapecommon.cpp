@@ -17,6 +17,7 @@
 
 #include <misc/debugquickinspector.h>
 #include <misc/terminationsignalwatcher.h>
+#include <misc/urlutils.h>
 #include <settings/ingescapesettings.h>
 
 #include <controller/abstractscenariocontroller.h>
@@ -138,6 +139,12 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterType<DashedBar>("INGESCAPE", 1, 0, "DashedBar");
 
 
+    //---------------
+    //
+    // Misc
+    //
+    //---------------
+    qmlRegisterSingletonType<URLUtils>("INGESCAPE", 1, 0, "URLUtils", &URLUtils::qmlSingleton);
 
 
     //------------------
