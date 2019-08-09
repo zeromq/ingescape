@@ -74,6 +74,45 @@ Item {
         color: IngeScapeTheme.veryLightGreyColor
     }
 
+    Rectangle {
+        id: actionsRightShadow
+
+        x: actionsPanel.width - (width / 2) + height / 2
+        y: actionsPanel.y + (actionsPanel.height / 2) - height / 2
+
+        height: 6
+        width: actionsPanel.height
+        rotation: -90
+
+        property bool forceUpdateToggle: false
+
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: IngeScapeTheme.darkGreyColor; }
+            GradientStop { position: 1.0; color: (actionsRightShadow.forceUpdateToggle ? "transparent" : "transparent") }
+        }
+    }
+
+    //
+    // Scenario TimeLine
+    //
+    ScenarioTimeLine {
+        id: timeline
+
+        anchors {
+            left: actionsPanel.right
+            right: parent.right
+            bottom: parent.bottom
+        }
+        height: 0
+
+        onHeightChanged: {
+            actionsRightShadow.forceUpdateToggle = !actionsRightShadow.forceUpdateToggle
+        }
+
+        scenarioController: rootItem.taskInstanceController ? rootItem.taskInstanceController.scenarioC : null;
+        timeLineController: rootItem.taskInstanceController ? rootItem.taskInstanceController.timeLineC : null;
+    }
+
     Item {
         id: headerItem
 
@@ -268,9 +307,7 @@ Item {
         anchors {
             left: parent.left
             top: headerItem.bottom
-            topMargin: 20
-            bottom: timeline.top
-            bottomMargin: 5
+            bottom: parent.bottom
         }
         width: 319
 
@@ -648,10 +685,7 @@ Item {
                 id: dropZone
 
                 anchors {
-                    top: titleAttachments.bottom
-                    bottom: parent.bottom
-                    left: parent.left
-                    right: parent.right
+                    fill: parent
                 }
 
                 color: "#D3D3D3"
@@ -736,21 +770,21 @@ Item {
         }
     }
 
-
-    //
-    // Scenario TimeLine
-    //
-    ScenarioTimeLine {
-        id: timeline
+    Rectangle {
+        id: headerBottomShadow
 
         anchors {
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
+            top: headerItem.bottom
+            left: headerItem.left
+            right: headerItem.right
         }
-        height: 0
 
-        scenarioController: rootItem.taskInstanceController ? rootItem.taskInstanceController.scenarioC : null;
-        timeLineController: rootItem.taskInstanceController ? rootItem.taskInstanceController.timeLineC : null;
+        height: 6
+
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: IngeScapeTheme.darkGreyColor; }
+            GradientStop { position: 1.0; color: "transparent" }
+        }
+
     }
 }
