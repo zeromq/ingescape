@@ -413,7 +413,6 @@ Item {
                                     deleteExperimentationPopup.open()
                                 }
                             }
-
                             Button {
                                 id: btnOpen
 

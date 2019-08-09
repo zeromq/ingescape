@@ -25,8 +25,16 @@ Rectangle {
 
     property var attachementName: null
 
+    property bool isMouseHovering: mouseArea.containsMouse || openButton.containsMouse || deleteButton.containsMouse || downloadButton.containsMouse
+
     height: 40
-    color: "transparent"
+    color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : "transparent"
+
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+        hoverEnabled: true
+    }
 
     Text {
         anchors {
@@ -41,6 +49,73 @@ Rectangle {
             family: IngeScapeTheme.textFontFamily
             weight: Font.Medium
             pixelSize: 16
+        }
+    }
+
+    Row {
+        id: buttonsRow
+
+        anchors {
+            verticalCenter: parent.verticalCenter
+            right: parent.right
+            rightMargin: 10
+        }
+        spacing: 14
+
+        Button {
+            id: downloadButton
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            property bool containsMouse: __behavior.containsMouse
+
+            opacity: rootItem.isMouseHovering ? 1 : 0
+            enabled: opacity > 0
+
+            width: 40
+            height: 30
+
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "download-button"
+                disabledID: releasedID
+            }
+        }
+
+        Button {
+            id: deleteButton
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            property bool containsMouse: __behavior.containsMouse
+
+            opacity: rootItem.isMouseHovering ? 1 : 0
+            enabled: opacity > 0
+
+            width: 40
+            height: 30
+
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "delete-blue"
+                disabledID: releasedID
+            }
+        }
+
+        Button {
+            id: openButton
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            property bool containsMouse: __behavior.containsMouse
+
+            opacity: rootItem.isMouseHovering ? 1 : 0
+            enabled: opacity > 0
+
+            width: 84
+            height: 30
+
+            style: IngeScapeAssessmentsButtonStyle {
+                text: "OPEN"
+            }
         }
     }
 

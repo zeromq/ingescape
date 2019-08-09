@@ -672,85 +672,150 @@ Item {
         }
 
         Rectangle {
+            id: dropZone
+
             anchors {
                 left: parent.left
                 right: parent.right
                 top: attachementsHeader.bottom
                 bottom: parent.bottom
+                bottomMargin: 10
             }
 
             color: IngeScapeTheme.whiteColor
 
-            Rectangle {
-                id: dropZone
+            // Fake model with URLs of dropped files to see results in view
+            property var listModel: ListModel {}
 
+            ScrollView {
+                id: attachementScrollView
                 anchors {
                     fill: parent
+                    rightMargin: -attachementScrollView.scrollBarSize -attachementScrollView.verticalScrollbarMargin
                 }
 
-                color: IngeScapeTheme.whiteColor
+                property int scrollBarSize: 11
+                property int verticalScrollbarMargin: 3
 
-                // Fake model with URLs of dropped files to see results in view
-                property var listModel: ListModel {}
+                style: IngeScapeAssessmentsScrollViewStyle {
+                    scrollBarSize: attachementScrollView.scrollBarSize
+                    verticalScrollbarMargin: attachementScrollView.verticalScrollbarMargin
+                }
 
-                ListView {
-                    id: attechementsListView
+                // Prevent drag overshoot on Windows
+                flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                    anchors {
-                        top: parent.top
-                        left: parent.left
-                        right: parent.right
-                    }
+                contentItem: Item {
+                    id: attachementScrollViewItem
 
-                    height: count * 38
+                    width: attachementScrollView.width - (attachementScrollView.scrollBarSize + attachementScrollView.verticalScrollbarMargin)
+                    height: childrenRect.height
 
-                    // Fake model
-                    model: dropZone.listModel
-
-                    delegate: AttachementDelegate {
-                        id: attachementDelegate
-
+                    ListView {
+                        id: attechementsListView
                         anchors {
+                            top: parent.top
                             left: parent.left
                             right: parent.right
                         }
 
-                        attachementName: model ? model.text : ""
-                    }
-                }
+                        height: childrenRect.height
 
-                DropArea {
-                    id: dropArea
+                        // Fake model
+                        model: dropZone.listModel
 
-                    anchors.fill: parent
+                        delegate: AttachementDelegate {
+                            id: attachementDelegate
 
-                    onDropped: {
-                        if (drop.hasUrls && rootItem.taskInstanceController)
-                        {
-                            rootItem.taskInstanceController.addNewAttachements(drop.urls)
-
-                            // Populate fake model to see results in view
-                            for (var index in drop.urls)
-                            {
-                                dropZone.listModel.append({"text": URLUtils.fileNameFromFileUrl(drop.urls[index])})
+                            anchors {
+                                left: parent.left
+                                right: parent.right
                             }
+
+                            attachementName: model ? model.text : ""
+                        }
+                    }
+
+                    Rectangle {
+                        id: dropAreaIndicator
+
+                        property real minimumHeight: 56
+
+                        height: Math.max(minimumHeight, attachementScrollView.height - attechementsListView.height - 8)
+
+                        anchors {
+                            top: attechementsListView.bottom
+                            topMargin: 8
+                            left: parent.left
+                            leftMargin: 10
+                            right: parent.right
+                            rightMargin: 10
+                        }
+
+                        radius: 5
+                        visible: dropArea.dragHovering
+
+                        color: IngeScapeTheme.veryLightGreyColor
+
+                        border { color: IngeScapeTheme.lightGreyColor; width: 1 }
+
+                        I2SvgItem {
+                            anchors {
+                                centerIn: parent
+                            }
+
+                            svgFileCache: IngeScapeAssessmentsTheme.svgFileIngeScapeAssessments
+                            svgElementId: "drag-and-drop-area"
                         }
                     }
                 }
             }
 
-            // Bottom shadow
-            Rectangle {
-                anchors {
-                    top: parent.bottom
-                    left: parent.left
-                    right: parent.right
+            DropArea {
+                id: dropArea
+
+                anchors.fill: parent
+
+                property bool dragHovering: false
+
+                onEntered: {
+                    console.log("Entered")
+                    dragHovering = true
                 }
-                height: 4
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
-                    GradientStop { position: 1.0; color: IngeScapeTheme.darkGreyColor; }
+
+                onExited: {
+                    console.log("Exited")
+                    dragHovering = false
                 }
+
+                onDropped: {
+                    console.log("Dropped")
+                    dragHovering = false
+                    if (drop.hasUrls && rootItem.taskInstanceController)
+                    {
+                        rootItem.taskInstanceController.addNewAttachements(drop.urls)
+
+                        // Populate fake model to see results in view
+                        for (var index in drop.urls)
+                        {
+                            dropZone.listModel.append({"text": URLUtils.fileNameFromFileUrl(drop.urls[index])})
+                        }
+                    }
+                }
+            }
+        }
+
+        // Bottom shadow
+        Rectangle {
+            anchors {
+                top: parent.bottom
+                left: parent.left
+                right: parent.right
+            }
+            height: 4
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
+                GradientStop { position: 1.0; color: IngeScapeTheme.darkGreyColor; }
             }
         }
     }
