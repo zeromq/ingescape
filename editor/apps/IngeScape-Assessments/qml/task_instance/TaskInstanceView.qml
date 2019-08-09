@@ -688,8 +688,7 @@ Item {
                     fill: parent
                 }
 
-                color: "#D3D3D3"
-                border { width: 3; color: "#606060"; }
+                color: IngeScapeTheme.whiteColor
 
                 // Fake model with URLs of dropped files to see results in view
                 property var listModel: ListModel {}
@@ -708,7 +707,7 @@ Item {
                     // Fake model
                     model: dropZone.listModel
 
-                    delegate: Rectangle {
+                    delegate: AttachementDelegate {
                         id: attachementDelegate
 
                         anchors {
@@ -716,20 +715,7 @@ Item {
                             right: parent.right
                         }
 
-                        height: 38
-
-                        color: "#353535"
-
-                        Text {
-                            anchors {
-                                left: parent.left
-                                verticalCenter: parent.verticalCenter
-                            }
-
-                            text: model.text
-                            color: "white"
-                        }
-
+                        attachementName: model ? model.text : ""
                     }
                 }
 
@@ -739,7 +725,6 @@ Item {
                     anchors.fill: parent
 
                     onDropped: {
-                        //FIXME Only accepts URLs but no restrictions on the protocol yet (http://, ftp://, file://, etc.)
                         if (drop.hasUrls && rootItem.taskInstanceController)
                         {
                             rootItem.taskInstanceController.addNewAttachements(drop.urls)
@@ -747,7 +732,7 @@ Item {
                             // Populate fake model to see results in view
                             for (var index in drop.urls)
                             {
-                                dropZone.listModel.append({"text": drop.urls[index]})
+                                dropZone.listModel.append({"text": URLUtils.fileNameFromFileUrl(drop.urls[index])})
                             }
                         }
                     }
