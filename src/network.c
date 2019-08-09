@@ -1458,7 +1458,7 @@ initLoop (zsock_t *pipe, void *args){
     zloop_timer(agentElements->loop, 1000, 0, triggerMappingUpdate, NULL);
     
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
-    if (license != NULL && license->isLicenseExpired){
+    if (license != NULL && !license->isLicenseValid){
         igs_license("License is not valid : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
         zloop_timer(agentElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, NULL);
     }
