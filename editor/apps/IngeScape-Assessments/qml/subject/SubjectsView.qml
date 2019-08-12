@@ -65,10 +65,6 @@ I2PopupBase {
         }
     }
 
-    onCurrentlyEditedSubjectDelegateChanged: {
-        console.log("Current edited subject changed: " + currentlyEditedSubjectDelegate)
-    }
-
     onSubjectEditionInProgressChanged: {
         if (!subjectEditionInProgress) {
             // Clear current subject being edited when edition ended
