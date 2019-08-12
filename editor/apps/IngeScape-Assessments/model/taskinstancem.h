@@ -30,9 +30,6 @@ class TaskInstanceM : public QObject
 {
     Q_OBJECT
 
-    // Unique identifier
-    I2_QML_PROPERTY(QString, uid)
-
     // Name
     I2_QML_PROPERTY_CUSTOM_SETTER(QString, name)
 

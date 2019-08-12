@@ -23,6 +23,24 @@
 
 
 /**
+ * @brief Equality operator to be able to compare CassUuid struct directly.
+ * Required to use CassUuid type as QHash key.
+ * @param left
+ * @param right
+ * @return
+ */
+bool operator==(const CassUuid& left, const CassUuid& right);
+
+/**
+ * @brief qHash function to compute a hash key for the given CassUuid.
+ * Required to use CassUuid type as QHash key.
+ * @param cassUuid
+ * @return
+ */
+uint qHash(const CassUuid& cassUuid);
+
+
+/**
  * @brief The AssessmentsModelManager class defines the manager for the data model of our IngeScape Assessments application
  */
 class AssessmentsModelManager : public IngeScapeModelManager

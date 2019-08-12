@@ -63,9 +63,7 @@ void ExportController::exportExperimentation()
     if (_currentExperimentation != nullptr)
     {
         CassUuid experimentationUid = _currentExperimentation->getCassUuid();
-        QString expeUuidString = AssessmentsModelManager::cassUuidToQString(experimentationUid);
-
-        qInfo() << "Export the experimentation" << _currentExperimentation->name() << "(" << expeUuidString << ")";
+        qInfo() << "Export the experimentation" << _currentExperimentation->name() << "(" << AssessmentsModelManager::cassUuidToQString(experimentationUid) << ")";
 
         QString exportFilePath = QString("%1export_%2.csv").arg(_exportsDirectoryPath, _currentExperimentation->name());
 
@@ -91,9 +89,8 @@ void ExportController::exportExperimentationTest(QString uuidIdExp)
 {
     CassUuid experimentationUid;
     cass_uuid_from_string(uuidIdExp.toLatin1().constData(), &experimentationUid);
-    QString expeUuidString = AssessmentsModelManager::cassUuidToQString(experimentationUid);
 
-    qInfo() << "Export the experimentation from UUID : "<< uuidIdExp;
+    qInfo() << "Export the experimentation from UUID : "<< AssessmentsModelManager::cassUuidToQString(experimentationUid);
 
     QString ipAddress = "127.0.0.1";
     QString exportFileName = QString("export_test.csv");

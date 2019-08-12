@@ -576,11 +576,11 @@ void ExperimentationController::_retrieveTaskInstancesForExperimentation(Experim
 
                     CassUuid subjectUuid;
                     cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
-                    SubjectM* subject = experimentation->getSubjectFromUID(AssessmentsModelManager::cassUuidToQString(subjectUuid));
+                    SubjectM* subject = experimentation->getSubjectFromUID(subjectUuid);
 
                     CassUuid taskUuid;
                     cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
-                    TaskM* task = experimentation->getTaskFromUID(AssessmentsModelManager::cassUuidToQString(taskUuid));
+                    TaskM* task = experimentation->getTaskFromUID(taskUuid);
 
                     TaskInstanceM* taskInstance = TaskInstanceM::createTaskInstanceFromCassandraRow(row, subject, task);
                     if (taskInstance != nullptr)
@@ -646,8 +646,6 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
                             // Get characteristic id
                             CassUuid characteristicUuid;
                             cass_value_get_uuid(cass_row_get_column_by_name(row, "id_characteristic"), &characteristicUuid);
-                            char chrCharacteristicUid[CASS_UUID_STRING_LENGTH];
-                            cass_uuid_string(characteristicUuid, chrCharacteristicUid);
 
                             // Get characteristic value as a string
                             const char *chrValueString = "";
@@ -657,7 +655,7 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
 
 
                             // Get characteristic value type
-                            CharacteristicM* characteristic = _currentExperimentation->getCharacteristicFromUID(chrCharacteristicUid);
+                            CharacteristicM* characteristic = _currentExperimentation->getCharacteristicFromUID(characteristicUuid);
                             if (characteristic != nullptr)
                             {
                                 switch (characteristic->valueType()) {

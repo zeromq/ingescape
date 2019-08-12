@@ -14,6 +14,32 @@
 
 #include "assessmentsmodelmanager.h"
 
+
+
+/**
+ * @brief Equality operator to be able to compare CassUuid struct directly.
+ * Required to use CassUuid type as QHash key.
+ * @param left
+ * @param right
+ * @return
+ */
+bool operator==(const CassUuid& left, const CassUuid& right)
+{
+    return (left.time_and_version == right.time_and_version) && (left.clock_seq_and_node == right.clock_seq_and_node);
+}
+
+/**
+ * @brief qHash function to compute a hash key for the given CassUuid.
+ * Required to use CassUuid type as QHash key.
+ * @param cassUuid
+ * @return
+ */
+uint qHash(const CassUuid& cassUuid)
+{
+    return static_cast<uint>(cassUuid.time_and_version * cassUuid.clock_seq_and_node);
+}
+
+
 /**
  * @brief The singleton instance.
  * NOTE: We hold a pointer here and not a plain value to be able to initialize it from the main controller without a "default value".
