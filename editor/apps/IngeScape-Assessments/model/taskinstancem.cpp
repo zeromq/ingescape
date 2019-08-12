@@ -347,10 +347,10 @@ void TaskInstanceM::_updateDBEntry()
 {
     if ((_task != nullptr) && (_subject != nullptr))
     {
-        std::time_t startDateTime(_startDateTime.toTime_t());
+        time_t startDateTime(_startDateTime.toTime_t());
         cass_uint32_t startYearMonthDay = cass_date_from_epoch(startDateTime);
         cass_int64_t startTimeOfDay = cass_time_from_epoch(startDateTime);
-        std::time_t endDateTime(_startDateTime.toTime_t());
+        time_t endDateTime(_startDateTime.toTime_t());
         cass_uint32_t endYearMonthDay = cass_date_from_epoch(endDateTime);
         cass_int64_t endTimeOfDay = cass_time_from_epoch(endDateTime);
 
