@@ -178,6 +178,9 @@ void registerCustomQmlTypes()
     // - Radio Button style
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeRadioButtonStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeRadioButtonStyle");
 
+    // - Combobox style
+    qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsComboboxStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsComboboxStyle");
+
     // - Button Style
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsButtonStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsButtonStyle");
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsSvgButtonStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsSvgButtonStyle");

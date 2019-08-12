@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Mathieu Soum       <soum@ingenuity.io>
  *
  */
 
@@ -218,16 +219,7 @@ AssessmentsPopupBase {
             enabled: rootItem.experimentation ? (rootItem.experimentation.allSubjects.count > 0)
                                               : false
 
-            style: I2ComboboxStyle {
-                borderColorIdle: IngeScapeTheme.veryLightGreyColor
-                currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                layerObjectName: "overlayLayerComboBox"
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
+            style: IngeScapeAssessmentsComboboxStyle {}
 
             function modelToString(_model) {
                 if (_model) {
@@ -290,16 +282,7 @@ AssessmentsPopupBase {
 
             model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
 
-            style: I2ComboboxStyle {
-                borderColorIdle: IngeScapeTheme.veryLightGreyColor
-                currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                layerObjectName: "overlayLayerComboBox"
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
+            style: IngeScapeAssessmentsComboboxStyle {}
 
             function modelToString(_model) {
                 if (_model) {

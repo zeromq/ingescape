@@ -157,15 +157,7 @@ Rectangle {
 
                         model: characteristicDelegate.characteristic ? characteristicDelegate.characteristic.enumValues : null
 
-                        style: I2ComboboxStyle {
-                            borderColorIdle: IngeScapeTheme.veryLightGreyColor
-                            currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                            layerObjectName: "overlayLayerComboBox"
-                            font {
-                                family: IngeScapeTheme.textFontFamily
-                                pixelSize: 16
-                            }
-                        }
+                        style: IngeScapeAssessmentsComboboxStyle {}
 
                         Binding {
                             target: comboboxEditor

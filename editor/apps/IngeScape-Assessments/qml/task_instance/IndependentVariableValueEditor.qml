@@ -143,14 +143,7 @@ Item {
 
             model: rootItem.variable ? rootItem.variable.enumValues : null
 
-            style: I2ComboboxStyle {
-                borderColorIdle: IngeScapeTheme.veryLightGreyColor
-                currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    pixelSize: 16
-                }
-            }
+            style: IngeScapeAssessmentsComboboxStyle {}
 
             Binding {
                 target: comboboxEditor
