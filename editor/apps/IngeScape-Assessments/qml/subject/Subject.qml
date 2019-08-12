@@ -58,6 +58,26 @@ Rectangle {
 
 
     //
+    // Slots
+    //
+
+    // Discards any edited values and end edition
+    function cancelEdition() {
+        rootItem.isCurrentlyEditing = false
+    }
+
+    // Apply the edited values to the actual subjact properties
+    function applyEdition() {
+        if (rootItem.subject)
+        {
+            rootItem.subject.applyTemporaryPropertyValues()
+        }
+
+        rootItem.isCurrentlyEditing = false
+    }
+
+
+    //
     // Content
     //
 
@@ -140,6 +160,7 @@ Rectangle {
                         style: I2ComboboxStyle {
                             borderColorIdle: IngeScapeTheme.veryLightGreyColor
                             currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                            layerObjectName: "overlayLayerComboBox"
                             font {
                                 family: IngeScapeTheme.textFontFamily
                                 pixelSize: 16
@@ -262,12 +283,7 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.subject)
-                {
-                    rootItem.subject.applyTemporaryPropertyValues()
-                }
-
-                rootItem.isCurrentlyEditing = false
+                applyEdition()
             }
         }
 
@@ -289,7 +305,7 @@ Rectangle {
             }
 
             onClicked: {
-                rootItem.isCurrentlyEditing = false
+                cancelEdition()
             }
         }
     }

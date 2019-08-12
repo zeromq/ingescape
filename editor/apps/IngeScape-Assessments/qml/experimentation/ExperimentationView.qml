@@ -728,16 +728,6 @@ Item {
         height: parent.height - 78
 
         subjectController: IngeScapeAssessmentsC.subjectsC
-
-        //
-        // Slots
-        //
-        onCloseSubjectsView: {
-            console.log("QML: on Close Subjects view");
-
-            // Remove the "Subjects View" from the stack
-            close()
-        }
     }
 
 

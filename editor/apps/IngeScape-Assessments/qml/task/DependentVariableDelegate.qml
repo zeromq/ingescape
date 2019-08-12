@@ -260,6 +260,7 @@ Rectangle {
                 style: I2ComboboxStyle {
                     borderColorIdle: IngeScapeTheme.veryLightGreyColor
                     currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                    layerObjectName: "overlayLayerComboBox"
                     font {
                         family: IngeScapeTheme.textFontFamily
                         weight: Font.Medium
@@ -343,6 +344,7 @@ Rectangle {
                 style: I2ComboboxStyle {
                     borderColorIdle: IngeScapeTheme.veryLightGreyColor
                     currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                    layerObjectName: "overlayLayerComboBox"
                     font {
                         family: IngeScapeTheme.textFontFamily
                         weight: Font.Medium
