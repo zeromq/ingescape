@@ -620,8 +620,7 @@ AssessmentsPopupBase {
             activeFocusOnPress: true
 
             enabled: if (rootPopup.taskController && (txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > -1))
-                     {
-                         // Edit an existing independent variable
+                     { // Edit an existing independent variable
                          if (rootPopup.independentVariableCurrentlyEdited)
                          {
                              rootPopup.taskController.canEditIndependentVariableWithName(rootPopup.independentVariableCurrentlyEdited, txtIndependentVariableName.text);

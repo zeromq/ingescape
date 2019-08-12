@@ -292,11 +292,14 @@ Item {
                     anchors {
                         left: parent.left
                         leftMargin: 25
+                        right: parent.right
+                        rightMargin: 25
                         top: parent.top
                         bottom: parent.bottom
                     }
 
                     text: rootExperimentationsGroup.experimentationsGroup ? rootExperimentationsGroup.experimentationsGroup.name : ""
+                    elide: Text.ElideRight
                     verticalAlignment: Text.AlignVCenter
 
                     color: IngeScapeTheme.whiteColor

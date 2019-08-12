@@ -177,7 +177,25 @@ Item {
 
             radius: 5
 
-            width: Math.max(taskInstanceName.width + 76, 450)
+            // Background rectangle won't be smaller than this
+            property real minWidth: 450
+
+            // Max available width based on the size of the parent. Won't be bigger than this
+            property real maxAvailableWidth: (parent.width
+                                              - 92 // enumName's leftMargin
+                                              + 10 // this left margin from enumName
+                                              - 22 // Right margin left to avoid reaching the edge of the window
+                                              - 10  // Margins around the edit button (5 on both sides)
+                                              )
+
+            // Desired width to follow the size of expeName
+            property real desiredWidth: taskInstanceName.width
+                                        + 10                // leftMargin
+                                        + 10                // rightMargin
+                                        + editButton.width  // button size
+                                        + 14                // margin between edit button and text
+
+            width: Math.min(maxAvailableWidth, Math.max(desiredWidth, minWidth))
             height: 40
 
             color: IngeScapeTheme.veryLightGreyColor
@@ -233,7 +251,16 @@ Item {
                 leftMargin: 92
             }
 
+            property real maxAvailableWidth: taskInstanceNameEditBackground.maxAvailableWidth
+                                             - 10                // background's left margin
+                                             - 5                 // edit button's right margin
+                                             - editButton.width  // edit button's width
+                                             - 14                // margin between edit button and text
+
+            width: Math.min(implicitWidth, maxAvailableWidth)
+
             text: rootItem.taskInstance ? rootItem.taskInstance.name : ""
+            elide: Text.ElideRight
 
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignLeft
@@ -284,7 +311,10 @@ Item {
                 left: taskInstanceName.left
             }
 
+            width: taskInstanceName.maxAvailableWidth
+
             text: rootItem.experimentationController && rootItem.experimentationController.currentExperimentation ? rootItem.experimentationController.currentExperimentation.name : ""
+            elide: Text.ElideRight
 
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
