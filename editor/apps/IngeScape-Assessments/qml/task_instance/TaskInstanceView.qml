@@ -450,6 +450,7 @@ Item {
 
             color: IngeScapeTheme.whiteColor
 
+            //FIXME We need a timer to avoid rapid subsequent DB updates
             TextArea {
                 id: txtComments
 
@@ -460,14 +461,7 @@ Item {
 
                 wrapMode: Text.WordWrap
 
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-    Nam lobortis augue pellentesque mattis tincidunt. Nunc efficitur faucibus nunc,
-    nec facilisis augue semper vitae.Proin consequat nulla at risus lacinia
-    sollicitudin. Nunc efficitur commodo leo at fringilla. Quisque ullamcorper
-    aliquet nulla, ut molestie ipsum placerat sed. Proin pretium sodales semper.
-    Ut vehicula nibh non metus lacinia dignissim. Suspendisse eu mi venenatis,
-    porttitor tellus nec, ultrices erat. Mauris nibh metus, facilisis et diam
-    quis, posuere faucibus lorem."
+                text: rootItem.taskInstance ? rootItem.taskInstance.comments : ""
 
                 style: I2TextAreaStyle {
                     backgroundColor: IngeScapeTheme.veryLightGreyColor
@@ -487,6 +481,12 @@ Item {
                     font {
                         pixelSize: 16
                         family: IngeScapeTheme.textFontFamily
+                    }
+                }
+
+                onTextChanged: {
+                    if (rootItem.taskInstance) {
+                        rootItem.taskInstance.comments = text
                     }
                 }
             }
