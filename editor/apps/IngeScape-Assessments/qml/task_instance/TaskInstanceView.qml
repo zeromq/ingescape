@@ -214,7 +214,7 @@ Item {
                     else
                     {
                         // Exiting edition mode
-                        if (rootItem.experimentation)
+                        if (rootItem.taskInstance)
                         {
                             taskInstanceName.text = taskInstanceNameEditionTextField.text
                             rootItem.taskInstance.name = taskInstanceName.text
