@@ -659,7 +659,7 @@ Item {
                     bottom: parent.bottom
                 }
 
-                text: "INDEPENDENT VARIABLES"
+                text: "ATTACHEMENTS"
                 verticalAlignment: Text.AlignVCenter
 
                 color: IngeScapeTheme.whiteColor
