@@ -12,6 +12,7 @@
 #include "ingescape_advanced.h"
 #include "yajl_parse.h"
 #include "yajl_gen.h"
+#include "yajl_tree.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // generate a JSON string
@@ -148,7 +149,7 @@ char* igs_JSONdump(igsJSON_t json){
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-// parse a JSON string or file
+// parse a JSON string or file "sax style" with a callback
 typedef struct json_parsingElements {
     igsyajl_handle handle;
     void *myData;
@@ -200,7 +201,7 @@ static int json_map_key(void * ctx, const unsigned char * stringVal,
 
 static int json_start_map(void * ctx){
     json_parsingElements_t *e = (json_parsingElements_t *) ctx;
-    e->cb(IGS_JSON_MAP_START, NULL, 0, e->myData);
+    e->cb(IGS_JSON_MAP, NULL, 0, e->myData);
     return 1;
 }
 
@@ -212,7 +213,7 @@ static int json_end_map(void * ctx){
 
 static int json_start_array(void * ctx){
     json_parsingElements_t *e = (json_parsingElements_t *) ctx;
-    e->cb(IGS_JSON_ARRAY_START, NULL, 0, e->myData);
+    e->cb(IGS_JSON_ARRAY, NULL, 0, e->myData);
     return 1;
 }
 
@@ -321,6 +322,66 @@ void igs_JSONparseFromString(const char *content, igs_JSONCallback cb, void *myD
     json_freeParsingElements(&elements);
 }
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// parse a JSON string or file "DOM style" with a tree
+typedef struct _igsJSONTree {
+    igsyajl_val root;
+} _igsJSONTree;
+
+void igs_JSONTreeFree(igsJSONTree_t *tree){
+    if (tree != NULL && *tree != NULL){
+        if ((*tree)->root != NULL)
+            igsyajl_tree_free((*tree)->root);
+        *tree = NULL;
+    }
+}
+
+igsJSONTree_t igs_JSONTreeParseFromFile(const char *path){
+    zfile_t *file = zfile_new (NULL, path);
+    if (file == NULL || !zfile_is_regular(file) || !zfile_is_readable(file) || zfile_input(file)){
+        igs_error("could not open %s", path);
+        return NULL;
+    }
+    char errbuf[1024] = "unknown error";
+    zchunk_t *data = zfile_read (file, zfile_size(path), 0);
+    igsJSONTree_t tree = calloc(1, sizeof(_igsJSONTree));
+    tree->root = igsyajl_tree_parse((const char *)zchunk_data(data), errbuf, sizeof(errbuf));
+    if (tree->root == NULL){
+        igs_error("parsing error (%s) : %s", path, errbuf);
+    }
+    zchunk_destroy(&data);
+    zfile_close(file);
+    return tree;
+}
+
+igsJSONTree_t igs_JSONTreeParseFromString(const char *content){
+    char errbuf[1024] = "unknown error";
+    igsJSONTree_t tree = calloc(1, sizeof(_igsJSONTree));
+    tree->root = igsyajl_tree_parse(content, errbuf, sizeof(errbuf));
+    if (tree->root == NULL){
+        igs_error("parsing error (%s) : %s", content, errbuf);
+    }
+    return tree;
+}
+
+igsJSONTreeValue_t* igs_JSONTreeGetValueAtPath(igsJSONTree_t tree, const char **path){
+    if (tree == NULL){
+        igs_warn("passed tree is NULL");
+        return NULL;
+    }
+    igsyajl_val v = igsyajl_tree_get(tree->root, path, igsyajl_t_any);
+    return (igsJSONTreeValue_t *)v;
+}
+
+bool igs_JSONTreeIsValueAnInteger(igsJSONTreeValue_t *value){
+    return IGSYAJL_IS_INTEGER(value);
+}
+
+bool igs_JSONTreeIsValueADouble(igsJSONTreeValue_t *value){
+    return IGSYAJL_IS_DOUBLE(value);
+}
+
 // TEST SCRIPT
 // to be copied and compiled as a main.c file
 //
@@ -352,7 +413,7 @@ void igs_JSONparseFromString(const char *content, igs_JSONCallback cb, void *myD
 //            str = (char *)value;
 //            printf("K:%s : ", (char *)value);
 //            break;
-//        case IGS_JSON_MAP_START:
+//        case IGS_JSON_MAP:
 //            printf("\n");
 //            for (int i = 0; i < indent; i++){
 //                printf("  ");
@@ -367,7 +428,7 @@ void igs_JSONparseFromString(const char *content, igs_JSONCallback cb, void *myD
 //            }
 //            printf("}\n");
 //            break;
-//        case IGS_JSON_ARRAY_START:
+//        case IGS_JSON_ARRAY:
 //            printf("\n");
 //            for (int i = 0; i < indent; i++){
 //                printf("  ");
@@ -468,6 +529,18 @@ void igs_JSONparseFromString(const char *content, igs_JSONCallback cb, void *myD
 //    printf("\n\n***************\n\n");
 //
 //    igs_JSONparseFromFile("/Users/steph/Documents/IngeScape/agents/igsDDS_definition.json", json_testParsingCallback, "plop");
+//
+//    igsJSONTree_t tree = igs_JSONTreeParseFromFile("/Users/steph/Documents/IngeScape/agents/philips.json");
+//
+//    //const char *path[] = {NULL}; //from the root of the tree
+//    //const char *path[] = {"lights", NULL};
+//    //const char *path[] = {"lights", "1", NULL};
+//    const char *path[] = {"lights", "1", "state", "xy", NULL};
+//    //const char *path[] = {"sensors", "1", "config", "on", NULL};
+//    igsJSONTreeValue_t *value = igs_JSONTreeGetValueAtPath(tree, path);
+//    bool b1 = igs_JSONTreeIsValueADouble(value);
+//    bool b2 = igs_JSONTreeIsValueAnInteger(value);
+//    igs_JSONTreeFree(&tree);
 //
 //    return 0;
 //}
