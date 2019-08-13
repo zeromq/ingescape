@@ -350,10 +350,9 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
 
                         CassUuid characteristicUid;
                         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &characteristicUid);
-                        QString chrCharacteristicUid = AssessmentsModelManager::cassUuidToQString(characteristicUid);
 
                         // Get the characteristic from its UID
-                        CharacteristicM* characteristic = currentExperimentation->getCharacteristicFromUID(chrCharacteristicUid);
+                        CharacteristicM* characteristic = currentExperimentation->getCharacteristicFromUID(characteristicUid);
 
                         // It does not yet exist
                         if (characteristic == nullptr)

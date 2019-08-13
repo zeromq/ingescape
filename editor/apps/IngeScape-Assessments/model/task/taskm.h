@@ -32,12 +32,6 @@ class TaskM : public QObject
 {
     Q_OBJECT
 
-    // Reference to experimentation's UUID from Cassandra DB (converted to string)
-    I2_CPP_NOSIGNAL_PROPERTY(QString, experimentationUuid)
-
-    // Unique identifier from Cassandra Data Base (converted to string)
-    I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
-
     // Name of our task
     I2_QML_PROPERTY(QString, name)
 

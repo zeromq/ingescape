@@ -257,15 +257,7 @@ Rectangle {
                 }
                 visible: rootItem.isCurrentlyEditing
 
-                style: I2ComboboxStyle {
-                    borderColorIdle: IngeScapeTheme.veryLightGreyColor
-                    currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                }
+                style: IngeScapeAssessmentsComboboxStyle {}
 
                 Binding {
                     target: agentComboboxEditor
@@ -340,15 +332,7 @@ Rectangle {
                 }
                 visible: rootItem.isCurrentlyEditing
 
-                style: I2ComboboxStyle {
-                    borderColorIdle: IngeScapeTheme.veryLightGreyColor
-                    currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                }
+                style: IngeScapeAssessmentsComboboxStyle {}
 
                 Binding {
                     target: outputComboboxEditor

@@ -46,27 +46,31 @@ I2PopupBase {
     // Flag indicating if a subject, amongst all subjects, is being edited
     property bool subjectEditionInProgress: false
 
-
-    //--------------------------------
-    //
-    //
-    // Signals
-    //
-    //
-    //--------------------------------
-
-    // Close Subjects view
-    signal closeSubjectsView();
-
+    // Current subject delegate being edited
+    property var currentlyEditedSubjectDelegate: null
 
 
     //--------------------------------
     //
     //
-    // Functions
+    // Slots
     //
     //
     //--------------------------------
+
+    onClosed: {
+        // Cancel any edition in progress when closing the subject popup
+        if (rootItem.currentlyEditedSubjectDelegate) {
+            rootItem.currentlyEditedSubjectDelegate.cancelEdition()
+        }
+    }
+
+    onSubjectEditionInProgressChanged: {
+        if (!subjectEditionInProgress) {
+            // Clear current subject being edited when edition ended
+            currentlyEditedSubjectDelegate = null
+        }
+    }
 
 
     //--------------------------------------------------------
@@ -101,8 +105,7 @@ I2PopupBase {
         }
 
         onClicked: {
-            // Emit the signal "closeSubjectsView"
-            rootItem.closeSubjectsView();
+            close()
         }
     }
 
@@ -431,6 +434,13 @@ I2PopupBase {
                                 target: rootItem
                                 property: "subjectEditionInProgress"
                                 value: subjectDelegate.isCurrentlyEditing
+                            }
+
+                            Binding {
+                                target: rootItem
+                                property: "currentlyEditedSubjectDelegate"
+                                value: subjectDelegate
+                                when: subjectDelegate.isCurrentlyEditing
                             }
 
                             onDeleteSubject: {

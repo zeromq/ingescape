@@ -35,5 +35,7 @@
         <file>qml/popup/AssessmentsPopupBase.qml</file>
         <file>qml/popup/DeleteConfirmationPopup.qml</file>
         <file>qml/theme/IngeScapeAssessmentsScrollViewStyle.qml</file>
+        <file>qml/task_instance/AttachementDelegate.qml</file>
+        <file>qml/theme/IngeScapeAssessmentsComboboxStyle.qml</file>
     </qresource>
 </RCC>

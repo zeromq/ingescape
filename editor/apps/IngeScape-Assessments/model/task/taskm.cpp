@@ -23,8 +23,6 @@
  */
 TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QString& name, const QUrl& platformFile, QObject *parent)
     : QObject(parent)
-    , _experimentationUuid(AssessmentsModelManager::cassUuidToQString(experimentationUuid))
-    , _uid(AssessmentsModelManager::cassUuidToQString(uid))
     , _name(name)
     , _platformFileUrl(QUrl())
     , _platformFileName("")

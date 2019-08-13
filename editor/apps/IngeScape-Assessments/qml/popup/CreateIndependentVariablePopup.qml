@@ -620,8 +620,7 @@ AssessmentsPopupBase {
             activeFocusOnPress: true
 
             enabled: if (rootPopup.taskController && (txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > -1))
-                     {
-                         // Edit an existing independent variable
+                     { // Edit an existing independent variable
                          if (rootPopup.independentVariableCurrentlyEdited)
                          {
                              rootPopup.taskController.canEditIndependentVariableWithName(rootPopup.independentVariableCurrentlyEdited, txtIndependentVariableName.text);
@@ -650,6 +649,18 @@ AssessmentsPopupBase {
                         // if the user decreases the value of the spin box after edition the last TextField)
                         // Where N = spinBoxValuesNumber.value (the value of the spin box)
                         var displayedEnumTexts = rootPopup.enumTexts.slice(0, spinBoxValuesNumber.value);
+
+                        // Check for duplicates
+                        let singles = []
+                        displayedEnumTexts.forEach(function(element, index) {
+                            // If the element is already in 'singles', it's a duplicate
+                            if (singles.indexOf(element) > -1) {
+                                //FIXME Show appropriate error message
+                            }
+
+                            // Add the element to 'singles'
+                            singles.push(element);
+                        })
 
                         var isEmptyValue = false;
                         var index = 0;

@@ -30,11 +30,11 @@ class TaskInstanceM : public QObject
 {
     Q_OBJECT
 
-    // Unique identifier of our record
-    I2_QML_PROPERTY(QString, uid)
+    // Name
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, name)
 
-    // Name of our record
-    I2_QML_PROPERTY(QString, name)
+    // User comments
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, comments)
 
     // Subject of our record
     I2_QML_PROPERTY_DELETE_PROOF(SubjectM*, subject)
@@ -75,12 +75,13 @@ public:
      * @param parent
      */
     explicit TaskInstanceM(CassUuid experimentationUuid,
-                          CassUuid cassUuid,
-                          QString name,
-                          SubjectM* subject,
-                          TaskM* task,
-                          QDateTime startDateTime,
-                          QObject *parent = nullptr);
+                           CassUuid cassUuid,
+                           QString name,
+                           QString comments,
+                           SubjectM* subject,
+                           TaskM* task,
+                           QDateTime startDateTime,
+                           QObject *parent = nullptr);
 
 
     /**
@@ -127,6 +128,11 @@ private:
      * @brief For debug purpose: Print the value of all independent variables
      */
     void _printIndependentVariableValues();
+
+    /**
+     * @brief Update the DB entry corresponding
+     */
+    void _updateDBEntry();
 
 private:
     QHash<QString, IndependentVariableM*> _mapIndependentVarByName;

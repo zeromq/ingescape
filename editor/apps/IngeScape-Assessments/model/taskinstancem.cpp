@@ -28,19 +28,19 @@ const QString TaskInstanceM::table = "ingescape.task_instance";
  * @param parent
  */
 TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
-                           CassUuid cassUuid,
-                           QString name,
-                           SubjectM* subject,
-                           TaskM* task,
-                           QDateTime startDateTime,
-                           QObject *parent) : QObject(parent),
-    _uid(AssessmentsModelManager::cassUuidToQString(cassUuid)),
+                             CassUuid cassUuid,
+                             QString name,
+                             QString comments,
+                             SubjectM* subject,
+                             TaskM* task,
+                             QDateTime startDateTime,
+                             QObject *parent) : QObject(parent),
     _name(name),
+    _comments(comments),
     _subject(subject),
     _task(task),
     _startDateTime(startDateTime),
     _endDateTime(QDateTime()),
-    //_duration(QDateTime())
     _duration(QTime()),
     _mapIndependentVariableValues(nullptr),
     _experimentationCassUuid(experimentationUuid),
@@ -51,7 +51,7 @@ TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
 
     if ((subject != nullptr) && (task != nullptr))
     {
-        qInfo() << "New Model of Record" << _name << "(" << _uid << ") for subject" << _subject->displayedId() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
+        qInfo() << "New Model of Record" << _name << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ") for subject" << _subject->displayedId() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
 
         // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
         _mapIndependentVariableValues = new QQmlPropertyMap(this);
@@ -79,7 +79,7 @@ TaskInstanceM::~TaskInstanceM()
 {
     if ((_subject != nullptr) && (_task != nullptr))
     {
-        qInfo() << "Delete Model of Record" << _name << "(" << _uid << ") for subject" << _subject->displayedId() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
+        qInfo() << "Delete Model of Record" << _name << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ") for subject" << _subject->displayedId() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
 
         // For debug purpose: Print the value of all independent variables
         _printIndependentVariableValues();
@@ -104,6 +104,44 @@ TaskInstanceM::~TaskInstanceM()
         // Reset pointers
         setsubject(nullptr);
         settask(nullptr);
+    }
+}
+
+/**
+ * @brief Custome _name setter that updates the DB entry with the new name
+ * @param value
+ */
+void TaskInstanceM::setname(QString value)
+{
+    if (value != _name)
+    {
+        // Assign value
+        _name = value;
+
+        // Update DB entry
+        _updateDBEntry();
+
+        // Notify change
+        Q_EMIT nameChanged(value);
+    }
+}
+
+/**
+ * @brief Custome _comments setter that updates the DB entry with the new user comments
+ * @param value
+ */
+void TaskInstanceM::setcomments(QString value)
+{
+    if (value != _comments)
+    {
+        // Assign value
+        _comments = value;
+
+        // Update DB entry
+        _updateDBEntry();
+
+        // Notify change
+        Q_EMIT commentsChanged(value);
     }
 }
 
@@ -148,6 +186,11 @@ TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* 
         cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
         QString taskName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
 
+        const char *chrComments = "";
+        size_t commentsLength = 0;
+        cass_value_get_string(cass_row_get_column_by_name(row, "comments"), &chrComments, &commentsLength);
+        QString comments = QString::fromUtf8(chrComments, static_cast<int>(commentsLength));
+
         const char *chrPlatformUrl = "";
         size_t platformUrlLength = 0;
         cass_value_get_string(cass_row_get_column_by_name(row, "platform_file"), &chrPlatformUrl, &platformUrlLength);
@@ -161,7 +204,7 @@ TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* 
         /* Convert 'date' and 'time' to Epoch time */
         time_t time = static_cast<time_t>(cass_date_time_to_epoch(yearMonthDay, timeOfDay));
 
-        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, taskName, subject, task, QDateTime::fromTime_t(static_cast<uint>(time)));
+        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, taskName, comments, subject, task, QDateTime::fromTime_t(static_cast<uint>(time)));
     }
 
     return taskInstance;
@@ -294,5 +337,51 @@ void TaskInstanceM::_printIndependentVariableValues()
                 }
             }
         }
+    }
+}
+
+/**
+ * @brief Update the DB entry corresponding
+ */
+void TaskInstanceM::_updateDBEntry()
+{
+    if ((_task != nullptr) && (_subject != nullptr))
+    {
+        time_t startDateTime(_startDateTime.toTime_t());
+        cass_uint32_t startYearMonthDay = cass_date_from_epoch(startDateTime);
+        cass_int64_t startTimeOfDay = cass_time_from_epoch(startDateTime);
+        time_t endDateTime(_startDateTime.toTime_t());
+        cass_uint32_t endYearMonthDay = cass_date_from_epoch(endDateTime);
+        cass_int64_t endTimeOfDay = cass_time_from_epoch(endDateTime);
+
+
+        //FIXME Hard coded record UUID for test purposes
+        CassUuid recordUuid;
+        cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
+
+        QString queryStr("UPDATE " + TaskInstanceM::table
+                         + " SET name = ?, comments = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?"
+                         + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;");
+
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 11);
+        cass_statement_bind_string(cassStatement, 0, _name.toStdString().c_str());
+        cass_statement_bind_string(cassStatement, 1, _comments.toStdString().c_str());
+        cass_statement_bind_uint32(cassStatement, 2, startYearMonthDay);
+        cass_statement_bind_int64 (cassStatement, 3, startTimeOfDay);
+        cass_statement_bind_uint32(cassStatement, 4, endYearMonthDay);
+        cass_statement_bind_int64 (cassStatement, 5, endTimeOfDay);
+        cass_statement_bind_uuid  (cassStatement, 6, _subject->getExperimentationCassUuid());
+        cass_statement_bind_uuid  (cassStatement, 7, _subject->getCassUuid());
+        cass_statement_bind_uuid  (cassStatement, 8, _task->getCassUuid());
+        cass_statement_bind_uuid  (cassStatement, 9, recordUuid);
+        cass_statement_bind_uuid  (cassStatement, 10, getCassUuid());
+
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError != CASS_OK)
+        {
+            qCritical() << "Unable to update the TaskInstance" << _name << cass_error_desc(cassError);
+        }
+
     }
 }

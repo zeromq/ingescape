@@ -10,6 +10,7 @@ SOURCES += \
     $$PWD/misc/terminationsignalwatcher.cpp \
     $$PWD/misc/ingescapeutils.cpp \
     $$PWD/misc/debugquickinspector.cpp \
+    $$PWD/misc/urlutils.cpp \
     $$PWD/model/enums.cpp \
     $$PWD/model/hostm.cpp \
     $$PWD/model/jsonhelper.cpp \
@@ -56,6 +57,7 @@ HEADERS += \
     $$PWD/misc/terminationsignalwatcher.h \
     $$PWD/misc/ingescapeutils.h \
     $$PWD/misc/debugquickinspector.h \
+    $$PWD/misc/urlutils.h \
     $$PWD/model/enums.h \
     $$PWD/model/hostm.h \
     $$PWD/model/jsonhelper.h \

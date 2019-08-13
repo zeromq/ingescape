@@ -31,7 +31,6 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
                                    QString groupeName,
                                    QDateTime creationDate,
                                    QObject *parent) : QObject(parent),
-    _uid(AssessmentsModelManager::cassUuidToQString(cassUuid)),
     _name(name),
     _groupName(groupeName),
     _creationDate(creationDate),
@@ -40,7 +39,7 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << _uid << ")";
+    qInfo() << "New Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ")";
 
     // Task instances are sorted on their start date/time (chronological order)
     _allTaskInstances.setSortProperty("startDateTime");
@@ -52,7 +51,7 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
  */
 ExperimentationM::~ExperimentationM()
 {
-    qInfo() << "Delete Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << _uid << ")";
+    qInfo() << "Delete Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ")";
 
     clearData();
 }
@@ -120,10 +119,10 @@ CassUuid ExperimentationM::getCassUuid() const
  */
 void ExperimentationM::addCharacteristic(CharacteristicM* characteristic)
 {
-    if ((characteristic != nullptr) && !_hashFromUIDtoCharacteristic.contains(characteristic->uid()))
+    if ((characteristic != nullptr) && !_hashFromUIDtoCharacteristic.contains(characteristic->getCassUuid()))
     {
         // Add to the hash
-        _hashFromUIDtoCharacteristic.insert(characteristic->uid(), characteristic);
+        _hashFromUIDtoCharacteristic.insert(characteristic->getCassUuid(), characteristic);
 
         // Add to the list
         _allCharacteristics.append(characteristic);
@@ -137,10 +136,10 @@ void ExperimentationM::addCharacteristic(CharacteristicM* characteristic)
  */
 void ExperimentationM::removeCharacteristic(CharacteristicM* characteristic)
 {
-    if ((characteristic != nullptr) && _hashFromUIDtoCharacteristic.contains(characteristic->uid()))
+    if ((characteristic != nullptr) && _hashFromUIDtoCharacteristic.contains(characteristic->getCassUuid()))
     {
         // Remove from the hash
-        _hashFromUIDtoCharacteristic.remove(characteristic->uid());
+        _hashFromUIDtoCharacteristic.remove(characteristic->getCassUuid());
 
         // Remove from the list
         _allCharacteristics.remove(characteristic);
@@ -233,35 +232,35 @@ void ExperimentationM::removeTaskInstance(TaskInstanceM* taskInstance)
 
 
 /**
- * @brief Get a characteristic from its UID
- * @param uid
+ * @brief Get a characteristic from its UUID
+ * @param cassUuid
  * @return
  */
-CharacteristicM* ExperimentationM::getCharacteristicFromUID(const QString& uid)
+CharacteristicM* ExperimentationM::getCharacteristicFromUID(const CassUuid& cassUuid)
 {
-    return _hashFromUIDtoCharacteristic.value(uid, nullptr);
+    return _hashFromUIDtoCharacteristic.value(cassUuid, nullptr);
 }
 
 /**
- * @brief Get a task from its UID
- * @param uid
+ * @brief Get a task from its UUID
+ * @param cassUuid
  * @return
  */
-SubjectM* ExperimentationM::getSubjectFromUID(const QString& uid)
+SubjectM* ExperimentationM::getSubjectFromUID(const CassUuid& cassUuid)
 {
-    auto subjectIt = std::find_if(_allSubjects.begin(), _allSubjects.end(), [uid](SubjectM* subject) { return (subject != nullptr) && (subject->uid() == uid); });
+    auto subjectIt = std::find_if(_allSubjects.begin(), _allSubjects.end(), [cassUuid](SubjectM* subject) { return (subject != nullptr) && (subject->getCassUuid() == cassUuid); });
     return (subjectIt != _allSubjects.end()) ? *subjectIt : nullptr;
 }
 
 
 /**
- * @brief Get a task from its UID
- * @param uid
+ * @brief Get a task from its UUID
+ * @param cassUuid
  * @return
  */
-TaskM* ExperimentationM::getTaskFromUID(const QString& uid)
+TaskM* ExperimentationM::getTaskFromUID(const CassUuid& cassUuid)
 {
-    auto taskIt = std::find_if(_allTasks.begin(), _allTasks.end(), [uid](TaskM* task) { return (task != nullptr) && (task->uid() == uid); });
+    auto taskIt = std::find_if(_allTasks.begin(), _allTasks.end(), [cassUuid](TaskM* task) { return (task != nullptr) && (task->getCassUuid() == cassUuid); });
     return (taskIt != _allTasks.end()) ? *taskIt : nullptr;
 }
 

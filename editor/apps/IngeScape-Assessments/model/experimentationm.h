@@ -33,9 +33,6 @@ class ExperimentationM : public QObject
 {
     Q_OBJECT
 
-    // Unique identifier in Cassandra Data Base converted to string
-    I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
-
     // Name of our experimentation
     I2_QML_PROPERTY_CUSTOM_SETTER(QString, name)
 
@@ -155,26 +152,26 @@ public:
 
 
     /**
-     * @brief Get a characteristic from its UID
-     * @param uid
+     * @brief Get a characteristic from its UUID
+     * @param cassUuid
      * @return
      */
-    CharacteristicM* getCharacteristicFromUID(const QString& uid);
+    CharacteristicM* getCharacteristicFromUID(const CassUuid& cassUuid);
 
     /**
-     * @brief Get a task from its UID
-     * @param uid
+     * @brief Get a task from its UUID
+     * @param cassUuid
      * @return
      */
-    SubjectM* getSubjectFromUID(const QString& uid);
+    SubjectM* getSubjectFromUID(const CassUuid& cassUuid);
 
 
     /**
-     * @brief Get a task from its UID
-     * @param uid
+     * @brief Get a task from its UUID
+     * @param cassUuid
      * @return
      */
-    TaskM* getTaskFromUID(const QString& uid);
+    TaskM* getTaskFromUID(const CassUuid& cassUuid);
 
 
     /**
@@ -219,7 +216,7 @@ private:
     CassUuid _cassUuid;
 
     // Hash table from an UID to a characteristic
-    QHash<QString, CharacteristicM*> _hashFromUIDtoCharacteristic;
+    QHash<CassUuid, CharacteristicM*> _hashFromUIDtoCharacteristic;
 
 };
 

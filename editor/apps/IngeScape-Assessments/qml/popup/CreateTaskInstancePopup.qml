@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Mathieu Soum       <soum@ingenuity.io>
  *
  */
 
@@ -218,6 +219,8 @@ AssessmentsPopupBase {
             enabled: rootItem.experimentation ? (rootItem.experimentation.allSubjects.count > 0)
                                               : false
 
+            style: IngeScapeAssessmentsComboboxStyle {}
+
             function modelToString(_model) {
                 if (_model) {
                     return _model.displayedId;
@@ -278,6 +281,8 @@ AssessmentsPopupBase {
             enabled: rootItem.experimentation && (rootItem.experimentation.allTasks.count > 0)
 
             model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
+
+            style: IngeScapeAssessmentsComboboxStyle {}
 
             function modelToString(_model) {
                 if (_model) {

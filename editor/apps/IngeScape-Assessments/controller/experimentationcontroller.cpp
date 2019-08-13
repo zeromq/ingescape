@@ -215,18 +215,19 @@ TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QStrin
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
 
-        QString queryStr = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, id_records, name, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
+        QString queryStr = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, id_records, name, comments, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 11);
         cass_statement_bind_uuid  (cassStatement, 0, taskInstanceUuid);
         cass_statement_bind_uuid  (cassStatement, 1, _currentExperimentation->getCassUuid());
         cass_statement_bind_uuid  (cassStatement, 2, subject->getCassUuid());
         cass_statement_bind_uuid  (cassStatement, 3, task->getCassUuid());
         cass_statement_bind_uuid  (cassStatement, 4, recordUuid);
         cass_statement_bind_string(cassStatement, 5, taskInstanceName.toStdString().c_str());
-        cass_statement_bind_uint32(cassStatement, 6, yearMonthDay);
-        cass_statement_bind_int64 (cassStatement, 7, timeOfDay);
-        cass_statement_bind_uint32(cassStatement, 8, yearMonthDay); //FIXME current date/time to have all values filled with something for test purposes.
-        cass_statement_bind_int64 (cassStatement, 9, timeOfDay); //FIXME current date/time to have all values filled with something for test purposes.
+        cass_statement_bind_string(cassStatement, 6, "");
+        cass_statement_bind_uint32(cassStatement, 7, yearMonthDay);
+        cass_statement_bind_int64 (cassStatement, 8, timeOfDay);
+        cass_statement_bind_uint32(cassStatement, 9, yearMonthDay); //FIXME current date/time to have all values filled with something for test purposes.
+        cass_statement_bind_int64 (cassStatement, 10, timeOfDay); //FIXME current date/time to have all values filled with something for test purposes.
 
         // Execute the query or bound statement
         CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
@@ -236,7 +237,7 @@ TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QStrin
             qInfo() << "New task_instance inserted into the DB";
 
             // Create the new task instance
-            taskInstance = new TaskInstanceM(_currentExperimentation->getCassUuid(), taskInstanceUuid, taskInstanceName, subject, task, QDateTime::currentDateTime());
+            taskInstance = new TaskInstanceM(_currentExperimentation->getCassUuid(), taskInstanceUuid, taskInstanceName, "", subject, task, QDateTime::currentDateTime());
 
             for (auto indeVarIt = task->independentVariables()->begin() ; indeVarIt != task->independentVariables()->end() ; ++indeVarIt)
             {
@@ -575,11 +576,11 @@ void ExperimentationController::_retrieveTaskInstancesForExperimentation(Experim
 
                     CassUuid subjectUuid;
                     cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
-                    SubjectM* subject = experimentation->getSubjectFromUID(AssessmentsModelManager::cassUuidToQString(subjectUuid));
+                    SubjectM* subject = experimentation->getSubjectFromUID(subjectUuid);
 
                     CassUuid taskUuid;
                     cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
-                    TaskM* task = experimentation->getTaskFromUID(AssessmentsModelManager::cassUuidToQString(taskUuid));
+                    TaskM* task = experimentation->getTaskFromUID(taskUuid);
 
                     TaskInstanceM* taskInstance = TaskInstanceM::createTaskInstanceFromCassandraRow(row, subject, task);
                     if (taskInstance != nullptr)
@@ -645,8 +646,6 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
                             // Get characteristic id
                             CassUuid characteristicUuid;
                             cass_value_get_uuid(cass_row_get_column_by_name(row, "id_characteristic"), &characteristicUuid);
-                            char chrCharacteristicUid[CASS_UUID_STRING_LENGTH];
-                            cass_uuid_string(characteristicUuid, chrCharacteristicUid);
 
                             // Get characteristic value as a string
                             const char *chrValueString = "";
@@ -656,7 +655,7 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
 
 
                             // Get characteristic value type
-                            CharacteristicM* characteristic = _currentExperimentation->getCharacteristicFromUID(chrCharacteristicUid);
+                            CharacteristicM* characteristic = _currentExperimentation->getCharacteristicFromUID(characteristicUuid);
                             if (characteristic != nullptr)
                             {
                                 switch (characteristic->valueType()) {

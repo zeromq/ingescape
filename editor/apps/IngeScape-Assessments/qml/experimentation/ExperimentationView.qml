@@ -137,7 +137,25 @@ Item {
 
             radius: 5
 
-            width: Math.max(expeName.width + 76, 450)
+            // Background rectangle won't be smaller than this
+            property real minWidth: 450
+
+            // Max available width based on the size of the parent. Won't be bigger than this
+            property real maxAvailableWidth: (parent.width
+                                              - 92 // enumName's leftMargin
+                                              + 10 // this left margin from enumName
+                                              - 22 // Right margin left to avoid reaching the edge of the window
+                                              - 10  // Margins around the edit button (5 on both sides)
+                                              )
+
+            // Desired width to follow the size of expeName
+            property real desiredWidth: expeName.width
+                                        + 10                // leftMargin
+                                        + 10                // rightMargin
+                                        + editButton.width  // button size
+                                        + 14                // margin between edit button and text
+
+            width: Math.min(maxAvailableWidth, Math.max(desiredWidth, minWidth))
             height: 40
 
             color: IngeScapeTheme.veryLightGreyColor
@@ -194,7 +212,16 @@ Item {
                 leftMargin: 92
             }
 
+            property real maxAvailableWidth: expeNameEditBackground.maxAvailableWidth
+                                             - 10                // background's left margin
+                                             - 5                 // edit button's right margin
+                                             - editButton.width  // edit button's width
+                                             - 14                // margin between edit button and text
+
+            width: Math.min(implicitWidth, maxAvailableWidth)
+
             text: rootItem.experimentation ? rootItem.experimentation.name : ""
+            elide: Text.ElideRight
 
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignLeft
@@ -247,10 +274,16 @@ Item {
 
             Text {
                 id: expeGroupNameText
+
+                property real maxAvailableWidth: expeName.maxAvailableWidth - expeGroupDate.width
+                width: Math.min(implicitWidth, maxAvailableWidth)
+
                 text: rootItem.experimentation ? rootItem.experimentation.groupName : ""
+                elide: Text.ElideRight
 
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
+
 
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
@@ -261,6 +294,8 @@ Item {
             }
 
             Text {
+                id: expeGroupDate
+
                 height: expeGroupNameText.height
 
                 text: rootItem.experimentation ? rootItem.experimentation.creationDate.toLocaleString(Qt.locale(), " - dd/MM/yyyy - hh:mm:ss") : ""
@@ -728,16 +763,6 @@ Item {
         height: parent.height - 78
 
         subjectController: IngeScapeAssessmentsC.subjectsC
-
-        //
-        // Slots
-        //
-        onCloseSubjectsView: {
-            console.log("QML: on Close Subjects view");
-
-            // Remove the "Subjects View" from the stack
-            close()
-        }
     }
 
 

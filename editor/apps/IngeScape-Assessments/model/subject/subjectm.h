@@ -27,9 +27,6 @@ class SubjectM : public QObject
 {
     Q_OBJECT
 
-    // Unique identifier in Cassandra Data Base converted to string
-    I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
-
     // Displayed identifier of our subject
     I2_QML_PROPERTY(QString, displayedId)
 

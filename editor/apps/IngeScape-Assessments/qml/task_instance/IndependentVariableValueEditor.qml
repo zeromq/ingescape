@@ -29,9 +29,6 @@ import INGESCAPE 1.0
 Item {
     id: rootItem
 
-    //anchors.fill: parent
-
-    width: parent.width
     height: 30
 
 
@@ -48,8 +45,6 @@ Item {
     // Keep type "var" because the C++ use a QVariant
     property var variableValue: "";
 
-    property bool isCurrentlyEditing: false;
-
 
 
     //--------------------------------
@@ -60,32 +55,8 @@ Item {
     //
     //--------------------------------
 
-    // Signal emitted when the user clicks on the toggle button to edit the variable
-    //signal editVariable();
-
-    // Signal emitted when the user clicks on the toggle button to stop the edition of the variable
-    //signal stopEditionOfVariable();
-
     // Independent Variable Value Updated
     signal independentVariableValueUpdated(var value);
-
-
-    //--------------------------------
-    //
-    //
-    // Slots
-    //
-    //
-    //--------------------------------
-
-    /*onCharacteristicChanged: {
-        console.log("QML: on Characteristic changed " + characteristic.name);
-    }*/
-
-    /*onCharacteristicValueChanged: {
-        console.log("QML: on Characteristic Value changed " + characteristicValue);
-    }*/
-
 
     //--------------------------------------------------------
     //
@@ -95,114 +66,69 @@ Item {
     //
     //--------------------------------------------------------
 
-    Rectangle {
-        id: background
+
+    I2SvgItem {
+        id: infoSvg
 
         anchors {
             left: parent.left
+            verticalCenter: parent.verticalCenter
+        }
+
+        svgFileCache: IngeScapeAssessmentsTheme.svgFileIngeScapeAssessments
+        svgElementId: "info-description"
+
+        MouseArea {
+            id: mouseAreaInfo
+            anchors.fill: parent
+            hoverEnabled: true
+        }
+
+        Controls2.ToolTip {
+            visible: mouseAreaInfo.containsMouse
+            delay: 800
+            text: rootItem.variable ? IndependentVariableValueTypes.enumToString(rootItem.variable.valueType) + "\n" + rootItem.variable.description : ""
+        }
+    }
+
+    Text {
+        id: indeVarName
+
+        anchors {
+            left: parent.left
+            leftMargin: 26
+            verticalCenter: parent.verticalCenter
+            right: loaderEditor.left
+            rightMargin: 15
+        }
+
+        text: rootItem.variable ? rootItem.variable.name + ":" : ""
+
+        elide: Text.ElideRight
+        color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+        font {
+            family: IngeScapeTheme.textFontFamily
+            weight: Font.Medium
+            pixelSize: 16
+        }
+    }
+
+    Loader {
+        id: loaderEditor
+
+        anchors {
+            left: parent.left
+            leftMargin: 213
             right: parent.right
             top: parent.top
             bottom: parent.bottom
         }
 
-        color: "transparent"
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
-        }
-
-        Text {
-            id: txtName
-
-            anchors {
-                left: parent.left
-                leftMargin: 5
-                top: parent.top
-                bottom: parent.bottom
-                margins: 1
-            }
-            width: 100
-
-            text: rootItem.variable ? rootItem.variable.name + ":" : ""
-
-            elide: Text.ElideRight
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignRight
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                //weight: Font.Medium
-                pixelSize: 12
-            }
-
-            MouseArea {
-                id: mouseAreaName
-
-                anchors.fill: parent
-
-                hoverEnabled: true
-            }
-
-            Controls2.ToolTip {
-                visible: mouseAreaName.containsMouse
-                delay: 800
-                text: rootItem.variable ? IndependentVariableValueTypes.enumToString(rootItem.variable.valueType) + "\n" + rootItem.variable.description : ""
-            }
-        }
-
-        Text {
-            id: txtValue
-
-            anchors {
-                left: txtName.right
-                leftMargin: 5
-                right: parent.right
-                rightMargin: 1
-                top: parent.top
-                topMargin: 1
-                bottom: parent.bottom
-                bottomMargin: 1
-            }
-
-            visible: !rootItem.isCurrentlyEditing
-
-            text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
-            elide: Text.ElideRight
-
-            verticalAlignment: Text.AlignVCenter
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 14
-            }
-        }
-
-
-        Loader {
-            id: loaderEditor
-
-            anchors {
-                left: txtName.right
-                leftMargin: 5
-                right: parent.right
-                rightMargin: 1
-                top: parent.top
-                topMargin: 1
-                bottom: parent.bottom
-                bottomMargin: 1
-            }
-
-            visible: rootItem.isCurrentlyEditing
-
-            // Load editor in function of the value type:
-            // - Enum --> combobox
-            // - NOT enum --> text field
-            sourceComponent: (rootItem.variable && (rootItem.variable.valueType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)) ? componentComboboxEditor
-                                                                                                                                              : componentTextFieldEditor
-        }
+        // Load editor in function of the value type:
+        // - Enum --> combobox
+        // - NOT enum --> text field
+        sourceComponent: (rootItem.variable && (rootItem.variable.valueType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)) ? componentComboboxEditor
+                                                                                                                                          : componentTextFieldEditor
     }
 
 
@@ -217,21 +143,24 @@ Item {
 
             model: rootItem.variable ? rootItem.variable.enumValues : null
 
+            style: IngeScapeAssessmentsComboboxStyle {}
+
+            Binding {
+                target: comboboxEditor
+                property: "selectedItem"
+                value: rootItem.variableValue
+            }
+
             onSelectedItemChanged: {
 
                 if (comboboxEditor.selectedItem)
                 {
-                    //console.log("QML: on Selected Item Changed " + comboboxEditor.selectedItem);
-
                     // Emit the signal "Independent Variable Value Updated"
                     rootItem.independentVariableValueUpdated(comboboxEditor.selectedItem);
                 }
             }
 
             Component.onCompleted: {
-
-                //console.log("onCompleted: selectedIndex=" + comboboxEditor.selectedIndex + " -- variableValue=" + rootItem.variableValue);
-
                 if ((comboboxEditor.selectedIndex < 0) && (typeof rootItem.variableValue !== 'undefined'))
                 {
                     var index = comboboxEditor.model.indexOf(rootItem.variableValue);
@@ -258,8 +187,6 @@ Item {
 
             text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
 
-            //inputMethodHints: Qt.ImhFormattedNumbersOnly
-
             validator: if (rootItem.variable)
                        {
                            if (rootItem.variable.valueType === IndependentVariableValueTypes.INTEGER) {
@@ -276,36 +203,29 @@ Item {
                            return null;
                        }
 
-
             style: I2TextFieldStyle {
-                backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                borderColor: IngeScapeTheme.whiteColor
+                backgroundColor: IngeScapeTheme.veryLightGreyColor
+                borderColor: IngeScapeAssessmentsTheme.blueButton
                 borderErrorColor: IngeScapeTheme.redColor
-                radiusTextBox: 1
-                borderWidth: 0;
-                borderWidthActive: 1
-                textIdleColor: IngeScapeTheme.whiteColor;
-                textDisabledColor: IngeScapeTheme.darkGreyColor
+                radiusTextBox: 5
+                borderWidth: 0
+                borderWidthActive: 2
+                textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
+                textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
 
-                padding.left: 3
-                padding.right: 3
+                padding.left: 12
+                padding.right: 12
 
                 font {
-                    pixelSize:15
+                    pixelSize: 16
                     family: IngeScapeTheme.textFontFamily
                 }
             }
 
             onTextChanged: {
-                //console.log("QML: on Text Changed " + textFieldEditor.text);
-
                 // Emit the signal "Independent Variable Value Updated"
                 rootItem.independentVariableValueUpdated(textFieldEditor.text);
             }
-
-            /*Component.onCompleted: {
-                console.log("onCompleted: text=" + textFieldEditor.text + " -- variableValue=" + rootItem.variableValue);
-            }*/
         }
     }
 }

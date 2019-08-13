@@ -58,6 +58,26 @@ Rectangle {
 
 
     //
+    // Slots
+    //
+
+    // Discards any edited values and end edition
+    function cancelEdition() {
+        rootItem.isCurrentlyEditing = false
+    }
+
+    // Apply the edited values to the actual subjact properties
+    function applyEdition() {
+        if (rootItem.subject)
+        {
+            rootItem.subject.applyTemporaryPropertyValues()
+        }
+
+        rootItem.isCurrentlyEditing = false
+    }
+
+
+    //
     // Content
     //
 
@@ -137,14 +157,7 @@ Rectangle {
 
                         model: characteristicDelegate.characteristic ? characteristicDelegate.characteristic.enumValues : null
 
-                        style: I2ComboboxStyle {
-                            borderColorIdle: IngeScapeTheme.veryLightGreyColor
-                            currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                            font {
-                                family: IngeScapeTheme.textFontFamily
-                                pixelSize: 16
-                            }
-                        }
+                        style: IngeScapeAssessmentsComboboxStyle {}
 
                         Binding {
                             target: comboboxEditor
@@ -262,12 +275,7 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.subject)
-                {
-                    rootItem.subject.applyTemporaryPropertyValues()
-                }
-
-                rootItem.isCurrentlyEditing = false
+                applyEdition()
             }
         }
 
@@ -289,7 +297,7 @@ Rectangle {
             }
 
             onClicked: {
-                rootItem.isCurrentlyEditing = false
+                cancelEdition()
             }
         }
     }
