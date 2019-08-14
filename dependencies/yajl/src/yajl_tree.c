@@ -460,16 +460,35 @@ igsyajl_val igsyajl_tree_get(igsyajl_val n, const char ** path, igsyajl_type typ
         size_t i;
         size_t len;
 
-        if (n->type != igsyajl_t_object) return NULL;
-        len = n->u.object.len;
-        for (i = 0; i < len; i++) {
-            if (!strcmp(*path, n->u.object.keys[i])) {
-                n = n->u.object.values[i];
-                break;
+        if (n->type == igsyajl_t_object){
+            len = n->u.object.len;
+            for (i = 0; i < len; i++) {
+                if (!strcmp(*path, n->u.object.keys[i])) {
+                    n = n->u.object.values[i];
+                    break;
+                }
+            }
+            if (i == len) return NULL;
+            path++;
+        } else if (n->type == igsyajl_t_array){
+            len = n->u.array.len;
+            char *end = (char *)*path;
+            long index = strtol(*path, &end, 10);
+            if (end != *path && index >= 0){
+                //we got a valid index
+                if (index < len){
+                    //we are in range
+                    n = n->u.array.values[index];
+                    path++;
+                }else{
+                    //out of range
+                    return NULL;
+                }
+            }else{
+                //invalid index format
+                return NULL;
             }
         }
-        if (i == len) return NULL;
-        path++;
     }
     if (n && type != igsyajl_t_any && type != n->type) n = NULL;
     return n;
