@@ -459,7 +459,6 @@ igsyajl_val igsyajl_tree_get(igsyajl_val n, const char ** path, igsyajl_type typ
     while (n && *path) {
         size_t i;
         size_t len;
-
         if (n->type == igsyajl_t_object){
             len = n->u.object.len;
             for (i = 0; i < len; i++) {
@@ -469,7 +468,6 @@ igsyajl_val igsyajl_tree_get(igsyajl_val n, const char ** path, igsyajl_type typ
                 }
             }
             if (i == len) return NULL;
-            path++;
         } else if (n->type == igsyajl_t_array){
             len = n->u.array.len;
             char *end = (char *)*path;
@@ -479,7 +477,6 @@ igsyajl_val igsyajl_tree_get(igsyajl_val n, const char ** path, igsyajl_type typ
                 if (index < len){
                     //we are in range
                     n = n->u.array.values[index];
-                    path++;
                 }else{
                     //out of range
                     return NULL;
@@ -489,6 +486,7 @@ igsyajl_val igsyajl_tree_get(igsyajl_val n, const char ** path, igsyajl_type typ
                 return NULL;
             }
         }
+        path++;
     }
     if (n && type != igsyajl_t_any && type != n->type) n = NULL;
     return n;
