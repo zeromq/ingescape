@@ -325,19 +325,14 @@ void igs_JSONparseFromString(const char *content, igs_JSONCallback cb, void *myD
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // parse a JSON string or file "DOM style" with a tree
-typedef struct _igsJSONTree {
-    igsyajl_val root;
-} _igsJSONTree;
-
-void igs_JSONTreeFree(igsJSONTree_t *tree){
-    if (tree != NULL && *tree != NULL){
-        if ((*tree)->root != NULL)
-            igsyajl_tree_free((*tree)->root);
-        *tree = NULL;
+void igs_JSONTreeFree(igsJSONTreeNode_t **node){
+    if (node != NULL && *node != NULL){
+        igsyajl_tree_free((igsyajl_val)*node);
+        *node = NULL;
     }
 }
 
-igsJSONTree_t igs_JSONTreeParseFromFile(const char *path){
+igsJSONTreeNode_t* igs_JSONTreeParseFromFile(const char *path){
     zfile_t *file = zfile_new (NULL, path);
     if (file == NULL || !zfile_is_regular(file) || !zfile_is_readable(file) || zfile_input(file)){
         igs_error("could not open %s", path);
@@ -345,40 +340,40 @@ igsJSONTree_t igs_JSONTreeParseFromFile(const char *path){
     }
     char errbuf[1024] = "unknown error";
     zchunk_t *data = zfile_read (file, zfile_size(path), 0);
-    igsJSONTree_t tree = calloc(1, sizeof(_igsJSONTree));
-    tree->root = igsyajl_tree_parse((const char *)zchunk_data(data), errbuf, sizeof(errbuf));
-    if (tree->root == NULL){
+    igsJSONTreeNode_t* node = calloc(1, sizeof(igsJSONTreeNode_t));
+    node = (igsJSONTreeNode_t*)igsyajl_tree_parse((const char *)zchunk_data(data), errbuf, sizeof(errbuf));
+    if (node == NULL){
         igs_error("parsing error (%s) : %s", path, errbuf);
     }
     zchunk_destroy(&data);
     zfile_close(file);
-    return tree;
+    return node;
 }
 
-igsJSONTree_t igs_JSONTreeParseFromString(const char *content){
+igsJSONTreeNode_t* igs_JSONTreeParseFromString(const char *content){
     char errbuf[1024] = "unknown error";
-    igsJSONTree_t tree = calloc(1, sizeof(_igsJSONTree));
-    tree->root = igsyajl_tree_parse(content, errbuf, sizeof(errbuf));
-    if (tree->root == NULL){
+    igsJSONTreeNode_t* node = calloc(1, sizeof(igsJSONTreeNode_t));
+    node = (igsJSONTreeNode_t*)igsyajl_tree_parse(content, errbuf, sizeof(errbuf));
+    if (node == NULL){
         igs_error("parsing error (%s) : %s", content, errbuf);
     }
-    return tree;
+    return node;
 }
 
-igsJSONTreeValue_t* igs_JSONTreeGetValueAtPath(igsJSONTree_t tree, const char **path){
-    if (tree == NULL){
-        igs_warn("passed tree is NULL");
+igsJSONTreeNode_t* igs_JSONTreeGetNodeAtPath(igsJSONTreeNode_t* node, const char **path){
+    if (node == NULL){
+        igs_warn("passed node is NULL");
         return NULL;
     }
-    igsyajl_val v = igsyajl_tree_get(tree->root, path, igsyajl_t_any);
-    return (igsJSONTreeValue_t *)v;
+    igsyajl_val v = igsyajl_tree_get((igsyajl_val)node, path, igsyajl_t_any);
+    return (igsJSONTreeNode_t *)v;
 }
 
-bool igs_JSONTreeIsValueAnInteger(igsJSONTreeValue_t *value){
+bool igs_JSONTreeIsValueAnInteger(igsJSONTreeNode_t *value){
     return IGSYAJL_IS_INTEGER(value);
 }
 
-bool igs_JSONTreeIsValueADouble(igsJSONTreeValue_t *value){
+bool igs_JSONTreeIsValueADouble(igsJSONTreeNode_t *value){
     return IGSYAJL_IS_DOUBLE(value);
 }
 
@@ -530,14 +525,14 @@ bool igs_JSONTreeIsValueADouble(igsJSONTreeValue_t *value){
 //
 //    igs_JSONparseFromFile("/Users/steph/Documents/IngeScape/agents/igsDDS_definition.json", json_testParsingCallback, "plop");
 //
-//    igsJSONTree_t tree = igs_JSONTreeParseFromFile("/Users/steph/Documents/IngeScape/agents/philips.json");
+//    igsJSONTreeNode_t* node = igs_JSONTreeParseFromFile("/Users/steph/Documents/IngeScape/agents/philips.json");
 //
-//    //const char *path[] = {NULL}; //from the root of the tree
+//    //const char *path[] = {NULL}; //from the root of the node
 //    //const char *path[] = {"lights", NULL};
 //    //const char *path[] = {"lights", "1", NULL};
 //    const char *path[] = {"lights", "1", "state", "xy", NULL};
 //    //const char *path[] = {"sensors", "1", "config", "on", NULL};
-//    igsJSONTreeValue_t *value = igs_JSONTreeGetValueAtPath(tree, path);
+//    igsJSONTreeNode_t *value = igs_JSONTreeGetNodeAtPath(node, path);
 //    bool b1 = igs_JSONTreeIsValueADouble(value);
 //    bool b2 = igs_JSONTreeIsValueAnInteger(value);
 //    igs_JSONTreeFree(&tree);

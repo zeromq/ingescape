@@ -213,12 +213,7 @@ PUBLIC void igs_JSONparseFromFile(const char *path, igs_JSONCallback cb, void *m
 PUBLIC void igs_JSONparseFromString(const char *content, igs_JSONCallback cb, void *myData);
 
 // parse a JSON string or file in a tree supporting queries
-typedef struct _igsJSONTree* igsJSONTree_t;
-PUBLIC void igs_JSONTreeFree(igsJSONTree_t *json);
-PUBLIC igsJSONTree_t igs_JSONTreeParseFromFile(const char *path);
-PUBLIC igsJSONTree_t igs_JSONTreeParseFromString(const char *content);
-
-typedef struct igsJSONValue {
+typedef struct igsJSONNode {
     igs_JSONValueType_t type;
     union {
         char * string;
@@ -230,29 +225,31 @@ typedef struct igsJSONValue {
         } number;
         struct {
             const char **keys; //array of keys
-            struct igsJSONValue *values; //array of values
-            size_t len; //number of key-value-pairs
+            struct igsJSONNode **values; //array of nodes
+            size_t len; //number of key-node-pairs
         } object;
         struct {
-            struct igsJSONValue *values; //array of elements
-            size_t len; //number of elements
+            struct igsJSONNode **values; //array of nodes
+            size_t len; //number of nodes
         } array;
     } u;
-} igsJSONTreeValue_t;
+} igsJSONTreeNode_t;
+PUBLIC void igs_JSONTreeFree(igsJSONTreeNode_t **node);
+PUBLIC igsJSONTreeNode_t* igs_JSONTreeParseFromFile(const char *path);
+PUBLIC igsJSONTreeNode_t* igs_JSONTreeParseFromString(const char *content);
 
-/* Tree can handle queries to retrieve elements returned as igsJSONTreeValue_t*.
+/* Tree node can handle queries to retrieve sub-nodes
  Important notes :
- - returned value must not be freed manually : it is owned by the tree
- - value structure returns a type that shall be checked to handle actual contained value
- - you can query into maps only at the moment (not into arrays) but you can iterate in array-type values
+ - returned value must not be freed manually : it is owned by the node
+ - returned structure contains a type that shall be checked to handle actual contained value(s)
  */
-PUBLIC igsJSONTreeValue_t* igs_JSONTreeGetValueAtPath(igsJSONTree_t tree, const char **path);
+PUBLIC igsJSONTreeNode_t* igs_JSONTreeGetNodeAtPath(igsJSONTreeNode_t *node, const char **path);
 
 //JSON parsing creates number values. Use these two additional functions
-//to check use as int and double values.
+//to check them as int and double values.
 //NB: int values are considered both int and double
-PUBLIC bool igs_JSONTreeIsValueAnInteger(igsJSONTreeValue_t *value);
-PUBLIC bool igs_JSONTreeIsValueADouble(igsJSONTreeValue_t *value);
+PUBLIC bool igs_JSONTreeIsValueAnInteger(igsJSONTreeNode_t *value);
+PUBLIC bool igs_JSONTreeIsValueADouble(igsJSONTreeNode_t *value);
 
 
 //////////////////////////////////////////////////
