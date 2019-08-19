@@ -20,8 +20,11 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
+import "qrc:/variables/fontawesome.js" as FontAwesome
+
 I2ComboboxStyle {
-    borderColorIdle: IngeScapeTheme.veryLightGreyColor
+    borderColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+    borderWidthIdle:0
     currentTextColorIdle: IngeScapeAssessmentsTheme.regularDarkBlueHeader
     layerObjectName: "overlayLayerComboBox"
     font {
@@ -29,4 +32,5 @@ I2ComboboxStyle {
         weight: Font.Medium
         pixelSize: 16
     }
+    dropdownIcon: FontAwesome.Icon.ChevronDown
 }

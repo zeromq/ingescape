@@ -143,7 +143,9 @@ Item {
 
             model: rootItem.variable ? rootItem.variable.enumValues : null
 
-            style: IngeScapeAssessmentsComboboxStyle {}
+            style: IngeScapeAssessmentsComboboxStyle {
+                backgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+            }
 
             Binding {
                 target: comboboxEditor
