@@ -91,7 +91,7 @@ Item {
             color: IngeScapeTheme.whiteColor
         }
 
-        height: 110
+        height: 108
 
         Button {
             id: btnGoBackToHome
@@ -744,11 +744,11 @@ Item {
             right: headerItem.right
         }
 
-        height: 6
+        height: 8
 
         gradient: Gradient {
             GradientStop { position: 0.0; color: IngeScapeTheme.darkGreyColor; }
-            GradientStop { position: 1.0; color: IngeScapeTheme.veryLightGreyColor; }
+            GradientStop { position: 1.0; color: "transparent"; }
         }
 
     }

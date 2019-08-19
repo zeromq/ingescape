@@ -80,15 +80,13 @@ Item {
         x: actionsPanel.width - (width / 2) + height / 2
         y: actionsPanel.y + (actionsPanel.height / 2) - height / 2
 
-        height: 6
+        height: 8
         width: actionsPanel.height
         rotation: -90
 
-        property bool forceUpdateToggle: false
-
         gradient: Gradient {
-            GradientStop { position: 0.0; color: IngeScapeTheme.darkGreyColor; }
-            GradientStop { position: 1.0; color: (actionsRightShadow.forceUpdateToggle ? "transparent" : "transparent") }
+            GradientStop { position: 0.0; color: IngeScapeTheme.lightGreyColor; }
+            GradientStop { position: 1.0; color: "transparent" }
         }
     }
 
@@ -105,12 +103,27 @@ Item {
         }
         height: 0
 
-        onHeightChanged: {
-            actionsRightShadow.forceUpdateToggle = !actionsRightShadow.forceUpdateToggle
-        }
-
         scenarioController: rootItem.taskInstanceController ? rootItem.taskInstanceController.scenarioC : null;
         timeLineController: rootItem.taskInstanceController ? rootItem.taskInstanceController.timeLineC : null;
+
+        Rectangle {
+            id: timeLineLeftShadow
+
+            anchors {
+                horizontalCenter: parent.left
+            }
+
+            y: (timeline.height / 2) - (height / 2)
+
+            height: 16
+            width: parent.height
+            rotation: -90
+
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#000000"; }
+                GradientStop { position: 1.0; color: "transparent" }
+            }
+        }
     }
 
     Item {
@@ -131,7 +144,7 @@ Item {
             color: IngeScapeTheme.whiteColor
         }
 
-        height: 110
+        height: 108
 
         Button {
             id: btnGoBackToHome
@@ -342,9 +355,23 @@ Item {
         width: 319
 
         color: IngeScapeTheme.veryDarkGreyColor
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
+
+        // Top shadow
+        Rectangle {
+            anchors {
+                top: parent.top
+                left: parent.left
+            }
+
+            width: parent.width - parent.border.width
+
+            height: 8
+
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: IngeScapeTheme.blackColor; }
+                GradientStop { position: 1.0; color: "transparent" }
+            }
+
         }
 
         Text {
@@ -432,7 +459,7 @@ Item {
 
         anchors {
             left: actionsPanel.right
-            leftMargin: 16
+            leftMargin: 21
             top: headerItem.bottom
             topMargin: 16
             bottom: timeline.top
@@ -855,11 +882,11 @@ Item {
 
         anchors {
             top: headerItem.bottom
-            left: headerItem.left
+            left: actionsPanel.right
             right: headerItem.right
         }
 
-        height: 6
+        height: 8
 
         gradient: Gradient {
             GradientStop { position: 0.0; color: IngeScapeTheme.darkGreyColor; }
