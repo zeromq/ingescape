@@ -257,7 +257,14 @@ Rectangle {
                 }
                 visible: rootItem.isCurrentlyEditing
 
-                style: IngeScapeAssessmentsComboboxStyle {}
+                style: IngeScapeAssessmentsComboboxStyle {
+                    frameVisible: false
+                    listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+                }
+                scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+                    scrollBarSize: 4
+                    verticalScrollbarMargin: 2
+                }
 
                 Binding {
                     target: agentComboboxEditor
@@ -332,7 +339,14 @@ Rectangle {
                 }
                 visible: rootItem.isCurrentlyEditing
 
-                style: IngeScapeAssessmentsComboboxStyle {}
+                style: IngeScapeAssessmentsComboboxStyle {
+                    frameVisible: false
+                    listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+                }
+                scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+                    scrollBarSize: 4
+                    verticalScrollbarMargin: 2
+                }
 
                 Binding {
                     target: outputComboboxEditor

@@ -378,22 +378,34 @@ Item {
 
             anchors {
                 left: parent.left
-                leftMargin: 5
+                leftMargin: 25
                 top: parent.top
-                topMargin: 5
+                topMargin: 30
             }
             height: 30
 
-            text: qsTr("Actions:")
+            text: qsTr("ACTIONS")
 
             verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
             font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 18
+                family: IngeScapeTheme.labelFontFamily
+                weight: Font.Black
+                pixelSize: 24
             }
+        }
+
+        Rectangle {
+            anchors {
+                bottom: actionsList.top
+                left: parent.left
+                right: parent.right
+            }
+
+            color: IngeScapeTheme.blackColor
+
+            height: 1
         }
 
         Column {
@@ -519,26 +531,7 @@ Item {
 
                 text: rootItem.taskInstance ? rootItem.taskInstance.comments : ""
 
-                style: I2TextAreaStyle {
-                    backgroundColor: IngeScapeTheme.veryLightGreyColor
-                    borderColor: IngeScapeAssessmentsTheme.blueButton
-                    borderErrorColor: IngeScapeTheme.redColor
-                    radiusTextBox: 5
-                    borderWidth: 0;
-                    borderWidthActive: 2
-                    textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
-                    textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
-
-                    padding.top: 10
-                    padding.bottom: 10
-                    padding.left: 12
-                    padding.right: 12
-
-                    font {
-                        pixelSize: 16
-                        family: IngeScapeTheme.textFontFamily
-                    }
-                }
+                style: IngeScapeAssessmentsTextAreaStyle {}
 
                 onTextChanged: {
                     if (rootItem.taskInstance) {
@@ -626,7 +619,7 @@ Item {
                 anchors {
                     fill: parent
                     leftMargin: 16
-                    topMargin: 5
+                    topMargin: 18
                     rightMargin: 16
                     bottomMargin: 5
                 }

@@ -87,6 +87,7 @@ Rectangle {
     }
 
     Row {
+        id: row
         spacing: 0
 
         anchors {
@@ -119,6 +120,8 @@ Rectangle {
         Text {
             id: taskName
 
+            width: taskColumnWidth
+            elide: Text.ElideRight
             text: (rootItem.modelM && rootItem.modelM.task) ? rootItem.modelM.task.name : ""
 
             color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
@@ -132,6 +135,8 @@ Rectangle {
         Text {
             id: subjectId
 
+            width: subjectColumnWidth
+            elide: Text.ElideRight
             text: (rootItem.modelM && rootItem.modelM.subject) ? rootItem.modelM.subject.displayedId : ""
 
             color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
@@ -145,6 +150,8 @@ Rectangle {
         Text {
             id: startDate
 
+            width: startDateColumnWidth
+            elide: Text.ElideRight
             text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "dd/MM/yyyy")
                                   : "../../...."
 
@@ -159,6 +166,8 @@ Rectangle {
         Text {
             id: startTime
 
+            width: startTimeColumnWidth
+            elide: Text.ElideRight
             text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "hh:mm:ss")
                                   : "..:..:.."
 
@@ -176,6 +185,8 @@ Rectangle {
 
             /*text: rootItem.modelM ? rootItem.modelM.duration.toLocaleString(Qt.locale(), "hh:mm:ss.zzz")
                                         : "00:00:00.000"*/
+            width: durationColumnWidth
+            elide: Text.ElideRight
             text: "00:00:00.000"
 
             color: IngeScapeAssessmentsTheme.regularDarkBlueHeader

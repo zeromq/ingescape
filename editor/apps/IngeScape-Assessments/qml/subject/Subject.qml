@@ -108,6 +108,8 @@ Rectangle {
                         fill: parent
                         leftMargin: 15
                     }
+
+                    elide: Text.ElideRight
                     text: rootItem.subject
                           && characteristicDelegate.characteristic
                           && (typeof rootItem.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name] !== "undefined")
@@ -116,8 +118,7 @@ Rectangle {
 
                     verticalAlignment: Text.AlignVCenter
 
-                    // Subject's is never editable
-                    visible:characteristicDelegate.characteristic.name === CHARACTERISTIC_SUBJECT_ID || !rootItem.isCurrentlyEditing
+                    visible: !rootItem.isCurrentlyEditing
 
                     color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                     font {
@@ -157,7 +158,14 @@ Rectangle {
 
                         model: characteristicDelegate.characteristic ? characteristicDelegate.characteristic.enumValues : null
 
-                        style: IngeScapeAssessmentsComboboxStyle {}
+                        style: IngeScapeAssessmentsComboboxStyle {
+                            frameVisible: false
+                            listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+                        }
+                        scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+                            scrollBarSize: 4
+                            verticalScrollbarMargin: 2
+                        }
 
                         Binding {
                             target: comboboxEditor

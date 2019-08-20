@@ -14,6 +14,8 @@
 
 #include "assessmentsmodelmanager.h"
 
+#include "settings/ingescapesettings.h"
+
 
 
 /**
@@ -112,6 +114,14 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
     _cassSession = cass_session_new();
     _cassUuidGen = cass_uuid_gen_new();
 
+    // Retrieving the Cassandra server url
+    QVariant cassServerUrl = IngeScapeSettings::Instance().value("network/cassandraServerUrl");
+    if (cassServerUrl.isValid())
+    {
+        _cassServer = cassServerUrl.toString();
+    }
+
+    // Establishing the connection
     cass_cluster_set_contact_points(_cassCluster, _cassServer.toStdString().c_str());
 
     // Connects a session

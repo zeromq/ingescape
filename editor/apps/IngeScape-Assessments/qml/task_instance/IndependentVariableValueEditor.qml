@@ -144,7 +144,13 @@ Item {
             model: rootItem.variable ? rootItem.variable.enumValues : null
 
             style: IngeScapeAssessmentsComboboxStyle {
+                frameVisible: false
+                listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
                 backgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+            }
+            scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+                scrollBarSize: 4
+                verticalScrollbarMargin: 2
             }
 
             Binding {
