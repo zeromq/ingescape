@@ -116,8 +116,7 @@ Rectangle {
 
                     verticalAlignment: Text.AlignVCenter
 
-                    // Subject's is never editable
-                    visible:characteristicDelegate.characteristic.name === CHARACTERISTIC_SUBJECT_ID || !rootItem.isCurrentlyEditing
+                    visible: !rootItem.isCurrentlyEditing
 
                     color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                     font {
