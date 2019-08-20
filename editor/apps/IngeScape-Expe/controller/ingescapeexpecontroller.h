@@ -50,6 +50,9 @@ class IngeScapeExpeController : public QObject
     // Network settings - port
     I2_QML_PROPERTY_READONLY(uint, port)
 
+    // Path to the directory with IngeScape licenses
+    I2_QML_PROPERTY_READONLY(QString, licensesPath)
+
     // Error message when a connection attempt fails
     I2_QML_PROPERTY_READONLY(QString, errorMessageWhenConnectionFailed)
 
