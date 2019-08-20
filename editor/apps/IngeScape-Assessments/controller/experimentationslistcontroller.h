@@ -31,6 +31,9 @@ class ExperimentationsListController : public QObject
     // List of all groups of experimentations
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ExperimentationsGroupVM, allExperimentationsGroups)
 
+    // List of all groups without the special 'Others' group
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ExperimentationsGroupVM, allExperimentationsGroupsWithoutOthers)
+
     // Default group "Other"
     I2_QML_PROPERTY_READONLY(ExperimentationsGroupVM*, defaultGroupOther)
 

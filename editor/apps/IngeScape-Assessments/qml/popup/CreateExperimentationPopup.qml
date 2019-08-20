@@ -185,6 +185,7 @@ AssessmentsPopupBase {
             text: qsTr("Group :")
 
             color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+            verticalAlignment: Text.AlignVCenter
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight: Font.Medium
@@ -192,44 +193,108 @@ AssessmentsPopupBase {
             }
         }
 
-        Column {
+        ExclusiveGroup {
+            id: exclusiveExperimentationsGroup
+        }
+
+        ScrollView {
+            id: groupsScrollView
             anchors {
                 top: parent.top
                 left: parent.left
-                leftMargin: 160
+                leftMargin: 132
                 right: parent.right
-            }
-            spacing: 4
-
-            ExclusiveGroup {
-                id: exclusiveExperimentationsGroup
+                rightMargin: -groupsScrollView.scrollBarSize - groupsScrollView.verticalScrollbarMargin
             }
 
-            Repeater {
-                model: controller ? controller.allExperimentationsGroups : null
+            property int scrollBarSize: 11
+            property int verticalScrollbarMargin: 3
 
-                delegate: RadioButton {
-                    id: radioExperimentationsGroup
+            style: IngeScapeAssessmentsScrollViewStyle {
+                scrollBarSize: groupsScrollView.scrollBarSize
+                verticalScrollbarMargin: groupsScrollView.verticalScrollbarMargin
+            }
 
+            // Prevent drag overshoot on Windows
+            flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+            contentItem: Item {
+                id: groupDelegateItem
+                height: childrenRect.height
+                width: groupsScrollView.width - groupsScrollView.scrollBarSize - groupsScrollView.verticalScrollbarMargin
+
+                property real delegateHeight: 30
+
+                Column {
+                    id: groupsListView
                     anchors {
+                        top: parent.top
                         left: parent.left
                         right: parent.right
                     }
 
-                    height: 30
+                    spacing: 4
 
-                    text: model.name
+                    height: Math.min(groupDelegateItem.delegateHeight * count, 180)
+
+                    Repeater {
+                        model: controller ? controller.allExperimentationsGroupsWithoutOthers : null
+
+                        delegate: RadioButton {
+                            id: radioExperimentationsGroup
+
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                            }
+
+                            height: groupDelegateItem.delegateHeight
+
+                            text: model.name
+
+                            exclusiveGroup: exclusiveExperimentationsGroup
+
+                            checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
+
+                            style: Theme.IngeScapeRadioButtonStyle { }
+
+                            onCheckedChanged: {
+                                if (checked) {
+                                    rootPopup.selectedExperimentationsGroup = model.QtObject;
+                                }
+                            }
+
+                            Binding {
+                                target: radioExperimentationsGroup
+                                property: "checked"
+                                value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
+                            }
+                        }
+                    }
+                }
+
+                RadioButton {
+                    id: radioExperimentationsGroupOthers
+
+                    anchors {
+                        top: groupsListView.bottom
+                        topMargin: 4
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    height: groupDelegateItem.delegateHeight
+
+                    text: controller && controller.defaultGroupOther ? controller.defaultGroupOther.name : ""
 
                     exclusiveGroup: exclusiveExperimentationsGroup
 
-                    checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
+                    checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.defaultGroupOther))
 
                     style: Theme.IngeScapeRadioButtonStyle { }
 
                     onCheckedChanged: {
                         if (checked) {
-                            console.log("Select experimentations group: " + model.name);
-
                             rootPopup.selectedExperimentationsGroup = model.QtObject;
                         }
                     }
@@ -240,88 +305,93 @@ AssessmentsPopupBase {
                         value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
                     }
                 }
-            }
 
-            Item {
-
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                }
-
-                height: 30
-
-                RadioButton {
-                    id: radioNewExperimentationsGroup
-
+                Item {
                     anchors {
+                        top: radioExperimentationsGroupOthers.bottom
+                        topMargin: 4
                         left: parent.left
-                        top: parent.top
-                        bottom: parent.bottom
+                        right: parent.right
                     }
 
-                    text: (controller && controller.newGroup) ? controller.newGroup.name : ""
+                    height: groupDelegateItem.delegateHeight
 
-                    exclusiveGroup: exclusiveExperimentationsGroup
+                    RadioButton {
+                        id: radioNewExperimentationsGroup
 
-                    checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.newGroup))
+                        anchors {
+                            left: parent.left
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
 
-                    style: Theme.IngeScapeRadioButtonStyle { }
+                        width: 126
 
-                    onCheckedChanged: {
-                        if (checked) {
-                            console.log("Select new experimentations group: ...");
+                        text: "New group : "
 
-                            rootPopup.selectedExperimentationsGroup = controller.newGroup;
+                        exclusiveGroup: exclusiveExperimentationsGroup
+
+                        checked: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.newGroup))
+
+                        style: Theme.IngeScapeRadioButtonStyle { }
+
+                        onCheckedChanged: {
+                            if (checked) {
+                                rootPopup.selectedExperimentationsGroup = controller.newGroup;
+                            }
+                        }
+
+                        Binding {
+                            target: radioNewExperimentationsGroup
+                            property: "checked"
+                            value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.newGroup))
                         }
                     }
 
-                    Binding {
-                        target: radioNewExperimentationsGroup
-                        property: "checked"
-                        value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.newGroup))
-                    }
-                }
+                    TextField {
+                        id: txtNewExperimentationsGroupName
 
-                TextField {
-                    id: txtNewExperimentationsGroupName
+                        anchors {
+                            left: radioNewExperimentationsGroup.right
+                            leftMargin: 20
+                            right: parent.right
+                            verticalCenter: radioNewExperimentationsGroup.verticalCenter
+                        }
 
-                    anchors {
-                        left: radioNewExperimentationsGroup.right
-                        leftMargin: 20
-                        right: parent.right
-                        verticalCenter: radioNewExperimentationsGroup.verticalCenter
-                    }
+                        height: 30
 
-                    height: 30
+                        text: ""
 
-                    text: ""
+                        style: I2TextFieldStyle {
+                            backgroundColor: IngeScapeTheme.veryLightGreyColor
+                            borderColor: IngeScapeAssessmentsTheme.blueButton
+                            borderErrorColor: IngeScapeTheme.redColor
+                            radiusTextBox: 5
+                            borderWidth: 0;
+                            borderWidthActive: 2
+                            textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
+                            textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
 
-                    style: I2TextFieldStyle {
-                        backgroundColor: IngeScapeTheme.veryLightGreyColor
-                        borderColor: IngeScapeAssessmentsTheme.blueButton
-                        borderErrorColor: IngeScapeTheme.redColor
-                        radiusTextBox: 5
-                        borderWidth: 0;
-                        borderWidthActive: 2
-                        textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
-                        textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
+                            padding.left: 16
+                            padding.right: 16
 
-                        padding.left: 16
-                        padding.right: 16
-
-                        font {
-                            pixelSize:16
-                            family: IngeScapeTheme.textFontFamily
+                            font {
+                                pixelSize:16
+                                family: IngeScapeTheme.textFontFamily
+                            }
                         }
                     }
                 }
             }
         }
+
+
     }
 
 
     Row {
+        id: buttonRow
+
         anchors {
             right: parent.right
             rightMargin: 28

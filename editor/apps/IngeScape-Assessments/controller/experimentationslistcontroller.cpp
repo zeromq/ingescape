@@ -31,6 +31,7 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
 
     // Groups are sorted on their name (alphabetical order)
     _allExperimentationsGroups.setSortProperty("name");
+    _allExperimentationsGroupsWithoutOthers.setSortProperty("name");
 
 
     //
@@ -119,6 +120,8 @@ ExperimentationsListController::~ExperimentationsListController()
 
     _allExperimentationsGroups.clear();
     //_allExperimentationsGroups.deleteAllItems();
+
+    _allExperimentationsGroupsWithoutOthers.clear();
 
     if (_defaultGroupOther != nullptr)
     {
@@ -274,6 +277,7 @@ ExperimentationsGroupVM* ExperimentationsListController::_createNewExperimentati
     if (expeGroupVM != nullptr)
     {
         _allExperimentationsGroups.append(expeGroupVM);
+        _allExperimentationsGroupsWithoutOthers.append(expeGroupVM);
         _hashFromNameToExperimentationsGroup.insert(newExperimentationsGroupName, expeGroupVM);
     }
     return expeGroupVM;
