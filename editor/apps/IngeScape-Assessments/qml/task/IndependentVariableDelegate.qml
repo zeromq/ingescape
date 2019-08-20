@@ -67,12 +67,11 @@ Rectangle {
             model: rootItem.indeVarModel ? [ rootItem.indeVarModel.name, rootItem.indeVarModel.description, IndependentVariableValueTypes.enumToString(rootItem.indeVarModel.valueType) ] : ["", "", ""]
 
             delegate: Item {
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                }
+
+                anchors.verticalCenter: parent.verticalCenter
 
                 width: rootItem.columnWidths[index]
+                height: 30
 
                 Text {
                     anchors{
