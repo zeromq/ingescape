@@ -330,7 +330,6 @@ Item {
             elide: Text.ElideRight
 
             verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
 
             color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
