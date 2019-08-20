@@ -235,9 +235,8 @@ AssessmentsPopupBase {
 
                     spacing: 4
 
-                    height: Math.min(groupDelegateItem.delegateHeight * count, 180)
-
                     Repeater {
+                        id: groupsRepeater
                         model: controller ? controller.allExperimentationsGroupsWithoutOthers : null
 
                         delegate: RadioButton {
@@ -300,9 +299,9 @@ AssessmentsPopupBase {
                     }
 
                     Binding {
-                        target: radioExperimentationsGroup
+                        target: radioExperimentationsGroupOthers
                         property: "checked"
-                        value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === model.QtObject))
+                        value: (rootPopup.selectedExperimentationsGroup && (rootPopup.selectedExperimentationsGroup === controller.defaultGroupOther))
                     }
                 }
 
