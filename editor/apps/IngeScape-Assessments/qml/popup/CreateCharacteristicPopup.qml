@@ -206,6 +206,11 @@ AssessmentsPopupBase {
                 delegate: RadioButton {
                     id: radioCharacteristicValueType
 
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+
                     text: model.name
                     height: 30
 
@@ -243,6 +248,7 @@ AssessmentsPopupBase {
                 RadioButton {
                     id: enumRadioButton
 
+                    width: 80
                     height: 30
                     text: "Enum"
 
