@@ -108,6 +108,8 @@ Rectangle {
                         fill: parent
                         leftMargin: 15
                     }
+
+                    elide: Text.ElideRight
                     text: rootItem.subject
                           && characteristicDelegate.characteristic
                           && (typeof rootItem.subject.mapCharacteristicValues[characteristicDelegate.characteristic.name] !== "undefined")
