@@ -519,26 +519,7 @@ Item {
 
                 text: rootItem.taskInstance ? rootItem.taskInstance.comments : ""
 
-                style: I2TextAreaStyle {
-                    backgroundColor: IngeScapeTheme.veryLightGreyColor
-                    borderColor: IngeScapeAssessmentsTheme.blueButton
-                    borderErrorColor: IngeScapeTheme.redColor
-                    radiusTextBox: 5
-                    borderWidth: 0;
-                    borderWidthActive: 2
-                    textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
-                    textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
-
-                    padding.top: 10
-                    padding.bottom: 10
-                    padding.left: 12
-                    padding.right: 12
-
-                    font {
-                        pixelSize: 16
-                        family: IngeScapeTheme.textFontFamily
-                    }
-                }
+                style: IngeScapeAssessmentsTextAreaStyle {}
 
                 onTextChanged: {
                     if (rootItem.taskInstance) {

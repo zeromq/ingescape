@@ -189,6 +189,9 @@ void registerCustomQmlTypes()
     // - ScrollView style
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsScrollViewStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsScrollViewStyle");
 
+    // - TextArea style
+    qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsTextAreaStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsTextAreaStyle");
+
     // - List Header
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeAssessmentsListHeader.qml"), "INGESCAPE", 1, 0, "IngeScapeAssessmentsListHeader");
 
