@@ -378,22 +378,34 @@ Item {
 
             anchors {
                 left: parent.left
-                leftMargin: 5
+                leftMargin: 25
                 top: parent.top
-                topMargin: 5
+                topMargin: 30
             }
             height: 30
 
-            text: qsTr("Actions:")
+            text: qsTr("ACTIONS")
 
             verticalAlignment: Text.AlignVCenter
 
             color: IngeScapeTheme.whiteColor
             font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 18
+                family: IngeScapeTheme.labelFontFamily
+                weight: Font.Black
+                pixelSize: 24
             }
+        }
+
+        Rectangle {
+            anchors {
+                bottom: actionsList.top
+                left: parent.left
+                right: parent.right
+            }
+
+            color: IngeScapeTheme.blackColor
+
+            height: 1
         }
 
         Column {
