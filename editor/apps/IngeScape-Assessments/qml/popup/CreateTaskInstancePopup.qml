@@ -219,7 +219,9 @@ AssessmentsPopupBase {
             enabled: rootItem.experimentation ? (rootItem.experimentation.allSubjects.count > 0)
                                               : false
 
-            style: IngeScapeAssessmentsComboboxStyle {}
+            style: IngeScapeAssessmentsComboboxStyle {
+                backgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+            }
 
             function modelToString(_model) {
                 if (_model) {
@@ -282,7 +284,9 @@ AssessmentsPopupBase {
 
             model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
 
-            style: IngeScapeAssessmentsComboboxStyle {}
+            style: IngeScapeAssessmentsComboboxStyle {
+                backgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+            }
 
             function modelToString(_model) {
                 if (_model) {
