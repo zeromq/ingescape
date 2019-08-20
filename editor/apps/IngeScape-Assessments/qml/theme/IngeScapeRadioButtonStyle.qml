@@ -38,9 +38,11 @@ RadioButtonStyle {
 
     label: Text {
         height: control.height
+        width: Math.min(implicitWidth, (control.width - control.height - spacing))
 
         text: control.text
         verticalAlignment: Text.AlignVCenter
+        elide: Text.ElideRight
 
         color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
         font {
