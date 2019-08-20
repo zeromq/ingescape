@@ -619,7 +619,7 @@ Item {
                 anchors {
                     fill: parent
                     leftMargin: 16
-                    topMargin: 5
+                    topMargin: 18
                     rightMargin: 16
                     bottomMargin: 5
                 }
