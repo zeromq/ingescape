@@ -220,7 +220,13 @@ AssessmentsPopupBase {
                                               : false
 
             style: IngeScapeAssessmentsComboboxStyle {
+                frameVisible: false
+                listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
                 backgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+            }
+            scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+                scrollBarSize: 4
+                verticalScrollbarMargin: 2
             }
 
             function modelToString(_model) {
@@ -285,7 +291,13 @@ AssessmentsPopupBase {
             model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
 
             style: IngeScapeAssessmentsComboboxStyle {
+                frameVisible: false
+                listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
                 backgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+            }
+            scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+                scrollBarSize: 4
+                verticalScrollbarMargin: 2
             }
 
             function modelToString(_model) {

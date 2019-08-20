@@ -156,7 +156,14 @@ Rectangle {
 
                         model: characteristicDelegate.characteristic ? characteristicDelegate.characteristic.enumValues : null
 
-                        style: IngeScapeAssessmentsComboboxStyle {}
+                        style: IngeScapeAssessmentsComboboxStyle {
+                            frameVisible: false
+                            listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+                        }
+                        scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+                            scrollBarSize: 4
+                            verticalScrollbarMargin: 2
+                        }
 
                         Binding {
                             target: comboboxEditor
