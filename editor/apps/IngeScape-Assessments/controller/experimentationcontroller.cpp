@@ -491,10 +491,10 @@ void ExperimentationController::_retrieveTasksForExperimentation(Experimentation
 {
     if (experimentation != nullptr)
     {
-        const char* query = "SELECT * FROM ingescape.task WHERE id_experimentation = ?;";
+        QString queryStr = "SELECT * FROM " + TaskM::table + " WHERE id_experimentation = ?;";
 
         // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(query, 1);
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
         cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
 
         // Execute the query or bound statement

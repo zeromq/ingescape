@@ -14,6 +14,10 @@
 
 #include "independentvariablem.h"
 
+#include "controller/assessmentsmodelmanager.h"
+
+const QString IndependentVariableM::table = "ingescape.independent_var";
+
 /**
  * @brief Constructor
  * @param name
@@ -103,4 +107,35 @@ IndependentVariableM* IndependentVariableM::createIndependentVariableFromCassand
     }
 
     return independentVariable;
+}
+
+
+/**
+ * @brief Delete the given independent variable from Cassandra DB
+ * @param independentVariable
+ * @return
+ */
+void IndependentVariableM::deleteIndependentVariableFromCassandra(const IndependentVariableM& independentVariable)
+{
+    // Remove independent variable from DB
+    QString queryStr = "DELETE FROM " + IndependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
+    cass_statement_bind_uuid(cassStatement, 0, independentVariable.getExperimentationCassUuid());
+    cass_statement_bind_uuid(cassStatement, 1, independentVariable.getTaskCassUuid());
+    cass_statement_bind_uuid(cassStatement, 2, independentVariable.getCassUuid());
+
+    // Execute the query or bound statement
+    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+    CassError cassError = cass_future_error_code(cassFuture);
+    if (cassError == CASS_OK)
+    {
+        qInfo() << "Independent variable" << independentVariable.name() << "has been successfully deleted from the DB";
+    }
+    else {
+        qCritical() << "Could not delete the independent variable" << independentVariable.name() << "from the DB:" << cass_error_desc(cassError);
+    }
+
+    // Clean-up cassandra objects
+    cass_future_free(cassFuture);
+    cass_statement_free(cassStatement);
 }

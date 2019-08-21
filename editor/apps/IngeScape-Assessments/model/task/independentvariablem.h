@@ -94,11 +94,23 @@ public:
     CassUuid getCassUuid() const { return _cassUuid; }
 
     /**
+     * @brief Independent variable table name
+     */
+    static const QString table;
+
+    /**
      * @brief Static factory method to create an independent variable from a CassandraDB record
      * @param row
      * @return
      */
     static IndependentVariableM* createIndependentVariableFromCassandraRow(const CassRow* row);
+
+    /**
+     * @brief Delete the given independent variable from Cassandra DB
+     * @param independentVariable
+     * @return
+     */
+    static void deleteIndependentVariableFromCassandra(const IndependentVariableM& independentVariable);
 
 private:
     // Task's experimentation's UUID from Cassandra DB
