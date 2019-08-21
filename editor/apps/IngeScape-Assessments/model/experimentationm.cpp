@@ -171,6 +171,9 @@ void ExperimentationM::removeSubject(SubjectM* subject)
     {
         // Remove from the list
         _allSubjects.remove(subject);
+
+        // Remove related TaskInstances
+        removeTaskInstanceRelatedToSubject(subject);
     }
 }
 
@@ -199,13 +202,16 @@ void ExperimentationM::removeTask(TaskM* task)
     {
         // Remove from the list
         _allTasks.remove(task);
+
+        // Remove related TaskInstances
+        removeTaskInstanceRelatedToTask(task);
     }
 }
 
 
 /**
- * @brief Add a rtask instance to our experimentation
- * @param record
+ * @brief Add a task instance to our experimentation
+ * @param taskInstance
  */
 void ExperimentationM::addTaskInstance(TaskInstanceM* taskInstance)
 {
@@ -219,7 +225,7 @@ void ExperimentationM::addTaskInstance(TaskInstanceM* taskInstance)
 
 /**
  * @brief Remove a task instance from our experimentation
- * @param record
+ * @param taskInstance
  */
 void ExperimentationM::removeTaskInstance(TaskInstanceM* taskInstance)
 {
@@ -227,6 +233,56 @@ void ExperimentationM::removeTaskInstance(TaskInstanceM* taskInstance)
     {
         // Remove from the list
         _allTaskInstances.remove(taskInstance);
+    }
+}
+
+
+/**
+ * @brief Remove task instances related to the given subject
+ * @param subject
+ */
+void ExperimentationM::removeTaskInstanceRelatedToSubject(SubjectM* subject)
+{
+    const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
+    auto taskInstanceIt = taskInstanceList.begin();
+    while (taskInstanceIt != taskInstanceList.end())
+    {
+        // Looking for a task instance related to the given subject
+        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [subject](TaskInstanceM* taskInstance){
+                return (taskInstance != nullptr) && (taskInstance->subject() == subject);
+        });
+
+        if (taskInstanceIt != taskInstanceList.end())
+        {
+            // We found a task instance with given subject
+            removeTaskInstance(*taskInstanceIt);
+            ++taskInstanceIt;
+        }
+    }
+}
+
+
+/**
+ * @brief Remove task instances related to the given task
+ * @param task
+ */
+void ExperimentationM::removeTaskInstanceRelatedToTask(TaskM* task)
+{
+    const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
+    auto taskInstanceIt = taskInstanceList.begin();
+    while (taskInstanceIt != taskInstanceList.end())
+    {
+        // Looking for a task instance related to the given subject
+        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [task](TaskInstanceM* taskInstance){
+                return (taskInstance != nullptr) && (taskInstance->task() == task);
+        });
+
+        if (taskInstanceIt != taskInstanceList.end())
+        {
+            // We found a task instance with given subject
+            removeTaskInstance(*taskInstanceIt);
+            ++taskInstanceIt;
+        }
     }
 }
 
@@ -279,25 +335,9 @@ ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const 
         CassUuid experimentationUid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &experimentationUid);
 
-        const char *chrExperimentationName = "";
-        size_t nameLength;
-        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrExperimentationName, &nameLength);
-        QString experimentationName = QString::fromUtf8(chrExperimentationName, static_cast<int>(nameLength));
-
-        const char *chrGroupName = "";
-        size_t groupNameLength;
-        cass_value_get_string(cass_row_get_column_by_name(row, "group_name"), &chrGroupName, &groupNameLength);
-        QString groupName = QString::fromUtf8(chrGroupName, static_cast<int>(groupNameLength));
-
-        cass_uint32_t creationDate;
-        cass_value_get_uint32(cass_row_get_column_by_name(row, "creation_date"), &creationDate);
-
-        cass_int64_t creationTime;
-        cass_value_get_int64(cass_row_get_column_by_name(row, "creation_time"), &creationTime);
-
-        time_t secCreationDateTime = cass_date_time_to_epoch(creationDate, creationTime);
-        QDateTime creationDateTime;
-        creationDateTime.setSecsSinceEpoch(secCreationDateTime);
+        QString experimentationName = AssessmentsModelManager::getStringValueFromColumnName(row, "name");
+        QString groupName = AssessmentsModelManager::getStringValueFromColumnName(row, "group_name");
+        QDateTime creationDateTime(AssessmentsModelManager::getDateTimeFromColumnNames(row, "creation_date", "creation_time"));
 
         experimentation = new ExperimentationM(experimentationUid, experimentationName, groupName, creationDateTime, nullptr);
     }
@@ -345,8 +385,8 @@ void ExperimentationM::deleteExperimentationFromCassandra(const ExperimentationM
  */
 void ExperimentationM::_deleteAllTasksForExperimentation(const ExperimentationM& experimentation)
 {
-    const char* query = "DELETE FROM ingescape.task WHERE id_experimentation = ?;";
-    CassStatement* cassStatement = cass_statement_new(query, 1);
+    QString queryStr = "DELETE FROM " + TaskM::table + " WHERE id_experimentation = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
     cass_statement_bind_uuid(cassStatement, 0, experimentation.getCassUuid());
 
     // Execute the query or bound statement

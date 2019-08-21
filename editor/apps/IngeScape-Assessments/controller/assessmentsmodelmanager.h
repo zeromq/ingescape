@@ -77,6 +77,33 @@ public:
      */
     static AssessmentsModelManager* Instance();
 
+    /**
+     * @brief Retrieve a 'text' value of given column inside the given row
+     * and convert it to QString before returning it
+     * @param row
+     * @param columnName
+     * @return
+     */
+    static QString getStringValueFromColumnName(const CassRow* row, const char* columnName);
+
+    /**
+     * @brief Retrive a full collection of 'text' for the given value inside the given row
+     * @param row
+     * @param columnName
+     * @return
+     */
+    static QStringList getStringListFromColumnName(const CassRow* row, const char* columnName);
+
+    /**
+     * @brief Retrive a date and a time value from the given columns inside the given row
+     * and convert it to a QDateTime before returning it
+     * @param row
+     * @param dateColumnName
+     * @param timeColumnName
+     * @return
+     */
+    static QDateTime getDateTimeFromColumnNames(const CassRow* row, const char* dateColumnName, const char* timeColumnName);
+
 
     // ------------------------
     //

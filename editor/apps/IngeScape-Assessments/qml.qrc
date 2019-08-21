@@ -22,7 +22,6 @@
         <file>qml/popup/CreateIndependentVariablePopup.qml</file>
         <file>qml/task_instance/TaskInstanceView.qml</file>
         <file>qml/task_instance/IndependentVariableValueEditor.qml</file>
-        <file>qml/task/IndependentVariableTableCell.qml</file>
         <file>qml/export/ExportView.qml</file>
         <file>qml/theme/IngeScapeAssessmentsButtonStyle.qml</file>
         <file>qml/theme/IngeScapeAssessmentsListHeader.qml</file>

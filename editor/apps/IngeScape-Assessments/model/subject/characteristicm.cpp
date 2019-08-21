@@ -73,24 +73,8 @@ CharacteristicM* CharacteristicM::createCharacteristicFromCassandraRow(const Cas
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &characteristicUuid);
 
-        const char *chrTaskName = "";
-        size_t nameLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
-        QString characteristicName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
-
-        QStringList enumValues;
-        CassIterator* enumValuesIterator = cass_iterator_from_collection(cass_row_get_column_by_name(row, "enum_values"));
-        if (enumValuesIterator != nullptr) {
-            while(cass_iterator_next(enumValuesIterator)) {
-                const char *chrEnumValue = "";
-                size_t enumValueLength = 0;
-                cass_value_get_string(cass_iterator_get_value(enumValuesIterator), &chrEnumValue, &enumValueLength);
-                enumValues.append(QString::fromUtf8(chrEnumValue, static_cast<int>(enumValueLength)));
-            }
-
-            cass_iterator_free(enumValuesIterator);
-            enumValuesIterator = nullptr;
-        }
+        QString characteristicName = AssessmentsModelManager::getStringValueFromColumnName(row, "name");
+        QStringList enumValues = AssessmentsModelManager::getStringListFromColumnName(row, "enum_values");
 
         int8_t i8ValueType = 0;
         cass_value_get_int8(cass_row_get_column_by_name(row, "value_type"), &i8ValueType);
@@ -134,13 +118,6 @@ void CharacteristicM::deleteCharacteristicFromCassandra(const CharacteristicM& c
 
 /**
  * @brief Delete every characteric value associated with the given characteristic
- * FIXME Sending a request for each subject does not seem very efficient...
- *       It would be nice if we could just have a WHERE clause on id_experimentation and id_characteristic, wouldn't it?
- * NOTE Having a model manager handling the model instances would allow a characteristic to get its experimentation from
- *      the CassUuid (which it already knows) without having to pass a pointer to said experimentation.
- *      Another solution would be to create ViewModels that holds pointers to the model instance and models that only handle UUIDs.
- *      This way, models are a match for what's ion the Cassandra DB and view models have access the linked instances for display purposes
- *      (cf. ItemVM in ENEDIS)
  * @param characteristic The characteristic to delete
  * @param experimentation The experimentation it's associated with for back reference to subjects
  */

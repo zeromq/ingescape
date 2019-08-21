@@ -76,6 +76,37 @@ SubjectM::~SubjectM()
     }
 }
 
+/**
+ * @brief Custom setter for the displayedId property that also updates the DB entry
+ * @param value
+ */
+void SubjectM::setdisplayedId(QString value)
+{
+    if (value != _displayedId)
+    {
+        QString queryStr = "UPDATE " + SubjectM::table + " SET displayed_id = ? WHERE id_experimentation = ? AND id = ?;";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
+        cass_statement_bind_string(cassStatement, 0, value.toStdString().c_str());
+        cass_statement_bind_uuid  (cassStatement, 1, _experimentationCassUuid);
+        cass_statement_bind_uuid  (cassStatement, 2, _cassUuid);
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError != CASS_OK)
+        {
+            qCritical() << "Could not update displayed id of subject" << _displayedId;
+
+            _displayedId = value;
+
+            Q_EMIT displayedIdChanged(value);
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+    }
+}
+
 
 /**
  * @brief Add the characteristic to our experimentation
@@ -159,10 +190,7 @@ SubjectM* SubjectM::createSubjectFromCassandraRow(const CassRow* row)
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &subjectUuid);
 
-        const char *chrDisplayedId = "";
-        size_t displayedIdLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "displayed_id"), &chrDisplayedId, &displayedIdLength);
-        QString displayedId = QString::fromUtf8(chrDisplayedId, static_cast<int>(displayedIdLength));
+        QString displayedId(AssessmentsModelManager::getStringValueFromColumnName(row, "displayed_id"));
 
         subject = new SubjectM(experimentationUuid, subjectUuid, displayedId);
     }

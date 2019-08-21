@@ -121,6 +121,11 @@ public:
 
 
     /**
+     * @brief Task table name
+     */
+    static const QString table;
+
+    /**
      * @brief Static factory method to create a task from a CassandraDB record
      * @param row
      * @return

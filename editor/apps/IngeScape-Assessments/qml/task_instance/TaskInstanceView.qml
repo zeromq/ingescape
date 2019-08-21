@@ -518,8 +518,7 @@ Item {
 
             color: IngeScapeTheme.whiteColor
 
-            //FIXME We need a timer to avoid rapid subsequent DB updates
-            TextArea {
+            TextAreaWithTimer {
                 id: txtComments
 
                 anchors {
@@ -533,7 +532,7 @@ Item {
 
                 style: IngeScapeAssessmentsTextAreaStyle {}
 
-                onTextChanged: {
+                onInputChanged: {
                     if (rootItem.taskInstance) {
                         rootItem.taskInstance.comments = text
                     }

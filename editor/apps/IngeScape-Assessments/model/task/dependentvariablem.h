@@ -69,6 +69,11 @@ public:
     virtual ~DependentVariableM();
 
     /**
+     * @brief Dependent variable table name
+     */
+    static const QString table;
+
+    /**
      * @brief Static factory method to create an dependent variable from a CassandraDB record
      * @param row
      * @return
