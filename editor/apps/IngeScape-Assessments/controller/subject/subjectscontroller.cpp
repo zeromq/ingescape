@@ -172,6 +172,9 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
 {
     if ((characteristic != nullptr) && (_currentExperimentation != nullptr))
     {
+        // Remove the characteristic values linked to soon-to-be-removed characteistic
+        _deleteCharacteristicValuesForCharacteristic(characteristic);
+
         // Remove the characteristic from the current experimentation
         _currentExperimentation->removeCharacteristic(characteristic);
 
@@ -547,7 +550,7 @@ void SubjectsController::_deleteCharacteristicValuesForCharacteristic(Characteri
             SubjectM* subject = *subjectIt;
             if (subject != nullptr)
             {
-                QString queryStr = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ;";
+                QString queryStr = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ?;";
                 CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
                 cass_statement_bind_uuid(cassStatement, 0, characteristic->getExperimentationCassUuid());
                 cass_statement_bind_uuid(cassStatement, 1, subject->getCassUuid());
