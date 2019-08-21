@@ -256,7 +256,7 @@ void SubjectsController::deleteSubject(SubjectM* subject)
         // Remove task instances related to the subject
         QList<CassUuid> taskUuidList;
         QStringList statementPlaceholders;
-        for (TaskM* task : _currentExperimentation->allTasks()->toList()) {
+        for (TaskM* task : *(_currentExperimentation->allTasks())) {
             if (task != nullptr)
             {
                 taskUuidList.append(task->getCassUuid());
@@ -410,11 +410,6 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
 
                             // Add the characteristic to the current experimentation
                             _currentExperimentation->addCharacteristic(characteristic);
-                        }
-                        // FIXME Update the existing characteristic ?
-                        else
-                        {
-
                         }
                     }
 
@@ -574,41 +569,48 @@ void SubjectsController::_insertCharacteristicValueForSubjectIntoDB(SubjectM* su
 
 /**
  * @brief Delete evert characteris value assciated with the given characteristic
- * FIXME Sending a request for each subject does not seem very efficient...
- *       It would be nive if we could just have a WHERE clause on id_experimentation and id_characteristic!
  * @param characteristic
  */
 void SubjectsController::_deleteCharacteristicValuesForCharacteristic(CharacteristicM* characteristic)
 {
     if ((characteristic != nullptr) && (_currentExperimentation != nullptr))
     {
-        for (auto subjectIt = _currentExperimentation->allSubjects()->begin() ; subjectIt != _currentExperimentation->allSubjects()->end() ; ++subjectIt)
-        {
-            SubjectM* subject = *subjectIt;
+        // Remove task instances related to the task
+        QList<CassUuid> subjectUuidList;
+        QStringList statementPlaceholders;
+        for (SubjectM* subject : _currentExperimentation->allSubjects()->toList()) {
             if (subject != nullptr)
             {
-                QString queryStr = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ?;";
-                CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
-                cass_statement_bind_uuid(cassStatement, 0, characteristic->getExperimentationCassUuid());
-                cass_statement_bind_uuid(cassStatement, 1, subject->getCassUuid());
-                cass_statement_bind_uuid(cassStatement, 2, characteristic->getCassUuid());
-
-                // Execute the query or bound statement
-                CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-                CassError cassError = cass_future_error_code(cassFuture);
-                if (cassError == CASS_OK)
-                {
-                    qInfo() << "Characteristic values for characteristic" << characteristic->name() << "has been successfully deleted from the DB";
-                }
-                else {
-                    qCritical() << "Could not delete the characteristic values for characteristic" << characteristic->name() << "from the DB:" << cass_error_desc(cassError);
-                }
-
-                // Clean-up cassandra objects
-                cass_future_free(cassFuture);
-                cass_statement_free(cassStatement);
+                subjectUuidList.append(subject->getCassUuid());
+                statementPlaceholders.append("?");
             }
         }
+
+        QString queryStr = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject IN (" + statementPlaceholders.join(", ") + ") AND id_characteristic = ?;";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), static_cast<size_t>(2 + statementPlaceholders.size()));
+        cass_statement_bind_uuid(cassStatement, 0, _currentExperimentation->getCassUuid());
+        size_t placeholderIdx = 1;
+        for (CassUuid uuid : subjectUuidList)
+        {
+            cass_statement_bind_uuid(cassStatement, placeholderIdx, uuid);
+            ++placeholderIdx;
+        }
+        cass_statement_bind_uuid(cassStatement, placeholderIdx, characteristic->getCassUuid());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "Characteristic values for characteristic" << characteristic->name() << "has been successfully deleted from the DB";
+        }
+        else {
+            qCritical() << "Could not delete the characteristic values for characteristic" << characteristic->name() << "from the DB:" << cass_error_desc(cassError);
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
     }
 }
 
