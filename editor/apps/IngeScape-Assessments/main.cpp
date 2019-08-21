@@ -216,6 +216,13 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 
+#ifdef Q_OS_WIN
+    // Fix crash with some Intel graphic cards (e.g. Intel HD Graphics 620)
+    // Qt bug https://bugreports.qt.io/browse/QTBUG-64697
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+
+
     //------------------------------
     //
     // Configure our application
