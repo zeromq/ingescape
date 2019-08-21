@@ -125,6 +125,26 @@ QStringList AssessmentsModelManager::getStringListFromColumnName(const CassRow* 
 }
 
 /**
+ * @brief Retrive a date and a time value from the given columns inside the given row
+ * and convert it to a QDateTime before returning it
+ * @param row
+ * @param dateColumnName
+ * @param timeColumnName
+ * @return
+ */
+QDateTime AssessmentsModelManager::getDateTimeFromColumnNames(const CassRow* row, const char* dateColumnName, const char* timeColumnName)
+{
+    cass_uint32_t yearMonthDay;
+    cass_value_get_uint32(cass_row_get_column_by_name(row, dateColumnName), &yearMonthDay);
+    cass_int64_t timeOfDay;
+    cass_value_get_int64(cass_row_get_column_by_name(row, timeColumnName), &timeOfDay);
+
+    /* Convert 'date' and 'time' to Epoch time */
+    time_t time = static_cast<time_t>(cass_date_time_to_epoch(yearMonthDay, timeOfDay));
+    return QDateTime::fromTime_t(static_cast<uint>(time));
+}
+
+/**
  * @brief Constructor
  * @param jsonHelper
  * @param rootDirectoryPath

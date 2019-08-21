@@ -336,18 +336,8 @@ ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const 
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &experimentationUid);
 
         QString experimentationName = AssessmentsModelManager::getStringValueFromColumnName(row, "name");
-
         QString groupName = AssessmentsModelManager::getStringValueFromColumnName(row, "group_name");
-
-        cass_uint32_t creationDate;
-        cass_value_get_uint32(cass_row_get_column_by_name(row, "creation_date"), &creationDate);
-
-        cass_int64_t creationTime;
-        cass_value_get_int64(cass_row_get_column_by_name(row, "creation_time"), &creationTime);
-
-        time_t secCreationDateTime = cass_date_time_to_epoch(creationDate, creationTime);
-        QDateTime creationDateTime;
-        creationDateTime.setSecsSinceEpoch(secCreationDateTime);
+        QDateTime creationDateTime(AssessmentsModelManager::getDateTimeFromColumnNames(row, "creation_date", "creation_time"));
 
         experimentation = new ExperimentationM(experimentationUid, experimentationName, groupName, creationDateTime, nullptr);
     }

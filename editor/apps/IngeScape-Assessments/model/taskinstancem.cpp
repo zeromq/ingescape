@@ -184,15 +184,9 @@ TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* 
         QString comments(AssessmentsModelManager::getStringValueFromColumnName(row, "comment"));
         QUrl platformUrl(AssessmentsModelManager::getStringValueFromColumnName(row, "platform_file"));
 
-        cass_uint32_t yearMonthDay;
-        cass_value_get_uint32(cass_row_get_column_by_name(row, "start_date"), &yearMonthDay);
-        cass_int64_t timeOfDay;
-        cass_value_get_int64(cass_row_get_column_by_name(row, "start_time"), &timeOfDay);
+        QDateTime startDateTime(AssessmentsModelManager::getDateTimeFromColumnNames(row, "start_date", "start_time"));
 
-        /* Convert 'date' and 'time' to Epoch time */
-        time_t time = static_cast<time_t>(cass_date_time_to_epoch(yearMonthDay, timeOfDay));
-
-        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, taskName, comments, subject, task, QDateTime::fromTime_t(static_cast<uint>(time)));
+        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, taskName, comments, subject, task, startDateTime);
     }
 
     return taskInstance;

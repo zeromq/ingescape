@@ -94,6 +94,16 @@ public:
      */
     static QStringList getStringListFromColumnName(const CassRow* row, const char* columnName);
 
+    /**
+     * @brief Retrive a date and a time value from the given columns inside the given row
+     * and convert it to a QDateTime before returning it
+     * @param row
+     * @param dateColumnName
+     * @param timeColumnName
+     * @return
+     */
+    static QDateTime getDateTimeFromColumnNames(const CassRow* row, const char* dateColumnName, const char* timeColumnName);
+
 
     // ------------------------
     //
