@@ -269,8 +269,6 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
     {
         qDebug() << "Subjects Controller: on Current Experimentation changed" << currentExperimentation->name();
 
-        // FIXME TODO: load data about this experimentation (subjects and characteristics)
-
         CassUuid uidExperimentation = currentExperimentation->getCassUuid();
 
         // Create the query

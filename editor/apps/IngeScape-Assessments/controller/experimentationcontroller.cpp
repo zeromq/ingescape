@@ -174,8 +174,6 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
     {
         qDebug() << "_on Current Experimentation Changed" << currentExperimentation->name();
 
-        // FIXME TODO: load data about this experimentation (subjects, tasks, ...)
-
         _retrieveTasksForExperimentation(currentExperimentation);
 
         _retrieveSubjectsForExperimentation(currentExperimentation);
