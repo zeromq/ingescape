@@ -174,8 +174,6 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
     {
         qDebug() << "_on Current Experimentation Changed" << currentExperimentation->name();
 
-        // FIXME TODO: load data about this experimentation (subjects, tasks, ...)
-
         _retrieveTasksForExperimentation(currentExperimentation);
 
         _retrieveSubjectsForExperimentation(currentExperimentation);
@@ -215,7 +213,7 @@ TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QStrin
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
 
-        QString queryStr = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, id_records, name, comments, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        QString queryStr = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, id_records, name, comment, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 11);
         cass_statement_bind_uuid  (cassStatement, 0, taskInstanceUuid);
         cass_statement_bind_uuid  (cassStatement, 1, _currentExperimentation->getCassUuid());
@@ -288,10 +286,10 @@ void ExperimentationController::_retrieveIndependentVariableForTask(TaskM* task)
 {
     if (AssessmentsModelManager::Instance() != nullptr)
     {
-        const char* query = "SELECT * FROM ingescape.independent_var WHERE id_experimentation = ? AND id_task = ?;";
+        QString queryStr = "SELECT * FROM " + IndependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ?;";
 
         // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(query, 2);
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
         cass_statement_bind_uuid(cassStatement, 0, task->getExperimentationCassUuid());
         cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
         // Execute the query or bound statement
@@ -338,10 +336,10 @@ void ExperimentationController::_retrieveDependentVariableForTask(TaskM* task)
 {
     if ((task != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
-        const char* query = "SELECT * FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ?;";
+        QString queryStr = "SELECT * FROM " + DependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ?;";
 
         // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(query, 2);
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
         cass_statement_bind_uuid(cassStatement, 0, task->getExperimentationCassUuid());
         cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
         // Execute the query or bound statement
@@ -493,10 +491,10 @@ void ExperimentationController::_retrieveTasksForExperimentation(Experimentation
 {
     if (experimentation != nullptr)
     {
-        const char* query = "SELECT * FROM ingescape.task WHERE id_experimentation = ?;";
+        QString queryStr = "SELECT * FROM " + TaskM::table + " WHERE id_experimentation = ?;";
 
         // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(query, 1);
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
         cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
 
         // Execute the query or bound statement
@@ -648,11 +646,7 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
                             cass_value_get_uuid(cass_row_get_column_by_name(row, "id_characteristic"), &characteristicUuid);
 
                             // Get characteristic value as a string
-                            const char *chrValueString = "";
-                            size_t valueStringLength = 0;
-                            cass_value_get_string(cass_row_get_column_by_name(row, "characteristic_value"), &chrValueString, &valueStringLength);
-                            QString valueString = QString::fromUtf8(chrValueString, static_cast<int>(valueStringLength));
-
+                            QString valueString = AssessmentsModelManager::getStringValueFromColumnName(row, "characteristic_value");
 
                             // Get characteristic value type
                             CharacteristicM* characteristic = _currentExperimentation->getCharacteristicFromUID(characteristicUuid);
@@ -728,19 +722,14 @@ void ExperimentationController::_retrieveIndependentVariableValuesForTaskInstanc
                     // Get independent variable uuid
                     CassUuid indeVarUuid;
                     cass_value_get_uuid(cass_row_get_column_by_name(row, "id_independent_var"), &indeVarUuid);
-                    char chrIndeVarUid[CASS_UUID_STRING_LENGTH];
-                    cass_uuid_string(indeVarUuid, chrIndeVarUid);
-
-                    // Get value as a string
-                    const char *chrValueString = "";
-                    size_t valueStringLength = 0;
-                    cass_value_get_string(cass_row_get_column_by_name(row, "independent_var_value"), &chrValueString, &valueStringLength);
-                    QString valueString = QString::fromUtf8(chrValueString, static_cast<int>(valueStringLength));
 
                     // Get corresponding independent variable
                     IndependentVariableM* indeVar = taskInstance->task()->getIndependentVariableFromUuid(indeVarUuid);
                     if (indeVar != nullptr)
                     {
+                        // Get value as a string
+                        QString valueString = AssessmentsModelManager::getStringValueFromColumnName(row, "independent_var_value");
+
                         taskInstance->setIndependentVariableValue(indeVar, valueString);
                     }
                 }

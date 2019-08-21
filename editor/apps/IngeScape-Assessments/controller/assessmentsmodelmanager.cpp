@@ -86,6 +86,65 @@ AssessmentsModelManager* AssessmentsModelManager::Instance()
 }
 
 /**
+ * @brief Retrieve a 'text' value of given column inside the given row
+ * and convert it to QString before returning it
+ * @param row
+ * @param columnName
+ * @return
+ */
+QString AssessmentsModelManager::getStringValueFromColumnName(const CassRow* row, const char* columnName)
+{
+    const char *chrValueString = "";
+    size_t valueStringLength = 0;
+    cass_value_get_string(cass_row_get_column_by_name(row, columnName), &chrValueString, &valueStringLength);
+    return QString::fromUtf8(chrValueString, static_cast<int>(valueStringLength));
+}
+
+/**
+ * @brief Retrive a full collection of 'text' for the given value inside the given row
+ * @param row
+ * @param columnName
+ * @return
+ */
+QStringList AssessmentsModelManager::getStringListFromColumnName(const CassRow* row, const char* columnName)
+{
+    QStringList collection;
+    CassIterator* enumValuesIterator = cass_iterator_from_collection(cass_row_get_column_by_name(row, columnName));
+    if (enumValuesIterator != nullptr) {
+        while(cass_iterator_next(enumValuesIterator)) {
+            const char *chrEnumValue = "";
+            size_t enumValueLength = 0;
+            cass_value_get_string(cass_iterator_get_value(enumValuesIterator), &chrEnumValue, &enumValueLength);
+            collection.append(QString::fromUtf8(chrEnumValue, static_cast<int>(enumValueLength)));
+        }
+
+        cass_iterator_free(enumValuesIterator);
+        enumValuesIterator = nullptr;
+    }
+    return collection;
+}
+
+/**
+ * @brief Retrive a date and a time value from the given columns inside the given row
+ * and convert it to a QDateTime before returning it
+ * @param row
+ * @param dateColumnName
+ * @param timeColumnName
+ * @return
+ */
+QDateTime AssessmentsModelManager::getDateTimeFromColumnNames(const CassRow* row, const char* dateColumnName, const char* timeColumnName)
+{
+    cass_uint32_t yearMonthDay;
+    cass_value_get_uint32(cass_row_get_column_by_name(row, dateColumnName), &yearMonthDay);
+    cass_int64_t timeOfDay;
+    cass_value_get_int64(cass_row_get_column_by_name(row, timeColumnName), &timeOfDay);
+
+    /* Convert 'date' and 'time' to Epoch time */
+    time_t time = static_cast<time_t>(cass_date_time_to_epoch(yearMonthDay, timeOfDay));
+    return QDateTime::fromTime_t(static_cast<uint>(time));
+}
+
+/**
  * @brief Constructor
  * @param jsonHelper
  * @param rootDirectoryPath

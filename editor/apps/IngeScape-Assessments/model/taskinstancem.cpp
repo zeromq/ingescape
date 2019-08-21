@@ -167,7 +167,6 @@ void TaskInstanceM::setIndependentVariableValue(IndependentVariableM* indeVar, c
  * @param row
  * @return
  */
-//NOTE Same note as CharacteristicM::_deleteCharacteristicValuesForCharacteristic
 TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* row, SubjectM* subject, TaskM* task)
 {
     TaskInstanceM* taskInstance = nullptr;
@@ -181,30 +180,13 @@ TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* 
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_records"), &recordUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskInstanceUuid);
 
-        const char *chrTaskName = "";
-        size_t nameLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
-        QString taskName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
+        QString taskName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
+        QString comments(AssessmentsModelManager::getStringValueFromColumnName(row, "comment"));
+        QUrl platformUrl(AssessmentsModelManager::getStringValueFromColumnName(row, "platform_file"));
 
-        const char *chrComments = "";
-        size_t commentsLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "comments"), &chrComments, &commentsLength);
-        QString comments = QString::fromUtf8(chrComments, static_cast<int>(commentsLength));
+        QDateTime startDateTime(AssessmentsModelManager::getDateTimeFromColumnNames(row, "start_date", "start_time"));
 
-        const char *chrPlatformUrl = "";
-        size_t platformUrlLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "platform_file"), &chrPlatformUrl, &platformUrlLength);
-        QUrl platformUrl(QString::fromUtf8(chrPlatformUrl, static_cast<int>(platformUrlLength)));
-
-        cass_uint32_t yearMonthDay;
-        cass_value_get_uint32(cass_row_get_column_by_name(row, "start_date"), &yearMonthDay);
-        cass_int64_t timeOfDay;
-        cass_value_get_int64(cass_row_get_column_by_name(row, "start_time"), &timeOfDay);
-
-        /* Convert 'date' and 'time' to Epoch time */
-        time_t time = static_cast<time_t>(cass_date_time_to_epoch(yearMonthDay, timeOfDay));
-
-        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, taskName, comments, subject, task, QDateTime::fromTime_t(static_cast<uint>(time)));
+        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, taskName, comments, subject, task, startDateTime);
     }
 
     return taskInstance;
@@ -360,7 +342,7 @@ void TaskInstanceM::_updateDBEntry()
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
         QString queryStr("UPDATE " + TaskInstanceM::table
-                         + " SET name = ?, comments = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?"
+                         + " SET name = ?, comment = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?"
                          + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;");
 
         CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 11);

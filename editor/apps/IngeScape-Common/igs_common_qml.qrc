@@ -27,5 +27,6 @@
         <file>qml/QtQuickInfoPopup.qml</file>
         <file>qml/NetworkPopup.qml</file>
         <file>qml/LicensePopup.qml</file>
+        <file>qml/TextAreaWithTimer.qml</file>
     </qresource>
 </RCC>

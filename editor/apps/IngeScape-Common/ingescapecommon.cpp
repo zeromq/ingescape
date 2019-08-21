@@ -169,6 +169,9 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     // - Qt Quick info Popup
     qmlRegisterType(QUrl("qrc:/qml/QtQuickInfoPopup.qml"), "INGESCAPE", 1, 0, "QtQuickInfoPopup");
 
+    // - Text area with timer to delay processing of edited text while the user is editing it
+    qmlRegisterType(QUrl("qrc:/qml/TextAreaWithTimer.qml"), "INGESCAPE", 1, 0, "TextAreaWithTimer");
+
 
     // - Timeline
     qmlRegisterType(QUrl("qrc:/qml/timeline/ActionInTimeLine.qml"), "INGESCAPE", 1, 0, "ActionInTimeLine");

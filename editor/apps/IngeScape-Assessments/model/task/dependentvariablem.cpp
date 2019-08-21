@@ -16,6 +16,13 @@
 
 #include <controller/assessmentsmodelmanager.h>
 
+
+/**
+ * @brief Dependent variable table name
+ */
+const QString DependentVariableM::table = "ingescape.dependent_var";
+
+
 /**
  * @brief Constructor
  * @param parent
@@ -55,14 +62,14 @@ DependentVariableM::~DependentVariableM()
 
 
 /**
- * @brief Update the given DependentVariableM into the Cassandra DB
+ * @brief Update the given Dependent variable the Cassandra DB
  * @param entry
  * @return
  */
 bool DependentVariableM::updateDependentVariableIntoCassandraDB(const DependentVariableM& entry)
 {
-    const char* query = "UPDATE ingescape.dependent_var SET name = ?, description = ?, agent_name = ?, output_name = ? WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
-    CassStatement* cassStatement = cass_statement_new(query, 7);
+    QString queryStr = "UPDATE " + DependentVariableM::table + " SET name = ?, description = ?, agent_name = ?, output_name = ? WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
     cass_statement_bind_string(cassStatement, 0, entry.name().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 1, entry.description().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 2, entry.agentName().toStdString().c_str());
@@ -95,25 +102,10 @@ DependentVariableM* DependentVariableM::createDependentVariableFromCassandraRow(
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &independentVarUuid);
 
-        const char *chrVariableName = "";
-        size_t varNameLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrVariableName, &varNameLength);
-        QString variableName = QString::fromUtf8(chrVariableName, static_cast<int>(varNameLength));
-
-        const char *chrVariableDescription = "";
-        size_t varDescriptionLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "description"), &chrVariableDescription, &varDescriptionLength);
-        QString variableDescription(QString::fromUtf8(chrVariableDescription, static_cast<int>(varDescriptionLength)));
-
-        const char *chrAgentName = "";
-        size_t agentNameLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "agent_name"), &chrAgentName, &agentNameLength);
-        QString agentName(QString::fromUtf8(chrAgentName, static_cast<int>(agentNameLength)));
-
-        const char *chrOutputName = "";
-        size_t outputNameLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "output_name"), &chrOutputName, &outputNameLength);
-        QString outputName(QString::fromUtf8(chrOutputName, static_cast<int>(outputNameLength)));
+        QString variableName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
+        QString variableDescription(AssessmentsModelManager::getStringValueFromColumnName(row, "description"));
+        QString agentName(AssessmentsModelManager::getStringValueFromColumnName(row, "agent_name"));
+        QString outputName(AssessmentsModelManager::getStringValueFromColumnName(row, "output_name"));
 
         dependentVariable = new DependentVariableM(experimentationUuid, taskUuid, independentVarUuid, variableName, variableDescription, agentName, outputName);
     }
@@ -122,15 +114,15 @@ DependentVariableM* DependentVariableM::createDependentVariableFromCassandraRow(
 }
 
 /**
- * @brief Delete the given dependent variable from the Cassandra DB
+ * @brief Delete the given dependent variable from Cassandra DB
  * @param row
  * @return
  */
 void DependentVariableM::deleteDependentVariableFromCassandraDB(const DependentVariableM& entry)
 {
     // Remove dependent_var from DB
-    const char* query = "DELETE FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
-    CassStatement* cassStatement = cass_statement_new(query, 3);
+    QString queryStr = "DELETE FROM " + DependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
     cass_statement_bind_uuid(cassStatement, 0, entry.getExperimentationCassUuid());
     cass_statement_bind_uuid(cassStatement, 1, entry.getTaskCassUuid());
     cass_statement_bind_uuid(cassStatement, 2, entry.getCassUuid());

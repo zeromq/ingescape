@@ -16,6 +16,12 @@
 
 #include "controller/assessmentsmodelmanager.h"
 
+
+/**
+ * @brief Task table name
+ */
+const QString TaskM::table = "ingescape.task";
+
 /**
  * @brief Constructor
  * @param name
@@ -184,15 +190,8 @@ TaskM* TaskM::createTaskFromCassandraRow(const CassRow* row)
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskUuid);
 
-        const char *chrTaskName = "";
-        size_t nameLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
-        QString taskName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
-
-        const char *chrPlatformUrl = "";
-        size_t platformUrlLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "platform_file"), &chrPlatformUrl, &platformUrlLength);
-        QUrl platformUrl(QString::fromUtf8(chrPlatformUrl, static_cast<int>(platformUrlLength)));
+        QString taskName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
+        QUrl platformUrl(AssessmentsModelManager::getStringValueFromColumnName(row, "platform_file"));
 
         task = new TaskM(experimentationUuid, taskUuid, taskName, platformUrl);
     }
@@ -208,8 +207,8 @@ void TaskM::deleteTaskFromCassandra(const TaskM& task)
 {
 
     // Remove independent_var from DB
-    const char* query = "DELETE FROM ingescape.independent_var WHERE id_experimentation = ? AND id_task = ?;";
-    CassStatement* cassStatement = cass_statement_new(query, 2);
+    QString queryStr = "DELETE FROM " + IndependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
     cass_statement_bind_uuid(cassStatement, 0, task.getExperimentationCassUuid());
     cass_statement_bind_uuid(cassStatement, 1, task.getCassUuid());
 
@@ -229,8 +228,8 @@ void TaskM::deleteTaskFromCassandra(const TaskM& task)
     cass_statement_free(cassStatement);
 
     // Remove dependent_var from DB
-    query = "DELETE FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ?;";
-    cassStatement = cass_statement_new(query, 2);
+    queryStr = "DELETE FROM " + DependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ?;";
+    cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
     cass_statement_bind_uuid(cassStatement, 0, task.getExperimentationCassUuid());
     cass_statement_bind_uuid(cassStatement, 1, task.getCassUuid());
 
@@ -250,8 +249,8 @@ void TaskM::deleteTaskFromCassandra(const TaskM& task)
     cass_statement_free(cassStatement);
 
     // Remove task from DB
-    query = "DELETE FROM ingescape.task WHERE id_experimentation = ? AND id = ?;";
-    cassStatement = cass_statement_new(query, 2);
+    queryStr = "DELETE FROM " + TaskM::table + " WHERE id_experimentation = ? AND id = ?;";
+    cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
     cass_statement_bind_uuid(cassStatement, 0, task.getExperimentationCassUuid());
     cass_statement_bind_uuid(cassStatement, 1, task.getCassUuid());
 

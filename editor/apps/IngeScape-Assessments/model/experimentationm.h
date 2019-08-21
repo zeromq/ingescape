@@ -139,16 +139,30 @@ public:
 
     /**
      * @brief Add a task instance to our experimentation
-     * @param record
+     * @param taskInstance
      */
     void addTaskInstance(TaskInstanceM* taskInstance);
 
 
     /**
      * @brief Remove a task instance from our experimentation
-     * @param record
+     * @param taskInstance
      */
     void removeTaskInstance(TaskInstanceM* taskInstance);
+
+
+    /**
+     * @brief Remove task instances related to the given subject
+     * @param subject
+     */
+    void removeTaskInstanceRelatedToSubject(SubjectM* subject);
+
+
+    /**
+     * @brief Remove task instances related to the given task
+     * @param task
+     */
+    void removeTaskInstanceRelatedToTask(TaskM* task);
 
 
     /**

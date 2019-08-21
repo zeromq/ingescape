@@ -236,9 +236,17 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 
+#ifdef Q_OS_WIN
+    // Fix crash with some Intel graphic cards (e.g. Intel HD Graphics 620)
+    // Qt bug https://bugreports.qt.io/browse/QTBUG-64697
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+
+
+#ifdef QT_DEBUG
     // Print out general information about various parts of the scene graph and the graphics stack
     QLoggingCategory::setFilterRules("qt.scenegraph.general = true");
-
+#endif
 
 
     //------------------------------

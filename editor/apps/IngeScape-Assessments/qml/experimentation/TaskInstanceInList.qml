@@ -179,15 +179,13 @@ Rectangle {
             }
         }
 
-        // FIXME TODO: record.duration
         Text {
             id: duration
 
-            /*text: rootItem.modelM ? rootItem.modelM.duration.toLocaleString(Qt.locale(), "hh:mm:ss.zzz")
-                                        : "00:00:00.000"*/
+            text: rootItem.modelM ? rootItem.modelM.duration.toLocaleString(Qt.locale(), "hh:mm:ss.zzz")
+                                  : "00:00:00.000"
             width: durationColumnWidth
             elide: Text.ElideRight
-            text: "00:00:00.000"
 
             color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {

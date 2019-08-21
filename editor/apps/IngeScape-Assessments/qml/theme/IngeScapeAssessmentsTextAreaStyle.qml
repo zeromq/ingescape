@@ -60,8 +60,8 @@ I2TextAreaStyle {
 
     // Background of our scrollbar
     scrollBarBackground: Item {
-        implicitWidth: rootStyle.scrollBarSize + rootStyle.verticalScrollbarMargin
-        implicitHeight: rootStyle.scrollBarSize + rootStyle.horizontalScrollbarMargin
+        implicitWidth: 14
+        implicitHeight: 14
     }
 
 
