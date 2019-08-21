@@ -235,7 +235,7 @@ void TaskM::deleteTaskFromCassandra(const TaskM& task)
     cass_statement_free(cassStatement);
 
     // Remove dependent_var from DB
-    queryStr = "DELETE FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ?;";
+    queryStr = "DELETE FROM " + DependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ?;";
     cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
     cass_statement_bind_uuid(cassStatement, 0, task.getExperimentationCassUuid());
     cass_statement_bind_uuid(cassStatement, 1, task.getCassUuid());

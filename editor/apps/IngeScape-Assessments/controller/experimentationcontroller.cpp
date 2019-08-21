@@ -336,10 +336,10 @@ void ExperimentationController::_retrieveDependentVariableForTask(TaskM* task)
 {
     if ((task != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
-        const char* query = "SELECT * FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ?;";
+        QString queryStr = "SELECT * FROM " + DependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ?;";
 
         // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(query, 2);
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
         cass_statement_bind_uuid(cassStatement, 0, task->getExperimentationCassUuid());
         cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
         // Execute the query or bound statement

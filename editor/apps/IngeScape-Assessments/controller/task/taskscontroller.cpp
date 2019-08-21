@@ -429,8 +429,8 @@ void TasksController::deleteDependentVariable(DependentVariableM* dependentVaria
         _selectedTask->removeDependentVariable(dependentVariable);
 
         // Remove from DB
-        const char* query = "DELETE FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ?;";
-        CassStatement* cassStatement = cass_statement_new(query, 2);
+        QString queryStr = "DELETE FROM " + DependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ?;";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
         cass_statement_bind_uuid(cassStatement, 0, _selectedTask->getExperimentationCassUuid());
         cass_statement_bind_uuid(cassStatement, 1, _selectedTask->getCassUuid());
 
@@ -585,8 +585,8 @@ DependentVariableM* TasksController::_insertDependentVariableIntoDB(CassUuid exp
     CassUuid dependentVarUuid;
     cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &dependentVarUuid);
 
-    const char* query = "INSERT INTO ingescape.dependent_var (id_experimentation, id_task, id, name, description, agent_name, output_name) VALUES (?, ?, ?, ?, ?, ?, ?);";
-    CassStatement* cassStatement = cass_statement_new(query, 7);
+    QString queryStr = "INSERT INTO " + DependentVariableM::table + " (id_experimentation, id_task, id, name, description, agent_name, output_name) VALUES (?, ?, ?, ?, ?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
     cass_statement_bind_uuid  (cassStatement, 0, experimentationUuid);
     cass_statement_bind_uuid  (cassStatement, 1, taskUuid);
     cass_statement_bind_uuid  (cassStatement, 2, dependentVarUuid);

@@ -16,6 +16,13 @@
 
 #include <controller/assessmentsmodelmanager.h>
 
+
+/**
+ * @brief Dependent variable table name
+ */
+const QString DependentVariableM::table = "ingescape.dependent_var";
+
+
 /**
  * @brief Constructor
  * @param parent
@@ -55,14 +62,14 @@ DependentVariableM::~DependentVariableM()
 
 
 /**
- * @brief Update the given DependentVariableM into the Cassandra DB
+ * @brief Update the given Dependent variable the Cassandra DB
  * @param entry
  * @return
  */
 bool DependentVariableM::updateDependentVariableIntoCassandraDB(const DependentVariableM& entry)
 {
-    const char* query = "UPDATE ingescape.dependent_var SET name = ?, description = ?, agent_name = ?, output_name = ? WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
-    CassStatement* cassStatement = cass_statement_new(query, 7);
+    QString queryStr = "UPDATE " + DependentVariableM::table + " SET name = ?, description = ?, agent_name = ?, output_name = ? WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
     cass_statement_bind_string(cassStatement, 0, entry.name().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 1, entry.description().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 2, entry.agentName().toStdString().c_str());
@@ -122,15 +129,15 @@ DependentVariableM* DependentVariableM::createDependentVariableFromCassandraRow(
 }
 
 /**
- * @brief Delete the given dependent variable from the Cassandra DB
+ * @brief Delete the given dependent variable from Cassandra DB
  * @param row
  * @return
  */
 void DependentVariableM::deleteDependentVariableFromCassandraDB(const DependentVariableM& entry)
 {
     // Remove dependent_var from DB
-    const char* query = "DELETE FROM ingescape.dependent_var WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
-    CassStatement* cassStatement = cass_statement_new(query, 3);
+    QString queryStr = "DELETE FROM " + DependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
     cass_statement_bind_uuid(cassStatement, 0, entry.getExperimentationCassUuid());
     cass_statement_bind_uuid(cassStatement, 1, entry.getTaskCassUuid());
     cass_statement_bind_uuid(cassStatement, 2, entry.getCassUuid());
