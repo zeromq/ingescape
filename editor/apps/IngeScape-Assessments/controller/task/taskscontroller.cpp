@@ -382,6 +382,45 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
 {
     if ((independentVariable != nullptr) && (_selectedTask != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
+        // Delete independent variable valuesfrom Cassandra DB
+        QList<CassUuid> taskInstanceUuidList;
+        QStringList statementPlaceholders;
+        for (TaskInstanceM* taskInstance : _currentExperimentation->allTaskInstances()->toList())
+        {
+            if (taskInstance != nullptr)
+            {
+                taskInstanceUuidList.append(taskInstance->getCassUuid());
+                statementPlaceholders.append("?");
+            }
+        }
+
+        QString queryStr = "DELETE FROM " + IndependentVariableValueM::table + " WHERE id_experimentation = ? AND id_task_instance IN (" + statementPlaceholders.join(", ") + ") AND id_independent_var = ?;";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), static_cast<size_t>(2 + statementPlaceholders.size()));
+        cass_statement_bind_uuid(cassStatement, 0, independentVariable->getExperimentationCassUuid());
+        size_t placeholderIdx = 1;
+        for (CassUuid uuid : taskInstanceUuidList)
+        {
+            cass_statement_bind_uuid(cassStatement, placeholderIdx, uuid);
+            ++placeholderIdx;
+        }
+        cass_statement_bind_uuid(cassStatement, placeholderIdx, independentVariable->getCassUuid());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "Values for independent variable" << independentVariable->name() << "has been successfully deleted from the DB";
+        }
+        else {
+            qCritical() << "Could not delete the values for independent variable" << independentVariable->name() << "from the DB:" << cass_error_desc(cassError);
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+
+
         // Delete independent variable from Cassandra DB
         IndependentVariableM::deleteIndependentVariableFromCassandra(*independentVariable);
 
