@@ -529,8 +529,8 @@ IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid
         CassUuid independentVarUuid;
         cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &independentVarUuid);
 
-        const char* query = "INSERT INTO ingescape.independent_var (id_experimentation, id_task, id, name, description, value_type, enum_values) VALUES (?, ?, ?, ?, ?, ?, ?);";
-        CassStatement* cassStatement = cass_statement_new(query, 7);
+        QString queryStr = "INSERT INTO " + IndependentVariableM::table + " (id_experimentation, id_task, id, name, description, value_type, enum_values) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
         cass_statement_bind_uuid  (cassStatement, 0, experimentationUuid);
         cass_statement_bind_uuid  (cassStatement, 1, taskUuid);
         cass_statement_bind_uuid  (cassStatement, 2, independentVarUuid);
