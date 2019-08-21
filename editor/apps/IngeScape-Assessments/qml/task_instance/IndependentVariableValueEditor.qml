@@ -87,7 +87,14 @@ Item {
         Controls2.ToolTip {
             visible: mouseAreaInfo.containsMouse
             delay: 800
-            text: rootItem.variable ? IndependentVariableValueTypes.enumToString(rootItem.variable.valueType) + "\n" + rootItem.variable.description : ""
+            text: {
+                var tooltipText = rootItem.variable ? IndependentVariableValueTypes.enumToString(rootItem.variable.valueType) + "\n" + rootItem.variable.description : ""
+                if (tooltipText.length > 150)
+                {
+                    tooltipText = tooltipText.substring(0, 147) + "..."
+                }
+                return tooltipText
+            }
         }
     }
 
