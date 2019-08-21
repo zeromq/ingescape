@@ -28,7 +28,7 @@ class SubjectM : public QObject
     Q_OBJECT
 
     // Displayed identifier of our subject
-    I2_QML_PROPERTY(QString, displayedId)
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, displayedId)
 
     // Values of the characteristics of our subject
     // "Qml Property Map" allows to set key-value pairs that can be used in QML bindings
