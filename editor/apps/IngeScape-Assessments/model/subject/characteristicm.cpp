@@ -74,20 +74,7 @@ CharacteristicM* CharacteristicM::createCharacteristicFromCassandraRow(const Cas
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &characteristicUuid);
 
         QString characteristicName = AssessmentsModelManager::getStringValueFromColumnName(row, "name");
-
-        QStringList enumValues;
-        CassIterator* enumValuesIterator = cass_iterator_from_collection(cass_row_get_column_by_name(row, "enum_values"));
-        if (enumValuesIterator != nullptr) {
-            while(cass_iterator_next(enumValuesIterator)) {
-                const char *chrEnumValue = "";
-                size_t enumValueLength = 0;
-                cass_value_get_string(cass_iterator_get_value(enumValuesIterator), &chrEnumValue, &enumValueLength);
-                enumValues.append(QString::fromUtf8(chrEnumValue, static_cast<int>(enumValueLength)));
-            }
-
-            cass_iterator_free(enumValuesIterator);
-            enumValuesIterator = nullptr;
-        }
+        QStringList enumValues = AssessmentsModelManager::getStringListFromColumnName(row, "enum_values");
 
         int8_t i8ValueType = 0;
         cass_value_get_int8(cass_row_get_column_by_name(row, "value_type"), &i8ValueType);

@@ -86,6 +86,14 @@ public:
      */
     static QString getStringValueFromColumnName(const CassRow* row, const char* columnName);
 
+    /**
+     * @brief Retrive a full collection of 'text' for the given value inside the given row
+     * @param row
+     * @param columnName
+     * @return
+     */
+    static QStringList getStringListFromColumnName(const CassRow* row, const char* columnName);
+
 
     // ------------------------
     //

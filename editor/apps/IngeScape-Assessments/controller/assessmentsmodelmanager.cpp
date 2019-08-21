@@ -101,6 +101,30 @@ QString AssessmentsModelManager::getStringValueFromColumnName(const CassRow* row
 }
 
 /**
+ * @brief Retrive a full collection of 'text' for the given value inside the given row
+ * @param row
+ * @param columnName
+ * @return
+ */
+QStringList AssessmentsModelManager::getStringListFromColumnName(const CassRow* row, const char* columnName)
+{
+    QStringList collection;
+    CassIterator* enumValuesIterator = cass_iterator_from_collection(cass_row_get_column_by_name(row, columnName));
+    if (enumValuesIterator != nullptr) {
+        while(cass_iterator_next(enumValuesIterator)) {
+            const char *chrEnumValue = "";
+            size_t enumValueLength = 0;
+            cass_value_get_string(cass_iterator_get_value(enumValuesIterator), &chrEnumValue, &enumValueLength);
+            collection.append(QString::fromUtf8(chrEnumValue, static_cast<int>(enumValueLength)));
+        }
+
+        cass_iterator_free(enumValuesIterator);
+        enumValuesIterator = nullptr;
+    }
+    return collection;
+}
+
+/**
  * @brief Constructor
  * @param jsonHelper
  * @param rootDirectoryPath
