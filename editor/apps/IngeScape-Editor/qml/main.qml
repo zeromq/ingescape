@@ -100,8 +100,19 @@ ApplicationWindow {
 
                 onTriggered: {
                     if (applicationLoader.item) {
-                        console.log("QML: open configuration");
+                        console.log("QML: Open configuration popup");
                         applicationLoader.item.openConfiguration();
+                    }
+                }
+            }
+            MenuItem {
+                text: qsTr("License")
+                //shortcut: StandardKey.
+
+                onTriggered: {
+                    if (applicationLoader.item) {
+                        console.log("QML: Open license popup");
+                        applicationLoader.item.openLicense();
                     }
                 }
             }

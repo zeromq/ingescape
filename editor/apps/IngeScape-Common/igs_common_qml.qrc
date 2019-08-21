@@ -25,6 +25,7 @@
         <file>qml/timeline/ScenarioTimeLine.qml</file>
         <file>qml/ConfirmationPopup.qml</file>
         <file>qml/QtQuickInfoPopup.qml</file>
-        <file>qml/ConfigurationPopup.qml</file>
+        <file>qml/NetworkPopup.qml</file>
+        <file>qml/LicensePopup.qml</file>
     </qresource>
 </RCC>

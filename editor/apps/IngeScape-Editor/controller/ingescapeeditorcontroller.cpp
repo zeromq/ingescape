@@ -179,6 +179,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::recorderExited, _recordsSupervisionC, &RecordsSupervisionController::onRecorderExited);
     connect(_networkC, &NetworkController::expeEntered, this, &IngeScapeEditorController::_onExpeEntered);
     connect(_networkC, &NetworkController::expeExited, this, &IngeScapeEditorController::_onExpeExited);
+    connect(_networkC, &NetworkController::licenseErrorOccured, this, &IngeScapeEditorController::_onLicenseErrorOccured);
 
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &EditorModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &EditorModelManager::onMappingReceived);
@@ -1168,6 +1169,18 @@ void IngeScapeEditorController::_onExpeExited(QString peerId, QString peerName)
         setpeerIdOfExpe("");
         setpeerNameOfExpe("");
     }
+}
+
+
+/**
+ * @brief Slot called when an error occured about the IngeScape license
+ * @param limit
+ */
+void IngeScapeEditorController::_onLicenseErrorOccured(QString limit)
+{
+    qInfo() << "on License Error Occured" << limit;
+
+    // TODO: display popup on HMI
 }
 
 

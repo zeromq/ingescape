@@ -272,6 +272,13 @@ Q_SIGNALS:
     void mappingReceived(QString peerId, QString peerName, QString mappingJSON);
 
 
+    /**
+     * @brief Signal emitted when an error occured about the IngeScape license
+     * @param limit
+     */
+    void licenseErrorOccured(QString limit);
+
+
 public Q_SLOTS:
 
 

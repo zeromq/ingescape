@@ -333,6 +333,13 @@ private Q_SLOTS:
     void _onExpeExited(QString peerId, QString peerName);
 
 
+    /**
+     * @brief Slot called when an error occured about the IngeScape license
+     * @param limit
+     */
+    void _onLicenseErrorOccured(QString limit);
+
+
 private:
 
     /**

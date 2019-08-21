@@ -347,11 +347,13 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
     IngeScapeNetworkController* networkController = (IngeScapeNetworkController*)myData;
     if (networkController != nullptr)
     {
+        // Emit the signal "License Error Occured"
+        Q_EMIT networkController->licenseErrorOccured("TODO");
+
         switch (limit)
         {
         case IGS_LICENSE_TIMEOUT:
             qCritical("IngeScape is stopped because demonstration mode timeout has been reached");
-            //Q_EMIT networkController->licenseError();
             break;
 
         case IGS_LICENSE_TOO_MANY_AGENTS:

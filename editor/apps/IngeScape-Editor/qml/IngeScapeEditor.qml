@@ -75,14 +75,22 @@ Item {
 
 
     //
-    // function allowing to open the network configuration popup
+    // Function allowing to open the network configuration popup
     //
     function openConfiguration() {
         if (IngeScapeEditorC.networkC) {
             IngeScapeEditorC.networkC.updateAvailableNetworkDevices();
         }
 
-        configurationPopup.open();
+        networkConfigurationPopup.open();
+    }
+
+
+    //
+    // Function allowing to open the license (configuration) popup
+    //
+    function openLicense() {
+        licensePopup.open();
     }
 
 
@@ -91,7 +99,7 @@ Item {
         if (IngeScapeEditorC.errorMessageWhenConnectionFailed !== "")
         {
             //console.error("On Completed: Error Message = " + IngeScapeEditorC.errorMessageWhenConnectionFailed);
-            configurationPopup.open();
+            networkConfigurationPopup.open();
         }
     }
 
@@ -462,7 +470,17 @@ Item {
     // Network Configuration (Popup)
     //
     NetworkConfiguration {
-        id: configurationPopup
+        id: networkConfigurationPopup
+
+        anchors.centerIn: parent
+    }
+
+
+    //
+    // License (Configuration) Popup
+    //
+    LicensePopup {
+        id: licensePopup
 
         anchors.centerIn: parent
     }
