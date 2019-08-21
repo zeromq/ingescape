@@ -213,7 +213,7 @@ TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QStrin
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
 
-        QString queryStr = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, id_records, name, comments, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        QString queryStr = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, id_records, name, comment, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 11);
         cass_statement_bind_uuid  (cassStatement, 0, taskInstanceUuid);
         cass_statement_bind_uuid  (cassStatement, 1, _currentExperimentation->getCassUuid());

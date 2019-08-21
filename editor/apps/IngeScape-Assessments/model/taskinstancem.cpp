@@ -188,7 +188,7 @@ TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* 
 
         const char *chrComments = "";
         size_t commentsLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "comments"), &chrComments, &commentsLength);
+        cass_value_get_string(cass_row_get_column_by_name(row, "comment"), &chrComments, &commentsLength);
         QString comments = QString::fromUtf8(chrComments, static_cast<int>(commentsLength));
 
         const char *chrPlatformUrl = "";
@@ -360,7 +360,7 @@ void TaskInstanceM::_updateDBEntry()
         cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
 
         QString queryStr("UPDATE " + TaskInstanceM::table
-                         + " SET name = ?, comments = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?"
+                         + " SET name = ?, comment = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?"
                          + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;");
 
         CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 11);
