@@ -95,7 +95,7 @@ ApplicationWindow {
             }
 
             MenuItem {
-                // If we use "Configuration", this MenuItem is displayed in the main app menu and called "Preferenes"
+                // If we use "Configuration", this MenuItem is displayed in the main app menu and called "Preferences"
                 // Workaround: we use an invisible character
                 text: qsTr("\u200BConfiguration")
                 shortcut: StandardKey.Preferences
