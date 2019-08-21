@@ -129,6 +129,43 @@ void TasksController::deleteTask(TaskM* task)
             setselectedTask(nullptr);
         }
 
+        // Remove task instances related to the task
+        QList<CassUuid> subjectUuidList;
+        QStringList statementPlaceholders;
+        for (SubjectM* subject : *(_currentExperimentation->allSubjects())) {
+            if (subject != nullptr)
+            {
+                subjectUuidList.append(subject->getCassUuid());
+                statementPlaceholders.append("?");
+            }
+        }
+
+        QString queryStr = "DELETE FROM " + TaskInstanceM::table + " WHERE id_experimentation = ? AND id_subject IN (" + statementPlaceholders.join(", ") + ") AND id_task = ? ;";
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), static_cast<size_t>(2 + statementPlaceholders.size()));
+        cass_statement_bind_uuid(cassStatement, 0, _currentExperimentation->getCassUuid());
+        size_t placeholderIdx = 1;
+        for (CassUuid uuid : subjectUuidList)
+        {
+            cass_statement_bind_uuid(cassStatement, placeholderIdx, uuid);
+            ++placeholderIdx;
+        }
+        cass_statement_bind_uuid(cassStatement, placeholderIdx, task->getCassUuid());
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << "TaskInstances related to the task" << task->name() << "has been successfully deleted from the DB";
+        }
+        else {
+            qCritical() << "Could not delete the TaskInstances related to the task" << task->name() << "from the DB:" << cass_error_desc(cassError);
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+
         // Remove from DB
         TaskM::deleteTaskFromCassandra(*task);
 
