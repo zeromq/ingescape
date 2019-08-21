@@ -86,6 +86,21 @@ AssessmentsModelManager* AssessmentsModelManager::Instance()
 }
 
 /**
+ * @brief Retrieve a 'text' value of given column inside the given row
+ * and convert it to QString before returning it
+ * @param row
+ * @param columnName
+ * @return
+ */
+QString AssessmentsModelManager::getStringValueFromColumnName(const CassRow* row, const char* columnName)
+{
+    const char *chrValueString = "";
+    size_t valueStringLength = 0;
+    cass_value_get_string(cass_row_get_column_by_name(row, columnName), &chrValueString, &valueStringLength);
+    return QString::fromUtf8(chrValueString, static_cast<int>(valueStringLength));
+}
+
+/**
  * @brief Constructor
  * @param jsonHelper
  * @param rootDirectoryPath

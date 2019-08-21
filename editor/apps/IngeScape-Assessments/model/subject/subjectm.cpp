@@ -190,10 +190,7 @@ SubjectM* SubjectM::createSubjectFromCassandraRow(const CassRow* row)
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &subjectUuid);
 
-        const char *chrDisplayedId = "";
-        size_t displayedIdLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "displayed_id"), &chrDisplayedId, &displayedIdLength);
-        QString displayedId = QString::fromUtf8(chrDisplayedId, static_cast<int>(displayedIdLength));
+        QString displayedId(AssessmentsModelManager::getStringValueFromColumnName(row, "displayed_id"));
 
         subject = new SubjectM(experimentationUuid, subjectUuid, displayedId);
     }

@@ -78,11 +78,7 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
                     ExperimentationM* experimentation = ExperimentationM::createExperimentationFromCassandraRow(row);
                     if (experimentation != nullptr)
                     {
-                        const char *chrExperimentationsGroupName = "";
-                        size_t experimentationsGroupNameLength;
-                        cass_value_get_string(cass_row_get_column_by_name(row, "group_name"), &chrExperimentationsGroupName, &experimentationsGroupNameLength);
-                        QString experimentationsGroupName = QString::fromUtf8(chrExperimentationsGroupName, static_cast<int>(experimentationsGroupNameLength));
-
+                        QString experimentationsGroupName = AssessmentsModelManager::getStringValueFromColumnName(row, "group_name");
                         ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentationsGroupName);
                         if (experimentationsGroup == nullptr)
                         {

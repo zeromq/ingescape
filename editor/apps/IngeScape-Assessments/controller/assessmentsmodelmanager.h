@@ -77,6 +77,15 @@ public:
      */
     static AssessmentsModelManager* Instance();
 
+    /**
+     * @brief Retrieve a 'text' value of given column inside the given row
+     * and convert it to QString before returning it
+     * @param row
+     * @param columnName
+     * @return
+     */
+    static QString getStringValueFromColumnName(const CassRow* row, const char* columnName);
+
 
     // ------------------------
     //

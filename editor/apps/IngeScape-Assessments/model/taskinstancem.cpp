@@ -180,20 +180,9 @@ TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* 
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_records"), &recordUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskInstanceUuid);
 
-        const char *chrTaskName = "";
-        size_t nameLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
-        QString taskName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
-
-        const char *chrComments = "";
-        size_t commentsLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "comment"), &chrComments, &commentsLength);
-        QString comments = QString::fromUtf8(chrComments, static_cast<int>(commentsLength));
-
-        const char *chrPlatformUrl = "";
-        size_t platformUrlLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "platform_file"), &chrPlatformUrl, &platformUrlLength);
-        QUrl platformUrl(QString::fromUtf8(chrPlatformUrl, static_cast<int>(platformUrlLength)));
+        QString taskName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
+        QString comments(AssessmentsModelManager::getStringValueFromColumnName(row, "comment"));
+        QUrl platformUrl(AssessmentsModelManager::getStringValueFromColumnName(row, "platform_file"));
 
         cass_uint32_t yearMonthDay;
         cass_value_get_uint32(cass_row_get_column_by_name(row, "start_date"), &yearMonthDay);

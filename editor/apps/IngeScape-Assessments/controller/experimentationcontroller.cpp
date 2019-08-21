@@ -646,11 +646,7 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
                             cass_value_get_uuid(cass_row_get_column_by_name(row, "id_characteristic"), &characteristicUuid);
 
                             // Get characteristic value as a string
-                            const char *chrValueString = "";
-                            size_t valueStringLength = 0;
-                            cass_value_get_string(cass_row_get_column_by_name(row, "characteristic_value"), &chrValueString, &valueStringLength);
-                            QString valueString = QString::fromUtf8(chrValueString, static_cast<int>(valueStringLength));
-
+                            QString valueString = AssessmentsModelManager::getStringValueFromColumnName(row, "characteristic_value");
 
                             // Get characteristic value type
                             CharacteristicM* characteristic = _currentExperimentation->getCharacteristicFromUID(characteristicUuid);
@@ -726,19 +722,14 @@ void ExperimentationController::_retrieveIndependentVariableValuesForTaskInstanc
                     // Get independent variable uuid
                     CassUuid indeVarUuid;
                     cass_value_get_uuid(cass_row_get_column_by_name(row, "id_independent_var"), &indeVarUuid);
-                    char chrIndeVarUid[CASS_UUID_STRING_LENGTH];
-                    cass_uuid_string(indeVarUuid, chrIndeVarUid);
-
-                    // Get value as a string
-                    const char *chrValueString = "";
-                    size_t valueStringLength = 0;
-                    cass_value_get_string(cass_row_get_column_by_name(row, "independent_var_value"), &chrValueString, &valueStringLength);
-                    QString valueString = QString::fromUtf8(chrValueString, static_cast<int>(valueStringLength));
 
                     // Get corresponding independent variable
                     IndependentVariableM* indeVar = taskInstance->task()->getIndependentVariableFromUuid(indeVarUuid);
                     if (indeVar != nullptr)
                     {
+                        // Get value as a string
+                        QString valueString = AssessmentsModelManager::getStringValueFromColumnName(row, "independent_var_value");
+
                         taskInstance->setIndependentVariableValue(indeVar, valueString);
                     }
                 }

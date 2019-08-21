@@ -190,15 +190,8 @@ TaskM* TaskM::createTaskFromCassandraRow(const CassRow* row)
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskUuid);
 
-        const char *chrTaskName = "";
-        size_t nameLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrTaskName, &nameLength);
-        QString taskName = QString::fromUtf8(chrTaskName, static_cast<int>(nameLength));
-
-        const char *chrPlatformUrl = "";
-        size_t platformUrlLength = 0;
-        cass_value_get_string(cass_row_get_column_by_name(row, "platform_file"), &chrPlatformUrl, &platformUrlLength);
-        QUrl platformUrl(QString::fromUtf8(chrPlatformUrl, static_cast<int>(platformUrlLength)));
+        QString taskName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
+        QUrl platformUrl(AssessmentsModelManager::getStringValueFromColumnName(row, "platform_file"));
 
         task = new TaskM(experimentationUuid, taskUuid, taskName, platformUrl);
     }

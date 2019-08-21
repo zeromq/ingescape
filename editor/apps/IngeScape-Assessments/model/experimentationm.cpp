@@ -335,15 +335,9 @@ ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const 
         CassUuid experimentationUid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &experimentationUid);
 
-        const char *chrExperimentationName = "";
-        size_t nameLength;
-        cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrExperimentationName, &nameLength);
-        QString experimentationName = QString::fromUtf8(chrExperimentationName, static_cast<int>(nameLength));
+        QString experimentationName = AssessmentsModelManager::getStringValueFromColumnName(row, "name");
 
-        const char *chrGroupName = "";
-        size_t groupNameLength;
-        cass_value_get_string(cass_row_get_column_by_name(row, "group_name"), &chrGroupName, &groupNameLength);
-        QString groupName = QString::fromUtf8(chrGroupName, static_cast<int>(groupNameLength));
+        QString groupName = AssessmentsModelManager::getStringValueFromColumnName(row, "group_name");
 
         cass_uint32_t creationDate;
         cass_value_get_uint32(cass_row_get_column_by_name(row, "creation_date"), &creationDate);

@@ -395,10 +395,7 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
                         // It does not yet exist
                         if (characteristic == nullptr)
                         {
-                            const char *chrCharacteristicName = "";
-                            size_t nameLength;
-                            cass_value_get_string(cass_row_get_column_by_name(row, "name"), &chrCharacteristicName, &nameLength);
-                            QString characteristicName = QString::fromUtf8(chrCharacteristicName, static_cast<int>(nameLength));
+                            QString characteristicName = AssessmentsModelManager::getStringValueFromColumnName(row, "name");
 
                             CharacteristicValueTypes::Value characteristicValueType = CharacteristicValueTypes::UNKNOWN;
                             int8_t type;
