@@ -171,6 +171,9 @@ void ExperimentationM::removeSubject(SubjectM* subject)
     {
         // Remove from the list
         _allSubjects.remove(subject);
+
+        // Remove related TaskInstances
+        removeTaskInstanceRelatedToSubject(subject);
     }
 }
 
@@ -199,13 +202,16 @@ void ExperimentationM::removeTask(TaskM* task)
     {
         // Remove from the list
         _allTasks.remove(task);
+
+        // Remove related TaskInstances
+        removeTaskInstanceRelatedToTask(task);
     }
 }
 
 
 /**
- * @brief Add a rtask instance to our experimentation
- * @param record
+ * @brief Add a task instance to our experimentation
+ * @param taskInstance
  */
 void ExperimentationM::addTaskInstance(TaskInstanceM* taskInstance)
 {
@@ -219,7 +225,7 @@ void ExperimentationM::addTaskInstance(TaskInstanceM* taskInstance)
 
 /**
  * @brief Remove a task instance from our experimentation
- * @param record
+ * @param taskInstance
  */
 void ExperimentationM::removeTaskInstance(TaskInstanceM* taskInstance)
 {
@@ -227,6 +233,56 @@ void ExperimentationM::removeTaskInstance(TaskInstanceM* taskInstance)
     {
         // Remove from the list
         _allTaskInstances.remove(taskInstance);
+    }
+}
+
+
+/**
+ * @brief Remove task instances related to the given subject
+ * @param subject
+ */
+void ExperimentationM::removeTaskInstanceRelatedToSubject(SubjectM* subject)
+{
+    const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
+    auto taskInstanceIt = taskInstanceList.begin();
+    while (taskInstanceIt != taskInstanceList.end())
+    {
+        // Looking for a task instance related to the given subject
+        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [subject](TaskInstanceM* taskInstance){
+                return (taskInstance != nullptr) && (taskInstance->subject() == subject);
+        });
+
+        if (taskInstanceIt != taskInstanceList.end())
+        {
+            // We found a task instance with given subject
+            removeTaskInstance(*taskInstanceIt);
+            ++taskInstanceIt;
+        }
+    }
+}
+
+
+/**
+ * @brief Remove task instances related to the given task
+ * @param task
+ */
+void ExperimentationM::removeTaskInstanceRelatedToTask(TaskM* task)
+{
+    const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
+    auto taskInstanceIt = taskInstanceList.begin();
+    while (taskInstanceIt != taskInstanceList.end())
+    {
+        // Looking for a task instance related to the given subject
+        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [task](TaskInstanceM* taskInstance){
+                return (taskInstance != nullptr) && (taskInstance->task() == task);
+        });
+
+        if (taskInstanceIt != taskInstanceList.end())
+        {
+            // We found a task instance with given subject
+            removeTaskInstance(*taskInstanceIt);
+            ++taskInstanceIt;
+        }
     }
 }
 
