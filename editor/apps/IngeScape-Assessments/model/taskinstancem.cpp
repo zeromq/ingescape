@@ -167,7 +167,6 @@ void TaskInstanceM::setIndependentVariableValue(IndependentVariableM* indeVar, c
  * @param row
  * @return
  */
-//NOTE Same note as CharacteristicM::_deleteCharacteristicValuesForCharacteristic
 TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* row, SubjectM* subject, TaskM* task)
 {
     TaskInstanceM* taskInstance = nullptr;
