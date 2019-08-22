@@ -235,6 +235,7 @@ Item {
                 onClicked: {
                     if (controller && rootItem.action)
                     {
+                        // FIXME: Common does not access to IngeScapeEditorC
                         if (controller.isActionInsertedInTimeLine(rootItem.action)
                                 || IngeScapeEditorC.agentsMappingC.isActionInsertedInMapping(rootItem.action))
                         {

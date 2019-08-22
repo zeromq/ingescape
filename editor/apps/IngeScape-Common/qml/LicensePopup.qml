@@ -28,8 +28,8 @@ I2PopupBase {
 
     dismissOnOutsideTap: false
 
-    // our main controller
-    //property var controller: null;
+    // Our controller
+    property LicensesController controller: null;
 
 
     //--------------------------------------------------------
@@ -46,15 +46,13 @@ I2PopupBase {
     function validate() {
         console.log("QML: function validate()");
 
-        // TODO
-        /*var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked, txtLicensesPath.text);
-        if (success === true)
+        if (rootItem.controller)
         {
-            rootItem.close();
+            rootItem.controller.updateLicensesPath(txtLicensesPath.text);
         }
-        else {
-            console.error("Network cannot be (re)started on device " + combobox.selectedItem.modelData + " and port " + txtPort.text);
-        }*/
+
+        // Close our popup
+        rootItem.close();
     }
 
 
@@ -67,8 +65,9 @@ I2PopupBase {
     //--------------------------------------------------------
 
     onOpened: {
-
-        txtLicensesPath.text = IngeScapeEditorC.licensesPath;
+        if (rootItem.controller) {
+            txtLicensesPath.text = rootItem.controller.licensesPath;
+        }
 
         // Set the focus to catch keyboard press on Return/Escape
         rootItem.focus = true;
@@ -119,7 +118,7 @@ I2PopupBase {
         Text {
             id: title
 
-            text: qsTr("Configure license")
+            text: qsTr("Licenses")
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -187,11 +186,12 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    //fileDialog.open();
-
-                    var directoryPath = IngeScapeEditorC.selectLicensesDirectory();
-                    if (directoryPath) {
-                        txtLicensesPath.text = directoryPath;
+                    if (rootItem.controller)
+                    {
+                        var directoryPath = rootItem.controller.selectLicensesDirectory();
+                        if (directoryPath) {
+                            txtLicensesPath.text = directoryPath;
+                        }
                     }
                 }
             }
@@ -207,7 +207,7 @@ I2PopupBase {
             height: 25
             verticalAlignment: TextInput.AlignVCenter
 
-            text: "" //IngeScapeEditorC.licensesPath
+            text: "" //rootItem.controller.licensesPath
 
             enabled: false
 
@@ -326,8 +326,6 @@ I2PopupBase {
 
             onClicked: {
                 console.log("QML: OK License Popup")
-
-                //rootItem.close();
 
                 rootItem.validate();
             }

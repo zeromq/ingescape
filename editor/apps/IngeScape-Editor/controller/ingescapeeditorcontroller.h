@@ -26,8 +26,9 @@
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/agentsmappingcontroller.h>
 #include <controller/agentssupervisioncontroller.h>
-#include <controller/hostssupervisioncontroller.h>
 #include <controller/editormodelmanager.h>
+#include <controller/hostssupervisioncontroller.h>
+#include <controller/licensescontroller.h>
 #include <controller/logstreamcontroller.h>
 #include <controller/networkcontroller.h>
 #include <controller/recordssupervisioncontroller.h>
@@ -53,9 +54,6 @@ class IngeScapeEditorController : public QObject
     // Network settings - port
     I2_QML_PROPERTY_READONLY(uint, port)
 
-    // Path to the directory with IngeScape licenses
-    I2_QML_PROPERTY_READONLY(QString, licensesPath)
-
     // Flag indicating if the Model/View Model Visualizer is available
     I2_QML_PROPERTY_READONLY(bool, isAvailableModelVisualizer)
 
@@ -68,31 +66,34 @@ class IngeScapeEditorController : public QObject
     // Snapshot Directory
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 
-    // Manager for the data model of our IngeScape editor
+    // Controller to manage the data model of our IngeScape editor
     I2_QML_PROPERTY_READONLY(EditorModelManager*, modelManager)
 
-    // Controller for agents supervision
+    // Controller to manage the agents list
     I2_QML_PROPERTY_READONLY(AgentsSupervisionController*, agentsSupervisionC)
 
-    // Controller for hosts supervision
+    // Controller to manage hosts
     I2_QML_PROPERTY_READONLY(HostsSupervisionController*, hostsSupervisionC)
 
     // Controller for records supervision
     I2_QML_PROPERTY_READONLY(RecordsSupervisionController*, recordsSupervisionC)
 
-    // Controller for agents mapping
+    // Controller to manage the agents mapping
     I2_QML_PROPERTY_READONLY(AgentsMappingController*, agentsMappingC)
 
-    // Controller for network communication
+    // Controller to manage network communications
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
 
-    // Controller for scenario management
+    // Controller to manage the scenario
     I2_QML_PROPERTY_READONLY(ScenarioController*, scenarioC)
 
-    // Controller for the history of values
+    // Controller to manage the history of values
     I2_QML_PROPERTY_READONLY(ValuesHistoryController*, valuesHistoryC)
 
-    // Controller for the time line
+    // Controller to manage IngeScape licenses
+    I2_QML_PROPERTY_READONLY(LicensesController*, licensesC)
+
+    // Controller to manage the time line
     I2_QML_PROPERTY_READONLY(AbstractTimeActionslineScenarioViewController*, timeLineC)
 
     // Opened log stream viewers
@@ -186,13 +187,6 @@ public:
      */
     //Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform);
     Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform, QString licensesPath);
-
-
-    /**
-     * @brief Select a directory with IngeScape licenses
-     * @return
-     */
-    Q_INVOKABLE QString selectLicensesDirectory();
 
 
     /**

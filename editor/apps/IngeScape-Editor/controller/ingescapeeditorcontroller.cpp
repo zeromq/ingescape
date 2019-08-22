@@ -33,7 +33,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _networkDevice(""),
     _ipAddress(""),
     _port(0),
-    _licensesPath(""),
     _isAvailableModelVisualizer(false),
     _isVisibleModelVisualizer(false),
     _errorMessageWhenConnectionFailed(""),
@@ -44,6 +43,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _networkC(nullptr),
     _scenarioC(nullptr),
     _valuesHistoryC(nullptr),
+    _licensesC(nullptr),
     _timeLineC(nullptr),
     _peerIdOfExpe(""),
     _peerNameOfExpe(""),
@@ -92,23 +92,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     //
-    // Settings about the "Licenses"
-    //
-    settings.beginGroup("licenses");
-
-    // Get the default path for "Licenses"
-    QString defaultLicensesPath = IngeScapeUtils::getLicensesPath();
-
-    _licensesPath = settings.value("directoryPath", QVariant(defaultLicensesPath)).toString();
-    qDebug() << "Licenses path:" << _licensesPath;
-
-    // Set the IngeScape license path
-    igs_setLicensePath(_licensesPath.toStdString().c_str());
-
-    settings.endGroup();
-
-
-    //
     // Settings about "Debug"
     //
     settings.beginGroup("debug");
@@ -146,28 +129,31 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Create the manager for the data model of our IngeScape Editor application
     _modelManager = new EditorModelManager(_jsonHelper, rootPath, this);
 
-    // Create the controller for network communications
+    // Create the controller to manage network communications
     _networkC = new NetworkController(this);
 
-    // Create the controller for agents supervision
+    // Create the controller to manage the agents list
     _agentsSupervisionC = new AgentsSupervisionController(_modelManager, _jsonHelper, this);
 
-    // Create the controller for hosts supervision
+    // Create the controller to manage hosts
     _hostsSupervisionC = new HostsSupervisionController(_modelManager, this);
 
     // Create the controller for records supervision
     _recordsSupervisionC = new RecordsSupervisionController(_modelManager, this);
 
-    // Create the controller for agents mapping
+    // Create the controller to manage the agents mapping
     _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, this);
 
-    // Create the controller for scenario management
+    // Create the controller to manage the scenario
     _scenarioC = new ScenarioController(_modelManager, _jsonHelper, this);
 
-    // Create the controller for the history of values
+    // Create the controller to manage the history of values
     _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
 
-    // Create the controller for the time line
+    // Create the controller to manage IngeScape licenses
+    _licensesC = new LicensesController(this);
+
+    // Create the controller to manage the time line
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
 
     // Connect to signals from the network controller
@@ -360,6 +346,16 @@ IngeScapeEditorController::~IngeScapeEditorController()
 
         AbstractTimeActionslineScenarioViewController* temp = _timeLineC;
         settimeLineC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
+
+    if (_licensesC != nullptr)
+    {
+        disconnect(_licensesC);
+
+        LicensesController* temp = _licensesC;
+        setlicensesC(nullptr);
         delete temp;
         temp = nullptr;
     }
@@ -619,14 +615,14 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
     // Reset the error message
     seterrorMessageWhenConnectionFailed("");
 
-    if ((_networkC != nullptr) && (_modelManager != nullptr))
+    if ((_networkC != nullptr) && (_modelManager != nullptr) && (_licensesC != nullptr))
     {
         bool isUInt = false;
         uint port = strPort.toUInt(&isUInt);
         if (isUInt && (port > 0))
         {
             // None changes (Same port, same network device and same licenses path)
-            if ((port == _port) && (networkDevice == _networkDevice) && (licensesPath == _licensesPath))
+            if ((port == _port) && (networkDevice == _networkDevice) && (licensesPath == _licensesC->licensesPath()))
             {
                 // Nothing to do
                 success = true;
@@ -649,26 +645,9 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 _networkC->stop();
 
 
-                // Licenses path has been changed
-                if (licensesPath != _licensesPath)
-                {
-                    qInfo() << "Licenses path changes from" << _licensesPath << "to" << licensesPath;
+                // FIXME: Update the licenses path
+                _licensesC->updateLicensesPath(licensesPath);
 
-                    // Update property
-                    setlicensesPath(licensesPath);
-
-                    // Set the IngeScape license path
-                    igs_setLicensePath(_licensesPath.toStdString().c_str());
-
-                    // Update settings file
-                    IngeScapeSettings &settings = IngeScapeSettings::Instance();
-                    settings.beginGroup("licenses");
-                    settings.setValue("directoryPath", _licensesPath);
-                    settings.endGroup();
-
-                    // Save new value
-                    settings.sync();
-                }
 
                 // Update properties
                 setnetworkDevice(networkDevice);
@@ -721,19 +700,6 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
     }
 
     return success;
-}
-
-
-/**
- * @brief Select a directory with IngeScape licenses
- * @return
- */
-QString IngeScapeEditorController::selectLicensesDirectory()
-{
-    // Open a directory dialog box
-    return QFileDialog::getExistingDirectory(nullptr,
-                                             "Select a directory with IngeScape licenses",
-                                             _licensesPath);
 }
 
 

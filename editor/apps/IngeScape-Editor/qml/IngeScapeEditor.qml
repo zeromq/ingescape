@@ -483,6 +483,8 @@ Item {
         id: licensePopup
 
         anchors.centerIn: parent
+
+        controller: IngeScapeEditorC.licensesC
     }
 
 

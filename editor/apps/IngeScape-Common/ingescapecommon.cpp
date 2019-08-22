@@ -18,12 +18,15 @@
 #include <misc/debugquickinspector.h>
 #include <misc/terminationsignalwatcher.h>
 #include <misc/urlutils.h>
+
 #include <settings/ingescapesettings.h>
 
 #include <controller/abstractscenariocontroller.h>
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/ingescapemodelmanager.h>
 #include <controller/ingescapenetworkcontroller.h>
+#include <controller/licensescontroller.h>
+
 #include <model/scenario/scenariom.h>
 #include <model/scenario/timetickm.h>
 
@@ -73,6 +76,7 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterUncreatableType<AbstractTimeActionslineScenarioViewController>("INGESCAPE", 1, 0, "AbstractTimeActionslineScenarioViewController", "Internal Class");
     qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal class");
     qmlRegisterUncreatableType<IngeScapeNetworkController>("INGESCAPE", 1, 0, "IngeScapeNetworkController", "Internal class");
+    qmlRegisterUncreatableType<LicensesController>("INGESCAPE", 1, 0, "LicensesController", "Internal class");
 
 
     //----------------

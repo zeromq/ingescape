@@ -87,7 +87,9 @@ I2PopupBase {
         txtPort.text = IngeScapeEditorC.port;
         combobox.selectedIndex = IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices.indexOf(IngeScapeEditorC.networkDevice) : -1;
         clearPlatform.checked = true;
-        txtLicensesPath.text = IngeScapeEditorC.licensesPath;
+        if (IngeScapeEditorC.licensesC) {
+            txtLicensesPath.text = IngeScapeEditorC.licensesC.licensesPath;
+        }
 
         // Set the focus to catch keyboard press on Return/Escape
         rootItem.focus = true;
@@ -397,60 +399,61 @@ I2PopupBase {
         Row {
             spacing: 10
 
-        Text {
-            text: qsTr("License path")
+            Text {
+                text: qsTr("License path")
 
-            anchors {
-                verticalCenter: parent.verticalCenter
-            }
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
 
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
-            }
-        }
-
-        Button {
-            id: btnSelectLicencesDirectory
-
-            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-            activeFocusOnPress: true
-
-            height: boundingBox.height
-            width: boundingBox.width
-
-            text: "Change..."
-
-            style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileIngeScape
-
-                pressedID: releasedID + "-pressed"
-                releasedID: "button"
-                disabledID: releasedID + "-disabled"
-
+                color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
                     weight : Font.Medium
                     pixelSize : 16
                 }
-                labelColorPressed: IngeScapeTheme.blackColor
-                labelColorReleased: IngeScapeTheme.whiteColor
-                labelColorDisabled: IngeScapeTheme.whiteColor
-
             }
 
-            onClicked: {
-                //fileDialog.open();
+            Button {
+                id: btnSelectLicencesDirectory
 
-                var directoryPath = IngeScapeEditorC.selectLicensesDirectory();
-                if (directoryPath) {
-                    txtLicensesPath.text = directoryPath;
+                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+                activeFocusOnPress: true
+
+                height: boundingBox.height
+                width: boundingBox.width
+
+                text: "Change..."
+
+                style: I2SvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button"
+                    disabledID: releasedID + "-disabled"
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+                    labelColorPressed: IngeScapeTheme.blackColor
+                    labelColorReleased: IngeScapeTheme.whiteColor
+                    labelColorDisabled: IngeScapeTheme.whiteColor
+
+                }
+
+                onClicked: {
+                    if (IngeScapeEditorC.licensesC)
+                    {
+                        var directoryPath = IngeScapeEditorC.licensesC.selectLicensesDirectory();
+                        if (directoryPath) {
+                            txtLicensesPath.text = directoryPath;
+                        }
+                    }
                 }
             }
-        }
         }
 
         TextField {
@@ -587,29 +590,4 @@ I2PopupBase {
             }
         }
     }
-
-
-    /*FileDialog {
-        id: fileDialog
-
-        title: "Select an IngeScape licenses directory"
-
-        folder: shortcuts.documents + "/IngeScape/licenses"
-
-        selectFolder: true
-
-        onAccepted: {
-            console.log("Selected Licenses Url: " + fileDialog.fileUrl)
-
-            txtLicensesPath.text = fileDialog.fileUrl;
-
-            //fileDialog.close();
-        }
-
-        onRejected: {
-            console.log("Canceled");
-
-            //fileDialog.close();
-        }
-    }*/
 }

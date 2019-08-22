@@ -47,6 +47,7 @@ SOURCES += \
     $$PWD/controller/abstracttimeactionslinescenarioviewcontroller.cpp \
     $$PWD/controller/ingescapemodelmanager.cpp \
     $$PWD/controller/ingescapenetworkcontroller.cpp \
+    $$PWD/controller/licensescontroller.cpp \
     $$PWD/sortFilter/abstracttimerangefilter.cpp \
     $$PWD/graphics/dashedbar.cpp
 
@@ -94,6 +95,7 @@ HEADERS += \
     $$PWD/controller/abstracttimeactionslinescenarioviewcontroller.h \
     $$PWD/controller/ingescapemodelmanager.h \
     $$PWD/controller/ingescapenetworkcontroller.h \
+    $$PWD/controller/licensescontroller.h \
     $$PWD/sortFilter/abstracttimerangefilter.h \
     $$PWD/graphics/dashedbar.h
 
