@@ -267,7 +267,7 @@ CassUuidGen* AssessmentsModelManager::getCassUuidGen()
  */
 QString AssessmentsModelManager::cassUuidToQString(CassUuid cassUuid)
 {
-    char chrTaskUuid[CASS_UUID_STRING_LENGTH];
-    cass_uuid_string(cassUuid, chrTaskUuid);
-    return QString(chrTaskUuid);
+    char chrCassUuid[CASS_UUID_STRING_LENGTH];
+    cass_uuid_string(cassUuid, chrCassUuid);
+    return QString(chrCassUuid);
 }
