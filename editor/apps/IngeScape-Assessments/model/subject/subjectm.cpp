@@ -200,7 +200,7 @@ void SubjectM::removeCharacteristic(CharacteristicM* characteristic)
  * @param row
  * @return
  */
-SubjectM* SubjectM::createSubjectFromCassandraRow(const CassRow* row)
+SubjectM* SubjectM::createFromCassandraRow(const CassRow* row)
 {
     SubjectM* subject = nullptr;
 

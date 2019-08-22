@@ -113,7 +113,7 @@ bool DependentVariableM::updateDependentVariableIntoCassandraDB(const DependentV
  * @param row
  * @return
  */
-DependentVariableM* DependentVariableM::createDependentVariableFromCassandraRow(const CassRow* row)
+DependentVariableM* DependentVariableM::createFromCassandraRow(const CassRow* row)
 {
     DependentVariableM* dependentVariable = nullptr;
 

@@ -75,7 +75,7 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
                     const CassRow* row = cass_iterator_get_row(cassIterator);
 
                     // Create the new experimentation
-                    ExperimentationM* experimentation = ExperimentationM::createExperimentationFromCassandraRow(row);
+                    ExperimentationM* experimentation = ExperimentationM::createFromCassandraRow(row);
                     if (experimentation != nullptr)
                     {
                         QString experimentationsGroupName = AssessmentsModelManager::getStringValueFromColumnName(row, "group_name");

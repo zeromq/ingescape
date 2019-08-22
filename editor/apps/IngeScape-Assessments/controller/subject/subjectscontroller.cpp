@@ -51,13 +51,6 @@ SubjectsController::~SubjectsController()
     {
         setcurrentExperimentation(nullptr);
     }
-
-    /*if (_modelManager != nullptr)
-    {
-        //disconnect(_modelManager, nullptr, this, nullptr);
-
-        _modelManager = nullptr;
-    }*/
 }
 
 

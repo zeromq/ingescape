@@ -134,13 +134,13 @@ public:
      * @param row
      * @return
      */
-    static TaskM* createTaskFromCassandraRow(const CassRow* row);
+    static TaskM* createFromCassandraRow(const CassRow* row);
 
     /**
      * @brief Delete the given task from the Cassandra DB
      * @param task
      */
-    static void deleteTaskFromCassandra(const TaskM& task);
+    static void deleteTaskFromCassandraRow(const TaskM& task);
 
     /**
      * @brief Initialize the temporary dependent variable with the given dependent variable

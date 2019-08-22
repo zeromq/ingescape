@@ -203,7 +203,7 @@ public:
      * @param row
      * @return
      */
-    static ExperimentationM* createExperimentationFromCassandraRow(const CassRow* row);
+    static ExperimentationM* createFromCassandraRow(const CassRow* row);
 
     /**
      * @brief Delete the given experimentation from Cassandra DB

@@ -192,7 +192,7 @@ void TaskM::removeDependentVariable(DependentVariableM* dependentVariable)
  * @param row
  * @return
  */
-TaskM* TaskM::createTaskFromCassandraRow(const CassRow* row)
+TaskM* TaskM::createFromCassandraRow(const CassRow* row)
 {
     TaskM* task = nullptr;
 
@@ -215,7 +215,7 @@ TaskM* TaskM::createTaskFromCassandraRow(const CassRow* row)
  * @brief Delete the given task from the Cassandra DB
  * @param task
  */
-void TaskM::deleteTaskFromCassandra(const TaskM& task)
+void TaskM::deleteTaskFromCassandraRow(const TaskM& task)
 {
 
     // Remove independent_var from DB

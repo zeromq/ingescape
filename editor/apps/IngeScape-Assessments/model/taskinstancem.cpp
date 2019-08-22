@@ -60,44 +60,46 @@ TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
                              CassUuid cassUuid,
                              QString name,
                              QString comments,
-                             SubjectM* subject,
-                             TaskM* task,
+                             CassUuid subjectUuid,
+                             CassUuid taskUuid,
                              QDateTime startDateTime,
                              QObject *parent) : QObject(parent),
     _name(name),
     _comments(comments),
-    _subject(subject),
-    _task(task),
+    _subject(nullptr),
+    _task(nullptr),
     _startDateTime(startDateTime),
     _endDateTime(QDateTime()),
     _duration(QTime()),
     _mapIndependentVariableValues(nullptr),
     _experimentationCassUuid(experimentationUuid),
+    _subjectUuid(subjectUuid),
+    _taskUuid(taskUuid),
     _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if ((subject != nullptr) && (task != nullptr))
-    {
-        qInfo() << "New Model of Record" << _name << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ") for subject" << _subject->displayedId() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
+    // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
+    _mapIndependentVariableValues = new QQmlPropertyMap(this);
 
-        // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
-        _mapIndependentVariableValues = new QQmlPropertyMap(this);
+    // Connect to signal "Value Changed" fro the "Qml Property Map"
+    connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &TaskInstanceM::_onIndependentVariableValueChanged);
 
-        for (IndependentVariableM* independentVariable : _task->independentVariables()->toList())
-        {
-            if (independentVariable != nullptr)
+    // Connect to task change to reset the independent variables values
+    connect(this, &TaskInstanceM::taskChanged, [this](TaskM* task) {
+        if (task != nullptr) {
+            for (IndependentVariableM* independentVariable : task->independentVariables()->toList())
             {
-                // Insert an (invalid) not initialized QVariant
-                _mapIndependentVariableValues->insert(independentVariable->name(), QVariant());
-                _mapIndependentVarByName.insert(independentVariable->name(), independentVariable);
+                if (independentVariable != nullptr)
+                {
+                    // Insert an (invalid) not initialized QVariant
+                    _mapIndependentVariableValues->insert(independentVariable->name(), QVariant());
+                    _mapIndependentVarByName.insert(independentVariable->name(), independentVariable);
+                }
             }
         }
-
-        // Connect to signal "Value Changed" fro the "Qml Property Map"
-        connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &TaskInstanceM::_onIndependentVariableValueChanged);
-    }
+    });
 }
 
 
@@ -119,11 +121,6 @@ TaskInstanceM::~TaskInstanceM()
         // Free memory
         if (_mapIndependentVariableValues != nullptr)
         {
-            /*// Clear each value
-            for (QString key : _mapIndependentVariableValues->keys())
-            {
-                _mapIndependentVariableValues->clear(key);
-            }*/
 
             QQmlPropertyMap* temp = _mapIndependentVariableValues;
             setmapIndependentVariableValues(nullptr);
@@ -196,7 +193,7 @@ void TaskInstanceM::setIndependentVariableValue(IndependentVariableM* indeVar, c
  * @param row
  * @return
  */
-TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* row, SubjectM* subject, TaskM* task)
+TaskInstanceM* TaskInstanceM::createFromCassandraRow(const CassRow* row)
 {
     TaskInstanceM* taskInstance = nullptr;
 
@@ -214,7 +211,7 @@ TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* 
 
         QDateTime startDateTime(AssessmentsModelManager::getDateTimeFromColumnNames(row, "start_date", "start_time"));
 
-        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, taskName, comments, subject, task, startDateTime);
+        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, taskName, comments, subjectUuid, taskUuid, startDateTime);
     }
 
     return taskInstance;
@@ -232,7 +229,7 @@ void TaskInstanceM::deleteTaskInstanceFromCassandra(const TaskInstanceM& taskIns
         AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ taskInstance.subject()->getExperimentationCassUuid(), taskInstance.getCassUuid() });
 
         // Delete the actual task instance from DB
-        AssessmentsModelManager::deleteEntry<TaskInstanceM>({ taskInstance.subject()->getExperimentationCassUuid(), taskInstance.getCassUuid() });
+        AssessmentsModelManager::deleteEntry<TaskInstanceM>({ taskInstance.subject()->getExperimentationCassUuid(), taskInstance.getSubjectCassUuid(), taskInstance.getTaskCassUuid(), taskInstance.getCassUuid() });
     }
 }
 

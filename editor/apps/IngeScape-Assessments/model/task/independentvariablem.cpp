@@ -89,7 +89,7 @@ IndependentVariableM::~IndependentVariableM()
  * @param row
  * @return
  */
-IndependentVariableM* IndependentVariableM::createIndependentVariableFromCassandraRow(const CassRow* row)
+IndependentVariableM* IndependentVariableM::createFromCassandraRow(const CassRow* row)
 {
     IndependentVariableM* independentVariable = nullptr;
 

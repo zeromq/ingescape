@@ -348,7 +348,7 @@ TaskM* ExperimentationM::getTaskFromUID(const CassUuid& cassUuid)
  * @param row
  * @return
  */
-ExperimentationM* ExperimentationM::createExperimentationFromCassandraRow(const CassRow* row)
+ExperimentationM* ExperimentationM::createFromCassandraRow(const CassRow* row)
 {
     ExperimentationM* experimentation = nullptr;
 

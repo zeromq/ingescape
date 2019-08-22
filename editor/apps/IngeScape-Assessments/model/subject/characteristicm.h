@@ -109,7 +109,7 @@ public:
      * @param row
      * @return
      */
-    static CharacteristicM* createCharacteristicFromCassandraRow(const CassRow* row);
+    static CharacteristicM* createFromCassandraRow(const CassRow* row);
 
 private:
     // Experimentation's unique identifier in Cassandra Data Base

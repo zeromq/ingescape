@@ -142,7 +142,7 @@ void TasksController::deleteTask(TaskM* task)
         AssessmentsModelManager::deleteEntry<TaskInstanceM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { task->getCassUuid() } });
 
         // Remove from DB
-        TaskM::deleteTaskFromCassandra(*task);
+        TaskM::deleteTaskFromCassandraRow(*task);
 
         // Remove the task from the current experimentation
         _currentExperimentation->removeTask(task);

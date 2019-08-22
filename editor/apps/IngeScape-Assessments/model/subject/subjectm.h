@@ -116,7 +116,7 @@ public:
      * @param row
      * @return
      */
-    static SubjectM* createSubjectFromCassandraRow(const CassRow* row);
+    static SubjectM* createFromCassandraRow(const CassRow* row);
 
 
     /**

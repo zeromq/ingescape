@@ -85,7 +85,7 @@ CharacteristicM::~CharacteristicM()
  * @param row
  * @return
  */
-CharacteristicM* CharacteristicM::createCharacteristicFromCassandraRow(const CassRow* row)
+CharacteristicM* CharacteristicM::createFromCassandraRow(const CassRow* row)
 {
     CharacteristicM* characteristic = nullptr;
 

@@ -24,9 +24,9 @@ const QString IndependentVariableValueM::table = "ingescape.independent_var_valu
  */
 const QStringList IndependentVariableValueM::columnNames = {
     "id_experimentation",
-    "id",
-    "name",
-    "platform_file",
+    "id_task_instance",
+    "id_independent_var",
+    "independent_var_value",
 };
 
 /**
@@ -34,5 +34,6 @@ const QStringList IndependentVariableValueM::columnNames = {
  */
 const QStringList IndependentVariableValueM::primaryKeys = {
     "id_experimentation",
-    "id",
+    "id_task_instance",
+    "id_independent_var",
 };

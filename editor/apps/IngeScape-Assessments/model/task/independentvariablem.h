@@ -106,7 +106,7 @@ public:
      * @param row
      * @return
      */
-    static IndependentVariableM* createIndependentVariableFromCassandraRow(const CassRow* row);
+    static IndependentVariableM* createFromCassandraRow(const CassRow* row);
 
     /**
      * @brief Delete the given independent variable from Cassandra DB

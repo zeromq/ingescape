@@ -88,7 +88,7 @@ public:
      * @param row
      * @return
      */
-    static DependentVariableM* createDependentVariableFromCassandraRow(const CassRow* row);
+    static DependentVariableM* createFromCassandraRow(const CassRow* row);
 
     /**
      * @brief Delete the given dependent variable from the Cassandra DB

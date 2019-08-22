@@ -78,8 +78,8 @@ public:
                            CassUuid cassUuid,
                            QString name,
                            QString comments,
-                           SubjectM* subject,
-                           TaskM* task,
+                           CassUuid subjectUuid,
+                           CassUuid taskUuid,
                            QDateTime startDateTime,
                            QObject *parent = nullptr);
 
@@ -111,6 +111,18 @@ public:
     CassUuid getCassUuid() const { return _cassUuid; }
 
     /**
+     * @brief Accessor for the task's Cassandra UUID of this entry
+     * @return
+     */
+    CassUuid getTaskCassUuid() const { return _taskUuid; }
+
+    /**
+     * @brief Accessor for the subject's Cassandra UUID of this entry
+     * @return
+     */
+    CassUuid getSubjectCassUuid() const { return _subjectUuid; }
+
+    /**
      * @brief Set the value of the given independent variable into the QQmlPropertyMap
      * @param indeVar
      * @param value
@@ -122,7 +134,7 @@ public:
      * @param row
      * @return
      */
-    static TaskInstanceM* createTaskInstanceFromCassandraRow(const CassRow* row, SubjectM* subject, TaskM* task);
+    static TaskInstanceM* createFromCassandraRow(const CassRow* row);
 
     /**
      * @brief Delete the given task instance from Cassandra DB
@@ -147,6 +159,8 @@ private:
 private:
     QHash<QString, IndependentVariableM*> _mapIndependentVarByName;
     CassUuid _experimentationCassUuid;
+    CassUuid _subjectUuid;
+    CassUuid _taskUuid;
 
     CassUuid _cassUuid;
 

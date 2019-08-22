@@ -231,6 +231,89 @@ public:
     }
 
     /**
+     * @brief Execute a SELECT request and return the corresponding list of entries.
+     * Filter values MUST be in the order of the primary keys.
+     * If more values than there are keys are given, only the n-first will be used in the query.
+     * If less values than there are keys are given, the query will not filter against the extra keys
+     */
+    template<class ModelClass>
+    static QList<ModelClass*> select(QList<CassUuid> filterValues)
+    {
+        QList<ModelClass*> objectList;
+
+        // Check that filter values were given
+        if (filterValues.isEmpty()) {
+            return objectList;
+        }
+
+        // Create an editable copy of the primary keys list
+        QStringList copyKeysList = ModelClass::primaryKeys;
+
+        // Removing extra primary keys
+        while (copyKeysList.size() > filterValues.size()) {
+            copyKeysList.removeLast();
+        }
+
+        // Removing extra filter values
+        while (filterValues.size() > copyKeysList.size()) {
+            filterValues.removeLast();
+        }
+
+        // Build the query with '?' placeholders
+        QString queryStr = "SELECT * FROM " + ModelClass::table + " WHERE ";
+        for (auto keyIt = copyKeysList.cbegin() ; keyIt != copyKeysList.cend() ; ++keyIt) {
+            // Join clauses with " AND "
+            if (keyIt > copyKeysList.cbegin()) {
+                queryStr += " AND ";
+            }
+            queryStr += *keyIt + " = ?";
+        }
+        queryStr += ";";
+
+        // Creates the new query statement
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), static_cast<size_t>(filterValues.size()));
+
+        // Bind values to query
+        size_t idx(0);
+        for (CassUuid uuid : filterValues) {
+            cass_statement_bind_uuid(cassStatement, idx, uuid);
+            ++idx;
+        }
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qDebug() << "SELECT query for" << typeid(ModelClass).name() << "succeeded";
+        }
+        else {
+            qCritical() << "SELECT query for" << typeid(ModelClass).name() << "failed. Error:" << cass_error_desc(cassError);
+        }
+
+        // Retrieve result set and iterate over the rows
+        const CassResult* cassResult = cass_future_get_result(cassFuture);
+        if (cassResult != nullptr)
+        {
+            CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+
+            while(cass_iterator_next(cassIterator))
+            {
+                const CassRow* row = cass_iterator_get_row(cassIterator);
+                ModelClass* objectInstance = ModelClass::createFromCassandraRow(row);
+                if (objectInstance != nullptr)
+                {
+                    objectList.append(objectInstance);
+                }
+            }
+
+            cass_iterator_free(cassIterator);
+        }
+
+        return objectList;
+    }
+
+    /**
      * @brief Get the Cassandra Cluster
      * @return
      */
