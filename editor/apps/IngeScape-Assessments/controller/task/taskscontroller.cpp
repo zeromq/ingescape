@@ -15,6 +15,7 @@
 #include "taskscontroller.h"
 
 #include <controller/assessmentsmodelmanager.h>
+#include "model/task/independentvariablevaluem.h"
 
 /**
  * @brief Constructor
@@ -505,25 +506,7 @@ void TasksController::deleteDependentVariable(DependentVariableM* dependentVaria
         _selectedTask->removeDependentVariable(dependentVariable);
 
         // Remove from DB
-        QString queryStr = "DELETE FROM " + DependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ?;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
-        cass_statement_bind_uuid(cassStatement, 0, _selectedTask->getExperimentationCassUuid());
-        cass_statement_bind_uuid(cassStatement, 1, _selectedTask->getCassUuid());
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "Dependent variables" << dependentVariable->name() << "has been successfully deleted from the DB";
-        }
-        else {
-            qCritical() << "Could not delete the dependent variables" << dependentVariable->name() << "from the DB:" << cass_error_desc(cassError);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
+        AssessmentsModelManager::deleteEntry<DependentVariableM>({ _selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid() });
 
         // Free memory
         delete dependentVariable;

@@ -125,6 +125,10 @@ public:
      */
     static const QString table;
 
+    static const QStringList columnNames;
+
+    static const QStringList primaryKeys;
+
     /**
      * @brief Static factory method to create a task from a CassandraDB record
      * @param row

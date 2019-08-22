@@ -95,6 +95,16 @@ public:
     static const QString table;
 
     /**
+     * @brief TaskInstance table column names
+     */
+    static const QStringList columnNames;
+
+    /**
+     * @brief TaskInstance table primary keys IN ORDER
+     */
+    static const QStringList primaryKeys;
+
+    /**
      * @brief Accessor for the Cassandra UUID of this entry
      * @return
      */

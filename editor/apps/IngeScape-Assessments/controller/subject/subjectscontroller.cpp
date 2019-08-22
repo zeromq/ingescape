@@ -15,6 +15,7 @@
 #include "subjectscontroller.h"
 
 #include <controller/assessmentsmodelmanager.h>
+#include "model/subject/characteristicvaluem.h"
 
 
 /**
@@ -179,25 +180,7 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
         _currentExperimentation->removeCharacteristic(characteristic);
 
         // Remove characteristic from DB
-        QString queryStr = "DELETE FROM " + CharacteristicM::table + " WHERE id_experimentation = ? AND id = ?;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
-        cass_statement_bind_uuid(cassStatement, 0, characteristic->getExperimentationCassUuid());
-        cass_statement_bind_uuid(cassStatement, 1, characteristic->getCassUuid());
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "Characteristic" << characteristic->name() << "has been successfully deleted from the DB";
-        }
-        else {
-            qCritical() << "Could not delete the characteristic" << characteristic->name() << "from the DB:" << cass_error_desc(cassError);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
+        AssessmentsModelManager::deleteEntry<CharacteristicM>({ _currentExperimentation->getCassUuid(), characteristic->getCassUuid() });
 
         // Free memory
         delete characteristic;

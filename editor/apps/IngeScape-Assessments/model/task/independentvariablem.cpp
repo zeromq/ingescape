@@ -16,7 +16,32 @@
 
 #include "controller/assessmentsmodelmanager.h"
 
+/**
+ * @brief Independent variable table name
+ */
 const QString IndependentVariableM::table = "ingescape.independent_var";
+
+/**
+ * @brief Independent variable table column names
+ */
+const QStringList IndependentVariableM::columnNames = {
+    "id_experimentation",
+    "id_task",
+    "id",
+    "description",
+    "enum_value",
+    "name",
+    "value_type",
+};
+
+/**
+ * @brief Independent variable table primary keys IN ORDER
+ */
+const QStringList IndependentVariableM::primaryKeys = {
+    "id_experimentation",
+    "id_task",
+    "id",
+};
 
 /**
  * @brief Constructor
@@ -99,24 +124,5 @@ IndependentVariableM* IndependentVariableM::createIndependentVariableFromCassand
 void IndependentVariableM::deleteIndependentVariableFromCassandra(const IndependentVariableM& independentVariable)
 {
     // Remove independent variable from DB
-    QString queryStr = "DELETE FROM " + IndependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
-    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
-    cass_statement_bind_uuid(cassStatement, 0, independentVariable.getExperimentationCassUuid());
-    cass_statement_bind_uuid(cassStatement, 1, independentVariable.getTaskCassUuid());
-    cass_statement_bind_uuid(cassStatement, 2, independentVariable.getCassUuid());
-
-    // Execute the query or bound statement
-    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-    CassError cassError = cass_future_error_code(cassFuture);
-    if (cassError == CASS_OK)
-    {
-        qInfo() << "Independent variable" << independentVariable.name() << "has been successfully deleted from the DB";
-    }
-    else {
-        qCritical() << "Could not delete the independent variable" << independentVariable.name() << "from the DB:" << cass_error_desc(cassError);
-    }
-
-    // Clean-up cassandra objects
-    cass_future_free(cassFuture);
-    cass_statement_free(cassStatement);
+    AssessmentsModelManager::deleteEntry<IndependentVariableM>({ independentVariable.getExperimentationCassUuid(), independentVariable.getTaskCassUuid(), independentVariable.getCassUuid() });
 }

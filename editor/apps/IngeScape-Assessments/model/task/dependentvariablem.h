@@ -74,6 +74,16 @@ public:
     static const QString table;
 
     /**
+     * @brief Dependent variable table column names
+     */
+    static const QStringList columnNames;
+
+    /**
+     * @brief Dependent variable table primary keys IN ORDER
+     */
+    static const QStringList primaryKeys;
+
+    /**
      * @brief Static factory method to create an dependent variable from a CassandraDB record
      * @param row
      * @return

@@ -17,6 +17,8 @@
 #include <ctime>
 
 #include <controller/assessmentsmodelmanager.h>
+#include "model/subject/characteristicvaluem.h"
+#include "model/task/independentvariablevaluem.h"
 
 /**
  * @brief Constructor

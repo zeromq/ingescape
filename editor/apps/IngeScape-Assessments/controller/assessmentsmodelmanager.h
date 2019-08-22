@@ -77,6 +77,13 @@ public:
      */
     static AssessmentsModelManager* Instance();
 
+
+    // ------------------------
+    //
+    //  Model manager logic
+    //
+    // ------------------------
+
     /**
      * @brief Retrieve a 'text' value of given column inside the given row
      * and convert it to QString before returning it
@@ -105,11 +112,67 @@ public:
     static QDateTime getDateTimeFromColumnNames(const CassRow* row, const char* dateColumnName, const char* timeColumnName);
 
 
-    // ------------------------
-    //
-    //  Model manager logic
-    //
-    // ------------------------
+    /**
+     * @brief Delete an entry of the template type from Cassandra DB.
+     * The primary key list represents the entries to delete.
+     * Values must be in the order of the primary key.
+     * If more values than there are keys are given, only the n-first will be used in the query.
+     * If less values than there are keys are given, the query will not filter against the extra keys
+     */
+    template <typename ModelClass>
+    static bool deleteEntry(QList<CassUuid> primaryKeyList)
+    {
+        // Create an editable copy of the primary keys list
+        QStringList copyKeysList = ModelClass::primaryKeys;
+
+        // Removing extra primary keys
+        while (copyKeysList.size() > primaryKeyList.size()) {
+            copyKeysList.removeLast();
+        }
+
+        // Removing extra filter values
+        while (primaryKeyList.size() > copyKeysList.size()) {
+            primaryKeyList.removeLast();
+        }
+
+        // Delete actual experimentation
+        QString queryStr = "DELETE FROM " + ModelClass::table + " WHERE ";
+        for (auto keyIt = copyKeysList.cbegin() ; keyIt != copyKeysList.cend() ; ++keyIt) {
+            if (keyIt > copyKeysList.cbegin()) {
+                queryStr += " AND ";
+            }
+            queryStr += *keyIt + " = ?";
+        }
+        queryStr += ";";
+
+        // Create the Cassandra query (aka. CassStatement)
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), static_cast<size_t>(primaryKeyList.length()));
+
+        // Bind values to the query
+        size_t idx = 0;
+        for (auto valueIt = primaryKeyList.cbegin() ; valueIt < primaryKeyList.cend() ; ++valueIt)
+        {
+            cass_statement_bind_uuid(cassStatement, idx, *valueIt);
+            ++idx;
+        }
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        if (cassError == CASS_OK)
+        {
+            qInfo() << typeid(ModelClass).name() << "has been successfully deleted from the DB";
+        }
+        else {
+            qCritical() << "Could not delete" << typeid(ModelClass).name() << "from the DB:" << cass_error_desc(cassError);
+        }
+
+        // Clean-up cassandra objects
+        cass_future_free(cassFuture);
+        cass_statement_free(cassStatement);
+
+        return cassError == CASS_OK;
+    }
 
     /**
      * @brief Get the Cassandra Cluster
