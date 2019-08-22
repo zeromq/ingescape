@@ -62,6 +62,14 @@ public:
     Q_INVOKABLE void updateLicensesPath(QString newLicensesPath);
 
 
+Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when the licenses have been updated
+     */
+    void licensesUpdated();
+
+
 };
 
 QML_DECLARE_TYPE(LicensesController)

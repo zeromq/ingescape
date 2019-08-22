@@ -92,9 +92,6 @@ void LicensesController::updateLicensesPath(QString newLicensesPath)
         // Update property
         setlicensesPath(newLicensesPath);
 
-        // Set the IngeScape license path
-        igs_setLicensePath(_licensesPath.toStdString().c_str());
-
         // Update settings file
         IngeScapeSettings &settings = IngeScapeSettings::Instance();
         settings.beginGroup("licenses");
@@ -103,5 +100,11 @@ void LicensesController::updateLicensesPath(QString newLicensesPath)
 
         // Save new value
         settings.sync();
+
+        // Set the IngeScape license path
+        igs_setLicensePath(_licensesPath.toStdString().c_str());
+
+        // Emit the signal "Licenses Updated"
+        Q_EMIT licensesUpdated();
     }
 }

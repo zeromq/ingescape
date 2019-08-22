@@ -165,7 +165,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::recorderExited, _recordsSupervisionC, &RecordsSupervisionController::onRecorderExited);
     connect(_networkC, &NetworkController::expeEntered, this, &IngeScapeEditorController::_onExpeEntered);
     connect(_networkC, &NetworkController::expeExited, this, &IngeScapeEditorController::_onExpeExited);
+
     connect(_networkC, &NetworkController::licenseErrorOccured, this, &IngeScapeEditorController::_onLicenseErrorOccured);
+    connect(_licensesC, &LicensesController::licensesUpdated, this, &IngeScapeEditorController::_onLicensesUpdated);
 
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &EditorModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &EditorModelManager::onMappingReceived);
@@ -612,91 +614,50 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
 {
     bool success = false;
 
-    // Reset the error message
-    seterrorMessageWhenConnectionFailed("");
-
-    if ((_networkC != nullptr) && (_modelManager != nullptr) && (_licensesC != nullptr))
+    bool isUInt = false;
+    uint port = strPort.toUInt(&isUInt);
+    if (isUInt && (port > 0))
     {
-        bool isUInt = false;
-        uint port = strPort.toUInt(&isUInt);
-        if (isUInt && (port > 0))
+        // None changes (Same port, same network device and same licenses path)
+        if ((port == _port) && (networkDevice == _networkDevice)
+                && (_licensesC != nullptr) && (licensesPath == _licensesC->licensesPath()))
         {
-            // None changes (Same port, same network device and same licenses path)
-            if ((port == _port) && (networkDevice == _networkDevice) && (licensesPath == _licensesC->licensesPath()))
-            {
-                // Nothing to do
-                success = true;
-            }
-            // Port and Network device
-            else
-            {
-                if (hasToClearPlatform) {
-                    qInfo() << "Restart the network on" << networkDevice << "with" << strPort << "(and CLEAR the current platform)";
-                }
-                else
-                {
-                    qInfo() << "Restart the network on" << networkDevice << "with" << strPort << "(and KEEP the current platform)";
-                }
-
-                _modelManager->setisMappingConnected(false);
-                _modelManager->setisMappingControlled(false);
-
-                // Stop our IngeScape agent
-                _networkC->stop();
-
-
-                // FIXME: Update the licenses path
-                _licensesC->updateLicensesPath(licensesPath);
-
-
-                // Update properties
-                setnetworkDevice(networkDevice);
-                setport(port);
-
-                // Update settings file
-                IngeScapeSettings &settings = IngeScapeSettings::Instance();
-                settings.beginGroup("network");
-                settings.setValue("networkDevice", networkDevice);
-                settings.setValue("port", port);
-                settings.endGroup();
-
-                // Save new values
-                settings.sync();
-
-
-                // Simulate an exit for each agent ON
-                _modelManager->simulateExitForEachAgentON();
-
-                // Simulate an exit for each launcher
-                _modelManager->simulateExitForEachLauncher();
-
-                // Has to clear the current platform
-                if (hasToClearPlatform)
-                {
-                    // Clear the current platform by deleting all existing data
-                    clearCurrentPlatform();
-                }
-
-                // Start our IngeScape agent with the network device and the port
-                success = _networkC->start(networkDevice, "", port);
-
-                if (success) {
-                    _modelManager->setisMappingConnected(true);
-                }
-            }
+            // Nothing to do
+            success = true;
         }
-        else {
-            if (!isUInt) {
-                qWarning() << "Port" << strPort << "is not an unsigned int !";
-            }
-            else if (port <= 0) {
-                qWarning() << "Port" << strPort << "is negative or null !";
-            }
+        // Port and Network device
+        else
+        {
+            // Update properties
+            setnetworkDevice(networkDevice);
+            setport(port);
+
+            // Update settings file
+            IngeScapeSettings &settings = IngeScapeSettings::Instance();
+            settings.beginGroup("network");
+            settings.setValue("networkDevice", networkDevice);
+            settings.setValue("port", port);
+            settings.endGroup();
+
+            // Save new values
+            settings.sync();
+
+
+            // FIXME (restartNetwork): Update the licenses path
+            _licensesC->updateLicensesPath(licensesPath);
+
+
+            // Restart IngeScape
+            success = _restartIngeScape(hasToClearPlatform);
         }
     }
-
-    if (!success) {
-        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(networkDevice, strPort));
+    else {
+        if (!isUInt) {
+            qWarning() << "Port" << strPort << "is not an unsigned int !";
+        }
+        else if (port <= 0) {
+            qWarning() << "Port" << strPort << "is negative or null !";
+        }
     }
 
     return success;
@@ -1151,6 +1112,18 @@ void IngeScapeEditorController::_onLicenseErrorOccured(QString limit)
 
 
 /**
+ * @brief Slot called when the licenses have been updated
+ */
+void IngeScapeEditorController::_onLicensesUpdated()
+{
+    qDebug() << "on License Updated";
+
+    // Restart IngeScape (Do not clear the current platform)
+    _restartIngeScape(false);
+}
+
+
+/**
  * @brief Load the platform from a JSON file
  * @param platformFilePath
  * @return
@@ -1329,4 +1302,61 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
         jsonDocument = QJsonDocument(platformJsonObject);
     }
     return jsonDocument;
+}
+
+
+/**
+ * @brief Restart IngeScape
+ * @param hasToClearPlatform
+ * @return true if success
+ */
+bool IngeScapeEditorController::_restartIngeScape(bool hasToClearPlatform)
+{
+    bool success = false;
+
+    // Reset the error message
+    seterrorMessageWhenConnectionFailed("");
+
+    if ((_networkC != nullptr) && (_modelManager != nullptr))
+    {
+        if (hasToClearPlatform) {
+            qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
+        }
+        else
+        {
+            qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
+        }
+
+        _modelManager->setisMappingConnected(false);
+        _modelManager->setisMappingControlled(false);
+
+        // Stop our IngeScape agent
+        _networkC->stop();
+
+        // Simulate an exit for each agent ON
+        _modelManager->simulateExitForEachAgentON();
+
+        // Simulate an exit for each launcher
+        _modelManager->simulateExitForEachLauncher();
+
+        // Has to clear the current platform
+        if (hasToClearPlatform)
+        {
+            // Clear the current platform by deleting all existing data
+            clearCurrentPlatform();
+        }
+
+        // Start our IngeScape agent with the network device and the port
+        success = _networkC->start(_networkDevice, "", _port);
+
+        if (success) {
+            _modelManager->setisMappingConnected(true);
+        }
+    }
+
+    if (!success) {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
+    }
+
+    return success;
 }

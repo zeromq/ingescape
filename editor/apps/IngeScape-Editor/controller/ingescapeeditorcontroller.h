@@ -245,7 +245,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 
     /**
-      * @brief Reset the mapping and timeline views
+      * @brief Signal emitted to reset the mapping and timeline views
       */
     void resetMappindAndTimeLineViews();
 
@@ -334,6 +334,12 @@ private Q_SLOTS:
     void _onLicenseErrorOccured(QString limit);
 
 
+    /**
+     * @brief Slot called when the licenses have been updated
+     */
+    void _onLicensesUpdated();
+
+
 private:
 
     /**
@@ -364,6 +370,14 @@ private:
      * @return
      */
     QJsonDocument _getJsonOfCurrentPlatform();
+
+
+    /**
+     * @brief Restart IngeScape
+     * @param hasToClearPlatform
+     * @return true if success
+     */
+    bool _restartIngeScape(bool hasToClearPlatform);
 
 
 private:
