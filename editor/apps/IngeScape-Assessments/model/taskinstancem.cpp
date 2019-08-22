@@ -173,11 +173,10 @@ TaskInstanceM* TaskInstanceM::createTaskInstanceFromCassandraRow(const CassRow* 
 
     if (row != nullptr)
     {
-        CassUuid experimentationUuid, subjectUuid, taskUuid, recordUuid, taskInstanceUuid;
+        CassUuid experimentationUuid, subjectUuid, taskUuid, taskInstanceUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_records"), &recordUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskInstanceUuid);
 
         QString taskName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
@@ -220,17 +219,12 @@ void TaskInstanceM::deleteTaskInstanceFromCassandra(const TaskInstanceM& taskIns
         cass_future_free(cassFuture);
         cass_statement_free(cassStatement);
 
-        //FIXME Hard coded record UUID for test purposes
-        CassUuid recordUuid;
-        cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
-
-        queryStr = "DELETE FROM " + TaskInstanceM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;";
-        cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 5);
+        queryStr = "DELETE FROM " + TaskInstanceM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id = ?;";
+        cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
         cass_statement_bind_uuid(cassStatement, 0, taskInstance.subject()->getExperimentationCassUuid());
         cass_statement_bind_uuid(cassStatement, 1, taskInstance.subject()->getCassUuid());
         cass_statement_bind_uuid(cassStatement, 2, taskInstance.task()->getCassUuid());
-        cass_statement_bind_uuid(cassStatement, 3, recordUuid);
-        cass_statement_bind_uuid(cassStatement, 4, taskInstance.getCassUuid());
+        cass_statement_bind_uuid(cassStatement, 3, taskInstance.getCassUuid());
 
         // Execute the query or bound statement
         cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
@@ -336,16 +330,11 @@ void TaskInstanceM::_updateDBEntry()
         cass_uint32_t endYearMonthDay = cass_date_from_epoch(endDateTime);
         cass_int64_t endTimeOfDay = cass_time_from_epoch(endDateTime);
 
-
-        //FIXME Hard coded record UUID for test purposes
-        CassUuid recordUuid;
-        cass_uuid_from_string("052c42a0-ad26-11e9-bd79-c9fd40f1d28a", &recordUuid);
-
         QString queryStr("UPDATE " + TaskInstanceM::table
                          + " SET name = ?, comment = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?"
-                         + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id_records = ? AND id = ?;");
+                         + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id = ?;");
 
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 11);
+        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
         cass_statement_bind_string(cassStatement, 0, _name.toStdString().c_str());
         cass_statement_bind_string(cassStatement, 1, _comments.toStdString().c_str());
         cass_statement_bind_uint32(cassStatement, 2, startYearMonthDay);
@@ -355,8 +344,7 @@ void TaskInstanceM::_updateDBEntry()
         cass_statement_bind_uuid  (cassStatement, 6, _subject->getExperimentationCassUuid());
         cass_statement_bind_uuid  (cassStatement, 7, _subject->getCassUuid());
         cass_statement_bind_uuid  (cassStatement, 8, _task->getCassUuid());
-        cass_statement_bind_uuid  (cassStatement, 9, recordUuid);
-        cass_statement_bind_uuid  (cassStatement, 10, getCassUuid());
+        cass_statement_bind_uuid  (cassStatement, 9, getCassUuid());
 
         CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
