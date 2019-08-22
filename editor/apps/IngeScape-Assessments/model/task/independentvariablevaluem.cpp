@@ -17,7 +17,7 @@
 /**
  * @brief Independent variable value table name
  */
-const QString IndependentVariableValueM::table = "ingescape.task";
+const QString IndependentVariableValueM::table = "ingescape.independent_var_value";
 
 /**
  * @brief Independent variable value table column names
