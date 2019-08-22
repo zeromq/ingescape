@@ -98,22 +98,23 @@ ApplicationWindow {
                 // If we use "Configuration", this MenuItem is displayed in the main app menu and called "Preferences"
                 // Workaround: we use an invisible character
                 text: qsTr("\u200BConfiguration")
+                //text: qsTr("Platform network")
                 shortcut: StandardKey.Preferences
 
                 onTriggered: {
                     if (applicationLoader.item) {
-                        console.log("QML: Open configuration popup");
+                        console.log("QML: Open network configuration popup");
                         applicationLoader.item.openConfiguration();
                     }
                 }
             }
             MenuItem {
-                text: qsTr("License")
+                text: qsTr("Platform license")
                 //shortcut: StandardKey.
 
                 onTriggered: {
                     if (applicationLoader.item) {
-                        console.log("QML: Open license popup");
+                        console.log("QML: Open license configuration popup");
                         applicationLoader.item.openLicense();
                     }
                 }

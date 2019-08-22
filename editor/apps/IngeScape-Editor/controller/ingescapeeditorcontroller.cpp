@@ -166,7 +166,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::expeEntered, this, &IngeScapeEditorController::_onExpeEntered);
     connect(_networkC, &NetworkController::expeExited, this, &IngeScapeEditorController::_onExpeExited);
 
-    connect(_networkC, &NetworkController::licenseErrorOccured, this, &IngeScapeEditorController::_onLicenseErrorOccured);
+    connect(_licensesC, &LicensesController::licenseErrorOccured, this, &IngeScapeEditorController::_onLicenseErrorOccured);
     connect(_licensesC, &LicensesController::licensesUpdated, this, &IngeScapeEditorController::_onLicensesUpdated);
 
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &EditorModelManager::onDefinitionReceived);

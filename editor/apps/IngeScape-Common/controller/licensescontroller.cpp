@@ -17,10 +17,46 @@
 #include <settings/ingescapesettings.h>
 #include <QFileDialog>
 
-extern "C" {
-#include <ingescape.h>
+
+/**
+ * @brief onLicenseCallback
+ * @param limit
+ * @param myData
+ */
+void onLicenseCallback(igs_license_limit_t limit, void *myData)
+{
+    LicensesController* licensesController = (LicensesController*)myData;
+    if (licensesController != nullptr)
+    {
+        // Emit the signal "License Error Occured"
+        Q_EMIT licensesController->licenseErrorOccured("TODO");
+
+        switch (limit)
+        {
+        case IGS_LICENSE_TIMEOUT:
+            qCritical("IngeScape is stopped because demonstration mode timeout has been reached");
+            break;
+
+        case IGS_LICENSE_TOO_MANY_AGENTS:
+            qCritical("IngeScape is stopped because too many agents are running on the platform compared to what the license allows");
+            break;
+
+        case IGS_LICENSE_TOO_MANY_IOPS:
+            qCritical("IngeScape is stopped because too many IOPs have been created on the platform compared to what the license allows");
+            break;
+
+        default:
+            break;
+        }
+    }
 }
 
+
+//--------------------------------------------------------------
+//
+// Licenses Controller
+//
+//--------------------------------------------------------------
 
 /**
  * @brief Constructor
@@ -48,10 +84,17 @@ LicensesController::LicensesController(QObject *parent) : QObject(parent),
 
     settings.endGroup();
 
+    qInfo() << "New Licenses Controller with licenses path" << _licensesPath;
+
+    // Begin to observe license events (events are triggered only when no valid license is available)
+    igs_observeLicense(onLicenseCallback, this);
+
     // Set the IngeScape license path
     igs_setLicensePath(_licensesPath.toStdString().c_str());
 
-    qInfo() << "New Licenses Controller with licenses path" << _licensesPath;
+    // Get the data about licenses
+    _getLicensesData();
+
 }
 
 
@@ -104,7 +147,49 @@ void LicensesController::updateLicensesPath(QString newLicensesPath)
         // Set the IngeScape license path
         igs_setLicensePath(_licensesPath.toStdString().c_str());
 
+        // Get the data about licenses
+        _getLicensesData();
+
         // Emit the signal "Licenses Updated"
         Q_EMIT licensesUpdated();
+    }
+}
+
+
+/**
+ * @brief Get the data about licenses
+ */
+void LicensesController::_getLicensesData()
+{
+    // Allows to update data about licenses
+    igs_checkLicenseForAgent(nullptr);
+
+    if (license != nullptr)
+    {
+        QDateTime licenseExpirationDate = QDateTime::fromSecsSinceEpoch(license->licenseExpirationDate);
+        QDateTime editorExpirationDate = QDateTime::fromSecsSinceEpoch(license->editorExpirationDate);
+
+        if (license->isLicenseValid && license->isEditorLicenseValid)
+        {
+            qInfo() << "VALID License: id" << QString(license->id) << "order" << QString(license->order) << "customer" << QString(license->customer) << "licenseExpirationDate" << licenseExpirationDate;
+            qInfo() << "VALID EDITOR License: editorOwner" << QString(license->editorOwner) << "editorExpirationDate" << editorExpirationDate;
+            qDebug() << "Nb MAX Agents" << license->platformNbAgents << "Nb MAX IOPs" << license->platformNbIOPs;
+
+            // Update flag
+            setisValidLicense(true);
+        }
+        else
+        {
+            if (!license->isLicenseValid) {
+                qInfo() << "IN-valid License: id" << QString(license->id) << "order" << QString(license->order) << "customer" << QString(license->customer) << "licenseExpirationDate" << licenseExpirationDate;
+            }
+            else { //if (!license->isEditorLicenseValid) {
+                qInfo() << "IN-valid EDITOR License: editorOwner" << QString(license->editorOwner) << "editorExpirationDate" << editorExpirationDate;
+            }
+            qDebug() << "Nb MAX Agents" << QString(license->platformNbAgents) << "Nb MAX IOPs" << QString(license->platformNbIOPs);
+
+            // Update flag
+            setisValidLicense(false);
+        }
     }
 }

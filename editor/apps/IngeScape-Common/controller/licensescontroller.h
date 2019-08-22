@@ -19,6 +19,14 @@
 
 #include <I2PropertyHelpers.h>
 
+
+extern "C" {
+#include <ingescape.h>
+//#include <ingescape_advanced.h>
+#include <ingescape_private.h>
+}
+
+
 /**
  * @brief The LicensesController class defines the controller to manage IngeScape licenses
  */
@@ -65,9 +73,24 @@ public:
 Q_SIGNALS:
 
     /**
+     * @brief Signal emitted when an error occured about the IngeScape license
+     * @param limit
+     */
+    void licenseErrorOccured(QString limit);
+
+
+    /**
      * @brief Signal emitted when the licenses have been updated
      */
     void licensesUpdated();
+
+
+private:
+
+    /**
+     * @brief Get the data about licenses
+     */
+    void _getLicensesData();
 
 
 };

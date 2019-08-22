@@ -337,40 +337,6 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 }
 
 
-/**
- * @brief onLicenseCallback
- * @param limit
- * @param myData
- */
-void onLicenseCallback(igs_license_limit_t limit, void *myData)
-{
-    IngeScapeNetworkController* networkController = (IngeScapeNetworkController*)myData;
-    if (networkController != nullptr)
-    {
-        // Emit the signal "License Error Occured"
-        Q_EMIT networkController->licenseErrorOccured("TODO");
-
-        switch (limit)
-        {
-        case IGS_LICENSE_TIMEOUT:
-            qCritical("IngeScape is stopped because demonstration mode timeout has been reached");
-            break;
-
-        case IGS_LICENSE_TOO_MANY_AGENTS:
-            qCritical("IngeScape is stopped because too many agents are running on the platform compared to what the license allows");
-            break;
-
-        case IGS_LICENSE_TOO_MANY_IOPS:
-            qCritical("IngeScape is stopped because too many IOPs have been created on the platform compared to what the license allows");
-            break;
-
-        default:
-            break;
-        }
-    }
-}
-
-
 //--------------------------------------------------------------
 //
 // IngeScape Network Controller
@@ -437,9 +403,6 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
     if (result == 0) {
         qCritical() << "The callback on zyre messages has NOT been registered !";
     }
-
-    // Begin to observe license events (events are triggered only when no valid license is available)
-    igs_observeLicense(onLicenseCallback, this);
 }
 
 
