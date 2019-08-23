@@ -28,14 +28,6 @@ class ExperimentationM;
 extern const QString CHARACTERISTIC_SUBJECT_ID;
 
 
-// Special namespace to match the behavior of model classes without having a proper model class for this particular table.
-namespace CharacteristicValueM {
-
-const QString table = "ingescape.characteristic_value";
-
-}
-
-
 /**
  * @brief The CharacteristicM class defines a model of characteristic for a subject
  */
@@ -87,6 +79,16 @@ public:
      */
     static const QString table;
 
+    /**
+     * @brief Characteristic table column names
+     */
+    static const QStringList columnNames;
+
+    /**
+     * @brief Characteristic table primary keys IN ORDER
+     */
+    static const QStringList primaryKeys;
+
 
     /**
      * @brief Get the unique identifier in Cassandra Data Base
@@ -107,30 +109,7 @@ public:
      * @param row
      * @return
      */
-    static CharacteristicM* createCharacteristicFromCassandraRow(const CassRow* row);
-
-    /**
-     * @brief Delete a characteristic from Cassandra DB
-     * @param characteristic The characteristic to delete
-     * @param experimentation The experimentation it's associated with for back reference to subjects
-     */
-    static void deleteCharacteristicFromCassandra(const CharacteristicM& characteristic, ExperimentationM* experimentation);
-
-private:
-
-    /**
-     * @brief Delete every characteric value associated with the given characteristic
-     * FIXME Sending a request for each subject does not seem very efficient...
-     *       It would be nice if we could just have a WHERE clause on id_experimentation and id_characteristic, wouldn't it?
-     * NOTE Having a model manager handling the model instances would allow a characteristic to get its experimentation from
-     *      the CassUuid (which it already knows) without having to pass a pointer to said experimentation.
-     *      Another solution would be to create ViewModels that holds pointers to the model instance and models that only handle UUIDs.
-     *      This way, models are a match for what's ion the Cassandra DB and view models have access the linked instances for display purposes
-     *      (cf. ItemVM in ENEDIS)
-     * @param characteristic The characteristic to delete
-     * @param experimentation The experimentation it's associated with for back reference to subjects
-     */
-    static void _deleteCharacteristicValuesForCharacteristic(const CharacteristicM& characteristic, ExperimentationM* experimentation);
+    static CharacteristicM* createFromCassandraRow(const CassRow* row);
 
 private:
     // Experimentation's unique identifier in Cassandra Data Base

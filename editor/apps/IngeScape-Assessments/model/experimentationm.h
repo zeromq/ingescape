@@ -81,6 +81,16 @@ public:
      */
     static const QString table;
 
+    /**
+     * @brief Experimentation table column names
+     */
+    static const QStringList columnNames;
+
+    /**
+     * @brief Experimentation table primary keys IN ORDER
+     */
+    static const QStringList primaryKeys;
+
 
     /**
      * @brief Clear the attribute lists
@@ -193,7 +203,7 @@ public:
      * @param row
      * @return
      */
-    static ExperimentationM* createExperimentationFromCassandraRow(const CassRow* row);
+    static ExperimentationM* createFromCassandraRow(const CassRow* row);
 
     /**
      * @brief Delete the given experimentation from Cassandra DB
@@ -220,10 +230,11 @@ private: // Methods
      */
     static void _deleteAllCharacteristicsForExperimentation(const ExperimentationM& experimentation);
     /**
-     * @brief Delete all tasks characteritics values with the given experimentation
+     * @brief Delete all task instances with the given experimentation
      * @param experimentation
      */
-    static void _deleteAllCharacteristicsValuesForExperimentation(const ExperimentationM& experimentation);
+    static void _deleteAllTaskInstancesForExperimentation(const ExperimentationM& experimentation);
+
 
 private:
     // Unique identifier in Cassandra Data Base

@@ -17,6 +17,8 @@
 #include <ctime>
 
 #include <controller/assessmentsmodelmanager.h>
+#include "model/subject/characteristicvaluem.h"
+#include "model/task/independentvariablevaluem.h"
 
 /**
  * @brief Constructor
@@ -229,7 +231,9 @@ TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QStrin
             qInfo() << "New task_instance inserted into the DB";
 
             // Create the new task instance
-            taskInstance = new TaskInstanceM(_currentExperimentation->getCassUuid(), taskInstanceUuid, taskInstanceName, "", subject, task, QDateTime::currentDateTime());
+            taskInstance = new TaskInstanceM(_currentExperimentation->getCassUuid(), taskInstanceUuid, taskInstanceName, "", subject->getCassUuid(), task->getCassUuid(), QDateTime::currentDateTime());
+            taskInstance->settask(task);
+            taskInstance->setsubject(subject);
 
             for (auto indeVarIt = task->independentVariables()->begin() ; indeVarIt != task->independentVariables()->end() ; ++indeVarIt)
             {
@@ -280,44 +284,10 @@ void ExperimentationController::_retrieveIndependentVariableForTask(TaskM* task)
 {
     if (AssessmentsModelManager::Instance() != nullptr)
     {
-        QString queryStr = "SELECT * FROM " + IndependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ?;";
-
-        // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
-        cass_statement_bind_uuid(cassStatement, 0, task->getExperimentationCassUuid());
-        cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qDebug() << "Get all independent variables for task" << task->name() << "succeeded";
+        QList<IndependentVariableM*> indeVarList = AssessmentsModelManager::select<IndependentVariableM>({ task->getExperimentationCassUuid(), task->getCassUuid() });
+        for (IndependentVariableM* independentVariable : indeVarList) {
+            task->addIndependentVariable(independentVariable);
         }
-        else {
-            qCritical() << "Could not get all independent variables for task" << task->name() << "from the database:" << cass_error_desc(cassError);
-        }
-
-        // Retrieve result set and iterate over the rows
-        const CassResult* cassResult = cass_future_get_result(cassFuture);
-        if (cassResult != nullptr)
-        {
-            CassIterator* cassIterator = cass_iterator_from_result(cassResult);
-
-            while(cass_iterator_next(cassIterator))
-            {
-                const CassRow* row = cass_iterator_get_row(cassIterator);
-                IndependentVariableM* independentVariable = IndependentVariableM::createIndependentVariableFromCassandraRow(row);
-                if (independentVariable != nullptr)
-                {
-                    task->addIndependentVariable(independentVariable);
-                }
-            }
-
-            cass_iterator_free(cassIterator);
-        }
-
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
     }
 }
 
@@ -330,44 +300,10 @@ void ExperimentationController::_retrieveDependentVariableForTask(TaskM* task)
 {
     if ((task != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
-        QString queryStr = "SELECT * FROM " + DependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ?;";
-
-        // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
-        cass_statement_bind_uuid(cassStatement, 0, task->getExperimentationCassUuid());
-        cass_statement_bind_uuid(cassStatement, 1, task->getCassUuid());
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qDebug() << "Get all independent variables for task" << task->name() << "succeeded";
+        QList<DependentVariableM*> depVarList = AssessmentsModelManager::select<DependentVariableM>({ task->getExperimentationCassUuid(), task->getCassUuid() });
+        for (DependentVariableM* dependentVariable : depVarList) {
+            task->addDependentVariable(dependentVariable);
         }
-        else {
-            qCritical() << "Could not get all independent variables for task" << task->name() << "from the database:" << cass_error_desc(cassError);
-        }
-
-        // Retrieve result set and iterate over the rows
-        const CassResult* cassResult = cass_future_get_result(cassFuture);
-        if (cassResult != nullptr)
-        {
-            CassIterator* cassIterator = cass_iterator_from_result(cassResult);
-
-            while(cass_iterator_next(cassIterator))
-            {
-                const CassRow* row = cass_iterator_get_row(cassIterator);
-                DependentVariableM* dependentVariable = DependentVariableM::createDependentVariableFromCassandraRow(row);
-                if (dependentVariable != nullptr)
-                {
-                    task->addDependentVariable(dependentVariable);
-                }
-            }
-
-            cass_iterator_free(cassIterator);
-        }
-
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
     }
 }
 
@@ -381,45 +317,10 @@ void ExperimentationController::_retrieveSubjectsForExperimentation(Experimentat
 {
     if (experimentation != nullptr)
     {
-        QString queryStr = "SELECT * FROM "+ SubjectM::table + " WHERE id_experimentation = ?;";
-        // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
-        cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qDebug() << "Get all subjects succeeded";
-
-            // Retrieve result set and iterate over the rows
-            const CassResult* cassResult = cass_future_get_result(cassFuture);
-
-            if (cassResult != nullptr)
-            {
-                CassIterator* cassIterator = cass_iterator_from_result(cassResult);
-
-                while(cass_iterator_next(cassIterator))
-                {
-                    const CassRow* row = cass_iterator_get_row(cassIterator);
-                    SubjectM* subject = SubjectM::createSubjectFromCassandraRow(row);
-                    if (subject != nullptr)
-                    {
-                        // Add the subject to the experimentation
-                        experimentation->addSubject(subject);
-                    }
-                }
-
-                cass_iterator_free(cassIterator);
-            }
+        QList<SubjectM*> subejctList = AssessmentsModelManager::select<SubjectM>({ experimentation->getCassUuid() });
+        for (SubjectM* subject : subejctList) {
+            experimentation->addSubject(subject);
         }
-        else {
-            qCritical() << "Could not get all subjects for the current experiment from the database:" << cass_error_desc(cassError);
-        }
-
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
     }
 }
 
@@ -433,45 +334,10 @@ void ExperimentationController::_retrieveCharacteristicsForExperimentation(Exper
 {
     if (experimentation != nullptr)
     {
-        QString queryStr = "SELECT * FROM " + CharacteristicM::table + " WHERE id_experimentation = ?;";
-        // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
-        cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qDebug() << "Get all characteristics succeeded";
-
-            // Retrieve result set and iterate over the rows
-            const CassResult* cassResult = cass_future_get_result(cassFuture);
-
-            if (cassResult != nullptr)
-            {
-                CassIterator* cassIterator = cass_iterator_from_result(cassResult);
-
-                while(cass_iterator_next(cassIterator))
-                {
-                    const CassRow* row = cass_iterator_get_row(cassIterator);
-                    CharacteristicM* characteristic = CharacteristicM::createCharacteristicFromCassandraRow(row);
-                    if (characteristic != nullptr)
-                    {
-                        // Add the characteristic to the experimentation
-                        experimentation->addCharacteristic(characteristic);
-                    }
-                }
-
-                cass_iterator_free(cassIterator);
-            }
+        QList<CharacteristicM*> characteristicList = AssessmentsModelManager::select<CharacteristicM>({ experimentation->getCassUuid() });
+        for (CharacteristicM* characteristic : characteristicList) {
+            experimentation->addCharacteristic(characteristic);
         }
-        else {
-            qCritical() << "Could not get all characteristics for the current experiment from the database:" << cass_error_desc(cassError);
-        }
-
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
     }
 }
 
@@ -485,52 +351,17 @@ void ExperimentationController::_retrieveTasksForExperimentation(Experimentation
 {
     if (experimentation != nullptr)
     {
-        QString queryStr = "SELECT * FROM " + TaskM::table + " WHERE id_experimentation = ?;";
+        QList<TaskM*> taskList = AssessmentsModelManager::select<TaskM>({ experimentation->getCassUuid() });
+        for (TaskM* task : taskList) {
+            // Independent variables
+            _retrieveIndependentVariableForTask(task);
 
-        // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
-        cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
+            // Dependent variables
+            _retrieveDependentVariableForTask(task);
 
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qDebug() << "Get all tasks succeeded";
-
-            // Retrieve result set and iterate over the rows
-            const CassResult* cassResult = cass_future_get_result(cassFuture);
-
-            if (cassResult != nullptr)
-            {
-                CassIterator* cassIterator = cass_iterator_from_result(cassResult);
-
-                while(cass_iterator_next(cassIterator))
-                {
-                    const CassRow* row = cass_iterator_get_row(cassIterator);
-                    TaskM* task = TaskM::createTaskFromCassandraRow(row);
-                    if (task != nullptr)
-                    {
-                        // Load variables
-                        _retrieveIndependentVariableForTask(task);
-
-                        // Load variables
-                        _retrieveDependentVariableForTask(task);
-
-                        // Add the task to the experimentation
-                        experimentation->addTask(task);
-                    }
-                }
-
-                cass_iterator_free(cassIterator);
-            }
+            // Add the task to the experimentation
+            experimentation->addTask(task);
         }
-        else {
-            qCritical() << "Could not get all tasks for the current experiment from the database:" << cass_error_desc(cassError);
-        }
-
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
     }
 }
 
@@ -543,57 +374,17 @@ void ExperimentationController::_retrieveTaskInstancesForExperimentation(Experim
 {
     if (experimentation != nullptr)
     {
-        QString queryStr = "SELECT * FROM " + TaskInstanceM::table + " WHERE id_experimentation = ?;";
-        // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 1);
-        cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
+        QList<TaskInstanceM*> taskInstanceList = AssessmentsModelManager::select<TaskInstanceM>({ experimentation->getCassUuid() });
+        for (TaskInstanceM* taskInstance : taskInstanceList) {
+            experimentation->addTaskInstance(taskInstance);
 
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qDebug() << "Get all task instances succeeded";
+            // Set pointers to Task & Subject
+            taskInstance->settask(experimentation->getTaskFromUID(taskInstance->getTaskCassUuid()));
+            taskInstance->setsubject(experimentation->getSubjectFromUID(taskInstance->getSubjectCassUuid()));
 
-            // Retrieve result set and iterate over the rows
-            const CassResult* cassResult = cass_future_get_result(cassFuture);
-
-            if (cassResult != nullptr)
-            {
-                CassIterator* cassIterator = cass_iterator_from_result(cassResult);
-
-                while(cass_iterator_next(cassIterator))
-                {
-                    const CassRow* row = cass_iterator_get_row(cassIterator);
-
-                    CassUuid subjectUuid;
-                    cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
-                    SubjectM* subject = experimentation->getSubjectFromUID(subjectUuid);
-
-                    CassUuid taskUuid;
-                    cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
-                    TaskM* task = experimentation->getTaskFromUID(taskUuid);
-
-                    TaskInstanceM* taskInstance = TaskInstanceM::createTaskInstanceFromCassandraRow(row, subject, task);
-                    if (taskInstance != nullptr)
-                    {
-                        // Add the task instance to the experimentation
-                        experimentation->addTaskInstance(taskInstance);
-
-                        // Retrieve independent variables values for the task instance
-                        _retrieveIndependentVariableValuesForTaskInstance(taskInstance);
-                    }
-                }
-
-                cass_iterator_free(cassIterator);
-            }
+            // Retrieve independent variables values for the task instance
+            _retrieveIndependentVariableValuesForTaskInstance(taskInstance);
         }
-        else {
-            qCritical() << "Could not get all task instances for the current experiment from the database:" << cass_error_desc(cassError);
-        }
-
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
     }
 }
 

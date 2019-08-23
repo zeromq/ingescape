@@ -15,6 +15,7 @@
 #include "subjectscontroller.h"
 
 #include <controller/assessmentsmodelmanager.h>
+#include "model/subject/characteristicvaluem.h"
 
 
 /**
@@ -50,13 +51,6 @@ SubjectsController::~SubjectsController()
     {
         setcurrentExperimentation(nullptr);
     }
-
-    /*if (_modelManager != nullptr)
-    {
-        //disconnect(_modelManager, nullptr, this, nullptr);
-
-        _modelManager = nullptr;
-    }*/
 }
 
 
@@ -179,25 +173,7 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
         _currentExperimentation->removeCharacteristic(characteristic);
 
         // Remove characteristic from DB
-        QString queryStr = "DELETE FROM " + CharacteristicM::table + " WHERE id_experimentation = ? AND id = ?;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
-        cass_statement_bind_uuid(cassStatement, 0, characteristic->getExperimentationCassUuid());
-        cass_statement_bind_uuid(cassStatement, 1, characteristic->getCassUuid());
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "Characteristic" << characteristic->name() << "has been successfully deleted from the DB";
-        }
-        else {
-            qCritical() << "Could not delete the characteristic" << characteristic->name() << "from the DB:" << cass_error_desc(cassError);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
+        AssessmentsModelManager::deleteEntry<CharacteristicM>({ _currentExperimentation->getCassUuid(), characteristic->getCassUuid() });
 
         // Free memory
         delete characteristic;
@@ -255,40 +231,15 @@ void SubjectsController::deleteSubject(SubjectM* subject)
 
         // Remove task instances related to the subject
         QList<CassUuid> taskUuidList;
-        QStringList statementPlaceholders;
         for (TaskM* task : *(_currentExperimentation->allTasks())) {
             if (task != nullptr)
             {
                 taskUuidList.append(task->getCassUuid());
-                statementPlaceholders.append("?");
             }
         }
 
-        QString queryStr = "DELETE FROM " + TaskInstanceM::table + " WHERE id_experimentation = ? AND id_subject = ? AND id_task IN (" + statementPlaceholders.join(", ") + ");";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), static_cast<size_t>(2 + statementPlaceholders.size()));
-        cass_statement_bind_uuid(cassStatement, 0, _currentExperimentation->getCassUuid());
-        cass_statement_bind_uuid(cassStatement, 1, subject->getCassUuid());
-        size_t placeholderIdx = 2;
-        for (CassUuid uuid : taskUuidList)
-        {
-            cass_statement_bind_uuid(cassStatement, placeholderIdx, uuid);
-            ++placeholderIdx;
-        }
+        AssessmentsModelManager::deleteEntry<TaskInstanceM>({ { _currentExperimentation->getCassUuid() }, { subject->getCassUuid() }, taskUuidList });
 
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "TaskInstances related to the subject" << subject->displayedId() << "has been successfully deleted from the DB";
-        }
-        else {
-            qCritical() << "Could not delete the TaskInstances related to the subject" << subject->displayedId() << "from the DB:" << cass_error_desc(cassError);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
 
         // Remove subject from DB
         SubjectM::deleteSubjectFromCassandra(*subject);
@@ -574,40 +525,14 @@ void SubjectsController::_deleteCharacteristicValuesForCharacteristic(Characteri
     {
         // Remove task instances related to the task
         QList<CassUuid> subjectUuidList;
-        QStringList statementPlaceholders;
         for (SubjectM* subject : _currentExperimentation->allSubjects()->toList()) {
             if (subject != nullptr)
             {
                 subjectUuidList.append(subject->getCassUuid());
-                statementPlaceholders.append("?");
             }
         }
 
-        QString queryStr = "DELETE FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject IN (" + statementPlaceholders.join(", ") + ") AND id_characteristic = ?;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), static_cast<size_t>(2 + statementPlaceholders.size()));
-        cass_statement_bind_uuid(cassStatement, 0, _currentExperimentation->getCassUuid());
-        size_t placeholderIdx = 1;
-        for (CassUuid uuid : subjectUuidList)
-        {
-            cass_statement_bind_uuid(cassStatement, placeholderIdx, uuid);
-            ++placeholderIdx;
-        }
-        cass_statement_bind_uuid(cassStatement, placeholderIdx, characteristic->getCassUuid());
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "Characteristic values for characteristic" << characteristic->name() << "has been successfully deleted from the DB";
-        }
-        else {
-            qCritical() << "Could not delete the characteristic values for characteristic" << characteristic->name() << "from the DB:" << cass_error_desc(cassError);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
+        AssessmentsModelManager::deleteEntry<CharacteristicValueM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { characteristic->getCassUuid() } });
     }
 }
 

@@ -69,6 +69,16 @@ public:
      */
     static const QString table;
 
+    /**
+     * @brief Subject table column names
+     */
+    static const QStringList columnNames;
+
+    /**
+     * @brief Subject table primary keys IN ORDER
+     */
+    static const QStringList primaryKeys;
+
 
     /**
      * @brief Get the unique identifier in Cassandra Data Base
@@ -106,7 +116,7 @@ public:
      * @param row
      * @return
      */
-    static SubjectM* createSubjectFromCassandraRow(const CassRow* row);
+    static SubjectM* createFromCassandraRow(const CassRow* row);
 
 
     /**

@@ -21,13 +21,6 @@
 
 #include "cassandra.h"
 
-// Special namespace to match the behavior of model classes without having a proper model class for this particular table.
-namespace IndependentVariableValueM {
-
-const QString table = "ingescape.independent_var_value";
-
-}
-
 /**
  * @brief The IndependentVariableM class defines a model of independent variable
  */
@@ -99,11 +92,21 @@ public:
     static const QString table;
 
     /**
+     * @brief Independent variable table column names
+     */
+    static const QStringList columnNames;
+
+    /**
+     * @brief Independent variable table primary keys IN ORDER
+     */
+    static const QStringList primaryKeys;
+
+    /**
      * @brief Static factory method to create an independent variable from a CassandraDB record
      * @param row
      * @return
      */
-    static IndependentVariableM* createIndependentVariableFromCassandraRow(const CassRow* row);
+    static IndependentVariableM* createFromCassandraRow(const CassRow* row);
 
     /**
      * @brief Delete the given independent variable from Cassandra DB

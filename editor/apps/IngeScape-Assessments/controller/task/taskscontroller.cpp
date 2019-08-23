@@ -15,6 +15,7 @@
 #include "taskscontroller.h"
 
 #include <controller/assessmentsmodelmanager.h>
+#include "model/task/independentvariablevaluem.h"
 
 /**
  * @brief Constructor
@@ -131,43 +132,17 @@ void TasksController::deleteTask(TaskM* task)
 
         // Remove task instances related to the task
         QList<CassUuid> subjectUuidList;
-        QStringList statementPlaceholders;
         for (SubjectM* subject : *(_currentExperimentation->allSubjects())) {
             if (subject != nullptr)
             {
                 subjectUuidList.append(subject->getCassUuid());
-                statementPlaceholders.append("?");
             }
         }
 
-        QString queryStr = "DELETE FROM " + TaskInstanceM::table + " WHERE id_experimentation = ? AND id_subject IN (" + statementPlaceholders.join(", ") + ") AND id_task = ? ;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), static_cast<size_t>(2 + statementPlaceholders.size()));
-        cass_statement_bind_uuid(cassStatement, 0, _currentExperimentation->getCassUuid());
-        size_t placeholderIdx = 1;
-        for (CassUuid uuid : subjectUuidList)
-        {
-            cass_statement_bind_uuid(cassStatement, placeholderIdx, uuid);
-            ++placeholderIdx;
-        }
-        cass_statement_bind_uuid(cassStatement, placeholderIdx, task->getCassUuid());
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "TaskInstances related to the task" << task->name() << "has been successfully deleted from the DB";
-        }
-        else {
-            qCritical() << "Could not delete the TaskInstances related to the task" << task->name() << "from the DB:" << cass_error_desc(cassError);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
+        AssessmentsModelManager::deleteEntry<TaskInstanceM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { task->getCassUuid() } });
 
         // Remove from DB
-        TaskM::deleteTaskFromCassandra(*task);
+        TaskM::deleteTaskFromCassandraRow(*task);
 
         // Remove the task from the current experimentation
         _currentExperimentation->removeTask(task);
@@ -421,42 +396,15 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
     {
         // Delete independent variable valuesfrom Cassandra DB
         QList<CassUuid> taskInstanceUuidList;
-        QStringList statementPlaceholders;
         for (TaskInstanceM* taskInstance : _currentExperimentation->allTaskInstances()->toList())
         {
             if (taskInstance != nullptr)
             {
                 taskInstanceUuidList.append(taskInstance->getCassUuid());
-                statementPlaceholders.append("?");
             }
         }
 
-        QString queryStr = "DELETE FROM " + IndependentVariableValueM::table + " WHERE id_experimentation = ? AND id_task_instance IN (" + statementPlaceholders.join(", ") + ") AND id_independent_var = ?;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), static_cast<size_t>(2 + statementPlaceholders.size()));
-        cass_statement_bind_uuid(cassStatement, 0, independentVariable->getExperimentationCassUuid());
-        size_t placeholderIdx = 1;
-        for (CassUuid uuid : taskInstanceUuidList)
-        {
-            cass_statement_bind_uuid(cassStatement, placeholderIdx, uuid);
-            ++placeholderIdx;
-        }
-        cass_statement_bind_uuid(cassStatement, placeholderIdx, independentVariable->getCassUuid());
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "Values for independent variable" << independentVariable->name() << "has been successfully deleted from the DB";
-        }
-        else {
-            qCritical() << "Could not delete the values for independent variable" << independentVariable->name() << "from the DB:" << cass_error_desc(cassError);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
-
+        AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ { _currentExperimentation->getCassUuid() }, taskInstanceUuidList, { independentVariable->getCassUuid() } });
 
         // Delete independent variable from Cassandra DB
         IndependentVariableM::deleteIndependentVariableFromCassandra(*independentVariable);
@@ -505,25 +453,7 @@ void TasksController::deleteDependentVariable(DependentVariableM* dependentVaria
         _selectedTask->removeDependentVariable(dependentVariable);
 
         // Remove from DB
-        QString queryStr = "DELETE FROM " + DependentVariableM::table + " WHERE id_experimentation = ? AND id_task = ?;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
-        cass_statement_bind_uuid(cassStatement, 0, _selectedTask->getExperimentationCassUuid());
-        cass_statement_bind_uuid(cassStatement, 1, _selectedTask->getCassUuid());
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "Dependent variables" << dependentVariable->name() << "has been successfully deleted from the DB";
-        }
-        else {
-            qCritical() << "Could not delete the dependent variables" << dependentVariable->name() << "from the DB:" << cass_error_desc(cassError);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
+        AssessmentsModelManager::deleteEntry<DependentVariableM>({ _selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid() });
 
         // Free memory
         delete dependentVariable;

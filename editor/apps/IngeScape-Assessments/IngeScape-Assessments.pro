@@ -46,9 +46,11 @@ SOURCES += main.cpp \
     model/subject/subjectm.cpp \
     model/subject/characteristicm.cpp \
     model/subject/characteristicenumm.cpp \
+    model/subject/characteristicvaluem.cpp \
     model/task/taskm.cpp \
     model/experimentationm.cpp \
     model/task/independentvariablem.cpp \
+    model/task/independentvariablevaluem.cpp \
     model/task/dependentvariablem.cpp \
     controller/experimentationslistcontroller.cpp \
     controller/subject/subjectscontroller.cpp \
@@ -70,9 +72,11 @@ HEADERS += \
     model/subject/subjectm.h \
     model/subject/characteristicm.h \
     model/subject/characteristicenumm.h \
+    model/subject/characteristicvaluem.h \
     model/task/taskm.h \
     model/experimentationm.h \
     model/task/independentvariablem.h \
+    model/task/independentvariablevaluem.h \
     model/task/dependentvariablem.h \
     controller/experimentationslistcontroller.h \
     controller/subject/subjectscontroller.h \
