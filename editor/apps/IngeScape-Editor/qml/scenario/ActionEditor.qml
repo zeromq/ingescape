@@ -596,7 +596,7 @@ WindowBlockTouches {
                                         }
                                     }
 
-                                    // Agent's Inputs/Outputs
+                                    // Agent's Inputs/Outputs/Parameters
                                     IngeScapeComboboxItemModelAgentsIOP {
                                         id: iopEffectsCombo
 
@@ -608,6 +608,10 @@ WindowBlockTouches {
 
                                         height: 25
                                         width: 148
+
+                                        inputsNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.inputsNumber : 0
+                                        outputsNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.outputsNumber : 0
+                                        parametersNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.parametersNumber : 0
 
                                         visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE)
                                         enabled: visible
