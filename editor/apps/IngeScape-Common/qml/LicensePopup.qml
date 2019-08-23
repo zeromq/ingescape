@@ -23,8 +23,8 @@ import INGESCAPE 1.0
 I2PopupBase {
     id: rootItem
 
-    width: 500
-    height: 500
+    width: 600
+    height: 750
 
     dismissOnOutsideTap: false
 
@@ -107,30 +107,146 @@ I2PopupBase {
         radius: 5
     }
 
+    Text {
+        id: title
+
+        anchors {
+            top: parent.top
+            topMargin: 25
+            horizontalCenter: parent.horizontalCenter
+        }
+
+        text: qsTr("Licenses")
+
+        color: IngeScapeTheme.whiteColor
+        font {
+            family: IngeScapeTheme.textFontFamily
+            weight : Font.Medium
+            pixelSize : 23
+        }
+    }
+
+
     Column {
         anchors {
-            fill: parent
-            margins: 20
+            left: parent.left
+            right: parent.right
+            top: title.bottom
+            bottom: parent.bottom
+            margins: 25
         }
 
         spacing: 6
 
         Text {
-            id: title
-
-            text: qsTr("Licenses")
+            text: qsTr("Directory path")
 
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight : Font.Medium
-                pixelSize : 23
+                pixelSize : 16
             }
         }
 
         Item {
-            id: space1
 
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+
+            TextField {
+                id: txtLicensesPath
+
+                anchors {
+                    left: parent.left
+                    right: btnSelectLicencesDirectory.left
+                    rightMargin: 10
+                }
+                height: btnSelectLicencesDirectory.height
+                verticalAlignment: TextInput.AlignVCenter
+
+                text: "" //rootItem.controller.licensesPath
+
+                enabled: false
+
+                style: I2TextFieldStyle {
+                    backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                    backgroundDisabledColor: IngeScapeTheme.darkBlueGreyColor
+
+                    borderColor: IngeScapeTheme.whiteColor
+                    borderDisabledColor: IngeScapeTheme.whiteColor
+
+                    borderErrorColor: IngeScapeTheme.redColor
+
+                    radiusTextBox: 1
+                    borderWidth: 0;
+                    borderWidthActive: 1
+
+                    textIdleColor: IngeScapeTheme.whiteColor
+                    textDisabledColor: IngeScapeTheme.whiteColor
+
+                    padding.left: 3
+                    padding.right: 3
+
+                    font {
+                        pixelSize:15
+                        family: IngeScapeTheme.textFontFamily
+                    }
+
+                }
+            }
+
+            Button {
+                id: btnSelectLicencesDirectory
+
+                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+                anchors {
+                    right: parent.right
+                }
+
+                height: boundingBox.height
+                width: boundingBox.width
+
+                text: "Change..."
+                activeFocusOnPress: true
+
+                style: I2SvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button"
+                    disabledID: releasedID + "-disabled"
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+                    labelColorPressed: IngeScapeTheme.blackColor
+                    labelColorReleased: IngeScapeTheme.whiteColor
+                    labelColorDisabled: IngeScapeTheme.whiteColor
+
+                }
+
+                onClicked: {
+                    if (rootItem.controller)
+                    {
+                        var directoryPath = rootItem.controller.selectLicensesDirectory();
+                        if (directoryPath) {
+                            txtLicensesPath.text = directoryPath;
+
+                            rootItem.controller.updateLicensesPath(directoryPath);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Vertical space
+        Item {
             anchors {
                 left: parent.left
                 right: parent.right
@@ -199,9 +315,8 @@ I2PopupBase {
             }
         }
 
+        // Vertical space
         Item {
-            id: space2
-
             anchors {
                 left: parent.left
                 right: parent.right
@@ -259,9 +374,8 @@ I2PopupBase {
             }
         }
 
+        // Vertical space
         Item {
-            id: space3
-
             anchors {
                 left: parent.left
                 right: parent.right
@@ -269,110 +383,121 @@ I2PopupBase {
             height: 10
         }
 
-        Row {
-            spacing: 10
+        Text {
+            text: rootItem.controller ? qsTr("Maximum number of agents: %1").arg(rootItem.controller.maxNbOfAgents) : ""
 
-            Text {
-                text: qsTr("License path")
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight : Font.Medium
-                    pixelSize : 16
-                }
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                //weight: Font.Medium
+                pixelSize: 16
             }
+        }
+        Text {
+            text: rootItem.controller ? qsTr("Maximum number of agents inputs/outputs/parameters: %1").arg(rootItem.controller.maxNbOfIOPs) : ""
 
-            Button {
-                id: btnSelectLicencesDirectory
-
-                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-                activeFocusOnPress: true
-
-                height: boundingBox.height
-                width: boundingBox.width
-
-                text: "Change..."
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.whiteColor
-
-                }
-
-                onClicked: {
-                    if (rootItem.controller)
-                    {
-                        var directoryPath = rootItem.controller.selectLicensesDirectory();
-                        if (directoryPath) {
-                            txtLicensesPath.text = directoryPath;
-                        }
-                    }
-                }
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                //weight: Font.Medium
+                pixelSize: 16
             }
         }
 
-        TextField {
-            id: txtLicensesPath
-
+        // Vertical space
+        Item {
             anchors {
                 left: parent.left
                 right: parent.right
             }
-            height: 25
-            verticalAlignment: TextInput.AlignVCenter
+            height: 10
+        }
 
-            text: "" //rootItem.controller.licensesPath
+        Text {
+            text: rootItem.controller ? qsTr("Features:") : ""
 
-            enabled: false
-
-            style: I2TextFieldStyle {
-                backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                backgroundDisabledColor: IngeScapeTheme.darkBlueGreyColor
-
-                borderColor: IngeScapeTheme.whiteColor
-                borderDisabledColor: IngeScapeTheme.whiteColor
-
-                borderErrorColor: IngeScapeTheme.redColor
-
-                radiusTextBox: 1
-                borderWidth: 0;
-                borderWidthActive: 1
-
-                textIdleColor: IngeScapeTheme.whiteColor
-                textDisabledColor: IngeScapeTheme.whiteColor
-
-                padding.left: 3
-                padding.right: 3
-
-                font {
-                    pixelSize:15
-                    family: IngeScapeTheme.textFontFamily
-                }
-
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 16
             }
         }
 
-        Item {
-            id: space4
+        Repeater {
+            model: rootItem.controller ? rootItem.controller.featureNames : null
 
+            Text {
+                text: " - " + modelData
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    //weight: Font.Medium
+                    pixelSize: 16
+                }
+            }
+        }
+
+        // Vertical space
+        Item {
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            height: 10
+        }
+
+        Text {
+            text: rootItem.controller ? qsTr("Agents:") : ""
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 16
+            }
+        }
+
+        Repeater {
+            model: rootItem.controller ? rootItem.controller.agentNames : null
+
+            Text {
+                text: " - " + modelData
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    //weight: Font.Medium
+                    pixelSize: 16
+                }
+            }
+        }
+
+        // Vertical space
+        Item {
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            height: 10
+        }
+
+        Text {
+            text: rootItem.controller ? qsTr("Files:") : ""
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 16
+            }
+        }
+
+        // FIXME TODO: list of licenseM
+
+        // Vertical space
+        Item {
             anchors {
                 left: parent.left
                 right: parent.right

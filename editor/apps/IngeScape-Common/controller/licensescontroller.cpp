@@ -84,7 +84,9 @@ LicensesController::LicensesController(QObject *parent) : QObject(parent),
     _editorOwner(""),
     _editorExpirationDate(QDate()),
     _maxNbOfAgents(0),
-    _maxNbOfIOPs(0)
+    _maxNbOfIOPs(0),
+    _featureNames(QStringList()),
+    _agentNames(QStringList())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -231,20 +233,75 @@ void LicensesController::_getLicensesData()
 
         qDebug() << "Nb MAX Agents" << _maxNbOfAgents << "Nb MAX IOPs" << _maxNbOfIOPs;
 
-        // FIXME TODO: zhash_t *features
+
+        //
+        // Features
+        //
+        QStringList featureNamesTemp = QStringList();
+
         if ((license->features != nullptr) && (zhash_size(license->features) > 0))
         {
-            qDebug() << "FIXME TODO: zhash_t *features (" << zhash_size(license->features) << "features)";
+            //qDebug() << zhash_size(license->features) << "features";
+
+            zlist_t *keys = zhash_keys(license->features);
+            if (keys != nullptr)
+            {
+                //qDebug() << zlist_size(keys) << "keys";
+
+                char* key = (char*)zlist_first(keys);
+                while (key != nullptr)
+                {
+                    //qDebug() << "key" << QString(key);
+
+                    featureNamesTemp.append(QString(key));
+
+                    key = (char*)zlist_next(keys);
+                }
+            }
         }
-        // FIXME TODO: zhash_t *agents
+        setfeatureNames(featureNamesTemp);
+        qInfo() << "Features" << _featureNames;
+
+
+        //
+        // Licenses for agents
+        //
+        QStringList agentNamesTemp = QStringList();
+
         if ((license->agents != nullptr) && (zhash_size(license->agents) > 0))
         {
-            qDebug() << "FIXME TODO: zhash_t *agents (" << zhash_size(license->agents) << "agents)";
+            //qDebug() << zhash_size(license->agents) << "agents";
+
+            licenseForAgent_t* agent = (licenseForAgent_t *)zhash_first(license->agents);
+            while (agent != nullptr)
+            {
+                //qDebug() << "name" << agent->agentName << "(" << agent->agentId << ")";
+
+                agentNamesTemp.append(QString(agent->agentName));
+
+                agent = (licenseForAgent_t *)zhash_next(license->agents);
+            }
         }
-        // FIXME TODO: zlist_t *licenseDetails;
-        if (license->licenseDetails != nullptr)
+        setagentNames(agentNamesTemp);
+        qInfo() << "Agents" << _agentNames;
+
+
+        //
+        // License details
+        //
+        if ((license->licenseDetails != nullptr) && (zlist_size(license->licenseDetails) > 0))
         {
-            qDebug() << "FIXME TODO: zlist_t *licenseDetails (" << zlist_size(license->licenseDetails) << "license details)";
+            qDebug() << zlist_size(license->licenseDetails) << "license details";
+
+            license_t* detail = (license_t*)zlist_first(license->licenseDetails);
+            while (detail != nullptr)
+            {
+                qDebug() << "detail" << detail->id << "fileName" << detail->fileName;
+
+                // FIXME TODO: create the list of licenseM
+
+                detail = (license_t *)zlist_next(license->licenseDetails);
+            }
         }
     }
 }

@@ -63,6 +63,14 @@ class LicensesController : public QObject
     // Max number of agents I/O/P in the platform
     I2_QML_PROPERTY_READONLY(int, maxNbOfIOPs)
 
+    // Names of each feature
+    I2_QML_PROPERTY(QStringList, featureNames)
+
+    // Names of each agent
+    I2_QML_PROPERTY(QStringList, agentNames)
+
+    // FIXME TODO: list of licenseM
+
 
 public:
 
