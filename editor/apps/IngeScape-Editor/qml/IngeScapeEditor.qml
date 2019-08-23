@@ -112,7 +112,7 @@ Item {
         }
 
         // ...we check the value of the flag "is Valid License"
-        /*if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isValidLicense)
+        /*if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isLicenseValid)
         {
             openLicensePopup();
         }*/
@@ -124,9 +124,16 @@ Item {
 
         //ignoreUnknownSignals: true
 
-        onIsValidLicenseChanged: {
-            console.log("QML (IngeScape Editor): on is Valid License Changed");
-            if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isValidLicense) {
+        onIsLicenseValidChanged: {
+            console.log("QML (IngeScape Editor): on is License Valid Changed");
+            if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isLicenseValid) {
+                openLicensePopup();
+            }
+        }
+
+        onIsEditorLicenseValidChanged: {
+            console.log("QML (IngeScape Editor): on is Editor License Valid Changed");
+            if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isEditorLicenseValid) {
                 openLicensePopup();
             }
         }

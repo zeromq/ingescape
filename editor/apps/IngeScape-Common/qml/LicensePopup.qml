@@ -142,7 +142,7 @@ I2PopupBase {
             spacing: 10
 
             Text {
-                text: qsTr("Validity:")
+                text: qsTr("License validity:")
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -158,10 +158,44 @@ I2PopupBase {
 
             Rectangle {
                 id: flag
-                width: 16
-                height: 16
-                radius: 8
-                color: rootItem.controller && rootItem.controller.isValidLicense ? "green" : "red"
+                width: 20
+                height: 20
+                radius: 10
+                color: rootItem.controller && rootItem.controller.isLicenseValid ? "green" : "red"
+            }
+        }
+
+        Text {
+            text: rootItem.controller ? qsTr("Customer: %1").arg(rootItem.controller.licenseCustomer) : ""
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
+        }
+
+        Text {
+            text: rootItem.controller ? qsTr("Order: %1").arg(rootItem.controller.licenseOrder) : ""
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
+        }
+
+        Text {
+            text: rootItem.controller ? qsTr("Expiration date: %1").arg(rootItem.controller.licenseExpirationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy"))
+                                      : ""
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
             }
         }
 
@@ -175,19 +209,49 @@ I2PopupBase {
             height: 10
         }
 
-        Text {
-            id: errorMessage
+        Row {
+            spacing: 10
 
-            anchors {
-                left: parent.left
-                right: parent.right
-                //verticalCenter: parent.verticalCenter
+            Text {
+                text: qsTr("Editor license validity:")
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 16
+                }
             }
-            wrapMode: Text.WordWrap
 
-            text: rootItem.controller ? rootItem.controller.errorMessageWhenLicenseFailed : ""
+            Rectangle {
+                id: flagEditor
+                width: 20
+                height: 20
+                radius: 10
+                color: rootItem.controller && rootItem.controller.isEditorLicenseValid ? "green" : "red"
+            }
+        }
 
-            color: IngeScapeTheme.orangeColor
+        Text {
+            text: rootItem.controller ? qsTr("Editor owner: %1").arg(rootItem.controller.editorOwner) : ""
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
+        }
+
+        Text {
+            text: rootItem.controller ? qsTr("Editor expiration date: %1").arg(rootItem.controller.editorExpirationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy"))
+                                      : ""
+
+            color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight : Font.Medium
@@ -306,6 +370,35 @@ I2PopupBase {
             }
         }
 
+        Item {
+            id: space4
+
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            height: 10
+        }
+
+        Text {
+            id: errorMessage
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                //verticalCenter: parent.verticalCenter
+            }
+            wrapMode: Text.WordWrap
+
+            text: rootItem.controller ? rootItem.controller.errorMessageWhenLicenseFailed : ""
+
+            color: IngeScapeTheme.orangeColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
+        }
     }
 
 

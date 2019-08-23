@@ -30,11 +30,38 @@ class LicensesController : public QObject
     // Path to the directory with IngeScape licenses
     I2_QML_PROPERTY_READONLY(QString, licensesPath)
 
-    // Flag indicating if the license is valid for our editor
-    I2_QML_PROPERTY_READONLY(bool, isValidLicense)
-
     // Error message when the IngeScape license is not valid
     I2_QML_PROPERTY_READONLY(QString, errorMessageWhenLicenseFailed)
+
+    // Flag indicating if the IngeScape license is valid
+    I2_QML_PROPERTY_READONLY(bool, isLicenseValid)
+
+    //
+    I2_CPP_NOSIGNAL_PROPERTY(QString, licenseId)
+
+    //
+    I2_QML_PROPERTY_READONLY(QString, licenseCustomer)
+
+    //
+    I2_QML_PROPERTY_READONLY(QString, licenseOrder)
+
+    //
+    I2_QML_PROPERTY_READONLY(QDate, licenseExpirationDate)
+
+    // Flag indicating if the license of our editor is valid
+    I2_QML_PROPERTY_READONLY(bool, isEditorLicenseValid)
+
+    //
+    I2_QML_PROPERTY_READONLY(QString, editorOwner)
+
+    //
+    I2_QML_PROPERTY_READONLY(QDate, editorExpirationDate)
+
+    // Max number of agents in the platform
+    I2_QML_PROPERTY_READONLY(int, maxNbOfAgents)
+
+    // Max number of agents I/O/P in the platform
+    I2_QML_PROPERTY_READONLY(int, maxNbOfIOPs)
 
 
 public:

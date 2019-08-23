@@ -55,8 +55,9 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
             break;
         }
 
-        // Update the flag
-        licensesController->setisValidLicense(false);
+        // Update flags
+        licensesController->setisLicenseValid(false);
+        //licensesController->setisEditorLicenseValid(false);
     }
 }
 
@@ -73,8 +74,17 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
  */
 LicensesController::LicensesController(QObject *parent) : QObject(parent),
     _licensesPath(""),
-    _isValidLicense(false),
-    _errorMessageWhenLicenseFailed("")
+    _errorMessageWhenLicenseFailed(""),
+    _isLicenseValid(false),
+    _licenseId(""),
+    _licenseCustomer(""),
+    _licenseOrder(""),
+    _licenseExpirationDate(QDate()),
+    _isEditorLicenseValid(false),
+    _editorOwner(""),
+    _editorExpirationDate(QDate()),
+    _maxNbOfAgents(0),
+    _maxNbOfIOPs(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -176,30 +186,65 @@ void LicensesController::_getLicensesData()
 
     if (license != nullptr)
     {
-        QDateTime licenseExpirationDate = QDateTime::fromSecsSinceEpoch(license->licenseExpirationDate);
-        QDateTime editorExpirationDate = QDateTime::fromSecsSinceEpoch(license->editorExpirationDate);
+        QDateTime licenseExpirationDateTime = QDateTime::fromSecsSinceEpoch(license->licenseExpirationDate);
+        setlicenseExpirationDate(licenseExpirationDateTime.date());
 
-        if (license->isLicenseValid && license->isEditorLicenseValid)
+        QDateTime editorExpirationDateTime = QDateTime::fromSecsSinceEpoch(license->editorExpirationDate);
+        seteditorExpirationDate(editorExpirationDateTime.date());
+
+        setmaxNbOfAgents(license->platformNbAgents);
+        setmaxNbOfIOPs(license->platformNbIOPs);
+
+        if (license->isLicenseValid)
         {
-            qInfo() << "VALID License: id" << QString(license->id) << "order" << QString(license->order) << "customer" << QString(license->customer) << "licenseExpirationDate" << licenseExpirationDate;
-            qInfo() << "VALID EDITOR License: editorOwner" << QString(license->editorOwner) << "editorExpirationDate" << editorExpirationDate;
-            qDebug() << "Nb MAX Agents" << license->platformNbAgents << "Nb MAX IOPs" << license->platformNbIOPs;
+            setlicenseId(license->id);
+            setlicenseCustomer(license->customer);
+            setlicenseOrder(license->order);
+            setisLicenseValid(true);
 
-            // Update flag
-            setisValidLicense(true);
+            qInfo() << "VALID License: id" << _licenseId << "order" << _licenseOrder << "customer" << _licenseCustomer << "licenseExpirationDate" << _licenseExpirationDate;
         }
         else
         {
-            if (!license->isLicenseValid) {
-                qInfo() << "IN-valid License: id" << QString(license->id) << "order" << QString(license->order) << "customer" << QString(license->customer) << "licenseExpirationDate" << licenseExpirationDate;
-            }
-            else { //if (!license->isEditorLicenseValid) {
-                qInfo() << "IN-valid EDITOR License: editorOwner" << QString(license->editorOwner) << "editorExpirationDate" << editorExpirationDate;
-            }
-            qDebug() << "Nb MAX Agents" << QString(license->platformNbAgents) << "Nb MAX IOPs" << QString(license->platformNbIOPs);
+            setlicenseId("");
+            setlicenseCustomer("");
+            setlicenseOrder("");
+            setisLicenseValid(false);
 
-            // Update flag
-            setisValidLicense(false);
+            qInfo() << "IN-valid License: id" << QString(license->id) << "order" << QString(license->order) << "customer" << QString(license->customer) << "licenseExpirationDate" << _licenseExpirationDate;
+        }
+
+        if (license->isEditorLicenseValid)
+        {
+            seteditorOwner(license->editorOwner);
+            setisEditorLicenseValid(true);
+
+            qInfo() << "VALID EDITOR License: editorOwner" << _editorOwner << "editorExpirationDate" << _editorExpirationDate;
+        }
+        else
+        {
+            seteditorOwner("");
+            setisEditorLicenseValid(false);
+
+            qInfo() << "IN-valid EDITOR License: editorOwner" << QString(license->editorOwner) << "editorExpirationDate" << _editorExpirationDate;
+        }
+
+        qDebug() << "Nb MAX Agents" << _maxNbOfAgents << "Nb MAX IOPs" << _maxNbOfIOPs;
+
+        // FIXME TODO: zhash_t *features
+        if ((license->features != nullptr) && (zhash_size(license->features) > 0))
+        {
+            qDebug() << "FIXME TODO: zhash_t *features (" << zhash_size(license->features) << "features)";
+        }
+        // FIXME TODO: zhash_t *agents
+        if ((license->agents != nullptr) && (zhash_size(license->agents) > 0))
+        {
+            qDebug() << "FIXME TODO: zhash_t *agents (" << zhash_size(license->agents) << "agents)";
+        }
+        // FIXME TODO: zlist_t *licenseDetails;
+        if (license->licenseDetails != nullptr)
+        {
+            qDebug() << "FIXME TODO: zlist_t *licenseDetails (" << zlist_size(license->licenseDetails) << "license details)";
         }
     }
 }
