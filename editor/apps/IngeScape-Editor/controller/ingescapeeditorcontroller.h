@@ -328,13 +328,6 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when an error occured about the IngeScape license
-     * @param limit
-     */
-    void _onLicenseErrorOccured(QString limit);
-
-
-    /**
      * @brief Slot called when the licenses have been updated
      */
     void _onLicensesUpdated();

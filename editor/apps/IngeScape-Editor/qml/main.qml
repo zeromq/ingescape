@@ -115,7 +115,7 @@ ApplicationWindow {
                 onTriggered: {
                     if (applicationLoader.item) {
                         console.log("QML: Open license configuration popup");
-                        applicationLoader.item.openLicense();
+                        applicationLoader.item.openLicensePopup();
                     }
                 }
             }
@@ -396,11 +396,13 @@ ApplicationWindow {
     }
 
 
-    //----------------------------------
+    //--------------------------------------------------------
+    //
     //
     // Behaviors
     //
-    //----------------------------------
+    //
+    //--------------------------------------------------------
 
     Component.onCompleted: {
         // Define the window associated to Qt Quick inspector

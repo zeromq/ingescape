@@ -89,20 +89,48 @@ Item {
     //
     // Function allowing to open the license (configuration) popup
     //
-    function openLicense() {
+    function openLicensePopup() {
         licensePopup.open();
     }
 
 
-    // When the QML is loaded, we check the value of the error message when a connection attempt fails
+    //--------------------------------------------------------
+    //
+    //
+    // Behaviors
+    //
+    //
+    //--------------------------------------------------------
+
+    // When the QML is loaded...
     Component.onCompleted: {
+        // ...we check the value of the error message when a connection attempt fails
         if (IngeScapeEditorC.errorMessageWhenConnectionFailed !== "")
         {
             //console.error("On Completed: Error Message = " + IngeScapeEditorC.errorMessageWhenConnectionFailed);
             networkConfigurationPopup.open();
         }
+
+        // ...we check the value of the flag "is Valid License"
+        /*if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isValidLicense)
+        {
+            openLicensePopup();
+        }*/
     }
 
+
+    Connections {
+        target: IngeScapeEditorC.licensesC
+
+        //ignoreUnknownSignals: true
+
+        onIsValidLicenseChanged: {
+            console.log("QML (IngeScape Editor): on is Valid License Changed");
+            if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isValidLicense) {
+                openLicensePopup();
+            }
+        }
+    }
 
 
     //--------------------------------------------------------

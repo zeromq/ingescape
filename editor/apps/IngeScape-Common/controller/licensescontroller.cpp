@@ -17,6 +17,12 @@
 #include <settings/ingescapesettings.h>
 #include <QFileDialog>
 
+extern "C" {
+#include <ingescape.h>
+//#include <ingescape_advanced.h>
+#include <ingescape_private.h>
+}
+
 
 /**
  * @brief onLicenseCallback
@@ -28,26 +34,29 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
     LicensesController* licensesController = (LicensesController*)myData;
     if (licensesController != nullptr)
     {
-        // Emit the signal "License Error Occured"
-        Q_EMIT licensesController->licenseErrorOccured("TODO");
-
         switch (limit)
         {
         case IGS_LICENSE_TIMEOUT:
             qCritical("IngeScape is stopped because demonstration mode timeout has been reached");
+            licensesController->seterrorMessageWhenLicenseFailed("IngeScape is stopped because demonstration mode timeout has been reached !");
             break;
 
         case IGS_LICENSE_TOO_MANY_AGENTS:
-            qCritical("IngeScape is stopped because too many agents are running on the platform compared to what the license allows");
+            qCritical("IngeScape is stopped because too many agents are running on the platform compared to what the license allows !");
+            licensesController->seterrorMessageWhenLicenseFailed("IngeScape is stopped because too many agents are running on the platform compared to what the license allows !");
             break;
 
         case IGS_LICENSE_TOO_MANY_IOPS:
             qCritical("IngeScape is stopped because too many IOPs have been created on the platform compared to what the license allows");
+            licensesController->seterrorMessageWhenLicenseFailed("IngeScape is stopped because too many IOPs have been created on the platform compared to what the license allows !");
             break;
 
         default:
             break;
         }
+
+        // Update the flag
+        licensesController->setisValidLicense(false);
     }
 }
 
@@ -64,7 +73,8 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
  */
 LicensesController::LicensesController(QObject *parent) : QObject(parent),
     _licensesPath(""),
-    _isValidLicense(false)
+    _isValidLicense(false),
+    _errorMessageWhenLicenseFailed("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

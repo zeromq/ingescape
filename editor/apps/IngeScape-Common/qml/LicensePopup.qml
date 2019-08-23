@@ -140,6 +140,74 @@ I2PopupBase {
 
         Row {
             spacing: 10
+
+            Text {
+                text: qsTr("Validity:")
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+
+                color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 16
+                }
+            }
+
+            Rectangle {
+                id: flag
+                width: 16
+                height: 16
+                radius: 8
+                color: rootItem.controller && rootItem.controller.isValidLicense ? "green" : "red"
+            }
+        }
+
+        Item {
+            id: space2
+
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            height: 10
+        }
+
+        Text {
+            id: errorMessage
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                //verticalCenter: parent.verticalCenter
+            }
+            wrapMode: Text.WordWrap
+
+            text: rootItem.controller ? rootItem.controller.errorMessageWhenLicenseFailed : ""
+
+            color: IngeScapeTheme.orangeColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
+        }
+
+        Item {
+            id: space3
+
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            height: 10
+        }
+
+        Row {
+            spacing: 10
+
             Text {
                 text: qsTr("License path")
 
