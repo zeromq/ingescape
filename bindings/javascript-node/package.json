@@ -1,0 +1,15 @@
+{
+  "name": "ingescape",
+  "version": "0.9.1",
+  "description": "Ingescape module for NodeJS",
+  "gypfile": true,
+  "main": "./build/Release/addon",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node-gyp configure build",
+    "clean": "node-gyp clean"
+  },
+  "author": "Chloé Roumieu",
+  "license": "todo",
+  "repository": ""
+}
