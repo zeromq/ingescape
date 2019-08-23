@@ -579,9 +579,7 @@ char *igs_getLicensePath(void){
 }
 
 bool igs_checkLicenseForAgent(const char *agentId){
-    if (license == NULL){
-        license_readLicense();
-    }
+    license_readLicense();
     if (agentId == NULL)
         return false;
     licenseForAgent_t *l = zhash_first(license->agents);
