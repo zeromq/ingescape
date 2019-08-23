@@ -260,113 +260,38 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
     {
         qDebug() << "Subjects Controller: on Current Experimentation changed" << currentExperimentation->name();
 
-        CassUuid uidExperimentation = currentExperimentation->getCassUuid();
+        // Retrieve the experimentation's characteristics
+        QList<CharacteristicM*> characteristicList = AssessmentsModelManager::select<CharacteristicM>({ currentExperimentation->getCassUuid() });
 
-        // Create the query
-        QString queryGetCharacteristics = QString("SELECT * FROM " + CharacteristicM::table + " WHERE id_experimentation = ?;");
-
-        // Creates the new query statement
-        CassStatement* cassStatementGetCharacteristics = cass_statement_new(queryGetCharacteristics.toStdString().c_str(), 1);
-        cass_statement_bind_uuid(cassStatementGetCharacteristics, 0, uidExperimentation);
-
-        // Execute the query or bound statement
-        CassFuture* cassFutureGetCharacteristics = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatementGetCharacteristics);
-
-        CassError cassErrorGetCharacteristics = cass_future_error_code(cassFutureGetCharacteristics);
-        if (cassErrorGetCharacteristics == CASS_OK)
+        if (characteristicList.isEmpty())
         {
-            qDebug() << "Get all characteristics succeeded";
+            qDebug() << "There is NO characteristic...create the special characteristic 'id'";
 
-            // Retrieve result set and iterate over the rows
-            const CassResult* cassResult = cass_future_get_result(cassFutureGetCharacteristics);
+            // Create the new characteristic
+            CharacteristicM* subjectIdCharacteristic = new CharacteristicM(AssessmentsModelManager::genCassUuid(), currentExperimentation->getCassUuid(), CHARACTERISTIC_SUBJECT_ID, CharacteristicValueTypes::TEXT);
 
-            if (cassResult != nullptr)
+            if (subjectIdCharacteristic != nullptr)
             {
-                size_t characteristicsNumber = cass_result_row_count(cassResult);
-                if (characteristicsNumber == 0)
-                {
-                    qDebug() << "There is NO characteristic...create the special characteristic 'id'";
+                // Insert the new characteristic into DB
+                AssessmentsModelManager::insert(*subjectIdCharacteristic);
 
-                    CassUuid characteristicUid;
-                    cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &characteristicUid);
-
-                    QString characteristicName = CHARACTERISTIC_SUBJECT_ID;
-                    CharacteristicValueTypes::Value characteristicValueType = CharacteristicValueTypes::TEXT;
-
-                    // Create the query
-                    QString queryInsertCharacteristic = QString("INSERT INTO " + CharacteristicM::table + " (id, id_experimentation, name, value_type, enum_values) VALUES (?, ?, ?, ?, ?);");
-
-                    // Creates the new query statement
-                    CassStatement* cassStatementInsertCharacteristic = cass_statement_new(queryInsertCharacteristic.toStdString().c_str(), 5);
-                    cass_statement_bind_uuid(cassStatementInsertCharacteristic, 0, characteristicUid);
-                    cass_statement_bind_uuid(cassStatementInsertCharacteristic, 1, uidExperimentation);
-                    cass_statement_bind_string(cassStatementInsertCharacteristic, 2, characteristicName.toStdString().c_str());
-                    cass_statement_bind_int8(cassStatementInsertCharacteristic, 3, characteristicValueType);
-                    CassCollection* emptyList = cass_collection_new(CASS_COLLECTION_TYPE_LIST, 0);
-                    cass_statement_bind_collection(cassStatementInsertCharacteristic, 4, emptyList);
-                    cass_collection_free(emptyList);
-
-                    // Execute the query or bound statement
-                    CassFuture* cassFutureInsertCharacteristic = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatementInsertCharacteristic);
-
-                    CassError cassErrorInsertCharacteristic = cass_future_error_code(cassFutureInsertCharacteristic);
-                    if (cassErrorInsertCharacteristic == CASS_OK)
-                    {
-                        qInfo() << "CharacteristicM" << characteristicName << "inserted into the DataBase";
-
-                        // Create the new characteristic
-                        CharacteristicM* characteristic = new CharacteristicM(characteristicUid, currentExperimentation->getCassUuid(), characteristicName, characteristicValueType);
-
-                        // Add the characteristic to the current experimentation
-                        _currentExperimentation->addCharacteristic(characteristic);
-                    }
-                    else {
-                        qCritical() << "Could not insert the experimentation" << characteristicName << "into the DataBase:" << cass_error_desc(cassErrorInsertCharacteristic);
-                    }
-
-                    cass_statement_free(cassStatementInsertCharacteristic);
-                    cass_future_free(cassFutureInsertCharacteristic);
-                }
-                else
-                {
-                    qDebug() << "There are" << characteristicsNumber << "characteristics";
-
-                    CassIterator* cassIterator = cass_iterator_from_result(cassResult);
-
-                    while(cass_iterator_next(cassIterator))
-                    {      
-                        const CassRow* row = cass_iterator_get_row(cassIterator);
-
-                        CassUuid characteristicUid;
-                        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &characteristicUid);
-
-                        // Get the characteristic from its UID
-                        CharacteristicM* characteristic = currentExperimentation->getCharacteristicFromUID(characteristicUid);
-
-                        // It does not yet exist
-                        if (characteristic == nullptr)
-                        {
-                            QString characteristicName = AssessmentsModelManager::getStringValueFromColumnName(row, "name");
-
-                            CharacteristicValueTypes::Value characteristicValueType = CharacteristicValueTypes::UNKNOWN;
-                            int8_t type;
-                            cass_value_get_int8(cass_row_get_column_by_name(row, "value_type"), &type);
-                            characteristicValueType = static_cast<CharacteristicValueTypes::Value>(type);
-
-                            // Create the characteristic
-                            characteristic = new CharacteristicM(characteristicUid, currentExperimentation->getCassUuid(), characteristicName, characteristicValueType);
-
-                            // Add the characteristic to the current experimentation
-                            _currentExperimentation->addCharacteristic(characteristic);
-                        }
-                    }
-
-                    cass_iterator_free(cassIterator);
-                }
+                // Add the characteristic to the current experimentation
+                _currentExperimentation->addCharacteristic(subjectIdCharacteristic);
             }
         }
-        else {
-            qCritical() << "Could not get all characteristics from the DataBase:" << cass_error_desc(cassErrorGetCharacteristics);
+        else
+        {
+            qDebug() << "There are" << characteristicList.size() << "characteristics";
+
+            for (CharacteristicM* characteristic : characteristicList)
+            {
+                // It does not yet exist
+                if (characteristic != nullptr)
+                {
+                    // Add the characteristic to the current experimentation
+                    _currentExperimentation->addCharacteristic(characteristic);
+                }
+            }
         }
     }
 }
@@ -382,41 +307,12 @@ void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* curr
  */
 CharacteristicM* SubjectsController::_insertCharacteristicIntoDB(CassUuid experimentationUuid, const QString& name, CharacteristicValueTypes::Value valueType, const QStringList& enumValues)
 {
-    CharacteristicM* characteristic = nullptr;
-
-    CassUuid characteristicUuid;
-    cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &characteristicUuid);
-
-    QString queryStr = "INSERT INTO " + CharacteristicM::table + " (id_experimentation, id, name, value_type, enum_values) VALUES (?, ?, ?, ?, ?);";
-    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 5);
-    cass_statement_bind_uuid  (cassStatement, 0, experimentationUuid);
-    cass_statement_bind_uuid  (cassStatement, 1, characteristicUuid);
-    cass_statement_bind_string(cassStatement, 2, name.toStdString().c_str());
-    cass_statement_bind_int8  (cassStatement, 3, static_cast<int8_t>(valueType));
-    CassCollection* enumValuesCassList = cass_collection_new(CASS_COLLECTION_TYPE_LIST, static_cast<size_t>(enumValues.size()));
-    for(QString enumValue : enumValues) {
-        cass_collection_append_string(enumValuesCassList, enumValue.toStdString().c_str());
-    }
-    cass_statement_bind_collection(cassStatement, 4, enumValuesCassList);
-    cass_collection_free(enumValuesCassList);
-
-    // Execute the query or bound statement
-    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-    CassError cassError = cass_future_error_code(cassFuture);
-    if (cassError == CASS_OK)
+    CharacteristicM* characteristic = new CharacteristicM(AssessmentsModelManager::genCassUuid(), experimentationUuid, name, valueType, enumValues);
+    if (characteristic == nullptr || !AssessmentsModelManager::insert(*characteristic))
     {
-        qInfo() << "New characteristic inserted into the DB";
-
-        // Create the new task
-        characteristic = new CharacteristicM(characteristicUuid, experimentationUuid, name, valueType, enumValues);
-
+        delete characteristic;
+        characteristic = nullptr;
     }
-    else {
-        qCritical() << "Could not insert the new characteristic into the DB:" << cass_error_desc(cassError);
-    }
-
-    cass_statement_free(cassStatement);
-    cass_future_free(cassFuture);
 
     return characteristic;
 }
@@ -431,33 +327,12 @@ CharacteristicM* SubjectsController::_insertCharacteristicIntoDB(CassUuid experi
  */
 SubjectM* SubjectsController::_insertSubjectIntoDB(CassUuid experimentationUuid, const QString& displayed_id)
 {
-    SubjectM* subject = nullptr;
-
-    CassUuid subjectUuid;
-    cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &subjectUuid);
-
-    QString queryStr = "INSERT INTO " + SubjectM::table + " (id_experimentation, id, displayed_id) VALUES (?, ?, ?);";
-    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
-    cass_statement_bind_uuid  (cassStatement, 0, experimentationUuid);
-    cass_statement_bind_uuid  (cassStatement, 1, subjectUuid);
-    cass_statement_bind_string(cassStatement, 2, displayed_id.toStdString().c_str());
-
-    // Execute the query or bound statement
-    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-    CassError cassError = cass_future_error_code(cassFuture);
-    if (cassError == CASS_OK)
+    SubjectM* subject = new SubjectM(experimentationUuid, AssessmentsModelManager::genCassUuid(), displayed_id);
+    if (subject == nullptr || !AssessmentsModelManager::insert(*subject))
     {
-        qInfo() << "New subject inserted into the DB";
-
-        // Create the new task
-        subject = new SubjectM(experimentationUuid, subjectUuid, displayed_id);
+        delete subject;
+        subject = nullptr;
     }
-    else {
-        qCritical() << "Could not insert the new subject into the DB:" << cass_error_desc(cassError);
-    }
-
-    cass_statement_free(cassStatement);
-    cass_future_free(cassFuture);
 
     return subject;
 }

@@ -143,6 +143,15 @@ public:
     static void deleteTaskFromCassandraRow(const TaskM& task);
 
     /**
+     * @brief Create a CassStatement to insert an TaskM into the DB.
+     * The statement contains the values from the given task.
+     * Passed task must have a valid and unique UUID.
+     * @param task
+     * @return
+     */
+    static CassStatement* createBoundInsertStatement(const TaskM& task);
+
+    /**
      * @brief Initialize the temporary dependent variable with the given dependent variable
      * @param baseVariable
      */

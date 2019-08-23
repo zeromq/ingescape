@@ -234,6 +234,23 @@ void SubjectM::deleteSubjectFromCassandra(const SubjectM& subject)
 }
 
 /**
+ * @brief Create a CassStatement to insert an SubjectM into the DB.
+ * The statement contains the values from the given subject.
+ * Passed subject must have a valid and unique UUID.
+ * @param subject
+ * @return
+ */
+CassStatement* SubjectM::createBoundInsertStatement(const SubjectM& subject)
+{
+    QString queryStr = "INSERT INTO " + SubjectM::table + " (id_experimentation, id, displayed_id) VALUES (?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
+    cass_statement_bind_uuid  (cassStatement, 0, subject.getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 1, subject.getCassUuid());
+    cass_statement_bind_string(cassStatement, 2, subject.displayedId().toStdString().c_str());
+    return cassStatement;
+}
+
+/**
  * @brief Restore the temporary map values wih the ones from the actual value map
  */
 void SubjectM::resetTemporaryPropertyValues()

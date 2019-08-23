@@ -384,6 +384,30 @@ void ExperimentationM::deleteExperimentationFromCassandra(const ExperimentationM
     AssessmentsModelManager::deleteEntry<ExperimentationM>({ experimentation.getCassUuid() });
 }
 
+
+/**
+ * @brief Create a CassStatement to insert an ExperimentationM into the DB.
+ * The statement contains the values from the given experimentation.
+ * Passed experimentation must have a valid and unique UUID.
+ * @param experimentation
+ * @return
+ */
+CassStatement* ExperimentationM::createBoundInsertStatement(const ExperimentationM& experimentation)
+{
+    // Create the query
+    QString query = "INSERT INTO " + ExperimentationM::table + " (id, name, creation_date, creation_time, group_name) VALUES (?, ?, ?, ?, ?);";
+
+    // Creates the new query statement
+    CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 5);
+    cass_statement_bind_uuid  (cassStatement, 0, experimentation.getCassUuid());
+    cass_statement_bind_string(cassStatement, 1, experimentation.name().toStdString().c_str());
+    cass_statement_bind_uint32(cassStatement, 2, cass_date_from_epoch(experimentation.creationDate().toTime_t()));
+    cass_statement_bind_int64 (cassStatement, 3, cass_time_from_epoch(experimentation.creationDate().toTime_t()));
+    cass_statement_bind_string(cassStatement, 4, experimentation.groupName().toStdString().c_str());
+
+    return cassStatement;
+}
+
 /**
  * @brief Delete all tasks associated with the given experimentation
  * @param experimentation

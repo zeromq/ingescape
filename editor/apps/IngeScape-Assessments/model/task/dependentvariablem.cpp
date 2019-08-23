@@ -147,6 +147,27 @@ void DependentVariableM::deleteDependentVariableFromCassandraDB(const DependentV
 }
 
 /**
+ * @brief Create a CassStatement to insert an DependentVariableM into the DB.
+ * The statement contains the values from the given dependentVariable.
+ * Passed dependentVariable must have a valid and unique UUID.
+ * @param dependentVariable
+ * @return
+ */
+CassStatement* DependentVariableM::createBoundInsertStatement(const DependentVariableM& dependentVariable)
+{
+    QString queryStr = "INSERT INTO " + DependentVariableM::table + " (id_experimentation, id_task, id, name, description, agent_name, output_name) VALUES (?, ?, ?, ?, ?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
+    cass_statement_bind_uuid  (cassStatement, 0, dependentVariable.getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 1, dependentVariable.getTaskCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 2, dependentVariable.getCassUuid());
+    cass_statement_bind_string(cassStatement, 3, dependentVariable.name().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 4, dependentVariable.description().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 5, dependentVariable.agentName().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 6, dependentVariable.outputName().toStdString().c_str());
+    return cassStatement;
+}
+
+/**
  * @brief Create a clone of the current object.
  * Return nullptr in case of failure.
  * The caller is in charge of freeing the returned instance (if any).

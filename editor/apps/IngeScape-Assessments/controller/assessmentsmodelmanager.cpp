@@ -271,3 +271,15 @@ QString AssessmentsModelManager::cassUuidToQString(CassUuid cassUuid)
     cass_uuid_string(cassUuid, chrCassUuid);
     return QString(chrCassUuid);
 }
+
+
+/**
+ * @brief Helper function generating a Cassandra UUID
+ * @return
+ */
+CassUuid AssessmentsModelManager::genCassUuid()
+{
+    CassUuid uuid;
+    cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &uuid);
+    return uuid;
+}

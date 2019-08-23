@@ -126,3 +126,29 @@ void IndependentVariableM::deleteIndependentVariableFromCassandra(const Independ
     // Remove independent variable from DB
     AssessmentsModelManager::deleteEntry<IndependentVariableM>({ independentVariable.getExperimentationCassUuid(), independentVariable.getTaskCassUuid(), independentVariable.getCassUuid() });
 }
+
+/**
+ * @brief Create a CassStatement to insert an IndependentVariableM into the DB.
+ * The statement contains the values from the given independentVariable.
+ * Passed independentVariable must have a valid and unique UUID.
+ * @param independentVariable
+ * @return
+ */
+CassStatement* IndependentVariableM::createBoundInsertStatement(const IndependentVariableM& independentVariable)
+{
+    QString queryStr = "INSERT INTO " + IndependentVariableM::table + " (id_experimentation, id_task, id, name, description, value_type, enum_values) VALUES (?, ?, ?, ?, ?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
+    cass_statement_bind_uuid  (cassStatement, 0, independentVariable.getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 1, independentVariable.getTaskCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 2, independentVariable.getTaskCassUuid());
+    cass_statement_bind_string(cassStatement, 3, independentVariable.name().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 4, independentVariable.description().toStdString().c_str());
+    cass_statement_bind_int8  (cassStatement, 5, static_cast<int8_t>(independentVariable.valueType()));
+    CassCollection* enumValuesCassList = cass_collection_new(CASS_COLLECTION_TYPE_LIST, static_cast<size_t>(independentVariable.enumValues().size()));
+    for(QString enumValue : independentVariable.enumValues()) {
+        cass_collection_append_string(enumValuesCassList, enumValue.toStdString().c_str());
+    }
+    cass_statement_bind_collection(cassStatement, 6, enumValuesCassList);
+    cass_collection_free(enumValuesCassList);
+    return cassStatement;
+}
