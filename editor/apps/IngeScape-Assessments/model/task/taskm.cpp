@@ -228,6 +228,25 @@ void TaskM::deleteTaskFromCassandraRow(const TaskM& task)
     AssessmentsModelManager::deleteEntry<TaskM>({ task.getExperimentationCassUuid(), task.getCassUuid() });
 }
 
+
+/**
+ * @brief Create a CassStatement to insert an TaskM into the DB.
+ * The statement contains the values from the given task.
+ * Passed task must have a valid and unique UUID.
+ * @param task
+ * @return
+ */
+CassStatement* TaskM::createBoundInsertStatement(const TaskM& task)
+{
+    QString queryStr = "INSERT INTO " + TaskM::table + " (id_experimentation, id, name, platform_file) VALUES (?, ?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
+    cass_statement_bind_uuid  (cassStatement, 0, task.getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 1, task.getCassUuid());
+    cass_statement_bind_string(cassStatement, 2, task.name().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 3, task.platformFileUrl().toString().toStdString().c_str());
+    return cassStatement;
+}
+
 /**
  * @brief Initialize the temporary dependent variable with the given dependent variable
  * @param baseVariable

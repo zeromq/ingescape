@@ -69,8 +69,8 @@ TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
     _subject(nullptr),
     _task(nullptr),
     _startDateTime(startDateTime),
-    _endDateTime(QDateTime()),
-    _duration(QTime()),
+    _endDateTime(startDateTime),  //FIXME Need a way to compute actual endDateTime.
+    _duration(QTime()),           //FIXME Need a way to compute actual duration.
     _mapIndependentVariableValues(nullptr),
     _experimentationCassUuid(experimentationUuid),
     _subjectUuid(subjectUuid),
@@ -231,6 +231,30 @@ void TaskInstanceM::deleteTaskInstanceFromCassandra(const TaskInstanceM& taskIns
         // Delete the actual task instance from DB
         AssessmentsModelManager::deleteEntry<TaskInstanceM>({ taskInstance.subject()->getExperimentationCassUuid(), taskInstance.getSubjectCassUuid(), taskInstance.getTaskCassUuid(), taskInstance.getCassUuid() });
     }
+}
+
+/**
+ * @brief Create a CassStatement to insert an TaskInstanceM into the DB.
+ * The statement contains the values from the given taskInstance.
+ * Passed taskInstance must have a valid and unique UUID.
+ * @param taskInstance
+ * @return
+ */
+CassStatement* TaskInstanceM::createBoundInsertStatement(const TaskInstanceM& taskInstance)
+{
+    QString queryStr = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, name, comment, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
+    cass_statement_bind_uuid  (cassStatement, 0, taskInstance.getCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 1, taskInstance.task()->getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 2, taskInstance.subject()->getCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 3, taskInstance.task()->getCassUuid());
+    cass_statement_bind_string(cassStatement, 4, taskInstance.name().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 5, "");
+    cass_statement_bind_uint32(cassStatement, 6, cass_date_from_epoch(taskInstance.startDateTime().toTime_t()));
+    cass_statement_bind_int64 (cassStatement, 7, cass_time_from_epoch(taskInstance.startDateTime().toTime_t()));
+    cass_statement_bind_uint32(cassStatement, 8, cass_date_from_epoch(taskInstance.endDateTime().toTime_t()));
+    cass_statement_bind_int64 (cassStatement, 9, cass_time_from_epoch(taskInstance.endDateTime().toTime_t()));
+    return cassStatement;
 }
 
 

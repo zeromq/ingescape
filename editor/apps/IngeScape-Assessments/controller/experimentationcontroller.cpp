@@ -65,13 +65,6 @@ ExperimentationController::~ExperimentationController()
         temp = nullptr;
     }
 
-    /*if (_modelManager != nullptr)
-    {
-        disconnect(_modelManager, nullptr, this, nullptr);
-
-        _modelManager = nullptr;
-    }*/
-
     // Reset pointers
     _jsonHelper = nullptr;
 }
@@ -202,74 +195,45 @@ TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QStrin
 
     if ((_currentExperimentation != nullptr) && (subject != nullptr) && (task != nullptr))
     {
-        CassUuid taskInstanceUuid;
-        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &taskInstanceUuid);
-
-        time_t now = std::time(nullptr);
-
-        cass_uint32_t yearMonthDay = cass_date_from_epoch(now);
-        cass_int64_t timeOfDay = cass_time_from_epoch(now);
-
-        QString queryStr = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, name, comment, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
-        cass_statement_bind_uuid  (cassStatement, 0, taskInstanceUuid);
-        cass_statement_bind_uuid  (cassStatement, 1, _currentExperimentation->getCassUuid());
-        cass_statement_bind_uuid  (cassStatement, 2, subject->getCassUuid());
-        cass_statement_bind_uuid  (cassStatement, 3, task->getCassUuid());
-        cass_statement_bind_string(cassStatement, 4, taskInstanceName.toStdString().c_str());
-        cass_statement_bind_string(cassStatement, 5, "");
-        cass_statement_bind_uint32(cassStatement, 6, yearMonthDay);
-        cass_statement_bind_int64 (cassStatement, 7, timeOfDay);
-        cass_statement_bind_uint32(cassStatement, 8, yearMonthDay);  //FIXME current date/time to have all values filled with something for test purposes.
-        cass_statement_bind_int64 (cassStatement, 9, timeOfDay);     //FIXME current date/time to have all values filled with something for test purposes.
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
+        // Create the new task instance
+        taskInstance = new TaskInstanceM(_currentExperimentation->getCassUuid(), AssessmentsModelManager::genCassUuid(), taskInstanceName, "", subject->getCassUuid(), task->getCassUuid(), QDateTime::currentDateTime());
+        if (taskInstance != nullptr)
         {
-            qInfo() << "New task_instance inserted into the DB";
-
-            // Create the new task instance
-            taskInstance = new TaskInstanceM(_currentExperimentation->getCassUuid(), taskInstanceUuid, taskInstanceName, "", subject->getCassUuid(), task->getCassUuid(), QDateTime::currentDateTime());
             taskInstance->settask(task);
             taskInstance->setsubject(subject);
 
-            for (auto indeVarIt = task->independentVariables()->begin() ; indeVarIt != task->independentVariables()->end() ; ++indeVarIt)
+            if (AssessmentsModelManager::insert(*taskInstance))
             {
-                IndependentVariableM* independentVar = *indeVarIt;
-                if (independentVar != nullptr)
+                for (auto indeVarIt = task->independentVariables()->begin() ; indeVarIt != task->independentVariables()->end() ; ++indeVarIt)
                 {
-                    // Insert an instance of every independent variable for this task instance into DB
-                    QString innerQueryString = "INSERT INTO " + IndependentVariableValueM::table + " (id_experimentation, id_task_instance, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
-                    CassStatement* innerCassStatement = cass_statement_new(innerQueryString.toStdString().c_str(), 4);
-                    cass_statement_bind_uuid  (innerCassStatement, 0, subject->getExperimentationCassUuid());
-                    cass_statement_bind_uuid  (innerCassStatement, 1, taskInstance->getCassUuid());
-                    cass_statement_bind_uuid  (innerCassStatement, 2, independentVar->getCassUuid());
-                    cass_statement_bind_string(innerCassStatement, 3, "");
-
-                    // Execute the query or bound statement
-                    CassFuture* innerCassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), innerCassStatement);
-                    CassError innerCassError = cass_future_error_code(innerCassFuture);
-                    if (innerCassError == CASS_OK)
+                    IndependentVariableM* independentVar = *indeVarIt;
+                    if (independentVar != nullptr)
                     {
-                        qInfo() << "New independent value for task_instance inserted into the DB";
-                    }
-                    else {
-                        qCritical() << "Could not insert the new independent value for task_instance" << taskInstanceName << "into the DB:" << cass_error_desc(innerCassError);
-                    }
+                        // Insert an instance of every independent variable for this task instance into DB
+                        QString innerQueryString = "INSERT INTO " + IndependentVariableValueM::table + " (id_experimentation, id_task_instance, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
+                        CassStatement* innerCassStatement = cass_statement_new(innerQueryString.toStdString().c_str(), 4);
+                        cass_statement_bind_uuid  (innerCassStatement, 0, subject->getExperimentationCassUuid());
+                        cass_statement_bind_uuid  (innerCassStatement, 1, taskInstance->getCassUuid());
+                        cass_statement_bind_uuid  (innerCassStatement, 2, independentVar->getCassUuid());
+                        cass_statement_bind_string(innerCassStatement, 3, "");
 
-                    cass_statement_free(innerCassStatement);
-                    cass_future_free(innerCassFuture);
+                        // Execute the query or bound statement
+                        CassFuture* innerCassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), innerCassStatement);
+                        CassError innerCassError = cass_future_error_code(innerCassFuture);
+                        if (innerCassError == CASS_OK)
+                        {
+                            qInfo() << "New independent value for task_instance inserted into the DB";
+                        }
+                        else {
+                            qCritical() << "Could not insert the new independent value for task_instance" << taskInstanceName << "into the DB:" << cass_error_desc(innerCassError);
+                        }
+
+                        cass_statement_free(innerCassStatement);
+                        cass_future_free(innerCassFuture);
+                    }
                 }
             }
         }
-        else {
-            qCritical() << "Could not insert the new task_instance into the DB:" << cass_error_desc(cassError);
-        }
-
-        cass_statement_free(cassStatement);
-        cass_future_free(cassFuture);
     }
 
     return taskInstance;

@@ -107,3 +107,29 @@ CharacteristicM* CharacteristicM::createFromCassandraRow(const CassRow* row)
 
     return characteristic;
 }
+
+
+/**
+ * @brief Create a CassStatement to insert an CharacteristicM into the DB.
+ * The statement contains the values from the given characteristic.
+ * Passed characteristic must have a valid and unique UUID.
+ * @param characteristic
+ * @return
+ */
+CassStatement* CharacteristicM::createBoundInsertStatement(const CharacteristicM& characteristic)
+{
+    QString queryStr = "INSERT INTO " + CharacteristicM::table + " (id_experimentation, id, name, value_type, enum_values) VALUES (?, ?, ?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 5);
+    cass_statement_bind_uuid  (cassStatement, 0, characteristic.getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 1, characteristic.getCassUuid());
+    cass_statement_bind_string(cassStatement, 2, characteristic.name().toStdString().c_str());
+    cass_statement_bind_int8  (cassStatement, 3, static_cast<int8_t>(characteristic.valueType()));
+    CassCollection* enumValuesCassList = cass_collection_new(CASS_COLLECTION_TYPE_LIST, static_cast<size_t>(characteristic.enumValues().size()));
+    for(QString enumValue : characteristic.enumValues()) {
+        cass_collection_append_string(enumValuesCassList, enumValue.toStdString().c_str());
+    }
+    cass_statement_bind_collection(cassStatement, 4, enumValuesCassList);
+    cass_collection_free(enumValuesCassList);
+
+    return cassStatement;
+}

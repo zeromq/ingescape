@@ -67,7 +67,6 @@ public:
      */
     virtual ~IndependentVariableM();
 
-
     /**
      * @brief Accessor for this independent variable's task's experiment UUID in the Cassandra DB
      * @return
@@ -114,6 +113,15 @@ public:
      * @return
      */
     static void deleteIndependentVariableFromCassandra(const IndependentVariableM& independentVariable);
+
+    /**
+     * @brief Create a CassStatement to insert an IndependentVariableM into the DB.
+     * The statement contains the values from the given independentVariable.
+     * Passed independentVariable must have a valid and unique UUID.
+     * @param independentVariable
+     * @return
+     */
+    static CassStatement* createBoundInsertStatement(const IndependentVariableM& independentVariable);
 
 private:
     // Task's experimentation's UUID from Cassandra DB

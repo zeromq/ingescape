@@ -111,6 +111,16 @@ public:
      */
     static CharacteristicM* createFromCassandraRow(const CassRow* row);
 
+
+    /**
+     * @brief Create a CassStatement to insert an CharacteristicM into the DB.
+     * The statement contains the values from the given characteristic.
+     * Passed characteristic must have a valid and unique UUID.
+     * @param characteristic
+     * @return
+     */
+    static CassStatement* createBoundInsertStatement(const CharacteristicM& characteristic);
+
 private:
     // Experimentation's unique identifier in Cassandra Data Base
     CassUuid _experimentationCassUuid;

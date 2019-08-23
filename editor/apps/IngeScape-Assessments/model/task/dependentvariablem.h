@@ -97,6 +97,16 @@ public:
      */
     static void deleteDependentVariableFromCassandraDB(const DependentVariableM& entry);
 
+
+    /**
+     * @brief Create a CassStatement to insert an DependentVariableM into the DB.
+     * The statement contains the values from the given dependentVariable.
+     * Passed dependentVariable must have a valid and unique UUID.
+     * @param dependentVariable
+     * @return
+     */
+    static CassStatement* createBoundInsertStatement(const DependentVariableM& dependentVariable);
+
     /**
      * @brief Update the given DependentVariableM into the Cassandra DB
      * @param entry

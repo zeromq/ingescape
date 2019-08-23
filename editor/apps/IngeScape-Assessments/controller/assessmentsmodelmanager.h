@@ -314,6 +314,36 @@ public:
     }
 
     /**
+     * @brief Execute a SELECT request and return the corresponding list of entries.
+     * Filter values MUST be in the order of the primary keys.
+     * If more values than there are keys are given, only the n-first will be used in the query.
+     * If less values than there are keys are given, the query will not filter against the extra keys
+     */
+    template<class ModelClass>
+    static bool insert(const ModelClass& modelInstance)
+    {
+        // Create an INSERT bound statement from the given model instance
+        CassStatement* cassStatement = ModelClass::createBoundInsertStatement(modelInstance);
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        bool success = (cassError == CASS_OK);
+        if (success)
+        {
+            qDebug() << "INSERT query for" << typeid(ModelClass).name() << "succeeded";
+        }
+        else {
+            qCritical() << "INSERT query for" << typeid(ModelClass).name() << "failed. Error:" << cass_error_desc(cassError);
+        }
+
+        cass_statement_free(cassStatement);
+        cass_future_free(cassFuture);
+
+        return success;
+    }
+
+    /**
      * @brief Get the Cassandra Cluster
      * @return
      */
@@ -341,6 +371,13 @@ public:
      * @return
      */
     static QString cassUuidToQString(CassUuid cassUuid);
+
+
+    /**
+     * @brief Helper function generating a Cassandra UUID
+     * @return
+     */
+    static CassUuid genCassUuid();
 
 
 private:

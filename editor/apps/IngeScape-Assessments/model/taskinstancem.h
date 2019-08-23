@@ -142,6 +142,15 @@ public:
      */
     static void deleteTaskInstanceFromCassandra(const TaskInstanceM& taskInstance);
 
+    /**
+     * @brief Create a CassStatement to insert an TaskInstanceM into the DB.
+     * The statement contains the values from the given taskInstance.
+     * Passed taskInstance must have a valid and unique UUID.
+     * @param taskInstance
+     * @return
+     */
+    static CassStatement* createBoundInsertStatement(const TaskInstanceM& taskInstance);
+
 private Q_SLOTS:
     void _onIndependentVariableValueChanged(const QString& key, const QVariant& value);
 
