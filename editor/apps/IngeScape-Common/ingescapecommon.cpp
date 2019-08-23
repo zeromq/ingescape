@@ -162,10 +162,19 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     // - Label-less SVG Button style
     qmlRegisterType(QUrl("qrc:/qml/theme/LabellessSvgButtonStyle.qml"), "INGESCAPE", 1, 0, "LabellessSvgButtonStyle");
 
+    // - Combobox style
+    qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeComboboxStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeComboboxStyle");
+
+    // - Scrollview style
+    qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeScrollViewStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeScrollViewStyle");
+
+    // - Combobox delegate with tooltip
+    qmlRegisterType(QUrl("qrc:/qml/IngeScapeToolTipComboboxDelegate.qml"), "INGESCAPE", 1, 0, "IngeScapeToolTipComboboxDelegate");
+
     // - Actions List Item
     qmlRegisterType(QUrl("qrc:/qml/ActionsListItem.qml"), "INGESCAPE", 1, 0, "ActionsListItem");
 
-    // - Confirmation and Configuration Popup
+    // - Popups
     qmlRegisterType(QUrl("qrc:/qml/ConfirmationPopup.qml"), "INGESCAPE", 1, 0, "ConfirmationPopup");
     qmlRegisterType(QUrl("qrc:/qml/LicensePopup.qml"), "INGESCAPE", 1, 0, "LicensePopup");
     qmlRegisterType(QUrl("qrc:/qml/NetworkPopup.qml"), "INGESCAPE", 1, 0, "NetworkPopup");

@@ -72,6 +72,22 @@ Item {
     }
 
 
+    //
+    // Function allowing to open the netowrk (configuration) popup
+    //
+    function openNetworkPopup() {
+        networkPopup.open();
+    }
+
+
+    //
+    // Function allowing to open the license (configuration) popup
+    //
+    function openLicensePopup() {
+        licensePopup.open();
+    }
+
+
     //--------------------------------------------------------
     //
     //
@@ -210,5 +226,29 @@ Item {
                 rootItem.resetCurrentTaskInstance();
             }
         }
+    }
+
+
+    //
+    // Network (Configuration) Popup
+    //
+    NetworkPopup {
+        id: networkPopup
+
+        anchors.centerIn: parent
+
+        controller: IngeScapeAssessmentsC
+    }
+
+
+    //
+    // License (Configuration) Popup
+    //
+    LicensePopup {
+        id: licensePopup
+
+        anchors.centerIn: parent
+
+        //controller: IngeScapeEditorC.licensesC
     }
 }

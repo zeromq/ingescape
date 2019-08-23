@@ -58,10 +58,10 @@ I2PopupBase {
             selectedNetworkDevice = combobox.selectedItem.modelData;
         }
 
-        if (controller && controller.networkC && controller.networkC.isAvailableNetworkDevice(selectedNetworkDevice))
+        if (rootItem.controller && rootItem.controller.networkC && rootItem.controller.networkC.isAvailableNetworkDevice(selectedNetworkDevice))
         {
             // Re-Start the Network
-            var success = controller.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked);
+            var success = rootItem.controller.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked);
             if (success === true)
             {
                 rootItem.close();
@@ -82,8 +82,16 @@ I2PopupBase {
     //--------------------------------------------------------
 
     onOpened: {
-        txtPort.text = controller.port;
-        combobox.selectedIndex = controller.networkC ? controller.networkC.availableNetworkDevices.indexOf(controller.networkDevice) : -1;
+        if (rootItem.controller && rootItem.controller.networkC)
+        {
+            txtPort.text = rootItem.controller.port;
+            combobox.selectedIndex = controller.networkC.availableNetworkDevices.indexOf(rootItem.controller.networkDevice);
+        }
+        else
+        {
+            txtPort.text = "";
+            combobox.selectedIndex = -1;
+        }
         clearPlatform.checked = true;
 
         // Set the focus to catch keyboard press on Return/Escape
@@ -180,7 +188,7 @@ I2PopupBase {
             height: 25
             verticalAlignment: TextInput.AlignVCenter
 
-            text: controller.port
+            text: rootItem.controller ? rootItem.controller.port : ""
 
             validator: IntValidator {
                 bottom: 1;
@@ -210,7 +218,7 @@ I2PopupBase {
             Binding {
                 target: txtPort
                 property: "text"
-                value: controller.port
+                value: rootItem.controller ? rootItem.controller.port : ""
             }
         }
 
@@ -235,9 +243,11 @@ I2PopupBase {
             }
         }
 
+
         I2ComboboxStringList {
             id: combobox
-            model: controller.networkC ? controller.networkC.availableNetworkDevices : 0
+            model: (rootItem.controller && rootItem.controller.networkC) ? rootItem.controller.networkC.availableNetworkDevices
+                                                                         : 0
 
             anchors {
                 left: parent.left
@@ -309,7 +319,7 @@ I2PopupBase {
                 }
                 wrapMode: Text.WordWrap
 
-                text: controller.errorMessageWhenConnectionFailed
+                text: rootItem.controller ? controller.errorMessageWhenConnectionFailed : ""
 
                 color: IngeScapeTheme.orangeColor
                 font {

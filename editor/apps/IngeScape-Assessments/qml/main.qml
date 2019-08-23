@@ -77,7 +77,7 @@ ApplicationWindow {
 
         Menu {
             id: menuToRename
-            title: qsTr("TO RENAME")
+            title: qsTr("Options")
 
             /*MenuItem {
                 text: qsTr("Start a new platform")
@@ -110,13 +110,24 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: qsTr("Platform network...")
-                shortcut: StandardKey.Preferences
+                text: qsTr("Network")
+                //shortcut: StandardKey.Preferences
 
                 onTriggered: {
                     if (applicationLoader.item) {
-                        //console.log("QML: open network configuration");
-                        applicationLoader.item.openNetworkConfiguration();
+                        //console.log("QML: Open network configuration popup");
+                        applicationLoader.item.openNetworkPopup();
+                    }
+                }
+            }
+            MenuItem {
+                text: qsTr("License")
+                //shortcut: StandardKey.
+
+                onTriggered: {
+                    if (applicationLoader.item) {
+                        console.log("QML: Open license configuration popup");
+                        applicationLoader.item.openLicensePopup();
                     }
                 }
             }

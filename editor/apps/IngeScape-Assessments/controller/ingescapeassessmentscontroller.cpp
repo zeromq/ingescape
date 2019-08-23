@@ -289,7 +289,69 @@ QObject* IngeScapeAssessmentsController::qmlSingleton(QQmlEngine* engine, QJSEng
  */
 void IngeScapeAssessmentsController::processBeforeClosing()
 {
-    // TODO...
+    // FXME TODO...
+}
+
+
+/**
+ * @brief Re-Start the network with a port and a network device
+ * @param strPort
+ * @param networkDevice
+ * @param hasToClearPlatform
+ * @return true when success
+ */
+bool IngeScapeAssessmentsController::restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform)
+{
+    Q_UNUSED(hasToClearPlatform)
+
+    bool success = false;
+
+    bool isUInt = false;
+    uint port = strPort.toUInt(&isUInt);
+    if (isUInt && (port > 0))
+    {
+        // None changes (same port and same network device)
+        if ((port == _port) && (networkDevice == _networkDevice))
+        {
+            // Nothing to do
+            success = true;
+        }
+        // Port and Network device
+        else
+        {
+            // Update properties
+            setnetworkDevice(networkDevice);
+            setport(port);
+
+            // Update settings file
+            IngeScapeSettings &settings = IngeScapeSettings::Instance();
+            settings.beginGroup("network");
+            settings.setValue("networkDevice", networkDevice);
+            settings.setValue("port", port);
+            settings.endGroup();
+
+            // Save new values
+            settings.sync();
+
+
+            // FIXME (restartNetwork): Update the licenses path
+            //_licensesC->updateLicensesPath(licensesPath);
+
+
+            // Restart IngeScape
+            success = _restartIngeScape();
+        }
+    }
+    else {
+        if (!isUInt) {
+            qWarning() << "Port" << strPort << "is not an unsigned int !";
+        }
+        else if (port <= 0) {
+            qWarning() << "Port" << strPort << "is negative or null !";
+        }
+    }
+
+    return success;
 }
 
 
@@ -329,3 +391,49 @@ void IngeScapeAssessmentsController::_onCurrentExperimentationChanged(Experiment
         qDebug() << "Current Experimentation is NULL !";
     }
 }
+
+
+/**
+ * @brief Restart IngeScape
+ * @return true if success
+ */
+bool IngeScapeAssessmentsController::_restartIngeScape()
+{
+    bool success = false;
+
+    // Reset the error message
+    seterrorMessageWhenConnectionFailed("");
+
+    AssessmentsModelManager* modelManager = AssessmentsModelManager::Instance();
+
+    if ((_networkC != nullptr) && (modelManager != nullptr))
+    {
+        qInfo() << "Restart the network on" << _networkDevice << "with" << _port;
+
+        modelManager->setisMappingConnected(false);
+        //modelManager->setisMappingControlled(false);
+
+        // Stop our IngeScape agent
+        _networkC->stop();
+
+        // Simulate an exit for each agent ON
+        //modelManager->simulateExitForEachAgentON();
+
+        // Simulate an exit for each launcher
+        //modelManager->simulateExitForEachLauncher();
+
+        // Start our IngeScape agent with the network device and the port
+        success = _networkC->start(_networkDevice, "", _port);
+
+        if (success) {
+            modelManager->setisMappingConnected(true);
+        }
+    }
+
+    if (!success) {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
+    }
+
+    return success;
+}
+

@@ -28,5 +28,8 @@
         <file>qml/NetworkPopup.qml</file>
         <file>qml/LicensePopup.qml</file>
         <file>qml/TextAreaWithTimer.qml</file>
+        <file>qml/theme/IngeScapeComboboxStyle.qml</file>
+        <file>qml/IngeScapeToolTipComboboxDelegate.qml</file>
+        <file>qml/theme/IngeScapeScrollViewStyle.qml</file>
     </qresource>
 </RCC>
