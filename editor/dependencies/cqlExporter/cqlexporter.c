@@ -22,12 +22,12 @@ typedef enum {
 } recordType_t;
 
 //Global variable
-FILE * fp;
-char* currentLine;
+static FILE * fp;
+static char* currentLine;
 
-CassCluster* cluster;
-CassSession* session;
-CassFuture* connect_future;
+static CassCluster* cluster;
+static CassSession* session;
+static CassFuture* connect_future;
 
 /*
  * BDD
@@ -183,7 +183,6 @@ void writeHeaderCharacteristic(CassUuid id_experimentation){
     /* This will block until the query has finished */
     CassError rc = cass_future_error_code(query_future);
 
-    char * strToWrite = NULL;
     if(cass_future_error_code(query_future) == CASS_OK)
     {
         const CassResult* result = cass_future_get_result(query_future);
@@ -260,7 +259,7 @@ void writeRecordInfoFromIdRecord(CassUuid id_record){
             cass_value_get_int64(cass_row_get_column_by_name(row_record, "end_time"), &end_time);
 
             //Creation of the date time epoch
-            cass_int64_t secsdateTimeEnd = cass_date_time_to_epoch(end_date, end_time);
+            time_t secsdateTimeEnd = (time_t)cass_date_time_to_epoch(end_date, end_time);
 
             //Convert the date time to string human readable
             char dateTimeEnd[20];
@@ -297,7 +296,7 @@ void writeRecordInfoFromIdRecord(CassUuid id_record){
             cass_value_get_int64(cass_row_get_column_by_name(row_record, "time_of_day"), &time_of_day);
 
             //Creation of the date time epoch
-            cass_int64_t secsdateTimeStart = cass_date_time_to_epoch(year_month_day, time_of_day);
+            time_t secsdateTimeStart = (time_t)cass_date_time_to_epoch(year_month_day, time_of_day);
 
             //Convert the date time to string human readable
             char dateTimeStart[20];
@@ -583,7 +582,7 @@ void writeAllEventsFromIdRecord(CassUuid id_record){
 
 
                 //Creation of the date time epoch
-                cass_int64_t secsdateTime = cass_date_time_to_epoch(year_month_day, time_of_day);
+                time_t secsdateTime = (time_t)cass_date_time_to_epoch(year_month_day, time_of_day);
 
                 //Convert the date time to string human readable
                 char dateTimeEvent[20];
@@ -631,7 +630,7 @@ void writeOneExpInfoFromId(CassUuid id_experimentation){
     /* This will block until the query has finished */
     CassError rc = cass_future_error_code(query_future);
 
-    char *dateExp = NULL, *timeExp = NULL, *temp = NULL, *strToWrite = NULL;
+    char *strToWrite = NULL;
     if(cass_future_error_code(query_future) == CASS_OK)
     {
         const CassResult* result = cass_future_get_result(query_future);
@@ -673,7 +672,7 @@ void writeOneExpInfoFromId(CassUuid id_experimentation){
             cass_value_get_int64(cass_row_get_column_by_name(row, "creation_time"), &creation_time);
 
             //Creation of the date time epoch
-            cass_int64_t secsdateTime = cass_date_time_to_epoch(creation_date, creation_time);
+            time_t secsdateTime = (time_t)cass_date_time_to_epoch(creation_date, creation_time);
 
             //Convert the date time to string human readable
             char dateTimeExp[20];
@@ -774,9 +773,7 @@ void writeOneTaskInfoById(CassUuid id_experimentation, CassUuid id_task){
         if(row != NULL)
         {
             // Gets the informations we need to store
-            CassUuid id_experimentation;
             char idExpStr[CASS_UUID_STRING_LENGTH];
-            cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &id_experimentation);
             cass_uuid_string ( id_experimentation, idExpStr );
 
             const char* name;
@@ -943,7 +940,7 @@ void writeAllIndepentVarFromIdExpAndIdRecord(CassUuid id_experimentation, CassUu
     }
 }
 
-int getNumberOfEventsFromIdRecord(CassUuid id_record){
+int getNumberOfEventsFromIdRecord(CassUuid id_record) {
     char uuidRecordStr[CASS_UUID_STRING_LENGTH];
     cass_uuid_string ( id_record, uuidRecordStr);
     int numberOfEvent = 0;
@@ -973,7 +970,7 @@ int getNumberOfEventsFromIdRecord(CassUuid id_record){
         {
             cass_int64_t number;
             cass_value_get_int64(cass_row_get_column_by_name(row, "count"), &number);
-            numberOfEvent = number;
+            numberOfEvent = (int)number;
         }
 
     }else {
@@ -1146,7 +1143,7 @@ void openFile(char* fileFullPath){
         }
 }
 
-void writeIntoFile(char * content, int saveIntoCurrentLine){
+void writeIntoFile(const char * content, int saveIntoCurrentLine){
     size_t sizeOflastCurrentLineContent = 0;
     size_t sizeOfContent = 0;
     char * lastCurrentLineContent = NULL;
@@ -1156,39 +1153,39 @@ void writeIntoFile(char * content, int saveIntoCurrentLine){
 
         if(saveIntoCurrentLine > 0){
 
-        if(currentLine != NULL){
-            //allocation of memory
-            sizeOflastCurrentLineContent = strlen (currentLine) + 1;
-            lastCurrentLineContent = (char *) malloc(sizeOflastCurrentLineContent);
+            if(currentLine != NULL){
+                //allocation of memory
+                sizeOflastCurrentLineContent = strlen (currentLine) + 1;
+                lastCurrentLineContent = (char *) malloc(sizeOflastCurrentLineContent);
 
-            //Copy the last content
-            strcpy(lastCurrentLineContent, currentLine);
+                //Copy the last content
+                strcpy(lastCurrentLineContent, currentLine);
 
-            //Alloc the size of the string for the new content
-            sizeOfContent = strlen(content) + 1;
-            sizeOflastCurrentLineContent = strlen(lastCurrentLineContent) + 1;
-            free(currentLine);
-            currentLine = (char *) malloc( sizeOflastCurrentLineContent + sizeOfContent);
+                //Alloc the size of the string for the new content
+                sizeOfContent = strlen(content) + 1;
+                sizeOflastCurrentLineContent = strlen(lastCurrentLineContent) + 1;
+                free(currentLine);
+                currentLine = (char *) malloc( sizeOflastCurrentLineContent + sizeOfContent);
 
-            //Copy the previous content
-            strcpy(currentLine, lastCurrentLineContent);
+                //Copy the previous content
+                strcpy(currentLine, lastCurrentLineContent);
 
-            //Concatenate the string
-            strcat(currentLine, content);
+                //Concatenate the string
+                strcat(currentLine, content);
 
-            //Release memory
-            free(lastCurrentLineContent);
-        }else{
-            sizeOfContent = strlen(content) + 1;
-            currentLine = (char *) malloc( sizeOfContent);
+                //Release memory
+                free(lastCurrentLineContent);
+            }else{
+                sizeOfContent = strlen(content) + 1;
+                currentLine = (char *) malloc( sizeOfContent);
 
-            //Copy the first content
-            strcpy(currentLine, content);
+                //Copy the first content
+                strcpy(currentLine, content);
+            }
         }
-    }
 
 
-        fprintf(fp, content);
+        fprintf(fp, "%s", content);
         fflush(fp);
     }
 }
@@ -1196,8 +1193,4 @@ void writeIntoFile(char * content, int saveIntoCurrentLine){
 void  closeFileOpened(){
     fclose(fp);
 }
-
-/*
- * Create header functions
- */
 
