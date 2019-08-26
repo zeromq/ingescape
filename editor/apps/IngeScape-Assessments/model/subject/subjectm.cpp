@@ -104,26 +104,11 @@ void SubjectM::setdisplayedId(QString value)
 {
     if (value != _displayedId)
     {
-        QString queryStr = "UPDATE " + SubjectM::table + " SET displayed_id = ? WHERE id_experimentation = ? AND id = ?;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
-        cass_statement_bind_string(cassStatement, 0, value.toStdString().c_str());
-        cass_statement_bind_uuid  (cassStatement, 1, _experimentationCassUuid);
-        cass_statement_bind_uuid  (cassStatement, 2, _cassUuid);
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError != CASS_OK)
-        {
-            qCritical() << "Could not update displayed id of subject" << _displayedId;
+        _displayedId = value;
 
-            _displayedId = value;
+        AssessmentsModelManager::update(*this);
 
-            Q_EMIT displayedIdChanged(value);
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
+        Q_EMIT displayedIdChanged(value);
     }
 }
 
@@ -247,6 +232,24 @@ CassStatement* SubjectM::createBoundInsertStatement(const SubjectM& subject)
     cass_statement_bind_uuid  (cassStatement, 0, subject.getExperimentationCassUuid());
     cass_statement_bind_uuid  (cassStatement, 1, subject.getCassUuid());
     cass_statement_bind_string(cassStatement, 2, subject.displayedId().toStdString().c_str());
+    return cassStatement;
+}
+
+
+/**
+ * @brief Create a CassStatement to update a SubjectM into the DB.
+ * The statement contains the values from the given subject.
+ * Passed subject must have a valid and unique UUID.
+ * @param subject
+ * @return
+ */
+CassStatement* SubjectM::createBoundUpdateStatement(const SubjectM& subject)
+{
+    QString queryStr = "UPDATE " + SubjectM::table + " SET displayed_id = ? WHERE id_experimentation = ? AND id = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 3);
+    cass_statement_bind_string(cassStatement, 0, subject.displayedId().toStdString().c_str());
+    cass_statement_bind_uuid  (cassStatement, 1, subject.getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 2, subject.getCassUuid());
     return cassStatement;
 }
 

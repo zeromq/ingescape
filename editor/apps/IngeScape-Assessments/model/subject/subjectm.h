@@ -127,13 +127,23 @@ public:
 
 
     /**
-     * @brief Create a CassStatement to insert an SubjectM into the DB.
+     * @brief Create a CassStatement to insert a SubjectM into the DB.
      * The statement contains the values from the given subject.
      * Passed subject must have a valid and unique UUID.
      * @param subject
      * @return
      */
     static CassStatement* createBoundInsertStatement(const SubjectM& subject);
+
+
+    /**
+     * @brief Create a CassStatement to update a SubjectM into the DB.
+     * The statement contains the values from the given subject.
+     * Passed subject must have a valid and unique UUID.
+     * @param subject
+     * @return
+     */
+    static CassStatement* createBoundUpdateStatement(const SubjectM& subject);
 
     /**
      * @brief Restore the temporary map values wih the ones from the actual value map
