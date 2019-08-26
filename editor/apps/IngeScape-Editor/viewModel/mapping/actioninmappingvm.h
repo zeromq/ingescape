@@ -59,6 +59,7 @@ public:
     explicit ActionInMappingVM(QString uid,
                                ActionM* action,
                                QPointF position,
+                               qreal width,
                                QObject *parent = nullptr);
 
 
@@ -66,6 +67,12 @@ public:
      * @brief Destructor
      */
     ~ActionInMappingVM();
+
+
+    /**
+     * @brief Default width of the item when created
+     */
+    static const qreal DEFAULT_WIDTH;
 
 
 Q_SIGNALS:

@@ -414,7 +414,7 @@ private:
      * @param position
      * @return
      */
-    AgentInMappingVM* _createAgentInMappingAtPosition(AgentsGroupedByNameVM* agentsGroupedByName, QPointF position);
+    AgentInMappingVM* _createAgentInMappingAtPosition(AgentsGroupedByNameVM* agentsGroupedByName, QPointF position, qreal width);
 
 
     /**
@@ -424,7 +424,7 @@ private:
      * @param position
      * @return
      */
-    ActionInMappingVM* _createActionInMappingAtPosition(QString uid, ActionM* action, QPointF position);
+    ActionInMappingVM* _createActionInMappingAtPosition(QString uid, ActionM* action, QPointF position, qreal width);
 
 
     /**

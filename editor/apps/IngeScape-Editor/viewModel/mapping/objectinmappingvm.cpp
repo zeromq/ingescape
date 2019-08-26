@@ -26,11 +26,13 @@ ObjectInMappingVM::ObjectInMappingVM(ObjectInMappingTypes::Value type,
                                      //QString name,
                                      //QString uid,
                                      QPointF position,
+                                     qreal width,
                                      QObject *parent) : QObject(parent),
     _type(type),
     _name(""),
     _uid(""),
     _position(position),
+    _width(width),
     _isReduced(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it

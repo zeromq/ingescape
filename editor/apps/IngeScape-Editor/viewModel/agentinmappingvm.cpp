@@ -22,6 +22,12 @@
 
 
 /**
+ * @brief Default width of the item when created
+ */
+const qreal AgentInMappingVM::DEFAULT_WIDTH = 258;
+
+
+/**
  * @brief Constructor
  * @param agentsGroupedByName View model of agents grouped by the same name
  * @param position Position of the top left corner
@@ -29,8 +35,10 @@
  */
 AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
                                    QPointF position,
+                                   qreal width,
                                    QObject *parent) : ObjectInMappingVM(ObjectInMappingTypes::AGENT,
                                                                         position,
+                                                                        width,
                                                                         parent),
     _agentsGroupedByName(agentsGroupedByName),
     _isLockedReduced(false),

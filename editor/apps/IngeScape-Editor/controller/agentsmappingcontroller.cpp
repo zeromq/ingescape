@@ -350,8 +350,8 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
         AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
         if (agentsGroupedByName != nullptr)
         {
-            // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
-            agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position);
+            // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position with the default width
+            agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position, AgentInMappingVM::DEFAULT_WIDTH);
 
             if (agentInMapping != nullptr)
             {
@@ -460,7 +460,7 @@ void AgentsMappingController::dropActionToMappingAtPosition(ActionM* action, QPo
         QString uid = IngeScapeUtils::getUIDforNewActionInMappingVM();
 
         // Create a new view model of action in mapping
-        ActionInMappingVM* actionInMapping = _createActionInMappingAtPosition(uid, action, position);
+        ActionInMappingVM* actionInMapping = _createActionInMappingAtPosition(uid, action, position, ActionInMappingVM::DEFAULT_WIDTH);
 
         if (actionInMapping != nullptr)
         {
@@ -791,6 +791,9 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
                 QString position = QString("%1, %2").arg(QString::number(agentInMapping->position().x()), QString::number(agentInMapping->position().y()));
                 jsonAgent.insert("position", position);
 
+                // Set the width
+                jsonAgent.insert("width", agentInMapping->width());
+
 
                 //
                 // Set the mapping
@@ -894,6 +897,9 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
                 // Set the position
                 QString position = QString("%1, %2").arg(QString::number(actionInMapping->position().x()), QString::number(actionInMapping->position().y()));
                 jsonAction.insert("position", position);
+
+                // Set the width
+                jsonAction.insert("width", actionInMapping->width());
 
 
                 //
@@ -1006,6 +1012,10 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                     QJsonValue jsonName = jsonObjectInMapping.value("agentName");
                     QJsonValue jsonMapping = jsonObjectInMapping.value("mapping");
 
+                    // Get the value for key "width"
+                    QJsonValue jsonWidth = jsonObjectInMapping.value("width");
+                    qreal width = jsonWidth.toDouble(AgentInMappingVM::DEFAULT_WIDTH);
+
                     if (jsonName.isString() && jsonMapping.isObject())
                     {
                         QString agentName = jsonName.toString();
@@ -1067,7 +1077,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                             //qDebug() << "Position:" << position.x() << position.y() << "is defined for" << agentName << "with" << agentsGroupedByName->models()->count() << "models";
 
                             // Create a new agent in the global mapping (with the "Agents Grouped by Name") at a specific position
-                            AgentInMappingVM* agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position);
+                            AgentInMappingVM* agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
 
 
                             // If there are some mapping elements, save the pair [agent, its mapping] in the list
@@ -1102,6 +1112,10 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 
                     QJsonValue jsonActionUID = jsonObjectInMapping.value("action_id");
                     QJsonValue jsonActionInMappingUID = jsonObjectInMapping.value("actionInMapping_id");
+
+                    // Get the value for key "width"
+                    QJsonValue jsonWidth = jsonObjectInMapping.value("width");
+                    qreal width = jsonWidth.toDouble(ActionInMappingVM::DEFAULT_WIDTH);
 
                     if (jsonActionName.isString() && jsonActionUID.isDouble() && jsonActionInMappingUID.isString())
                     {
@@ -1179,7 +1193,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                             IngeScapeUtils::bookUIDforActionInMappingVM(actionInMappingUID);
 
                             // Create a new action in the global mapping with a unique id, with a model of action and at a specific position
-                            ActionInMappingVM* actionInMapping = _createActionInMappingAtPosition(actionInMappingUID, action, position);
+                            ActionInMappingVM* actionInMapping = _createActionInMappingAtPosition(actionInMappingUID, action, position, width);
 
 
                             // If there are some mapping to agents and actions, save the pair [action, action mapping] in the list
@@ -1722,13 +1736,15 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
 
                 // Get a random position in the current window
                 QPointF position = _getRandomPosition(randomMax);
+                // Default with of the new agent
+                qreal width = AgentInMappingVM::DEFAULT_WIDTH;
 
                 // Get the (view model of) agents grouped for the name
                 AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
                 if (agentsGroupedByName != nullptr)
                 {
                     // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
-                    agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position);
+                    agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
                     if (agentInMapping != nullptr)
                     {
                         // No need to add links on inputs now, because the mapping will be received after the creation of this agent(s grouped by name)
@@ -2051,7 +2067,7 @@ void AgentsMappingController::_onWriteOnInputOfAgentInMapping(ObjectInMappingVM*
  * @param position
  * @return
  */
-AgentInMappingVM* AgentsMappingController::_createAgentInMappingAtPosition(AgentsGroupedByNameVM* agentsGroupedByName, QPointF position)
+AgentInMappingVM* AgentsMappingController::_createAgentInMappingAtPosition(AgentsGroupedByNameVM* agentsGroupedByName, QPointF position, qreal width)
 {
     AgentInMappingVM* agentInMapping = nullptr;
 
@@ -2063,7 +2079,7 @@ AgentInMappingVM* AgentsMappingController::_createAgentInMappingAtPosition(Agent
         if (agentInMapping == nullptr)
         {
             // Create a new view model of agent in the global Mapping
-            agentInMapping = new AgentInMappingVM(agentsGroupedByName, position, this);
+            agentInMapping = new AgentInMappingVM(agentsGroupedByName, position, width, this);
 
             // Connect to signals from this new agent in mapping
             connect(agentInMapping, &AgentInMappingVM::linkInputsListHaveBeenAdded, this, &AgentsMappingController::_onLinkInputsListHaveBeenAdded);
@@ -2092,7 +2108,7 @@ AgentInMappingVM* AgentsMappingController::_createAgentInMappingAtPosition(Agent
  * @param position
  * @return
  */
-ActionInMappingVM* AgentsMappingController::_createActionInMappingAtPosition(QString uid, ActionM* action, QPointF position)
+ActionInMappingVM* AgentsMappingController::_createActionInMappingAtPosition(QString uid, ActionM* action, QPointF position, qreal width)
 {
     ActionInMappingVM* actionInMapping = nullptr;
 
@@ -2104,7 +2120,7 @@ ActionInMappingVM* AgentsMappingController::_createActionInMappingAtPosition(QSt
         if (actionInMapping == nullptr)
         {
             // Create a new view model of action in mapping
-            actionInMapping = new ActionInMappingVM(uid, action, position);
+            actionInMapping = new ActionInMappingVM(uid, action, position, width);
 
             // Add in the hash table
             _hashFromUidToActionInMapping.insert(actionInMapping->uid(), actionInMapping);
@@ -2361,9 +2377,11 @@ void AgentsMappingController::_updateMappingWithAgentsONandLinks()
                 {
                     // Get a random position in the current window
                     QPointF position = _getRandomPosition(randomMax);
+                    // Default with of the new agent
+                    qreal width = AgentInMappingVM::DEFAULT_WIDTH;
 
                     // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
-                    _createAgentInMappingAtPosition(agentsGroupedByName, position);
+                    _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
                 }
             }
         }

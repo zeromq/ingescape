@@ -44,6 +44,9 @@ class ObjectInMappingVM : public QObject
     // The position corresponds to the corner Top-Left of the box
     I2_QML_PROPERTY(QPointF, position)
 
+    // The object's width (some objects can be resized)
+    I2_QML_PROPERTY_FUZZY_COMPARE(qreal, width)
+
     // Flag indicating if our object is reduced
     I2_QML_PROPERTY(bool, isReduced)
 
@@ -68,6 +71,7 @@ public:
                                //QString name,
                                //QString uid,
                                QPointF position,
+                               qreal width,
                                QObject *parent = nullptr);
 
 

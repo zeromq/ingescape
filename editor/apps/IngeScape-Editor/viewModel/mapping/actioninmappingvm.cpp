@@ -14,6 +14,13 @@
 
 #include "actioninmappingvm.h"
 
+
+/**
+ * @brief Default width of the item when created
+ */
+const qreal ActionInMappingVM::DEFAULT_WIDTH = 220;
+
+
 /**
  * @brief Constructor
  * @param uid
@@ -24,8 +31,10 @@
 ActionInMappingVM::ActionInMappingVM(QString uid,
                                      ActionM* action,
                                      QPointF position,
+                                     qreal width,
                                      QObject *parent) : ObjectInMappingVM(ObjectInMappingTypes::ACTION,
                                                                           position,
+                                                                          width,
                                                                           parent),
     _action(action),
     _linkInput(nullptr),

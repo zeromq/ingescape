@@ -66,14 +66,8 @@ Rectangle {
     // Duration of expand/collapse animation in milliseconds (250 ms => default duration of QML animations)
     property int _expandCollapseAnimationDuration: 250
 
-    // Default width. Agents nodes spawn with this width
-    property real defaultWidth: 258
-
     // Minimum width. Agents nodes cannot be resized smaller than this width
     property real minimumWidth: 150
-
-
-    width: 258
 
     height: (rootItem.agentMappingVM && !rootItem.isReduced) ? (54 + 22 * Math.max(rootItem.agentMappingVM.linkInputsList.count, rootItem.agentMappingVM.linkOutputsList.count))
                                                              : 42
@@ -82,6 +76,9 @@ Rectangle {
     // Init position of our agent
     x: (agentMappingVM && agentMappingVM.position) ? agentMappingVM.position.x : 0
     y: (agentMappingVM && agentMappingVM.position) ? agentMappingVM.position.y : 0
+
+    // Init width of our agent
+    width: agentMappingVM.width
 
 
     radius: 6
@@ -122,6 +119,15 @@ Rectangle {
         target: rootItem.agentMappingVM
         property: "position"
         value: Qt.point(rootItem.x, rootItem.y)
+    }
+
+    //
+    // Bindings to save the position of our agent when we move it (drag-n-drop)
+    //
+    Binding {
+        target: rootItem.agentMappingVM
+        property: "width"
+        value: rootItem.width
     }
 
 
