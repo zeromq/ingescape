@@ -277,7 +277,7 @@ void TaskM::applyTemporaryDependentVariable(DependentVariableM* variableToUpdate
         variableToUpdate->setagentName(_temporaryDependentVariable->agentName());
         variableToUpdate->setoutputName(_temporaryDependentVariable->outputName());
 
-        DependentVariableM::updateDependentVariableIntoCassandraDB(*variableToUpdate);
+        AssessmentsModelManager::update(*variableToUpdate);
     }
 }
 
@@ -291,7 +291,7 @@ void TaskM::deleteDependentVariable(DependentVariableM* variableToDelete)
     {
         _dependentVariables.remove(variableToDelete);
 
-        DependentVariableM::deleteDependentVariableFromCassandraDB(*variableToDelete);
+        AssessmentsModelManager::deleteEntry<DependentVariableM>({ variableToDelete->getExperimentationCassUuid(), variableToDelete->getTaskCassUuid(), variableToDelete->getCassUuid() });
     }
 }
 

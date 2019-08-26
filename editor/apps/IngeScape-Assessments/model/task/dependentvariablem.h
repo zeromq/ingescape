@@ -90,16 +90,9 @@ public:
      */
     static DependentVariableM* createFromCassandraRow(const CassRow* row);
 
-    /**
-     * @brief Delete the given dependent variable from the Cassandra DB
-     * @param row
-     * @return
-     */
-    static void deleteDependentVariableFromCassandraDB(const DependentVariableM& entry);
-
 
     /**
-     * @brief Create a CassStatement to insert an DependentVariableM into the DB.
+     * @brief Create a CassStatement to insert a DependentVariableM into the DB.
      * The statement contains the values from the given dependentVariable.
      * Passed dependentVariable must have a valid and unique UUID.
      * @param dependentVariable
@@ -108,11 +101,13 @@ public:
     static CassStatement* createBoundInsertStatement(const DependentVariableM& dependentVariable);
 
     /**
-     * @brief Update the given DependentVariableM into the Cassandra DB
-     * @param entry
+     * @brief Create a CassStatement to update a DependentVariableM into the DB.
+     * The statement contains the values from the given dependentVariable.
+     * Passed dependentVariable must have a valid and unique UUID.
+     * @param dependentVariable
      * @return
      */
-    static bool updateDependentVariableIntoCassandraDB(const DependentVariableM& entry);
+    static CassStatement* createBoundUpdateStatement(const DependentVariableM& dependentVariable);
 
 
     CassUuid getExperimentationCassUuid() const { return _experimentationCassUuid; }

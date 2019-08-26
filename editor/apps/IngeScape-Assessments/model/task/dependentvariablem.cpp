@@ -84,31 +84,6 @@ DependentVariableM::~DependentVariableM()
 
 
 /**
- * @brief Update the given Dependent variable the Cassandra DB
- * @param entry
- * @return
- */
-bool DependentVariableM::updateDependentVariableIntoCassandraDB(const DependentVariableM& entry)
-{
-    QString queryStr = "UPDATE " + DependentVariableM::table + " SET name = ?, description = ?, agent_name = ?, output_name = ? WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
-    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
-    cass_statement_bind_string(cassStatement, 0, entry.name().toStdString().c_str());
-    cass_statement_bind_string(cassStatement, 1, entry.description().toStdString().c_str());
-    cass_statement_bind_string(cassStatement, 2, entry.agentName().toStdString().c_str());
-    cass_statement_bind_string(cassStatement, 3, entry.outputName().toStdString().c_str());
-    cass_statement_bind_uuid  (cassStatement, 4, entry.getExperimentationCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 5, entry.getTaskCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 6, entry.getCassUuid());
-
-    // Execute the query or bound statement
-    CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-    CassError cassError = cass_future_error_code(cassFuture);
-
-    return cassError == CASS_OK;
-}
-
-
-/**
  * @brief Static factory method to create an dependent variable from a CassandraDB record
  * @param row
  * @return
@@ -136,17 +111,6 @@ DependentVariableM* DependentVariableM::createFromCassandraRow(const CassRow* ro
 }
 
 /**
- * @brief Delete the given dependent variable from Cassandra DB
- * @param row
- * @return
- */
-void DependentVariableM::deleteDependentVariableFromCassandraDB(const DependentVariableM& entry)
-{
-    // Remove dependent_var from DB
-    AssessmentsModelManager::deleteEntry<DependentVariableM>({ entry.getExperimentationCassUuid(), entry.getTaskCassUuid(), entry.getCassUuid() });
-}
-
-/**
  * @brief Create a CassStatement to insert an DependentVariableM into the DB.
  * The statement contains the values from the given dependentVariable.
  * Passed dependentVariable must have a valid and unique UUID.
@@ -164,6 +128,27 @@ CassStatement* DependentVariableM::createBoundInsertStatement(const DependentVar
     cass_statement_bind_string(cassStatement, 4, dependentVariable.description().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 5, dependentVariable.agentName().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 6, dependentVariable.outputName().toStdString().c_str());
+    return cassStatement;
+}
+
+/**
+ * @brief Create a CassStatement to update a DependentVariableM into the DB.
+ * The statement contains the values from the given dependentVariable.
+ * Passed dependentVariable must have a valid and unique UUID.
+ * @param dependentVariable
+ * @return
+ */
+CassStatement* DependentVariableM::createBoundUpdateStatement(const DependentVariableM& dependentVariable)
+{
+    QString queryStr = "UPDATE " + DependentVariableM::table + " SET name = ?, description = ?, agent_name = ?, output_name = ? WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
+    cass_statement_bind_string(cassStatement, 0, dependentVariable.name().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 1, dependentVariable.description().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 2, dependentVariable.agentName().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 3, dependentVariable.outputName().toStdString().c_str());
+    cass_statement_bind_uuid  (cassStatement, 4, dependentVariable.getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 5, dependentVariable.getTaskCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 6, dependentVariable.getCassUuid());
     return cassStatement;
 }
 
