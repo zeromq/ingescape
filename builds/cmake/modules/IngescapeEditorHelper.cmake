@@ -5,6 +5,7 @@ set(macro_current_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
 # Macro to add ingescape sources in given var
 macro(add_ingescape_common_sources _SOURCES)
+    add_definitions(-DINGESCAPECOMMON_FROM_PRI=1)
     file(GLOB_RECURSE _ingescape_common_sources "${macro_current_dir}/../../../editor/apps/IngeScape-Common/*.cpp")
     list(APPEND ${_SOURCES}
         ${_ingescape_common_sources}
