@@ -66,6 +66,12 @@ Rectangle {
     // Duration of expand/collapse animation in milliseconds (250 ms => default duration of QML animations)
     property int _expandCollapseAnimationDuration: 250
 
+    // Default width. Agents nodes spawn with this width
+    property real defaultWidth: 258
+
+    // Minimum width. Agents nodes cannot be resized smaller than this width
+    property real minimumWidth: 150
+
 
     width: 258
 
@@ -1074,6 +1080,33 @@ Rectangle {
             }
         }
 
+        // Resize handle (right side)
+        Rectangle {
+            id: resizeHandle
 
+            //FIXME Refine style and position of the handle
+            width: 18
+            height: 18
+            radius: 18
+            color: "steelblue"
+            anchors.horizontalCenter: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+
+            visible: (opacity !== 0)
+            opacity: !rootItem.isReduced ? 1 : 0
+
+            MouseArea {
+                anchors.fill: parent
+                drag{ target: parent; axis: Drag.XAxis }
+                onMouseXChanged: {
+                    if(drag.active){
+                        rootItem.width += (mouseX - (resizeHandle.width / 2))
+                        if(rootItem.width < rootItem.minimumWidth)
+                            rootItem.width = rootItem.minimumWidth
+                    }
+                }
+            }
+        }
     }
+
 }
