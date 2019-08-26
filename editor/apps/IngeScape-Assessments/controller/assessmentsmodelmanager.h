@@ -313,10 +313,7 @@ public:
     }
 
     /**
-     * @brief Execute a SELECT request and return the corresponding list of entries.
-     * Filter values MUST be in the order of the primary keys.
-     * If more values than there are keys are given, only the n-first will be used in the query.
-     * If less values than there are keys are given, the query will not filter against the extra keys
+     * @brief Execute an INSERT query to update the entry corresponding to the given instance
      */
     template<class ModelClass>
     static bool insert(const ModelClass& modelInstance)
@@ -334,6 +331,34 @@ public:
         }
         else {
             qCritical() << "INSERT query for" << typeid(ModelClass).name() << "failed. Error:" << cass_error_desc(cassError);
+        }
+
+        cass_statement_free(cassStatement);
+        cass_future_free(cassFuture);
+
+        return success;
+    }
+
+
+    /**
+     * @brief Execute an UPDATE to update the entry corresponding to the given instance
+     */
+    template<class ModelClass>
+    static bool update(const ModelClass& modelInstance)
+    {
+        // Create an UPDATE bound statement from the given model instance
+        CassStatement* cassStatement = ModelClass::createBoundUpdateStatement(modelInstance);
+
+        // Execute the query or bound statement
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassError cassError = cass_future_error_code(cassFuture);
+        bool success = (cassError == CASS_OK);
+        if (success)
+        {
+            qDebug() << "UPDATE query for" << typeid(ModelClass).name() << "succeeded";
+        }
+        else {
+            qCritical() << "UPDATE query for" << typeid(ModelClass).name() << "failed. Error:" << cass_error_desc(cassError);
         }
 
         cass_statement_free(cassStatement);
