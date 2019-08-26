@@ -241,11 +241,6 @@ public:
     {
         QList<ModelClass*> objectList;
 
-        // Check that filter values were given
-        if (filterValues.isEmpty()) {
-            return objectList;
-        }
-
         // Create an editable copy of the primary keys list
         QStringList copyKeysList = ModelClass::primaryKeys;
 
@@ -260,13 +255,17 @@ public:
         }
 
         // Build the query with '?' placeholders
-        QString queryStr = "SELECT * FROM " + ModelClass::table + " WHERE ";
-        for (auto keyIt = copyKeysList.cbegin() ; keyIt != copyKeysList.cend() ; ++keyIt) {
-            // Join clauses with " AND "
-            if (keyIt > copyKeysList.cbegin()) {
-                queryStr += " AND ";
+        QString queryStr = "SELECT * FROM " + ModelClass::table;
+        if (!filterValues.isEmpty())
+        {
+            queryStr += " WHERE ";
+            for (auto keyIt = copyKeysList.cbegin() ; keyIt != copyKeysList.cend() ; ++keyIt) {
+                // Join clauses with " AND "
+                if (keyIt > copyKeysList.cbegin()) {
+                    queryStr += " AND ";
+                }
+                queryStr += *keyIt + " = ?";
             }
-            queryStr += *keyIt + " = ?";
         }
         queryStr += ";";
 
