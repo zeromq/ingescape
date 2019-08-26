@@ -82,13 +82,22 @@ public:
     static IndependentVariableValueM* createFromCassandraRow(const CassRow* row);
 
     /**
-     * @brief Create a CassStatement to insert an IndependentVariableValueM into the DB.
+     * @brief Create a CassStatement to insert a IndependentVariableValueM into the DB.
      * The statement contains the values from the given independent variable value.
      * Passed independent variable value must have a valid and unique UUID.
      * @param independentVariableValue
      * @return
      */
     static CassStatement* createBoundInsertStatement(const IndependentVariableValueM& independentVariableValue);
+
+    /**
+     * @brief Create a CassStatement to update a IndependentVariableValueM into the DB.
+     * The statement contains the values from the given independent variable value.
+     * Passed independent variable value must have a valid and unique UUID.
+     * @param independentVariableValue
+     * @return
+     */
+    static CassStatement* createBoundUpdateStatement(const IndependentVariableValueM& independentVariableValue);
 };
 
 #endif // INDEPENDENTVARIABLEVALUEM_H

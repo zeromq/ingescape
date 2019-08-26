@@ -290,19 +290,7 @@ void TaskInstanceM::_onIndependentVariableValueChanged(const QString& key, const
     IndependentVariableM* indeVar = _mapIndependentVarByName.value(key, nullptr);
     if (indeVar != nullptr)
     {
-        QString queryStr = "UPDATE " + IndependentVariableValueM::table + " SET independent_var_value = ? WHERE id_experimentation = ? AND id_task_instance = ? AND id_independent_var = ?;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
-        cass_statement_bind_string(cassStatement, 0, value.toString().toStdString().c_str());
-        cass_statement_bind_uuid  (cassStatement, 1, _experimentationCassUuid);
-        cass_statement_bind_uuid  (cassStatement, 2, _cassUuid);
-        cass_statement_bind_uuid  (cassStatement, 3, indeVar->getCassUuid());
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError != CASS_OK)
-        {
-            qCritical() << "Could not update the value of independent variable" << indeVar->name() << "for record_setup" << name();
-        }
+        AssessmentsModelManager::update(IndependentVariableValueM(_experimentationCassUuid, _cassUuid, indeVar->getCassUuid(), value.toString()));
     }
     else {
         qCritical() << "Unknown independent variable" << key;

@@ -96,3 +96,21 @@ CassStatement* IndependentVariableValueM::createBoundInsertStatement(const Indep
     cass_statement_bind_string(cassStatement, 3, independentVariableValue.valueString.toStdString().c_str());
     return cassStatement;
 }
+
+/**
+ * @brief Create a CassStatement to update a IndependentVariableValueM into the DB.
+ * The statement contains the values from the given independent variable value.
+ * Passed independent variable value must have a valid and unique UUID.
+ * @param independentVariableValue
+ * @return
+ */
+CassStatement* IndependentVariableValueM::createBoundUpdateStatement(const IndependentVariableValueM& independentVariableValue)
+{
+    QString queryStr = "INSERT INTO " + IndependentVariableValueM::table + " (id_experimentation, id_task_instance, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
+    cass_statement_bind_string(cassStatement, 0, independentVariableValue.valueString.toStdString().c_str());
+    cass_statement_bind_uuid  (cassStatement, 1, independentVariableValue.experimentationUuid);
+    cass_statement_bind_uuid  (cassStatement, 2, independentVariableValue.taskInstanceUuid);
+    cass_statement_bind_uuid  (cassStatement, 3, independentVariableValue.independentVariableUuid);
+    return cassStatement;
+}
