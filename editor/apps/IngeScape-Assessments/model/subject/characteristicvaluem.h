@@ -16,13 +16,48 @@
 #define CHARACTERISTICVALUEM_H
 
 #include <QStringList>
+#include "cassandra.h"
 
 /**
  * @brief Mostly empty class representing a characteristic value for a particular subject.
- * This class is never instantiated and is there only to match the other model classes.
+ * This class is a "fancy-struct" with all its attributes publicly accessible.
+ * Its purpose is to handle more easily the DB entries and should no be kept in collections by controllers.
+ * See SubjectM for more details on how characteristic values are stored for QML to use them.
  */
 class CharacteristicValueM {
+
     public:
+        /**
+         * @brief Constructor settings all parameters
+         * @param experimentationUuid
+         * @param subjectUuid
+         * @param characteristicUuid
+         */
+        CharacteristicValueM(const CassUuid& experimentationUuid,
+                             const CassUuid& subjectUuid,
+                             const CassUuid& characteristicUuid,
+                             const QString& valueString);
+
+        /**
+         * @brief Experimentation's UUID
+         */
+        CassUuid experimentationUuid;
+
+        /**
+         * @brief Subject's UUID
+         */
+        CassUuid subjectUuid;
+
+        /**
+         * @brief Characteristic's UUID
+         */
+        CassUuid characteristicUuid;
+
+        /**
+         * @brief The characteristic value as a QString
+         */
+        QString valueString;
+
         /**
          * @brief Characteristic value table name
          */
@@ -38,8 +73,21 @@ class CharacteristicValueM {
          */
         static const QStringList primaryKeys;
 
-    private:
-        CharacteristicValueM() = default;
+        /**
+         * @brief Static factory method to create a characteristic value from a CassandraDB record
+         * @param row
+         * @return
+         */
+        static CharacteristicValueM* createFromCassandraRow(const CassRow* row);
+
+        /**
+         * @brief Create a CassStatement to insert an CharacteristicValueM into the DB.
+         * The statement contains the values from the given characteristicValue.
+         * Passed characteristicValue must have a valid and unique UUID.
+         * @param characteristicValue
+         * @return
+         */
+        static CassStatement* createBoundInsertStatement(const CharacteristicValueM& valueString);
 };
 
 #endif // CHARACTERISTICVALUEM_H

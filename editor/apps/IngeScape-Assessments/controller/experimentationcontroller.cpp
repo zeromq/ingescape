@@ -361,75 +361,35 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
 {
     if (experimentation != nullptr)
     {
-        for (auto subjectIt = experimentation->allSubjects()->begin() ; subjectIt != experimentation->allSubjects()->end() ; ++subjectIt)
+        QList<CharacteristicValueM*> characValueList = AssessmentsModelManager::select<CharacteristicValueM>({experimentation->getCassUuid()});
+
+        for (CharacteristicValueM* characValue : characValueList)
         {
-            SubjectM* subject = *subjectIt;
-            if (subject != nullptr)
+            if (characValue != nullptr)
             {
-                QString queryStr = "SELECT * FROM " + CharacteristicValueM::table + " WHERE id_experimentation = ? AND id_subject = ?;";
-                // Creates the new query statement
-                CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
-                cass_statement_bind_uuid(cassStatement, 0, experimentation->getCassUuid());
-                cass_statement_bind_uuid(cassStatement, 1, subject->getCassUuid());
+                SubjectM* subject = experimentation->getSubjectFromUID(characValue->subjectUuid);
+                CharacteristicM* characteristic = experimentation->getCharacteristicFromUID(characValue->characteristicUuid);
 
-                // Execute the query or bound statement
-                CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-                CassError cassError = cass_future_error_code(cassFuture);
-                if (cassError == CASS_OK)
+                // Get characteristic value type
+                if ((subject != nullptr) && (characteristic != nullptr))
                 {
-                    qDebug() << "Get all characteristics values for subject" << subject->displayedId() << "succeeded";
-
-                    // Retrieve result set and iterate over the rows
-                    const CassResult* cassResult = cass_future_get_result(cassFuture);
-
-                    if (cassResult != nullptr)
-                    {
-                        CassIterator* cassIterator = cass_iterator_from_result(cassResult);
-
-                        while(cass_iterator_next(cassIterator))
-                        {
-                            const CassRow* row = cass_iterator_get_row(cassIterator);
-
-                            // Get characteristic id
-                            CassUuid characteristicUuid;
-                            cass_value_get_uuid(cass_row_get_column_by_name(row, "id_characteristic"), &characteristicUuid);
-
-                            // Get characteristic value as a string
-                            QString valueString = AssessmentsModelManager::getStringValueFromColumnName(row, "characteristic_value");
-
-                            // Get characteristic value type
-                            CharacteristicM* characteristic = _currentExperimentation->getCharacteristicFromUID(characteristicUuid);
-                            if (characteristic != nullptr)
-                            {
-                                switch (characteristic->valueType()) {
-                                    case CharacteristicValueTypes::INTEGER:
-                                        subject->setCharacteristicValue(characteristic, valueString.toInt());
-                                        break;
-                                    case CharacteristicValueTypes::DOUBLE:
-                                        subject->setCharacteristicValue(characteristic, valueString.toDouble());
-                                        break;
-                                    case CharacteristicValueTypes::TEXT:
-                                        subject->setCharacteristicValue(characteristic, valueString);
-                                        break;
-                                    case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-                                        subject->setCharacteristicValue(characteristic, valueString);
-                                        break;
-                                    default: // UNKNOWN
-                                        break;
-                                }
-                            }
-
-                        }
-
-                        cass_iterator_free(cassIterator);
+                    switch (characteristic->valueType()) {
+                        case CharacteristicValueTypes::INTEGER:
+                            subject->setCharacteristicValue(characteristic, characValue->valueString.toInt());
+                            break;
+                        case CharacteristicValueTypes::DOUBLE:
+                            subject->setCharacteristicValue(characteristic, characValue->valueString.toDouble());
+                            break;
+                        case CharacteristicValueTypes::TEXT:
+                            subject->setCharacteristicValue(characteristic, characValue->valueString);
+                            break;
+                        case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
+                            subject->setCharacteristicValue(characteristic, characValue->valueString);
+                            break;
+                        default: // UNKNOWN
+                            break;
                     }
                 }
-                else {
-                    qCritical() << "Could not get all characteristic values for the subjects of experiment" << experimentation->name() << "from the database:" << cass_error_desc(cassError);
-                }
-
-                cass_future_free(cassFuture);
-                cass_statement_free(cassStatement);
             }
         }
     }

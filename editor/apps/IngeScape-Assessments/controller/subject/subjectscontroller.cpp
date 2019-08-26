@@ -348,44 +348,29 @@ void SubjectsController::_insertCharacteristicValueForSubjectIntoDB(SubjectM* su
 {
     if ((subject != nullptr) && (characteristic != nullptr))
     {
-        QString queryStr = "INSERT INTO " + CharacteristicValueM::table + " (id_experimentation, id_subject, id_characteristic, characteristic_value) VALUES (?, ?, ?, ?);";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
-        cass_statement_bind_uuid  (cassStatement, 0, subject->getExperimentationCassUuid());
-        cass_statement_bind_uuid  (cassStatement, 1, subject->getCassUuid());
-        cass_statement_bind_uuid  (cassStatement, 2, characteristic->getCassUuid());
-        const char* value;
+        QString valueString;
         switch(characteristic->valueType())
         {
             case CharacteristicValueTypes::INTEGER:
-                value = "0";
+                valueString = "0";
                 break;
             case CharacteristicValueTypes::DOUBLE:
-                value = "0.0";
+                valueString = "0.0";
                 break;
             case CharacteristicValueTypes::TEXT:
             case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-                value = "";
+                valueString = "";
                 break;
             default:
                 // Unknown characteristic value type
-                value = "";
+                valueString = "";
                 break;
         }
-        cass_statement_bind_string(cassStatement, 3, value);
 
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "New characteristic value inserted into the DB";
-        }
-        else {
-            qCritical() << "Could not insert the new subject into the DB:" << cass_error_desc(cassError);
-        }
-
-        cass_statement_free(cassStatement);
-        cass_future_free(cassFuture);
+        AssessmentsModelManager::insert(CharacteristicValueM(subject->getExperimentationCassUuid(),
+                                                             subject->getCassUuid(),
+                                                             characteristic->getCassUuid(),
+                                                             valueString));
     }
 }
 
