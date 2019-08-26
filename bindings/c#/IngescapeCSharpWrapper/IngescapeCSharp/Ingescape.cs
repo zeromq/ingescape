@@ -9,9 +9,16 @@ using System.Runtime.CompilerServices;
 
 namespace Ingescape
 {
+    #region Enums
+
     public enum iop_t { IGS_INPUT_T = 1, IGS_OUTPUT_T, IGS_PARAMETER_T };
     public enum iopType_t { IGS_INTEGER_T = 1, IGS_DOUBLE_T, IGS_STRING_T, IGS_BOOL_T, IGS_IMPULSION_T, IGS_DATA_T };
-    public enum igs_logLevel_t{IGS_LOG_TRACE = 0,IGS_LOG_DEBUG,IGS_LOG_INFO,IGS_LOG_WARN,IGS_LOG_ERROR,IGS_LOG_FATAL};
+    public enum igs_logLevel_t { IGS_LOG_TRACE = 0, IGS_LOG_DEBUG, IGS_LOG_INFO, IGS_LOG_WARN, IGS_LOG_ERROR, IGS_LOG_FATAL };
+    public enum igs_license_limit_t { IGS_LICENSE_TIMEOUT = 0, IGS_LICENSE_TOO_MANY_AGENTS, IGS_LICENSE_TOO_MANY_IOPS };
+
+    #endregion
+
+    #region Callbacks
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void igs_observeCallback(iop_t iopType,
@@ -31,15 +38,21 @@ namespace Ingescape
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void igs_freezeCallback(bool isPaused, IntPtr myData);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void igs_licenseCallback(igs_license_limit_t limit, IntPtr myData);
+
+    #endregion
 
     public class Igs
     {
+        #region Path to library C IngeScape
+
         //Librairie x86 debug
         //private const string ingescapeDLLPath = "C:\\ingescape\\libs\\debug\\ingescape.dll";
-        
+
         // Library 32 bits (x86)
         //private const string ingescapeDLLPath = "C:\\Program Files (x86)\\ingescape\\lib\\ingescape.dll";
-        
+
         // Library 64 bits
         private const string ingescapeDLLPath = "C:\\Program Files\\ingescape\\lib\\ingescape.dll";
 
@@ -49,6 +62,7 @@ namespace Ingescape
         // Library iOS
         //private const string ingescapeDLLPath = "__Internal";
 
+        #endregion
 
         //////////////////////////////////////////////////
         // Initialization and control
@@ -57,9 +71,11 @@ namespace Ingescape
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_startWithDevice([MarshalAs(UnmanagedType.LPStr)]  string networkDevice, int port);
         public static int startWithDevice(string networkDevice, int port) { return igs_startWithDevice(networkDevice, port); }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_startWithIP([MarshalAs(UnmanagedType.LPStr)]  string ipAddress, int port);
         public static int startWithIP(string ipAddress, int port) { return igs_startWithIP(ipAddress, port); }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_stop();
         public static int stop() { return igs_stop(); }
@@ -770,6 +786,8 @@ namespace Ingescape
         public static bool getRequestOutputsFromMappedAgents() { return igs_getRequestOutputsFromMappedAgents(); }
 
 
+        #region Logs
+
         /* Logs policy
          - fatal : Events that force application termination.
          - error : Events that are fatal to the current operation but not the whole application.
@@ -825,6 +843,7 @@ namespace Ingescape
             str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_setLogLevel(igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
         public static void setLogLevel(igs_logLevel_t level) { igs_setLogLevel(level); } //set log level in console, default is IGS_LOG_INFO
@@ -842,6 +861,39 @@ namespace Ingescape
         public static void igs_info(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_INFO, memberName, message); }
         public static void igs_warn(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_WARN, memberName, message); }
         public static void igs_error(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_ERROR, memberName, message); }
-        public static void igs_fatal(string message, [CallerMemberName] string memberName = "") {igs_log(igs_logLevel_t.IGS_LOG_FATAL, memberName, message);}
+        public static void igs_fatal(string message, [CallerMemberName] string memberName = "") {igs_log(igs_logLevel_t.IGS_LOG_FATAL, memberName, message); }
+
+        #endregion
+
+        #region License
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_setLicensePath(string path);
+        public static void setLicensePath(string path) { igs_setLicensePath(path); }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_getLicensePath(); // must be freed by caller
+        public static string getLicensePath()
+        {
+            string str = "";
+            IntPtr ptr = igs_getLicensePath();
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
+        }
+
+        // Any agent developer can use this function to check the license against her/his agent's unique id.
+        // IDs are provided by the ingescape team.
+        // Returns true if check is OK
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_checkLicenseForAgent(string agentId);
+        public static void checkLicenseForAgent(string agentId) { igs_checkLicenseForAgent(agentId); }
+
+        // use this callback mechanism to be notified when the timer
+        // or number of agents or number of IOPs has been exceeded in demo mode
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_observeLicense([MarshalAs(UnmanagedType.FunctionPtr)] igs_licenseCallback cb, IntPtr myData);
+        public static void observeLicense(igs_licenseCallback cb, IntPtr myData) { igs_observeLicense(cb, myData); }
+
+        #endregion
     }
 }

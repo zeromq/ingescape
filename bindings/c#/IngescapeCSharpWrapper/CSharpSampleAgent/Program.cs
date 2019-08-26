@@ -45,7 +45,7 @@ namespace CSharpSampleAgent
             //string msg = null;
             while (true)
             {
-                Console.Write("Press  'X' to quit \n Press  'A' to write in log \n");
+                Console.Write("Press  'X' to quit \nPress  'A' to write in log \n");
 
                 // Start a console read operation. Do not display the input.
                 cki = Console.ReadKey(true);

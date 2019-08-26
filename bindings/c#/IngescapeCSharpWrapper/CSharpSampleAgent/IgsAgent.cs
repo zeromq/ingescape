@@ -12,8 +12,19 @@ namespace CSharpSampleAgent
 {
     class IgsAgent
     {
+        #region Callbacks
+
         public igs_observeCallback callbckPtr;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="iopType"></param>
+        /// <param name="name"></param>
+        /// <param name="valueType"></param>
+        /// <param name="value"></param>
+        /// <param name="valueSize"></param>
+        /// <param name="myData"></param>
         void genericCallback(iop_t iopType,
         [MarshalAs(UnmanagedType.LPStr)] string name,
         iopType_t valueType,
@@ -57,6 +68,26 @@ namespace CSharpSampleAgent
 
         }
 
+        // License Callback
+        public igs_licenseCallback ptrOnLicenseCallbck;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="limit"></param>
+        /// <param name="myData"></param>
+        void onLicenseCallback(igs_license_limit_t limit, IntPtr myData)
+        {
+            Console.WriteLine("onLicenseCallback " + limit);
+        }
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public IgsAgent()
         {
             //Load a definition from file
@@ -78,10 +109,15 @@ namespace CSharpSampleAgent
             //Get network list devices
             string[] netDevicesList = Igs.getNetDevicesList();
  
-            ////Verbose
-            //Igs.setVerbose(true);
+            // Verbose
+            Igs.setVerbose(true);
             //bool isVerbose = Igs.isVerbose();
-            //Console.WriteLine("Is verbose : " + isVerbose);
+            //Console.WriteLine("Is verbose: " + isVerbose);
+
+            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string licensePath = string.Format(@"{0}\IngeScape\licenses\", documentsPath);
+            Console.WriteLine("documentsPath: {0} -- licensePath: {1}", documentsPath, licensePath);
+            Igs.setLicensePath(licensePath);
 
             ////Color Verbose
             //Igs.setUseColorVerbose(true);
@@ -103,16 +139,30 @@ namespace CSharpSampleAgent
             //string logPath = Igs.getLogPath();
             //Console.WriteLine("Log file path : " + logPath);
 
-            ////Log level
-            //Igs.setLogLevel(igs_logLevel_t.IGS_LOG_TRACE);
-            //igs_logLevel_t logLevel = Igs.getLogLevel();
-            //Console.WriteLine("Log level : " + logLevel);
+            // Log level
+            Igs.setLogLevel(igs_logLevel_t.IGS_LOG_TRACE);
+            igs_logLevel_t logLevel = Igs.getLogLevel();
+            Console.WriteLine("Log level: " + logLevel);
+
+            ptrOnLicenseCallbck = onLicenseCallback;
+
+            // Observe license error
+            Igs.observeLicense(ptrOnLicenseCallbck, IntPtr.Zero);
+
+            // 
+            //Igs.checkLicenseForAgent("");
+
+
 
             //Start the agent on the network
             Igs.startWithDevice("Wi-Fi", 5671);
 
             //TODO : implement test of the command line functions
         }
+
+        #endregion
+
+        #region Methods
 
         public void readGenericFunctions()
         {
@@ -286,5 +336,7 @@ namespace CSharpSampleAgent
         {
             Igs.stop();
         }
+
+        #endregion
     }
 }
