@@ -47,62 +47,25 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
     // Create the (fake) group "New"
     _newGroup = new ExperimentationsGroupVM(tr("New Group"), nullptr);
 
-    AssessmentsModelManager* modelManager = AssessmentsModelManager::Instance();
-    if (modelManager != nullptr) {
-        // Create the query
-        QString query = "SELECT * FROM " + ExperimentationM::table;
-
-        // Creates the new query statement
-        CassStatement* cassStatement = cass_statement_new(query.toStdString().c_str(), 0);
-
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(modelManager->getCassSession(), cassStatement);
-
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
+    // Create the query
+    QList<ExperimentationM*> experimentationList = AssessmentsModelManager::select<ExperimentationM>({}); // #NoFilter
+    for (ExperimentationM* experimentation : experimentationList)
+    {
+        if (experimentation != nullptr)
         {
-            qDebug() << "Get all experimentations succeeded";
-
-            // Retrieve result set and iterate over the rows
-            const CassResult* cassResult = cass_future_get_result(cassFuture);
-
-            if (cassResult != nullptr)
+            ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentation->groupName());
+            if (experimentationsGroup == nullptr)
             {
-                CassIterator* cassIterator = cass_iterator_from_result(cassResult);
+                // Create the ExperimentationGroupVM
+                experimentationsGroup = _createNewExperimentationGroup(experimentation->groupName());
+            }
 
-                while(cass_iterator_next(cassIterator))
-                {
-                    const CassRow* row = cass_iterator_get_row(cassIterator);
-
-                    // Create the new experimentation
-                    ExperimentationM* experimentation = ExperimentationM::createFromCassandraRow(row);
-                    if (experimentation != nullptr)
-                    {
-                        QString experimentationsGroupName = AssessmentsModelManager::getStringValueFromColumnName(row, "group_name");
-                        ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentationsGroupName);
-                        if (experimentationsGroup == nullptr)
-                        {
-                            // Create the ExperimentationGroupVM
-                            experimentationsGroup = _createNewExperimentationGroup(experimentationsGroupName);
-                        }
-
-                        if (experimentationsGroup != nullptr)
-                        {
-                            // Add to the group
-                            experimentationsGroup->experimentations()->append(experimentation);
-                        }
-                    }
-                }
-
-                cass_iterator_free(cassIterator);
+            if (experimentationsGroup != nullptr)
+            {
+                // Add to the group
+                experimentationsGroup->experimentations()->append(experimentation);
             }
         }
-        else {
-            qCritical() << "Could not get all experimentations from the DataBase:" << cass_error_desc(cassError);
-        }
-
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
     }
 }
 
