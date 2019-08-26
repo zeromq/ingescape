@@ -16,14 +16,49 @@
 #define INDEPENDENTVARIABLEVALUEM_H
 
 #include <QStringList>
+#include "cassandra.h"
 
 /**
  * @brief Mostly empty class representing an independent variable value for a particular task instance.
- * This class is never instantiated and is there only to match the other model classes.
+ * This class is a "fancy-struct" with all its attributes publicly accessible.
+ * Its purpose is to handle more easily the DB entries and should no be kept in collections by controllers.
+ * See TaskInstanceM for more details on how independent variable values values are stored for QML to use them.
  */
 class IndependentVariableValueM
 {
 public:
+    /**
+     * @brief Constructor setting all parameters
+     * @param experimentationUuid
+     * @param taskInstanceUuid
+     * @param independentVariableUuid
+     * @param valueString
+     */
+    IndependentVariableValueM(const CassUuid& experimentationUuid,
+                              const CassUuid& taskInstanceUuid,
+                              const CassUuid& independentVariableUuid,
+                              const QString& valueString);
+
+    /**
+     * @brief Experimentation's UUID
+     */
+    CassUuid experimentationUuid;
+
+    /**
+     * @brief Task instance's UUID
+     */
+    CassUuid taskInstanceUuid;
+
+    /**
+     * @brief Independent variable's UUID
+     */
+    CassUuid independentVariableUuid;
+
+    /**
+     * @brief The independent variable value as a QString
+     */
+    QString valueString;
+
     /**
      * @brief Independent variable value table name
      */
@@ -39,8 +74,21 @@ public:
      */
     static const QStringList primaryKeys;
 
-private:
-    IndependentVariableValueM() = default;
+    /**
+     * @brief Static factory method to create an independent variable value from a CassandraDB record
+     * @param row
+     * @return
+     */
+    static IndependentVariableValueM* createFromCassandraRow(const CassRow* row);
+
+    /**
+     * @brief Create a CassStatement to insert an IndependentVariableValueM into the DB.
+     * The statement contains the values from the given independent variable value.
+     * Passed independent variable value must have a valid and unique UUID.
+     * @param independentVariableValue
+     * @return
+     */
+    static CassStatement* createBoundInsertStatement(const IndependentVariableValueM& independentVariableValue);
 };
 
 #endif // INDEPENDENTVARIABLEVALUEM_H

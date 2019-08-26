@@ -344,6 +344,19 @@ TaskM* ExperimentationM::getTaskFromUID(const CassUuid& cassUuid)
 
 
 /**
+ * @brief Get a task instance from its UUID
+ * @param cassUuid
+ * @return
+ */
+TaskInstanceM* ExperimentationM::getTaskInstanceFromUID(const CassUuid& cassUuid)
+{
+    const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
+    auto taskInstanceIt = std::find_if(taskInstanceList.begin(), taskInstanceList.end(), [cassUuid](TaskInstanceM* taskInstance) { return (taskInstance != nullptr) && (taskInstance->getCassUuid() == cassUuid); });
+    return (taskInstanceIt != taskInstanceList.end()) ? *taskInstanceIt : nullptr;
+}
+
+
+/**
  * @brief Static factory method to create an experiment from a CassandraDB record
  * @param row
  * @return

@@ -199,6 +199,14 @@ public:
 
 
     /**
+     * @brief Get a task instance from its UUID
+     * @param cassUuid
+     * @return
+     */
+    TaskInstanceM* getTaskInstanceFromUID(const CassUuid& cassUuid);
+
+
+    /**
      * @brief Static factory method to create an experiment from a CassandraDB record
      * @param row
      * @return

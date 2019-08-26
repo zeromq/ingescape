@@ -40,10 +40,11 @@ const QStringList CharacteristicValueM::primaryKeys = {
 };
 
 /**
- * @brief Constructor settings all parameters
+ * @brief Constructor setting all parameters
  * @param experimentationUuid
  * @param subjectUuid
  * @param characteristicUuid
+ * @param valueString
  */
 CharacteristicValueM::CharacteristicValueM(const CassUuid& experimentationUuid, const CassUuid& subjectUuid, const CassUuid& characteristicUuid, const QString& characteristicValue)
     : experimentationUuid(experimentationUuid)

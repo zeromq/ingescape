@@ -28,10 +28,11 @@ class CharacteristicValueM {
 
     public:
         /**
-         * @brief Constructor settings all parameters
+         * @brief Constructor setting all parameters
          * @param experimentationUuid
          * @param subjectUuid
          * @param characteristicUuid
+ * @param valueString
          */
         CharacteristicValueM(const CassUuid& experimentationUuid,
                              const CassUuid& subjectUuid,
@@ -87,7 +88,7 @@ class CharacteristicValueM {
          * @param characteristicValue
          * @return
          */
-        static CassStatement* createBoundInsertStatement(const CharacteristicValueM& valueString);
+        static CassStatement* createBoundInsertStatement(const CharacteristicValueM& characteristicValue);
 };
 
 #endif // CHARACTERISTICVALUEM_H

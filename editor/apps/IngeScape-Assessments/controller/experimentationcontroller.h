@@ -146,11 +146,11 @@ protected: // Methods
     void _retrieveCharacteristicValuesForSubjectsInExperimentation(ExperimentationM* experimentation);
 
     /**
-     * @brief Retrieve all independent variable values Cassandra DB for the given task instance.
-     * The task instance will be updated by this method
-     * @param taskInstance
+     * @brief Retrieve all independent variable values Cassandra DB for each task instance in the given experimentation.
+     * The experimentation will be updated by this method
+     * @param experimentation
      */
-    void _retrieveIndependentVariableValuesForTaskInstance(TaskInstanceM* taskInstance);
+    void _retrieveIndependentVariableValuesForTaskInstancesInExperimentation(ExperimentationM* experimentation);
 
 protected: // Attributes
     // Helper to manage JSON files
