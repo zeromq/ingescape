@@ -109,7 +109,7 @@ namespace CSharpSampleAgent
             //Console.WriteLine("Log level : " + logLevel);
 
             //Start the agent on the network
-            Igs.startWithDevice("Ethernet", 5670);
+            Igs.startWithDevice("Wi-Fi", 5671);
 
             //TODO : implement test of the command line functions
         }
