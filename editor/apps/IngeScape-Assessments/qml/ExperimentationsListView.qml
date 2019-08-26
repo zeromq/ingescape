@@ -98,7 +98,7 @@ Item {
             horizontalCenter: parent.horizontalCenter
         }
 
-        width: childrenRect.width
+        width: parent.width
         height: childrenRect.height
 
         I2SvgItem {

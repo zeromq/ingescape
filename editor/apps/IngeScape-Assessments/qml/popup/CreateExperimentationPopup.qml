@@ -294,7 +294,7 @@ AssessmentsPopupBase {
 
                     onCheckedChanged: {
                         if (checked) {
-                            rootPopup.selectedExperimentationsGroup = model.QtObject;
+                            rootPopup.selectedExperimentationsGroup = controller.defaultGroupOther;
                         }
                     }
 
