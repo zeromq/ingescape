@@ -82,13 +82,22 @@ class CharacteristicValueM {
         static CharacteristicValueM* createFromCassandraRow(const CassRow* row);
 
         /**
-         * @brief Create a CassStatement to insert an CharacteristicValueM into the DB.
+         * @brief Create a CassStatement to insert a CharacteristicValueM into the DB.
          * The statement contains the values from the given characteristicValue.
          * Passed characteristicValue must have a valid and unique UUID.
          * @param characteristicValue
          * @return
          */
         static CassStatement* createBoundInsertStatement(const CharacteristicValueM& characteristicValue);
+
+        /**
+         * @brief Create a CassStatement to update a CharacteristicValueM into the DB.
+         * The statement contains the values from the given characteristicValue.
+         * Passed characteristicValue must have a valid and unique UUID.
+         * @param characteristicValue
+         * @return
+         */
+        static CassStatement* createBoundUpdateStatement(const CharacteristicValueM& characteristicValue);
 };
 
 #endif // CHARACTERISTICVALUEM_H

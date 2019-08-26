@@ -80,7 +80,7 @@ CharacteristicValueM* CharacteristicValueM::createFromCassandraRow(const CassRow
 }
 
 /**
- * @brief Create a CassStatement to insert an CharacteristicValueM into the DB.
+ * @brief Create a CassStatement to insert a CharacteristicValueM into the DB.
  * The statement contains the values from the given characteristicValue.
  * Passed characteristicValue must have a valid and unique UUID.
  * @param characteristicValue
@@ -97,6 +97,27 @@ CassStatement* CharacteristicValueM::createBoundInsertStatement(const Characteri
     cass_statement_bind_uuid  (cassStatement, 1, characteristicValue.subjectUuid);
     cass_statement_bind_uuid  (cassStatement, 2, characteristicValue.characteristicUuid);
     cass_statement_bind_string(cassStatement, 3, characteristicValue.valueString.toStdString().c_str());
+
+    return cassStatement;
+}
+
+/**
+ * @brief Create a CassStatement to update a CharacteristicValueM into the DB.
+ * The statement contains the values from the given characteristicValue.
+ * Passed characteristicValue must have a valid and unique UUID.
+ * @param characteristicValue
+ * @return
+ */
+CassStatement* CharacteristicValueM::createBoundUpdateStatement(const CharacteristicValueM& characteristicValue)
+{
+    QString queryStr = "UPDATE " + CharacteristicValueM::table + " SET characteristic_value = ? WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ?;";
+
+    // Creates the new query statement
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
+    cass_statement_bind_string(cassStatement, 0, characteristicValue.valueString.toStdString().c_str());
+    cass_statement_bind_uuid  (cassStatement, 1, characteristicValue.experimentationUuid);
+    cass_statement_bind_uuid  (cassStatement, 2, characteristicValue.subjectUuid);
+    cass_statement_bind_uuid  (cassStatement, 3, characteristicValue.characteristicUuid);
 
     return cassStatement;
 }

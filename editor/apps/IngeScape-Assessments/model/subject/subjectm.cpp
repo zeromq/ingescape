@@ -236,8 +236,7 @@ CassStatement* SubjectM::createBoundInsertStatement(const SubjectM& subject)
 }
 
 
-/**
- * @brief Create a CassStatement to update a SubjectM into the DB.
+/** * @brief Create a CassStatement to update a SubjectM into the DB.
  * The statement contains the values from the given subject.
  * Passed subject must have a valid and unique UUID.
  * @param subject
@@ -303,24 +302,7 @@ void SubjectM::_onCharacteristicValueChanged(const QString &key, const QVariant 
     CharacteristicM* characteristic = _mapCharacteristicsByName.value(key, nullptr);
     if (characteristic != nullptr)
     {
-        QString queryStr = "UPDATE " + CharacteristicValueM::table + " SET characteristic_value = ? WHERE id_experimentation = ? AND id_subject = ? AND id_characteristic = ?;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
-        cass_statement_bind_string(cassStatement, 0, value.toString().toStdString().c_str());
-        cass_statement_bind_uuid  (cassStatement, 1, _experimentationCassUuid);
-        cass_statement_bind_uuid  (cassStatement, 2, _cassUuid);
-        cass_statement_bind_uuid  (cassStatement, 3, characteristic->getCassUuid());
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-
-        if (cassError != CASS_OK)
-        {
-            qCritical() << "Could not update the characteristic value of" << characteristic->name() << "for subject" << displayedId();
-        }
-
-        // Clean-up cassandra objects
-        cass_future_free(cassFuture);
-        cass_statement_free(cassStatement);
+        AssessmentsModelManager::update(CharacteristicValueM(characteristic->getExperimentationCassUuid(), getCassUuid(), characteristic->getCassUuid(), value.toString()));
     }
 }
 
