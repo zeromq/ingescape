@@ -143,13 +143,22 @@ public:
     static void deleteTaskInstanceFromCassandra(const TaskInstanceM& taskInstance);
 
     /**
-     * @brief Create a CassStatement to insert an TaskInstanceM into the DB.
+     * @brief Create a CassStatement to insert a TaskInstanceM into the DB.
      * The statement contains the values from the given taskInstance.
      * Passed taskInstance must have a valid and unique UUID.
      * @param taskInstance
      * @return
      */
     static CassStatement* createBoundInsertStatement(const TaskInstanceM& taskInstance);
+
+    /**
+     * @brief Create a CassStatement to update a TaskInstanceM into the DB.
+     * The statement contains the values from the given taskInstance.
+     * Passed taskInstance must have a valid and unique UUID.
+     * @param taskInstance
+     * @return
+     */
+    static CassStatement* createBoundUpdateStatement(const TaskInstanceM& taskInstance);
 
 private Q_SLOTS:
     void _onIndependentVariableValueChanged(const QString& key, const QVariant& value);
@@ -159,11 +168,6 @@ private:
      * @brief For debug purpose: Print the value of all independent variables
      */
     void _printIndependentVariableValues();
-
-    /**
-     * @brief Update the DB entry corresponding
-     */
-    void _updateDBEntry();
 
 private:
     QHash<QString, IndependentVariableM*> _mapIndependentVarByName;

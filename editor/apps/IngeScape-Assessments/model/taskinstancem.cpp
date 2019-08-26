@@ -145,7 +145,7 @@ void TaskInstanceM::setname(QString value)
         _name = value;
 
         // Update DB entry
-        _updateDBEntry();
+        AssessmentsModelManager::update(*this);
 
         // Notify change
         Q_EMIT nameChanged(value);
@@ -164,7 +164,7 @@ void TaskInstanceM::setcomments(QString value)
         _comments = value;
 
         // Update DB entry
-        _updateDBEntry();
+        AssessmentsModelManager::update(*this);
 
         // Notify change
         Q_EMIT commentsChanged(value);
@@ -234,7 +234,7 @@ void TaskInstanceM::deleteTaskInstanceFromCassandra(const TaskInstanceM& taskIns
 }
 
 /**
- * @brief Create a CassStatement to insert an TaskInstanceM into the DB.
+ * @brief Create a CassStatement to insert a TaskInstanceM into the DB.
  * The statement contains the values from the given taskInstance.
  * Passed taskInstance must have a valid and unique UUID.
  * @param taskInstance
@@ -254,6 +254,33 @@ CassStatement* TaskInstanceM::createBoundInsertStatement(const TaskInstanceM& ta
     cass_statement_bind_int64 (cassStatement, 7, cass_time_from_epoch(taskInstance.startDateTime().toTime_t()));
     cass_statement_bind_uint32(cassStatement, 8, cass_date_from_epoch(taskInstance.endDateTime().toTime_t()));
     cass_statement_bind_int64 (cassStatement, 9, cass_time_from_epoch(taskInstance.endDateTime().toTime_t()));
+    return cassStatement;
+}
+
+/**
+ * @brief Create a CassStatement to update a TaskInstanceM into the DB.
+ * The statement contains the values from the given taskInstance.
+ * Passed taskInstance must have a valid and unique UUID.
+ * @param taskInstance
+ * @return
+ */
+CassStatement* TaskInstanceM::createBoundUpdateStatement(const TaskInstanceM& taskInstance)
+{
+
+    QString queryStr("UPDATE " + TaskInstanceM::table
+                     + " SET name = ?, comment = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?"
+                     + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id = ?;");
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
+    cass_statement_bind_string(cassStatement, 0, taskInstance.name().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 1, taskInstance.comments().toStdString().c_str());
+    cass_statement_bind_uint32(cassStatement, 2, cass_date_from_epoch(taskInstance.startDateTime().toTime_t()));
+    cass_statement_bind_int64 (cassStatement, 3, cass_time_from_epoch(taskInstance.startDateTime().toTime_t()));
+    cass_statement_bind_uint32(cassStatement, 4, cass_date_from_epoch(taskInstance.endDateTime().toTime_t()));
+    cass_statement_bind_int64 (cassStatement, 5, cass_time_from_epoch(taskInstance.endDateTime().toTime_t()));
+    cass_statement_bind_uuid  (cassStatement, 6, taskInstance.subject()->getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 7, taskInstance.subject()->getCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 8, taskInstance.task()->getCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 9, taskInstance.getCassUuid());
     return cassStatement;
 }
 
@@ -327,45 +354,5 @@ void TaskInstanceM::_printIndependentVariableValues()
                 }
             }
         }
-    }
-}
-
-/**
- * @brief Update the DB entry corresponding
- */
-void TaskInstanceM::_updateDBEntry()
-{
-    if ((_task != nullptr) && (_subject != nullptr))
-    {
-        time_t startDateTime(_startDateTime.toTime_t());
-        cass_uint32_t startYearMonthDay = cass_date_from_epoch(startDateTime);
-        cass_int64_t startTimeOfDay = cass_time_from_epoch(startDateTime);
-        time_t endDateTime(_startDateTime.toTime_t());
-        cass_uint32_t endYearMonthDay = cass_date_from_epoch(endDateTime);
-        cass_int64_t endTimeOfDay = cass_time_from_epoch(endDateTime);
-
-        QString queryStr("UPDATE " + TaskInstanceM::table
-                         + " SET name = ?, comment = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?"
-                         + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id = ?;");
-
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
-        cass_statement_bind_string(cassStatement, 0, _name.toStdString().c_str());
-        cass_statement_bind_string(cassStatement, 1, _comments.toStdString().c_str());
-        cass_statement_bind_uint32(cassStatement, 2, startYearMonthDay);
-        cass_statement_bind_int64 (cassStatement, 3, startTimeOfDay);
-        cass_statement_bind_uint32(cassStatement, 4, endYearMonthDay);
-        cass_statement_bind_int64 (cassStatement, 5, endTimeOfDay);
-        cass_statement_bind_uuid  (cassStatement, 6, _subject->getExperimentationCassUuid());
-        cass_statement_bind_uuid  (cassStatement, 7, _subject->getCassUuid());
-        cass_statement_bind_uuid  (cassStatement, 8, _task->getCassUuid());
-        cass_statement_bind_uuid  (cassStatement, 9, getCassUuid());
-
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError != CASS_OK)
-        {
-            qCritical() << "Unable to update the TaskInstance" << _name << cass_error_desc(cassError);
-        }
-
     }
 }
