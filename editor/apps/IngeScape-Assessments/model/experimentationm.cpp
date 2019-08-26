@@ -105,20 +105,7 @@ void ExperimentationM::setname(QString value)
     {
         _name = value;
 
-        QString queryStr = "UPDATE " + ExperimentationM::table + " SET name = ? WHERE id = ?;";
-        CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 2);
-        cass_statement_bind_string(cassStatement, 0, value.toStdString().c_str());
-        cass_statement_bind_uuid  (cassStatement, 1, _cassUuid);
-        // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
-        CassError cassError = cass_future_error_code(cassFuture);
-        if (cassError == CASS_OK)
-        {
-            qInfo() << "Experimentation renamed successfully";
-        }
-        else {
-            qCritical() << "Could not update the name of the experimentation" << cass_error_desc(cassError);
-        }
+        AssessmentsModelManager::update(*this);
 
         Q_EMIT nameChanged(value);
     }
@@ -418,6 +405,25 @@ CassStatement* ExperimentationM::createBoundInsertStatement(const Experimentatio
     cass_statement_bind_int64 (cassStatement, 3, cass_time_from_epoch(experimentation.creationDate().toTime_t()));
     cass_statement_bind_string(cassStatement, 4, experimentation.groupName().toStdString().c_str());
 
+    return cassStatement;
+}
+
+/**
+ * @brief Create a CassStatement to update an ExperimentationM into the DB.
+ * The statement contains the values from the given experimentation.
+ * Passed experimentation must have a valid and unique UUID.
+ * @param experimentation
+ * @return
+ */
+CassStatement* ExperimentationM::createBoundUpdateStatement(const ExperimentationM& experimentation)
+{
+    QString queryStr = "UPDATE " + ExperimentationM::table + " SET name = ?, creation_date = ?, creation_time = ?, group_name = ? WHERE id = ?;";
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 5);
+    cass_statement_bind_string(cassStatement, 0, experimentation.name().toStdString().c_str());
+    cass_statement_bind_uint32(cassStatement, 1, cass_date_from_epoch(experimentation.creationDate().toTime_t()));
+    cass_statement_bind_int64 (cassStatement, 2, cass_time_from_epoch(experimentation.creationDate().toTime_t()));
+    cass_statement_bind_string(cassStatement, 3, experimentation.groupName().toStdString().c_str());
+    cass_statement_bind_uuid  (cassStatement, 4, experimentation.getCassUuid());
     return cassStatement;
 }
 

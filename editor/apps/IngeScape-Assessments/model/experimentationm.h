@@ -220,7 +220,6 @@ public:
      */
     static void deleteExperimentationFromCassandra(const ExperimentationM& experimentation);
 
-
     /**
      * @brief Create a CassStatement to insert an ExperimentationM into the DB.
      * The statement contains the values from the given experimentation.
@@ -229,6 +228,15 @@ public:
      * @return
      */
     static CassStatement* createBoundInsertStatement(const ExperimentationM& experimentation);
+
+    /**
+     * @brief Create a CassStatement to update an ExperimentationM into the DB.
+     * The statement contains the values from the given experimentation.
+     * Passed experimentation must have a valid and unique UUID.
+     * @param experimentation
+     * @return
+     */
+    static CassStatement* createBoundUpdateStatement(const ExperimentationM& experimentation);
 
 
 private: // Methods
