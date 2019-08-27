@@ -523,7 +523,7 @@ ApplicationWindow {
                 });
 
                 mainWindow.title = Qt.binding(function() {
-                    return qsTr("IngeScape Editor - v%1 - %2").arg(Qt.application.version).arg(IngeScapeEditorC.currentPlatformName);
+                    return qsTr("IngeScape Editor - v%1 - %2 %3").arg(Qt.application.version).arg(IngeScapeEditorC.currentPlatformName).arg(IngeScapeEditorC.hasAPlatformBeenLoadedByUser ? "" : "(no opened platform)");
                 });
 
                 menuPlugUNplugMapping.text = Qt.binding(function() {

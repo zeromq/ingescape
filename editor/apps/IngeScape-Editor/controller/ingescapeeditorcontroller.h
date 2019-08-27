@@ -111,6 +111,9 @@ class IngeScapeEditorController : public QObject
     // Name of the current IngeScape platform
     I2_QML_PROPERTY_READONLY(QString, currentPlatformName)
 
+    // Flag indicating if a platform has been loaded (opened) by the user or if we are in a "new" or "last" state
+    I2_QML_PROPERTY_READONLY(bool, hasAPlatformBeenLoadedByUser)
+
 
 public:
 
@@ -386,6 +389,15 @@ private:
 
     // Path to the default file containing the last platform
     QString _platformDefaultFilePath;
+
+    // Path to the currently opened platform file (*.json)
+    QString _currentPlatformFilePath;
+
+    // Default name to save the platform when exiting
+    static const QString DEFAULT_LAST_PLATFORM_NAME;
+
+    // Default name when creating a new platform
+    static const QString DEFAULT_NEW_PLATFORM_NAME;
 
 };
 

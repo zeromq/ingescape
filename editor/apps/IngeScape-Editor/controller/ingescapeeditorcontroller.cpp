@@ -25,6 +25,12 @@
 #include <settings/ingescapesettings.h>
 
 
+// Default name to save the platform when exiting
+const QString IngeScapeEditorController::DEFAULT_LAST_PLATFORM_NAME = "last";
+
+// Default name when creating a new platform
+const QString IngeScapeEditorController::DEFAULT_NEW_PLATFORM_NAME = "new";
+
 /**
  * @brief Constructor
  * @param parent
@@ -47,11 +53,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _timeLineC(nullptr),
     _peerIdOfExpe(""),
     _peerNameOfExpe(""),
-    _currentPlatformName("last"),
+    _currentPlatformName(DEFAULT_LAST_PLATFORM_NAME),
+    _hasAPlatformBeenLoadedByUser(false),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
     _platformDirectoryPath(""),
-    _platformDefaultFilePath("")
+    _platformDefaultFilePath(""),
+    _currentPlatformFilePath("")
 {
     qInfo() << "New IngeScape Editor Controller";
 
@@ -114,7 +122,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         _platformDirectoryPath = platformPath;
 
         // Init the path to the JSON file to load the last platform
-        _platformDefaultFilePath = QString("%1%2.json").arg(_platformDirectoryPath, _currentPlatformName);
+        _platformDefaultFilePath = QString("%1%2.json").arg(_platformDirectoryPath, DEFAULT_LAST_PLATFORM_NAME);
+        _currentPlatformFilePath = _platformDefaultFilePath;
     }
 
 
@@ -473,6 +482,11 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
             qCritical() << "The loading of the selected platform failed !";
         }
 
+        // Special case if the user opens the "last.json" platform, we don't consider that a saved platform's been opened
+        if (success && QFileInfo(platformFilePath).baseName() != DEFAULT_LAST_PLATFORM_NAME) {
+            sethasAPlatformBeenLoadedByUser(true);
+        }
+
         // Force our global mapping to CONTROLLED
         if (_modelManager != nullptr) {
             _modelManager->setisMappingControlled(true);
@@ -490,11 +504,19 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
  */
 void IngeScapeEditorController::savePlatformToSelectedFile()
 {
-    // "File Dialog" to get the file (path) to save
-    QString platformFilePath = QFileDialog::getSaveFileName(nullptr,
-                                                            "Save platform",
-                                                            _platformDirectoryPath,
-                                                            "JSON (*.json)");
+    QString platformFilePath;
+    if (_hasAPlatformBeenLoadedByUser)
+    {
+        // Save to the opened platform
+        platformFilePath = _currentPlatformFilePath;
+    }
+    else {
+        // "File Dialog" to get the file (path) to save
+        platformFilePath = QFileDialog::getSaveFileName(nullptr,
+                                                        "Save platform",
+                                                        _platformDirectoryPath,
+                                                        "JSON (*.json)");
+    }
 
     if (!platformFilePath.isEmpty()) {
         // Save the platform to JSON file
@@ -527,6 +549,8 @@ void IngeScapeEditorController::clearCurrentPlatform()
 
     // Update the current platform name
     setcurrentPlatformName("new");
+    _currentPlatformFilePath = _platformDefaultFilePath;
+    sethasAPlatformBeenLoadedByUser(false);
 
     // Clear the current mapping
     if (_agentsMappingC != nullptr) {
@@ -878,6 +902,7 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
             // Update the current platform name
             if (!recordName.isEmpty()) {
                 setcurrentPlatformName(recordName);
+                _currentPlatformFilePath = QFileInfo(jsonPlatform).absoluteFilePath();
             }
 
             if (_scenarioC != nullptr)
@@ -919,6 +944,9 @@ void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFile
 
     if (!success) {
         qCritical() << "The loading of the asked platform failed !";
+    }
+    else {
+        sethasAPlatformBeenLoadedByUser(true);
     }
 
     // Force our global mapping to CONTROLLED
@@ -1131,6 +1159,7 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                 // Update the current platform name
                 QFileInfo fileInfo = QFileInfo(jsonFile);
                 setcurrentPlatformName(fileInfo.baseName());
+                _currentPlatformFilePath = fileInfo.absoluteFilePath();
 
                 QByteArray byteArrayOfJson = jsonFile.readAll();
                 jsonFile.close();
@@ -1175,6 +1204,7 @@ void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
                 // Update the current platform name
                 QFileInfo fileInfo = QFileInfo(jsonFile);
                 setcurrentPlatformName(fileInfo.baseName());
+                _currentPlatformFilePath = fileInfo.absoluteFilePath();
 
                 jsonFile.write(jsonDocument.toJson(QJsonDocument::Indented));
                 jsonFile.close();
