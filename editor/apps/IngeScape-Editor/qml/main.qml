@@ -83,7 +83,7 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: qsTr("Save...")
+                text: qsTr("Save")
                 shortcut: StandardKey.Save
 
                 onTriggered: {

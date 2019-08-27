@@ -514,7 +514,7 @@ void IngeScapeEditorController::savePlatformToSelectedFile(bool forceFileSelecti
         // "File Dialog" to get the file (path) to save
         platformFilePath = QFileDialog::getSaveFileName(nullptr,
                                                         "Save platform",
-                                                        _platformDirectoryPath,
+                                                        _currentPlatformFilePath,
                                                         "JSON (*.json)");
     }
 
