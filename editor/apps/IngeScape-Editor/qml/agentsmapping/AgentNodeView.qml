@@ -78,7 +78,7 @@ Rectangle {
     y: (agentMappingVM && agentMappingVM.position) ? agentMappingVM.position.y : 0
 
     // Init width of our agent
-    width: agentMappingVM.width
+    width: agentMappingVM ? agentMappingVM.width : minimumWidth
 
 
     radius: 6
@@ -214,6 +214,51 @@ Rectangle {
         // Input and output slots
         //
         //------------------------------------------
+
+
+        // Resize handles
+        MouseArea {
+            id: resizeHandleRight
+
+            width: 4
+            height: parent.height
+            anchors.right: parent.right
+            anchors.rightMargin: -1
+
+            drag { target: parent; axis: Drag.XAxis }
+            onMouseXChanged: {
+                if(drag.active){
+                    rootItem.width += (mouseX - (resizeHandleRight.width / 2))
+                    if (rootItem.width < rootItem.minimumWidth) {
+                        rootItem.width = rootItem.minimumWidth
+                    }
+                }
+            }
+            cursorShape: Qt.SizeHorCursor
+        }
+
+        MouseArea {
+            id: resizeHandleLeft
+
+            width: 4
+            height: parent.height
+            anchors.left: parent.left
+            anchors.leftMargin: -1
+
+            drag { target: parent; axis: Drag.XAxis }
+            onMouseXChanged: {
+                if(drag.active){
+                    var previousX = rootItem.x
+                    rootItem.width -= (mouseX - (resizeHandleLeft.width / 2))
+                    rootItem.x += (mouseX - (resizeHandleLeft.width / 2))
+                    if (rootItem.width < rootItem.minimumWidth) {
+                        rootItem.x -= (rootItem.minimumWidth - rootItem.width)
+                        rootItem.width = rootItem.minimumWidth
+                    }
+                }
+            }
+            cursorShape: Qt.SizeHorCursor
+        }
 
 
         Item {
@@ -1082,34 +1127,6 @@ Rectangle {
             Behavior on opacity {
                 NumberAnimation {
                     duration: rootItem._expandCollapseAnimationDuration
-                }
-            }
-        }
-
-        // Resize handle (right side)
-        Rectangle {
-            id: resizeHandle
-
-            //FIXME Refine style and position of the handle
-            width: 18
-            height: 18
-            radius: 18
-            color: "steelblue"
-            anchors.horizontalCenter: parent.right
-            anchors.verticalCenter: parent.bottom
-
-            visible: (opacity !== 0)
-            opacity: !rootItem.isReduced ? 1 : 0
-
-            MouseArea {
-                anchors.fill: parent
-                drag{ target: parent; axis: Drag.XAxis }
-                onMouseXChanged: {
-                    if(drag.active){
-                        rootItem.width += (mouseX - (resizeHandle.width / 2))
-                        if(rootItem.width < rootItem.minimumWidth)
-                            rootItem.width = rootItem.minimumWidth
-                    }
                 }
             }
         }
