@@ -150,7 +150,7 @@ public:
       * @brief Save the platform (agents, mappings, actions, palette, timeline actions)
       * to the file selected by the user
       */
-    Q_INVOKABLE void savePlatformToSelectedFile();
+    Q_INVOKABLE void savePlatformToSelectedFile(bool forceFileSelection = false);
 
 
     /**

@@ -83,11 +83,20 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: qsTr("Save the current platform...")
+                text: qsTr("Save...")
                 shortcut: StandardKey.Save
 
                 onTriggered: {
                     IngeScapeEditorC.savePlatformToSelectedFile();
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Save As...")
+                shortcut: StandardKey.SaveAs
+
+                onTriggered: {
+                    IngeScapeEditorC.savePlatformToSelectedFile(true);
                 }
             }
 

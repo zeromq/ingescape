@@ -502,10 +502,10 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
  * @brief Save the platform (agents, mappings, actions, palette, timeline actions)
  * to the file selected by the user
  */
-void IngeScapeEditorController::savePlatformToSelectedFile()
+void IngeScapeEditorController::savePlatformToSelectedFile(bool forceFileSelection)
 {
     QString platformFilePath;
-    if (_hasAPlatformBeenLoadedByUser)
+    if (!forceFileSelection && _hasAPlatformBeenLoadedByUser)
     {
         // Save to the opened platform
         platformFilePath = _currentPlatformFilePath;
