@@ -1096,7 +1096,7 @@ Rectangle {
             radius: 18
             color: "steelblue"
             anchors.horizontalCenter: parent.right
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenter: parent.bottom
 
             visible: (opacity !== 0)
             opacity: !rootItem.isReduced ? 1 : 0
