@@ -29,7 +29,7 @@
 const QString IngeScapeEditorController::DEFAULT_LAST_PLATFORM_NAME = "last";
 
 // Default name when creating a new platform
-const QString IngeScapeEditorController::DEFAULT_NEW_PLATFORM_NAME = "new";
+const QString IngeScapeEditorController::DEFAULT_NEW_PLATFORM_NAME = "New Platform";
 
 /**
  * @brief Constructor
@@ -81,6 +81,22 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
 
 
+    // Directory for platform files
+    QString platformPath = IngeScapeUtils::getPlatformsPath();
+
+    QDir platformDir(platformPath);
+    if (!platformDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << platformPath << "' !";
+    }
+    else
+    {
+        _platformDirectoryPath = platformPath;
+
+        // Init the path to the JSON file to load the last platform
+        _platformDefaultFilePath = QString("%1%2.json").arg(_platformDirectoryPath, DEFAULT_LAST_PLATFORM_NAME);
+    }
+
+
     //
     // Settings
     //
@@ -109,20 +125,15 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     settings.endGroup();
 
-
-    // Directory for platform files
-    QString platformPath = IngeScapeUtils::getPlatformsPath();
-
-    QDir platformDir(platformPath);
-    if (!platformDir.exists()) {
-        qCritical() << "ERROR: could not create directory at '" << platformPath << "' !";
-    }
-    else
+    //
+    // Settings about "Platform"
+    //
+    settings.beginGroup("paltform");
+    _currentPlatformFilePath = settings.value("last", "").toString();
+    settings.endGroup();
+    if (_currentPlatformFilePath.isEmpty())
     {
-        _platformDirectoryPath = platformPath;
-
-        // Init the path to the JSON file to load the last platform
-        _platformDefaultFilePath = QString("%1%2.json").arg(_platformDirectoryPath, DEFAULT_LAST_PLATFORM_NAME);
+        qDebug() << "No previous platform saved. Try opening 'last.json'.";
         _currentPlatformFilePath = _platformDefaultFilePath;
     }
 
@@ -266,14 +277,19 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_recordsSupervisionC, &RecordsSupervisionController::startToRecord, this, &IngeScapeEditorController::_onStartToRecord);
 
 
-    if (!_platformDefaultFilePath.isEmpty())
+    if (!_currentPlatformFilePath.isEmpty())
     {
         // Load the platform (agents, mappings, actions, palette, timeline actions)
-        // from the default file "last.json"
-        bool success = _loadPlatformFromFile(_platformDefaultFilePath);
+        // from the last opened platform (saved in the settings)
+        bool success = _loadPlatformFromFile(_currentPlatformFilePath);
 
         if (!success) {
             qCritical() << "The loading of the last platform failed !";
+            clearCurrentPlatform();
+            _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, DEFAULT_NEW_PLATFORM_NAME);
+        }
+        else {
+            sethasAPlatformBeenLoadedByUser(true);
         }
     }
 
@@ -481,9 +497,7 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
         if (!success) {
             qCritical() << "The loading of the selected platform failed !";
         }
-
-        // Special case if the user opens the "last.json" platform, we don't consider that a saved platform's been opened
-        if (success && QFileInfo(platformFilePath).baseName() != DEFAULT_LAST_PLATFORM_NAME) {
+        else {
             sethasAPlatformBeenLoadedByUser(true);
         }
 
@@ -526,20 +540,6 @@ void IngeScapeEditorController::savePlatformToSelectedFile(bool forceFileSelecti
 
 
 /**
- * @brief Save the platform (agents, mappings, actions, palette, timeline actions)
- * to the default file "last.json"
- */
-void IngeScapeEditorController::savePlatformToDefaultFile()
-{
-    if (!_platformDefaultFilePath.isEmpty())
-    {
-        // Save the platform to JSON file
-        _savePlatformToFile(_platformDefaultFilePath);
-    }
-}
-
-
-/**
  * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions)
  * by deleting all existing data
  */
@@ -548,8 +548,8 @@ void IngeScapeEditorController::clearCurrentPlatform()
     qInfo() << "Clear Current Platform (" << _currentPlatformName << ")";
 
     // Update the current platform name
-    setcurrentPlatformName("new");
-    _currentPlatformFilePath = _platformDefaultFilePath;
+    setcurrentPlatformName(DEFAULT_NEW_PLATFORM_NAME);
+    _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, DEFAULT_NEW_PLATFORM_NAME);
     sethasAPlatformBeenLoadedByUser(false);
 
     // Clear the current mapping
@@ -581,8 +581,16 @@ void IngeScapeEditorController::clearCurrentPlatform()
  */
 void IngeScapeEditorController::processBeforeClosing()
 {
-    // Save the platform to the default file
-    savePlatformToDefaultFile();
+    // Save in the app settings the currently opened platform (to open it at next launch)
+    IngeScapeSettings &settings = IngeScapeSettings::Instance();
+    settings.beginGroup("paltform");
+    settings.setValue("last", _currentPlatformFilePath);
+    settings.endGroup();
+
+    // Save new values
+    settings.sync();
+
+    //TODO Check if something has changed and if so, ask to save
 }
 
 
@@ -1168,6 +1176,9 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
 
                 // Load the platform from JSON
                 success = _loadPlatformFromJSON(jsonDocument);
+                if (success) {
+                    sethasAPlatformBeenLoadedByUser(true);
+                }
 
                 // Notify QML to reset view
                 Q_EMIT resetMappindAndTimeLineViews();
