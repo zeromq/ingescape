@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 
 namespace Ingescape
@@ -54,13 +49,18 @@ namespace Ingescape
         //private const string ingescapeDLLPath = "C:\\Program Files (x86)\\ingescape\\lib\\ingescape.dll";
 
         // Library 64 bits
-        private const string ingescapeDLLPath = "C:\\Program Files\\ingescape\\lib\\ingescape.dll";
+        //private const string ingescapeDLLPath = "C:\\Program Files\\ingescape\\lib\\ingescape.dll";
 
         // Library MAC OS
         //private const string ingescapeDLLPath = "/usr/local/lib/libingescape.dylib";
 
         // Library iOS
         //private const string ingescapeDLLPath = "__Internal";
+
+        // Ingescape dll directory is in PATH, put just ingescape for dll import will :
+        // For windows : add <name>.dll and search in PATH
+        // For Unix/OsX : add lib<name>.dll and search in PATH
+        private const string ingescapeDLLPath = "ingescape";
 
         #endregion
 

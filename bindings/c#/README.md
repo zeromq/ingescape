@@ -1,7 +1,7 @@
 #To build
 
 - Open the vs solution to build the c# library : .\IngescapeCSharpWrapper\IngescapeCSharpWrapper.sln
-- Check and modify the path of the library : C:\\ingescape\\libs\\debug\\ingescape.dll
+- Check and modify the path of the library : ingescape, if needed because it will search ingescape.dll in path on windows and liningescape.dylib on OsX
 - Build
 - You will find the 3 files composing the c# library : .\IngescapeCSharpWrapper\IngescapeCSharp\bin\Debug\netstandard2.0
 	-IngescapeCSharp.deps.json
