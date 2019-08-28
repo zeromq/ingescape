@@ -68,28 +68,13 @@ TasksController::~TasksController()
  */
 bool TasksController::canCreateTaskWithName(QString taskName)
 {
-    //NOTE Oneliner
-//    const QList<TaskM*>& taskList = _currentExperimentation->allTasks()->toList();
-//    return !taskName.isEmpty() && (_currentExperimentation != nullptr)
-//            && std::none_of(taskList.begin(), taskList.end(),
-//                            [taskName](IndependentVariableM* task){
-//        return (task != nullptr) && (task->name() == taskName);
-//    });
+    const QList<TaskM*>& taskList = _currentExperimentation->allTasks()->toList();
+    auto hasGivenName = [taskName](TaskM* task) {
+        return (task != nullptr) && (task->name() == taskName);
+    };
 
-    if (!taskName.isEmpty() && (_currentExperimentation != nullptr))
-    {
-        for (TaskM* task : _currentExperimentation->allTasks()->toList())
-        {
-            if ((task != nullptr) && (task->name() == taskName))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-    else {
-        return false;
-    }
+    return !taskName.isEmpty() && (_currentExperimentation != nullptr)
+            && std::none_of(taskList.begin(), taskList.end(), hasGivenName);
 }
 
 
@@ -225,28 +210,13 @@ void TasksController::duplicateTask(TaskM* task)
  */
 bool TasksController::canCreateIndependentVariableWithName(QString independentVariableName)
 {
-    //NOTE Oneliner
-//    const QList<IndependentVariableM*>& varList = _selectedTask->independentVariables()->toList();
-//    return !independentVariableName.isEmpty() && (_selectedTask != nullptr)
-//            && std::none_of(varList.begin(), varList.end(),
-//                            [independentVariableName](IndependentVariableM* independentVariable){
-//        return (independentVariable != nullptr) && (independentVariable->name() == independentVariableName);
-//    });
+    const QList<IndependentVariableM*>& varList = _selectedTask->independentVariables()->toList();
+    auto hasGivenName = [independentVariableName](IndependentVariableM* independentVariable){
+        return (independentVariable != nullptr) && (independentVariable->name() == independentVariableName);
+    };
 
-    if (!independentVariableName.isEmpty() && (_selectedTask != nullptr))
-    {
-        for (IndependentVariableM* independentVariable : _selectedTask->independentVariables()->toList())
-        {
-            if ((independentVariable != nullptr) && (independentVariable->name() == independentVariableName))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-    else {
-        return false;
-    }
+    return !independentVariableName.isEmpty() && (_selectedTask != nullptr)
+            && std::none_of(varList.begin(), varList.end(), hasGivenName);
 }
 
 
@@ -259,28 +229,13 @@ bool TasksController::canCreateIndependentVariableWithName(QString independentVa
  */
 bool TasksController::canEditIndependentVariableWithName(IndependentVariableM* independentVariableCurrentlyEdited, QString independentVariableName)
 {
-    //NOTE Oneliner
-//    const QList<IndependentVariableM*>& varList = _selectedTask->independentVariables()->toList();
-//    return (independentVariableCurrentlyEdited != nullptr) && !independentVariableName.isEmpty() && (_selectedTask != nullptr)
-//            && std::none_of(varList.begin(), varList.end(),
-//                            [independentVariableName, independentVariableCurrentlyEdited](IndependentVariableM* independentVariable){
-//        return (independentVariable != nullptr) && (independentVariable != independentVariableCurrentlyEdited) && (independentVariable->name() == independentVariableName);
-//    });
+    const QList<IndependentVariableM*>& varList = _selectedTask->independentVariables()->toList();
+    auto hasGivenNameAndIsNotEdited = [independentVariableName, independentVariableCurrentlyEdited](IndependentVariableM* independentVariable){
+        return (independentVariable != nullptr) && (independentVariable != independentVariableCurrentlyEdited) && (independentVariable->name() == independentVariableName);
+    };
 
-    if ((independentVariableCurrentlyEdited != nullptr) && !independentVariableName.isEmpty() && (_selectedTask != nullptr))
-    {
-        for (IndependentVariableM* independentVariable : _selectedTask->independentVariables()->toList())
-        {
-            if ((independentVariable != nullptr) && (independentVariable != independentVariableCurrentlyEdited) && (independentVariable->name() == independentVariableName))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (independentVariableCurrentlyEdited != nullptr) && !independentVariableName.isEmpty() && (_selectedTask != nullptr)
+            && std::none_of(varList.begin(), varList.end(), hasGivenNameAndIsNotEdited);
 }
 
 
