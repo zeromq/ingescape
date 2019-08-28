@@ -251,7 +251,7 @@ binding-csharp-windows-x64:
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build -G"Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release
-    - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
+    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build --target IngescapeCSharp --config Release
   artifacts:
     paths:
@@ -271,7 +271,7 @@ binding-csharp-windows-x86:
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build -G"Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Release
-    - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
+    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build --target IngescapeCSharp --config Release
   artifacts:
     paths:
