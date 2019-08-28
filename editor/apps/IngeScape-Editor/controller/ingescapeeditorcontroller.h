@@ -227,6 +227,13 @@ public:
     Q_INVOKABLE void removeOpenedWindow(QObject* window);
 
 
+    /**
+     * @brief Checks if there was changes since the platform was last saved
+     * @return
+     */
+    Q_INVOKABLE bool hasPlatformChanged();
+
+
 public Q_SLOTS:
 
     /**

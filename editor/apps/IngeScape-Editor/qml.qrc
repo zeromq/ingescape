@@ -41,5 +41,6 @@
         <file>qml/scenario/InputIOPValueField.qml</file>
         <file>resources/SVG/ingescape-editor.svg</file>
         <file>qml/agentsmapping/ActionInMapping.qml</file>
+        <file>qml/popup/SaveBeforeQuitPopup.qml</file>
     </qresource>
 </RCC>

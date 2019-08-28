@@ -50,6 +50,9 @@ ApplicationWindow {
 
     color: IngeScapeTheme.windowBackgroundColor
 
+    // Flag enabling the check for a platform change before closing
+    property bool forceClose: false
+
 
     //----------------------------------
     //
@@ -424,7 +427,17 @@ ApplicationWindow {
     // When user clicks on window close button
     onClosing: {
         console.info("QML: Close Window");
-        IngeScapeEditorC.processBeforeClosing();
+        if (!mainWindow.forceClose && IngeScapeEditorC && IngeScapeEditorC.hasPlatformChanged())
+        {
+            // Cancel window closing
+            close.accepted = false;
+
+            // Open save popup
+            saveBeforeQuitPopup.open();
+        }
+        else {
+            IngeScapeEditorC.processBeforeClosing();
+        }
     }
 
 
@@ -612,6 +625,33 @@ ApplicationWindow {
         // Qt Quick infos
         QtQuickInfoPopup {
             id: qtQuickInfoPopup
+        }
+
+        // Save before quit popup
+        Popups.SaveBeforeQuitPopup {
+            id: saveBeforeQuitPopup
+
+            anchors.centerIn: parent
+
+            // Save the changes to the currently opened platform and quit
+            onSave: {
+                if (IngeScapeEditorC)
+                {
+                    IngeScapeEditorC.savePlatformToSelectedFile()
+                }
+
+                mainWindow.forceClose = true
+                mainWindow.close()
+            }
+
+            // Discard all unsaved changes and quit
+            onDiscard: {
+                mainWindow.forceClose = true
+                mainWindow.close()
+            }
+
+            // Cancel the closing procedure and keep the editor open
+            onCancel: {}
         }
     }
 }

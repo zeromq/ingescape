@@ -589,8 +589,6 @@ void IngeScapeEditorController::processBeforeClosing()
 
     // Save new values
     settings.sync();
-
-    //TODO Check if something has changed and if so, ask to save
 }
 
 
@@ -767,6 +765,35 @@ void IngeScapeEditorController::removeOpenedWindow(QObject* window)
         if (_openedWindows.contains(window)) {
             _openedWindows.remove(window);
         }
+    }
+}
+
+/**
+ * @brief Checks if there was changes since the platform was last saved
+ * @return
+ */
+bool IngeScapeEditorController::hasPlatformChanged()
+{
+    if (_hasAPlatformBeenLoadedByUser)
+    {
+        QJsonDocument loadedPlatform;
+        QFile jsonFile(_currentPlatformFilePath);
+        if (jsonFile.exists() && jsonFile.open(QIODevice::ReadOnly))
+        {
+            QByteArray byteArrayOfJson = jsonFile.readAll();
+            jsonFile.close();
+            loadedPlatform = QJsonDocument::fromJson(byteArrayOfJson);
+        }
+
+        QJsonDocument currentPlatform = _getJsonOfCurrentPlatform();
+
+        qDebug() << "Platform has" << (loadedPlatform != currentPlatform ? "" : "NOT") << "changed";
+
+        return loadedPlatform != currentPlatform;
+    }
+    else {
+        // Always ask to save the current platform if none has been loaded
+        return true;
     }
 }
 
