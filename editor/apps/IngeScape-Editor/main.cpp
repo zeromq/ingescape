@@ -250,6 +250,7 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("ingenuity.io");
     app.setApplicationName("IngeScape-Editor");
     app.setApplicationVersion(VERSION);
+    QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
 
     // - behavior when our last window is closed
     app.setQuitOnLastWindowClosed(true);
@@ -383,7 +384,7 @@ int main(int argc, char *argv[])
 
         // Runtime version of Qt. This may be a different version than the version the application was compiled against
         qmlContext->setContextProperty("QT_RUNTIME_VERSION", QString(qVersion()));
-        
+
         // Version of our application
         qmlContext->setContextProperty("VERSION", app.applicationVersion());
 
@@ -400,7 +401,6 @@ int main(int argc, char *argv[])
     // Load our main QML file
     //
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
-
 
 
     //------------------------------

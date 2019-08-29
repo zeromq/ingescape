@@ -61,7 +61,6 @@ ApplicationWindow {
     //----------------------------------
 
     menuBar: MenuBar {
-
         // Platform
         Menu {
             id: menuPlatform
@@ -154,6 +153,19 @@ ApplicationWindow {
                         console.log("Show the Model and View Model Visualizer");
                         IngeScapeEditorC.isVisibleModelVisualizer = true;
                     }
+                }
+            }
+
+            // By using "Quit", this MenuItem is displayed in the main app menu and called "Quit <app_name>"
+            // It will override the regular Command+Q action and perform our last minute check to ask the user to saves the changes if any.
+            // FIXME [soum] On my macOS with the french locale, "Quitter" works but "Quit" doesn't. Forcing the app locale to "en_US" make both work.
+            //       We need to check what happens on a macOS with only an english locale.
+            MenuItem {
+                text: qsTr("Quit")
+                shortcut: StandardKey.Quit
+
+                onTriggered: {
+                    mainWindow.close()
                 }
             }
         }
