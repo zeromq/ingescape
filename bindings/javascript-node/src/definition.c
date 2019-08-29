@@ -208,24 +208,28 @@ void * convertValueWithGoodType(napi_env env, napi_value value, iopType_js type,
     *size_convert = 0;
     switch(type) {
         case IGS_NUMBER_JS  :
-            p_value = (double *) malloc(sizeof(double));
+            *size_convert = sizeof(double);
+            p_value = (double *) malloc(*size_convert);
             convert_napi_to_double(env, value, p_value);
             break;
         case IGS_STRING_JS  :
             p_value = (char *) convert_napi_to_string(env, value);
-            printf("size : %lu\n", *size_convert);
+            *size_convert = (strlen(p_value)+1) * sizeof(char);
             break;
         case IGS_BOOL_JS  :
-            p_value = (bool *) malloc(sizeof(bool));
+            *size_convert = sizeof(bool);
+            p_value = (bool *) malloc(*size_convert);
             convert_napi_to_bool(env, value, p_value);
             break;
         case IGS_IMPULSION_JS  :
+            *size_convert = 1 * sizeof(char);
             p_value = (char*) "";
             break;
         case IGS_DATA_JS  :
             convert_napi_to_data(env, value, &p_value, size_convert);
             break;
         default : 
+            *size_convert = 0;
             p_value = NULL;
             napi_throw_error(env, NULL, "Unknow iopType_js");
     }
