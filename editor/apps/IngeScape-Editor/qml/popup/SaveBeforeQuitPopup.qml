@@ -24,8 +24,8 @@ import INGESCAPE 1.0
 I2PopupBase {
     id: popupMessage
 
-    height: 225
-    width: 550
+    height: 135
+    width: 450
 
     isModal: true
     dismissOnOutsideTap: true
@@ -33,7 +33,7 @@ I2PopupBase {
 
     signal cancel()
     signal discard()
-    signal save()
+    signal saveAs()
 
     Rectangle {
 
@@ -49,7 +49,7 @@ I2PopupBase {
     Text {
         id: popupText
 
-        text: "Do you want to save your changes before quitting the application?"
+        text: "Changes in the current platform have not yet been saved."
 
         anchors {
             left: parent.left
@@ -66,6 +66,47 @@ I2PopupBase {
         font {
             family: IngeScapeTheme.textFontFamily
             pixelSize: 16
+        }
+    }
+
+    Button {
+        anchors {
+            left: parent.left
+            leftMargin: 16
+            bottom : parent.bottom
+            bottomMargin: 16
+        }
+
+        property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+        height: boundingBox.height
+        width: 115
+
+        activeFocusOnPress: true
+        text: "Do not save"
+
+        style: I2SvgButtonStyle {
+            fileCache: IngeScapeTheme.svgFileIngeScape
+
+            pressedID: releasedID + "-pressed"
+            releasedID: "button"
+            disabledID: releasedID + "-disabled"
+
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
+            labelColorPressed: IngeScapeTheme.blackColor
+            labelColorReleased: IngeScapeTheme.whiteColor
+            labelColorDisabled: IngeScapeTheme.whiteColor
+        }
+
+        onClicked: {
+            discard();
+
+            // Close our popup
+            popupMessage.close();
         }
     }
 
@@ -116,10 +157,11 @@ I2PopupBase {
             property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
 
             height: boundingBox.height
-            width: boundingBox.width
+            width: 110
 
             activeFocusOnPress: true
-            text: "Discard"
+            text: "Save as..."
+
 
             style: I2SvgButtonStyle {
                 fileCache: IngeScapeTheme.svgFileIngeScape
@@ -139,41 +181,7 @@ I2PopupBase {
             }
 
             onClicked: {
-                discard();
-
-                // Close our popup
-                popupMessage.close();
-            }
-        }
-
-        Button {
-            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-            height: boundingBox.height
-            width: boundingBox.width
-
-            activeFocusOnPress: true
-            text: "Save"
-
-            style: I2SvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileIngeScape
-
-                pressedID: releasedID + "-pressed"
-                releasedID: "button"
-                disabledID: releasedID + "-disabled"
-
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight : Font.Medium
-                    pixelSize : 16
-                }
-                labelColorPressed: IngeScapeTheme.blackColor
-                labelColorReleased: IngeScapeTheme.whiteColor
-                labelColorDisabled: IngeScapeTheme.whiteColor
-            }
-
-            onClicked: {
-                save();
+                saveAs();
 
                 // Close our popup
                 popupMessage.close();

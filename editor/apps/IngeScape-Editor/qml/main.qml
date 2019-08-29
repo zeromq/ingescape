@@ -634,10 +634,10 @@ ApplicationWindow {
             anchors.centerIn: parent
 
             // Save the changes to the currently opened platform and quit
-            onSave: {
+            onSaveAs: {
                 if (IngeScapeEditorC)
                 {
-                    IngeScapeEditorC.savePlatformToSelectedFile()
+                    IngeScapeEditorC.savePlatformToSelectedFile(true)
                 }
 
                 mainWindow.forceClose = true
