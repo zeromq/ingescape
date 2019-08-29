@@ -52,10 +52,19 @@ int convert_napi_to_double(napi_env env, napi_value value, double* value_convert
 
 int convert_napi_to_data(napi_env env, napi_value value, void ** value_converted, size_t* size_value_converted) {
     napi_status status;
-    status = napi_get_arraybuffer_info(env, value, value_converted, size_value_converted);
-    if (status != napi_ok) {
-    	napi_throw_error(env, NULL, "Invalid array buffer was passed as argument");
-    	return 0;
+    napi_valuetype valueType;
+    status = napi_typeof(env, value, &valueType);
+
+    if ((valueType == napi_undefined) || (valueType == napi_null)) {
+        *value_converted = NULL;
+        *size_value_converted = 0;
+    }
+    else {
+        status = napi_get_arraybuffer_info(env, value, value_converted, size_value_converted);
+        if (status != napi_ok) {
+            napi_throw_error(env, NULL, "Invalid array buffer was passed as argument");
+            return 0;
+        }
     }
     return 1;
 }
