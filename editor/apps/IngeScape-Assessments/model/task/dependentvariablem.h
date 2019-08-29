@@ -114,19 +114,6 @@ public:
     CassUuid getTaskCassUuid() const { return _taskCassUuid; }
     CassUuid getCassUuid() const { return _cassUuid; }
 
-    /**
-     * @brief Create a clone of the current object.
-     * Return nullptr in case of failure.
-     * Clone object does not have valid CassUuids.
-     * The caller is in charge of freeing the returned instance (if any).
-     * @return
-     */
-    DependentVariableM* clone() const;
-
-
-
-protected: // Methods
-
 protected: // Attributes
     // Task's experimentation's UUID from Cassandra DB
     CassUuid _experimentationCassUuid;

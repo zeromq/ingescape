@@ -151,14 +151,3 @@ CassStatement* DependentVariableM::createBoundUpdateStatement(const DependentVar
     cass_statement_bind_uuid  (cassStatement, 6, dependentVariable.getCassUuid());
     return cassStatement;
 }
-
-/**
- * @brief Create a clone of the current object.
- * Return nullptr in case of failure.
- * The caller is in charge of freeing the returned instance (if any).
- * @return
- */
-DependentVariableM* DependentVariableM::clone() const
-{
-    return new DependentVariableM(CassUuid(), CassUuid(), CassUuid(), _name, _description, _agentName, _outputName);
-}
