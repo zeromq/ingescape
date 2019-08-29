@@ -351,7 +351,7 @@ void makeFilePath(char *from, char *to, size_t size_of_to) {
     if (from[0] == '~') {
         from++;
 #ifdef _WIN32
-        char *home = getenv("HOMEPATH");
+        char *home = getenv("USERPROFILE");
 #else
         char *home = getenv("HOME");
 #endif
