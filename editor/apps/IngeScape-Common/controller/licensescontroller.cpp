@@ -86,7 +86,8 @@ LicensesController::LicensesController(QObject *parent) : QObject(parent),
     _maxNbOfAgents(0),
     _maxNbOfIOPs(0),
     _featureNames(QStringList()),
-    _agentNames(QStringList())
+    _agentNames(QStringList()),
+    _licenseInformation(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -188,6 +189,17 @@ void LicensesController::_getLicensesData()
 
     if (license != nullptr)
     {
+        if (_licenseInformation != nullptr)
+        {
+            LicenseInformationM* temp = _licenseInformation;
+            setlicenseInformation(nullptr);
+            delete temp;
+        }
+
+        setlicenseInformation(new LicenseInformationM(license));
+        qDebug() << "License information:";
+        qDebug() << *_licenseInformation;
+
         QDateTime licenseExpirationDateTime = QDateTime::fromSecsSinceEpoch(license->licenseExpirationDate);
         setlicenseExpirationDate(licenseExpirationDateTime.date());
 
@@ -296,7 +308,7 @@ void LicensesController::_getLicensesData()
             license_t* detail = (license_t*)zlist_first(license->licenseDetails);
             while (detail != nullptr)
             {
-                qDebug() << "detail" << detail->id << "fileName" << detail->fileName;
+                qDebug() << LicenseInformationM(detail);
 
                 // FIXME TODO: create the list of licenseM
 

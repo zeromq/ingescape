@@ -18,6 +18,7 @@
 #include <QObject>
 
 #include <I2PropertyHelpers.h>
+#include "model/licenseinformationm.h"
 
 
 /**
@@ -70,6 +71,8 @@ class LicensesController : public QObject
     I2_QML_PROPERTY(QStringList, agentNames)
 
     // FIXME TODO: list of licenseM
+
+    I2_QML_PROPERTY(LicenseInformationM*, licenseInformation)
 
 
 public:
