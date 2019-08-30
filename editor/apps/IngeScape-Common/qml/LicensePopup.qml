@@ -126,17 +126,16 @@ I2PopupBase {
         }
     }
 
-
-    Column {
+    Item {
+        id: directoryPathItem
         anchors {
             left: parent.left
             right: parent.right
             top: title.bottom
-            bottom: parent.bottom
             margins: 25
         }
 
-        spacing: 6
+        height: childrenRect.height
 
         Text {
             text: qsTr("Directory path")
@@ -155,6 +154,8 @@ I2PopupBase {
                 left: parent.left
                 right: parent.right
             }
+
+            height: childrenRect.height
 
             TextField {
                 id: txtLicensesPath
@@ -253,281 +254,84 @@ I2PopupBase {
             }
             height: 10
         }
+    }
 
-        Row {
-            spacing: 10
+    ScrollView {
+        anchors {
+            top: directoryPathItem.bottom
+            left: parent.left
+            right: parent.right
+            bottom: buttonRow.top
+            margins: 25
+        }
+
+        contentItem: Column {
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+
+            spacing: 16
+
+            LicenseInformationView {
+                controller: rootItem.controller
+            }
+
+            // Vertical space
+            Item {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+                height: 10
+            }
 
             Text {
-                text: qsTr("License validity:")
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
+                text: rootItem.controller ? qsTr("Files:") : ""
 
                 color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Medium
+                    pixelSize: 16
+                }
+            }
+
+            // FIXME TODO: list of licenseM
+
+            // Vertical space
+            Item {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+                height: 10
+            }
+
+            Text {
+                id: errorMessage
+
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    //verticalCenter: parent.verticalCenter
+                }
+                wrapMode: Text.WordWrap
+
+                text: rootItem.controller ? rootItem.controller.errorMessageWhenLicenseFailed : ""
+
+                color: IngeScapeTheme.orangeColor
                 font {
                     family: IngeScapeTheme.textFontFamily
                     weight : Font.Medium
                     pixelSize : 16
                 }
-            }
-
-            Rectangle {
-                id: flag
-                width: 20
-                height: 20
-                radius: 10
-                color: rootItem.controller && rootItem.controller.isLicenseValid ? "green" : "red"
-            }
-        }
-
-        Text {
-            text: rootItem.controller ? qsTr("Customer: %1").arg(rootItem.controller.licenseCustomer) : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
-            }
-        }
-
-        Text {
-            text: rootItem.controller ? qsTr("Order: %1").arg(rootItem.controller.licenseOrder) : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
-            }
-        }
-
-        Text {
-            text: rootItem.controller ? qsTr("Expiration date: %1").arg(rootItem.controller.licenseExpirationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy"))
-                                      : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
-            }
-        }
-
-        // Vertical space
-        Item {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 10
-        }
-
-        Row {
-            spacing: 10
-
-            Text {
-                text: qsTr("Editor license validity:")
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight : Font.Medium
-                    pixelSize : 16
-                }
-            }
-
-            Rectangle {
-                id: flagEditor
-                width: 20
-                height: 20
-                radius: 10
-                color: rootItem.controller && rootItem.controller.isEditorLicenseValid ? "green" : "red"
-            }
-        }
-
-        Text {
-            text: rootItem.controller ? qsTr("Editor owner: %1").arg(rootItem.controller.editorOwner) : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
-            }
-        }
-
-        Text {
-            text: rootItem.controller ? qsTr("Editor expiration date: %1").arg(rootItem.controller.editorExpirationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy"))
-                                      : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
-            }
-        }
-
-        // Vertical space
-        Item {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 10
-        }
-
-        Text {
-            text: rootItem.controller ? qsTr("Maximum number of agents: %1").arg(rootItem.controller.maxNbOfAgents) : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                //weight: Font.Medium
-                pixelSize: 16
-            }
-        }
-        Text {
-            text: rootItem.controller ? qsTr("Maximum number of agents inputs/outputs/parameters: %1").arg(rootItem.controller.maxNbOfIOPs) : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                //weight: Font.Medium
-                pixelSize: 16
-            }
-        }
-
-        // Vertical space
-        Item {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 10
-        }
-
-        Text {
-            text: rootItem.controller ? qsTr("Features:") : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 16
-            }
-        }
-
-        Repeater {
-            model: rootItem.controller ? rootItem.controller.featureNames : null
-
-            Text {
-                text: " - " + modelData
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    //weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
-        }
-
-        // Vertical space
-        Item {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 10
-        }
-
-        Text {
-            text: rootItem.controller ? qsTr("Agents:") : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 16
-            }
-        }
-
-        Repeater {
-            model: rootItem.controller ? rootItem.controller.agentNames : null
-
-            Text {
-                text: " - " + modelData
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    //weight: Font.Medium
-                    pixelSize: 16
-                }
-            }
-        }
-
-        // Vertical space
-        Item {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 10
-        }
-
-        Text {
-            text: rootItem.controller ? qsTr("Files:") : ""
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Medium
-                pixelSize: 16
-            }
-        }
-
-        // FIXME TODO: list of licenseM
-
-        // Vertical space
-        Item {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 10
-        }
-
-        Text {
-            id: errorMessage
-
-            anchors {
-                left: parent.left
-                right: parent.right
-                //verticalCenter: parent.verticalCenter
-            }
-            wrapMode: Text.WordWrap
-
-            text: rootItem.controller ? rootItem.controller.errorMessageWhenLicenseFailed : ""
-
-            color: IngeScapeTheme.orangeColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
             }
         }
     }
 
-
     Row {
+        id: buttonRow
         anchors {
             right: parent.right
             rightMargin: 20
@@ -535,6 +339,8 @@ I2PopupBase {
             bottomMargin: 20
         }
         spacing : 15
+
+        height: 30
 
         Button {
             id: cancelButton

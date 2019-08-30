@@ -31,5 +31,6 @@
         <file>qml/theme/IngeScapeComboboxStyle.qml</file>
         <file>qml/IngeScapeToolTipComboboxDelegate.qml</file>
         <file>qml/theme/IngeScapeScrollViewStyle.qml</file>
+        <file>qml/LicenseInformationView.qml</file>
     </qresource>
 </RCC>
