@@ -111,6 +111,7 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterUncreatableType<PublishedValueM>("INGESCAPE", 1, 0, "PublishedValueM", "Internal class");
     qmlRegisterUncreatableType<ScenarioM>("INGESCAPE", 1, 0, "ScenarioM", "Internal class");
     qmlRegisterUncreatableType<TimeTickM>("INGESCAPE", 1, 0, "TimeTickM", "Internal class");
+    qmlRegisterUncreatableType<LicenseInformationM>("INGESCAPE", 1, 0, "LicenseInformationM", "Internal class");
 
 
     //---------------

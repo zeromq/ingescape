@@ -22,9 +22,11 @@ import INGESCAPE 1.0
 
 Column {
     id: rootItem
-    property LicensesController controller: null
+    property LicenseInformationM licenseInformation: null
 
     spacing: 8
+
+
     Row {
         spacing: 10
 
@@ -48,12 +50,12 @@ Column {
             width: 20
             height: 20
             radius: 10
-            color: rootItem.controller && rootItem.controller.isLicenseValid ? "green" : "red"
+            color: rootItem.licenseInformation && rootItem.licenseInformation.ingescapeLicenseValidity ? "green" : "red"
         }
     }
 
     Text {
-        text: rootItem.controller ? qsTr("Customer: %1").arg(rootItem.controller.licenseCustomer) : ""
+        text: rootItem.licenseInformation ? qsTr("Customer: %1").arg(rootItem.licenseInformation.customers) : ""
 
         color: IngeScapeTheme.whiteColor
         font {
@@ -64,7 +66,7 @@ Column {
     }
 
     Text {
-        text: rootItem.controller ? qsTr("Order: %1").arg(rootItem.controller.licenseOrder) : ""
+        text: rootItem.licenseInformation ? qsTr("Order: %1").arg(rootItem.licenseInformation.orderNumbers) : ""
 
         color: IngeScapeTheme.whiteColor
         font {
@@ -75,8 +77,8 @@ Column {
     }
 
     Text {
-        text: rootItem.controller ? qsTr("Expiration date: %1").arg(rootItem.controller.licenseExpirationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy"))
-                                  : ""
+        text: rootItem.licenseInformation ? qsTr("Expiration date: %1").arg(rootItem.licenseInformation.expirationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy"))
+                                   : ""
 
         color: IngeScapeTheme.whiteColor
         font {
@@ -118,12 +120,12 @@ Column {
             width: 20
             height: 20
             radius: 10
-            color: rootItem.controller && rootItem.controller.isEditorLicenseValid ? "green" : "red"
+            color: rootItem.licenseInformation && rootItem.licenseInformation.editorLicenseValidity ? "green" : "red"
         }
     }
 
     Text {
-        text: rootItem.controller ? qsTr("Editor owner: %1").arg(rootItem.controller.editorOwner) : ""
+        text: rootItem.licenseInformation ? qsTr("Editor owner: %1").arg(rootItem.licenseInformation.editorOwners) : ""
 
         color: IngeScapeTheme.whiteColor
         font {
@@ -134,8 +136,8 @@ Column {
     }
 
     Text {
-        text: rootItem.controller ? qsTr("Editor expiration date: %1").arg(rootItem.controller.editorExpirationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy"))
-                                  : ""
+        text: rootItem.licenseInformation ? qsTr("Editor expiration date: %1").arg(rootItem.licenseInformation.editorExpirationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy"))
+                                   : ""
 
         color: IngeScapeTheme.whiteColor
         font {
@@ -155,7 +157,7 @@ Column {
     }
 
     Text {
-        text: rootItem.controller ? qsTr("Maximum number of agents: %1").arg(rootItem.controller.maxNbOfAgents) : ""
+        text: rootItem.licenseInformation ? qsTr("Maximum number of agents: %1").arg(rootItem.licenseInformation.maxNumberOfAgents) : ""
 
         color: IngeScapeTheme.whiteColor
         font {
@@ -165,7 +167,7 @@ Column {
         }
     }
     Text {
-        text: rootItem.controller ? qsTr("Maximum number of agents inputs/outputs/parameters: %1").arg(rootItem.controller.maxNbOfIOPs) : ""
+        text: rootItem.licenseInformation ? qsTr("Maximum number of agents inputs/outputs/parameters: %1").arg(rootItem.licenseInformation.maxNumberOfIOPs) : ""
 
         color: IngeScapeTheme.whiteColor
         font {
@@ -185,7 +187,7 @@ Column {
     }
 
     Text {
-        text: rootItem.controller ? qsTr("Features:") : ""
+        text: rootItem.licenseInformation ? qsTr("Features:") : ""
 
         color: IngeScapeTheme.whiteColor
         font {
@@ -196,7 +198,7 @@ Column {
     }
 
     Repeater {
-        model: rootItem.controller ? rootItem.controller.featureNames : null
+        model: rootItem.licenseInformation ? rootItem.licenseInformation.features : null
 
         Text {
             text: " - " + modelData
@@ -220,7 +222,7 @@ Column {
     }
 
     Text {
-        text: rootItem.controller ? qsTr("Agents:") : ""
+        text: rootItem.licenseInformation ? qsTr("Agents:") : ""
 
         color: IngeScapeTheme.whiteColor
         font {
@@ -231,7 +233,7 @@ Column {
     }
 
     Repeater {
-        model: rootItem.controller ? rootItem.controller.agentNames : null
+        model: rootItem.licenseInformation ? rootItem.licenseInformation.agents : null
 
         Text {
             text: " - " + modelData

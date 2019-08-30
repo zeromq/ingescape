@@ -28,7 +28,7 @@ LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject
     , _editorLicenseValidity(false)
     , _features({})
     , _agents({})
-    , _licenseFileInfo(QFileInfo())
+    , _fileName("")
 {
     if (licenseObject != nullptr)
     {
@@ -42,6 +42,7 @@ LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject
         seteditorOwners(licenseObject->editorOwner);
         seteditorExpirationDate(QDateTime::fromTime_t(static_cast<uint>(licenseObject->editorExpirationDate)));
         seteditorLicenseValidity(licenseObject->isEditorLicenseValid);
+        setfileName(licenseObject->fileName);
 
         QStringList features;
         zlist_t *featureNames = zhash_keys(license->features);
@@ -69,13 +70,15 @@ LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject
         }
         setagents(agents);
 
-        setlicenseFileInfo(QFileInfo(licenseObject->fileName));
+        setfileName(QFileInfo(licenseObject->fileName).fileName());
     }
 }
 
 QDebug operator<<(QDebug debug, const LicenseInformationM& licenseInformation)
 {
     QDebugStateSaver saver(debug);
+
+    debug << "License file name:" << licenseInformation.fileName() << "\n";
     debug << "Licence ID:" << licenseInformation.licenseId() << "\n";
     debug << "Customer:" << licenseInformation.customers() << "\n";
     debug << "Order n°:" << licenseInformation.orderNumbers() << "\n";

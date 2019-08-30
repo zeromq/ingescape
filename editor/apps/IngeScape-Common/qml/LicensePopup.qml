@@ -257,6 +257,7 @@ I2PopupBase {
     }
 
     ScrollView {
+        id: detailsScrollView
         anchors {
             top: directoryPathItem.bottom
             left: parent.left
@@ -266,46 +267,53 @@ I2PopupBase {
         }
 
         contentItem: Column {
+            id: detailsColumn
             anchors {
                 left: parent.left
                 right: parent.right
             }
 
-            spacing: 16
+            spacing: 26
 
             LicenseInformationView {
-                controller: rootItem.controller
-            }
-
-            // Vertical space
-            Item {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                }
-                height: 10
+                licenseInformation: rootItem.controller.mergedLicense
             }
 
             Text {
-                text: rootItem.controller ? qsTr("Files:") : ""
+                text: rootItem.controller ? qsTr("License details:") : ""
 
                 color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
                     weight: Font.Medium
                     pixelSize: 16
+                    bold: true
                 }
             }
 
-            // FIXME TODO: list of licenseM
+            Repeater {
+                model: rootItem.controller ? rootItem.controller.licenseDetailsList : 0
 
-            // Vertical space
-            Item {
-                anchors {
-                    left: parent.left
-                    right: parent.right
+                delegate: Column {
+                    spacing: 26
+
+                    Text {
+                        text: qsTr("###\n### License file name: %1\n###").arg(model ? model.fileName : "")
+
+                        color: IngeScapeTheme.whiteColor
+                        elide: Text.ElideRight
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            weight: Font.Medium
+                            pixelSize: 16
+                            italic: true
+                        }
+                    }
+
+                    LicenseInformationView {
+                        licenseInformation: model ? model.QtObject : null
+                    }
                 }
-                height: 10
             }
 
             Text {
@@ -318,7 +326,7 @@ I2PopupBase {
                 }
                 wrapMode: Text.WordWrap
 
-                text: rootItem.controller ? rootItem.controller.errorMessageWhenLicenseFailed : ""
+                text: rootItem.controller ? rootItem.controller.errorMessageWhenLicenseFailed : "TEST"
 
                 color: IngeScapeTheme.orangeColor
                 font {
@@ -392,7 +400,6 @@ I2PopupBase {
 
             activeFocusOnPress: true
             text: "OK"
-            //enabled: true
 
             anchors {
                 verticalCenter: parent.verticalCenter

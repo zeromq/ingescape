@@ -87,7 +87,7 @@ LicensesController::LicensesController(QObject *parent) : QObject(parent),
     _maxNbOfIOPs(0),
     _featureNames(QStringList()),
     _agentNames(QStringList()),
-    _licenseInformation(nullptr)
+    _mergedLicense(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -189,16 +189,16 @@ void LicensesController::_getLicensesData()
 
     if (license != nullptr)
     {
-        if (_licenseInformation != nullptr)
+        if (_mergedLicense != nullptr)
         {
-            LicenseInformationM* temp = _licenseInformation;
-            setlicenseInformation(nullptr);
+            LicenseInformationM* temp = _mergedLicense;
+            setmergedLicense(nullptr);
             delete temp;
         }
 
-        setlicenseInformation(new LicenseInformationM(license));
+        setmergedLicense(new LicenseInformationM(license));
         qDebug() << "License information:";
-        qDebug() << *_licenseInformation;
+        qDebug() << *_mergedLicense;
 
         QDateTime licenseExpirationDateTime = QDateTime::fromSecsSinceEpoch(license->licenseExpirationDate);
         setlicenseExpirationDate(licenseExpirationDateTime.date());
@@ -297,6 +297,7 @@ void LicensesController::_getLicensesData()
         setagentNames(agentNamesTemp);
         qInfo() << "Agents" << _agentNames;
 
+        _licenseDetailsList.deleteAllItems();
 
         //
         // License details
@@ -308,7 +309,9 @@ void LicensesController::_getLicensesData()
             license_t* detail = (license_t*)zlist_first(license->licenseDetails);
             while (detail != nullptr)
             {
-                qDebug() << LicenseInformationM(detail);
+                LicenseInformationM* licenseDetails = new LicenseInformationM(detail);
+                _licenseDetailsList.append(licenseDetails);
+                qDebug() << *licenseDetails;
 
                 // FIXME TODO: create the list of licenseM
 

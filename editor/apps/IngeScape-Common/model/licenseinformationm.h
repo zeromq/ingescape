@@ -70,7 +70,7 @@ class LicenseInformationM : public QObject
     I2_QML_PROPERTY(QStringList, agents)
 
     // License file (or directory in case of merged license)
-    I2_QML_PROPERTY(QFileInfo, licenseFileInfo)
+    I2_QML_PROPERTY(QString, fileName)
 
 public:
     LicenseInformationM(const license_t* licenseObject, QObject* parent = nullptr);

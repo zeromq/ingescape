@@ -72,7 +72,11 @@ class LicensesController : public QObject
 
     // FIXME TODO: list of licenseM
 
-    I2_QML_PROPERTY(LicenseInformationM*, licenseInformation)
+    // Merged license information
+    I2_QML_PROPERTY(LicenseInformationM*, mergedLicense)
+
+    // List of detailed licenses (one for each file)
+    I2_QOBJECT_LISTMODEL(LicenseInformationM, licenseDetailsList)
 
 
 public:
