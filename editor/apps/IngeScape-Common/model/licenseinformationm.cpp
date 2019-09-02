@@ -14,6 +14,12 @@
 
 #include "licenseinformationm.h"
 
+/**
+ * @brief Basic constructor.
+ * Analyse the given license_t pointer to populate the properties.
+ * @param licenseObject
+ * @param parent
+ */
 LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject* parent)
     : QObject (parent)
     , _licenseId("")
@@ -42,8 +48,9 @@ LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject
         seteditorOwners(licenseObject->editorOwner);
         seteditorExpirationDate(QDateTime::fromTime_t(static_cast<uint>(licenseObject->editorExpirationDate)));
         seteditorLicenseValidity(licenseObject->isEditorLicenseValid);
-        setfileName(licenseObject->fileName);
+        setfileName(QFileInfo(licenseObject->fileName).fileName());
 
+        // Extract features allowed
         QStringList features;
         zlist_t *featureNames = zhash_keys(license->features);
         if (featureNames != nullptr)
@@ -57,6 +64,7 @@ LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject
         }
         setfeatures(features);
 
+        // Extract agents allowed
         QStringList agents;
         zlist_t *agentNames = zhash_keys(license->agents);
         if (agentNames != nullptr)
@@ -69,11 +77,16 @@ LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject
             }
         }
         setagents(agents);
-
-        setfileName(QFileInfo(licenseObject->fileName).fileName());
     }
 }
 
+
+/**
+ * @brief Overload QDebug::operator<< to display license information directly in the logs.
+ * @param debug
+ * @param licenseInformation
+ * @return
+ */
 QDebug operator<<(QDebug debug, const LicenseInformationM& licenseInformation)
 {
     QDebugStateSaver saver(debug);

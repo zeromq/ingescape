@@ -73,9 +73,21 @@ class LicenseInformationM : public QObject
     I2_QML_PROPERTY(QString, fileName)
 
 public:
+    /**
+     * @brief Basic constructor.
+     * Analyse the given license_t pointer to populate the properties.
+     * @param licenseObject
+     * @param parent
+     */
     LicenseInformationM(const license_t* licenseObject, QObject* parent = nullptr);
 };
 
+/**
+ * @brief Overload QDebug::operator<< to display license information directly in the logs.
+ * @param debug
+ * @param licenseInformation
+ * @return
+ */
 QDebug operator<<(QDebug debug, const LicenseInformationM& licenseInformation);
 
 QML_DECLARE_TYPE(LicenseInformationM)
