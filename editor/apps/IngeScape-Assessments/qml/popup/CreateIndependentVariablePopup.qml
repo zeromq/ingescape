@@ -48,6 +48,10 @@ AssessmentsPopupBase {
 
     property var enumTexts: [];
 
+    property bool errorDetected: false
+    property string errorMessage: ""
+    property int errorEnumIndex: -1
+
     // Our popup is used:
     // - to create a new independent variable
     // OR
@@ -113,6 +117,11 @@ AssessmentsPopupBase {
         rootPopup.selectedType = -1;
         rootPopup.enumTexts = [];
         rootPopup.independentVariableCurrentlyEdited = null;
+
+        // Reset error status
+        errorDetected = false
+        errorMessage = ""
+        errorEnumIndex = -1
 
         // Close the popup
         rootPopup.close();
@@ -364,176 +373,248 @@ AssessmentsPopupBase {
                 }
 
                 Rectangle {
+                    id: enumValuesBackground
                     anchors {
                         top: enumRadioButton.top
                         left: enumRadioButton.right
-                        leftMargin: 40
+                        leftMargin: 15
                         right: parent.right
+                        topMargin: -10
+                        bottomMargin: -15
+                        rightMargin: -22
                     }
 
                     height: 264
                     radius: 5
+                    color: IngeScapeTheme.veryLightGreyColor
 
                     // Selected type is "Enum"
                     visible: (rootPopup.selectedType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)
 
-                    Rectangle {
-                        id: enumValuesBackground
-
+                    Item {
                         anchors {
                             fill: parent
-                            topMargin: -10
-                            bottomMargin: -15
-                            leftMargin: -25
-                            rightMargin: -22
+                            topMargin: 10
+                            bottomMargin: 15
+                            leftMargin: 25
+                            rightMargin: 22
                         }
-                        radius: 5
 
-                        color: IngeScapeTheme.veryLightGreyColor
+                        Row {
+                            id: headerNewEnum
+
+                            anchors {
+                                top: parent.top
+                                left: parent.left
+                            }
+
+                            height: 30
+                            spacing: 10
+
+                            Text {
+                                anchors {
+                                    top: parent.top
+                                    bottom: parent.bottom
+                                }
+
+                                text: "Number of values:"
+                                verticalAlignment: Text.AlignVCenter
+
+                                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    weight: Font.Medium
+                                    pixelSize: 16
+                                }
+                            }
+
+                            SpinBox {
+                                id: spinBoxValuesNumber
+
+                                anchors {
+                                    top: parent.top
+                                    bottom: parent.bottom
+                                }
+
+                                width: 44
+
+                                horizontalAlignment: Text.AlignHCenter
+
+                                style: SpinBoxStyle {
+                                    textColor: control.enabled ? IngeScapeAssessmentsTheme.regularDarkBlueHeader : IngeScapeAssessmentsTheme.lighterDarkBlueHeader
+                                    background: Rectangle {
+                                        radius: 5
+                                        border {
+                                            color: IngeScapeAssessmentsTheme.blueButton
+                                            width: control.enabled && control.activeFocus ? 2 : 0
+                                        }
+
+                                        color: IngeScapeTheme.whiteColor
+                                    }
+                                }
+
+                                minimumValue: 2
+                                value: 2
+
+                            }
+                        }
+
+                        ScrollView {
+                            id: enumValueScrollView
+
+                            anchors {
+                                top: headerNewEnum.bottom
+                                topMargin: 20
+                                left: parent.left
+                                right: parent.right
+                                rightMargin: -scrollBarSize - verticalScrollbarMargin
+                                bottom: parent.bottom
+                            }
+
+                            property int scrollBarSize: 11
+                            property int verticalScrollbarMargin: 3
+
+                            style: IngeScapeAssessmentsScrollViewStyle {
+                                scrollBarSize: enumValueScrollView.scrollBarSize
+                                verticalScrollbarMargin: enumValueScrollView.verticalScrollbarMargin
+                            }
+
+                            // Prevent drag overshoot on Windows
+                            flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+                            contentItem: Column {
+                                width: enumValueScrollView.width - enumValueScrollView.scrollBarSize - enumValueScrollView.verticalScrollbarMargin
+                                height: childrenRect.height
+                                spacing: 12
+
+                                Repeater {
+                                    model: spinBoxValuesNumber.value
+
+                                    delegate: TextField {
+                                        id: enumText
+
+                                        anchors {
+                                            left: parent.left
+                                            right: parent.right
+                                        }
+
+                                        Connections {
+                                            target: rootPopup
+
+                                            onErrorDetectedChanged: {
+                                                if (index === rootPopup.errorEnumIndex)
+                                                {
+                                                    console.log("update error detected")
+                                                    forceActiveFocus();
+
+                                                    var currentItemHeight = enumText.height
+                                                    var currentItemY = enumText.y
+
+                                                    // Viewport is above the item (need to scroll down)
+                                                    if ((currentItemY + currentItemHeight) > (enumValueScrollView.flickableItem.contentY + enumValueScrollView.height))
+                                                    {
+                                                        enumValueScrollView.flickableItem.contentY += (currentItemY + currentItemHeight) - enumValueScrollView.flickableItem.contentY - enumValueScrollView.height
+                                                    }
+                                                    // Viewport is below the item (need to scroll up)
+                                                    else if ((currentItemY + currentItemHeight) < enumValueScrollView.flickableItem.contentY)
+                                                    {
+                                                        enumValueScrollView.flickableItem.contentY -= enumValueScrollView.flickableItem.contentY - currentItemY
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        height: 30
+
+                                        text: rootPopup.enumTexts[index] ? rootPopup.enumTexts[index] : ""
+
+                                        style: I2TextFieldStyle {
+                                            backgroundColor: IngeScapeTheme.whiteColor
+                                            borderColor: IngeScapeAssessmentsTheme.blueButton
+                                            borderErrorColor: IngeScapeTheme.redColor
+                                            radiusTextBox: 5
+                                            borderWidth: 0;
+                                            borderWidthActive: 2
+                                            textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
+                                            textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
+                                            isError: rootPopup.errorDetected && index === rootPopup.errorEnumIndex;
+
+                                            placeholderCustomText: qsTr("Name of the value %1").arg(index + 1)
+                                            placeholderMarginLeft: 15
+                                            placeholderColor: IngeScapeTheme.lightGreyColor
+                                            placeholderFont {
+                                                pixelSize: 16
+                                                family: IngeScapeTheme.textFontFamily
+                                                italic: true
+                                            }
+
+                                            padding.left: 15
+                                            padding.right: 15
+
+                                            font {
+                                                pixelSize: 16
+                                                family: IngeScapeTheme.textFontFamily
+                                            }
+                                        }
+
+                                        Component.onCompleted: {
+                                            // If this index is not defined, initialize it with empty string
+                                            if (typeof rootPopup.enumTexts[index] === 'undefined') {
+                                                rootPopup.enumTexts[index] = "";
+                                            }
+                                        }
+
+                                        onTextChanged: {
+                                            // Update the strings array for this index
+                                            rootPopup.enumTexts[index] = enumText.text;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
+                }
+
+                Item {
+                    id: errorMessageItem
+
+                    anchors {
+                        top: enumValuesBackground.bottom
+                        topMargin: 10
+                        left: enumValuesBackground.left
+                        leftMargin: 5
+                        right: enumValuesBackground.right
+                    }
+
+                    visible: rootPopup.errorDetected
 
                     Row {
-                        id: headerNewEnum
+                        spacing: 5
 
-                        anchors {
-                            top: parent.top
-                            left: parent.left
+                        I2SvgItem {
+                            id: errorMessageIcon
+                            anchors {
+                                verticalCenter: errorMessageText.verticalCenter
+                            }
+
+                            svgFileCache: IngeScapeAssessmentsTheme.svgFileIngeScapeAssessments
+                            svgElementId: "warning"
                         }
-
-                        height: 30
-                        spacing: 10
 
                         Text {
+                            id: errorMessageText
+
                             anchors {
-                                top: parent.top
-                                bottom: parent.bottom
+                                verticalCenter: parent.verticalCenter
                             }
 
-                            text: "Number of values:"
-                            verticalAlignment: Text.AlignVCenter
+                            text: rootPopup.errorMessage
+                            color: IngeScapeTheme.greyColor2
 
-                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                             font {
                                 family: IngeScapeTheme.textFontFamily
-                                weight: Font.Medium
                                 pixelSize: 16
-                            }
-                        }
-
-                        SpinBox {
-                            id: spinBoxValuesNumber
-
-                            anchors {
-                                top: parent.top
-                                bottom: parent.bottom
-                            }
-
-                            width: 44
-
-                            horizontalAlignment: Text.AlignHCenter
-
-                            style: SpinBoxStyle {
-                                textColor: control.enabled ? IngeScapeAssessmentsTheme.regularDarkBlueHeader : IngeScapeAssessmentsTheme.lighterDarkBlueHeader
-                                background: Rectangle {
-                                    radius: 5
-                                    border {
-                                        color: IngeScapeAssessmentsTheme.blueButton
-                                        width: control.enabled && control.activeFocus ? 2 : 0
-                                    }
-
-                                    color: IngeScapeTheme.whiteColor
-                                }
-                            }
-
-                            minimumValue: 2
-                            value: 2
-
-                        }
-                    }
-
-                    ScrollView {
-                        id: enumValueScrollView
-
-                        anchors {
-                            top: headerNewEnum.bottom
-                            topMargin: 20
-                            left: parent.left
-                            right: parent.right
-                            rightMargin: -scrollBarSize - verticalScrollbarMargin
-                            bottom: parent.bottom
-                        }
-
-                        property int scrollBarSize: 11
-                        property int verticalScrollbarMargin: 3
-
-                        style: IngeScapeAssessmentsScrollViewStyle {
-                            scrollBarSize: enumValueScrollView.scrollBarSize
-                            verticalScrollbarMargin: enumValueScrollView.verticalScrollbarMargin
-                        }
-
-                        // Prevent drag overshoot on Windows
-                        flickableItem.boundsBehavior: Flickable.OvershootBounds
-
-                        contentItem: Column {
-                            width: enumValueScrollView.width - enumValueScrollView.scrollBarSize - enumValueScrollView.verticalScrollbarMargin
-                            height: childrenRect.height
-                            spacing: 12
-
-                            Repeater {
-                                model: spinBoxValuesNumber.value
-
-                                delegate: TextField {
-                                    id: enumText
-
-                                    anchors {
-                                        left: parent.left
-                                        right: parent.right
-                                    }
-
-                                    height: 30
-
-                                    text: rootPopup.enumTexts[index] ? rootPopup.enumTexts[index] : ""
-
-                                    style: I2TextFieldStyle {
-                                        backgroundColor: IngeScapeTheme.whiteColor
-                                        borderColor: IngeScapeAssessmentsTheme.blueButton
-                                        borderErrorColor: IngeScapeTheme.redColor
-                                        radiusTextBox: 5
-                                        borderWidth: 0;
-                                        borderWidthActive: 2
-                                        textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
-                                        textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
-
-                                        placeholderCustomText: qsTr("Name of the value %1").arg(index + 1)
-                                        placeholderMarginLeft: 15
-                                        placeholderColor: IngeScapeTheme.lightGreyColor
-                                        placeholderFont {
-                                            pixelSize: 16
-                                            family: IngeScapeTheme.textFontFamily
-                                            italic: true
-                                        }
-
-                                        padding.left: 15
-                                        padding.right: 15
-
-                                        font {
-                                            pixelSize: 16
-                                            family: IngeScapeTheme.textFontFamily
-                                        }
-                                    }
-
-                                    Component.onCompleted: {
-                                        // If this index is not defined, initialize it with empty string
-                                        if (typeof rootPopup.enumTexts[index] === 'undefined') {
-                                            rootPopup.enumTexts[index] = "";
-                                        }
-                                    }
-
-                                    onTextChanged: {
-                                        // Update the strings array for this index
-                                        rootPopup.enumTexts[index] = enumText.text;
-                                    }
-                                }
+                                italic: true
                             }
                         }
                     }
@@ -637,38 +718,51 @@ AssessmentsPopupBase {
                         // Where N = spinBoxValuesNumber.value (the value of the spin box)
                         var displayedEnumTexts = rootPopup.enumTexts.slice(0, spinBoxValuesNumber.value);
 
-                        // Check for duplicates
-                        let singles = []
-                        displayedEnumTexts.forEach(function(element, index) {
-                            // If the element is already in 'singles', it's a duplicate
-                            if (singles.indexOf(element) > -1) {
-                                //FIXME Show appropriate error message
-                            }
+                        // Clean-up global error status
+                        rootPopup.errorDetected = false;
+                        rootPopup.errorEnumIndex = -1
 
-                            // Add the element to 'singles'
-                            singles.push(element);
-                        })
+                        var index = 0;      // Index of the current enum value (in for-loops)
+                        var enumValue = ""; // Enum value iterator
 
-                        var isEmptyValue = false;
-                        var index = 0;
-
-                        displayedEnumTexts.forEach(function(element) {
-                            if (element === "") {
-                                isEmptyValue = true;
-                                console.log("value at " + index + " is empty, edit it !");
+                        for (enumValue of displayedEnumTexts)
+                        {
+                            if (enumValue === "") {
+                                console.log("Error index: " + index)
+                                rootPopup.errorMessage = "Enum entries cannot be empty"
+                                rootPopup.errorEnumIndex = index;
+                                rootPopup.errorDetected = true;
+                                break;
                             }
                             index++;
-                        });
+                        }
+
+                        if (!rootPopup.errorDetected)
+                        {
+                            // Check for duplicates
+                            index = 0;
+                            let singles = []
+                            for (enumValue of displayedEnumTexts)
+                            {
+                                // If the element is already in 'singles', it's a duplicate
+                                if (singles.indexOf(enumValue) > -1) {
+                                    console.log("Error index: " + index)
+                                    rootPopup.errorMessage = "Enum entries must be unique"
+                                    rootPopup.errorEnumIndex = index;
+                                    rootPopup.errorDetected = true;
+                                    break;
+                                }
+
+                                // Add the element to 'singles'
+                                singles.push(enumValue);
+
+                                index++;
+                            }
+                        }
 
                         console.log("QML: Enum with " + spinBoxValuesNumber.value + " strings: " + displayedEnumTexts);
 
-                        if (isEmptyValue === true)
-                        {
-                            console.warn("Some values of the enum are empty, edit them !");
-
-                            // FIXME TODO: display warning message
-                        }
-                        else
+                        if (!rootPopup.errorDetected)
                         {
                             // Edit an existing independent variable
                             if (rootPopup.independentVariableCurrentlyEdited)
