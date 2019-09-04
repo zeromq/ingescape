@@ -78,20 +78,20 @@ An [Enterprise Service Bus](https://en.wikipedia.org/wiki/Enterprise_service_bus
 In addition, the advanced ingeScape API provides a services description mechanism, already used by the ingeScape editor and some existing agents, to adapt their behavior according to the presence or absence of a given service, attached or not to a specific agent. This description mechanism works in the same way as [Zeroconf](https://en.wikipedia.org/wiki/Zero-configuration_networking), enabling each agent to publish sets of keys/values describing its capabilities.
 
 
-#### What about old good Client/Server ?
+#### What about good old Client/Server ?
 
-The ingeScape paradigm based on *definitions* and *mapping* does not cover the Request/Reply (a.k.a REQ/REP) pattern completely: with this ingeScape paradigm, it is difficult to have a server send its reply to a specific agent only by emitting on its outputs, because an agent has no knowledge of the mappings to its outputs.
+The ingeScape dataflow paradigm based on *definitions* and *mapping* does not cover the Request/Reply (a.k.a REQ/REP) pattern completely: with this dataflow paradigm only, it is difficult to have an agent handle queries and send its replies to specific agents which generated each query.
 
-That is why ingeScape introduced the concept of [tokens](/blog/architecture_101#tokens). A token can be seen as a public service exposed by an agent to any other agent. The service is called from any agent by naming the target agent and the service name and by providing the expected complementary information as parameters. This is just like a function call in any programming language, except that the call is for an agent on the network. When a token on an agent is called, the caller is known and is thus able to receive a private custom answer, using another token or any other relevant mean.
+That is why ingeScape introduced the concept of [calls](/blog/architecture_101#calls). A call can be seen as a public service exposed by an agent to any other agent. The service is called from any agent by naming the target agent and the service name and by providing the expected complementary information as arguments. This is just like a function call in any programming language, except that the call is transmitted to an agent on the network. When a call on an agent is executed, the caller is known and is thus able to receive a private custom reply, using another predefined reply call (or any other relevant mean).
 
-Moreover, the MoM features proposed by ingeScape, especially when using private messages for replies, also covers REQ/REP perfectly. In addition, the ZeroMQ network layer used by ingeScape implements the REQ/REP pattern natively, enabling to set it up if required by performance or compatibility constraints.
+In addition, the MoM features proposed by ingeScape, especially when using private messages for replies, also covers REQ/REP. And finally, the ZeroMQ network layer used by ingeScape implements the REQ/REP pattern natively with special care of the ordering of requests and replies, ready to be used if required for performance or compatibility constraints.
 
 
 #### Advanced patterns
 
-The PUB/SUB pattern and the REQ/REP pattern may not be fully convenient to cover advanced task delegation or parallelization scenarios, for instance when a ventilator shall distribute tasks to an arbitrary and variable number of workers, which, in turn, send their results to a collector. Fortunately, the ingeScape network layer, combined with some expertise, can handle these situations.
+The PUB/SUB and REQ/REP patterns may not be fully convenient to cover advanced task delegation or parallelization scenarios, for instance when a ventilator shall distribute tasks to an arbitrary and variable number of workers, which, in turn, send their results to a collector. Fortunately, the ingeScape network layer, combined with some expertise, can handle these situations.
 
-For other patterns engaging reliability, redundancy, synchronicity, etc., ad-hoc solutions are always possible, often without breaking the simplicity of the ingeScape paradigm. The paradigm exposed by ingeScape relies on the ZeroMQ network layer that already covers many difficulties related to network communications and can be extended to face the most complex real-world challenges, at least as efficiently as many other software buses.
+For other patterns engaging reliability, redundancy, synchronicity, etc., ad-hoc solutions are always possible, often without breaking the simplicity of the ingeScape paradigm. The paradigm exposed by ingeScape relies on the ZeroMQ network layer that already covers many difficulties related to network communications and can be extended to face the most complex real-world challenges, at least as efficiently as all the other commercial and open-source software buses.
 
 
 ### Other important and advanced network features
