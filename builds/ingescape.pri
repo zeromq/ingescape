@@ -14,7 +14,7 @@ SOURCES += \
     $$PWD/../src/parser.c \
     $$PWD/../src/admin.c \
     $$PWD/../src/bus.c \
-    $$PWD/../src/token.c \
+    $$PWD/../src/call.c \
     $$PWD/../src/license.c \
     $$PWD/../src/monitor.c \
     $$PWD/../src/json.c \

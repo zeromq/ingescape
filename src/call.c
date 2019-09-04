@@ -44,8 +44,14 @@ void call_freeCallArguments(igs_callArgument_t *args){
 
 void call_freeCall(igs_call_t *t){
     if (t != NULL){
-        free(t->name);
+        if (t->name != NULL)
+            free(t->name);
         call_freeCallArguments(t->arguments);
+        if (t->reply != NULL){
+            if (t->reply->name != NULL)
+                free(t->reply->name);
+            call_freeCallArguments(t->reply->arguments);
+        }
         free(t);
     }
 }

@@ -13,7 +13,7 @@ macro(add_ingescape_sources _SOURCES)
         ${macro_current_dir}/../../../src/parser.c
         ${macro_current_dir}/../../../src/admin.c
         ${macro_current_dir}/../../../src/bus.c
-        ${macro_current_dir}/../../../src/token.c
+        ${macro_current_dir}/../../../src/call.c
         ${macro_current_dir}/../../../src/license.c
         ${macro_current_dir}/../../../src/monitor.c
         ${macro_current_dir}/../../../src/json.c

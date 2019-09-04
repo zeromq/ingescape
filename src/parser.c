@@ -319,8 +319,23 @@ static void json_add_call_to_hash (igs_call_t **hasht, igsyajl_val obj){
         if (arguments != NULL){
             json_parse_call_arguments(call, arguments);
         }
-        //TODO: parse reply
-        IGS_UNUSED(reply)
+        if (reply != NULL && reply->type == igsyajl_t_object
+            && reply->u.object.len >= 2){
+            igs_call_t *callReply = calloc(1, sizeof(igs_call_t));
+            for (size_t i = 0; i < reply->u.object.len; i++){
+                const char *key = reply->u.object.keys[i];
+                if (strcmp(key, STR_NAME) == 0
+                    && reply->u.object.values[i] != NULL
+                    && reply->u.object.values[i]->type == igsyajl_t_string){
+                    callReply->name = strdup(reply->u.object.values[i]->u.string);
+                } else if (strcmp(key, STR_ARGUMENTS) == 0
+                           && reply->u.object.values[i] != NULL
+                           && reply->u.object.values[i]->type == igsyajl_t_array){
+                    json_parse_call_arguments(callReply, reply->u.object.values[i]);
+                }
+            }
+            call->reply = callReply;
+        }
         HASH_ADD_STR(*hasht, name, call);
     }else{
         igs_warn("%s already exists", name);
@@ -684,7 +699,34 @@ static void json_dump_call (igsyajl_gen *g, igs_call_t *call) {
         }
         igsyajl_gen_array_close(*g);
     }
-    //TODO: dump reply
+    //dump reply
+    if (call->reply != NULL && call->reply->name != NULL){
+        igsyajl_gen_string(*g, (const unsigned char *) STR_REPLY, strlen(STR_REPLY));
+        igsyajl_gen_map_open(*g);
+        
+        igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+        igsyajl_gen_string(*g, (const unsigned char *) call->reply->name, strlen (call->reply->name));
+        
+        arg = NULL;
+        nbArgs = 0;
+        DL_COUNT(call->reply->arguments, arg, nbArgs);
+        if ((call->reply->arguments != NULL) && (nbArgs > 0)){
+            igsyajl_gen_string(*g, (const unsigned char *) STR_ARGUMENTS, strlen(STR_ARGUMENTS));
+            igsyajl_gen_array_open(*g);
+            DL_FOREACH(call->reply->arguments, arg){
+                igsyajl_gen_map_open(*g);
+                igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+                igsyajl_gen_string(*g, (const unsigned char *) arg->name, strlen(arg->name));
+                igsyajl_gen_string(*g, (const unsigned char *) STR_TYPE, strlen(STR_TYPE));
+                const char *type = value_type_to_string(arg->type);
+                igsyajl_gen_string(*g, (const unsigned char *) type, strlen(type));
+                igsyajl_gen_map_close(*g);
+            }
+            igsyajl_gen_array_close(*g);
+        }
+        
+        igsyajl_gen_map_close(*g);
+    }
     
     igsyajl_gen_map_close(*g);
 }

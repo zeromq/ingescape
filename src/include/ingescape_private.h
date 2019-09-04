@@ -90,6 +90,7 @@ typedef struct call{
     igs_callFunction cb;
     void *cbData;
     igs_callArgument_t *arguments;
+    struct call *reply;
     UT_hash_handle hh;
 } igs_call_t;
 
