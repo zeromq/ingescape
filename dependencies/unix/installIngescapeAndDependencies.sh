@@ -368,7 +368,7 @@ function install_ingescape {
         _check_sudo rpm -Uvh ${SCRIPT_DIR}/${LINUX_PACKAGE_FILE_NAME}.rpm
     elif [[ "$OS" =~ "Darwin" ]]
     then
-        _check_sudo ${SCRIPT_DIR}/${DARWIN_PACKAGE_FILE_NAME}.sh --prefix=/usr/local/
+        _check_sudo installer -pkg ${SCRIPT_DIR}/${DARWIN_PACKAGE_FILE_NAME}.pkg --target /
     else # Falling back to ZIP installation
         unzip ${SCRIPT_DIR}/${LINUX_PACKAGE_FILE_NAME}.zip
         _check_sudo cp -rv ${SCRIPT_DIR}/${LINUX_PACKAGE_FILE_NAME}/* /usr/local/
