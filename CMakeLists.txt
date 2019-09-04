@@ -82,7 +82,10 @@ set (ingescape_headers
 )
 
 source_group ("Header Files" FILES ${ingescape_headers})
-install(FILES ${ingescape_headers_to_install} DESTINATION include/ingescape)
+install(FILES ${ingescape_headers_to_install}
+  DESTINATION include/ingescape
+  COMPONENT library
+)
 
 add_ingescape_include_directory(_INCLUDES_DIRECTORY)
 include_directories(${_INCLUDES_DIRECTORY})
@@ -164,8 +167,11 @@ if (INGESCAPE_BUILD_SHARED)
   install(TARGETS ${PROJECT_NAME}
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
+      COMPONENT library
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
+      COMPONENT library
     RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
+      COMPONENT library
   )
 
   target_include_directories(${PROJECT_NAME}
@@ -210,8 +216,11 @@ if (INGESCAPE_BUILD_STATIC)
   install(TARGETS ${PROJECT_NAME}-static
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
+      COMPONENT library
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
+      COMPONENT library
     RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
+      COMPONENT library
   )
 
   target_include_directories(${PROJECT_NAME}-static
@@ -241,6 +250,7 @@ configure_file(
 install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc"
     DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
+    COMPONENT library
 )
 
 ########################################################################
@@ -281,7 +291,6 @@ endif()
 ########################################################################
 # Package installer for release build only
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-  set(CPACK_MONOLITHIC_INSTALL ON)
   set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME} library")
   set(CPACK_PACKAGE_VENDOR "Ingescape")
@@ -337,11 +346,10 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   #set(CPACK_WIX_UI_BANNER ) #493 by 58 pixels
   #set(CPACK_WIX_UI_DIALOG ) #493 by 312 pixels
   
-
-
   set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/editor/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/")
   
   if (WIN32)
+      set(CPACK_MONOLITHIC_INSTALL ON)
       #set(CPACK_SOURCE_GENERATOR "ZIP") #sources are useless for Windows
       #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/android)
       #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/ios)
@@ -359,12 +367,31 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
 
       file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.txt "The bin directory is empty after installation on purpose.\r\n"
                                                         "It will contain agents' executables once installed.")
-      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/README.txt DESTINATION bin)
+      install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/README.txt
+        DESTINATION bin
+        COMPONENT library
+      )
+
   elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-      set(CPACK_GENERATOR "STGZ")
+    # Without component productbuild will not package any files
+    set (CPACK_COMPONENTS_ALL library)
+    #set (CPACK_COMPONENT_LIBRARY_DISPLAY_NAME "Libraries files")
+    #set (CPACK_COMPONENT_LIBRARY_DESCRIPTION "All libraries files")
+    #set (CPACK_COMPONENT_LIBRARY_GROUP "Runtime")
+    set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
+
+    # Without extention productbuild will crash
+    # So we just copy License file in build folder with an extension 
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/LICENSE" "${CMAKE_BINARY_DIR}/LICENSE.txt" COPYONLY)
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/LICENSE.txt")
+
+    set(CPACK_GENERATOR "productbuild")
+
       #set(CPACK_SOURCE_GENERATOR "TGZ")
       #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
   else ()
+      set(CPACK_MONOLITHIC_INSTALL ON)
       if ( CMAKE_OS_NAME AND ${CMAKE_OS_NAME} STREQUAL "Debian" AND ${CMAKE_OS_VERSION} STREQUAL "10" )
           set(CPACK_GENERATOR "DEB")
           set(CPACK_DEBIAN_PACKAGE_DEPENDS "libczmq4, libsodium23 (>= 1.0.14), libzmq5, libzyre2")
