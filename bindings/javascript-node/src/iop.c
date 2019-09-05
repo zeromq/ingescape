@@ -83,7 +83,6 @@ napi_value node_igs_readInputAsString(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // PUBLIC int igs_readInputAsData(const char *name, void **data, size_t *size); 
 napi_value node_igs_readInputAsData(napi_env env, napi_callback_info info) {
-    napi_status status;
     size_t nb_arguments = 1;
     napi_value argv[nb_arguments];
 
@@ -99,11 +98,9 @@ napi_value node_igs_readInputAsData(napi_env env, napi_callback_info info) {
     igs_readInputAsData(name, &data, &size); 
     free(name);
 
+    // convert res into napi_value
     napi_value napi_array_buffer;
-    status = napi_create_external_arraybuffer(env, data, size, NULL, NULL, &napi_array_buffer);
-    if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to create array buffer");
-    }
+    convert_data_to_napi(env, data, size, &napi_array_buffer);
     free(data);
     return napi_array_buffer;
 }
@@ -183,7 +180,6 @@ napi_value node_igs_readOutputAsString(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // PUBLIC int igs_readOutputAsData(const char *name, void **data, size_t *size);
 napi_value node_igs_readOutputAsData(napi_env env, napi_callback_info info) {
-    napi_status status; //to check status of node_api
     size_t nb_arguments = 1;
     napi_value argv[nb_arguments];
 
@@ -199,11 +195,9 @@ napi_value node_igs_readOutputAsData(napi_env env, napi_callback_info info) {
     igs_readOutputAsData(name, &data, &size); 
     free(name);
 
+    // convert res into napi_value
     napi_value napi_array_buffer;
-    status = napi_create_external_arraybuffer(env, data, size, NULL, NULL, &napi_array_buffer);
-    if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to create array buffer");
-    }
+    convert_data_to_napi(env, data, size, &napi_array_buffer);
     free(data);
     return napi_array_buffer;
 }
@@ -283,7 +277,6 @@ napi_value node_igs_readParameterAsString(napi_env env, napi_callback_info info)
 // Wrapper for : 
 // PUBLIC int igs_readParameterAsData(const char *name, void **data, size_t *size); 
 napi_value node_igs_readParameterAsData(napi_env env, napi_callback_info info) {
-    napi_status status;
     size_t nb_arguments = 1;
     napi_value argv[nb_arguments];
 
@@ -299,11 +292,9 @@ napi_value node_igs_readParameterAsData(napi_env env, napi_callback_info info) {
     igs_readParameterAsData(name, &data, &size); 
     free(name);
 
+    // convert res into napi_value
     napi_value napi_array_buffer;
-    status = napi_create_external_arraybuffer(env, data, size, NULL, NULL, &napi_array_buffer);
-    if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to create array buffer");
-    }
+    convert_data_to_napi(env, data, size, &napi_array_buffer);
     free(data);
     return napi_array_buffer;
 }

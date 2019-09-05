@@ -281,7 +281,6 @@ CallbackIopJS *headIopObserved = NULL;
 
 // convert C value into napi value according to iopType value
 napi_value createValueWithGoodType(napi_env env, void * value, size_t size, iopType_t type) {
-    napi_status status; //to check status of node_api
     napi_value res = NULL;
 
     switch(type) {
@@ -301,10 +300,7 @@ napi_value createValueWithGoodType(napi_env env, void * value, size_t size, iopT
             convert_null_to_napi(env, &res);
             break;
         case IGS_DATA_T  :
-            status = napi_create_external_arraybuffer(env, value, size, NULL, NULL, &res);
-            if (status != napi_ok) {
-                napi_throw_error(env, NULL, "Unable to get array buffer value");
-            }
+            convert_data_to_napi(env, value, size, &res);
             break;
         default : 
             napi_throw_error(env, NULL, "Unknow iopType_t passed as type");

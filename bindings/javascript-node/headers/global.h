@@ -37,6 +37,7 @@ int convert_bool_to_napi(napi_env env, bool value, napi_value* value_converted);
 int convert_string_to_napi(napi_env env, const char * value, napi_value* value_converted);
 int convert_double_to_napi(napi_env env, double value, napi_value* value_converted);
 int convert_null_to_napi(napi_env env, napi_value* value_converted);
+int convert_data_to_napi(napi_env env, void * value, size_t size, napi_value* value_converted);
 
 // javascript callbacks 
 int get_function_arguments(napi_env env, napi_callback_info info, size_t argc, napi_value * argv);

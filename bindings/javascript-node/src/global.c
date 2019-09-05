@@ -119,6 +119,16 @@ int convert_null_to_napi(napi_env env, napi_value* value_converted) {
     return 1;
 }
 
+int convert_data_to_napi(napi_env env, void * value, size_t size, napi_value* value_converted) {
+    napi_status status;
+    status = napi_create_external_arraybuffer(env, value, size, NULL, NULL, value_converted);
+    if (status != napi_ok) {
+        napi_throw_error(env, NULL, "N-API : Unable to create array buffer into napi_value");
+        return 0;
+    }
+    return 1;
+}
+
 int get_function_arguments(napi_env env, napi_callback_info info, size_t argc, napi_value * argv) {
     napi_status status;
     size_t nb_infos = argc;
