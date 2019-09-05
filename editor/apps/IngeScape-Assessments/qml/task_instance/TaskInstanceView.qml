@@ -151,7 +151,7 @@ Item {
 
             anchors {
                 left: parent.left
-                leftMargin: 26
+                leftMargin: 21
                 top: parent.top
                 topMargin: 20
             }
@@ -168,6 +168,32 @@ Item {
 
                 // Emit the signal the "Go Back To Home"
                 rootItem.goBackToHome();
+            }
+        }
+
+        Button {
+            id: btnGoBackToExpe
+
+            anchors {
+                left: btnGoBackToHome.right
+                leftMargin: 15
+                top: parent.top
+                topMargin: 20
+            }
+
+            height: 50
+            width: 50
+
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "back-to-records-list"
+                disabledID: releasedID
+            }
+
+            onClicked: {
+                console.log("QML: Go back to 'Expe'");
+
+                // Emit the signal the "Go Back To Expe"
+                rootItem.goBackToExperimentation();
             }
         }
 
@@ -261,7 +287,7 @@ Item {
                 top: parent.top
                 topMargin: 30
                 left: parent.left
-                leftMargin: 92
+                leftMargin: 153
             }
 
             property real maxAvailableWidth: taskInstanceNameEditBackground.maxAvailableWidth
