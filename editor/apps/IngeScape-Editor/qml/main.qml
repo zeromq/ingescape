@@ -89,7 +89,7 @@ ApplicationWindow {
                 shortcut: StandardKey.Save
 
                 onTriggered: {
-                    IngeScapeEditorC.savePlatformToSelectedFile();
+                    IngeScapeEditorC.savePlatformToCurrentlyLoadedFile();
                 }
             }
 
@@ -98,7 +98,7 @@ ApplicationWindow {
                 shortcut: StandardKey.SaveAs
 
                 onTriggered: {
-                    IngeScapeEditorC.savePlatformToSelectedFile(true);
+                    IngeScapeEditorC.selectFileToSavePlatform();
                 }
             }
 
@@ -649,7 +649,7 @@ ApplicationWindow {
             onSaveAs: {
                 if (IngeScapeEditorC)
                 {
-                    IngeScapeEditorC.savePlatformToSelectedFile(true)
+                    IngeScapeEditorC.selectFileToSavePlatform()
                 }
 
                 mainWindow.forceClose = true

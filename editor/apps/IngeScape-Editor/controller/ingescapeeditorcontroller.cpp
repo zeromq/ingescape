@@ -516,25 +516,34 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
  * @brief Save the platform (agents, mappings, actions, palette, timeline actions)
  * to the file selected by the user
  */
-void IngeScapeEditorController::savePlatformToSelectedFile(bool forceFileSelection)
+void IngeScapeEditorController::selectFileToSavePlatform()
 {
-    QString platformFilePath;
-    if (!forceFileSelection && _hasAPlatformBeenLoadedByUser)
-    {
-        // Save to the opened platform
-        platformFilePath = _currentPlatformFilePath;
-    }
-    else {
-        // "File Dialog" to get the file (path) to save
-        platformFilePath = QFileDialog::getSaveFileName(nullptr,
-                                                        "Save platform",
-                                                        _currentPlatformFilePath,
-                                                        "JSON (*.json)");
-    }
+        QString platformFilePath = QFileDialog::getSaveFileName(nullptr,
+                                                                "Save platform",
+                                                                _currentPlatformFilePath,
+                                                                "JSON (*.json)");
 
-    if (!platformFilePath.isEmpty()) {
+        if (!platformFilePath.isEmpty()) {
+            // Save the platform to JSON file
+            _savePlatformToFile(platformFilePath);
+        }
+}
+
+
+/**
+ * @brief Save the current platform to the last loaded platform file
+ */
+void IngeScapeEditorController::savePlatformToCurrentlyLoadedFile()
+{
+    if (!_hasAPlatformBeenLoadedByUser)
+    {
+        // No platform was loaded. Cannot save to current file.
+        selectFileToSavePlatform();
+    }
+    else
+    {
         // Save the platform to JSON file
-        _savePlatformToFile(platformFilePath);
+        _savePlatformToFile(_currentPlatformFilePath);
     }
 }
 

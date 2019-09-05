@@ -150,7 +150,13 @@ public:
       * @brief Save the platform (agents, mappings, actions, palette, timeline actions)
       * to the file selected by the user
       */
-    Q_INVOKABLE void savePlatformToSelectedFile(bool forceFileSelection = false);
+    Q_INVOKABLE void selectFileToSavePlatform();
+
+
+    /**
+     * @brief Save the current platform to the last loaded platform file
+     */
+    Q_INVOKABLE void savePlatformToCurrentlyLoadedFile();
 
 
     /**
