@@ -291,6 +291,62 @@ napi_value node_igs_canBeFrozen(napi_env env, napi_callback_info info) {
     return napi_return;
 }
 
+// Wrapper for : 
+// PUBLIC void igs_setPublishingPort(unsigned int port);
+napi_value node_igs_setPublishingPort(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 1;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    int port;
+    convert_napi_to_int(env, argv[0], &port);
+
+    // call igs function
+    igs_setPublishingPort(port);
+    return NULL;
+}
+
+// Wrapper for : 
+// PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
+napi_value node_igs_setDiscoveryInterval(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 1;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    int interval;
+    convert_napi_to_int(env, argv[0], &interval);
+
+    printf("GOOOOOO : %d\n", interval);
+
+    // call igs function
+    igs_setDiscoveryInterval(interval);
+    return NULL;
+}
+
+// Wrapper for : 
+// PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
+napi_value node_igs_setAgentTimeout(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 1;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    int duration;
+    convert_napi_to_int(env, argv[0], &duration);
+
+    // call igs function
+    igs_setAgentTimeout(duration);
+    return NULL;
+}
+
 // Allow callback for initialization and control ingescape code 
 napi_value init_initialization(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_startWithDevice, "startWithDevice", exports);
@@ -311,5 +367,8 @@ napi_value init_initialization(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_unfreeze, "unfreeze", exports);
     exports = enable_callback_into_js(env, node_igs_setCanBeFrozen, "setCanBeFrozen", exports);
     exports = enable_callback_into_js(env, node_igs_canBeFrozen, "canBeFrozen", exports);
+    exports = enable_callback_into_js(env, node_igs_setPublishingPort, "setPublishingPort", exports);
+    exports = enable_callback_into_js(env, node_igs_setDiscoveryInterval, "setDiscoveryInterval", exports);
+    exports = enable_callback_into_js(env, node_igs_setAgentTimeout, "setAgentTimeout", exports);
     return exports;
 }

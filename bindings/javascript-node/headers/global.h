@@ -8,6 +8,7 @@
 
 #include <node_api.h>
 #include <ingescape/ingescape.h> 
+#include <ingescape/ingescape_advanced.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

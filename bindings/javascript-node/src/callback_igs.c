@@ -8,7 +8,6 @@
 
 #include "../headers/callback_igs.h"
 
-CallbackForcedStopJS ** callbackForcedStopObserved = NULL;
 CallbackForcedStopJS *headForcedStopObserved = NULL;
 
 // Function to callback forced stop JS function 
@@ -96,7 +95,6 @@ napi_value node_igs_observeForcedStop(napi_env env, napi_callback_info info) {
     return NULL;
 }
 
-CallbackMuteJS ** callbacksMuteObserved = NULL;
 CallbackMuteJS *headMuteObserved = NULL;
 
 // Function to callback mute JS function 
@@ -188,7 +186,6 @@ napi_value node_igs_observeMute(napi_env env, napi_callback_info info) {
     return res_convert;
 }
 
-CallbackFreezeJS ** callbacksFreezeObserved = NULL;
 CallbackFreezeJS *headFreezeObserved = NULL;
 
 // Function to callback freeze JS function 
@@ -280,7 +277,6 @@ napi_value node_igs_observeFreeze(napi_env env, napi_callback_info info) {
     return res_convert;
 }
 
-CallbackIopJS ** callbacksIopObserved = NULL;
 CallbackIopJS *headIopObserved = NULL;
 
 // convert C value into napi value according to iopType value
@@ -524,7 +520,6 @@ napi_value node_igs_observeParameter(napi_env env, napi_callback_info info) {
     return res_convert;
 }
 
-CallbackLicense ** callbacksLicenseObserved = NULL;
 CallbackLicense *headLicenseObserved = NULL;
 
 // Function to callback License JS function 
@@ -643,7 +638,6 @@ void free_data_cb() {
     DL_FOREACH_SAFE(headLicenseObserved, eltLicense, tmpLicense) {
         DL_DELETE(headLicenseObserved, eltLicense);
     }
-
 }
 
 // Allow callback for observe ingescape code 
