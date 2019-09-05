@@ -328,6 +328,7 @@ I2PopupBase {
                 topMargin: 12
                 left: parent.left
                 right: parent.right
+                rightMargin: 144
             }
 
             Flickable {
@@ -377,11 +378,18 @@ I2PopupBase {
             value: subjectsScrollView.flickableItem.contentX
         }
 
+        Binding {
+            target: buttonsFlickable
+            property: "contentY"
+            value: subjectsScrollView.flickableItem.contentY
+        }
+
         Rectangle {
+            id: scrollViewBackground
             anchors {
                 top: subjectListHeader.bottom
-                left: parent.left
-                right: parent.right
+                left: subjectListHeader.left
+                right: subjectListHeader.right
                 bottom: parent.bottom
             }
 
@@ -415,59 +423,89 @@ I2PopupBase {
                     height: childrenRect.height
                     spacing: 0
 
-                    Repeater {
-                        model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
-
-                        delegate: Subject {
-                            id: subjectDelegate
-
-                            height: 40
-                            width: Math.max(characteristicValueColumnWidth * rootItem.experimentation.allCharacteristics.count, subjectsScrollView.width - (subjectsScrollView.__verticalScrollBar.visible ? scrollBarSize + verticalScrollbarMargin : 0))
-
-                            experimentation: rootItem.experimentation
-                            subject: model ? model.QtObject : null
-
-                            characteristicValueColumnWidth: rootItem.characteristicValueColumnWidth
-                            subjectEditionInProgress: rootItem.subjectEditionInProgress
-
-                            Binding {
-                                target: rootItem
-                                property: "subjectEditionInProgress"
-                                value: subjectDelegate.isCurrentlyEditing
-                            }
-
-                            Binding {
-                                target: rootItem
-                                property: "currentlyEditedSubjectDelegate"
-                                value: subjectDelegate
-                                when: subjectDelegate.isCurrentlyEditing
-                            }
-
-                            onDeleteSubject: {
-                                if (rootItem.subjectController && subjectDelegate.subject)
-                                {
-                                    subjectDelegate.isCurrentlyEditing = false
-                                    rootItem.subjectController.deleteSubject(subjectDelegate.subject);
-                                }
-
-                            }
-                        }
-                    }
+                    // Items within subjectsRepeater have this column as parent
                 }
+            }
+        }
+
+        Flickable {
+            id: buttonsFlickable
+
+            anchors {
+                top: scrollViewBackground.top
+                left: scrollViewBackground.right
+                right: parent.right
+                bottom: scrollViewBackground.bottom
+            }
+
+            clip: true
+            interactive: false
+
+            Column {
+                id: buttonsFlickableColumn
+                height: parent.height
+                width: parent.width
+
+                // Items within subjectsRepeater have this column as parent
             }
         }
 
         Rectangle {
             id: subjectsBottomShadow
             anchors {
-                left: parent.left
-                right: parent.right
+                left: scrollViewBackground.left
+                right: scrollViewBackground.right
                 bottom: parent.bottom
             }
             height: 4
             gradient: Gradient {
                 GradientStop { position: 0.0; color: IngeScapeTheme.whiteColor; }
                 GradientStop { position: 1.0; color: IngeScapeTheme.darkGreyColor; }
+            }
+        }
+    }
+
+    Repeater {
+        id: subjectsRepeater
+        model: rootItem.experimentation ? rootItem.experimentation.allSubjects : null
+
+        delegate: Subject {
+            id: subjectDelegate
+
+            height: 40
+            width: Math.max(characteristicValueColumnWidth * rootItem.experimentation.allCharacteristics.count, subjectsScrollView.width - (subjectsScrollView.__verticalScrollBar.visible ? subjectsScrollView.scrollBarSize + subjectsScrollView.verticalScrollbarMargin : 0))
+
+            experimentation: rootItem.experimentation
+            subject: model ? model.QtObject : null
+
+            characteristicValueColumnWidth: rootItem.characteristicValueColumnWidth
+            subjectEditionInProgress: rootItem.subjectEditionInProgress
+
+            // Changing characteristics values item's parent
+            characteristicsRowParent: subjectsColumn
+            // Changing button item's parent
+            buttonsRowParent: buttonsFlickableColumn
+
+            Binding {
+                target: rootItem
+                property: "subjectEditionInProgress"
+                value: subjectDelegate.isCurrentlyEditing
+            }
+
+            Binding {
+                target: rootItem
+                property: "currentlyEditedSubjectDelegate"
+                value: subjectDelegate
+                when: subjectDelegate.isCurrentlyEditing
+            }
+
+            onDeleteSubject: {
+                if (rootItem.subjectController && subjectDelegate.subject)
+                {
+                    subjectDelegate.isCurrentlyEditing = false
+                    rootItem.subjectController.deleteSubject(subjectDelegate.subject);
+                }
+
             }
         }
     }
