@@ -106,7 +106,7 @@ CassStatement* IndependentVariableValueM::createBoundInsertStatement(const Indep
  */
 CassStatement* IndependentVariableValueM::createBoundUpdateStatement(const IndependentVariableValueM& independentVariableValue)
 {
-    QString queryStr = "INSERT INTO " + IndependentVariableValueM::table + " (id_experimentation, id_task_instance, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
+    QString queryStr = "UPDATE " + IndependentVariableValueM::table + " SET independent_var_value = ? WHERE id_experimentation = ? AND id_task_instance = ? AND id_independent_var = ?;";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
     cass_statement_bind_string(cassStatement, 0, independentVariableValue.valueString.toStdString().c_str());
     cass_statement_bind_uuid  (cassStatement, 1, independentVariableValue.experimentationUuid);
