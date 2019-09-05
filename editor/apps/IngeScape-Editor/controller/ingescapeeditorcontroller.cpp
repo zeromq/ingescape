@@ -923,6 +923,8 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
         recordName = _recordsSupervisionC->getCurrentReplayName();
     }
 
+    // FIXME TODO: execute in other thread ?
+
     if ((deltaTimeFromTimeLineStart >= 0) && !jsonPlatform.isEmpty())
     {
         // First, clear the current platform by deleting all existing data
@@ -935,9 +937,14 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
         if (success)
         {
             // Update the current platform name
-            if (!recordName.isEmpty()) {
+            if (!recordName.isEmpty())
+            {
                 setcurrentPlatformName(recordName);
-                _currentPlatformFilePath = QFileInfo(jsonPlatform).absoluteFilePath();
+
+                //_currentPlatformFilePath = QDir(_platformDirectoryPath).absoluteFilePath(recordName);
+                _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, recordName);
+
+                sethasAPlatformBeenLoadedByUser(true);
             }
 
             if (_scenarioC != nullptr)
