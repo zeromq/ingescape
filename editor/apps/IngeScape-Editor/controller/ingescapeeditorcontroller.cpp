@@ -943,6 +943,8 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
 
                 //_currentPlatformFilePath = QDir(_platformDirectoryPath).absoluteFilePath(recordName);
                 _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, recordName);
+
+                sethasAPlatformBeenLoadedByUser(true);
             }
 
             if (_scenarioC != nullptr)

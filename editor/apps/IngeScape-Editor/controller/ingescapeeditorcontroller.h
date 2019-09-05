@@ -154,13 +154,6 @@ public:
 
 
     /**
-      * @brief Save the platform (agents, mappings, actions, palette, timeline actions)
-      * to the default file "last.json"
-      */
-    void savePlatformToDefaultFile();
-
-
-    /**
       * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions)
       *        by deleting all existing data
       */
