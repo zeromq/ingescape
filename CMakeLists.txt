@@ -173,12 +173,6 @@ if (INGESCAPE_BUILD_SHARED)
     RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
       COMPONENT library
   )
-
-  target_include_directories(${PROJECT_NAME}
-    PUBLIC
-      $<BUILD_INTERFACE:${SOURCE_DIR}/include>
-      $<INSTALL_INTERFACE:include>
-  )
 endif()
 
 # static
@@ -221,15 +215,6 @@ if (INGESCAPE_BUILD_STATIC)
       COMPONENT library
     RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
       COMPONENT library
-  )
-
-  target_include_directories(${PROJECT_NAME}-static
-    PUBLIC
-      $<BUILD_INTERFACE:${SOURCE_DIR}/include>
-      $<INSTALL_INTERFACE:include>
-  )
-  target_compile_definitions(${PROJECT_NAME}-static
-    PUBLIC INGESCAPE__STATIC
   )
 endif()
 
