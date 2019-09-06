@@ -1,17 +1,11 @@
 # Gitlab ci
 
-# TODO Check why with install target windows api are in bin subfolder
-# TODO Check why with compile target zmq, ... are not copied in Release folder on windows
-# TODO Add job to deploy ingescape website on commit (Can filter to launch job on doc folder changes and only master git's branche)
-# TODO Add job to compile ingeprobe
-# TODO Add job to package bindings
-
 # Define job order
 stages:
   - build-lib
   - installer-lib
-#  - build-binding
-#  - installer-binding
+  - build-binding
+  - installer-binding
   - build-apps
   - installer-apps
   - deploy-lib
@@ -240,45 +234,45 @@ lib-macos-release-x64:
     expire_in: 1 week
   dependencies: []
 
-# binding-csharp-windows-x64:
-#   <<: *build-csharp-files
-#   stage: build-binding
-#   tags:
-#     - windows
-#     - "1"
-#   variables:
-#     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
-#   script:
-#     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
-#     - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
-#     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
-#     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build --target IngescapeCSharp --config Release
-#   artifacts:
-#     paths:
-#      - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
-#     name: "binding-csharp-windows-x64"
-#     expire_in: 1 week
-#   dependencies: []
+binding-csharp-windows-x64:
+  <<: *build-csharp-files
+  stage: build-binding
+  tags:
+    - windows
+    - "1"
+  variables:
+    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+  script:
+    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
+    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
+    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build --target IngescapeCSharp --config Release
+  artifacts:
+    paths:
+     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
+    name: "binding-csharp-windows-x64"
+    expire_in: 1 week
+  dependencies: []
 
-# binding-csharp-windows-x86:
-#   <<: *build-csharp-files
-#   stage: build-binding
-#   tags:
-#     - windows
-#     - "1"
-#   variables:
-#     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
-#   script:
-#     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
-#     - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
-#     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
-#     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build --target IngescapeCSharp --config Release
-#   artifacts:
-#     paths:
-#      - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
-#     name: "binding-csharp-windows-x86"
-#     expire_in: 1 week
-#   dependencies: []
+binding-csharp-windows-x86:
+  <<: *build-csharp-files
+  stage: build-binding
+  tags:
+    - windows
+    - "1"
+  variables:
+    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+  script:
+    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
+    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build --target IngescapeCSharp --config Release
+  artifacts:
+    paths:
+     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
+    name: "binding-csharp-windows-x86"
+    expire_in: 1 week
+  dependencies: []
 
 # Create ingescape editor for macos
 editor-macos-release-x64:
@@ -626,38 +620,38 @@ lib-installer-runtime-macos-x64:
     - lib-macos-release-x64
 
 # Create runtime install for windows 64 bits
-# binding-csharp-installer-windows-x64:
-#   <<: *build-csharp-files
-#   stage: installer-binding
-#   tags:
-#     - windows
-#     - "1"
-#   script:
-#     - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
-#   artifacts:
-#     paths:
-#       - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.exe
-#       - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.zip
-#     name: "binding-csharp-installer-windows-x64"
-#   dependencies:
-#     - binding-csharp-windows-x64
+binding-csharp-installer-windows-x64:
+  <<: *build-csharp-files
+  stage: installer-binding
+  tags:
+    - windows
+    - "1"
+  script:
+    - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+  artifacts:
+    paths:
+      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.exe
+      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.zip
+    name: "binding-csharp-installer-windows-x64"
+  dependencies:
+    - binding-csharp-windows-x64
 
 # Create runtime install for windows 32 bits
-# binding-csharp-installer-windows-x86:
-#   <<: *build-csharp-files
-#   stage: installer-binding
-#   tags:
-#     - windows
-#     - "1"
-#   script:
-#     - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
-#   artifacts:
-#     paths:
-#       - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.exe
-#       - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.zip
-#     name: "binding-csharp-installer-windows-x86"
-#   dependencies:
-#     - binding-csharp-windows-x86
+binding-csharp-installer-windows-x86:
+  <<: *build-csharp-files
+  stage: installer-binding
+  tags:
+    - windows
+    - "1"
+  script:
+    - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+  artifacts:
+    paths:
+      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.exe
+      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.zip
+    name: "binding-csharp-installer-windows-x86"
+  dependencies:
+    - binding-csharp-windows-x86
 
 # Create editor install for macos 64 bits
 editor-installer-macos-x64:
