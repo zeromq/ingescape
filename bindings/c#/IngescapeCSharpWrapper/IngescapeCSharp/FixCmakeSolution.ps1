@@ -4,6 +4,15 @@ param (
    [string]$projectName = "IngescapeCSharp"
 )
 
+# Update output buffer size to prevent clipping in Visual Studio project file.
+if( $Host -and $Host.UI -and $Host.UI.RawUI ) {
+  $rawUI = $Host.UI.RawUI
+  $oldSize = $rawUI.BufferSize
+  $typeName = $oldSize.GetType( ).FullName
+  $newSize = New-Object $typeName (200, $oldSize.Height)
+  $rawUI.BufferSize = $newSize
+}
+
 # Check if solution folder exist
 if (!(Test-Path "$buildFolder\$projectName.sln" -PathType Leaf)) {
    throw "Solution file do not exist: $buildFolder\$projectName.sln"
@@ -35,7 +44,7 @@ Remove-Item ALL_BUILD.vcxproj.filters
   Select-String -Pattern "Microsoft.Common.props" -NotMatch |
   <# for some reason, Select-String prepends an empty line which is not
      allowed before <?xml ..., so we trim it away. #>
-  Out-String).Trim() | Out-File -Width 255 "$projectName.csproj"
+  Out-String).Trim() | Out-File "$projectName.csproj"
 if (!$?) {
    Set-Location $StartLocation
    throw "Cannot fix $projectName.csproj project file"
