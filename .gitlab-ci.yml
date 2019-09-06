@@ -259,7 +259,7 @@ binding-csharp-windows-x86:
   stage: build-binding
   tags:
     - windows
-    - "1"
+    - "2"
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
   script:
@@ -642,7 +642,7 @@ binding-csharp-installer-windows-x86:
   stage: installer-binding
   tags:
     - windows
-    - "1"
+    - "2"
   script:
     - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
