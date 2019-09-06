@@ -147,7 +147,11 @@ macro(install_ingescape_dependencies _LIB _HEADERS_PATH _IS_EDITOR)
         else ()
             install(FILES ${${_LIB}} DESTINATION "lib${LIB_SUFFIX}" COMPONENT library)
             install(FILES ${${_FILE_WITHOUT_EXT}_DLL_FILE} DESTINATION "lib${LIB_SUFFIX}" COMPONENT library)
-            install(DIRECTORY ${${_HEADERS_PATH}}/ DESTINATION include COMPONENT library)
+            install(DIRECTORY ${${_HEADERS_PATH}}/
+                DESTINATION include
+                COMPONENT library
+                PATTERN ingescape_private.h EXCLUDE
+            )
         endif()
     endif()
 endmacro()
