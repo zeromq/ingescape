@@ -61,6 +61,7 @@ LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject
                 features.append(QString(key));
                 key = static_cast<char*>(zlist_next(featureNames));
             }
+            zlist_destroy(&featureNames);
         }
         setfeatures(features);
 
@@ -75,6 +76,7 @@ LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject
                 agents.append(QString(key));
                 key = static_cast<char*>(zlist_next(agentNames));
             }
+            zlist_destroy(&agentNames);
         }
         setagents(agents);
     }

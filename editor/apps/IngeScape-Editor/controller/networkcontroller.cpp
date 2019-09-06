@@ -17,6 +17,8 @@
 #include <QDebug>
 #include <QApplication>
 
+#include <memory>
+
 
 static const QString prefix_Muted = "MUTED=";
 static const QString prefix_CanBeFrozen = "CANBEFROZEN=";
@@ -356,7 +358,8 @@ void NetworkController::manageShoutedMessage(QString peerId, QString peerName, z
  */
 void NetworkController::manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
 {
-    QString message = zmsg_popstr(zMessage);
+    std::unique_ptr<char> zmsg_str(zmsg_popstr(zMessage));
+    QString message(zmsg_str.get());
 
     // An agent DEFINITION has been received
     if (message.startsWith(prefix_Definition))

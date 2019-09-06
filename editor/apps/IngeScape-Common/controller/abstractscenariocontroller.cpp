@@ -453,6 +453,10 @@ void AbstractScenarioController::clearScenario()
 
     // Clear names list
     _allActionNames.clear();
+
+    // Clean-up sorted actions hash table
+    qDeleteAll(_hashFromLineIndexToSortedViewModelsOfAction);
+    _hashFromLineIndexToSortedViewModelsOfAction.clear();
 }
 
 

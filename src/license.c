@@ -271,6 +271,7 @@ void license_cleanLicense(void){
                     free(l->agentId);
                 if (l->agentName)
                     free(l->agentName);
+                free(l);
                 l = zhash_next(license->agents);
             }
             zhash_destroy(&license->agents);
@@ -303,14 +304,17 @@ void license_cleanLicense(void){
                             free(l->agentId);
                         if (l->agentName)
                             free(l->agentName);
+                        free(l);
                         l = zhash_next(detail->agents);
                     }
                     zhash_destroy(&detail->agents);
                 }
+                free(detail);
                 detail = zlist_next(license->licenseDetails);
             }
             zlist_destroy(&license->licenseDetails);
         }
+        free(license);
         license = NULL;
     }
     license_readWriteUnlock();
@@ -437,6 +441,7 @@ void license_readLicense(void){
                     *nextLine = '\n';  // then restore newline-char, just to be tidy
                 curLine = nextLine ? (nextLine + 1) : NULL;
             }
+            free(licenseText);
             zfile_destroy(&file);
             file = zlist_next(filesList);
         }
@@ -497,6 +502,7 @@ void license_readLicense(void){
                     }
                     k = zlist_next(features);
                 }
+                zlist_destroy(&features);
                 
                 //add new agents that are not in the list yet
                 zlist_t *agents = zhash_keys(detail->agents);
@@ -511,6 +517,7 @@ void license_readLicense(void){
                     }
                     k = zlist_next(agents);
                 }
+                zlist_destroy(&agents);
             }
             if (detail->isEditorLicenseValid){
                 if (detail->editorOwner != NULL){

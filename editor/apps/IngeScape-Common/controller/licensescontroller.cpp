@@ -31,7 +31,7 @@ extern "C" {
  */
 void onLicenseCallback(igs_license_limit_t limit, void *myData)
 {
-    LicensesController* licensesController = (LicensesController*)myData;
+    LicensesController* licensesController = static_cast<LicensesController*>(myData);
     if (licensesController != nullptr)
     {
         switch (limit)
@@ -128,6 +128,16 @@ LicensesController::~LicensesController()
 {
     qInfo() << "Delete Licenses Controller";
 
+    // Clean-up merged license
+    if (_mergedLicense != nullptr)
+    {
+        LicenseInformationM* temp = _mergedLicense;
+        setmergedLicense(nullptr);
+        delete temp;
+    }
+
+    // Clean-up license details
+    _licenseDetailsList.deleteAllItems();
 }
 
 
@@ -253,23 +263,17 @@ void LicensesController::_getLicensesData()
 
         if ((license->features != nullptr) && (zhash_size(license->features) > 0))
         {
-            //qDebug() << zhash_size(license->features) << "features";
-
             zlist_t *keys = zhash_keys(license->features);
             if (keys != nullptr)
             {
-                //qDebug() << zlist_size(keys) << "keys";
-
-                char* key = (char*)zlist_first(keys);
+                char* key = static_cast<char*>(zlist_first(keys));
                 while (key != nullptr)
                 {
-                    //qDebug() << "key" << QString(key);
-
                     featureNamesTemp.append(QString(key));
-
-                    key = (char*)zlist_next(keys);
+                    key = static_cast<char*>(zlist_next(keys));
                 }
             }
+            zlist_destroy(&keys);
         }
         setfeatureNames(featureNamesTemp);
         qInfo() << "Features" << _featureNames;
@@ -282,16 +286,11 @@ void LicensesController::_getLicensesData()
 
         if ((license->agents != nullptr) && (zhash_size(license->agents) > 0))
         {
-            //qDebug() << zhash_size(license->agents) << "agents";
-
-            licenseForAgent_t* agent = (licenseForAgent_t *)zhash_first(license->agents);
+            licenseForAgent_t* agent = static_cast<licenseForAgent_t *>(zhash_first(license->agents));
             while (agent != nullptr)
             {
-                //qDebug() << "name" << agent->agentName << "(" << agent->agentId << ")";
-
                 agentNamesTemp.append(QString(agent->agentName));
-
-                agent = (licenseForAgent_t *)zhash_next(license->agents);
+                agent = static_cast<licenseForAgent_t *>(zhash_next(license->agents));
             }
         }
         setagentNames(agentNamesTemp);
@@ -306,16 +305,13 @@ void LicensesController::_getLicensesData()
         {
             qDebug() << zlist_size(license->licenseDetails) << "license details";
 
-            license_t* detail = (license_t*)zlist_first(license->licenseDetails);
+            license_t* detail = static_cast<license_t*>(zlist_first(license->licenseDetails));
             while (detail != nullptr)
             {
                 LicenseInformationM* licenseDetails = new LicenseInformationM(detail);
                 _licenseDetailsList.append(licenseDetails);
                 qDebug() << *licenseDetails;
-
-                // FIXME TODO: create the list of licenseM
-
-                detail = (license_t *)zlist_next(license->licenseDetails);
+                detail = static_cast<license_t*>(zlist_next(license->licenseDetails));
             }
         }
     }

@@ -17,6 +17,7 @@
 #include <QDebug>
 #include <QApplication>
 
+#include <memory>
 
 static const QString suffix_Launcher = ".ingescapelauncher";
 
@@ -36,7 +37,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 {
     Q_UNUSED(channel)
 
-    IngeScapeNetworkController* networkController = (IngeScapeNetworkController*)myData;
+    IngeScapeNetworkController* networkController = static_cast<IngeScapeNetworkController*>(myData);
     if (networkController != nullptr)
     {
         QString peerId = QString(peer);
@@ -82,9 +83,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 QString key = "";
                 QString value = "";
 
-                while ((k = (char *)zlist_pop(keys)))
+                while ((k = static_cast<char*>(zlist_pop(keys))))
                 {
-                    v = (char *)zhash_lookup(headers, k);
+                    v = static_cast<char*>(zhash_lookup(headers, k));
 
                     key = QString(k);
                     value = QString(v);
@@ -131,10 +132,11 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     else if (key == "videoStream") {
                         streamingPort = value;
                     }
-                }
 
-                free(k);
-                //free(v);
+                    if (k) {
+                        free(k);
+                    }
+                }
             }
             zlist_destroy(&keys);
 
@@ -563,7 +565,8 @@ bool IngeScapeNetworkController::isAvailableNetworkDevice(QString networkDevice)
  */
 void IngeScapeNetworkController::manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
 {
-    QString message = zmsg_popstr(zMessage);
+    std::unique_ptr<char> zmsg_str(zmsg_popstr(zMessage));
+    QString message(zmsg_str.get());
 
     qDebug() << "Not yet managed SHOUTED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
 }
@@ -577,7 +580,8 @@ void IngeScapeNetworkController::manageShoutedMessage(QString peerId, QString pe
  */
 void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
 {
-    QString message = zmsg_popstr(zMessage);
+    std::unique_ptr<char> zmsg_str(zmsg_popstr(zMessage));
+    QString message(zmsg_str.get());
 
     qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
 }
