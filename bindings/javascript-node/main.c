@@ -13,6 +13,7 @@
 #include "./headers/iop.h"
 #include "./headers/mapping.h"
 #include "./headers/licenses.h"
+#include "./headers/call.h"
 
 
 // Allow calling into the add-on native code from JavaScript
@@ -24,7 +25,7 @@ napi_value Init(napi_env env, napi_value exports) {
 	exports = init_iop(env, exports);
 	exports = init_mapping(env, exports);
 	exports = init_licenses(env, exports);
-
+	exports = init_call(env, exports);
 	return exports;
 }
 

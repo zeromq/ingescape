@@ -195,3 +195,131 @@ iopType_js get_iop_type_js_from_iop_type_t(iopType_t type) {
             return -1;
     }
 }
+
+void getArrayJSFromCallArgumentList(napi_env env, igs_callArgument_t *firstArgument, napi_value *arrayJS) {
+    napi_status status;
+    igs_callArgument_t * arg = firstArgument;
+    uint32_t i = 0;
+    napi_value argJS;
+    status = napi_create_array(env, arrayJS);
+    if (status != napi_ok) {
+        napi_throw_error(env, NULL, "N-API : Unable to create array");
+    }
+    
+    while (arg != NULL) {
+        switch (arg->type) {
+            case IGS_INTEGER_T :
+                convert_int_to_napi(env, arg->i, &argJS);
+                break;
+            case IGS_DOUBLE_T  :
+                convert_double_to_napi(env, arg->d, &argJS);
+                break;
+            case IGS_STRING_T  :
+                convert_string_to_napi(env, arg->c, &argJS);
+                break;
+            case IGS_BOOL_T  :
+                convert_bool_to_napi(env, arg->b, &argJS);
+                break;
+            case IGS_IMPULSION_T  :
+                napi_throw_error(env, NULL, "Type IMPULSION is not handling by calls");
+                break;
+            case IGS_DATA_T  :
+                convert_data_to_napi(env, arg->data, arg->size, &argJS);
+                break;
+            default : 
+                napi_throw_error(env, NULL, "Type not handling in binding");
+        }
+        status = napi_set_element(env, *arrayJS, i, argJS);
+        if (status != napi_ok) {
+            napi_throw_error(env, NULL, "N-API : Unable to set element in array");
+        }
+        arg = arg->next;
+        i++;
+    }
+}
+
+void getCallArgumentListFromArrayJS(napi_env env, napi_value array, igs_callArgument_t **firstArgument) {
+    napi_status status;
+    napi_valuetype value_type;
+    status = napi_typeof(env, array, &value_type);
+    if (status != napi_ok) {
+        napi_throw_error(env, NULL, "N-API : Unable to get napi value type");
+    }
+
+    *firstArgument = NULL;
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
+        *firstArgument = NULL;
+    }
+    else {
+        bool isArray;
+        status = napi_is_array(env, array, &isArray);
+        if (status != napi_ok) {
+            napi_throw_error(env, NULL, "napi_value must be an array or null or undefined");
+        }
+
+        // Rebuild list of igs_callArgument_t
+        uint32_t length;
+        status = napi_get_array_length(env, array, &length);
+        if (status != napi_ok) {
+            napi_throw_error(env, NULL, "N-API : Unable to get array length");
+        }
+
+        uint32_t i = 0;
+        napi_value elt;
+        napi_valuetype typeElt;
+        // Translate all the array elements to create list
+        while (i < length) {
+            status = napi_get_element(env, array, i, &elt);
+            if (status != napi_ok) {
+                napi_throw_error(env, NULL, "N-API : Unable to get element in array");
+            }
+
+            status = napi_typeof(env, elt, &typeElt);
+            if (status != napi_ok) {
+                napi_throw_error(env, NULL, "N-API : Unable to get napi value type of element");
+            }
+
+            void * eltC = NULL;
+            size_t size;
+            switch (typeElt) {
+                case napi_number :
+                    // convert to double
+                    eltC = (double *) malloc(sizeof(double));
+                    convert_napi_to_double(env, elt, eltC);
+                    igs_addDoubleToArgumentsList(firstArgument, *(double *)eltC);
+                    break;
+                case napi_boolean :
+                    // convert to bool 
+                    eltC = (bool *) malloc(sizeof(bool));
+                    convert_napi_to_bool(env, elt, eltC);
+                    igs_addBoolToArgumentsList(firstArgument, *(bool *)eltC);
+                    break;
+                case napi_string :
+                    // convert to string 
+                    eltC = convert_napi_to_string(env, elt);
+                    igs_addStringToArgumentsList(firstArgument, eltC);
+                    free(eltC);
+                    break;
+                case napi_undefined : 
+                    // convert to data
+                    igs_addDataToArgumentsList(firstArgument, NULL, 0);
+                case napi_null :
+                    // convert to data
+                    igs_addDataToArgumentsList(firstArgument, NULL, 0);
+                default :
+                    
+                    //check if it is an array buffer
+                    status = napi_get_arraybuffer_info(env, elt, &eltC, &size);
+                    if (status == napi_ok) {
+                        // convert to data
+                        convert_napi_to_data(env, elt, &eltC, &size);
+                        igs_addDataToArgumentsList(firstArgument, eltC, size);
+                    }
+                    else {
+                        napi_throw_error(env, NULL, "Wrong type of element in array, accept undefined, null, string, number, boolean and ArrayBuffer objects");
+                    }
+            }
+            i++;
+        }
+    } 
+}

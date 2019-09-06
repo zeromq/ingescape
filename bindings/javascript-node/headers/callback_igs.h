@@ -48,6 +48,18 @@ typedef struct CallbackLicense {
     napi_ref ref_myData;
     struct CallbackLicense *prev, *next;
 } CallbackLicense;
+
+typedef struct CallbackCall {
+    char *senderAgentName;
+    char *senderAgentUUID;
+    char *callName;
+    igs_callArgument_t *firstArgument;
+    size_t nbArgs;
+    
+    napi_threadsafe_function threadsafe_func;
+    napi_ref ref_myData;
+    struct CallbackCall *prev, *next;
+} CallbackCall;
 #endif
 
 // Free allocated memory for callbacks during lifetime of the agent

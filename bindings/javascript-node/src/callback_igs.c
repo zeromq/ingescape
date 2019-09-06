@@ -608,6 +608,111 @@ napi_value node_igs_observeLicense (napi_env env, napi_callback_info info) {
     return res_convert;
 }
 
+CallbackCall *headCallObserved = NULL;
+
+static void cbCall_into_js(napi_env env, napi_value js_callback, void* ctx, void* data) {
+    napi_status status;
+    CallbackCall * callback = (CallbackCall *) data;
+    napi_value argv[5];
+
+    // convert args to napi
+    convert_string_to_napi(env, callback->senderAgentName, &argv[0]);
+    convert_string_to_napi(env, callback->senderAgentUUID, &argv[1]);
+    convert_string_to_napi(env, callback->callName, &argv[2]);
+
+    //convert chained list to arraybuffer
+    getArrayJSFromCallArgumentList(env, igs_cloneArgumentsList(callback->firstArgument), &argv[3]);
+    //get reference data from JS
+    if (callback->ref_myData == NULL) {
+        convert_null_to_napi(env, &argv[4]);
+    }
+    else {
+        status = napi_get_reference_value(env, callback->ref_myData, &argv[4]);
+        if (status != napi_ok) {
+            napi_throw_error(env, NULL, "N-API : Unable to get reference value");
+        }
+    }
+    
+    // Since a function call must have a receiver, we use undefined
+    napi_value undefined;
+    status = napi_get_undefined(env, &undefined);
+    if (status != napi_ok) {
+        napi_throw_error(env, NULL, "Impossible to get undefined");
+    }
+
+    // callback into JavaScript
+    status = napi_call_function(env, undefined, js_callback, 5, argv, NULL);
+    if (status != napi_ok) {
+        napi_throw_error(env, NULL, "Unable to call javascript function");
+    }
+}
+
+// type defined call C function
+void callCallback (const char *senderAgentName, const char *senderAgentUUID,
+    const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
+    void* myData) {
+    // call threadsafe function
+    CallbackCall * callback = (CallbackCall *) myData;
+    callback->senderAgentName = strndup(senderAgentName, strlen(senderAgentName));
+    callback->senderAgentUUID = strndup(senderAgentUUID, strlen(senderAgentUUID));
+    callback->callName = strndup(callName, strlen(callName));
+    callback->firstArgument = igs_cloneArgumentsList(firstArgument); //clone it to keep it
+    callback->nbArgs = nbArgs;
+    napi_call_threadsafe_function(callback->threadsafe_func, callback, napi_tsfn_nonblocking);
+}   
+
+napi_value node_igs_initCall(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 3;
+    napi_status status; //to check status of node_api
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    char * name = convert_napi_to_string(env, argv[0]);
+
+    // Initiate struct
+    CallbackCall * callback = calloc(1, sizeof(CallbackCall));
+    DL_APPEND(headCallObserved, callback);
+
+    //create threadsafe function
+    napi_value async_name;
+    status = napi_create_string_utf8(env, "Ingescape/CallbackCall", NAPI_AUTO_LENGTH, &async_name);
+    if (status != napi_ok) {
+        napi_throw_error(env, NULL, "Invalid name for async_name napi_value");
+    }
+    status = napi_create_threadsafe_function(env, argv[1], NULL, async_name, 0, 1, NULL, NULL, NULL, 
+    cbCall_into_js, &(callback->threadsafe_func));
+    if (status != napi_ok) {
+        napi_throw_error(env, NULL, "Impossible to create threadsafe function");
+    }
+
+    //create reference for arguments callback if not null
+    napi_valuetype value_type;
+    status = napi_typeof(env, argv[2], &value_type);
+    if (status != napi_ok) {
+        napi_throw_error(env, NULL, "N-API : Unable to get napi value type of 2nd argument");
+    }
+    if (value_type == napi_null) {
+        callback->ref_myData = NULL;
+    }
+    else {
+        status = napi_create_reference(env, argv[2], 1, &(callback->ref_myData));
+        if (status != napi_ok) {
+            napi_throw_error(env, NULL, "3rd argument must be a JavaScript Object or an Array or null");
+        }
+    }
+
+    // call igs function
+    int res = igs_initCall(name, callCallback, callback);
+    free(name);
+
+    napi_value res_convert;
+    convert_int_to_napi(env, res, &res_convert);
+    return res_convert;
+}
+
 // Free allocated memory for callbacks during lifetime of the agent
 void free_data_cb() {
     CallbackForcedStopJS *eltFS, *tmpFS;
@@ -634,6 +739,11 @@ void free_data_cb() {
     DL_FOREACH_SAFE(headLicenseObserved, eltLicense, tmpLicense) {
         DL_DELETE(headLicenseObserved, eltLicense);
     }
+
+    CallbackCall *eltCall, *tmpCall;
+    DL_FOREACH_SAFE(headCallObserved, eltCall, tmpCall) {
+        DL_DELETE(headCallObserved, eltCall);
+    }
 }
 
 // Allow callback for observe ingescape code 
@@ -645,5 +755,6 @@ napi_value init_callback_igs(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_observeOutput, "observeOutput", exports);
     exports = enable_callback_into_js(env, node_igs_observeParameter, "observeParameter", exports);
     exports = enable_callback_into_js(env, node_igs_observeLicense, "observeLicense", exports);
+    exports = enable_callback_into_js(env, node_igs_initCall, "initCall", exports);
     return exports;
 }

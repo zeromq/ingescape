@@ -46,3 +46,7 @@ napi_value enable_callback_into_js(napi_env env, napi_callback cb, const char * 
 //ioptype_t conversions
 iopType_t get_iop_type_t_from_iop_type_js(iopType_js type_js);
 iopType_js get_iop_type_js_from_iop_type_t(iopType_t type);
+
+// utils Call
+void getArrayJSFromCallArgumentList(napi_env env, igs_callArgument_t *firstArgument, napi_value *arrayJS);
+void getCallArgumentListFromArrayJS(napi_env env, napi_value array, igs_callArgument_t **firstArgument);
