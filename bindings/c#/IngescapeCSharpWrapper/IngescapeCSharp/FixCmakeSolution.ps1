@@ -35,7 +35,7 @@ Remove-Item ALL_BUILD.vcxproj.filters
   Select-String -Pattern "Microsoft.Common.props" -NotMatch |
   <# for some reason, Select-String prepends an empty line which is not
      allowed before <?xml ..., so we trim it away. #>
-  Out-String).Trim() | Out-File "$projectName.csproj"
+  Out-String).Trim() | Out-File -Width 255 "$projectName.csproj"
 if (!$?) {
    Set-Location $StartLocation
    throw "Cannot fix $projectName.csproj project file"
