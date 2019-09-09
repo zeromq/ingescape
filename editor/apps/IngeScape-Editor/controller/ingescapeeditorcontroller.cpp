@@ -1259,6 +1259,7 @@ void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
                 QFileInfo fileInfo = QFileInfo(jsonFile);
                 setcurrentPlatformName(fileInfo.baseName());
                 _currentPlatformFilePath = fileInfo.absoluteFilePath();
+                sethasAPlatformBeenLoadedByUser(true);
 
                 jsonFile.write(jsonDocument.toJson(QJsonDocument::Indented));
                 jsonFile.close();
