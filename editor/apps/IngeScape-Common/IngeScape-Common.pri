@@ -53,7 +53,9 @@ SOURCES += \
     $$PWD/sortFilter/abstracttimerangefilter.cpp \
     $$PWD/graphics/dashedbar.cpp
 
+
 HEADERS += \
+    $$PWD/platformsupport/macosutils.h \
     $$PWD/ingescapecommon.h \
     $$PWD/ingescape-common_global.h \
     $$PWD/model/licenseinformationm.h \
@@ -103,6 +105,11 @@ HEADERS += \
     $$PWD/graphics/dashedbar.h
 
 
+OBJECTIVE_SOURCES += \
+    $$PWD/platformsupport/macosutils.mm
+
+
+
 # This variable only makes sense in a subdirs project.
 # It lists the directories to build. If it is absent the build system will attempt to build projects underneath this directory.
 # Note that this behavior does not work for the project at the top of a tree, which must use the second notation to build all projects.
@@ -118,3 +125,28 @@ DISTFILES +=
 
 RESOURCES += \
     $$PWD/igs_common_qml.qrc
+
+
+
+
+
+#####################################################################
+#
+# OS specific rules
+#
+#####################################################################
+
+
+#------------------------
+#
+# OSX specific rules
+#
+#------------------------
+mac {
+    message(Ingescape-common.pri: macOS and iOS specific rules)
+
+
+    # Add specific depdencies
+    LIBS += -framework Foundation
+}
+

@@ -61,13 +61,15 @@ ApplicationWindow {
     //----------------------------------
 
     menuBar: MenuBar {
-        // Platform
+        // File
         Menu {
-            id: menuPlatform
-            title: qsTr("Platform")
+            id: menuFile
+
+            title: qsTr("&File")
 
             MenuItem {
-                text: qsTr("Start a new platform")
+                text: qsTr("&New platform")
+
                 shortcut: StandardKey.New
 
                 onTriggered: {
@@ -77,6 +79,7 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Open a platform...")
+
                 shortcut: StandardKey.Open
 
                 onTriggered: {
@@ -84,8 +87,11 @@ ApplicationWindow {
                 }
             }
 
+            MenuSeparator {}
+
             MenuItem {
                 text: qsTr("Save")
+
                 shortcut: StandardKey.Save
 
                 onTriggered: {
@@ -95,6 +101,7 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Save As...")
+
                 shortcut: StandardKey.SaveAs
 
                 onTriggered: {
@@ -102,14 +109,11 @@ ApplicationWindow {
                 }
             }
 
-            MenuSeparator {
-            }
+            MenuSeparator {}
 
             MenuItem {
-                // If we use "Configuration", this MenuItem is displayed in the main app menu and called "Preferences"
-                // Workaround: we use an invisible character
-                text: qsTr("\u200BConfiguration")
-                //text: qsTr("Platform network")
+                text: qsTr("Preferences...")
+
                 shortcut: StandardKey.Preferences
 
                 onTriggered: {
@@ -119,9 +123,9 @@ ApplicationWindow {
                     }
                 }
             }
+
             MenuItem {
-                text: qsTr("Platform license")
-                //shortcut: StandardKey.
+                text: qsTr("Licenses...")
 
                 onTriggered: {
                     if (applicationLoader.item) {
@@ -130,18 +134,24 @@ ApplicationWindow {
                     }
                 }
             }
+
+            MenuSeparator {}
+
             MenuItem {
                 text: qsTr("Create snapshot")
+
                 shortcut: StandardKey.AddTab
 
                 onTriggered: {
                     I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "IngeScape-Editor");
                 }
             }
+
             MenuItem {
                 id: menuItemModelVisualizer
 
-                text: "" // (IngeScapeEditorC.isVisibleModelVisualizer ? qsTr("Hide the model visualizer") : qsTr("Show the model visualizer"))
+                text: ""
+
                 visible: false
 
                 onTriggered: {
@@ -156,16 +166,101 @@ ApplicationWindow {
                 }
             }
 
-            // By using "Quit", this MenuItem is displayed in the main app menu and called "Quit <app_name>"
-            // It will override the regular Command+Q action and perform our last minute check to ask the user to saves the changes if any.
-            // FIXME [soum] On my macOS with the french locale, "Quitter" works but "Quit" doesn't. Forcing the app locale to "en_US" make both work.
-            //       We need to check what happens on a macOS with only an english locale.
+            MenuSeparator {}
+
             MenuItem {
-                text: qsTr("Quit")
+                text: qsTr("E&xit")
+
                 shortcut: StandardKey.Quit
 
                 onTriggered: {
-                    mainWindow.close()
+                    // Try to close our man window
+                    mainWindow.close();
+                }
+            }
+        }
+
+
+        // Edit
+        Menu {
+            id: menuEdit
+
+            title: qsTr("&Edit")
+
+            MenuItem {
+                id: menuEditItemUndo
+
+                text: qsTr("&Undo")
+
+                shortcut: StandardKey.Undo
+
+                enabled: false
+
+                onTriggered: {
+                    // TODO: undo
+                    console.log("TODO: undo");
+                }
+            }
+
+            MenuItem {
+                id: menuEditItemRedo
+
+                text: qsTr("&Redo")
+
+                shortcut: StandardKey.Redo
+
+                enabled: false
+
+                onTriggered: {
+                    // TODO: redo
+                    console.log("TODO: redo");
+                }
+            }
+
+            MenuSeparator {}
+
+            MenuItem {
+                id: menuEditItemCut
+
+                text: qsTr("Cu&t")
+
+                shortcut: StandardKey.Cut
+
+                enabled: false
+
+                onTriggered: {
+                    // TODO: cut
+                    console.log("TODO: cut");
+                }
+            }
+
+            MenuItem {
+                id: menuEditItemCopy
+
+                text: qsTr("Copy")
+
+                shortcut: StandardKey.Copy
+
+                enabled: false
+
+                onTriggered: {
+                    // TODO: copy
+                    console.log("TODO: copy");
+                }
+            }
+
+            MenuItem {
+                id: menuEditItemPaste
+
+                text: qsTr("Paste")
+
+                shortcut: StandardKey.Paste
+
+                enabled: false
+
+                onTriggered: {
+                    // TODO: paste
+                    console.log("TODO: paste");
                 }
             }
         }
@@ -178,7 +273,7 @@ ApplicationWindow {
             MenuItem {
                 id: menuPlugUNplugMapping
 
-                text: "" // (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingConnected) ? qsTr("Disconnect mapping") : qsTr("Connect mapping")
+                text: ""
 
                 onTriggered: {
                     if (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingConnected) {
@@ -192,11 +287,11 @@ ApplicationWindow {
                 }
             }
 
-            MenuSeparator {
-            }
+            MenuSeparator {}
 
             MenuItem {
                 text: qsTr("Zoom In")
+
                 shortcut: StandardKey.ZoomIn
 
                 onTriggered: {
@@ -209,6 +304,7 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Zoom Out")
+
                 shortcut: StandardKey.ZoomOut
 
                 onTriggered: {
@@ -243,7 +339,7 @@ ApplicationWindow {
         }
 
 
-        // Supervision
+        // Agents
         Menu {
             title: qsTr("Agents")
 
@@ -309,25 +405,22 @@ ApplicationWindow {
 
             Instantiator {
                 id: subWindowsInstantiator
-                model: 0 // IngeScapeEditorC.openedWindows
+
+                model: null
 
                 delegate: MenuItem {
                     text: model.QtObject.title
 
                     onTriggered: {
-                        //console.log("click on " + model.QtObject.title + " (" + model.QtObject + ")")
-
                         // Raises the window in the windowing system
                         model.QtObject.raise();
                     }
                 }
 
                 onObjectAdded: {
-                    //console.log("onObjectAdded " + index)
                     menuWindows.insertItem(index, object)
                 }
                 onObjectRemoved: {
-                    //console.log("onObjectRemoved")
                     menuWindows.removeItem(object)
                 }
             }
@@ -348,8 +441,11 @@ ApplicationWindow {
                 id: visualizeNormal
 
                 text: qsTr("Normal rendering")
+
                 checkable: true
+
                 checked: true
+
                 exclusiveGroup: visualizeGroup
 
                 onTriggered: {
@@ -361,7 +457,9 @@ ApplicationWindow {
                 id: visualizeClipping
 
                 text: qsTr("Visualize clipping")
+
                 checkable: true
+
                 exclusiveGroup: visualizeGroup
 
                 onTriggered: {
@@ -373,7 +471,9 @@ ApplicationWindow {
                 id: visualizeBatches
 
                 text: qsTr("Visualize batches")
+
                 checkable: true
+
                 exclusiveGroup: visualizeGroup
 
                 onTriggered: {
@@ -385,7 +485,9 @@ ApplicationWindow {
                 id: visualizeOverdraw
 
                 text: qsTr("Visualize overdraw")
+
                 checkable: true
+
                 exclusiveGroup: visualizeGroup
 
                 onTriggered: {
@@ -397,7 +499,9 @@ ApplicationWindow {
                 id: visualizeChanges
 
                 text: qsTr("Visualize changes")
+
                 checkable: true
+
                 exclusiveGroup: visualizeGroup
 
                 onTriggered: {
@@ -435,6 +539,7 @@ ApplicationWindow {
         // Start our loader delay animation when our initial content is ready
         loaderDelayAnimation.start();
     }
+
 
     // When user clicks on window close button
     onClosing: {
@@ -520,13 +625,9 @@ ApplicationWindow {
             Behavior on opacity {
                 NumberAnimation {
                     duration: 200
-                    easing.type: Easing.OutQuad;
+                    easing.type: Easing.OutQuad
                 }
             }
-
-            /*onLoaded: {
-                console.log("onLoaded " + applicationLoader.item)
-            }*/
 
             onVisibleChanged: {
                 if (visible) {

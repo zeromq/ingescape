@@ -41,6 +41,19 @@
 #include <misc/ingescapeutils.h>
 
 
+
+
+//
+// Macos specific headers
+//
+#ifdef Q_OS_MAC
+#include "platformsupport/macosutils.h"
+#endif
+
+
+
+
+
 /**
  * @brief Handler for "Log Message"
  * @param type
@@ -227,17 +240,31 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 
+    //
+    // Windows OS specific
+    //
 #ifdef Q_OS_WIN
     // Fix crash with some Intel graphic cards (e.g. Intel HD Graphics 620)
     // Qt bug https://bugreports.qt.io/browse/QTBUG-64697
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setAttribute(Qt::AA_DisableShaderDiskCache);
 #endif
+
+
+    //
+    // Macos specific
+    //
+#ifdef Q_OS_MAC
+    // Clean-up menus
+    MacosUtils::removeMacosGeneratedMenuItems();
+#endif
+
 
 
 #ifdef QT_DEBUG
     // Print out general information about various parts of the scene graph and the graphics stack
     QLoggingCategory::setFilterRules("qt.scenegraph.general = true");
 #endif
+
 
 
     //------------------------------
@@ -401,6 +428,7 @@ int main(int argc, char *argv[])
     // Load our main QML file
     //
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
+
 
 
     //------------------------------

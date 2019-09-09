@@ -38,6 +38,7 @@ PRECOMPILED_HEADER  = stable.h
 OBJECTS_DIR = tmp
 MOC_DIR = tmp
 RCC_DIR = tmp
+UI_DIR = tmp
 
 
 SOURCES += main.cpp \
