@@ -48,7 +48,13 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property var controller : null;
+    property AgentsSupervisionController agentsSupervisionController: null;
+
+    // Licenses controller
+    property LicensesController licensesController: null;
+
+    // Flag indicating if the user have a valid license for the editor
+    property bool isEditorLicenseValid: rootItem.licensesController && rootItem.licensesController.mergedLicense && rootItem.licensesController.mergedLicense.editorLicenseValidity
 
 
     //
@@ -65,10 +71,10 @@ Item {
         var currentObject = startingObject;
         var layerRoot = null;
 
-        while ((currentObject !== null) && (layerRoot == null))
+        while ((currentObject !== null) && (layerRoot === null))
         {
             var index = 0;
-            while ((index < currentObject.data.length) && (layerRoot == null))
+            while ((index < currentObject.data.length) && (layerRoot === null))
             {
                 if (currentObject.data[index].objectName === layerObjectName)
                 {
@@ -94,9 +100,9 @@ Item {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            if (controller.selectedAgent)
+            if (agentsSupervisionController.selectedAgent)
             {
-                controller.selectedAgent = null;
+                agentsSupervisionController.selectedAgent = null;
             }
         }
     }
@@ -125,7 +131,7 @@ Item {
         ListView {
             id: agentsList
 
-            model: controller.agentsList
+            model: agentsSupervisionController.agentsList
 
             delegate: componentAgentListItem
 
@@ -234,6 +240,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
                 activeFocusOnPress: true
+                enabled: rootItem.isEditorLicenseValid
 
                 style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
@@ -274,7 +281,7 @@ Item {
             Button {
                 id: btnExportAgentsList
 
-                enabled: visible && (controller.agentsList.count > 0)
+                enabled: visible && rootItem.isEditorLicenseValid && (agentsSupervisionController.agentsList.count > 0)
                 activeFocusOnPress: true
 
                 anchors {
@@ -373,7 +380,7 @@ Item {
                 anchors.fill : parent
 
                 agent: model.QtObject
-                controller: rootItem.controller
+                controller: rootItem.agentsSupervisionController
 
                 visible: mouseArea.drag.active
 
@@ -409,13 +416,13 @@ Item {
                     cursorShape: mouseArea.drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
 
                     onPressed: {
-                        if (controller) {
-                            if (controller.selectedAgent === model.QtObject)
+                        if (agentsSupervisionController) {
+                            if (agentsSupervisionController.selectedAgent === model.QtObject)
                             {
-                                controller.selectedAgent = null;
+                                agentsSupervisionController.selectedAgent = null;
                             }
                             else {
-                                controller.selectedAgent = model.QtObject;
+                                agentsSupervisionController.selectedAgent = model.QtObject;
                             }
 
                         }
@@ -457,7 +464,7 @@ Item {
                         width: notDraggableItem.width
 
                         agent: model.QtObject
-                        controller: rootItem.controller
+                        controller: rootItem.agentsSupervisionController
 
                         agentItemIsHovered: mouseArea.containsMouse
                         visible: !mouseArea.drag.active
@@ -504,8 +511,8 @@ Item {
         confirmationText: "This agent is used in the platform.\nDo you want to completely delete it?"
 
         onConfirmed: {
-            if (controller) {
-                controller.deleteAgentInList(deleteConfirmationPopup.myAgent);
+            if (agentsSupervisionController) {
+                agentsSupervisionController.deleteAgentInList(deleteConfirmationPopup.myAgent);
             }
         }
     }

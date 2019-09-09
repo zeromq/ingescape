@@ -25,6 +25,7 @@ import ".." as Editor;
 
 import INGESCAPE 1.0
 import "../theme" as Theme
+import "../popup" as Popup
 
 Item {
     id: rootItem
@@ -38,7 +39,13 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property var controller : null;
+    property AbstractScenarioController scenarioController: null;
+
+    // Licenses controller
+    property LicensesController licensesController: IngeScapeEditorC.licensesC;
+
+    // Flag indicating if the user have a valid license for the editor
+    property bool isEditorLicenseValid: mainWindow.licensesController && mainWindow.licensesController.mergedLicense && mainWindow.licensesController.mergedLicense.editorLicenseValidity
 
 
     //-----------------------------------------
@@ -53,10 +60,10 @@ Item {
         var currentObject = startingObject;
         var layerRoot = null;
 
-        while ((currentObject !== null) && (layerRoot == null))
+        while ((currentObject !== null) && (layerRoot === null))
         {
             var index = 0;
-            while ((index < currentObject.data.length) && (layerRoot == null))
+            while ((index < currentObject.data.length) && (layerRoot === null))
             {
                 if (currentObject.data[index].objectName === layerObjectName)
                 {
@@ -84,9 +91,9 @@ Item {
         anchors.fill: parent
 
         onClicked: {
-            if (controller.selectedAction)
+            if (scenarioController.selectedAction)
             {
-                controller.selectedAction = null;
+                scenarioController.selectedAction = null;
             }
         }
     }
@@ -116,7 +123,7 @@ Item {
         ListView {
             id: actionsList
 
-            model: controller.actionsList
+            model: scenarioController.actionsList
 
             delegate: componentActionsListItem
 
@@ -202,7 +209,16 @@ Item {
                 }
 
                 onClicked: {
-                    controller.openActionEditorWithModel(null);
+                    if (!rootItem.isEditorLicenseValid
+                            && rootItem.scenarioController && rootItem.scenarioController.actionsList && rootItem.scenarioController.actionsList.count >= 1)
+                    {
+                        noMoreActionMessage.open()
+                    }
+                    else
+                    {
+                        scenarioController.openActionEditorWithModel(null);
+                    }
+
                 }
             }
 
@@ -284,7 +300,7 @@ Item {
                 anchors.fill : parent
 
                 action : model.QtObject
-                controller: rootItem.controller
+                controller: rootItem.scenarioController
 
                 // visible: mouseArea.drag.active
 
@@ -322,13 +338,13 @@ Item {
                     cursorShape: mouseArea.drag.active ? Qt.PointingHandCursor : Qt.OpenHandCursor
 
                     onPressed: {
-                        if (controller)
+                        if (scenarioController)
                         {
-                            if (controller.selectedAction === model.QtObject) {
-                                controller.selectedAction = null;
+                            if (scenarioController.selectedAction === model.QtObject) {
+                                scenarioController.selectedAction = null;
                             }
                             else {
-                                controller.selectedAction = model.QtObject;
+                                scenarioController.selectedAction = model.QtObject;
                             }
                         }
 
@@ -385,7 +401,7 @@ Item {
                         width: notDraggableItem.width
 
                         action: model.QtObject
-                        controller: rootItem.controller
+                        controller: rootItem.scenarioController
 
                         actionItemIsHovered: mouseArea.containsMouse
                         actionItemIsPressed: mouseArea.pressed
@@ -484,12 +500,20 @@ Item {
         confirmationText: "This action is used in the platform.\nDo you want to completely delete it?"
 
         onConfirmed: {
-            if (myAction && controller) {
+            if (myAction && scenarioController) {
                 // Delete our action
-                controller.deleteAction(myAction);
+                scenarioController.deleteAction(myAction);
             }
         }
     }
 
+    Popup.MessagePopup {
+        id: noMoreActionMessage
+        anchors.centerIn: parent
 
+        width: 300
+
+        message: qsTr("The editor has no valid license.\nYou cannot create any more actions.")
+
+    }
 }

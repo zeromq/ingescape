@@ -53,6 +53,12 @@ ApplicationWindow {
     // Flag enabling the check for a platform change before closing
     property bool forceClose: false
 
+    // Licenses controller
+    property LicensesController licensesController: IngeScapeEditorC.licensesC;
+
+    // Flag indicating if the user have a valid license for the editor
+    property bool isEditorLicenseValid: mainWindow.licensesController && mainWindow.licensesController.mergedLicense && mainWindow.licensesController.mergedLicense.editorLicenseValidity
+
 
     //----------------------------------
     //
@@ -93,6 +99,7 @@ ApplicationWindow {
                 text: qsTr("Save")
 
                 shortcut: StandardKey.Save
+                enabled: mainWindow.isEditorLicenseValid
 
                 onTriggered: {
                     IngeScapeEditorC.savePlatformToCurrentlyLoadedFile();
@@ -103,6 +110,7 @@ ApplicationWindow {
                 text: qsTr("Save As...")
 
                 shortcut: StandardKey.SaveAs
+                enabled: mainWindow.isEditorLicenseValid
 
                 onTriggered: {
                     IngeScapeEditorC.selectFileToSavePlatform();
@@ -368,6 +376,7 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Export agents...")
+                enabled: mainWindow.isEditorLicenseValid
 
                 onTriggered: {
                     if (IngeScapeEditorC.modelManager) {
@@ -544,17 +553,21 @@ ApplicationWindow {
     // When user clicks on window close button
     onClosing: {
         console.info("QML: Close Window");
-        if (mainWindow.isEditorLicenseValid && !mainWindow.forceClose && IngeScapeEditorC && IngeScapeEditorC.hasPlatformChanged())
+        if (mainWindow.isEditorLicenseValid)
         {
-            // Cancel window closing
-            close.accepted = false;
+            if (!mainWindow.forceClose && IngeScapeEditorC && IngeScapeEditorC.hasPlatformChanged())
+            {
+                // Cancel window closing
+                close.accepted = false;
 
-            // Open save popup
-            saveBeforeQuitPopup.open();
+                // Open save popup
+                saveBeforeQuitPopup.open();
+            }
+            else {
+                IngeScapeEditorC.processBeforeClosing();
+            }
         }
-        else {
-            IngeScapeEditorC.processBeforeClosing();
-        }
+        // else: Simply close the appliction
     }
 
 

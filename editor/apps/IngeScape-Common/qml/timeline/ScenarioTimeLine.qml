@@ -58,6 +58,12 @@ Item {
     }
 
 
+    // Licenses controller
+    property LicensesController licensesController: IngeScapeEditorC.licensesC;
+
+    // Flag indicating if the user have a valid license for the editor
+    property bool isEditorLicenseValid: rootItem.licensesController && rootItem.licensesController.mergedLicense && rootItem.licensesController.mergedLicense.editorLicenseValidity
+
 
     // Flag used to check if we can perform resize animations
     // NB: this flag is used to avoid animations during a drag-n-drop
@@ -495,6 +501,7 @@ Item {
                             DropArea {
                                 anchors.fill: parent
                                 keys: ["ActionsListItem", "ActionInTimeLine"]
+                                enabled: rootItem.isEditorLicenseValid
 
                                 onEntered: {
                                     if (drag.source !== null)
@@ -1285,18 +1292,18 @@ Item {
 
             activeFocusOnPress: true
             checkable: true
+            enabled: rootItem.isEditorLicenseValid
 
             style: I2SvgToggleButtonStyle {
                 fileCache: IngeScapeTheme.svgFileIngeScape
 
                 toggleCheckedReleasedID: "timeline-pause"
                 toggleCheckedPressedID: toggleCheckedReleasedID + "-pressed"
+                toggleCheckedDisabledID: toggleCheckedReleasedID
+
                 toggleUncheckedReleasedID: "timeline-play"
                 toggleUncheckedPressedID: toggleUncheckedReleasedID + "-pressed"
-
-                // No disabled states
-                toggleCheckedDisabledID: ""
-                toggleUncheckedDisabledID: ""
+                toggleUncheckedDisabledID: toggleUncheckedReleasedID
 
                 labelMargin: 0;
             }

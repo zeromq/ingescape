@@ -104,6 +104,8 @@ Item {
 
     // When the QML is loaded...
     Component.onCompleted: {
+        // FIXME Several popup may appear at startup depending on the current platform configuration. Need to prioritize them and maybe show them sequentialy, not on top of each other.
+
         // ...we check the value of the error message when a connection attempt fails
         if (IngeScapeEditorC.errorMessageWhenConnectionFailed !== "")
         {
@@ -112,10 +114,10 @@ Item {
         }
 
         // ...we check the value of the flag "is Valid License"
-        /*if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isLicenseValid)
+        if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.editorLicenseValidity)
         {
             openLicensePopup();
-        }*/
+        }
     }
 
 
@@ -296,7 +298,8 @@ Item {
 
                         anchors.fill: parent
 
-                        controller: IngeScapeEditorC.agentsSupervisionC
+                        agentsSupervisionController: IngeScapeEditorC.agentsSupervisionC
+                        licensesController: IngeScapeEditorC.licensesC
                     }
                 }
 
@@ -331,7 +334,7 @@ Item {
                                 bottomMargin: actionsPanel.height
                             }
 
-                            controller: IngeScapeEditorC.scenarioC
+                            scenarioController: IngeScapeEditorC.scenarioC
                         }
 
                         Scenario.ActionsPanel {

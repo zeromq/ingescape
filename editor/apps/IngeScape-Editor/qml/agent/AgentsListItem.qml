@@ -44,6 +44,12 @@ Item {
     // true if agent Item contains the mouse (rollover)
     property bool agentItemIsHovered : false
 
+    // Licenses controller
+    property LicensesController licensesController: IngeScapeEditorC.licensesC;
+
+    // Flag indicating if the user have a valid license for the editor
+    property bool isEditorLicenseValid: rootItem.licensesController && rootItem.licensesController.mergedLicense && rootItem.licensesController.mergedLicense.editorLicenseValidity
+
     width: IngeScapeEditorTheme.leftPanelWidth
     height: 85
 
@@ -408,7 +414,9 @@ Item {
             Button {
                 id: muteButton
 
-                visible: (model.isON === true)
+                visible: model.isON
+                enabled: rootItem.isEditorLicenseValid
+
                 activeFocusOnPress: true
 
                 style: LabellessSvgButtonStyle {
@@ -430,9 +438,9 @@ Item {
 
                 // Agent is "ON" OR Agent can be restarted
                 visible: (rootItem.agent && (rootItem.agent.isON || rootItem.agent.canBeRestarted))
+                enabled: visible && rootItem.isEditorLicenseValid
 
                 activeFocusOnPress: true
-                enabled: visible
 
                 style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
@@ -466,8 +474,9 @@ Item {
             Button {
                 id: freezeButton
 
-                visible: model.canBeFrozen && (model.isON === true)
-                enabled : visible
+                visible: model.canBeFrozen && model.isON
+                enabled : visible && rootItem.isEditorLicenseValid
+
                 activeFocusOnPress: true
 
                 style: LabellessSvgButtonStyle {
@@ -488,6 +497,8 @@ Item {
                 id: btnOptions
 
                 visible: (model.isON === true)
+                enabled: rootItem.isEditorLicenseValid
+
                 activeFocusOnPress: true
 
                 style: LabellessSvgButtonStyle {
