@@ -27,6 +27,8 @@ I2PopupBase {
     height: 150
     width: 350
 
+    property string message: ""
+
     isModal: true
     dismissOnOutsideTap: true
     keepRelativePositionToInitialParent: false
@@ -44,7 +46,7 @@ I2PopupBase {
         Text {
             id: popupText
 
-            text: "The file does not contain valid agent definition(s) !"
+            text: popupMessage.message
 
             anchors {
                 left: parent.left

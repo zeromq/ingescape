@@ -705,8 +705,8 @@ ApplicationWindow {
             //
             Popups.MessagePopup {
                 id: popupErrorMessage
-
                 anchors.centerIn: parent
+                message: "The file does not contain valid agent definition(s) !"
             }
         }
 
