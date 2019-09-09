@@ -519,7 +519,7 @@ Item {
 
         anchors.centerIn: parent
 
-        controller: IngeScapeEditorC.licensesC
+        licenseController: IngeScapeEditorC.licensesC
     }
 
 

@@ -190,6 +190,65 @@ void LicensesController::updateLicensesPath(QString newLicensesPath)
 
 
 /**
+ * @brief Delete the given license from the platform and from the filesystem
+ * @param licenseInformation
+ * @return
+ */
+bool LicensesController::deleteLicense(LicenseInformationM* licenseInformation)
+{
+    QDir licenseDirectory(_licensesPath);
+    if (licenseDirectory.exists() && licenseDirectory.remove(licenseInformation->fileName()))
+    {
+        // Success
+        _getLicensesData();
+        return true;
+    }
+
+    // Failure
+    qDebug() << "Unable to delete the license file.";
+    return false;
+}
+
+
+/**
+ * @brief Copy the license file from the given path the the current license directory
+ * then refresh the global license information
+ * @param licenseFilePath
+ * @return
+ */
+bool LicensesController::addLicenses(const QList<QUrl>& licenseUrlList)
+{
+    bool completeSuccess = true;
+
+    // Are all URLs corresponding to local files ?
+    if (std::all_of(licenseUrlList.begin(), licenseUrlList.end(), [](const QUrl& url){ return url.isLocalFile(); }))
+    {
+        for (QUrl licenseUrl : licenseUrlList)
+        {
+            QFileInfo licenseFile(licenseUrl.toLocalFile());
+            if (licenseFile.exists())
+            {
+                bool success = QFile::copy(licenseFile.absoluteFilePath(), QDir(_licensesPath).filePath(licenseFile.fileName()));
+                if (!success)
+                {
+                    qDebug() << "Unable to copy" << licenseFile.fileName() << "to the license directory";
+                }
+                completeSuccess &= success;
+            }
+        }
+
+        _getLicensesData();
+    }
+    else
+    {
+        completeSuccess = false;
+    }
+
+    return completeSuccess;
+}
+
+
+/**
  * @brief Get the data about licenses
  */
 void LicensesController::_getLicensesData()

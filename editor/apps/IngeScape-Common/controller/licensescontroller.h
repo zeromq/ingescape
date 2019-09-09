@@ -108,6 +108,23 @@ public:
     Q_INVOKABLE void updateLicensesPath(QString newLicensesPath);
 
 
+    /**
+     * @brief Delete the given license from the platform and from the filesystem
+     * @param licenseInformation
+     * @return
+     */
+    Q_INVOKABLE bool deleteLicense(LicenseInformationM* licenseInformation);
+
+
+    /**
+     * @brief Copy the license file from the given path the the current license directory
+     * then refresh the global license information
+     * @param licenseFilePath
+     * @return
+     */
+    Q_INVOKABLE bool addLicenses(const QList<QUrl>& licenseUrlList);
+
+
 Q_SIGNALS:
 
     /**
