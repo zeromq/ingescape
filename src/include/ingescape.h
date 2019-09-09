@@ -248,6 +248,8 @@ PUBLIC int igs_removeMappingEntryWithName(const char *fromOurInput, const char *
 //displays MAJOR.MINOR.MICRO in console
 PUBLIC int igs_version(void);
 
+//IngeScape protocol version
+PUBLIC int igs_protocol(void);
 
 //Utility functions to find network adapters with broadcast capabilities
 //to be used in igs_startWithDevice
