@@ -234,6 +234,12 @@ target_link_libraries(
     I2Quick
 )
 
+
+if (APPLE)
+    target_link_libraries(${PROJECT_NAME} "-framework Foundation")
+endif()
+
+
 # Find Cassandra dependencies
 if(UNIX)
   include(ExternalProject)

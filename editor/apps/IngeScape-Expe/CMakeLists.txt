@@ -228,6 +228,11 @@ target_link_libraries(
     I2Quick
 )
 
+if (APPLE)
+    target_link_libraries(${PROJECT_NAME} "-framework Foundation")
+endif()
+
+
 # Retrieve the absolute path to qmake and then use that path to find
 # the binaries
 get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
