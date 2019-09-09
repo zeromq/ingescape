@@ -1252,8 +1252,8 @@ initLoop (zsock_t *pipe, void *args){
                             "%s", agentElements->brokerEndPoint);
     }else{
         if (agentElements->node == NULL){
-            igs_error("Could not create bus node : Agent will interrupt immediately.");
-            canContinue = false;
+            igs_fatal("Could not create bus node : Agent will interrupt immediately.");
+            return;
         }else{
             zyre_set_interface(agentElements->node, agentElements->networkDevice);
             zyre_set_port(agentElements->node, agentElements->zyrePort);
@@ -1266,12 +1266,14 @@ initLoop (zsock_t *pipe, void *args){
     snprintf(replayChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-REPLAY", igsAgentName);
     zyre_join(agentElements->node, replayChannel);
     
+    //Add version and protocol to headers
+    zyre_set_header(agentElements->node, "ingescape", "v%d.%d.%d", (int)igs_version()/10000, (int)(igs_version() %10000)/100, (int)(igs_version() %100));
+    zyre_set_header(agentElements->node, "protocol", "v%d", igs_protocol());
+    
     //Add stored headers to zyre
-    if (canContinue){
-        serviceHeader_t *el, *tmp;
-        HASH_ITER(hh, serviceHeaders, el, tmp){
-            zyre_set_header(agentElements->node, el->key, "%s", el->value);
-        }
+    serviceHeader_t *el, *tmp;
+    HASH_ITER(hh, serviceHeaders, el, tmp){
+        zyre_set_header(agentElements->node, el->key, "%s", el->value);
     }
     
     //start TCP publisher

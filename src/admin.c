@@ -23,10 +23,12 @@
 #include "ingescape.h"
 #include "ingescape_private.h"
 
-#define INGESCAPE_MAJOR 0
-#define INGESCAPE_MINOR 9
+#define INGESCAPE_MAJOR 1
+#define INGESCAPE_MINOR 0
 #define INGESCAPE_MICRO 0
 #define INGESCAPE_VERSION ((INGESCAPE_MAJOR * 10000) + (INGESCAPE_MINOR * 100) + INGESCAPE_MICRO)
+
+#define INGESCAPE_PROTOCOL 1
 
 FILE *fp = NULL;
 bool admin_logInStream = false;
@@ -133,6 +135,11 @@ void admin_unlock(void) {
 int igs_version(void){
     igs_debug("IngeScape version : %d.%d.%d\n", INGESCAPE_MAJOR, INGESCAPE_MINOR, INGESCAPE_MICRO);
     return INGESCAPE_VERSION;
+}
+
+int igs_protocol(void){
+    igs_debug("IngeScape protocol version : %d\n", INGESCAPE_PROTOCOL);
+    return INGESCAPE_PROTOCOL;
 }
 
 void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
