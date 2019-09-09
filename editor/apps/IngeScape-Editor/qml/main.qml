@@ -544,7 +544,7 @@ ApplicationWindow {
     // When user clicks on window close button
     onClosing: {
         console.info("QML: Close Window");
-        if (!mainWindow.forceClose && IngeScapeEditorC.hasPlatformChanged())
+        if (mainWindow.isEditorLicenseValid && !mainWindow.forceClose && IngeScapeEditorC && IngeScapeEditorC.hasPlatformChanged())
         {
             // Cancel window closing
             close.accepted = false;
@@ -552,8 +552,7 @@ ApplicationWindow {
             // Open save popup
             saveBeforeQuitPopup.open();
         }
-        else
-        {
+        else {
             IngeScapeEditorC.processBeforeClosing();
         }
     }
