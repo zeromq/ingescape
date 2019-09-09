@@ -439,7 +439,7 @@ ApplicationWindow {
     // When user clicks on window close button
     onClosing: {
         console.info("QML: Close Window");
-        if (!mainWindow.forceClose && IngeScapeEditorC && IngeScapeEditorC.hasPlatformChanged())
+        if (!mainWindow.forceClose && IngeScapeEditorC.hasPlatformChanged())
         {
             // Cancel window closing
             close.accepted = false;
@@ -447,7 +447,8 @@ ApplicationWindow {
             // Open save popup
             saveBeforeQuitPopup.open();
         }
-        else {
+        else
+        {
             IngeScapeEditorC.processBeforeClosing();
         }
     }
@@ -639,6 +640,7 @@ ApplicationWindow {
             id: qtQuickInfoPopup
         }
 
+
         // Save before quit popup
         Popups.SaveBeforeQuitPopup {
             id: saveBeforeQuitPopup
@@ -647,19 +649,16 @@ ApplicationWindow {
 
             // Save the changes to the currently opened platform and quit
             onSaveAs: {
-                if (IngeScapeEditorC)
-                {
-                    IngeScapeEditorC.selectFileToSavePlatform()
-                }
+                IngeScapeEditorC.selectFileToSavePlatform();
 
-                mainWindow.forceClose = true
-                mainWindow.close()
+                mainWindow.forceClose = true;
+                mainWindow.close();
             }
 
             // Discard all unsaved changes and quit
             onDiscard: {
-                mainWindow.forceClose = true
-                mainWindow.close()
+                mainWindow.forceClose = true;
+                mainWindow.close();
             }
 
             // Cancel the closing procedure and keep the editor open

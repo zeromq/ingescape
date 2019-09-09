@@ -24,6 +24,13 @@ import INGESCAPE 1.0
 I2PopupBase {
     id: popupMessage
 
+    //----------------------------------
+    //
+    // Properties
+    //
+    //----------------------------------
+
+
     height: 135
     width: 450
 
@@ -31,18 +38,36 @@ I2PopupBase {
     dismissOnOutsideTap: true
     keepRelativePositionToInitialParent: false
 
+
+    //----------------------------------
+    //
+    // Signals
+    //
+    //----------------------------------
+
+
     signal cancel()
     signal discard()
     signal saveAs()
 
-    Rectangle {
 
+    //----------------------------------
+    //
+    // Content
+    //
+    //----------------------------------
+
+
+    Rectangle {
         anchors.fill: parent
+
         radius: 5
+
         border {
             width: 2
             color: IngeScapeTheme.editorsBackgroundBorderColor
         }
+
         color: IngeScapeTheme.editorsBackgroundColor
     }
 
