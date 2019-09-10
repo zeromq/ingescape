@@ -236,7 +236,7 @@ target_link_libraries(
 )
 
 if (APPLE)
-    target_link_libraries(${PROJECT_NAME} "-framework Foundation")
+    target_link_libraries(${PROJECT_NAME} "-framework Foundation -framework AppKit")
 endif()
 
 

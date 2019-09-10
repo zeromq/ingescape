@@ -8,6 +8,8 @@ QT += qml quick svg xml sql quick-private core-private gui-private concurrent
 SOURCES += \
     $$PWD/ingescapecommon.cpp \
     $$PWD/model/licenseinformationm.cpp \
+    $$PWD/platformsupport/microsoftwindowutils.cpp \
+    $$PWD/platformsupport/osutils.cpp \
     $$PWD/settings/ingescapesettings.cpp \
     $$PWD/misc/terminationsignalwatcher.cpp \
     $$PWD/misc/ingescapeutils.cpp \
@@ -59,6 +61,8 @@ HEADERS += \
     $$PWD/ingescapecommon.h \
     $$PWD/ingescape-common_global.h \
     $$PWD/model/licenseinformationm.h \
+    $$PWD/platformsupport/microsoftwindowutils.h \
+    $$PWD/platformsupport/osutils.h \
     $$PWD/settings/ingescapesettings.h \
     $$PWD/misc/terminationsignalwatcher.h \
     $$PWD/misc/ingescapeutils.h \
@@ -147,6 +151,6 @@ mac {
 
 
     # Add specific depdencies
-    LIBS += -framework Foundation
+    LIBS += -framework Foundation -framework AppKit
 }
 

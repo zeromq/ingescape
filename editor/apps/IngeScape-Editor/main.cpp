@@ -39,16 +39,7 @@
 #include <ingescapecommon.h>
 #include <settings/ingescapesettings.h>
 #include <misc/ingescapeutils.h>
-
-
-
-
-//
-// Macos specific headers
-//
-#ifdef Q_OS_MAC
-#include "platformsupport/macosutils.h"
-#endif
+#include "platformsupport/osutils.h"
 
 
 
@@ -251,13 +242,12 @@ int main(int argc, char *argv[])
 
 
     //
-    // Macos specific
-    //
-#ifdef Q_OS_MAC
     // Clean-up menus
-    MacosUtils::removeMacosGeneratedMenuItems();
-#endif
-
+    //
+    if (OSUtils::instance() != nullptr)
+    {
+        OSUtils::instance()->removeOSGeneratedMenuItems();
+    }
 
 
 #ifdef QT_DEBUG

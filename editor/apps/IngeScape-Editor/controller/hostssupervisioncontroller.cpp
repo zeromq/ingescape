@@ -142,7 +142,8 @@ void HostsSupervisionController::onHostModelWillBeDeleted(HostM* host)
 
             _hashFromNameToHost.remove(hostName);
 
-            if (_selectedHost == hostVM) {
+            if (_selectedHost == hostVM)
+            {
                 // Clean-up current selection
                 setselectedHost(nullptr);
             }

@@ -32,6 +32,10 @@
 
 #include <graphics/dashedbar.h>
 
+#include <platformsupport/osutils.h>
+
+
+
 
 /**
  * @brief Constructor
@@ -150,6 +154,17 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     //
     //---------------
     qmlRegisterSingletonType<URLUtils>("INGESCAPE", 1, 0, "URLUtils", &URLUtils::qmlSingleton);
+
+
+
+    //---------------
+    //
+    // Platform support
+    //
+    //---------------
+    qmlRegisterSingletonType<OSUtils>("INGESCAPE", 1, 0, "OSUtils", &OSUtils::qmlSingleton);
+
+
 
 
     //------------------
