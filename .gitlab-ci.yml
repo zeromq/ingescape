@@ -31,6 +31,12 @@ stages:
   only:
     changes:
       - .gitlab-ci.yml
+      - src/**/*
+      - builds/cmake/**/*
+      - dependencies/yajl/**/*
+      - dependencies/unix/*
+      - dependencies/windows/unix/*
+      - CMakeLists.txt
       - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/**/*
     refs:
       - master
