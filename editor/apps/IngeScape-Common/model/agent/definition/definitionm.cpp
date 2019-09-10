@@ -480,21 +480,7 @@ DefinitionM* DefinitionM::copy()
  */
 bool DefinitionM::_areIdenticalsIdsList(QStringList idsList1, QStringList idsList2)
 {
-    // Same numbers of ids
-    if (idsList1.count() == idsList2.count())
-    {
-        for (QString id : idsList1)
-        {
-            // id of list 1 is not in the list 2
-            if (!idsList2.contains(id)) {
-                return false;
-            }
-        }
-        // All ids of list 1 are inside list 2
-        return true;
-    }
-    // Numbers of ids in lists are different
-    else {
-        return false;
-    }
+    idsList1.sort();
+    idsList2.sort();
+    return idsList1 == idsList2;
 }
