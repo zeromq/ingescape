@@ -127,7 +127,7 @@ void OSUtils::init()
     // Init
     MacosUtils::instance().init();
 
-#elif Q_OS_WIN
+#elif defined (Q_OS_WIN)
     //
     // Microsoft Windows
     //
@@ -230,7 +230,7 @@ void OSUtils::_clean()
     // Clean-up
     MacosUtils::instance().clean();
 
-#elif Q_OS_WIN
+#elif defined (Q_OS_WIN)
     //
     // Microsoft Windows
     //
@@ -266,7 +266,7 @@ void OSUtils::_osPreventEnergyEfficiencyFeatures(bool value)
     //
     MacosUtils::instance().energyEfficiencyFeaturesEnabled(!value);
 
-#elif Q_OS_WIN
+#elif defined (Q_OS_WIN)
     //
     // Microsoft Windows
     //
