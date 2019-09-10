@@ -24,13 +24,6 @@
 
 #include "I2PropertyHelpers.h"
 
-
-#ifdef Q_OS_MAC
-#include "macosutils.h"
-#endif
-
-
-
 /**
  * @brief The OSUtils class defines a set of utility functions to perform OS specific operations
  */

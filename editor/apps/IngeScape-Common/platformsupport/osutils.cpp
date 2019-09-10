@@ -20,6 +20,12 @@
 #include <QQmlEngine>
 
 
+#ifdef Q_OS_MAC
+#include "macosutils.h"
+#elif defined (Q_OS_WIN)
+#include "microsoftwindowutils.h"
+#endif
+
 //
 // Define our singleton instance
 //
