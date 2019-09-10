@@ -304,8 +304,13 @@ Window {
                         anchors.centerIn: parent
 
                         svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
-                        svgElementId: styleData.selected ? "tab-" + index + "-Selected"
-                                                         : "tab-" + index;
+                        svgElementId: if (index === 0) {
+                                          "tab-0" + (styleData.selected ? "-Selected" : "")
+                                      } else if (0 < index && index < tabRepeater.count - 1) {
+                                          "tab-1" + (styleData.selected ? "-Selected" : "")
+                                      } else if (index === tabRepeater.count - 1) {
+                                          "tab-2" + (styleData.selected ? "-Selected" : "")
+                                      }
 
                         Text {
                             anchors.centerIn: parent
@@ -337,12 +342,21 @@ Window {
             //
             //---------------------------------------
             Repeater {
-                model : ["Inputs", "Outputs", "Parameters"]
+                id: tabRepeater
+                model : {
+                    var model = [ qsTr("Inputs"), qsTr("Outputs"), qsTr("Parameters") ]
+                    if (definition && definition.callsList && definition.callsList.count > 0) {
+                        model.push(qsTr("Calls"))
+                    }
+                    return model;
+                }
 
                 Tab {
                     id : tab
                     title: modelData;
                     active : true
+
+                    property int modelIndex: index
 
                     Item {
                         anchors.fill: parent
@@ -360,13 +374,31 @@ Window {
                             height : 33
 
                             Repeater {
-                                model: [
-                                    qsTr("Name"),
-                                    qsTr("Type"),
-                                    qsTr("Initial value"),
-                                    qsTr("Current value"),
-                                    qsTr("Mute")
-                                ]
+                                model: if (tab.modelIndex === 1) { // "Output"
+                                           [
+                                           qsTr("Name"),
+                                           qsTr("Type"),
+                                           qsTr("Initial value"),
+                                           qsTr("Current value"),
+                                           qsTr("Mute")
+                                           ]
+                                       } else if (tab.modelIndex === 3) { // "Calls"
+                                           [
+                                           qsTr("Prototype"),
+                                           "",
+                                           "",
+                                           "",
+                                           ""
+                                           ]
+                                       } else {
+                                           [
+                                           qsTr("Name"),
+                                           qsTr("Type"),
+                                           qsTr("Initial value"),
+                                           "",
+                                           ""
+                                           ]
+                                       }
 
                                 Item {
                                     height : 33
@@ -379,8 +411,7 @@ Window {
                                             verticalCenter: parent.verticalCenter
                                         }
 
-                                        // Allow to hide the header of column "Current value" (index = 3) and "Mute" (index = 4) for Inputs and Parameters
-                                        text: ((tab.title !== "Outputs") && ((index === 3) || (index === 4))) ? "" : modelData
+                                        text: modelData
 
                                         color: IngeScapeEditorTheme.definitionEditorsAgentDescriptionColor
                                         font {
@@ -599,21 +630,21 @@ Window {
                                             }
                                         }
                                     }
-
-
-                                    //separator
-                                    Rectangle {
-                                        anchors {
-                                            left : parent.left
-                                            right : parent.right
-                                            bottom : parent.bottom
-                                        }
-                                        height : 1
-
-                                        color : IngeScapeTheme.blackColor
-                                    }
-
                                 }
+
+
+                                //separator
+                                Rectangle {
+                                    anchors {
+                                        left : parent.left
+                                        right : parent.right
+                                        bottom : parent.bottom
+                                    }
+                                    height : 1
+
+                                    color : IngeScapeTheme.blackColor
+                                }
+
                             }
                         }
                     }

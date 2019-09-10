@@ -44,6 +44,12 @@ Item {
     // true if agent Item contains the mouse (rollover)
     property bool agentItemIsHovered : false
 
+    // Licenses controller
+    property LicensesController licensesController: IngeScapeEditorC.licensesC;
+
+    // Flag indicating if the user have a valid license for the editor
+    property bool isEditorLicenseValid: rootItem.licensesController && rootItem.licensesController.mergedLicense && rootItem.licensesController.mergedLicense.editorLicenseValidity
+
     width: IngeScapeEditorTheme.leftPanelWidth
     height: 85
 
@@ -59,6 +65,9 @@ Item {
 
     // signal emitted when the user clicks on the option "Set Path for Definition/Mapping"
     signal configureFilesPaths(var agent);
+
+    // Signal emitted when the user tries to perform an action forbidden by the license
+    signal unlicensedAction();
 
 
     //-----------------------------------------
@@ -408,7 +417,8 @@ Item {
             Button {
                 id: muteButton
 
-                visible: (model.isON === true)
+                visible: model.isON
+
                 activeFocusOnPress: true
 
                 style: LabellessSvgButtonStyle {
@@ -420,7 +430,14 @@ Item {
                 }
 
                 onClicked: {
-                    model.QtObject.changeMuteAllOutputs();
+                    if (rootItem.isEditorLicenseValid)
+                    {
+                        model.QtObject.changeMuteAllOutputs();
+                    }
+                    else
+                    {
+                        rootItem.unlicensedAction();
+                    }
                 }
             }
 
@@ -430,9 +447,9 @@ Item {
 
                 // Agent is "ON" OR Agent can be restarted
                 visible: (rootItem.agent && (rootItem.agent.isON || rootItem.agent.canBeRestarted))
+                enabled: visible
 
                 activeFocusOnPress: true
-                enabled: visible
 
                 style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
@@ -443,7 +460,14 @@ Item {
                 }
 
                 onClicked: {
-                    model.QtObject.changeState();
+                    if (rootItem.isEditorLicenseValid)
+                    {
+                        model.QtObject.changeState();
+                    }
+                    else
+                    {
+                        rootItem.unlicensedAction();
+                    }
                 }
             }
         }
@@ -466,8 +490,9 @@ Item {
             Button {
                 id: freezeButton
 
-                visible: model.canBeFrozen && (model.isON === true)
+                visible: model.canBeFrozen && model.isON
                 enabled : visible
+
                 activeFocusOnPress: true
 
                 style: LabellessSvgButtonStyle {
@@ -479,7 +504,14 @@ Item {
                 }
 
                 onClicked: {
-                    model.QtObject.changeFreeze();
+                    if (rootItem.isEditorLicenseValid)
+                    {
+                        model.QtObject.changeFreeze();
+                    }
+                    else
+                    {
+                        rootItem.unlicensedAction();
+                    }
                 }
             }
 
@@ -487,7 +519,8 @@ Item {
             Button {
                 id: btnOptions
 
-                visible: (model.isON === true)
+                visible: model.isON
+
                 activeFocusOnPress: true
 
                 style: LabellessSvgButtonStyle {
@@ -499,10 +532,15 @@ Item {
                 }
 
                 onClicked: {
-                    //console.log("QML: Open options...");
-
                     // Open the popup with options
-                    popupOptions.openInScreen();
+                    if (rootItem.isEditorLicenseValid)
+                    {
+                        popupOptions.openInScreen();
+                    }
+                    else
+                    {
+                        rootItem.unlicensedAction();
+                    }
                 }
             }
         }

@@ -108,6 +108,29 @@ public:
     Q_INVOKABLE void updateLicensesPath(QString newLicensesPath);
 
 
+    /**
+     * @brief Delete the given license from the platform and from the filesystem
+     * @param licenseInformation
+     * @return
+     */
+    Q_INVOKABLE bool deleteLicense(LicenseInformationM* licenseInformation);
+
+
+    /**
+     * @brief Copy the license file from the given path the the current license directory
+     * then refresh the global license information
+     * @param licenseFilePath
+     * @return
+     */
+    Q_INVOKABLE bool addLicenses(const QList<QUrl>& licenseUrlList);
+
+
+    /**
+     * @brief Open a file dialog to import a license file.
+     */
+    Q_INVOKABLE void importLicense();
+
+
 Q_SIGNALS:
 
     /**
@@ -122,6 +145,14 @@ private:
      * @brief Get the data about licenses
      */
     void _getLicensesData();
+
+
+    /**
+     * @brief Import (copy) the given license file to the license directory
+     * @param licenseFile
+     * @return true on success. false otherwise.
+     */
+    bool _importLicenseFromFile(const QFileInfo& licenseFile);
 
 
 };

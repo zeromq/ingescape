@@ -593,7 +593,8 @@ void IngeScapeEditorController::processBeforeClosing()
     // Save in the app settings the currently opened platform (to open it at next launch)
     IngeScapeSettings &settings = IngeScapeSettings::Instance();
     settings.beginGroup("paltform");
-    settings.setValue("last", _currentPlatformFilePath);
+    // Clear the value if we close with an unsaved new platform
+    settings.setValue("last", _hasAPlatformBeenLoadedByUser ? _currentPlatformFilePath : "");
     settings.endGroup();
 
     // Save new values
@@ -1259,6 +1260,7 @@ void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
                 QFileInfo fileInfo = QFileInfo(jsonFile);
                 setcurrentPlatformName(fileInfo.baseName());
                 _currentPlatformFilePath = fileInfo.absoluteFilePath();
+                sethasAPlatformBeenLoadedByUser(true);
 
                 jsonFile.write(jsonDocument.toJson(QJsonDocument::Indented));
                 jsonFile.close();

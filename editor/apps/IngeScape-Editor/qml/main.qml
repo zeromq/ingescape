@@ -53,6 +53,12 @@ ApplicationWindow {
     // Flag enabling the check for a platform change before closing
     property bool forceClose: false
 
+    // Licenses controller
+    property LicensesController licensesController: IngeScapeEditorC.licensesC;
+
+    // Flag indicating if the user have a valid license for the editor
+    property bool isEditorLicenseValid: mainWindow.licensesController && mainWindow.licensesController.mergedLicense && mainWindow.licensesController.mergedLicense.editorLicenseValidity
+
 
     //----------------------------------
     //
@@ -95,7 +101,14 @@ ApplicationWindow {
                 shortcut: StandardKey.Save
 
                 onTriggered: {
-                    IngeScapeEditorC.savePlatformToCurrentlyLoadedFile();
+                    if (mainWindow.isEditorLicenseValid)
+                    {
+                        IngeScapeEditorC.savePlatformToCurrentlyLoadedFile();
+                    }
+                    else
+                    {
+                        applicationLoader.item.openLicensePopup();
+                    }
                 }
             }
 
@@ -105,7 +118,14 @@ ApplicationWindow {
                 shortcut: StandardKey.SaveAs
 
                 onTriggered: {
-                    IngeScapeEditorC.selectFileToSavePlatform();
+                    if (mainWindow.isEditorLicenseValid)
+                    {
+                        IngeScapeEditorC.selectFileToSavePlatform();
+                    }
+                    else
+                    {
+                        applicationLoader.item.openLicensePopup();
+                    }
                 }
             }
 
@@ -356,12 +376,19 @@ ApplicationWindow {
                 text: qsTr("Import agents...")
 
                 onTriggered: {
-                    if (IngeScapeEditorC.modelManager)
+                    if (mainWindow.isEditorLicenseValid)
                     {
-                        var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
-                        if (!success) {
-                            popupErrorMessage.open();
+                        if (IngeScapeEditorC.modelManager)
+                        {
+                            var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
+                            if (!success) {
+                                popupErrorMessage.open();
+                            }
                         }
+                    }
+                    else
+                    {
+                        applicationLoader.item.openLicensePopup();
                     }
                 }
             }
@@ -370,8 +397,15 @@ ApplicationWindow {
                 text: qsTr("Export agents...")
 
                 onTriggered: {
-                    if (IngeScapeEditorC.modelManager) {
-                        IngeScapeEditorC.modelManager.exportAgentsListToSelectedFile();
+                    if (mainWindow.isEditorLicenseValid)
+                    {
+                        if (IngeScapeEditorC.modelManager) {
+                            IngeScapeEditorC.modelManager.exportAgentsListToSelectedFile();
+                        }
+                    }
+                    else
+                    {
+                        applicationLoader.item.openLicensePopup();
                     }
                 }
             }
@@ -544,18 +578,21 @@ ApplicationWindow {
     // When user clicks on window close button
     onClosing: {
         console.info("QML: Close Window");
-        if (!mainWindow.forceClose && IngeScapeEditorC.hasPlatformChanged())
+        if (mainWindow.isEditorLicenseValid)
         {
-            // Cancel window closing
-            close.accepted = false;
+            if (!mainWindow.forceClose && IngeScapeEditorC && IngeScapeEditorC.hasPlatformChanged())
+            {
+                // Cancel window closing
+                close.accepted = false;
 
-            // Open save popup
-            saveBeforeQuitPopup.open();
+                // Open save popup
+                saveBeforeQuitPopup.open();
+            }
+            else {
+                IngeScapeEditorC.processBeforeClosing();
+            }
         }
-        else
-        {
-            IngeScapeEditorC.processBeforeClosing();
-        }
+        // else: Simply close the appliction
     }
 
 
@@ -706,8 +743,8 @@ ApplicationWindow {
             //
             Popups.MessagePopup {
                 id: popupErrorMessage
-
                 anchors.centerIn: parent
+                message: "The file does not contain valid agent definition(s) !"
             }
         }
 

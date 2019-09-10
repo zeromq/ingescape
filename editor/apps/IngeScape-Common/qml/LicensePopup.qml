@@ -29,7 +29,7 @@ I2PopupBase {
     dismissOnOutsideTap: false
 
     // Our controller
-    property LicensesController controller: null;
+    property LicensesController licenseController: null;
 
 
     //--------------------------------------------------------
@@ -46,9 +46,9 @@ I2PopupBase {
     function validate() {
         console.log("QML: function validate()");
 
-        if (rootItem.controller)
+        if (rootItem.licenseController)
         {
-            rootItem.controller.updateLicensesPath(txtLicensesPath.text);
+            rootItem.licenseController.updateLicensesPath(txtLicensesPath.text);
         }
 
         // Close our popup
@@ -65,8 +65,8 @@ I2PopupBase {
     //--------------------------------------------------------
 
     onOpened: {
-        if (rootItem.controller) {
-            txtLicensesPath.text = rootItem.controller.licensesPath;
+        if (rootItem.licenseController) {
+            txtLicensesPath.text = rootItem.licenseController.licensesPath;
         }
 
         // Set the focus to catch keyboard press on Return/Escape
@@ -233,13 +233,13 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    if (rootItem.controller)
+                    if (rootItem.licenseController)
                     {
-                        var directoryPath = rootItem.controller.selectLicensesDirectory();
+                        var directoryPath = rootItem.licenseController.selectLicensesDirectory();
                         if (directoryPath) {
                             txtLicensesPath.text = directoryPath;
 
-                            rootItem.controller.updateLicensesPath(directoryPath);
+                            rootItem.licenseController.updateLicensesPath(directoryPath);
                         }
                     }
                 }
@@ -266,6 +266,8 @@ I2PopupBase {
             margins: 25
         }
 
+        visible: licenseDetailsRepeater.model && licenseDetailsRepeater.model.count > 0
+
         contentItem: Column {
             id: detailsColumn
             anchors {
@@ -276,11 +278,11 @@ I2PopupBase {
             spacing: 26
 
             LicenseInformationView {
-                licenseInformation: rootItem.controller.mergedLicense
+                licenseInformation: rootItem.licenseController.mergedLicense
             }
 
             Text {
-                text: rootItem.controller ? qsTr("License details:") : ""
+                text: rootItem.licenseController ? qsTr("License details:") : ""
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -292,21 +294,52 @@ I2PopupBase {
             }
 
             Repeater {
-                model: rootItem.controller ? rootItem.controller.licenseDetailsList : 0
+                id: licenseDetailsRepeater
+                model: rootItem.licenseController ? rootItem.licenseController.licenseDetailsList : 0
 
                 delegate: Column {
                     spacing: 26
 
-                    Text {
-                        text: qsTr("###\n### License file name: %1\n###").arg(model ? model.fileName : "")
+                    Item {
 
-                        color: IngeScapeTheme.whiteColor
-                        elide: Text.ElideRight
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            weight: Font.Medium
-                            pixelSize: 16
-                            italic: true
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                        }
+
+                        height: childrenRect.height
+
+                        Text {
+                            id: licenseFileName
+                            text: qsTr("###\n### License file name: %1\n###").arg(model ? model.fileName : "")
+
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                            }
+
+                            color: IngeScapeTheme.whiteColor
+                            elide: Text.ElideRight
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight: Font.Medium
+                                pixelSize: 16
+                                italic: true
+                            }
+                        }
+
+                        Button {
+                            text: "DEL"
+                            anchors {
+                                right: parent.right
+                                verticalCenter: licenseFileName.verticalCenter
+                            }
+
+                            onClicked: {
+                                if (model && rootItem.licenseController) {
+                                    rootItem.licenseController.deleteLicense(model.QtObject)
+                                }
+                            }
                         }
                     }
 
@@ -326,7 +359,7 @@ I2PopupBase {
                 }
                 wrapMode: Text.WordWrap
 
-                text: rootItem.controller ? rootItem.controller.errorMessageWhenLicenseFailed : "TEST"
+                text: rootItem.licenseController ? rootItem.licenseController.errorMessageWhenLicenseFailed : "TEST"
 
                 color: IngeScapeTheme.orangeColor
                 font {
@@ -338,31 +371,47 @@ I2PopupBase {
         }
     }
 
-    Row {
-        id: buttonRow
-        anchors {
-            right: parent.right
-            rightMargin: 20
-            bottom : parent.bottom
-            bottomMargin: 20
-        }
-        spacing : 15
+    Item {
+        id: emptyLicenseFeedback
+        anchors.fill: detailsScrollView
 
-        height: 30
+        visible: !detailsScrollView.visible
+
+        Text {
+            id: emptyLicenseFeedbackText
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                verticalCenter: parent.verticalCenter
+            }
+
+            text: "No license file has been found.\nPlease change the license directory above, drop a license file here or\nuse the \"Import...\" button below."
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+
+            color: IngeScapeTheme.whiteColor
+            wrapMode: Text.WordWrap
+            font {
+                family: IngeScapeTheme.textFontFamily
+                pixelSize : 18
+                italic: true
+            }
+        }
 
         Button {
-            id: cancelButton
-            activeFocusOnPress: true
-
             property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
 
             height: boundingBox.height
             width: boundingBox.width
 
-            text: "Cancel"
+            activeFocusOnPress: true
+            text: "Import..."
 
             anchors {
-                verticalCenter: parent.verticalCenter
+                top: emptyLicenseFeedbackText.bottom
+                topMargin: 25
+                horizontalCenter: parent.horizontalCenter
             }
 
             style: I2SvgButtonStyle {
@@ -379,16 +428,64 @@ I2PopupBase {
                 }
                 labelColorPressed: IngeScapeTheme.blackColor
                 labelColorReleased: IngeScapeTheme.whiteColor
-                labelColorDisabled: IngeScapeTheme.whiteColor
+                labelColorDisabled: IngeScapeTheme.greyColor
 
             }
 
             onClicked: {
-                console.log("QML: Cancel License Popup")
-
-                rootItem.close();
+                if (rootItem.licenseController) {
+                    rootItem.licenseController.importLicense();
+                }
             }
         }
+    }
+
+    DropArea {
+        id: dropZone
+        anchors.fill: detailsScrollView
+
+        property bool dragHovering: false
+
+        onEntered: {
+            dragHovering = true
+        }
+
+        onExited: {
+            dragHovering = false
+        }
+
+        onDropped: {
+            dragHovering = false
+            if (drop.hasUrls && rootItem.licenseController)
+            {
+                rootItem.licenseController.addLicenses(drop.urls)
+            }
+        }
+
+        // Overlay appearing when the user drags something over the drop zone
+        Rectangle {
+            id: dropZoneOverlay
+            anchors.fill: parent
+
+            color: IngeScapeTheme.veryLightGreyColor
+            opacity: dropZone.dragHovering ? 0.65 : 0
+
+            Behavior on opacity {
+                NumberAnimation {}
+            }
+        }
+    }
+
+    Row {
+        id: buttonRow
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            bottom : parent.bottom
+            bottomMargin: 20
+        }
+        spacing : 15
+
+        height: 30
 
         Button {
             id: okButton
