@@ -425,12 +425,7 @@ void AgentsGroupedByNameVM::openDefinition()
  */
 QList<InputVM*> AgentsGroupedByNameVM::getInputsListFromName(QString inputName)
 {
-    if (_hashFromNameToInputsList.contains(inputName)) {
-        return _hashFromNameToInputsList.value(inputName);
-    }
-    else {
-        return QList<InputVM*>();
-    }
+    return _hashFromNameToInputsList.value(inputName, QList<InputVM*>());
 }
 
 
@@ -440,12 +435,7 @@ QList<InputVM*> AgentsGroupedByNameVM::getInputsListFromName(QString inputName)
  */
 InputVM* AgentsGroupedByNameVM::getInputFromId(QString inputId)
 {
-    if (_hashFromIdToInput.contains(inputId)) {
-        return _hashFromIdToInput.value(inputId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromIdToInput.value(inputId, nullptr);
 }
 
 
@@ -455,12 +445,7 @@ InputVM* AgentsGroupedByNameVM::getInputFromId(QString inputId)
  */
 QList<OutputVM*> AgentsGroupedByNameVM::getOutputsListFromName(QString outputName)
 {
-    if (_hashFromNameToOutputsList.contains(outputName)) {
-        return _hashFromNameToOutputsList.value(outputName);
-    }
-    else {
-        return QList<OutputVM*>();
-    }
+    return _hashFromNameToOutputsList.value(outputName, QList<OutputVM*>());
 }
 
 
@@ -470,12 +455,7 @@ QList<OutputVM*> AgentsGroupedByNameVM::getOutputsListFromName(QString outputNam
  */
 OutputVM* AgentsGroupedByNameVM::getOutputFromId(QString outputId)
 {
-    if (_hashFromIdToOutput.contains(outputId)) {
-        return _hashFromIdToOutput.value(outputId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromIdToOutput.value(outputId, nullptr);
 }
 
 
@@ -485,12 +465,7 @@ OutputVM* AgentsGroupedByNameVM::getOutputFromId(QString outputId)
  */
 QList<ParameterVM*> AgentsGroupedByNameVM::getParametersListFromName(QString parameterName)
 {
-    if (_hashFromNameToParametersList.contains(parameterName)) {
-        return _hashFromNameToParametersList.value(parameterName);
-    }
-    else {
-        return QList<ParameterVM*>();
-    }
+    return _hashFromNameToParametersList.value(parameterName, QList<ParameterVM*>());
 }
 
 
@@ -500,12 +475,7 @@ QList<ParameterVM*> AgentsGroupedByNameVM::getParametersListFromName(QString par
  */
 ParameterVM* AgentsGroupedByNameVM::getParameterFromId(QString parameterId)
 {
-    if (_hashFromIdToParameter.contains(parameterId)) {
-        return _hashFromIdToParameter.value(parameterId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromIdToParameter.value(parameterId, nullptr);
 }
 
 
@@ -516,12 +486,7 @@ ParameterVM* AgentsGroupedByNameVM::getParameterFromId(QString parameterId)
  */
 MappingElementVM* AgentsGroupedByNameVM::getMappingElementVMfromName(QString name)
 {
-    if (_hashFromNameToMappingElement.contains(name)) {
-        return _hashFromNameToMappingElement.value(name);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromNameToMappingElement.value(name, nullptr);
 }
 
 

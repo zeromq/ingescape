@@ -66,12 +66,7 @@ AgentMappingM::~AgentMappingM()
  */
 MappingElementM* AgentMappingM::getMappingElementFromName(QString name)
 {
-    if (_hashFromNameToMappingElement.contains(name)) {
-        return _hashFromNameToMappingElement.value(name);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromNameToMappingElement.value(name, nullptr);
 }
 
 

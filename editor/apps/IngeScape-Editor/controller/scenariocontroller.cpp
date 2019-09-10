@@ -823,12 +823,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
  */
 ActionEditorController* ScenarioController::_getActionEditorFromModelOfAction(ActionM* action)
 {
-    if (_hashActionEditorControllerFromModelOfAction.contains(action)) {
-        return _hashActionEditorControllerFromModelOfAction.value(action);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashActionEditorControllerFromModelOfAction.value(action, nullptr);
 }
 
 
@@ -838,10 +833,5 @@ ActionEditorController* ScenarioController::_getActionEditorFromModelOfAction(Ac
  */
 ActionEditorController* ScenarioController::_getActionEditorFromViewModelOfAction(ActionVM* action)
 {
-    if (_hashActionEditorControllerFromViewModelOfAction.contains(action)) {
-        return _hashActionEditorControllerFromViewModelOfAction.value(action);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashActionEditorControllerFromViewModelOfAction.value(action, nullptr);
 }

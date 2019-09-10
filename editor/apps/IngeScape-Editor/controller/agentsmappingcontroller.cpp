@@ -685,12 +685,7 @@ void AgentsMappingController::dropLinkFromAgentToAction(AgentInMappingVM* output
  */
 AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(const QString& name)
 {
-    if (_hashFromNameToAgentInMapping.contains(name)) {
-        return _hashFromNameToAgentInMapping.value(name);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromNameToAgentInMapping.value(name, nullptr);
 }
 
 
@@ -701,12 +696,7 @@ AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(const QStri
  */
 ActionInMappingVM* AgentsMappingController::getActionInMappingFromUid(const QString& uid)
 {
-    if (_hashFromUidToActionInMapping.contains(uid)) {
-        return _hashFromUidToActionInMapping.value(uid);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromUidToActionInMapping.value(uid, nullptr);
 }
 
 
@@ -717,12 +707,7 @@ ActionInMappingVM* AgentsMappingController::getActionInMappingFromUid(const QStr
  */
 QList<LinkVM*> AgentsMappingController::getLinksInMappingFromName(const QString& linkName)
 {
-    if (_hashFromNameToListOfLinksInMapping.contains(linkName)) {
-        return _hashFromNameToListOfLinksInMapping.value(linkName);
-    }
-    else {
-        return QList<LinkVM*>();
-    }
+    return _hashFromNameToListOfLinksInMapping.value(linkName, QList<LinkVM*>());
 }
 
 
@@ -733,12 +718,7 @@ QList<LinkVM*> AgentsMappingController::getLinksInMappingFromName(const QString&
  */
 LinkVM* AgentsMappingController::getLinkInMappingFromId(const QString& linkId)
 {
-    if (_hashFromIdToLinkInMapping.contains(linkId)) {
-        return _hashFromIdToLinkInMapping.value(linkId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromIdToLinkInMapping.value(linkId, nullptr);
 }
 
 
@@ -749,17 +729,11 @@ LinkVM* AgentsMappingController::getLinkInMappingFromId(const QString& linkId)
  */
 bool AgentsMappingController::isActionInsertedInMapping(ActionM* actionM)
 {
-    if (actionM != nullptr)
-    {
-        for (ActionInMappingVM* actionInMapping : _allActionsInMapping)
-        {
-            if ((actionInMapping != nullptr) && (actionInMapping->action() == actionM))
-            {
-                return true;
-            }
-        }
-    }
-    return false;
+    auto isActionM = [actionM](ActionInMappingVM* actionInMapping) {
+        return (actionInMapping != nullptr) && (actionInMapping->action() == actionM);
+    };
+
+    return (actionM != nullptr) && std::any_of(_allActionsInMapping.begin(), _allActionsInMapping.end(), isActionM);
 }
 
 
@@ -1595,12 +1569,7 @@ void AgentsMappingController::onHighlightLink(const QStringList& parameters)
 void AgentsMappingController::_onAllAgentsInMappingChanged()
 {
     // Update the flag "is Empty Mapping"
-    if (_allAgentsInMapping.isEmpty()) {
-        setisEmptyMapping(true);
-    }
-    else {
-        setisEmptyMapping(false);
-    }
+    setisEmptyMapping(_allAgentsInMapping.isEmpty());
 }
 
 
@@ -2641,12 +2610,7 @@ QPointF AgentsMappingController::_getRandomPosition(double randomMax)
  */
 QList<MappingElementVM*> AgentsMappingController::_getWaitingMappingElementsOnOutputAgent(const QString& outputAgentName)
 {
-    if (_hashFromOutputAgentNameToListOfWaitingMappingElements.contains(outputAgentName)) {
-        return _hashFromOutputAgentNameToListOfWaitingMappingElements.value(outputAgentName);
-    }
-    else {
-        return QList<MappingElementVM*>();
-    }
+    return _hashFromOutputAgentNameToListOfWaitingMappingElements.value(outputAgentName, QList<MappingElementVM*>());
 }
 
 

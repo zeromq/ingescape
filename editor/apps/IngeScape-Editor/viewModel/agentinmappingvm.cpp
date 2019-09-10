@@ -140,12 +140,7 @@ AgentInMappingVM::~AgentInMappingVM()
  */
 QList<LinkInputVM*> AgentInMappingVM::getLinkInputsListFromName(QString inputName)
 {
-    if (_hashFromNameToLinkInputsList.contains(inputName)) {
-        return _hashFromNameToLinkInputsList.value(inputName);
-    }
-    else {
-        return QList<LinkInputVM*>();
-    }
+    return _hashFromNameToLinkInputsList.value(inputName, QList<LinkInputVM*>());
 }
 
 
@@ -155,12 +150,7 @@ QList<LinkInputVM*> AgentInMappingVM::getLinkInputsListFromName(QString inputNam
  */
 LinkInputVM* AgentInMappingVM::getLinkInputFromId(QString inputId)
 {
-    if (_hashFromIdToLinkInput.contains(inputId)) {
-        return _hashFromIdToLinkInput.value(inputId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromIdToLinkInput.value(inputId, nullptr);
 }
 
 
@@ -170,12 +160,7 @@ LinkInputVM* AgentInMappingVM::getLinkInputFromId(QString inputId)
  */
 QList<LinkOutputVM*> AgentInMappingVM::getLinkOutputsListFromName(QString outputName)
 {
-    if (_hashFromNameToLinkOutputsList.contains(outputName)) {
-        return _hashFromNameToLinkOutputsList.value(outputName);
-    }
-    else {
-        return QList<LinkOutputVM*>();
-    }
+    return _hashFromNameToLinkOutputsList.value(outputName, QList<LinkOutputVM*>());
 }
 
 
@@ -185,12 +170,7 @@ QList<LinkOutputVM*> AgentInMappingVM::getLinkOutputsListFromName(QString output
  */
 LinkOutputVM* AgentInMappingVM::getLinkOutputFromId(QString outputId)
 {
-    if (_hashFromIdToLinkOutput.contains(outputId)) {
-        return _hashFromIdToLinkOutput.value(outputId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromIdToLinkOutput.value(outputId, nullptr);
 }
 
 
@@ -264,12 +244,7 @@ void AgentInMappingVM::cancelAllAddedLinks_WhileMappingWasUNactivated()
  */
 MappingElementM* AgentInMappingVM::getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId)
 {
-    if (_hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.contains(linkId)) {
-        return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.value(linkId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.value(linkId, nullptr);
 }
 
 
@@ -381,12 +356,7 @@ void AgentInMappingVM::cancelAllRemovedLinks_WhileMappingWasUNactivated()
  */
 MappingElementVM* AgentInMappingVM::getRemovedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId)
 {
-    if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId)) {
-        return _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.value(linkId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.value(linkId, nullptr);
 }
 
 

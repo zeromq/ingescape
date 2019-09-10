@@ -255,12 +255,7 @@ void DefinitionM::_onIsMutedOutputChanged(bool isMutedOutput)
  */
 AgentIOPM* DefinitionM::getInputWithName(QString inputName)
 {
-    if (_mapFromInputNameToInput.contains(inputName)) {
-        return _mapFromInputNameToInput.value(inputName);
-    }
-    else {
-        return nullptr;
-    }
+    return _mapFromInputNameToInput.value(inputName, nullptr);
 }
 
 
@@ -271,12 +266,7 @@ AgentIOPM* DefinitionM::getInputWithName(QString inputName)
  */
 OutputM* DefinitionM::getOutputWithName(QString outputName)
 {
-    if (_mapFromOutputNameToOutput.contains(outputName)) {
-        return _mapFromOutputNameToOutput.value(outputName);
-    }
-    else {
-        return nullptr;
-    }
+    return _mapFromOutputNameToOutput.value(outputName, nullptr);
 }
 
 
@@ -287,12 +277,7 @@ OutputM* DefinitionM::getOutputWithName(QString outputName)
  */
 AgentIOPM* DefinitionM::getParameterWithName(QString parameterName)
 {
-    if (_mapFromParameterNameToParameter.contains(parameterName)) {
-        return _mapFromParameterNameToParameter.value(parameterName);
-    }
-    else {
-        return nullptr;
-    }
+    return _mapFromParameterNameToParameter.value(parameterName, nullptr);
 }
 
 /**

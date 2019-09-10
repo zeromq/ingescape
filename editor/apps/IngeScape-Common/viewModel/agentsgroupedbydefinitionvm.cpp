@@ -377,12 +377,7 @@ void AgentsGroupedByDefinitionVM::openLogStream()
  */
 QList<AgentM*> AgentsGroupedByDefinitionVM::getModelsOnHost(QString hostname)
 {
-    if (_hashFromHostnameToModels.contains(hostname)) {
-        return _hashFromHostnameToModels.value(hostname);
-    }
-    else {
-        return QList<AgentM*>();
-    }
+    return _hashFromHostnameToModels.value(hostname, QList<AgentM*>());
 }
 
 

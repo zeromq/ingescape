@@ -340,12 +340,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
  */
 QList<DefinitionM*> AgentsSupervisionController::_getDefinitionsListWithName(QString definitionName)
 {
-    if (_hashFromDefinitionNameToDefinitionsList.contains(definitionName)) {
-        return _hashFromDefinitionNameToDefinitionsList.value(definitionName);
-    }
-    else {
-        return QList<DefinitionM*>();
-    }
+    return _hashFromDefinitionNameToDefinitionsList.value(definitionName, QList<DefinitionM*>());
 }
 
 

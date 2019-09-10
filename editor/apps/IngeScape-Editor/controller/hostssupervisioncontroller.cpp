@@ -219,10 +219,5 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
  */
 HostVM* HostsSupervisionController::_getHostWithName(QString hostName)
 {
-    if (_hashFromNameToHost.contains(hostName)) {
-        return _hashFromNameToHost.value(hostName);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromNameToHost.value(hostName, nullptr);
 }
