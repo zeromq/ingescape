@@ -613,7 +613,7 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
             for (DefinitionM* iterator : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
             {
                 // The 2 definitions are strictly identicals
-                if ((iterator != nullptr) && DefinitionM::areIdenticals(iterator, previousDefinition))
+                if ((iterator != nullptr) && (*iterator == *previousDefinition))
                 {
                     previousGroup = _hashFromDefinitionToAgentsGroupedByDefinition.value(iterator);
                     break;
@@ -807,9 +807,9 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
  */
 void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
 {
-    if ((model != nullptr) && (model->definition() != nullptr))
+    DefinitionM* definition = model->definition();
+    if ((model != nullptr) && (definition != nullptr))
     {
-        DefinitionM* definition = model->definition();
 
         AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition = nullptr;
 
@@ -817,7 +817,7 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
         for (DefinitionM* iterator : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
         {
             // The 2 definitions are strictly identicals
-            if ((iterator != nullptr) && DefinitionM::areIdenticals(iterator, definition))
+            if ((iterator != nullptr) && (*iterator == *definition))
             {
                 qDebug() << "There is exactly the same agent definition for name" << definition->name() << "and version" << definition->version();
 
@@ -988,9 +988,9 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
  */
 void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
 {
-    if ((model != nullptr) && (model->definition() != nullptr))
+    DefinitionM* newDefinition = model->definition();
+    if ((model != nullptr) && (newDefinition != nullptr))
     {
-        DefinitionM* newDefinition = model->definition();
 
         AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition = nullptr;
 
@@ -998,7 +998,7 @@ void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
         for (DefinitionM* iterator : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
         {
             // The 2 definitions are strictly identicals
-            if ((iterator != nullptr) && DefinitionM::areIdenticals(iterator, newDefinition))
+            if ((iterator != nullptr) && (*iterator == *newDefinition))
             {
                 qDebug() << "There is exactly the same agent definition for name" << newDefinition->name() << "and version" << newDefinition->version();
 

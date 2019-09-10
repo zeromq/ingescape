@@ -64,6 +64,14 @@ private:
     QHash<QString, AgentIOPValueTypes::Value> _arguments;
 };
 
+/**
+ * @brief Equality operator to compare 2 calls
+ * @param left
+ * @param right
+ * @return
+ */
+bool operator==(const CallM& left, const CallM& right);
+
 QML_DECLARE_TYPE(CallM)
 
 #endif // CALLM_H

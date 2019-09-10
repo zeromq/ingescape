@@ -53,3 +53,18 @@ CallM::~CallM()
 
     _arguments.clear();
 }
+
+/**
+ * @brief Equality operator to compare 2 calls
+ * @param left
+ * @param right
+ * @return
+ */
+bool operator==(const CallM& left, const CallM& right)
+{
+    return left.name() == right.name()
+            && left.description() == right.description()
+            && left.arguments() == right.arguments()
+            && ( (left.reply() == right.reply())
+                 || ( (left.reply() != nullptr) && (right.reply() != nullptr) && (*(left.reply()) == *(right.reply())) ) );
+}

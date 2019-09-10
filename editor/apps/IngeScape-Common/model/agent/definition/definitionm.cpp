@@ -95,12 +95,7 @@ void DefinitionM::setisMutedOutput(bool isMuted, QString outputName)
 bool DefinitionM::getIsMutedOutput(QString outputName)
 {
     OutputM* output = getOutputWithName(outputName);
-    if (output != nullptr) {
-        return output->isMutedOutput();
-    }
-    else {
-        return false;
-    }
+    return output != nullptr && output->isMutedOutput();
 }
 
 
@@ -110,7 +105,7 @@ bool DefinitionM::getIsMutedOutput(QString outputName)
  */
 void DefinitionM::setisMutedOfAllOutputs(bool isMuted)
 {
-    for (OutputM* output : _outputsList.toList())
+    for (OutputM* output : _outputsList)
     {
         if (output != nullptr) {
             output->setisMutedAllOutputs(isMuted);
@@ -124,7 +119,7 @@ void DefinitionM::setisMutedOfAllOutputs(bool isMuted)
  */
 void DefinitionM::_onInputsListChanged()
 {
-    QList<AgentIOPM*> newInputsList = _inputsList.toList();
+    const QList<AgentIOPM*>& newInputsList = _inputsList.toList();
 
     // Input added
     if (_previousInputsList.count() < newInputsList.count())
@@ -162,7 +157,7 @@ void DefinitionM::_onInputsListChanged()
  */
 void DefinitionM::_onOutputsListChanged()
 {
-    QList<OutputM*> newOutputsList = _outputsList.toList();
+    const QList<OutputM*>& newOutputsList = _outputsList.toList();
 
     // Output added
     if (_previousOutputsList.count() < newOutputsList.count())
@@ -254,42 +249,6 @@ void DefinitionM::_onIsMutedOutputChanged(bool isMutedOutput)
 
 
 /**
- * @brief Return true if the 2 definitions are strictly identicals
- * @param definition1
- * @param definition2
- * @return
- */
-bool DefinitionM::areIdenticals(DefinitionM* definition1, DefinitionM* definition2)
-{
-    bool areIdenticals = false;
-
-    if ((definition1 != nullptr) && (definition2 != nullptr))
-    {
-        // Same name and same version
-        if ((definition1->name() == definition2->name())
-                && (definition1->version() == definition2->version()))
-        {
-            // same number of inputs, outputs and parameters
-            if ((definition1->inputsIdsList().count() == definition2->inputsIdsList().count())
-                    && (definition1->outputsIdsList().count() == definition2->outputsIdsList().count())
-                    && (definition1->parametersIdsList().count() == definition2->parametersIdsList().count()))
-            {
-                // check each id for inputs, outputs and parameters
-                if (DefinitionM::_areIdenticalsIdsList(definition1->inputsIdsList(), definition2->inputsIdsList())
-                        && DefinitionM::_areIdenticalsIdsList(definition1->outputsIdsList(), definition2->outputsIdsList())
-                        && DefinitionM::_areIdenticalsIdsList(definition1->parametersIdsList(), definition2->parametersIdsList()))
-                {
-                    areIdenticals = true;
-                }
-            }
-        }
-    }
-
-    return areIdenticals;
-}
-
-
-/**
  * @brief Get an Input with its name
  * @param inputName
  * @return
@@ -334,6 +293,16 @@ AgentIOPM* DefinitionM::getParameterWithName(QString parameterName)
     else {
         return nullptr;
     }
+}
+
+/**
+ * @brief Accessor for the list of calls.
+ * The returned value is a const ref so the calls list cannot be modified from here.
+ * @return
+ */
+QList<CallM*> DefinitionM::getCallsList() const
+{
+    return _callsList.toList();
 }
 
 
@@ -471,16 +440,37 @@ DefinitionM* DefinitionM::copy()
     return copy;
 }
 
-
 /**
- * @brief Return true if the 2 list of ids are strictly identicals
- * @param idsList1
- * @param idsList2
+ * @brief Equality operator to compare two definition
+ * @param left
+ * @param right
  * @return
  */
-bool DefinitionM::_areIdenticalsIdsList(QStringList idsList1, QStringList idsList2)
+bool operator==(const DefinitionM& left, const DefinitionM& right)
 {
-    idsList1.sort();
-    idsList2.sort();
-    return idsList1 == idsList2;
+    // Lambda comparing unsorted QStringLists
+    auto listsAreEqual = [](QStringList idsList1, QStringList idsList2) {
+        idsList1.sort();
+        idsList2.sort();
+        return idsList1 == idsList2;
+    };
+
+    return left.name() == right.name()
+            && left.version() == right.version()
+            && listsAreEqual(left.inputsIdsList(), right.inputsIdsList())
+            && listsAreEqual(left.outputsIdsList(), right.outputsIdsList())
+            && listsAreEqual(left.parametersIdsList(), right.parametersIdsList())
+            && left.getCallsList() == right.getCallsList();
+}
+
+/**
+ * @brief Difference operator to compare two definition
+ * Simply the negation of the equality operator
+ * @param left
+ * @param right
+ * @return
+ */
+bool operator!=(const DefinitionM& left, const DefinitionM& right)
+{
+     return !(left == right);
 }
