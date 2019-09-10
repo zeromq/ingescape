@@ -24,29 +24,47 @@ import INGESCAPE 1.0
 I2PopupBase {
     id: popupMessage
 
+    //----------------------------------
+    //
+    // Properties
+    //
+    //----------------------------------
+
+    // Message displayed by our popup
+    property alias message: popupText.text
+
+
     height: 150
     width: 350
-
-    property string message: ""
 
     isModal: true
     dismissOnOutsideTap: true
     keepRelativePositionToInitialParent: false
 
-    Rectangle {
 
+
+    //----------------------------------
+    //
+    // Content
+    //
+    //----------------------------------
+
+    Rectangle {
         anchors.fill: parent
+
         radius: 5
+
         border {
             width: 2
             color: IngeScapeTheme.editorsBackgroundBorderColor
         }
+
         color: IngeScapeTheme.editorsBackgroundColor
 
         Text {
             id: popupText
 
-            text: popupMessage.message
+            text: ""
 
             anchors {
                 left: parent.left
