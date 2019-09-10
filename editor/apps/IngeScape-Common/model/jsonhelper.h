@@ -22,6 +22,7 @@
 
 #include <I2PropertyHelpers.h>
 #include <model/agent/agentm.h>
+#include <model/agent/definition/callm.h>
 #include <model/scenario/scenariom.h>
 
 
@@ -176,6 +177,13 @@ private:
      * @return
      */
     AgentIOPM* _createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTypes::Value agentIOPType);
+
+    /**
+     * @brief Create a model of call from a JSON object
+     * @param jsonObject
+     * @return
+     */
+    CallM* _createModelOfCall(const QJsonObject& jsonObject);
 
 
     /**

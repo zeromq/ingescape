@@ -79,6 +79,7 @@ DefinitionM* JsonHelper::createModelOfAgentDefinitionFromJSON(QJsonObject jsonDe
     QJsonValue jsonParameters = jsonDefinition.value("parameters");
     QJsonValue jsonInputs = jsonDefinition.value("inputs");
     QJsonValue jsonOutputs = jsonDefinition.value("outputs");
+    QJsonValue jsonCalls = jsonDefinition.value("calls");
 
     if (jsonName.isString() && jsonDescription.isString() && jsonVersion.isString())
     {
@@ -125,6 +126,21 @@ DefinitionM* JsonHelper::createModelOfAgentDefinitionFromJSON(QJsonObject jsonDe
                     AgentIOPM* agentOutput = _createModelOfAgentIOP(jsonOutput.toObject(), AgentIOPTypes::OUTPUT);
                     if (agentOutput != nullptr) {
                         definition->outputsList()->append(agentOutput);
+                    }
+                }
+            }
+        }
+
+        if (jsonCalls.isArray())
+        {
+            for (QJsonValue jsonCall : jsonCalls.toArray())
+            {
+                if (jsonCall.isObject())
+                {
+                    CallM* call = _createModelOfCall(jsonCall.toObject());
+                    if (call != nullptr)
+                    {
+                        definition->callsList()->append(call);
                     }
                 }
             }
@@ -1016,6 +1032,50 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
     }
 
     return agentIOP;
+}
+
+/**
+ * @brief Create a model of call from a JSON object
+ * @param jsonObject
+ * @return
+ */
+CallM* JsonHelper::_createModelOfCall(const QJsonObject& jsonObject)
+{
+    CallM* call = nullptr;
+
+    QJsonValue jsonName = jsonObject.value("name");
+    QJsonValue jsonDesciprion = jsonObject.value("description");
+    QJsonValue jsonArguments = jsonObject.value("arguments");
+    QJsonValue jsonReply = jsonObject.value("reply");
+
+    QHash<QString, AgentIOPValueTypes::Value> argumentsHash;
+    if (jsonArguments.isArray())
+    {
+        for (QJsonValue jsonArgument : jsonArguments.toArray())
+        {
+            if (jsonArgument.isObject())
+            {
+                QJsonObject argumentObject = jsonArgument.toObject();
+                QJsonValue argumentName = argumentObject.value("name");
+                QJsonValue argumentType = argumentObject.value("type");
+
+                if (argumentName.isString() && argumentType.isString())
+                {
+                    argumentsHash.insert(argumentName.toString(), static_cast<AgentIOPValueTypes::Value>(AgentIOPValueTypes::staticEnumFromKey(argumentType.toString())));
+                }
+            }
+        }
+    }
+
+    CallM* reply = nullptr;
+    if (jsonReply.isObject())
+    {
+        QJsonObject replyObject = jsonReply.toObject();
+        reply = _createModelOfCall(replyObject);
+    }
+
+    call = new CallM(jsonName.toString(""), jsonDesciprion.toString(""), argumentsHash, reply);
+    return call;
 }
 
 
