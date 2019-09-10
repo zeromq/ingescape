@@ -163,6 +163,16 @@ Item {
 
     //--------------------------------
     //
+    // Signals
+    //
+    //--------------------------------
+
+    // Signal emitted when the user tries to perform an action forbidden by the license
+    signal unlicensedAction();
+
+
+    //--------------------------------
+    //
     // Content
     //
     //--------------------------------
@@ -1292,7 +1302,6 @@ Item {
 
             activeFocusOnPress: true
             checkable: true
-            enabled: rootItem.isEditorLicenseValid
 
             style: I2SvgToggleButtonStyle {
                 fileCache: IngeScapeTheme.svgFileIngeScape
@@ -1310,10 +1319,12 @@ Item {
 
             onClicked: {
                 if (scenarioController) {
-                    if (checked) {
+                    if (!rootItem.isEditorLicenseValid) {
+                        checked = false
+                        rootItem.unlicensedAction();
+                    } else if (checked) {
                         scenarioController.playOrResumeTimeLine();
-                    }
-                    else {
+                    } else {
                         scenarioController.pauseTimeLine();
                     }
                 }

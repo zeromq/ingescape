@@ -92,6 +92,16 @@ Item {
 
     //--------------------------------
     //
+    // Signals
+    //
+    //--------------------------------
+
+    // Signal emitted when the user tries to perform an action forbidden by the license
+    signal unlicensedAction();
+
+
+    //--------------------------------
+    //
     // Content
     //
     //--------------------------------
@@ -240,7 +250,6 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
                 activeFocusOnPress: true
-                enabled: rootItem.isEditorLicenseValid
 
                 style: LabellessSvgButtonStyle {
                     fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
@@ -252,13 +261,20 @@ Item {
                 }
 
                 onClicked: {
-                    if (IngeScapeEditorC.modelManager)
+                    if (rootItem.isEditorLicenseValid)
                     {
-                        //console.log("Import Agent(s)")
-                        var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
-                        if (!success) {
-                            popupErrorMessage.open();
+                        if (IngeScapeEditorC.modelManager)
+                        {
+                            //console.log("Import Agent(s)")
+                            var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
+                            if (!success) {
+                                popupErrorMessage.open();
+                            }
                         }
+                    }
+                    else
+                    {
+                        rootItem.unlicensedAction()
                     }
                 }
             }
@@ -281,7 +297,7 @@ Item {
             Button {
                 id: btnExportAgentsList
 
-                enabled: visible && rootItem.isEditorLicenseValid && (agentsSupervisionController.agentsList.count > 0)
+                enabled: visible && (agentsSupervisionController.agentsList.count > 0)
                 activeFocusOnPress: true
 
                 anchors {
@@ -297,10 +313,17 @@ Item {
                 }
 
                 onClicked: {
-                    if (IngeScapeEditorC.modelManager) {
-                        //console.log("Export Agent(s)")
-                        IngeScapeEditorC.modelManager.exportAgentsListToSelectedFile();
+                    if (rootItem.isEditorLicenseValid) {
+                        if (IngeScapeEditorC.modelManager) {
+                            //console.log("Export Agent(s)")
+                            IngeScapeEditorC.modelManager.exportAgentsListToSelectedFile();
+                        }
                     }
+                    else
+                    {
+                        rootItem.unlicensedAction();
+                    }
+
                 }
             }
 
@@ -385,6 +408,10 @@ Item {
                 visible: mouseArea.drag.active
 
                 agentItemIsHovered: mouseArea.containsMouse
+
+                onUnlicensedAction: {
+                    rootItem.unlicensedAction();
+                }
             }
 
             // Draggable Agent Item
@@ -485,6 +512,10 @@ Item {
 
                             // Open the popup
                             agentFilesPathsPopup.open();
+                        }
+
+                        onUnlicensedAction: {
+                            rootItem.unlicensedAction();
                         }
                     }
 

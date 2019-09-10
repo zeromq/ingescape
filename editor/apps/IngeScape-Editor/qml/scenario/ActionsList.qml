@@ -82,6 +82,16 @@ Item {
 
     //--------------------------------
     //
+    // Signals
+    //
+    //--------------------------------
+
+    // Signal emitted when the user tries to perform an action forbidden by the license
+    signal unlicensedAction();
+
+
+    //--------------------------------
+    //
     // Content
     //
     //--------------------------------
@@ -212,7 +222,7 @@ Item {
                     if (!rootItem.isEditorLicenseValid
                             && rootItem.scenarioController && rootItem.scenarioController.actionsList && rootItem.scenarioController.actionsList.count >= 1)
                     {
-                        noMoreActionMessage.open()
+                        rootItem.unlicensedAction();
                     }
                     else
                     {

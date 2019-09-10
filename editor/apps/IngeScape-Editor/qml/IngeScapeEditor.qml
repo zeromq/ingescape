@@ -190,6 +190,10 @@ Item {
 
         scenarioController: IngeScapeEditorC.scenarioC
         timeLineController: IngeScapeEditorC.timeLineC
+
+        onUnlicensedAction: {
+            licensePopup.open();
+        }
     }
 
 
@@ -300,6 +304,10 @@ Item {
 
                         agentsSupervisionController: IngeScapeEditorC.agentsSupervisionC
                         licensesController: IngeScapeEditorC.licensesC
+
+                        onUnlicensedAction: {
+                            licensePopup.open();
+                        }
                     }
                 }
 
@@ -335,6 +343,10 @@ Item {
                             }
 
                             scenarioController: IngeScapeEditorC.scenarioC
+
+                            onUnlicensedAction: {
+                                licensePopup.open();
+                            }
                         }
 
                         Scenario.ActionsPanel {
