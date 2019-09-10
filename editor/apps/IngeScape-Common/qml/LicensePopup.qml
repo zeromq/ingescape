@@ -371,22 +371,72 @@ I2PopupBase {
         }
     }
 
-    Text {
+    Item {
         id: emptyLicenseFeedback
         anchors.fill: detailsScrollView
 
         visible: !detailsScrollView.visible
 
-        text: "No license file has been found. Please change the license directory above or drop a license file here."
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
+        Text {
+            id: emptyLicenseFeedbackText
 
-        color: IngeScapeTheme.whiteColor
-        wrapMode: Text.WordWrap
-        font {
-            family: IngeScapeTheme.textFontFamily
-            pixelSize : 18
-            italic: true
+            anchors {
+                left: parent.left
+                right: parent.right
+                verticalCenter: parent.verticalCenter
+            }
+
+            text: "No license file has been found.\nPlease change the license directory above, drop a license file here or\nuse the \"Import...\" button below."
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+
+            color: IngeScapeTheme.whiteColor
+            wrapMode: Text.WordWrap
+            font {
+                family: IngeScapeTheme.textFontFamily
+                pixelSize : 18
+                italic: true
+            }
+        }
+
+        Button {
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+            height: boundingBox.height
+            width: boundingBox.width
+
+            activeFocusOnPress: true
+            text: "Import..."
+
+            anchors {
+                top: emptyLicenseFeedbackText.bottom
+                topMargin: 25
+                horizontalCenter: parent.horizontalCenter
+            }
+
+            style: I2SvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "button"
+                disabledID: releasedID + "-disabled"
+
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 16
+                }
+                labelColorPressed: IngeScapeTheme.blackColor
+                labelColorReleased: IngeScapeTheme.whiteColor
+                labelColorDisabled: IngeScapeTheme.greyColor
+
+            }
+
+            onClicked: {
+                if (rootItem.licenseController) {
+                    rootItem.licenseController.importLicense();
+                }
+            }
         }
     }
 

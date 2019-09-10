@@ -12,6 +12,8 @@ do
         --agents /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/agents.txt \
         --customer $m \
         --editorOwner $m \
+        --features ./src/features.txt \
+        --agents ./src/agents.txt \
         --output ./licenses/$m.igslicense
     echo ""
 done

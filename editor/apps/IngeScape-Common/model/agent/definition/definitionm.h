@@ -22,6 +22,7 @@
 
 #include <model/agent/definition/agentiopm.h>
 #include <model/agent/definition/outputm.h>
+#include <model/agent/definition/callm.h>
 
 
 /**
@@ -51,6 +52,9 @@ class DefinitionM : public QObject
 
     // List of parameters of our agent definition
     I2_QOBJECT_LISTMODEL(AgentIOPM, parametersList)
+
+    // List of calls of our agent definition
+    I2_QOBJECT_LISTMODEL(CallM, callsList)
 
     // List of ids of inputs
     I2_CPP_NOSIGNAL_PROPERTY(QStringList, inputsIdsList)
@@ -226,8 +230,11 @@ private:
     // Previous list of outputs
     QList<OutputM*> _previousOutputsList;
 
-    // Previous list of outputs
+    // Previous list of parameters
     QList<AgentIOPM*> _previousParametersList;
+
+    // Previous list of calls
+    QList<CallM*> _previousCallsList;
 
     // Map from an input name to a model of input
     QHash<QString, AgentIOPM*> _mapFromInputNameToInput;

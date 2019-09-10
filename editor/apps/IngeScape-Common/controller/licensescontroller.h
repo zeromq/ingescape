@@ -125,6 +125,12 @@ public:
     Q_INVOKABLE bool addLicenses(const QList<QUrl>& licenseUrlList);
 
 
+    /**
+     * @brief Open a file dialog to import a license file.
+     */
+    Q_INVOKABLE void importLicense();
+
+
 Q_SIGNALS:
 
     /**
@@ -139,6 +145,14 @@ private:
      * @brief Get the data about licenses
      */
     void _getLicensesData();
+
+
+    /**
+     * @brief Import (copy) the given license file to the license directory
+     * @param licenseFile
+     * @return true on success. false otherwise.
+     */
+    bool _importLicenseFromFile(const QFileInfo& licenseFile);
 
 
 };

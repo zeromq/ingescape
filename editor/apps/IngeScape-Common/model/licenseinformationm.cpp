@@ -67,16 +67,11 @@ LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject
 
         // Extract agents allowed
         QStringList agents;
-        zlist_t *agentNames = zhash_keys(license->agents);
-        if (agentNames != nullptr)
+        licenseForAgent_t *agent = static_cast<licenseForAgent_t*>(zhash_first(license->agents));
+        while (agent != nullptr)
         {
-            char* key = static_cast<char*>(zlist_first(agentNames));
-            while (key != nullptr)
-            {
-                agents.append(QString(key));
-                key = static_cast<char*>(zlist_next(agentNames));
-            }
-            zlist_destroy(&agentNames);
+            agents.append(QString(agent->agentName));
+            agent = static_cast<licenseForAgent_t*>(zhash_next(license->agents));
         }
         setagents(agents);
     }

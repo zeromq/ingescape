@@ -68,6 +68,9 @@ DefinitionM::~DefinitionM()
 
     _previousParametersList.clear();
     _parametersList.deleteAllItems();
+
+    // Delete calls
+    _callsList.deleteAllItems();
 }
 
 
@@ -436,6 +439,34 @@ DefinitionM* DefinitionM::copy()
         }
     }
     copy->parametersList()->append(copiesOfParameters);
+
+
+    //
+    // Calls
+    //
+    QList<CallM*> copiesOfCalls;
+    for (CallM* iterator : _callsList)
+    {
+        if (iterator != nullptr)
+        {
+            CallM* copyOfReply = nullptr;
+            if (iterator->reply() != nullptr)
+            {
+                copyOfReply = new CallM(iterator->reply()->name()
+                                        , iterator->reply()->description()
+                                        , iterator->reply()->arguments()
+                                        , nullptr);
+            }
+
+            CallM* copyOfCall = new CallM(iterator->name()
+                                          , iterator->description()
+                                          , iterator->arguments()
+                                          , copyOfReply);
+
+            copiesOfCalls.append(copyOfCall);
+        }
+    }
+    copy->callsList()->append(copiesOfCalls);
 
     return copy;
 }

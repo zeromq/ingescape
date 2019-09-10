@@ -99,10 +99,16 @@ ApplicationWindow {
                 text: qsTr("Save")
 
                 shortcut: StandardKey.Save
-                enabled: mainWindow.isEditorLicenseValid
 
                 onTriggered: {
-                    IngeScapeEditorC.savePlatformToCurrentlyLoadedFile();
+                    if (mainWindow.isEditorLicenseValid)
+                    {
+                        IngeScapeEditorC.savePlatformToCurrentlyLoadedFile();
+                    }
+                    else
+                    {
+                        applicationLoader.item.openLicensePopup();
+                    }
                 }
             }
 
@@ -110,10 +116,16 @@ ApplicationWindow {
                 text: qsTr("Save As...")
 
                 shortcut: StandardKey.SaveAs
-                enabled: mainWindow.isEditorLicenseValid
 
                 onTriggered: {
-                    IngeScapeEditorC.selectFileToSavePlatform();
+                    if (mainWindow.isEditorLicenseValid)
+                    {
+                        IngeScapeEditorC.selectFileToSavePlatform();
+                    }
+                    else
+                    {
+                        applicationLoader.item.openLicensePopup();
+                    }
                 }
             }
 
@@ -364,23 +376,36 @@ ApplicationWindow {
                 text: qsTr("Import agents...")
 
                 onTriggered: {
-                    if (IngeScapeEditorC.modelManager)
+                    if (mainWindow.isEditorLicenseValid)
                     {
-                        var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
-                        if (!success) {
-                            popupErrorMessage.open();
+                        if (IngeScapeEditorC.modelManager)
+                        {
+                            var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
+                            if (!success) {
+                                popupErrorMessage.open();
+                            }
                         }
+                    }
+                    else
+                    {
+                        applicationLoader.item.openLicensePopup();
                     }
                 }
             }
 
             MenuItem {
                 text: qsTr("Export agents...")
-                enabled: mainWindow.isEditorLicenseValid
 
                 onTriggered: {
-                    if (IngeScapeEditorC.modelManager) {
-                        IngeScapeEditorC.modelManager.exportAgentsListToSelectedFile();
+                    if (mainWindow.isEditorLicenseValid)
+                    {
+                        if (IngeScapeEditorC.modelManager) {
+                            IngeScapeEditorC.modelManager.exportAgentsListToSelectedFile();
+                        }
+                    }
+                    else
+                    {
+                        applicationLoader.item.openLicensePopup();
                     }
                 }
             }

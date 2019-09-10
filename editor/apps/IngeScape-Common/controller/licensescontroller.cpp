@@ -221,30 +221,47 @@ bool LicensesController::addLicenses(const QList<QUrl>& licenseUrlList)
     bool completeSuccess = true;
 
     // Are all URLs corresponding to local files ?
-    if (std::all_of(licenseUrlList.begin(), licenseUrlList.end(), [](const QUrl& url){ return url.isLocalFile(); }))
+    for (QUrl licenseUrl : licenseUrlList)
     {
-        for (QUrl licenseUrl : licenseUrlList)
+        if (licenseUrl.isLocalFile())
         {
-            QFileInfo licenseFile(licenseUrl.toLocalFile());
-            if (licenseFile.exists())
-            {
-                bool success = QFile::copy(licenseFile.absoluteFilePath(), QDir(_licensesPath).filePath(licenseFile.fileName()));
-                if (!success)
-                {
-                    qDebug() << "Unable to copy" << licenseFile.fileName() << "to the license directory";
-                }
-                completeSuccess &= success;
-            }
+            completeSuccess &= _importLicenseFromFile(QFileInfo(licenseUrl.toLocalFile()));
         }
+        else
+        {
+            completeSuccess = false;
+        }
+    }
 
-        _getLicensesData();
-    }
-    else
-    {
-        completeSuccess = false;
-    }
+    _getLicensesData();
 
     return completeSuccess;
+}
+
+
+/**
+ * @brief Open a file dialog to import a license file.
+ */
+void LicensesController::importLicense()
+{
+    // "File Dialog" to get the files (paths) to open
+    QString platformFilePath = QFileDialog::getOpenFileName(nullptr,
+                                                            "Import IGS license",
+                                                            QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
+                                                            "IGS License (*.igslicense)");
+
+    if (!platformFilePath.isEmpty())
+    {
+        QFileInfo licenseFile(platformFilePath);
+        bool importFromLicensePath = licenseFile.absoluteDir() == _licensesPath;
+
+        // Do not import from the license path
+        if (!importFromLicensePath && _importLicenseFromFile(licenseFile))
+        {
+            _getLicensesData();
+        }
+    }
+
 }
 
 
@@ -374,4 +391,24 @@ void LicensesController::_getLicensesData()
             }
         }
     }
+}
+
+
+/**
+ * @brief Import (copy) the given license file to the license directory
+ * @param licenseFile
+ * @return true on success. false otherwise.
+ */
+bool LicensesController::_importLicenseFromFile(const QFileInfo& licenseFile)
+{
+    bool success = false;
+    if (licenseFile.exists())
+    {
+        success = QFile::copy(licenseFile.absoluteFilePath(), QDir(_licensesPath).filePath(licenseFile.fileName()));
+        if (!success)
+        {
+            qDebug() << "Unable to copy" << licenseFile.fileName() << "to the license directory";
+        }
+    }
+    return success;
 }
