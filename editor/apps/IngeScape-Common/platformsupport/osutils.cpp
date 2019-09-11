@@ -19,11 +19,13 @@
 #include <QtGlobal>
 #include <QQmlEngine>
 
-
-//
-// Define our singleton instance
-//
-Q_GLOBAL_STATIC(OSUtils, _singletonInstance)
+#ifdef Q_OS_MAC
+#include "macosutils.h"
+#elif defined(Q_OS_WIN)
+#include "microsoftwindowutils.h"
+#elif defined(Q_OS_LINUX)
+#include "linuxutils.h"
+#endif
 
 
 
@@ -35,6 +37,10 @@ Q_GLOBAL_STATIC(OSUtils, _singletonInstance)
 //
 //---------------------------------------------------------------------
 
+//
+// Define our singleton instance
+//
+Q_GLOBAL_STATIC(OSUtils, _singletonInstance)
 
 
 /**
@@ -49,8 +55,9 @@ OSUtils::OSUtils(QObject *parent)
     // Force C++ ownership, otherwise our singleton will be owned by the QML engine
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    //FIXME: check if we need extra parameters
-    init();
+    // Subscribe to system power notifications
+    connect(this, &OSUtils::systemSleep, this, &OSUtils::_onSystemSleep);
+    connect(this, &OSUtils::systemWake, this, &OSUtils::_onSystemWake);
 }
 
 
@@ -59,7 +66,9 @@ OSUtils::OSUtils(QObject *parent)
   */
 OSUtils::~OSUtils()
 {
-   _clean();
+    // Unsubscribe to system power notifications
+    disconnect(this, &OSUtils::systemSleep, this, &OSUtils::_onSystemSleep);
+    disconnect(this, &OSUtils::systemWake, this, &OSUtils::_onSystemWake);
 }
 
 
@@ -75,7 +84,14 @@ void OSUtils::setpreventEnergyEfficiencyFeatures(bool value)
         _preventEnergyEfficiencyFeatures = value;
 
         // Update our OS
-        _osPreventEnergyEfficiencyFeatures(value);
+        if (value)
+        {
+            _disableEnergyEfficiencyFeatures();
+        }
+        else
+        {
+            _enableEnergyEfficiencyFeatures();
+        }
 
         // Notify change
         Q_EMIT preventEnergyEfficiencyFeaturesChanged(value);
@@ -89,7 +105,19 @@ void OSUtils::setpreventEnergyEfficiencyFeatures(bool value)
  */
 OSUtils* OSUtils::instance()
 {
-    return _singletonInstance();
+    // Fallback value
+    OSUtils* result = _singletonInstance;
+
+    // Check OS
+#ifdef Q_OS_MAC
+    result = MacosUtils::instance();
+#elif defined(Q_OS_WIN)
+    result = MicrosoftWindowUtils::instance();
+#elif defined(Q_OS_LINUX)
+    result = LinuxOSUtils::instance();
+#endif
+
+    return result;
 }
 
 
@@ -104,55 +132,8 @@ QObject* OSUtils::qmlSingleton(QQmlEngine* qmlEngine, QJSEngine* scriptEngine)
     Q_UNUSED(qmlEngine)
     Q_UNUSED(scriptEngine);
 
-    OSUtils* singleton = _singletonInstance();
-
-    return singleton;
+    return instance();
 }
-
-
-/**
- * @brief Init
- */
-void OSUtils::init()
-{
-#ifdef Q_OS_MAC
-    //
-    // Macos
-    //
-
-    // Subscribe to power notifications
-    connect(&MacosUtils::instance(), &MacosUtils::systemSleep, this, &OSUtils::_onSystemSleep);
-    connect(&MacosUtils::instance(), &MacosUtils::systemWake, this, &OSUtils::_onSystemWake);
-
-    // Init
-    MacosUtils::instance().init();
-
-#elif defined (Q_OS_WIN)
-    //
-    // Microsoft Windows
-    //
-
-    // Subscribe to power notifications
-    connect(&MicrosoftWindowUtils::instance(), &MicrosoftWindowUtils::systemSleep, this, &OSUtils::_onSystemSleep);
-    connect(&MicrosoftWindowUtils::instance(), &MicrosoftWindowUtils::systemWake, this, &OSUtils::_onSystemWake);
-
-
-    // Init
-    MicrosoftWindowUtils::instance().init();
-
-#else
-    //
-    // Other OS
-    //
-    qDebug() << Q_FUNC_INFO << "no implemented for this OS";
-
-#endif
-
-
-    // Prevent energy efficiency features ?
-    _osPreventEnergyEfficiencyFeatures(_preventEnergyEfficiencyFeatures);
-}
-
 
 
 /**
@@ -160,10 +141,6 @@ void OSUtils::init()
  */
 void OSUtils::removeOSGeneratedMenuItems()
 {
-#ifdef Q_OS_MAC
-    // Macos
-    MacosUtils::instance().removeOSGeneratedMenuItems();
-#endif
 }
 
 
@@ -185,10 +162,7 @@ void OSUtils::_onSystemSleep()
     setisAwake(false);
 
     // Re-enable energy efficiency features
-    _osPreventEnergyEfficiencyFeatures(false);
-
-    // Notify signal
-    Q_EMIT systemSleep();
+    _enableEnergyEfficiencyFeatures();
 }
 
 
@@ -201,82 +175,27 @@ void OSUtils::_onSystemWake()
     setisAwake(true);
 
     // Prevent energy efficiency features if needed
-    _osPreventEnergyEfficiencyFeatures(_preventEnergyEfficiencyFeatures);
-
-    // Notify signal
-    Q_EMIT systemWake();
+    if (_preventEnergyEfficiencyFeatures)
+    {
+        _disableEnergyEfficiencyFeatures();
+    }
 }
 
 
 /**
- * @brief Clean-up
+ * @brief Enable energy efficiency features
  */
-void OSUtils::_clean()
+void OSUtils::_enableEnergyEfficiencyFeatures()
 {
-    // Enable energy efficiency features
-    _osPreventEnergyEfficiencyFeatures(true);
-
-
-#ifdef Q_OS_MAC
-    //
-    // Macos
-    //
-
-    // Unsubscribe to power notifications
-    disconnect(&MacosUtils::instance(), &MacosUtils::systemSleep, this, &OSUtils::_onSystemSleep);
-    disconnect(&MacosUtils::instance(), &MacosUtils::systemWake, this, &OSUtils::_onSystemWake);
-
-
-    // Clean-up
-    MacosUtils::instance().clean();
-
-#elif defined (Q_OS_WIN)
-    //
-    // Microsoft Windows
-    //
-
-    // Unsubscribe to power notifications
-    disconnect(&MicrosoftWindowUtils::instance(), &MicrosoftWindowUtils::systemSleep, this, &OSUtils::_onSystemSleep);
-    disconnect(&MicrosoftWindowUtils::instance(), &MicrosoftWindowUtils::systemWake, this, &OSUtils::_onSystemWake);
-
-
-    // Clean-up
-    MicrosoftWindowUtils::instance().clean();
-
-#else
-    //
-    // Other OS
-    //
-    qDebug() << Q_FUNC_INFO << "no implemented for this OS";
-#endif
 }
-
 
 
 /**
- * @brief Called when our preventEnergyEfficiencyFeatures flag has changed
- *
- * @param value
+ * @brief Disable energy efficiency features
  */
-void OSUtils::_osPreventEnergyEfficiencyFeatures(bool value)
+void OSUtils::_disableEnergyEfficiencyFeatures()
 {
-#ifdef Q_OS_MAC
-    //
-    // Macos
-    //
-    MacosUtils::instance().energyEfficiencyFeaturesEnabled(!value);
-
-#elif defined (Q_OS_WIN)
-    //
-    // Microsoft Windows
-    //
-    MicrosoftWindowUtils::instance().energyEfficiencyFeaturesEnabled(!value);
-
-#else
-    //
-    // Other OS
-    //
-    Q_UNUSED(value)
-    qDebug() << Q_FUNC_INFO << "no implemented for this OS";
-#endif
 }
+
+
+

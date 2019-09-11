@@ -6,8 +6,10 @@ QT += qml quick svg xml sql quick-private core-private gui-private concurrent
 
 
 SOURCES += \
+    $$PWD/model/agent/definition/callm.cpp \
     $$PWD/ingescapecommon.cpp \
     $$PWD/model/licenseinformationm.cpp \
+    $$PWD/platformsupport/linuxutils.cpp \
     $$PWD/platformsupport/microsoftwindowutils.cpp \
     $$PWD/platformsupport/osutils.cpp \
     $$PWD/settings/ingescapesettings.cpp \
@@ -57,6 +59,8 @@ SOURCES += \
 
 
 HEADERS += \
+    $$PWD/model/agent/definition/callm.h \
+    $$PWD/platformsupport/linuxutils.h \
     $$PWD/platformsupport/macosutils.h \
     $$PWD/ingescapecommon.h \
     $$PWD/ingescape-common_global.h \

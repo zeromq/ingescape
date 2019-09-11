@@ -43,6 +43,10 @@
 // Subscribe to system power notifications
 -(void)subcribeToSystemPowerNotification;
 
+// Unsubscribe to system power notifications
+-(void)unsubcribeToSystemPowerNotification;
+
+
 // Enable App Nap
 -(void)enableAppNap;
 
@@ -66,7 +70,10 @@
 -(void)receiveSleepNotification: (NSNotification*) notification
 {
 #pragma unused(notification)
-    MacosUtils::instance().systemSleep();
+    if (MacosUtils::instance() != nullptr)
+    {
+        MacosUtils::instance()->systemSleep();
+    }
 }
 
 
@@ -74,7 +81,10 @@
 -(void)receiveWakeNotification: (NSNotification*) notification
 {
 #pragma unused(notification)
-    MacosUtils::instance().systemWake();
+    if (MacosUtils::instance() != nullptr)
+    {
+        MacosUtils::instance()->systemWake();
+    }
 }
 
 
@@ -93,6 +103,22 @@
                                                         name: NSWorkspaceDidWakeNotification
                                                         object: nil];
 }
+
+
+// Unsubscribe to system power notifications
+-(void)unsubcribeToSystemPowerNotification
+{
+    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver: self
+                                                        name: NSWorkspaceWillSleepNotification
+                                                        object: nil];
+
+
+
+    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver: self
+                                                        name: NSWorkspaceDidWakeNotification
+                                                        object: nil];
+}
+
 
 
 // Enable App Nap
@@ -152,6 +178,7 @@ public:
     }
 
 
+public:
     MacosUtilsNative* objectiveCAPI;
 };
 
@@ -167,14 +194,25 @@ public:
 //---------------------------------------------------------------------
 
 
+//
+// Define our singleton instance
+//
+Q_GLOBAL_STATIC(MacosUtils, _singletonInstance)
+
+
 
 /**
  * @brief Constructor
  */
 MacosUtils::MacosUtils(QObject* parent)
-    : QObject(parent),
+    : OSUtils(parent),
       _privateAPI(new MacosUtilsPrivate())
 {
+    MacosUtilsNative* macosUtilsNative = [[MacosUtilsNative alloc] init];
+    _privateAPI->objectiveCAPI = macosUtilsNative;
+
+    // Subscribe to system power notifications
+    [_privateAPI->objectiveCAPI subcribeToSystemPowerNotification];
 }
 
 
@@ -183,6 +221,8 @@ MacosUtils::MacosUtils(QObject* parent)
  */
 MacosUtils::~MacosUtils()
 {
+    // Unubscribe to system power notifications
+    [_privateAPI->objectiveCAPI unsubcribeToSystemPowerNotification];
 }
 
 
@@ -190,33 +230,9 @@ MacosUtils::~MacosUtils()
  * @brief Get our singleton instance
  * @return
  */
-MacosUtils& MacosUtils::instance()
+MacosUtils* MacosUtils::instance()
 {
-    static MacosUtils instance;
-    return instance;
-}
-
-
-/**
- * @brief Init
- */
-void MacosUtils::init()
-{
-    if (_privateAPI->objectiveCAPI == nil)
-    {qDebug() << "NILL";
-        MacosUtilsNative* macosUtilsNative = [[MacosUtilsNative alloc] init];
-        _privateAPI->objectiveCAPI = macosUtilsNative;
-    }
-
-    _subscribeToSystemPowerNotifications();
-}
-
-
-/**
- * @brief Clean
- */
-void MacosUtils::clean()
-{
+    return _singletonInstance;
 }
 
 
@@ -232,33 +248,21 @@ void MacosUtils::removeOSGeneratedMenuItems()
 
 
 /**
- * @brief Enable or disable energy efficiency features
- *
- * @param value
+ * @brief Enable energy efficiency features
  */
-void MacosUtils::energyEfficiencyFeaturesEnabled(bool value)
+void MacosUtils::_enableEnergyEfficiencyFeatures()
 {
-    if (value)
-    {
-        [_privateAPI->objectiveCAPI enableAppNap];
-    }
-    else
-    {
-        [_privateAPI->objectiveCAPI disableAppNap];
-    }
+    [_privateAPI->objectiveCAPI enableAppNap];
 }
-
 
 
 /**
- * @brief Subscribe to system power notifications
+ * @brief Disable energy efficiency features
  */
-void MacosUtils::_subscribeToSystemPowerNotifications()
+void MacosUtils::_disableEnergyEfficiencyFeatures()
 {
-    [_privateAPI->objectiveCAPI subcribeToSystemPowerNotification];
+    [_privateAPI->objectiveCAPI disableAppNap];
 }
-
-
 
 
 /**

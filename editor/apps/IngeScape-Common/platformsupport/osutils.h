@@ -25,11 +25,6 @@
 #include "I2PropertyHelpers.h"
 
 
-#ifdef Q_OS_MAC
-#include "macosutils.h"
-#endif
-
-
 
 /**
  * @brief The OSUtils class defines a set of utility functions to perform OS specific operations
@@ -77,15 +72,9 @@ public:
 
 
      /**
-      * @brief Init
-      */
-     void init();
-
-
-     /**
       * @brief Clean-up our menu
       */
-     void removeOSGeneratedMenuItems();
+     virtual void removeOSGeneratedMenuItems();
 
 
 Q_SIGNALS:
@@ -115,18 +104,16 @@ protected:
 
 
 protected:
-     /**
-      * @brief Clean-up
-      */
-     void _clean();
+    /**
+     * @brief Enable energy efficiency features
+     */
+    virtual void _enableEnergyEfficiencyFeatures();
 
 
-     /**
-      * @brief Called when our preventEnergyEfficiencyFeatures flag has changed
-      *
-      * @param value
-      */
-     void _osPreventEnergyEfficiencyFeatures(bool value);
+    /**
+     * @brief Disable energy efficiency features
+     */
+    virtual void _disableEnergyEfficiencyFeatures();
 };
 
 QML_DECLARE_TYPE(OSUtils)
