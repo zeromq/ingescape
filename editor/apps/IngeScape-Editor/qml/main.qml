@@ -588,6 +588,9 @@ ApplicationWindow {
                 // Cancel window closing
                 close.accepted = false;
 
+                // Bring to foreground
+                raise();
+
                 // Open save popup
                 saveBeforeQuitPopup.open();
             }
