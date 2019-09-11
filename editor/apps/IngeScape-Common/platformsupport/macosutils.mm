@@ -52,6 +52,8 @@
 // Unsubscribe to user session notifications
 -(void)unsubscribeToUserSessionNotifications;
 
+-(bool)supportsAppNap;
+
 // Enable App Nap
 -(void)enableAppNap;
 
@@ -173,6 +175,11 @@
 }
 
 
+// Check if our macos version supports App Nap
+-(bool)supportsAppNap
+{
+    return [[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)];
+}
 
 
 // Enable App Nap
@@ -264,6 +271,9 @@ MacosUtils::MacosUtils(QObject* parent)
 {
     MacosUtilsNative* macosUtilsNative = [[MacosUtilsNative alloc] init];
     _privateAPI->objectiveCAPI = macosUtilsNative;
+
+    // Check if App Nap is supported
+    sethasEnergyEfficiencyFeatures([_privateAPI->objectiveCAPI supportsAppNap]);
 
     // Subscribe to system power notifications
     [_privateAPI->objectiveCAPI subscribeToSystemPowerNotifications];

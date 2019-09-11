@@ -570,6 +570,9 @@ ApplicationWindow {
         // Define the window associated to Qt Quick inspector
         DebugQuickInspector.currentWindow = mainWindow;
 
+        // Define the window associated to OSUtils
+        OSUtils.currentWindow = mainWindow;
+
         // Start our loader delay animation when our initial content is ready
         loaderDelayAnimation.start();
     }

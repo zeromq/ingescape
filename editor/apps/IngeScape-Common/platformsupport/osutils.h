@@ -42,6 +42,9 @@ class OSUtils : public QObject
     // Flag indicating if our user session is locked
     I2_QML_PROPERTY_READONLY(bool, isUserSessionLocked)
 
+    // Flag indicating if our system has energy efficency features (Macos App Nap, etc.)
+    I2_QML_PROPERTY_READONLY(bool, hasEnergyEfficiencyFeatures)
+
     // Flag indicating if we want to prevent energy efficency features (Macos App Nap, etc.)
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, preventEnergyEfficiencyFeatures)
 

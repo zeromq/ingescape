@@ -52,6 +52,7 @@ OSUtils::OSUtils(QObject *parent)
       _currentWindow(nullptr),
       _isAwake(true), // We assume that our system is awake
       _isUserSessionLocked(false), // We assume that our user session is not locked
+      _hasEnergyEfficiencyFeatures(false), // We assume that all OS don't have energy efficiency features
       _preventEnergyEfficiencyFeatures(false)
 {
     // Force C++ ownership, otherwise our singleton will be owned by the QML engine

@@ -154,7 +154,20 @@ mac {
     message(Ingescape-common.pri: macOS and iOS specific rules)
 
 
-    # Add specific depdencies
+    # Add specific dependencies
     LIBS += -framework Foundation -framework AppKit
 }
 
+
+
+#------------------------
+#
+# Windows specific rules
+#
+#------------------------
+win32 {
+    message(Ingescape-common.pri: Windows specific rules)
+
+    # Add specific dependencies
+    LIBS += -lWtsapi32
+}

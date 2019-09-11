@@ -232,6 +232,10 @@ if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework Foundation -framework AppKit")
 endif()
 
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} Wtsapi32)
+endif()
+
 
 # Retrieve the absolute path to qmake and then use that path to find
 # the binaries
