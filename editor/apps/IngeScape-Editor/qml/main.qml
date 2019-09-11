@@ -554,6 +554,15 @@ ApplicationWindow {
 
                 onTriggered: qtQuickInfoPopup.open();
             }
+
+            MenuItem {
+                text: "Getting started"
+
+                onTriggered: {
+                    gettingStartedWindow.resetInternetUrl()
+                    gettingStartedWindow.visible = true
+                }
+            }
         }
     }
 
@@ -587,6 +596,9 @@ ApplicationWindow {
             {
                 // Cancel window closing
                 close.accepted = false;
+
+                // Bring to foreground
+                raise();
 
                 // Open save popup
                 saveBeforeQuitPopup.open();
@@ -805,5 +817,9 @@ ApplicationWindow {
             // Cancel the closing procedure and keep the editor open
             onCancel: {}
         }
+    }
+
+    GettingStartedWindow {
+        id: gettingStartedWindow
     }
 }

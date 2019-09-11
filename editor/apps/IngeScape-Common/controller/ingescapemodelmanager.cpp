@@ -258,12 +258,7 @@ void IngeScapeModelManager::deleteAgentsGroupedByName(AgentsGroupedByNameVM* age
  */
 HostM* IngeScapeModelManager::getHostModelWithName(QString hostName)
 {
-    if (_hashFromNameToHost.contains(hostName)) {
-        return _hashFromNameToHost.value(hostName);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromNameToHost.value(hostName, nullptr);
 }
 
 
@@ -293,12 +288,7 @@ QString IngeScapeModelManager::getPeerIdOfLauncherOnHost(QString hostName)
  */
 AgentM* IngeScapeModelManager::getAgentModelFromPeerId(QString peerId)
 {
-    if (_hashFromPeerIdToAgent.contains(peerId)) {
-        return _hashFromPeerIdToAgent.value(peerId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromPeerIdToAgent.value(peerId, nullptr);
 }
 
 
@@ -309,12 +299,7 @@ AgentM* IngeScapeModelManager::getAgentModelFromPeerId(QString peerId)
  */
 AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString name)
 {
-    if (_hashFromNameToAgentsGrouped.contains(name)) {
-        return _hashFromNameToAgentsGrouped.value(name);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromNameToAgentsGrouped.value(name, nullptr);
 }
 
 
@@ -325,12 +310,7 @@ AgentsGroupedByNameVM* IngeScapeModelManager::getAgentsGroupedForName(QString na
  */
 ActionM* IngeScapeModelManager::getActionWithId(int actionId)
 {
-    if (_hashFromUidToModelOfAction.contains(actionId)) {
-        return _hashFromUidToModelOfAction.value(actionId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromUidToModelOfAction.value(actionId, nullptr);
 }
 
 
@@ -360,9 +340,7 @@ void IngeScapeModelManager::deleteAction(ActionM* action)
         int actionId = action->uid();
 
         // Remove action form the hash table
-        if (_hashFromUidToModelOfAction.contains(actionId)) {
-            _hashFromUidToModelOfAction.remove(actionId);
-        }
+        _hashFromUidToModelOfAction.remove(actionId);
 
         // Free memory
         delete action;
@@ -380,7 +358,7 @@ void IngeScapeModelManager::deleteAllActions()
 {
     //qDeleteAll(_hashFromUidToModelOfAction);
 
-    for (ActionM* action : _hashFromUidToModelOfAction.values())
+    for (ActionM* action : _hashFromUidToModelOfAction)
     {
         deleteAction(action);
     }

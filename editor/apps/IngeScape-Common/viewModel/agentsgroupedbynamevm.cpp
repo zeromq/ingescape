@@ -425,12 +425,7 @@ void AgentsGroupedByNameVM::openDefinition()
  */
 QList<InputVM*> AgentsGroupedByNameVM::getInputsListFromName(QString inputName)
 {
-    if (_hashFromNameToInputsList.contains(inputName)) {
-        return _hashFromNameToInputsList.value(inputName);
-    }
-    else {
-        return QList<InputVM*>();
-    }
+    return _hashFromNameToInputsList.value(inputName, QList<InputVM*>());
 }
 
 
@@ -440,12 +435,7 @@ QList<InputVM*> AgentsGroupedByNameVM::getInputsListFromName(QString inputName)
  */
 InputVM* AgentsGroupedByNameVM::getInputFromId(QString inputId)
 {
-    if (_hashFromIdToInput.contains(inputId)) {
-        return _hashFromIdToInput.value(inputId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromIdToInput.value(inputId, nullptr);
 }
 
 
@@ -455,12 +445,7 @@ InputVM* AgentsGroupedByNameVM::getInputFromId(QString inputId)
  */
 QList<OutputVM*> AgentsGroupedByNameVM::getOutputsListFromName(QString outputName)
 {
-    if (_hashFromNameToOutputsList.contains(outputName)) {
-        return _hashFromNameToOutputsList.value(outputName);
-    }
-    else {
-        return QList<OutputVM*>();
-    }
+    return _hashFromNameToOutputsList.value(outputName, QList<OutputVM*>());
 }
 
 
@@ -470,12 +455,7 @@ QList<OutputVM*> AgentsGroupedByNameVM::getOutputsListFromName(QString outputNam
  */
 OutputVM* AgentsGroupedByNameVM::getOutputFromId(QString outputId)
 {
-    if (_hashFromIdToOutput.contains(outputId)) {
-        return _hashFromIdToOutput.value(outputId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromIdToOutput.value(outputId, nullptr);
 }
 
 
@@ -485,12 +465,7 @@ OutputVM* AgentsGroupedByNameVM::getOutputFromId(QString outputId)
  */
 QList<ParameterVM*> AgentsGroupedByNameVM::getParametersListFromName(QString parameterName)
 {
-    if (_hashFromNameToParametersList.contains(parameterName)) {
-        return _hashFromNameToParametersList.value(parameterName);
-    }
-    else {
-        return QList<ParameterVM*>();
-    }
+    return _hashFromNameToParametersList.value(parameterName, QList<ParameterVM*>());
 }
 
 
@@ -500,12 +475,7 @@ QList<ParameterVM*> AgentsGroupedByNameVM::getParametersListFromName(QString par
  */
 ParameterVM* AgentsGroupedByNameVM::getParameterFromId(QString parameterId)
 {
-    if (_hashFromIdToParameter.contains(parameterId)) {
-        return _hashFromIdToParameter.value(parameterId);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromIdToParameter.value(parameterId, nullptr);
 }
 
 
@@ -516,12 +486,7 @@ ParameterVM* AgentsGroupedByNameVM::getParameterFromId(QString parameterId)
  */
 MappingElementVM* AgentsGroupedByNameVM::getMappingElementVMfromName(QString name)
 {
-    if (_hashFromNameToMappingElement.contains(name)) {
-        return _hashFromNameToMappingElement.value(name);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromNameToMappingElement.value(name, nullptr);
 }
 
 
@@ -613,7 +578,7 @@ void AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(
             for (DefinitionM* iterator : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
             {
                 // The 2 definitions are strictly identicals
-                if ((iterator != nullptr) && DefinitionM::areIdenticals(iterator, previousDefinition))
+                if ((iterator != nullptr) && (*iterator == *previousDefinition))
                 {
                     previousGroup = _hashFromDefinitionToAgentsGroupedByDefinition.value(iterator);
                     break;
@@ -807,9 +772,9 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
  */
 void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
 {
-    if ((model != nullptr) && (model->definition() != nullptr))
+    DefinitionM* definition = model->definition();
+    if ((model != nullptr) && (definition != nullptr))
     {
-        DefinitionM* definition = model->definition();
 
         AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition = nullptr;
 
@@ -817,7 +782,7 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
         for (DefinitionM* iterator : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
         {
             // The 2 definitions are strictly identicals
-            if ((iterator != nullptr) && DefinitionM::areIdenticals(iterator, definition))
+            if ((iterator != nullptr) && (*iterator == *definition))
             {
                 qDebug() << "There is exactly the same agent definition for name" << definition->name() << "and version" << definition->version();
 
@@ -988,9 +953,9 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
  */
 void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
 {
-    if ((model != nullptr) && (model->definition() != nullptr))
+    DefinitionM* newDefinition = model->definition();
+    if ((model != nullptr) && (newDefinition != nullptr))
     {
-        DefinitionM* newDefinition = model->definition();
 
         AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition = nullptr;
 
@@ -998,7 +963,7 @@ void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
         for (DefinitionM* iterator : _hashFromDefinitionToAgentsGroupedByDefinition.keys())
         {
             // The 2 definitions are strictly identicals
-            if ((iterator != nullptr) && DefinitionM::areIdenticals(iterator, newDefinition))
+            if ((iterator != nullptr) && (*iterator == *newDefinition))
             {
                 qDebug() << "There is exactly the same agent definition for name" << newDefinition->name() << "and version" << newDefinition->version();
 

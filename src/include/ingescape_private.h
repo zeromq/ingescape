@@ -41,7 +41,7 @@
 extern "C" {
 #endif
 
-#define MAX_PATH 2048
+#define IGS_MAX_PATH 2048
 #define MAX_IOP_NAME_LENGTH 256
 #define MAX_AGENT_NAME_LENGTH 256
 #define MAX_DEFINITION_NAME_LENGTH 1024
@@ -238,12 +238,12 @@ typedef struct license_callback {
 //////////////////  FUNCTIONS  //////////////////
 
 //  definition
-extern char definitionPath[MAX_PATH];
+extern char definitionPath[IGS_MAX_PATH];
 extern definition* igs_internal_definition;
 PUBLIC void definition_freeDefinition (definition* definition);
 
 //  mapping
-extern char mappingPath[MAX_PATH];
+extern char mappingPath[IGS_MAX_PATH];
 extern mapping_t *igs_internal_mapping;
 PUBLIC void mapping_freeMapping (mapping_t* map);
 mapping_element_t * mapping_createMappingElement(const char * input_name,

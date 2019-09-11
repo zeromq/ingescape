@@ -106,15 +106,6 @@ public:
 
 
     /**
-     * @brief Return true if the 2 definitions are strictly identicals
-     * @param definition1
-     * @param definition2
-     * @return
-     */
-    static bool areIdenticals(DefinitionM* definition1, DefinitionM* definition2);
-
-
-    /**
      * @brief Get an Input with its name
      * @param inputName
      * @return
@@ -136,6 +127,14 @@ public:
      * @return
      */
     AgentIOPM* getParameterWithName(QString parameterName);
+
+
+    /**
+     * @brief Accessor for the list of calls.
+     * The returned value is a copy of the calls list cannot be modified from here.
+     * @return
+     */
+    QList<CallM*> getCallsList() const;
 
 
     /**
@@ -214,15 +213,6 @@ private Q_SLOTS:
     void _onIsMutedOutputChanged(bool isMutedOutput);
 
 
-    /**
-     * @brief Return true if the 2 list of ids are strictly identicals
-     * @param idsList1
-     * @param idsList2
-     * @return
-     */
-    static bool _areIdenticalsIdsList(QStringList idsList1, QStringList idsList2);
-
-
 private:
     // Previous list of inputs
     QList<AgentIOPM*> _previousInputsList;
@@ -246,6 +236,23 @@ private:
     QHash<QString, AgentIOPM*> _mapFromParameterNameToParameter;
 
 };
+
+/**
+ * @brief Equality operator to compare two definition
+ * @param left
+ * @param right
+ * @return
+ */
+bool operator==(const DefinitionM& left, const DefinitionM& right);
+
+/**
+ * @brief Difference operator to compare two definition
+ * Simply the negation of the equality operator
+ * @param left
+ * @param right
+ * @return
+ */
+bool operator!=(const DefinitionM& left, const DefinitionM& right);
 
 QML_DECLARE_TYPE(DefinitionM)
 

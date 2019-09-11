@@ -1376,11 +1376,11 @@ initLoop (zsock_t *pipe, void *args){
 
         //Use GetModuleFileName() to get exec path
         // See comment on define UNICODE in the top of this file, without define UNICODE This lines return NULL String
-        WCHAR temp[MAX_PATH];
-        GetModuleFileName(NULL,temp,MAX_PATH);
+        WCHAR temp[IGS_MAX_PATH];
+        GetModuleFileName(NULL,temp,IGS_MAX_PATH);
         
         //Conversion in char *
-        char exeFilePath[MAX_PATH];
+        char exeFilePath[IGS_MAX_PATH];
         wcstombs_s(NULL,exeFilePath,sizeof(exeFilePath),temp,sizeof(temp));
         zyre_set_header(agentElements->node, "commandline", "%s", exeFilePath);
     }else{
@@ -2204,11 +2204,11 @@ void igs_setCommandLineFromArgs(int argc, const char * argv[]){
 #elif (defined WIN32 || defined _WIN32)
     //Use GetModuleFileName() to get exec path, argv[0] do not contain full path
     // See comment on define UNICODE in the top of this file, without define UNICODE This lines return NULL String
-    WCHAR temp[MAX_PATH];
-    GetModuleFileName(NULL, temp, MAX_PATH);
+    WCHAR temp[IGS_MAX_PATH];
+    GetModuleFileName(NULL, temp, IGS_MAX_PATH);
 
     //Conversion in char *
-    char exeFilePath[MAX_PATH];
+    char exeFilePath[IGS_MAX_PATH];
     wcstombs_s(NULL, exeFilePath, sizeof(exeFilePath), temp, sizeof(temp));
     strcat(cmd, exeFilePath);
 #endif

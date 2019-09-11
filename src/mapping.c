@@ -13,7 +13,7 @@
 #include "ingescape_private.h"
 
 mapping_t *igs_internal_mapping = NULL;
-char mappingPath[MAX_PATH] = "";
+char mappingPath[IGS_MAX_PATH] = "";
 
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
@@ -175,7 +175,7 @@ int igs_loadMappingFromPath (const char* file_path){
         igs_error("Mapping could not be loaded from path %s", file_path);
         return -1;
     }else{
-        strncpy(mappingPath, file_path, MAX_PATH-1);
+        strncpy(mappingPath, file_path, IGS_MAX_PATH-1);
         igs_internal_mapping = tmp;
         network_needToUpdateMapping = true;
     }
@@ -569,7 +569,7 @@ int igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent
 }
 
 void igs_setMappingPath(const char *path){
-    strncpy(mappingPath, path, MAX_PATH - 1);
+    strncpy(mappingPath, path, IGS_MAX_PATH - 1);
     if (agentElements != NULL && agentElements->node != NULL){
         zyre_shouts(agentElements->node, CHANNEL, "MAPPING_FILE_PATH=%s", mappingPath);
     }

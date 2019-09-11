@@ -340,12 +340,7 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
  */
 QList<DefinitionM*> AgentsSupervisionController::_getDefinitionsListWithName(QString definitionName)
 {
-    if (_hashFromDefinitionNameToDefinitionsList.contains(definitionName)) {
-        return _hashFromDefinitionNameToDefinitionsList.value(definitionName);
-    }
-    else {
-        return QList<DefinitionM*>();
-    }
+    return _hashFromDefinitionNameToDefinitionsList.value(definitionName, QList<DefinitionM*>());
 }
 
 
@@ -383,7 +378,7 @@ void AgentsSupervisionController::_updateDefinitionVariants(QString definitionNa
                 {
                     // We compare I/O/P between current iterator and the first one
                     DefinitionM* first = definitionsListForVersion.first();
-                    if ((first != nullptr) && !DefinitionM::areIdenticals(first, iterator)) {
+                    if ((first != nullptr) && !(*first == *iterator)) {
                         versionsWithVariant.append(version);
                     }
                 }

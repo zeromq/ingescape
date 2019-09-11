@@ -1129,12 +1129,7 @@ void AbstractScenarioController::_executeAction(ActionVM* actionVM, ActionExecut
  */
 QList<ActionVM*> AbstractScenarioController::_getListOfActionVMwithId(int actionId)
 {
-    if (_hashFromUidToViewModelsOfAction.contains(actionId)) {
-        return _hashFromUidToViewModelsOfAction.value(actionId);
-    }
-    else {
-        return QList<ActionVM*>();
-    }
+    return _hashFromUidToViewModelsOfAction.value(actionId, QList<ActionVM*>());
 }
 
 
@@ -1145,10 +1140,5 @@ QList<ActionVM*> AbstractScenarioController::_getListOfActionVMwithId(int action
  */
 I2CustomItemSortFilterListModel<ActionVM>* AbstractScenarioController::_getSortedListOfActionVMwithLineIndex(int index)
 {
-    if (_hashFromLineIndexToSortedViewModelsOfAction.contains(index)) {
-        return _hashFromLineIndexToSortedViewModelsOfAction.value(index);
-    }
-    else {
-        return nullptr;
-    }
+    return _hashFromLineIndexToSortedViewModelsOfAction.value(index, nullptr);
 }
