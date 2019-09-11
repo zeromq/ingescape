@@ -80,16 +80,28 @@ bool MicrosoftWindowUtilsEventFilter::nativeEventFilter(const QByteArray &eventT
             // Check if we have a user session notification
             else if (msg->message == WM_WTSSESSION_CHANGE)
             {
+                // NB: WM_WTSSESSION_CHANGE messages are received twice
+
                 if (msg->wParam == WTS_SESSION_LOCK)
                 {
-                    if (MicrosoftWindowUtils::instance() != nullptr)
+                    if (
+                        (MicrosoftWindowUtils::instance() != nullptr)
+                        &&
+                        // We need this guard because WTS_SESSION_LOCK is received twice
+                        !(MicrosoftWindowUtils::instance()->isUserSessionLocked())
+                        )
                     {
                         MicrosoftWindowUtils::instance()->userSessionLocked();
                     }
                 }
                 else if (msg->wParam == WTS_SESSION_UNLOCK)
                 {
-                    if (MicrosoftWindowUtils::instance() != nullptr)
+                    if (
+                        (MicrosoftWindowUtils::instance() != nullptr)
+                        &&
+                        // We need this guard because WTS_SESSION_UNLOCK is received twice
+                        MicrosoftWindowUtils::instance()->isUserSessionLocked()
+                        )
                     {
                         MicrosoftWindowUtils::instance()->userSessionUnlocked();
                     }

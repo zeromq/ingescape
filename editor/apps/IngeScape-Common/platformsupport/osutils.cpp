@@ -214,7 +214,7 @@ void OSUtils::_onUserSessionLocked()
 void OSUtils::_onUserSessionUnlocked()
 {qDebug() << Q_FUNC_INFO;
     // Update internal state
-    setisUserSessionLocked(true);
+    setisUserSessionLocked(false);
 }
 
 
