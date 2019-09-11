@@ -241,14 +241,6 @@ int main(int argc, char *argv[])
 #endif
 
 
-    //
-    // Clean-up menus
-    //
-    if (OSUtils::instance() != nullptr)
-    {
-        OSUtils::instance()->removeOSGeneratedMenuItems();
-    }
-
 
 #ifdef QT_DEBUG
     // Print out general information about various parts of the scene graph and the graphics stack
@@ -271,6 +263,14 @@ int main(int argc, char *argv[])
 
     // - behavior when our last window is closed
     app.setQuitOnLastWindowClosed(true);
+
+
+
+    // Clean-up menus
+    if (OSUtils::instance() != nullptr)
+    {
+        OSUtils::instance()->removeOSGeneratedMenuItems();
+    }
 
 
     //------------------------------
@@ -352,7 +352,6 @@ int main(int argc, char *argv[])
     {
         qFatal("ERROR: There is no special directory 'Documents' !");
     }
-
 
 
     //------------------------------

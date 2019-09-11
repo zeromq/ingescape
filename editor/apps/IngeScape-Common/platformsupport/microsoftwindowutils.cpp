@@ -14,6 +14,8 @@
 
 #include "microsoftwindowutils.h"
 
+#include <QDebug>
+
 
 #ifdef Q_OS_WIN
 
@@ -138,6 +140,7 @@ MicrosoftWindowUtils* MicrosoftWindowUtils::instance()
  */
 void MicrosoftWindowUtils::removeOSGeneratedMenuItems()
 {
+    // Nothing to do: Qt does not add extra menu items on Windows
 }
 
 
