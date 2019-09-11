@@ -127,7 +127,7 @@ OSUtils* OSUtils::instance()
 #elif defined(Q_OS_WIN)
     result = MicrosoftWindowUtils::instance();
 #elif defined(Q_OS_LINUX)
-    result = LinuxOSUtils::instance();
+    result = LinuxUtils::instance();
 #endif
 
     return result;

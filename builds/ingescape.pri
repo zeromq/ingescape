@@ -112,6 +112,11 @@ mac:{
     LIBS += /usr/local/lib/libsodium.dylib
 }
 
+unix:!mac {
+    INCLUDEPATH += /usr/local/include
+    LIBS += -lczmq -lzyre -lsodium
+}
+
 
 
 #
