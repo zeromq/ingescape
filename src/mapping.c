@@ -431,7 +431,7 @@ unsigned long igs_addMappingEntry(const char *fromOurInput,
     }
 
     //Add the new mapping element if not already there
-    unsigned long len = strlen(fromOurInput)+strlen(toAgent)+strlen(withOutput)+3+1;
+    size_t len = strlen(fromOurInput)+strlen(toAgent)+strlen(withOutput)+3+1;
     char *mashup = calloc(1, len*sizeof(char));
     strcpy(mashup, reviewedFromOurInput);
     strcat(mashup, ".");//separator
@@ -542,7 +542,7 @@ int igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent
         return -4;
     }
 
-    unsigned long len = strlen(fromOurInput)+strlen(toAgent)+strlen(withOutput)+3+1;
+    size_t len = strlen(fromOurInput)+strlen(toAgent)+strlen(withOutput)+3+1;
     char *mashup = calloc(1, len*sizeof(char));
     strcpy(mashup, fromOurInput);
     strcat(mashup, ".");//separator

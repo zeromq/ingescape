@@ -542,7 +542,7 @@ const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t
     }
     int ret = 1;
     void *outValue = NULL;
-    long outSize = 0;
+    size_t outSize = 0;
     
     model_readWriteLock();
     //TODO optimize if value is NULL

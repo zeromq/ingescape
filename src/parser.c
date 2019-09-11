@@ -537,7 +537,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
         igs_warn("Mapping parser : spaces are not allowed in IOP: %s has been renamed to %s\n", output_name, reviewedWithOutput);
     }
     
-    unsigned long len = strlen(reviewedFromOurInput)+strlen(reviewedToAgent)+strlen(reviewedWithOutput)+3+1;
+    size_t len = strlen(reviewedFromOurInput)+strlen(reviewedToAgent)+strlen(reviewedWithOutput)+3+1;
     char *mashup = calloc(1, len*sizeof(char));
     strcpy(mashup, reviewedFromOurInput);
     strcat(mashup, ".");//separator
