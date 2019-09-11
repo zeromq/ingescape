@@ -201,11 +201,10 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_readInputAsString([MarshalAs(UnmanagedType.LPStr)]  string name);
-        public static string readInputAsString(string name) {
-            string str = "";
+        public static string readInputAsString(string name)
+        {
             IntPtr ptr = igs_readInputAsString(name);
-            str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+            return _getStringUTF8(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -216,7 +215,7 @@ namespace Ingescape
             int sizeRead = 0;
             IntPtr[] intPtrArray = new IntPtr[1];
 
-            //Read output data
+            //Read input data
             int ret = igs_readInputAsData(name, intPtrArray, ref sizeRead);
 
             //Copy the content of the IntPtr to byte array
@@ -242,10 +241,8 @@ namespace Ingescape
         private static extern IntPtr igs_readOutputAsString([MarshalAs(UnmanagedType.LPStr)]  string name);
         public static string readOutputAsString(string name)
         {
-            string str = "";
             IntPtr ptr = igs_readOutputAsString(name);
-            str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+            return _getStringUTF8(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -282,10 +279,8 @@ namespace Ingescape
         private static extern IntPtr igs_readParameterAsString([MarshalAs(UnmanagedType.LPStr)]  string name);
         public static string readParameterAsString(string name)
         {
-            string str = "";
             IntPtr ptr = igs_readParameterAsString(name);
-            str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+            return _getStringUTF8(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -296,7 +291,7 @@ namespace Ingescape
             int sizeRead = 0;
             IntPtr[] intPtrArray = new IntPtr[1];
 
-            //Read output data
+            //Read parameter data
             int ret = igs_readParameterAsData(name, intPtrArray, ref sizeRead);
 
             //IntPtr to byte array
@@ -498,6 +493,8 @@ namespace Ingescape
                 //TOFIX : release memory raise an exception
                 //Marshal.FreeCoTaskMem(intPtrArray[i]);
             }
+            // FIXME: usefull ?
+            //Igs.igs_freeIOPList(ref intptr, nbOfElements);
 
             return list;
         }
@@ -525,6 +522,8 @@ namespace Ingescape
                 //TOFIX : release memory raise an exception
                 //Marshal.FreeCoTaskMem(intPtrArray[i]);
             }
+            // FIXME: usefull ?
+            //Igs.igs_freeIOPList(ref intptr, nbOfElements);
 
             return list;
         }
@@ -681,13 +680,10 @@ namespace Ingescape
         private static extern IntPtr igs_getMappingVersion(); 
         public static string getMappingVersion()
         {
-            string mappingVersion = "";
-
+            string str = "";
             IntPtr ptr = igs_getMappingVersion();
-
-            mappingVersion = Marshal.PtrToStringAnsi(ptr);
-
-            return mappingVersion;
+            str = Marshal.PtrToStringAnsi(ptr);
+            return str;
         }       
 
         //edit mapping using the API
@@ -895,5 +891,21 @@ namespace Ingescape
         public static void observeLicense(igs_licenseCallback cb, IntPtr myData) { igs_observeLicense(cb, myData); }
 
         #endregion
+
+        /// <summary>
+        /// Return a managed string with UTF-8 encoding from the unmanaged ANSI string
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <returns>string with UTF-8 encoding</returns>
+        private static string _getStringUTF8(IntPtr ptr)
+        {
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            // Allows to manage the accents, the cedilla, etc.
+            byte[] bytes = System.Text.Encoding.Default.GetBytes(strANSI);
+            string strUTF8 = System.Text.Encoding.UTF8.GetString(bytes);
+
+            return strUTF8;
+        }
     }
 }
