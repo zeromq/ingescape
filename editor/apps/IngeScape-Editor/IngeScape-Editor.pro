@@ -23,7 +23,7 @@ DEFINES += "VERSION=\\\"$$VERSION\\\""
 DEFINES += DISABLE_LICENSE_TIMEOUT
 
 # Qt modules used by our application and/or its dependencies
-QT += qml quick quick-private svg xml concurrent sql core-private gui-private
+QT += qml quick quick-private svg xml concurrent sql core-private gui-private webview
 
 CONFIG += c++11 precompiled_header
 

@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QtGlobal>
 #include <QDate>
+#include <QtWebView>
 
 #include <I2Quick.h>
 
@@ -352,6 +353,10 @@ int main(int argc, char *argv[])
     {
         qFatal("ERROR: There is no special directory 'Documents' !");
     }
+
+
+    // Initialize the WebView back-end
+    QtWebView::initialize();
 
 
     //------------------------------
