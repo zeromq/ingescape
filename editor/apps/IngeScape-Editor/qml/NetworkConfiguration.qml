@@ -27,8 +27,8 @@ import QtQuick.Controls 2.0 as Controls2
 I2PopupBase {
     id: rootItem
 
-    width: 500
-    height: 500
+    width: 290
+    height: 360
 
     dismissOnOutsideTap: false
 
@@ -62,9 +62,8 @@ I2PopupBase {
         if (IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.isAvailableNetworkDevice(selectedNetworkDevice))
         {
             // Re-Start the Network
-            //var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked);
-            var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked, txtLicensesPath.text);
-            if (success === true)
+            var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice, clearPlatform.checked);
+            if (success)
             {
                 rootItem.close();
             }
@@ -362,141 +361,6 @@ I2PopupBase {
                 }
             }
         }
-
-        Item {
-            id: space4
-
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 30
-        }
-
-        Text {
-            id: titleLicenses
-
-            text: qsTr("Licenses")
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 23
-            }
-        }
-
-        Item {
-            id: space5
-
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 10
-        }
-
-        Row {
-            spacing: 10
-
-            Text {
-                text: qsTr("License path")
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                color: IngeScapeTheme.whiteColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight : Font.Medium
-                    pixelSize : 16
-                }
-            }
-
-            Button {
-                id: btnSelectLicencesDirectory
-
-                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-                activeFocusOnPress: true
-
-                height: boundingBox.height
-                width: boundingBox.width
-
-                text: "Change..."
-
-                style: I2SvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID: releasedID + "-disabled"
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
-                    }
-                    labelColorPressed: IngeScapeTheme.blackColor
-                    labelColorReleased: IngeScapeTheme.whiteColor
-                    labelColorDisabled: IngeScapeTheme.whiteColor
-
-                }
-
-                onClicked: {
-                    if (IngeScapeEditorC.licensesC)
-                    {
-                        var directoryPath = IngeScapeEditorC.licensesC.selectLicensesDirectory();
-                        if (directoryPath) {
-                            txtLicensesPath.text = directoryPath;
-                        }
-                    }
-                }
-            }
-        }
-
-        TextField {
-            id: txtLicensesPath
-
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-            height: 25
-            verticalAlignment: TextInput.AlignVCenter
-
-            text: "" //IngeScapeEditorC.licensesPath
-
-            enabled: false
-
-            style: I2TextFieldStyle {
-                backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                backgroundDisabledColor: IngeScapeTheme.darkBlueGreyColor
-
-                borderColor: IngeScapeTheme.whiteColor
-                borderDisabledColor: IngeScapeTheme.whiteColor
-
-                borderErrorColor: IngeScapeTheme.redColor
-
-                radiusTextBox: 1
-                borderWidth: 0;
-                borderWidthActive: 1
-
-                textIdleColor: IngeScapeTheme.whiteColor
-                textDisabledColor: IngeScapeTheme.whiteColor
-
-                padding.left: 3
-                padding.right: 3
-
-                font {
-                    pixelSize:15
-                    family: IngeScapeTheme.textFontFamily
-                }
-
-            }
-        }
-
     }
 
 
@@ -543,8 +407,6 @@ I2PopupBase {
             }
 
             onClicked: {
-                //console.log("QML: Cancel")
-
                 rootItem.close();
             }
         }
@@ -559,7 +421,6 @@ I2PopupBase {
 
             activeFocusOnPress: true
             text: "OK"
-            //enabled: true
 
             anchors {
                 verticalCenter: parent.verticalCenter
@@ -584,8 +445,6 @@ I2PopupBase {
             }
 
             onClicked: {
-                //console.log("QML: OK")
-
                 rootItem.validate();
             }
         }

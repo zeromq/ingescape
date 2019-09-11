@@ -187,8 +187,7 @@ public:
      * @param hasToClearPlatform
      * @return true when success
      */
-    //Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform);
-    Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform, QString licensesPath);
+    Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform);
 
 
     /**

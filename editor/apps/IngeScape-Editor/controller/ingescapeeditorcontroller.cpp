@@ -649,7 +649,7 @@ bool IngeScapeEditorController::isAgentUsedInPlatform(AgentsGroupedByDefinitionV
  * @param hasToClearPlatform
  * @return true when success
  */
-bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform, QString licensesPath)
+bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform)
 {
     bool success = false;
 
@@ -658,8 +658,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
     if (isUInt && (port > 0))
     {
         // None changes (Same port, same network device and same licenses path)
-        if ((port == _port) && (networkDevice == _networkDevice)
-                && (_licensesC != nullptr) && (licensesPath == _licensesC->licensesPath()))
+        if ((port == _port) && (networkDevice == _networkDevice))
         {
             // Nothing to do
             success = true;
@@ -680,11 +679,6 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
 
             // Save new values
             settings.sync();
-
-
-            // FIXME (restartNetwork): Update the licenses path
-            _licensesC->updateLicensesPath(licensesPath);
-
 
             // Restart IngeScape
             success = _restartIngeScape(hasToClearPlatform);
