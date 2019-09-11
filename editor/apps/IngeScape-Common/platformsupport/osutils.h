@@ -20,7 +20,7 @@
 #include <QtQml>
 #include <QQmlEngine>
 #include <QJSEngine>
-#include <QTranslator>
+#include <QQuickWindow>
 
 #include "I2PropertyHelpers.h"
 
@@ -33,9 +33,14 @@ class OSUtils : public QObject
 {
     Q_OBJECT
 
+    // Current window
+    I2_QML_PROPERTY_DELETE_PROOF(QQuickWindow*, currentWindow)
+
     // Flag indicating if our system is awake
     I2_QML_PROPERTY_READONLY(bool, isAwake)
 
+    // Flag indicating if our user session is locked
+    I2_QML_PROPERTY_READONLY(bool, isUserSessionLocked)
 
     // Flag indicating if we want to prevent energy efficency features (Macos App Nap, etc.)
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, preventEnergyEfficiencyFeatures)
@@ -90,17 +95,41 @@ Q_SIGNALS:
      void systemWake();
 
 
+     /**
+      * @brief Triggered when our user session is locked
+      */
+     void userSessionLocked();
+
+
+     /**
+      * @brief Triggered when our user session is unlocked
+      */
+     void userSessionUnlocked();
+
+
 protected:
     /**
-     * @brief Triggered when we receive a systemSleep signal
+     * @brief Called when we receive a systemSleep signal
      */
     void _onSystemSleep();
 
 
     /**
-     * @brief Triggered when we receive a systemWake signal
+     * @brief Called when we receive a systemWake signal
      */
     void _onSystemWake();
+
+
+    /**
+     * @brief Called when we receive a userSessionLocked signal
+     */
+    void _onUserSessionLocked();
+
+
+    /**
+     * @brief Called when we receive a userSessionUnlocked signal
+     */
+    void _onUserSessionUnlocked();
 
 
 protected:

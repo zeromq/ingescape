@@ -98,10 +98,13 @@ MicrosoftWindowUtils::MicrosoftWindowUtils(QObject *parent)
     : OSUtils(parent),
       _eventFilter(nullptr)
 {
-    _eventFilter = new MicrosoftWindowUtilsEventFilter();
+    // Subscribe to currentWindow changes
+    connect(this, &MicrosoftWindowUtils::currentWindowChanged, this, &MicrosoftWindowUtils::_onCurrentWindowChanged);
 
-    if ((_eventFilter != nullptr) && (QCoreApplication::instance() != nullptr))
+    // Try to install our event filter
+    if (QCoreApplication::instance() != nullptr)
     {
+        _eventFilter = new MicrosoftWindowUtilsEventFilter();
         QCoreApplication::instance()->installNativeEventFilter(_eventFilter);
     }
 }
@@ -112,16 +115,22 @@ MicrosoftWindowUtils::MicrosoftWindowUtils(QObject *parent)
  */
 MicrosoftWindowUtils::~MicrosoftWindowUtils()
 {
+    // Unsubscribe to currentWindow changes
+    disconnect(this, &MicrosoftWindowUtils::currentWindowChanged, this, &MicrosoftWindowUtils::_onCurrentWindowChanged);
+
+
+    // Clean-up our event filter
     if (_eventFilter != nullptr)
     {
         if (QCoreApplication::instance() != nullptr)
         {
             QCoreApplication::instance()->removeNativeEventFilter(_eventFilter);
         }
+        // Else: should not happen because we can not create an event filter without a QCoreApplication
 
         delete _eventFilter;
         _eventFilter = nullptr;
-    }
+    }    
 }
 
 
@@ -141,6 +150,15 @@ MicrosoftWindowUtils* MicrosoftWindowUtils::instance()
 void MicrosoftWindowUtils::removeOSGeneratedMenuItems()
 {
     // Nothing to do: Qt does not add extra menu items on Windows
+}
+
+
+/**
+ * @brief Called when our currentWindow property has changed
+ */
+void MicrosoftWindowUtils::_onCurrentWindowChanged()
+{
+
 }
 
 

@@ -49,7 +49,9 @@ Q_GLOBAL_STATIC(OSUtils, _singletonInstance)
  */
 OSUtils::OSUtils(QObject *parent)
     : QObject(parent),
+      _currentWindow(nullptr),
       _isAwake(true), // We assume that our system is awake
+      _isUserSessionLocked(false), // We assume that our user session is not locked
       _preventEnergyEfficiencyFeatures(false)
 {
     // Force C++ ownership, otherwise our singleton will be owned by the QML engine
@@ -58,6 +60,10 @@ OSUtils::OSUtils(QObject *parent)
     // Subscribe to system power notifications
     connect(this, &OSUtils::systemSleep, this, &OSUtils::_onSystemSleep);
     connect(this, &OSUtils::systemWake, this, &OSUtils::_onSystemWake);
+
+    // Subscribe to user session notifications
+    connect(this, &OSUtils::userSessionLocked, this, &OSUtils::_onUserSessionLocked);
+    connect(this, &OSUtils::userSessionUnlocked, this, &OSUtils::_onUserSessionUnlocked);
 }
 
 
@@ -66,9 +72,16 @@ OSUtils::OSUtils(QObject *parent)
   */
 OSUtils::~OSUtils()
 {
+    // Clean-up properties
+    setcurrentWindow(nullptr);
+
     // Unsubscribe to system power notifications
     disconnect(this, &OSUtils::systemSleep, this, &OSUtils::_onSystemSleep);
     disconnect(this, &OSUtils::systemWake, this, &OSUtils::_onSystemWake);
+
+    // Unsubscribe to user session notifications
+    disconnect(this, &OSUtils::userSessionLocked, this, &OSUtils::_onUserSessionLocked);
+    disconnect(this, &OSUtils::userSessionUnlocked, this, &OSUtils::_onUserSessionUnlocked);
 }
 
 
@@ -154,7 +167,7 @@ void OSUtils::removeOSGeneratedMenuItems()
 //---------------------------------------------------------------------
 
 /**
- * @brief Triggered when we receive a systemSleep signal
+ * @brief Called when we receive a systemSleep signal
  */
 void OSUtils::_onSystemSleep()
 {qDebug() << Q_FUNC_INFO;
@@ -167,7 +180,7 @@ void OSUtils::_onSystemSleep()
 
 
 /**
- * @brief Triggered when we receive a systemWake signal
+ * @brief Called when we receive a systemWake signal
  */
 void OSUtils::_onSystemWake()
 {qDebug() << Q_FUNC_INFO;
@@ -179,6 +192,28 @@ void OSUtils::_onSystemWake()
     {
         _disableEnergyEfficiencyFeatures();
     }
+}
+
+
+/**
+ * @brief Called when we receive a userSessionLocked signal
+ */
+void OSUtils::_onUserSessionLocked()
+{qDebug() << Q_FUNC_INFO;
+    // Update internal state
+    setisUserSessionLocked(true);
+
+    //FIXME: do we need to re-enable energy efficiency features ?
+}
+
+
+/**
+ * @brief Called when we receive a userSessionUnlocked signal
+ */
+void OSUtils::_onUserSessionUnlocked()
+{qDebug() << Q_FUNC_INFO;
+    // Update internal state
+    setisUserSessionLocked(true);
 }
 
 

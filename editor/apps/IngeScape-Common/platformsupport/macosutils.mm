@@ -41,11 +41,16 @@
 
 
 // Subscribe to system power notifications
--(void)subcribeToSystemPowerNotification;
+-(void)subscribeToSystemPowerNotifications;
 
 // Unsubscribe to system power notifications
--(void)unsubcribeToSystemPowerNotification;
+-(void)unsubscribeToSystemPowerNotifications;
 
+// Subscribe to user session notifications
+-(void)subscribeToUserSessionNotifications;
+
+// Unsubscribe to user session notifications
+-(void)unsubscribeToUserSessionNotifications;
 
 // Enable App Nap
 -(void)enableAppNap;
@@ -63,7 +68,7 @@
 //
 @implementation MacosUtilsNative
 
-@synthesize preventAppNapActivity = _preventAppNapActivity;
+@synthesize preventAppNapActivity;
 
 
 // Callback NSWorkspaceWillSleepNotification
@@ -77,7 +82,7 @@
 }
 
 
-// Callback receiveWakeNotification
+// Callback NSWorkspaceDidWakeNotification
 -(void)receiveWakeNotification: (NSNotification*) notification
 {
 #pragma unused(notification)
@@ -88,8 +93,28 @@
 }
 
 
+// Callback "com.apple.screenIsLocked"
+-(void)receiveUserSessionIsLocked
+{
+    if (MacosUtils::instance() != nullptr)
+    {
+        MacosUtils::instance()->userSessionLocked();
+    }
+}
+
+
+// Callback "com.apple.screenIsLocked"
+-(void)receiveUserSessionIsUnlocked
+{
+    if (MacosUtils::instance() != nullptr)
+    {
+        MacosUtils::instance()->userSessionUnlocked();
+    }
+}
+
+
 // Subscribe to system power notifications
--(void)subcribeToSystemPowerNotification
+-(void)subscribeToSystemPowerNotifications
 {
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
                                                         selector: @selector(receiveSleepNotification:)
@@ -106,7 +131,7 @@
 
 
 // Unsubscribe to system power notifications
--(void)unsubcribeToSystemPowerNotification
+-(void)unsubscribeToSystemPowerNotifications
 {
     [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver: self
                                                         name: NSWorkspaceWillSleepNotification
@@ -120,11 +145,40 @@
 }
 
 
+// Subscribe to user session notifications
+-(void)subscribeToUserSessionNotifications
+{
+    [[NSDistributedNotificationCenter defaultCenter] addObserver: self
+                                                     selector: @selector(receiveUserSessionIsLocked)
+                                                     name: @"com.apple.screenIsLocked"
+                                                     object: nil];
+
+    [[NSDistributedNotificationCenter defaultCenter] addObserver: self
+                                                     selector: @selector(receiveUserSessionIsUnlocked)
+                                                     name: @"com.apple.screenIsUnlocked"
+                                                     object: nil];
+}
+
+
+// Unsubscribe to user session notifications
+-(void)unsubscribeToUserSessionNotifications
+{
+    [[NSDistributedNotificationCenter defaultCenter] removeObserver: self
+                                                     name: @"com.apple.screenIsLocked"
+                                                     object: nil];
+
+    [[NSDistributedNotificationCenter defaultCenter] removeObserver: self
+                                                     name: @"com.apple.screenIsUnlocked"
+                                                     object: nil];
+}
+
+
+
 
 // Enable App Nap
 -(void)enableAppNap
 {
-   if (_preventAppNapActivity != nil)
+   if (self.preventAppNapActivity != nil)
    {
        NSProcessInfo* processInfo = [NSProcessInfo processInfo];
        if (
@@ -133,7 +187,7 @@
            [processInfo respondsToSelector:@selector(beginActivityWithOptions:reason:)]
            )
        {
-           _preventAppNapActivity = [processInfo beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
+           self.preventAppNapActivity = [processInfo beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
                                                  reason:@"Disable App Nap from Qt"];
        }
    }
@@ -143,10 +197,10 @@
 // Disbale App Nap
 -(void)disableAppNap
 {
-    if (_preventAppNapActivity != nil) {
+    if (self.preventAppNapActivity != nil) {
 
-        [[NSProcessInfo processInfo] endActivity:_preventAppNapActivity];
-        _preventAppNapActivity = nil;
+        [[NSProcessInfo processInfo] endActivity:self.preventAppNapActivity];
+        self.preventAppNapActivity = nil;
     }
 }
 
@@ -212,7 +266,10 @@ MacosUtils::MacosUtils(QObject* parent)
     _privateAPI->objectiveCAPI = macosUtilsNative;
 
     // Subscribe to system power notifications
-    [_privateAPI->objectiveCAPI subcribeToSystemPowerNotification];
+    [_privateAPI->objectiveCAPI subscribeToSystemPowerNotifications];
+
+    // Subscribe to user session notifications
+    [_privateAPI->objectiveCAPI subscribeToUserSessionNotifications];
 }
 
 
@@ -222,7 +279,13 @@ MacosUtils::MacosUtils(QObject* parent)
 MacosUtils::~MacosUtils()
 {
     // Unubscribe to system power notifications
-    [_privateAPI->objectiveCAPI unsubcribeToSystemPowerNotification];
+    [_privateAPI->objectiveCAPI unsubscribeToSystemPowerNotifications];
+
+    // Unsubscribe to user session notifications
+    [_privateAPI->objectiveCAPI unsubscribeToUserSessionNotifications];
+
+    // Re-enable App Nap
+    [_privateAPI->objectiveCAPI enableAppNap];
 }
 
 

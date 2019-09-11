@@ -83,6 +83,13 @@ public:
     void removeOSGeneratedMenuItems() Q_DECL_OVERRIDE;
 
 
+protected Q_SLOTS:
+    /**
+     * @brief Called when our currentWindow property has changed
+     */
+    void _onCurrentWindowChanged();
+
+
 protected:
     /**
      * @brief Enable energy efficiency features
