@@ -156,7 +156,7 @@ INCLUDEPATH += ../../frameworks/I2Quick/include
 
 
 # Include PGIMCommon library
-!include(../Ingescape-Common/Ingescape-Common.pri) {
+!include(../IngeScape-Common/IngeScape-Common.pri) {
     error(Could not load Ingescape-Common.pri)
 }
 
@@ -307,5 +307,13 @@ win32 {
 unix:!mac {
     message(Linux specific rules)
 
-    # TODO if needed
+    QMAKE_CXXFLAGS -= -Werror
+
+    # Compute the LFLAG associated to our frameworks
+    LIBS += -L../../frameworks/I2Quick/Unix -lI2Quick
+
+    # Copy libraries into the build directory of our application
+    librariesToCopy.files += ../../frameworks/I2Quick/Unix/libI2Quick.$${QMAKE_EXTENSION_SHLIB}
+    librariesToCopy.path = $${DESTDIR}
+    QMAKE_BUNDLE_DATA += librariesToCopy
 }
