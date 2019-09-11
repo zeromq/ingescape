@@ -39,7 +39,7 @@
 #define MAP_NO_DESCRIPTION "NO_DESCRIPTION"
 #define MAP_NO_VERSION "NO_VERSION"
 
-char definitionPath[MAX_PATH] = "";
+char definitionPath[IGS_MAX_PATH] = "";
 
 iopType_t string_to_value_type(const char* str) {
     
@@ -1233,7 +1233,7 @@ int igs_loadDefinitionFromPath (const char* file_path){
         igs_debug("igs_loadDefinitionFromPath : %s caused an error and was ignored\n", file_path);
         return -1;
     }else{
-        strncpy(definitionPath, file_path, MAX_PATH - 1);
+        strncpy(definitionPath, file_path, IGS_MAX_PATH - 1);
         if (igs_internal_definition != NULL){
             definition_freeDefinition(igs_internal_definition);
             igs_internal_definition = NULL;

@@ -351,11 +351,11 @@ void license_readLicense(void){
         WSAStartup(MAKEWORD(2,2), &wsaData);
         //Use GetModuleFileName() to get exec path
         // See comment on define UNICODE in the top of this file, without define UNICODE This lines return NULL String
-        WCHAR temp[MAX_PATH];
-        GetModuleFileName(NULL,temp,MAX_PATH);
+        WCHAR temp[IGS_MAX_PATH];
+        GetModuleFileName(NULL,temp,IGS_MAX_PATH);
             
         //Conversion in char *
-        char pathbuf[MAX_PATH];
+        char pathbuf[IGS_MAX_PATH];
         wcstombs_s(NULL,pathbuf,sizeof(pathbuf),temp,sizeof(temp));
 #endif
         //remove exec name from exec path
