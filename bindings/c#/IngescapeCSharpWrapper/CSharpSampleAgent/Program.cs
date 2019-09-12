@@ -18,6 +18,8 @@ namespace CSharpSampleAgent
 
             Console.WriteLine(" ------------C# agent sample ------------");
 
+            Console.WriteLine("IntPtr.Size = " + IntPtr.Size);
+
             //Intanciate Igs agent middleware
             IgsAgent igsAgent = new IgsAgent();
 

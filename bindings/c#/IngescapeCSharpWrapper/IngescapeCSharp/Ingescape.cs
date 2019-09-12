@@ -107,10 +107,9 @@ namespace Ingescape
         private static extern IntPtr igs_getAgentName();
         public static string getAgentName()
         {
-            string agentName = "";
             IntPtr ptr = igs_getAgentName();
-            agentName = Marshal.PtrToStringAnsi(ptr);
-            return agentName;
+            string str = Marshal.PtrToStringAnsi(ptr);
+            return str;
         }
 
         //control agent state
@@ -120,9 +119,8 @@ namespace Ingescape
         private static extern IntPtr igs_getAgentState();
         public static string getAgentState()
         {
-            string str = "";
             IntPtr ptr = igs_getAgentState();
-            str = Marshal.PtrToStringAnsi(ptr);
+            string str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }
 
@@ -564,36 +562,32 @@ namespace Ingescape
         private static extern IntPtr igs_getDefinition(); //returns json string
         public static string getDefinition()
         {
-            string str = "";
             IntPtr ptr = igs_getDefinition();
-            str = Marshal.PtrToStringAnsi(ptr);
+            string str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getDefinitionName();
         public static string getDefinitionName()
         {
-            string str = "";
             IntPtr ptr = igs_getDefinitionName();
-            str = Marshal.PtrToStringAnsi(ptr);
+            string str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getDefinitionDescription();
         public static string getDefinitionDescription()
         {
-            string str = "";
             IntPtr ptr = igs_getDefinitionDescription();
-            str = Marshal.PtrToStringAnsi(ptr);
+            string str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getDefinitionVersion();
         public static string getDefinitionVersion()
         {
-            string str = "";
             IntPtr ptr = igs_getDefinitionVersion();
-            str = Marshal.PtrToStringAnsi(ptr);
+            string str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -653,36 +647,32 @@ namespace Ingescape
         private static extern IntPtr igs_getMapping(); //returns json string
         public static string getMapping()
         {
-            string str = "";
             IntPtr ptr = igs_getMapping();
-            str = Marshal.PtrToStringAnsi(ptr);
+            string str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getMappingName();
         public static string getMappingName()
         {
-            string str = "";
             IntPtr ptr = igs_getMappingName();
-            str = Marshal.PtrToStringAnsi(ptr);
+            string str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getMappingDescription();
         public static string getMappingDescription()
         {
-            string str = "";
             IntPtr ptr = igs_getMappingDescription();
-            str = Marshal.PtrToStringAnsi(ptr);
+            string str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getMappingVersion(); 
         public static string getMappingVersion()
         {
-            string str = "";
             IntPtr ptr = igs_getMappingVersion();
-            str = Marshal.PtrToStringAnsi(ptr);
+            string str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }       
 
@@ -834,9 +824,8 @@ namespace Ingescape
         private static extern IntPtr igs_getLogPath(); // must be freed by caller
         public static string getLogPath()
         {
-            string str = "";
             IntPtr ptr = igs_getLogPath();
-            str = Marshal.PtrToStringAnsi(ptr);
+            string str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }
 
@@ -871,9 +860,8 @@ namespace Ingescape
         private static extern IntPtr igs_getLicensePath(); // must be freed by caller
         public static string getLicensePath()
         {
-            string str = "";
             IntPtr ptr = igs_getLicensePath();
-            str = Marshal.PtrToStringAnsi(ptr);
+            string str = Marshal.PtrToStringAnsi(ptr);
             return str;
         }
 
