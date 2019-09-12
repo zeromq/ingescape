@@ -172,14 +172,15 @@ namespace CSharpSampleAgent
         {
             /*
              * Input
-             */ 
+             */
             //Write a value
             string str = "helloword-input";
+            //string str = "helloword-é-input";
             Igs.writeInputAsString("string", str);
 
             //Use the generic function to read the value of the input
             IntPtr[] intPtrArray = new IntPtr[1];
-            int size = 0;
+            uint size = 0;
             Igs.readInput("string", intPtrArray, ref size);
             string value = Marshal.PtrToStringAnsi(intPtrArray[0]);
 
@@ -292,6 +293,7 @@ namespace CSharpSampleAgent
 
             //Initialize object
             Foo foo = new Foo();
+            Console.WriteLine("foo X={0}, Y={1} will be written on output", foo.FooX, foo.FooY);
 
             //Serialize object to byte array
             BinaryFormatter bf = new BinaryFormatter();
@@ -300,7 +302,8 @@ namespace CSharpSampleAgent
             fooBytes = ms.ToArray();
 
             //Write on output
-            int size = fooBytes.Length;
+            uint size = (uint)fooBytes.Length;
+            //uint size = Convert.ToUInt32(fooBytes.Length);
             Igs.writeOutputAsData("data-out", fooBytes, size);
 
             //Read data
@@ -311,8 +314,16 @@ namespace CSharpSampleAgent
             BinaryFormatter formatter = new BinaryFormatter();
             MemoryStream msRead = new MemoryStream(data);
             Foo readFoo = (Foo)formatter.Deserialize(msRead);
+            if (readFoo != null)
+            {
+                Console.WriteLine("Foo X={0} Y={1} has been read", readFoo.FooX, readFoo.FooY);
+            }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void memoryleakstest()
         {
             for (int i = 0; i < 1000; i++)
