@@ -165,8 +165,6 @@ Window {
             visible: !rootItem.loadingError
 
             onLoadingChanged: {
-                console.log(loadRequest.url)
-                console.log(loadRequest.status)
                 if (loadRequest.status === 3)
                 {
                     if (loadRequest.url.toString() === rootItem.gettingStartedRemoteUrl)
