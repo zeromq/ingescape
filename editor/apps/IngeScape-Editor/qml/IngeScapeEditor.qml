@@ -135,18 +135,18 @@ Item {
 
 
     Connections {
-        target: IngeScapeEditorC.licensesC
+        target: IngeScapeEditorC.licensesC.mergedLicense
 
         //ignoreUnknownSignals: true
 
-        onIsLicenseValidChanged: {
+        onIngescapeLicenseValidityChanged: {
             console.log("QML (IngeScape Editor): on is License Valid Changed");
             if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.ingescapeLicenseValidity) {
                 openLicensePopup();
             }
         }
 
-        onIsEditorLicenseValidChanged: {
+        onEditorLicenseValidityChanged: {
             console.log("QML (IngeScape Editor): on is Editor License Valid Changed");
             if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.editorLicenseValidity) {
                 openLicensePopup();
