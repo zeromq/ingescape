@@ -41,7 +41,7 @@
 extern "C" {
 #endif
 
-#define IGS_MAX_PATH 2048
+#define IGS_MAX_PATH 4096
 #define MAX_IOP_NAME_LENGTH 256
 #define MAX_AGENT_NAME_LENGTH 256
 #define MAX_DEFINITION_NAME_LENGTH 1024
