@@ -114,6 +114,12 @@ class IngeScapeEditorController : public QObject
     // Flag indicating if a platform has been loaded (opened) by the user or if we are in a "new" or "last" state
     I2_QML_PROPERTY_READONLY(bool, hasAPlatformBeenLoadedByUser)
 
+    // The remote URL to access the latest version of the getting started web page
+    I2_QML_PROPERTY_READONLY(QString, gettingStartedRemoteUrl)
+
+    // The local URL to access the version of the getting started web page that was delivered with the editor
+    I2_QML_PROPERTY_READONLY(QString, gettingStartedLocalUrl)
+
 
 public:
 
@@ -403,6 +409,12 @@ private:
 
     // Default name when creating a new platform
     static const QString DEFAULT_NEW_PLATFORM_NAME;
+
+    // Default remote URL for the getting started page
+    static const QString DEFAULT_REMOTE_URL_GETTING_STARTED;
+
+    // Default local URL for the getting started page
+    static const QString DEFAULT_LOCAL_URL_GETTING_STARTED;
 
 };
 

@@ -31,6 +31,12 @@ const QString IngeScapeEditorController::DEFAULT_LAST_PLATFORM_NAME = "last";
 // Default name when creating a new platform
 const QString IngeScapeEditorController::DEFAULT_NEW_PLATFORM_NAME = "New Platform";
 
+// Default remote URL for the getting started page
+const QString IngeScapeEditorController::DEFAULT_REMOTE_URL_GETTING_STARTED = ""; //FIXME Define default URL ?
+
+// Default local URL for the getting started page
+const QString IngeScapeEditorController::DEFAULT_LOCAL_URL_GETTING_STARTED = ""; //FIXME Define default URL ?
+
 /**
  * @brief Constructor
  * @param parent
@@ -55,6 +61,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _peerNameOfExpe(""),
     _currentPlatformName(DEFAULT_LAST_PLATFORM_NAME),
     _hasAPlatformBeenLoadedByUser(false),
+    _gettingStartedRemoteUrl(""),
+    _gettingStartedLocalUrl(""),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
     _platformDirectoryPath(""),
@@ -136,6 +144,14 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         qDebug() << "No previous platform saved. Try opening 'last.json'.";
         _currentPlatformFilePath = _platformDefaultFilePath;
     }
+
+    //
+    // Settings about "Help"
+    //
+    settings.beginGroup("help");
+    _gettingStartedRemoteUrl = settings.value("remoteUrlGettingStarted", DEFAULT_REMOTE_URL_GETTING_STARTED).toString();
+    _gettingStartedLocalUrl = settings.value("localUrlGettingStarted", DEFAULT_LOCAL_URL_GETTING_STARTED).toString();
+    settings.endGroup();
 
 
     // Create the helper to manage JSON files
@@ -465,8 +481,8 @@ IngeScapeEditorController::~IngeScapeEditorController()
  */
 QObject* IngeScapeEditorController::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
 {
-    Q_UNUSED(engine);
-    Q_UNUSED(scriptEngine);
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
 
     // NOTE: A QObject singleton type instance returned from a singleton type provider is owned by the QML engine.
     // For this reason, the singleton type provider function should not be implemented as a singleton factory.
