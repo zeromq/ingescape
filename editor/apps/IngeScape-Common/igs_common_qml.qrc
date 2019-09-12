@@ -32,5 +32,6 @@
         <file>qml/theme/IngeScapeScrollViewStyle.qml</file>
         <file>qml/LicenseInformationView.qml</file>
         <file>qml/SystemInformationPopup.qml</file>
+        <file>qml/NetworkConnectionInformationItem.qml</file>
     </qresource>
 </RCC>
