@@ -141,14 +141,14 @@ Item {
 
         onIsLicenseValidChanged: {
             console.log("QML (IngeScape Editor): on is License Valid Changed");
-            if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isLicenseValid) {
+            if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.ingescapeLicenseValidity) {
                 openLicensePopup();
             }
         }
 
         onIsEditorLicenseValidChanged: {
             console.log("QML (IngeScape Editor): on is Editor License Valid Changed");
-            if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isEditorLicenseValid) {
+            if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.editorLicenseValidity) {
                 openLicensePopup();
             }
         }
