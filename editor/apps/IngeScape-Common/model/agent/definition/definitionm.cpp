@@ -95,7 +95,7 @@ void DefinitionM::setisMutedOutput(bool isMuted, QString outputName)
 bool DefinitionM::getIsMutedOutput(QString outputName)
 {
     OutputM* output = getOutputWithName(outputName);
-    return output != nullptr && output->isMutedOutput();
+    return (output != nullptr) && output->isMutedOutput();
 }
 
 
