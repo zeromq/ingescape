@@ -408,16 +408,19 @@ private:
     QString _currentPlatformFilePath;
 
     // Default name to save the platform when exiting
-    static const QString DEFAULT_LAST_PLATFORM_NAME;
+    static const QString EXAMPLE_PLATFORM_NAME;
 
     // Default name when creating a new platform
-    static const QString DEFAULT_NEW_PLATFORM_NAME;
+    static const QString NEW_PLATFORM_NAME;
 
     // Default remote URL for the getting started page
     static const QString DEFAULT_REMOTE_URL_GETTING_STARTED;
 
     // Default local URL for the getting started page
     static const QString DEFAULT_LOCAL_URL_GETTING_STARTED;
+
+    // Default name when creating a new platform
+    static const QString SPECIAL_EMPTY_LAST_PLATFORM;
 
 };
 

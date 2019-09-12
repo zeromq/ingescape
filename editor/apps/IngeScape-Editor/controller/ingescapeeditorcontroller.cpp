@@ -25,11 +25,14 @@
 #include <settings/ingescapesettings.h>
 
 
-// Default name to save the platform when exiting
-const QString IngeScapeEditorController::DEFAULT_LAST_PLATFORM_NAME = "last";
+// Name of the example platform to load when no other platform has been loaded yet
+const QString IngeScapeEditorController::EXAMPLE_PLATFORM_NAME = "example";
 
 // Default name when creating a new platform
-const QString IngeScapeEditorController::DEFAULT_NEW_PLATFORM_NAME = "New Platform";
+const QString IngeScapeEditorController::NEW_PLATFORM_NAME = "New Platform";
+
+// Default name when creating a new platform
+const QString IngeScapeEditorController::SPECIAL_EMPTY_LAST_PLATFORM = "empty";
 
 // Default remote URL for the getting started page
 const QString IngeScapeEditorController::DEFAULT_REMOTE_URL_GETTING_STARTED = ""; //FIXME Define default URL ?
@@ -59,7 +62,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _timeLineC(nullptr),
     _peerIdOfExpe(""),
     _peerNameOfExpe(""),
-    _currentPlatformName(DEFAULT_LAST_PLATFORM_NAME),
+    _currentPlatformName(EXAMPLE_PLATFORM_NAME),
     _hasAPlatformBeenLoadedByUser(false),
     _gettingStartedRemoteUrl(""),
     _gettingStartedLocalUrl(""),
@@ -101,8 +104,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     {
         _platformDirectoryPath = platformPath;
 
-        // Init the path to the JSON file to load the last platform
-        _platformDefaultFilePath = QString("%1%2.json").arg(_platformDirectoryPath, DEFAULT_LAST_PLATFORM_NAME);
+        // Init the path to the JSON file to load the example platform
+        _platformDefaultFilePath = QString("%1%2.json").arg(_platformDirectoryPath, EXAMPLE_PLATFORM_NAME);
     }
 
 
@@ -138,13 +141,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Settings about "Platform"
     //
     settings.beginGroup("paltform");
-    _currentPlatformFilePath = settings.value("last", "").toString();
+    _currentPlatformFilePath = settings.value("last", _platformDefaultFilePath).toString();
     settings.endGroup();
-    if (_currentPlatformFilePath.isEmpty())
-    {
-        qDebug() << "No previous platform saved. Try opening 'last.json'.";
-        _currentPlatformFilePath = _platformDefaultFilePath;
-    }
 
     //
     // Settings about "Help"
@@ -297,17 +295,28 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     if (!_currentPlatformFilePath.isEmpty())
     {
-        // Load the platform (agents, mappings, actions, palette, timeline actions)
-        // from the last opened platform (saved in the settings)
-        bool success = _loadPlatformFromFile(_currentPlatformFilePath);
-
-        if (!success) {
+        if (_currentPlatformFilePath == SPECIAL_EMPTY_LAST_PLATFORM)
+        {
+            // Load an empty platform
             qCritical() << "The loading of the last platform failed !";
             clearCurrentPlatform();
-            _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, DEFAULT_NEW_PLATFORM_NAME);
+            _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
         }
-        else {
-            sethasAPlatformBeenLoadedByUser(true);
+        else
+        {
+            // Load the platform (agents, mappings, actions, palette, timeline actions)
+            // from the last opened platform (saved in the settings)
+            bool success = _loadPlatformFromFile(_currentPlatformFilePath);
+
+            if (!success) {
+                qCritical() << "The loading of the last platform failed !";
+                clearCurrentPlatform();
+                _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
+            }
+            else
+            {
+                sethasAPlatformBeenLoadedByUser(true);
+            }
         }
     }
 
@@ -493,7 +502,8 @@ QObject* IngeScapeEditorController::qmlSingleton(QQmlEngine* engine, QJSEngine* 
 
 
 /**
- * @brief IngeScapeEditorController::setgettingStartedShowAtStartup
+ * @brief Custom setter for the gettingStartedShowAtStartup property.
+ * Save the new value to INI file immediatly
  * @param value
  */
 void IngeScapeEditorController::setgettingStartedShowAtStartup(bool value)
@@ -577,7 +587,7 @@ void IngeScapeEditorController::selectFileToSavePlatform()
  */
 void IngeScapeEditorController::savePlatformToCurrentlyLoadedFile()
 {
-    if (!_hasAPlatformBeenLoadedByUser)
+    if (!_hasAPlatformBeenLoadedByUser || (_currentPlatformName == EXAMPLE_PLATFORM_NAME))
     {
         // No platform was loaded. Cannot save to current file.
         selectFileToSavePlatform();
@@ -599,8 +609,8 @@ void IngeScapeEditorController::clearCurrentPlatform()
     qInfo() << "Clear Current Platform (" << _currentPlatformName << ")";
 
     // Update the current platform name
-    setcurrentPlatformName(DEFAULT_NEW_PLATFORM_NAME);
-    _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, DEFAULT_NEW_PLATFORM_NAME);
+    setcurrentPlatformName(NEW_PLATFORM_NAME);
+    _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
     sethasAPlatformBeenLoadedByUser(false);
 
     // Clear the current mapping
@@ -636,7 +646,7 @@ void IngeScapeEditorController::processBeforeClosing()
     IngeScapeSettings &settings = IngeScapeSettings::Instance();
     settings.beginGroup("paltform");
     // Clear the value if we close with an unsaved new platform
-    settings.setValue("last", _hasAPlatformBeenLoadedByUser ? _currentPlatformFilePath : "");
+    settings.setValue("last", _hasAPlatformBeenLoadedByUser ? _currentPlatformFilePath : SPECIAL_EMPTY_LAST_PLATFORM);
     settings.endGroup();
 
     // Save new values
