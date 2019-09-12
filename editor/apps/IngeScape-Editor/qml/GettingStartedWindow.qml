@@ -158,7 +158,7 @@ Window {
                 top: btnCloseEditor.bottom
                 left: parent.left
                 right: parent.right
-                bottom: parent.bottom
+                bottom: showOnStartupCheckbox.top
                 margins: 15
             }
 
@@ -195,7 +195,7 @@ Window {
                 top: btnCloseEditor.bottom
                 left: parent.left
                 right: parent.right
-                bottom: parent.bottom
+                bottom: showOnStartupCheckbox.top
                 margins: 15
             }
 
@@ -211,6 +211,44 @@ Window {
                 family: IngeScapeTheme.textFontFamily
                 pixelSize : 18
                 italic: true
+            }
+        }
+
+        CheckBox {
+            id: showOnStartupCheckbox
+            anchors {
+                left: parent.left
+                leftMargin: 15
+                bottom: parent.bottom
+                bottomMargin: 15
+            }
+
+            checked: IngeScapeEditorC.gettingStartedShowAtStartup
+
+            onCheckedChanged: {
+                IngeScapeEditorC.gettingStartedShowAtStartup = checked
+            }
+
+            activeFocusOnPress: true;
+
+            style: CheckBoxStyle {
+                label: Text {
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        verticalCenterOffset: 1
+                    }
+
+                    color: IngeScapeTheme.lightGreyColor
+
+                    text: "Show this page at startup"
+                    elide: Text.ElideRight
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        pixelSize: 16
+                    }
+
+                }
             }
         }
     }

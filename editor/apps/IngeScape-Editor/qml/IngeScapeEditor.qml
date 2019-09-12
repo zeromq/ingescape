@@ -94,6 +94,13 @@ Item {
     }
 
 
+    // Function allowing to open the Getting Started popup
+    function openGettingStarted() {
+        gettingStartedWindow.resetInternetUrl();
+        gettingStartedWindow.visible = true;
+    }
+
+
     //--------------------------------------------------------
     //
     //
@@ -117,6 +124,12 @@ Item {
         if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.editorLicenseValidity)
         {
             openLicensePopup();
+        }
+
+        // ...we check if we must open the getting started window
+        if (IngeScapeEditorC.gettingStartedShowAtStartup)
+        {
+            openGettingStarted();
         }
     }
 
@@ -535,6 +548,10 @@ Item {
         anchors.centerIn: parent
 
         licenseController: IngeScapeEditorC.licensesC
+    }
+
+    GettingStartedWindow {
+        id: gettingStartedWindow
     }
 
 

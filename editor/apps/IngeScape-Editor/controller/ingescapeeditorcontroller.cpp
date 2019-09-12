@@ -63,6 +63,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _hasAPlatformBeenLoadedByUser(false),
     _gettingStartedRemoteUrl(""),
     _gettingStartedLocalUrl(""),
+    _gettingStartedShowAtStartup(true),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
     _platformDirectoryPath(""),
@@ -151,6 +152,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     settings.beginGroup("help");
     _gettingStartedRemoteUrl = settings.value("remoteUrlGettingStarted", DEFAULT_REMOTE_URL_GETTING_STARTED).toString();
     _gettingStartedLocalUrl = settings.value("localUrlGettingStarted", DEFAULT_LOCAL_URL_GETTING_STARTED).toString();
+    _gettingStartedShowAtStartup = settings.value("showAtStartup", true).toBool();
     settings.endGroup();
 
 
@@ -487,6 +489,30 @@ QObject* IngeScapeEditorController::qmlSingleton(QQmlEngine* engine, QJSEngine* 
     // NOTE: A QObject singleton type instance returned from a singleton type provider is owned by the QML engine.
     // For this reason, the singleton type provider function should not be implemented as a singleton factory.
     return new IngeScapeEditorController();
+}
+
+
+/**
+ * @brief IngeScapeEditorController::setgettingStartedShowAtStartup
+ * @param value
+ */
+void IngeScapeEditorController::setgettingStartedShowAtStartup(bool value)
+{
+    if (value != _gettingStartedShowAtStartup)
+    {
+        _gettingStartedShowAtStartup = value;
+
+        IngeScapeSettings &settings = IngeScapeSettings::Instance();
+        settings.beginGroup("help");
+        // Clear the value if we close with an unsaved new platform
+        settings.setValue("showAtStartup", value);
+        settings.endGroup();
+
+        // Save new values
+        settings.sync();
+
+        Q_EMIT gettingStartedShowAtStartupChanged(value);
+    }
 }
 
 

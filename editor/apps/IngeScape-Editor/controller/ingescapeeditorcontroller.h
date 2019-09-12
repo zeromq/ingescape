@@ -120,6 +120,9 @@ class IngeScapeEditorController : public QObject
     // The local URL to access the version of the getting started web page that was delivered with the editor
     I2_QML_PROPERTY_READONLY(QString, gettingStartedLocalUrl)
 
+    // Flag indicating if we must show the getting started page on startup
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, gettingStartedShowAtStartup)
+
 
 public:
 
