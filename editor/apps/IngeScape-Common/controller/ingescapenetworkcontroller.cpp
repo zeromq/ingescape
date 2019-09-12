@@ -369,7 +369,7 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
                 }
                 break;
 
-            case IGS_NETWORK_DEVICE_AVAILABLE_AGAIN:
+            case IGS_NETWORK_OK:
                 {
                     qInfo() << "Device available again: " << device << " - ingescape agent can be restarted";
                     networkController->networkDeviceIsAvailableAgain();
