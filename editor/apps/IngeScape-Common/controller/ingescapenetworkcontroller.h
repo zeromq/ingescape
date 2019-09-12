@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort    <lemort@ingenuity.io>
  *
  */
 
@@ -45,6 +46,15 @@ class IngeScapeNetworkController: public QObject
 
     // List of available network devices
     I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
+
+    // Flag indicating if our agent is online
+    // NB: false when our agent is not started OR when its network device is no more available
+    I2_QML_PROPERTY_READONLY(bool, isOnline)
+
+    // Flag indicating if we must stop/restart our agent automatically
+    // NB: this flags exists to allow each application based on IngeScape-Common to define its own behavior
+    //     By default, this property is set to false
+    I2_QML_PROPERTY(bool, automaticallyStopRestart)
 
     // Number of each type of IngeScape applications
     I2_QML_PROPERTY_READONLY(int, numberOfAgents)
@@ -85,6 +95,14 @@ public:
      * @brief Stop our IngeScape agent
      */
     void stop();
+
+
+    /**
+     * @brief Restart our ingescape agent
+     *
+     * @return true if our agent has restarted
+     */
+    bool restart();
 
 
     /**
@@ -143,6 +161,24 @@ public:
 
 
 Q_SIGNALS:
+    /**
+     * @brief Triggered when our network device is no more available
+     */
+    void networkDeviceIsNoMoreAvailable();
+
+
+    /**
+     * @brief Triggered when our network device is available again
+     */
+    void networkDeviceIsAvailableAgain();
+
+
+    /**
+     * @brief Triggered when our network device has a new IP address
+     * @param newIpAddress
+     */
+    void networkDeviceIpAddressHasChanged(QString newIpAddress);
+
 
     /**
      * @brief Signal emitted when an "IngeScape Agent" enter the network
@@ -276,7 +312,6 @@ public Q_SLOTS:
 
 
 protected:
-
     // Name of our "IngeScape" agent that correspond to our application
     QString _igsAgentApplicationName;
 
@@ -286,6 +321,10 @@ protected:
     // Hash table from a peer id to a type of IngeScape elements on the network
     QHash<QString, IngeScapeTypes::Value> _hashFromPeerIdToIngeScapeType;
 
+    // Last agruments of start
+    QString _lastArgumentsOfStart_networkDevice;
+    QString _lastArgumentsOfStart_ipAddress;
+    uint _lastArgumentsOfStart_port;
 };
 
 QML_DECLARE_TYPE(IngeScapeNetworkController)

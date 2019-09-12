@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort    <lemort@ingenuity.io>
  *
  */
 
@@ -341,30 +342,58 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
 
 
+/**
+ * @brief Callback for igs_monitor
+ * @param event
+ * @param device
+ * @param ipAddress
+ * @param myData
+ */
 void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData)
 {
-    Q_UNUSED(ipAddress)
-
     IngeScapeNetworkController* networkController = static_cast<IngeScapeNetworkController*>(myData);
     if (networkController != nullptr)
     {
         switch (event)
         {
-            case IGS_NETWORK_OK:
-                qDebug() << "network ok";
+            case IGS_NETWORK_DEVICE_NOT_AVAILABLE:
+                {
+                    qInfo() << "Device not available: " << device << " - ingescape agent must be stopped";
+                    networkController->setisOnline(false);
+                    networkController->networkDeviceIsNoMoreAvailable();
 
-            break;
+                    if (networkController->automaticallyStopRestart())
+                    {
+                        networkController->stop();
+                    }
+                }
+                break;
 
-        case IGS_NETWORK_DEVICE_NOT_AVAILABLE:
-                qDebug() << "device not available" << device;
-                networkController->stop();
-            break;
+            case IGS_NETWORK_DEVICE_AVAILABLE_AGAIN:
+                {
+                    qInfo() << "Device available again: " << device << " - ingescape agent can be restarted";
+                    networkController->networkDeviceIsAvailableAgain();
 
-        case IGS_NETWORK_ADDRESS_CHANGED:
-            qDebug() << "address changed" << device;
-            break;
+                    if (networkController->automaticallyStopRestart())
+                    {
+                        networkController->restart();
+                    }
+                }
+                break;
 
-        default:
+            case IGS_NETWORK_ADDRESS_CHANGED:
+                {
+                    qInfo() << "Device ip address has changed: " << device << " - ingescape agent must be restarted";
+                    networkController->networkDeviceIpAddressHasChanged(QString(ipAddress));
+
+                    if (networkController->automaticallyStopRestart())
+                    {
+                        networkController->restart();
+                    }
+                }
+                break;
+
+            default:
                 break;
         }
     }
@@ -383,6 +412,8 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
  * @param parent
  */
 IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObject(parent),
+    _isOnline(false),
+    _automaticallyStopRestart(true), // TEMP: because no controller handles our new signals
     _numberOfAgents(0),
     _numberOfLaunchers(0),
     _numberOfRecorders(0),
@@ -390,7 +421,10 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
     _numberOfAssessments(0),
     _numberOfExpes(0),
     _igsAgentApplicationName(""),
-    _isIngeScapeAgentStarted(0)
+    _isIngeScapeAgentStarted(0),
+    _lastArgumentsOfStart_networkDevice(""),
+    _lastArgumentsOfStart_ipAddress(""),
+    _lastArgumentsOfStart_port(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -418,6 +452,7 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
 
     igs_loadDefinition(definitionByDefault.toStdString().c_str());
 
+
     //
     // Create our internal mapping
     //
@@ -432,8 +467,11 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
     igs_loadMapping(mappingByDefault.toStdString().c_str());
 
 
+    // Enable IGS monitoring
+    igs_monitoringShallStartStopAgent(false);
     igs_monitor(&onMonitorCallback, this);
-    igs_monitoringEnable(100);
+    igs_monitoringEnable(500);
+
 
     // Begin to observe incoming messages on the bus
     int result = igs_observeBus(&onIncommingBusMessageCallback, this);
@@ -448,6 +486,7 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
  */
 IngeScapeNetworkController::~IngeScapeNetworkController()
 {
+    // Disable IGS monitoring
     igs_monitoringDisable();
 
     // Stop our IngeScape agent
@@ -487,12 +526,19 @@ bool IngeScapeNetworkController::start(QString networkDevice, QString ipAddress,
         // Log status
         if (_isIngeScapeAgentStarted == 1)
         {
+            setisOnline(true);
             qInfo() << "IngeScape Agent" << _igsAgentApplicationName << "started";
         }
         else
         {
+            setisOnline(false);
             qCritical() << "The network has NOT been initialized on" << networkDevice << "or" << ipAddress << "and port" << QString::number(port);
         }
+
+        // Save values
+        _lastArgumentsOfStart_networkDevice = networkDevice;
+        _lastArgumentsOfStart_ipAddress = ipAddress;
+        _lastArgumentsOfStart_port = port;
     }
 
     return _isIngeScapeAgentStarted;
@@ -509,8 +555,19 @@ void IngeScapeNetworkController::stop()
         // Stop network services
         igs_stop();
 
+        setisOnline(false);
         _isIngeScapeAgentStarted = 0;
     }
+}
+
+
+/**
+ * @brief Restart our Ingescape agent
+ */
+bool IngeScapeNetworkController::restart()
+{
+    stop();
+    return start(_lastArgumentsOfStart_networkDevice, _lastArgumentsOfStart_ipAddress, _lastArgumentsOfStart_port);
 }
 
 
