@@ -34,44 +34,6 @@ class LicensesController : public QObject
     // Error message when the IngeScape license is not valid
     I2_QML_PROPERTY_READONLY(QString, errorMessageWhenLicenseFailed)
 
-    // Flag indicating if the IngeScape license is valid
-    I2_QML_PROPERTY_READONLY(bool, isLicenseValid)
-
-    //
-    I2_CPP_NOSIGNAL_PROPERTY(QString, licenseId)
-
-    //
-    I2_QML_PROPERTY_READONLY(QString, licenseCustomer)
-
-    //
-    I2_QML_PROPERTY_READONLY(QString, licenseOrder)
-
-    //
-    I2_QML_PROPERTY_READONLY(QDate, licenseExpirationDate)
-
-    // Flag indicating if the license of our editor is valid
-    I2_QML_PROPERTY_READONLY(bool, isEditorLicenseValid)
-
-    //
-    I2_QML_PROPERTY_READONLY(QString, editorOwner)
-
-    //
-    I2_QML_PROPERTY_READONLY(QDate, editorExpirationDate)
-
-    // Max number of agents in the platform
-    I2_QML_PROPERTY_READONLY(int, maxNbOfAgents)
-
-    // Max number of agents I/O/P in the platform
-    I2_QML_PROPERTY_READONLY(int, maxNbOfIOPs)
-
-    // Names of each feature
-    I2_QML_PROPERTY(QStringList, featureNames)
-
-    // Names of each agent
-    I2_QML_PROPERTY(QStringList, agentNames)
-
-    // FIXME TODO: list of licenseM
-
     // Merged license information
     I2_QML_PROPERTY(LicenseInformationM*, mergedLicense)
 
@@ -130,6 +92,11 @@ public:
      */
     Q_INVOKABLE void importLicense();
 
+    /**
+     * @brief Get the data about licenses
+     */
+    void refreshLicensesData();
+
 
 Q_SIGNALS:
 
@@ -140,11 +107,6 @@ Q_SIGNALS:
 
 
 private:
-
-    /**
-     * @brief Get the data about licenses
-     */
-    void _getLicensesData();
 
 
     /**

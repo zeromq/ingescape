@@ -94,6 +94,13 @@ Item {
     }
 
 
+    // Function allowing to open the Getting Started popup
+    function openGettingStarted() {
+        gettingStartedWindow.resetInternetUrl();
+        gettingStartedWindow.visible = true;
+    }
+
+
     //--------------------------------------------------------
     //
     //
@@ -118,6 +125,12 @@ Item {
         {
             openLicensePopup();
         }
+
+        // ...we check if we must open the getting started window
+        if (IngeScapeEditorC.gettingStartedShowAtStartup)
+        {
+            openGettingStarted();
+        }
     }
 
 
@@ -128,14 +141,14 @@ Item {
 
         onIsLicenseValidChanged: {
             console.log("QML (IngeScape Editor): on is License Valid Changed");
-            if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isLicenseValid) {
+            if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.ingescapeLicenseValidity) {
                 openLicensePopup();
             }
         }
 
         onIsEditorLicenseValidChanged: {
             console.log("QML (IngeScape Editor): on is Editor License Valid Changed");
-            if (IngeScapeEditorC.licensesC && !IngeScapeEditorC.licensesC.isEditorLicenseValid) {
+            if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.editorLicenseValidity) {
                 openLicensePopup();
             }
         }
@@ -535,6 +548,10 @@ Item {
         anchors.centerIn: parent
 
         licenseController: IngeScapeEditorC.licensesC
+    }
+
+    GettingStartedWindow {
+        id: gettingStartedWindow
     }
 
 

@@ -358,7 +358,7 @@ void IngeScapeModelManager::deleteAllActions()
 {
     //qDeleteAll(_hashFromUidToModelOfAction);
 
-    for (ActionM* action : _hashFromUidToModelOfAction)
+    for (ActionM* action : _hashFromUidToModelOfAction.values())
     {
         deleteAction(action);
     }

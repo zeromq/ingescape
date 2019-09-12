@@ -27,8 +27,8 @@ Window {
 
     title: "Getting started"
 
-    property url gettingStartedInternetUrl: "https://ingescape.com/"
-    property url gettingStartedLocalUrl: "file:///tmp/hello.html"
+    property string gettingStartedRemoteUrl: IngeScapeEditorC.gettingStartedRemoteUrl
+    property string gettingStartedLocalUrl: IngeScapeEditorC.gettingStartedLocalUrl
 
     height: minimumHeight
     width: minimumWidth
@@ -38,6 +38,8 @@ Window {
 
     flags: Qt.Dialog
 
+    // Flag indicating if neither the Internet URL nor the locale URL could be loaded
+    property bool loadingError: true
 
     //--------------------------------
     //
@@ -48,15 +50,30 @@ Window {
     // Reset the URL to the Internet URL of the getting started page
     function resetInternetUrl()
     {
-        webview.stop()
-        webview.url = gettingStartedInternetUrl
+        if (rootItem.gettingStartedRemoteUrl !== "")
+        {
+            webview.stop()
+            webview.url = rootItem.gettingStartedRemoteUrl
+        }
+        else
+        {
+            rootItem.switchToLocalUrl()
+        }
+
     }
 
     // Reset the URL to the Internet URL of the getting started page
     function switchToLocalUrl()
     {
-        webview.stop()
-        webview.url = gettingStartedLocalUrl
+        if (rootItem.gettingStartedLocalUrl !== "")
+        {
+            webview.stop()
+            webview.url = rootItem.gettingStartedLocalUrl
+        }
+        else
+        {
+            rootItem.loadingError = true
+        }
     }
 
 
@@ -141,18 +158,98 @@ Window {
                 top: btnCloseEditor.bottom
                 left: parent.left
                 right: parent.right
-                bottom: parent.bottom
+                bottom: showOnStartupCheckbox.top
                 margins: 15
             }
 
+            visible: !rootItem.loadingError
+
             onLoadingChanged: {
-                if ((loadRequest.url === rootItem.gettingStartedInternetUrl) && (loadRequest.status === 3))
+                console.log(loadRequest.url)
+                console.log(loadRequest.status)
+                if (loadRequest.status === 3)
                 {
-                    console.log(qsTr("Fail loading 'Getting Started' internet URL. Switching to local URL."))
-                    rootItem.switchToLocalUrl()
+                    if (loadRequest.url.toString() === rootItem.gettingStartedRemoteUrl)
+                    {
+                        console.log(qsTr("Fail loading 'Getting Started' internet URL. Switching to local URL."))
+                        rootItem.switchToLocalUrl()
+                    }
+                    else if (loadRequest.url.toString() === rootItem.gettingStartedLocalUrl)
+                    {
+                        console.log(qsTr("Fail loading 'Getting Started' local URL. Showing feedback text."))
+                        rootItem.loadingError = true
+                    }
                 }
+                else if (loadRequest.status == 2)
+                {
+                    rootItem.loadingError = false
+                }
+
+            }
+        }
+
+        Text {
+            id: loadingFailedFeedback
+
+            anchors {
+                top: btnCloseEditor.bottom
+                left: parent.left
+                right: parent.right
+                bottom: showOnStartupCheckbox.top
+                margins: 15
             }
 
+            visible: !webview.visible
+
+            text: "Unable to load the 'Getting started' page.\nPlease try using a web browser to access <URL> directly." //FIXME Fallback URL to define
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+
+            color: IngeScapeTheme.whiteColor
+            wrapMode: Text.WordWrap
+            font {
+                family: IngeScapeTheme.textFontFamily
+                pixelSize : 18
+                italic: true
+            }
+        }
+
+        CheckBox {
+            id: showOnStartupCheckbox
+            anchors {
+                left: parent.left
+                leftMargin: 15
+                bottom: parent.bottom
+                bottomMargin: 15
+            }
+
+            checked: IngeScapeEditorC.gettingStartedShowAtStartup
+
+            onCheckedChanged: {
+                IngeScapeEditorC.gettingStartedShowAtStartup = checked
+            }
+
+            activeFocusOnPress: true;
+
+            style: CheckBoxStyle {
+                label: Text {
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        verticalCenterOffset: 1
+                    }
+
+                    color: IngeScapeTheme.lightGreyColor
+
+                    text: "Show this page at startup"
+                    elide: Text.ElideRight
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        pixelSize: 16
+                    }
+
+                }
+            }
         }
     }
 }

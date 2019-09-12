@@ -56,8 +56,7 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
         }
 
         // Update flags
-        licensesController->setisLicenseValid(false);
-        //licensesController->setisEditorLicenseValid(false);
+        licensesController->refreshLicensesData();
     }
 }
 
@@ -75,18 +74,6 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
 LicensesController::LicensesController(QObject *parent) : QObject(parent),
     _licensesPath(""),
     _errorMessageWhenLicenseFailed(""),
-    _isLicenseValid(false),
-    _licenseId(""),
-    _licenseCustomer(""),
-    _licenseOrder(""),
-    _licenseExpirationDate(QDate()),
-    _isEditorLicenseValid(false),
-    _editorOwner(""),
-    _editorExpirationDate(QDate()),
-    _maxNbOfAgents(0),
-    _maxNbOfIOPs(0),
-    _featureNames(QStringList()),
-    _agentNames(QStringList()),
     _mergedLicense(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -116,7 +103,7 @@ LicensesController::LicensesController(QObject *parent) : QObject(parent),
     igs_setLicensePath(_licensesPath.toStdString().c_str());
 
     // Get the data about licenses
-    _getLicensesData();
+    refreshLicensesData();
 
 }
 
@@ -181,7 +168,7 @@ void LicensesController::updateLicensesPath(QString newLicensesPath)
         igs_setLicensePath(_licensesPath.toStdString().c_str());
 
         // Get the data about licenses
-        _getLicensesData();
+        refreshLicensesData();
 
         // Emit the signal "Licenses Updated"
         Q_EMIT licensesUpdated();
@@ -200,7 +187,7 @@ bool LicensesController::deleteLicense(LicenseInformationM* licenseInformation)
     if (licenseDirectory.exists() && licenseDirectory.remove(licenseInformation->fileName()))
     {
         // Success
-        _getLicensesData();
+        refreshLicensesData();
         return true;
     }
 
@@ -233,7 +220,7 @@ bool LicensesController::addLicenses(const QList<QUrl>& licenseUrlList)
         }
     }
 
-    _getLicensesData();
+    refreshLicensesData();
 
     return completeSuccess;
 }
@@ -258,7 +245,7 @@ void LicensesController::importLicense()
         // Do not import from the license path
         if (!importFromLicensePath && _importLicenseFromFile(licenseFile))
         {
-            _getLicensesData();
+            refreshLicensesData();
         }
     }
 
@@ -268,7 +255,7 @@ void LicensesController::importLicense()
 /**
  * @brief Get the data about licenses
  */
-void LicensesController::_getLicensesData()
+void LicensesController::refreshLicensesData()
 {
     // Allows to update data about licenses
     igs_checkLicenseForAgent(nullptr);
@@ -285,92 +272,6 @@ void LicensesController::_getLicensesData()
         setmergedLicense(new LicenseInformationM(license));
         qDebug() << "License information:";
         qDebug() << *_mergedLicense;
-
-        QDateTime licenseExpirationDateTime = QDateTime::fromSecsSinceEpoch(license->licenseExpirationDate);
-        setlicenseExpirationDate(licenseExpirationDateTime.date());
-
-        QDateTime editorExpirationDateTime = QDateTime::fromSecsSinceEpoch(license->editorExpirationDate);
-        seteditorExpirationDate(editorExpirationDateTime.date());
-
-        setmaxNbOfAgents(license->platformNbAgents);
-        setmaxNbOfIOPs(license->platformNbIOPs);
-
-        if (license->isLicenseValid)
-        {
-            setlicenseId(license->id);
-            setlicenseCustomer(license->customer);
-            setlicenseOrder(license->order);
-            setisLicenseValid(true);
-
-            qInfo() << "VALID License: id" << _licenseId << "order" << _licenseOrder << "customer" << _licenseCustomer << "licenseExpirationDate" << _licenseExpirationDate;
-        }
-        else
-        {
-            setlicenseId("");
-            setlicenseCustomer("");
-            setlicenseOrder("");
-            setisLicenseValid(false);
-
-            qInfo() << "IN-valid License: id" << QString(license->id) << "order" << QString(license->order) << "customer" << QString(license->customer) << "licenseExpirationDate" << _licenseExpirationDate;
-        }
-
-        if (license->isEditorLicenseValid)
-        {
-            seteditorOwner(license->editorOwner);
-            setisEditorLicenseValid(true);
-
-            qInfo() << "VALID EDITOR License: editorOwner" << _editorOwner << "editorExpirationDate" << _editorExpirationDate;
-        }
-        else
-        {
-            seteditorOwner("");
-            setisEditorLicenseValid(false);
-
-            qInfo() << "IN-valid EDITOR License: editorOwner" << QString(license->editorOwner) << "editorExpirationDate" << _editorExpirationDate;
-        }
-
-        qDebug() << "Nb MAX Agents" << _maxNbOfAgents << "Nb MAX IOPs" << _maxNbOfIOPs;
-
-
-        //
-        // Features
-        //
-        QStringList featureNamesTemp = QStringList();
-
-        if ((license->features != nullptr) && (zhash_size(license->features) > 0))
-        {
-            zlist_t *keys = zhash_keys(license->features);
-            if (keys != nullptr)
-            {
-                char* key = static_cast<char*>(zlist_first(keys));
-                while (key != nullptr)
-                {
-                    featureNamesTemp.append(QString(key));
-                    key = static_cast<char*>(zlist_next(keys));
-                }
-            }
-            zlist_destroy(&keys);
-        }
-        setfeatureNames(featureNamesTemp);
-        qInfo() << "Features" << _featureNames;
-
-
-        //
-        // Licenses for agents
-        //
-        QStringList agentNamesTemp = QStringList();
-
-        if ((license->agents != nullptr) && (zhash_size(license->agents) > 0))
-        {
-            licenseForAgent_t* agent = static_cast<licenseForAgent_t *>(zhash_first(license->agents));
-            while (agent != nullptr)
-            {
-                agentNamesTemp.append(QString(agent->agentName));
-                agent = static_cast<licenseForAgent_t *>(zhash_next(license->agents));
-            }
-        }
-        setagentNames(agentNamesTemp);
-        qInfo() << "Agents" << _agentNames;
 
         _licenseDetailsList.deleteAllItems();
 

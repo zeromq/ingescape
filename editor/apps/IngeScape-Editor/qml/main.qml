@@ -553,8 +553,7 @@ ApplicationWindow {
                 text: qsTr("Getting started")
 
                 onTriggered: {
-                    gettingStartedWindow.resetInternetUrl();
-                    gettingStartedWindow.visible = true;
+                     applicationLoader.item.openGettingStarted();
                 }
             }
 
@@ -835,9 +834,5 @@ ApplicationWindow {
             // Cancel the closing procedure and keep the editor open
             onCancel: {}
         }
-    }
-
-    GettingStartedWindow {
-        id: gettingStartedWindow
     }
 }

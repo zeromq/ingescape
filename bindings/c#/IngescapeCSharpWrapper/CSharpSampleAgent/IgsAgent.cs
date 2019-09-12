@@ -115,9 +115,13 @@ namespace CSharpSampleAgent
             //Console.WriteLine("Is verbose: " + isVerbose);
 
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string licensePath = string.Format(@"{0}\IngeScape\licenses\", documentsPath);
+            //string licensePath = string.Format(@"{0}\IngeScape\licenses\", documentsPath);
+            string licensePath = string.Format(@"{0}\IngeScape\licenses_aççents_égüe\", documentsPath);
             Console.WriteLine("documentsPath: {0} -- licensePath: {1}", documentsPath, licensePath);
             Igs.setLicensePath(licensePath);
+
+            string checkLicensePath = Igs.getLicensePath();
+            Console.WriteLine("get License Path: '{0}'", checkLicensePath);
 
             ////Color Verbose
             //Igs.setUseColorVerbose(true);

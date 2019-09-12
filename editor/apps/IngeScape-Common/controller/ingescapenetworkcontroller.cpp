@@ -339,6 +339,38 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 }
 
 
+
+
+void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData)
+{
+    Q_UNUSED(ipAddress)
+
+    IngeScapeNetworkController* networkController = static_cast<IngeScapeNetworkController*>(myData);
+    if (networkController != nullptr)
+    {
+        switch (event)
+        {
+            case IGS_NETWORK_OK:
+                qDebug() << "network ok";
+
+            break;
+
+        case IGS_NETWORK_DEVICE_NOT_AVAILABLE:
+                qDebug() << "device not available" << device;
+                networkController->stop();
+            break;
+
+        case IGS_NETWORK_ADDRESS_CHANGED:
+            qDebug() << "address changed" << device;
+            break;
+
+        default:
+                break;
+        }
+    }
+}
+
+
 //--------------------------------------------------------------
 //
 // IngeScape Network Controller
@@ -400,6 +432,9 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
     igs_loadMapping(mappingByDefault.toStdString().c_str());
 
 
+    igs_monitor(&onMonitorCallback, this);
+    igs_monitoringEnable(100);
+
     // Begin to observe incoming messages on the bus
     int result = igs_observeBus(&onIncommingBusMessageCallback, this);
     if (result == 0) {
@@ -413,6 +448,8 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
  */
 IngeScapeNetworkController::~IngeScapeNetworkController()
 {
+    igs_monitoringDisable();
+
     // Stop our IngeScape agent
     stop();
 }
@@ -447,11 +484,13 @@ bool IngeScapeNetworkController::start(QString networkDevice, QString ipAddress,
             _isIngeScapeAgentStarted = igs_startWithIP(ipAddress.toStdString().c_str(), port);
         }
 
+        // Log status
         if (_isIngeScapeAgentStarted == 1)
         {
             qInfo() << "IngeScape Agent" << _igsAgentApplicationName << "started";
         }
-        else {
+        else
+        {
             qCritical() << "The network has NOT been initialized on" << networkDevice << "or" << ipAddress << "and port" << QString::number(port);
         }
     }
