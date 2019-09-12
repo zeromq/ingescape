@@ -51,36 +51,49 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
     assert (iflist);
     const char *name = ziflist_first (iflist);
     while (name) {
-        if (agentElements != NULL && strcmp(name, agentElements->networkDevice) == 0){
-            foundNetworkDevice = true;
-            if (strcmp(agentElements->ipAddress, ziflist_address(iflist)) != 0){
-                //IP address has changed
-                igs_warn("IP address has changed from %s to %s", agentElements->ipAddress, ziflist_address(iflist));
+        // Check if everything is ok
+        if (monitor->status == IGS_NETWORK_OK)
+        {
+            // Network status is ok
 
-                // Call our callbacks
-                DL_FOREACH(monitorCallbacks, cb){
-                    cb->callback_ptr(IGS_NETWORK_ADDRESS_CHANGED, agentElements->networkDevice, ziflist_address(iflist), cb->myData);
-                }
+            // Check if this is the network device of our agent
+            if ((agentElements != NULL)
+                && (strcmp(name, agentElements->networkDevice) == 0)){
+                foundNetworkDevice = true;
 
-                // check if we need to restart it
-                if (monitor_shallStartStopAgent){
-                    unsigned int port = agentElements->zyrePort;
-                    char *networkDevice = strdup(agentElements->networkDevice);
-                    igs_warn("restarting agent after IP address change on %s", networkDevice);
-                    igs_stop();
-                    igs_startWithDevice(networkDevice, port);
-                    free(networkDevice);
+                // Check if IP address has changed
+                if (strcmp(agentElements->ipAddress, ziflist_address(iflist)) != 0){
+                    //IP address has changed
+                    igs_warn("IP address has changed from %s to %s", agentElements->ipAddress, ziflist_address(iflist));
+
+                    // Call our callbacks
+                    DL_FOREACH(monitorCallbacks, cb){
+                        cb->callback_ptr(IGS_NETWORK_ADDRESS_CHANGED, agentElements->networkDevice, ziflist_address(iflist), cb->myData);
+                    }
+
+                    // check if we need to restart it
+                    if (monitor_shallStartStopAgent){
+                        unsigned int port = agentElements->zyrePort;
+                        char *networkDevice = strdup(agentElements->networkDevice);
+                        igs_warn("restarting agent after IP address change on %s", networkDevice);
+                        igs_stop();
+                        igs_startWithDevice(networkDevice, port);
+                        free(networkDevice);
+                    }
                 }
+                break;
             }
-            break;
-        } else if (agentElements == NULL){
-            //agent is stopped
-            if ((monitor->status == IGS_NETWORK_DEVICE_NOT_AVAILABLE)
-                && (monitor->networkDevice != NULL)
+        }
+        else if (monitor->status == IGS_NETWORK_DEVICE_NOT_AVAILABLE)
+        {
+            // Network status is not ok
+
+            // Check if this is the network device used previously
+            if ((monitor->networkDevice != NULL)
                 && (strcmp(name, monitor->networkDevice) == 0)){
                 //device was missing and has come back
                 foundNetworkDevice = true;
-                igs_warn("network device %s has appeared", monitor->networkDevice);
+                igs_warn("network device %s has come back", monitor->networkDevice);
 
                 // Update status
                 monitor->status = IGS_NETWORK_OK;
@@ -93,6 +106,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
                 // check if we need to restart it
                 if (monitor_shallStartStopAgent){
                     igs_warn("restarting agent after network device %s is back", monitor->networkDevice);
+                    igs_stop();
                     igs_startWithDevice(monitor->networkDevice, monitor->port);
                 }
 
@@ -102,12 +116,13 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
             }
             break;
         }
+
         name = ziflist_next (iflist);
     }
     ziflist_destroy (&iflist);
     
-    //NB: if nework device has disappeared, we do not risk detecting an IP address change before
-    //detecting device disappearance.
+    //NB: if network device has disappeared, we do not risk detecting an IP address change before
+    //    detecting device disappearance.
     if (agentElements != NULL
         && !foundNetworkDevice
         && monitor->status != IGS_NETWORK_DEVICE_NOT_AVAILABLE){
