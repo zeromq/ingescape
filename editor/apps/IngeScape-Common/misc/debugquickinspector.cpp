@@ -18,6 +18,8 @@
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 
+#include <QSysInfo>
+
 
 #include <private/qquickwindow_p.h>
 #include <private/qsgrenderloop_p.h>
@@ -37,8 +39,18 @@ DebugQuickInspector::DebugQuickInspector(QObject *parent) : QObject(parent),
     _useOpenGL(false),
     _openGLVendor(""),
     _openGLRenderer(""),
-    _openGLVersion("")
+    _openGLVersion(""),
+    _cpuArchitecture(""),
+    _os(""),
+    _systemInformation("")
 {
+    // CPU architecture
+    setcpuArchitecture(QSysInfo::currentCpuArchitecture());
+
+    // OS
+    setos(QSysInfo::prettyProductName()
+          + " [" + QSysInfo::kernelType()
+          + " version " + QSysInfo::kernelVersion() + "]");
 }
 
 
@@ -371,6 +383,14 @@ void DebugQuickInspector::_initQtQuickInfos()
             setopenGLRenderer("");
             setopenGLVersion("");
         }
+
+
+        // Update system information
+        _updateSystemInformation();
+    }
+    else
+    {
+        _resetQtQuickInfos();
     }
 }
 
@@ -386,5 +406,41 @@ void DebugQuickInspector::_resetQtQuickInfos()
     setopenGLVendor("");
     setopenGLRenderer("");
     setopenGLVersion("");
+
+    // Update system information
+    _updateSystemInformation();
+}
+
+
+/**
+ * @brief Update our systemInformation property
+ */
+void DebugQuickInspector::_updateSystemInformation()
+{
+    QString newSystemInformation = tr("OS: %1").arg(_os)
+                                 + "\n"
+                                 + tr("CPU architecture: %1").arg(_cpuArchitecture)
+                                 + "\n\n"
+                                 + tr("Built with Qt %1").arg(_qtCompilationVersion)
+                                 + "\n"
+                                 + tr("Using Qt %1").arg(_qtRuntimeVersion)
+                                 + "\n\n"
+                                 + tr("Render loop: %1").arg(_renderLoop)
+                                 + "\n"
+                                 + tr("Scene graph backend: %1").arg(_sceneGraphBackend)
+                                 ;
+
+    if (_useOpenGL)
+    {
+        newSystemInformation += "\n"
+                              + tr("- Vendor: %1").arg(_openGLVendor)
+                              + "\n"
+                              + tr(" - Renderer: %1").arg(_openGLRenderer)
+                              + "\n"
+                              + tr(" - Version: %1").arg(_openGLVersion)
+                              ;
+    }
+
+    setsystemInformation(newSystemInformation);
 }
 

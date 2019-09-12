@@ -24,7 +24,6 @@
         <file>qml/timeline/ActionInTimeLine.qml</file>
         <file>qml/timeline/ScenarioTimeLine.qml</file>
         <file>qml/ConfirmationPopup.qml</file>
-        <file>qml/QtQuickInfoPopup.qml</file>
         <file>qml/NetworkPopup.qml</file>
         <file>qml/LicensePopup.qml</file>
         <file>qml/TextAreaWithTimer.qml</file>
@@ -32,5 +31,6 @@
         <file>qml/IngeScapeToolTipComboboxDelegate.qml</file>
         <file>qml/theme/IngeScapeScrollViewStyle.qml</file>
         <file>qml/LicenseInformationView.qml</file>
+        <file>qml/SystemInformationPopup.qml</file>
     </qresource>
 </RCC>

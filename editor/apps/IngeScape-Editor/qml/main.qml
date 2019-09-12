@@ -550,18 +550,36 @@ ApplicationWindow {
             title: qsTr("&Help")
 
             MenuItem {
-                text: qsTr("Qt Quick infos")
+                text: qsTr("Getting started")
 
-                onTriggered: qtQuickInfoPopup.open();
+                onTriggered: {
+                    gettingStartedWindow.resetInternetUrl();
+                    gettingStartedWindow.visible = true;
+                }
+            }
+
+            MenuSeparator {}
+
+            MenuItem {
+                text: qsTr("Report bug...")
+
+                onTriggered: {
+                    //TODO: open a webpage (bug tracking software) or use a simple mailto ?
+                    Qt.openUrlExternally(
+                                         "mailto:contact@ingescape.com?subject=Bug report "
+                                         + Qt.application.name + " v" + Qt.application.version
+                                         + "&body=(write your bug report here)\n\n"
+                                         + "----------------------------------\n"
+                                         + "System information:\n"
+                                         + DebugQuickInspector.systemInformation
+                                         );
+                }
             }
 
             MenuItem {
-                text: "Getting started"
+                text: qsTr("System information...")
 
-                onTriggered: {
-                    gettingStartedWindow.resetInternetUrl()
-                    gettingStartedWindow.visible = true
-                }
+                onTriggered: systemInformationPopup.open();
             }
         }
     }
@@ -788,9 +806,9 @@ ApplicationWindow {
         //
         //----------------------------------
 
-        // Qt Quick infos
-        QtQuickInfoPopup {
-            id: qtQuickInfoPopup
+        // System information
+        SystemInformationPopup {
+            id: systemInformationPopup
         }
 
 

@@ -73,6 +73,16 @@ class DebugQuickInspector : public QObject
     // OpenGL version
     I2_QML_PROPERTY_READONLY(QString, openGLVersion)
 
+    // CPU architecture
+    I2_QML_PROPERTY_READONLY(QString, cpuArchitecture)
+
+    // OS
+    I2_QML_PROPERTY_READONLY(QString, os)
+
+    // System information
+    I2_QML_PROPERTY_READONLY(QString, systemInformation)
+
+
 public:
     /**
      * @brief Default constructor
@@ -146,6 +156,13 @@ protected:
      * @brief Reset Qt Quick infos
      */
     void _resetQtQuickInfos();
+
+
+    /**
+     * @brief Update our systemInformation property
+     */
+    void _updateSystemInformation();
+
 
 protected:
     // Mutex used to update the rendering mode of our window
