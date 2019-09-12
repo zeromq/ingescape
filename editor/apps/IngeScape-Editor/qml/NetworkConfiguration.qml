@@ -86,9 +86,6 @@ I2PopupBase {
         txtPort.text = IngeScapeEditorC.port;
         combobox.selectedIndex = IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices.indexOf(IngeScapeEditorC.networkDevice) : -1;
         clearPlatform.checked = true;
-        if (IngeScapeEditorC.licensesC) {
-            txtLicensesPath.text = IngeScapeEditorC.licensesC.licensesPath;
-        }
 
         // Set the focus to catch keyboard press on Return/Escape
         rootItem.focus = true;
