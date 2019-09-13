@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Ingescape;
+using System;
+using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
-using Ingescape;
 
 namespace CSharpSampleAgent
 {
@@ -91,27 +88,54 @@ namespace CSharpSampleAgent
         public IgsAgent()
         {
             //Load a definition from file
-            Igs.loadDefinitionFromPath("../../../data/igs-csharp-sample-def.json");
+            int success = Igs.loadDefinitionFromPath("../../../data/igs-csharp-sample-def.json");
+            if (success == 1) {
+                Console.WriteLine("The loading of the definition succeeded");
+            }
+            else {
+                Console.WriteLine("ERROR: The loading of the definition failed !");
+            }
+
+            //Igs.setDefinitionName("A (éç) A");
+            string defName = Igs.getDefinitionName();
+            string defDescription = Igs.getDefinitionDescription();
+            Console.WriteLine("Definition: Name = '{0}' -- Description = '{1}'", defName, defDescription);
 
             //Load mapping from file
-            Igs.loadMappingFromPath("../../../data/igs-csharp-sample-mapping.json");
+            success = Igs.loadMappingFromPath("../../../data/igs-csharp-sample-mapping.json");
+            if (success == 1) {
+                Console.WriteLine("The loading of the mapping succeeded");
+            }
+            else {
+                Console.WriteLine("ERROR: The loading of the mapping failed !");
+            }
+
+            //Igs.setMappingName("A (éç) A");
+            string mapName = Igs.getMappingName();
+            string mapDescription = Igs.getMappingDescription();
+            Console.WriteLine("Mapping: Name = '{0}' -- Description = '{1}'", mapName, mapDescription);
 
             //Get mapping version 
             string mappingVersion = Igs.getMappingVersion();
 
             //Get agent name
             string agentName = Igs.getAgentName();
-            Igs.setAgentName("test-é-ç");
+            //Igs.setAgentName("test-é-ç");
 
             // Get agent state
-            string checkAgentName = Igs.getAgentName();
-            Console.WriteLine("Agent name = '{0}'", checkAgentName);
+            //string checkAgentName = Igs.getAgentName();
+            //Console.WriteLine("Agent name = '{0}'", checkAgentName);
 
             // Get agent state
             string agentState = Igs.getAgentState();
 
             //Get network list devices
             string[] netDevicesList = Igs.getNetDevicesList();
+            for (int i = 0; i < netDevicesList.Length; i++)
+            {
+                string netDevice = netDevicesList[i];
+                Console.WriteLine("{0}: {1}", i, netDevice);
+            }
  
             // Verbose
             Igs.setVerbose(true);
@@ -119,8 +143,8 @@ namespace CSharpSampleAgent
             //Console.WriteLine("Is verbose: " + isVerbose);
 
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            //string licensePath = string.Format(@"{0}\IngeScape\licenses\", documentsPath);
-            string licensePath = string.Format(@"{0}\IngeScape\licenses_aççents_égüe\", documentsPath);
+            string licensePath = string.Format(@"{0}\IngeScape\licenses\", documentsPath);
+            //string licensePath = string.Format(@"{0}\IngeScape\licenses_aççents_égüe\", documentsPath);
             Console.WriteLine("documentsPath: {0} -- licensePath: {1}", documentsPath, licensePath);
             Igs.setLicensePath(licensePath);
 
@@ -161,9 +185,14 @@ namespace CSharpSampleAgent
             //Igs.checkLicenseForAgent("");
 
 
+            // getting app parameters
+            string igsNetDevice = ConfigurationManager.AppSettings["igsNetDevice"];
+            //string igsIP = ConfigurationManager.AppSettings["igsIP"];
+            int igsPort = int.Parse(ConfigurationManager.AppSettings["igsNetPort"]);
+            Console.WriteLine("Parameters: Net device='{0}' -- Net port={1}", igsNetDevice, igsPort);
 
             //Start the agent on the network
-            Igs.startWithDevice("Wi-Fi", 5671);
+            Igs.startWithDevice(igsNetDevice, igsPort);
 
             //TODO : implement test of the command line functions
         }

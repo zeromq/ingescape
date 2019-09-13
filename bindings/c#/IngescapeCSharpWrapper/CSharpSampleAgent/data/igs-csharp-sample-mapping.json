@@ -1,7 +1,7 @@
 {
 "mapping": {
-        "name": "CSharp-Sample-Mapping",
-        "description": "",
+        "name": "C#-Sample-Mapping (é ç partï)",
+        "description": "Mapping of C# Sample (é ç partï)",
         "version": "1.0",
         "mapping_out": [{
                    "input_name": "integer",

@@ -1,7 +1,7 @@
 {
 	"definition": {
-		"name": "Csharp-Sample",
-		"description": "this module is the Csharp sample agent",
+		"name": "C#-Sample (é ç partï)",
+		"description": "this module is the C# sample agent (é ç partï)",
 		"version": "1.0",
 		"parameters": [{
                    "name": "integer-param",

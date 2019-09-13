@@ -587,10 +587,14 @@ namespace Ingescape
         private static extern bool igs_checkParameterExistence([MarshalAs(UnmanagedType.LPStr)]  string name);
         public static bool checkParameterExistence(string name) { return igs_checkParameterExistence(name); }
 
-        //////////////////////////////////////////////////
-        //Definitions
 
-        //load / set / get definition
+        //////////////////////////////////////////////////
+        //
+        // Definition
+        // Load / set / get definition
+        //
+        //////////////////////////////////////////////////
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_loadDefinition([MarshalAs(UnmanagedType.LPStr)]  string json_str);
         public static int loadDefinition(string json_str) { return igs_loadDefinition(json_str); }
@@ -608,47 +612,63 @@ namespace Ingescape
         public static string getDefinition()
         {
             IntPtr ptr = igs_getDefinition();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+            return Marshal.PtrToStringAnsi(ptr);
         }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getDefinitionName();
         public static string getDefinitionName()
         {
             IntPtr ptr = igs_getDefinitionName();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+
+            // Return a managed string with default encoding from the unmanaged ANSI string
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            return _stringFromANSI_ToUTF8(strANSI);
         }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getDefinitionDescription();
         public static string getDefinitionDescription()
         {
             IntPtr ptr = igs_getDefinitionDescription();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+
+            // Return a managed string with default encoding from the unmanaged ANSI string
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            return _stringFromANSI_ToUTF8(strANSI);
         }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getDefinitionVersion();
         public static string getDefinitionVersion()
         {
             IntPtr ptr = igs_getDefinitionVersion();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+            return Marshal.PtrToStringAnsi(ptr);
         }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_setDefinitionName([MarshalAs(UnmanagedType.LPStr)] string name);
-        public static int setDefinitionName(string name) { return igs_setDefinitionName(name); }
+        public static int setDefinitionName(string name)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(name);
+            return igs_setDefinitionName(strANSI);
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_setDefinitionDescription([MarshalAs(UnmanagedType.LPStr)] string description);
-        public static int setDefinitionDescription(string description) { return igs_setDefinitionDescription(description); }
+        public static int setDefinitionDescription(string description)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(description);
+            return igs_setDefinitionDescription(strANSI);
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_setDefinitionVersion([MarshalAs(UnmanagedType.LPStr)] string version);
         public static int setDefinitionVersion(string version) { return igs_setDefinitionVersion(version); }
 
 
-        //edit the definition using the API
+        // Edit the definition using the API
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_createInput([MarshalAs(UnmanagedType.LPStr)]  string name, iopType_t value_type, IntPtr value, uint size); //value must be copied in function
         public static int createInput(string name, iopType_t value_type, IntPtr value, uint size) { return igs_createInput(name, value_type, value, size) ;} //value must be copied in function
@@ -673,9 +693,14 @@ namespace Ingescape
         private static extern int igs_removeParameter([MarshalAs(UnmanagedType.LPStr)]  string name);
         public static int removeParameter(string name) { return igs_removeParameter(name); }
 
+
         //////////////////////////////////////////////////
-        //mapping
-        //load / set / get mapping
+        //
+        // Mapping
+        // Load / set / get mapping
+        //
+        //////////////////////////////////////////////////
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_loadMapping([MarshalAs(UnmanagedType.LPStr)]  string json_str);
         public static int loadMapping(string json_str) { return igs_loadMapping(json_str); }
@@ -693,42 +718,57 @@ namespace Ingescape
         public static string getMapping()
         {
             IntPtr ptr = igs_getMapping();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+            return Marshal.PtrToStringAnsi(ptr);
         }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getMappingName();
         public static string getMappingName()
         {
             IntPtr ptr = igs_getMappingName();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+
+            // Return a managed string with default encoding from the unmanaged ANSI string
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            return _stringFromANSI_ToUTF8(strANSI);
         }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getMappingDescription();
         public static string getMappingDescription()
         {
             IntPtr ptr = igs_getMappingDescription();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+
+            // Return a managed string with default encoding from the unmanaged ANSI string
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            return _stringFromANSI_ToUTF8(strANSI);
         }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getMappingVersion(); 
         public static string getMappingVersion()
         {
             IntPtr ptr = igs_getMappingVersion();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+            return Marshal.PtrToStringAnsi(ptr);
         }       
 
-        //edit mapping using the API
+        // Edit the mapping using the API
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_setMappingName([MarshalAs(UnmanagedType.LPStr)] string name);
-        public static int setMappingName(string name) { return igs_setMappingName(name); }
+        public static int setMappingName(string name)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(name);
+            return igs_setMappingName(strANSI);
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_setMappingDescription([MarshalAs(UnmanagedType.LPStr)] string description);
-        public static int setMappingDescription(string description) { return igs_setMappingDescription(description); }
+        public static int setMappingDescription(string description)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(description);
+            return igs_setMappingDescription(strANSI);
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_setMappingVersion([MarshalAs(UnmanagedType.LPStr)] string version);
@@ -752,7 +792,7 @@ namespace Ingescape
 
 
         //////////////////////////////////////////////////
-        //administration, configuration & utilities
+        // Administration, configuration & utilities
 
         //IngeScape library version
         //returns MAJOR*10000 + MINOR*100 + MICRO
@@ -870,8 +910,7 @@ namespace Ingescape
         public static string getLogPath()
         {
             IntPtr ptr = igs_getLogPath();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+            return Marshal.PtrToStringAnsi(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
