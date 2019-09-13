@@ -185,6 +185,20 @@ Item {
 
             controller: IngeScapeEditorC.agentsMappingC
         }
+
+
+        NetworkConnectionInformationItem {
+            id: networkConfigurationInfo
+
+            anchors {
+                top: parent.top
+                topMargin: -1
+                right: parent.right
+                rightMargin: -1
+            }
+
+            isOnline: IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.isOnline
+        }
     }
 
 
