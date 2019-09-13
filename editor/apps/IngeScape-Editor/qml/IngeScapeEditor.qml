@@ -198,6 +198,42 @@ Item {
             }
 
             isOnline: IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.isOnline
+
+            currentNetworkDevice: IngeScapeEditorC.networkDevice
+            currentPort: IngeScapeEditorC.port
+
+            listOfNetworkDevices: IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices : null
+
+
+            onIsEditionModeOpenedChanged: {
+                if (isEditionModeOpened)
+                {
+                    // Update our list of available network devices
+                    if (IngeScapeEditorC.networkC)
+                    {
+                        IngeScapeEditorC.networkC.updateAvailableNetworkDevices();
+                    }
+
+                    // Update selected index
+                    listOfNetworkDevicesSelectedIndex = IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices.indexOf(IngeScapeEditorC.networkDevice) : -1;
+                }
+            }
+
+            onChangeNetworkSettings: {
+                if (IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.isAvailableNetworkDevice(networkDevice))
+                {
+                    // Re-Start the Network
+                    var success = IngeScapeEditorC.restartNetwork(port, networkDevice, clearPlatform);
+                    if (success)
+                    {
+                        networkConfigurationInfo.close();
+                    }
+                    else
+                    {
+                        console.error("Network cannot be (re)started on device " + networkDevice + " and port " + port);
+                    }
+                }
+            }
         }
     }
 
