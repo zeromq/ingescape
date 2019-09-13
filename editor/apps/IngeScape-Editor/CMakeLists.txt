@@ -78,8 +78,10 @@ if (NOT MSVC)
         if(OPT${_OPT}_C)
           set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_OPT}")
         endif()
-	endforeach()
-endif()
+    endforeach()
+else (NOT MSVC)
+    add_definitions(-DNOMINMAX)                 # Does not define min/max macros
+endif(NOT MSVC)
 
 ########################################################################
 # version
