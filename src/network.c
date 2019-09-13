@@ -1840,9 +1840,17 @@ int igs_stop(){
         //cleaning agent
         free (agentElements);
         agentElements = NULL;
+
         #if (defined WIN32 || defined _WIN32)
-        zsys_shutdown();
+        // On Windows, we need to use a sledgehammer to avoid assertion errors
+        // NB: If we don't call zsys_shutdown, the application will crash on exit
+        // (WSASTARTUP assertion failure)
+        // NB: Monitoring also uses a zactor, we can not call zsys_shutdown() when it is running
+        if (!igs_isMonitoringEnabled()) {
+            zsys_shutdown();
+        }
         #endif
+
         igs_info("Agent stopped");
     }else{
         igs_debug("Agent already stopped");

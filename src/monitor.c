@@ -232,6 +232,19 @@ void igs_monitoringDisable(void){
     }
     free(monitor);
     monitor = NULL;
+
+#if (defined WIN32 || defined _WIN32)
+    // On Windows, we need to use a sledgehammer to avoid assertion errors
+    // NB: If we don't call zsys_shutdown, the application will crash on exit
+    // (WSASTARTUP assertion failure)
+    if (agentElements == NULL) {
+        zsys_shutdown();
+    }
+#endif
+}
+
+bool igs_isMonitoringEnabled(){
+    return (monitor != NULL);
 }
 
 void igs_monitor(igs_monitorCallback cb, void *myData){
