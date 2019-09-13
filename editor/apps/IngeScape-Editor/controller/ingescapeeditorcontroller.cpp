@@ -140,7 +140,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
     // Settings about "Platform"
     //
-    settings.beginGroup("paltform");
+    settings.beginGroup("platform");
     _currentPlatformFilePath = settings.value("last", _platformDefaultFilePath).toString();
     settings.endGroup();
 
@@ -644,7 +644,7 @@ void IngeScapeEditorController::processBeforeClosing()
 {
     // Save in the app settings the currently opened platform (to open it at next launch)
     IngeScapeSettings &settings = IngeScapeSettings::Instance();
-    settings.beginGroup("paltform");
+    settings.beginGroup("platform");
     // Clear the value if we close with an unsaved new platform
     settings.setValue("last", _hasAPlatformBeenLoadedByUser ? _currentPlatformFilePath : SPECIAL_EMPTY_LAST_PLATFORM);
     settings.endGroup();
