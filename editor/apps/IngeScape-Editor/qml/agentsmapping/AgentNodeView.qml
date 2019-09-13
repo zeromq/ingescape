@@ -234,7 +234,9 @@ Rectangle {
                     }
                 }
             }
-            cursorShape: Qt.SizeHorCursor
+
+            // Avoid ugly cursor on Macos
+            cursorShape: (Qt.platform.os == "osx") ? Qt.SplitHCursor : Qt.SizeHorCursor
         }
 
         MouseArea {
@@ -257,7 +259,9 @@ Rectangle {
                     }
                 }
             }
-            cursorShape: Qt.SizeHorCursor
+
+            // Avoid ugly cursor on Macos
+            cursorShape: (Qt.platform.os == "osx") ? Qt.SplitHCursor : Qt.SizeHorCursor
         }
 
 
