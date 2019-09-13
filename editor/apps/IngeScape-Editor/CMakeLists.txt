@@ -321,7 +321,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_EDITOR_VERSION_MINOR}")
     set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_EDITOR_VERSION_PATCH}")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
-    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY ${PROJECT_NAME})
 
     # Installers for 32- vs. 64-bit CMake:
     #  - Root install directory (displayed to end user at installer-run time)
