@@ -132,10 +132,15 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
     settings.beginGroup("debug");
 
+#ifdef QT_DEBUG
+    _isAvailableModelVisualizer = true;
+#else
     _isAvailableModelVisualizer = settings.value("modelVisualizer", QVariant(false)).toBool();
+#endif
     qDebug() << "The Model/View Model Visualizer is available ?" << _isAvailableModelVisualizer;
 
     settings.endGroup();
+
 
     //
     // Settings about "Platform"

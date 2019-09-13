@@ -167,25 +167,6 @@ ApplicationWindow {
                 }
             }
 
-            MenuItem {
-                id: menuItemModelVisualizer
-
-                text: ""
-
-                visible: false
-
-                onTriggered: {
-                    if (IngeScapeEditorC.isVisibleModelVisualizer) {
-                        console.log("Hide the Model and View Model Visualizer");
-                        IngeScapeEditorC.isVisibleModelVisualizer = false;
-                    }
-                    else {
-                        console.log("Show the Model and View Model Visualizer");
-                        IngeScapeEditorC.isVisibleModelVisualizer = true;
-                    }
-                }
-            }
-
             MenuSeparator {}
 
             MenuItem {
@@ -463,9 +444,11 @@ ApplicationWindow {
 
         // Debug
         Menu {
-            title: qsTr("Debug Qt Quick")
+            id: menuDebug
 
-            visible: SHOW_DEBUG_MENU
+            title: qsTr("Debug")
+
+            visible: false
 
             ExclusiveGroup {
                 id: visualizeGroup
@@ -540,6 +523,28 @@ ApplicationWindow {
 
                 onTriggered: {
                       DebugQuickInspector.currentWindowRenderingMode = DebugWindowRenderingMode.VisualizeChanges;
+                }
+            }
+
+
+            MenuSeparator {}
+
+            MenuItem {
+                id: menuItemModelVisualizer
+
+                text: ""
+
+                visible: false
+
+                onTriggered: {
+                    if (IngeScapeEditorC.isVisibleModelVisualizer) {
+                        console.log("Hide the Model and View Model Visualizer");
+                        IngeScapeEditorC.isVisibleModelVisualizer = false;
+                    }
+                    else {
+                        console.log("Show the Model and View Model Visualizer");
+                        IngeScapeEditorC.isVisibleModelVisualizer = true;
+                    }
                 }
             }
         }
@@ -751,6 +756,10 @@ ApplicationWindow {
                         return (IngeScapeEditorC.isVisibleModelVisualizer ? qsTr("Hide the model visualizer") : qsTr("Show the model visualizer"));
                     });
                 }
+
+                menuDebug.visible = Qt.binding(function() {
+                   return (SHOW_DEBUG_MENU || IngeScapeEditorC.isAvailableModelVisualizer);
+                });
             }
         }
 
