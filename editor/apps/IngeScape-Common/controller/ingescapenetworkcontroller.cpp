@@ -359,11 +359,31 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
     IngeScapeNetworkController* networkController = static_cast<IngeScapeNetworkController*>(myData);
     if (networkController != nullptr)
     {
+#ifdef Q_OS_WIN
+        QString networkDevice = QString::fromLatin1(device);
+#else
+        QString networkDevice = QString(device);
+#endif
+
         switch (event)
         {
+            case IGS_NETWORK_OK:
+                {
+                    qInfo() << "Device available again: " << networkDevice
+                            << " - ingescape agent can be restarted";
+                    networkController->networkDeviceIsAvailableAgain();
+
+                    if (networkController->automaticallyStopRestart())
+                    {
+                        networkController->restart();
+                    }
+                }
+                break;
+
             case IGS_NETWORK_DEVICE_NOT_AVAILABLE:
                 {
-                    qInfo() << "Device not available: " << device << " - ingescape agent must be stopped";
+                    qInfo() << "Device not available: " << networkDevice
+                            << " - ingescape agent must be stopped";
                     networkController->setisOnline(false);
                     networkController->networkDeviceIsNoMoreAvailable();
 
@@ -374,21 +394,10 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
                 }
                 break;
 
-            case IGS_NETWORK_OK:
-                {
-                    qInfo() << "Device available again: " << device << " - ingescape agent can be restarted";
-                    networkController->networkDeviceIsAvailableAgain();
-
-                    if (networkController->automaticallyStopRestart())
-                    {
-                        networkController->restart();
-                    }
-                }
-                break;
-
             case IGS_NETWORK_ADDRESS_CHANGED:
                 {
-                    qInfo() << "Device ip address has changed: " << device << " - ingescape agent must be restarted";
+                    qInfo() << "IngeScapeNetworkController: device " << networkDevice
+                            << " has a new ip address " << ipAddress << " - ingescape agent must be restarted";
                     networkController->networkDeviceIpAddressHasChanged(QString(ipAddress));
 
                     if (networkController->automaticallyStopRestart())
