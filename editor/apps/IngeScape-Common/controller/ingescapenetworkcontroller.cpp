@@ -20,6 +20,11 @@
 
 #include <memory>
 
+
+#define INGESCAPENETWORKCONTROLLER_IGS_MONITOR_TIMEOUT_IN_MILLISECONDS 500
+
+
+// Suffix used by IngeScape launcher
 static const QString suffix_Launcher = ".ingescapelauncher";
 
 
@@ -467,10 +472,9 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
     igs_loadMapping(mappingByDefault.toStdString().c_str());
 
 
-    // Enable IGS monitoring
+    // Configure IGS monitoring
     igs_monitoringShallStartStopAgent(false);
     igs_monitor(&onMonitorCallback, this);
-    igs_monitoringEnable(500);
 
 
     // Begin to observe incoming messages on the bus
@@ -526,12 +530,24 @@ bool IngeScapeNetworkController::start(QString networkDevice, QString ipAddress,
         // Log status
         if (_isIngeScapeAgentStarted == 1)
         {
+            // Update internal state
             setisOnline(true);
+
+            // Start monitoring if needed
+            if (!igs_isMonitoringEnabled())
+            {
+                igs_monitoringEnable(INGESCAPENETWORKCONTROLLER_IGS_MONITOR_TIMEOUT_IN_MILLISECONDS);
+            }
+
+            // Log
             qInfo() << "IngeScape Agent" << _igsAgentApplicationName << "started";
         }
         else
         {
+            // Update internal state
             setisOnline(false);
+
+            // Log
             qCritical() << "The network has NOT been initialized on" << networkDevice << "or" << ipAddress << "and port" << QString::number(port);
         }
 
@@ -552,9 +568,12 @@ void IngeScapeNetworkController::stop()
 {
     if (_isIngeScapeAgentStarted == 1)
     {
+        qInfo() << "IngeScape Agent" << _igsAgentApplicationName << "will stop";
+
         // Stop network services
         igs_stop();
 
+        // Update internal states
         setisOnline(false);
         _isIngeScapeAgentStarted = 0;
     }
