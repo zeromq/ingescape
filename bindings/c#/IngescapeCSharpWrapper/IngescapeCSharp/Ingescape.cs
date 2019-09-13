@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Ingescape
 {
@@ -99,28 +100,44 @@ namespace Ingescape
 
         // Agent name
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_setAgentName([MarshalAs(UnmanagedType.LPStr)]  string name);
-        public static int setAgentName(string name) { return igs_setAgentName(name); }
+        private static extern int igs_setAgentName([MarshalAs(UnmanagedType.LPStr)] string name);
+        public static int setAgentName(string name)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(name);
+            return igs_setAgentName(strANSI);
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getAgentName();
         public static string getAgentName()
         {
             IntPtr ptr = igs_getAgentName();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+
+            // Return a managed string with default encoding from the unmanaged ANSI string
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            return _stringFromANSI_ToUTF8(strANSI);
         }
 
         // Agent state
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int igs_setAgentState([MarshalAs(UnmanagedType.LPStr)]  string state);
+        private static extern int igs_setAgentState([MarshalAs(UnmanagedType.LPStr)] string state);
+        public static int setAgentState(string state)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(state);
+            return igs_setAgentState(strANSI);
+        }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getAgentState();
         public static string getAgentState()
         {
             IntPtr ptr = igs_getAgentState();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+
+            // Return a managed string with default encoding from the unmanaged ANSI string
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            return _stringFromANSI_ToUTF8(strANSI);
         }
 
         // Mute the agent ouputs
@@ -200,7 +217,11 @@ namespace Ingescape
         public static string readInputAsString(string name)
         {
             IntPtr ptr = igs_readInputAsString(name);
-            return _getStringUTF8(ptr);
+
+            // Return a managed string with default encoding from the unmanaged ANSI string
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            return _stringFromANSI_ToUTF8(strANSI);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -240,7 +261,11 @@ namespace Ingescape
         public static string readOutputAsString(string name)
         {
             IntPtr ptr = igs_readOutputAsString(name);
-            return _getStringUTF8(ptr);
+
+            // Return a managed string with default encoding from the unmanaged ANSI string
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            return _stringFromANSI_ToUTF8(strANSI);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -280,7 +305,11 @@ namespace Ingescape
         public static string readParameterAsString(string name)
         {
             IntPtr ptr = igs_readParameterAsString(name);
-            return _getStringUTF8(ptr);
+
+            // Return a managed string with default encoding from the unmanaged ANSI string
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            return _stringFromANSI_ToUTF8(strANSI);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -318,7 +347,11 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeInputAsString([MarshalAs(UnmanagedType.LPStr)]  string name, [MarshalAs(UnmanagedType.LPStr)] string value);
-        public static int writeInputAsString(string name, string value) { return igs_writeInputAsString(name, value); }
+        public static int writeInputAsString(string name, string value)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(value);
+            return igs_writeInputAsString(name, strANSI);
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeInputAsImpulsion([MarshalAs(UnmanagedType.LPStr)]  string name);
@@ -342,7 +375,11 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeOutputAsString([MarshalAs(UnmanagedType.LPStr)]  string name, [MarshalAs(UnmanagedType.LPStr)] string value);
-        public static int writeOutputAsString(string name, string value) { return igs_writeOutputAsString(name, value); }
+        public static int writeOutputAsString(string name, string value)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(value);
+            return igs_writeOutputAsString(name, strANSI);
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeOutputAsImpulsion([MarshalAs(UnmanagedType.LPStr)]  string name);
@@ -366,7 +403,11 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeParameterAsString([MarshalAs(UnmanagedType.LPStr)]  string name, [MarshalAs(UnmanagedType.LPStr)] string value);
-        public static int writeParameterAsString(string name, string value) { return igs_writeParameterAsString(name, value); }
+        public static int writeParameterAsString(string name, string value)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(value);
+            return igs_writeParameterAsString(name, strANSI);
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeParameterAsData([MarshalAs(UnmanagedType.LPStr)]  string name, byte[] value, uint size);
@@ -865,8 +906,7 @@ namespace Ingescape
         public static string getLicensePath()
         {
             IntPtr ptr = igs_getLicensePath();
-            string str = Marshal.PtrToStringAnsi(ptr);
-            return str;
+            return Marshal.PtrToStringAnsi(ptr);
         }
 
         // Any agent developer can use this function to check the license against her/his agent's unique id.
@@ -884,20 +924,35 @@ namespace Ingescape
 
         #endregion
 
+        #region Helpers
+
         /// <summary>
-        /// Return a managed string with UTF-8 encoding from the unmanaged ANSI string
+        /// Convert string from ANSI to UTF-8.
+        /// Allows to manage the accents, the cedilla, etc.
         /// </summary>
-        /// <param name="ptr"></param>
-        /// <returns>string with UTF-8 encoding</returns>
-        private static string _getStringUTF8(IntPtr ptr)
+        /// <param name="strANSI">ANSI string</param>
+        /// <returns>UTF-8 string</returns>
+        private static string _stringFromANSI_ToUTF8(string strANSI)
         {
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            // Allows to manage the accents, the cedilla, etc.
-            byte[] bytes = System.Text.Encoding.Default.GetBytes(strANSI);
-            string strUTF8 = System.Text.Encoding.UTF8.GetString(bytes);
-
-            return strUTF8;
+            // https://docs.microsoft.com/en-gb/dotnet/api/system.text.encoding.default
+            byte[] bytes = Encoding.Default.GetBytes(strANSI);
+            return Encoding.UTF8.GetString(bytes);
         }
+
+
+        /// <summary>
+        /// Convert string from UTF-8 to ANSI.
+        /// Allows to manage the accents, the cedilla, etc.
+        /// </summary>
+        /// <param name="strUTF8">UTF-8 string</param>
+        /// <returns>ANSI string</returns>
+        private static string _stringFromUTF8_ToANSI(string strUTF8)
+        {
+            // https://docs.microsoft.com/en-gb/dotnet/api/system.text.encoding.default
+            byte[] bytes = Encoding.UTF8.GetBytes(strUTF8);
+            return Encoding.Default.GetString(bytes);
+        }
+
+        #endregion
     }
 }

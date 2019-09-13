@@ -101,9 +101,13 @@ namespace CSharpSampleAgent
 
             //Get agent name
             string agentName = Igs.getAgentName();
-            Igs.setAgentName("test");
+            Igs.setAgentName("test-é-ç");
 
-            //Get agent state
+            // Get agent state
+            string checkAgentName = Igs.getAgentName();
+            Console.WriteLine("Agent name = '{0}'", checkAgentName);
+
+            // Get agent state
             string agentState = Igs.getAgentState();
 
             //Get network list devices
@@ -168,14 +172,17 @@ namespace CSharpSampleAgent
 
         #region Methods
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void readGenericFunctions()
         {
             /*
              * Input
              */
             //Write a value
-            string str = "helloword-input";
-            //string str = "helloword-é-input";
+            //string str = "helloword-input";
+            string str = "helloword-é-ç-input";
             Igs.writeInputAsString("string", str);
 
             //Use the generic function to read the value of the input
@@ -191,7 +198,8 @@ namespace CSharpSampleAgent
              * Output
              */
             //Write a value
-            str = "helloword-out";
+            //str = "helloword-out";
+            str = "helloword-é-ç-output";
             Igs.writeOutputAsString("string-out", str);
 
             //Use the generic function to read the value of the output
@@ -206,7 +214,7 @@ namespace CSharpSampleAgent
              * Parameter
              */
             //Write a value
-            str = "helloword-param";
+            str = "helloword-é-ç-param";
             Igs.writeParameterAsString("string-param", str);
 
             //Use the generic function to read the value of the parameter
