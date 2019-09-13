@@ -20,6 +20,7 @@ SET(CMAKE_C_FLAGS_RELEASE "-O2")
 # Add path to custom macro
 set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/builds/cmake/modules")
 list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR})
+list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/builds/cmake/modules/library") # NSIS templates
 include(IngescapeHelper)
 include(IdentifyOS)
 
@@ -294,11 +295,12 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   if(CMAKE_CL_64)
     set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
     set(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
+    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
   else()
     set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
     set(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
+    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
   endif()
-  set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_NSIS_PACKAGE_NAME}")
 
   # NSIS configuration for Windows
   #see https://cmake.org/cmake/help/v3.14/cpack_gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
@@ -320,10 +322,10 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   #set(CPACK_NSIS_CREATE_ICONS_EXTRA )
   #set(CPACK_NSIS_DELETE_ICONS_EXTRA )
   #set(CPACK_NSIS_MUI_FINISHPAGE_RUN )
-  #set(CPACK_NSIS_MENU_LINKS )
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
   set(CPACK_NSIS_MODIFY_PATH ON)
   set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
+  set(CPACK_NSIS_MENU_LINKS ${CMAKE_PROJECT_HOMEPAGE_URL} "IngeScape Web Site")
 
 
   # see: https://cmake.org/cmake/help/v3.13/cpack_gen/wix.html?highlight=wix

@@ -17,7 +17,6 @@
   Var DO_NOT_ADD_TO_PATH
   Var ADD_TO_PATH_ALL_USERS
   Var ADD_TO_PATH_CURRENT_USER
-  Var INSTALL_DESKTOP
   Var IS_DEFAULT_INSTALLDIR
 ;--------------------------------
 ;Include Modern UI
@@ -683,7 +682,6 @@ Section "-Core installation"
   Push "Contact"
   Push "@CPACK_NSIS_CONTACT@"
   Call ConditionalAddToRegisty
-  !insertmacro MUI_INSTALLOPTIONS_READ $INSTALL_DESKTOP "NSIS.InstallOptions.ini" "Field 5" "State"
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
 
   ;Create shortcuts
@@ -709,9 +707,6 @@ Section "-Core installation"
   Call ConditionalAddToRegisty
   Push "AddToPathCurrentUser"
   Push "$ADD_TO_PATH_CURRENT_USER"
-  Call ConditionalAddToRegisty
-  Push "InstallToDesktop"
-  Push "$INSTALL_DESKTOP"
   Call ConditionalAddToRegisty
 
   !insertmacro MUI_STARTMENU_WRITE_END
@@ -814,9 +809,6 @@ Section "Uninstall"
   ReadRegStr $ADD_TO_PATH_CURRENT_USER SHCTX \
     "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "AddToPathCurrentUser"
   ;MessageBox MB_OK "Add to path: $DO_NOT_ADD_TO_PATH all users: $ADD_TO_PATH_ALL_USERS"
-  ReadRegStr $INSTALL_DESKTOP SHCTX \
-    "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "InstallToDesktop"
-  ;MessageBox MB_OK "Install to desktop: $INSTALL_DESKTOP "
 
 @CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS@
 

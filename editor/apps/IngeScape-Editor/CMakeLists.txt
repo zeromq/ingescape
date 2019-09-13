@@ -43,6 +43,7 @@ set(CMAKE_AUTORCC ON)
 # Add path to custom macro
 set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/../../../builds/cmake/modules")
 list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR})
+list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/../../../builds/cmake/modules/apps") # NSIS templates
 include(IngescapeHelper)
 include(IngescapeEditorHelper)
 
