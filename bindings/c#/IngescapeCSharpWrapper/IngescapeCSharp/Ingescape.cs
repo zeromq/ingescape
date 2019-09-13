@@ -88,6 +88,7 @@ namespace Ingescape
         //4- using an igs_forcedStopCallback (see below) and calling code ON THE MAIN APP THREAD from it
         //In any case, igs_stop MUST NEVER BE CALLED directly from any ingeScape callback, as it would cause a thread deadlock.
         public static bool interrupted;
+
         //register a callback when the agent is forced to stop by the ingescape platform
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_observeForcedStop([MarshalAs(UnmanagedType.FunctionPtr)] igs_forcedStopCallback cb, IntPtr myData);
@@ -144,12 +145,15 @@ namespace Ingescape
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_mute();
         public static int mute() { return igs_mute(); }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_unmute();
         public static int unmute() { return igs_unmute(); }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool igs_isMuted();
         public static bool isMuted() { return igs_isMuted(); }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_observeMute([MarshalAs(UnmanagedType.FunctionPtr)] igs_muteCallback cb, IntPtr myData);
         public static void observeMute(igs_muteCallback cb, IntPtr myData) { igs_observeMute(cb, myData); }
@@ -183,8 +187,11 @@ namespace Ingescape
         private static extern bool igs_canBeFrozen();
         public static bool canBeFrozen() { return igs_canBeFrozen(); }
 
+
         //////////////////////////////////////////////////
-        //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
+        #region Inputs, Outputs and Parameters
+
+        // IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
         // read IOP using void* 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -587,13 +594,13 @@ namespace Ingescape
         private static extern bool igs_checkParameterExistence([MarshalAs(UnmanagedType.LPStr)]  string name);
         public static bool checkParameterExistence(string name) { return igs_checkParameterExistence(name); }
 
+        #endregion
+
 
         //////////////////////////////////////////////////
-        //
-        // Definition
+        #region Definition
+
         // Load / set / get definition
-        //
-        //////////////////////////////////////////////////
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_loadDefinition([MarshalAs(UnmanagedType.LPStr)]  string json_str);
@@ -693,14 +700,14 @@ namespace Ingescape
         private static extern int igs_removeParameter([MarshalAs(UnmanagedType.LPStr)]  string name);
         public static int removeParameter(string name) { return igs_removeParameter(name); }
 
+        #endregion
+
 
         //////////////////////////////////////////////////
-        //
-        // Mapping
+        #region Mapping
+
         // Load / set / get mapping
-        //
-        //////////////////////////////////////////////////
-        
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_loadMapping([MarshalAs(UnmanagedType.LPStr)]  string json_str);
         public static int loadMapping(string json_str) { return igs_loadMapping(json_str); }
@@ -790,6 +797,7 @@ namespace Ingescape
         private static extern int igs_removeMappingEntryWithName([MarshalAs(UnmanagedType.LPStr)]  string fromOurInput, [MarshalAs(UnmanagedType.LPStr)]  string toAgent, [MarshalAs(UnmanagedType.LPStr)]  string withOutput);
         public static int removeMappingEntryWithName(string fromOurInput, string toAgent, string withOutput) { return igs_removeMappingEntryWithName(fromOurInput, toAgent, withOutput); }
 
+        #endregion
 
         //////////////////////////////////////////////////
         // Administration, configuration & utilities
@@ -857,6 +865,7 @@ namespace Ingescape
         public static bool getRequestOutputsFromMappedAgents() { return igs_getRequestOutputsFromMappedAgents(); }
 
 
+        //////////////////////////////////////////////////
         #region Logs
 
         /* Logs policy
@@ -934,6 +943,8 @@ namespace Ingescape
 
         #endregion
 
+
+        //////////////////////////////////////////////////
         #region License
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -963,6 +974,8 @@ namespace Ingescape
 
         #endregion
 
+
+        //////////////////////////////////////////////////
         #region Helpers
 
         /// <summary>
