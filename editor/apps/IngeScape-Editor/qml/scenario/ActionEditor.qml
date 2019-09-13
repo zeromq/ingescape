@@ -165,7 +165,7 @@ WindowBlockTouches {
                 }
             }
 
-            Button {
+            LabellessSvgButton {
                 id: btnCloseEditor
 
                 anchors {
@@ -173,15 +173,10 @@ WindowBlockTouches {
                     right: parent.right
                 }
 
-                activeFocusOnPress: true
+                pressedID: releasedID + "-pressed"
+                releasedID: "closeEditor"
+                disabledID : releasedID
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "closeEditor"
-                    disabledID : releasedID
-                }
 
                 onClicked: {
                     // Close our popup
@@ -673,7 +668,7 @@ WindowBlockTouches {
                                         }
                                     }
 
-                                    Button {
+                                    LabellessSvgButton {
                                         id: btnWarningActionEditor
 
                                         anchors {
@@ -684,16 +679,13 @@ WindowBlockTouches {
 
                                         visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPType !== AgentIOPTypes.OUTPUT)
 
-                                        activeFocusOnPress: true
+
                                         checkable: true
 
-                                        style: LabellessSvgButtonStyle {
-                                            fileCache: IngeScapeTheme.svgFileIngeScape
+                                        pressedID: releasedID + "-pressed"
+                                        releasedID: "warningActionEditor"
+                                        disabledID : releasedID
 
-                                            pressedID: releasedID + "-pressed"
-                                            releasedID: "warningActionEditor"
-                                            disabledID : releasedID
-                                        }
 
                                         onClicked: {
                                             infosBulle.open();
@@ -1034,7 +1026,7 @@ WindowBlockTouches {
 
 
                                 // Delete Effect
-                                Button {
+                                LabellessSvgButton {
                                     id: btnDeleteEffect
 
                                     height : 10
@@ -1045,15 +1037,10 @@ WindowBlockTouches {
                                         margins: 5
                                     }
 
-                                    activeFocusOnPress: true
+                                    pressedID: releasedID + "-pressed"
+                                    releasedID: "closeEditor"
+                                    disabledID : releasedID
 
-                                    style: LabellessSvgButtonStyle {
-                                        fileCache: IngeScapeTheme.svgFileIngeScape
-
-                                        pressedID: releasedID + "-pressed"
-                                        releasedID: "closeEditor"
-                                        disabledID : releasedID
-                                    }
 
                                     onClicked: {
                                         if (panelController && myEffect)
@@ -1068,22 +1055,17 @@ WindowBlockTouches {
                         }
 
                         // Add effect
-                        Button {
+                        LabellessSvgButton {
                             id: addEffects
-
-                            activeFocusOnPress: true
 
                             anchors {
                                 left: parent.left
                             }
 
-                            style: LabellessSvgButtonStyle {
-                                fileCache: IngeScapeTheme.svgFileIngeScape
+                            pressedID: releasedID + "-pressed"
+                            releasedID: "createButton"
+                            disabledID : releasedID
 
-                                pressedID: releasedID + "-pressed"
-                                releasedID: "createButton"
-                                disabledID : releasedID
-                            }
 
                             onClicked: {
                                 if (panelController)
@@ -1645,7 +1627,7 @@ WindowBlockTouches {
 
 
                                 // Delete Condition
-                                Button {
+                                LabellessSvgButton {
                                     id: btnDeleteCondition
 
                                     height : 10
@@ -1656,15 +1638,10 @@ WindowBlockTouches {
                                         margins: 5
                                     }
 
-                                    activeFocusOnPress: true
+                                    pressedID: releasedID + "-pressed"
+                                    releasedID: "closeEditor"
+                                    disabledID : releasedID
 
-                                    style: LabellessSvgButtonStyle {
-                                        fileCache: IngeScapeTheme.svgFileIngeScape
-
-                                        pressedID: releasedID + "-pressed"
-                                        releasedID: "closeEditor"
-                                        disabledID : releasedID
-                                    }
 
                                     onClicked: {
                                         if (panelController && myCondition)
@@ -1677,22 +1654,17 @@ WindowBlockTouches {
                         }
 
                         // add conditions
-                        Button {
+                        LabellessSvgButton {
                             id: addCondition
-
-                            activeFocusOnPress: true
 
                             anchors {
                                 left: parent.left
                             }
 
-                            style: LabellessSvgButtonStyle {
-                                fileCache: IngeScapeTheme.svgFileIngeScape
+                            pressedID: releasedID + "-pressed"
+                            releasedID: "createButton"
+                            disabledID : releasedID
 
-                                pressedID: releasedID + "-pressed"
-                                releasedID: "createButton"
-                                disabledID : releasedID
-                            }
 
                             onClicked: {
                                 if (panelController)

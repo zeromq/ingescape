@@ -891,7 +891,7 @@ Rectangle {
 
 
         // Button to open the definition
-        Button {
+        LabellessSvgButton {
             id: btnOpenDefinition
 
             anchors {
@@ -901,13 +901,12 @@ Rectangle {
                 leftMargin: 10
             }
 
-            style: LabellessSvgButtonStyle {
-                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+            fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                pressedID: releasedID + "-pressed"
-                releasedID: "definition-button"
-                disabledID : releasedID
-            }
+            pressedID: releasedID + "-pressed"
+            releasedID: "definition-button"
+            disabledID : releasedID
+
 
             opacity: rootItem.agentItemIsHovered ? 1 : 0
 
@@ -979,7 +978,7 @@ Rectangle {
 
 
         // Remove button
-        Button {
+        LabellessSvgButton {
             id: btnRemoveFromMapping
 
             anchors {
@@ -998,15 +997,11 @@ Rectangle {
                 NumberAnimation {}
             }
 
-            activeFocusOnPress: true
 
-            style: LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileIngeScape
+            pressedID: releasedID + "-pressed"
+            releasedID: "delete"
+            disabledID : releasedID
 
-                pressedID: releasedID + "-pressed"
-                releasedID: "delete"
-                disabledID : releasedID
-            }
 
             onClicked: {
                 if (controller)

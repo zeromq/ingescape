@@ -428,7 +428,7 @@ Item {
 
 
             // Button "Remove"
-            Button {
+            LabellessSvgButton {
                 id: removeButton
 
                 anchors {
@@ -440,15 +440,10 @@ Item {
 
                 visible: mouseAreaRecordItem.containsMouse || removeButton.hovered
 
-                activeFocusOnPress: true
+                releasedID: "delete"
+                pressedID: releasedID + "-pressed"
+                disabledID: releasedID
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    releasedID: "delete"
-                    pressedID: releasedID + "-pressed"
-                    disabledID: releasedID
-                }
 
                 onClicked: {
                     if (controller)
@@ -461,7 +456,7 @@ Item {
 
 
             // Button "Play"
-            Button {
+            LabellessSvgButton {
                 id: playButton
 
                 anchors {
@@ -471,18 +466,14 @@ Item {
                     bottomMargin: 35
                 }
 
-                activeFocusOnPress: true
 
                 visible: controller && ((controller.replayState === ReplayStates.LOADED) || (controller.replayState === ReplayStates.PAUSED))
                          && recordItem._isCurrentReplay
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
+                releasedID: "list-play"
+                pressedID: releasedID + "-pressed"
+                disabledID: releasedID
 
-                    releasedID: "list-play"
-                    pressedID: releasedID + "-pressed"
-                    disabledID: releasedID
-                }
 
                 onClicked: {
                     if (controller) {
@@ -502,7 +493,7 @@ Item {
 
 
             // Button "Pause"
-            Button {
+            LabellessSvgButton {
                 id: pauseButton
 
                 anchors {
@@ -515,15 +506,10 @@ Item {
                 visible: rootItem._isPlayingOrResumingReplay
                          && recordItem._isCurrentReplay
 
-                activeFocusOnPress: true
+                releasedID: "pause"
+                pressedID: releasedID + "-pressed"
+                disabledID: releasedID
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    releasedID: "pause"
-                    pressedID: releasedID + "-pressed"
-                    disabledID: releasedID
-                }
 
                 onClicked: {
                     if (controller)
@@ -536,7 +522,7 @@ Item {
 
 
             // Button "Rewind"
-            Button {
+            LabellessSvgButton {
                 id: rewindButton
 
                 anchors {
@@ -549,15 +535,10 @@ Item {
                 visible: controller && ((controller.replayState === ReplayStates.PAUSED) || rootItem._isPlayingOrResumingReplay)
                          && recordItem._isCurrentReplay
 
-                activeFocusOnPress: true
+                releasedID: "list-rewind"
+                pressedID: releasedID + "-pressed"
+                disabledID: releasedID
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    releasedID: "list-rewind"
-                    pressedID: releasedID + "-pressed"
-                    disabledID: releasedID
-                }
 
                 onClicked: {
                     if (controller)
@@ -570,7 +551,7 @@ Item {
 
 
             // Options button
-            Button {
+            LabellessSvgButton {
                 id: btnOptions
 
                 anchors {
@@ -580,15 +561,10 @@ Item {
                     bottomMargin: 10
                 }
 
-                activeFocusOnPress: true
+                releasedID: "button-options"
+                pressedID: releasedID + "-pressed"
+                disabledID : releasedID
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    releasedID: "button-options"
-                    pressedID: releasedID + "-pressed"
-                    disabledID : releasedID
-                }
 
                 onClicked: {
                     console.log("QML: Open options...");

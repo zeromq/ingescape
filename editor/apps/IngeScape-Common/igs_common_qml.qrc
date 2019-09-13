@@ -33,5 +33,6 @@
         <file>qml/LicenseInformationView.qml</file>
         <file>qml/SystemInformationPopup.qml</file>
         <file>qml/NetworkConnectionInformationItem.qml</file>
+        <file>qml/widgets/LabellessSvgButton.qml</file>
     </qresource>
 </RCC>

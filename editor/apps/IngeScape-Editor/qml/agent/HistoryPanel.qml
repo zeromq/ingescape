@@ -131,7 +131,7 @@ WindowBlockTouches {
 
 
 
-        Button {
+        LabellessSvgButton {
             id: btnClose
 
             anchors {
@@ -140,15 +140,10 @@ WindowBlockTouches {
                 rightMargin: 20
             }
 
-            activeFocusOnPress: true
+            pressedID: releasedID + "-pressed"
+            releasedID: "closeEditor"
+            disabledID : releasedID
 
-            style: LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileIngeScape
-
-                pressedID: releasedID + "-pressed"
-                releasedID: "closeEditor"
-                disabledID : releasedID
-            }
 
             onClicked: {
                 // Close our popup

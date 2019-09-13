@@ -162,7 +162,7 @@ Window {
         color: IngeScapeTheme.editorsBackgroundColor
 
 
-        Button {
+        LabellessSvgButton {
             id: btnCloseEditor
 
             anchors {
@@ -171,15 +171,10 @@ Window {
                 rightMargin: 20
             }
 
-            activeFocusOnPress: true
+            pressedID: releasedID + "-pressed"
+            releasedID: "closeEditor"
+            disabledID : releasedID
 
-            style: LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileIngeScape
-
-                pressedID: releasedID + "-pressed"
-                releasedID: "closeEditor"
-                disabledID : releasedID
-            }
 
             onClicked: {
                 // Close our popup
@@ -602,27 +597,23 @@ Window {
                                             width: rootItem.widthsOfColumns[4]
                                             height: parent.height
 
-                                            Button {
+                                            LabellessSvgButton {
                                                 id: btnMuteOutput
-                                                visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
-                                                enabled: visible
-                                                activeFocusOnPress: true
 
                                                 anchors {
                                                     verticalCenter: parent.verticalCenter
                                                     right : parent.right
                                                 }
 
-                                                style: LabellessSvgButtonStyle {
-                                                    fileCache: IngeScapeTheme.svgFileIngeScape
+                                                visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
+                                                enabled: visible
 
-                                                    pressedID: releasedID + "-pressed"
-                                                    //releasedID: model.isMutedOutput ? "active-mute" : "inactive-mute"
-                                                    releasedID: model.isMuted ? "active-mute" : "inactive-mute"
 
-                                                    disabledID : releasedID
+                                                pressedID: releasedID + "-pressed"
+                                                //releasedID: model.isMutedOutput ? "active-mute" : "inactive-mute"
+                                                releasedID: model.isMuted ? "active-mute" : "inactive-mute"
 
-                                                }
+                                                disabledID : releasedID
 
                                                 onClicked: {
                                                     model.QtObject.changeMuteOutput();

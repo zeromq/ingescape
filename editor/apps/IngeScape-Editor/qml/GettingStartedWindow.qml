@@ -106,7 +106,7 @@ Window {
         color: IngeScapeTheme.editorsBackgroundColor
 
 
-        Button {
+        LabellessSvgButton {
             id: btnCloseEditor
 
             anchors {
@@ -115,15 +115,11 @@ Window {
                 rightMargin: 20
             }
 
-            activeFocusOnPress: true
 
-            style: LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileIngeScape
+            pressedID: releasedID + "-pressed"
+            releasedID: "closeEditor"
+            disabledID : releasedID
 
-                pressedID: releasedID + "-pressed"
-                releasedID: "closeEditor"
-                disabledID : releasedID
-            }
 
             onClicked: {
                 // Close our popup

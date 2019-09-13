@@ -131,7 +131,7 @@ Item {
             NumberAnimation { target: chooseMappingType; property: "opacity"; from: 1; to: 0; duration: 500 }
         }
 
-        Button {
+        LabellessSvgButton {
             id: activeMappingBtn
 
             anchors {
@@ -141,16 +141,13 @@ Item {
                 bottomMargin: 23
             }
 
-            activeFocusOnPress: true
             checkable: true
 
-            style: LabellessSvgButtonStyle {
-                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+            fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                pressedID: releasedID + "-pressed"
-                releasedID: IngeScapeEditorC.modelManager.isMappingConnected ? "connect-on" : "connect-off"
-                disabledID : releasedID
-            }
+            pressedID: releasedID + "-pressed"
+            releasedID: IngeScapeEditorC.modelManager.isMappingConnected ? "connect-on" : "connect-off"
+            disabledID : releasedID
 
             onClicked: {
                 IngeScapeEditorC.modelManager.isMappingConnected = checked;
@@ -175,20 +172,18 @@ Item {
                 bottomMargin: 64 + (IngeScapeEditorC.modelManager.isMappingControlled ? 0 : 2)
             }
 
-            Button {
+            LabellessSvgButton {
                 id: typeMappingBtn
+
                 visible: true
 
-                activeFocusOnPress: true
                 checkable: true
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: IngeScapeEditorC.modelManager.isMappingControlled ? "control" : "observe"
-                    disabledID : releasedID
-                }
+                pressedID: releasedID + "-pressed"
+                releasedID: IngeScapeEditorC.modelManager.isMappingControlled ? "control" : "observe"
+                disabledID : releasedID
 
                 onClicked: {
                     openAnimation.running = true;

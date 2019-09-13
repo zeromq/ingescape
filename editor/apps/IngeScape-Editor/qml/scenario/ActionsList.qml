@@ -200,9 +200,8 @@ Item {
                 leftMargin: 10
             }
 
-            Button {
+            LabellessSvgButton {
                 id: btnAddAction
-                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -210,13 +209,12 @@ Item {
 
                 enabled: (IngeScapeEditorC.modelManager && (IngeScapeEditorC.modelManager.allAgentsGroupsByName.count > 0))
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "new-agent"
-                    disabledID : releasedID + "-disabled"
-                }
+                pressedID: releasedID + "-pressed"
+                releasedID: "new-agent"
+                disabledID : releasedID + "-disabled"
+
 
                 onClicked: {
                     if (!rootItem.isEditorLicenseValid
@@ -246,24 +244,21 @@ Item {
                 rightMargin: 10
             }
 
-            Button {
+            LabellessSvgButton {
                 id: btnRemoveAction
-
-                enabled: false
-                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                enabled: false
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "delete-all"
-                    disabledID : releasedID + "-disabled"
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                }
+                pressedID: releasedID + "-pressed"
+                releasedID: "delete-all"
+                disabledID : releasedID + "-disabled"
+
 
                 onClicked: {
                     console.log("Supprimer Action")

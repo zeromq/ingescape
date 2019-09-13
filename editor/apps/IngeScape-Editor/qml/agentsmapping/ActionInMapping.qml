@@ -720,7 +720,7 @@ Item {
         //------------------------------------------
 
         // Button to open the action editor
-        Button {
+        LabellessSvgButton {
             id: btnOpenEditor
 
             anchors {
@@ -732,13 +732,12 @@ Item {
                 horizontalCenter: parent.left
             }
 
-            style: LabellessSvgButtonStyle {
-                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+            fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                pressedID: releasedID + "-pressed"
-                releasedID: "definition-button"
-                disabledID : releasedID
-            }
+            pressedID: releasedID + "-pressed"
+            releasedID: "definition-button"
+            disabledID : releasedID
+
 
             opacity: rootItem.actionItemIsHovered ? 1 : 0
 
@@ -810,7 +809,7 @@ Item {
 
 
         // Remove button
-        Button {
+        LabellessSvgButton {
             id: btnRemoveFromMapping
 
             anchors {
@@ -831,15 +830,11 @@ Item {
                 NumberAnimation {}
             }
 
-            activeFocusOnPress: true
 
-            style: LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileIngeScape
+            pressedID: releasedID + "-pressed"
+            releasedID: "delete"
+            disabledID : releasedID
 
-                pressedID: releasedID + "-pressed"
-                releasedID: "delete"
-                disabledID : releasedID
-            }
 
             onClicked: {
                 if (controller)

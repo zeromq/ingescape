@@ -209,24 +209,21 @@ Item {
                 leftMargin: 10
             }
 
-            Button {
+            LabellessSvgButton {
                 id: btnAddAgent
-
-                enabled:false
-                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                enabled:false
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "new-agent"
-                    disabledID : releasedID + "-disabled"
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                }
+                pressedID: releasedID + "-pressed"
+                releasedID: "new-agent"
+                disabledID : releasedID + "-disabled"
+
 
                 onClicked: {
                     console.log("Create a new Agent")
@@ -243,22 +240,19 @@ Item {
                 color : IngeScapeTheme.blueGreyColor
             }
 
-            Button {
+            LabellessSvgButton {
                 id: btnImportAgentOrAgentsList
 
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
-                activeFocusOnPress: true
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "import"
-                    disabledID : releasedID + "-disabled"
+                pressedID: releasedID + "-pressed"
+                releasedID: "import"
+                disabledID : releasedID + "-disabled"
 
-                }
 
                 onClicked: {
                     if (rootItem.isEditorLicenseValid)
@@ -294,23 +288,21 @@ Item {
             }
 
 
-            Button {
+            LabellessSvgButton {
                 id: btnExportAgentsList
-
-                enabled: visible && (agentsSupervisionController.agentsList.count > 0)
-                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                enabled: visible && (agentsSupervisionController.agentsList.count > 0)
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "export"
-                    disabledID : releasedID + "-disabled"
-                }
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "export"
+                disabledID : releasedID + "-disabled"
+
 
                 onClicked: {
                     if (rootItem.isEditorLicenseValid) {
@@ -338,24 +330,21 @@ Item {
             }
 
 
-            Button {
+            LabellessSvgButton {
                 id: btnRemoveAgent
-
-                enabled: false
-                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                enabled: false
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "delete-all"
-                    disabledID : releasedID + "-disabled"
 
-                }
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "delete-all"
+                disabledID : releasedID + "-disabled"
 
                 onClicked: {
                     console.log("Remove Agent")

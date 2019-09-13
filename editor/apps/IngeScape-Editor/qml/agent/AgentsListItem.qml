@@ -122,7 +122,7 @@ Item {
         }
 
         // Remove button
-        Button {
+        LabellessSvgButton {
             id: removeButton
 
             anchors {
@@ -135,15 +135,10 @@ Item {
             visible: (model.isON === false)
             opacity: agentItemIsHovered ? 1 : 0
 
-            activeFocusOnPress: true
+            releasedID: "delete"
+            pressedID: releasedID + "-pressed"
+            disabledID : releasedID
 
-            style: LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileIngeScape
-
-                releasedID: "delete"
-                pressedID: releasedID + "-pressed"
-                disabledID : releasedID
-            }
 
             onClicked: {
                 if (IngeScapeEditorC.isAgentUsedInPlatform(rootItem.agent))
@@ -414,20 +409,17 @@ Item {
             spacing: 5
 
             // Button Mute
-            Button {
+            LabellessSvgButton {
                 id: muteButton
 
                 visible: model.isON
 
-                activeFocusOnPress: true
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                pressedID: releasedID + "-pressed"
+                releasedID: model.isMuted ? "active-mute" : "inactive-mute"
+                disabledID : releasedID
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: model.isMuted ? "active-mute" : "inactive-mute"
-                    disabledID : releasedID
-                }
 
                 onClicked: {
                     if (rootItem.isEditorLicenseValid)
@@ -442,22 +434,19 @@ Item {
             }
 
             // Button ON/OFF
-            Button {
+            LabellessSvgButton {
                 id: btnOnOff
 
                 // Agent is "ON" OR Agent can be restarted
                 visible: (rootItem.agent && (rootItem.agent.isON || rootItem.agent.canBeRestarted))
                 enabled: visible
 
-                activeFocusOnPress: true
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                pressedID: releasedID + "-pressed"
+                releasedID: model.isON ? "on" : "off"
+                disabledID : releasedID
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: model.isON ? "on" : "off"
-                    disabledID : releasedID
-                }
 
                 onClicked: {
                     if (rootItem.isEditorLicenseValid)
@@ -487,21 +476,18 @@ Item {
             spacing: 5
 
             // Button Freeze
-            Button {
+            LabellessSvgButton {
                 id: freezeButton
 
                 visible: model.canBeFrozen && model.isON
                 enabled : visible
 
-                activeFocusOnPress: true
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                pressedID: releasedID + "-pressed"
+                releasedID: model.isFrozen ? "active-freeze" : "inactive-freeze"
+                disabledID : releasedID
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: model.isFrozen ? "active-freeze" : "inactive-freeze"
-                    disabledID : releasedID
-                }
 
                 onClicked: {
                     if (rootItem.isEditorLicenseValid)
@@ -516,20 +502,15 @@ Item {
             }
 
             // Options button
-            Button {
+            LabellessSvgButton {
                 id: btnOptions
 
                 visible: model.isON
 
-                activeFocusOnPress: true
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    releasedID: "button-options"
-                    pressedID: releasedID + "-pressed"
-                    disabledID : releasedID
-                }
+                releasedID: "button-options"
+                pressedID: releasedID + "-pressed"
+                disabledID : releasedID
 
                 onClicked: {
                     // Open the popup with options

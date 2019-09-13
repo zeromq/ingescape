@@ -324,26 +324,21 @@ Item {
                         }
 
                         // Remove button
-                        Button {
+                        LabellessSvgButton {
                             id: removeButton
-
-                            visible: (model.isON === false)
-                            opacity: (removeButton.hovered || mouseAreaToolTip.containsMouse) ? 1.0 : 0.0
-
-                            activeFocusOnPress: true
 
                             anchors {
                                 top: parent.top
                                 right : parent.right
                             }
 
-                            style: LabellessSvgButtonStyle {
-                                fileCache: IngeScapeTheme.svgFileIngeScape
+                            visible: (model.isON === false)
+                            opacity: (removeButton.hovered || mouseAreaToolTip.containsMouse) ? 1.0 : 0.0
 
-                                pressedID: releasedID + "-pressed"
-                                releasedID: "delete"
-                                disabledID : releasedID
-                            }
+
+                            pressedID: releasedID + "-pressed"
+                            releasedID: "delete"
+                            disabledID : releasedID
 
 
                             onClicked: {
@@ -362,7 +357,7 @@ Item {
             }
 
             // Button Options
-            Button {
+            LabellessSvgButton {
                 id: btnOptions
 
                 anchors {
@@ -372,15 +367,10 @@ Item {
                     rightMargin: 10
                 }
 
-                activeFocusOnPress: true
+                pressedID: releasedID + "-pressed"
+                releasedID: "button-options"
+                disabledID : releasedID
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button-options"
-                    disabledID : releasedID
-                }
 
                 onClicked: {
                     // console.log("QML: Open options...");
@@ -394,13 +384,8 @@ Item {
             }
 
             // Stream button
-            Button {
+            LabellessSvgButton {
                 id: streamButton
-
-                visible: model.canProvideStream
-
-                activeFocusOnPress: true
-                enabled: visible
 
                 anchors {
                     right: parent.right
@@ -408,13 +393,17 @@ Item {
                     rightMargin: 5
                 }
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                visible: model.canProvideStream
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: model.isStreaming ? "on" : "off"
-                    disabledID : releasedID
-                }
+                enabled: visible
+
+
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+
+                pressedID: releasedID + "-pressed"
+                releasedID: model.isStreaming ? "on" : "off"
+                disabledID : releasedID
+
 
                 onClicked: {
                     if (model.isStreaming)

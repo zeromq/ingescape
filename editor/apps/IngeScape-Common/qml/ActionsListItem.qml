@@ -189,22 +189,16 @@ Item {
 
             spacing: 12
 
-            Button {
+            LabellessSvgButton {
                 id: playButton
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                activeFocusOnPress: true
-
                 visible: rootItem.actionItemIsHovered
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "list-play"
-                    disabledID: releasedID
-                }
+                pressedID: releasedID + "-pressed"
+                releasedID: "list-play"
+                disabledID: releasedID
 
                 onClicked: {
                     console.log("QML: play action '" + rootItem.action.name + "'");
@@ -214,23 +208,17 @@ Item {
                 }
             }
 
-            Button {
+            LabellessSvgButton {
                 id: removeButton
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                activeFocusOnPress: true
-
                 //visible: rootItem.actionItemIsSelected
                 visible: rootItem.actionItemIsHovered
 
-                style: LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileIngeScape
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "delete"
-                    disabledID: releasedID
-                }
+                pressedID: releasedID + "-pressed"
+                releasedID: "delete"
+                disabledID: releasedID
 
                 onClicked: {
                     if (controller && rootItem.action)

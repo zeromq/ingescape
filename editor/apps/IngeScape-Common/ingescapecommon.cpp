@@ -194,17 +194,19 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterType(QUrl("qrc:/qml/ConfirmationPopup.qml"), "INGESCAPE", 1, 0, "ConfirmationPopup");
     qmlRegisterType(QUrl("qrc:/qml/LicensePopup.qml"), "INGESCAPE", 1, 0, "LicensePopup");
     qmlRegisterType(QUrl("qrc:/qml/NetworkPopup.qml"), "INGESCAPE", 1, 0, "NetworkPopup");
-
-    // - Qt Quick info Popup
     qmlRegisterType(QUrl("qrc:/qml/SystemInformationPopup.qml"), "INGESCAPE", 1, 0, "SystemInformationPopup");
 
     // - Text area with timer to delay processing of edited text while the user is editing it
     qmlRegisterType(QUrl("qrc:/qml/TextAreaWithTimer.qml"), "INGESCAPE", 1, 0, "TextAreaWithTimer");
 
+    // - Network configuration information
+    qmlRegisterType(QUrl("qrc:/qml/NetworkConnectionInformationItem.qml"), "INGESCAPE", 1, 0, "NetworkConnectionInformationItem");
 
     // - Timeline
     qmlRegisterType(QUrl("qrc:/qml/timeline/ActionInTimeLine.qml"), "INGESCAPE", 1, 0, "ActionInTimeLine");
     qmlRegisterType(QUrl("qrc:/qml/timeline/ScenarioTimeLine.qml"), "INGESCAPE", 1, 0, "ScenarioTimeLine");
 
+    // - Widgets
+    qmlRegisterType(QUrl("qrc:/qml/widgets/LabellessSvgButton.qml"), "INGESCAPE", 1, 0, "LabellessSvgButton");
 }
 

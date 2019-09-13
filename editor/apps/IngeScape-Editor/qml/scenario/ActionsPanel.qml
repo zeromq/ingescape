@@ -169,7 +169,7 @@ Item {
 
 
 
-                Button {
+                LabellessSvgButton {
                     id: btnremoveAction
 
                     anchors {
@@ -180,15 +180,12 @@ Item {
                     visible : model.modelM !== null
                     enabled : visible
 
-                    activeFocusOnPress: true
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
-                    style: LabellessSvgButtonStyle {
-                        fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "removeActionInPalette"
+                    disabledID : releasedID
 
-                        pressedID: releasedID + "-pressed"
-                        releasedID: "removeActionInPalette"
-                        disabledID : releasedID
-                    }
 
                     onClicked: {
                         if (controller) {
