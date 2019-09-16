@@ -367,7 +367,7 @@ I2CustomRectangle {
 
                     elide: Text.ElideRight
 
-                    text: (root.isOnline) ? qsTr("Connected on %1").arg(root.currentNetworkDevice+" kkkkkkkkkkkkkkkkkkkk")
+                    text: (root.isOnline) ? qsTr("Connected on %1").arg(root.currentNetworkDevice)
                                           : qsTr("Offline")
                 }
 
