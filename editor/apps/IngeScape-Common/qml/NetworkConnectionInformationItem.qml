@@ -255,7 +255,7 @@ I2CustomRectangle {
 
         width: (rootPrivate.isEditionModeOpened)
                ? 300
-               : Math.min(textConnectionInfo.implicitWidth + textConnectionInfo.anchors.rightMargin + buttons.width, 300)
+               : Math.min(300, Math.max(textInfoPart1.implicitWidth, textInfoPart2.implicitWidth) + columnInfo.anchors.rightMargin + buttons.width)
 
 
         Behavior on width {
@@ -338,8 +338,8 @@ I2CustomRectangle {
 
 
             // Infos
-            Text {
-                id: textConnectionInfo
+            Column {
+                id: columnInfo
 
                 anchors {
                     left: parent.left
@@ -347,24 +347,79 @@ I2CustomRectangle {
                     rightMargin: 20
                 }
 
-                color: IngeScapeTheme.whiteColor
+                spacing: 0
 
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Medium
-                    pixelSize: 18
+                Text {
+                    id: textInfoPart1
+
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    color: IngeScapeTheme.whiteColor
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight: Font.Medium
+                        pixelSize: 18
+                    }
+
+                    elide: Text.ElideRight
+
+                    text: (root.isOnline) ? qsTr("Connected on %1").arg(root.currentNetworkDevice+" kkkkkkkkkkkkkkkkkkkk")
+                                          : qsTr("Offline")
                 }
 
-                elide: Text.ElideRight
+                Item {
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
 
-                text: (root.isOnline) ? qsTr("Connected on %1\nwith port %2").arg(root.currentNetworkDevice).arg(root.currentPort)
-                                      : qsTr("Offline")
+                    height: (root.isOnline) ? textInfoPart2.height : 0
 
-                Behavior on height {
-                    enabled: rootPrivate.canPerformAnimations
+                    visible: (height !== 0)
 
-                    NumberAnimation {
-                        duration: root.animationDuration
+                    clip: (height !== textConnectedPort.height)
+
+                    opacity: (root.isOnline) ? 1 : 0
+
+                    Behavior on height {
+                        enabled: rootPrivate.canPerformAnimations
+
+                        NumberAnimation {
+                            duration: root.animationDuration
+                        }
+                    }
+
+                    Behavior on opacity {
+                        enabled: rootPrivate.canPerformAnimations
+
+                        NumberAnimation {
+                            duration: root.animationDuration
+                        }
+                    }
+
+                    Text {
+                        id: textInfoPart2
+
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                        }
+
+                        color: IngeScapeTheme.whiteColor
+
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            weight: Font.Medium
+                            pixelSize: 18
+                        }
+
+                        elide: Text.ElideRight
+
+                        text: qsTr("with port %1").arg(root.currentPort)
                     }
                 }
             }
