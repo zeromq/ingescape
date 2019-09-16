@@ -15,7 +15,7 @@ import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Window 2.3
-import QtWebView 1.1
+import QtWebEngine 1.8
 
 import I2Quick 1.0
 
@@ -39,7 +39,10 @@ Window {
     flags: Qt.Dialog
 
     // Flag indicating if neither the Internet URL nor the locale URL could be loaded
-    property bool loadingError: true
+    property bool loadingError: false
+
+    // Signal emitted when the page is loaded or failed to load
+    signal loadingComplete(bool success);
 
     //--------------------------------
     //
@@ -52,11 +55,13 @@ Window {
     {
         if (rootItem.gettingStartedRemoteUrl !== "")
         {
+            console.log("Reset Internet URL")
             webview.stop()
             webview.url = rootItem.gettingStartedRemoteUrl
         }
         else
         {
+            console.log("Empty internet URL -> Switch to local URL")
             rootItem.switchToLocalUrl()
         }
 
@@ -68,11 +73,13 @@ Window {
         if (rootItem.gettingStartedLocalUrl !== "")
         {
             webview.stop()
+            console.log("Reset Local URL")
             webview.url = rootItem.gettingStartedLocalUrl
         }
         else
         {
-            rootItem.loadingError = true
+            console.log("Empty local URL -> Loading failed")
+            loadingComplete(false)
         }
     }
 
@@ -85,6 +92,10 @@ Window {
 
     Component.onCompleted: {
         resetInternetUrl();
+    }
+
+    onLoadingComplete: {
+        rootItem.loadingError = !success
     }
 
 
@@ -137,7 +148,7 @@ Window {
                 leftMargin: 18
             }
 
-            text: webview.title === "" ? "Getting started" : webview.title
+            text: rootItem.loadingError ? "Getting started" : webview.title
             elide: Text.ElideRight
             color: IngeScapeTheme.whiteColor
 
@@ -148,7 +159,7 @@ Window {
             }
         }
 
-        WebView {
+        WebEngineView {
             id: webview
             anchors {
                 top: btnCloseEditor.bottom
@@ -156,6 +167,10 @@ Window {
                 right: parent.right
                 bottom: showOnStartupCheckbox.top
                 margins: 15
+            }
+
+            profile: WebEngineProfile {
+                offTheRecord: true
             }
 
             visible: !rootItem.loadingError
@@ -171,12 +186,12 @@ Window {
                     else if (loadRequest.url.toString() === rootItem.gettingStartedLocalUrl)
                     {
                         console.log(qsTr("Fail loading 'Getting Started' local URL. Showing feedback text."))
-                        rootItem.loadingError = true
+                        loadingComplete(false)
                     }
                 }
                 else if (loadRequest.status == 2)
                 {
-                    rootItem.loadingError = false
+                    loadingComplete(true)
                 }
 
             }

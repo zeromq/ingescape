@@ -54,6 +54,10 @@ Item {
     //
     //--------------------------------------------------------
 
+    // Flag indicating if an explicit request to open the Getting Started window has been performed.
+    // Avoid opening the window at startup is none of the internet or the local page if accessible.
+    property bool requestGettingStarted: false
+
 
 
     //--------------------------------------------------------
@@ -94,9 +98,13 @@ Item {
 
 
     // Function allowing to open the Getting Started popup
-    function openGettingStarted() {
+    function openGettingStarted(forceOpen) {
+        // Default forceOpen parameter value
+        if (forceOpen === undefined) forceOpen = false
+
+        rootItem.requestGettingStarted = forceOpen;
+
         gettingStartedWindow.resetInternetUrl();
-        gettingStartedWindow.visible = true;
     }
 
 
@@ -602,6 +610,14 @@ Item {
     //
     GettingStartedWindow {
         id: gettingStartedWindow
+
+        onLoadingComplete: {
+            if ((success && IngeScapeEditorC.gettingStartedShowAtStartup)
+                    || rootItem.requestGettingStarted)
+            {
+                gettingStartedWindow.visible = true
+            }
+        }
     }
 
 

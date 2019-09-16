@@ -561,7 +561,7 @@ ApplicationWindow {
                 text: qsTr("Getting started")
 
                 onTriggered: {
-                     applicationLoader.item.openGettingStarted();
+                     applicationLoader.item.openGettingStarted(true);
                 }
             }
 
