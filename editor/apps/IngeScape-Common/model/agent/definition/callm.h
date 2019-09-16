@@ -25,7 +25,6 @@ extern "C" {
 
 #include <model/enums.h>
 
-
 /**
  * @brief Model class representing an ingescape call.
  */
@@ -35,7 +34,8 @@ class CallM : public QObject
 
     I2_QML_PROPERTY_READONLY(QString, name)
     I2_QML_PROPERTY_READONLY(QString, description)
-    Q_PROPERTY(QHash<QString, AgentIOPValueTypes::Value> arguments READ arguments CONSTANT)
+    I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, arguments)
+    I2_QML_PROPERTY_READONLY(QStringList, argumentNames)
     I2_QML_PROPERTY_READONLY_DELETE_PROOF(CallM*, reply)
 
 public:
@@ -55,13 +55,10 @@ public:
     virtual ~CallM();
 
     /**
-     * @brief Accessor for the arguments property
+     * @brief Return the arguments as a QHash
      * @return
      */
-    QHash<QString, AgentIOPValueTypes::Value> arguments() const { return _arguments; }
-
-private:
-    QHash<QString, AgentIOPValueTypes::Value> _arguments;
+    QHash<QString, AgentIOPValueTypes::Value> argumentsHash() const;
 };
 
 /**

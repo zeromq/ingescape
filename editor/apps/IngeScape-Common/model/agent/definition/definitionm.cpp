@@ -410,13 +410,13 @@ DefinitionM* DefinitionM::copy()
             {
                 copyOfReply = new CallM(iterator->reply()->name()
                                         , iterator->reply()->description()
-                                        , iterator->reply()->arguments()
+                                        , iterator->reply()->argumentsHash()
                                         , nullptr);
             }
 
             CallM* copyOfCall = new CallM(iterator->name()
                                           , iterator->description()
-                                          , iterator->arguments()
+                                          , iterator->argumentsHash()
                                           , copyOfReply);
 
             copiesOfCalls.append(copyOfCall);

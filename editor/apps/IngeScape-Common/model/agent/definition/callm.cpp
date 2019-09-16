@@ -31,12 +31,21 @@ CallM::CallM(const QString& name
     , _name(name)
     , _description(description)
     , _reply(nullptr)
-    , _arguments(arguments)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     setreply(reply);
+
+    _argumentNames = arguments.keys();
+    _arguments = new QQmlPropertyMap();
+    if (_arguments != nullptr)
+    {
+        for(auto argIt = arguments.begin() ; argIt != arguments.end() ; ++argIt)
+        {
+            _arguments->setProperty(argIt.key().toStdString().c_str(), argIt.value());
+        }
+    }
 }
 
 /**
@@ -51,7 +60,28 @@ CallM::~CallM()
         delete temp;
     }
 
-    _arguments.clear();
+    if (_arguments != nullptr)
+    {
+        QQmlPropertyMap* temp = _arguments;
+        setarguments(nullptr);
+        delete temp;
+    }
+
+    _argumentNames.clear();
+}
+
+/**
+ * @brief Return the arguments as a QHash
+ * @return
+ */
+QHash<QString, AgentIOPValueTypes::Value> CallM::argumentsHash() const
+{
+    QHash<QString, AgentIOPValueTypes::Value> arguments;
+    for(QString argName : _argumentNames)
+    {
+        arguments.insert(argName, static_cast<AgentIOPValueTypes::Value>(_arguments->value(argName).toInt()));
+    }
+    return arguments;
 }
 
 /**
@@ -64,7 +94,7 @@ bool operator==(const CallM& left, const CallM& right)
 {
     return left.name() == right.name()
             && left.description() == right.description()
-            && left.arguments() == right.arguments()
+            && left.argumentsHash() == right.argumentsHash()
             && ( (left.reply() == right.reply())
                  || ( (left.reply() != nullptr) && (right.reply() != nullptr) && (*(left.reply()) == *(right.reply())) ) );
 }

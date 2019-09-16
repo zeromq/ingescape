@@ -338,9 +338,12 @@ Window {
             //---------------------------------------
             Repeater {
                 id: tabRepeater
+
+                property bool definitionHasCalls: definition && definition.callsList && definition.callsList.count > 0
+
                 model : {
                     var model = [ qsTr("Inputs"), qsTr("Outputs"), qsTr("Parameters") ]
-                    if (definition && definition.callsList && definition.callsList.count > 0) {
+                    if (tabRepeater.definitionHasCalls) {
                         model.push(qsTr("Calls"))
                     }
                     return model;
@@ -448,11 +451,13 @@ Window {
                             style: IngeScapeScrollViewStyle {
                             }
 
-                            // Content of our scrollview
+
                             ListView {
-                                id : listView
+                                id : listViewIOPs
 
                                 width : scrollView.width
+
+                                visible: tab.modelIndex < 3 // Visible for all but Calls
 
                                 model: if (definition) {
                                            switch (tabs.currentIndex)
@@ -617,6 +622,94 @@ Window {
 
                                                 onClicked: {
                                                     model.QtObject.changeMuteOutput();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                                //separator
+                                Rectangle {
+                                    anchors {
+                                        left : parent.left
+                                        right : parent.right
+                                        bottom : parent.bottom
+                                    }
+                                    height : 1
+
+                                    color : IngeScapeTheme.blackColor
+                                }
+
+                            }
+
+
+                            // Content of our scrollview
+                            ListView {
+                                id : listViewCalls
+
+                                width : scrollView.width
+
+                                visible: tab.modelIndex === 3 // Visible only for Calls
+
+                                model: definition ? definition.callsList : 0;
+
+                                delegate: Item {
+                                    id: callDelegate
+                                    anchors {
+                                        left : parent.left
+                                        right : parent.right
+                                    }
+
+                                    property var callModel: model ? model.QtObject : null;
+
+                                    property int lineHeight: 30
+                                    // QVariantHash is translated as raw JS object
+                                    property int callParamCount: callDelegate.callModel ? callDelegate.callModel.argumentNames.length : 0;
+                                    height : lineHeight + (callParamCount * lineHeight)
+
+                                    Column {
+                                        anchors.fill: parent
+
+                                        // Name
+                                        Text {
+                                            text: model.name
+
+                                            anchors {
+                                                left: parent.left
+                                                right: parent.right
+                                            }
+                                            verticalAlignment: Text.AlignVCenter
+                                            width : rootItem.widthsOfColumns[0]
+                                            elide: Text.ElideRight
+                                            height: callDelegate.lineHeight
+                                            color: IngeScapeTheme.whiteColor
+                                            font {
+                                                family: IngeScapeTheme.textFontFamily
+                                                pixelSize : 16
+                                            }
+                                        }
+
+                                        Repeater {
+                                            model: callDelegate.callModel ? callDelegate.callModel.argumentNames : 0
+
+                                            delegate: Text {
+                                                anchors {
+                                                    left: parent.left
+                                                    leftMargin: 75
+                                                    right: parent.right
+                                                }
+
+                                                text: " - " + (callDelegate.callModel ? AgentIOPValueTypes.enumToString(callDelegate.callModel.arguments[modelData]) + " " + modelData
+                                                                                      : "UNKNOWN")
+                                                verticalAlignment: Text.AlignVCenter
+                                                width : rootItem.widthsOfColumns[0]
+                                                elide: Text.ElideRight
+                                                height: callDelegate.lineHeight
+                                                color: IngeScapeTheme.whiteColor
+                                                font {
+                                                    family: IngeScapeTheme.textFontFamily
+                                                    pixelSize : 16
                                                 }
                                             }
                                         }
