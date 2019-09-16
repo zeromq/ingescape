@@ -353,6 +353,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+        
+        install(FILES "${SOURCE_DIR}/resources/qt.conf" DESTINATION .)
     elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
         set(CPACK_GENERATOR "DragNDrop")
         set(CPACK_SOURCE_GENERATOR "TGZ")
