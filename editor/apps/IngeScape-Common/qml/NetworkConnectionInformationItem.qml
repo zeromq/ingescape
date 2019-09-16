@@ -381,7 +381,7 @@ I2CustomRectangle {
 
                     visible: (height !== 0)
 
-                    clip: (height !== textConnectedPort.height)
+                    clip: (height !== textInfoPart2.height)
 
                     opacity: (root.isOnline) ? 1 : 0
 
