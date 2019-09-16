@@ -47,6 +47,9 @@ class IngeScapeNetworkController: public QObject
     // List of available network devices
     I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
 
+    // Flag indicating if our agent is started
+    I2_QML_PROPERTY_READONLY(bool, isStarted)
+
     // Flag indicating if our agent is online
     // NB: false when our agent is not started OR when its network device is no more available
     I2_QML_PROPERTY_READONLY(bool, isOnline)
@@ -106,9 +109,20 @@ public:
 
 
     /**
-     * @brief Start monitoring
+     * @brief start with previous configuration
+     * @return
      */
-    void startMonitoring();
+    bool startWithPreviousConfiguration();
+
+
+
+    /**
+     * @brief Start monitoring
+     *
+     * @param expectedNetworkDevice
+     * @param expectedPort
+     */
+    void startMonitoring(QString expectedNetworkDevice = "", uint expectedPort = 31520);
 
 
     /**
@@ -174,9 +188,9 @@ public:
 
 Q_SIGNALS:
     /**
-     * @brief Triggered when our network device is no more available
+     * @brief Triggered when our network device is not available
      */
-    void networkDeviceIsNoMoreAvailable();
+    void networkDeviceIsNotAvailable();
 
 
     /**
@@ -326,9 +340,6 @@ public Q_SLOTS:
 protected:
     // Name of our "IngeScape" agent that correspond to our application
     QString _igsAgentApplicationName;
-
-    // Our IngeScape agent is successfully started if the result of igs_startWithDevice / igs_startWithIP is 1 (O otherwise)
-    int _isIngeScapeAgentStarted;
 
     // Hash table from a peer id to a type of IngeScape elements on the network
     QHash<QString, IngeScapeTypes::Value> _hashFromPeerIdToIngeScapeType;

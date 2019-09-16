@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -24,6 +24,8 @@
 #include <misc/ingescapeutils.h>
 #include <settings/ingescapesettings.h>
 
+#include <platformsupport/osutils.h>
+
 
 // Name of the example platform to load when no other platform has been loaded yet
 const QString IngeScapeEditorController::EXAMPLE_PLATFORM_NAME = "example";
@@ -39,6 +41,8 @@ const QString IngeScapeEditorController::DEFAULT_REMOTE_URL_GETTING_STARTED = ""
 
 // Default local URL for the getting started page
 const QString IngeScapeEditorController::DEFAULT_LOCAL_URL_GETTING_STARTED = ""; //FIXME Define default URL ?
+
+
 
 /**
  * @brief Constructor
@@ -71,24 +75,30 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _jsonHelper(nullptr),
     _platformDirectoryPath(""),
     _platformDefaultFilePath(""),
-    _currentPlatformFilePath("")
+    _currentPlatformFilePath(""),
+    // Connect mapping in observe mode
+    _beforeNetworkStop_isMappingConnected(true),
+    _beforeNetworkStop_isMappingControlled(false)
 {
     qInfo() << "New IngeScape Editor Controller";
 
     // Root directory path
     QString rootPath = IngeScapeUtils::getRootPath();
     QDir rootDir(rootPath);
-    if (!rootDir.exists()) {
+    if (!rootDir.exists())
+    {
         qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
     }
 
     // Snapshots directory path
     QString snapshotsPath = IngeScapeUtils::getSnapshotsPath();
     QDir snapshotsDirectory(snapshotsPath);
-    if (snapshotsDirectory.exists()) {
+    if (snapshotsDirectory.exists())
+    {
         _snapshotDirectory = snapshotsPath;
     }
-    else {
+    else
+    {
         qCritical() << "ERROR: could not create directory at '" << snapshotsPath << "' !";
     }
 
@@ -97,7 +107,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     QString platformPath = IngeScapeUtils::getPlatformsPath();
 
     QDir platformDir(platformPath);
-    if (!platformDir.exists()) {
+    if (!platformDir.exists())
+    {
         qCritical() << "ERROR: could not create directory at '" << platformPath << "' !";
     }
     else
@@ -197,7 +208,16 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Create the controller to manage the time line
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
 
+
+    // Connect to signals from our licenses manager
+    connect(_licensesC, &LicensesController::licensesUpdated, this, &IngeScapeEditorController::_onLicensesUpdated);
+
+
     // Connect to signals from the network controller
+    connect(_networkC, &NetworkController::networkDeviceIsNotAvailable, this, &IngeScapeEditorController::_onNetworkDeviceIsNotAvailable);
+    connect(_networkC, &NetworkController::networkDeviceIsAvailableAgain, this, &IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain);
+    connect(_networkC, &NetworkController::networkDeviceIpAddressHasChanged, this, &IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged);
+
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &EditorModelManager::onAgentEntered);
     connect(_networkC, &NetworkController::agentExited, _modelManager, &EditorModelManager::onAgentExited);
     connect(_networkC, &NetworkController::launcherEntered, _modelManager, &EditorModelManager::onLauncherEntered);
@@ -206,8 +226,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::recorderExited, _recordsSupervisionC, &RecordsSupervisionController::onRecorderExited);
     connect(_networkC, &NetworkController::expeEntered, this, &IngeScapeEditorController::_onExpeEntered);
     connect(_networkC, &NetworkController::expeExited, this, &IngeScapeEditorController::_onExpeExited);
-
-    connect(_licensesC, &LicensesController::licensesUpdated, this, &IngeScapeEditorController::_onLicensesUpdated);
 
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &EditorModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &EditorModelManager::onMappingReceived);
@@ -298,6 +316,12 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_recordsSupervisionC, &RecordsSupervisionController::startToRecord, this, &IngeScapeEditorController::_onStartToRecord);
 
 
+    // Connect to OS events
+    connect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeEditorController::_onSystemSleep);
+    connect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeEditorController::_onSystemWake);
+
+
+
     if (!_currentPlatformFilePath.isEmpty())
     {
         if (_currentPlatformFilePath == SPECIAL_EMPTY_LAST_PLATFORM)
@@ -326,31 +350,18 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
 
 
-    if (_isAvailableModelVisualizer) {
+    if (_isAvailableModelVisualizer)
+    {
         // Create a fake launcher for fake agents
         _modelManager->onLauncherEntered("0", HOSTNAME_NOT_DEFINED, "0.0.0.0", "");
     }
 
 
-    // Update the list of available network devices
-    _networkC->updateAvailableNetworkDevices();
+    //
+    // Start IngeScape
+    //
+    _startIngeScape(true);
 
-    // There is only one available network device, we use it !
-    if (_networkC->availableNetworkDevices().count() == 1) {
-        _networkDevice = _networkC->availableNetworkDevices().at(0);
-    }
-
-    // Start our IngeScape agent with a network device (or an IP address) and a port
-    bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
-
-    if (isStarted)
-    {
-        // Initialize platform from online mapping
-        _modelManager->setisMappingConnected(true);
-    }
-    else {
-        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
-    }
 
 
     //
@@ -379,6 +390,12 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
  */
 IngeScapeEditorController::~IngeScapeEditorController()
 {
+    // Unsubscribe to OS events
+    disconnect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeEditorController::_onSystemSleep);
+    disconnect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeEditorController::_onSystemWake);
+
+
+
     // Delete all log stream viewers
     _openedLogStreamControllers.deleteAllItems();
 
@@ -738,14 +755,17 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
             settings.sync();
 
             // Restart IngeScape
-            success = _restartIngeScape(hasToClearPlatform);
+            success = _restartIngeScape(hasToClearPlatform, false);
         }
     }
-    else {
-        if (!isUInt) {
+    else
+    {
+        if (!isUInt)
+        {
             qWarning() << "Port" << strPort << "is not an unsigned int !";
         }
-        else if (port <= 0) {
+        else if (port <= 0)
+        {
             qWarning() << "Port" << strPort << "is negative or null !";
         }
     }
@@ -1229,6 +1249,12 @@ void IngeScapeEditorController::_onExpeExited(QString peerId, QString peerName)
 }
 
 
+
+
+
+
+
+
 /**
  * @brief Slot called when the licenses have been updated
  */
@@ -1236,8 +1262,83 @@ void IngeScapeEditorController::_onLicensesUpdated()
 {
     qDebug() << "on License Updated";
 
-    // Restart IngeScape (Do not clear the current platform)
-    _restartIngeScape(false);
+    // Restart IngeScape
+    // (Do not clear the current platform, do not check available network devices)
+    _restartIngeScape(false, false);
+}
+
+
+/**
+ * @brief Called when our network device is not available
+ */
+void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Stop IngeScape if needed
+    if ((_networkC != nullptr) && _networkC->isStarted())
+    {
+        _stopIngeScape(false);
+    }
+    // Else: our agent is not started, we don't need to stop it
+}
+
+
+/**
+ * @brief Called when our network device is available again
+ */
+void IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Start IngeScape
+    // => we don't need to check available network devices
+    _startIngeScape(false);
+}
+
+
+/**
+ * @brief Called when the IP address of our network device has changed
+ */
+void IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Restart IngeScape
+    // (Do not clear platform, do no check available network devices)
+    _restartIngeScape(false, false);
+}
+
+
+/**
+ * @brief Called when our machine will go to sleep
+ */
+void IngeScapeEditorController::_onSystemSleep()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Stop monitoring to save energy
+    if (_networkC != nullptr)
+    {
+        _networkC->stopMonitoring();
+    }
+
+    // Stop IngeScape
+    _stopIngeScape(false);
+}
+
+
+/**
+ * @brief Called when our machine did wake from sleep
+ */
+void IngeScapeEditorController::_onSystemWake()
+{
+    if (_networkC != nullptr)
+    {
+        // Start IngeScape
+        // => we need to check available network devices
+        _startIngeScape(true);
+    }
 }
 
 
@@ -1278,11 +1379,13 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                 // Notify QML to reset view
                 Q_EMIT resetMappindAndTimeLineViews();
             }
-            else {
+            else
+            {
                 qCritical() << "Can not open file" << platformFilePath;
             }
         }
-        else {
+        else
+        {
             qWarning() << "There is no file" << platformFilePath;
         }
     }
@@ -1430,27 +1533,29 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
 
 
 /**
- * @brief Restart IngeScape
+ * @brief Stop IngeScape
+ *
  * @param hasToClearPlatform
- * @return true if success
  */
-bool IngeScapeEditorController::_restartIngeScape(bool hasToClearPlatform)
+void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
 {
-    bool success = false;
-
-    // Reset the error message
-    seterrorMessageWhenConnectionFailed("");
-
     if ((_networkC != nullptr) && (_modelManager != nullptr))
     {
-        if (hasToClearPlatform) {
-            qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
+        if (hasToClearPlatform)
+        {
+            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
         }
         else
         {
-            qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
+            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
         }
 
+        // Save states of our mapping if needed
+        _beforeNetworkStop_isMappingConnected = _modelManager->isMappingConnected();
+        _beforeNetworkStop_isMappingControlled = _modelManager->isMappingControlled();
+
+
+        // Disable mapping
         _modelManager->setisMappingConnected(false);
         _modelManager->setisMappingControlled(false);
 
@@ -1469,18 +1574,81 @@ bool IngeScapeEditorController::_restartIngeScape(bool hasToClearPlatform)
             // Clear the current platform by deleting all existing data
             clearCurrentPlatform();
         }
+    }
+}
+
+
+/**
+ * @brief Start IngeScape
+ *
+ * @param checkAvailableNetworkDevices
+ *
+ * @return
+ */
+bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevices)
+{
+    bool success = false;
+
+    // Reset the error message
+    seterrorMessageWhenConnectionFailed("");
+
+    if ((_networkC != nullptr) && (_modelManager != nullptr))
+    {
+        if (checkAvailableNetworkDevices)
+        {
+            // Update the list of available network devices
+            _networkC->updateAvailableNetworkDevices();
+
+            // There is only one available network device, we use it !
+            if (_networkC->availableNetworkDevices().count() == 1)
+            {
+                _networkDevice = _networkC->availableNetworkDevices().at(0);
+            }
+        }
+
 
         // Start our IngeScape agent with the network device and the port
-        success = _networkC->start(_networkDevice, "", _port);
+        success = _networkC->start(_networkDevice, _ipAddress, _port);
 
-        if (success) {
-            _modelManager->setisMappingConnected(true);
+        if (success)
+        {
+            // Re-enable mapping
+            _modelManager->setisMappingConnected(_beforeNetworkStop_isMappingConnected);
+            _modelManager->setisMappingControlled(_beforeNetworkStop_isMappingControlled);
         }
     }
 
-    if (!success) {
-        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
+    if (!success)
+    {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect on network device %1 with port %2").arg(_networkDevice, QString::number(_port)));
     }
 
     return success;
+}
+
+
+/**
+ * @brief Restart IngeScape
+ *
+ * @param hasToClearPlatform
+ * @param checkAvailableNetworkDevices
+ *
+ * @return true if success
+ */
+bool IngeScapeEditorController::_restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices)
+{
+    if (hasToClearPlatform)
+    {
+        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
+    }
+    else
+    {
+        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
+    }
+
+    // Stop IngeScape
+    _stopIngeScape(hasToClearPlatform);
+
+    // Start IngeScape
+    return _startIngeScape(checkAvailableNetworkDevices);
 }

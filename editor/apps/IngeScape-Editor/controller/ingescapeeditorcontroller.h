@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -350,6 +350,36 @@ private Q_SLOTS:
     void _onLicensesUpdated();
 
 
+    /**
+     * @brief Called when our network device is not available
+     */
+    void _onNetworkDeviceIsNotAvailable();
+
+
+    /**
+     * @brief Called when our network device is available again
+     */
+    void _onNetworkDeviceIsAvailableAgain();
+
+
+    /**
+     * @brief Called when our network device has a new IP address
+     */
+    void _onNetworkDeviceIpAddressHasChanged();
+
+
+    /**
+     * @brief Called when our machine will go to sleep
+     */
+    void _onSystemSleep();
+
+
+    /**
+     * @brief Called when our machine did wake from sleep
+     */
+    void _onSystemWake();
+
+
 private:
 
     /**
@@ -382,16 +412,38 @@ private:
     QJsonDocument _getJsonOfCurrentPlatform();
 
 
+
+    /**
+     * @brief Stop IngeScape
+     *
+     * @param hasToClearPlatform
+     */
+    void _stopIngeScape(bool hasToClearPlatform);
+
+
+    /**
+     * @brief Start IngeScape
+     *
+     * @param checkAvailableNetworkDevices
+     *
+     * @return
+     */
+    bool _startIngeScape(bool checkAvailableNetworkDevices);
+
+
     /**
      * @brief Restart IngeScape
+     *
      * @param hasToClearPlatform
+     * @param checkAvailableNetworkDevices
+     *
+     *
      * @return true if success
      */
-    bool _restartIngeScape(bool hasToClearPlatform);
+    bool _restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices = false);
 
 
 private:
-
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
 
@@ -406,6 +458,10 @@ private:
 
     // Path to the currently opened platform file (*.json)
     QString _currentPlatformFilePath;
+
+    // States of our mapping when our network was stopped
+    bool _beforeNetworkStop_isMappingConnected;
+    bool _beforeNetworkStop_isMappingControlled;
 
     // Default name to save the platform when exiting
     static const QString EXAMPLE_PLATFORM_NAME;
