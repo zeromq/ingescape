@@ -56,6 +56,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
             if ((agentElements != NULL)
                 && (strcmp(name, agentElements->networkDevice) == 0)){
                 foundNetworkDevice = true;
+
                 // Check if IP address has changed
                 if (strcmp(agentElements->ipAddress, ziflist_address(iflist)) != 0){
                     //IP address has changed
@@ -76,11 +77,24 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
                         free(networkDevice);
                     }
                 }
+
+                break;
+
+            }
+            // Check if this is our expected network device
+            else if ((agentElements == NULL)
+                     && (monitor->networkDevice != NULL)
+                     && (strcmp(name, monitor->networkDevice) == 0)){
+                // Agent is not started BUT network device is available
+                foundNetworkDevice = true;
+
                 break;
             }
+
         } else if (monitor->status == IGS_NETWORK_DEVICE_NOT_AVAILABLE) {
             // Check if this is the network device used previously
-            if ((monitor->networkDevice != NULL)
+            if ((agentElements == NULL)
+                && (monitor->networkDevice != NULL)
                 && (strcmp(name, monitor->networkDevice) == 0)){
                 //device was missing and has come back
                 foundNetworkDevice = true;
@@ -104,8 +118,31 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
                 // Clean-up
                 free(monitor->networkDevice);
                 monitor->networkDevice = NULL;
+
+                break;
             }
-            break;
+            // Check if our agent has been started
+            else if ((agentElements != NULL)
+                      && (strcmp(name, agentElements->networkDevice) == 0)){
+                foundNetworkDevice = true;
+
+                // Update our status
+                monitor->status = IGS_NETWORK_OK;
+
+                // Call our callbacks
+                DL_FOREACH(monitorCallbacks, cb){
+                    cb->callback_ptr(IGS_NETWORK_OK_AFTER_MANUAL_RESTART, agentElements->networkDevice, agentElements->ipAddress, cb->myData);
+                }
+
+                //NB: we don't need to start our agent because it is already running
+
+                // Clean-up if needed
+                if (monitor->networkDevice != NULL)
+                    free(monitor->networkDevice);
+                monitor->networkDevice = NULL;
+
+                break;
+            }
         }
 
         name = ziflist_next (iflist);
@@ -114,31 +151,48 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
     
     //NB: if network device has disappeared, we cannot detect an IP address change before
     //detecting device disappearance.
-    if (agentElements != NULL
-        && !foundNetworkDevice
-        && monitor->status != IGS_NETWORK_DEVICE_NOT_AVAILABLE){
-        //agent is started but network device was not found
-        igs_warn("network device %s has disappeared", agentElements->networkDevice);
+    if (!foundNetworkDevice
+        && (monitor->status != IGS_NETWORK_DEVICE_NOT_AVAILABLE)){
 
-        // Update status
-        monitor->status = IGS_NETWORK_DEVICE_NOT_AVAILABLE;
+        // Check if our agent is started
+        if (agentElements != NULL) {
+            //agent is started but network device was not found
+            igs_warn("network device %s has disappeared", agentElements->networkDevice);
 
-        // Save values before calling our callbacks and igs_stop
-        monitor->port = agentElements->zyrePort;
-        if (monitor->networkDevice != NULL)
-            free(monitor->networkDevice);
-        monitor->networkDevice = strdup(agentElements->networkDevice);
+            // Update status
+            monitor->status = IGS_NETWORK_DEVICE_NOT_AVAILABLE;
 
-        // Call our callbacks
-        DL_FOREACH(monitorCallbacks, cb){
-            cb->callback_ptr(IGS_NETWORK_DEVICE_NOT_AVAILABLE, agentElements->networkDevice, agentElements->ipAddress, cb->myData);
-        }
+            // Save values before calling our callbacks and igs_stop
+            monitor->port = agentElements->zyrePort;
+            if (monitor->networkDevice != NULL)
+                free(monitor->networkDevice);
+            monitor->networkDevice = strdup(agentElements->networkDevice);
 
-        // Check if we need to stop it
-        if (monitor_shallStartStopAgent){
-            // NB: we use monitor->networkDevice instead of agentElements->networkDevice because callbacks may call igs_stop()
-            igs_warn("stopping agent after network device %s has disappeared", monitor->networkDevice);
-            igs_stop();
+            // Call our callbacks
+            DL_FOREACH(monitorCallbacks, cb){
+                cb->callback_ptr(IGS_NETWORK_DEVICE_NOT_AVAILABLE, agentElements->networkDevice, agentElements->ipAddress, cb->myData);
+            }
+
+            // Check if we need to stop it
+            if (monitor_shallStartStopAgent){
+                // NB: we use monitor->networkDevice instead of agentElements->networkDevice because callbacks may call igs_stop()
+                igs_warn("stopping agent after network device %s has disappeared", monitor->networkDevice);
+                igs_stop();
+            }
+
+        }else if (monitor->networkDevice != NULL){
+            //agent is not started AND we have an expected network device
+            igs_warn("network device %s not found", monitor->networkDevice);
+
+            // Update status
+            monitor->status = IGS_NETWORK_DEVICE_NOT_AVAILABLE;
+
+            // Call our callbacks
+            DL_FOREACH(monitorCallbacks, cb){
+                cb->callback_ptr(IGS_NETWORK_DEVICE_NOT_AVAILABLE, monitor->networkDevice, NULL, cb->myData);
+            }
+
+            //NB: we don't need to call igs_stop because our agent is not running
         }
     }
     
@@ -210,6 +264,26 @@ void igs_monitoringEnable(unsigned int period){
     monitor->monitorActor = zactor_new (monitor_initLoop, NULL);
 }
 
+void igs_monitoringEnableWithExpectedDevice(unsigned int period, const char* networkDevice, unsigned int port){
+    if (monitor != NULL){
+        igs_warn("monitor is already started");
+        return;
+    }
+
+    monitor = (monitor_t *)calloc(1, sizeof(monitor_t));
+    monitor->period = period;
+    monitor->status = IGS_NETWORK_OK;
+
+    if ((networkDevice == NULL) || (strlen(networkDevice) == 0)){
+        igs_warn("networkDevice should not be NULL or empty");
+    }else{
+        monitor->networkDevice = strdup(networkDevice);
+    }
+    monitor->port = port;
+
+    monitor->monitorActor = zactor_new (monitor_initLoop, NULL);
+}
+
 void igs_monitoringDisable(void){
     if (monitor == NULL){
         igs_warn("monitor is not started");
@@ -219,6 +293,9 @@ void igs_monitoringDisable(void){
     if (monitor->monitorActor != NULL){
         zactor_destroy (&monitor->monitorActor);
     }
+    if (monitor->networkDevice != NULL)
+        free(monitor->networkDevice);
+    monitor->networkDevice = NULL;
     free(monitor);
     monitor = NULL;
 

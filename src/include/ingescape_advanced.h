@@ -48,6 +48,7 @@ PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 //called to actually stop the monitor. If not stopped, it may cause an error when
 //an agent terminates.
 PUBLIC void igs_monitoringEnable(unsigned int period); //in milliseconds
+PUBLIC void igs_monitoringEnableWithExpectedDevice(unsigned int period, const char* networkDevice, unsigned int port);
 PUBLIC void igs_monitoringDisable(void);
 PUBLIC bool igs_isMonitoringEnabled();
 //When the monitor is started and igs_monitoringShallStartStopAgent is set to true :
@@ -56,8 +57,9 @@ PUBLIC bool igs_isMonitoringEnabled();
 PUBLIC void igs_monitoringShallStartStopAgent(bool flag);
 typedef enum {
     IGS_NETWORK_OK = 1, //Default status when the monitor starts
-    IGS_NETWORK_DEVICE_NOT_AVAILABLE,
-    IGS_NETWORK_ADDRESS_CHANGED
+    IGS_NETWORK_DEVICE_NOT_AVAILABLE, //Status when our network device is not available
+    IGS_NETWORK_ADDRESS_CHANGED, //Only used in callback when the IP address of our netowrk device has changed
+    IGS_NETWORK_OK_AFTER_MANUAL_RESTART // Only used in callback when our agent has been manually restarted with a call to startWithDevice or igs_startWithIP
 } igs_monitorEvent_t;
 typedef void (*igs_monitorCallback)(igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData);
 PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
