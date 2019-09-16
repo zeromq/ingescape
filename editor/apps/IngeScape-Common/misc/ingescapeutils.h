@@ -21,33 +21,17 @@
 
 
 /**
- * @brief The IngeScapeUtils class defines the IngeScape utils
+ * @brief The IngeScapeUtils namespace defines the IngeScape utils
  */
-class IngeScapeUtils: public QObject
+namespace IngeScapeUtils
 {
-    Q_OBJECT
-
-
-public:
-
-    /**
-     * @brief Default constructor
-     * @param parent
-     */
-    explicit IngeScapeUtils(QObject *parent = nullptr);
-
-
-    /**
-      * @brief Destructor
-      */
-    ~IngeScapeUtils();
 
 
     /**
       * @brief Create a directory if it does not exist
       * @param directoryPath
       */
-    static void createDirectoryIfNotExist(QString directoryPath);
+    void createDirectoryIfNotExist(QString directoryPath);
 
 
     /**
@@ -55,7 +39,7 @@ public:
      * "[DocumentsLocation]/IngeScape/"
      * @return
      */
-    static QString getRootPath();
+    QString getRootPath();
 
 
     /**
@@ -63,7 +47,7 @@ public:
      * "[DocumentsLocation]/IngeScape/settings/"
      * @return
      */
-    static QString getSettingsPath();
+    QString getSettingsPath();
 
 
     /**
@@ -71,7 +55,7 @@ public:
      * "[DocumentsLocation]/IngeScape/snapshots/"
      * @return
      */
-    static QString getSnapshotsPath();
+    QString getSnapshotsPath();
 
 
     /**
@@ -79,7 +63,7 @@ public:
      * "[DocumentsLocation]/IngeScape/platforms/"
      * @return
      */
-    static QString getPlatformsPath();
+    QString getPlatformsPath();
 
 
     /**
@@ -87,7 +71,7 @@ public:
      * "[DocumentsLocation]/IngeScape/exports/"
      * @return
      */
-    static QString getExportsPath();
+    QString getExportsPath();
 
 
     /**
@@ -95,49 +79,49 @@ public:
      * "[DocumentsLocation]/IngeScape/licenses/"
      * @return
      */
-    static QString getLicensesPath();
+    QString getLicensesPath();
 
 
     /**
      * @brief Get an UID for a new model of action
      * @return
      */
-    static int getUIDforNewActionM();
+    int getUIDforNewActionM();
 
 
     /**
      * @brief Free an UID of a model of action
      * @param uid
      */
-    static void freeUIDofActionM(int uid);
+    void freeUIDofActionM(int uid);
 
 
     /**
      * @brief Book an UID for a new model of action
      * @param uid
      */
-    static void bookUIDforActionM(int uid);
+    void bookUIDforActionM(int uid);
 
 
     /**
      * @brief Get an UID for a new view model of action in mapping
      * @return
      */
-    static QString getUIDforNewActionInMappingVM();
+    QString getUIDforNewActionInMappingVM();
 
 
     /**
      * @brief Free an UID of a view model of action in mapping
      * @param uid
      */
-    static void freeUIDofActionInMappingVM(QString uid);
+    void freeUIDofActionInMappingVM(QString uid);
 
 
     /**
      * @brief Book an UID for a new view model of action in mapping
      * @param uid
      */
-    static void bookUIDforActionInMappingVM(QString uid);
+    void bookUIDforActionInMappingVM(QString uid);
 
 
     /**
@@ -145,7 +129,7 @@ public:
      * instead of comparing the pointers.
      */
     template<class T>
-    static bool arePointerListsEqual(const QList<T*> & left, const QList<T*>& right)
+    bool arePointerListsEqual(const QList<T*> & left, const QList<T*>& right)
     {
         bool equality = true;
 
@@ -174,16 +158,13 @@ public:
         return equality;
     }
 
-
-protected:
     /**
      * @brief Get (and create if needed) the fullpath of a given sub-directory
      * @param subDirectory
      * @return
      */
-    static QString _getSubDirectoryPath(QString subDirectory);
-};
+    QString _getSubDirectoryPath(QString subDirectory);
 
-QML_DECLARE_TYPE(IngeScapeUtils)
+};
 
 #endif // INGESCAPEUTILS_H

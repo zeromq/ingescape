@@ -32,24 +32,6 @@ static int BIGGEST_UID_OF_ACTION_IN_MAPPING_VIEW_MODEL = -1;
 //
 //--------------------------------------------------------------
 
-/**
- * @brief Default constructor
- * @param parent
- */
-IngeScapeUtils::IngeScapeUtils(QObject *parent) : QObject(parent)
-{
-    // Force ownership of our object, it will prevent Qml from stealing it
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-}
-
-
-/**
- * @brief Destructor
- */
-IngeScapeUtils::~IngeScapeUtils()
-{
-}
-
 
 /**
   * @brief Create a directory if it does not exist
