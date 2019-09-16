@@ -55,8 +55,8 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
             break;
         }
 
-        // Update flags
-        licensesController->refreshLicensesData();
+        // Update data
+        licensesController->needsUpdate();
     }
 }
 
@@ -96,6 +96,9 @@ LicensesController::LicensesController(QObject *parent) : QObject(parent),
 
     qInfo() << "New Licenses Controller with licenses path" << _licensesPath;
 
+    // Subcribe to updates
+    connect(this, &LicensesController::needsUpdate, this, &LicensesController::_onNeedsUpdate);
+
     // Begin to observe license events (events are triggered only when no valid license is available)
     igs_observeLicense(onLicenseCallback, this);
 
@@ -104,7 +107,6 @@ LicensesController::LicensesController(QObject *parent) : QObject(parent),
 
     // Get the data about licenses
     refreshLicensesData();
-
 }
 
 
@@ -114,6 +116,9 @@ LicensesController::LicensesController(QObject *parent) : QObject(parent),
 LicensesController::~LicensesController()
 {
     qInfo() << "Delete Licenses Controller";
+
+    // Unsubcribe to updates
+    disconnect(this, &LicensesController::needsUpdate, this, &LicensesController::_onNeedsUpdate);
 
     // Clean-up merged license
     if (_mergedLicense != nullptr)
@@ -312,4 +317,13 @@ bool LicensesController::_importLicenseFromFile(const QFileInfo& licenseFile)
         }
     }
     return success;
+}
+
+
+/**
+ * @brief Called when our needsUpdate signal is triggered
+ */
+void LicensesController::_onNeedsUpdate()
+{
+    refreshLicensesData();
 }

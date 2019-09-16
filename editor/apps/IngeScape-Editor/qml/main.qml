@@ -161,7 +161,7 @@ ApplicationWindow {
             MenuSeparator {}
 
             MenuItem {
-                text: qsTr("Create snapshot")
+                text: qsTr("Take a snapshot")
 
                 shortcut: StandardKey.AddTab
 
