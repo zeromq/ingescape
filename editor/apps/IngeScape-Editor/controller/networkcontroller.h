@@ -280,6 +280,12 @@ Q_SIGNALS:
     void updateRecordState(QString state);
 
 
+    /**
+     * @brief Signal emitted when a record has been exported
+     */
+    void recordExported();
+
+
 public Q_SLOTS:
 
     /**

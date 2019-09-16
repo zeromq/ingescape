@@ -267,7 +267,7 @@ void RecordsSupervisionController::exportRecord(QString recordId)
 {
     if (_isRecorderON && !recordId.isEmpty())
     {
-        QString commandAndParameters = QString("%1=%2").arg(command_ExportReplay, recordId);
+        QString commandAndParameters = QString("%1=%2").arg(command_ExportRecord, recordId);
 
         Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
     }
@@ -502,6 +502,15 @@ void RecordsSupervisionController::onReplayEnded()
 {
     // Update the current state of the replay
     setreplayState(ReplayStates::LOADED);
+}
+
+
+/**
+ * @brief Slot called when a record has been exported
+ */
+void RecordsSupervisionController::onRecordExported()
+{
+    qInfo() << "The record has been recorded";
 }
 
 

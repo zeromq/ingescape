@@ -228,6 +228,12 @@ public Q_SLOTS:
     void onReplayEnded();
 
 
+    /**
+     * @brief Slot called when a record has been exported
+     */
+    void onRecordExported();
+
+
 private Q_SLOTS:
 
     /**

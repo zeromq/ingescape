@@ -244,7 +244,7 @@ Item {
                     }
                     elide: Text.ElideRight
 
-                    text: hostItem.model_hostVM.modelM ? hostItem.model_hostVM.modelM.ipAddress : "?.?.?.?"
+                    text: hostItem.model_hostVM.modelM ? hostItem.model_hostVM.modelM.ipAddress : ""
 
                     color: IngeScapeTheme.lightBlueGreyColor
                     font: IngeScapeTheme.heading2Font

@@ -99,13 +99,13 @@ static const QString command_ExecutedAction = "EXECUTED_ACTION";
 static const QString command_StartRecord = "START_RECORD";
 static const QString command_StopRecord = "STOP_RECORD";
 static const QString command_DeleteRecord = "DELETE_RECORD";
+static const QString command_ExportRecord = "EXPORT_RECORD";
 static const QString command_LoadReplay = "LOAD_REPLAY";
 static const QString command_UNloadReplay = "UNLOAD_REPLAY";
 static const QString command_StartReplay = "START_REPLAY";
 static const QString command_StopReplay = "STOP_REPLAY";
 static const QString command_PauseReplay = "PAUSE_REPLAY";
 static const QString command_UNpauseReplay = "UNPAUSE_REPLAY";
-static const QString command_ExportReplay = "EXPORT_REPLAY";
 
 static const QString command_LoadPlatformFile = "LOAD_PLATFORM_FROM_PATH";
 static const QString command_UpdateTimeLineState = "UPDATE_TIMELINE_STATE";
