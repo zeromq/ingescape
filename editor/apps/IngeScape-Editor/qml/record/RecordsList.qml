@@ -29,6 +29,8 @@ import "../theme" as Theme;
 // parent-directory
 import ".." as Editor;
 
+import "../popup" as PopUp
+
 
 Item {
     id: rootItem
@@ -257,7 +259,7 @@ Item {
         Item {
             id: recordItem
 
-            //property var model_record: model.QtObject
+            property RecordVM model_recordVM: model.QtObject
             property bool _isCurrentReplay: controller && controller.currentReplay && controller.currentReplay.modelM && (controller.currentReplay.modelM.uid === model.modelM.uid)
 
             anchors {
@@ -330,7 +332,8 @@ Item {
                     }
                     elide: Text.ElideRight
 
-                    text: model.modelM.name
+                    text: recordItem.model_recordVM.modelM ? recordItem.model_recordVM.modelM.name : ""
+
                     color: rootItem._isPlayingOrResumingReplay && recordItem._isCurrentReplay ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
                     font: IngeScapeTheme.headingFont
                 }
@@ -569,9 +572,98 @@ Item {
                 onClicked: {
                     console.log("QML: Open options...");
 
+                    // Parent must be record item and not the list to have good x and y value
+                    popupOptions.parent = recordItem;
+
+                    if (recordItem.model_recordVM.modelM) {
+                        popupOptions.recordId = recordItem.model_recordVM.modelM.uid;
+                    }
+
                     // Open the popup with options
-                    //popupOptions.openInScreen();
+                    popupOptions.openInScreen();
                 }
+            }
+        }
+    }
+
+
+    //
+    // Menu popup with options
+    //
+    PopUp.MenuPopup  {
+        id : popupOptions
+
+        anchors {
+            top: rootItem.top
+            left: rootItem.right
+            leftMargin: 2
+        }
+
+        readonly property int optionHeight: 30
+        property string recordId: ""
+
+        // Get height from children
+        height: popUpBackground.y + popUpBackground.height
+        width: 200
+
+        isModal: true;
+        layerColor: "transparent"
+        dismissOnOutsideTap : true;
+
+        keepRelativePositionToInitialParent : true;
+
+        onClosed: {
+
+        }
+        onOpened: {
+
+        }
+
+        Rectangle {
+            id: popUpBackground
+            height: buttons.y + buttons.height
+            anchors {
+                right: parent.right
+                left: parent.left
+            }
+            color: IngeScapeTheme.veryDarkGreyColor
+            radius: 5
+            border {
+                color: IngeScapeTheme.blueGreyColor2
+                width: 1
+            }
+
+            Column {
+                id: buttons
+                anchors {
+                    right: parent.right
+                    left: parent.left
+                }
+
+                Button {
+                    id: optionExport
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Export")
+                    enabled: true
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        console.log("QML: clik on option 'Export'");
+
+                        if (rootItem.controller) {
+                            rootItem.controller.exportRecord(popupOptions.recordId);
+                        }
+
+                        popupOptions.close();
+                    }
+                }
+
             }
         }
     }

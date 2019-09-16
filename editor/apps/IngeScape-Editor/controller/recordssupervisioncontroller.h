@@ -128,6 +128,13 @@ public:
 
 
     /**
+     * @brief Export a record
+     * @param recordId
+     */
+    Q_INVOKABLE void exportRecord(QString recordId);
+
+
+    /**
      * @brief Get the name of the current replay
      * @return
      */

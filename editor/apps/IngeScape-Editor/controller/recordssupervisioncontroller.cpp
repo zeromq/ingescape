@@ -260,6 +260,21 @@ void RecordsSupervisionController::stopOrPauseReplay(bool isStop)
 
 
 /**
+ * @brief Export a record
+ * @param recordId
+ */
+void RecordsSupervisionController::exportRecord(QString recordId)
+{
+    if (_isRecorderON && !recordId.isEmpty())
+    {
+        QString commandAndParameters = QString("%1=%2").arg(command_ExportReplay, recordId);
+
+        Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+    }
+}
+
+
+/**
  * @brief Get the name of the current replay
  * @return
  */
