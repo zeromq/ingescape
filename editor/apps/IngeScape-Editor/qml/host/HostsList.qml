@@ -227,7 +227,9 @@ Item {
                     elide: Text.ElideRight
 
                     text: model.name
-                    color: IngeScapeTheme.whiteColor
+
+                    color: model.isON ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+
                     font: IngeScapeTheme.headingFont
                 }
 
@@ -417,21 +419,10 @@ Item {
                         streamPopup.title = model.name;
                         receiver.start();
                     }
-                    model.QtObject.changeState();
+                    model.QtObject.changeStreamState();
                 }
             }
-
-            // GST not included in master branch
-//            Connections {
-//                    target: streamPopup
-//                    onClosing: {
-//                        receiver.stop();
-//                        model.QtObject.changeState();
-//                        close.accepted = true;
-//                    }
-//            }
        }
-
 
     }
 

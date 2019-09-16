@@ -36,7 +36,10 @@ class HostVM : public QObject
     I2_QML_PROPERTY_READONLY(QString, name)
 
     // Model of our host
-    I2_QML_PROPERTY_READONLY(HostM*, modelM)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(HostM*, modelM)
+
+    // Flag indicating if our host is ON (vs OFF)
+    I2_QML_PROPERTY_READONLY(bool, isON)
 
     // Sorted list of associated agents
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentM, agentsList)
@@ -52,9 +55,13 @@ public:
 
     /**
      * @brief Constructor
+     * @param name
+     * @param model
      * @param parent
      */
-    explicit HostVM(HostM* model, QObject *parent = nullptr);
+    explicit HostVM(QString name,
+                    HostM* model = nullptr,
+                    QObject *parent = nullptr);
 
 
     /**
@@ -64,9 +71,9 @@ public:
 
 
     /**
-     * @brief Change the state of our host
+     * @brief Change the stream state of our host
      */
-    Q_INVOKABLE void changeState();
+    Q_INVOKABLE void changeStreamState();
 
 
     /**

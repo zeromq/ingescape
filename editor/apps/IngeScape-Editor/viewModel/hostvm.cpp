@@ -21,12 +21,16 @@
 
 /**
  * @brief Constructor
+ * @param name
  * @param model
  * @param parent
  */
-HostVM::HostVM(HostM* model, QObject *parent) : QObject(parent),
-    _name(""),
+HostVM::HostVM(QString name,
+               HostM* model,
+               QObject *parent) : QObject(parent),
+    _name(name),
     _modelM(model),
+    _isON(false),
     _canProvideStream(false),
     _isStreaming(false)
 {
@@ -38,16 +42,25 @@ HostVM::HostVM(HostM* model, QObject *parent) : QObject(parent),
     _agentsList.setSortProperty("isON");
     _agentsList.setSortOrder(Qt::DescendingOrder);
 
+    //qInfo() << "New View Model of Host" << _name;
+
     if (_modelM != nullptr)
     {
-        _name = _modelM->name();
+        _isON = true;
 
-        qInfo() << "New View Model of Host" << _name;
+        qInfo() << "New View Model of Host" << _name << "ON (connected to IngeScape)";
+
+        if (_name != _modelM->name()) {
+            qCritical() << "The name of the view model of host" << _name << "does not correspond to the name of the model" << _modelM->name();
+        }
 
         if (!_modelM->streamingPort().isEmpty())
         {
             _canProvideStream = true;
         }
+    }
+    else {
+        qInfo() << "New View Model of Host" << _name << "OFF (dis-connected from IngeScape)";
     }
 }
 
@@ -69,9 +82,33 @@ HostVM::~HostVM()
 
 
 /**
- * @brief Change the state of our agent
+ * @brief Setter for proprty "model"
+ * @param value
  */
-void HostVM::changeState()
+void HostVM::setmodelM(HostM *value)
+{
+    if (_modelM != value)
+    {
+        _modelM = value;
+
+        // The real host enter the network
+        if (_modelM != nullptr) {
+            setisON(true);
+        }
+        // The real host leave the network
+        else {
+            setisON(false);
+        }
+
+        Q_EMIT modelMChanged(value);
+    }
+}
+
+
+/**
+ * @brief Change the stream state of our host
+ */
+void HostVM::changeStreamState()
 {
     // is streaming => request streaming end
     if (_isStreaming)
