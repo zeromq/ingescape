@@ -143,7 +143,7 @@ I2CustomRectangle {
     {
         return (
                 // Coherent values
-                (index > 0)
+                (index >= 0)
                 && (networkDevice !== "")
                 && (port !== "")
                 // Values are still available
@@ -387,7 +387,7 @@ I2CustomRectangle {
 
                             height: 1
 
-                            color: background.borderColor
+                            color: root.borderColor
                         }
                     }
 
