@@ -37,6 +37,7 @@ static const QString prefix_RecordStopped = "RECORD_STOPPED";
 static const QString prefix_AllRecords = "RECORDS_LIST=";
 static const QString prefix_AddedRecord = "ADDED_RECORD=";
 static const QString prefix_DeletedRecord = "DELETED_RECORD=";
+static const QString prefix_RecordExported = "RECORD_EXPORTED";
 static const QString prefix_ReplayLoading = "REPLAY_LOADING=";
 static const QString prefix_ReplayLoaded = "REPLAY_LOADED";
 static const QString prefix_ReplayUNloaded = "REPLAY_UNLOADED";
@@ -576,6 +577,11 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
         QString state = message.remove(0, prefix_UpdateRecordState.length());
 
         Q_EMIT updateRecordState(state);
+    }
+    // A record has been exported
+    else if (message == prefix_RecordExported)
+    {
+        Q_EMIT recordExported();
     }
     // Unknown
     else

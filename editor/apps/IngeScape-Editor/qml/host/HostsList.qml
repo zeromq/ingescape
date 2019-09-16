@@ -178,7 +178,8 @@ Item {
         Item {
             id: hostItem
 
-            property var model_host: model.QtObject
+            //property var model_hostVM: model.QtObject
+            property HostVM model_hostVM: model.QtObject
             property var model_agentsList: model.agentsList
 
             //height: 5 + hostInfos.height + 6
@@ -226,8 +227,10 @@ Item {
                     }
                     elide: Text.ElideRight
 
-                    text: model.name
-                    color: IngeScapeTheme.whiteColor
+                    text: hostItem.model_hostVM.name
+
+                    color: hostItem.model_hostVM.isON ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+
                     font: IngeScapeTheme.headingFont
                 }
 
@@ -241,7 +244,8 @@ Item {
                     }
                     elide: Text.ElideRight
 
-                    text: model.modelM.ipAddress
+                    text: hostItem.model_hostVM.modelM ? hostItem.model_hostVM.modelM.ipAddress : ""
+
                     color: IngeScapeTheme.lightBlueGreyColor
                     font: IngeScapeTheme.heading2Font
                 }
@@ -305,12 +309,12 @@ Item {
                                 // ON
                                 if (model.isON) {
                                     //console.log("QML: Stop " + model.name);
-                                    hostItem.model_host.stopAgent(model.QtObject);
+                                    hostItem.model_hostVM.stopAgent(model.QtObject);
                                 }
                                 // OFF
                                 else {
                                     //console.log("QML: Start " + model.name);
-                                    hostItem.model_host.startAgent(model.QtObject);
+                                    hostItem.model_hostVM.startAgent(model.QtObject);
                                 }
                             }
                         }
@@ -344,10 +348,10 @@ Item {
                             onClicked: {
                                 if (controller)
                                 {
-                                    //console.log("QML: Remove agent model " + model.name + " on " + hostItem.model_host.name);
+                                    //console.log("QML: Remove agent model " + model.name + " on " + hostItem.model_hostVM.name);
 
                                     // Remove the model of agent from our host
-                                    controller.removeAgentModelFromHost(model.QtObject, hostItem.model_host);
+                                    controller.removeAgentModelFromHost(model.QtObject, hostItem.model_hostVM);
                                 }
                             }
                         }
@@ -417,25 +421,17 @@ Item {
                         streamPopup.title = model.name;
                         receiver.start();
                     }
-                    model.QtObject.changeState();
+                    model.QtObject.changeStreamState();
                 }
             }
-
-            // GST not included in master branch
-//            Connections {
-//                    target: streamPopup
-//                    onClosing: {
-//                        receiver.stop();
-//                        model.QtObject.changeState();
-//                        close.accepted = true;
-//                    }
-//            }
        }
-
 
     }
 
 
+    //
+    // Menu popup with options
+    //
     PopUp.MenuPopup  {
         id : popupOptions
 
@@ -529,7 +525,3 @@ Item {
     }
 
 }
-
-
-
-

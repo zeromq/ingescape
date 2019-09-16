@@ -250,6 +250,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::replayLoadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayLoaded);
     connect(_networkC, &NetworkController::replayUNloadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayUNloaded);
     connect(_networkC, &NetworkController::replayEndedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayEnded);
+    connect(_networkC, &NetworkController::recordExported, _recordsSupervisionC, &RecordsSupervisionController::onRecordExported);
 
     connect(_networkC, &NetworkController::runAction, _scenarioC, &ScenarioController::onRunAction);
     connect(_networkC, &NetworkController::loadPlatformFileFromPath, this, &IngeScapeEditorController::_onLoadPlatformFileFromPath);
@@ -353,7 +354,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     if (_isAvailableModelVisualizer)
     {
         // Create a fake launcher for fake agents
-        _modelManager->onLauncherEntered("0", HOSTNAME_NOT_DEFINED, "0.0.0.0", "");
+        _modelManager->onLauncherEntered("0", HOSTNAME_NOT_DEFINED, "", "");
     }
 
 

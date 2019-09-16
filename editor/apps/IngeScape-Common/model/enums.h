@@ -99,6 +99,7 @@ static const QString command_ExecutedAction = "EXECUTED_ACTION";
 static const QString command_StartRecord = "START_RECORD";
 static const QString command_StopRecord = "STOP_RECORD";
 static const QString command_DeleteRecord = "DELETE_RECORD";
+static const QString command_ExportRecord = "EXPORT_RECORD";
 static const QString command_LoadReplay = "LOAD_REPLAY";
 static const QString command_UNloadReplay = "UNLOAD_REPLAY";
 static const QString command_StartReplay = "START_REPLAY";

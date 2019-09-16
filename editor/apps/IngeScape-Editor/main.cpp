@@ -161,8 +161,10 @@ void registerCustomQmlTypes()
     // Models
     //
     //----------------
+    //qmlRegisterUncreatableType<ActionMappingM>("INGESCAPE", 1, 0, "ActionMappingM", "Internal class");
     qmlRegisterUncreatableType<EditorEnums>("INGESCAPE", 1, 0, "EditorEnums", "Internal class");
     qmlRegisterUncreatableType<LogM>("INGESCAPE", 1, 0, "LogM", "Internal class");
+    qmlRegisterUncreatableType<RecordM>("INGESCAPE", 1, 0, "RecordM", "Internal class");
 
 
     //---------------
@@ -172,11 +174,13 @@ void registerCustomQmlTypes()
     //---------------
     qmlRegisterUncreatableType<ActionInMappingVM>("INGESCAPE", 1, 0, "ActionInMappingVM", "Internal class");
     qmlRegisterUncreatableType<AgentInMappingVM>("INGESCAPE", 1, 0, "AgentInMappingVM", "Internal class");
+    qmlRegisterUncreatableType<HostVM>("INGESCAPE", 1, 0, "HostVM", "Internal class");
     qmlRegisterUncreatableType<LinkConnectorVM>("INGESCAPE", 1, 0, "LinkConnectorVM", "Internal class");
     qmlRegisterUncreatableType<LinkInputVM>("INGESCAPE", 1, 0, "LinkInputVM", "Internal class");
     qmlRegisterUncreatableType<LinkOutputVM>("INGESCAPE", 1, 0, "LinkOutputVM", "Internal class");
     qmlRegisterUncreatableType<LinkVM>("INGESCAPE", 1, 0, "LinkVM", "Internal class");
     qmlRegisterUncreatableType<ObjectInMappingVM>("INGESCAPE", 1, 0, "ObjectInMappingVM", "Internal class");
+    qmlRegisterUncreatableType<RecordVM>("INGESCAPE", 1, 0, "RecordVM", "Internal class");
 
 
     //------------------

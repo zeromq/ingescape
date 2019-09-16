@@ -97,10 +97,11 @@ void HostsSupervisionController::onHostModelHasBeenCreated(HostM* host)
 
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(hostName);
+
         if (hostVM == nullptr)
         {
             // Create a view model for this model of host
-            hostVM = new HostVM(host, this);
+            hostVM = new HostVM(hostName, host, this);
 
             connect(hostVM, &HostVM::commandAskedToAgent, this, &HostsSupervisionController::commandAskedToAgent);
             connect(hostVM, &HostVM::commandAskedToLauncher, this, &HostsSupervisionController::commandAskedToLauncher);
@@ -120,6 +121,19 @@ void HostsSupervisionController::onHostModelHasBeenCreated(HostM* host)
                 }
             }
         }
+        else
+        {
+            if (hostVM->modelM() == nullptr)
+            {
+                // Set the model of host
+                hostVM->setmodelM(host);
+
+                // FIXME: Do something for agents ?
+            }
+            else {
+                qCritical() << "A model of host already exist for the view model" << hostName;
+            }
+        }
     }
 }
 
@@ -136,9 +150,10 @@ void HostsSupervisionController::onHostModelWillBeDeleted(HostM* host)
 
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(hostName);
+
         if (hostVM != nullptr)
         {
-            disconnect(hostVM, nullptr, this, nullptr);
+            /*disconnect(hostVM, nullptr, this, nullptr);
 
             _hashFromNameToHost.remove(hostName);
 
@@ -152,7 +167,16 @@ void HostsSupervisionController::onHostModelWillBeDeleted(HostM* host)
             _hostsList.remove(hostVM);
 
             // Free memory
-            delete hostVM;
+            delete hostVM;*/
+
+            if (hostVM->modelM() == host)
+            {
+                // Simply, remove the model of host from this view model
+                hostVM->setmodelM(nullptr);
+            }
+            else {
+                qCritical() << "The model of host does not correspond to the view model" << hostName;
+            }
         }
     }
 }

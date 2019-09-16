@@ -128,6 +128,13 @@ public:
 
 
     /**
+     * @brief Export a record
+     * @param recordId
+     */
+    Q_INVOKABLE void exportRecord(QString recordId);
+
+
+    /**
      * @brief Get the name of the current replay
      * @return
      */
@@ -219,6 +226,12 @@ public Q_SLOTS:
      * @brief Slot called when a replay has ended
      */
     void onReplayEnded();
+
+
+    /**
+     * @brief Slot called when a record has been exported
+     */
+    void onRecordExported();
 
 
 private Q_SLOTS:
