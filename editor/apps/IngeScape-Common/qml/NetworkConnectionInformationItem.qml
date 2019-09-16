@@ -38,6 +38,11 @@ I2CustomRectangle {
     // Selected index of our list of network devices
     property alias listOfNetworkDevicesSelectedIndex: selectNetworkDeviceCombobox.selectedIndex;
 
+    // Error message
+    property alias errorMessage: textErrorMessage.text
+
+    // Auto-close timeout in milliseconds
+    property alias autoCloseTimeoutInMilliseconds: autoCloseTimer.interval
 
 
     //
@@ -68,6 +73,9 @@ I2CustomRectangle {
 
         // Flag indicating if our edition mode is opened
         property bool isEditionModeOpened: false
+
+        // Flag indicating if we can auto-close our edition mode
+        property bool canAutoCloseEditionMode: false
     }
 
 
@@ -100,17 +108,53 @@ I2CustomRectangle {
     // Open our widget
     function open()
     {
-        // Notify change
-        root.willOpenEditionMode();
+        if (!rootPrivate.isEditionModeOpened)
+        {
+            // Notify change
+            root.willOpenEditionMode();
 
-        // Update internal state
-        rootPrivate.isEditionModeOpened = true;
+            // Update internal states
+            rootPrivate.isEditionModeOpened = true;
+            rootPrivate.canAutoCloseEditionMode = true;
 
-        // Get focus
-        root.forceActiveFocus();
+            // Get focus
+            root.forceActiveFocus();
 
-        // Reset UI
-        // - network device
+            // Reset UI
+            // - network device
+            resetListOfNetworkDevices();
+            // - port
+            selectPortTextfield.text = Qt.binding(function() {
+               return root.currentPort;
+            });
+            // - clearPlatform flag
+            clearPlatform.checked = true;
+        }
+    }
+
+
+    // Close our widget
+    function close()
+    {
+        if (rootPrivate.isEditionModeOpened)
+        {
+            // Stop our timer
+            autoCloseTimer.stop();
+
+            // Notify change
+            root.willCloseEditionMode();
+
+            // Update internal states
+            rootPrivate.isEditionModeOpened = false;
+            rootPrivate.canAutoCloseEditionMode = false;
+        }
+    }
+
+
+
+    // Reset our list of network devices
+    function resetListOfNetworkDevices()
+    {
         selectNetworkDeviceCombobox.selectedIndex = Qt.binding(function() {
            return (
                    (root.listOfNetworkDevices)
@@ -118,23 +162,6 @@ I2CustomRectangle {
                    : -1
                    );
         });
-        // - port
-        selectPortTextfield.text = Qt.binding(function() {
-           return root.currentPort;
-        });
-        // - clearPlatform flag
-        clearPlatform.checked = true;
-    }
-
-
-    // Close our widget
-    function close()
-    {
-        // Notify change
-        root.willCloseEditionMode();
-
-        // Update internal state
-        rootPrivate.isEditionModeOpened = false;
     }
 
 
@@ -143,13 +170,21 @@ I2CustomRectangle {
     {
         return (
                 // Coherent values
-                (index > 0)
+                (index >= 0)
                 && (networkDevice !== "")
                 && (port !== "")
                 // Values are still available
                 && listOfNetworkDevices
                 && (listOfNetworkDevices.indexOf(networkDevice) >= 0)
                 );
+    }
+
+
+    // Reset auto-close timer
+    function resetAutoCloseTimer()
+    {
+        rootPrivate.canAutoCloseEditionMode = false;
+        rootPrivate.canAutoCloseEditionMode = true;
     }
 
 
@@ -181,6 +216,23 @@ I2CustomRectangle {
         rootPrivate.canPerformAnimations = true;
     }
 
+
+
+    Timer {
+        id: autoCloseTimer
+
+        running: root.isOnline && rootPrivate.canAutoCloseEditionMode
+                 && !(selectNetworkDeviceCombobox.comboList.visible || selectPortTextfield.activeFocus)
+
+        repeat: false
+        triggeredOnStart: false
+
+        interval: 20000
+
+        onTriggered: {
+            root.close();
+        }
+    }
 
 
 
@@ -300,7 +352,7 @@ I2CustomRectangle {
                 font {
                     family: IngeScapeTheme.textFontFamily
                     weight: Font.Medium
-                    pixelSize: 16
+                    pixelSize: 18
                 }
 
                 elide: Text.ElideRight
@@ -387,7 +439,7 @@ I2CustomRectangle {
 
                             height: 1
 
-                            color: background.borderColor
+                            color: root.borderColor
                         }
                     }
 
@@ -404,7 +456,7 @@ I2CustomRectangle {
                         font {
                             family: IngeScapeTheme.textFontFamily
                             weight: Font.Medium
-                            pixelSize: 20
+                            pixelSize: 18
                         }
                     }
                 }
@@ -487,6 +539,11 @@ I2CustomRectangle {
                                 return selectNetworkDeviceCombobox.modelToString(selectNetworkDeviceCombobox.model[index]);
                             }
                         }
+
+
+                        onSelectedIndexChanged: {
+                            root.resetAutoCloseTimer();
+                        }
                     }
                 }
 
@@ -566,6 +623,11 @@ I2CustomRectangle {
                             property: "text"
                             value: root.currentPort
                         }
+
+
+                        onTextChanged: {
+                            root.resetAutoCloseTimer();
+                        }
                     }
 
                 }
@@ -619,8 +681,37 @@ I2CustomRectangle {
                             }
                         }
                     }
+
+
+                    onCheckedChanged: {
+                        root.resetAutoCloseTimer();
+                    }
                 }
 
+
+                // Error message
+                Text {
+                    id: textErrorMessage
+
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    wrapMode: Text.WordWrap
+
+                    color: IngeScapeTheme.orangeColor
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight: Font.Medium
+                        pixelSize: 16
+                    }
+
+                    text: ""
+
+                    visible: (text.length !== 0)
+                }
 
 
                 // Actions
