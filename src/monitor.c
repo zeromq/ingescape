@@ -309,7 +309,7 @@ void igs_monitoringDisable(void){
 #endif
 }
 
-bool igs_isMonitoringEnabled(){
+bool igs_isMonitoringEnabled(void){
     return (monitor != NULL);
 }
 

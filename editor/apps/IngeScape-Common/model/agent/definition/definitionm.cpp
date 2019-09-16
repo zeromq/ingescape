@@ -14,6 +14,8 @@
 
 #include "definitionm.h"
 
+#include <misc/ingescapeutils.h>
+
 /**
  * @brief Constructor
  * @param name
@@ -445,7 +447,7 @@ bool operator==(const DefinitionM& left, const DefinitionM& right)
             && listsAreEqual(left.inputsIdsList(), right.inputsIdsList())
             && listsAreEqual(left.outputsIdsList(), right.outputsIdsList())
             && listsAreEqual(left.parametersIdsList(), right.parametersIdsList())
-            && left.getCallsList() == right.getCallsList();
+            && IngeScapeUtils::arePointerListsEqual(left.getCallsList(), right.getCallsList());
 }
 
 /**

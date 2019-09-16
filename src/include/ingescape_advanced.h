@@ -50,7 +50,7 @@ PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 PUBLIC void igs_monitoringEnable(unsigned int period); //in milliseconds
 PUBLIC void igs_monitoringEnableWithExpectedDevice(unsigned int period, const char* networkDevice, unsigned int port);
 PUBLIC void igs_monitoringDisable(void);
-PUBLIC bool igs_isMonitoringEnabled();
+PUBLIC bool igs_isMonitoringEnabled(void);
 //When the monitor is started and igs_monitoringShallStartStopAgent is set to true :
 // - IP change will cause the agent to restart on the new IP (same device, same port)
 // - Network device disappearance will cause the agent to stop. Agent will restart when device is back.

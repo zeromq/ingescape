@@ -140,6 +140,41 @@ public:
     static void bookUIDforActionInMappingVM(QString uid);
 
 
+    /**
+     * @brief Compare the values pointed by the elements of both lists
+     * instead of comparing the pointers.
+     */
+    template<class T>
+    static bool arePointerListsEqual(const QList<T*> & left, const QList<T*>& right)
+    {
+        bool equality = true;
+
+        // Compare the refs lists
+        if (left.length() != right.length())
+        {
+            equality = false;
+        }
+        else
+        {
+            for(T* leftItem : left)
+            {
+                // Check if any element of 'right' is equal to 'leftItem'
+                equality = std::any_of(right.begin(), right.end(), [leftItem](T* rightItem) {
+                        return (leftItem == nullptr && rightItem == nullptr)
+                        || (*leftItem == *rightItem);
+                });
+
+                if (!equality)
+                {
+                    break;
+                }
+            }
+        }
+
+        return equality;
+    }
+
+
 protected:
     /**
      * @brief Get (and create if needed) the fullpath of a given sub-directory
