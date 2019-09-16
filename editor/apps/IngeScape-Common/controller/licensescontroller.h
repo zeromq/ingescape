@@ -92,6 +92,7 @@ public:
      */
     Q_INVOKABLE void importLicense();
 
+
     /**
      * @brief Get the data about licenses
      */
@@ -99,11 +100,23 @@ public:
 
 
 Q_SIGNALS:
+    /**
+     * @brief Triggered to update licenses data
+     */
+    void needsUpdate();
+
 
     /**
      * @brief Signal emitted when the licenses have been updated
      */
     void licensesUpdated();
+
+
+protected Q_SLOTS:
+    /**
+     * @brief Called when our needsUpdate signal is triggered
+     */
+    void _onNeedsUpdate();
 
 
 private:
