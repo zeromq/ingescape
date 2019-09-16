@@ -134,12 +134,15 @@ ApplicationWindow {
             MenuItem {
                 text: qsTr("Preferences...")
 
+                //FIXME: enable this MenuItem when PreferencesPopup is ready (designed and coded)
+                enabled: false
+
                 shortcut: StandardKey.Preferences
 
                 onTriggered: {
                     if (applicationLoader.item) {
-                        console.log("QML: Open network configuration popup");
-                        applicationLoader.item.openConfiguration();
+                        console.log("QML: Open preferences popup");
+                        applicationLoader.item.openPreferences();
                     }
                 }
             }

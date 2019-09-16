@@ -23,7 +23,6 @@
         <file>qml/host/HostsList.qml</file>
         <file>settings/IngeScape-Editor.ini</file>
         <file>qml/record/RecordsList.qml</file>
-        <file>qml/NetworkConfiguration.qml</file>
         <file>qml/agent/AgentFilesPaths.qml</file>
         <file>qml/theme/ButtonStyleOfOption.qml</file>
         <file>qml/agent/LogStreamPanel.qml</file>
@@ -43,5 +42,6 @@
         <file>qml/agentsmapping/ActionInMapping.qml</file>
         <file>qml/popup/SaveBeforeQuitPopup.qml</file>
         <file>qml/GettingStartedWindow.qml</file>
+        <file>qml/popup/PreferencesPopup.qml</file>
     </qresource>
 </RCC>

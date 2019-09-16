@@ -36,6 +36,9 @@ import "record" as Record
 // scenario sub-directory
 import "scenario" as Scenario
 
+// popups
+import "popup" as Popup
+
 
 Item {
     id: rootItem
@@ -75,14 +78,10 @@ Item {
 
 
     //
-    // Function allowing to open the network configuration popup
+    // Function allowing to open the Preferences popup
     //
-    function openConfiguration() {
-        if (IngeScapeEditorC.networkC) {
-            IngeScapeEditorC.networkC.updateAvailableNetworkDevices();
-        }
-
-        networkConfigurationPopup.open();
+    function openPreferences() {
+        preferencesPopup.open();
     }
 
 
@@ -117,7 +116,7 @@ Item {
         if (IngeScapeEditorC.errorMessageWhenConnectionFailed !== "")
         {
             //console.error("On Completed: Error Message = " + IngeScapeEditorC.errorMessageWhenConnectionFailed);
-            networkConfigurationPopup.open();
+            networkConfigurationInfo.open();
         }
 
         // ...we check the value of the flag "is Valid License"
@@ -204,6 +203,7 @@ Item {
 
             listOfNetworkDevices: IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices : null
 
+            errorMessage: IngeScapeEditorC.errorMessageWhenConnectionFailed
 
             onWillOpenEditionMode: {
                 // Update our list of available network devices
@@ -573,11 +573,13 @@ Item {
     }
 
 
+
+
     //
-    // Network Configuration (Popup)
+    // Preferences popup
     //
-    NetworkConfiguration {
-        id: networkConfigurationPopup
+    Popup.PreferencesPopup {
+        id: preferencesPopup
 
         anchors.centerIn: parent
     }
@@ -594,6 +596,10 @@ Item {
         licenseController: IngeScapeEditorC.licensesC
     }
 
+
+    //
+    // Getting started window
+    //
     GettingStartedWindow {
         id: gettingStartedWindow
     }
