@@ -495,7 +495,7 @@ Item {
                     }
 
                     onClicked: {
-                        console.log("QML: clik on option 'Reboot'");
+                        console.log("QML: click on option 'Reboot'");
 
                         popupOptions.close();
                     }
@@ -515,7 +515,7 @@ Item {
                     }
 
                     onClicked: {
-                        console.log("QML: clik on option 'View Screen'");
+                        console.log("QML: click on option 'View Screen'");
 
                         popupOptions.close();
                     }

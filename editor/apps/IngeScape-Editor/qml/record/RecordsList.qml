@@ -570,7 +570,7 @@ Item {
 
 
                 onClicked: {
-                    console.log("QML: Open options...");
+                    //console.log("QML: Open options...");
 
                     // Parent must be record item and not the list to have good x and y value
                     popupOptions.parent = recordItem;
@@ -654,7 +654,7 @@ Item {
                     }
 
                     onClicked: {
-                        console.log("QML: clik on option 'Export'");
+                        //console.log("QML: click on option 'Export'");
 
                         if (rootItem.controller) {
                             rootItem.controller.exportRecord(popupOptions.recordId);
