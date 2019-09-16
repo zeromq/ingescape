@@ -700,11 +700,11 @@ I2CustomRectangle {
 
                     wrapMode: Text.WordWrap
 
-                    color: IngeScapeTheme.orangeColor
+                    color: (root.isOnline) ? IngeScapeTheme.orangeColor : IngeScapeTheme.whiteColor
 
                     font {
                         family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
+                        bold: true
                         pixelSize: 16
                     }
 
