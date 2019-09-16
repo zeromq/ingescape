@@ -24,7 +24,7 @@ I2CustomRectangle {
     property bool isOnline: false
 
     // Current network device
-    property string currentNetworkDevice: "null"
+    property string currentNetworkDevice: ""
 
     // Current port
     property int currentPort: 31520
@@ -43,8 +43,8 @@ I2CustomRectangle {
     //
     // Configure our item
     //
-    width: childrenRect.x * 2 + childrenRect.width
-    height: childrenRect.y * 2 + childrenRect.height
+    width: content.x * 2 + content.width
+    height: content.y * 2 + content.height
 
     bottomLeftRadius: 5
 
@@ -78,8 +78,16 @@ I2CustomRectangle {
     //
     //--------------------------------------------------------
 
+    // Triggered when our edition mode will be opened
+    signal willOpenEditionMode();
 
+    // Triggered when our edition mode will be closed
+    signal willCloseEditionMode();
+
+
+    // Triggered when we press the "OK" button
     signal changeNetworkSettings(string networkDevice, int port, bool clearPlatform);
+
 
 
 
@@ -92,16 +100,57 @@ I2CustomRectangle {
     // Open our widget
     function open()
     {
+        // Notify change
+        root.willOpenEditionMode();
+
+        // Update internal state
         rootPrivate.isEditionModeOpened = true;
+
+        // Get focus
+        root.forceActiveFocus();
+
+        // Reset UI
+        // - network device
+        selectNetworkDeviceCombobox.selectedIndex = Qt.binding(function() {
+           return (
+                   (root.listOfNetworkDevices)
+                   ? root.listOfNetworkDevices.indexOf(root.currentNetworkDevice)
+                   : -1
+                   );
+        });
+        // - port
+        selectPortTextfield.text = Qt.binding(function() {
+           return root.currentPort;
+        });
+        // - clearPlatform flag
+        clearPlatform.checked = true;
     }
 
 
     // Close our widget
     function close()
     {
+        // Notify change
+        root.willCloseEditionMode();
+
+        // Update internal state
         rootPrivate.isEditionModeOpened = false;
     }
 
+
+    // Check if values are valid or not
+    function checkValues(index, networkDevice, port, forceQmlUpdate)
+    {
+        return (
+                // Coherent values
+                (index > 0)
+                && (networkDevice !== "")
+                && (port !== "")
+                // Values are still available
+                && listOfNetworkDevices
+                && (listOfNetworkDevices.indexOf(networkDevice) >= 0)
+                );
+    }
 
 
     //--------------------------------------------------------
@@ -310,7 +359,7 @@ I2CustomRectangle {
                     right: parent.right
                 }
 
-                spacing: 10
+                spacing: 15
 
                 // Title
                 Column {
@@ -438,13 +487,7 @@ I2CustomRectangle {
                                 return selectNetworkDeviceCombobox.modelToString(selectNetworkDeviceCombobox.model[index]);
                             }
                         }
-
-
-                        onSelectedItemChanged: {
-                            // TODO
-                        }
                     }
-
                 }
 
 
@@ -498,13 +541,13 @@ I2CustomRectangle {
 
                         style: I2TextFieldStyle {
                             backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                            borderColor: IngeScapeTheme.whiteColor;
+                            borderColor: IngeScapeTheme.whiteColor
                             borderErrorColor: IngeScapeTheme.redColor
                             radiusTextBox: 1
-                            borderWidth: 0;
+                            borderWidth: 0
                             borderWidthActive: 1
-                            textIdleColor: IngeScapeTheme.whiteColor;
-                            textDisabledColor: IngeScapeTheme.darkGreyColor;
+                            textIdleColor: IngeScapeTheme.whiteColor
+                            textDisabledColor: IngeScapeTheme.darkGreyColor
 
                             padding {
                                 left: 3
@@ -521,15 +564,69 @@ I2CustomRectangle {
                         Binding {
                             target: selectPortTextfield
                             property: "text"
-                            value: root.port
+                            value: root.currentPort
                         }
                     }
 
                 }
 
 
+                // Clear platform ?
+                CheckBox {
+                    id: clearPlatform
+
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    checked: true
+
+                    activeFocusOnPress: true
+
+                    style: CheckBoxStyle {
+                        label: Text {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                                verticalCenterOffset: 2
+                            }
+
+                            text: qsTr("Clear platform when modified")
+
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                pixelSize: 16
+                            }
+
+                            color: control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                        }
+
+                        indicator: Rectangle {
+                            implicitWidth: 14
+                            implicitHeight: 14
+
+                            border.width: 0
+
+                            color: IngeScapeTheme.darkBlueGreyColor
+
+                            I2SvgItem {
+                                visible: control.checked
+
+                                anchors.centerIn: parent
+
+                                svgFileCache: IngeScapeTheme.svgFileIngeScape
+                                svgElementId: "check"
+                            }
+                        }
+                    }
+                }
+
+
+
                 // Actions
                 Item {
+                    id: actions
+
                     anchors {
                         left: parent.left
                         right: parent.right
@@ -546,15 +643,19 @@ I2CustomRectangle {
                             bottom: parent.bottom
                         }
 
-                        height: childrenRect.height
+                        height: actions.buttonBoundingBox.height
 
                         spacing: 15
 
                         Button {
                             id: buttonCancel
 
-                            width: buttonBoundingBox.width
-                            height: buttonBoundingBox.height
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                            }
+
+                            width: actions.buttonBoundingBox.width
 
                             activeFocusOnPress: true
 
@@ -586,10 +687,18 @@ I2CustomRectangle {
                         Button {
                             id: buttonOk
 
-                            width: buttonBoundingBox.width
-                            height: buttonBoundingBox.height
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                            }
 
-                            enabled: false
+                            width: actions.buttonBoundingBox.width
+
+                            enabled: root.checkValues(selectNetworkDeviceCombobox.selectedIndex,
+                                                      selectNetworkDeviceCombobox.selectedItem,
+                                                      selectPortTextfield.text,
+                                                      (root.listOfNetworkDevices ? root.listOfNetworkDevices.length : 0)
+                                                      )
 
                             activeFocusOnPress: true
 
@@ -604,8 +713,8 @@ I2CustomRectangle {
 
                                 font {
                                     family: IngeScapeTheme.textFontFamily
-                                    weight : Font.Medium
-                                    pixelSize : 16
+                                    weight: Font.Medium
+                                    pixelSize: 16
                                 }
                                 labelColorPressed: IngeScapeTheme.blackColor
                                 labelColorReleased: IngeScapeTheme.whiteColor
@@ -613,7 +722,7 @@ I2CustomRectangle {
                             }
 
                             onClicked: {
-                                //TODO
+                                root.changeNetworkSettings(selectNetworkDeviceCombobox.selectedItem, selectPortTextfield.text, clearPlatform.checked);
                             }
                         }
                     }
@@ -622,4 +731,21 @@ I2CustomRectangle {
         }
     }
 
+
+
+
+    //--------------------------------------------------------
+    //
+    // Layers
+    //
+    //--------------------------------------------------------
+
+    // layer used to display comboboxes
+    I2Layer {
+        id: overlayLayerComboBox
+
+        objectName: "overlayLayerComboBox"
+
+        anchors.fill: parent
+    }
 }

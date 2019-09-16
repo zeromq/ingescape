@@ -499,8 +499,8 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
  */
 IngeScapeNetworkController::~IngeScapeNetworkController()
 {
-    // Disable IGS monitoring
-    igs_monitoringDisable();
+    // Stop monitoring
+    stopMonitoring();
 
     // Stop our IngeScape agent
     stop();
@@ -542,11 +542,8 @@ bool IngeScapeNetworkController::start(QString networkDevice, QString ipAddress,
             // Update internal state
             setisOnline(true);
 
-            // Start monitoring if needed
-            if (!igs_isMonitoringEnabled())
-            {
-                igs_monitoringEnable(INGESCAPENETWORKCONTROLLER_IGS_MONITOR_TIMEOUT_IN_MILLISECONDS);
-            }
+            // Start monitoring
+            startMonitoring();
 
             // Log
             qInfo() << "IngeScape Agent" << _igsAgentApplicationName << "started";
@@ -596,6 +593,25 @@ bool IngeScapeNetworkController::restart()
 {
     stop();
     return start(_lastArgumentsOfStart_networkDevice, _lastArgumentsOfStart_ipAddress, _lastArgumentsOfStart_port);
+}
+
+
+
+/**
+ * @brief Start monitoring
+ */
+void IngeScapeNetworkController::startMonitoring()
+{
+    igs_monitoringEnable(INGESCAPENETWORKCONTROLLER_IGS_MONITOR_TIMEOUT_IN_MILLISECONDS);
+}
+
+
+/**
+ * @brief Stop monitoring
+ */
+void IngeScapeNetworkController::stopMonitoring()
+{
+    igs_monitoringDisable();
 }
 
 
