@@ -98,11 +98,23 @@ public:
 
 
     /**
-     * @brief Restart our ingescape agent
+     * @brief Restart our ingescape agent (stop + start with arguments used in the last call to start)
      *
      * @return true if our agent has restarted
      */
     bool restart();
+
+
+    /**
+     * @brief Start monitoring
+     */
+    void startMonitoring();
+
+
+    /**
+     * @brief Stop monitoring
+     */
+    void stopMonitoring();
 
 
     /**

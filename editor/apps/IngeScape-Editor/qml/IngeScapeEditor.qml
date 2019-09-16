@@ -205,17 +205,11 @@ Item {
             listOfNetworkDevices: IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices : null
 
 
-            onIsEditionModeOpenedChanged: {
-                if (isEditionModeOpened)
+            onWillOpenEditionMode: {
+                // Update our list of available network devices
+                if (IngeScapeEditorC.networkC)
                 {
-                    // Update our list of available network devices
-                    if (IngeScapeEditorC.networkC)
-                    {
-                        IngeScapeEditorC.networkC.updateAvailableNetworkDevices();
-                    }
-
-                    // Update selected index
-                    listOfNetworkDevicesSelectedIndex = IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices.indexOf(IngeScapeEditorC.networkDevice) : -1;
+                    IngeScapeEditorC.networkC.updateAvailableNetworkDevices();
                 }
             }
 
@@ -226,7 +220,7 @@ Item {
                     var success = IngeScapeEditorC.restartNetwork(port, networkDevice, clearPlatform);
                     if (success)
                     {
-                        networkConfigurationInfo.close();
+                        close();
                     }
                     else
                     {
