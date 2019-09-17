@@ -95,7 +95,7 @@ DIR *opendir(const char *name)
         if((dir = (DIR *) malloc(sizeof *dir)) != 0 &&
            (dir->name = (char *) malloc(base_length + strlen(all) + 1)) != 0)
         {
-            strcat(strcpy(dir->name, name), all);
+            strncat(strcpy(dir->name, name), all, strlen(name) + strlen (all) + 1);
             
             if((dir->handle =
                 (handle_type) _findfirst(dir->name, &dir->info)) != -1)

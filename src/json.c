@@ -370,11 +370,11 @@ igsJSONTreeNode_t* igs_JSONTreeGetNodeAtPath(igsJSONTreeNode_t* node, const char
 }
 
 bool igs_JSONTreeIsValueAnInteger(igsJSONTreeNode_t *value){
-    return IGSYAJL_IS_INTEGER(value);
+    return IGSYAJL_IS_INTEGER((igsyajl_val)value);
 }
 
 bool igs_JSONTreeIsValueADouble(igsJSONTreeNode_t *value){
-    return IGSYAJL_IS_DOUBLE(value);
+    return IGSYAJL_IS_DOUBLE((igsyajl_val)value);
 }
 
 // TEST SCRIPT

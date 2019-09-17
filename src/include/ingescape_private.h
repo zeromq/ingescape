@@ -209,12 +209,12 @@ typedef struct license {
     char *id;
     char *customer;
     char *order;
-    long licenseExpirationDate;
+    time_t licenseExpirationDate;
     bool isLicenseValid;
     int platformNbAgents;
     int platformNbIOPs;
     char *editorOwner;
-    long editorExpirationDate;
+    time_t editorExpirationDate;
     bool isEditorLicenseValid;
     zhash_t *features;
     zhash_t *agents;
