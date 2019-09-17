@@ -215,7 +215,7 @@ Item {
                     rightMargin: 12
                 }
 
-                spacing: 5
+                spacing: 8
 
                 // Name
                 Text {
@@ -225,6 +225,7 @@ Item {
                         left : parent.left
                         right : parent.right
                     }
+
                     elide: Text.ElideRight
 
                     text: hostItem.model_hostVM.name
@@ -242,6 +243,8 @@ Item {
                         left : parent.left
                         right : parent.right
                     }
+                    height: if (text == "") { 0 }
+
                     elide: Text.ElideRight
 
                     text: hostItem.model_hostVM.modelM ? hostItem.model_hostVM.modelM.ipAddress : ""

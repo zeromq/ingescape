@@ -25,3 +25,22 @@ do
     ingelicense --read ./licenses/$m.igslicense
     echo ""
 done
+
+#licenses for airbus
+echo "License for AirbusControlDeck"
+ingelicense \
+    --id AirbusControlDeck \
+    --customer Airbus \
+    --order ORFE \
+    --expiration 2050/12/31 \
+    --editorExpiration 2050/12/31 \
+    --features /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/features.txt \
+    --agents /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/agents.txt \
+    --editorOwner "Jérome Barbé" \
+    --features ./src/features.txt \
+    --agents ./src/agents.txt \
+    --output ./licenses/AirbusControlDeck.igslicense
+echo ""
+echo "Read license for AirbusControlDeck"
+ingelicense --read ./licenses/AirbusControlDeck.igslicense
+echo ""

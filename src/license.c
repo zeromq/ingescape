@@ -458,24 +458,30 @@ void license_readLicense(void){
                     if (license->id == NULL){
                         license->id = strdup(detail->id);
                     }else{
+                        char *tempId = strdup(license->id);
                         license->id = realloc(license->id, strlen(license->id) + strlen(detail->id) + 3);
-                        sprintf(license->id, "%s, %s", license->id, detail->id);
+                        sprintf(license->id, "%s, %s", tempId, detail->id);
+                        free(tempId);
                     }
                 }
                 if (detail->customer != NULL){
                     if (license->customer == NULL){
                         license->customer = strdup(detail->customer);
                     }else{
+                        char *tempCustomer = strdup(license->customer);
                         license->customer = realloc(license->customer, strlen(license->customer) + strlen(detail->customer) + 3);
-                        sprintf(license->customer, "%s, %s", license->customer, detail->customer);
+                        sprintf(license->customer, "%s, %s", tempCustomer, detail->customer);
+                        free(tempCustomer);
                     }
                 }
                 if (detail->order != NULL){
                     if (license->order == NULL){
                         license->order = strdup(detail->order);
                     }else{
+                        char *tempOrder = strdup(license->order);
                         license->order = realloc(license->order, strlen(license->order) + strlen(detail->order) + 3);
-                        sprintf(license->order, "%s, %s", license->order, detail->order);
+                        sprintf(license->order, "%s, %s", tempOrder, detail->order);
+                        free(tempOrder);
                     }
                 }
                 if (license->licenseExpirationDate < detail->licenseExpirationDate){
@@ -524,8 +530,10 @@ void license_readLicense(void){
                     if (license->editorOwner == NULL){
                         license->editorOwner = strdup(detail->editorOwner);
                     }else{
+                        char *tempOwner = strdup(license->editorOwner);
                         license->editorOwner = realloc(license->editorOwner, strlen(license->editorOwner) + strlen(detail->editorOwner) + 3);
-                        sprintf(license->editorOwner, "%s, %s", license->editorOwner, detail->editorOwner);
+                        sprintf(license->editorOwner, "%s, %s", tempOwner, detail->editorOwner);
+                        free(tempOwner);
                     }
                 }
                 if (license->editorExpirationDate < detail->editorExpirationDate){

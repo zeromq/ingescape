@@ -78,25 +78,27 @@ void admin_computeTime(char *dest){
 #endif
     }
 
-void admin_makeFilePath(const char *from, char *to, size_t size_of_to)
-{
-#if defined(__unix__) || defined(__linux__) || \
-(defined(__APPLE__) && defined(__MACH__))
-    if (from[0] == '~'){
+void admin_makeFilePath(const char *from, char *to, size_t size_of_to){
+    if (from[0] == '~') {
         from++;
+#ifdef _WIN32
+        char *home = getenv("USERPROFILE");
+#else
         char *home = getenv("HOME");
-        strncpy(to, home, size_of_to);
-        strncat(to, from, size_of_to - strlen(home));
-    }else{
+#endif
+        if (home == NULL) {
+            igs_error("could not find path for home directory");
+        } else {
+            strncpy(to, home, size_of_to);
+            strncat(to, from, size_of_to);
+        }
+    }
+    else {
         strncpy(to, from, size_of_to);
     }
-#else
-    //on Windows, just copy from to to
-    strncpy(to, from, size_of_to);
-#endif
 }
 
-void admin_lock(void)   {
+void admin_lock(void){
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
     if (lock == NULL){

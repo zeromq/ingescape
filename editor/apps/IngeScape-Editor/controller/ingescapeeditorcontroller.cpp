@@ -120,6 +120,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
 
 
+    // Create the (sub) directory "exports" if not exist (the directory contains CSV files about exports)
+    IngeScapeUtils::getExportsPath();
+
+
     //
     // Settings
     //
@@ -268,6 +272,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     connect(_modelManager, &EditorModelManager::hostModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onHostModelHasBeenCreated);
     connect(_modelManager, &EditorModelManager::hostModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onHostModelWillBeDeleted);
+    connect(_modelManager, &EditorModelManager::previousHostParsed, _hostsSupervisionC, &HostsSupervisionController::onPreviousHostParsed);
 
     connect(_modelManager, &EditorModelManager::agentsGroupedByNameHasBeenCreated, _valuesHistoryC, &ValuesHistoryController::onAgentsGroupedByNameHasBeenCreated);
     connect(_modelManager, &EditorModelManager::agentsGroupedByNameHasBeenCreated, _agentsMappingC, &AgentsMappingController::onAgentsGroupedByNameHasBeenCreated);
@@ -353,8 +358,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     if (_isAvailableModelVisualizer)
     {
-        // Create a fake launcher for fake agents
-        _modelManager->onLauncherEntered("0", HOSTNAME_NOT_DEFINED, "", "");
+        // Emit the signal "Previous Host Parsed" to create the fake host "HOSTNAME_NOT_DEFINED"
+        Q_EMIT _modelManager->previousHostParsed(HOSTNAME_NOT_DEFINED, "...");
     }
 
 

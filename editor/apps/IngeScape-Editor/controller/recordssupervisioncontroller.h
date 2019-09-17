@@ -48,7 +48,7 @@ class RecordsSupervisionController : public QObject
     I2_QML_PROPERTY_READONLY(bool, isRecorderON)
 
     // List of records
-    I2_QOBJECT_LISTMODEL(RecordVM, recordsList)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(RecordVM, recordsList)
 
     // Selected Record in the Records list
     //I2_QML_PROPERTY_DELETE_PROOF(RecordVM*, selectedRecord)
