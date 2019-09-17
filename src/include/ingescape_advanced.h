@@ -58,8 +58,8 @@ PUBLIC void igs_monitoringShallStartStopAgent(bool flag);
 typedef enum {
     IGS_NETWORK_OK = 1, //Default status when the monitor starts
     IGS_NETWORK_DEVICE_NOT_AVAILABLE, //Status when our network device is not available
-    IGS_NETWORK_ADDRESS_CHANGED, //Only used in callback when the IP address of our netowrk device has changed
-    IGS_NETWORK_OK_AFTER_MANUAL_RESTART // Only used in callback when our agent has been manually restarted with a call to startWithDevice or igs_startWithIP
+    IGS_NETWORK_ADDRESS_CHANGED, //Status when the IP address of our network device has changed
+    IGS_NETWORK_OK_AFTER_MANUAL_RESTART // Status when our agent has been manually restarted and is now OK
 } igs_monitorEvent_t;
 typedef void (*igs_monitorCallback)(igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData);
 PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);

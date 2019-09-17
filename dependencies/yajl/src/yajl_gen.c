@@ -210,7 +210,7 @@ igsyajl_gen_integer(igsyajl_gen g, long long int number)
 {
     char i[32];
     ENSURE_VALID_STATE; ENSURE_NOT_KEY; INSERT_SEP; INSERT_WHITESPACE;
-    sprintf(i, "%lld", number);
+    snprintf(i, 32, "%lld", number);
     g->print(g->ctx, i, (unsigned int)strlen(i));
     APPENDED_ATOM;
     FINAL_NEWLINE;
@@ -230,9 +230,9 @@ igsyajl_gen_double(igsyajl_gen g, double number)
     ENSURE_VALID_STATE; ENSURE_NOT_KEY;
     if (isnan(number) || isinf(number)) return igsyajl_gen_invalid_number;
     INSERT_SEP; INSERT_WHITESPACE;
-    sprintf(i, "%.20g", number);
+    snprintf(i, 32, "%.20g", number);
     if (strspn(i, "0123456789-") == strlen(i)) {
-        strcat(i, ".0");
+        strncat(i, ".0", 32);
     }
     g->print(g->ctx, i, (unsigned int)strlen(i));
     APPENDED_ATOM;

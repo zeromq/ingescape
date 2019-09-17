@@ -2175,12 +2175,10 @@ void igs_setCommandLineFromArgs(int argc, const char * argv[]){
         igs_error("passed args must at least contain one element");
         return;
     }
-    
-    
     char cmd[COMMAND_LINE_LENGTH] = "";
     
 #if defined __linux__ || defined __APPLE__ || defined __unix__
-    int ret;
+    size_t ret;
     pid_t pid;
     pid = getpid();
 #ifdef __APPLE__
@@ -2194,7 +2192,7 @@ void igs_setCommandLineFromArgs(int argc, const char * argv[]){
 #else
     char pathbuf[4*1024];
     memset(pathbuf, 0, 4*1024);
-    ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
+    ret = readlink("/proc/self/exe", pathbuf, 4*1024);
 #endif
     if ( ret <= 0 ) {
         igs_error("PID %d: proc_pidpath () - %s", pid, strerror(errno));

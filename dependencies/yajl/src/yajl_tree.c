@@ -471,7 +471,7 @@ igsyajl_val igsyajl_tree_get(igsyajl_val n, const char ** path, igsyajl_type typ
         } else if (n->type == igsyajl_t_array){
             len = n->u.array.len;
             char *end = (char *)*path;
-            size_t index = strtol(*path, &end, 10);
+            unsigned long index = (unsigned long) strtol(*path, &end, 10);
             if (end != *path && index >= 0){
                 //we got a valid index
                 if (index < len){

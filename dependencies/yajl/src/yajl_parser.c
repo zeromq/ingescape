@@ -93,13 +93,13 @@ igsyajl_render_error_string(igsyajl_handle hand, const unsigned char * jsonText,
         str = (unsigned char *) YA_MALLOC(&(hand->alloc), memneeded + 2);
         if (!str) return NULL;
         str[0] = 0;
-        strcat((char *) str, errorType);
-        strcat((char *) str, " error");
+        strncat((char *) str, errorType, memneeded + 2);
+        strncat((char *) str, " error", memneeded + 2);
         if (errorText != NULL) {
-            strcat((char *) str, ": ");
-            strcat((char *) str, errorText);
+            strncat((char *) str, ": ", memneeded + 2);
+            strncat((char *) str, errorText, memneeded + 2);
         }
-        strcat((char *) str, "\n");
+        strncat((char *) str, "\n", memneeded + 2);
     }
 
     /* now we append as many spaces as needed to make sure the error
@@ -128,15 +128,14 @@ igsyajl_render_error_string(igsyajl_handle hand, const unsigned char * jsonText,
         text[i++] = '\n';
         text[i] = 0;
         {
+            size_t newStrLength = strlen((char *) str) + strlen((char *) text) + strlen(arrow) + 1;
             char * newStr = (char *)
-                YA_MALLOC(&(hand->alloc), (unsigned int)(strlen((char *) str) +
-                                                         strlen((char *) text) +
-                                                         strlen(arrow) + 1));
+                YA_MALLOC(&(hand->alloc), newStrLength);
             if (newStr) {
                 newStr[0] = 0;
-                strcat((char *) newStr, (char *) str);
-                strcat((char *) newStr, text);
-                strcat((char *) newStr, arrow);
+                strncat((char *) newStr, (char *) str, newStrLength);
+                strncat((char *) newStr, text, newStrLength);
+                strncat((char *) newStr, arrow, newStrLength);
             }
             YA_FREE(&(hand->alloc), str);
             str = (unsigned char *) newStr;
