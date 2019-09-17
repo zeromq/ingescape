@@ -717,13 +717,17 @@ Rectangle {
 
 
 
-                            I2SvgItem {
+                            SvgImage {
                                 anchors.centerIn: parent
+
+                                // Max zoom of NodeGraphView is 4
+                                sourceScale: 4
 
                                 svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
                                 svgElementId: "outputIsMuted"
 
                                 visible: (myModel.output && myModel.output.firstModel && myModel.output.firstModel.isMuted)
+
                             }
                         }
 
@@ -891,7 +895,7 @@ Rectangle {
 
 
         // Button to open the definition
-        LabellessSvgButton {
+        LabellessSvgButtonCachedImage {
             id: btnOpenDefinition
 
             anchors {
@@ -900,6 +904,9 @@ Rectangle {
                 left: parent.left
                 leftMargin: 10
             }
+
+            // Max zoom of NodeGraphView is 4
+            sourceScale: 4
 
             fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
@@ -978,7 +985,7 @@ Rectangle {
 
 
         // Remove button
-        LabellessSvgButton {
+        LabellessSvgButtonCachedImage {
             id: btnRemoveFromMapping
 
             anchors {
@@ -988,6 +995,14 @@ Rectangle {
                 rightMargin: 10
             }
 
+            // Max zoom of NodeGraphView is 4
+            sourceScale: 4
+
+            pressedID: releasedID + "-pressed"
+            releasedID: "delete"
+            disabledID : releasedID
+
+
             opacity: rootItem.agentItemIsHovered ? 1 : 0
 
             visible: (opacity !== 0)
@@ -996,12 +1011,6 @@ Rectangle {
             Behavior on opacity {
                 NumberAnimation {}
             }
-
-
-            pressedID: releasedID + "-pressed"
-            releasedID: "delete"
-            disabledID : releasedID
-
 
             onClicked: {
                 if (controller)

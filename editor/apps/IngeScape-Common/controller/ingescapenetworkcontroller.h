@@ -54,10 +54,10 @@ class IngeScapeNetworkController: public QObject
     // NB: false when our agent is not started OR when its network device is no more available
     I2_QML_PROPERTY_READONLY(bool, isOnline)
 
-    // Flag indicating if we must stop/restart our agent automatically
+    // Flag indicating if we must start/stop our agent automatically when we receive monitor events
     // NB: this flags exists to allow each application based on IngeScape-Common to define its own behavior
     //     By default, this property is set to false
-    I2_QML_PROPERTY(bool, automaticallyStopRestart)
+    I2_QML_PROPERTY(bool, automaticallyStartStopOnMonitorEvents)
 
     // Number of each type of IngeScape applications
     I2_QML_PROPERTY_READONLY(int, numberOfAgents)

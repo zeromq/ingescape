@@ -208,5 +208,8 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
 
     // - Widgets
     qmlRegisterType(QUrl("qrc:/qml/widgets/LabellessSvgButton.qml"), "INGESCAPE", 1, 0, "LabellessSvgButton");
+    qmlRegisterType(QUrl("qrc:/qml/widgets/LabellessSvgButtonCachedImage.qml"), "INGESCAPE", 1, 0, "LabellessSvgButtonCachedImage");
+    qmlRegisterType(QUrl("qrc:/qml/widgets/SvgImage.qml"), "INGESCAPE", 1, 0, "SvgImage");
+
 }
 

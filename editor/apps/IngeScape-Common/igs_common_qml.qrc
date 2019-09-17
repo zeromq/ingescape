@@ -34,5 +34,7 @@
         <file>qml/SystemInformationPopup.qml</file>
         <file>qml/NetworkConnectionInformationItem.qml</file>
         <file>qml/widgets/LabellessSvgButton.qml</file>
+        <file>qml/widgets/SvgImage.qml</file>
+        <file>qml/widgets/LabellessSvgButtonCachedImage.qml</file>
     </qresource>
 </RCC>
