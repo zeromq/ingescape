@@ -2760,8 +2760,8 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../src/include",
 					"$(SRCROOT)/../../dependencies/yajl/src/api",
-					"$(SRCROOT)/../../src/include/",
 					/usr/local/include,
 				);
 				INFOPLIST_FILE = Info.plist;
@@ -2778,6 +2778,7 @@
 				PRODUCT_NAME = ingescape;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				USE_HEADERMAP = NO;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -2797,8 +2798,8 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../src/include",
 					"$(SRCROOT)/../../dependencies/yajl/src/api",
-					"$(SRCROOT)/../../src/include/",
 					/usr/local/include,
 				);
 				INFOPLIST_FILE = Info.plist;
@@ -2815,6 +2816,7 @@
 				PRODUCT_NAME = ingescape;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				USE_HEADERMAP = NO;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
