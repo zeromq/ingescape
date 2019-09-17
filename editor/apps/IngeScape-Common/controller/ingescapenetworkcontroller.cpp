@@ -609,6 +609,14 @@ void IngeScapeNetworkController::stop()
         // Update internal states
         setisStarted(false);
         setisOnline(false);
+
+        // Reset counters
+        setnumberOfAgents(0);
+        setnumberOfLaunchers(0);
+        setnumberOfRecorders(0);
+        setnumberOfEditors(0);
+        setnumberOfAssessments(0);
+        setnumberOfExpes(0);
     }
 }
 

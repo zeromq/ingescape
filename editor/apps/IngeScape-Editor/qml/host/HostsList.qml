@@ -178,7 +178,6 @@ Item {
         Item {
             id: hostItem
 
-            //property var model_hostVM: model.QtObject
             property HostVM model_hostVM: model.QtObject
             property var model_agentsList: model.agentsList
 
@@ -228,9 +227,9 @@ Item {
 
                     elide: Text.ElideRight
 
-                    text: hostItem.model_hostVM.name
+                    text: hostItem.model_hostVM ? hostItem.model_hostVM.name : ""
 
-                    color: hostItem.model_hostVM.isON ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                    color: hostItem.model_hostVM && hostItem.model_hostVM.isON ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
 
                     font: IngeScapeTheme.headingFont
                 }
@@ -247,7 +246,7 @@ Item {
 
                     elide: Text.ElideRight
 
-                    text: hostItem.model_hostVM.modelM ? hostItem.model_hostVM.modelM.ipAddress : ""
+                    text: hostItem.model_hostVM && hostItem.model_hostVM.modelM ? hostItem.model_hostVM.modelM.ipAddress : ""
 
                     color: IngeScapeTheme.lightBlueGreyColor
                     font: IngeScapeTheme.heading2Font

@@ -1579,11 +1579,21 @@ void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
         // Stop our IngeScape agent
         _networkC->stop();
 
+        // We don't see itself
+        _networkC->setnumberOfEditors(1);
+
         // Simulate an exit for each agent ON
         _modelManager->simulateExitForEachAgentON();
 
         // Simulate an exit for each launcher
         _modelManager->simulateExitForEachLauncher();
+
+        // Simulate an exit for the recorder
+        //_modelManager->simulateExitForRecorder();
+        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
+        {
+            _recordsSupervisionC->onRecorderExited(_recordsSupervisionC->peerIdOfRecorder(), _recordsSupervisionC->peerNameOfRecorder());
+        }
 
         // Has to clear the current platform
         if (hasToClearPlatform)
