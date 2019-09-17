@@ -256,14 +256,50 @@ I2PopupBase {
         }
     }
 
+    Text {
+        id: errorMessage
+
+        anchors {
+            top: directoryPathItem.bottom
+            topMargin: 25
+            left: parent.left
+            leftMargin: 25
+            right: parent.right
+            rightMargin: 25
+        }
+        wrapMode: Text.WordWrap
+
+        height: text !== "" ? 30 : 0
+
+        Connections {
+            target: rootItem.licenseController
+
+            onLicenseLimitationReached: {
+                errorMessage.visible = true
+            }
+        }
+
+        text: rootItem.licenseController ? rootItem.licenseController.errorMessageWhenLicenseFailed : ""
+
+        color: IngeScapeTheme.orangeColor
+        font {
+            family: IngeScapeTheme.textFontFamily
+            weight : Font.Medium
+            pixelSize : 16
+        }
+    }
+
     ScrollView {
         id: detailsScrollView
         anchors {
-            top: directoryPathItem.bottom
+            top: errorMessage.bottom
+            topMargin: errorMessage.height > 0 ? 25 : 0
             left: parent.left
+            leftMargin: 25
             right: parent.right
+            rightMargin: 25
             bottom: buttonRow.top
-            margins: 25
+            bottomMargin: 25
         }
 
         visible: licenseDetailsRepeater.model && licenseDetailsRepeater.model.count > 0
@@ -346,26 +382,6 @@ I2PopupBase {
                     LicenseInformationView {
                         licenseInformation: model ? model.QtObject : null
                     }
-                }
-            }
-
-            Text {
-                id: errorMessage
-
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    //verticalCenter: parent.verticalCenter
-                }
-                wrapMode: Text.WordWrap
-
-                text: rootItem.licenseController ? rootItem.licenseController.errorMessageWhenLicenseFailed : "TEST"
-
-                color: IngeScapeTheme.orangeColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight : Font.Medium
-                    pixelSize : 16
                 }
             }
         }

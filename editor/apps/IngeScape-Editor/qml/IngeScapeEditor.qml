@@ -97,6 +97,14 @@ Item {
     }
 
 
+    //
+    // Function allowing to open the license error popup
+    //
+    function openLicenseEventPopup() {
+        licenseEventPopup.open();
+    }
+
+
     // Function allowing to open the Getting Started popup
     function openGettingStarted(forceOpen) {
         // Default forceOpen parameter value
@@ -144,20 +152,20 @@ Item {
     Connections {
         target: IngeScapeEditorC.licensesC.mergedLicense
 
-        //ignoreUnknownSignals: true
-
-        onIngescapeLicenseValidityChanged: {
-            console.log("QML (IngeScape Editor): on is License Valid Changed");
-            if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.ingescapeLicenseValidity) {
-                openLicensePopup();
-            }
-        }
-
         onEditorLicenseValidityChanged: {
             console.log("QML (IngeScape Editor): on is Editor License Valid Changed");
             if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.editorLicenseValidity) {
                 openLicensePopup();
             }
+        }
+    }
+
+    Connections {
+        target: IngeScapeEditorC.licensesC
+
+        onLicenseLimitationReached: {
+            console.log("QML (IngeScape Editor): on License Limitation Reached");
+            openLicenseEventPopup();
         }
     }
 
@@ -618,6 +626,11 @@ Item {
                 gettingStartedWindow.visible = true
             }
         }
+    }
+
+
+    LicenseEventPopup {
+        id: licenseEventPopup
     }
 
 

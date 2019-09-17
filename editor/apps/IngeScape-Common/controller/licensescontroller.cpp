@@ -57,6 +57,7 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
 
         // Update data
         licensesController->needsUpdate();
+        Q_EMIT licensesController->licenseLimitationReached();
     }
 }
 

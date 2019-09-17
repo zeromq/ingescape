@@ -111,6 +111,11 @@ Q_SIGNALS:
      */
     void licensesUpdated();
 
+    /**
+     * @brief Signal emited when the license has reached a limitation (timeour, agents, IOPs)
+     */
+    void licenseLimitationReached();
+
 
 protected Q_SLOTS:
     /**
