@@ -379,7 +379,7 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
                     networkController->networkDeviceIsAvailableAgain();
 
                     // Automatically start our agent if needed
-                    if (networkController->automaticallyStopRestart())
+                    if (networkController->automaticallyStartStopOnMonitorEvents())
                     {
                         networkController->startWithPreviousConfiguration();
                     }
@@ -401,7 +401,7 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
                     networkController->networkDeviceIsNotAvailable();
 
                     // Automatically stop our agent if needed
-                    if (networkController->automaticallyStopRestart())
+                    if (networkController->automaticallyStartStopOnMonitorEvents())
                     {
                         networkController->stop();
                     }
@@ -417,7 +417,7 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
                     networkController->networkDeviceIpAddressHasChanged(QString(ipAddress));
 
                     // Automatically restart our agent if needed
-                    if (networkController->automaticallyStopRestart())
+                    if (networkController->automaticallyStartStopOnMonitorEvents())
                     {
                         networkController->restart();
                     }
@@ -426,7 +426,8 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
 
             case IGS_NETWORK_OK_AFTER_MANUAL_RESTART:
                 {
-                    qInfo() << "IngeScape manually reconnected on device: " << networkDevice;
+                    qInfo() << "IngeScape manually reconnected on device: " << networkDevice
+                            << " - nothing to do";
                 }
                 break;
 
@@ -451,7 +452,7 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
 IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObject(parent),
     _isStarted(false),
     _isOnline(false),
-    _automaticallyStopRestart(false),
+    _automaticallyStartStopOnMonitorEvents(false),
     _numberOfAgents(0),
     _numberOfLaunchers(0),
     _numberOfRecorders(0),

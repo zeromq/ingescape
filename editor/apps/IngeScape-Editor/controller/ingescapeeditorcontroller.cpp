@@ -325,6 +325,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Connect to OS events
     connect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeEditorController::_onSystemSleep);
     connect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeEditorController::_onSystemWake);
+    connect(OSUtils::instance(), &OSUtils::systemNetworkConfigurationsUpdated, this, &IngeScapeEditorController::_onSystemNetworkConfigurationsUpdated);
 
 
     if (_isAvailableModelVisualizer)
@@ -333,7 +334,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         Q_EMIT _modelManager->previousHostParsed(HOSTNAME_NOT_DEFINED, "...");
     }
 
-
+    
+    //
+    // Platform file
+    //
     if (!_currentPlatformFilePath.isEmpty())
     {
         if (_currentPlatformFilePath == SPECIAL_EMPTY_LAST_PLATFORM)
@@ -379,11 +383,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
                             QApplication::instance()->quit();
                         }
                      });
-
-
-
-    // Sleep to display our loading screen
-    //QThread::msleep(2000);
 }
 
 
@@ -395,6 +394,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
     // Unsubscribe to OS events
     disconnect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeEditorController::_onSystemSleep);
     disconnect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeEditorController::_onSystemWake);
+    disconnect(OSUtils::instance(), &OSUtils::systemNetworkConfigurationsUpdated, this, &IngeScapeEditorController::_onSystemNetworkConfigurationsUpdated);
 
 
 
@@ -1342,6 +1342,21 @@ void IngeScapeEditorController::_onSystemWake()
         _startIngeScape(true);
     }
 }
+
+
+
+/**
+ * @brief Called when a network configuration is added, removed or changed
+ */
+void IngeScapeEditorController::_onSystemNetworkConfigurationsUpdated()
+{
+    if (_networkC != nullptr)
+    {
+        _networkC->updateAvailableNetworkDevices();
+    }
+}
+
+
 
 
 /**

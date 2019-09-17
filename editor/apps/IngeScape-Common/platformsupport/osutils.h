@@ -22,6 +22,9 @@
 #include <QJSEngine>
 #include <QQuickWindow>
 
+#include <QNetworkConfigurationManager>
+
+
 #include "I2PropertyHelpers.h"
 
 
@@ -110,6 +113,12 @@ Q_SIGNALS:
      void userSessionUnlocked();
 
 
+     /**
+      * @brief Triggered when a network configuration is added, removed or changed
+      */
+     void systemNetworkConfigurationsUpdated();
+
+
 protected:
     /**
      * @brief Called when we receive a systemSleep signal
@@ -135,6 +144,27 @@ protected:
     void _onUserSessionUnlocked();
 
 
+    /**
+     * @brief Called when a configuration is added to the system
+     * @param config
+     */
+    void _onConfigurationAdded(const QNetworkConfiguration &config);
+
+
+    /**
+     * @brief Called when a configuration is about to be removed from the system
+     * @param config
+     */
+    void _onConfigurationRemoved(const QNetworkConfiguration &config);
+
+
+    /**
+     * @brief Called when a configuration has changed (ex: Wifi on <=> off)
+     * @param config
+     */
+    void _onConfigurationChanged(const QNetworkConfiguration &config);
+
+
 protected:
     /**
      * @brief Enable energy efficiency features
@@ -146,6 +176,11 @@ protected:
      * @brief Disable energy efficiency features
      */
     virtual void _disableEnergyEfficiencyFeatures();
+
+
+protected:
+    // Used to manages the network configurations provided by the system
+    QNetworkConfigurationManager _networkConfigurationManager;
 };
 
 QML_DECLARE_TYPE(OSUtils)

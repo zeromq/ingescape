@@ -173,6 +173,7 @@ find_package(Qt5 NO_MODULE COMPONENTS
     Core
     Gui
     WebView
+    Network
     REQUIRED
 )
 
@@ -246,6 +247,7 @@ target_link_libraries(
     Qt5::Core
     Qt5::Gui
     Qt5::WebView
+    Qt5::Network
     ${_INGESCAPE_LIBS}
     I2Quick
 )

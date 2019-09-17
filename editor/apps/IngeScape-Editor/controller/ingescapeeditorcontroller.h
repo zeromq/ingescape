@@ -380,6 +380,12 @@ private Q_SLOTS:
     void _onSystemWake();
 
 
+    /**
+     * @brief Called when a network configuration is added, removed or changed
+     */
+    void _onSystemNetworkConfigurationsUpdated();
+
+
 private:
 
     /**

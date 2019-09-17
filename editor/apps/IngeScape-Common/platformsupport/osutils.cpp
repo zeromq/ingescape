@@ -65,6 +65,11 @@ OSUtils::OSUtils(QObject *parent)
     // Subscribe to user session notifications
     connect(this, &OSUtils::userSessionLocked, this, &OSUtils::_onUserSessionLocked);
     connect(this, &OSUtils::userSessionUnlocked, this, &OSUtils::_onUserSessionUnlocked);
+
+    // Subscribe to network configuration events
+    connect(&_networkConfigurationManager, &QNetworkConfigurationManager::configurationAdded, this, &OSUtils::_onConfigurationAdded);
+    connect(&_networkConfigurationManager, &QNetworkConfigurationManager::configurationRemoved, this, &OSUtils::_onConfigurationRemoved);
+    connect(&_networkConfigurationManager, &QNetworkConfigurationManager::configurationChanged, this, &OSUtils::_onConfigurationChanged);
 }
 
 
@@ -75,6 +80,11 @@ OSUtils::~OSUtils()
 {
     // Clean-up properties
     setcurrentWindow(nullptr);
+
+    // Unsubscribe to network configuration events
+    disconnect(&_networkConfigurationManager, &QNetworkConfigurationManager::configurationAdded, this, &OSUtils::_onConfigurationAdded);
+    disconnect(&_networkConfigurationManager, &QNetworkConfigurationManager::configurationRemoved, this, &OSUtils::_onConfigurationRemoved);
+    disconnect(&_networkConfigurationManager, &QNetworkConfigurationManager::configurationChanged, this, &OSUtils::_onConfigurationChanged);
 
     // Unsubscribe to system power notifications
     disconnect(this, &OSUtils::systemSleep, this, &OSUtils::_onSystemSleep);
@@ -234,4 +244,35 @@ void OSUtils::_disableEnergyEfficiencyFeatures()
 }
 
 
+/**
+ * @brief Called when a configuration is added to the system
+ * @param config
+ */
+void OSUtils::_onConfigurationAdded(const QNetworkConfiguration &config)
+{
+    Q_UNUSED(config)
+    Q_EMIT systemNetworkConfigurationsUpdated();
+}
+
+
+/**
+ * @brief Called when a configuration is about to be removed from the system
+ * @param config
+ */
+void OSUtils::_onConfigurationRemoved(const QNetworkConfiguration &config)
+{
+    Q_UNUSED(config)
+    Q_EMIT systemNetworkConfigurationsUpdated();
+}
+
+
+/**
+ * @brief Called when a configuration has changed (ex: Wifi on <=> off)
+ * @param config
+ */
+void OSUtils::_onConfigurationChanged(const QNetworkConfiguration &config)
+{
+    Q_UNUSED(config)
+    Q_EMIT systemNetworkConfigurationsUpdated();
+}
 

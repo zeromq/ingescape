@@ -2,7 +2,7 @@ INCLUDEPATH += $$PWD
 
 DEFINES += INGESCAPECOMMON_FROM_PRI
 
-QT += qml quick svg xml sql quick-private core-private gui-private concurrent
+QT += qml quick svg xml sql quick-private core-private gui-private concurrent network
 
 
 SOURCES += \
