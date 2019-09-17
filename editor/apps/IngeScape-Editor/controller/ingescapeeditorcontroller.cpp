@@ -327,14 +327,18 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeEditorController::_onSystemWake);
 
 
+    if (_isAvailableModelVisualizer)
+    {
+        // Emit the signal "Previous Host Parsed" to create the fake host "HOSTNAME_NOT_DEFINED"
+        Q_EMIT _modelManager->previousHostParsed(HOSTNAME_NOT_DEFINED, "...");
+    }
+
 
     if (!_currentPlatformFilePath.isEmpty())
     {
         if (_currentPlatformFilePath == SPECIAL_EMPTY_LAST_PLATFORM)
         {
-            // Load an empty platform
-            qCritical() << "The loading of the last platform failed !";
-            clearCurrentPlatform();
+            qWarning() << "There is no 'last' platform to load !";
             _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
         }
         else
@@ -345,7 +349,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
             if (!success) {
                 qCritical() << "The loading of the last platform failed !";
-                clearCurrentPlatform();
                 _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
             }
             else
@@ -353,13 +356,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
                 sethasAPlatformBeenLoadedByUser(true);
             }
         }
-    }
-
-
-    if (_isAvailableModelVisualizer)
-    {
-        // Emit the signal "Previous Host Parsed" to create the fake host "HOSTNAME_NOT_DEFINED"
-        Q_EMIT _modelManager->previousHostParsed(HOSTNAME_NOT_DEFINED, "...");
     }
 
 
