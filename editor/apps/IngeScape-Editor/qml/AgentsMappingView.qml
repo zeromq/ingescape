@@ -88,296 +88,308 @@ Item {
         // Mapping Activation
         //
         Item {
-            id: arcBehindMappingActivationBtn
+            id: mappingActivation
 
             anchors {
                 bottom: parent.bottom
                 left: parent.left
-                leftMargin: 10
-                bottomMargin: 10
             }
 
-            width: 80
-            height: 80
+            width: childrenRect.x + childrenRect.width
 
-            I2PieSlice {
-                id: pieSlice
-                //visible: IngeScapeEditorC.modelManager.isMappingConnected
+            Item {
+                id: arcBehindMappingActivationBtn
 
-                anchors.fill: parent
+                anchors {
+                    bottom: parent.bottom
+                    left: parent.left
+                    leftMargin: 10
+                    bottomMargin: 10
+                }
 
-                color: IngeScapeTheme.lightGreyColor
+                width: 80
+                height: 80
 
-                innerRadiusX: 39
-                innerRadiusY: 39
+                I2PieSlice {
+                    id: pieSlice
+                    //visible: IngeScapeEditorC.modelManager.isMappingConnected
 
-                startAngle: -10
-                sweepAngle: 315
-            }
-        }
+                    anchors.fill: parent
 
-        ParallelAnimation {
-            id: openAnimation
-            running: false
-            NumberAnimation { target: pieSlice; property: "startAngle"; from:-10; to: 0; duration: 300 }
-            NumberAnimation { target: pieSlice; property: "sweepAngle"; from: 315; to: 295; duration: 300 }
-            NumberAnimation { target: chooseMappingType; property: "opacity"; from: 0; to: 1; duration: 500 }
-        }
-        ParallelAnimation {
-            id: closeAnimation
-            running: false
-            NumberAnimation { target: pieSlice; property: "startAngle"; from:0; to: -10; duration: 300 }
-            NumberAnimation { target: pieSlice; property: "sweepAngle"; from: 295; to: 315; duration: 300 }
-            NumberAnimation { target: chooseMappingType; property: "opacity"; from: 1; to: 0; duration: 500 }
-        }
+                    color: IngeScapeTheme.lightGreyColor
 
-        LabellessSvgButton {
-            id: activeMappingBtn
+                    innerRadiusX: 39
+                    innerRadiusY: 39
 
-            anchors {
-                bottom: parent.bottom
-                left: parent.left
-                leftMargin: 23
-                bottomMargin: 23
+                    startAngle: -10
+                    sweepAngle: 315
+                }
             }
 
-            checkable: true
-
-            fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
-
-            pressedID: releasedID + "-pressed"
-            releasedID: IngeScapeEditorC.modelManager.isMappingConnected ? "connect-on" : "connect-off"
-            disabledID : releasedID
-
-            onClicked: {
-                IngeScapeEditorC.modelManager.isMappingConnected = checked;
+            ParallelAnimation {
+                id: openAnimation
+                running: false
+                NumberAnimation { target: pieSlice; property: "startAngle"; from:-10; to: 0; duration: 300 }
+                NumberAnimation { target: pieSlice; property: "sweepAngle"; from: 315; to: 295; duration: 300 }
+                NumberAnimation { target: chooseMappingType; property: "opacity"; from: 0; to: 1; duration: 500 }
             }
-
-            Binding {
-                target: activeMappingBtn
-                property: "checked"
-                value: IngeScapeEditorC.modelManager.isMappingConnected
-            }
-        }
-
-        Rectangle {
-            color: "transparent"
-            width: childrenRect.width
-            height: childrenRect.height
-
-            anchors {
-                bottom: parent.bottom
-                left: parent.left
-                leftMargin: 74 + (IngeScapeEditorC.modelManager.isMappingControlled ? 5 : 0)
-                bottomMargin: 64 + (IngeScapeEditorC.modelManager.isMappingControlled ? 0 : 2)
+            ParallelAnimation {
+                id: closeAnimation
+                running: false
+                NumberAnimation { target: pieSlice; property: "startAngle"; from:0; to: -10; duration: 300 }
+                NumberAnimation { target: pieSlice; property: "sweepAngle"; from: 295; to: 315; duration: 300 }
+                NumberAnimation { target: chooseMappingType; property: "opacity"; from: 1; to: 0; duration: 500 }
             }
 
             LabellessSvgButton {
-                id: typeMappingBtn
+                id: activeMappingBtn
 
-                visible: true
+                anchors {
+                    bottom: parent.bottom
+                    left: parent.left
+                    leftMargin: 23
+                    bottomMargin: 23
+                }
 
                 checkable: true
 
                 fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                 pressedID: releasedID + "-pressed"
-                releasedID: IngeScapeEditorC.modelManager.isMappingControlled ? "control" : "observe"
+                releasedID: IngeScapeEditorC.modelManager.isMappingConnected ? "connect-on" : "connect-off"
                 disabledID : releasedID
 
                 onClicked: {
-                    openAnimation.running = true;
-
-                    // Show choose mapping type
-                    chooseMappingType.visible = true;
-
-                    // Hide our feedback button
-                    typeMappingBtn.visible = false;
-                }
-            }
-        }
-
-        Column {
-            id: chooseMappingType
-            visible: false
-            opacity: 0
-
-            spacing: 5
-
-            anchors {
-                bottom: parent.bottom
-                left: parent.left
-                leftMargin: 80
-                bottomMargin: 60
-            }
-
-            ExclusiveGroup {
-                id: typeMappingGroup
-            }
-
-            CheckBox {
-                id: checkBoxObserve
-
-                exclusiveGroup: typeMappingGroup
-                //checked: !IngeScapeEditorC.modelManager.isMappingControlled
-
-                style: CheckBoxStyle {
-                    label: Text {
-                        color: control.checked ? (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.veryLightGreyColor)
-                                               : (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.greyColor2)
-
-                        text: qsTr("OBSERVE")
-
-                        anchors {
-                            left: parent.left
-                            leftMargin: 5
-                        }
-
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            weight: Font.Bold
-                            pixelSize: 12
-                        }
-                    }
-
-                    indicator: Rectangle {
-                        implicitWidth: 14
-                        implicitHeight: 14
-                        border.width: 0
-                        color: "transparent"
-
-                        I2SvgItem {
-                            anchors.centerIn: parent
-                            svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
-
-                            svgElementId: control.checked ? (control.pressed ? "radio-observe-on" : "radio-observe-white")
-                                                          : (control.pressed ? "radio-observe-on" : "radio-observe-off");
-                        }
-                    }
-                }
-
-                onClicked: {
-                    if (checked) {
-                        IngeScapeEditorC.modelManager.isMappingControlled = false;
-                    }
-
-                    // Show feedback button
-                    typeMappingBtn.visible = true;
-
-                    // Hide choose mapping type
-                    chooseMappingType.visible = false;
-
-                    closeAnimation.running = true;
+                    IngeScapeEditorC.modelManager.isMappingConnected = checked;
                 }
 
                 Binding {
-                    target: checkBoxObserve
+                    target: activeMappingBtn
                     property: "checked"
-                    value: !IngeScapeEditorC.modelManager.isMappingControlled
+                    value: IngeScapeEditorC.modelManager.isMappingConnected
                 }
             }
 
-            CheckBox {
-                id: checkBoxControl
+            Rectangle {
+                color: "transparent"
 
-                exclusiveGroup: typeMappingGroup
-                //checked: IngeScapeEditorC.modelManager.isMappingControlled
+                width: childrenRect.width
+                height: childrenRect.height
 
-                style: CheckBoxStyle {
-                    label: Text {
-                        color: control.checked ? (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.veryLightGreyColor)
-                                               : (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.greyColor2)
-
-                        text: qsTr("CONTROL")
-
-                        anchors {
-                            left: parent.left
-                            leftMargin: 5
-                        }
-
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            weight: Font.Bold
-                            pixelSize: 12
-                        }
-                    }
-
-                    indicator: Rectangle {
-                        implicitWidth: 14
-                        implicitHeight: 14
-                        border.width: 0
-                        color: "transparent"
-
-                        I2SvgItem {
-                            anchors.centerIn: parent
-                            svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
-
-                            svgElementId: control.checked ? (control.pressed ? "radio-control-on" : "radio-control-white")
-                                                          : (control.pressed ? "radio-control-on" : "radio-control-off");
-                        }
-                    }
-                }
-
-                onClicked: {
-                    if (checked) {
-                        IngeScapeEditorC.modelManager.isMappingControlled = true;
-                    }
-
-                    // Show feedback button
-                    typeMappingBtn.visible = true;
-
-                    // Hide choose mapping type
-                    chooseMappingType.visible = false;
-
-                    closeAnimation.running = true;
-                }
-
-                Binding {
-                    target: checkBoxControl
-                    property: "checked"
-                    value: IngeScapeEditorC.modelManager.isMappingControlled
-                }
-            }
-        }
-
-
-        Column {
-            anchors {
-                verticalCenter: activeMappingBtn.verticalCenter
-                left : activeMappingBtn.right
-                leftMargin: 75
-            }
-
-            Text {
                 anchors {
-                    left : parent.left
+                    bottom: parent.bottom
+                    left: parent.left
+                    leftMargin: 74 + (IngeScapeEditorC.modelManager.isMappingControlled ? 5 : 0)
+                    bottomMargin: 64 + (IngeScapeEditorC.modelManager.isMappingControlled ? 0 : 2)
                 }
 
-                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingConnected
-                text : "No active mapping at the moment."
+                LabellessSvgButton {
+                    id: typeMappingBtn
 
-                color : IngeScapeTheme.blueGreyColor
-                font {
-                    family : IngeScapeTheme.textFontFamily
-                    bold : true
-                    pixelSize: 20
+                    visible: true
 
+                    checkable: true
+
+                    fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: IngeScapeEditorC.modelManager.isMappingControlled ? "control" : "observe"
+                    disabledID : releasedID
+
+                    onClicked: {
+                        openAnimation.running = true;
+
+                        // Show choose mapping type
+                        chooseMappingType.visible = true;
+
+                        // Hide our feedback button
+                        typeMappingBtn.visible = false;
+                    }
                 }
             }
 
-            Text {
+            Column {
+                id: chooseMappingType
+                visible: false
+                opacity: 0
+
+                spacing: 5
+
                 anchors {
-                    left : parent.left
+                    bottom: parent.bottom
+                    left: parent.left
+                    leftMargin: 80
+                    bottomMargin: 60
                 }
 
-                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingConnected
-                text : "Click on the button to synchronize with the current platform and get the active mapping.\nOr create/load a platform description and click on the button to apply it to the platform."
+                ExclusiveGroup {
+                    id: typeMappingGroup
+                }
 
-                color : IngeScapeTheme.blueGreyColor
-                font {
-                    family : IngeScapeTheme.textFontFamily
-                    weight : Font.Light
-                    pixelSize: 17
+                CheckBox {
+                    id: checkBoxObserve
+
+                    exclusiveGroup: typeMappingGroup
+                    //checked: !IngeScapeEditorC.modelManager.isMappingControlled
+
+                    style: CheckBoxStyle {
+                        label: Text {
+                            color: control.checked ? (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.veryLightGreyColor)
+                                                   : (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.greyColor2)
+
+                            text: qsTr("OBSERVE")
+
+                            anchors {
+                                left: parent.left
+                                leftMargin: 5
+                            }
+
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight: Font.Bold
+                                pixelSize: 12
+                            }
+                        }
+
+                        indicator: Rectangle {
+                            implicitWidth: 14
+                            implicitHeight: 14
+                            border.width: 0
+                            color: "transparent"
+
+                            I2SvgItem {
+                                anchors.centerIn: parent
+                                svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+
+                                svgElementId: control.checked ? (control.pressed ? "radio-observe-on" : "radio-observe-white")
+                                                              : (control.pressed ? "radio-observe-on" : "radio-observe-off");
+                            }
+                        }
+                    }
+
+                    onClicked: {
+                        if (checked) {
+                            IngeScapeEditorC.modelManager.isMappingControlled = false;
+                        }
+
+                        // Show feedback button
+                        typeMappingBtn.visible = true;
+
+                        // Hide choose mapping type
+                        chooseMappingType.visible = false;
+
+                        closeAnimation.running = true;
+                    }
+
+                    Binding {
+                        target: checkBoxObserve
+                        property: "checked"
+                        value: !IngeScapeEditorC.modelManager.isMappingControlled
+                    }
+                }
+
+                CheckBox {
+                    id: checkBoxControl
+
+                    exclusiveGroup: typeMappingGroup
+                    //checked: IngeScapeEditorC.modelManager.isMappingControlled
+
+                    style: CheckBoxStyle {
+                        label: Text {
+                            color: control.checked ? (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.veryLightGreyColor)
+                                                   : (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.greyColor2)
+
+                            text: qsTr("CONTROL")
+
+                            anchors {
+                                left: parent.left
+                                leftMargin: 5
+                            }
+
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight: Font.Bold
+                                pixelSize: 12
+                            }
+                        }
+
+                        indicator: Rectangle {
+                            implicitWidth: 14
+                            implicitHeight: 14
+                            border.width: 0
+                            color: "transparent"
+
+                            I2SvgItem {
+                                anchors.centerIn: parent
+                                svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+
+                                svgElementId: control.checked ? (control.pressed ? "radio-control-on" : "radio-control-white")
+                                                              : (control.pressed ? "radio-control-on" : "radio-control-off");
+                            }
+                        }
+                    }
+
+                    onClicked: {
+                        if (checked) {
+                            IngeScapeEditorC.modelManager.isMappingControlled = true;
+                        }
+
+                        // Show feedback button
+                        typeMappingBtn.visible = true;
+
+                        // Hide choose mapping type
+                        chooseMappingType.visible = false;
+
+                        closeAnimation.running = true;
+                    }
+
+                    Binding {
+                        target: checkBoxControl
+                        property: "checked"
+                        value: IngeScapeEditorC.modelManager.isMappingControlled
+                    }
+                }
+            }
+
+
+            Column {
+                anchors {
+                    verticalCenter: activeMappingBtn.verticalCenter
+                    left : activeMappingBtn.right
+                    leftMargin: 75
+                }
+
+                Text {
+                    anchors {
+                        left : parent.left
+                    }
+
+                    visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingConnected
+                    text : "No active mapping at the moment."
+
+                    color : IngeScapeTheme.blueGreyColor
+                    font {
+                        family : IngeScapeTheme.textFontFamily
+                        bold : true
+                        pixelSize: 20
+
+                    }
+                }
+
+                Text {
+                    anchors {
+                        left : parent.left
+                    }
+
+                    visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingConnected
+                    text : "Click on the button to synchronize with the current platform and get the active mapping.\nOr create/load a platform description and click on the button to apply it to the platform."
+
+                    color : IngeScapeTheme.blueGreyColor
+                    font {
+                        family : IngeScapeTheme.textFontFamily
+                        weight : Font.Light
+                        pixelSize: 17
+                    }
                 }
             }
         }

@@ -9,8 +9,10 @@ stages:
   - build-apps
   - installer-apps
   - deploy-lib
+  - deploy-binding
   - delivery-lib
   - delivery-apps
+  - delivery-binding
 
 # Define ingescape library files
 .build-lib-files: &build-lib-files
@@ -250,12 +252,12 @@ binding-csharp-windows-x64:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
-    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
-    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build --target IngescapeCSharp --config Release
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
+    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
+    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
   artifacts:
     paths:
-     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
+     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     name: "binding-csharp-windows-x64"
     expire_in: 1 week
   dependencies: []
@@ -270,12 +272,12 @@ binding-csharp-windows-x86:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
-    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
-    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build --target IngescapeCSharp --config Release
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
+    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 --target IngescapeCSharp --config Release
   artifacts:
     paths:
-     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build
+     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
     name: "binding-csharp-windows-x86"
     expire_in: 1 week
   dependencies: []
@@ -633,11 +635,11 @@ binding-csharp-installer-windows-x64:
     - windows
     - "1"
   script:
-    - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..\..
   artifacts:
     paths:
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.exe
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.zip
+      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\IngescapeCSharp-*.exe
+      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\IngescapeCSharp-*.zip
     name: "binding-csharp-installer-windows-x64"
   dependencies:
     - binding-csharp-windows-x64
@@ -650,11 +652,11 @@ binding-csharp-installer-windows-x86:
     - windows
     - "2"
   script:
-    - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..\..
   artifacts:
     paths:
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.exe
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\IngescapeCSharp-*.zip
+      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\IngescapeCSharp-*.exe
+      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\IngescapeCSharp-*.zip
     name: "binding-csharp-installer-windows-x86"
   dependencies:
     - binding-csharp-windows-x86
@@ -1023,6 +1025,7 @@ lib-deploy-windows-release-x64:
   stage: deploy-lib
   tags:
     - windows
+    - "1"
   script:
     - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
     - copy /y build\ReleaseX64\Release\* C:\Users\admin\dev\Builds\Release\x64\
@@ -1035,6 +1038,7 @@ lib-deploy-windows-release-x86:
   stage: deploy-lib
   tags:
     - windows
+    - "2"
   script:
     - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
     - copy /y build\ReleaseX86\Release\* C:\Users\admin\dev\Builds\Release\x86\
@@ -1064,6 +1068,30 @@ lib-deploy-windows-debug-x86:
     - copy /y build\DebugX86\Debug\* C:\Users\admin\dev\Builds\Debug\x86\
   dependencies:
     - lib-windows-debug-x86
+
+# Deploy ingescape binding in windows to be able to compile agents
+binding-deploy-windows-release-x64:
+  <<: *build-csharp-files
+  stage: deploy-binding
+  tags:
+    - windows
+    - "1"
+  script:
+    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll C:\Users\admin\dev\Builds\Release\x64\
+  dependencies:
+    - binding-csharp-windows-x64
+
+# Deploy ingescape binding in windows to be able to compile agents
+binding-deploy-windows-release-x86:
+  <<: *build-csharp-files
+  stage: deploy-binding
+  tags:
+    - windows
+    - "2"
+  script:
+    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll C:\Users\admin\dev\Builds\Release\x86\
+  dependencies:
+    - binding-csharp-windows-x86
 
 # Deliver installers so they can be downloaded from the website
 lib-delivery-all:
@@ -1260,3 +1288,35 @@ expe-delivery-all:
     - expe-installer-macos-x64
     - expe-installer-windows-x86
     - expe-installer-windows-x64
+
+
+# Deliver installers so they can be downloaded from the website
+binding-delivery-all:
+  <<: *build-csharp-files
+  stage: delivery-binding
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - mv bindings _bindings
+    - echo "Deliver Windows x86 binding"
+    - mkdir --parents bindings/CSharp/win32
+    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86/IngescapeCSharp-*
+         bindings/CSharp/win32/
+    - ls bindings/CSharp/win32/ | grep -v 'latest_delivery' > bindings/CSharp/win32/latest_delivery
+    - echo "Deliver Windows x64 binding"
+    - mkdir --parents bindings/CSharp/win64
+    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64/IngescapeCSharp-*
+         bindings/CSharp/win64/
+    - ls bindings/CSharp/win64/ | grep -v 'latest_delivery' > bindings/CSharp/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive bindings ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - binding-csharp-installer-windows-x64
+    - binding-csharp-installer-windows-x86

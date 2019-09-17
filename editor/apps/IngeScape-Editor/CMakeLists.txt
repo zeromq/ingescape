@@ -176,6 +176,16 @@ find_package(Qt5 NO_MODULE COMPONENTS
     REQUIRED
 )
 
+
+if (UNIX AND NOT APPLE)
+    find_package(Qt5 NO_MODULE COMPONENTS
+        DBus
+        REQUIRED
+    )
+endif()
+
+
+
 # Find ingescape dependencies
 set(pkg_config_libs_private "")
 add_ingescape_libraries_dependencies(_INGESCAPE_LIBS pkg_config_libs_private)
@@ -239,6 +249,10 @@ target_link_libraries(
     ${_INGESCAPE_LIBS}
     I2Quick
 )
+
+if (UNIX AND NOT APPLE)
+    target_link_libraries(${PROJECT_NAME} Qt5::DBus)
+endif()
 
 if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework Foundation -framework AppKit")

@@ -26,6 +26,12 @@
 //
 //---------------------------------------------------------------------
 
+#include <QDBusConnection>
+#include <QDBusInterface>
+
+#include <QDebug>
+
+
 //
 // Define our singleton instance
 //
@@ -39,6 +45,22 @@ Q_GLOBAL_STATIC(LinuxUtils, _singletonInstance)
 LinuxUtils::LinuxUtils(QObject *parent)
     : OSUtils(parent)
 {
+    // Check if UPower is available
+    if (
+        (QDBusConnection::systemBus().interface() != nullptr)
+        &&
+        QDBusConnection::systemBus().interface()->isServiceRegistered( UPowerService )
+        )
+    {
+        // Subscribe to UPower
+        QDBusConnection dbusConnection = QDBusConnection::systemBus();
+        dbusConnection.connect("org.freedesktop.UPower", "/org/freedesktop/UPower", "org.freedesktop.UPower", "Sleeping", this, SLOT(_onUPowerSleeping()));
+        dbusConnection.connect("org.freedesktop.UPower", "/org/freedesktop/UPower", "org.freedesktop.UPower", "Resuming", this, SLOT(_onUPowerResuming()));
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << ": UPower is not available";
+    }
 }
 
 
@@ -81,6 +103,24 @@ void LinuxUtils::_enableEnergyEfficiencyFeatures()
  */
 void LinuxUtils::_disableEnergyEfficiencyFeatures()
 {
+}
+
+
+/**
+ * @brief Triggered when we receive a Sleeping signal from DBUS
+ */
+void LinuxUtils::_onUPowerSleeping()
+{
+    Q_EMIT systemSleep();
+}
+
+
+/**
+ * @brief Triggered when we receive a Resume signal from DBUS
+ */
+void LinuxUtils::_onUPowerResuming()
+{
+    Q_EMIT systemWake();
 }
 
 

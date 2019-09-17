@@ -60,6 +60,19 @@ public:
     void removeOSGeneratedMenuItems() Q_DECL_OVERRIDE;
 
 
+protected Q_SLOTS:
+    /**
+     * @brief Triggered when we receive a Sleeping signal from DBUS
+     */
+    void _onUPowerSleeping();
+
+
+    /**
+     * @brief Triggered when we receive a Resuming signal from DBUS
+     */
+    void _onUPowerResuming();
+
+
 protected:
     /**
      * @brief Enable energy efficiency features

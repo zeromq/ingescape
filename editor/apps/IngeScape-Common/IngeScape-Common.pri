@@ -171,3 +171,17 @@ win32 {
     # Add specific dependencies
     LIBS += -lWtsapi32
 }
+
+
+
+#------------------------
+#
+# Linux specific
+#
+#------------------------
+unix:!mac {
+    message(Ingescape-common.pri: Linux specific rules)
+
+    # Add DBUS
+    QT += dbus
+}
