@@ -625,7 +625,7 @@ void IngeScapeEditorController::savePlatformToCurrentlyLoadedFile()
 
 
 /**
- * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions)
+ * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions, hosts)
  * by deleting all existing data
  */
 void IngeScapeEditorController::clearCurrentPlatform()
@@ -645,6 +645,12 @@ void IngeScapeEditorController::clearCurrentPlatform()
     // Clear the current scenario
     if (_scenarioC != nullptr) {
         _scenarioC->clearScenario();
+    }
+
+    if (_hostsSupervisionC != nullptr)
+    {
+        // Delete all hosts
+        _hostsSupervisionC->deleteAllHosts();
     }
 
     if (_modelManager != nullptr)
@@ -1249,12 +1255,6 @@ void IngeScapeEditorController::_onExpeExited(QString peerId, QString peerName)
         setpeerNameOfExpe("");
     }
 }
-
-
-
-
-
-
 
 
 /**

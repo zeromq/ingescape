@@ -61,6 +61,12 @@ public:
     Q_INVOKABLE void removeAgentModelFromHost(AgentM* agent, HostVM* host);
 
 
+    /**
+     * @brief Delete all hosts
+     */
+    void deleteAllHosts();
+
+
 Q_SIGNALS:
 
     /**

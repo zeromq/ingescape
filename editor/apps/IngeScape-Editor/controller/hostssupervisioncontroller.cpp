@@ -86,6 +86,35 @@ void HostsSupervisionController::removeAgentModelFromHost(AgentM* agent, HostVM*
 
 
 /**
+ * @brief Delete all hosts
+ */
+void HostsSupervisionController::deleteAllHosts()
+{
+    for (HostVM* host : _hostsList.toList())
+    {
+        if ((host != nullptr) && !host->name().isEmpty() && (host->name() != HOSTNAME_NOT_DEFINED))
+        {
+            disconnect(host, nullptr, this, nullptr);
+
+            _hashFromNameToHost.remove(host->name());
+
+            if (_selectedHost == host)
+            {
+                // Clean-up current selection
+                setselectedHost(nullptr);
+            }
+
+            // Remove from the sorted list of hosts
+            _hostsList.remove(host);
+
+            // Free memory
+            delete host;
+        }
+    }
+}
+
+
+/**
  * @brief Slot called when a new model of host has been created
  * @param host
  */
@@ -146,22 +175,6 @@ void HostsSupervisionController::onHostModelWillBeDeleted(HostM* host)
 
         if (hostVM != nullptr)
         {
-            /*disconnect(hostVM, nullptr, this, nullptr);
-
-            _hashFromNameToHost.remove(hostName);
-
-            if (_selectedHost == hostVM)
-            {
-                // Clean-up current selection
-                setselectedHost(nullptr);
-            }
-
-            // Remove from the sorted list of hosts
-            _hostsList.remove(hostVM);
-
-            // Free memory
-            delete hostVM;*/
-
             if (hostVM->modelM() == host)
             {
                 // Simply, remove the model of host from this view model
