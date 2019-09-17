@@ -251,13 +251,6 @@ Item {
 
                     color: IngeScapeTheme.lightBlueGreyColor
                     font: IngeScapeTheme.heading2Font
-
-                    onHeightChanged: {
-                        console.log("onHeightChanged " + height);
-                    }
-                    Component.onCompleted: {
-                        console.log("onCompleted " + height);
-                    }
                 }
 
                 // List of associated agents

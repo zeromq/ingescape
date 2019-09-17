@@ -120,6 +120,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
 
 
+    // Create the (sub) directory "exports" if not exist (the directory contains CSV files about exports)
+    IngeScapeUtils::getExportsPath();
+
+
     //
     // Settings
     //
