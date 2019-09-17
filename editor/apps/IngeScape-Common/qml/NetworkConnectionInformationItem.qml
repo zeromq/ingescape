@@ -367,7 +367,7 @@ I2CustomRectangle {
 
                     elide: Text.ElideRight
 
-                    text: (root.isOnline) ? qsTr("Connected on %1").arg(root.currentNetworkDevice+" kkkkkkkkkkkkkkkkkkkk")
+                    text: (root.isOnline) ? qsTr("Connected on %1").arg(root.currentNetworkDevice)
                                           : qsTr("Offline")
                 }
 
@@ -381,7 +381,7 @@ I2CustomRectangle {
 
                     visible: (height !== 0)
 
-                    clip: (height !== textConnectedPort.height)
+                    clip: (height !== textInfoPart2.height)
 
                     opacity: (root.isOnline) ? 1 : 0
 
