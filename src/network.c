@@ -281,12 +281,13 @@ void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
     igs_debug("cleaning subscription to %s\n", subscriber->agentName);
     // clean the agent definition
     if(subscriber->definition != NULL){
-#if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
+        #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
         licEnforcement->currentIOPNb -= (HASH_COUNT(subscriber->definition->inputs_table) +
                                          HASH_COUNT(subscriber->definition->outputs_table) +
                                          HASH_COUNT(subscriber->definition->params_table));
         licEnforcement->currentAgentsNb--;
-#endif
+        //igs_license("license: %ld agents and %ld iops (%s)", licEnforcement->currentAgentsNb, licEnforcement->currentIOPNb, subscriber->agentName);
+        #endif
         definition_freeDefinition(subscriber->definition);
     }
     //clean the agent mapping
@@ -589,15 +590,27 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         subscriber->pollItem->revents = 0;
                         zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
                         zloop_poller_set_tolerant(loop, subscriber->pollItem);
-#if defined __unix__ || defined __APPLE__ || defined __linux__
+                        #if defined __unix__ || defined __APPLE__ || defined __linux__
                         if (useIPC){
                             igs_debug("Subscription created for %s at %s",subscriber->agentName,ipcAddress);
                         }else{
                             igs_debug("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
                         }
-#else
+                        #else
                         igs_debug("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
-#endif
+                        #endif
+                        #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
+                        licEnforcement->currentAgentsNb++;
+                        //igs_license("%ld agents (adding %s)", licEnforcement->currentAgentsNb, name);
+                        if (licEnforcement->currentAgentsNb > license->platformNbAgents){
+                            igs_license("Maximum number of allowed agents (%d) is exceeded : agent will stop", license->platformNbAgents);
+                            license_callback_t *el = NULL;
+                            DL_FOREACH(licenseCallbacks, el){
+                                el->callback_ptr(IGS_LICENSE_TOO_MANY_AGENTS, el->data);
+                            }
+                            return -1;
+                        }
+                        #endif
                     }
                 }
                 free(k);
@@ -717,28 +730,26 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     // Look if this agent already has a definition
                     if(subscriber->definition != NULL) {
                         igs_debug("Definition already exists for agent %s : new definition will overwrite the previous one...", name);
+                        #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
+                        //we remove IOP count from previous definition
+                        licEnforcement->currentIOPNb -= (HASH_COUNT(subscriber->definition->inputs_table) +
+                                                         HASH_COUNT(subscriber->definition->outputs_table) +
+                                                         HASH_COUNT(subscriber->definition->params_table));
+                        //igs_license("%ld iops (cleaning %s)", licEnforcement->currentIOPNb, name);
+                        #endif
                         definition_freeDefinition(subscriber->definition);
                         subscriber->definition = NULL;
                     }
-                    
                     #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
                     licEnforcement->currentIOPNb += (HASH_COUNT(newDefinition->inputs_table) +
                                                      HASH_COUNT(newDefinition->outputs_table) +
                                                      HASH_COUNT(newDefinition->params_table));
+                    //igs_license("%ld iops (adding %s)", licEnforcement->currentIOPNb, name);
                     if (licEnforcement->currentIOPNb > license->platformNbIOPs){
                         igs_license("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", license->platformNbIOPs);
                         license_callback_t *el = NULL;
                         DL_FOREACH(licenseCallbacks, el){
                             el->callback_ptr(IGS_LICENSE_TOO_MANY_IOPS, el->data);
-                        }
-                        return -1;
-                    }
-                    licEnforcement->currentAgentsNb++;
-                    if (licEnforcement->currentAgentsNb > license->platformNbAgents){
-                        igs_license("Maximum number of allowed agents (%d) is exceeded : agent will stop", license->platformNbAgents);
-                        license_callback_t *el = NULL;
-                        DL_FOREACH(licenseCallbacks, el){
-                            el->callback_ptr(IGS_LICENSE_TOO_MANY_AGENTS, el->data);
                         }
                         return -1;
                     }
@@ -1236,8 +1247,13 @@ initLoop (zsock_t *pipe, void *args){
         free(licEnforcement);
     }
     licEnforcement = calloc(1, sizeof(licenseEnforcement_t));
-    licEnforcement->currentAgentsNb = 0;
-    licEnforcement->currentIOPNb = 0;
+    //count our own presence and IOPs
+    licEnforcement->currentAgentsNb = 1;
+    licEnforcement->currentIOPNb = (HASH_COUNT(igs_internal_definition->inputs_table) +
+                                    HASH_COUNT(igs_internal_definition->outputs_table) +
+                                    HASH_COUNT(igs_internal_definition->params_table));
+    //NB: counting the number of IOPs here does not include future
+    //definition modifications when the agent is running.
 #endif
 
     network_needToSendDefinitionUpdate = false;
