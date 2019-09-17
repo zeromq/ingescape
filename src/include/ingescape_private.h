@@ -284,6 +284,7 @@ mapping_t* parser_LoadMapFromPath (const char* load_file);
 extern bool admin_logInStream;
 extern bool admin_logInFile;
 extern char admin_logFile[4096];
+void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
 
 //bus
 extern serviceHeader_t *serviceHeaders;

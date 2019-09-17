@@ -122,7 +122,7 @@ I2CustomRectangle {
 
             // Reset UI
             // - network device
-            resetListOfNetworkDevices();
+            resetComboboxSelectNetworkDevice();
             // - port
             selectPortTextfield.text = Qt.binding(function() {
                return root.currentPort;
@@ -152,14 +152,26 @@ I2CustomRectangle {
 
 
 
-    // Reset our list of network devices
-    function resetListOfNetworkDevices()
+    // Reset our combobox used to select a network device
+    function resetComboboxSelectNetworkDevice()
     {
+        // Close our combobox
+        selectNetworkDeviceCombobox.close();
+
+        // Update selected index
         selectNetworkDeviceCombobox.selectedIndex = Qt.binding(function() {
-           return (
-                   (root.listOfNetworkDevices)
-                   ? root.listOfNetworkDevices.indexOf(root.currentNetworkDevice)
-                   : -1
+            var index = (
+                         (root.listOfNetworkDevices)
+                         ? root.listOfNetworkDevices.indexOf(root.currentNetworkDevice)
+                         : -1
+                        );
+
+            // When our current network device is offline, we try to help our end-users
+            // by selecting a network device when we can i.e. when there is a single network device available
+            return (
+                    (index >= 0)
+                    ? index
+                    : ((root.listOfNetworkDevices.length === 1) ? 0 : -1)
                    );
         });
     }
@@ -217,7 +229,13 @@ I2CustomRectangle {
     }
 
 
+    onListOfNetworkDevicesChanged: {
+        resetComboboxSelectNetworkDevice();
+    }
 
+
+
+    // Timer used to auto-close our edition mode
     Timer {
         id: autoCloseTimer
 
@@ -567,6 +585,7 @@ I2CustomRectangle {
                             text: selectNetworkDeviceCombobox.text
                         }
 
+                        placeholderText: qsTr("Select a network device...")
 
                         model: null
                         selectedIndex: -1

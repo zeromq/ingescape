@@ -32,6 +32,22 @@ Button {
     property real sourceScale: 1
 
 
+
+    // This property to define what happens when the source image has a different size than the item
+    property int fillMode: Image.Stretch
+
+    // This property holds whether the image should be horizontally inverted (effectively displaying a mirrored image)
+    property bool mirror: false
+
+    // This property holds whether the image is smoothly filtered when scaled or transformed
+    property bool smooth: true
+
+    // This property holds whether the image uses mipmap filtering when scaled or transformed
+    property bool mipmap: false
+
+
+
+
     activeFocusOnPress: true
 
 
@@ -65,6 +81,12 @@ Button {
                     leftMargin : maskHorizontalMargins
                     rightMargin : maskHorizontalMargins
                 }
+
+                fillMode: root.fillMode
+                mirror: root.mirror
+
+                smooth: root.smooth
+                mipmap: root.mipmap
 
                 sourceScale: root.sourceScale
 

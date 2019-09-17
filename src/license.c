@@ -580,13 +580,15 @@ void license_readLicense(void){
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 void igs_setLicensePath(const char *path){
-    if (zsys_file_exists(path)){
+    char reviewedPath[4096] = "";
+    admin_makeFilePath(path, reviewedPath, 4096);
+    if (zsys_file_exists(reviewedPath)){
         if (licensePath != NULL){
             free(licensePath);
         }
-        licensePath = strdup(path);
+        licensePath = strdup(reviewedPath);
     }else{
-        igs_license("%s does not exist", path);
+        igs_license("%s does not exist", reviewedPath);
     }
 }
 char *igs_getLicensePath(void){
