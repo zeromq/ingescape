@@ -160,6 +160,7 @@ find_package(Qt5 NO_MODULE COMPONENTS
     Sql
     Core
     Gui
+    Network
     REQUIRED
 )
 
@@ -231,6 +232,7 @@ target_link_libraries(
     Qt5::Sql
     Qt5::Core
     Qt5::Gui
+    Qt5::Network
     ${_INGESCAPE_LIBS}
     I2Quick
 )
