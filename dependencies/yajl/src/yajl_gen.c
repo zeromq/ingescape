@@ -232,7 +232,7 @@ igsyajl_gen_double(igsyajl_gen g, double number)
     INSERT_SEP; INSERT_WHITESPACE;
     snprintf(i, 32, "%.20g", number);
     if (strspn(i, "0123456789-") == strlen(i)) {
-        strncat(i, ".0", 32);
+        strncat(i, ".0", 31);
     }
     g->print(g->ctx, i, (unsigned int)strlen(i));
     APPENDED_ATOM;
