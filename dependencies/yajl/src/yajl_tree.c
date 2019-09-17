@@ -472,7 +472,7 @@ igsyajl_val igsyajl_tree_get(igsyajl_val n, const char ** path, igsyajl_type typ
             len = n->u.array.len;
             char *end = (char *)*path;
             unsigned long index = (unsigned long) strtol(*path, &end, 10);
-            if (end != *path && index >= 0){
+            if (end != *path){
                 //we got a valid index
                 if (index < len){
                     //we are in range
