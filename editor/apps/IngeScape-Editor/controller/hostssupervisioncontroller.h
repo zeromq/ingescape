@@ -97,6 +97,14 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot called when a previous host has been parsed (in JSON file)
+     * @param hostName
+     * @param ipAddress
+     */
+    void onPreviousHostParsed(QString hostName, QString ipAddress);
+
+
+    /**
      * @brief Slot called when a new model of agent has been created
      * @param agent
      */
@@ -118,6 +126,15 @@ private:
      * @return
      */
     HostVM* _getHostWithName(QString hostName);
+
+
+    /**
+     * @brief Create a view model of host with a name and a model (optional)
+     * @param hostName
+     * @param model
+     * @return
+     */
+    HostVM* _createViewModelOfHost(QString hostName, HostM* model);
 
 
 private:

@@ -38,6 +38,9 @@ class RecordVM : public QObject
     // Define a QTime and a QDateTime: Manage a date in addition to the time to prevent a delta in hours between JS (QML) and C++
     I2_QML_PROPERTY_QTime(elapsedTime)
 
+    // The value will never change (get from the model)
+    Q_PROPERTY(QDateTime endDateTime READ endDateTime CONSTANT)
+
 
 public:
 
@@ -53,6 +56,13 @@ public:
      * @brief Destructor
      */
     ~RecordVM();
+
+
+    /**
+     * @brief Get "End Date Time" from model
+     * @return
+     */
+    QDateTime endDateTime() const;
 
 
 Q_SIGNALS:

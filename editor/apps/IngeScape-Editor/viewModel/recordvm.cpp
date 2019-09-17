@@ -49,3 +49,18 @@ RecordVM::~RecordVM()
     }
 }
 
+
+/**
+ * @brief Get "End Date Time" from model
+ * @return
+ */
+QDateTime RecordVM::endDateTime() const
+{
+    if (_modelM != nullptr) {
+        return _modelM->endDateTime();
+    }
+    else {
+         return QDateTime();
+    }
+}
+

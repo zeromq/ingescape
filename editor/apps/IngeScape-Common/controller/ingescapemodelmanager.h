@@ -288,6 +288,14 @@ Q_SIGNALS:
     void hostModelWillBeDeleted(HostM* host);
 
 
+    /**
+     * @brief Signal emitted when a previous host has been parsed (in JSON file)
+     * @param hostName
+     * @param ipAddress
+     */
+    void previousHostParsed(QString hostName, QString ipAddress);
+
+
 public Q_SLOTS:
 
     /**

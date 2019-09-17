@@ -100,15 +100,8 @@ void HostsSupervisionController::onHostModelHasBeenCreated(HostM* host)
 
         if (hostVM == nullptr)
         {
-            // Create a view model for this model of host
-            hostVM = new HostVM(hostName, host, this);
-
-            connect(hostVM, &HostVM::commandAskedToAgent, this, &HostsSupervisionController::commandAskedToAgent);
-            connect(hostVM, &HostVM::commandAskedToLauncher, this, &HostsSupervisionController::commandAskedToLauncher);
-
-            _hashFromNameToHost.insert(hostName, hostVM);
-
-            _hostsList.append(hostVM);
+            // Create a view model of host with a name and a model
+            hostVM = _createViewModelOfHost(hostName, host);
 
             // Associate host with existing agents if necessary
             for (AgentM* agent : _allAgents)
@@ -183,6 +176,27 @@ void HostsSupervisionController::onHostModelWillBeDeleted(HostM* host)
 
 
 /**
+ * @brief Slot called when a previous host has been parsed (in JSON file)
+ * @param hostName
+ * @param ipAddress
+ */
+void HostsSupervisionController::onPreviousHostParsed(QString hostName, QString ipAddress)
+{
+    if (!hostName.isEmpty() && !ipAddress.isEmpty())
+    {
+        // Get the view model of host with its name
+        HostVM* hostVM = _getHostWithName(hostName);
+
+        if (hostVM == nullptr)
+        {
+            // Create a view model of host with a name
+            hostVM = _createViewModelOfHost(hostName, nullptr);
+        }
+    }
+}
+
+
+/**
  * @brief Slot called when a new model of agent has been created
  * @param agent
  */
@@ -244,4 +258,31 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
 HostVM* HostsSupervisionController::_getHostWithName(QString hostName)
 {
     return _hashFromNameToHost.value(hostName, nullptr);
+}
+
+
+/**
+ * @brief Create a view model of host with a name and a model (optional)
+ * @param hostName
+ * @param model
+ * @return
+ */
+HostVM* HostsSupervisionController::_createViewModelOfHost(QString hostName, HostM* model)
+{
+    HostVM* host = nullptr;
+
+    if (!hostName.isEmpty() && !_hashFromNameToHost.contains(hostName))
+    {
+        // Create a view model for this model of host
+        host = new HostVM(hostName, model, this);
+
+        // Connect to signals
+        connect(host, &HostVM::commandAskedToAgent, this, &HostsSupervisionController::commandAskedToAgent);
+        connect(host, &HostVM::commandAskedToLauncher, this, &HostsSupervisionController::commandAskedToLauncher);
+
+        _hashFromNameToHost.insert(hostName, host);
+
+        _hostsList.append(host);
+    }
+    return host;
 }

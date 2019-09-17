@@ -45,6 +45,9 @@ RecordsSupervisionController::RecordsSupervisionController(EditorModelManager* m
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Records are sorted on their end date & time
+    _recordsList.setSortProperty("endDateTime");
+
     // Init the timer
     _timerToDisplayTime.setInterval(INTERVAL_ELAPSED_TIME);
     connect(&_timerToDisplayTime, &QTimer::timeout, this, &RecordsSupervisionController::_onTimeout_DisplayTime);
@@ -584,8 +587,8 @@ void RecordsSupervisionController::_createRecordVMwithModel(RecordM* model)
 
         _hashFromRecordIdToViewModel.insert(model->uid(), vm);
 
-        // Insert in the displayed list
-        _recordsList.insert(0, vm);
+        // Add to the displayed list
+        _recordsList.append(vm);
     }
 }
 

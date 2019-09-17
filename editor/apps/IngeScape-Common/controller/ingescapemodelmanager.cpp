@@ -582,14 +582,17 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
 
                                     if (jsonHostname.isString() && jsonCommandLine.isString() && jsonPeerId.isString() && jsonAddress.isString())
                                     {
-                                        QString hostname = jsonHostname.toString();
+                                        QString hostName = jsonHostname.toString();
                                         QString commandLine = jsonCommandLine.toString();
                                         QString peerId = jsonPeerId.toString();
                                         QString ipAddress = jsonAddress.toString();
 
                                         //if (!hostname.isEmpty() && !commandLine.isEmpty())
-                                        if (!hostname.isEmpty() && !commandLine.isEmpty() && !peerId.isEmpty() && !ipAddress.isEmpty())
+                                        if (!hostName.isEmpty() && !commandLine.isEmpty() && !peerId.isEmpty() && !ipAddress.isEmpty())
                                         {
+                                            // Emit the signal "Previous Host Parsed"
+                                            Q_EMIT previousHostParsed(hostName, ipAddress);
+
                                             // Check that there is not yet an agent with this peer id
                                             AgentM* agent = getAgentModelFromPeerId(peerId);
                                             if (agent == nullptr)
@@ -607,7 +610,7 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                                                  copyOfDefinition,
                                                                  peerId,
                                                                  ipAddress,
-                                                                 hostname,
+                                                                 hostName,
                                                                  commandLine);
                                             }
                                             else {
