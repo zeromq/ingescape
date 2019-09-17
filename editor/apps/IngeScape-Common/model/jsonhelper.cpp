@@ -271,9 +271,21 @@ QJsonObject JsonHelper::exportAgentDefinitionToJson(DefinitionM* agentDefinition
             }
         }
 
+        QJsonArray jsonCalls = QJsonArray();
+        for (CallM* call : *(agentDefinition->callsList()))
+        {
+            if (call != nullptr) {
+                // Get JSON object from the agent Input/Output/Parameter
+                QJsonObject jsonAgentCalls = _getJsonFromCall(call);
+
+                jsonCalls.append(jsonAgentCalls);
+            }
+        }
+
         jsonDefinition.insert("inputs", jsonInputs);
         jsonDefinition.insert("outputs", jsonOutputs);
         jsonDefinition.insert("parameters", jsonParameters);
+        jsonDefinition.insert("calls", jsonCalls);
     }
 
     return jsonDefinition;
@@ -1149,6 +1161,41 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
     }
 
     return jsonAgentIOP;
+}
+
+
+/**
+ * @brief Get JSON object from a CallM
+ * @param call
+ * @return
+ */
+QJsonObject JsonHelper::_getJsonFromCall(CallM* call)
+{
+    QJsonObject jsonCall;
+
+    if (call != nullptr)
+    {
+        jsonCall.insert("name", call->name());
+        jsonCall.insert("description", call->description());
+
+        QJsonArray argumentsArray;
+        const QHash<QString, AgentIOPValueTypes::Value>& arguments = call->argumentsHash();
+        for(auto argIt = arguments.begin() ; argIt != arguments.end() ; ++argIt)
+        {
+            QJsonObject argumentObject;
+            argumentObject.insert("name", argIt.key());
+            argumentObject.insert("type", AgentIOPValueTypes::staticEnumToString(argIt.value()));
+            argumentsArray.append(argumentObject);
+        }
+        jsonCall.insert("arguments", argumentsArray);
+
+        if (call->reply() != nullptr)
+        {
+            jsonCall.insert("reply", _getJsonFromCall(call->reply()));
+        }
+    }
+
+    return jsonCall;
 }
 
 

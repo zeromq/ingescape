@@ -195,6 +195,14 @@ private:
 
 
     /**
+     * @brief Get JSON object from a CallM
+     * @param call
+     * @return
+     */
+    QJsonObject _getJsonFromCall(CallM* call);
+
+
+    /**
      * @brief Create a model of mapping element Input name/Output agent name/Output name with JSON
      * @param inputAgentName
      * @param jsonObject
