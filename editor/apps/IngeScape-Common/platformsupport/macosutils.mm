@@ -239,6 +239,18 @@ public:
     }
 
 
+    /**
+     * @brief Destructor
+     */
+    ~MacosUtilsPrivate()
+    {
+        if (objectiveCAPI != nil)
+        {
+            [objectiveCAPI release];
+        }
+    }
+
+
 public:
     MacosUtilsNative* objectiveCAPI;
 };
