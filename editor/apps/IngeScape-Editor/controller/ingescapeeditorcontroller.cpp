@@ -649,8 +649,8 @@ void IngeScapeEditorController::clearCurrentPlatform()
 
     if (_hostsSupervisionC != nullptr)
     {
-        // Delete all hosts
-        _hostsSupervisionC->deleteAllHosts();
+        // Delete hosts OFF
+        _hostsSupervisionC->deleteHostsOFF();
     }
 
     if (_modelManager != nullptr)

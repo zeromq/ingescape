@@ -86,29 +86,15 @@ void HostsSupervisionController::removeAgentModelFromHost(AgentM* agent, HostVM*
 
 
 /**
- * @brief Delete all hosts
+ * @brief Delete hosts OFF
  */
-void HostsSupervisionController::deleteAllHosts()
+void HostsSupervisionController::deleteHostsOFF()
 {
     for (HostVM* host : _hostsList.toList())
     {
-        if ((host != nullptr) && !host->name().isEmpty() && (host->name() != HOSTNAME_NOT_DEFINED))
+        if ((host != nullptr) && !host->isON() && (host->name() != HOSTNAME_NOT_DEFINED))
         {
-            disconnect(host, nullptr, this, nullptr);
-
-            _hashFromNameToHost.remove(host->name());
-
-            if (_selectedHost == host)
-            {
-                // Clean-up current selection
-                setselectedHost(nullptr);
-            }
-
-            // Remove from the sorted list of hosts
-            _hostsList.remove(host);
-
-            // Free memory
-            delete host;
+            _deleteHost(host);
         }
     }
 }
@@ -298,4 +284,33 @@ HostVM* HostsSupervisionController::_createViewModelOfHost(QString hostName, Hos
         _hostsList.append(host);
     }
     return host;
+}
+
+
+/**
+ * @brief Delete a view model of host
+ * @param host
+ */
+void HostsSupervisionController::_deleteHost(HostVM* host)
+{
+    if (host != nullptr)
+    {
+        disconnect(host, nullptr, this, nullptr);
+
+        if (_selectedHost == host)
+        {
+            // Clean-up current selection
+            setselectedHost(nullptr);
+        }
+
+        if (!host->name().isEmpty() && _hashFromNameToHost.contains(host->name())) {
+            _hashFromNameToHost.remove(host->name());
+        }
+
+        // Remove from the sorted list of hosts
+        _hostsList.remove(host);
+
+        // Free memory
+        delete host;
+    }
 }
