@@ -1296,24 +1296,24 @@ iopType_t igs_getTypeForParameter(const char *name){
 
 int igs_getInputsNumber(){
     if(igs_internal_definition == NULL){
-        igs_error("Definition is NULL");
-        return -1;
+        igs_warn("definition is NULL");
+        return 0;
     }
     return HASH_COUNT(igs_internal_definition->inputs_table);
 }
 
 int igs_getOutputsNumber(){
     if(igs_internal_definition == NULL){
-        igs_error("Definition is NULL");
-        return -1;
+        igs_warn("definition is NULL");
+        return 0;
     }
     return HASH_COUNT(igs_internal_definition->outputs_table);
 }
 
 int igs_getParametersNumber(){
     if(igs_internal_definition == NULL){
-        igs_error("Definition is NULL");
-        return -1;
+        igs_warn("definition is NULL");
+        return 0;
     }
     return HASH_COUNT(igs_internal_definition->params_table);
 }

@@ -1249,9 +1249,14 @@ initLoop (zsock_t *pipe, void *args){
     licEnforcement = calloc(1, sizeof(licenseEnforcement_t));
     //count our own presence and IOPs
     licEnforcement->currentAgentsNb = 1;
-    licEnforcement->currentIOPNb = (HASH_COUNT(igs_internal_definition->inputs_table) +
-                                    HASH_COUNT(igs_internal_definition->outputs_table) +
-                                    HASH_COUNT(igs_internal_definition->params_table));
+    if (igs_internal_definition != NULL){
+        licEnforcement->currentIOPNb = (HASH_COUNT(igs_internal_definition->inputs_table) +
+                                        HASH_COUNT(igs_internal_definition->outputs_table) +
+                                        HASH_COUNT(igs_internal_definition->params_table));
+    }else{
+        licEnforcement->currentIOPNb = 0;
+    }
+    
     //NB: counting the number of IOPs here does not include future
     //definition modifications when the agent is running.
 #endif

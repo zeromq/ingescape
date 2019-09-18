@@ -404,8 +404,10 @@ int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgu
 }
 
 size_t igs_getNumberOfCalls(void){
-    if (igs_internal_definition == NULL)
+    if (igs_internal_definition == NULL){
+        igs_warn("definition is NULL");
         return 0;
+    }
     return HASH_COUNT(igs_internal_definition->calls_table);
 }
 
