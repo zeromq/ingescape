@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -12,45 +12,34 @@
  *
  */
 
-#ifndef LOGSSORTFILTER_H
-#define LOGSSORTFILTER_H
+#ifndef AGENTSINHOSTSORTFILTER_H
+#define AGENTSINHOSTSORTFILTER_H
 
 #include <QObject>
-#include <QtQml>
-
 #include <I2PropertyHelpers.h>
 #include <I2Quick.h>
 
-#include <model/logm.h>
-
 
 /**
- * @brief The LogsSortFilter class defines a specific filter for the logs
+ * @brief The AgentsInHostSortFilter class defines a specific sort for the agents list in a host
  */
-class LogsSortFilter : public I2SortFilterProxyModel
+class AgentsInHostSortFilter : public I2SortFilterProxyModel
 {
     Q_OBJECT
 
-
 public:
+
     /**
      * @brief Constructor
      * @param parent
      */
-    explicit LogsSortFilter(QObject *parent = nullptr);
+    explicit AgentsInHostSortFilter(QObject *parent = nullptr);
 
 
     /**
       * @brief Destructor
       */
-    //~LogsSortFilter();
-
-
-    /**
-     * @brief Update the filter (with the new list of selected log types)
-     * @param selectedLogTypes
-     */
-    void updateFilter(QList<int> selectedLogTypes);
+    //~AgentsInHostSortFilter();
 
 
 protected:
@@ -78,14 +67,9 @@ protected:
      */
     bool isLessThan(QObject* item1, int indexItem1, QObject* item2, int indexItem2) const Q_DECL_OVERRIDE;
 
-
-private:
-
-    // List of selected log types
-    QList<int> _selectedLogTypes;
-
 };
 
-QML_DECLARE_TYPE(LogsSortFilter)
+QML_DECLARE_TYPE(AgentsInHostSortFilter)
 
-#endif // LOGSSORTFILTER_H
+
+#endif // AGENTSINHOSTSORTFILTER_H

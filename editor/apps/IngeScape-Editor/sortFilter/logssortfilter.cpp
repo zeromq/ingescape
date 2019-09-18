@@ -29,10 +29,9 @@ LogsSortFilter::LogsSortFilter(QObject *parent) : I2SortFilterProxyModel(parent)
 /**
   * @brief Destructor
   */
-LogsSortFilter::~LogsSortFilter()
+/*LogsSortFilter::~LogsSortFilter()
 {
-
-}
+}*/
 
 
 /**

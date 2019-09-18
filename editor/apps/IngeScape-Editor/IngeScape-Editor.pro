@@ -51,6 +51,7 @@ SOURCES += main.cpp \
     controller/valueshistorycontroller.cpp \
     misc/collapsiblecolumn.cpp \
     model/actionmappingm.cpp \
+    sortFilter/agentsinhostsortfilter.cpp \
     sortFilter/valueshistorysortfilter.cpp \
     controller/hostssupervisioncontroller.cpp \
     model/recordm.cpp \
@@ -76,6 +77,7 @@ SOURCES += main.cpp \
 HEADERS += \
     model/actionmappingm.h \
     controller/scenariocontroller.h \
+    sortFilter/agentsinhostsortfilter.h \
     stable.h \
     controller/agentssupervisioncontroller.h \
     controller/agentsmappingcontroller.h \

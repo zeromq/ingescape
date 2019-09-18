@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -31,7 +31,6 @@ ValuesHistorySortFilter::ValuesHistorySortFilter(QObject *parent) : I2SortFilter
   */
 /*ValuesHistorySortFilter::~ValuesHistorySortFilter()
 {
-
 }*/
 
 

@@ -39,8 +39,9 @@ HostVM::HostVM(QString name,
 
     // Agents are sorted on their name (alphabetical order)
     //_agentsList.setSortProperty("name");
-    _agentsList.setSortProperty("isON");
-    _agentsList.setSortOrder(Qt::DescendingOrder);
+    //_agentsList.setSortProperty("isON");
+    //_agentsList.setSortOrder(Qt::DescendingOrder);
+    _sortedAgents.setSourceModel(_agentsList);
 
     //qInfo() << "New View Model of Host" << _name;
 
@@ -77,7 +78,8 @@ HostVM::~HostVM()
     }
 
     // Clear the list of agents
-    _agentsList.clear();
+    //_agentsList.clear();
+    _sortedAgents.clear();
 }
 
 

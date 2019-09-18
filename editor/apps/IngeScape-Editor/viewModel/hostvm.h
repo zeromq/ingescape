@@ -23,6 +23,7 @@
 
 #include <model/hostm.h>
 #include <model/agent/agentm.h>
+#include <sortFilter/agentsinhostsortfilter.h>
 
 
 /**
@@ -42,7 +43,13 @@ class HostVM : public QObject
     I2_QML_PROPERTY_READONLY(bool, isON)
 
     // Sorted list of associated agents
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentM, agentsList)
+    //I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentM, agentsList)
+
+    // Not sorted list of agents
+    I2_QOBJECT_LISTMODEL(AgentM, agentsList)
+
+    // List of (filtered and) sorted agents
+    Q_PROPERTY(AgentsInHostSortFilter* sortedAgents READ sortedAgents CONSTANT)
 
     // Flag indicating if our host can provide stream
     I2_QML_PROPERTY_READONLY(bool, canProvideStream)
@@ -68,6 +75,16 @@ public:
      * @brief Destructor
      */
     ~HostVM();
+
+
+    /**
+     * @brief Get our sorted list of agents
+     * @return
+     */
+    AgentsInHostSortFilter* sortedAgents()
+    {
+        return &_sortedAgents;
+    }
 
 
     /**
@@ -107,6 +124,11 @@ Q_SIGNALS:
      * @param commandLine
      */
     void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
+
+
+private:
+    // List of (filtered and) sorted agents
+    AgentsInHostSortFilter _sortedAgents;
 
 };
 
