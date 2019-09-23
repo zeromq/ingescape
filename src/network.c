@@ -656,7 +656,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if (admin_logInStream){
                     zyre_whispers(agentElements->node, peer, "LOG_IN_STREAM=1");
                 }
-                if (admin_logInFile && strlen(admin_logFile) > 0){
+                if (admin_logInFile){
                     zyre_whispers(agentElements->node, peer, "LOG_IN_FILE=1");
                     zyre_whispers(agentElements->node, peer, "LOG_FILE_PATH=%s", admin_logFile);
                 }

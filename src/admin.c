@@ -164,20 +164,20 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
             char *name = igs_getAgentName();
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
-            snprintf(admin_logFile, 4095, "~/%s_log.csv", name);
+            snprintf(admin_logFile, 4095, "~/Documents/IngeScape/logs/%s_log.csv", name);
 #else
             //default path for Windows is current PATH
-            snprintf(admin_logFile, 4095, "%s_log.csv", name);
+            snprintf(admin_logFile, 4095, "~/Documents/IngeScape/logs/%s_log.csv", name);
 #endif
+            free(name);
+            if (admin_logFile[0] == '~'){
+                char buff[4097] = "";
+                strncpy(buff, admin_logFile, 4096);
+                admin_makeFilePath(buff, admin_logFile, 4096);
+            }
             if (agentElements != NULL && agentElements->node != NULL){
                 zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
             }
-            free(name);
-        }
-        if (admin_logFile[0] == '~'){
-            char buff[4097] = "";
-            strncpy(buff, admin_logFile, 4096);
-            admin_makeFilePath(buff, admin_logFile, 4096);
         }
         if (access(admin_logFile, W_OK) == -1){
             //printf("need to create log file: %s\n", admin_logFile);
