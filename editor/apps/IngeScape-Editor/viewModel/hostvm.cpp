@@ -37,11 +37,8 @@ HostVM::HostVM(QString name,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    // Agents are sorted on their name (alphabetical order)
-    //_agentsList.setSortProperty("name");
-    //_agentsList.setSortProperty("isON");
-    //_agentsList.setSortOrder(Qt::DescendingOrder);
-    _sortedAgents.setSourceModel(_agentsList);
+    // Allows to sort agents executed on our host
+    _sortedAgents.setSourceModel(&_agentsList);
 
     //qInfo() << "New View Model of Host" << _name;
 
@@ -78,8 +75,7 @@ HostVM::~HostVM()
     }
 
     // Clear the list of agents
-    //_agentsList.clear();
-    _sortedAgents.clear();
+    _agentsList.clear();
 }
 
 

@@ -42,13 +42,10 @@ class HostVM : public QObject
     // Flag indicating if our host is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
 
-    // Sorted list of associated agents
-    //I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentM, agentsList)
-
-    // Not sorted list of agents
+    // (NOT sorted) list of agents executed on our host
     I2_QOBJECT_LISTMODEL(AgentM, agentsList)
 
-    // List of (filtered and) sorted agents
+    // List of (filtered and) sorted agents executed on our host
     Q_PROPERTY(AgentsInHostSortFilter* sortedAgents READ sortedAgents CONSTANT)
 
     // Flag indicating if our host can provide stream

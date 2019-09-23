@@ -179,7 +179,7 @@ Item {
             id: hostItem
 
             property HostVM model_hostVM: model.QtObject
-            property var model_agentsList: model.agentsList
+            property var model_agentsList: model.sortedAgents
 
             //height: 5 + hostInfos.height + 6
             height: 5 + hostName.height + hostInfos.spacing + hostIP.height + hostInfos.spacing + listViewOfAgents.height + 6
@@ -434,7 +434,7 @@ Item {
     //
     // Menu popup with options
     //
-    PopUp.MenuPopup  {
+    PopUp.MenuPopup {
         id : popupOptions
 
         anchors {
@@ -513,11 +513,34 @@ Item {
                     enabled: false
 
                     style: Theme.ButtonStyleOfOption {
-                        isVisibleSeparation: false
+
                     }
 
                     onClicked: {
                         console.log("QML: click on option 'View Screen'");
+
+                        popupOptions.close();
+                    }
+                }
+
+                Button {
+                    id: optionRemove
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Remove")
+
+                    // FIXME: option "remove host"
+                    //enabled: (rootItem.host && rootItem.host.isON)
+                    enabled: false
+
+                    style: Theme.ButtonStyleOfOption {
+                        isVisibleSeparation: false
+                    }
+
+                    onClicked: {
+                        console.log("QML: click on option 'Remove Host'");
 
                         popupOptions.close();
                     }
