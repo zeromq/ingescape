@@ -295,7 +295,8 @@ int main(int argc, char *argv[])
         //
         //------------------------------
 
-        QString logFilePath = QString("%1log-IngeScape-Editor.csv").arg(rootDirectoryPath);
+        QString logsDirectoryPath = IngeScapeUtils::getLogsPath();
+        QString logFilePath = QString("%1%2_log.csv").arg(logsDirectoryPath, app.applicationName());
 
         // Set the log level from which logs are printed in the console
         igs_setVerbose(true);

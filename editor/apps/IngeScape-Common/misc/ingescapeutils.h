@@ -51,6 +51,14 @@ namespace IngeScapeUtils
 
 
     /**
+     * @brief Get (and create if needed) the logs path of our application
+     * "[DocumentsLocation]/IngeScape/logs/"
+     * @return
+     */
+    QString getLogsPath();
+
+
+    /**
      * @brief Get (and create if needed) the snapshots path of our application
      * "[DocumentsLocation]/IngeScape/snapshots/"
      * @return
