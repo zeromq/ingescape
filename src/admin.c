@@ -316,7 +316,7 @@ void igs_setLogPath(const char *path){
         }else{
             printf("switching to new log file: %s\n", admin_logFile);
         }
-        if (fp != NULL & agentElements != NULL && agentElements->node != NULL){
+        if (fp != NULL && agentElements != NULL && agentElements->node != NULL){
             zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
         }
         admin_unlock();
