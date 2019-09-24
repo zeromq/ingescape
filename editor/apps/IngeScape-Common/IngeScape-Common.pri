@@ -1,6 +1,6 @@
 INCLUDEPATH += $$PWD
 
-DEFINES += INGESCAPECOMMON_FROM_PRI
+DEFINES += INGESCAPECOMMON_INTERNAL_BUILD
 
 QT += qml quick svg xml sql quick-private core-private gui-private concurrent network
 
