@@ -449,11 +449,11 @@ Item {
 
 
                 onClicked: {
-                    if (controller)
-                    {
-                        // Delete the record
-                        controller.deleteRecord(model.QtObject);
-                    }
+                    // Set the record
+                    deleteConfirmationPopup.record = model.QtObject;
+
+                    // Open the popup
+                    deleteConfirmationPopup.open();
                 }
             }
 
@@ -687,6 +687,24 @@ Item {
             }
         }
     }
-}
 
+
+    //
+    // Popup about "Delete Record" confirmation
+    //
+    ConfirmationPopup {
+        id: deleteConfirmationPopup
+
+        property RecordVM record: null;
+
+        confirmationText: record ? "Do you want to remove " + record.name + "?"
+                                 : ""
+
+        onConfirmed: {
+            if (rootItem.controller) {
+                rootItem.controller.deleteRecord(record);
+            }
+        }
+    }
+}
 

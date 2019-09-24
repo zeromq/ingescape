@@ -31,6 +31,9 @@ class RecordVM : public QObject
 {
     Q_OBJECT
 
+    // Name of our record
+    I2_QML_PROPERTY_READONLY(QString, name)
+
     // Model of our record
     I2_QML_PROPERTY_DELETE_PROOF(RecordM*, modelM)
 
@@ -46,10 +49,13 @@ public:
 
     /**
      * @brief Constructor
+     * @param name
      * @param model
      * @param parent
      */
-    explicit RecordVM(RecordM* model, QObject *parent = nullptr);
+    explicit RecordVM(//QString name,
+                      RecordM* model,
+                      QObject *parent = nullptr);
 
 
     /**

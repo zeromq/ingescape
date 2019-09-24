@@ -59,6 +59,16 @@ Item {
 
     //--------------------------------
     //
+    // Signals
+    //
+    //--------------------------------
+
+    // signal emitted when the user clicks on the remove button
+    signal needConfirmationToDeleteHostInList();
+
+
+    //--------------------------------
+    //
     // Content
     //
     //--------------------------------
@@ -127,11 +137,8 @@ Item {
 
                 onClicked: {
 
-                    if (controller)
-                    {
-                        // Remove our host from the list and delete it
-                        controller.deleteHost(rootItem.host);
-                    }
+                    // Emit the signal to display a confirmation popup
+                    rootItem.needConfirmationToDeleteHostInList();
                 }
             }
         }
@@ -470,11 +477,8 @@ Item {
                     }
 
                     onClicked: {
-                        if (controller)
-                        {
-                            // Remove our host from the list and delete it
-                            controller.deleteHost(rootItem.host);
-                        }
+                        // Emit the signal to display a confirmation popup
+                        rootItem.needConfirmationToDeleteHostInList();
 
                         popupOptions.close();
                     }

@@ -98,9 +98,18 @@ Item {
 
 
             delegate: HostsListItem {
+                id: hostsListItem
 
                 host: model.QtObject
                 controller: rootItem.controller
+
+                onNeedConfirmationToDeleteHostInList: {
+                    // Set the host
+                    deleteConfirmationPopup.host = model.QtObject;
+
+                    // Open the popup
+                    deleteConfirmationPopup.open();
+                }
             }
 
 
@@ -168,6 +177,25 @@ Item {
         color: IngeScapeTheme.blackColor
 
         height: 1
+    }
+
+
+    //
+    // Popup about "Delete Host" confirmation
+    //
+    ConfirmationPopup {
+        id: deleteConfirmationPopup
+
+        property HostVM host: null
+
+        confirmationText: host ? "Do you want to remove " + host.name + "?"
+                               : ""
+
+        onConfirmed: {
+            if (rootItem.controller) {
+                rootItem.controller.deleteHost(deleteConfirmationPopup.host);
+            }
+        }
     }
 
 

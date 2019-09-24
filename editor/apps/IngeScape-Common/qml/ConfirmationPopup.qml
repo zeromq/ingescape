@@ -45,10 +45,10 @@ I2PopupBase {
     //
     //--------------------------------
 
-    // Signal emitted when the user clicks on the "OK" button
+    // Signal emitted when the user clicks on the "YES" button
     signal confirmed();
 
-    // Signal emitted when the user clicks on the "Cancel" button
+    // Signal emitted when the user clicks on the "NO" button
     signal cancelled();
 
 
@@ -110,7 +110,7 @@ I2PopupBase {
                 width: boundingBox.width
 
                 enabled: visible
-                text: "Cancel"
+                text: "NO"
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -153,7 +153,7 @@ I2PopupBase {
 
                 enabled: visible
                 activeFocusOnPress: true
-                text: "OK"
+                text: "YES"
 
                 anchors {
                     verticalCenter: parent.verticalCenter
