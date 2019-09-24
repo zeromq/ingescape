@@ -472,9 +472,6 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
     QString organizationName = QApplication::instance()->organizationName();
     QString version = QApplication::instance()->applicationVersion();
 
-    // Set the name of our agent
-    igs_setAgentName(_igsAgentApplicationName.toStdString().c_str());
-
 
     //
     // Create our internal definition

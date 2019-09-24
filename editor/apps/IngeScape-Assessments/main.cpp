@@ -237,6 +237,9 @@ int main(int argc, char *argv[])
     // - behavior when our last window is closed
     app.setQuitOnLastWindowClosed(true);
 
+    // Set the name of our agent
+    igs_setAgentName(app.applicationName().toStdString().c_str());
+
     //------------------------------
     //
     // Snippet to test the integration of the exporting code
@@ -264,14 +267,14 @@ int main(int argc, char *argv[])
         //
         //------------------------------
 
-        QString logsDirectoryPath = IngeScapeUtils::getLogsPath();
-        QString logFilePath = QString("%1%2_log.csv").arg(logsDirectoryPath, app.applicationName());
+        //QString logsDirectoryPath = IngeScapeUtils::getLogsPath();
+        //QString logFilePath = QString("%1%2_log.csv").arg(logsDirectoryPath, app.applicationName());
 
         // Set the log level from which logs are printed in the console
         //igs_setLogLevel(IGS_LOG_DEBUG);
         igs_setLogLevel(IGS_LOG_INFO);
 
-        igs_setLogPath(logFilePath.toStdString().c_str());
+        //igs_setLogPath(logFilePath.toStdString().c_str());
         igs_setLogInFile(true);
 
 #ifdef QT_DEBUG
