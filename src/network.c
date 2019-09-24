@@ -9,16 +9,6 @@
   * \file ../../src/include/ingescape.h
   */
 
-#if (defined WIN32 || defined _WIN32)
-// Define UNICODE before includes for cross compile
-// Because GetModuleFileName with UNICODE is  GetModuleFileNameW(void*, wchar*, size_t)
-// And GetModuleFileName without UNICODE is  GetModuleFileNameW(void*, char*, size_t)
-// Call GetModuleFileName without UNICODE but with wchar as parameter result of NULL string
-#ifndef UNICODE
-#define UNICODE
-#endif
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1395,14 +1385,17 @@ initLoop (zsock_t *pipe, void *args){
     if (strlen(commandLine) == 0){
         //command line was not set manually : we try to get exec path instead
 
-        //Use GetModuleFileName() to get exec path
-        // See comment on define UNICODE in the top of this file, without define UNICODE This lines return NULL String
+        // Use GetModuleFileName() to get exec path
+        char exeFilePath[IGS_MAX_PATH];
+#ifdef UNICODE
         WCHAR temp[IGS_MAX_PATH];
         GetModuleFileName(NULL,temp,IGS_MAX_PATH);
-        
         //Conversion in char *
-        char exeFilePath[IGS_MAX_PATH];
         wcstombs_s(NULL,exeFilePath,sizeof(exeFilePath),temp,sizeof(temp));
+#else
+        GetModuleFileName(NULL,exeFilePath,IGS_MAX_PATH);
+#endif
+
         zyre_set_header(agentElements->node, "commandline", "%s", exeFilePath);
     }else{
         zyre_set_header(agentElements->node, "commandline", "%s", commandLine);
@@ -2229,14 +2222,16 @@ void igs_setCommandLineFromArgs(int argc, const char * argv[]){
     }
     
 #elif (defined WIN32 || defined _WIN32)
-    //Use GetModuleFileName() to get exec path, argv[0] do not contain full path
-    // See comment on define UNICODE in the top of this file, without define UNICODE This lines return NULL String
-    WCHAR temp[IGS_MAX_PATH];
-    GetModuleFileName(NULL, temp, IGS_MAX_PATH);
-
-    //Conversion in char *
+    // Use GetModuleFileName() to get exec path, argv[0] do not contain full path
     char exeFilePath[IGS_MAX_PATH];
-    wcstombs_s(NULL, exeFilePath, sizeof(exeFilePath), temp, sizeof(temp));
+#ifdef UNICODE
+    WCHAR temp[IGS_MAX_PATH];
+    GetModuleFileName(NULL,temp,IGS_MAX_PATH);
+    //Conversion in char *
+    wcstombs_s(NULL,exeFilePath,sizeof(exeFilePath),temp,sizeof(temp));
+#else
+    GetModuleFileName(NULL,exeFilePath,IGS_MAX_PATH);
+#endif
     strcat(cmd, exeFilePath);
 #endif
     
