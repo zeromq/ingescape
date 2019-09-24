@@ -11,6 +11,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
+#include <czmq.h>
 
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
@@ -161,42 +162,40 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
     if (admin_logInFile){
         //create default path if current is empty
         if (strlen(admin_logFile) == 0){
-            char *name = igs_getAgentName();
-#if defined(__unix__) || defined(__linux__) || \
-(defined(__APPLE__) && defined(__MACH__))
-            snprintf(admin_logFile, 4095, "~/Documents/IngeScape/logs/%s_log.csv", name);
-#else
-            //default path for Windows is current PATH
-            snprintf(admin_logFile, 4095, "~/Documents/IngeScape/logs/%s_log.csv", name);
-#endif
-            free(name);
-            if (admin_logFile[0] == '~'){
-                char buff[4097] = "";
-                strncpy(buff, admin_logFile, 4096);
-                admin_makeFilePath(buff, admin_logFile, 4096);
+            char buff[4097] = "";
+            snprintf(admin_logFile, 4095, "~/Documents/IngeScape/logs/");
+            strncpy(buff, admin_logFile, 4096);
+            admin_makeFilePath(buff, admin_logFile, 4096);
+            if (!zsys_file_exists(admin_logFile)){
+                printf("creating log path %s\n", admin_logFile);
+                if(zsys_dir_create(admin_logFile) != 0){
+                    printf("error while creating log path %s\n", admin_logFile);
+                }
             }
+            char *name = igs_getAgentName();
+            strncat(admin_logFile, name, 4095);
+            strncat(admin_logFile, ".log", 4095);
+            free(name);
             if (agentElements != NULL && agentElements->node != NULL){
                 zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
-            }
-        }
-        if (access(admin_logFile, W_OK) == -1){
-            //printf("need to create log file: %s\n", admin_logFile);
-            if (fp != NULL){
-                fclose(fp);
-                fp = NULL;
             }
         }
         if (fp == NULL){
             fp = fopen (admin_logFile,"a");
             if (fp == NULL){
-                printf("error when trying to create log file: %s\n", admin_logFile);
+                printf("error while trying to create/open log file: %s\n", admin_logFile);
             }
         }
-        admin_computeTime(logTime);
-        fprintf(fp,"%s;%s;%s;%s\n", logTime, log_levels[level], function, logContent);
-        if (++nb_of_entries > NUMBER_OF_LOGS_FOR_FFLUSH){
-            nb_of_entries = 0;
-            fflush(fp);
+        if (fp != NULL){
+            admin_computeTime(logTime);
+            if (fprintf(fp,"%s;%s;%s;%s\n", logTime, log_levels[level], function, logContent) >= 0){
+                if (++nb_of_entries > NUMBER_OF_LOGS_FOR_FFLUSH){
+                    nb_of_entries = 0;
+                    fflush(fp);
+                }
+            }else{
+                printf("error while writing logs in %s\n", admin_logFile);
+            }
         }
     }
     if ((logInConsole && level >= logLevel) || level >= IGS_LOG_ERROR){
@@ -291,39 +290,37 @@ bool igs_getLogStream (void) {
 void igs_setLogPath(const char *path){
     if ((path != NULL) && (strlen(path) > 0)){
         char tmpPath[4096] = "";
+        admin_lock();
         admin_makeFilePath(path, tmpPath, 4095);
+        if (access(tmpPath, W_OK) == -1){
+            printf("'%s' is not writable and will not be used\n", tmpPath);
+            admin_unlock();
+            return;
+        }
         if (strcmp(admin_logFile, tmpPath) == 0){
             printf("'%s' is already the log path\n", admin_logFile);
+            admin_unlock();
             return;
         }else{
             strncpy(admin_logFile, tmpPath, 4096);
         }
-        bool needToResetFile = false;
         if (fp != NULL){
-            //we need to close previous and initiate new one
-            needToResetFile = true;
-        }
-        if (needToResetFile){
-            admin_lock();
             fflush(fp);
             fclose(fp);
             fp = NULL;
-            if (access(admin_logFile, W_OK) == -1){
-                printf("need to create new log file: %s\n", admin_logFile);
-            }
-            fp = fopen (admin_logFile,"a");
-            if (fp == NULL){
-                printf("could NOT create log file at path %s\n", admin_logFile);
-            }else{
-                printf("switching to new log file: %s\n", admin_logFile);
-            }
-            admin_unlock();
         }
-        if (agentElements != NULL && agentElements->node != NULL){
+        fp = fopen (admin_logFile,"a");
+        if (fp == NULL){
+            printf("could NOT create log file at path %s\n", admin_logFile);
+        }else{
+            printf("switching to new log file: %s\n", admin_logFile);
+        }
+        if (fp != NULL & agentElements != NULL && agentElements->node != NULL){
             zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
         }
+        admin_unlock();
     }else{
-        printf("passed path cannot be NULL or with length equal to zero\n");
+        printf("passed path cannot be NULL or zero length\n");
     }
 }
 
