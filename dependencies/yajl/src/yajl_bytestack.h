@@ -56,7 +56,7 @@ typedef struct igsyajl_bytestack_t
         (obs).stack = (obs).yaf->realloc((obs).yaf->ctx,\
                                          (void *) (obs).stack, (obs).size);\
     }                                                   \
-    (obs).stack[((obs).used)++] = (byte);               \
+    (obs).stack[((obs).used)++] = (unsigned char)(byte);               \
 }
 
 /* removes the top item of the stack, returns nothing */

@@ -113,7 +113,7 @@
 		976FFCA522BD5708000876BF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1100;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
 					976FFCAC22BD5708000876BF = {
@@ -265,6 +265,7 @@
 		976FFCB522BD5708000876BF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				HEADER_SEARCH_PATHS = /usr/local/include;
@@ -276,6 +277,7 @@
 		976FFCB622BD5708000876BF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				HEADER_SEARCH_PATHS = /usr/local/include;

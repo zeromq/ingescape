@@ -175,6 +175,7 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
             char *name = igs_getAgentName();
             strncat(admin_logFile, name, 4095);
             strncat(admin_logFile, ".log", 4095);
+            printf("creating default log file %s\n", admin_logFile);
             free(name);
             if (agentElements != NULL && agentElements->node != NULL){
                 zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
