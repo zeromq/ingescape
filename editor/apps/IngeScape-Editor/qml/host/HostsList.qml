@@ -30,7 +30,7 @@ import "../theme" as Theme;
 
 // parent-directory
 import ".." as Editor;
-import "../popup" as PopUp
+import "../popup" as Popup
 
 
 Item {
@@ -109,6 +109,14 @@ Item {
 
                     // Open the popup
                     deleteConfirmationPopup.open();
+                }
+
+                onNeedRenameHostInList: {
+                    // Set the host
+                    renameHostPopup.host = model.QtObject;
+
+                    // Open the popup
+                    renameHostPopup.open();
                 }
             }
 
@@ -192,7 +200,7 @@ Item {
                                : ""
 
         onConfirmed: {
-            if (rootItem.controller) {
+            if (rootItem.controller && deleteConfirmationPopup.host) {
                 rootItem.controller.deleteHost(deleteConfirmationPopup.host);
             }
         }
@@ -200,121 +208,18 @@ Item {
 
 
     //
-    // Menu popup with options
+    // Popup about "Rename Host"
     //
-    /*PopUp.MenuPopup {
-        id : popupOptions
+    Popup.RenamePopup {
+        id: renameHostPopup
 
-        anchors {
-            top: rootItem.top
-            left: rootItem.right
-            leftMargin: 2
-        }
+        property HostVM host: null
 
-        readonly property int optionHeight: 30
+        previousHostName: host ? host.name : ""
 
-        // Get height from children
-        height: popUpBackground.y + popUpBackground.height
-        width: 200
-
-        isModal: true;
-        layerColor: "transparent"
-        dismissOnOutsideTap : true;
-
-        keepRelativePositionToInitialParent : true;
-
-        onClosed: {
-
-        }
-        onOpened: {
-
-        }
-
-        Rectangle {
-            id: popUpBackground
-            height: buttons.y + buttons.height
-            anchors {
-                right: parent.right
-                left: parent.left
-            }
-            color: IngeScapeTheme.veryDarkGreyColor
-            radius: 5
-            border {
-                color: IngeScapeTheme.blueGreyColor2
-                width: 1
-            }
-
-            Column {
-                id: buttons
-                anchors {
-                    right: parent.right
-                    left: parent.left
-                }
-
-                Button {
-                    id: optionReboot
-
-                    height: popupOptions.optionHeight
-                    width: parent.width
-
-                    text: qsTr("Reboot")
-                    enabled: false
-
-                    style: Theme.ButtonStyleOfOption {
-
-                    }
-
-                    onClicked: {
-                        console.log("QML: click on option 'Reboot'");
-
-                        popupOptions.close();
-                    }
-                }
-
-                Button {
-                    id: optionViewScreen
-
-                    height: popupOptions.optionHeight
-                    width: parent.width
-
-                    text: qsTr("View Screen")
-                    enabled: false
-
-                    style: Theme.ButtonStyleOfOption {
-
-                    }
-
-                    onClicked: {
-                        console.log("QML: click on option 'View Screen'");
-
-                        popupOptions.close();
-                    }
-                }
-
-                Button {
-                    id: optionRemove
-
-                    height: popupOptions.optionHeight
-                    width: parent.width
-
-                    text: qsTr("Remove")
-
-                    // FIXME: option "remove host"
-                    //enabled: (rootItem.host && rootItem.host.isON)
-                    enabled: false
-
-                    style: Theme.ButtonStyleOfOption {
-                        isVisibleSeparation: false
-                    }
-
-                    onClicked: {
-                        console.log("QML: click on option 'Remove Host'");
-
-                        popupOptions.close();
-                    }
-                }
-            }
-        }
-    }*/
+        /*onConfirmed: {
+            console.log("host renamed " + renameHostPopup.newName);
+        }*/
+    }
 
 }

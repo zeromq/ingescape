@@ -22,7 +22,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 import "../theme" as Theme
-import "../popup" as PopUp
+import "../popup" as Popup
 
 
 Item {
@@ -530,7 +530,7 @@ Item {
 
     }
 
-    PopUp.MenuPopup {
+    Popup.MenuPopup {
         id : popupOptions
 
         anchors {

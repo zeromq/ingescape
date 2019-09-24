@@ -45,5 +45,6 @@
         <file>qml/popup/PreferencesPopup.qml</file>
         <file>qml/host/HostsListItem.qml</file>
         <file>qml/record/RecordsListItem.qml</file>
+        <file>qml/popup/RenamePopup.qml</file>
     </qresource>
 </RCC>

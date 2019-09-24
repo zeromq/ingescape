@@ -29,7 +29,7 @@ import "../theme" as Theme;
 // parent-directory
 import ".." as Editor;
 
-import "../popup" as PopUp
+import "../popup" as Popup
 
 
 Item {
@@ -590,7 +590,7 @@ Item {
     //
     // Menu popup with options
     //
-    PopUp.MenuPopup  {
+    Popup.MenuPopup  {
         id : popupOptions
 
         anchors {

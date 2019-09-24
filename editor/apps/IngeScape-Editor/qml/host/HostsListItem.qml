@@ -30,7 +30,7 @@ import "../theme" as Theme;
 
 // parent-directory
 import ".." as Editor;
-import "../popup" as PopUp
+import "../popup" as Popup
 
 
 Item {
@@ -63,8 +63,11 @@ Item {
     //
     //--------------------------------
 
-    // signal emitted when the user clicks on the remove button
+    // signal emitted when the user clicks on the "remove" button
     signal needConfirmationToDeleteHostInList();
+
+    // signal emitted when the user clicks on the "rename" option
+    signal needRenameHostInList();
 
 
     //--------------------------------
@@ -373,7 +376,7 @@ Item {
     //
     // Menu popup with options
     //
-    PopUp.MenuPopup {
+    Popup.MenuPopup {
         id : popupOptions
 
         anchors {
@@ -423,6 +426,27 @@ Item {
                 }
 
                 Button {
+                    id: optionRename
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Rename")
+
+                    enabled: (rootItem.host && !rootItem.host.isON)
+
+                    style: Theme.ButtonStyleOfOption {
+                    }
+
+                    onClicked: {
+                        // Emit the signal to display a popup about rename our host
+                        rootItem.needRenameHostInList();
+
+                        popupOptions.close();
+                    }
+                }
+
+                Button {
                     id: optionReboot
 
                     height: popupOptions.optionHeight
@@ -452,33 +476,11 @@ Item {
                     enabled: false
 
                     style: Theme.ButtonStyleOfOption {
-
-                    }
-
-                    onClicked: {
-                        console.log("QML: click on option 'View Screen'");
-
-                        popupOptions.close();
-                    }
-                }
-
-                Button {
-                    id: optionRemove
-
-                    height: popupOptions.optionHeight
-                    width: parent.width
-
-                    text: qsTr("Remove")
-
-                    enabled: (rootItem.host && !rootItem.host.isON)
-
-                    style: Theme.ButtonStyleOfOption {
                         isVisibleSeparation: false
                     }
 
                     onClicked: {
-                        // Emit the signal to display a confirmation popup
-                        rootItem.needConfirmationToDeleteHostInList();
+                        console.log("QML: click on option 'View Screen'");
 
                         popupOptions.close();
                     }
