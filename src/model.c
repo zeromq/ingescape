@@ -581,7 +581,7 @@ const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_debug("set %s to %s (length: %lu)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_debug("set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
@@ -643,7 +643,7 @@ const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_debug("set %s to %s (length: %lu)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_debug("set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
@@ -705,7 +705,7 @@ const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_debug("set %s to %s (length: %lu)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_debug("set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
@@ -780,7 +780,7 @@ const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_debug("set %s to %s (length: %lu)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_debug("set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
@@ -841,7 +841,7 @@ const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t
                     iop->value.s = strdup("");
                     outSize = iop->valueSize = sizeof(char);
                     outValue = iop->value.s;
-                    igs_debug("set %s to %s (length: %lu)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_debug("set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
