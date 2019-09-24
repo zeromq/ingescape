@@ -41,7 +41,7 @@ Item {
     //property AgentsGroupedByDefinitionVM agentsGroupedByDefinition: null;
     property var agent: null;
 
-    // true if agent Item contains the mouse (rollover)
+    // true if agent item contains the mouse (rollover)
     property bool agentItemIsHovered : false
 
     // Licenses controller
@@ -92,6 +92,7 @@ Item {
 
         color: agentItemIsHovered ? IngeScapeEditorTheme.agentsListItemRollOverBackgroundColor : IngeScapeEditorTheme.agentsListItemBackgroundColor
 
+        // bottom separator
         Rectangle {
             anchors {
                 bottom: parent.bottom
@@ -132,7 +133,7 @@ Item {
                 rightMargin: 10
             }
 
-            visible: (model.isON === false)
+            visible: !model.isON
             opacity: agentItemIsHovered ? 1 : 0
 
             releasedID: "delete"
@@ -194,7 +195,7 @@ Item {
 
                 text: textMetricsName.elidedText
 
-                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeEditorTheme.agentsListLabelColor : IngeScapeEditorTheme.agentOFFLabelColor
+                color: (rootItem.agent && rootItem.agent.isON) ? IngeScapeEditorTheme.agentsListLabelColor : IngeScapeEditorTheme.agentOFFLabelColor
 
                 font: IngeScapeTheme.headingFont
 
@@ -285,7 +286,7 @@ Item {
                     color: if (rootItem.agent)
                            {
                                // ON
-                               if (rootItem.agent.isON === true)
+                               if (rootItem.agent.isON)
                                {
                                    // ON & Variant
                                    if (rootItem.agent.definition && rootItem.agent.definition.isVariant)
@@ -388,7 +389,7 @@ Item {
 
                 text: rootItem.agent ? rootItem.agent.hostnames: ""
 
-                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeEditorTheme.agentsListTextColor : IngeScapeEditorTheme.agentOFFTextColor
+                color: (rootItem.agent && rootItem.agent.isON) ? IngeScapeEditorTheme.agentsListTextColor : IngeScapeEditorTheme.agentOFFTextColor
                 font: IngeScapeTheme.normalFont
             }
 
@@ -559,6 +560,7 @@ Item {
 
         Rectangle {
             id: popUpBackground
+
             height: buttons.y + buttons.height
             anchors {
                 right: parent.right
@@ -734,7 +736,7 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: (rootItem.agent && (rootItem.agent.hasLogInFile === true)) ? qsTr("Disable log file") : qsTr("Enable log file")
+                    text: (rootItem.agent && rootItem.agent.hasLogInFile) ? qsTr("Disable log file") : qsTr("Enable log file")
 
                     style: Theme.ButtonStyleOfOption {
 
@@ -755,7 +757,7 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: (rootItem.agent && (rootItem.agent.hasLogInStream === true)) ? qsTr("Disable Log Stream") : qsTr("Enable Log Stream")
+                    text: (rootItem.agent && rootItem.agent.hasLogInStream) ? qsTr("Disable Log Stream") : qsTr("Enable Log Stream")
 
                     style: Theme.ButtonStyleOfOption {
 

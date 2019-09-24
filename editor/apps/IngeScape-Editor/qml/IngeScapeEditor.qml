@@ -311,12 +311,12 @@ Item {
                     tab: I2CustomRectangle {
                         color: styleData.selected ? IngeScapeEditorTheme.selectedTabsBackgroundColor : "transparent"
 
-                        implicitWidth: (IngeScapeEditorC.recordsSupervisionC && (IngeScapeEditorC.recordsSupervisionC.isRecorderON === true)) ? leftPanelTabs.width / 4
+                        implicitWidth: (IngeScapeEditorC.recordsSupervisionC && IngeScapeEditorC.recordsSupervisionC.isRecorderON) ? leftPanelTabs.width / 4
                                                                                                                                               : leftPanelTabs.width / 3
                         implicitHeight: 26
                         topRightRadius : 5
 
-                        visible: (styleData.index === 3) ? (IngeScapeEditorC.recordsSupervisionC && (IngeScapeEditorC.recordsSupervisionC.isRecorderON === true))
+                        visible: (styleData.index === 3) ? (IngeScapeEditorC.recordsSupervisionC && IngeScapeEditorC.recordsSupervisionC.isRecorderON)
                                                          : true
 
                         Text {
@@ -357,7 +357,7 @@ Item {
                     onIsRecorderONChanged: {
                         //console.log("on Is Recorder ON changed: " + IngeScapeEditorC.recordsSupervisionC.isRecorderON);
 
-                        if (IngeScapeEditorC.recordsSupervisionC && (IngeScapeEditorC.recordsSupervisionC.isRecorderON === false)) {
+                        if (IngeScapeEditorC.recordsSupervisionC && !IngeScapeEditorC.recordsSupervisionC.isRecorderON) {
                             leftPanelTabs.currentIndex = 0;
                         }
                     }

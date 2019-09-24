@@ -67,6 +67,13 @@ public:
     void deleteHostsOFF();
 
 
+    /**
+     * @brief Delete a view model of host
+     * @param host
+     */
+    Q_INVOKABLE void deleteHost(HostVM* host);
+
+
 Q_SIGNALS:
 
     /**
@@ -141,13 +148,6 @@ private:
      * @return
      */
     HostVM* _createViewModelOfHost(QString hostName, HostM* model);
-
-
-    /**
-     * @brief Delete a view model of host
-     * @param host
-     */
-    void _deleteHost(HostVM* host);
 
 
 private:

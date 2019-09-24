@@ -43,5 +43,6 @@
         <file>qml/popup/SaveBeforeQuitPopup.qml</file>
         <file>qml/GettingStartedWindow.qml</file>
         <file>qml/popup/PreferencesPopup.qml</file>
+        <file>qml/host/HostsListItem.qml</file>
     </qresource>
 </RCC>
