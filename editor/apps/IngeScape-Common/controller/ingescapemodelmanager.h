@@ -67,19 +67,19 @@ public:
      * @brief Create a new model of agent with a name, a definition (can be NULL) and some properties
      * @param agentName
      * @param definition optional (NULL by default)
-     * @param peerId optional (empty by default)
-     * @param ipAddress optional (empty by default)
      * @param hostname optional (default value)
      * @param commandLine optional (empty by default)
+     * @param peerId optional (empty by default)
+     * @param ipAddress optional (empty by default)
      * @param isON optional (false by default)
      * @return
      */
     AgentM* createAgentModel(QString agentName,
                              DefinitionM* definition = nullptr,
-                             QString peerId = "",
-                             QString ipAddress = "",
                              QString hostname = HOSTNAME_NOT_DEFINED,
                              QString commandLine = "",
+                             QString peerId = "",
+                             QString ipAddress = "",
                              bool isON = false);
 
 
@@ -291,9 +291,8 @@ Q_SIGNALS:
     /**
      * @brief Signal emitted when a previous host has been parsed (in JSON file)
      * @param hostName
-     * @param ipAddress
      */
-    void previousHostParsed(QString hostName, QString ipAddress);
+    void previousHostParsed(QString hostName);
 
 
 public Q_SLOTS:

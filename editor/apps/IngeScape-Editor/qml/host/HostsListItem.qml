@@ -350,7 +350,7 @@ Item {
                                 : ""
                 }
 
-                // Button Options
+                // Agent Options button
                 LabellessSvgButton {
                     id: btnOptionsAgent
 
@@ -380,7 +380,7 @@ Item {
                     }
                 }
 
-                // Remove button
+                // Remove Agent button
                 LabellessSvgButton {
                     id: btnRemoveAgent
 
@@ -404,8 +404,8 @@ Item {
                         {
                             //console.log("QML: Remove agent model " + model.name + " on " + host.name);
 
-                            // Remove the model of agent from our host
-                            controller.removeAgentModelFromHost(model.QtObject, host);
+                            // Emit the signal to display a confirmation popup
+                            rootItem.needConfirmationToDeleteAgentInHost(model.QtObject);
                         }
                     }
                 }

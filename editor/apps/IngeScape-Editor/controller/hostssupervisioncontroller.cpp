@@ -206,11 +206,10 @@ void HostsSupervisionController::onHostModelWillBeDeleted(HostM* host)
 /**
  * @brief Slot called when a previous host has been parsed (in JSON file)
  * @param hostName
- * @param ipAddress
  */
-void HostsSupervisionController::onPreviousHostParsed(QString hostName, QString ipAddress)
+void HostsSupervisionController::onPreviousHostParsed(QString hostName)
 {
-    if (!hostName.isEmpty() && !ipAddress.isEmpty())
+    if (!hostName.isEmpty())
     {
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(hostName);

@@ -331,7 +331,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     if (_isAvailableModelVisualizer)
     {
         // Emit the signal "Previous Host Parsed" to create the fake host "HOSTNAME_NOT_DEFINED"
-        Q_EMIT _modelManager->previousHostParsed(HOSTNAME_NOT_DEFINED, "...");
+        Q_EMIT _modelManager->previousHostParsed(HOSTNAME_NOT_DEFINED);
     }
 
     

@@ -112,9 +112,8 @@ public Q_SLOTS:
     /**
      * @brief Slot called when a previous host has been parsed (in JSON file)
      * @param hostName
-     * @param ipAddress
      */
-    void onPreviousHostParsed(QString hostName, QString ipAddress);
+    void onPreviousHostParsed(QString hostName);
 
 
     /**

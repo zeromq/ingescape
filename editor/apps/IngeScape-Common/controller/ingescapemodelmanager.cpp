@@ -110,19 +110,19 @@ void IngeScapeModelManager::setisMappingConnected(bool value)
  * @brief Create a new model of agent with a name, a definition (can be NULL) and some properties
  * @param agentName
  * @param definition optional (NULL by default)
- * @param peerId optional (empty by default)
- * @param ipAddress optional (empty by default)
  * @param hostname optional (default value)
  * @param commandLine optional (empty by default)
+ * @param peerId optional (empty by default)
+ * @param ipAddress optional (empty by default)
  * @param isON optional (false by default)
  * @return
  */
 AgentM* IngeScapeModelManager::createAgentModel(QString agentName,
                                                 DefinitionM* definition,
-                                                QString peerId,
-                                                QString ipAddress,
                                                 QString hostname,
                                                 QString commandLine,
+                                                QString peerId,
+                                                QString ipAddress,
                                                 bool isON)
 {
     AgentM* agent = nullptr;
@@ -563,8 +563,7 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                             }
 
                             // Create a new model of agent
-                            createAgentModel(agentName,
-                                             copyOfDefinition);
+                            createAgentModel(agentName, copyOfDefinition);
                         }
                         // There are some clones with a defined hostname
                         else
@@ -577,45 +576,36 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
 
                                     QJsonValue jsonHostname = jsonClone.value("hostname");
                                     QJsonValue jsonCommandLine = jsonClone.value("commandLine");
-                                    QJsonValue jsonPeerId = jsonClone.value("peerId");
-                                    QJsonValue jsonAddress = jsonClone.value("address");
+                                    //QJsonValue jsonPeerId = jsonClone.value("peerId");
+                                    //QJsonValue jsonAddress = jsonClone.value("address");
 
-                                    if (jsonHostname.isString() && jsonCommandLine.isString() && jsonPeerId.isString() && jsonAddress.isString())
+                                    //if (jsonHostname.isString() && jsonCommandLine.isString() && jsonPeerId.isString() && jsonAddress.isString())
+                                    if (jsonHostname.isString() && jsonCommandLine.isString())
                                     {
                                         QString hostName = jsonHostname.toString();
                                         QString commandLine = jsonCommandLine.toString();
-                                        QString peerId = jsonPeerId.toString();
-                                        QString ipAddress = jsonAddress.toString();
+                                        //QString peerId = jsonPeerId.toString();
+                                        //QString ipAddress = jsonAddress.toString();
 
-                                        //if (!hostname.isEmpty() && !commandLine.isEmpty())
-                                        if (!hostName.isEmpty() && !commandLine.isEmpty() && !peerId.isEmpty() && !ipAddress.isEmpty())
+                                        //if (!hostName.isEmpty() && !commandLine.isEmpty() && !peerId.isEmpty() && !ipAddress.isEmpty())
+                                        if (!hostName.isEmpty() && !commandLine.isEmpty())
                                         {
                                             // Emit the signal "Previous Host Parsed"
-                                            Q_EMIT previousHostParsed(hostName, ipAddress);
+                                            Q_EMIT previousHostParsed(hostName);
 
-                                            // Check that there is not yet an agent with this peer id
-                                            AgentM* agent = getAgentModelFromPeerId(peerId);
-                                            if (agent == nullptr)
-                                            {
-                                                //qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
+                                            //qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
 
-                                                // Make a copy of the definition
-                                                DefinitionM* copyOfDefinition = nullptr;
-                                                if (agentDefinition != nullptr) {
-                                                    copyOfDefinition = agentDefinition->copy();
-                                                }
-
-                                                // Create a new model of agent
-                                                createAgentModel(agentName,
-                                                                 copyOfDefinition,
-                                                                 peerId,
-                                                                 ipAddress,
-                                                                 hostName,
-                                                                 commandLine);
+                                            // Make a copy of the definition
+                                            DefinitionM* copyOfDefinition = nullptr;
+                                            if (agentDefinition != nullptr) {
+                                                copyOfDefinition = agentDefinition->copy();
                                             }
-                                            else {
-                                                qWarning() << "The agent" << agent->name() << "already exists with the peer id" << peerId;
-                                            }
+
+                                            // Create a new model of agent
+                                            createAgentModel(agentName,
+                                                             copyOfDefinition,
+                                                             hostName,
+                                                             commandLine);
                                         }
                                     }
                                 }
@@ -737,10 +727,10 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
             // Create a new model of agent
             agent = createAgentModel(agentName,
                                      nullptr,
-                                     peerId,
-                                     ipAddress,
                                      hostname,
                                      commandLine,
+                                     peerId,
+                                     ipAddress,
                                      true);
 
             if (agent != nullptr)

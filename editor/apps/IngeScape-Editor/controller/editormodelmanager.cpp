@@ -131,8 +131,8 @@ QJsonArray EditorModelManager::exportAgentsToJSON()
                                 QJsonObject jsonClone = QJsonObject();
                                 jsonClone.insert("hostname", model->hostname());
                                 jsonClone.insert("commandLine", model->commandLine());
-                                jsonClone.insert("peerId", model->peerId());
-                                jsonClone.insert("address", model->address());
+                                //jsonClone.insert("peerId", model->peerId());
+                                //jsonClone.insert("address", model->address());
 
                                 jsonClones.append(jsonClone);
                             }
