@@ -279,6 +279,36 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
 
 
 /**
+ * @brief Slot called when the name of a view model of host changed
+ * @param newName
+ */
+/*void HostsSupervisionController::_onHostNameChanged(QString newName)
+{
+    HostVM* host = qobject_cast<HostVM*>(sender());
+    if (host != nullptr)
+    {
+        QString previousName = "";
+
+        for (QString key : _hashFromNameToHost.keys())
+        {
+            HostVM* iterator = _hashFromNameToHost.value(key);
+            if ((iterator != nullptr) && (iterator == host))
+            {
+                previousName = key;
+                break;
+            }
+        }
+
+        if (!previousName.isEmpty())
+        {
+            _hashFromNameToHost.remove(previousName);
+            _hashFromNameToHost.insert(newName, host);
+        }
+    }
+}*/
+
+
+/**
  * @brief Get the view model of host with a name
  * @param hostName
  * @return
@@ -305,6 +335,7 @@ HostVM* HostsSupervisionController::_createViewModelOfHost(QString hostName, Hos
         host = new HostVM(hostName, model, this);
 
         // Connect to signals
+        //connect(host, &HostVM::nameChanged, this, &HostsSupervisionController::_onHostNameChanged);
         connect(host, &HostVM::commandAskedToAgent, this, &HostsSupervisionController::commandAskedToAgent);
         connect(host, &HostVM::commandAskedToLauncher, this, &HostsSupervisionController::commandAskedToLauncher);
 

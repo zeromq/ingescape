@@ -5,7 +5,7 @@ import I2Quick 1.0
 import INGESCAPE 1.0
 
 
-// SvgImage defines an alternative to I2SvgItem that use
+// SvgImage defines an alternative to I2SvgItem that use an image
 Image {
     id: root
 

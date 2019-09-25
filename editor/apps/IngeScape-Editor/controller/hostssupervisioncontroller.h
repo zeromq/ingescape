@@ -131,6 +131,15 @@ public Q_SLOTS:
     void onAgentModelWillBeDeleted(AgentM* agent);
 
 
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the name of a view model of host changed
+     * @param newName
+     */
+    //void _onHostNameChanged(QString newName);
+
+
 private:
 
     /**

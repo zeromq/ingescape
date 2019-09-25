@@ -139,7 +139,6 @@ Item {
 
 
                 onClicked: {
-
                     // Emit the signal to display a confirmation popup
                     rootItem.needConfirmationToDeleteHostInList();
                 }
@@ -425,7 +424,7 @@ Item {
                     left: parent.left
                 }
 
-                Button {
+                /*Button {
                     id: optionRename
 
                     height: popupOptions.optionHeight
@@ -441,6 +440,27 @@ Item {
                     onClicked: {
                         // Emit the signal to display a popup about rename our host
                         rootItem.needRenameHostInList();
+
+                        popupOptions.close();
+                    }
+                }*/
+
+                Button {
+                    id: optionRemove
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Remove")
+
+                    enabled: (rootItem.host && !rootItem.host.isON)
+
+                    style: Theme.ButtonStyleOfOption {
+                    }
+
+                    onClicked: {
+                        // Emit the signal to display a confirmation popup
+                        rootItem.needConfirmationToDeleteHostInList();
 
                         popupOptions.close();
                     }

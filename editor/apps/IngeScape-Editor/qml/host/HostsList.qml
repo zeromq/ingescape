@@ -111,13 +111,13 @@ Item {
                     deleteConfirmationPopup.open();
                 }
 
-                onNeedRenameHostInList: {
+                /*onNeedRenameHostInList: {
                     // Set the host
                     renameHostPopup.host = model.QtObject;
 
                     // Open the popup
                     renameHostPopup.open();
-                }
+                }*/
             }
 
 
@@ -210,16 +210,17 @@ Item {
     //
     // Popup about "Rename Host"
     //
-    Popup.RenamePopup {
+    /*Popup.RenamePopup {
         id: renameHostPopup
 
         property HostVM host: null
 
         previousHostName: host ? host.name : ""
 
-        /*onConfirmed: {
-            console.log("host renamed " + renameHostPopup.newName);
-        }*/
-    }
+        onNameValidated: {
+            // Call the setter in C++ with event "nameChanged"
+            host.name = newName;
+        }
+    }*/
 
 }

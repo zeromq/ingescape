@@ -34,7 +34,7 @@ class HostVM : public QObject
     Q_OBJECT
 
     // Name of our host
-    I2_QML_PROPERTY_READONLY(QString, name)
+    I2_QML_PROPERTY(QString, name)
 
     // Model of our host
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(HostM*, modelM)
