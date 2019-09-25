@@ -162,13 +162,13 @@ Item {
 
 
                 onClicked: {
-                    // console.log("QML: Open options...");
+                    // console.log("QML: Open host options...");
 
                     // Parent must be host item and not the list to have good x and y value
-                    popupOptions.parent = rootItem;
+                    popupHostOptions.parent = rootItem;
 
                     // Open the popup with options
-                    popupOptions.openInScreen();
+                    popupHostOptions.openInScreen();
                 }
             }
 
@@ -283,6 +283,8 @@ Item {
 
             delegate: Rectangle {
 
+                id: agentInHost
+
                 anchors {
                     left: parent.left
                     right: parent.right
@@ -298,9 +300,8 @@ Item {
                     anchors {
                         left : parent.left
                         leftMargin: 10
-                        //right: (model && model.isON) ? parent.right : btnRemoveAgent.left
                         right: btnOptionsAgent.left
-                        rightMargin: 5
+                        rightMargin: 10
                         verticalCenter: parent.verticalCenter
                     }
 
@@ -361,7 +362,15 @@ Item {
                     disabledID : releasedID
 
                     onClicked: {
-                        console.log("QML: Open options...");
+                        //console.log("QML: Open agent options...");
+
+                        // Parent must be agent item and not the list to have good x and y value
+                        popupAgentOptions.parent = agentInHost;
+
+                        popupAgentOptions.agent = model.QtObject;
+
+                        // Open the popup with options
+                        popupAgentOptions.openInScreen();
                     }
                 }
 
@@ -401,10 +410,10 @@ Item {
 
 
     //
-    // Menu popup with options
+    // Menu popup with options about our host
     //
     Popup.MenuPopup {
-        id : popupOptions
+        id : popupHostOptions
 
         anchors {
             top: rootItem.top
@@ -415,7 +424,7 @@ Item {
         readonly property int optionHeight: 30
 
         // Get height from children
-        height: popUpBackground.y + popUpBackground.height
+        height: bgPopupHostOptions.y + bgPopupHostOptions.height
         width: 200
 
         isModal: true;
@@ -432,8 +441,9 @@ Item {
         }
 
         Rectangle {
-            id: popUpBackground
-            height: buttons.y + buttons.height
+            id: bgPopupHostOptions
+
+            height: hostOptions.y + hostOptions.height
             anchors {
                 right: parent.right
                 left: parent.left
@@ -446,7 +456,8 @@ Item {
             }
 
             Column {
-                id: buttons
+                id: hostOptions
+
                 anchors {
                     right: parent.right
                     left: parent.left
@@ -455,7 +466,7 @@ Item {
                 Button {
                     id: optionRename
 
-                    height: popupOptions.optionHeight
+                    height: popupHostOptions.optionHeight
                     width: parent.width
 
                     text: qsTr("Rename")
@@ -470,14 +481,14 @@ Item {
                         // Emit the signal to display a popup about rename our host
                         rootItem.needRenameHostInList();
 
-                        popupOptions.close();
+                        popupHostOptions.close();
                     }
                 }
 
                 Button {
                     id: optionRemove
 
-                    height: popupOptions.optionHeight
+                    height: popupHostOptions.optionHeight
                     width: parent.width
 
                     text: qsTr("Remove")
@@ -491,14 +502,14 @@ Item {
                         // Emit the signal to display a confirmation popup
                         rootItem.needConfirmationToDeleteHostInList();
 
-                        popupOptions.close();
+                        popupHostOptions.close();
                     }
                 }
 
                 Button {
                     id: optionReboot
 
-                    height: popupOptions.optionHeight
+                    height: popupHostOptions.optionHeight
                     width: parent.width
 
                     text: qsTr("Reboot")
@@ -511,14 +522,14 @@ Item {
                     onClicked: {
                         console.log("QML: click on option 'Reboot'");
 
-                        popupOptions.close();
+                        popupHostOptions.close();
                     }
                 }
 
                 Button {
                     id: optionViewScreen
 
-                    height: popupOptions.optionHeight
+                    height: popupHostOptions.optionHeight
                     width: parent.width
 
                     text: qsTr("View Screen")
@@ -531,13 +542,180 @@ Item {
                     onClicked: {
                         console.log("QML: click on option 'View Screen'");
 
-                        popupOptions.close();
+                        popupHostOptions.close();
                     }
                 }
             }
         }
     }
 
+
+    //
+    // Menu popup with options about an agent of our host
+    //
+    Popup.MenuPopup {
+        id : popupAgentOptions
+
+        anchors {
+            top: rootItem.top
+            left: rootItem.right
+            leftMargin: -60
+        }
+
+        property AgentM agent: null
+        readonly property int optionHeight: 30
+
+        // Get height from children
+        height: bgPopupAgentOptions.y + bgPopupAgentOptions.height
+        width: 200
+
+        isModal: true;
+        layerColor: "transparent"
+        dismissOnOutsideTap : true;
+
+        keepRelativePositionToInitialParent : true;
+
+        onClosed: {
+
+        }
+        onOpened: {
+
+        }
+
+        Rectangle {
+            id: bgPopupAgentOptions
+
+            height: agentOptions.y + agentOptions.height
+            anchors {
+                right: parent.right
+                left: parent.left
+            }
+            color: IngeScapeTheme.veryDarkGreyColor
+            radius: 5
+            border {
+                color: IngeScapeTheme.blueGreyColor2
+                width: 1
+            }
+
+            Column {
+                id: agentOptions
+
+                anchors {
+                    right: parent.right
+                    left: parent.left
+                }
+
+                Button {
+                    id: optionStartStop
+
+                    height: popupAgentOptions.optionHeight
+                    width: parent.width
+
+                    text: (popupAgentOptions.agent && popupAgentOptions.agent.isON) ? qsTr("Stop") : qsTr("Start")
+
+                    style: Theme.ButtonStyleOfOption {
+                    }
+
+                    onClicked: {
+                        if (rootItem.host && popupAgentOptions.agent)
+                        {
+                            // ON
+                            if (popupAgentOptions.agent.isON)
+                            {
+                                console.log("QML: Stop " + popupAgentOptions.agent.name);
+                                rootItem.host.stopAgent(popupAgentOptions.agent);
+                            }
+                            // OFF
+                            else
+                            {
+                                console.log("QML: Start " + popupAgentOptions.agent.name);
+                                rootItem.host.startAgent(popupAgentOptions.agent);
+                            }
+                        }
+
+                        popupAgentOptions.close();
+                    }
+                }
+
+                Button {
+                    id: optionRemoveAgent
+
+                    height: popupAgentOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Remove")
+
+                    enabled: (popupAgentOptions.agent && !popupAgentOptions.agent.isON)
+
+                    style: Theme.ButtonStyleOfOption {
+                    }
+
+                    onClicked: {
+                        // Emit the signal to display a confirmation popup
+                        //rootItem.needConfirmationToDeleteAgentInHost();
+
+                        if (rootItem.controller && rootItem.host && popupAgentOptions.agent)
+                        {
+                            console.log("QML: Remove agent model " + popupAgentOptions.agent.name + " on " + rootItem.host.name);
+
+                            // Remove the model of agent from our host
+                            rootItem.controller.removeAgentModelFromHost(popupAgentOptions.agent, rootItem.host);
+                        }
+
+                        popupAgentOptions.close();
+                    }
+                }
+
+                Button {
+                    id: optionEditCommandLine
+
+                    height: popupAgentOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Edit command line")
+
+                    enabled: (popupAgentOptions.agent && !popupAgentOptions.agent.isON)
+
+                    style: Theme.ButtonStyleOfOption {
+                        isVisibleSeparation: false
+                    }
+
+                    onClicked: {
+                        console.log("QML: click on option 'Edit command line'");
+
+                        // Set the agent
+                        editCommandLinePopup.agent = popupAgentOptions.agent;
+
+                        // Open the popup
+                        editCommandLinePopup.open();
+
+                        popupAgentOptions.close();
+                    }
+                }
+            }
+        }
+    }
+
+
+    //
+    // Popup about "Edit Command Line"
+    //
+    Popup.EditCommandLinePopup {
+        id: editCommandLinePopup
+
+        property AgentM agent: null
+
+        agentName: agent ? agent.name : ""
+        previousCommandLine: agent ? agent.commandLine : ""
+
+        onCommandLineValidated: {
+            if (agent)
+            {
+                // Call the setter in C++ (with event "commandLineChanged")
+                agent.commandLine = newCommandLine;
+            }
+        }
+    }
 
 }
 

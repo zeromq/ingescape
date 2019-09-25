@@ -27,7 +27,7 @@ I2PopupBase {
         // Configure x and y to stay in screen
         if (isOpened)
         {
-            var parentHeight =  parent.height;
+            var parentHeight = parent.height;
             if (popup.y + popup.height > parentHeight) {
                 popup.y = parentHeight - popup.height;
             }
