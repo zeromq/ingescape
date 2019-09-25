@@ -106,6 +106,16 @@ Item {
                 onNeedConfirmationToDeleteHostInList: {
                     // Set the host
                     deleteConfirmationPopup.host = model.QtObject;
+                    deleteConfirmationPopup.agent = null;
+
+                    // Open the popup
+                    deleteConfirmationPopup.open();
+                }
+
+                onNeedConfirmationToDeleteAgentInHost: {
+                    // Set the host and the agent
+                    deleteConfirmationPopup.host = model.QtObject;
+                    deleteConfirmationPopup.agent = agent;
 
                     // Open the popup
                     deleteConfirmationPopup.open();
@@ -195,13 +205,25 @@ Item {
         id: deleteConfirmationPopup
 
         property HostVM host: null
+        property AgentM agent: null
 
-        confirmationText: host ? "Do you want to remove " + host.name + "?"
+        confirmationText: host ? ("Do you want to remove " + (agent ? agent.name + " on " : "") + host.name + "?")
                                : ""
 
         onConfirmed: {
-            if (rootItem.controller && deleteConfirmationPopup.host) {
-                rootItem.controller.deleteHost(deleteConfirmationPopup.host);
+            if (rootItem.controller && deleteConfirmationPopup.host)
+            {
+                // Agent is defined, remove/delete it
+                if (deleteConfirmationPopup.agent)
+                {
+                    // Remove the model of agent from the host
+                    rootItem.controller.removeAgentModelFromHost(deleteConfirmationPopup.agent, deleteConfirmationPopup.host);
+                }
+                // Agent is NOT defined, remove/delete the host
+                else
+                {
+                    rootItem.controller.deleteHost(deleteConfirmationPopup.host);
+                }
             }
         }
     }

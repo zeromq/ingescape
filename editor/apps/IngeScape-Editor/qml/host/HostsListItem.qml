@@ -66,8 +66,11 @@ Item {
     // signal emitted when the user clicks on the "remove" button
     signal needConfirmationToDeleteHostInList();
 
+    // signal emitted when the user clicks on the "remove" button of an agent in the list
+    signal needConfirmationToDeleteAgentInHost(AgentM agent);
+
     // signal emitted when the user clicks on the "rename" option
-    signal needRenameHostInList();
+    //signal needRenameHostInList();
 
 
     //--------------------------------
@@ -638,6 +641,30 @@ Item {
                 }
 
                 Button {
+                    id: optionStartClone
+
+                    height: popupAgentOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Start again")
+
+                    visible: (popupAgentOptions.agent && popupAgentOptions.agent.isON)
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        if (rootItem.host && popupAgentOptions.agent)
+                        {
+                            rootItem.host.startAgent(popupAgentOptions.agent);
+                        }
+
+                        popupAgentOptions.close();
+                    }
+                }
+
+                Button {
                     id: optionRemoveAgent
 
                     height: popupAgentOptions.optionHeight
@@ -652,15 +679,7 @@ Item {
 
                     onClicked: {
                         // Emit the signal to display a confirmation popup
-                        //rootItem.needConfirmationToDeleteAgentInHost();
-
-                        if (rootItem.controller && rootItem.host && popupAgentOptions.agent)
-                        {
-                            console.log("QML: Remove agent model " + popupAgentOptions.agent.name + " on " + rootItem.host.name);
-
-                            // Remove the model of agent from our host
-                            rootItem.controller.removeAgentModelFromHost(popupAgentOptions.agent, rootItem.host);
-                        }
+                        rootItem.needConfirmationToDeleteAgentInHost(popupAgentOptions.agent);
 
                         popupAgentOptions.close();
                     }
@@ -681,8 +700,6 @@ Item {
                     }
 
                     onClicked: {
-                        console.log("QML: click on option 'Edit command line'");
-
                         // Set the agent
                         editCommandLinePopup.agent = popupAgentOptions.agent;
 
@@ -692,6 +709,7 @@ Item {
                         popupAgentOptions.close();
                     }
                 }
+
             }
         }
     }

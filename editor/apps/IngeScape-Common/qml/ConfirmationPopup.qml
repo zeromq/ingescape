@@ -28,7 +28,7 @@ I2PopupBase {
     id: rootItem
 
     height: 150
-    width: 290
+    width: 450
 
     anchors.centerIn: parent
 
