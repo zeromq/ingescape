@@ -77,7 +77,7 @@ Item {
     //--------------------------------
 
     MouseArea {
-        id: mouseArea
+        id: mouseAreaHost
 
         anchors.fill: parent
 
@@ -88,7 +88,8 @@ Item {
 
             border.width: 0
 
-            color: mouseArea.containsMouse ? IngeScapeEditorTheme.agentsListItemRollOverBackgroundColor : IngeScapeEditorTheme.agentsListItemBackgroundColor
+            //color: mouseAreaHost.containsMouse ? IngeScapeEditorTheme.agentsListItemRollOverBackgroundColor : IngeScapeEditorTheme.agentsListItemBackgroundColor
+            color: IngeScapeEditorTheme.agentsListItemBackgroundColor
 
             // bottom separator
             Rectangle {
@@ -120,7 +121,7 @@ Item {
             }
 
             // Remove button
-            LabellessSvgButton {
+            /*LabellessSvgButton {
                 id: removeButton
 
                 anchors {
@@ -131,7 +132,7 @@ Item {
                 }
 
                 visible: (host && !host.isON)
-                opacity: mouseArea.containsMouse ? 1 : 0
+                opacity: mouseAreaHost.containsMouse ? 1 : 0
 
                 releasedID: "delete"
                 pressedID: releasedID + "-pressed"
@@ -142,7 +143,72 @@ Item {
                     // Emit the signal to display a confirmation popup
                     rootItem.needConfirmationToDeleteHostInList();
                 }
+            }*/
+
+            // Button Options
+            LabellessSvgButton {
+                id: btnOptions
+
+                anchors {
+                    top: parent.top
+                    topMargin: 10
+                    right : parent.right
+                    rightMargin: 10
+                }
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "button-options"
+                disabledID : releasedID
+
+
+                onClicked: {
+                    // console.log("QML: Open options...");
+
+                    // Parent must be host item and not the list to have good x and y value
+                    popupOptions.parent = rootItem;
+
+                    // Open the popup with options
+                    popupOptions.openInScreen();
+                }
             }
+
+            // Stream button
+            /*LabellessSvgButton {
+                id: streamButton
+
+                anchors {
+                    right: parent.right
+                    verticalCenter: parent.verticalCenter
+                    rightMargin: 5
+                }
+
+                visible: model.canProvideStream
+
+                enabled: visible
+
+
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+
+                pressedID: releasedID + "-pressed"
+                releasedID: model.isStreaming ? "on" : "off"
+                disabledID : releasedID
+
+
+                onClicked: {
+                    if (model.isStreaming)
+                    {
+                        streamPopup.close();
+                        receiver.stop();
+                    }
+                    else
+                    {
+                        streamPopup.show();
+                        streamPopup.title = model.name;
+                        receiver.start();
+                    }
+                    model.QtObject.changeStreamState();
+                }
+            }*/
         }
     }
 
@@ -196,14 +262,17 @@ Item {
             font: IngeScapeTheme.heading2Font
         }
 
-        // List of associated agents
+
+        //
+        // List of agents on our host
+        //
         ListView {
             id: listViewOfAgents
 
             anchors {
                 left: parent.left
                 right: parent.right
-                rightMargin: 30
+                //rightMargin: 30
             }
             height: contentHeight
 
@@ -218,10 +287,10 @@ Item {
                     left: parent.left
                     right: parent.right
                 }
-                //height: txtAgentName.height
-                height: 16
+                height: 20
 
-                color: "transparent"
+                //color: "transparent"
+                color: mouseAreaAgent.containsMouse ? IngeScapeEditorTheme.agentsListItemRollOverBackgroundColor : IngeScapeEditorTheme.agentsListItemBackgroundColor
 
                 Text {
                     id: txtAgentName
@@ -229,8 +298,10 @@ Item {
                     anchors {
                         left : parent.left
                         leftMargin: 10
-                        right: (model && model.isON) ? parent.right : btnRemoveAgent.left
+                        //right: (model && model.isON) ? parent.right : btnRemoveAgent.left
+                        right: btnOptionsAgent.left
                         rightMargin: 5
+                        verticalCenter: parent.verticalCenter
                     }
 
                     text: model.name
@@ -243,11 +314,10 @@ Item {
                 }
 
                 MouseArea {
-                    id: mouseAreaToolTip
+                    id: mouseAreaAgent
 
                     anchors.fill: parent
 
-                    //acceptedButtons: Qt.NoButton
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
 
@@ -267,10 +337,32 @@ Item {
 
                 Controls2.ToolTip {
                     delay: 400
-                    visible: mouseAreaToolTip.containsMouse
-                    //text: (model ? model.commandLine : "")
-                    text: model ? model.name + "\n" + model.commandLine
+                    visible: mouseAreaAgent.containsMouse
+
+                    text: model ? model.name + " (" + model.peerId + ")\n" + model.commandLine
                                 : ""
+                }
+
+                // Button Options
+                LabellessSvgButton {
+                    id: btnOptionsAgent
+
+                    anchors {
+                        right: parent.right
+                        //right: (model && model.isON) ? parent.right : btnRemoveAgent.left
+                        rightMargin: 25
+                        verticalCenter: parent.verticalCenter
+                    }
+
+                    opacity: (btnOptionsAgent.hovered || mouseAreaAgent.containsMouse) ? 1.0 : 0.0
+
+                    releasedID: "button-options"
+                    pressedID: releasedID + "-pressed"
+                    disabledID : releasedID
+
+                    onClicked: {
+                        console.log("QML: Open options...");
+                    }
                 }
 
                 // Remove button
@@ -278,12 +370,13 @@ Item {
                     id: btnRemoveAgent
 
                     anchors {
-                        top: parent.top
-                        right : parent.right
+                        right: parent.right
+                        rightMargin: 5
+                        verticalCenter: parent.verticalCenter
                     }
 
                     visible: !model.isON
-                    opacity: (btnRemoveAgent.hovered || mouseAreaToolTip.containsMouse) ? 1.0 : 0.0
+                    opacity: (btnRemoveAgent.hovered || mouseAreaAgent.containsMouse) ? 1.0 : 0.0
 
 
                     pressedID: releasedID + "-pressed"
@@ -305,71 +398,6 @@ Item {
         }
 
     }
-
-    // Button Options
-    LabellessSvgButton {
-        id: btnOptions
-
-        anchors {
-            bottom: parent.bottom
-            bottomMargin: 10
-            right : parent.right
-            rightMargin: 10
-        }
-
-        pressedID: releasedID + "-pressed"
-        releasedID: "button-options"
-        disabledID : releasedID
-
-
-        onClicked: {
-            // console.log("QML: Open options...");
-
-            // Parent must be host item and not the list to have good x and y value
-            popupOptions.parent = rootItem;
-
-            // Open the popup with options
-            popupOptions.openInScreen();
-        }
-    }
-
-    // Stream button
-    /*LabellessSvgButton {
-        id: streamButton
-
-        anchors {
-            right: parent.right
-            verticalCenter: parent.verticalCenter
-            rightMargin: 5
-        }
-
-        visible: model.canProvideStream
-
-        enabled: visible
-
-
-        fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
-
-        pressedID: releasedID + "-pressed"
-        releasedID: model.isStreaming ? "on" : "off"
-        disabledID : releasedID
-
-
-        onClicked: {
-            if (model.isStreaming)
-            {
-                streamPopup.close();
-                receiver.stop();
-            }
-            else
-            {
-                streamPopup.show();
-                streamPopup.title = model.name;
-                receiver.start();
-            }
-            model.QtObject.changeStreamState();
-        }
-    }*/
 
 
     //
@@ -424,7 +452,7 @@ Item {
                     left: parent.left
                 }
 
-                /*Button {
+                Button {
                     id: optionRename
 
                     height: popupOptions.optionHeight
@@ -432,7 +460,8 @@ Item {
 
                     text: qsTr("Rename")
 
-                    enabled: (rootItem.host && !rootItem.host.isON)
+                    //enabled: (rootItem.host && !rootItem.host.isON)
+                    enabled: false
 
                     style: Theme.ButtonStyleOfOption {
                     }
@@ -443,7 +472,7 @@ Item {
 
                         popupOptions.close();
                     }
-                }*/
+                }
 
                 Button {
                     id: optionRemove
