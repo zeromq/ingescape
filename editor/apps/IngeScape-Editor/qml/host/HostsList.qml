@@ -100,9 +100,16 @@ Item {
             delegate: HostsListItem {
                 id: hostsListItem
 
+                //
+                // Properties
+                //
                 host: model.QtObject
                 controller: rootItem.controller
 
+
+                //
+                // Slots
+                //
                 onNeedConfirmationToDeleteHostInList: {
                     // Set the host
                     deleteConfirmationPopup.host = model.QtObject;
@@ -128,6 +135,14 @@ Item {
                     // Open the popup
                     renameHostPopup.open();
                 }*/
+
+                onNeedEditAgentCommandLine: {
+                    // Set the agent
+                    editCommandLinePopup.agent = agent;
+
+                    // Open the popup
+                    editCommandLinePopup.open();
+                }
             }
 
 
@@ -244,5 +259,26 @@ Item {
             host.name = newName;
         }
     }*/
+
+
+    //
+    // Popup about "Edit Command Line"
+    //
+    Popup.EditCommandLinePopup {
+        id: editCommandLinePopup
+
+        property AgentM agent: null
+
+        agentName: agent ? agent.name : ""
+        previousCommandLine: agent ? agent.commandLine : ""
+
+        onCommandLineValidated: {
+            if (agent)
+            {
+                // Call the setter in C++ (with event "commandLineChanged")
+                agent.commandLine = newCommandLine;
+            }
+        }
+    }
 
 }

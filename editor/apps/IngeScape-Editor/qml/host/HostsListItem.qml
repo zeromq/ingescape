@@ -72,6 +72,9 @@ Item {
     // signal emitted when the user clicks on the "rename" option
     //signal needRenameHostInList();
 
+    // signal emitted when the user clicks on the "edit command line" option of an agent in the list
+    signal needEditAgentCommandLine(AgentM agent);
+
 
     //--------------------------------
     //
@@ -700,37 +703,13 @@ Item {
                     }
 
                     onClicked: {
-                        // Set the agent
-                        editCommandLinePopup.agent = popupAgentOptions.agent;
-
-                        // Open the popup
-                        editCommandLinePopup.open();
+                        // Emit the signal to display an edition popup
+                        rootItem.needEditAgentCommandLine(popupAgentOptions.agent)
 
                         popupAgentOptions.close();
                     }
                 }
 
-            }
-        }
-    }
-
-
-    //
-    // Popup about "Edit Command Line"
-    //
-    Popup.EditCommandLinePopup {
-        id: editCommandLinePopup
-
-        property AgentM agent: null
-
-        agentName: agent ? agent.name : ""
-        previousCommandLine: agent ? agent.commandLine : ""
-
-        onCommandLineValidated: {
-            if (agent)
-            {
-                // Call the setter in C++ (with event "commandLineChanged")
-                agent.commandLine = newCommandLine;
             }
         }
     }
