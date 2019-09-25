@@ -159,6 +159,8 @@ MicrosoftWindowUtils::~MicrosoftWindowUtils()
 }
 
 
+#ifndef OSUTILS_NO_QML
+
 /**
  * @brief Override the setter of our currentWindow property
  * @param value
@@ -182,6 +184,8 @@ bool MicrosoftWindowUtils::setcurrentWindow (QQuickWindow* value)
 
     return hasChanged;
 }
+
+#endif
 
 
 
@@ -222,6 +226,8 @@ void MicrosoftWindowUtils::_disableEnergyEfficiencyFeatures()
 }
 
 
+#ifndef OSUTILS_NO_QML
+
 /**
  * @brief Subscribe to user session notifications
  */
@@ -261,6 +267,7 @@ void MicrosoftWindowUtils::_unsubscribeToUserSessionNotifications(QQuickWindow* 
     }
 }
 
+#endif
 
 
 #else

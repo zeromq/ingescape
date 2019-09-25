@@ -49,7 +49,9 @@ Q_GLOBAL_STATIC(OSUtils, _singletonInstance)
  */
 OSUtils::OSUtils(QObject *parent)
     : QObject(parent),
+#ifndef OSUTILS_NO_QML
       _currentWindow(nullptr),
+#endif
       _isAwake(true), // We assume that our system is awake
       _isUserSessionLocked(false), // We assume that our user session is not locked
       _hasEnergyEfficiencyFeatures(false), // We assume that all OS don't have energy efficiency features
@@ -78,8 +80,10 @@ OSUtils::OSUtils(QObject *parent)
   */
 OSUtils::~OSUtils()
 {
+#ifndef OSUTILS_NO_QML
     // Clean-up properties
     setcurrentWindow(nullptr);
+#endif
 
     // Unsubscribe to network configuration events
     disconnect(&_networkConfigurationManager, &QNetworkConfigurationManager::configurationAdded, this, &OSUtils::_onConfigurationAdded);
@@ -100,8 +104,10 @@ OSUtils::~OSUtils()
  * @briefSet our preventEnergyEfficiencyFeatures flag
  * @param value
  */
-void OSUtils::setpreventEnergyEfficiencyFeatures(bool value)
+bool OSUtils::setpreventEnergyEfficiencyFeatures(bool value)
 {
+    bool hasChanged = false;
+
     if (_preventEnergyEfficiencyFeatures != value)
     {
         // Save value
@@ -119,7 +125,10 @@ void OSUtils::setpreventEnergyEfficiencyFeatures(bool value)
 
         // Notify change
         Q_EMIT preventEnergyEfficiencyFeaturesChanged(value);
+        hasChanged = true;
     }
+
+    return hasChanged;
 }
 
 
