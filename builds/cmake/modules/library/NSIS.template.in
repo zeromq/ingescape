@@ -557,7 +557,6 @@ FunctionEnd
   @CPACK_NSIS_PAGE_COMPONENTS@
 
   !insertmacro MUI_PAGE_INSTFILES
-  !define MUI_FINISHPAGE_NOAUTOCLOSE
   !insertmacro MUI_PAGE_FINISH
 
   !insertmacro MUI_UNPAGE_CONFIRM
