@@ -552,6 +552,7 @@ FunctionEnd
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "SHCTX"
   !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
+  !define MUI_STARTMENUPAGE_DEFAULTFOLDER "Ingescape"
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
 
   @CPACK_NSIS_PAGE_COMPONENTS@
@@ -690,7 +691,7 @@ Section "-Core installation"
   CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
 @CPACK_NSIS_CREATE_ICONS@
 @CPACK_NSIS_CREATE_ICONS_EXTRA@
-  CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall @CPACK_PACKAGE_NAME@.lnk" "$INSTDIR\Uninstall @CPACK_PACKAGE_NAME@.exe"
+  CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall\Uninstall @CPACK_PACKAGE_NAME@.lnk" "$INSTDIR\Uninstall @CPACK_PACKAGE_NAME@.exe"
 
   ;Read a value from an InstallOptions INI file
   !insertmacro MUI_INSTALLOPTIONS_READ $DO_NOT_ADD_TO_PATH "NSIS.InstallOptions.ini" "Field 2" "State"
@@ -843,7 +844,8 @@ Section "Uninstall"
 
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
 
-  Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall @CPACK_PACKAGE_NAME@.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall\Uninstall @CPACK_PACKAGE_NAME@.lnk"
+  RMDir "$SMPROGRAMS\$MUI_TEMP\Uninstall"
 @CPACK_NSIS_DELETE_ICONS@
 @CPACK_NSIS_DELETE_ICONS_EXTRA@
 
@@ -863,7 +865,8 @@ Section "Uninstall"
   ; If the user changed the shortcut, then untinstall may not work. This should
   ; try to fix it.
   StrCpy $MUI_TEMP "$START_MENU"
-  Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall @CPACK_PACKAGE_NAME@.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall\Uninstall @CPACK_PACKAGE_NAME@.lnk"
+  RMDir "$SMPROGRAMS\$MUI_TEMP\Uninstall"
 @CPACK_NSIS_DELETE_ICONS_EXTRA@
 
   ;Delete empty start menu parent directories
