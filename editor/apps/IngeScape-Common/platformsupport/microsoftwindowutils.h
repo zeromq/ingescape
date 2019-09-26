@@ -70,12 +70,15 @@ public:
     ~MicrosoftWindowUtils() Q_DECL_OVERRIDE;
 
 
+#ifndef OSUTILS_NO_QML
     /**
      * @brief Override the setter of our currentWindow property
      * @param value
      * @return
      */
     bool setcurrentWindow (QQuickWindow* value) Q_DECL_OVERRIDE;
+
+#endif
 
 
     /**
@@ -104,6 +107,7 @@ protected:
     void _disableEnergyEfficiencyFeatures() Q_DECL_OVERRIDE;
 
 
+#ifndef OSUTILS_NO_QML
     /**
      * @brief Subscribe to user session notifications
      */
@@ -114,6 +118,8 @@ protected:
      * @brief Unsubscribe to user session notifications
      */
     void _unsubscribeToUserSessionNotifications(QQuickWindow* window);
+#endif
+
 
 
 protected:
