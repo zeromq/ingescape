@@ -301,9 +301,11 @@ Window {
                         svgFileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
                         svgElementId: if (index === 0) {
                                           "tab-0" + (styleData.selected ? "-Selected" : "")
-                                      } else if (0 < index && index < tabRepeater.count - 1) {
+                                      }
+                                      else if (0 < index && index < tabRepeater.count - 1) {
                                           "tab-1" + (styleData.selected ? "-Selected" : "")
-                                      } else if (index === tabRepeater.count - 1) {
+                                      }
+                                      else if (index === tabRepeater.count - 1) {
                                           "tab-2" + (styleData.selected ? "-Selected" : "")
                                       }
 
@@ -380,7 +382,8 @@ Window {
                                            qsTr("Current value"),
                                            qsTr("Mute")
                                            ]
-                                       } else if (tab.modelIndex === 3) { // "Calls"
+                                       }
+                                       else if (tab.modelIndex === 3) { // "Calls"
                                            [
                                            qsTr("Prototype"),
                                            "",
@@ -388,7 +391,8 @@ Window {
                                            "",
                                            ""
                                            ]
-                                       } else {
+                                       }
+                                       else {
                                            [
                                            qsTr("Name"),
                                            qsTr("Type"),

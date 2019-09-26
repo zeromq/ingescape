@@ -168,7 +168,8 @@ public:
                     ++placeholderCount;
                 }
                 queryStr += ")";
-            } else {
+            }
+            else {
                 // Single filter value for this key
                 queryStr += " = ?";
                 ++placeholderCount;
