@@ -438,9 +438,9 @@ Window {
                             color : IngeScapeTheme.blackColor
                         }
 
-                        /// ****** List ***** ////
+                        /// ****** List IOPs ***** ////
                         ScrollView {
-                            id : scrollView
+                            id : scrollViewIOP
 
                             anchors {
                                 top: tableauHeaderRow.bottom
@@ -452,16 +452,15 @@ Window {
                             // Prevent drag overshoot on Windows
                             flickableItem.boundsBehavior: Flickable.OvershootBounds
 
+                            visible: tab.modelIndex < 3 // Visible for all but Calls
+
                             style: IngeScapeScrollViewStyle {
                             }
-
 
                             ListView {
                                 id : listViewIOPs
 
-                                width : scrollView.width
-
-                                visible: tab.modelIndex < 3 // Visible for all but Calls
+                                width : scrollViewIOP.width
 
                                 model: if (definition) {
                                            switch (tabs.currentIndex)
@@ -646,15 +645,32 @@ Window {
                                 }
 
                             }
+                        }
 
+                        /// ****** List calls ***** ////
+                        ScrollView {
+                            id : scrollView
+
+                            anchors {
+                                top: tableauHeaderRow.bottom
+                                left : parent.left
+                                right : parent.right
+                                bottom : parent.bottom
+                            }
+
+                            visible: tab.modelIndex === 3 // Visible only for Calls
+
+                            // Prevent drag overshoot on Windows
+                            flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+                            style: IngeScapeScrollViewStyle {
+                            }
 
                             // Content of our scrollview
                             ListView {
                                 id : listViewCalls
 
                                 width : scrollView.width
-
-                                visible: tab.modelIndex === 3 // Visible only for Calls
 
                                 model: definition ? definition.callsList : 0;
 
