@@ -1,11 +1,10 @@
 # CMake build script for Ingescape
 
-#TODO Add NSIS management (CPACK)
-#TODO Add clean target (see czmq)
+# TODO Add NSIS management (CPACK) TODO Add clean target (see czmq)
 
-########################################################################
+# ##############################################################################
 # Project setup
-########################################################################
+# ##############################################################################
 cmake_minimum_required(VERSION 3.13.1)
 project(ingescape HOMEPAGE_URL https://ingescape.com)
 
@@ -16,31 +15,62 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # Select flags
-SET(CMAKE_C_FLAGS_RELEASE "-O2")
+set(CMAKE_C_FLAGS_RELEASE "-O2")
 # Add path to custom macro
 set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/builds/cmake/modules")
 list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR})
-list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/builds/cmake/modules/library") # NSIS templates
+list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/builds/cmake/modules/library")
+# NSIS templates
 include(IngescapeHelper)
 include(IdentifyOS)
 
-
-########################################################################
+# ##############################################################################
 # options
-########################################################################
+# ##############################################################################
 # Default build mode is debug
-if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE Debug)
-endif ()
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
 add_definitions(-DINGESCAPE=1 -DTARGET_OS_IOS=0)
 
-
-########################################################################
+# ##############################################################################
 # plateform specific
-########################################################################
-if (NOT MSVC)
+# ##############################################################################
+if(NOT MSVC)
   include(CheckCCompilerFlag)
-  foreach(_CCOPT -pedantic -Wall -Wextra -W -Wpointer-arith -Wwrite-strings -Wunused -Wshadow -Winline -Wnested-externs -Wno-long-long -Wfloat-equal -Wno-multichar -Wsign-compare -Wundef -Wno-format-nonliteral -Wendif-labels -Wstrict-prototypes -Wstrict-aliasing=3 -Wcast-align -Wtype-limits -Wold-style-declaration -Wmissing-parameter-type -Wempty-body -Wclobbered -Wignored-qualifiers -Wconversion -Wno-sign-conversion -Wvla -Wdouble-promotion -Wno-system-headers -Wno-pedantic-ms-format)
+  foreach(_CCOPT
+          -pedantic
+          -Wall
+          -Wextra
+          -W
+          -Wpointer-arith
+          -Wwrite-strings
+          -Wunused
+          -Wshadow
+          -Winline
+          -Wnested-externs
+          -Wno-long-long
+          -Wfloat-equal
+          -Wno-multichar
+          -Wsign-compare
+          -Wundef
+          -Wno-format-nonliteral
+          -Wendif-labels
+          -Wstrict-prototypes
+          -Wstrict-aliasing=3
+          -Wcast-align
+          -Wtype-limits
+          -Wold-style-declaration
+          -Wmissing-parameter-type
+          -Wempty-body
+          -Wclobbered
+          -Wignored-qualifiers
+          -Wconversion
+          -Wno-sign-conversion
+          -Wvla
+          -Wdouble-promotion
+          -Wno-system-headers
+          -Wno-pedantic-ms-format)
     # surprisingly, CHECK_C_COMPILER_FLAG needs a new variable to store each new
     # test result in.
     check_c_compiler_flag(${_CCOPT} OPT${_CCOPT})
@@ -50,25 +80,25 @@ if (NOT MSVC)
   endforeach()
 endif()
 
-
-########################################################################
+# ##############################################################################
 # version
-########################################################################
-#gets version from admin.c file
-get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR INGESCAPE_VERSION_PATCH)
-set(INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
+# ##############################################################################
+# gets version from admin.c file
+get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR
+                      INGESCAPE_VERSION_PATCH)
+set(
+  INGESCAPE_VERSION
+  "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}"
+  )
 message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
 
-
-########################################################################
+# ##############################################################################
 # includes
-########################################################################
-set (ingescape_headers_to_install
-    src/include/ingescape.h
-    src/include/ingescape_advanced.h
-)
+# ##############################################################################
+set(ingescape_headers_to_install src/include/ingescape.h
+                                 src/include/ingescape_advanced.h)
 
-set (ingescape_headers
+set(ingescape_headers
     ${ingescape_headers_to_install}
     src/include/ingescape_private.h
     src/include/uthash/libut.h
@@ -79,204 +109,222 @@ set (ingescape_headers
     src/include/uthash/utmm.h
     src/include/uthash/utringbuffer.h
     src/include/uthash/utstring.h
-    src/include/uthash/utvector.h
-)
+    src/include/uthash/utvector.h)
 
-source_group ("Header Files" FILES ${ingescape_headers})
+source_group("Header Files" FILES ${ingescape_headers})
 install(FILES ${ingescape_headers_to_install}
-  DESTINATION include/ingescape
-  COMPONENT library
-)
+        DESTINATION include/ingescape
+        COMPONENT library)
 
 add_ingescape_include_directory(_INCLUDES_DIRECTORY)
 include_directories(${_INCLUDES_DIRECTORY})
 
-
-########################################################################
+# ##############################################################################
 # Sources files
-########################################################################
+# ##############################################################################
 add_ingescape_sources(ingescape_sources)
 source_group("Source Files" FILES ${ingescape_sources})
 
-
-########################################################################
+# ##############################################################################
 # dependencies
-########################################################################
-# Will be used to add flags to pkg-config useful when apps want to statically link
+# ##############################################################################
+# Will be used to add flags to pkg-config useful when apps want to statically
+# link
 set(pkg_config_libs_private "")
 add_ingescape_libraries_dependencies(MORE_LIBRARIES pkg_config_libs_private)
-set (pkgconfig_name_libzmq "libzmq >= 4")
-set (pkgconfig_name_libczmq "libczmq >= 4")
-set (pkgconfig_name_libzyre "libzyre >= 2")
-set (pkgconfig_name_libsodium "libsodium")
+set(pkgconfig_name_libzmq "libzmq >= 4")
+set(pkgconfig_name_libczmq "libczmq >= 4")
+set(pkgconfig_name_libzyre "libzyre >= 2")
+set(pkgconfig_name_libsodium "libsodium")
 
-
-########################################################################
+# ##############################################################################
 # library
-########################################################################
+# ##############################################################################
 option(INGESCAPE_BUILD_SHARED "Whether or not to build the shared object" ON)
 option(INGESCAPE_BUILD_STATIC "Whether or not to build the static archive" ON)
 
-if (NOT INGESCAPE_BUILD_SHARED AND NOT INGESCAPE_BUILD_STATIC)
+if(NOT INGESCAPE_BUILD_SHARED AND NOT INGESCAPE_BUILD_STATIC)
   message(FATAL_ERROR "Neither static nor shared library build enabled")
 endif()
 
-IF (NOT MSVC)
-  # avoid building everything twice for shared + static
-  # only on *nix, as Windows needs different preprocessor defines in static builds
-  add_library (ingescape_objects OBJECT ${ingescape_sources})
+if(NOT MSVC)
+  # avoid building everything twice for shared + static only on *nix, as Windows
+  # needs different preprocessor defines in static builds
+  add_library(ingescape_objects OBJECT ${ingescape_sources})
   set_property(TARGET ingescape_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
-ENDIF (NOT MSVC)
+endif(NOT MSVC)
 
 # shared
-if (INGESCAPE_BUILD_SHARED)
-  IF (MSVC)
+if(INGESCAPE_BUILD_SHARED)
+  if(MSVC)
     add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
 
-    IF (CMAKE_BUILD_TYPE STREQUAL "Release")
-      set_target_properties (${PROJECT_NAME} PROPERTIES
-        PUBLIC_HEADER "${public_headers}"
-        DEFINE_SYMBOL "INGESCAPE_EXPORTS"
-        SOVERSION "${INGESCAPE_VERSION_MAJOR}"
-        VERSION "${INGESCAPE_VERSION}"
-        OUTPUT_NAME "ingescape"
-      )
-    ELSE ()
-      set_target_properties (${PROJECT_NAME} PROPERTIES
-        PUBLIC_HEADER "${public_headers}"
-        DEFINE_SYMBOL "INGESCAPE_EXPORTS"
-        SOVERSION "${INGESCAPE_VERSION_MAJOR}"
-        VERSION "${INGESCAPE_VERSION}"
-        OUTPUT_NAME "ingescaped"
-      )
-    ENDIF()
-  ELSE (MSVC)
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+      set_target_properties(${PROJECT_NAME}
+                            PROPERTIES PUBLIC_HEADER
+                                       "${public_headers}"
+                                       DEFINE_SYMBOL
+                                       "INGESCAPE_EXPORTS"
+                                       SOVERSION
+                                       "${INGESCAPE_VERSION_MAJOR}"
+                                       VERSION
+                                       "${INGESCAPE_VERSION}"
+                                       OUTPUT_NAME
+                                       "ingescape")
+    else()
+      set_target_properties(${PROJECT_NAME}
+                            PROPERTIES PUBLIC_HEADER
+                                       "${public_headers}"
+                                       DEFINE_SYMBOL
+                                       "INGESCAPE_EXPORTS"
+                                       SOVERSION
+                                       "${INGESCAPE_VERSION_MAJOR}"
+                                       VERSION
+                                       "${INGESCAPE_VERSION}"
+                                       OUTPUT_NAME
+                                       "ingescaped")
+    endif()
+  else(MSVC)
     add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:ingescape_objects>)
 
-    set_target_properties (${PROJECT_NAME} PROPERTIES
-      PUBLIC_HEADER "${public_headers}"
-      DEFINE_SYMBOL "INGESCAPE_EXPORTS"
-      SOVERSION "${INGESCAPE_VERSION_MAJOR}"
-      VERSION "${INGESCAPE_VERSION}"
-      OUTPUT_NAME "ingescape"
-      PREFIX "lib"
-    )
-  ENDIF (MSVC)
+    set_target_properties(${PROJECT_NAME}
+                          PROPERTIES PUBLIC_HEADER
+                                     "${public_headers}"
+                                     DEFINE_SYMBOL
+                                     "INGESCAPE_EXPORTS"
+                                     SOVERSION
+                                     "${INGESCAPE_VERSION_MAJOR}"
+                                     VERSION
+                                     "${INGESCAPE_VERSION}"
+                                     OUTPUT_NAME
+                                     "ingescape"
+                                     PREFIX
+                                     "lib")
+  endif(MSVC)
 
   target_link_libraries(${PROJECT_NAME} PRIVATE ${MORE_LIBRARIES})
 
   install(TARGETS ${PROJECT_NAME}
-    EXPORT ${PROJECT_NAME}-targets
-    LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
-      COMPONENT library
-    ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-      COMPONENT library
-    RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
-      COMPONENT library
-  )
+          EXPORT ${PROJECT_NAME}-targets
+          LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
+                  COMPONENT library
+          ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
+                  COMPONENT library
+          RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
+                  COMPONENT library)
 endif()
 
 # static
-if (INGESCAPE_BUILD_STATIC)
-  IF (MSVC)
+if(INGESCAPE_BUILD_STATIC)
+  if(MSVC)
     add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
 
-    IF (CMAKE_BUILD_TYPE STREQUAL "Release")
-      set_target_properties (${PROJECT_NAME}-static PROPERTIES
-        PUBLIC_HEADER "${public_headers}"
-        COMPILE_DEFINITIONS "INGESCAPE_STATIC"
-        OUTPUT_NAME "ingescape_static"
-      )
-    ELSE ()
-      set_target_properties (${PROJECT_NAME}-static PROPERTIES
-        PUBLIC_HEADER "${public_headers}"
-        COMPILE_DEFINITIONS "INGESCAPE_STATIC"
-        OUTPUT_NAME "ingescaped_static"
-      )
-    ENDIF()
-  ELSE (MSVC)
-    add_library(${PROJECT_NAME}-static STATIC $<TARGET_OBJECTS:ingescape_objects>)
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+      set_target_properties(${PROJECT_NAME}-static
+                            PROPERTIES PUBLIC_HEADER
+                                       "${public_headers}"
+                                       COMPILE_DEFINITIONS
+                                       "INGESCAPE_STATIC"
+                                       OUTPUT_NAME
+                                       "ingescape_static")
+    else()
+      set_target_properties(${PROJECT_NAME}-static
+                            PROPERTIES PUBLIC_HEADER
+                                       "${public_headers}"
+                                       COMPILE_DEFINITIONS
+                                       "INGESCAPE_STATIC"
+                                       OUTPUT_NAME
+                                       "ingescaped_static")
+    endif()
+  else(MSVC)
+    add_library(${PROJECT_NAME}-static STATIC
+                $<TARGET_OBJECTS:ingescape_objects>)
 
-    set_target_properties(${PROJECT_NAME}-static PROPERTIES
-      PUBLIC_HEADER "${public_headers}"
-      COMPILE_DEFINITIONS "INGESCAPE_STATIC"
-      OUTPUT_NAME "ingescape"
-      PREFIX "lib"
-    )
-  ENDIF (MSVC)
-
+    set_target_properties(${PROJECT_NAME}-static
+                          PROPERTIES PUBLIC_HEADER
+                                     "${public_headers}"
+                                     COMPILE_DEFINITIONS
+                                     "INGESCAPE_STATIC"
+                                     OUTPUT_NAME
+                                     "ingescape"
+                                     PREFIX
+                                     "lib")
+  endif(MSVC)
 
   target_link_libraries(${PROJECT_NAME}-static PRIVATE ${MORE_LIBRARIES})
 
   install(TARGETS ${PROJECT_NAME}-static
-    EXPORT ${PROJECT_NAME}-targets
-    LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
-      COMPONENT library
-    ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-      COMPONENT library
-    RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
-      COMPONENT library
-  )
+          EXPORT ${PROJECT_NAME}-targets
+          LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
+                  COMPONENT library
+          ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
+                  COMPONENT library
+          RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
+                  COMPONENT library)
 endif()
 
-########################################################################
+# ##############################################################################
 # pkgconfig
-########################################################################
-set (VERSION "${INGESCAPE_VERSION}")
-set (prefix "${CMAKE_INSTALL_PREFIX}")
-set (exec_prefix "\${prefix}")
-set (libdir "\${prefix}/lib${LIB_SUFFIX}")
-set (includedir "\${prefix}/include")
-set (pkg_config_defines "")
-configure_file(
-    "${SOURCE_DIR}/src/libingescape.pc.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc"
-@ONLY)
+# ##############################################################################
+set(VERSION "${INGESCAPE_VERSION}")
+set(prefix "${CMAKE_INSTALL_PREFIX}")
+set(exec_prefix "\${prefix}")
+set(libdir "\${prefix}/lib${LIB_SUFFIX}")
+set(includedir "\${prefix}/include")
+set(pkg_config_defines "")
+configure_file("${SOURCE_DIR}/src/libingescape.pc.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc" @ONLY)
 
-install(
-    FILES "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc"
-    DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
-    COMPONENT library
-)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc"
+        DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
+        COMPONENT library)
 
-########################################################################
+# ##############################################################################
 # installation
-########################################################################
+# ##############################################################################
 include(CMakePackageConfigHelpers)
-if (WIN32)
-  set(CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for ingescapeConfig.cmake")
+if(WIN32)
+  set(CMAKECONFIG_INSTALL_DIR
+      "CMake"
+      CACHE STRING "install path for ingescapeConfig.cmake")
 else()
   # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
-  set(CMAKECONFIG_INSTALL_DIR "share/cmake/ingescape" CACHE STRING "install path for ingescapeConfig.cmake")
+  set(CMAKECONFIG_INSTALL_DIR
+      "share/cmake/ingescape"
+      CACHE STRING "install path for ingescapeConfig.cmake")
 endif()
 
-if (NOT CMAKE_VERSION VERSION_LESS 3.0)
+if(NOT CMAKE_VERSION VERSION_LESS 3.0)
   export(EXPORT ${PROJECT_NAME}-targets
          FILE "${CMAKE_CURRENT_BINARY_DIR}/ingescapeTargets.cmake")
 endif()
-configure_package_config_file(builds/cmake/Config.cmake.in
-                              "${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake"
-                              INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
-                                 VERSION ${INGESCAPE_VERSION}
-                                 COMPATIBILITY AnyNewerVersion)
+configure_package_config_file(
+  builds/cmake/Config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake"
+  INSTALL_DESTINATION
+  ${CMAKECONFIG_INSTALL_DIR})
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
+  VERSION ${INGESCAPE_VERSION}
+  COMPATIBILITY AnyNewerVersion)
 
 # uninstall target
 if(NOT TARGET uninstall)
-    configure_file(
-        "${SOURCE_DIR}/builds/cmake/cmake_uninstall.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-        IMMEDIATE @ONLY)
+  configure_file("${SOURCE_DIR}/builds/cmake/cmake_uninstall.cmake.in"
+                 "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+                 IMMEDIATE
+                 @ONLY)
 
-    add_custom_target(uninstall
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+  add_custom_target(uninstall
+                    COMMAND ${CMAKE_COMMAND} -P
+                            ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif()
 
-########################################################################
+# ##############################################################################
 # installer
-########################################################################
+# ##############################################################################
 # Package installer for release build only
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME} library")
   set(CPACK_PACKAGE_VENDOR "Ingescape")
@@ -288,149 +336,134 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
   set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 
-  # Installers for 32- vs. 64-bit CMake:
-  #  - Root install directory (displayed to end user at installer-run time)
-  #  - "NSIS package/display name" (text used in the installer GUI)
-  #  - Registry key used to store info about the installation
+  # Installers for 32- vs. 64-bit CMake: - Root install directory (displayed to
+  # end user at installer-run time) - "NSIS package/display name" (text used in
+  # the installer GUI) - Registry key used to store info about the installation
   if(CMAKE_CL_64)
     set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
-    set(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
+    set(CPACK_NSIS_PACKAGE_NAME
+        "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
     set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
   else()
     set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
-    set(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
+    set(CPACK_NSIS_PACKAGE_NAME
+        "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
     set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
   endif()
 
-  # NSIS configuration for Windows
-  #see https://cmake.org/cmake/help/v3.14/cpack_gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
-  #set(CPACK_NSIS_INSTALL_ROOT )
-  #set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}\\\\InstallIcon.bmp") #https://docs.microsoft.com/fr-fr/windows/desktop/shell/desktop-app-tiles-on-the-start-screen
-  #set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}\\\\InstallIcon.bmp")
-  #set(CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP )
-  #set(CPACK_NSIS_MUI_UNWELCOMEFINISHPAGE_BITMAP )
-  #set(CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS )
-  #set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS )
-  #set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS )
-  #set(CPACK_NSIS_COMPRESSOR )
+  # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
+  # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
   set(CPACK_NSIS_DISPLAY_NAME "IngeScape library")
   set(CPACK_NSIS_PACKAGE_NAME ${PROJECT_NAME})
-  #set(CPACK_NSIS_INSTALLED_ICON_NAME "${CMAKE_CURRENT_SOURCE_DIR}\\\\InstallIcon.bmp")
   set(CPACK_NSIS_HELP_LINK "https://ingescape.com")
   set(CPACK_NSIS_CONTACT "contact@ingescape.com")
-  #set(CPACK_NSIS_<compName>_INSTALL_DIRECTORY )
-  #set(CPACK_NSIS_CREATE_ICONS_EXTRA )
-  #set(CPACK_NSIS_DELETE_ICONS_EXTRA )
-  #set(CPACK_NSIS_MUI_FINISHPAGE_RUN )
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
   set(CPACK_NSIS_MODIFY_PATH ON)
   set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
   set(CPACK_NSIS_MENU_LINKS ${CMAKE_PROJECT_HOMEPAGE_URL} "IngeScape Web Site")
 
+  set(
+    CPACK_SOURCE_IGNORE_FILES
+    "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/editor/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/"
+    )
 
-  # see: https://cmake.org/cmake/help/v3.13/cpack_gen/wix.html?highlight=wix
-  #set(CPACK_WIX_PRODUCT_ICON "${CMAKE_CURRENT_SOURCE_DIR}\\\\InstallIcon.bmp")
-  #set(CPACK_WIX_UI_BANNER ) #493 by 58 pixels
-  #set(CPACK_WIX_UI_DIALOG ) #493 by 312 pixels
-  
-  set(CPACK_SOURCE_IGNORE_FILES "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/editor/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/")
-  
-  if (WIN32)
-      set(CPACK_MONOLITHIC_INSTALL ON)
-      #set(CPACK_SOURCE_GENERATOR "ZIP") #sources are useless for Windows
-      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/android)
-      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/ios)
-      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/macos)
-      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/raspberry)
-      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/unix)
+  if(WIN32)
+    set(CPACK_MONOLITHIC_INSTALL ON)
 
-      set(CPACK_GENERATOR "NSIS;ZIP")
-      # On windows we want to package these libraries
-      set(IS_EDITOR FALSE)
-      install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
-      install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
-      install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
-      install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+    set(CPACK_GENERATOR "NSIS;ZIP")
+    # On windows we want to package these libraries
+    set(IS_EDITOR FALSE)
+    install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS
+                                   IS_EDITOR)
+    install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
+                                   IS_EDITOR)
+    install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
+    install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
 
-      file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.txt "The bin directory is empty after installation on purpose.\r\n"
-                                                        "It will contain agents' executables once installed.")
-      install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/README.txt
-        DESTINATION bin
-        COMPONENT library
-      )
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.txt
+         "The bin directory is empty after installation on purpose.\r\n"
+         "It will contain agents' executables once installed.")
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/README.txt
+            DESTINATION bin
+            COMPONENT library)
 
-  elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+  elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     # Without component productbuild will not package any files
-    set (CPACK_COMPONENTS_ALL library)
-    #set (CPACK_COMPONENT_LIBRARY_DISPLAY_NAME "Libraries files")
-    #set (CPACK_COMPONENT_LIBRARY_DESCRIPTION "All libraries files")
-    #set (CPACK_COMPONENT_LIBRARY_GROUP "Runtime")
+    set(CPACK_COMPONENTS_ALL library)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
 
-    # Without extention productbuild will crash
-    # So we just copy License file in build folder with an extension 
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/LICENSE" "${CMAKE_BINARY_DIR}/LICENSE.txt" COPYONLY)
+    # Without extention productbuild will crash So we just copy License file in
+    # build folder with an extension
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
+                   "${CMAKE_BINARY_DIR}/LICENSE.txt" COPYONLY)
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/LICENSE.txt")
 
     set(CPACK_GENERATOR "productbuild")
 
-      #set(CPACK_SOURCE_GENERATOR "TGZ")
-      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
-  else ()
-      set(CPACK_MONOLITHIC_INSTALL ON)
-      if ( CMAKE_OS_NAME AND ${CMAKE_OS_NAME} STREQUAL "Debian" AND ${CMAKE_OS_VERSION} STREQUAL "10" )
-          set(CPACK_GENERATOR "DEB")
-          set(CPACK_DEBIAN_PACKAGE_DEPENDS "libczmq4, libsodium23 (>= 1.0.14), libzmq5, libzyre2")
-      elseif ( ANDROID )
-          set(IS_EDITOR FALSE)
-          install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
-          install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
-          install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
-          install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
-          set(CPACK_GENERATOR "ZIP")
-      else ()
-          set(CPACK_GENERATOR "ZIP")
-      endif ()
+  else()
+    set(CPACK_MONOLITHIC_INSTALL ON)
+    if(CMAKE_OS_NAME
+       AND ${CMAKE_OS_NAME} STREQUAL "Debian"
+       AND ${CMAKE_OS_VERSION} STREQUAL "10")
+      set(CPACK_GENERATOR "DEB")
+      set(CPACK_DEBIAN_PACKAGE_DEPENDS
+          "libczmq4, libsodium23 (>= 1.0.14), libzmq5, libzyre2")
+    elseif(ANDROID)
+      set(IS_EDITOR FALSE)
+      install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS
+                                     IS_EDITOR)
+      install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
+                                     IS_EDITOR)
+      install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
+      install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+      set(CPACK_GENERATOR "ZIP")
+    else()
+      set(CPACK_GENERATOR "ZIP")
+    endif()
+  endif()
 
-      #set(CPACK_SOURCE_GENERATOR "TGZ")
-      #list(APPEND CPACK_SOURCE_IGNORE_FILES ${SOURCE_DIR}/dependencies/)
-  endif ()
-
-  include (CPack)
+  include(CPack)
 endif()
 
-########################################################################
+# ##############################################################################
 # summary
-########################################################################
-message ("")
-message (STATUS "******************* Configuration Summary *******************")
-message (STATUS "General:")
-message (STATUS "  Version           :   ${VERSION}")
-message (STATUS "  System            :   ${CMAKE_SYSTEM_NAME}")
-message (STATUS "  C compiler        :   ${CMAKE_C_COMPILER}")
-message (STATUS "  Debug C flags     :   ${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS}")
-message (STATUS "  Release C flags   :   ${CMAKE_C_FLAGS_RELEASE} ${CMAKE_C_FLAGS}")
-message (STATUS "  Build type        :   ${CMAKE_BUILD_TYPE}")
-message (STATUS "  Static build      :   ${INGESCAPE_BUILD_STATIC}")
-message (STATUS "  Shared build      :   ${INGESCAPE_BUILD_SHARED}")
-message (STATUS "")
-message (STATUS "Dependencies:")
+# ##############################################################################
+message("")
+message(STATUS "******************* Configuration Summary *******************")
+message(STATUS "General:")
+message(STATUS "  Version           :   ${VERSION}")
+message(STATUS "  System            :   ${CMAKE_SYSTEM_NAME}")
+message(STATUS "  C compiler        :   ${CMAKE_C_COMPILER}")
+message(
+  STATUS "  Debug C flags     :   ${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS}")
+message(
+  STATUS "  Release C flags   :   ${CMAKE_C_FLAGS_RELEASE} ${CMAKE_C_FLAGS}")
+message(STATUS "  Build type        :   ${CMAKE_BUILD_TYPE}")
+message(STATUS "  Static build      :   ${INGESCAPE_BUILD_STATIC}")
+message(STATUS "  Shared build      :   ${INGESCAPE_BUILD_SHARED}")
+message(STATUS "")
+message(STATUS "Dependencies:")
 include(FeatureSummary)
-feature_summary (WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
-message (STATUS "")
-message (STATUS "Install:")
-message (STATUS "  Install prefix    :   ${CMAKE_INSTALL_PREFIX}")
-message (STATUS "")
-if (NOT MSVC)
-message (STATUS "*************************************************************")
-message (STATUS "Configuration complete! Now procced with:")
-message (STATUS "  'make'                compile the project")
-message (STATUS "  'make install'        install the project to ${CMAKE_INSTALL_PREFIX}")
-message (STATUS "  'make uninstall'      uninstall the project from ${CMAKE_INSTALL_PREFIX}")
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
-message (STATUS "  'make package'        Create library installer")
-message (STATUS "  'make package_source' Create source installer")
-endif ()
-endif ()
-message (STATUS "")
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
+message(STATUS "")
+message(STATUS "Install:")
+message(STATUS "  Install prefix    :   ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "")
+if(NOT MSVC)
+  message(
+    STATUS "*************************************************************")
+  message(STATUS "Configuration complete! Now procced with:")
+  message(STATUS "  'make'                compile the project")
+  message(
+    STATUS
+      "  'make install'        install the project to ${CMAKE_INSTALL_PREFIX}")
+  message(
+    STATUS
+      "  'make uninstall'      uninstall the project from ${CMAKE_INSTALL_PREFIX}"
+    )
+  if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    message(STATUS "  'make package'        Create library installer")
+    message(STATUS "  'make package_source' Create source installer")
+  endif()
+endif()
+message(STATUS "")
