@@ -400,13 +400,8 @@ Item {
 
 
                     onClicked: {
-                        if (controller)
-                        {
-                            //console.log("QML: Remove agent model " + model.name + " on " + host.name);
-
-                            // Emit the signal to display a confirmation popup
-                            rootItem.needConfirmationToDeleteAgentInHost(model.QtObject);
-                        }
+                        // Emit the signal to display a confirmation popup
+                        rootItem.needConfirmationToDeleteAgentInHost(model.QtObject);
                     }
                 }
             }
