@@ -478,6 +478,7 @@ Section "-Core installation"
 
   ;Create shortcuts
   CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
+  CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall"
 @CPACK_NSIS_CREATE_ICONS@
 @CPACK_NSIS_CREATE_ICONS_EXTRA@
   CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall\Uninstall @CPACK_PACKAGE_NAME@.lnk" "$INSTDIR\Uninstall @CPACK_PACKAGE_NAME@.exe"
