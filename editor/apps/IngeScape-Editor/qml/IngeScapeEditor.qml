@@ -149,6 +149,16 @@ Item {
     }
 
 
+
+    Connections {
+        target: IngeScapeEditorC
+
+        onOpenLicensePopup: {
+            openLicensePopup();
+        }
+    }
+
+
     Connections {
         target: IngeScapeEditorC.licensesC.mergedLicense
 

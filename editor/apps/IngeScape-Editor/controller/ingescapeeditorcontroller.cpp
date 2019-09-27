@@ -25,6 +25,7 @@
 #include <settings/ingescapesettings.h>
 
 #include <platformsupport/osutils.h>
+#include <platformsupport/IngescapeApplication.h>
 
 
 // Name of the example platform to load when no other platform has been loaded yet
@@ -124,9 +125,11 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     IngeScapeUtils::getExportsPath();
 
 
+    //------------------
     //
     // Settings
     //
+    //------------------
     IngeScapeSettings &settings = IngeScapeSettings::Instance();
 
     //
@@ -174,13 +177,19 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     settings.endGroup();
 
 
+
+    //
     // Create the helper to manage JSON files
+    //
     _jsonHelper = new JsonHelper(this);
 
 
+
+    //-------------------------------
     //
     // Create sub-controllers
     //
+    //-------------------------------
 
     // Create the manager for the data model of our IngeScape Editor application
     _modelManager = new EditorModelManager(_jsonHelper, rootPath, this);
@@ -334,16 +343,48 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         Q_EMIT _modelManager->previousHostParsed(HOSTNAME_NOT_DEFINED);
     }
 
+
+
+    // Check if there is a pending "open file" request
+    // NB: We must perform this check because IngeScapeEditorController is created asynchronously
+    bool hasPendingOpenFileRequest = false;
+    QUrl pendingOpenFileRequestUrl;
+    QString pendingOpenFileRequestFilePath;
+    if (IngescapeApplication::instance() != nullptr)
+    {
+        // Check if there is a pending "open file" request
+        // NB: We must perform this check because IngeScapeEditorController is created asynchronously
+        if (IngescapeApplication::instance()->hasPendingOpenFileRequest())
+        {
+            QPair<QUrl, QString> pendingRequest = IngescapeApplication::instance()->getPendingOpenFileRequest();
+            hasPendingOpenFileRequest = true;
+            pendingOpenFileRequestUrl = pendingRequest.first;
+            pendingOpenFileRequestFilePath = pendingRequest.second;
+
+            QString scheme = pendingOpenFileRequestUrl.scheme();
+            if (QString::compare(scheme, QStringLiteral("file"), Qt::CaseSensitive) == 0)
+            {
+                QFileInfo fileInfo(pendingRequest.second);
+                if (QString::compare(fileInfo.suffix(), QStringLiteral("igsplatform")) == 0)
+                {
+                    _currentPlatformFilePath = pendingOpenFileRequestFilePath;
+                    hasPendingOpenFileRequest = false;
+                }
+            }
+            // Else: scheme is not supported
+        }
+    }
+
     
     //
-    // Platform file
+    // Load our platform file if needed
     //
     if (!_currentPlatformFilePath.isEmpty())
     {
         if (_currentPlatformFilePath == SPECIAL_EMPTY_LAST_PLATFORM)
         {
             qWarning() << "There is no 'last' platform to load !";
-            _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
+            _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
         }
         else
         {
@@ -351,9 +392,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
             // from the last opened platform (saved in the settings)
             bool success = _loadPlatformFromFile(_currentPlatformFilePath);
 
-            if (!success) {
+            if (!success)
+            {
                 qCritical() << "The loading of the last platform failed !";
-                _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
+                _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
             }
             else
             {
@@ -363,11 +405,26 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
 
 
+
+    // Application
+    if (IngescapeApplication::instance() != nullptr)
+    {
+        // Check if there is a pending "open file" request (agent(s) definition or license file)
+        if (hasPendingOpenFileRequest)
+        {
+            _onOpenFileRequest(pendingOpenFileRequestUrl, pendingOpenFileRequestFilePath);
+        }
+
+        // Subscribe to our application
+        connect(IngescapeApplication::instance(), &IngescapeApplication::openFileRequest, this, &IngeScapeEditorController::_onOpenFileRequest);
+    }
+
+
+
     //
     // Start IngeScape
     //
     _startIngeScape(true);
-
 
 
     //
@@ -396,6 +453,11 @@ IngeScapeEditorController::~IngeScapeEditorController()
     disconnect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeEditorController::_onSystemWake);
     disconnect(OSUtils::instance(), &OSUtils::systemNetworkConfigurationsUpdated, this, &IngeScapeEditorController::_onSystemNetworkConfigurationsUpdated);
 
+    // Unsubscribe to our application
+    if (IngescapeApplication::instance() != nullptr)
+    {
+        disconnect(IngescapeApplication::instance(), &IngescapeApplication::openFileRequest, this, &IngeScapeEditorController::_onOpenFileRequest);
+    }
 
 
     // Delete all log stream viewers
@@ -558,32 +620,18 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
 {
     // "File Dialog" to get the files (paths) to open
     QString platformFilePath = QFileDialog::getOpenFileName(nullptr,
-                                                            "Open platform",
+                                                            tr("Open platform"),
                                                             _platformDirectoryPath,
-                                                            "JSON (*.json)");
+                                                            tr("IGS platform (*.igsplatform *.json)")
+                                                            );
 
     if (!platformFilePath.isEmpty())
     {
-        // First, clear the current platform by deleting all existing data
-        clearCurrentPlatform();
-
-        // Load the platform from JSON file
-        bool success = _loadPlatformFromFile(platformFilePath);
-
-        if (!success) {
-            qCritical() << "The loading of the selected platform failed !";
-        }
-        else {
-            sethasAPlatformBeenLoadedByUser(true);
-        }
-
-        // Force our global mapping to CONTROLLED
-        if (_modelManager != nullptr) {
-            _modelManager->setisMappingControlled(true);
-        }
+        _clearAndLoadPlatformFromFile(platformFilePath);
     }
-    else {
-        qDebug() << "Platform file path is empty, nothing to do";
+    else
+    {
+        qDebug() << Q_FUNC_INFO << ":Platform file path is empty, nothing to do";
     }
 }
 
@@ -909,6 +957,86 @@ QPointF IngeScapeEditorController::getGlobalMousePosition()
 }
 
 
+
+/**
+ * @brief Called when our application receives an "open file" request
+ * @param url
+ * @param filePath
+ */
+void IngeScapeEditorController::_onOpenFileRequest(QUrl url, QString filePath)
+{
+    qInfo() << Q_FUNC_INFO << "url=" << url << ", filePath=" << filePath;
+
+    QString scheme = url.scheme();
+
+    if (QString::compare(scheme, QStringLiteral("file"), Qt::CaseSensitive) == 0)
+    {
+        QFileInfo fileInfo(filePath);
+        if (fileInfo.exists())
+        {
+            if (QString::compare(fileInfo.suffix(), QStringLiteral("igsplatform")) == 0)
+            {
+                // Platform
+                _clearAndLoadPlatformFromFile(filePath);
+            }
+            else if (QString::compare(fileInfo.suffix(), QStringLiteral("igsdefinition")) == 0)
+            {
+                // Definition file
+
+                // We need to check if we have a valid license
+                if (
+                    (_licensesC != nullptr)
+                    &&
+                    (_licensesC->mergedLicense() != nullptr)
+                    &&
+                    _licensesC->mergedLicense()->editorLicenseValidity()
+                    )
+                {
+                    if (_modelManager != nullptr)
+                    {
+                        bool succeeded = _modelManager->importAgentOrAgentsListFromFilePath(filePath);
+                        if (!succeeded)
+                        {
+                            Q_EMIT openPopupFailedToLoadAgentDefinition();
+                        }
+                    }
+                }
+                else
+                {
+                    // Invalid license
+                    Q_EMIT openPopupLicense();
+                }
+            }
+            else if (QString::compare(fileInfo.suffix(), QStringLiteral("igslicense")) == 0)
+            {
+                // License file
+                if (_licensesC != nullptr)
+                {
+                    QList<QUrl> listOfUrls;
+                    listOfUrls.append(url);
+
+                    _licensesC->addLicenses(listOfUrls);
+                }
+            }
+            else
+            {
+                qInfo() << Q_FUNC_INFO <<": unknown file type " << filePath;
+            }
+        }
+        else
+        {
+            // NB: Should not happen IF we don't create fake QFileOpenEvent events
+            qWarning() << Q_FUNC_INFO << "warning: file" << filePath << "does not exist";
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: scheme" << scheme << "not supported";
+    }
+}
+
+
+
 /**
  * @brief Slot called when we have to open the "Log Stream" of a list of agents
  * @param models
@@ -1067,30 +1195,17 @@ void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFile
 {
     qInfo() << "Received the command 'Load Platform file from path'" << platformFilePath;
 
-    // First, clear the current platform by deleting all existing data
-    clearCurrentPlatform();
+    // Clear the current platform and load our new one
+    bool success = _clearAndLoadPlatformFromFile(platformFilePath);
 
-    // Load the platform from a JSON file
-    bool success = _loadPlatformFromFile(platformFilePath);
-
-    if (!success) {
-        qCritical() << "The loading of the asked platform failed !";
-    }
-    else {
-        sethasAPlatformBeenLoadedByUser(true);
-    }
-
-    // Force our global mapping to CONTROLLED
-    if (_modelManager != nullptr) {
-        _modelManager->setisMappingControlled(true);
-    }
-
+    // Send command to Ingescape-Expe if needed
     if ((_networkC != nullptr) && !_peerIdOfExpe.isEmpty())
     {
         // Reply by sending the command execution status to Expe
         _networkC->sendCommandExecutionStatusToExpe(_peerIdOfExpe, command_LoadPlatformFile, platformFilePath, static_cast<int>(success));
     }
-    else {
+    else
+    {
         qWarning() << "Peer Id of Expe is empty" << _peerIdOfExpe;
     }
 }
@@ -1370,7 +1485,7 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
 
     if (!platformFilePath.isEmpty())
     {
-        qInfo() << "Load the platform from JSON file" << platformFilePath;
+        qInfo() << "Load the platform from file" << platformFilePath;
 
         QFile jsonFile(platformFilePath);
         if (jsonFile.exists())
@@ -1389,7 +1504,8 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
 
                 // Load the platform from JSON
                 success = _loadPlatformFromJSON(jsonDocument);
-                if (success) {
+                if (success)
+                {
                     sethasAPlatformBeenLoadedByUser(true);
                 }
 
@@ -1406,8 +1522,52 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
             qWarning() << "There is no file" << platformFilePath;
         }
     }
+
     return success;
 }
+
+
+
+/**
+ * @brief Clear our current platform and load a new platform from a given file
+ * @param platformFilePath
+ * @return
+ */
+bool IngeScapeEditorController::_clearAndLoadPlatformFromFile(QString platformFilePath)
+{
+    bool succeeded = false;
+
+    if (!platformFilePath.isEmpty())
+    {
+        // First, clear the current platform by deleting all existing data
+        clearCurrentPlatform();
+
+        // Load the platform from JSON file
+        succeeded = _loadPlatformFromFile(platformFilePath);
+
+        if (!succeeded)
+        {
+            qCritical() << Q_FUNC_INFO << ": Failed to load platform" <<  platformFilePath;
+        }
+        else
+        {
+            sethasAPlatformBeenLoadedByUser(true);
+        }
+
+        // Force our global mapping to CONTROLLED
+        if (_modelManager != nullptr)
+        {
+            _modelManager->setisMappingControlled(true);
+        }
+    }
+    else
+    {
+        qDebug() << Q_FUNC_INFO << ": Platform file path is empty, nothing to do";
+    }
+
+    return succeeded;
+}
+
 
 
 /**

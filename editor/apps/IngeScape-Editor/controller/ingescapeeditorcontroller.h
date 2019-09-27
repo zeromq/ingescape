@@ -260,6 +260,17 @@ public Q_SLOTS:
 
 
 Q_SIGNALS:
+    /**
+     * @brief Triggered to open our license popup
+     */
+    void openPopupLicense();
+
+
+    /**
+     * @brief Triggered to open our "failed to load agent(s) definition" popup
+     */
+    void openPopupFailedToLoadAgentDefinition();
+
 
     /**
       * @brief Signal emitted to reset the mapping and timeline views
@@ -268,6 +279,13 @@ Q_SIGNALS:
 
 
 private Q_SLOTS:
+    /**
+     * @brief Called when our application receives an "open file" request
+     * @param url
+     * @param filePath
+     */
+    void _onOpenFileRequest(QUrl url, QString filePath);
+
 
     /**
      * @brief Slot called when we have to open the "Log Stream" of a list of agents
@@ -394,6 +412,14 @@ private:
      * @return
      */
     bool _loadPlatformFromFile(QString platformFilePath);
+
+
+    /**
+     * @brief Clear our current platform and load a new platform from a given file
+     * @param platformFilePath
+     * @return
+     */
+    bool _clearAndLoadPlatformFromFile(QString platformFilePath);
 
 
     /**

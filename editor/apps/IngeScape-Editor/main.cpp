@@ -41,7 +41,7 @@
 #include <settings/ingescapesettings.h>
 #include <misc/ingescapeutils.h>
 #include "platformsupport/osutils.h"
-
+#include "platformsupport/IngescapeApplication.h"
 
 
 
@@ -260,7 +260,7 @@ int main(int argc, char *argv[])
     // Configure our application
     //
     //------------------------------
-    QApplication app(argc, argv);
+    IngescapeApplication app(argc, argv);
     app.setOrganizationName("Ingenuity i/o");
     app.setOrganizationDomain("ingenuity.io");
     app.setApplicationName("IngeScape-Editor");
