@@ -22,7 +22,7 @@ import I2Quick 1.0
 import INGESCAPE 1.0
 
 
-Window {
+ApplicationWindow {
     id: rootItem
 
     title: "Getting started"
@@ -35,8 +35,6 @@ Window {
 
     minimumWidth: 1200
     minimumHeight: 880
-
-    flags: Qt.Dialog
 
     // Flag indicating if neither the Internet URL nor the locale URL could be loaded
     property bool loadingError: false
