@@ -885,18 +885,6 @@ bool IngeScapeEditorController::hasPlatformChanged()
 
         QJsonDocument currentPlatform = _getJsonOfCurrentPlatform();
 
-        QFile loaded("/tmp/loaded.json");
-        if (loaded.open(QFile::WriteOnly))
-        {
-            loaded.write(loadedPlatform.toJson(QJsonDocument::Indented));
-        }
-
-        QFile current("/tmp/current.json");
-        if (current.open(QFile::WriteOnly))
-        {
-            current.write(currentPlatform.toJson(QJsonDocument::Indented));
-        }
-
         qDebug() << "Platform has" << (loadedPlatform != currentPlatform ? "" : "NOT") << "changed";
 
         return loadedPlatform != currentPlatform;
