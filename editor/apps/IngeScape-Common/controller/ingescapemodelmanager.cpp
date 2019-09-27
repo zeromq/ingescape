@@ -665,9 +665,12 @@ void IngeScapeModelManager::simulateExitForEachLauncher()
 
 /**
  * @brief Delete agents OFF
+ * @return namesListOfAgentsON
  */
-void IngeScapeModelManager::deleteAgentsOFF()
+QStringList IngeScapeModelManager::deleteAgentsOFF()
 {   
+    QStringList namesListOfAgentsON = QStringList();
+
     for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
     {
         if (agentsGroupedByName != nullptr)
@@ -675,6 +678,8 @@ void IngeScapeModelManager::deleteAgentsOFF()
             // ON
             if (agentsGroupedByName->isON())
             {
+                namesListOfAgentsON.append(agentsGroupedByName->name());
+
                 // Delete agents OFF
                 agentsGroupedByName->deleteAgentsOFF();
             }
@@ -686,6 +691,17 @@ void IngeScapeModelManager::deleteAgentsOFF()
             }
         }
     }
+
+    return namesListOfAgentsON;
+}
+
+
+/**
+ * @brief Delete all published values
+ */
+void IngeScapeModelManager::deleteAllPublishedValues()
+{
+    _publishedValues.deleteAllItems();
 }
 
 

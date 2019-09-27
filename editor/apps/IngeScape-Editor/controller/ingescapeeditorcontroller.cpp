@@ -655,11 +655,20 @@ void IngeScapeEditorController::clearCurrentPlatform()
 
     if (_modelManager != nullptr)
     {
+        // Delete all published values
+        _modelManager->deleteAllPublishedValues();
+
         // Delete all actions
         _modelManager->deleteAllActions();
 
         // Delete agents OFF
-        _modelManager->deleteAgentsOFF();
+        QStringList namesListOfAgentsON = _modelManager->deleteAgentsOFF();
+
+        if (_valuesHistoryC != nullptr)
+        {
+            // Set both list of agent names with agents ON
+            _valuesHistoryC->setAgentNamesList(namesListOfAgentsON);
+        }
     }
 
     // Notify QML to reset view

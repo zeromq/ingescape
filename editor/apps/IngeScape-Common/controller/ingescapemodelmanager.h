@@ -201,8 +201,15 @@ public:
 
     /**
      * @brief Delete agents OFF
+     * @return namesListOfAgentsON
      */
-    void deleteAgentsOFF();
+    QStringList deleteAgentsOFF();
+
+
+    /**
+     * @brief Delete all published values
+     */
+    void deleteAllPublishedValues();
 
 
 Q_SIGNALS:

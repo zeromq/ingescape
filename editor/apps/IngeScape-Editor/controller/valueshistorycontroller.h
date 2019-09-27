@@ -100,6 +100,13 @@ public:
     Q_INVOKABLE bool areShownValuesOfAgent(QString agentName);
 
 
+    /**
+     * @brief Set both list of agent names
+     * @param agentNamesList
+     */
+    void setAgentNamesList(QStringList agentNamesList);
+
+
 Q_SIGNALS:
 
 
