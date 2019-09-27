@@ -1645,7 +1645,7 @@ bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevice
         }
     }
 
-    if (!success)
+    if (!success && !_networkDevice.isEmpty())
     {
         seterrorMessageWhenConnectionFailed(tr("Failed to connect on network device %1 with port %2").arg(_networkDevice, QString::number(_port)));
     }
