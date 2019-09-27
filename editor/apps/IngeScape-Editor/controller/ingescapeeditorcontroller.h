@@ -488,7 +488,7 @@ private:
     // Path to the default file containing the last platform
     QString _platformDefaultFilePath;
 
-    // Path to the currently opened platform file (*.json)
+    // Path to the currently opened platform file (*.igsplatform)
     QString _currentPlatformFilePath;
 
     // States of our mapping when our network was stopped

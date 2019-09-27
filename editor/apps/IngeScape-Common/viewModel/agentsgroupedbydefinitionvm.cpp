@@ -184,9 +184,10 @@ void AgentsGroupedByDefinitionVM::loadDefinition()
 {
     // "File Dialog" to get the file path to open
     QString definitionFilePath = QFileDialog::getOpenFileName(nullptr,
-                                                              "Open definition",
+                                                              tr("Open definition"),
                                                               "",
-                                                              "JSON (*.json)");
+                                                              tr("Definition (*.igsdefinition)")
+                                                              );
 
     if (!definitionFilePath.isEmpty()) {
         Q_EMIT loadAgentDefinitionFromPath(_peerIdsList, definitionFilePath);
@@ -202,9 +203,10 @@ void AgentsGroupedByDefinitionVM::loadMapping()
 {
     // "File Dialog" to get the file path to open
     QString mappingFilePath = QFileDialog::getOpenFileName(nullptr,
-                                                           "Open mapping",
+                                                           tr("Open mapping"),
                                                            "",
-                                                           "JSON (*.json)");
+                                                           tr("Mapping (*.json)")
+                                                           );
 
     if (!mappingFilePath.isEmpty()) {
         Q_EMIT loadAgentMappingFromPath(_peerIdsList, mappingFilePath);
@@ -217,16 +219,17 @@ void AgentsGroupedByDefinitionVM::loadMapping()
  */
 void AgentsGroupedByDefinitionVM::downloadDefinition()
 {
-    QString defaultDefinitionName = QString("Definition_of_%1.json").arg(_name);
+    QString defaultDefinitionName = QString("Definition_of_%1.igsdefinition").arg(_name);
     if (_definition != nullptr) {
-        defaultDefinitionName = QString("%1.json").arg(_definition->name());
+        defaultDefinitionName = QString("%1.igsdefinition").arg(_definition->name());
     }
 
     // "File Dialog" to get the file path to save
     QString definitionFilePath = QFileDialog::getSaveFileName(nullptr,
-                                                              "Save definition",
+                                                              tr("Save definition"),
                                                               defaultDefinitionName,
-                                                              "JSON (*.json)");
+                                                              tr("Definition (*.igsdefinition)")
+                                                              );
 
     if (!definitionFilePath.isEmpty() && (_definition != nullptr)) {
         Q_EMIT downloadAgentDefinitionToPath(_definition, definitionFilePath);
@@ -250,9 +253,10 @@ void AgentsGroupedByDefinitionVM::downloadMapping()
 
     // "File Dialog" to get the file path to save
     QString mappingFilePath = QFileDialog::getSaveFileName(nullptr,
-                                                           "Save mapping",
+                                                           tr("Save mapping"),
                                                            defaultMappingName,
-                                                           "JSON (*.json)");
+                                                           tr("Mapping (*.json)")
+                                                           );
 
     if (!mappingFilePath.isEmpty() && !_models.isEmpty())
     {

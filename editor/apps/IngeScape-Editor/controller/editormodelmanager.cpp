@@ -161,9 +161,10 @@ void EditorModelManager::exportAgentsListToSelectedFile()
 {
     // "File Dialog" to get the file (path) to save
     QString agentsListFilePath = QFileDialog::getSaveFileName(nullptr,
-                                                              "Save agents",
+                                                              tr("Save agents"),
                                                               _rootDirectoryPath,
-                                                              "JSON (*.json)");
+                                                              tr("List of agents (*.json)")
+                                                              );
 
     if (!agentsListFilePath.isEmpty())
     {

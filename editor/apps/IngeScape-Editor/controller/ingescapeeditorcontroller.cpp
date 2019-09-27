@@ -116,8 +116,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     {
         _platformDirectoryPath = platformPath;
 
-        // Init the path to the JSON file to load the example platform
-        _platformDefaultFilePath = QString("%1%2.json").arg(_platformDirectoryPath, EXAMPLE_PLATFORM_NAME);
+        // Init the path to the platform file to load the example file
+        _platformDefaultFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, EXAMPLE_PLATFORM_NAME);
     }
 
 
@@ -622,7 +622,7 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
     QString platformFilePath = QFileDialog::getOpenFileName(nullptr,
                                                             tr("Open platform"),
                                                             _platformDirectoryPath,
-                                                            tr("IGS platform (*.igsplatform *.json)")
+                                                            tr("Platform (*.igsplatform)")
                                                             );
 
     if (!platformFilePath.isEmpty())
@@ -643,9 +643,10 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
 void IngeScapeEditorController::selectFileToSavePlatform()
 {
         QString platformFilePath = QFileDialog::getSaveFileName(nullptr,
-                                                                "Save platform",
+                                                                tr("Save platform"),
                                                                 _currentPlatformFilePath,
-                                                                "JSON (*.json)");
+                                                                tr("Platform (*.igsplatform)")
+                                                                );
 
         if (!platformFilePath.isEmpty()) {
             // Save the platform to JSON file
@@ -682,7 +683,7 @@ void IngeScapeEditorController::clearCurrentPlatform()
 
     // Update the current platform name
     setcurrentPlatformName(NEW_PLATFORM_NAME);
-    _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
+    _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
     sethasAPlatformBeenLoadedByUser(false);
 
     // Clear the current mapping
@@ -1168,7 +1169,7 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
                 setcurrentPlatformName(recordName);
 
                 //_currentPlatformFilePath = QDir(_platformDirectoryPath).absoluteFilePath(recordName);
-                _currentPlatformFilePath = QString("%1%2.json").arg(_platformDirectoryPath, recordName);
+                _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, recordName);
 
                 sethasAPlatformBeenLoadedByUser(true);
             }

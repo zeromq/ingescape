@@ -388,7 +388,7 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
     QString filePath = QFileDialog::getOpenFileName(nullptr,
                                                     tr("Open an agent(s) definition"),
                                                     _rootDirectoryPath,
-                                                    tr("Agent(s) definition (*igsdefinition *.json)")
+                                                    tr("Definition (*.igsdefinition)")
                                                     );
 
     if (!filePath.isEmpty())
