@@ -1060,7 +1060,7 @@ CallM* JsonHelper::_createModelOfCall(const QJsonObject& jsonObject)
     QJsonValue jsonArguments = jsonObject.value("arguments");
     QJsonValue jsonReply = jsonObject.value("reply");
 
-    QHash<QString, AgentIOPValueTypes::Value> argumentsHash;
+    QList<QPair<QString, AgentIOPValueTypes::Value>> argumentsHash;
     if (jsonArguments.isArray())
     {
         for (QJsonValue jsonArgument : jsonArguments.toArray())
@@ -1073,7 +1073,7 @@ CallM* JsonHelper::_createModelOfCall(const QJsonObject& jsonObject)
 
                 if (argumentName.isString() && argumentType.isString())
                 {
-                    argumentsHash.insert(argumentName.toString(), static_cast<AgentIOPValueTypes::Value>(AgentIOPValueTypes::staticEnumFromKey(argumentType.toString())));
+                    argumentsHash.append({ argumentName.toString(), static_cast<AgentIOPValueTypes::Value>(AgentIOPValueTypes::staticEnumFromKey(argumentType.toString())) });
                 }
             }
         }
@@ -1179,12 +1179,12 @@ QJsonObject JsonHelper::_getJsonFromCall(CallM* call)
         jsonCall.insert("description", call->description());
 
         QJsonArray argumentsArray;
-        const QHash<QString, AgentIOPValueTypes::Value>& arguments = call->argumentsHash();
-        for(auto argIt = arguments.begin() ; argIt != arguments.end() ; ++argIt)
+        const QList<QPair<QString, AgentIOPValueTypes::Value>>& arguments = call->argumentsHash();
+        for (const QPair<QString, AgentIOPValueTypes::Value>& argumentPair : arguments)
         {
             QJsonObject argumentObject;
-            argumentObject.insert("name", argIt.key());
-            argumentObject.insert("type", AgentIOPValueTypes::staticEnumToString(argIt.value()));
+            argumentObject.insert("name", argumentPair.first);
+            argumentObject.insert("type", AgentIOPValueTypes::staticEnumToString(argumentPair.second));
             argumentsArray.append(argumentObject);
         }
         jsonCall.insert("arguments", argumentsArray);

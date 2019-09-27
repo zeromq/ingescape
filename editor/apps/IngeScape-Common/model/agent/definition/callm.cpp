@@ -24,7 +24,7 @@
  */
 CallM::CallM(const QString& name
              , const QString& description
-             , const QHash<QString, AgentIOPValueTypes::Value>& arguments
+             , const QList<QPair<QString, AgentIOPValueTypes::Value>>& arguments
              , CallM* reply
              , QObject* parent)
     : QObject(parent)
@@ -37,14 +37,12 @@ CallM::CallM(const QString& name
 
     setreply(reply);
 
-    _argumentNames = arguments.keys();
     _arguments = new QQmlPropertyMap();
-    if (_arguments != nullptr)
+    for (const QPair<QString, AgentIOPValueTypes::Value>& argumentPair : arguments)
     {
-        for(auto argIt = arguments.begin() ; argIt != arguments.end() ; ++argIt)
-        {
-            _arguments->setProperty(argIt.key().toStdString().c_str(), argIt.value());
-        }
+        _argumentNames.append(argumentPair.first);
+        _argumentsPairList.append(argumentPair);
+        _arguments->setProperty(argumentPair.first.toStdString().c_str(), argumentPair.second);
     }
 }
 
@@ -67,21 +65,17 @@ CallM::~CallM()
         delete temp;
     }
 
+    _argumentsPairList.clear();
     _argumentNames.clear();
 }
 
 /**
- * @brief Return the arguments as a QHash
+ * @brief Return the arguments as a QPair list
  * @return
  */
-QHash<QString, AgentIOPValueTypes::Value> CallM::argumentsHash() const
+QList<QPair<QString, AgentIOPValueTypes::Value> > CallM::argumentsHash() const
 {
-    QHash<QString, AgentIOPValueTypes::Value> arguments;
-    for(QString argName : _argumentNames)
-    {
-        arguments.insert(argName, static_cast<AgentIOPValueTypes::Value>(_arguments->value(argName).toInt()));
-    }
-    return arguments;
+    return _argumentsPairList;
 }
 
 /**
