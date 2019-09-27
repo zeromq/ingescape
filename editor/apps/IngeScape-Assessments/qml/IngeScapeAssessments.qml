@@ -73,14 +73,6 @@ Item {
 
 
     //
-    // Function allowing to open the netowrk (configuration) popup
-    //
-    function openNetworkPopup() {
-        networkPopup.open();
-    }
-
-
-    //
     // Function allowing to open the license (configuration) popup
     //
     function openLicensePopup() {
@@ -91,10 +83,34 @@ Item {
     //--------------------------------------------------------
     //
     //
-    // Slots
+    // Behaviors
     //
     //
     //--------------------------------------------------------
+
+    // When the QML is loaded...
+    Component.onCompleted: {
+        // FIXME Several popup may appear at startup depending on the current platform configuration. Need to prioritize them and maybe show them sequentialy, not on top of each other.
+
+        // ...we check the value of the error message when a connection attempt fails
+        if (IngeScapeAssessmentsC.errorMessageWhenConnectionFailed !== "")
+        {
+            //console.error("On Completed: Error Message = " + IngeScapeAssessmentsC.errorMessageWhenConnectionFailed);
+            networkConfigurationInfo.open();
+        }
+
+        /*// ...we check the value of the flag "is Valid License"
+        if (IngeScapeAssessmentsC.licensesC && IngeScapeAssessmentsC.licensesC.mergedLicense && !IngeScapeAssessmentsC.licensesC.mergedLicense.editorLicenseValidity)
+        {
+            openLicensePopup();
+        }
+
+        // ...we check if we must open the getting started window
+        if (IngeScapeAssessmentsC.gettingStartedShowAtStartup)
+        {
+            openGettingStarted();
+        }*/
+    }
 
     Connections {
         target: IngeScapeAssessmentsC.experimentationC
@@ -125,13 +141,13 @@ Item {
             {
                 console.log("QML: on Current Task Instance changed: " + IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentTaskInstance.name);
 
-                // Add the "Task Instance View" to the stack
+                // Add the "Task Instance view" to the stack
                 stackview.push(componentTaskInstanceView);
             }
             else {
                 console.log("QML: on Current Task Instance changed to NULL");
 
-                // Remove the "Task Instance iew" from the stack
+                // Remove the "Task Instance view" from the stack
                 stackview.pop();
             }
         }
@@ -152,6 +168,51 @@ Item {
         anchors.fill: parent
 
         initialItem: componentExperimentationsListView
+    }
+
+
+    NetworkConnectionInformationItem {
+        id: networkConfigurationInfo
+
+        anchors {
+            top: parent.top
+            topMargin: -1
+            right: parent.right
+            rightMargin: -1
+        }
+
+        isOnline: IngeScapeAssessmentsC.networkC && IngeScapeAssessmentsC.networkC.isOnline
+
+        currentNetworkDevice: IngeScapeAssessmentsC.networkDevice
+        currentPort: IngeScapeAssessmentsC.port
+
+        listOfNetworkDevices: IngeScapeAssessmentsC.networkC ? IngeScapeAssessmentsC.networkC.availableNetworkDevices : null
+
+        errorMessage: IngeScapeAssessmentsC.errorMessageWhenConnectionFailed
+
+        onWillOpenEditionMode: {
+            // Update our list of available network devices
+            if (IngeScapeAssessmentsC.networkC)
+            {
+                IngeScapeAssessmentsC.networkC.updateAvailableNetworkDevices();
+            }
+        }
+
+        onChangeNetworkSettings: {
+            if (IngeScapeAssessmentsC.networkC && IngeScapeAssessmentsC.networkC.isAvailableNetworkDevice(networkDevice))
+            {
+                // Re-Start the Network
+                var success = IngeScapeAssessmentsC.restartNetwork(port, networkDevice, clearPlatform);
+                if (success)
+                {
+                    close();
+                }
+                else
+                {
+                    console.error("Network cannot be (re)started on device " + networkDevice + " and port " + port);
+                }
+            }
+        }
     }
 
 
@@ -230,18 +291,6 @@ Item {
 
 
     //
-    // Network (Configuration) Popup
-    //
-    NetworkPopup {
-        id: networkPopup
-
-        anchors.centerIn: parent
-
-        controller: IngeScapeAssessmentsC
-    }
-
-
-    //
     // License (Configuration) Popup
     //
     LicensePopup {
@@ -249,6 +298,6 @@ Item {
 
         anchors.centerIn: parent
 
-        //licenseController: IngeScapeEditorC.licensesC
+        //licenseController: IngeScapeAssessmentsC.licensesC
     }
 }

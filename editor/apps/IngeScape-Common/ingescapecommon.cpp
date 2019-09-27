@@ -193,7 +193,6 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     // - Popups
     qmlRegisterType(QUrl("qrc:/qml/ConfirmationPopup.qml"), "INGESCAPE", 1, 0, "ConfirmationPopup");
     qmlRegisterType(QUrl("qrc:/qml/LicensePopup.qml"), "INGESCAPE", 1, 0, "LicensePopup");
-    qmlRegisterType(QUrl("qrc:/qml/NetworkPopup.qml"), "INGESCAPE", 1, 0, "NetworkPopup");
     qmlRegisterType(QUrl("qrc:/qml/SystemInformationPopup.qml"), "INGESCAPE", 1, 0, "SystemInformationPopup");
 
     // - Text area with timer to delay processing of edited text while the user is editing it
