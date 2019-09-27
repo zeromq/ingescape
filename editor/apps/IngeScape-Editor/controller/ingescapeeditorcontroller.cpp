@@ -876,6 +876,18 @@ bool IngeScapeEditorController::hasPlatformChanged()
 
         QJsonDocument currentPlatform = _getJsonOfCurrentPlatform();
 
+        QFile loaded("/tmp/loaded.json");
+        if (loaded.open(QFile::WriteOnly))
+        {
+            loaded.write(loadedPlatform.toJson(QJsonDocument::Indented));
+        }
+
+        QFile current("/tmp/current.json");
+        if (current.open(QFile::WriteOnly))
+        {
+            current.write(currentPlatform.toJson(QJsonDocument::Indented));
+        }
+
         qDebug() << "Platform has" << (loadedPlatform != currentPlatform ? "" : "NOT") << "changed";
 
         return loadedPlatform != currentPlatform;
@@ -1513,10 +1525,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
         {
             // Export the agents into JSON
             QJsonArray arrayOfAgents = _modelManager->exportAgentsToJSON();
-
-            if (!arrayOfAgents.isEmpty()) {
-                platformJsonObject.insert("agents", arrayOfAgents);
-            }
+            platformJsonObject.insert("agents", arrayOfAgents);
         }
 
         // Save the mapping
@@ -1524,10 +1533,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
         {
             // Export the global mapping (of agents) into JSON
             QJsonArray arrayOfAgentsInMapping = _agentsMappingC->exportGlobalMappingToJSON();
-
-            if (!arrayOfAgentsInMapping.isEmpty()) {
-                platformJsonObject.insert("mapping", arrayOfAgentsInMapping);
-            }
+            platformJsonObject.insert("mapping", arrayOfAgentsInMapping);
         }
 
         // Save the scenario
