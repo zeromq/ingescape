@@ -53,6 +53,18 @@ I2PopupBase {
     //--------------------------------
     //
     //
+    // Signals
+    //
+    //
+    //--------------------------------
+
+    // Close Tasks view
+    //signal closeSubjectsView();
+
+
+    //--------------------------------
+    //
+    //
     // Slots
     //
     //
@@ -105,7 +117,12 @@ I2PopupBase {
         }
 
         onClicked: {
-            close()
+            console.log("QML: close Subjects view");
+
+            // Emit the signal "closeSubjectsView"
+            //rootItem.closeSubjectsView();
+
+            close();
         }
     }
 

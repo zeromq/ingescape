@@ -58,6 +58,9 @@ Item {
     // Avoid opening the window at startup is none of the internet or the local page if accessible.
     property bool requestGettingStarted: false
 
+    property bool gettingStartedOpen: false
+    property GettingStartedWindow gettingStartedWindow: null
+
 
 
     //--------------------------------------------------------
@@ -104,15 +107,36 @@ Item {
         licenseEventPopup.open();
     }
 
-
     // Function allowing to open the Getting Started popup
     function openGettingStarted(forceOpen) {
         // Default forceOpen parameter value
         if (forceOpen === undefined) forceOpen = false
-
         rootItem.requestGettingStarted = forceOpen;
 
-        gettingStartedWindow.resetInternetUrl();
+        if (gettingStartedOpen && gettingStartedWindow)
+        {
+            gettingStartedWindow.raise();
+            gettingStartedWindow.active = true;
+        }
+        else
+        {
+            // NOTE creating the window this way is required to have it as a separate window application
+            var component = Qt.createComponent("GettingStartedWindow.qml");
+            var window = component.createObject("rootItem");
+
+            gettingStartedWindow = window;
+            gettingStartedWindow.resetInternetUrl();
+            gettingStartedWindow.show()
+            gettingStartedOpen = true;
+        }
+    }
+
+    // Function to close the getting started window
+    function closeGettingStarted() {
+        if (gettingStartedWindow)
+        {
+            gettingStartedWindow.visible = false;
+        }
     }
 
 
@@ -176,6 +200,15 @@ Item {
         onLicenseLimitationReached: {
             console.log("QML (IngeScape Editor): on License Limitation Reached");
             openLicenseEventPopup();
+        }
+    }
+
+
+    Connections {
+        target: gettingStartedWindow
+
+        onVisibleChanged: {
+            rootItem.gettingStartedOpen = gettingStartedWindow.visible;
         }
     }
 
@@ -620,22 +653,6 @@ Item {
         anchors.centerIn: parent
 
         licenseController: IngeScapeEditorC.licensesC
-    }
-
-
-    //
-    // Getting started window
-    //
-    GettingStartedWindow {
-        id: gettingStartedWindow
-
-        onLoadingComplete: {
-            if ((success && IngeScapeEditorC.gettingStartedShowAtStartup)
-                    || rootItem.requestGettingStarted)
-            {
-                gettingStartedWindow.visible = true
-            }
-        }
     }
 
 

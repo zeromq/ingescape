@@ -24,10 +24,8 @@ import INGESCAPE 1.0
 import "../popup" as Popup
 
 
-Item {
+I2PopupBase {
     id: rootItem
-
-    //anchors.fill: parent
 
 
     //--------------------------------------------------------
@@ -52,14 +50,14 @@ Item {
     //--------------------------------
 
     // Close Export view
-    signal closeExportView();
+    //signal closeExportView();
 
 
 
     //--------------------------------
     //
     //
-    // Functions
+    // Slots
     //
     //
     //--------------------------------
@@ -76,75 +74,77 @@ Item {
 
     Rectangle {
         id: background
-
         anchors.fill: parent
-
-        color: IngeScapeTheme.veryDarkGreyColor
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
-        }
+        color: IngeScapeTheme.veryLightGreyColor
     }
 
     Button {
         id: btnClose
 
         anchors {
-            right: parent.right
             top: parent.top
+            topMargin: 21
+            right: parent.right
+            rightMargin: 21
         }
-        height: 30
 
-        text: "X"
+        height: 18
+        width: 18
+
+        style: IngeScapeAssessmentsSvgButtonStyle {
+            releasedID: "close"
+        }
 
         onClicked: {
             console.log("QML: close Export view");
 
             // Emit the signal "Close Export View"
-            rootItem.closeExportView();
+            //rootItem.closeExportView();
+
+            close();
         }
     }
 
-    Row {
-        id: header
+    Text {
+        id: titleExport
 
         anchors {
             top: parent.top
-            topMargin: 10
-            horizontalCenter: parent.horizontalCenter
+            topMargin: 25
+            left: parent.left
+            leftMargin: 25
+        }
+        //height: parent.height
+        //verticalAlignment: Text.AlignVCenter
+
+        text: qsTr("EXPORT")
+
+        color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+        font {
+            family: IngeScapeTheme.labelFontFamily
+            weight: Font.Black
+            pixelSize: 24
+        }
+    }
+
+    Button {
+        id: btnExportCurrentExpe
+
+        anchors {
+            top: titleExport.bottom
+            topMargin: 15
+            left: parent.left
+            leftMargin: 25
         }
         height: 30
 
-        spacing: 20
+        text: "Export '" + (rootItem.experimentation ? rootItem.experimentation.name : "") + "'"
 
-        Text {
-            id: title
+        onClicked: {
+            console.log("QML: Export experimentation " + rootItem.experimentation.name);
 
-            text: "Export"
-
-            height: parent.height
-            verticalAlignment: Text.AlignVCenter
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 20
-            }
-        }
-
-
-        Button {
-            text: rootItem.experimentation ? rootItem.experimentation.name : "..."
-
-            height: parent.height
-
-            onClicked: {
-                console.log("QML: Export experimentation " + rootItem.experimentation.name);
-
-                if (rootItem.controller) {
-                    rootItem.controller.exportExperimentation();
-                }
+            if (rootItem.controller) {
+                rootItem.controller.exportExperimentation();
             }
         }
     }

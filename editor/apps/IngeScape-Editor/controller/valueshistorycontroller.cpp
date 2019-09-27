@@ -119,6 +119,23 @@ bool ValuesHistoryController::areShownValuesOfAgent(QString agentName)
 
 
 /**
+ * @brief Set both list of agent names
+ * @param agentNamesList
+ */
+void ValuesHistoryController::setAgentNamesList(QStringList agentNamesList)
+{
+    // Use the setter to emit a signal for QML binding
+    setallAgentNamesList(agentNamesList);
+
+    // Use the setter to emit a signal for QML binding
+    setselectedAgentNamesList(agentNamesList);
+
+    // Update the filters on the list of values
+    _updateFilters();
+}
+
+
+/**
  * @brief Slot called when a new view model of agents grouped by name has been created
  * @param agentsGroupedByName
  */

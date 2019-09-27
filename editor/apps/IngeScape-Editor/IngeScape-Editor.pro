@@ -18,9 +18,8 @@ else:VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
 
 DEFINES += "VERSION=\\\"$$VERSION\\\""
 
-#disable the timeout in the library
-#(editor will stay connected even with invalid or expired license)
-DEFINES += DISABLE_LICENSE_TIMEOUT
+# Enable function names and line numbers even for release builds
+DEFINES += QT_MESSAGELOGCONTEXT
 
 # Qt modules used by our application and/or its dependencies
 QT += qml quick quick-private svg xml concurrent sql core-private gui-private webview

@@ -615,6 +615,10 @@ ApplicationWindow {
     // When user clicks on window close button
     onClosing: {
         console.info("QML: Close Window");
+
+        // Try to close the getting started window
+        applicationLoader.item.closeGettingStarted();
+
         if (mainWindow.isEditorLicenseValid)
         {
             if (!mainWindow.forceClose && IngeScapeEditorC && IngeScapeEditorC.hasPlatformChanged())

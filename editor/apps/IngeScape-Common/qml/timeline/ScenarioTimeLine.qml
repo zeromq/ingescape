@@ -1283,15 +1283,62 @@ Item {
         }
     }
 
-    // Play Button
+
+    // Buttons and time
     Item {
         anchors {
-            left : parent.left
-            right : columnHeadersArea.left
-            top : parent.top
+            left: parent.left
+            right: columnHeadersArea.left
+            top: parent.top
             topMargin: 20
         }
 
+
+        /*// Start/Stop Record button
+        Button {
+            id: startOrStopRecordButton
+
+            anchors {
+                top: parent.top
+                topMargin: -(20 + startOrStopRecordButton.height)
+                horizontalCenter: parent.horizontalCenter
+            }
+
+            //enabled: (controller.currentReplay === null)
+            //opacity: enabled ? 1.0 : 0.4
+
+            style: I2SvgToggleButtonStyle {
+                fileCache: IngeScapeTheme.svgFileIngeScape
+
+                toggleCheckedReleasedID: "record-stop"
+                toggleCheckedPressedID: toggleCheckedReleasedID + "-pressed"
+                toggleUncheckedReleasedID: "record-start"
+                toggleUncheckedPressedID: toggleUncheckedReleasedID + "-pressed"
+
+                // No disabled states
+                toggleCheckedDisabledID: toggleCheckedPressedID
+                toggleUncheckedDisabledID: toggleUncheckedPressedID
+
+                labelMargin: 0
+            }
+
+            onClicked: {
+                if (scenarioController) {
+                    console.log("QML: Start or Stop to Record");
+
+                    //scenarioController.startOrStopToRecord();
+                }
+            }
+
+            //Binding {
+            //    target: startOrStopRecordButton
+            //    property: "checked"
+            //    value: scenarioController ? scenarioController.isRecording : false
+            //}
+        }*/
+
+
+        // Play Button
         Button {
             id: playScenarioBtn
 
@@ -1322,9 +1369,11 @@ Item {
                     if (!rootItem.isEditorLicenseValid) {
                         checked = false
                         rootItem.unlicensedAction();
-                    } else if (checked) {
+                    }
+                    else if (checked) {
                         scenarioController.playOrResumeTimeLine();
-                    } else {
+                    }
+                    else {
                         scenarioController.pauseTimeLine();
                     }
                 }

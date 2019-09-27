@@ -47,7 +47,7 @@ public:
      * @param reply
      * @param parent
      */
-    explicit CallM(const QString& name, const QString& description, const QHash<QString, AgentIOPValueTypes::Value>& arguments, CallM* reply, QObject *parent = nullptr);
+    explicit CallM(const QString& name, const QString& description, const QList<QPair<QString, AgentIOPValueTypes::Value>>& arguments, CallM* reply, QObject *parent = nullptr);
 
     /**
      * @brief Destructor
@@ -55,10 +55,16 @@ public:
     virtual ~CallM();
 
     /**
-     * @brief Return the arguments as a QHash
+     * @brief Return the arguments as a QPair list
      * @return
      */
-    QHash<QString, AgentIOPValueTypes::Value> argumentsHash() const;
+    QList<QPair<QString, AgentIOPValueTypes::Value>> argumentsHash() const;
+
+private:
+    /**
+     * @brief Pair list of arguments to keep them in order
+     */
+    QList<QPair<QString, AgentIOPValueTypes::Value>> _argumentsPairList;
 };
 
 /**

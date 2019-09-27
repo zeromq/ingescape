@@ -703,11 +703,20 @@ void IngeScapeEditorController::clearCurrentPlatform()
 
     if (_modelManager != nullptr)
     {
+        // Delete all published values
+        _modelManager->deleteAllPublishedValues();
+
         // Delete all actions
         _modelManager->deleteAllActions();
 
         // Delete agents OFF
-        _modelManager->deleteAgentsOFF();
+        QStringList namesListOfAgentsON = _modelManager->deleteAgentsOFF();
+
+        if (_valuesHistoryC != nullptr)
+        {
+            // Set both list of agent names with agents ON
+            _valuesHistoryC->setAgentNamesList(namesListOfAgentsON);
+        }
     }
 
     // Notify QML to reset view
@@ -1673,10 +1682,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
         {
             // Export the agents into JSON
             QJsonArray arrayOfAgents = _modelManager->exportAgentsToJSON();
-
-            if (!arrayOfAgents.isEmpty()) {
-                platformJsonObject.insert("agents", arrayOfAgents);
-            }
+            platformJsonObject.insert("agents", arrayOfAgents);
         }
 
         // Save the mapping
@@ -1684,10 +1690,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
         {
             // Export the global mapping (of agents) into JSON
             QJsonArray arrayOfAgentsInMapping = _agentsMappingC->exportGlobalMappingToJSON();
-
-            if (!arrayOfAgentsInMapping.isEmpty()) {
-                platformJsonObject.insert("mapping", arrayOfAgentsInMapping);
-            }
+            platformJsonObject.insert("mapping", arrayOfAgentsInMapping);
         }
 
         // Save the scenario
@@ -1805,7 +1808,7 @@ bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevice
         }
     }
 
-    if (!success)
+    if (!success && !_networkDevice.isEmpty())
     {
         seterrorMessageWhenConnectionFailed(tr("Failed to connect on network device %1 with port %2").arg(_networkDevice, QString::number(_port)));
     }
