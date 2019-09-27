@@ -13,6 +13,9 @@ stages:
   - delivery-lib
   - delivery-apps
   - delivery-binding
+  - delivery-lib-stable
+  - delivery-apps-stable
+  - delivery-binding-stable
 
 # Define ingescape library files
 .build-lib-files: &build-lib-files
@@ -27,6 +30,7 @@ stages:
       - CMakeLists.txt
     refs:
       - master
+      - stable
 
 # Define csharp binding files
 .build-csharp-files: &build-csharp-files
@@ -42,6 +46,7 @@ stages:
       - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/**/*
     refs:
       - master
+      - stable
 
 # Define ingescape editor files
 .build-editor-files: &build-editor-files
@@ -58,6 +63,7 @@ stages:
       - editor/apps/IngeScape-Editor/**/*
     refs:
       - master
+      - stable
 
 # Define ingescape assessments files
 .build-assessments-files: &build-assessments-files
@@ -74,6 +80,7 @@ stages:
       - editor/apps/IngeScape-Assessments/**/*
     refs:
       - master
+      - stable
 
 # Define ingescape expe files
 .build-expe-files: &build-expe-files
@@ -90,6 +97,7 @@ stages:
       - editor/apps/IngeScape-Expe/**/*
     refs:
       - master
+      - stable
 
 # Create ingescape library for linux (x86_64)
 lib-linux-release-x64:
@@ -1317,6 +1325,244 @@ binding-delivery-all:
     - ls bindings/CSharp/win64/ | grep -v 'latest_delivery' > bindings/CSharp/win64/latest_delivery
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive bindings ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - binding-csharp-installer-windows-x64
+    - binding-csharp-installer-windows-x86
+
+# Deliver installers so they can be downloaded from the website
+lib-delivery-all-stable:
+  only:
+    refs:
+      - stable
+  stage: delivery-lib-stable
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Deliver Windows x86"
+    - mkdir --parents library/win32
+    - mv build/ReleaseX86/ingescape-*
+         library/win32/
+    - ls library/win32/ | grep -v 'latest_delivery' > library/win32/latest_delivery
+    - echo "Deliver Windows x64"
+    - mkdir --parents library/win64
+    - mv build/ReleaseX64/ingescape-*
+         library/win64/
+    - ls library/win64/ | grep -v 'latest_delivery' > library/win64/latest_delivery
+    - echo "Deliver MacOS x64"
+    - mkdir --parents library/macos
+    - mv macos_x64/ingescape-*
+         macos_x64/installIngescapeAndDependencies.sh
+         library/macos/
+    - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
+    - echo "Deliver generic Linux x64"
+    - mkdir --parents library/linux_x64/
+    - mv linux_x64/ingescape-*
+         linux_x64/installIngescapeAndDependencies.sh
+         library/linux_x64/
+    - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
+    - echo "Deliver Debian 9 x64"
+    - mkdir --parents library/debian9/
+    - mv debian9_x64/ingescape-*
+         debian9_x64/installIngescapeAndDependencies.sh
+         library/debian9/
+    - ls library/debian9/ | grep -v 'latest_delivery' > library/debian9/latest_delivery
+    - echo "Deliver Debian 10 x64"
+    - mkdir --parents library/debian10/
+    - mv debian10_x64/ingescape-*
+         debian10_x64/installIngescapeAndDependencies.sh
+         library/debian10/
+    - ls library/debian10/ | grep -v 'latest_delivery' > library/debian10/latest_delivery
+    - echo "Deliver CentOS 7 x64"
+    - mkdir --parents library/centos7
+    - mv centos7_x64/ingescape-*
+         centos7_x64/installIngescapeAndDependencies.sh
+         library/centos7/
+    - ls library/centos7/ | grep -v 'latest_delivery' > library/centos7/latest_delivery
+    - echo "Deliver generic Linux armhf"
+    - mkdir --parents library/linux_armhf
+    - mv linux_armhf/ingescape-*
+         linux_armhf/installIngescapeAndDependencies.sh
+         library/linux_armhf/
+    - ls library/linux_armhf/ | grep -v 'latest_delivery' > library/linux_armhf/latest_delivery
+    - echo "Deliver Raspbian 9 armhf"
+    - mkdir --parents library/raspbian9
+    - mv raspbian9_armhf/ingescape-*
+         raspbian9_armhf/installIngescapeAndDependencies.sh
+         library/raspbian9/
+    - ls library/raspbian9/ | grep -v 'latest_delivery' > library/raspbian9/latest_delivery
+    - echo "Deliver Android armv7a (softfp)"
+    - mkdir --parents library/android
+    - mv android/ingescape-*
+         library/android/
+    - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive library ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
+  dependencies:
+    - lib-installer-runtime-windows-x86
+    - lib-installer-runtime-windows-x64
+    - lib-installer-runtime-macos-x64
+    - lib-installer-runtime-linux-x64
+    - lib-installer-runtime-debian-9-x64
+    - lib-installer-runtime-debian-10-x64
+    - lib-installer-runtime-centos-x64
+    - lib-installer-runtime-linux-armhf
+    - lib-installer-runtime-raspbian-9-armhf
+    - lib-installer-runtime-android-armv7a-softfp
+
+# Deliver installers so they can be downloaded from the website
+editor-delivery-all-stable:
+  only:
+    refs:
+      - stable
+  stage: delivery-apps
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${STABL_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - mv editor _editor
+    - echo "Deliver Mac OS x64 editor"
+    - mkdir --parents editor/macos
+    - mv _editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
+         editor/macos/
+    - ls editor/macos/ | grep -v 'latest_delivery' > editor/macos/latest_delivery
+    - echo "Deliver Windows x86 editor"
+    - mkdir --parents editor/win32
+    - mv _editor/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
+         editor/win32/
+    - ls editor/win32/ | grep -v 'latest_delivery' > editor/win32/latest_delivery
+    - echo "Deliver Windows x64 editor"
+    - mkdir --parents editor/win64
+    - mv _editor/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
+         editor/win64/
+    - ls editor/win64/ | grep -v 'latest_delivery' > editor/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive editor ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
+  dependencies:
+    - editor-installer-macos-x64
+    - editor-installer-windows-x86
+    - editor-installer-windows-x64
+
+# Deliver installers so they can be downloaded from the website
+assessments-delivery-all-stable:
+  only:
+    refs:
+      - stable
+  stage: delivery-apps
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - mv editor _editor
+    - echo "Deliver Mac OS x64 assessments"
+    - mkdir --parents assessments/macos
+    - mv _editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+         assessments/macos/
+    - ls assessments/macos/ | grep -v 'latest_delivery' > assessments/macos/latest_delivery
+    - echo "Deliver Windows x86 assessments"
+    - mkdir --parents assessments/win32
+    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
+         assessments/win32/
+    - ls assessments/win32/ | grep -v 'latest_delivery' > assessments/win32/latest_delivery
+    - echo "Deliver Windows x64 assessments"
+    - mkdir --parents assessments/win64
+    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
+         assessments/win64/
+    - ls assessments/win64/ | grep -v 'latest_delivery' > assessments/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
+  dependencies:
+    - assessments-installer-macos-x64
+    - assessments-installer-windows-x86
+    - assessments-installer-windows-x64
+
+# Deliver installers so they can be downloaded from the website
+expe-delivery-all-stable:
+  only:
+    refs:
+      - stable
+  stage: delivery-apps
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - mv editor _editor
+    - echo "Deliver Mac OS x64 expe"
+    - mkdir --parents expe/macos
+    - mv _editor/apps/IngeScape-Expe/build/IngeScape-Expe-*
+         expe/macos/
+    - ls expe/macos/ | grep -v 'latest_delivery' > expe/macos/latest_delivery
+    - echo "Deliver Windows x86 expe"
+    - mkdir --parents expe/win32
+    - mv _editor/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
+         expe/win32/
+    - ls expe/win32/ | grep -v 'latest_delivery' > expe/win32/latest_delivery
+    - echo "Deliver Windows x64 expe"
+    - mkdir --parents expe/win64
+    - mv _editor/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
+         expe/win64/
+    - ls expe/win64/ | grep -v 'latest_delivery' > expe/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive expe ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
+  dependencies:
+    - expe-installer-macos-x64
+    - expe-installer-windows-x86
+    - expe-installer-windows-x64
+
+
+# Deliver installers so they can be downloaded from the website
+binding-delivery-all-stable:
+  only:
+    refs:
+      - stable
+  stage: delivery-binding
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - mv bindings _bindings
+    - echo "Deliver Windows x86 binding"
+    - mkdir --parents bindings/CSharp/win32
+    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86/IngescapeCSharp-*
+         bindings/CSharp/win32/
+    - ls bindings/CSharp/win32/ | grep -v 'latest_delivery' > bindings/CSharp/win32/latest_delivery
+    - echo "Deliver Windows x64 binding"
+    - mkdir --parents bindings/CSharp/win64
+    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64/IngescapeCSharp-*
+         bindings/CSharp/win64/
+    - ls bindings/CSharp/win64/ | grep -v 'latest_delivery' > bindings/CSharp/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive bindings ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
   dependencies:
     - binding-csharp-installer-windows-x64
     - binding-csharp-installer-windows-x86
