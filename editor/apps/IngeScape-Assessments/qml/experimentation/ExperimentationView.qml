@@ -382,7 +382,9 @@ Item {
                     }
 
                     onClicked: {
-                        // Add the "Subjects View" to the stack
+                        console.log("QML: Open the 'Subjects View' popup");
+
+                        // Open the popup "Subjects View"
                         subjectsViewPopup.open()
                     }
                 }
@@ -401,7 +403,9 @@ Item {
                     }
 
                     onClicked: {
-                        // Add the "Tasks View" to the stack
+                        console.log("QML: Open the 'Tasks View' popup");
+
+                        // Open the popup "Tasks View"
                         tasksViewPopup.open();
                     }
                 }
@@ -452,10 +456,10 @@ Item {
                     }
 
                     onClicked: {
-                        console.log("QML: Add the 'Export View' to the stack");
+                        console.log("QML: Open the 'Export View' popup");
 
-                        // Add the "Export View" to the stack
-                        //                            stackview.push(componentExportView);
+                        // Open the popup "Export View"
+                        exportViewPopup.open();
                     }
                 }
             }
@@ -754,6 +758,9 @@ Item {
     }
 
 
+    //
+    // Subjects View (popup)
+    //
     Subject.SubjectsView {
         id: subjectsViewPopup
 
@@ -778,43 +785,21 @@ Item {
         height: parent.height - 78
 
         taskController: IngeScapeAssessmentsC.tasksC
-
-        //
-        // Slots
-        //
-
-        onCloseTasksView: {
-            console.log("QML: on Close Tasks view");
-
-            // Remove the "Tasks View" from the stack
-            close()
-        }
     }
 
 
     //
-    // Export View
+    // Export View (popup)
     //
-    Component {
-        id: componentExportView
+    Export.ExportView {
+        id: exportViewPopup
 
-        Export.ExportView {
-            id: exportView
+        anchors.centerIn: parent
 
-            controller: IngeScapeAssessmentsC.exportC
+        width: parent.width - 78
+        height: parent.height - 78
 
-
-            //
-            // Slots
-            //
-
-            onCloseExportView: {
-                console.log("QML: on Close Export view");
-
-                // Remove the "Export View" from the stack
-//                stackview.pop();
-            }
-        }
+        controller: IngeScapeAssessmentsC.exportC
     }
 
 

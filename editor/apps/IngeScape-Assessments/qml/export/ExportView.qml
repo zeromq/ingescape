@@ -24,10 +24,8 @@ import INGESCAPE 1.0
 import "../popup" as Popup
 
 
-Item {
+I2PopupBase {
     id: rootItem
-
-    //anchors.fill: parent
 
 
     //--------------------------------------------------------
@@ -52,14 +50,14 @@ Item {
     //--------------------------------
 
     // Close Export view
-    signal closeExportView();
+    //signal closeExportView();
 
 
 
     //--------------------------------
     //
     //
-    // Functions
+    // Slots
     //
     //
     //--------------------------------
@@ -76,34 +74,37 @@ Item {
 
     Rectangle {
         id: background
-
         anchors.fill: parent
-
-        color: IngeScapeTheme.veryDarkGreyColor
-        border {
-            color: IngeScapeTheme.darkGreyColor
-            width: 1
-        }
+        color: IngeScapeTheme.veryLightGreyColor
     }
 
     Button {
         id: btnClose
 
         anchors {
-            right: parent.right
             top: parent.top
+            topMargin: 21
+            right: parent.right
+            rightMargin: 21
         }
-        height: 30
 
-        text: "X"
+        height: 18
+        width: 18
+
+        style: IngeScapeAssessmentsSvgButtonStyle {
+            releasedID: "close"
+        }
 
         onClicked: {
             console.log("QML: close Export view");
 
             // Emit the signal "Close Export View"
-            rootItem.closeExportView();
+            //rootItem.closeExportView();
+
+            close();
         }
     }
+
 
     Row {
         id: header

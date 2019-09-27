@@ -50,7 +50,7 @@ I2PopupBase {
     //--------------------------------
 
     // Close Tasks view
-    signal closeTasksView();
+    //signal closeTasksView();
 
 
 
@@ -253,8 +253,12 @@ I2PopupBase {
                     taskController.selectedTask = null;
                 }
 
+                console.log("QML: close Tasks view");
+
                 // Emit the signal "closeTasksView"
-                rootItem.closeTasksView();
+                //rootItem.closeTasksView();
+
+                close();
             }
         }
     }
