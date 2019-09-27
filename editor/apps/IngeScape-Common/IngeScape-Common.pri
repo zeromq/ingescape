@@ -9,6 +9,7 @@ SOURCES += \
     $$PWD/model/agent/definition/callm.cpp \
     $$PWD/ingescapecommon.cpp \
     $$PWD/model/licenseinformationm.cpp \
+    $$PWD/platformsupport/IngescapeApplication.cpp \
     $$PWD/platformsupport/linuxutils.cpp \
     $$PWD/platformsupport/microsoftwindowutils.cpp \
     $$PWD/platformsupport/osutils.cpp \
@@ -60,6 +61,7 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/model/agent/definition/callm.h \
+    $$PWD/platformsupport/IngescapeApplication.h \
     $$PWD/platformsupport/linuxutils.h \
     $$PWD/platformsupport/macosutils.h \
     $$PWD/ingescapecommon.h \

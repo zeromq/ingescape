@@ -54,10 +54,10 @@ ApplicationWindow {
     property bool forceClose: false
 
     // Licenses controller
-    property LicensesController licensesController: IngeScapeEditorC.licensesC;
+    property LicensesController licensesController: null
 
     // Flag indicating if the user have a valid license for the editor
-    property bool isEditorLicenseValid: mainWindow.licensesController && mainWindow.licensesController.mergedLicense && mainWindow.licensesController.mergedLicense.editorLicenseValidity
+    property bool isEditorLicenseValid: licensesController && licensesController.mergedLicense && licensesController.mergedLicense.editorLicenseValidity
 
 
     //----------------------------------
@@ -366,7 +366,7 @@ ApplicationWindow {
                         {
                             var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
                             if (!success) {
-                                popupErrorMessage.open();
+                                popupFailedToLoadAgentDefinition.open();
                             }
                         }
                     }
@@ -636,7 +636,19 @@ ApplicationWindow {
                 IngeScapeEditorC.processBeforeClosing();
             }
         }
-        // else: Simply close the appliction
+        // else: Simply close the application
+    }
+
+
+
+    Connections {
+        id: connectionsIngescapeEditorC
+
+        ignoreUnknownSignals: true
+
+        onOpenPopupFailedToLoadAgentDefinition: {
+            popupFailedToLoadAgentDefinition.open();
+        }
     }
 
 
@@ -739,8 +751,14 @@ ApplicationWindow {
                     return ((applicationLoader.status === Loader.Ready) && (IngeScapeEditorC.modelManager !== null));
                 });
 
+                connectionsIngescapeEditorC.target = IngeScapeEditorC;
+
                 mainWindow.title = Qt.binding(function() {
                     return qsTr("IngeScape Editor - v%1 - %2").arg(Qt.application.version).arg(IngeScapeEditorC.currentPlatformName);
+                });
+
+                mainWindow.licensesController = Qt.binding(function() {
+                   return IngeScapeEditorC.licensesC;
                 });
 
                 menuPlugUNplugMapping.text = Qt.binding(function() {
@@ -787,12 +805,14 @@ ApplicationWindow {
 
 
             //
-            // Popup for Error messages
+            // Popup "for Error messages"failed to laod agent definition"
             //
             Popups.MessagePopup {
-                id: popupErrorMessage
+                id: popupFailedToLoadAgentDefinition
+
                 anchors.centerIn: parent
-                message: "The file does not contain valid agent definition(s) !"
+
+                message: qsTr("The file does not contain valid agent definition(s) !");
             }
         }
 
