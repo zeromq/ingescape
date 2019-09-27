@@ -107,7 +107,10 @@ Item {
         licenseEventPopup.open();
     }
 
+
+    //
     // Function allowing to open the Getting Started popup
+    //
     function openGettingStarted(forceOpen) {
         // Default forceOpen parameter value
         if (forceOpen === undefined) forceOpen = false
@@ -131,7 +134,10 @@ Item {
         }
     }
 
+
+    //
     // Function to close the getting started window
+    //
     function closeGettingStarted() {
         if (gettingStartedWindow)
         {

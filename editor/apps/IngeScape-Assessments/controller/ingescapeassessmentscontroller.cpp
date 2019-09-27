@@ -333,20 +333,17 @@ bool IngeScapeAssessmentsController::restartNetwork(QString strPort, QString net
             // Save new values
             settings.sync();
 
-
-            // FIXME (restartNetwork): Update the licenses path
-            //_licensesC->updateLicensesPath(licensesPath);
-
-
             // Restart IngeScape
             success = _restartIngeScape();
         }
     }
     else {
-        if (!isUInt) {
+        if (!isUInt)
+        {
             qWarning() << "Port" << strPort << "is not an unsigned int !";
         }
-        else if (port <= 0) {
+        else if (port <= 0)
+        {
             qWarning() << "Port" << strPort << "is negative or null !";
         }
     }

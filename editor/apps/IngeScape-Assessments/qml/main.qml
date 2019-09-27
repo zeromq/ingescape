@@ -13,7 +13,7 @@
  *
  */
 
-import QtQuick 2.9
+import QtQuick 2.8
 import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.3
@@ -23,7 +23,8 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
-//import QtQml.StateMachine 1.0
+// popup sub-directory
+//import "popup" as Popups
 
 
 ApplicationWindow {
@@ -74,13 +75,15 @@ ApplicationWindow {
     //----------------------------------
 
     menuBar: MenuBar {
-
+        // File
         Menu {
-            id: menuToRename
-            title: qsTr("Options")
+            id: menuFile
+
+            title: qsTr("&File")
 
             /*MenuItem {
-                text: qsTr("Start a new platform")
+                text: qsTr("&New platform")
+
                 shortcut: StandardKey.New
 
                 onTriggered: {
@@ -90,6 +93,7 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Open a platform...")
+
                 shortcut: StandardKey.Open
 
                 onTriggered: {
@@ -97,32 +101,62 @@ ApplicationWindow {
                 }
             }
 
+            MenuSeparator {}
+
             MenuItem {
-                text: qsTr("Save the current platform...")
+                text: qsTr("Save")
+
                 shortcut: StandardKey.Save
 
                 onTriggered: {
-                    IngeScapeAssessmentsC.savePlatformToSelectedFile();
-                }
-            }*/
-
-            MenuSeparator {
-            }
-
-            MenuItem {
-                text: qsTr("Network")
-                //shortcut: StandardKey.Preferences
-
-                onTriggered: {
-                    if (applicationLoader.item) {
-                        //console.log("QML: Open network configuration popup");
-                        applicationLoader.item.openNetworkPopup();
+                    if (mainWindow.isEditorLicenseValid)
+                    {
+                        IngeScapeAssessmentsC.savePlatformToCurrentlyLoadedFile();
+                    }
+                    else
+                    {
+                        applicationLoader.item.openLicensePopup();
                     }
                 }
             }
+
             MenuItem {
-                text: qsTr("License")
-                //shortcut: StandardKey.
+                text: qsTr("Save As...")
+
+                shortcut: StandardKey.SaveAs
+
+                onTriggered: {
+                    if (mainWindow.isEditorLicenseValid)
+                    {
+                        IngeScapeAssessmentsC.selectFileToSavePlatform();
+                    }
+                    else
+                    {
+                        applicationLoader.item.openLicensePopup();
+                    }
+                }
+            }
+
+            MenuSeparator {}*/
+
+            MenuItem {
+                text: qsTr("Preferences...")
+
+                //FIXME: enable this MenuItem when PreferencesPopup is ready (designed and coded)
+                enabled: false
+
+                shortcut: StandardKey.Preferences
+
+                onTriggered: {
+                    if (applicationLoader.item) {
+                        console.log("QML: Open preferences popup");
+                        applicationLoader.item.openPreferences();
+                    }
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Licenses...")
 
                 onTriggered: {
                     if (applicationLoader.item) {
@@ -131,62 +165,124 @@ ApplicationWindow {
                     }
                 }
             }
+
+            MenuSeparator {}
+
             MenuItem {
-                text: qsTr("Create snapshot")
+                text: qsTr("Take a snapshot")
+
                 shortcut: StandardKey.AddTab
 
                 onTriggered: {
                     I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "IngeScape-Assessments");
                 }
             }
+
+            MenuSeparator {}
+
+            MenuItem {
+                text: qsTr("E&xit")
+
+                shortcut: StandardKey.Quit
+
+                onTriggered: {
+                    // Try to close our man window
+                    mainWindow.close();
+                }
+            }
         }
 
 
-        // Windows
-        /*Menu {
-            id: menuWindows
+        // Edit
+        Menu {
+            id: menuEdit
 
-            title: qsTr("Windows")
+            title: qsTr("&Edit")
 
             MenuItem {
-                text: qsTr("Main window")
+                id: menuEditItemUndo
+
+                text: qsTr("&Undo")
+
+                shortcut: StandardKey.Undo
+
+                enabled: false
 
                 onTriggered: {
-                    // Raises our window in the windowing system
-                    mainWindow.raise();
+                    // TODO: undo
+                    console.log("TODO: undo");
                 }
             }
 
-            Instantiator {
-                id: subWindowsInstantiator
-                model: 0 // IngeScapeAssessmentsC.openedWindows
+            MenuItem {
+                id: menuEditItemRedo
 
-                delegate: MenuItem {
-                    text: model.QtObject.title
+                text: qsTr("&Redo")
 
-                    onTriggered: {
-                        //console.log("click on " + model.QtObject.title + " (" + model.QtObject + ")")
+                shortcut: StandardKey.Redo
 
-                        // Raises the window in the windowing system
-                        model.QtObject.raise();
-                    }
-                }
+                enabled: false
 
-                onObjectAdded: {
-                    //console.log("onObjectAdded " + index)
-                    menuWindows.insertItem(index, object)
-                }
-                onObjectRemoved: {
-                    //console.log("onObjectRemoved")
-                    menuWindows.removeItem(object)
+                onTriggered: {
+                    // TODO: redo
+                    console.log("TODO: redo");
                 }
             }
-        }*/
+
+            MenuSeparator {}
+
+            MenuItem {
+                id: menuEditItemCut
+
+                text: qsTr("Cu&t")
+
+                shortcut: StandardKey.Cut
+
+                enabled: false
+
+                onTriggered: {
+                    // TODO: cut
+                    console.log("TODO: cut");
+                }
+            }
+
+            MenuItem {
+                id: menuEditItemCopy
+
+                text: qsTr("Copy")
+
+                shortcut: StandardKey.Copy
+
+                enabled: false
+
+                onTriggered: {
+                    // TODO: copy
+                    console.log("TODO: copy");
+                }
+            }
+
+            MenuItem {
+                id: menuEditItemPaste
+
+                text: qsTr("Paste")
+
+                shortcut: StandardKey.Paste
+
+                enabled: false
+
+                onTriggered: {
+                    // TODO: paste
+                    console.log("TODO: paste");
+                }
+            }
+        }
 
 
         // Debug
         Menu {
-            title: qsTr("Debug Qt Quick")
+            id: menuDebug
+
+            title: qsTr("Debug")
 
             visible: SHOW_DEBUG_MENU
 
@@ -256,7 +352,44 @@ ApplicationWindow {
             }
         }
 
+        // Help
+        Menu {
+            title: qsTr("&Help")
 
+            MenuItem {
+                text: qsTr("Getting started")
+
+                enabled: false
+
+                onTriggered: {
+                     //applicationLoader.item.openGettingStarted(true);
+                }
+            }
+
+            MenuSeparator {}
+
+            MenuItem {
+                text: qsTr("Report bug...")
+
+                onTriggered: {
+                    //TODO: open a webpage (bug tracking software) or use a simple mailto ?
+                    Qt.openUrlExternally(
+                                         "mailto:contact@ingescape.com?subject=Bug report "
+                                         + Qt.application.name + " v" + Qt.application.version
+                                         + "&body=(write your bug report here)\n\n"
+                                         + "----------------------------------\n"
+                                         + "System information:\n"
+                                         + DebugQuickInspector.systemInformation
+                                         );
+                }
+            }
+
+            MenuItem {
+                text: qsTr("System information...")
+
+                onTriggered: systemInformationPopup.open();
+            }
+        }
     }
 
 
@@ -281,6 +414,7 @@ ApplicationWindow {
     // When user clicks on window close button
     onClosing: {
         console.info("QML: Close Window");
+
         IngeScapeAssessmentsC.processBeforeClosing();
     }
 
@@ -355,9 +489,6 @@ ApplicationWindow {
                 }
             }
 
-            /*onLoaded: {
-                console.log("onLoaded " + applicationLoader.item)
-            }*/
         }
 
 
@@ -426,5 +557,40 @@ ApplicationWindow {
         }
 
 
+        //----------------------------------
+        //
+        // Popups
+        //
+        //----------------------------------
+
+        // System information
+        SystemInformationPopup {
+            id: systemInformationPopup
+        }
+
+
+        // Save before quit popup
+        /*Popups.SaveBeforeQuitPopup {
+            id: saveBeforeQuitPopup
+
+            anchors.centerIn: parent
+
+            // Save the changes to the currently opened platform and quit
+            onSaveAs: {
+                IngeScapeEditorC.selectFileToSavePlatform();
+
+                mainWindow.forceClose = true;
+                mainWindow.close();
+            }
+
+            // Discard all unsaved changes and quit
+            onDiscard: {
+                mainWindow.forceClose = true;
+                mainWindow.close();
+            }
+
+            // Cancel the closing procedure and keep the editor open
+            onCancel: {}
+        }*/
     }
 }

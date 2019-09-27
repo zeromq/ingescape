@@ -24,7 +24,6 @@
         <file>qml/timeline/ActionInTimeLine.qml</file>
         <file>qml/timeline/ScenarioTimeLine.qml</file>
         <file>qml/ConfirmationPopup.qml</file>
-        <file>qml/NetworkPopup.qml</file>
         <file>qml/LicensePopup.qml</file>
         <file>qml/TextAreaWithTimer.qml</file>
         <file>qml/theme/IngeScapeComboboxStyle.qml</file>
