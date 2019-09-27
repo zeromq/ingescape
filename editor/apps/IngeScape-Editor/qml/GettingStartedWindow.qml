@@ -116,53 +116,10 @@ Window {
         }
         color: IngeScapeTheme.editorsBackgroundColor
 
-
-        LabellessSvgButton {
-            id: btnCloseEditor
-
-            anchors {
-                verticalCenter: pageTitle.verticalCenter
-                right : parent.right
-                rightMargin: 20
-            }
-
-
-            pressedID: releasedID + "-pressed"
-            releasedID: "closeEditor"
-            disabledID : releasedID
-
-
-            onClicked: {
-                // Close our popup
-                rootItem.close();
-            }
-        }
-
-        Text {
-            id: pageTitle
-
-            anchors {
-                top: parent.top
-                topMargin: 15
-                left: parent.left
-                leftMargin: 18
-            }
-
-            text: rootItem.loadingError ? "Getting started" : webview.title
-            elide: Text.ElideRight
-            color: IngeScapeTheme.whiteColor
-
-            font {
-                family: IngeScapeTheme.textFontFamily
-                pixelSize: 23
-                weight: Font.Medium
-            }
-        }
-
         WebEngineView {
             id: webview
             anchors {
-                top: btnCloseEditor.bottom
+                top: parent.top
                 left: parent.left
                 right: parent.right
                 bottom: showOnStartupCheckbox.top
