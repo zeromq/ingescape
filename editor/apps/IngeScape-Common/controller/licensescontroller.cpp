@@ -276,9 +276,6 @@ void LicensesController::refreshLicensesData()
         }
 
         setmergedLicense(new LicenseInformationM(license));
-        qDebug() << "License information:";
-        qDebug() << *_mergedLicense;
-
         _licenseDetailsList.deleteAllItems();
 
         //
@@ -286,14 +283,11 @@ void LicensesController::refreshLicensesData()
         //
         if ((license->licenseDetails != nullptr) && (zlist_size(license->licenseDetails) > 0))
         {
-            qDebug() << zlist_size(license->licenseDetails) << "license details";
-
             license_t* detail = static_cast<license_t*>(zlist_first(license->licenseDetails));
             while (detail != nullptr)
             {
                 LicenseInformationM* licenseDetails = new LicenseInformationM(detail);
                 _licenseDetailsList.append(licenseDetails);
-                qDebug() << *licenseDetails;
                 detail = static_cast<license_t*>(zlist_next(license->licenseDetails));
             }
         }
