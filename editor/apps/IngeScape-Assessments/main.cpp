@@ -269,18 +269,19 @@ int main(int argc, char *argv[])
 
         //QString logsDirectoryPath = IngeScapeUtils::getLogsPath();
         //QString logFilePath = QString("%1%2_log.csv").arg(logsDirectoryPath, app.applicationName());
-
-        // Set the log level from which logs are printed in the console
-        //igs_setLogLevel(IGS_LOG_DEBUG);
-        igs_setLogLevel(IGS_LOG_INFO);
-
         //igs_setLogPath(logFilePath.toStdString().c_str());
+
+        igs_setVerbose(true);
         igs_setLogInFile(true);
 
 #ifdef QT_DEBUG
+        igs_setLogLevel(IGS_LOG_DEBUG);
+
         // Use a custom message format
         qSetMessagePattern("%{time hh:mm:ss.zzz} %{type} %{if-category}%{category} %{endif}file://%{file}:%{line} %{message}");
 #else
+        igs_setLogLevel(IGS_LOG_INFO);
+
         // Replace the default message handler with our own logger
         qInstallMessageHandler(LogMessageHandler);
 #endif

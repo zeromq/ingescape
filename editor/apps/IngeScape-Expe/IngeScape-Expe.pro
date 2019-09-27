@@ -13,11 +13,13 @@ VERSION_MINOR = 0
 VERSION_PATCH = 0
 VERSION_BUILD = 0
 
-
 win32:VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}.$${VERSION_BUILD}
 else:VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
 
 DEFINES += "VERSION=\\\"$$VERSION\\\""
+
+# Enable function names and line numbers even for release builds
+DEFINES += QT_MESSAGELOGCONTEXT
 
 # Qt modules used by our application and/or its dependencies
 QT += qml quick quick-private svg xml concurrent sql core-private gui-private
