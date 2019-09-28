@@ -2269,7 +2269,8 @@ void igs_getNetdevicesList(char ***devices, int *nb){
     assert (LOBYTE (wsa_data.wVersion) == 2 &&
             HIBYTE (wsa_data.wVersion) == 2);
 #endif
-    *devices = calloc(MAX_NUMBER_OF_NETDEVICES, sizeof(char*));
+    if (devices != NULL)
+        *devices = calloc(MAX_NUMBER_OF_NETDEVICES, sizeof(char*));
     int currentDeviceNb = 0;
     
     ziflist_t *iflist = ziflist_new ();
@@ -2278,8 +2279,40 @@ void igs_getNetdevicesList(char ***devices, int *nb){
     while (name) {
         //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
         //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
-        (*devices)[currentDeviceNb] = calloc(NETWORK_DEVICE_LENGTH+1, sizeof(char));
-        strncpy((*devices)[currentDeviceNb], name, NETWORK_DEVICE_LENGTH);
+        if (devices != NULL){
+            (*devices)[currentDeviceNb] = calloc(NETWORK_DEVICE_LENGTH+1, sizeof(char));
+            strncpy((*devices)[currentDeviceNb], name, NETWORK_DEVICE_LENGTH);
+        }
+        currentDeviceNb++;
+        name = ziflist_next (iflist);
+    }
+    ziflist_destroy (&iflist);
+    *nb = currentDeviceNb;
+#if (defined WIN32 || defined _WIN32)
+    WSACleanup();
+#endif
+}
+
+void igs_getNetaddressesList(char ***addresses, int *nb){
+#if (defined WIN32 || defined _WIN32)
+    WORD version_requested = MAKEWORD (2, 2);
+    WSADATA wsa_data;
+    int rc = WSAStartup (version_requested, &wsa_data);
+    assert (rc == 0);
+    assert (LOBYTE (wsa_data.wVersion) == 2 &&
+            HIBYTE (wsa_data.wVersion) == 2);
+#endif
+    if (addresses != NULL)
+        *addresses = calloc(MAX_NUMBER_OF_NETDEVICES, sizeof(char*));
+    int currentDeviceNb = 0;
+    
+    ziflist_t *iflist = ziflist_new ();
+    assert (iflist);
+    const char *name = ziflist_first (iflist);
+    while (name) {
+        if (addresses != NULL){
+            (*addresses)[currentDeviceNb] = strdup(ziflist_address(iflist));
+        }
         currentDeviceNb++;
         name = ziflist_next (iflist);
     }
@@ -2293,11 +2326,16 @@ void igs_getNetdevicesList(char ***devices, int *nb){
 void igs_freeNetdevicesList(char **devices, int nb){
     int i = 0;
     for (i = 0; i < nb; i++){
-        if (devices[i] != NULL && strlen(devices[i]) > 0){
+        if (devices != NULL && devices[i] != NULL){
             free(devices[i]);
         }
     }
-    free (devices);
+    if (devices != NULL)
+        free (devices);
+}
+
+void igs_freeNetaddressesList(char **addresses, int nb){
+    igs_freeNetdevicesList(addresses, nb);
 }
 
 void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData){
