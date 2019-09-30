@@ -252,9 +252,11 @@ PUBLIC int igs_version(void);
 PUBLIC int igs_protocol(void);
 
 //Utility functions to find network adapters with broadcast capabilities
-//to be used in igs_startWithDevice
+//to be used in igs_startWithDevice and igs_startWithIP
 PUBLIC void igs_getNetdevicesList(char ***devices, int *nb);
 PUBLIC void igs_freeNetdevicesList(char **devices, int nb);
+PUBLIC void igs_getNetaddressesList(char ***addresses, int *nb);
+PUBLIC void igs_freeNetaddressesList(char **addresses, int nb);
 
 
 //Agent command line can be passed here to be used by ingescapeLauncher. If not set,

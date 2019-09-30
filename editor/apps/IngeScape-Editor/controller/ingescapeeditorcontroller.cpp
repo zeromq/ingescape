@@ -117,7 +117,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         _platformDirectoryPath = platformPath;
 
         // Init the path to the platform file to load the example file
-        _platformDefaultFilePath = QString("%1%2.json").arg(_platformDirectoryPath, EXAMPLE_PLATFORM_NAME);
+        _platformDefaultFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, EXAMPLE_PLATFORM_NAME);
     }
 
 

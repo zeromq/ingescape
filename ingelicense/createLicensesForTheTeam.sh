@@ -44,3 +44,22 @@ echo ""
 echo "Read license for AirbusControlDeck"
 ingelicense --read ./licenses/AirbusControlDeck.igslicense
 echo ""
+
+#licenses for diota
+echo "License for DiotaEval"
+ingelicense \
+    --id DiotaEval \
+    --customer Diota \
+    --order Eval \
+    --expiration 2019/12/31 \
+    --editorExpiration 2019/12/31 \
+    --features /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/features.txt \
+    --agents /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/agents.txt \
+    --editorOwner "Christophe Chastanet" \
+    --features ./src/features.txt \
+    --agents ./src/agents.txt \
+    --output ./licenses/DiotaEval.igslicense
+echo ""
+echo "Read license for DiotaEval"
+ingelicense --read ./licenses/DiotaEval.igslicense
+echo ""
