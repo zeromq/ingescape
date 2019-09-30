@@ -290,8 +290,19 @@ elseif (WIN32)
         math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
         set_target_properties(cassandra PROPERTIES IMPORTED_IMPLIB "${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/cassandra.lib")
         set_target_properties(cassandra PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/cassandra.dll")
-        install(DIRECTORY ${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/ DESTINATION lib FILES_MATCHING PATTERN "*.dll")
+
+        file(GLOB CASSANDRA_DEPENDENCIES "${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/*.dll")
+
+        # Copy cassandra dependency
+        add_custom_command(
+            TARGET ${PROJECT_NAME}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CASSANDRA_DEPENDENCIES} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        )
+
+        install(FILES ${CASSANDRA_DEPENDENCIES} DESTINATION .)
     endif()
+
     target_link_libraries(${PROJECT_NAME} cassandra)
 else ()
     message(FATAL_ERROR "UNIX or WIN32 not defined, can not create make file")

@@ -725,8 +725,9 @@ AssessmentsPopupBase {
                         var index = 0;      // Index of the current enum value (in for-loops)
                         var enumValue = ""; // Enum value iterator
 
-                        for (enumValue of displayedEnumTexts)
+                        for (index = 0 ; index < displayedEnumTexts.length ; ++index)
                         {
+                            enumValue = displayedEnumTexts[index]
                             if (enumValue === "") {
                                 console.log("Error index: " + index)
                                 rootPopup.errorMessage = "Enum entries cannot be empty"
@@ -734,16 +735,16 @@ AssessmentsPopupBase {
                                 rootPopup.errorDetected = true;
                                 break;
                             }
-                            index++;
                         }
 
                         if (!rootPopup.errorDetected)
                         {
                             // Check for duplicates
-                            index = 0;
-                            let singles = []
-                            for (enumValue of displayedEnumTexts)
+                            var singles = []
+
+                            for (index = 0 ; index < displayedEnumTexts.length ; ++index)
                             {
+                                enumValue = displayedEnumTexts[index]
                                 // If the element is already in 'singles', it's a duplicate
                                 if (singles.indexOf(enumValue) > -1) {
                                     console.log("Error index: " + index)
@@ -755,8 +756,6 @@ AssessmentsPopupBase {
 
                                 // Add the element to 'singles'
                                 singles.push(enumValue);
-
-                                index++;
                             }
                         }
 
