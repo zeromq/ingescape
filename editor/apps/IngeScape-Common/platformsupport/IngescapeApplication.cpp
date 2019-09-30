@@ -108,7 +108,7 @@ public:
      * @param params
      * @return
      */
-    voi onDdeCommand(const QString &command, const QString &params);
+    void onDdeCommand(const QString &command, const QString &params);
 
 
     /**
