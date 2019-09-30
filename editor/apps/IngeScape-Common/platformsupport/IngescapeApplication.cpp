@@ -17,6 +17,7 @@
 
 #include <QtGlobal>
 #include <QDebug>
+#include <QFileInfo>
 #include <QFileOpenEvent>
 #include <QAbstractNativeEventFilter>
 
@@ -209,7 +210,7 @@ public:
 IngescapeApplicationPrivate::IngescapeApplicationPrivate(IngescapeApplication* parent)
     : QAbstractNativeEventFilter(),
       _parent(parent),
-      appAtomName(""),
+      appAtomName(QFileInfo(QApplication::applicationFilePath()).baseName()),
       systemTopicAtomName("system"),
       appAtom(0),
       systemTopicAtom(0)
@@ -244,9 +245,7 @@ IngescapeApplicationPrivate::~IngescapeApplicationPrivate()
 void IngescapeApplicationPrivate::enableDdeCommands()
 {
     if ((appAtom == 0) && (systemTopicAtom == 0))
-    {qDebug() << "Enable dde commands";
-        appAtomName = QFileInfo(QApplication::applicationFilePath()).baseName();
-qDebug() << "- app=" << appAtomName;
+    {
 #ifdef UNICODE
         appAtom = ::GlobalAddAtom( reinterpret_cast<const WCHAR *>(appAtomName.utf16()) );
 #else
@@ -268,7 +267,7 @@ qDebug() << "- app=" << appAtomName;
  * @brief Disbale DDE commands
  */
 void IngescapeApplicationPrivate::disableDdeCommands()
-{qDebug() << "DISABLE DDE commands";
+{
     if (appAtom != 0)
     {
         ::GlobalDeleteAtom(appAtom);
@@ -294,8 +293,7 @@ bool IngescapeApplicationPrivate::nativeEventFilter(const QByteArray &eventType,
 {
     bool eventFiltered = false;
 
-    //TODO: check if we also need "windows_dispatcher_MSG" (system-wide messages)
-    //if (eventType == "windows_generic_MSG")
+    if (eventType == "windows_generic_MSG")
     {
         MSG* msg = static_cast<MSG*>(message);
         if (msg != nullptr)
@@ -303,19 +301,19 @@ bool IngescapeApplicationPrivate::nativeEventFilter(const QByteArray &eventType,
             switch (msg->message)
             {
                 case WM_DDE_INITIATE:
-                {qInfo() << "WM_DDE_INITIATE";
+                {
                     eventFiltered = ddeInitiate(msg, result);
                 }
                 break;
 
                 case WM_DDE_EXECUTE:
-                {qInfo() << "WM_DDE_EXECUTE";
+                {
                     eventFiltered = ddeExecute(msg, result);
                 }
                 break;
 
                 case WM_DDE_TERMINATE:
-                {qInfo() << "WM_DDE_TERMINATE";
+                {
                     eventFiltered = ddeTerminate(msg, result);
                 }
                 break;
@@ -484,7 +482,7 @@ void IngescapeApplicationPrivate::onDdeCommand(const QString &command, const QSt
         if (_parent != nullptr)
         {
             QString filePath = regexCommand.cap(1);
-            _parent->_newOpenFileRequest(QUrl::fromLocalFile(filePath), filePath);
+            _parent->addPendingOpenFileRequest(QUrl::fromLocalFile(filePath), filePath);
         }
     }
     // Else: unsupported command
@@ -499,10 +497,11 @@ bool IngescapeApplicationPrivate::SetHkcrUserRegKey(QString key, const QString &
 {
     bool succeeded = false;
 
-    qDebug() << "SetHkcrUserRegKey";
-    qDebug() << "- Register=" << "Software\\Classes\\" + key;
-    qDebug() << "- ValueName=" << valueName;
-    qDebug() << "- Value=" << value;
+    qInfo() << "Add key in HKEY_CURRENT_USER";
+    qInfo() << "- Register=" << "Software\\Classes\\" + key;
+    qInfo() << "- ValueName=" << valueName;
+    qInfo() << "- Value=" << value;
+    qInfo() << "";
 
     HKEY hKey;
     key.prepend("Software\\Classes\\");
@@ -565,6 +564,8 @@ void IngescapeApplicationPrivate::registerFileType(const QString &documentId, co
     // first register the type ID of our server
     if (!SetHkcrUserRegKey(documentId, fileTypeName))
     {
+        qWarning() << Q_FUNC_INFO << "warning: failed to register file type"
+                   << fileTypeName;
         return;
     }
 
@@ -574,6 +575,8 @@ void IngescapeApplicationPrivate::registerFileType(const QString &documentId, co
                     QApplication::applicationFilePath()))
                 .arg(appIconIndex)))
     {
+        qWarning() << Q_FUNC_INFO << "warning: failed to register default icon of documentId"
+                   << documentId;
         return;
     }
 
@@ -608,10 +611,13 @@ void IngescapeApplicationPrivate::registerFileType(const QString &documentId, co
     {
         // no association for that suffix
         if (!SetHkcrUserRegKey(fileExtension, documentId))
+        {
+            qWarning() << Q_FUNC_INFO << "warning: failed to associated file extension" << fileExtension
+                       << "with documentId=" << documentId;
             return;
+        }
 
-        SetHkcrUserRegKey(
-            QString("%1\\ShellNew").arg(fileExtension), QString(), "NullFile");
+        SetHkcrUserRegKey(QString("%1\\ShellNew").arg(fileExtension), QString(), "NullFile");
     }
 }
 
@@ -645,11 +651,13 @@ void IngescapeApplicationPrivate::registerCommand(const QString &command, const 
                 QString("%1\\shell\\%2\\ddeexec").arg(documentId).arg(command),
                 ddeCommand))
             return;
+
         if (!SetHkcrUserRegKey(QString("%1\\shell\\%2\\ddeexec\\application")
                                       .arg(documentId)
                                       .arg(command),
                 appAtomName))
             return;
+
         if (!SetHkcrUserRegKey(QString("%1\\shell\\%2\\ddeexec\\topic")
                                       .arg(documentId)
                                       .arg(command),
@@ -774,7 +782,7 @@ bool IngescapeApplication::event(QEvent *event)
         QFileOpenEvent *fileOpenEvent = dynamic_cast<QFileOpenEvent*>(event);
         if (fileOpenEvent != nullptr)
         {
-            _newOpenFileRequest(fileOpenEvent->url(), fileOpenEvent->file());
+            addPendingOpenFileRequest(fileOpenEvent->url(), fileOpenEvent->file());
         }
         // Else: should not happen because (type() == QEvent::FileOpen) means that we have a QFileOpenEvent event
 
@@ -800,6 +808,25 @@ QPair<QUrl, QString> IngescapeApplication::getPendingOpenFileRequest()
 
     return result;
 }
+
+
+/**
+ * @brief Add a pending "open file" request
+ *
+ * @param fileUrl
+ * @param filePath
+ */
+void IngescapeApplication::addPendingOpenFileRequest(QUrl fileUrl, QString filePath)
+{
+    // Save this new request
+    _pendingOpenFileRequestUrl = fileUrl;
+    _pendingOpenFileRequestFilePath = filePath;
+
+    // Notify request
+    sethasPendingOpenFileRequest(true);
+    Q_EMIT openFileRequest(_pendingOpenFileRequestUrl, _pendingOpenFileRequestFilePath);
+}
+
 
 
 /**
@@ -849,7 +876,6 @@ void IngescapeApplication::_subscribeToCurrentWindow(QQuickWindow* window)
     if (window != nullptr)
     {
 #ifdef Q_OS_WIN
-        qDebug() << "Enable DDE";
         _privateAPI->enableDdeCommands();
 #endif
     }
@@ -870,18 +896,3 @@ void IngescapeApplication::_unsubscribeToCurrentWindow(QQuickWindow* window)
 }
 
 
-/**
- * @brief Called to build a new "open file" request
- * @param fileUrl
- * @param filePath
- */
-void IngescapeApplication::_newOpenFileRequest(QUrl fileUrl, QString filePath)
-{
-    // Save this new request
-    _pendingOpenFileRequestUrl = fileUrl;
-    _pendingOpenFileRequestFilePath = filePath;
-
-    // Notify request
-    sethasPendingOpenFileRequest(true);
-    Q_EMIT openFileRequest(_pendingOpenFileRequestUrl, _pendingOpenFileRequestFilePath);
-}

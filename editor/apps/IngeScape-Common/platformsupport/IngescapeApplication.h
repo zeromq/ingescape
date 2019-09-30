@@ -95,6 +95,15 @@ public:
 
 
     /**
+     * @brief Add a pending "open file" request
+     *
+     * @param url
+     * @param filePath
+     */
+    void addPendingOpenFileRequest(QUrl url, QString filePath);
+
+
+    /**
      * @brief Register a file type
      *
      * @param documentId    e.g. ApplicationName.myextension
@@ -138,6 +147,7 @@ protected:
     bool event(QEvent *event) Q_DECL_OVERRIDE;
 
 
+protected:
     /**
      * @brief Subscribe to our current window
      */
@@ -149,17 +159,6 @@ protected:
      */
     void _unsubscribeToCurrentWindow(QQuickWindow* window);
 
-
-    /**
-     * @brief Called to build a new "open file" request
-     * @param fileUrl
-     * @param filePath
-     */
-    void _newOpenFileRequest(QUrl fileUrl, QString filePath);
-
-
-    // To allow access to our internal API
-    friend class IngescapeApplicationPrivate;
 
 private:
     // Current window

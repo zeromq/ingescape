@@ -20,6 +20,7 @@
 #include <QThread>
 #include <QApplication>
 #include <QCursor>
+#include <QCommandLineParser>
 
 #include <misc/ingescapeutils.h>
 #include <settings/ingescapesettings.h>
@@ -183,6 +184,35 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
     _jsonHelper = new JsonHelper(this);
 
+
+
+
+    //-------------------------------
+    //
+    // Command line options
+    //
+    //-------------------------------
+
+    // Define command line options
+    QCommandLineParser commandLineParser;
+    commandLineParser.setApplicationDescription("IngeScape Editor");
+    commandLineParser.addHelpOption();
+    commandLineParser.addVersionOption();
+    commandLineParser.addPositionalArgument("file", tr("File to open"));
+
+    // Process command line options
+    commandLineParser.process((qApp != nullptr) ? qApp->arguments() : QStringList());
+
+    // Check if we have a file
+    // NB: On Windows, we will not receive DDE messages until our main window is displayed
+    //     that's why we must handle a command line argument
+    // NB: On linux, we only rely on this command line argument
+    QStringList positionalArguments = commandLineParser.positionalArguments();
+    if ((positionalArguments.count() > 0) && (IngescapeApplication::instance() != nullptr))
+    {
+        QString filePath = positionalArguments.at(0);
+        IngescapeApplication::instance()->addPendingOpenFileRequest(QUrl::fromLocalFile(filePath), filePath);
+    }
 
 
     //-------------------------------
@@ -368,6 +398,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
                 if (QString::compare(fileInfo.suffix(), QStringLiteral("igsplatform")) == 0)
                 {
                     _currentPlatformFilePath = pendingOpenFileRequestFilePath;
+
+                    // Request will be handled by _loadPlatformFromFile()
                     hasPendingOpenFileRequest = false;
                 }
             }

@@ -268,9 +268,9 @@ int main(int argc, char *argv[])
     QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
 
     //TEMP: Windows test
-    app.registerFileType("Ingescape.Editor.igsplatform", "IGS Platform", ".igsplatform");
-    app.registerFileType("Ingescape.Editor.igsdefinition", "IGS Definition", ".igsdefinition");
-    app.registerFileType("Ingescape.Editor.igslicense", "IGS License", ".igslicense");
+    //app.registerFileType("Ingescape.Editor.igsplatform", "IGS Platform", ".igsplatform");
+    //app.registerFileType("Ingescape.Editor.igsdefinition", "IGS Definition", ".igsdefinition");
+    //app.registerFileType("Ingescape.Editor.igslicense", "IGS License", ".igslicense");
 
 
     // - behavior when our last window is closed
@@ -321,7 +321,6 @@ int main(int argc, char *argv[])
         qInstallMessageHandler(LogMessageHandler);
 #endif
 
-        qInfo() << "Application" << app.applicationName() << "is running with version" << app.applicationVersion();
 
 
         //------------------------------
@@ -366,6 +365,10 @@ int main(int argc, char *argv[])
     {
         qFatal("ERROR: There is no special directory 'Documents' !");
     }
+
+
+
+    qInfo() << "Application" << app.applicationName() << "is running with version" << app.applicationVersion();
 
 
     // Initialize the WebView back-end
