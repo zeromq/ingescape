@@ -197,7 +197,7 @@ mac {
 
         # Release only: copy Qt libs and plugins inside our application to create a standalone application
         # NB: macdeployqt only runs qmlimportscanner correctly when run from Qt bin directory
-        QMAKE_POST_LINK += $$quote(cd `dirname $(QMAKE)` && macdeployqt $${OUT_PWD}/$${TARGET}.app -qmldir=$${PWD} $$escape_expand(\n\t))
+        #QMAKE_POST_LINK += $$quote(cd `dirname $(QMAKE)` && macdeployqt $${OUT_PWD}/$${TARGET}.app -qmldir=$${PWD} $$escape_expand(\n\t))
     }
     else {
         # We must call install_name_tool to create a valid link. Otherwise, our application will not found our library

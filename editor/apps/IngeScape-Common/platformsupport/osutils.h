@@ -101,7 +101,8 @@ public:
       * @param value
       * @return
       */
-     virtual bool setcurrentWindow (QQuickWindow* value) {
+     virtual bool setcurrentWindow (QQuickWindow* value)
+     {
          bool hasChanged = false;
          if (_currentWindow != value)
          {
@@ -376,7 +377,7 @@ protected:
 
 protected:
 #ifndef OSUTILS_NO_QML
-    // Current windiw
+    // Current window
     QQuickWindow* _currentWindow;
 #endif
 

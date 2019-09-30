@@ -33,7 +33,7 @@
 #include <graphics/dashedbar.h>
 
 #include <platformsupport/osutils.h>
-
+#include <platformsupport/IngescapeApplicationQmlHelper.h>
 
 
 
@@ -163,6 +163,7 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     //
     //---------------
     qmlRegisterSingletonType<OSUtils>("INGESCAPE", 1, 0, "OSUtils", &OSUtils::qmlSingleton);
+    qmlRegisterSingletonType<IngescapeApplicationQmlHelper>("INGESCAPE", 1, 0, "IngescapeApplicationQmlHelper", &IngescapeApplicationQmlHelper::qmlSingleton);
 
 
 

@@ -607,6 +607,9 @@ ApplicationWindow {
         // Define the window associated to OSUtils
         OSUtils.currentWindow = mainWindow;
 
+        // Define the window associated to IngescapeApplicationQmlHelper
+        IngescapeApplicationQmlHelper.currentWindow = mainWindow;
+
         // Start our loader delay animation when our initial content is ready
         loaderDelayAnimation.start();
     }

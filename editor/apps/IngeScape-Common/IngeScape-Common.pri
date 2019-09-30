@@ -10,6 +10,7 @@ SOURCES += \
     $$PWD/ingescapecommon.cpp \
     $$PWD/model/licenseinformationm.cpp \
     $$PWD/platformsupport/IngescapeApplication.cpp \
+    $$PWD/platformsupport/IngescapeApplicationQmlHelper.cpp \
     $$PWD/platformsupport/linuxutils.cpp \
     $$PWD/platformsupport/microsoftwindowutils.cpp \
     $$PWD/platformsupport/osutils.cpp \
@@ -62,6 +63,7 @@ SOURCES += \
 HEADERS += \
     $$PWD/model/agent/definition/callm.h \
     $$PWD/platformsupport/IngescapeApplication.h \
+    $$PWD/platformsupport/IngescapeApplicationQmlHelper.h \
     $$PWD/platformsupport/linuxutils.h \
     $$PWD/platformsupport/macosutils.h \
     $$PWD/ingescapecommon.h \
@@ -171,7 +173,7 @@ win32 {
     message(Ingescape-common.pri: Windows specific rules)
 
     # Add specific dependencies
-    LIBS += -lWtsapi32
+    LIBS += -lWtsapi32 -luser32 - lAdvapi32
 }
 
 

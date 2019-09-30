@@ -261,11 +261,17 @@ int main(int argc, char *argv[])
     //
     //------------------------------
     IngescapeApplication app(argc, argv);
-    app.setOrganizationName("Ingenuity i/o");
+    app.setOrganizationName("Ingenuity io");
     app.setOrganizationDomain("ingenuity.io");
     app.setApplicationName("IngeScape-Editor");
     app.setApplicationVersion(VERSION);
     QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+
+    //TEMP: Windows test
+    app.registerFileType("Ingescape.Editor.igsplatform", "IGS Platform", ".igsplatform");
+    app.registerFileType("Ingescape.Editor.igsdefinition", "IGS Definition", ".igsdefinition");
+    app.registerFileType("Ingescape.Editor.igslicense", "IGS License", ".igslicense");
+
 
     // - behavior when our last window is closed
     app.setQuitOnLastWindowClosed(true);

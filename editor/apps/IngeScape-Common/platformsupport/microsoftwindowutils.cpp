@@ -35,6 +35,7 @@
  * @brief Constructor
  */
 MicrosoftWindowUtilsEventFilter::MicrosoftWindowUtilsEventFilter()
+    : QAbstractNativeEventFilter()
 {
 }
 

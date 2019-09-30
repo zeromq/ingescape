@@ -183,7 +183,7 @@ Item {
     Connections {
         target: IngeScapeEditorC
 
-        onOpenLicensePopup: {
+        onOpenPopupLicense: {
             openLicensePopup();
         }
     }

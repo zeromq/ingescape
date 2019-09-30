@@ -19,8 +19,21 @@
 #include <QObject>
 #include <QApplication>
 #include <QUrl>
+#include <QScopedPointer>
+#include <QtQml>
+#include <QQmlEngine>
+#include <QJSEngine>
+#include <QQuickWindow>
 
 #include "I2PropertyHelpers.h"
+
+
+
+/**
+ * @brief The IngescapeApplicationPrivate class defines the private API of IngescapeApplicationPrivate
+ */
+class IngescapeApplicationPrivate;
+
 
 
 /**
@@ -33,6 +46,10 @@ class IngescapeApplication : public QApplication
     // Flag indicating if we have a pending "open file" request
     I2_QML_PROPERTY_READONLY(bool, hasPendingOpenFileRequest)
 
+    // Current window
+    Q_PROPERTY(QQuickWindow* currentWindow READ currentWindow WRITE setcurrentWindow NOTIFY currentWindowChanged)
+
+
 public:
     /**
      * @brief Default constructor
@@ -40,6 +57,27 @@ public:
      * @param argv
      */
     explicit IngescapeApplication(int &argc, char **argv);
+
+
+    /**
+     * @brief Destructor
+     */
+    ~IngescapeApplication();
+
+
+    /**
+    * @brief get our current window
+    * @return
+    */
+    QQuickWindow* currentWindow() const;
+
+
+    /**
+     * @brief Set our current window
+     * @param value
+     * @return
+     */
+    bool setcurrentWindow (QQuickWindow* value);
 
 
     /**
@@ -56,13 +94,39 @@ public:
     QPair<QUrl, QString> getPendingOpenFileRequest();
 
 
+    /**
+     * @brief Register a file type
+     *
+     * @param documentId    e.g. ApplicationName.myextension
+     * @param fileTypeName  e.g. My file type
+     * @param fileExtension e.g. .myextension
+     * @param appIconIndex
+     */
+    void registerFileType(const QString &documentId, const QString &fileTypeName, const QString &fileExtension, qint32 appIconIndex = 0);
+
+
 Q_SIGNALS:
+    /**
+     * @brief Triggered when our currentWindow property has changed
+     * @param value
+     */
+    void currentWindowChanged(QQuickWindow* value);
+
+
     /**
      * @brief Triggered when our application receives an "open file" request
      * @param url
      * @param filePath
      */
     void openFileRequest(QUrl fileUrl, QString filePath);
+
+
+private Q_SLOTS:
+    /**
+    * @brief Called when our current window is destroyed
+    */
+   void _oncurrentWindowDestroyed(QObject*);
+
 
 
 protected:
@@ -74,10 +138,39 @@ protected:
     bool event(QEvent *event) Q_DECL_OVERRIDE;
 
 
-protected:
+    /**
+     * @brief Subscribe to our current window
+     */
+    void _subscribeToCurrentWindow(QQuickWindow* window);
+
+
+    /**
+     * @brief Unsubscribe to our current Window
+     */
+    void _unsubscribeToCurrentWindow(QQuickWindow* window);
+
+
+    /**
+     * @brief Called to build a new "open file" request
+     * @param fileUrl
+     * @param filePath
+     */
+    void _newOpenFileRequest(QUrl fileUrl, QString filePath);
+
+
+    // To allow access to our internal API
+    friend class IngescapeApplicationPrivate;
+
+private:
+    // Current window
+    QQuickWindow* _currentWindow;
+
     // Pending "open file" request
     QUrl _pendingOpenFileRequestUrl;
     QString _pendingOpenFileRequestFilePath;
+
+    // Private API
+    QScopedPointer<IngescapeApplicationPrivate> _privateAPI;
 };
 
 #endif // INGESCAPEAPPLICATION_H

@@ -253,7 +253,7 @@ if (APPLE)
 endif()
 
 if (WIN32)
-    target_link_libraries(${PROJECT_NAME} Wtsapi32)
+    target_link_libraries(${PROJECT_NAME} Wtsapi32 user32 Advapi32)
 endif()
 
 
