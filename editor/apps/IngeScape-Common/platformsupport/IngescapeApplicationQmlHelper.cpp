@@ -26,6 +26,7 @@ IngescapeApplicationQmlHelper::IngescapeApplicationQmlHelper(QObject *parent)
     : QObject(parent),
       _currentWindow(nullptr)
 {
+    connect(this, &IngescapeApplicationQmlHelper::currentWindowChanged, this, &IngescapeApplicationQmlHelper::_onCurrentWindowChanged);
 }
 
 
@@ -34,6 +35,7 @@ IngescapeApplicationQmlHelper::IngescapeApplicationQmlHelper(QObject *parent)
  */
 IngescapeApplicationQmlHelper::~IngescapeApplicationQmlHelper()
 {
+    disconnect(this, &IngescapeApplicationQmlHelper::currentWindowChanged, this, &IngescapeApplicationQmlHelper::_onCurrentWindowChanged);
     setcurrentWindow(nullptr);
 }
 

@@ -246,9 +246,20 @@ void IngescapeApplicationPrivate::enableDdeCommands()
     if ((appAtom == 0) && (systemTopicAtom == 0))
     {
         appAtomName = QFileInfo(QApplication::applicationFilePath()).baseName();
-        appAtom = ::GlobalAddAtom( reinterpret_cast<const wchar_t *>(appAtomName.utf16()) );
 
-        systemTopicAtom = ::GlobalAddAtom( reinterpret_cast<const wchar_t *>(systemTopicAtomName.utf16()) );
+#ifdef UNICODE
+        appAtom = ::GlobalAddAtom( reinterpret_cast<const WCHAR *>(appAtomName.utf16()) );
+#else
+        auto tempAppName = appAtomName.toLocal8Bit();
+        appAtom = ::GlobalAddAtom( tempAppName.constData() );
+#endif
+
+#ifdef UNICODE
+        systemTopicAtom = ::GlobalAddAtom( reinterpret_cast<const WCHAR *>(systemTopicAtomName.utf16()) );
+#else
+        auto tempSystemTopicName = systemTopicAtomName.toLocal8Bit();
+        systemTopicAtom = ::GlobalAddAtom( tempSystemTopicName.constData() );
+#endif
     }
 }
 
@@ -284,7 +295,7 @@ bool IngescapeApplicationPrivate::nativeEventFilter(const QByteArray &eventType,
     bool eventFiltered = false;
 
     //TODO: check if we also need "windows_dispatcher_MSG" (system-wide messages)
-    if (eventType == "windows_generic_MSG")
+    //if (eventType == "windows_generic_MSG")
     {
         MSG* msg = static_cast<MSG*>(message);
         if (msg != nullptr)
@@ -342,7 +353,7 @@ bool IngescapeApplicationPrivate::ddeInitiate(MSG *message, long *result)
         WId winId = _parent->currentWindow()->winId();
 
         // make duplicates of the incoming atoms (really adding a reference)
-        wchar_t atomName[_MAX_PATH];
+        TCHAR atomName[_MAX_PATH];
 
         bool ok;
         ok = (::GlobalGetAtomNameW(appAtom, atomName, _MAX_PATH-1) != 0);
@@ -493,11 +504,22 @@ bool IngescapeApplicationPrivate::SetHkcrUserRegKey(QString key, const QString &
     HKEY hKey;
     key.prepend("Software\\Classes\\");
 
-    auto szKey = reinterpret_cast<const wchar_t *>(key.utf16());
+#ifdef UNICODE
+    auto szKey = reinterpret_cast<const WCHAR *>(key.utf16());
+#else
+    QByteArray sKey = key.toLocal8Bit();
+    auto szKey = sKey.constData();
+#endif
+
     LONG lRetVal = RegCreateKey(HKEY_CURRENT_USER, szKey, &hKey);
     if (ERROR_SUCCESS == lRetVal)
     {
-        auto szValue = reinterpret_cast<const wchar_t *>(valueName.utf16());
+#ifdef UNICODE
+        auto szValue = reinterpret_cast<const WCHAR *>(valueName.utf16());
+#else
+        QByteArray sValue = valueName.toLocal8Bit();
+        auto szValue = sValue.constData();
+#endif
 
         LONG lResult = ::RegSetValueEx(hKey, szValue[0] ? nullptr : szValue, 0, REG_SZ, (CONST BYTE *) value.utf16(), (value.length() + 1) * sizeof(quint16));
 
@@ -512,9 +534,13 @@ bool IngescapeApplicationPrivate::SetHkcrUserRegKey(QString key, const QString &
     }
     else
     {
-        wchar_t buffer[4096];
+        TCHAR buffer[4096];
         auto size = ::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, lRetVal, 0, buffer, 4096, 0);
+#ifdef UNICODE
         auto errorMessage = QString::fromWCharArray(buffer, size);
+#else
+        auto errorMessage = QString::fromLocal8Bit(buffer, size);
+#endif
 
         qWarning() << Q_FUNC_INFO << "warning: failed to set key" << key
                    << ", Error=" << errorMessage;
@@ -552,14 +578,22 @@ void IngescapeApplicationPrivate::registerFileType(const QString &documentId, co
     // Register DDE commands
     registerCommand("Open", documentId, " %1", "[open(\"%1\")]");
 
-
+#ifdef UNICODE
     auto szExtension = reinterpret_cast<const WCHAR *>(fileExtension.utf16());
+#else
+    QByteArray sExtension = fileExtension.toLocal8Bit();
+    auto szExtension = sExtension.constData();
+#endif
     LONG lSize = _MAX_PATH * 2;
     TCHAR szTempBuffer[_MAX_PATH * 2];
     LONG lResult =
         ::RegQueryValue(HKEY_CLASSES_ROOT, szExtension, szTempBuffer, &lSize);
 
+#ifdef UNICODE
     QString temp = QString::fromWCharArray(szTempBuffer, lSize);
+#else
+    QString temp = QString::fromLocal8Bit(szTempBuffer, lSize);
+#endif
 
     if (
         (lResult != ERROR_SUCCESS)
@@ -812,6 +846,7 @@ void IngescapeApplication::_subscribeToCurrentWindow(QQuickWindow* window)
     if (window != nullptr)
     {
 #ifdef Q_OS_WIN
+        qDebug() << "Enable DDE";
         _privateAPI->enableDdeCommands();
 #endif
     }
