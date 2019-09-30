@@ -173,7 +173,7 @@ win32 {
     message(Ingescape-common.pri: Windows specific rules)
 
     # Add specific dependencies
-    LIBS += -lWtsapi32 -luser32 - lAdvapi32
+    LIBS += -lWtsapi32 -luser32 -lAdvapi32
 }
 
 

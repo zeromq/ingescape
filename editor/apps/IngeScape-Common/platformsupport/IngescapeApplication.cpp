@@ -23,6 +23,7 @@
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
+#include <dde.h>
 #endif
 
 
@@ -108,7 +109,7 @@ public:
      * @param params
      * @return
      */
-    voi onDdeCommand(const QString &command, const QString &params);
+    void onDdeCommand(const QString &command, const QString &params);
 
 
     /**
@@ -142,7 +143,7 @@ protected:
     IngescapeApplication* _parent;
 
     // the name of the application, without file extension
-    QString applicationAtomName;
+    QString appAtomName;
     // the name of the system topic atom, typically "System"
     QString systemTopicAtomName;
     // The windows atom needed for DDE communication
@@ -207,11 +208,11 @@ public:
  */
 IngescapeApplicationPrivate::IngescapeApplicationPrivate(IngescapeApplication* parent)
     : QAbstractNativeEventFilter(),
-      _parent(nullptr),
+      _parent(parent),
       appAtomName(""),
       systemTopicAtomName("system"),
       appAtom(0),
-      systemTopicAtom(0),
+      systemTopicAtom(0)
 {
 }
 
@@ -327,7 +328,7 @@ bool IngescapeApplicationPrivate::ddeInitiate(MSG *message, long *result)
     bool eventFiltered = false;
 
     if (
-        ((_parent != nullptr) && (_parent->curentWindow() != nullptr))
+        ((_parent != nullptr) && (_parent->currentWindow() != nullptr))
         &&
         (0 != LOWORD(message->lParam))
         &&
@@ -335,10 +336,10 @@ bool IngescapeApplicationPrivate::ddeInitiate(MSG *message, long *result)
         &&
         (LOWORD(message->lParam) == appAtom)
         &&
-        (HIWORD(message->lParam) == _systemTopicAtom))
+        (HIWORD(message->lParam) == systemTopicAtom)
         )
     {
-        WId winId = _parent->curentWindow()->winId();
+        WId winId = _parent->currentWindow()->winId();
 
         // make duplicates of the incoming atoms (really adding a reference)
         wchar_t atomName[_MAX_PATH];
@@ -387,10 +388,10 @@ bool IngescapeApplicationPrivate::ddeExecute(MSG *message, long *result)
 {
     bool eventFiltered = false;
 
-    if ((_parent != nullptr) && (_parent->curentWindow() != nullptr))
+    if ((_parent != nullptr) && (_parent->currentWindow() != nullptr))
     {
 
-        WId winId = _parent->curentWindow()->winId();
+        WId winId = _parent->currentWindow()->winId();
 
         // unpack the DDE message
         UINT_PTR unused;
@@ -436,9 +437,9 @@ bool IngescapeApplicationPrivate::ddeTerminate(MSG *message, long *result)
 {
     bool eventFiltered = false;
 
-    if ((_parent != nullptr) && (_parent->curentWindow() != nullptr))
+    if ((_parent != nullptr) && (_parent->currentWindow() != nullptr))
     {
-        WId winId = _parent->curentWindow()->winId();
+        WId winId = _parent->currentWindow()->winId();
 
         ::PostMessage(reinterpret_cast<HWND>(message->wParam), WM_DDE_TERMINATE, static_cast<WPARAM>(winId), message->lParam);
 
@@ -456,7 +457,7 @@ bool IngescapeApplicationPrivate::ddeTerminate(MSG *message, long *result)
  * @param params
  * @return
  */
-voi IngescapeApplicationPrivate::onDdeCommand(const QString &command, const QString &params)
+void IngescapeApplicationPrivate::onDdeCommand(const QString &command, const QString &params)
 {
     QRegExp regexCommand("^\"(.*)\"$");
     bool singleCommand = regexCommand.exactMatch(params);
@@ -651,7 +652,7 @@ IngescapeApplication::IngescapeApplication(int &argc, char **argv)
       _privateAPI(new IngescapeApplicationPrivate(this))
 {
 #ifdef Q_OS_WIN
-    installNativeEventFilter(_privateAPI);
+    installNativeEventFilter(_privateAPI.data());
 #endif
 }
 
@@ -811,7 +812,7 @@ void IngescapeApplication::_subscribeToCurrentWindow(QQuickWindow* window)
     if (window != nullptr)
     {
 #ifdef Q_OS_WIN
-        enableDdeCommands();
+        _privateAPI->enableDdeCommands();
 #endif
     }
 }
@@ -825,7 +826,7 @@ void IngescapeApplication::_unsubscribeToCurrentWindow(QQuickWindow* window)
     if (window != nullptr)
     {
 #ifdef Q_OS_WIN
-        disableDdeCommands();
+        _privateAPI->disableDdeCommands();
 #endif
     }
 }
