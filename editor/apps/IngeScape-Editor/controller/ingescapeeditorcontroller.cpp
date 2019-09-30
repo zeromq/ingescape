@@ -60,6 +60,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _snapshotDirectory(""),
     _modelManager(nullptr),
     _agentsSupervisionC(nullptr),
+    _callHomeC(nullptr),
     _agentsMappingC(nullptr),
     _networkC(nullptr),
     _scenarioC(nullptr),
@@ -238,6 +239,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // Create the controller to manage the agents mapping
     _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, this);
+
+    // Create the controller to manage the call home at startup
+    _callHomeC = new CallHomeController(this);
 
     // Create the controller to manage the scenario
     _scenarioC = new ScenarioController(_modelManager, _jsonHelper, this);
@@ -547,6 +551,16 @@ IngeScapeEditorController::~IngeScapeEditorController()
 
         AgentsMappingController* temp = _agentsMappingC;
         setagentsMappingC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
+
+    if (_callHomeC != nullptr)
+    {
+        disconnect(_callHomeC);
+
+        CallHomeController* temp = _callHomeC;
+        setcallHomeC(nullptr);
         delete temp;
         temp = nullptr;
     }

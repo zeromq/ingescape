@@ -26,6 +26,7 @@
 #include <controller/ingescapemodelmanager.h>
 #include <controller/ingescapenetworkcontroller.h>
 #include <controller/licensescontroller.h>
+#include <controller/callhomecontroller.h>
 
 #include <model/scenario/scenariom.h>
 #include <model/scenario/timetickm.h>
@@ -81,6 +82,7 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal class");
     qmlRegisterUncreatableType<IngeScapeNetworkController>("INGESCAPE", 1, 0, "IngeScapeNetworkController", "Internal class");
     qmlRegisterUncreatableType<LicensesController>("INGESCAPE", 1, 0, "LicensesController", "Internal class");
+    qmlRegisterUncreatableType<CallHomeController>("INGESCAPE", 1, 0, "CallHomeController", "Internal class");
 
 
     //----------------

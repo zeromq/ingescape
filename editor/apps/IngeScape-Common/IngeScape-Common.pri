@@ -6,6 +6,7 @@ QT += qml quick svg xml sql quick-private core-private gui-private concurrent ne
 
 
 SOURCES += \
+    $$PWD/controller/callhomecontroller.cpp \
     $$PWD/model/agent/definition/callm.cpp \
     $$PWD/ingescapecommon.cpp \
     $$PWD/model/licenseinformationm.cpp \
@@ -61,6 +62,7 @@ SOURCES += \
 
 
 HEADERS += \
+    $$PWD/controller/callhomecontroller.h \
     $$PWD/model/agent/definition/callm.h \
     $$PWD/platformsupport/IngescapeApplication.h \
     $$PWD/platformsupport/IngescapeApplicationQmlHelper.h \

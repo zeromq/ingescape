@@ -176,6 +176,12 @@ Item {
         {
             openGettingStarted();
         }
+
+        // ...we silently call home to signal the license user launched the editor
+        if (IngeScapeEditorC.licensesC && IngeScapeEditorC.callHomeC)
+        {
+            IngeScapeEditorC.callHomeC.editorLaunched(IngeScapeEditorC.licensesC.mergedLicense)
+        }
     }
 
 

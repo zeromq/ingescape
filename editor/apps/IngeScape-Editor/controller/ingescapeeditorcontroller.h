@@ -26,6 +26,7 @@
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/agentsmappingcontroller.h>
 #include <controller/agentssupervisioncontroller.h>
+#include <controller/callhomecontroller.h>
 #include <controller/editormodelmanager.h>
 #include <controller/hostssupervisioncontroller.h>
 #include <controller/licensescontroller.h>
@@ -71,6 +72,9 @@ class IngeScapeEditorController : public QObject
 
     // Controller to manage the agents list
     I2_QML_PROPERTY_READONLY(AgentsSupervisionController*, agentsSupervisionC)
+
+    // Controller to manager the call home at startup
+    I2_QML_PROPERTY_READONLY(CallHomeController*, callHomeC)
 
     // Controller to manage hosts
     I2_QML_PROPERTY_READONLY(HostsSupervisionController*, hostsSupervisionC)
