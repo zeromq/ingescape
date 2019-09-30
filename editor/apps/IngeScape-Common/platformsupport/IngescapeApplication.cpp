@@ -244,9 +244,9 @@ IngescapeApplicationPrivate::~IngescapeApplicationPrivate()
 void IngescapeApplicationPrivate::enableDdeCommands()
 {
     if ((appAtom == 0) && (systemTopicAtom == 0))
-    {
+    {qDebug() << "Enable dde commands";
         appAtomName = QFileInfo(QApplication::applicationFilePath()).baseName();
-
+qDebug() << "- app=" << appAtomName;
 #ifdef UNICODE
         appAtom = ::GlobalAddAtom( reinterpret_cast<const WCHAR *>(appAtomName.utf16()) );
 #else
@@ -268,7 +268,7 @@ void IngescapeApplicationPrivate::enableDdeCommands()
  * @brief Disbale DDE commands
  */
 void IngescapeApplicationPrivate::disableDdeCommands()
-{
+{qDebug() << "DISABLE DDE commands";
     if (appAtom != 0)
     {
         ::GlobalDeleteAtom(appAtom);
@@ -303,19 +303,19 @@ bool IngescapeApplicationPrivate::nativeEventFilter(const QByteArray &eventType,
             switch (msg->message)
             {
                 case WM_DDE_INITIATE:
-                {qDebug() << "WM_DDE_INITIATE";
+                {qInfo() << "WM_DDE_INITIATE";
                     eventFiltered = ddeInitiate(msg, result);
                 }
                 break;
 
                 case WM_DDE_EXECUTE:
-                {qDebug() << "WM_DDE_EXECUTE";
+                {qInfo() << "WM_DDE_EXECUTE";
                     eventFiltered = ddeExecute(msg, result);
                 }
                 break;
 
                 case WM_DDE_TERMINATE:
-                {qDebug() << "WM_DDE_TERMINATE";
+                {qInfo() << "WM_DDE_TERMINATE";
                     eventFiltered = ddeTerminate(msg, result);
                 }
                 break;
@@ -356,21 +356,21 @@ bool IngescapeApplicationPrivate::ddeInitiate(MSG *message, long *result)
         TCHAR atomName[_MAX_PATH];
 
         bool ok;
-        ok = (::GlobalGetAtomNameW(appAtom, atomName, _MAX_PATH-1) != 0);
+        ok = (::GlobalGetAtomName(appAtom, atomName, _MAX_PATH-1) != 0);
 
         if (ok)
         {
-            ok = (::GlobalAddAtomW(atomName) == appAtom);
+            ok = (::GlobalAddAtom(atomName) == appAtom);
         }
 
         if (ok)
         {
-            ok = (::GlobalGetAtomNameW(systemTopicAtom, atomName, _MAX_PATH-1) != 0);
+            ok = (::GlobalGetAtomName(systemTopicAtom, atomName, _MAX_PATH-1) != 0);
         }
 
         if (ok)
         {
-            ok = (::GlobalAddAtomW(atomName) == systemTopicAtom);
+            ok = (::GlobalAddAtom(atomName) == systemTopicAtom);
         }
 
         if (ok)
@@ -383,7 +383,8 @@ bool IngescapeApplicationPrivate::ddeInitiate(MSG *message, long *result)
                           MAKELPARAM(appAtom, systemTopicAtom)
                           );
 
-            *result = 0;
+            if (result) *result = 0;
+
             eventFiltered = true;
         }
     }
@@ -432,7 +433,8 @@ bool IngescapeApplicationPrivate::ddeExecute(MSG *message, long *result)
                 onDdeCommand(regCommand.cap(1), regCommand.cap(2));
             }
 
-            *result = 0;
+            if (result) *result = 0;
+
             eventFiltered = true;
         }
     }
@@ -454,7 +456,8 @@ bool IngescapeApplicationPrivate::ddeTerminate(MSG *message, long *result)
 
         ::PostMessage(reinterpret_cast<HWND>(message->wParam), WM_DDE_TERMINATE, static_cast<WPARAM>(winId), message->lParam);
 
-        *result = 0;
+        if (result) *result = 0;
+
         eventFiltered = true;
     }
 
