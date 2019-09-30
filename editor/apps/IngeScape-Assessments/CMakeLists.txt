@@ -206,6 +206,46 @@ else ()
     #TODO Add so for unix
 endif ()
 
+# Find Cassandra dependencies
+add_library(cassandra SHARED IMPORTED)
+set(CASSANDRA_LIB "")
+if(APPLE)
+    include(ExternalProject)
+
+    set(CASS_SOURCE_DIR ${SOURCE_DIR}/../../dependencies/cassandra-cpp-driver)
+
+    ExternalProject_Add(cassandra_external
+        SOURCE_DIR ${CASS_SOURCE_DIR}
+        CMAKE_ARGS
+            ${GLOBAL_DEFAULT_ARGS}
+            ${GLOBAL_THIRDPARTY_LIB_ARGS}
+            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/build/
+        BUILD_COMMAND make
+        INSTALL_COMMAND make install
+    )
+
+    set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/lib")
+    set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/include")
+
+    set(CASSANDRA_DEPENDENCIES "${LIB_DIR}/libcassandra.2.dylib")
+
+    set_source_files_properties("${CASSANDRA_DEPENDENCIES}" PROPERTIES MACOSX_PACKAGE_LOCATION Frameworks)
+    set_target_properties(cassandra PROPERTIES IMPORTED_LOCATION "${CASSANDRA_DEPENDENCIES}")
+    add_dependencies(cassandra cassandra_external)
+elseif (WIN32)
+    # Check 32 or 64 bit
+    # CMAKE_SIZEOF_VOID_P EQUAL 8 and CMAKE_CL_64 check current platform and no target
+    math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
+    set_target_properties(cassandra PROPERTIES IMPORTED_IMPLIB "${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/cassandra.lib")
+    set_target_properties(cassandra PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/cassandra.dll")
+
+    file(GLOB CASSANDRA_DEPENDENCIES "${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/*.dll")
+
+    install(FILES ${CASSANDRA_DEPENDENCIES} DESTINATION .)
+else ()
+    message(FATAL_ERROR "APPLE or WIN32 not defined, can not create make file")
+endif()
+
 
 ########################################################################
 # executable
@@ -242,71 +282,16 @@ target_link_libraries(
     Qt5::Network
     ${_INGESCAPE_LIBS}
     I2Quick
+    cassandra
 )
-
-if (UNIX AND NOT APPLE)
-    target_link_libraries(${PROJECT_NAME} Qt5::DBus)
-endif()
 
 if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework Foundation -framework AppKit")
-endif()
-
-if (WIN32)
+elseif (WIN32)
     target_link_libraries(${PROJECT_NAME} Wtsapi32 user32 Advapi32)
 endif()
 
 
-# Find Cassandra dependencies
-if(UNIX)
-  include(ExternalProject)
-  set(CASS_SOURCE_DIR ${SOURCE_DIR}/../../dependencies/cassandra-cpp-driver)
-  ExternalProject_Add(cassandra_external
-    SOURCE_DIR ${CASS_SOURCE_DIR}
-    CMAKE_ARGS
-        ${GLOBAL_DEFAULT_ARGS}
-        ${GLOBAL_THIRDPARTY_LIB_ARGS}
-        -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/build/
-    BUILD_COMMAND make
-    INSTALL_COMMAND make install
-    )
-
-    add_dependencies(${PROJECT_NAME} cassandra_external)
-
-    set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/lib")
-    set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/include")
-
-    if(APPLE)
-        set(CASSANDRA_LIBRARIES "${LIB_DIR}/libcassandra.dylib")
-        install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.dylib" )
-    else(APPLE)
-        set(CASSANDRA_LIBRARIES "${LIB_DIR}/libcassandra.so")
-        install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.so" )
-    endif(APPLE)
-    target_link_libraries(${PROJECT_NAME} ${CASSANDRA_LIBRARIES})
-elseif (WIN32)
-    add_library(cassandra SHARED IMPORTED)
-    if (MSVC)
-        math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
-        set_target_properties(cassandra PROPERTIES IMPORTED_IMPLIB "${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/cassandra.lib")
-        set_target_properties(cassandra PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/cassandra.dll")
-
-        file(GLOB CASSANDRA_DEPENDENCIES "${SOURCE_DIR}/../../dependencies/windows/lib${BITS}/*.dll")
-
-        # Copy cassandra dependency
-        add_custom_command(
-            TARGET ${PROJECT_NAME}
-            POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CASSANDRA_DEPENDENCIES} $<TARGET_FILE_DIR:${PROJECT_NAME}>
-        )
-
-        install(FILES ${CASSANDRA_DEPENDENCIES} DESTINATION .)
-    endif()
-
-    target_link_libraries(${PROJECT_NAME} cassandra)
-else ()
-    message(FATAL_ERROR "UNIX or WIN32 not defined, can not create make file")
-endif(UNIX)
 
 # Retrieve the absolute path to qmake and then use that path to find
 # the binaries
@@ -328,6 +313,14 @@ if (APPLE)
         TARGET ${PROJECT_NAME}
         POST_BUILD
         COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change libI2Quick.dylib "@executable_path/../Frameworks/libI2Quick.dylib" $<TARGET_FILE:${PROJECT_NAME}>
+    )
+
+    # Copy cassandra dependency
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change libcassandra.2.dylib "@executable_path/../Frameworks/libcassandra.2.dylib" $<TARGET_FILE:${PROJECT_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CASSANDRA_DEPENDENCIES} "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks"
     )
 
     if (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -353,6 +346,13 @@ elseif (WIN32)
         TARGET ${PROJECT_NAME}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SOURCE_DIR}/../../frameworks/I2Quick/${_MY_LIB_FOLDER}/I2Quick.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    )
+
+    # Copy cassandra dependency
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CASSANDRA_DEPENDENCIES} $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
 
     if (CMAKE_BUILD_TYPE STREQUAL "Release")
