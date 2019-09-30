@@ -129,12 +129,18 @@ namespace CSharpSampleAgent
             // Get agent state
             string agentState = Igs.getAgentState();
 
-            //Get network list devices
+            // Get network devices and addresses
             string[] netDevicesList = Igs.getNetDevicesList();
-            for (int i = 0; i < netDevicesList.Length; i++)
+            string[] netAddressesList = Igs.getNetAddressesList();
+            if (netDevicesList.Length == netAddressesList.Length)
             {
-                string netDevice = netDevicesList[i];
-                Console.WriteLine("{0}: {1}", i, netDevice);
+                for (int i = 0; i < netDevicesList.Length; i++)
+                {
+                    string netDevice = netDevicesList[i];
+                    string netAddress = netAddressesList[i];
+
+                    Console.WriteLine("{0}: '{1}' with ip {2}", i, netDevice, netAddress);
+                }
             }
  
             // Verbose
