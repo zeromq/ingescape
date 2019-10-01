@@ -127,7 +127,7 @@ _____________________________________________________________________________
     WriteRegStr HKCR $R1 "backup_val" "$1"  ; backup current value
 NoBackup:
   WriteRegStr HKCR $R1 "" "$R3"  ; set our file association
-  WriteRegStr HKCR "$R1\ShellNew" "NullFile" ""
+  WriteRegStr HKCR "$R1\ShellNew" "" ""
  
   ReadRegStr $0 HKCR $R3 ""
   StrCmp $0 "" 0 Skip
@@ -136,7 +136,7 @@ NoBackup:
     WriteRegStr HKCR "$R3\DefaultIcon" "" "$R2,0"
 Skip:
   WriteRegStr HKCR "$R3\shell\open\command" "" '"$R2" "%1"'
-  WriteRegStr HKCR "$R3\shell\open\ddeexec" "" '[open(\"%1\")]'
+  WriteRegStr HKCR "$R3\shell\open\ddeexec" "" '[open("%1")]'
   WriteRegStr HKCR "$R3\shell\open\ddeexec\application" "" "IngeScape-Editor"
   WriteRegStr HKCR "$R3\shell\open\ddeexec\topic" "" "system"
  
