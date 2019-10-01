@@ -372,18 +372,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
 
         set(NSIS_FILE_ASSOCIATION_PATH "${SOURCE_DIR}/../../../builds/cmake/modules/apps/FileAssociation.nsh")
         string(REPLACE "/" "\\\\" NSIS_FILE_ASSOCIATION_PATH_VALID ${NSIS_FILE_ASSOCIATION_PATH} )
-        set(CPACK_NSIS_DEFINES "!include \\\"${NSIS_FILE_ASSOCIATION_PATH_VALID}\\\"")
-
-        set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
-    \\\${registerExtension} '\\\$INSTDIR\\\\${PROJECT_NAME}.exe' '.igsplatform' 'Platform files'
-    \\\${registerExtension} '\\\$INSTDIR\\\\${PROJECT_NAME}.exe' '.igsdefinition' 'Definition files'
-    \\\${registerExtension} '\\\$INSTDIR\\\\${PROJECT_NAME}.exe' '.igslicense' 'License files'
-        ")
-
-        set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
-    \\\${unregisterExtension} '.igsplatform' 'Platform files'
-    \\\${unregisterExtension} '.igsdefinition' 'Definition files'
-    \\\${unregisterExtension} '.igslicense' 'License files'
+        set(CPACK_NSIS_DEFINES "
+        !include \\\"${NSIS_FILE_ASSOCIATION_PATH_VALID}\\\"
+        !define NSIS_IS_EDITOR_BUILD \\\"ON\\\"
         ")
         
         install(FILES "${SOURCE_DIR}/resources/qt.conf" DESTINATION .)

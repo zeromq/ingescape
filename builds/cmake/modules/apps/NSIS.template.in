@@ -492,6 +492,11 @@ Section "-Core installation"
 
 @CPACK_NSIS_EXTRA_INSTALL_COMMANDS@
 
+  !ifdef NSIS_IS_EDITOR_BUILD
+    ${registerExtension} "$INSTDIR\@CPACK_PACKAGE_NAME@.exe" ".igsplatform" "Ingescape.Editor.igsplatform" "IGS Platform"
+    ${registerExtension} "$INSTDIR\@CPACK_PACKAGE_NAME@.exe" ".igsdefinition" "Ingescape.Editor.igsdefinition" "IGS Definition"
+    ${registerExtension} "$INSTDIR\@CPACK_PACKAGE_NAME@.exe" ".igslicense" "Ingescape.Editor.igslicense" "IGS License"
+  !endif
 SectionEnd
 
 ;--------------------------------
@@ -565,6 +570,12 @@ Section "Uninstall"
   ;MessageBox MB_OK "Start menu is in: $START_MENU"
 
 @CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS@
+
+  !ifdef NSIS_IS_EDITOR_BUILD
+    ${unregisterExtension} ".igsplatform" "Ingescape.Editor.igsplatform"
+    ${unregisterExtension} ".igsdefinition" "Ingescape.Editor.igsdefinition"
+    ${unregisterExtension} ".igslicense" "Ingescape.Editor.igslicense"
+  !endif
 
   ;Remove files we installed.
   ;Keep the list of directories here in sync with the File commands above.

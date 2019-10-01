@@ -73,21 +73,22 @@ _____________________________________________________________________________
  
  
  
-!macro RegisterExtensionCall _EXECUTABLE _EXTENSION _DESCRIPTION
+!macro RegisterExtensionCall _EXECUTABLE _EXTENSION _ID_APPLICATION _DESCRIPTION
   !verbose push
   !verbose ${_FileAssociation_VERBOSE}
   Push `${_DESCRIPTION}`
+  Push `${_ID_APPLICATION}`
   Push `${_EXTENSION}`
   Push `${_EXECUTABLE}`
   ${CallArtificialFunction} RegisterExtension_
   !verbose pop
 !macroend
  
-!macro UnRegisterExtensionCall _EXTENSION _DESCRIPTION
+!macro UnRegisterExtensionCall _EXTENSION _ID_APPLICATION
   !verbose push
   !verbose ${_FileAssociation_VERBOSE}
   Push `${_EXTENSION}`
-  Push `${_DESCRIPTION}`
+  Push `${_ID_APPLICATION}`
   ${CallArtificialFunction} UnRegisterExtension_
   !verbose pop
 !macroend
@@ -110,35 +111,43 @@ _____________________________________________________________________________
   Exch $R2 ;exe
   Exch
   Exch $R1 ;ext
+  Exch 2
+  Exch $R3 ;id
+  Exch 3
+  Exch $R0 ;desc
   Exch
   Exch 2
-  Exch $R0 ;desc
-  Exch 2
+  Exch     ;R0,R1,R2,R3
   Push $0
   Push $1
+
+  MessageBox MB_OK "$R0 : $R1 : $R2 : $R3"
  
   ReadRegStr $1 HKCR $R1 ""  ; read current file association
   StrCmp "$1" "" NoBackup  ; is it empty
-  StrCmp "$1" "$R0" NoBackup  ; is it our own
+  StrCmp "$1" "$R3" NoBackup  ; is it our own
     WriteRegStr HKCR $R1 "backup_val" "$1"  ; backup current value
 NoBackup:
-  WriteRegStr HKCR $R1 "" "$R0"  ; set our file association
+  WriteRegStr HKCR $R1 "" "$R3"  ; set our file association
+  WriteRegStr HKCR "$R1\ShellNew" "NullFile" ""
  
-  ReadRegStr $0 HKCR $R0 ""
+  ReadRegStr $0 HKCR $R3 ""
   StrCmp $0 "" 0 Skip
-    WriteRegStr HKCR "$R0" "" "$R0"
-    WriteRegStr HKCR "$R0\shell" "" "open"
-    WriteRegStr HKCR "$R0\DefaultIcon" "" "$R2,0"
+    WriteRegStr HKCR "$R3" "" "$R0"
+    WriteRegStr HKCR "$R3\shell" "" "open"
+    WriteRegStr HKCR "$R3\DefaultIcon" "" "$R2,0"
 Skip:
-  WriteRegStr HKCR "$R0\shell\open\command" "" '"$R2" "%1"'
-  WriteRegStr HKCR "$R0\shell\edit" "" "Edit $R0"
-  WriteRegStr HKCR "$R0\shell\edit\command" "" '"$R2" "%1"'
+  WriteRegStr HKCR "$R3\shell\open\command" "" '"$R2" "%1"'
+  WriteRegStr HKCR "$R3\shell\open\ddeexec" "" '[open(\"%1\")]'
+  WriteRegStr HKCR "$R3\shell\open\ddeexec\application" "" "IngeScape-Editor"
+  WriteRegStr HKCR "$R3\shell\open\ddeexec\topic" "" "system"
  
   Pop $1
   Pop $0
-  Pop $R2
-  Pop $R1
   Pop $R0
+  Pop $R1
+  Pop $R2
+  Pop $R3
  
   !verbose pop
 !macroend
@@ -158,7 +167,7 @@ Skip:
   !verbose push
   !verbose ${_FileAssociation_VERBOSE}
  
-  Exch $R1 ;desc
+  Exch $R1 ;id
   Exch
   Exch $R0 ;ext
   Exch
@@ -175,9 +184,9 @@ Skip:
 Restore:
   WriteRegStr HKCR $R0 "" $1
   DeleteRegValue HKCR $R0 "backup_val"
-  DeleteRegKey HKCR $R1 ;Delete key with association name settings
  
 NoOwn:
+  DeleteRegKey HKCR $R1 ;Delete key with association name settings
  
   Pop $1
   Pop $0
