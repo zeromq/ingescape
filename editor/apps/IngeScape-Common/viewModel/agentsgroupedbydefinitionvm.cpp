@@ -186,7 +186,7 @@ void AgentsGroupedByDefinitionVM::loadDefinition()
     QString definitionFilePath = QFileDialog::getOpenFileName(nullptr,
                                                               tr("Open definition"),
                                                               "",
-                                                              tr("Definition (*.igsdefinition)")
+                                                              tr("Definition (*.igsdefinition *.json)")
                                                               );
 
     if (!definitionFilePath.isEmpty()) {

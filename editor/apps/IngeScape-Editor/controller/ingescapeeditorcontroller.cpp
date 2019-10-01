@@ -668,7 +668,7 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
     QString platformFilePath = QFileDialog::getOpenFileName(nullptr,
                                                             tr("Open platform"),
                                                             _platformDirectoryPath,
-                                                            tr("Platform (*.igsplatform)")
+                                                            tr("Platform (*.igsplatform *.json)")
                                                             );
 
     if (!platformFilePath.isEmpty())
