@@ -120,8 +120,6 @@ _____________________________________________________________________________
   Exch     ;R0,R1,R2,R3
   Push $0
   Push $1
-
-  MessageBox MB_OK "$R0 : $R1 : $R2 : $R3"
  
   ReadRegStr $1 HKCR $R1 ""  ; read current file association
   StrCmp "$1" "" NoBackup  ; is it empty
