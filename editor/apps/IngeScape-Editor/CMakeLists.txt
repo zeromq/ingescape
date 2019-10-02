@@ -272,7 +272,7 @@ get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
 
 if (APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE YES)
-
+    set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/macos-Info.plist.in)
     # Mac OS X bundle specific settings
     set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${INGESCAPE_EDITOR_VERSION}")
@@ -280,6 +280,7 @@ if (APPLE)
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${INGESCAPE_EDITOR_VERSION_MAJOR}")
     set(MACOSX_BUNDLE_BUNDLE_VERSION "${INGESCAPE_EDITOR_VERSION}")
     set(MACOSX_BUNDLE_ICON_FILE "icon_IGS")
+    set(MACOSX_BUNDLE_COPYRIGHT "Copyright 2019 Ingenuity i/o")
 
     add_custom_command(
         TARGET ${PROJECT_NAME}

@@ -209,6 +209,9 @@ mac {
     # Set icon of our executable
     ICON = icon_IGS.icns
 
+
+    # Plist file
+    QMAKE_INFO_PLIST = macos-Info.plist
 }
 
 
