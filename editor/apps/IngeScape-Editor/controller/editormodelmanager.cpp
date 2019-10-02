@@ -174,6 +174,9 @@ void EditorModelManager::exportAgentsListToSelectedFile()
         QJsonArray jsonArrayOfAgents = exportAgentsToJSON();
 
         QJsonObject jsonRoot = QJsonObject();
+
+        jsonRoot.insert("version", VERSION_JSON_PLATFORM);
+
         jsonRoot.insert("agents", jsonArrayOfAgents);
 
         QByteArray byteArrayOfJson = QJsonDocument(jsonRoot).toJson(QJsonDocument::Indented);
