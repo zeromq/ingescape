@@ -399,7 +399,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
             if (QString::compare(scheme, QStringLiteral("file"), Qt::CaseSensitive) == 0)
             {
                 QFileInfo fileInfo(pendingRequest.second);
-                if (QString::compare(fileInfo.suffix(), QStringLiteral("igsplatform")) == 0)
+                if (
+                    (QString::compare(fileInfo.suffix(), QStringLiteral("igsplatform")) == 0)
+                    ||
+                    // Our application may be launched with a .json file as command line argument
+                    // We assume that this .json file is an IGS platform file
+                    (QString::compare(fileInfo.suffix(), QStringLiteral("json")) == 0)
+                   )
                 {
                     _currentPlatformFilePath = pendingOpenFileRequestFilePath;
 
@@ -445,7 +451,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Application
     if (IngescapeApplication::instance() != nullptr)
     {
-        // Check if there is a pending "open file" request (agent(s) definition or license file)
+        // Check if there is a pending "open file" request (agent(s) definition (.igsdefinition) or license file (.igslicense))
         if (hasPendingOpenFileRequest)
         {
             _onOpenFileRequest(pendingOpenFileRequestUrl, pendingOpenFileRequestFilePath);
@@ -1634,7 +1640,7 @@ void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
 {
     if (!platformFilePath.isEmpty())
     {
-        qInfo() << "Save the current platform to JSON file" << platformFilePath;
+        qInfo() << "Save the current platform to file" << platformFilePath;
 
         // Get the JSON of the current platform
         QJsonDocument jsonDocument = _getJsonOfCurrentPlatform();

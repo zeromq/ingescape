@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>@EXECUTABLE@</string>
+	<key>CFBundleGetInfoString</key>
+	<string>@EXECUTABLE@ @FULL_VERSION@</string>
+	<key>CFBundleIconFile</key>
+	<string>@ICON@</string>
+	<key>CFBundleIdentifier</key>
+	<string>@BUNDLEIDENTIFIER@</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleLongVersionString</key>
+	<string>@FULL_VERSION@</string>
+	<key>CFBundleName</key>
+	<string>@EXECUTABLE@</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>@FULL_VERSION@</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>@FULL_VERSION@</string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright 2019 Ingenuity i/o</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<!-- Declare associated filetypes -->
+	<key>CFBundleDocumentTypes</key>              
+	<array>
+		<!-- IGS platform files -->
+		<dict>
+			<key>CFBundleTypeExtensions</key>         
+			<array>
+				<string>igsplatform</string>
+			</array>
+			<key>CFBundleTypeName</key>               
+			<string>IGS Platform (.igsplatform)</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>@ICON@</string>
+			<key>CFBundleTypeRole</key>              
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+            		<string>Owner</string>
+		</dict>
+		<!-- IGS agent definition files -->
+		<dict>
+			<key>CFBundleTypeExtensions</key>         
+			<array>
+				<string>igsdefinition</string>
+			</array>
+			<key>CFBundleTypeName</key>               
+			<string>IGS Agent definition (.igsdefinition)</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>@ICON@</string>
+			<key>CFBundleTypeRole</key>              
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+            		<string>Owner</string>
+		</dict>
+		<!-- IGS license files -->
+		<dict>
+			<key>CFBundleTypeExtensions</key>         
+			<array>
+				<string>igslicense</string>
+			</array>
+			<key>CFBundleTypeName</key>               
+			<string>IGS License (.igslicense)</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>@ICON@</string>
+			<key>CFBundleTypeRole</key>              
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+            		<string>Owner</string>
+		</dict>
+	</array>
+</dict>
+</plist>
