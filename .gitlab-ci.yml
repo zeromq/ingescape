@@ -115,7 +115,7 @@ lib-linux-release-x64:
     paths:
       - build
     name: "lib-linux-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape library for Debian 9 (x86_64)
@@ -134,7 +134,7 @@ lib-debian-9-release-x64:
     paths:
       - build
     name: "lib-debian-9-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape library for Debian 10 (x86_64)
@@ -153,7 +153,7 @@ lib-debian-10-release-x64:
     paths:
       - build
     name: "lib-debian-10-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape library for CentOS 7 (x86_64)
@@ -172,7 +172,7 @@ lib-centos-7-release-x64:
     paths:
       - build
     name: "lib-centos-7-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape library for linux (armv7/armhf)
@@ -191,7 +191,7 @@ lib-linux-release-armhf:
     paths:
       - build
     name: "lib-linux-release-armhf"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape library for Raspbian 9 (armv7/armhf)
@@ -210,7 +210,7 @@ lib-raspbian-9-release-armhf:
     paths:
       - build
     name: "lib-raspbian-9-release-armhf"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape library for Android (armv7a softfp)
@@ -229,7 +229,7 @@ lib-android-release-armv7a-softfp:
     paths:
       - build
     name: "lib-android-release-armv7a-softfp"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape library for macos
@@ -247,7 +247,7 @@ lib-macos-release-x64:
     paths:
       - build
     name: "lib-macos-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 binding-csharp-windows-x64:
@@ -267,7 +267,7 @@ binding-csharp-windows-x64:
     paths:
      - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     name: "binding-csharp-windows-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 binding-csharp-windows-x86:
@@ -287,7 +287,7 @@ binding-csharp-windows-x86:
     paths:
      - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
     name: "binding-csharp-windows-x86"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape editor for macos
@@ -307,7 +307,7 @@ editor-macos-release-x64:
     paths:
       - editor/apps/IngeScape-Editor/build
     name: "editor-macos-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape assessments for macos
@@ -328,7 +328,7 @@ assessments-macos-release-x64:
     paths:
       - editor/apps/IngeScape-Assessments/build
     name: "assessments-macos-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape expe for macos
@@ -349,7 +349,7 @@ expe-macos-release-x64:
     paths:
       - editor/apps/IngeScape-Expe/build
     name: "expe-macos-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape library for windows 64 bits release
@@ -371,7 +371,7 @@ lib-windows-release-x64:
     paths:
      - build
     name: "lib-windows-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape library for windows 32 bits release
@@ -393,7 +393,7 @@ lib-windows-release-x86:
     paths:
      - build
     name: "lib-windows-release-x86"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape library for windows 64 bits debug
@@ -415,7 +415,7 @@ lib-windows-debug-x64:
     paths:
      - build
     name: "lib-windows-debug-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape library for windows 32 bits debug
@@ -437,7 +437,7 @@ lib-windows-debug-x86:
     paths:
      - build
     name: "lib-windows-debug-x86"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape editor for windows
@@ -460,7 +460,7 @@ editor-windows-release-x86:
     paths:
       - editor\apps\IngeScape-Editor\build
     name: "editor-windows-release-x86"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape editor for windows
@@ -483,7 +483,7 @@ editor-windows-release-x64:
     paths:
       - editor\apps\IngeScape-Editor\build
     name: "editor-windows-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape assessments for windows
@@ -507,7 +507,7 @@ assessments-windows-release-x86:
     paths:
       - editor\apps\IngeScape-Assessments\build
     name: "assessments-windows-release-x86"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape assessments for windows
@@ -531,7 +531,7 @@ assessments-windows-release-x64:
     paths:
       - editor\apps\IngeScape-Assessments\build
     name: "assessments-windows-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape expe for windows (x86)
@@ -555,7 +555,7 @@ expe-windows-release-x86:
     paths:
       - editor\apps\IngeScape-Expe\build
     name: "expe-windows-release-x86"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape expe for windows (x64)
@@ -579,7 +579,7 @@ expe-windows-release-x64:
     paths:
       - editor\apps\IngeScape-Expe\build
     name: "expe-windows-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create runtime install for windows 32 bits
