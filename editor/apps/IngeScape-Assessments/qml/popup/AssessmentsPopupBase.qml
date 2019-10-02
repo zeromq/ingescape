@@ -88,6 +88,8 @@ I2PopupBase {
         }
 
         Button {
+            id: btnClose
+
             anchors {
                 verticalCenter: parent.verticalCenter
                 right: parent.right

@@ -47,6 +47,9 @@ class AssessmentsModelManager : public IngeScapeModelManager
 {
     Q_OBJECT
 
+    // IP Address of the (Cassandra) DataBase
+    I2_QML_PROPERTY_READONLY(QString, dataBaseAddress)
+
 
 public:
 
@@ -390,6 +393,14 @@ public:
 
 
     /**
+     * @brief Connect to the Cassandra DataBase
+     * @param dataBaseAddress
+     * @return
+     */
+    Q_INVOKABLE bool connectToDataBase(QString dataBaseAddress);
+
+
+    /**
      * @brief Converts the given CassUuid into a readable QString
      * This is a static utility function and does not interact with the Cassandra server
      * @param cassUuid
@@ -444,11 +455,6 @@ private:
      * pools of connections to cluster nodes which are used to query the cluster.
      */
     CassSession* _cassSession = nullptr;
-
-    /**
-     * @brief The Cassandra server URL
-     */
-    QString _cassServer;
 
     /**
      * @brief A UUID generator privoded by Cassandra

@@ -23,6 +23,7 @@ import INGESCAPE 1.0
 
 import "experimentation" as Experimentation
 import "task_instance" as TaskInstance
+import "popup" as Popup
 
 
 Item {
@@ -77,6 +78,14 @@ Item {
     //
     function openLicensePopup() {
         licensePopup.open();
+    }
+
+
+    //
+    // Function allowing to open the database (configuration) popup
+    //
+    function openDataBasePopup() {
+        dataBasePopup.open();
     }
 
 
@@ -299,5 +308,17 @@ Item {
         anchors.centerIn: parent
 
         //licenseController: IngeScapeAssessmentsC.licensesC
+    }
+
+
+    //
+    // DataBase (Configuration) Popup
+    //
+    Popup.DataBaseConfigurationPopup {
+        id: dataBasePopup
+
+        anchors.centerIn: parent
+
+        modelManager: IngeScapeAssessmentsC.modelManager
     }
 }

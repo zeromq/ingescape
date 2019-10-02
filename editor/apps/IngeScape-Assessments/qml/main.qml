@@ -166,6 +166,15 @@ ApplicationWindow {
                 }
             }
 
+            MenuItem {
+                text: qsTr("DataBase")
+
+                onTriggered: {
+                    console.log("QML: Open the DataBase configuration popup");
+                    applicationLoader.item.openDataBasePopup();
+                }
+            }
+
             MenuSeparator {}
 
             MenuItem {
