@@ -362,6 +362,14 @@ private:
 
 
     /**
+     * @brief Manage a new model of agent ON on a host for a group of agents with the same definition (can be NULL)
+     * @param model
+     * @param groupOfAgentsWithSameDefinition
+     */
+    void _manageNewModelOnHostForGroup(AgentM* model, AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition);
+
+
+    /**
      * @brief Create a new view model of agents grouped by definition
      * @param definition
      * @param model
