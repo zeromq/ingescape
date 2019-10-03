@@ -26,7 +26,6 @@
         <file>qml/theme/IngeScapeAssessmentsButtonStyle.qml</file>
         <file>qml/theme/IngeScapeAssessmentsListHeader.qml</file>
         <file>qml/subject/Subject.qml</file>
-        <file>resources/SVG/ingescape_assessments-pictos-SVG.svg</file>
         <file>qml/theme/IngeScapeAssessmentsSvgButtonStyle.qml</file>
         <file>qml/theme/IngeScapeAssessmentsSvgAndTextButtonStyle.qml</file>
         <file>qml/task/IndependentVariableDelegate.qml</file>
@@ -38,5 +37,6 @@
         <file>qml/theme/IngeScapeAssessmentsComboboxStyle.qml</file>
         <file>qml/theme/IngeScapeAssessmentsTextAreaStyle.qml</file>
         <file>qml/popup/DatabaseConfigurationPopup.qml</file>
+        <file>resources/SVG/ingescape_assessments-pictos.svg</file>
     </qresource>
 </RCC>

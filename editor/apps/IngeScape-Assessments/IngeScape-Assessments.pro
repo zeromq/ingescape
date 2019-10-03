@@ -191,7 +191,7 @@ mac {
 
 
     # Set icon of our executable
-    ICON = icon_IGS.icns
+    ICON = icon_Assessments.icns
 
 }
 
@@ -276,7 +276,7 @@ win32 {
 
 
     # Set icon of our executable
-    RC_ICONS = icon_IGS.ico
+    RC_ICONS = icon_Assessments.ico
 
     # Set application info
     QMAKE_TARGET_COMPANY = Ingenuity i/o

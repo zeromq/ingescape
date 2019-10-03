@@ -51,8 +51,8 @@ Item {
 
         anchors.centerIn: parent
 
-        width: 244
-        height: 244
+        width: 297
+        height: 297
 
         I2SvgItem {
             id: logo
