@@ -47,23 +47,27 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
     // Create the (fake) group "New"
     _newGroup = new ExperimentationsGroupVM(tr("New Group"), nullptr);
 
-    // Create the query
-    QList<ExperimentationM*> experimentationList = AssessmentsModelManager::select<ExperimentationM>({}); // #NoFilter
-    for (ExperimentationM* experimentation : experimentationList)
+    // Check that we are connected to the database
+    if (AssessmentsModelManager::Instance()->isConnectedToDatabase())
     {
-        if (experimentation != nullptr)
+        // Create the query
+        QList<ExperimentationM*> experimentationList = AssessmentsModelManager::select<ExperimentationM>({}); // #NoFilter
+        for (ExperimentationM* experimentation : experimentationList)
         {
-            ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentation->groupName());
-            if (experimentationsGroup == nullptr)
+            if (experimentation != nullptr)
             {
-                // Create the ExperimentationGroupVM
-                experimentationsGroup = _createNewExperimentationGroup(experimentation->groupName());
-            }
+                ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentation->groupName());
+                if (experimentationsGroup == nullptr)
+                {
+                    // Create the ExperimentationGroupVM
+                    experimentationsGroup = _createNewExperimentationGroup(experimentation->groupName());
+                }
 
-            if (experimentationsGroup != nullptr)
-            {
-                // Add to the group
-                experimentationsGroup->experimentations()->append(experimentation);
+                if (experimentationsGroup != nullptr)
+                {
+                    // Add to the group
+                    experimentationsGroup->experimentations()->append(experimentation);
+                }
             }
         }
     }
@@ -193,6 +197,11 @@ ExperimentationsGroupVM* ExperimentationsListController::_getExperimentationsGro
 }
 
 
+/**
+ * @brief Creates a new experimentation group and returns it
+ * @param experimentationsGroup
+ * @param newExperimentationsGroupName
+ */
 ExperimentationsGroupVM* ExperimentationsListController::_createNewExperimentationGroup(const QString& newExperimentationsGroupName)
 {
     ExperimentationsGroupVM* expeGroupVM = new ExperimentationsGroupVM(newExperimentationsGroupName, nullptr);

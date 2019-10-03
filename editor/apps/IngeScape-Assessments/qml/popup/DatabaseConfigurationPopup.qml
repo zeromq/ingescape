@@ -102,7 +102,7 @@ AssessmentsPopupBase {
 
             height: 30
 
-            text: qsTr("IP address or 'localhost':")
+            text: qsTr("Database IP address (or 'localhost'):")
 
             verticalAlignment: Text.AlignVCenter
 
@@ -149,15 +149,32 @@ AssessmentsPopupBase {
             }
         }
 
-        // Error message
-        Text {
-            id: textErrorMessage
+
+        Rectangle {
+            id: stateFeedback
 
             anchors {
                 left: parent.left
-                right: parent.right
+                verticalCenter: textStateMessage.verticalCenter
+            }
+
+            width: 20
+            height: 20
+
+            color: (rootPopup.modelManager && rootPopup.modelManager.isConnectedToDatabase) ? "green" : "red"
+            radius: 10
+        }
+
+        // State message
+        Text {
+            id: textStateMessage
+
+            anchors {
                 top: txtDatabaseAddress.bottom
                 topMargin: 15
+                left: stateFeedback.right
+                leftMargin: 10
+                right: parent.right
             }
 
             wrapMode: Text.WordWrap
@@ -174,6 +191,7 @@ AssessmentsPopupBase {
 
             //visible: (text.length !== 0)
         }
+
 
     }
 
@@ -249,7 +267,7 @@ AssessmentsPopupBase {
             }
 
             onClicked: {
-                console.log("Update database address " + txtDatabaseAddress.text);
+                //console.log("Update database address " + txtDatabaseAddress.text);
 
                 if (rootPopup.modelManager)
                 {

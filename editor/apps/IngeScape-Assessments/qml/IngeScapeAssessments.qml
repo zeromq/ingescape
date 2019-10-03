@@ -101,6 +101,12 @@ Item {
     Component.onCompleted: {
         // FIXME Several popup may appear at startup depending on the current platform configuration. Need to prioritize them and maybe show them sequentialy, not on top of each other.
 
+        // ...we check if we are connected to a database
+        if (IngeScapeAssessmentsC.modelManager && !IngeScapeAssessmentsC.modelManager.isConnectedToDatabase)
+        {
+            openDatabasePopup();
+        }
+
         // ...we check the value of the error message when a connection attempt fails
         if (IngeScapeAssessmentsC.errorMessageWhenConnectionFailed !== "")
         {

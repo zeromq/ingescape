@@ -406,6 +406,12 @@ public:
 
 
     /**
+     * @brief DIS-connect from the Cassandra Database
+     */
+    void disconnectFromDatabase();
+
+
+    /**
      * @brief Converts the given CassUuid into a readable QString
      * This is a static utility function and does not interact with the Cassandra server
      * @param cassUuid
