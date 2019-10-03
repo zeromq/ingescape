@@ -37,6 +37,6 @@
         <file>qml/task_instance/AttachementDelegate.qml</file>
         <file>qml/theme/IngeScapeAssessmentsComboboxStyle.qml</file>
         <file>qml/theme/IngeScapeAssessmentsTextAreaStyle.qml</file>
-        <file>qml/popup/DataBaseConfigurationPopup.qml</file>
+        <file>qml/popup/DatabaseConfigurationPopup.qml</file>
     </qresource>
 </RCC>

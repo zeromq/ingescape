@@ -84,8 +84,8 @@ Item {
     //
     // Function allowing to open the database (configuration) popup
     //
-    function openDataBasePopup() {
-        dataBasePopup.open();
+    function openDatabasePopup() {
+        databasePopup.open();
     }
 
 
@@ -312,10 +312,10 @@ Item {
 
 
     //
-    // DataBase (Configuration) Popup
+    // Database (Configuration) Popup
     //
-    Popup.DataBaseConfigurationPopup {
-        id: dataBasePopup
+    Popup.DatabaseConfigurationPopup {
+        id: databasePopup
 
         anchors.centerIn: parent
 

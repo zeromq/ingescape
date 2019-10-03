@@ -167,11 +167,11 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: qsTr("DataBase")
+                text: qsTr("Database")
 
                 onTriggered: {
-                    console.log("QML: Open the DataBase configuration popup");
-                    applicationLoader.item.openDataBasePopup();
+                    console.log("QML: Open the Database configuration popup");
+                    applicationLoader.item.openDatabasePopup();
                 }
             }
 

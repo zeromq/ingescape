@@ -155,7 +155,9 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
                                                  QObject *parent) : IngeScapeModelManager(jsonHelper,
                                                                                           rootDirectoryPath,
                                                                                           parent),
-    _dataBaseAddress("localhost"),
+    _databaseAddress("localhost"),
+    _isConnectedToDatabase(false),
+    _errorMessageWhenDatabaseConnectionFailed(""),
     _cassCluster(nullptr),
     _cassSession(nullptr),
     _cassUuidGen(nullptr)
@@ -167,34 +169,22 @@ AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
 
 
     //
-    // Init about Cassandra DataBase
+    // Init about Cassandra database
     //
     _cassCluster = cass_cluster_new();
     _cassSession = cass_session_new();
     _cassUuidGen = cass_uuid_gen_new();
 
-    // Retrieve the IP Address of the (Cassandra) DataBase
-    QVariant tempDataBaseAddress = IngeScapeSettings::Instance().value("network/dataBaseAddress");
-    if (tempDataBaseAddress.isValid())
+    // Retrieve the IP Address of the (Cassandra) database
+    QVariant tempDatabaseAddress = IngeScapeSettings::Instance().value("network/databaseAddress");
+    if (tempDatabaseAddress.isValid())
     {
-        _dataBaseAddress = tempDataBaseAddress.toString();
-        qInfo() << "DataBase address" << _dataBaseAddress;
+        setdatabaseAddress(tempDatabaseAddress.toString());
+        qInfo() << "Database address" << _databaseAddress;
     }
 
-    // Establishing the connection
-    cass_cluster_set_contact_points(_cassCluster, _dataBaseAddress.toStdString().c_str());
-
-    // Connects a session
-    CassFuture* cassFuture = cass_session_connect(_cassSession, _cassCluster);
-    CassError cassError = cass_future_error_code(cassFuture);
-    if (cassError == CASS_OK) {
-        qInfo() << "Connected to the Cassandra DataBase on" << _dataBaseAddress;
-    }
-    else {
-        qCritical() << "Could not connect to the Cassandra DataBase on" << _dataBaseAddress << "(" << cass_error_desc(cassError) << ")";
-    }
-
-    cass_future_free(cassFuture);
+    // Connect to the Cassandra database
+    connectToDatabase();
 }
 
 
@@ -206,7 +196,7 @@ AssessmentsModelManager::~AssessmentsModelManager()
     qInfo() << "Delete IngeScape Assessments Model Manager";
 
     //
-    // Cleaning about Cassandra DataBase
+    // Cleaning about Cassandra database
     //
     if (_cassUuidGen != nullptr) {
         cass_uuid_gen_free(_cassUuidGen);
@@ -227,6 +217,29 @@ AssessmentsModelManager::~AssessmentsModelManager()
 
     // Mother class is automatically called
     //IngeScapeModelManager::~IngeScapeModelManager();
+}
+
+
+/**
+ * @brief Setter for property "Database Address"
+ * @param value
+ */
+void AssessmentsModelManager::setdatabaseAddress(QString value)
+{
+    if (_databaseAddress != value)
+    {
+        _databaseAddress = value;
+
+        // Update settings file
+        IngeScapeSettings &settings = IngeScapeSettings::Instance();
+
+        settings.setValue("network/databaseAddress", _databaseAddress);
+
+        // Save new values
+        settings.sync();
+
+        Q_EMIT databaseAddressChanged(value);
+    }
 }
 
 
@@ -261,32 +274,63 @@ CassUuidGen* AssessmentsModelManager::getCassUuidGen()
 
 
 /**
- * @brief Connect to the Cassandra DataBase
- * @param dataBaseAddress
- * @return
+ * @brief Connect to the Cassandra Database
  */
-bool AssessmentsModelManager::connectToDataBase(QString dataBaseAddress)
+void AssessmentsModelManager::connectToDatabase()
 {
-    bool success = false;
+    if ((_cassCluster != nullptr) && (_cassSession != nullptr))
+    {
+        if (_isConnectedToDatabase)
+        {
+            // Closes the session instance, outputs a close future which can be used to determine when the session has been terminated.
+            // This allows in-flight requests to finish.
+            CassFuture* cassFuture1 = cass_session_close(_cassSession);
 
-    // Establishing the connection
-    cass_cluster_set_contact_points(_cassCluster, _dataBaseAddress.toStdString().c_str());
+            CassError cassError1 = cass_future_error_code(cassFuture1);
 
-    // Connects a session
-    CassFuture* cassFuture = cass_session_connect(_cassSession, _cassCluster);
-    CassError cassError = cass_future_error_code(cassFuture);
-    if (cassError == CASS_OK) {
-        qInfo() << "Connected to the Cassandra DataBase on" << _dataBaseAddress;
-        success = true;
+            if (cassError1 == CASS_OK)
+            {
+                qInfo() << "DIS-connected from the Cassandra database";
+            }
+            else
+            {
+                qCritical() << "Could not DIS-connect from the Cassandra database (" << cass_error_desc(cassError1) << ")";
+            }
+
+            cass_future_free(cassFuture1);
+
+            //cass_session_free(_cassSession);
+        }
+
+        // Establishing the connection
+        cass_cluster_set_contact_points(_cassCluster, _databaseAddress.toStdString().c_str());
+
+        // Connects a session
+        CassFuture* cassFuture2 = cass_session_connect(_cassSession, _cassCluster);
+        //CassFuture* cassFuture2 = cass_session_connect_keyspace(_cassSession, _cassCluster, "ingescape");
+
+        CassError cassError2 = cass_future_error_code(cassFuture2);
+
+        if (cassError2 == CASS_OK)
+        {
+            qInfo() << "Connected to the Cassandra database on" << _databaseAddress;
+
+            // Reset the error message and set the flag
+            //seterrorMessageWhenDatabaseConnectionFailed("");
+            seterrorMessageWhenDatabaseConnectionFailed(tr("Connected to the Cassandra database on '%1'").arg(_databaseAddress));
+            setisConnectedToDatabase(true);
+        }
+        else
+        {
+            qCritical() << "Could not connect to the Cassandra database on" << _databaseAddress << "(" << cass_error_desc(cassError2) << ")";
+
+            // Set the error message
+            seterrorMessageWhenDatabaseConnectionFailed(tr("Failed to connect to the Cassandra database on '%1'\nMust be 'localhost' or an IP address").arg(_databaseAddress));
+            setisConnectedToDatabase(false);
+        }
+
+        cass_future_free(cassFuture2);
     }
-    else {
-        qCritical() << "Could not connect to the Cassandra DataBase on" << _dataBaseAddress << "(" << cass_error_desc(cassError) << ")";
-        //success = false;
-    }
-
-    cass_future_free(cassFuture);
-
-    return success;
 }
 
 

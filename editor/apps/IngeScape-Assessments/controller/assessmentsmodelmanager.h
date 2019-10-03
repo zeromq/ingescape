@@ -47,8 +47,14 @@ class AssessmentsModelManager : public IngeScapeModelManager
 {
     Q_OBJECT
 
-    // IP Address of the (Cassandra) DataBase
-    I2_QML_PROPERTY_READONLY(QString, dataBaseAddress)
+    // IP Address of the Cassandra database
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, databaseAddress)
+
+    // Flag indicating if we are connected to the Cassandra database
+    I2_QML_PROPERTY_READONLY(bool, isConnectedToDatabase)
+
+    // Error message when a connection to the database attempt fails
+    I2_QML_PROPERTY_READONLY(QString, errorMessageWhenDatabaseConnectionFailed)
 
 
 public:
@@ -393,11 +399,10 @@ public:
 
 
     /**
-     * @brief Connect to the Cassandra DataBase
-     * @param dataBaseAddress
+     * @brief Connect to the Cassandra Database
      * @return
      */
-    Q_INVOKABLE bool connectToDataBase(QString dataBaseAddress);
+    Q_INVOKABLE void connectToDatabase();
 
 
     /**

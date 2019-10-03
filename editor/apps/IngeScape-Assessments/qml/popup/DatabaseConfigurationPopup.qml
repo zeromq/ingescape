@@ -54,7 +54,7 @@ AssessmentsPopupBase {
     onOpened: {
         if (modelManager)
         {
-            txtDataBaseAddress.text = modelManager.dataBaseAddress;
+            txtDatabaseAddress.text = modelManager.databaseAddress;
         }
     }
 
@@ -67,23 +67,12 @@ AssessmentsPopupBase {
     //
     //--------------------------------
 
-    //
-    // Reset all user inputs and close the popup
-    //
-    function resetInputsAndClosePopup() {
-        console.log("QML: Reset all user inputs and close popup");
-
-        // Reset all user inputs
-        //txtRecordName.text = "";
-
-        // Close the popup
-        rootPopup.close();
-    }
-
 
     //--------------------------------
     //
+    //
     // Content
+    //
     //
     //--------------------------------
 
@@ -103,7 +92,7 @@ AssessmentsPopupBase {
         //height: 30
 
         Text {
-            id: lblDataBaseAddress
+            id: lblDatabaseAddress
 
             anchors {
                 left: parent.left
@@ -126,12 +115,12 @@ AssessmentsPopupBase {
         }
 
         TextField {
-            id: txtDataBaseAddress
+            id: txtDatabaseAddress
 
             anchors {
                 left: parent.left
                 right: parent.right
-                top: lblDataBaseAddress.bottom
+                top: lblDatabaseAddress.bottom
                 topMargin: 5
                 //verticalCenter: parent.verticalCenter
             }
@@ -158,6 +147,32 @@ AssessmentsPopupBase {
                     family: IngeScapeTheme.textFontFamily
                 }
             }
+        }
+
+        // Error message
+        Text {
+            id: textErrorMessage
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: txtDatabaseAddress.bottom
+                topMargin: 15
+            }
+
+            wrapMode: Text.WordWrap
+
+            color: (rootPopup.modelManager && rootPopup.modelManager.isConnectedToDatabase) ? IngeScapeAssessmentsTheme.regularDarkBlueHeader : IngeScapeTheme.orangeColor
+
+            font {
+                family: IngeScapeTheme.textFontFamily
+                bold: true
+                pixelSize: 16
+            }
+
+            text: rootPopup.modelManager ? rootPopup.modelManager.errorMessageWhenDatabaseConnectionFailed : ""
+
+            //visible: (text.length !== 0)
         }
 
     }
@@ -208,8 +223,8 @@ AssessmentsPopupBase {
             }
 
             onClicked: {
-                // Reset all user inputs and close the popup
-                rootPopup.resetInputsAndClosePopup();
+                // Close the popup
+                rootPopup.close();
             }
         }
 
@@ -227,32 +242,33 @@ AssessmentsPopupBase {
 
             activeFocusOnPress: true
 
-            enabled: rootPopup.modelManager && (rootPopup.modelManager.dataBaseAddress !== txtDataBaseAddress.text)
+            enabled: rootPopup.modelManager && (rootPopup.modelManager.databaseAddress !== txtDatabaseAddress.text)
 
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OK"
             }
 
             onClicked: {
-                console.log("Update DataBase address " + txtDataBaseAddress.text);
+                console.log("Update database address " + txtDatabaseAddress.text);
 
                 if (rootPopup.modelManager)
                 {
-                    //rootPopup.modelManager.dataBaseAddress = txtDataBaseAddress.text;
+                    rootPopup.modelManager.databaseAddress = txtDatabaseAddress.text;
 
-                    var success = rootPopup.modelManager.connectToDataBase(txtDataBaseAddress.text);
-                    if (success)
+                    rootPopup.modelManager.connectToDatabase();
+
+                    if (rootPopup.modelManager.isConnectedToDatabase)
                     {
-                        console.log("QML: Connected to the Cassandra DataBase on " + rootPopup.modelManager.dataBaseAddress);
+                        console.log("QML: Connected to the Cassandra database on " + rootPopup.modelManager.databaseAddress);
+
+                        // Close the popup
+                        //rootPopup.close();
                     }
                     else
                     {
-                        console.warn("QML: Could not connect to the Cassandra DataBase on " + rootPopup.modelManager.dataBaseAddress);
+                        console.warn("QML: Could not connect to the Cassandra database on " + rootPopup.modelManager.databaseAddress);
                     }
                 }
-
-                // Reset all user inputs and close the popup
-                rootPopup.resetInputsAndClosePopup();
             }
         }
     }
