@@ -127,6 +127,10 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _exportC = new ExportController(this);
 
 
+    // Connect to signals from the data model manager
+    connect(_modelManager, &AssessmentsModelManager::isConnectedToDatabaseChanged,
+            this, &IngeScapeAssessmentsController::_onIsConnectedToDatabaseChanged);
+
     // Connect to signals from the experimentation controller to the rest of the controllers
     connect(_experimentationC, &ExperimentationController::currentExperimentationChanged,
             this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
@@ -361,6 +365,35 @@ bool IngeScapeAssessmentsController::restartNetwork(QString strPort, QString net
 void IngeScapeAssessmentsController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
+}
+
+
+/**
+ * @brief Slot called when the flag "Is Connected to Database" changed
+ * @param isConnectedToDatabase
+ */
+void IngeScapeAssessmentsController::_onIsConnectedToDatabaseChanged(bool isConnectedToDatabase)
+{
+    // Databse connection is BACK
+    if (isConnectedToDatabase)
+    {
+        qInfo("Database connection: NOT connected --> CONNECTED");
+
+        if (_experimentationsListC != nullptr)
+        {
+            _experimentationsListC->updateWhenConnectedDatabase();
+        }
+    }
+    // Databse connection is LOST
+    else
+    {
+        qInfo("Database connection: CONNECTED --> NOT connected");
+
+        if (_experimentationsListC != nullptr)
+        {
+            _experimentationsListC->updateWhenDISconnectedDatabase();
+        }
+    }
 }
 
 

@@ -130,6 +130,13 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     /**
+     * @brief Slot called when the flag "Is Connected to Database" changed
+     * @param isConnectedToDatabase
+     */
+    void _onIsConnectedToDatabaseChanged(bool isConnectedToDatabase);
+
+
+    /**
      * @brief Slot called when the current experimentation changed
      * @param value
      */
