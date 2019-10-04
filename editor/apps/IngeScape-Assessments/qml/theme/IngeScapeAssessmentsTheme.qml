@@ -31,12 +31,12 @@ Item {
     //-----------------------------------------
 
     // Minimum size of our application (Window)
-    readonly property int appMinWidth: 1530
-    readonly property int appMinHeight: 768
+    readonly property int appMinWidth: 1280
+    readonly property int appMinHeight: 960
 
     // Default size of our application (Window)
-    readonly property int appDefaultWidth: 1920
-    readonly property int appDefaultHeight: 1080
+    readonly property int appDefaultWidth: 1280
+    readonly property int appDefaultHeight: 960
 
 
     //-----------------------------------------
