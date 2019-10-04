@@ -212,6 +212,28 @@ Item {
         }
     }
 
+    Label {
+        id: lblNoneExperimentations
+
+        anchors {
+            verticalCenter: btnNewExpe.verticalCenter
+            right: btnNewExpe.left
+            rightMargin: 5
+        }
+
+        visible: controller && (controller.experimentationsTotalNumber === 0)
+
+        text: "Create a new experiment to start using the application:"
+
+        color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+        font {
+            family: IngeScapeTheme.textFontFamily
+            pixelSize: 20
+            //bold: true
+            italic: true
+        }
+    }
+
 
     ScrollView {
         id: scrollViewExperimentationsGroups

@@ -22,7 +22,8 @@
  */
 ExperimentationsListController::ExperimentationsListController(QObject *parent) : QObject(parent),
     _defaultGroupOther(nullptr),
-    _newGroup(nullptr)
+    _newGroup(nullptr),
+    _experimentationsTotalNumber(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -144,11 +145,19 @@ void ExperimentationsListController::createNewExperimentationInGroup(QString exp
     if (!experimentationName.isEmpty() && (experimentationsGroup != nullptr)
             && (AssessmentsModelManager::Instance() != nullptr))
     {
-        ExperimentationM* experimentation = new ExperimentationM(AssessmentsModelManager::genCassUuid(), experimentationName, experimentationsGroup->name(), QDateTime::currentDateTime(), nullptr);
-        if (experimentation != nullptr && AssessmentsModelManager::insert(*experimentation))
+        ExperimentationM* experimentation = new ExperimentationM(AssessmentsModelManager::genCassUuid(),
+                                                                 experimentationName,
+                                                                 experimentationsGroup->name(),
+                                                                 QDateTime::currentDateTime(),
+                                                                 nullptr);
+
+        if ((experimentation != nullptr) && AssessmentsModelManager::insert(*experimentation))
         {
             // Add to the group
             experimentationsGroup->experimentations()->append(experimentation);
+
+            // Update the total number of experimentations
+            setexperimentationsTotalNumber(_experimentationsTotalNumber + 1);
         }
     }
     else {
@@ -182,6 +191,9 @@ void ExperimentationsListController::deleteExperimentationOfGroup(Experimentatio
 
         // Remove from the group
         experimentationsGroup->experimentations()->remove(experimentation);
+
+        // Update the total number of experimentations
+        setexperimentationsTotalNumber(_experimentationsTotalNumber - 1);
 
         // Remove from DB
         ExperimentationM::deleteExperimentationFromCassandra(*experimentation);
@@ -245,6 +257,9 @@ void ExperimentationsListController::_initExperimentationsList()
                 {
                     // Add to the group
                     experimentationsGroup->experimentations()->append(experimentation);
+
+                    // Update the total number of experimentations
+                    setexperimentationsTotalNumber(_experimentationsTotalNumber + 1);
                 }
             }
         }

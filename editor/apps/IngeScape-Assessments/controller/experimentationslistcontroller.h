@@ -40,11 +40,8 @@ class ExperimentationsListController : public QObject
     // (Fake) group "New"
     I2_QML_PROPERTY_READONLY(ExperimentationsGroupVM*, newGroup)
 
-    // The experimentations group currently selected
-    //I2_QML_PROPERTY(ExperimentationsGroupVM*, currentExperimentationsGroup)
-
-    // The experimentation currently selected
-    //I2_QML_PROPERTY(ExperimentationM*, currentExperimentation)
+    // Total number of experimentations
+    I2_QML_PROPERTY_READONLY(int, experimentationsTotalNumber)
 
 
 public:
