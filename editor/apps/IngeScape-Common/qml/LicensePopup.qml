@@ -21,7 +21,7 @@ import I2Quick 1.0
 import INGESCAPE 1.0
 
 I2PopupBase {
-    id: rootItem
+    id: rootPopup
 
     width: 600
     height: 750
@@ -30,6 +30,10 @@ I2PopupBase {
 
     // Our controller
     property LicensesController licenseController: null;
+
+    // Flag indicating if we prevent the user to continue to use our Application
+    // We display only the button "Quit"
+    property bool allowsOnlyQuit: false
 
 
     //--------------------------------------------------------
@@ -46,13 +50,13 @@ I2PopupBase {
     function validate() {
         console.log("QML: function validate()");
 
-        if (rootItem.licenseController)
+        if (rootPopup.licenseController)
         {
-            rootItem.licenseController.updateLicensesPath(txtLicensesPath.text);
+            rootPopup.licenseController.updateLicensesPath(txtLicensesPath.text);
         }
 
         // Close our popup
-        rootItem.close();
+        rootPopup.close();
     }
 
 
@@ -65,24 +69,24 @@ I2PopupBase {
     //--------------------------------------------------------
 
     onOpened: {
-        if (rootItem.licenseController) {
-            txtLicensesPath.text = rootItem.licenseController.licensesPath;
+        if (rootPopup.licenseController) {
+            txtLicensesPath.text = rootPopup.licenseController.licensesPath;
         }
 
         // Set the focus to catch keyboard press on Return/Escape
-        rootItem.focus = true;
+        rootPopup.focus = true;
     }
 
     Keys.onEscapePressed: {
         //console.log("QML: Escape Pressed");
 
-        rootItem.close();
+        rootPopup.close();
     }
 
     Keys.onReturnPressed: {
         //console.log("QML: Return Pressed");
 
-        rootItem.validate();
+        rootPopup.validate();
     }
 
 
@@ -168,7 +172,7 @@ I2PopupBase {
                 height: btnSelectLicencesDirectory.height
                 verticalAlignment: TextInput.AlignVCenter
 
-                text: "" //rootItem.controller.licensesPath
+                text: "" //rootPopup.controller.licensesPath
 
                 enabled: false
 
@@ -233,13 +237,13 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    if (rootItem.licenseController)
+                    if (rootPopup.licenseController)
                     {
-                        var directoryPath = rootItem.licenseController.selectLicensesDirectory();
+                        var directoryPath = rootPopup.licenseController.selectLicensesDirectory();
                         if (directoryPath) {
                             txtLicensesPath.text = directoryPath;
 
-                            rootItem.licenseController.updateLicensesPath(directoryPath);
+                            rootPopup.licenseController.updateLicensesPath(directoryPath);
                         }
                     }
                 }
@@ -269,17 +273,17 @@ I2PopupBase {
         }
         wrapMode: Text.WordWrap
 
-        height: text !== "" ? 30 : 0
+        height: (text === "") ? 0 : 30
 
         Connections {
-            target: rootItem.licenseController
+            target: rootPopup.licenseController
 
             onLicenseLimitationReached: {
                 errorMessage.visible = true
             }
         }
 
-        text: rootItem.licenseController ? rootItem.licenseController.errorMessageWhenLicenseFailed : ""
+        text: rootPopup.licenseController ? rootPopup.licenseController.errorMessageWhenLicenseFailed : ""
 
         color: IngeScapeTheme.orangeColor
         font {
@@ -293,7 +297,7 @@ I2PopupBase {
         id: detailsScrollView
         anchors {
             top: errorMessage.bottom
-            topMargin: errorMessage.height > 0 ? 25 : 0
+            topMargin: (errorMessage.height > 0) ? 25 : 0
             left: parent.left
             leftMargin: 25
             right: parent.right
@@ -314,11 +318,11 @@ I2PopupBase {
             spacing: 26
 
             LicenseInformationView {
-                licenseInformation: rootItem.licenseController.mergedLicense
+                licenseInformation: rootPopup.licenseController.mergedLicense
             }
 
             Text {
-                text: rootItem.licenseController ? qsTr("License details:") : ""
+                text: rootPopup.licenseController ? qsTr("License details:") : ""
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -331,7 +335,7 @@ I2PopupBase {
 
             Repeater {
                 id: licenseDetailsRepeater
-                model: rootItem.licenseController ? rootItem.licenseController.licenseDetailsList : 0
+                model: rootPopup.licenseController ? rootPopup.licenseController.licenseDetailsList : 0
 
                 delegate: Column {
                     spacing: 26
@@ -372,8 +376,8 @@ I2PopupBase {
                             }
 
                             onClicked: {
-                                if (model && rootItem.licenseController) {
-                                    rootItem.licenseController.deleteLicense(model.QtObject)
+                                if (model && rootPopup.licenseController) {
+                                    rootPopup.licenseController.deleteLicense(model.QtObject)
                                 }
                             }
                         }
@@ -449,8 +453,8 @@ I2PopupBase {
             }
 
             onClicked: {
-                if (rootItem.licenseController) {
-                    rootItem.licenseController.importLicense();
+                if (rootPopup.licenseController) {
+                    rootPopup.licenseController.importLicense();
                 }
             }
         }
@@ -472,9 +476,9 @@ I2PopupBase {
 
         onDropped: {
             dragHovering = false
-            if (drop.hasUrls && rootItem.licenseController)
+            if (drop.hasUrls && rootPopup.licenseController)
             {
-                rootItem.licenseController.addLicenses(drop.urls)
+                rootPopup.licenseController.addLicenses(drop.urls)
             }
         }
 
@@ -492,8 +496,10 @@ I2PopupBase {
         }
     }
 
+
     Row {
         id: buttonRow
+
         anchors {
             horizontalCenter: parent.horizontalCenter
             bottom : parent.bottom
@@ -512,7 +518,7 @@ I2PopupBase {
             width: boundingBox.width
 
             activeFocusOnPress: true
-            text: "OK"
+            text: rootPopup.allowsOnlyQuit ? qsTr("QUIT") : qsTr("OK")
 
             anchors {
                 verticalCenter: parent.verticalCenter
@@ -537,9 +543,18 @@ I2PopupBase {
             }
 
             onClicked: {
-                console.log("QML: OK License Popup")
+                if (rootPopup.allowsOnlyQuit)
+                {
+                    console.info("QML: QUIT on License Popup")
 
-                rootItem.validate();
+                    // Quit our application (close the main window)
+                    Qt.quit();
+                }
+                else
+                {
+                    console.log("QML: OK on License Popup")
+                    rootPopup.validate();
+                }
             }
         }
     }
