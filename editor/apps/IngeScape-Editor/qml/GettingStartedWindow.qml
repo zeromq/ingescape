@@ -22,10 +22,10 @@ import I2Quick 1.0
 import INGESCAPE 1.0
 
 
-ApplicationWindow {
+Window {
     id: rootItem
 
-    title: "Getting started"
+    title: qsTr("Getting started")
 
     property string gettingStartedRemoteUrl: IngeScapeEditorC.gettingStartedRemoteUrl
     property string gettingStartedLocalUrl: IngeScapeEditorC.gettingStartedLocalUrl
@@ -204,7 +204,8 @@ ApplicationWindow {
 
                     color: IngeScapeTheme.lightGreyColor
 
-                    text: "Show this page at startup"
+                    text: qsTr("Show this page at startup")
+
                     elide: Text.ElideRight
 
                     font {
