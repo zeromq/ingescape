@@ -252,11 +252,11 @@ endif()
 ########################################################################
 set(INGESCAPE_ASSESSMENTS_ICON)
 if (APPLE)
-    set(INGESCAPE_ASSESSMENTS_ICON "${SOURCE_DIR}/icon_IGS.icns")
+    set(INGESCAPE_ASSESSMENTS_ICON "${SOURCE_DIR}/icon_Assessments.icns")
     set_source_files_properties("${INGESCAPE_ASSESSMENTS_ICON}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 elseif (WIN32)
     set(INGESCAPE_ASSESSMENTS_ICON "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc")
-    file(WRITE ${INGESCAPE_ASSESSMENTS_ICON} "IDI_ICON1               ICON    DISCARDABLE     \"icon_IGS.ico\"")
+    file(WRITE ${INGESCAPE_ASSESSMENTS_ICON} "IDI_ICON1               ICON    DISCARDABLE     \"icon_Assessments.ico\"")
 endif ()
 
 # Create target
@@ -307,7 +307,7 @@ if (APPLE)
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${INGESCAPE_ASSESSMENTS_VERSION}")
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${INGESCAPE_ASSESSMENTS_VERSION_MAJOR}")
     set(MACOSX_BUNDLE_BUNDLE_VERSION "${INGESCAPE_ASSESSMENTS_VERSION}")
-    set(MACOSX_BUNDLE_ICON_FILE "icon_IGS")
+    set(MACOSX_BUNDLE_ICON_FILE "icon_Assessments")
 
     add_custom_command(
         TARGET ${PROJECT_NAME}
