@@ -47,6 +47,15 @@ class AssessmentsModelManager : public IngeScapeModelManager
 {
     Q_OBJECT
 
+    // IP Address of the Cassandra database
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, databaseAddress)
+
+    // Flag indicating if we are connected to the Cassandra database
+    I2_QML_PROPERTY_READONLY(bool, isConnectedToDatabase)
+
+    // Error message when a connection to the database attempt fails
+    I2_QML_PROPERTY_READONLY(QString, errorMessageWhenDatabaseConnectionFailed)
+
 
 public:
 
@@ -390,6 +399,19 @@ public:
 
 
     /**
+     * @brief Connect to the Cassandra Database
+     * @return
+     */
+    Q_INVOKABLE void connectToDatabase();
+
+
+    /**
+     * @brief DIS-connect from the Cassandra Database
+     */
+    void disconnectFromDatabase();
+
+
+    /**
      * @brief Converts the given CassUuid into a readable QString
      * This is a static utility function and does not interact with the Cassandra server
      * @param cassUuid
@@ -444,11 +466,6 @@ private:
      * pools of connections to cluster nodes which are used to query the cluster.
      */
     CassSession* _cassSession = nullptr;
-
-    /**
-     * @brief The Cassandra server URL
-     */
-    QString _cassServer;
 
     /**
      * @brief A UUID generator privoded by Cassandra

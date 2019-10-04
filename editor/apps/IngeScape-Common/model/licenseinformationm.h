@@ -1,5 +1,5 @@
 /*
- *	ENEDIS - Inget-PS
+ *	IngeScape Common
  *
  *  Copyright (c) 2019 Ingenuity i/o. All rights reserved.
  *

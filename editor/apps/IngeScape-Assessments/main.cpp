@@ -114,6 +114,7 @@ void registerCustomQmlTypes()
     qmlRegisterSingletonType<IngeScapeAssessmentsController>("INGESCAPE", 1, 0, "IngeScapeAssessmentsC", &IngeScapeAssessmentsController::qmlSingleton);
 
     // sub-controllers
+    qmlRegisterUncreatableType<AssessmentsModelManager>("INGESCAPE", 1, 0, "AssessmentsModelManager", "Internal Class");
     qmlRegisterUncreatableType<ExperimentationController>("INGESCAPE", 1, 0, "ExperimentationController", "Internal Class");
     qmlRegisterUncreatableType<ExperimentationsListController>("INGESCAPE", 1, 0, "ExperimentationsListController", "Internal Class");
     qmlRegisterUncreatableType<ExportController>("INGESCAPE", 1, 0, "ExportController", "Internal Class");

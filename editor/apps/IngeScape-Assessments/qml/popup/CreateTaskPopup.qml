@@ -354,7 +354,7 @@ AssessmentsPopupBase {
 
         folder: shortcuts.documents + "/IngeScape/platforms"
 
-        nameFilters: [ "JSON files (*.json)" ]
+        nameFilters: [ qsTr("Platform (*.igsplatform *.json)") ]
 
         onAccepted: {
             // Set the selected platform URL

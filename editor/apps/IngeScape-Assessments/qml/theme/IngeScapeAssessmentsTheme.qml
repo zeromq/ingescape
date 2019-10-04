@@ -50,7 +50,7 @@ Item {
 
     I2SvgFileCache {
         id: svgFileCacheIngeScapeAssessments
-        svgFile: "qrc:/resources/SVG/ingescape_assessments-pictos-SVG.svg"
+        svgFile: "qrc:/resources/SVG/ingescape_assessments-pictos.svg"
     }
 
 

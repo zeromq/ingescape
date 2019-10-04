@@ -22,6 +22,7 @@
 
 #include <I2PropertyHelpers.h>
 
+#include <controller/assessmentsmodelmanager.h>
 #include <controller/networkcontroller.h>
 #include <controller/experimentationslistcontroller.h>
 #include <controller/experimentationcontroller.h>
@@ -56,6 +57,9 @@ class IngeScapeAssessmentsController : public QObject
 
     // Snapshot Directory
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
+
+    // Manager for the data model of our IngeScape Assessments application
+    I2_QML_PROPERTY_READONLY(AssessmentsModelManager*, modelManager)
 
     // Controller for network communication
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
@@ -124,6 +128,13 @@ public Q_SLOTS:
 
 
 private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the flag "Is Connected to Database" changed
+     * @param isConnectedToDatabase
+     */
+    void _onIsConnectedToDatabaseChanged(bool isConnectedToDatabase);
+
 
     /**
      * @brief Slot called when the current experimentation changed

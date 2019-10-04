@@ -32,6 +32,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _licensesPath(""),
     _errorMessageWhenConnectionFailed(""),
     _snapshotDirectory(""),
+    _modelManager(nullptr),
     _networkC(nullptr),
     _experimentationsListC(nullptr),
     _experimentationC(nullptr),
@@ -72,7 +73,8 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _networkDevice = settings.value("networkDevice", QVariant("")).toString();
     _ipAddress = settings.value("ipAddress", QVariant("")).toString();
     _port = settings.value("port", QVariant(0)).toUInt();
-    qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
+
+    qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port:" << QString::number(_port);
 
     settings.endGroup();
 
@@ -104,6 +106,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
     // Create the manager for the data model of our IngeScape Assessments application
     AssessmentsModelManager::initInstance(_jsonHelper, rootPath, this);
+    _modelManager = AssessmentsModelManager::Instance();
 
     // Create the controller for network communications
     _networkC = new NetworkController(this);
@@ -123,6 +126,10 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     // Create the controller to export data from the database
     _exportC = new ExportController(this);
 
+
+    // Connect to signals from the data model manager
+    connect(_modelManager, &AssessmentsModelManager::isConnectedToDatabaseChanged,
+            this, &IngeScapeAssessmentsController::_onIsConnectedToDatabaseChanged);
 
     // Connect to signals from the experimentation controller to the rest of the controllers
     connect(_experimentationC, &ExperimentationController::currentExperimentationChanged,
@@ -144,10 +151,10 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     // Start our INGESCAPE agent with a network device (or an IP address) and a port
     bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
-    if (isStarted && (AssessmentsModelManager::Instance() != nullptr))
+    if (isStarted && (_modelManager != nullptr))
     {
         // Initialize platform from online mapping
-        AssessmentsModelManager::Instance()->setisMappingConnected(true);
+        _modelManager->setisMappingConnected(true);
     }
     else {
         seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
@@ -168,9 +175,6 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
         }
     });
 
-
-    // Sleep to display our loading screen
-    //QThread::msleep(2000);
 }
 
 
@@ -362,6 +366,35 @@ void IngeScapeAssessmentsController::forceCreation()
 
 
 /**
+ * @brief Slot called when the flag "Is Connected to Database" changed
+ * @param isConnectedToDatabase
+ */
+void IngeScapeAssessmentsController::_onIsConnectedToDatabaseChanged(bool isConnectedToDatabase)
+{
+    // Databse connection is BACK
+    if (isConnectedToDatabase)
+    {
+        qInfo("Database connection: NOT connected --> CONNECTED");
+
+        if (_experimentationsListC != nullptr)
+        {
+            _experimentationsListC->updateWhenConnectedDatabase();
+        }
+    }
+    // Databse connection is LOST
+    else
+    {
+        qInfo("Database connection: CONNECTED --> NOT connected");
+
+        if (_experimentationsListC != nullptr)
+        {
+            _experimentationsListC->updateWhenDISconnectedDatabase();
+        }
+    }
+}
+
+
+/**
  * @brief Slot called when the current experimentation changed
  * @param value
  */
@@ -401,14 +434,12 @@ bool IngeScapeAssessmentsController::_restartIngeScape()
     // Reset the error message
     seterrorMessageWhenConnectionFailed("");
 
-    AssessmentsModelManager* modelManager = AssessmentsModelManager::Instance();
-
-    if ((_networkC != nullptr) && (modelManager != nullptr))
+    if ((_networkC != nullptr) && (_modelManager != nullptr))
     {
         qInfo() << "Restart the network on" << _networkDevice << "with" << _port;
 
-        modelManager->setisMappingConnected(false);
-        //modelManager->setisMappingControlled(false);
+        _modelManager->setisMappingConnected(false);
+        //_modelManager->setisMappingControlled(false);
 
         // Stop our IngeScape agent
         _networkC->stop();
@@ -423,7 +454,7 @@ bool IngeScapeAssessmentsController::_restartIngeScape()
         success = _networkC->start(_networkDevice, "", _port);
 
         if (success) {
-            modelManager->setisMappingConnected(true);
+            _modelManager->setisMappingConnected(true);
         }
     }
 

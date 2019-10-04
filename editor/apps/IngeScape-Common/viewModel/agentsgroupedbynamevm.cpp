@@ -158,8 +158,8 @@ void AgentsGroupedByNameVM::addNewAgentModel(AgentM* model)
         {
             if (_agentsGroupedByDefinitionNULL != nullptr)
             {
-                // Add the model to the special view model of agents grouped by definition NULL
-                _agentsGroupedByDefinitionNULL->models()->append(model);
+                // Manage a new model of agent ON on a host for a group of agents with the same definition (can be NULL)
+                _manageNewModelOnHostForGroup(model, _agentsGroupedByDefinitionNULL);
             }
             else
             {
@@ -184,7 +184,7 @@ void AgentsGroupedByNameVM::removeOldAgentModel(AgentM* model)
 {
     if (model != nullptr)
     {
-        qDebug() << "Grouped by" << _name << ": Remove old model" << model;
+        //qDebug() << "Grouped by" << _name << ": Remove old model" << model;
 
         if (_models.contains(model))
         {
@@ -758,7 +758,7 @@ void AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition()
  */
 void AgentsGroupedByNameVM::_updateWithAllModels()
 {
-    qDebug() << "Grouped by" << _name << ": Update with all (" << _models.count() << ") models (" << this << ")";
+    qDebug() << "Grouped by" << _name << ": Update with all (" << _models.count() << ") models";
 
     _peerIdsList.clear();
 
@@ -990,7 +990,11 @@ void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
         // Exactly the same definition
         if (groupOfAgentsWithSameDefinition != nullptr)
         {
-            QString hostname = model->hostname();
+            // Manage a new model of agent ON on a host for a group of agents with the same definition (can be NULL)
+            _manageNewModelOnHostForGroup(model, groupOfAgentsWithSameDefinition);
+
+
+            /*QString hostname = model->hostname();
             QString commandLine = model->commandLine();
 
             // Model is ON and its hostname is a real one
@@ -1053,7 +1057,7 @@ void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
             }
             else {
                 qCritical() << "The definition of" << _name << "changed while the agent is OFF or its hostname is not defined !";
-            }
+            }*/
         }
         // The definition is a new one
         else
@@ -1061,6 +1065,79 @@ void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
             // Create a new view model of agents grouped by definition (with a copy of the definition)
             _createAgentsGroupedByDefinition(newDefinition->copy(), model);
         }
+    }
+}
+
+
+/**
+ * @brief Manage a new model of agent ON on a host for a group of agents with the same definition (can be NULL)
+ * @param groupOfAgentsWithSameDefinition
+ * @param model
+ */
+void AgentsGroupedByNameVM::_manageNewModelOnHostForGroup(AgentM* model, AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition)
+{
+    // Model is ON and its hostname is a real one
+    if ((groupOfAgentsWithSameDefinition != nullptr) && (model != nullptr)
+            && model->isON() && (model->hostname() != HOSTNAME_NOT_DEFINED))
+    {
+        QString hostname = model->hostname();
+        QString commandLine = model->commandLine();
+
+        // Get the list of agent models on the host
+        QList<AgentM*> modelsOnHost = groupOfAgentsWithSameDefinition->getModelsOnHost(hostname);
+
+        // There is NO agent on this host yet
+        if (modelsOnHost.isEmpty())
+        {
+            qDebug() << "Add model of agent" << _name << "on" << hostname;
+
+            // Add the model of agent to the view model of agents grouped by definition
+            groupOfAgentsWithSameDefinition->models()->append(model);
+        }
+        // There is already some agent models on this host
+        else
+        {
+            AgentM* sameModel = nullptr;
+
+            for (AgentM* iterator : modelsOnHost)
+            {
+                // Same command line and existing agent is OFF --> we consider that it is the same model that evolve from OFF to ON
+                if ((iterator != nullptr) && (iterator->commandLine() == commandLine) && !iterator->isON())
+                {
+                    // We have to replace it by the new one
+                    sameModel = iterator;
+                    break;
+                }
+            }
+
+            // If we have to replace an existing (same) model by the new one
+            if (sameModel != nullptr)
+            {
+                if (groupOfAgentsWithSameDefinition->models()->contains(sameModel))
+                {
+                    qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
+
+                    // First add the new model before remove the previous model
+                    // (allows to prevent to have 0 model at a given moment and to prevent to emit signal noMoreModelAndUseless that remove the groupOfAgentsWithSameDefinition)
+                    groupOfAgentsWithSameDefinition->models()->append(model);
+
+                    groupOfAgentsWithSameDefinition->models()->remove(sameModel);
+
+                    // Emit the signal to delete the previous model of agent
+                    Q_EMIT agentModelHasToBeDeleted(sameModel);
+                }
+            }
+            // Else, we add the new model
+            else
+            {
+                qDebug() << "Add model of agent" << _name << "on" << hostname;
+
+                // Add the model of agent to the view model of agents grouped by definition
+                groupOfAgentsWithSameDefinition->models()->append(model);
+            }
+        }
+
+        qDebug() << "There are" << groupOfAgentsWithSameDefinition->models()->count() << "models of agent" << _name << "with the same definition";
     }
 }
 

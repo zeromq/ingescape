@@ -47,25 +47,15 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
     // Create the (fake) group "New"
     _newGroup = new ExperimentationsGroupVM(tr("New Group"), nullptr);
 
-    // Create the query
-    QList<ExperimentationM*> experimentationList = AssessmentsModelManager::select<ExperimentationM>({}); // #NoFilter
-    for (ExperimentationM* experimentation : experimentationList)
-    {
-        if (experimentation != nullptr)
-        {
-            ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentation->groupName());
-            if (experimentationsGroup == nullptr)
-            {
-                // Create the ExperimentationGroupVM
-                experimentationsGroup = _createNewExperimentationGroup(experimentation->groupName());
-            }
 
-            if (experimentationsGroup != nullptr)
-            {
-                // Add to the group
-                experimentationsGroup->experimentations()->append(experimentation);
-            }
-        }
+    // Get the model manager
+    AssessmentsModelManager* modelManager = AssessmentsModelManager::Instance();
+
+    // If we are connected to the database
+    if ((modelManager != nullptr) && modelManager->isConnectedToDatabase())
+    {
+        // Init the list of experimentations
+        _initExperimentationsList();
     }
 }
 
@@ -95,6 +85,26 @@ ExperimentationsListController::~ExperimentationsListController()
         setnewGroup(nullptr);
         delete temp;
     }
+}
+
+
+/**
+ * @brief Update when we are just connected to a database
+ */
+void ExperimentationsListController::updateWhenConnectedDatabase()
+{
+    // Init the list of experimentations
+    _initExperimentationsList();
+}
+
+
+/**
+ * @brief update when we are just DIS-connected from a database
+ */
+void ExperimentationsListController::updateWhenDISconnectedDatabase()
+{
+    // FIXME TODO: Clear the list of experimentations ?
+    //_clearExperimentationsList();
 }
 
 
@@ -193,6 +203,11 @@ ExperimentationsGroupVM* ExperimentationsListController::_getExperimentationsGro
 }
 
 
+/**
+ * @brief Creates a new experimentation group and returns it
+ * @param experimentationsGroup
+ * @param newExperimentationsGroupName
+ */
 ExperimentationsGroupVM* ExperimentationsListController::_createNewExperimentationGroup(const QString& newExperimentationsGroupName)
 {
     ExperimentationsGroupVM* expeGroupVM = new ExperimentationsGroupVM(newExperimentationsGroupName, nullptr);
@@ -203,4 +218,35 @@ ExperimentationsGroupVM* ExperimentationsListController::_createNewExperimentati
         _hashFromNameToExperimentationsGroup.insert(newExperimentationsGroupName, expeGroupVM);
     }
     return expeGroupVM;
+}
+
+
+/**
+ * @brief Init the list of experimentations
+ */
+void ExperimentationsListController::_initExperimentationsList()
+{
+    if (AssessmentsModelManager::Instance()->isConnectedToDatabase())
+    {
+        // Create the query
+        QList<ExperimentationM*> experimentationsList = AssessmentsModelManager::select<ExperimentationM>({}); // #NoFilter
+        for (ExperimentationM* experimentation : experimentationsList)
+        {
+            if (experimentation != nullptr)
+            {
+                ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentation->groupName());
+                if (experimentationsGroup == nullptr)
+                {
+                    // Create the ExperimentationGroupVM
+                    experimentationsGroup = _createNewExperimentationGroup(experimentation->groupName());
+                }
+
+                if (experimentationsGroup != nullptr)
+                {
+                    // Add to the group
+                    experimentationsGroup->experimentations()->append(experimentation);
+                }
+            }
+        }
+    }
 }

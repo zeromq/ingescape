@@ -64,6 +64,18 @@ public:
 
 
     /**
+     * @brief Update when we are just connected to a database
+     */
+    void updateWhenConnectedDatabase();
+
+
+    /**
+     * @brief update when we are just DIS-connected from a database
+     */
+    void updateWhenDISconnectedDatabase();
+
+
+    /**
      * @brief Create a new experimentation in new group (to create)
      * @param experimentationName
      * @param newExperimentationsGroupName
@@ -112,6 +124,12 @@ private:
      * @param newExperimentationsGroupName
      */
     ExperimentationsGroupVM* _createNewExperimentationGroup(const QString& newExperimentationsGroupName);
+
+
+    /**
+     * @brief Init the list of experimentations
+     */
+    void _initExperimentationsList();
 
 
 private:

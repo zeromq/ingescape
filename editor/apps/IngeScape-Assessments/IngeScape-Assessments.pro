@@ -191,7 +191,7 @@ mac {
 
 
     # Set icon of our executable
-    ICON = icon_IGS.icns
+    ICON = icon_Assessments.icns
 
 }
 
@@ -276,7 +276,7 @@ win32 {
 
 
     # Set icon of our executable
-    RC_ICONS = icon_IGS.ico
+    RC_ICONS = icon_Assessments.ico
 
     # Set application info
     QMAKE_TARGET_COMPANY = Ingenuity i/o
@@ -301,3 +301,11 @@ unix:!mac {
     # TODO if needed
 }
 
+# Just for search and replace and avoid error with CMake not updated
+DISTFILES += \
+    ../../../builds/cmake/modules/IngescapeEditorHelper.cmake \
+    ../../../builds/cmake/modules/IngescapeHelper.cmake \
+    ../../../builds/cmake/modules/Windeploy.cmake \
+    ../../../builds/cmake/modules/apps/FileAssociation.nsh \
+    ../../../builds/cmake/modules/apps/NSIS.template.in \
+    CMakeLists.txt
