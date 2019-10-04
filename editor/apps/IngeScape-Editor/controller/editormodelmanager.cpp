@@ -248,6 +248,31 @@ void EditorModelManager::openDefinition(DefinitionM* definition)
 
 
 /**
+ * @brief Duplicate the agent with a new command line
+ * @param agent
+ * @param newCommandLine
+ */
+void EditorModelManager::duplicateAgentWithNewCommandLine(AgentM* agent, QString newCommandLine)
+{
+    if (agent != nullptr)
+    {
+         qDebug() << "Duplicate the agent" << agent->name() << "with the new command line" << newCommandLine << "on" << agent->hostname();
+
+         DefinitionM* copyOfDefinition = nullptr;
+         if (agent->definition() != nullptr) {
+             copyOfDefinition = agent->definition()->copy();
+         }
+
+         // Duplicate the agent with the new command line
+         createAgentModel(agent->name(),
+                          copyOfDefinition,
+                          agent->hostname(),
+                          newCommandLine);
+    }
+}
+
+
+/**
  * @brief Slot called when an agent definition has been received and must be processed
  * @param peer Id
  * @param agent name

@@ -75,6 +75,9 @@ Item {
     // signal emitted when the user clicks on the "edit command line" option of an agent in the list
     signal needEditAgentCommandLine(AgentM agent);
 
+    // signal emitted when the user clicks on the "duplicate with other command line" option of an agent in the list
+    signal needDuplicateAgentWithOtherCommandLine(AgentM agent);
+
 
     //--------------------------------
     //
@@ -568,7 +571,7 @@ Item {
 
         // Get height from children
         height: bgPopupAgentOptions.y + bgPopupAgentOptions.height
-        width: 200
+        width: 260
 
         isModal: true;
         layerColor: "transparent"
@@ -691,15 +694,37 @@ Item {
 
                     text: qsTr("Edit command line")
 
-                    enabled: (popupAgentOptions.agent && !popupAgentOptions.agent.isON)
+                    //enabled: (popupAgentOptions.agent && !popupAgentOptions.agent.isON)
+                    visible: (popupAgentOptions.agent && !popupAgentOptions.agent.isON)
+
+                    style: Theme.ButtonStyleOfOption {
+                    }
+
+                    onClicked: {
+                        // Emit the signal to display a command line edition popup
+                        rootItem.needEditAgentCommandLine(popupAgentOptions.agent)
+
+                        popupAgentOptions.close();
+                    }
+                }
+
+                Button {
+                    id: optionDuplicateWithOtherCommandLine
+
+                    height: popupAgentOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Duplicate with other command line")
 
                     style: Theme.ButtonStyleOfOption {
                         isVisibleSeparation: false
                     }
 
                     onClicked: {
-                        // Emit the signal to display an edition popup
-                        rootItem.needEditAgentCommandLine(popupAgentOptions.agent)
+                        console.log("Duplicate with other command line...");
+
+                        // Emit the signal to display a command line edition popup
+                        rootItem.needDuplicateAgentWithOtherCommandLine(popupAgentOptions.agent)
 
                         popupAgentOptions.close();
                     }

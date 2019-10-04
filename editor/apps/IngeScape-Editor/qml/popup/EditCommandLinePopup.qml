@@ -34,6 +34,8 @@ I2PopupBase {
 
     property string previousCommandLine: ""
 
+    property bool haveToDuplicate: false
+
     //property alias newCommandLine: textFieldNewCommandLine.text
 
     anchors.centerIn: parent
@@ -105,7 +107,8 @@ I2PopupBase {
             Text {
                 id: title
 
-                text: "Edit command line of " + rootPopup.agentName
+                text: rootPopup.haveToDuplicate ? "Edit the command line of " + rootPopup.agentName + " to duplicate this agent"
+                                                : "Edit the command line of " + rootPopup.agentName
 
                 horizontalAlignment: Text.AlignHCenter
                 lineHeight: 24
@@ -215,7 +218,7 @@ I2PopupBase {
             width: boundingBox.width
 
             text: "OK"
-            enabled: true
+            enabled: (textFieldCommandLine.text !== rootPopup.previousCommandLine)
 
             activeFocusOnPress: true
 

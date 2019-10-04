@@ -78,6 +78,14 @@ public:
     Q_INVOKABLE void openDefinition(DefinitionM* definition);
 
 
+    /**
+     * @brief Duplicate the agent with a new command line
+     * @param agent
+     * @param newCommandLine
+     */
+    Q_INVOKABLE void duplicateAgentWithNewCommandLine(AgentM* agent, QString newCommandLine);
+
+
 Q_SIGNALS:
 
 

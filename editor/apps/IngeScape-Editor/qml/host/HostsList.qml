@@ -139,6 +139,16 @@ Item {
                 onNeedEditAgentCommandLine: {
                     // Set the agent
                     editCommandLinePopup.agent = agent;
+                    editCommandLinePopup.haveToDuplicate = false;
+
+                    // Open the popup
+                    editCommandLinePopup.open();
+                }
+
+                onNeedDuplicateAgentWithOtherCommandLine: {
+                    // Set the agent
+                    editCommandLinePopup.agent = agent;
+                    editCommandLinePopup.haveToDuplicate = true;
 
                     // Open the popup
                     editCommandLinePopup.open();
@@ -275,8 +285,19 @@ Item {
         onCommandLineValidated: {
             if (agent)
             {
-                // Call the setter in C++ (with event "commandLineChanged")
-                agent.commandLine = newCommandLine;
+                // If we have to duplicate the agent
+                if (editCommandLinePopup.haveToDuplicate)
+                {
+                    if (IngeScapeEditorC.modelManager) {
+                        IngeScapeEditorC.modelManager.duplicateAgentWithNewCommandLine(agent, newCommandLine);
+                    }
+                }
+                // Else, simply update its command line
+                else
+                {
+                    // Call the setter in C++ (with event "commandLineChanged")
+                    agent.commandLine = newCommandLine;
+                }
             }
         }
     }
