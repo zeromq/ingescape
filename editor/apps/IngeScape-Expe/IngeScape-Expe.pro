@@ -247,3 +247,11 @@ unix:!mac {
     # TODO if needed
 }
 
+# Just for search and replace and avoid error with CMake not updated
+DISTFILES += \
+    ../../../builds/cmake/modules/IngescapeEditorHelper.cmake \
+    ../../../builds/cmake/modules/IngescapeHelper.cmake \
+    ../../../builds/cmake/modules/Windeploy.cmake \
+    ../../../builds/cmake/modules/apps/FileAssociation.nsh \
+    ../../../builds/cmake/modules/apps/NSIS.template.in \
+    CMakeLists.txt
