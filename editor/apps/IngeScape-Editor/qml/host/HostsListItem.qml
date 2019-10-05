@@ -473,7 +473,7 @@ Item {
                     height: popupHostOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Rename")
+                    text: qsTr("Rename...")
 
                     //enabled: (rootItem.host && !rootItem.host.isON)
                     enabled: false
@@ -495,7 +495,7 @@ Item {
                     height: popupHostOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Remove")
+                    text: qsTr("Remove...")
 
                     enabled: (rootItem.host && !rootItem.host.isON)
 
@@ -516,7 +516,7 @@ Item {
                     height: popupHostOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Reboot")
+                    text: qsTr("Reboot...")
                     enabled: false
 
                     style: Theme.ButtonStyleOfOption {
@@ -647,7 +647,7 @@ Item {
                     height: popupAgentOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Start again")
+                    text: qsTr("Start another")
 
                     visible: (popupAgentOptions.agent && popupAgentOptions.agent.isON)
 
@@ -671,7 +671,7 @@ Item {
                     height: popupAgentOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Remove")
+                    text: qsTr("Remove...")
 
                     enabled: (popupAgentOptions.agent && !popupAgentOptions.agent.isON)
 
@@ -692,7 +692,7 @@ Item {
                     height: popupAgentOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Edit command line")
+                    text: qsTr("Edit command line...")
 
                     //enabled: (popupAgentOptions.agent && !popupAgentOptions.agent.isON)
                     visible: (popupAgentOptions.agent && !popupAgentOptions.agent.isON)
@@ -714,14 +714,14 @@ Item {
                     height: popupAgentOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Duplicate with other command line")
+                    text: qsTr("Duplicate with edited command line...")
 
                     style: Theme.ButtonStyleOfOption {
                         isVisibleSeparation: false
                     }
 
                     onClicked: {
-                        console.log("Duplicate with other command line...");
+                        console.log("Duplicate with edited command line...");
 
                         // Emit the signal to display a command line edition popup
                         rootItem.needDuplicateAgentWithOtherCommandLine(popupAgentOptions.agent)

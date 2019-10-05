@@ -37,18 +37,18 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
         switch (limit)
         {
         case IGS_LICENSE_TIMEOUT:
-            qCritical("IngeScape is stopped because demonstration mode timeout has been reached");
-            licensesController->seterrorMessageWhenLicenseFailed("IngeScape is stopped because demonstration mode timeout has been reached !");
+            qCritical("The editor has reached demonstration timeout and is now stopped.");
+            licensesController->seterrorMessageWhenLicenseFailed("The editor has reached demonstration timeout and is now stopped.");
             break;
 
         case IGS_LICENSE_TOO_MANY_AGENTS:
-            qCritical("IngeScape is stopped because too many agents are running on the platform compared to what the license allows !");
-            licensesController->seterrorMessageWhenLicenseFailed("IngeScape is stopped because too many agents are running on the platform compared to what the license allows !");
+            qCritical("The editor has reached maximum number of agents allowed with your current license and is now stopped.");
+            licensesController->seterrorMessageWhenLicenseFailed("The editor has reached maximum number of agents allowed with your current license and is now stopped.");
             break;
 
         case IGS_LICENSE_TOO_MANY_IOPS:
-            qCritical("IngeScape is stopped because too many IOPs have been created on the platform compared to what the license allows");
-            licensesController->seterrorMessageWhenLicenseFailed("IngeScape is stopped because too many IOPs have been created on the platform compared to what the license allows !");
+            qCritical("The editor has reached maximum number of IOPs allowed with your current license and is now stopped.");
+            licensesController->seterrorMessageWhenLicenseFailed("The editor has reached maximum number of IOPs allowed with your current license and is now stopped.");
             break;
 
         default:

@@ -406,7 +406,7 @@ I2PopupBase {
                 verticalCenter: parent.verticalCenter
             }
 
-            text: "No license file has been found.\nPlease change the license directory above, drop a license file here or\nuse the \"Import...\" button below."
+            text: "No license file found.\nThe editor is running un demo mode with limitations.\n\n\n\nTo change this, please set the license directory above,\ndrop a license file here \nor use the \"Import...\" button below."
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
 
@@ -518,7 +518,7 @@ I2PopupBase {
             width: boundingBox.width
 
             activeFocusOnPress: true
-            text: rootPopup.allowsOnlyQuit ? qsTr("QUIT") : qsTr("OK")
+            text: rootPopup.allowsOnlyQuit ? qsTr("Quit") : qsTr("OK")
 
             anchors {
                 verticalCenter: parent.verticalCenter
