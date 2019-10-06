@@ -342,9 +342,9 @@ typedef enum {
 typedef void (*igs_licenseCallback)(igs_license_limit_t limit, void *myData);
 
 #if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
-// Default licenses path is empty and is automatically set to agent's executable path.
+// Default licenses path is empty and, if so, is automatically set at runtime to agent's executable path.
 // All licenses in path will be examined and used if valid
-// When path is set manually, it takes priority to agent's executable path.
+// When path is set manually, it takes priority over agent's executable path.
 PUBLIC void igs_setLicensePath(const char *path);
 PUBLIC char *igs_getLicensePath(void);
     

@@ -376,8 +376,8 @@ void license_readLicense(void){
         igs_error("%s could not be opened properly : no license found", licensePath);
     }else{
         //NB: zdir provides a function to scan folder contents but
-        //this function scans all subdirectories which may time a very
-        //long time to do, e.g. in /Applications/.
+        //this function scans all subdirectories which may take a very
+        //long time, e.g. in /Applications/.
         //That's why we use dirent here.
         igs_debug("scan for licenses in %s", licensePath);
         zlist_t *filesList = zlist_new();
