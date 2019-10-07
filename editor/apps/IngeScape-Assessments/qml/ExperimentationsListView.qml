@@ -194,8 +194,8 @@ Item {
         id: btnNewExpe
 
         anchors {
-            right: parent.right
-            rightMargin: 37
+            left: parent.left
+            leftMargin: 20
             bottom: scrollViewExperimentationsGroups.top
             bottomMargin: 9
         }
@@ -217,13 +217,13 @@ Item {
 
         anchors {
             verticalCenter: btnNewExpe.verticalCenter
-            right: btnNewExpe.left
-            rightMargin: 5
+            left: btnNewExpe.right
+            leftMargin: 10
         }
 
         visible: controller && (controller.experimentationsTotalNumber === 0)
 
-        text: "Create a new experiment to start using the application:"
+        text: "Create a new experiment to start using the application"
 
         color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
         font {
@@ -363,56 +363,66 @@ Item {
 
                         MouseArea {
                             id: itemMouseArea
+
                             anchors.fill: parent
                             hoverEnabled: true
+
                             onDoubleClicked: {
                                 rootItem.openExperimentation(rootExperimentation.experimentation)
                             }
                         }
 
-                        Row {
+                        Text {
+                            id: txtExpeName
+
                             anchors {
                                 left: parent.left
                                 leftMargin: 25
+                                right: txtExpeDateTime.left
+                                rightMargin: 20
                                 verticalCenter: parent.verticalCenter
                             }
 
-                            spacing: 10
+                            text: rootExperimentation.experimentation ? rootExperimentation.experimentation.name : ""
 
-                            Text {
-                                text: rootExperimentation.experimentation ? rootExperimentation.experimentation.name : ""
+                            elide: Text.ElideRight
+                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight: Font.Bold
+                                pixelSize: 16
+                            }
+                        }
 
-                                width: 350
-                                elide: Text.ElideRight
-                                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                                font {
-                                    family: IngeScapeTheme.textFontFamily
-                                    weight: Font.Bold
-                                    pixelSize: 16
-                                }
+                        Text {
+                            id: txtExpeDateTime
+
+                            anchors {
+                                right: rowExpeButtons.left
+                                rightMargin: 20
+                                verticalCenter: parent.verticalCenter
                             }
 
-                            Text {
-                                text: rootExperimentation.experimentation ? rootExperimentation.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy - hh:mm:ss") : ""
+                            text: rootExperimentation.experimentation ? rootExperimentation.experimentation.creationDate.toLocaleString(Qt.locale(), "dd/MM/yyyy - hh:mm:ss") : ""
 
-                                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                                font {
-                                    family: IngeScapeTheme.textFontFamily
-                                    weight: Font.Medium
-                                    pixelSize: 16
-                                }
+                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight: Font.Medium
+                                pixelSize: 16
                             }
                         }
 
                         Row {
-                            spacing: 14
+                            id: rowExpeButtons
 
                             anchors {
                                 right: parent.right
                                 rightMargin: 18
                             }
-
                             height: parent.height
+
+                            spacing: 14
 
                             Button {
                                 id: btnDelete
@@ -438,6 +448,7 @@ Item {
                                     deleteExperimentationPopup.open()
                                 }
                             }
+
                             Button {
                                 id: btnOpen
 
