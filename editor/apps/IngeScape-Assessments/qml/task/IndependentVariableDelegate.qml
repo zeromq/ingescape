@@ -32,11 +32,14 @@ Rectangle {
     //--------------------------------------------------------
 
     // Model to diplay
-    property var indeVarModel: null
+    property var independentVarModel: null
+
     // Task controller
     property var taskController: null
+
     // Flag indicating if the mouse is hovering the item
-    property bool isMouseHovering: itemMouseArea.containsMouse || deleteButton.containsMouse
+    property bool isMouseHovering: itemMouseArea.containsMouse || editIndepVarButton.containsMouse || deleteIndepVarButton.containsMouse
+
     // Width of the columns (bound by the parent)
     property var columnWidths: [ 0, 0, 0 ]
 
@@ -64,7 +67,7 @@ Rectangle {
         }
 
         Repeater {
-            model: rootItem.indeVarModel ? [ rootItem.indeVarModel.name, rootItem.indeVarModel.description, IndependentVariableValueTypes.enumToString(rootItem.indeVarModel.valueType) ] : ["", "", ""]
+            model: rootItem.independentVarModel ? [ rootItem.independentVarModel.name, rootItem.independentVarModel.description, IndependentVariableValueTypes.enumToString(rootItem.independentVarModel.valueType) ] : ["", "", ""]
 
             delegate: Item {
 
@@ -82,7 +85,9 @@ Rectangle {
 
                     verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideRight
+
                     text: modelData
+
                     color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                     font {
                         family: IngeScapeTheme.textFontFamily
@@ -95,31 +100,61 @@ Rectangle {
         }
     }
 
-    Button {
-        id: deleteButton
+    Row {
+        spacing: 12
 
         anchors {
-            verticalCenter: parent.verticalCenter
             right: parent.right
             rightMargin: 15
+            verticalCenter: parent.verticalCenter
         }
 
-        property bool containsMouse: __behavior.containsMouse
+        Button {
+            id: editIndepVarButton
+            height: 30
+            width: 40
 
-        opacity: rootItem.isMouseHovering ? 1 : 0
-        enabled: opacity > 0
+            property bool containsMouse: __behavior.containsMouse
 
-        width: 40
-        height: 30
+            //opacity: rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress ? 1 : 0
+            opacity: rootItem.isMouseHovering ? 1 : 0
+            enabled: opacity > 0
 
-        style: IngeScapeAssessmentsSvgButtonStyle {
-            releasedID: "delete-blue"
-            disabledID: releasedID
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "edit"
+                disabledID: releasedID
+            }
+
+            onClicked: {
+                /*if (rootItem.taskModel && rootItem.dependentVariableModel) {
+                    rootItem.taskModel.initTemporaryDependentVariable(rootItem.dependentVariableModel)
+                }
+
+                rootItem.isCurrentlyEditing = true;*/
+            }
         }
 
-        onClicked: {
-            if (rootItem.taskController && rootItem.indeVarModel) {
-                rootItem.taskController.deleteIndependentVariable(rootItem.indeVarModel)
+        Button {
+            id: deleteIndepVarButton
+
+            property bool containsMouse: __behavior.containsMouse
+
+            height: 30
+            width: 40
+
+            //opacity: rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress ? 1 : 0
+            opacity: rootItem.isMouseHovering ? 1 : 0
+            enabled: opacity > 0
+
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "delete-blue"
+                disabledID: releasedID
+            }
+
+            onClicked: {
+                if (rootItem.taskController && rootItem.independentVarModel) {
+                    rootItem.taskController.deleteIndependentVariable(rootItem.independentVarModel)
+                }
             }
         }
     }

@@ -16,6 +16,9 @@ import QtQuick 2.9
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 
+// Needed to access to ToolTip (https://doc.qt.io/qt-5.11/qml-qtquick-controls2-tooltip.html)
+import QtQuick.Controls 2.0 as Controls2
+
 import I2Quick 1.0
 
 import INGESCAPE 1.0
@@ -125,7 +128,7 @@ Item {
             }
 
             Text {
-                text: rootItem.modelM ? "Platform: " + rootItem.modelM.platformFileName : ""
+                text: rootItem.modelM ? rootItem.modelM.platformFileName : ""
 
                 color: IngeScapeTheme.lightGreyColor
 
@@ -179,6 +182,12 @@ Item {
                 onClicked: {
                     deleteTaskPopup.open()
                 }
+
+                Controls2.ToolTip {
+                    visible: btnDuplicate.hovered
+                    text: qsTr("delete")
+                    delay: 800
+                }
             }
 
             Button {
@@ -197,6 +206,12 @@ Item {
                 onClicked: {
                     // Emit the signal "Duplicate Task"
                     rootItem.duplicateTask();
+                }
+
+                Controls2.ToolTip {
+                    visible: btnDelete.hovered
+                    text: qsTr("duplicate")
+                    delay: 800
                 }
             }
         }

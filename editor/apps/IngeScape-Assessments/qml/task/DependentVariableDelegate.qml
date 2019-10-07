@@ -433,31 +433,8 @@ Rectangle {
 
         anchors {
             right: parent.right
-            rightMargin: 18
+            rightMargin: 15
             verticalCenter: parent.verticalCenter
-        }
-
-        Button {
-            id: deleteDepVarButton
-            height: 30
-            width: 40
-
-            property bool containsMouse: __behavior.containsMouse
-
-            opacity: rootItem.isMouseHovering && !rootItem.depVarEditionInProgress ? 1 : 0
-            enabled: opacity > 0
-
-            style: IngeScapeAssessmentsSvgButtonStyle {
-                releasedID: "delete-blue"
-                disabledID: releasedID
-            }
-
-            onClicked: {
-                if (rootItem.taskModel && rootItem.dependentVariableModel)
-                {
-                    rootItem.taskModel.deleteDependentVariable(rootItem.dependentVariableModel)
-                }
-            }
         }
 
         Button {
@@ -481,6 +458,29 @@ Rectangle {
                 }
 
                 rootItem.isCurrentlyEditing = true
+            }
+        }
+
+        Button {
+            id: deleteDepVarButton
+            height: 30
+            width: 40
+
+            property bool containsMouse: __behavior.containsMouse
+
+            opacity: rootItem.isMouseHovering && !rootItem.depVarEditionInProgress ? 1 : 0
+            enabled: opacity > 0
+
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "delete-blue"
+                disabledID: releasedID
+            }
+
+            onClicked: {
+                if (rootItem.taskModel && rootItem.dependentVariableModel)
+                {
+                    rootItem.taskModel.deleteDependentVariable(rootItem.dependentVariableModel)
+                }
             }
         }
     }

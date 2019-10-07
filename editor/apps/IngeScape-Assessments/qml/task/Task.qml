@@ -112,7 +112,7 @@ Item {
             leftMargin: 26
         }
 
-        text: rootItem.modelM ? "TASK : " + rootItem.modelM.name.toUpperCase() : "..."
+        text: rootItem.modelM ? rootItem.modelM.name.toUpperCase() : "..."
         verticalAlignment: Text.AlignVCenter
 
         color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
@@ -183,7 +183,8 @@ Item {
         }
 
         IngeScapeAssessmentsListHeader {
-            id: indeVarListHeader
+            id: indepVarListHeader
+
             anchors {
                 top: newIndeVarButton.bottom
                 topMargin: 12
@@ -191,7 +192,7 @@ Item {
                 right: parent.right
             }
 
-            property var headerColumnWidths: [ 229, 336, width - 229 - 336]
+            property var headerColumnWidths: [ 250, width - 250 - 250, 250]
 
             Row {
                 anchors {
@@ -210,7 +211,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
 
-                        width: indeVarListHeader.headerColumnWidths[index]
+                        width: indepVarListHeader.headerColumnWidths[index]
 
                         text: modelData
                         color: IngeScapeTheme.whiteColor
@@ -226,7 +227,7 @@ Item {
 
         Rectangle {
             anchors {
-                top: indeVarListHeader.bottom
+                top: indepVarListHeader.bottom
                 left: parent.left
                 right: parent.right
                 bottom: parent.bottom
@@ -247,9 +248,9 @@ Item {
 
                     height: 40
                     width: indeVarColumn.width
-                    indeVarModel: model ? model.QtObject : null
+                    independentVarModel: model ? model.QtObject : null
 
-                    columnWidths: indeVarListHeader.headerColumnWidths
+                    columnWidths: indepVarListHeader.headerColumnWidths
                 }
             }
         }

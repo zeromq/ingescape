@@ -92,7 +92,7 @@ I2PopupBase {
         width: 340
 
         Text {
-            id: titleCharacteristics
+            id: titleProtocols
 
             anchors {
                 verticalCenter: btnNewTask.verticalCenter
@@ -100,7 +100,7 @@ I2PopupBase {
                 leftMargin: 28
             }
 
-            text: qsTr("TASKS")
+            text: qsTr("PROTOCOLS")
 
             height: parent.height
             verticalAlignment: Text.AlignVCenter
@@ -127,7 +127,7 @@ I2PopupBase {
 
             onClicked: {
                 // Open the popup
-                createTaskPopup.open();
+                createProtocolPopup.open();
             }
 
             style: IngeScapeAssessmentsButtonStyle {
@@ -268,7 +268,7 @@ I2PopupBase {
     // Create Task Popup
     //
     Popup.CreateTaskPopup {
-        id: createTaskPopup
+        id: createProtocolPopup
 
         layerObjectName: "overlay2Layer"
 

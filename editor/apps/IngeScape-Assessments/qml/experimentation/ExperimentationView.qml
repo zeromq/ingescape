@@ -46,6 +46,9 @@ Item {
 
     property int rightMarginToAvoidToBeHiddenByNetworkConnectionInfo: 220
 
+    property int subScreensMargin: 35
+
+
     //--------------------------------
     //
     //
@@ -708,8 +711,8 @@ Item {
 
         anchors.centerIn: parent
 
-        width: parent.width - 78
-        height: parent.height - 78
+        width: parent.width - subScreensMargin
+        height: parent.height - subScreensMargin
 
         subjectController: IngeScapeAssessmentsC.subjectsC
     }
@@ -723,8 +726,8 @@ Item {
 
         anchors.centerIn: parent
 
-        width: parent.width - 78
-        height: parent.height - 78
+        width: parent.width - subScreensMargin
+        height: parent.height - subScreensMargin
 
         taskController: IngeScapeAssessmentsC.tasksC
     }
@@ -738,8 +741,8 @@ Item {
 
         anchors.centerIn: parent
 
-        width: parent.width - 78
-        height: parent.height - 78
+        width: parent.width - subScreensMargin
+        height: parent.height - subScreensMargin
 
         controller: IngeScapeAssessmentsC.exportC
     }
