@@ -55,11 +55,9 @@ Rectangle {
     signal deleteTaskInstance();
 
 
-    property alias taskColumnWidth: taskName.width
+    property alias protocolColumnWidth: txtProtocolName.width
     property alias subjectColumnWidth: subjectId.width
-    property alias startDateColumnWidth: startDate.width
-    property alias startTimeColumnWidth: startTime.width
-    property alias durationColumnWidth: duration.width
+    property alias creationDateTimeColumnWidth: creationDateTime.width
     property alias buttonColumnWidth: buttonRow.width
 
     property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.containsMouse || btnOpen.containsMouse
@@ -88,6 +86,7 @@ Rectangle {
 
     Row {
         id: row
+
         spacing: 0
 
         anchors {
@@ -97,13 +96,12 @@ Rectangle {
         }
 
         Text {
-            id: taskInstanceName
-            width: rootItem.width
-                   - taskColumnWidth
+            id: txtSessionName
+
+            width: rootItem.width - row.anchors.leftMargin
+                   - protocolColumnWidth
                    - subjectColumnWidth
-                   - startDateColumnWidth
-                   - startTimeColumnWidth
-                   - durationColumnWidth
+                   - creationDateTimeColumnWidth
                    - buttonColumnWidth
 
             text: rootItem.modelM ? rootItem.modelM.name : ""
@@ -118,9 +116,9 @@ Rectangle {
         }
 
         Text {
-            id: taskName
+            id: txtProtocolName
 
-            width: taskColumnWidth
+            width: protocolColumnWidth
             elide: Text.ElideRight
             text: (rootItem.modelM && rootItem.modelM.task) ? rootItem.modelM.task.name : ""
 
@@ -148,44 +146,12 @@ Rectangle {
         }
 
         Text {
-            id: startDate
+            id: creationDateTime
 
-            width: startDateColumnWidth
+            width: creationDateTimeColumnWidth
             elide: Text.ElideRight
-            text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "dd/MM/yyyy")
-                                  : "../../...."
-
-            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Bold
-                pixelSize: 16
-            }
-        }
-
-        Text {
-            id: startTime
-
-            width: startTimeColumnWidth
-            elide: Text.ElideRight
-            text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "hh:mm:ss")
-                                  : "..:..:.."
-
-            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Bold
-                pixelSize: 16
-            }
-        }
-
-        Text {
-            id: duration
-
-            text: rootItem.modelM ? rootItem.modelM.duration.toLocaleString(Qt.locale(), "hh:mm:ss.zzz")
-                                  : "00:00:00.000"
-            width: durationColumnWidth
-            elide: Text.ElideRight
+            text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "dd/MM/yyyy") + " " + rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "hh:mm:ss")
+                                  : "../../.... ..:..:.."
 
             color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
@@ -205,6 +171,28 @@ Rectangle {
             right: parent.right
         }
         height: parent.height
+
+        Button {
+            id: btnOpen
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            property bool containsMouse: __behavior.containsMouse
+
+            opacity: rootItem.isMouseHovering ? 1 : 0
+            enabled: opacity > 0
+
+            width: 85
+            height: 30
+
+            style: IngeScapeAssessmentsButtonStyle {
+                text: "OPEN"
+            }
+
+            onClicked: {
+                rootItem.openTaskInstance();
+            }
+        }
 
         Button {
             id: btnDelete
@@ -228,32 +216,11 @@ Rectangle {
                 rootItem.deleteTaskInstance();
             }
         }
-
-        Button {
-            id: btnOpen
-
-            anchors.verticalCenter: parent.verticalCenter
-
-            property bool containsMouse: __behavior.containsMouse
-
-            opacity: rootItem.isMouseHovering ? 1 : 0
-            enabled: opacity > 0
-
-            width: 85
-            height: 30
-
-            style: IngeScapeAssessmentsButtonStyle {
-                text: "OPEN"
-            }
-
-            onClicked: {
-                rootItem.openTaskInstance();
-            }
-        }
     }
 
     Rectangle {
         id: bottomSeparator
+
         anchors {
             left: parent.left
             right: parent.right

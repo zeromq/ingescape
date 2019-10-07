@@ -44,6 +44,8 @@ Item {
 
     property bool isEditingName: false
 
+    property int rightMarginToAvoidToBeHiddenByNetworkConnectionInfo: 220
+
     //--------------------------------
     //
     //
@@ -129,6 +131,7 @@ Item {
 
         Rectangle {
             id: expeNameEditBackground
+
             anchors {
                 left: expeName.left
                 leftMargin: -10
@@ -142,9 +145,10 @@ Item {
 
             // Max available width based on the size of the parent. Won't be bigger than this
             property real maxAvailableWidth: (parent.width
-                                              - 92 // enumName's leftMargin
-                                              + 10 // this left margin from enumName
-                                              - 22 // Right margin left to avoid reaching the edge of the window
+                                              - 92 // expeName's leftMargin
+                                              + 10 // this left margin from expeName
+                                              - rightMarginToAvoidToBeHiddenByNetworkConnectionInfo // Right margin left to avoid (reaching the edge of the window)
+                                              // Right margin left to avoid to be hidden by the network connection info panel on foreground
                                               - 10  // Margins around the edit button (5 on both sides)
                                               )
 
@@ -205,6 +209,7 @@ Item {
 
         Text {
             id: expeName
+
             anchors {
                 top: parent.top
                 topMargin: 30
@@ -263,53 +268,27 @@ Item {
             }
         }
 
-        Row {
+        Text {
+            id: expeGroupNameText
+
             anchors {
-                top: expeName.bottom
-                topMargin: 15
-                left: expeName.left
+                left: (expeNameEditBackground.opacity > 0) ? expeNameEditBackground.right : expeName.right
+                leftMargin: 15
+                right: parent.right
+                rightMargin: rightMarginToAvoidToBeHiddenByNetworkConnectionInfo
+                bottom: expeName.bottom
             }
+            verticalAlignment: Text.AlignVCenter
 
-            spacing: 0
+            text: rootItem.experimentation ? "- " + rootItem.experimentation.groupName
+                                           : ""
+            elide: Text.ElideRight
 
-            Text {
-                id: expeGroupNameText
-
-                property real maxAvailableWidth: expeName.maxAvailableWidth - expeGroupDate.width
-                width: Math.min(implicitWidth, maxAvailableWidth)
-
-                text: rootItem.experimentation ? rootItem.experimentation.groupName : ""
-                elide: Text.ElideRight
-
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-
-
-                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    pixelSize: 20
-                    bold: true
-                }
-            }
-
-            Text {
-                id: expeGroupDate
-
-                height: expeGroupNameText.height
-
-                text: rootItem.experimentation ? rootItem.experimentation.creationDate.toLocaleString(Qt.locale(), " - dd/MM/yyyy - hh:mm:ss") : ""
-
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-
-                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    pixelSize: 18
-                    bold: true
-                    italic: true
-                }
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+            font {
+                family: IngeScapeTheme.textFontFamily
+                pixelSize: 20
+                bold: true
             }
         }
     }
@@ -328,19 +307,16 @@ Item {
         }
 
         //FIXME Minimum size not handled
-        property real taskColumnWidth: 280
-        property real subjectColumnWidth: 216
-        property real startDateColumnWidth: 138
-        property real startTimeColumnWidth: 138
-        property real durationColumnWidth: 126
+        property real protocolColumnWidth: 280
+        property real subjectColumnWidth: 180
+        property real creationDateTimeColumnWidth: 150
+
         property real buttonColumnWidth: 158
-        property real taskInstanceNameColumnWidth: taskInstancesPanel.width
-                                                   - taskColumnWidth
-                                                   - subjectColumnWidth
-                                                   - startDateColumnWidth
-                                                   - startTimeColumnWidth
-                                                   - durationColumnWidth
-                                                   - buttonColumnWidth
+        property real sessionNameColumnWidth: taskInstancesPanel.width - taskInstanceScrollView.scrollBarSize - taskInstanceScrollView.verticalScrollbarMargin
+                                              - protocolColumnWidth
+                                              - subjectColumnWidth
+                                              - creationDateTimeColumnWidth
+                                              - buttonColumnWidth
 
         //
         // Configuration Panel
@@ -373,7 +349,7 @@ Item {
                     height: 62
 
                     style: IngeScapeAssessmentsSvgAndTextButtonStyle {
-                        text: "SUBJECTS"
+                        text: qsTr("SUBJECTS")
 
                         releasedID: "subjects"
                         pressedID: releasedID
@@ -394,7 +370,7 @@ Item {
                     height: 62
 
                     style: IngeScapeAssessmentsSvgAndTextButtonStyle {
-                        text: "TASKS"
+                        text: qsTr("PROTOCOLS")
 
                         releasedID: "tasks"
                         pressedID: releasedID
@@ -403,10 +379,10 @@ Item {
                     }
 
                     onClicked: {
-                        console.log("QML: Open the 'Tasks View' popup");
+                        console.log("QML: Open the 'Protocols View' popup");
 
-                        // Open the popup "Tasks View"
-                        tasksViewPopup.open();
+                        // Open the popup "Protocols View"
+                        protocolsViewPopup.open();
                     }
                 }
 
@@ -417,7 +393,7 @@ Item {
                     enabled: false
 
                     style: IngeScapeAssessmentsSvgAndTextButtonStyle {
-                        text: "CODING"
+                        text: qsTr("CODING")
 
                         releasedID: "coding"
                         pressedID: releasedID
@@ -433,7 +409,7 @@ Item {
                     enabled: false
 
                     style: IngeScapeAssessmentsSvgAndTextButtonStyle {
-                        text: "CLEANING"
+                        text: qsTr("CLEANING")
 
                         releasedID: "cleaning"
                         pressedID: releasedID
@@ -447,7 +423,7 @@ Item {
                     height: 62
 
                     style: IngeScapeAssessmentsSvgAndTextButtonStyle {
-                        text: "EXPORT"
+                        text: qsTr("EXPORT")
 
                         releasedID: "export"
                         pressedID: releasedID
@@ -476,22 +452,22 @@ Item {
                 top: parent.top
                 topMargin: 34
                 bottom: parent.bottom
-                bottomMargin: 49
+                bottomMargin: 28
                 left: configurationPanel.right
-                leftMargin: 30
+                leftMargin: 28
                 right: parent.right
                 rightMargin: 28
             }
 
             Text {
-                id: titleTaskInstances
+                id: titleSessions
 
                 anchors {
-                    verticalCenter: btnNewRecord.verticalCenter
+                    verticalCenter: btnNewSession.verticalCenter
                     left: parent.left
                 }
 
-                text: qsTr("TASK INSTANCES")
+                text: qsTr("SESSIONS")
 
                 height: parent.height
                 verticalAlignment: Text.AlignVCenter
@@ -505,7 +481,7 @@ Item {
             }
 
             Button {
-                id: btnNewRecord
+                id: btnNewSession
 
                 anchors {
                     top: parent.top
@@ -517,18 +493,18 @@ Item {
 
                 onClicked: {
                     // Open the popup
-                    createTaskInstancePopup.open();
+                    createSessionPopup.open();
                 }
 
                 style: IngeScapeAssessmentsButtonStyle {
-                    text: qsTr("NEW TASK INSTANCE")
+                    text: qsTr("NEW SESSION")
                 }
             }
 
             IngeScapeAssessmentsListHeader {
                 id: listHeader
                 anchors {
-                    top: btnNewRecord.bottom
+                    top: btnNewSession.bottom
                     topMargin: 12
                     left: parent.left
                     right: parent.right
@@ -548,9 +524,9 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
 
-                        width: mainView.taskInstanceNameColumnWidth
+                        width: mainView.sessionNameColumnWidth
 
-                        text: qsTr("Task instance's name")
+                        text: qsTr("Name")
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
@@ -564,9 +540,9 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
 
-                        width: mainView.taskColumnWidth
+                        width: mainView.protocolColumnWidth
 
-                        text: qsTr("Task's name")
+                        text: qsTr("Protocol")
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
@@ -582,7 +558,7 @@ Item {
 
                         width: mainView.subjectColumnWidth
 
-                        text: qsTr("Subject's ID")
+                        text: qsTr("Subject")
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
@@ -596,41 +572,9 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
 
-                        width: mainView.startDateColumnWidth
+                        width: mainView.creationDateTimeColumnWidth
 
-                        text: qsTr("Start date")
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 18
-                            weight: Font.Black
-                        }
-                    }
-
-                    Text {
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        width: mainView.startTimeColumnWidth
-
-                        text: qsTr("Start time")
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 18
-                            weight: Font.Black
-                        }
-                    }
-
-                    Text {
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        width: mainView.durationColumnWidth
-
-                        text: qsTr("Duration")
+                        text: qsTr("Creation date")
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
@@ -679,11 +623,9 @@ Item {
                             model: rootItem.experimentation ? rootItem.experimentation.allTaskInstances : null
 
                             delegate: TaskInstanceInList {
-                                taskColumnWidth: mainView.taskColumnWidth
+                                protocolColumnWidth: mainView.protocolColumnWidth
                                 subjectColumnWidth: mainView.subjectColumnWidth
-                                startDateColumnWidth: mainView.startDateColumnWidth
-                                startTimeColumnWidth: mainView.startTimeColumnWidth
-                                durationColumnWidth: mainView.durationColumnWidth
+                                creationDateTimeColumnWidth: mainView.creationDateTimeColumnWidth
                                 buttonColumnWidth: mainView.buttonColumnWidth
 
                                 anchors {
@@ -732,7 +674,7 @@ Item {
         // Create Experimentation Popup
         //
         Popup.CreateTaskInstancePopup {
-            id: createTaskInstancePopup
+            id: createSessionPopup
 
             experimentationController: rootItem.controller
             experimentation: rootItem.experimentation
@@ -774,10 +716,10 @@ Item {
 
 
     //
-    // Tasks View (popup)
+    // Protocols View (popup)
     //
     Task.TasksView {
-        id: tasksViewPopup
+        id: protocolsViewPopup
 
         anchors.centerIn: parent
 

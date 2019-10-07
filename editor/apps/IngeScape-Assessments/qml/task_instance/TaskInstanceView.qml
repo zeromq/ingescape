@@ -221,8 +221,8 @@ Item {
 
             // Max available width based on the size of the parent. Won't be bigger than this
             property real maxAvailableWidth: (parent.width
-                                              - 92 // enumName's leftMargin
-                                              + 10 // this left margin from enumName
+                                              - 92 // taskInstanceName's leftMargin
+                                              + 10 // this left margin from taskInstanceName
                                               - 22 // Right margin left to avoid reaching the edge of the window
                                               - 10  // Margins around the edit button (5 on both sides)
                                               )
