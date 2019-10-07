@@ -123,7 +123,7 @@ void ExperimentationsListController::createNewExperimentationInNewGroup(QString 
         if (experimentationsGroup == nullptr)
         {
             // Create a new experimentations group
-            experimentationsGroup = _createNewExperimentationGroup(newExperimentationsGroupName);
+            experimentationsGroup = _createNewExperimentationsGroup(newExperimentationsGroupName);
         }
 
         if (experimentationsGroup != nullptr)
@@ -200,6 +200,13 @@ void ExperimentationsListController::deleteExperimentationOfGroup(Experimentatio
 
         // Free memory
         delete experimentation;
+
+        // The group is empty (and is not the default group "Other")
+        if ((experimentationsGroup->experimentations()->count() == 0) && (experimentationsGroup != _defaultGroupOther))
+        {
+            // Remove the experimentations group
+            _removeExperimentationsGroup(experimentationsGroup);
+        }
     }
 }
 
@@ -220,16 +227,33 @@ ExperimentationsGroupVM* ExperimentationsListController::_getExperimentationsGro
  * @param experimentationsGroup
  * @param newExperimentationsGroupName
  */
-ExperimentationsGroupVM* ExperimentationsListController::_createNewExperimentationGroup(const QString& newExperimentationsGroupName)
+ExperimentationsGroupVM* ExperimentationsListController::_createNewExperimentationsGroup(const QString& newExperimentationsGroupName)
 {
-    ExperimentationsGroupVM* expeGroupVM = new ExperimentationsGroupVM(newExperimentationsGroupName, nullptr);
-    if (expeGroupVM != nullptr)
+    ExperimentationsGroupVM* experimentationsGroup = new ExperimentationsGroupVM(newExperimentationsGroupName, nullptr);
+    if (experimentationsGroup != nullptr)
     {
-        _allExperimentationsGroups.append(expeGroupVM);
-        _allExperimentationsGroupsWithoutOthers.append(expeGroupVM);
-        _hashFromNameToExperimentationsGroup.insert(newExperimentationsGroupName, expeGroupVM);
+        _allExperimentationsGroups.append(experimentationsGroup);
+        _allExperimentationsGroupsWithoutOthers.append(experimentationsGroup);
+        _hashFromNameToExperimentationsGroup.insert(newExperimentationsGroupName, experimentationsGroup);
     }
-    return expeGroupVM;
+    return experimentationsGroup;
+}
+
+
+/**
+ * @brief Remove an experimentations group
+ * @param experimentationsGroup
+ */
+void ExperimentationsListController::_removeExperimentationsGroup(ExperimentationsGroupVM* experimentationsGroup)
+{
+    if (experimentationsGroup != nullptr)
+    {
+        _allExperimentationsGroups.remove(experimentationsGroup);
+        _allExperimentationsGroupsWithoutOthers.remove(experimentationsGroup);
+        _hashFromNameToExperimentationsGroup.remove(experimentationsGroup->name());
+
+        delete experimentationsGroup;
+    }
 }
 
 
@@ -249,8 +273,8 @@ void ExperimentationsListController::_initExperimentationsList()
                 ExperimentationsGroupVM* experimentationsGroup = _getExperimentationsGroupFromName(experimentation->groupName());
                 if (experimentationsGroup == nullptr)
                 {
-                    // Create the ExperimentationGroupVM
-                    experimentationsGroup = _createNewExperimentationGroup(experimentation->groupName());
+                    // Create the Experimentations Group VM
+                    experimentationsGroup = _createNewExperimentationsGroup(experimentation->groupName());
                 }
 
                 if (experimentationsGroup != nullptr)

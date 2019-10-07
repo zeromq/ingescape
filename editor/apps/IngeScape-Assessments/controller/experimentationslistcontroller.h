@@ -116,11 +116,18 @@ private:
 
 
     /**
-     * @brief Creates a new experimentation group and returns it
+     * @brief Creates a new experimentations group and returns it
      * @param experimentationsGroup
      * @param newExperimentationsGroupName
      */
-    ExperimentationsGroupVM* _createNewExperimentationGroup(const QString& newExperimentationsGroupName);
+    ExperimentationsGroupVM* _createNewExperimentationsGroup(const QString& newExperimentationsGroupName);
+
+
+    /**
+     * @brief Remove an experimentations group
+     * @param experimentationsGroup
+     */
+    void _removeExperimentationsGroup(ExperimentationsGroupVM* experimentationsGroup);
 
 
     /**
