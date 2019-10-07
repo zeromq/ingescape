@@ -138,16 +138,16 @@ Item {
         }
 
         // 34 => margin between popup.top and taskName.top
-        // 18 => margin between taskName.bottom and indeVar.top
+        // 18 => margin between taskName.bottom and indepVar.top
         // 24 => margin between depVar.bottom and popup.bottom
-        // 26 => 52 / 2 ; 52 is margin between indeVar.bottom and depVar.top
+        // 26 => 52 / 2 ; 52 is margin between indepVar.bottom and depVar.top
         height: (parent.height - 34 - taskName.height - 18 - 24 - 26) / 2
 
         Text {
             text: "INDEPENDENT VARIABLES"
             anchors {
                 left: parent.left
-                verticalCenter: newIndeVarButton.verticalCenter
+                verticalCenter: newIndepVarButton.verticalCenter
             }
 
             verticalAlignment: Text.AlignVCenter
@@ -161,7 +161,7 @@ Item {
         }
 
         Button {
-            id: newIndeVarButton
+            id: newIndepVarButton
             anchors {
                 top: parent.top
                 right: parent.right
@@ -186,7 +186,7 @@ Item {
             id: indepVarListHeader
 
             anchors {
-                top: newIndeVarButton.bottom
+                top: newIndepVarButton.bottom
                 topMargin: 12
                 left: parent.left
                 right: parent.right
@@ -236,18 +236,18 @@ Item {
             color: IngeScapeTheme.whiteColor
 
             ListView {
-                id: indeVarColumn
+                id: indepVarColumn
                 anchors.fill: parent
 
                 model: rootItem.modelM ? rootItem.modelM.independentVariables : null
 
                 delegate: IndependentVariableDelegate {
-                    id: indeVarDelegate
+                    id: indepVarDelegate
 
                     taskController: rootItem.taskController
 
                     height: 40
-                    width: indeVarColumn.width
+                    width: indepVarColumn.width
                     independentVarModel: model ? model.QtObject : null
 
                     columnWidths: indepVarListHeader.headerColumnWidths
@@ -256,7 +256,8 @@ Item {
         }
 
         Rectangle {
-            id: indeVarBottomShadow
+            id: indepVarBottomShadow
+
             anchors {
                 left: parent.left
                 right: parent.right
@@ -285,9 +286,9 @@ Item {
         }
 
         // 34 => margin between popup.top and taskName.top
-        // 18 => margin between taskName.bottom and indeVar.top
+        // 18 => margin between taskName.bottom and indepVar.top
         // 24 => margin between depVar.bottom and popup.bottom
-        // 26 => 52 / 2 ; 52 is margin between indeVar.bottom and depVar.top
+        // 26 => 52 / 2 ; 52 is margin between indepVar.bottom and depVar.top
         height: (parent.height - 34 - taskName.height - 18 - 24 - 26) / 2
 
         Text {
@@ -332,6 +333,7 @@ Item {
 
         IngeScapeAssessmentsListHeader {
             id: depVarListHeader
+
             anchors {
                 top: newDepVarButton.bottom
                 topMargin: 12
@@ -340,10 +342,10 @@ Item {
             }
 
             property var headerColumnWidths: [
-                229, // Name
-                336, // Description
-                231, // Agent
-                227  // Output
+                225, // Name
+                width - 225 - 225 - 225, // Description
+                225, // Agent
+                225  // Output
             ]
 
             Row {

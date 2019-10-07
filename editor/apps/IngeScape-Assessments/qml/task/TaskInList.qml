@@ -110,13 +110,21 @@ Item {
             anchors {
                 verticalCenter: parent.verticalCenter
                 left: parent.left
-                leftMargin: 28
+                leftMargin: 25
+                right: parent.right
+                rightMargin: 15
             }
 
-            spacing: 6
+            spacing: 10
 
             Text {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+
                 text: rootItem.modelM ? rootItem.modelM.name : ""
+                elide: Text.ElideRight
 
                 color: rootItem.isSelected ? IngeScapeAssessmentsTheme.darkerDarkBlueHeader : IngeScapeTheme.whiteColor
 
@@ -128,7 +136,13 @@ Item {
             }
 
             Text {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+
                 text: rootItem.modelM ? rootItem.modelM.platformFileName : ""
+                elide: Text.ElideRight
 
                 color: IngeScapeTheme.lightGreyColor
 
