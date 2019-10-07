@@ -307,7 +307,7 @@ int igs_removeArgumentFromCall(const char *callName, const char *argName){
             if (strcmp(argName, arg->name) == 0){
                 LL_DELETE(t->arguments, arg);
                 free(arg->name);
-                if (tmp->type == IGS_DATA_T && arg->data != NULL){
+                if (arg->type == IGS_DATA_T && arg->data != NULL){
                     free(arg->data);
                 } else if (arg->type == IGS_STRING_T && arg->data != NULL){
                     free(arg->c);
