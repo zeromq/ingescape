@@ -22,7 +22,7 @@ DEFINES += "VERSION=\\\"$$VERSION\\\""
 DEFINES += QT_MESSAGELOGCONTEXT
 
 # Qt modules used by our application and/or its dependencies
-QT += qml quick quick-private svg xml concurrent sql core-private gui-private
+QT += qml quick quick-private svg xml concurrent core-private gui-private
 
 CONFIG += c++11 precompiled_header
 
@@ -213,7 +213,7 @@ win32 {
 
         # Copy Qt dlls
         # NB: Some Qt libs must be explictly referenced because their are used by I2Quick.dll and not our .exe
-        QMAKE_POST_LINK += $$shell_quote($$shell_path($$[QT_INSTALL_BINS]/windeployqt)) $${DESTDIR}/$${TARGET}.exe -xml -concurrent -printsupport -sql -qmldir=$${PWD} $$escape_expand(\n\t)
+        QMAKE_POST_LINK += $$shell_quote($$shell_path($$[QT_INSTALL_BINS]/windeployqt)) $${DESTDIR}/$${TARGET}.exe -xml -concurrent -printsupport -qmldir=$${PWD} $$escape_expand(\n\t)
     }
     else {
         # copy I2Quick (if we don't call make install)
