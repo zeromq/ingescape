@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef OSUTILS_H
-#define OSUTILS_H
+#ifndef I2OSUTILS_H
+#define I2OSUTILS_H
 
 #include <QObject>
 #include <QtQml>
@@ -186,4 +186,4 @@ protected:
 
 QML_DECLARE_TYPE(I2OSUtils)
 
-#endif // OSUTILS_H
+#endif // I2OSUTILS_H
