@@ -71,17 +71,12 @@
 
 //----------
 //
-// Helpers
+// Platform support
 //
 //----------
 
 
-
-//----------
-//
-// Syntax highlighters
-//
-//----------
+#include "platformsupport/i2osutils.h"
 
 
 

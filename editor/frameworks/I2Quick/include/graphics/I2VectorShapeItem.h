@@ -142,7 +142,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit I2VectorShapeItem(QQuickItem *parent = 0);
+    explicit I2VectorShapeItem(QQuickItem *parent = nullptr);
 
 
    /**

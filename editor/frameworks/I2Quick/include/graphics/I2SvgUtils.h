@@ -36,7 +36,7 @@ class I2QUICK_EXPORT I2SvgUtils : public QObject
     Q_OBJECT
 
 public:
-    explicit I2SvgUtils(QObject* parent = 0);
+    explicit I2SvgUtils(QObject* parent = nullptr);
 
     /**
      * @brief Method used to provide a singleton to QML

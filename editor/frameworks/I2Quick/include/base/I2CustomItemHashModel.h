@@ -35,7 +35,7 @@ class I2QUICK_EXPORT I2CustomItemHashPair : public QObject
     Q_OBJECT
 
     // Key
-    Q_PROPERTY (QString key READ key)
+    Q_PROPERTY (QString key READ key CONSTANT)
 
     // Value
     Q_PROPERTY (QObject* value READ value WRITE setValue NOTIFY valueChanged)
@@ -305,7 +305,8 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit I2CustomItemHashModel(QObject* parent = 0): AbstractI2CustomItemHashModel(parent)
+    explicit I2CustomItemHashModel(QObject* parent = nullptr): AbstractI2CustomItemHashModel(parent)
+      , _lastItemCount(0)
     {
         // Get index of our callback called when an item changes (one of its properties has changed)
         _onListItemChangedCallback = metaObject()->method(metaObject()->indexOfMethod("_onListItemChanged()"));
@@ -561,7 +562,7 @@ public: // QAbstractListModel API
      */
     void appendRows(const QList<I2CustomItemHashPair *> &items)
     {
-        if (items.size() != 0)
+        if (!items.isEmpty())
         {
             // NB: We don't check if our key already exists or is empty
             //     BECAUSE the test MUST be performed before calling this function
@@ -963,7 +964,7 @@ public: // Hash API
                     QStringList validNewkeys;
 
                     QList<QString> hashModelKeys = castedHashModel->keys();
-                    for (auto key : hashModelKeys)
+                    for (const auto& key : hashModelKeys)
                     {
                         // Check if we can use this key
                         if (!key.isEmpty() && !(_hash.contains(key)) && !(validNewkeys.contains(key)))

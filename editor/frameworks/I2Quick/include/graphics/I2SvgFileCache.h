@@ -57,7 +57,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit I2SvgFileCache(QQuickItem *parent = 0);
+    explicit I2SvgFileCache(QQuickItem *parent = nullptr);
 
 
     /**

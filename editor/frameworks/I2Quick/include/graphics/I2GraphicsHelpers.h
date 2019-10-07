@@ -341,7 +341,7 @@ public:
         }
     }
 
-    static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+    static bool parsePathDataFast(const QString &dataStr, QPainterPath &path)
     {
         qreal x0 = 0, y0 = 0;              // starting point
         qreal x = 0, y = 0;                // current point
@@ -355,11 +355,8 @@ public:
                 ++str;
             QChar pathElem = *str;
             ++str;
-            QChar endc = *end;
-            *const_cast<QChar *>(end) = 0; // parseNumbersArray requires 0-termination that QStringRef cannot guarantee
             QVarLengthArray<qreal, 8> arg;
             parseNumbersArray(str, arg);
-            *const_cast<QChar *>(end) = endc;
             if (pathElem == QLatin1Char('z') || pathElem == QLatin1Char('Z'))
                 arg.append(0);//dummy
             const qreal *num = arg.constData();
@@ -729,8 +726,7 @@ public:
 
         if (!svgPath.isEmpty())
         {
-            QStringRef stringRef = QStringRef(&svgPath);
-            parsePathDataFast(stringRef, result);
+            parsePathDataFast(svgPath, result);
         }
 
         return result;
