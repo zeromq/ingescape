@@ -50,7 +50,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit I2SvgVectorFileCache(QObject* parent = 0);
+    explicit I2SvgVectorFileCache(QObject* parent = nullptr);
 
 
     /**

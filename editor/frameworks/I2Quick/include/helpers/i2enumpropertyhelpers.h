@@ -29,6 +29,7 @@
 #include <QQmlProperty>
 #include <QtGlobal>
 #include <QMetaType>
+#include <utility>
 
 
 #include "i2quick_global.h"
@@ -141,7 +142,7 @@
         } \
         static int staticEnumFromKey(QString key) { \
             name instance; \
-            return instance.enumFromKey(key); \
+            return instance.enumFromKey(std::move(key)); \
         } \
         static QStringList staticAllKeys() { \
             name instance; \
@@ -188,6 +189,8 @@
     class name : public I2AbstractQmlEnumClass { \
         Q_OBJECT \
     public: \
+        explicit name(QObject* parent = nullptr) : I2AbstractQmlEnumClass(parent) { \
+        } \
         enum Value { __VA_ARGS__ }; \
         Q_ENUM (Value) \
         static QObject *qmlSingleton(QQmlEngine *engine, QJSEngine *scriptEngine) { \
@@ -224,7 +227,7 @@
         } \
         static int staticEnumFromKey(QString key) { \
             name instance; \
-            return instance.enumFromKey(key); \
+            return instance.enumFromKey(std::move(key)); \
         } \
         static QStringList staticAllKeys() { \
             name instance; \

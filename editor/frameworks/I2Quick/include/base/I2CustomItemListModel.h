@@ -539,7 +539,7 @@ public: // QAbstractListModel API
     void appendRows(const QList<CustomItemType *> &items)
     {
         // Check if we have at least one item
-        if (items.size() != 0)
+        if (!items.isEmpty())
         {
             // Check if we can add duplicate items
             if (_allowDuplicateItems)
@@ -575,7 +575,7 @@ public: // QAbstractListModel API
                 }
 
                 // Add items if needed
-                if (itemsToAdd.size() != 0)
+                if (!itemsToAdd.isEmpty())
                 {
                     // Update our list
                     beginInsertRows(QModelIndex(), rowCount(), rowCount() + itemsToAdd.size() - 1);

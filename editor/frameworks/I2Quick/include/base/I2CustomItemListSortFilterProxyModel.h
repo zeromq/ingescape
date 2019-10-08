@@ -1560,7 +1560,7 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit I2CustomItemSortFilterListModel(QObject *parent = 0) : I2CustomItemSortFilterProxyModel<CustomItemType>(parent)
+    explicit I2CustomItemSortFilterListModel(QObject *parent = nullptr) : I2CustomItemSortFilterProxyModel<CustomItemType>(parent)
     {
         // Use it as our source model
         I2CustomItemSortFilterProxyModel<CustomItemType>::setSourceModel(&_list);

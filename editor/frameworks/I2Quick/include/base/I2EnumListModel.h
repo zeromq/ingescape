@@ -654,7 +654,7 @@ public: // QAbstractListModel API
     void appendRows(const QList<I2EnumListItemData *> &items)
     {
         // Check if we have at least one item to add
-        if (items.size() != 0)
+        if (!items.isEmpty())
         {
             // Insert items in our list
             beginInsertRows(QModelIndex(), rowCount(), rowCount() + items.size() - 1);
@@ -1004,7 +1004,7 @@ public: // List API
       QList<I2EnumListItemData *> items;
       CustomEnumType myTempEnumObject;
 
-      for (QString enumKey : enumKeys)
+      for (const QString& enumKey : enumKeys)
       {
           // Check if we don't already have this key
           if (!containsEnumKey(enumKey))

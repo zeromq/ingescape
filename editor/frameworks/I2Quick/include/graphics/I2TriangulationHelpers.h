@@ -69,7 +69,7 @@ class I2QUICK_EXPORT I2TriangulationHelpers : public QObject
 
 
 public:
-    explicit I2TriangulationHelpers(QObject *parent = 0);
+    explicit I2TriangulationHelpers(QObject *parent = nullptr);
 
 
     /**

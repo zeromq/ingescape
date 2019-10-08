@@ -187,7 +187,7 @@
             bool hasChanged = false;
             if (_x != value) {
                 if (_x != nullptr) {
-                    disconnect(_x, SIGNAL(destroyed(QObject *)), this, 0);
+                    disconnect(_x, SIGNAL(destroyed(QObject *)), this, nullptr);
                 }
                 _x = value;
                 if (_x != nullptr) {
@@ -218,7 +218,7 @@
             bool hasChanged = false; \
             if (_##name != value) { \
                 if (_##name != nullptr) {\
-                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, 0); \
+                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, nullptr); \
                 } \
                 _##name = value; \
                 if (_##name != nullptr) { \
@@ -554,7 +554,7 @@
             bool hasChanged = false;
             if (_x != value) {
                 if (_x != nullptr) {
-                    disconnect(_x, SIGNAL(destroyed(QObject *)), this, 0);
+                    disconnect(_x, SIGNAL(destroyed(QObject *)), this, nullptr);
                 }
                 _x = value;
                 if (_x != nullptr) {
@@ -581,7 +581,7 @@
             bool hasChanged = false; \
             if (_##name != value) { \
                 if (_##name != nullptr) {\
-                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, 0); \
+                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, nullptr); \
                 } \
                 _##name = value; \
                 if (_##name != nullptr) { \

@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2015-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2015-2019 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -41,6 +41,22 @@ public:
      * @brief Destructor
      */
     ~I2SVGImageProvider();
+
+
+    /**
+     * @brief Return the size of the image returned by a given request
+     * @param id
+     * @return
+     */
+    static QSize requestImageSize(const QString &id);
+
+
+    /**
+     * @brief Request a QImage
+     * @param id
+     * @return
+     */
+    static QImage requestQImage(const QString &id, QSize *size, const QSize &requestedSize);
 
 
     /**
@@ -85,11 +101,23 @@ public:
 
 private:
     /**
+     * @brief Compute an image size
+     * @param defaultSize
+     * @param requestedSize
+     * @param width
+     * @param height
+     * @param scale
+     * @return (size, canUseDevicePixelRatio)
+     */
+    static QPair<QSize, bool> _computeImageSize(const QSize& defaultSize, const QSize& requestedSize, int width = -1, int height = -1, qreal scale = 1.0);
+
+
+    /**
      * @brief Get the SVG renderer for a given SVG file
      * @param svgFile
      * @return
      */
-    QSvgRenderer *_getSvgRenderer(const QString &svgFile);
+    static QSvgRenderer *_getSvgRenderer(const QString &svgFile);
 
 
     /**
@@ -98,12 +126,23 @@ private:
      * @param size
      * @return
      */
-    QImage _buildErrorImage(const QString& errorMessage, const QSize& size = QSize(100, 100));
+    static QImage _buildErrorImage(const QString& errorMessage, const QSize& size = QSize(100, 100));
+
+
+    /**
+     * @brief Build an empty image
+     * @param size
+     * @return
+     */
+    static QImage _buildEmptyImage(const QSize& size = QSize(100, 100));
 
 
 protected:
     // Cache for SVG files
     static QHash<QString, QSvgRenderer *> _static_svgFilesCache;
+
+    // Debug image default size
+    static QSize _static_debugImageSize;
 };
 
 #endif // _I2SVGIMAGEPROVIDER_H_
