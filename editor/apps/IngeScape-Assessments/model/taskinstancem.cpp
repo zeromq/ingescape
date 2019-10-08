@@ -205,13 +205,13 @@ TaskInstanceM* TaskInstanceM::createFromCassandraRow(const CassRow* row)
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskInstanceUuid);
 
-        QString taskName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
+        QString sessionName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
         QString comments(AssessmentsModelManager::getStringValueFromColumnName(row, "comment"));
         QUrl platformUrl(AssessmentsModelManager::getStringValueFromColumnName(row, "platform_file"));
 
         QDateTime startDateTime(AssessmentsModelManager::getDateTimeFromColumnNames(row, "start_date", "start_time"));
 
-        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, taskName, comments, subjectUuid, taskUuid, startDateTime);
+        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, sessionName, comments, subjectUuid, taskUuid, startDateTime);
     }
 
     return taskInstance;

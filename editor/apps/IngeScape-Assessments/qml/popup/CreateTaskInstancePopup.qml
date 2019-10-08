@@ -92,7 +92,7 @@ AssessmentsPopupBase {
     //--------------------------------
 
 
-    Item {
+    /*Item {
         id: nameRow
 
         anchors {
@@ -165,13 +165,14 @@ AssessmentsPopupBase {
                 pixelSize: 16
             }
         }
-    }
+    }*/
 
     Item {
         id: subjectRow
 
         anchors {
-            top: nameRow.bottom
+            //top: nameRow.bottom
+            top: parent.top
             topMargin: 30
             left: parent.left
             leftMargin: 28
@@ -376,19 +377,20 @@ AssessmentsPopupBase {
 
             activeFocusOnPress: true
 
-            enabled: (taskInstanceName.text.length > 0) && (typeof comboSubjects.selectedItem !== 'undefined') && (typeof comboTasks.selectedItem !== 'undefined')
+            //enabled: (taskInstanceName.text.length > 0) && (typeof comboSubjects.selectedItem !== 'undefined') && (typeof comboTasks.selectedItem !== 'undefined')
+            enabled: (typeof comboSubjects.selectedItem !== 'undefined') && (typeof comboTasks.selectedItem !== 'undefined')
 
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OK"
             }
 
             onClicked: {
-                console.log("QML: create new Task Instance " + taskInstanceName.text + " of type " + rootPopup.selectedType);
-
                 if (experimentationController && comboSubjects.selectedItem && comboTasks.selectedItem)
                 {
-                    // Create a new record for a subject and a task
-                    experimentationController.createNewTaskInstanceForSubjectAndTask(taskInstanceName.text, comboSubjects.selectedItem, comboTasks.selectedItem);
+                    //console.log("QML: create new session with protocol " + comboTasks.selectedItem + " and subject " + comboSubjects.selectedItem);
+
+                    // Create a new session for a subject and a protocol
+                    experimentationController.createNewSessionForSubjectAndProtocol(comboSubjects.selectedItem, comboTasks.selectedItem);
                 }
 
                 // Reset all user inputs and close the popup

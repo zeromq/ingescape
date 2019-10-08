@@ -30,7 +30,7 @@ AssessmentsPopupBase {
 
     anchors.centerIn: parent
 
-    title: "NEW TASK"
+    title: "NEW PROTOCOL"
 
 
     //--------------------------------------------------------
@@ -328,7 +328,7 @@ AssessmentsPopupBase {
             activeFocusOnPress: true
 
             enabled: ( (txtTaskName.text.length > 0) && (txtPlatformUrl.text.length > 0)
-                      && rootPopup.taskController && rootPopup.taskController.canCreateTaskWithName(txtTaskName.text) )
+                      && rootPopup.taskController && rootPopup.taskController.canCreateProtocolWithName(txtTaskName.text) )
 
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OK"
@@ -337,8 +337,8 @@ AssessmentsPopupBase {
             onClicked: {
                 if (rootPopup.taskController)
                 {
-                    // Create a new task with an IngeScape platform file path
-                    rootPopup.taskController.createNewTaskWithIngeScapePlatformFilePath(txtTaskName.text, txtPlatformUrl.text);
+                    // Create a new protocol with an IngeScape platform file path
+                    rootPopup.taskController.createNewProtocolWithIngeScapePlatformFilePath(txtTaskName.text, txtPlatformUrl.text);
                 }
 
                 // Reset all user inputs and close the popup

@@ -57,20 +57,20 @@ public:
 
 
     /**
-     * @brief Return true if the user can create a task with the name
-     * Check if the name is not empty and if a task with the same name does not already exist
-     * @param taskName
+     * @brief Return true if the user can create a protocol with the name
+     * Check if the name is not empty and if a protocol with the same name does not already exist
+     * @param protocolName
      * @return
      */
-    Q_INVOKABLE bool canCreateTaskWithName(QString taskName);
+    Q_INVOKABLE bool canCreateProtocolWithName(QString protocolName);
 
 
     /**
-     * @brief Create a new task with an IngeScape platform file path
-     * @param taskName
+     * @brief Create a new protocol with an IngeScape platform file path
+     * @param protocolName
      * @param platformFilePath
      */
-    Q_INVOKABLE void createNewTaskWithIngeScapePlatformFilePath(QString taskName, QString platformFilePath);
+    Q_INVOKABLE void createNewProtocolWithIngeScapePlatformFilePath(QString protocolName, QString platformFilePath);
 
 
     /**
@@ -177,12 +177,12 @@ public:
 private:
 
     /**
-     * @brief Create a new task with an IngeScape platform file URL
-     * @param taskName
+     * @brief Create a new protocol with an IngeScape platform file URL
+     * @param protocolName
      * @param platformFileUrl
      * @return
      */
-    TaskM* _createNewTaskWithIngeScapePlatformFileUrl(QString taskName, QUrl platformFileUrl);
+    TaskM* _createNewProtocolWithIngeScapePlatformFileUrl(QString protocolName, QUrl platformFileUrl);
 
 
     /**

@@ -95,27 +95,30 @@ void ExperimentationController::setcurrentExperimentation(ExperimentationM *valu
 
 
 /**
- * @brief Create a new task instance for a subject and a task
- * @param recordName
+ * @brief Create a new session for a subject and a protocol
  * @param subject
- * @param task
+ * @param protocol
  */
-void ExperimentationController::createNewTaskInstanceForSubjectAndTask(QString taskInstanceName, SubjectM* subject, TaskM* task)
+void ExperimentationController::createNewSessionForSubjectAndProtocol(SubjectM* subject, TaskM* protocol)
 {
-    if (!taskInstanceName.isEmpty() && (subject != nullptr) && (task != nullptr) && (_currentExperimentation != nullptr))
+    //if (!taskInstanceName.isEmpty() && (subject != nullptr) && (task != nullptr) && (_currentExperimentation != nullptr))
+    if ((subject != nullptr) && (protocol != nullptr) && (_currentExperimentation != nullptr))
     {
-        qInfo() << "Create new record" << taskInstanceName << "for subject" << subject->displayedId() << "and task" << task->name();
+        QString sessionName = QString("%1 - %2 - %3").arg(protocol->name(), subject->displayedId(), QDate::currentDate().toString("dd/MM/yy"));
+
+        qInfo() << "Create new session" << sessionName << "for subject" << subject->displayedId() << "and protocol" << protocol->name();
 
         // Create a new (experimentation) task instance
-        TaskInstanceM* taskInstance = _insertTaskInstanceIntoDB(taskInstanceName, subject, task);
+        //TaskInstanceM* taskInstance = _insertTaskInstanceIntoDB(taskInstanceName, subject, task);
+        TaskInstanceM* session = _insertTaskInstanceIntoDB(sessionName, subject, protocol);
 
-        if (taskInstance != nullptr)
+        if (session != nullptr)
         {
             // Add the task insatnce to the current experimentation
-            _currentExperimentation->addTaskInstance(taskInstance);
+            _currentExperimentation->addTaskInstance(session);
 
             // Open this new task instance
-            openTaskInstance(taskInstance);
+            openTaskInstance(session);
         }
     }
 }

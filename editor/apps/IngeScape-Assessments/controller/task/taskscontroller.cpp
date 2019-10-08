@@ -61,43 +61,43 @@ TasksController::~TasksController()
 
 
 /**
- * @brief Return true if the user can create a task with the name
- * Check if the name is not empty and if a task with the same name does not already exist
- * @param taskName
+ * @brief Return true if the user can create a protocol with the name
+ * Check if the name is not empty and if a protocol with the same name does not already exist
+ * @param protocolName
  * @return
  */
-bool TasksController::canCreateTaskWithName(QString taskName)
+bool TasksController::canCreateProtocolWithName(QString protocolName)
 {
     const QList<TaskM*>& taskList = _currentExperimentation->allTasks()->toList();
-    auto hasGivenName = [taskName](TaskM* task) {
-        return (task != nullptr) && (task->name() == taskName);
+    auto hasGivenName = [protocolName](TaskM* task) {
+        return (task != nullptr) && (task->name() == protocolName);
     };
 
-    return !taskName.isEmpty() && (_currentExperimentation != nullptr)
+    return !protocolName.isEmpty() && (_currentExperimentation != nullptr)
             && std::none_of(taskList.begin(), taskList.end(), hasGivenName);
 }
 
 
 /**
- * @brief Create a new task with an IngeScape platform file path
- * @param taskName
+ * @brief Create a new protocol with an IngeScape platform file path
+ * @param protocolName
  * @param platformFilePath
  */
-void TasksController::createNewTaskWithIngeScapePlatformFilePath(QString taskName, QString platformFilePath)
+void TasksController::createNewProtocolWithIngeScapePlatformFilePath(QString protocolName, QString platformFilePath)
 {
-    if (!taskName.isEmpty() && !platformFilePath.isEmpty())
+    if (!protocolName.isEmpty() && !platformFilePath.isEmpty())
     {
-        qInfo() << "Create new task" << taskName << "with file" << platformFilePath;
+        qInfo() << "Create new protocol" << protocolName << "with file" << platformFilePath;
 
         QUrl platformFileUrl = QUrl(platformFilePath);
 
         if (platformFileUrl.isValid())
         {
-            // Create a new task with an IngeScape platform file URL
-            _createNewTaskWithIngeScapePlatformFileUrl(taskName, platformFileUrl);
+            // Create a new protocol with an IngeScape platform file URL
+            _createNewProtocolWithIngeScapePlatformFileUrl(protocolName, platformFileUrl);
         }
         else {
-            qWarning() << "Failed to create the task" << taskName << "because the path" << platformFilePath << "is wrong !";
+            qWarning() << "Failed to create the protocol" << protocolName << "because the path" << platformFilePath << "is wrong !";
         }
     }
 }
@@ -146,10 +146,10 @@ void TasksController::duplicateTask(TaskM* task)
 {
     if (task != nullptr)
     {
-        QString taskName = QString("%1_copy").arg(task->name());
+        QString protocolName = QString("%1_copy").arg(task->name());
 
-        // Create a new task with an IngeScape platform file URL
-        TaskM* newTask = _createNewTaskWithIngeScapePlatformFileUrl(taskName, task->platformFileUrl());
+        // Create a new protocol with an IngeScape platform file URL
+        TaskM* newTask = _createNewProtocolWithIngeScapePlatformFileUrl(protocolName, task->platformFileUrl());
 
         if (newTask != nullptr)
         {
@@ -417,19 +417,19 @@ void TasksController::deleteDependentVariable(DependentVariableM* dependentVaria
 
 
 /**
- * @brief Create a new task with an IngeScape platform file URL
- * @param taskName
+ * @brief Create a new protocol with an IngeScape platform file URL
+ * @param protocolName
  * @param platformFileUrl
  * @return
  */
-TaskM* TasksController::_createNewTaskWithIngeScapePlatformFileUrl(QString taskName, QUrl platformFileUrl)
+TaskM* TasksController::_createNewProtocolWithIngeScapePlatformFileUrl(QString protocolName, QUrl platformFileUrl)
 {
     TaskM* task = nullptr;
 
-    if (!taskName.isEmpty() && platformFileUrl.isValid() && (_currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
+    if (!protocolName.isEmpty() && platformFileUrl.isValid() && (_currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
         // Create the new task
-        task = new TaskM(_currentExperimentation->getCassUuid(), AssessmentsModelManager::genCassUuid(), taskName, platformFileUrl);
+        task = new TaskM(_currentExperimentation->getCassUuid(), AssessmentsModelManager::genCassUuid(), protocolName, platformFileUrl);
         if (task == nullptr || !AssessmentsModelManager::insert(*task)) {
             delete task;
             task = nullptr;

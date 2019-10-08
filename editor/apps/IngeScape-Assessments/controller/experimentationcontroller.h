@@ -55,12 +55,11 @@ public:
 
 
     /**
-     * @brief Create a new task instance for a subject and a task
-     * @param recordName
+     * @brief Create a new session for a subject and a protocol
      * @param subject
-     * @param task
+     * @param protocol
      */
-    Q_INVOKABLE void createNewTaskInstanceForSubjectAndTask(QString recordName, SubjectM* subject, TaskM* task);
+    Q_INVOKABLE void createNewSessionForSubjectAndProtocol(SubjectM* subject, TaskM* protocol);
 
 
     /**

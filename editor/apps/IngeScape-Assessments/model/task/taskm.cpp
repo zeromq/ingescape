@@ -203,10 +203,10 @@ TaskM* TaskM::createFromCassandraRow(const CassRow* row)
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskUuid);
 
-        QString taskName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
+        QString protocolName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
         QUrl platformUrl(AssessmentsModelManager::getStringValueFromColumnName(row, "platform_file"));
 
-        task = new TaskM(experimentationUuid, taskUuid, taskName, platformUrl);
+        task = new TaskM(experimentationUuid, taskUuid, protocolName, platformUrl);
     }
 
     return task;
