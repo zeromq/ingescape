@@ -55,6 +55,12 @@ public:
      static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
 
 
+     /**
+      * @brief Default directory used to store snapshots
+      */
+     static QString defaultDirectory;
+
+
 Q_SIGNALS:
      /**
      * @brief SaveItem has succeeded
