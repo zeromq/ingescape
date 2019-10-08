@@ -40,6 +40,18 @@ Item {
 
     property bool isEditingName: false
 
+    // 319 = actions panel width
+    // 16 = left margin of other panels
+    // 8 = the (right) margin between the last panel and the window
+    //property real panelWidth: (rootItem.width - 319 - 8) / 3 - 16
+    //property var panelWidths: [ 319, panelWidth, panelWidth, panelWidth]
+
+    // 319 = actions panel width
+    // 8 = the (right) margin between the last panel and the window
+    // 16 = left margin of other panels
+    property real restWidth_For3Panels: rootItem.width - 319 - 8 - (3*16)
+    property var panelWidths: [ 319, 2*restWidth_For3Panels/7, 3*restWidth_For3Panels/7, 2*restWidth_For3Panels/7]
+
 
 
     //--------------------------------
@@ -377,7 +389,7 @@ Item {
             top: headerItem.bottom
             bottom: parent.bottom
         }
-        width: 319
+        width: panelWidths[0]
 
         color: IngeScapeTheme.veryDarkGreyColor
 
@@ -496,15 +508,13 @@ Item {
 
         anchors {
             left: actionsPanel.right
-            leftMargin: 21
+            leftMargin: 16
             top: headerItem.bottom
             topMargin: 16
             bottom: timeline.top
             bottomMargin: 56
         }
-
-        height: 519
-        width: 495
+        width: panelWidths[1]
 
         IngeScapeAssessmentsListHeader {
             id: commentsHeader
@@ -522,7 +532,7 @@ Item {
                     bottom: parent.bottom
                 }
 
-                text: "COMMENTS"
+                text: qsTr("COMMENTS")
                 verticalAlignment: Text.AlignVCenter
 
                 color: IngeScapeTheme.whiteColor
@@ -585,22 +595,21 @@ Item {
     // Independent Variable panel
     //
     Item {
-        id: indeVarPanel
+        id: indepVarPanel
 
         anchors {
             left: commentsPanel.right
-            leftMargin: 38
+            leftMargin: 16
             top: headerItem.bottom
             topMargin: 16
             bottom: timeline.top
             bottomMargin: 56
         }
-
-        height: 519
-        width: 495
+        width: panelWidths[2]
 
         IngeScapeAssessmentsListHeader {
-            id: indeVarHeader
+            id: indepVarHeader
+
             anchors {
                 top: parent.top
                 left: parent.left
@@ -615,7 +624,7 @@ Item {
                     bottom: parent.bottom
                 }
 
-                text: "INDEPENDENT VARIABLES"
+                text: qsTr("INDEPENDENT VARIABLES")
                 verticalAlignment: Text.AlignVCenter
 
                 color: IngeScapeTheme.whiteColor
@@ -631,7 +640,7 @@ Item {
             anchors {
                 left: parent.left
                 right: parent.right
-                top: indeVarHeader.bottom
+                top: indepVarHeader.bottom
                 bottom: parent.bottom
             }
 
@@ -702,23 +711,22 @@ Item {
     //
     // Attachments panel
     //
-    Rectangle {
+    Item {
         id: attachmentsPanel
 
         anchors {
-            left: indeVarPanel.right
-            leftMargin: 38
+            left: indepVarPanel.right
+            leftMargin: 16
             top: headerItem.bottom
             topMargin: 16
             bottom: timeline.top
             bottomMargin: 56
         }
-
-        height: 519
-        width: 495
+        width: panelWidths[3]
 
         IngeScapeAssessmentsListHeader {
             id: attachementsHeader
+
             anchors {
                 top: parent.top
                 left: parent.left
@@ -733,7 +741,7 @@ Item {
                     bottom: parent.bottom
                 }
 
-                text: "ATTACHEMENTS"
+                text: qsTr("ATTACHEMENTS")
                 verticalAlignment: Text.AlignVCenter
 
                 color: IngeScapeTheme.whiteColor
@@ -753,7 +761,7 @@ Item {
                 right: parent.right
                 top: attachementsHeader.bottom
                 bottom: parent.bottom
-                bottomMargin: 10
+                //bottomMargin: 10
             }
 
             color: IngeScapeTheme.whiteColor
@@ -815,7 +823,7 @@ Item {
 
                         property real minimumHeight: 56
 
-                        height: Math.max(minimumHeight, attachementScrollView.height - attechementsListView.height - 8)
+                        height: Math.max(minimumHeight, attachementScrollView.height - attechementsListView.height - 8 - 8)
 
                         anchors {
                             top: attechementsListView.bottom
@@ -831,7 +839,10 @@ Item {
 
                         color: IngeScapeTheme.veryLightGreyColor
 
-                        border { color: IngeScapeTheme.lightGreyColor; width: 1 }
+                        border {
+                            color: IngeScapeTheme.lightGreyColor
+                            width: 1
+                        }
 
                         I2SvgItem {
                             anchors {

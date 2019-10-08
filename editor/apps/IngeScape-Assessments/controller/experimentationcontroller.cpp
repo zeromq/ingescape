@@ -206,13 +206,13 @@ TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QStrin
 
             if (AssessmentsModelManager::insert(*taskInstance))
             {
-                for (auto indeVarIt = task->independentVariables()->begin() ; indeVarIt != task->independentVariables()->end() ; ++indeVarIt)
+                for (auto indepVarIterator = task->independentVariables()->begin() ; indepVarIterator != task->independentVariables()->end() ; ++indepVarIterator)
                 {
-                    IndependentVariableM* independentVar = *indeVarIt;
+                    IndependentVariableM* independentVar = *indepVarIterator;
                     if (independentVar != nullptr)
                     {
-                        IndependentVariableValueM indeVarValue(subject->getExperimentationCassUuid(), taskInstance->getCassUuid(), independentVar->getCassUuid(), "");
-                        AssessmentsModelManager::insert(indeVarValue);
+                        IndependentVariableValueM indepVarValue(subject->getExperimentationCassUuid(), taskInstance->getCassUuid(), independentVar->getCassUuid(), "");
+                        AssessmentsModelManager::insert(indepVarValue);
                     }
                 }
             }
@@ -231,8 +231,8 @@ void ExperimentationController::_retrieveIndependentVariableForTask(TaskM* task)
 {
     if (AssessmentsModelManager::Instance() != nullptr)
     {
-        QList<IndependentVariableM*> indeVarList = AssessmentsModelManager::select<IndependentVariableM>({ task->getExperimentationCassUuid(), task->getCassUuid() });
-        for (IndependentVariableM* independentVariable : indeVarList) {
+        QList<IndependentVariableM*> indepVarList = AssessmentsModelManager::select<IndependentVariableM>({ task->getExperimentationCassUuid(), task->getCassUuid() });
+        for (IndependentVariableM* independentVariable : indepVarList) {
             task->addIndependentVariable(independentVariable);
         }
     }
@@ -385,20 +385,20 @@ void ExperimentationController::_retrieveIndependentVariableValuesForTaskInstanc
 {
     if (experimentation != nullptr)
     {
-        QList<IndependentVariableValueM*> indeVarValueList = AssessmentsModelManager::select<IndependentVariableValueM>({ experimentation->getCassUuid() });
-        for (IndependentVariableValueM* indeVarValue : indeVarValueList)
+        QList<IndependentVariableValueM*> indepVarValueList = AssessmentsModelManager::select<IndependentVariableValueM>({ experimentation->getCassUuid() });
+        for (IndependentVariableValueM* indepVarValue : indepVarValueList)
         {
-            if (indeVarValue != nullptr)
+            if (indepVarValue != nullptr)
             {
-                TaskInstanceM* taskInstance = experimentation->getTaskInstanceFromUID(indeVarValue->taskInstanceUuid);
-                IndependentVariableM* indeVar = taskInstance->task()->getIndependentVariableFromUuid(indeVarValue->independentVariableUuid);
-                if ((taskInstance != nullptr) && (indeVar != nullptr))
+                TaskInstanceM* taskInstance = experimentation->getTaskInstanceFromUID(indepVarValue->taskInstanceUuid);
+                IndependentVariableM* indepVar = taskInstance->task()->getIndependentVariableFromUuid(indepVarValue->independentVariableUuid);
+                if ((taskInstance != nullptr) && (indepVar != nullptr))
                 {
-                    taskInstance->setIndependentVariableValue(indeVar, indeVarValue->valueString);
+                    taskInstance->setIndependentVariableValue(indepVar, indepVarValue->valueString);
                 }
             }
         }
-        qDeleteAll(indeVarValueList);
-        indeVarValueList.clear();
+        qDeleteAll(indepVarValueList);
+        indepVarValueList.clear();
     }
 }

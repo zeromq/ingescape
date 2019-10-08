@@ -30,7 +30,7 @@ AssessmentsPopupBase {
 
     anchors.centerIn: parent
 
-    title: "NEW TASK INSTANCE"
+    title: "NEW SESSION"
 
 
     //--------------------------------------------------------
@@ -141,18 +141,18 @@ AssessmentsPopupBase {
 
             // the subject and the task are defined
             text: if (comboSubjects.selectedItem && comboTasks.selectedItem) {
-                      String("TaskInstance-%1-%2-%3").arg(comboSubjects.selectedItem.displayedId).arg(comboTasks.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+                      String("Session-%1-%2-%3").arg(comboSubjects.selectedItem.displayedId).arg(comboTasks.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
                   }
             // Only the subject is defined
                   else if (comboSubjects.selectedItem) {
-                      String("TaskInstance-%1-???-%2").arg(comboSubjects.selectedItem.displayedId).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+                      String("Session-%1-???-%2").arg(comboSubjects.selectedItem.displayedId).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
                   }
             // Only the task is defined
                   else if (comboTasks.selectedItem) {
-                      String("TaskInstance-???-%1-%2").arg(comboTasks.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+                      String("Session-???-%1-%2").arg(comboTasks.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
                   }
                   else {
-                      String("TaskInstance-???-???-%1").arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+                      String("Session-???-???-%1").arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
                   }
 
             verticalAlignment: Text.AlignVCenter

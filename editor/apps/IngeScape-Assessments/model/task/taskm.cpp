@@ -146,19 +146,20 @@ void TaskM::removeIndependentVariable(IndependentVariableM* independentVariable)
  */
 IndependentVariableM* TaskM::getIndependentVariableFromUuid(const CassUuid& cassUuid) const
 {
-    IndependentVariableM* indeVar = nullptr;
-    auto indeVarIt = std::find_if(_independentVariables.begin(),
-                                  _independentVariables.end(),
-                                  [&cassUuid](IndependentVariableM* indeVar){
-            return AssessmentsModelManager::cassUuidToQString(cassUuid) == AssessmentsModelManager::cassUuidToQString(indeVar->getCassUuid());
+    IndependentVariableM* indepVar = nullptr;
+    auto indepVarIterator = std::find_if(_independentVariables.begin(),
+                                         _independentVariables.end(),
+                                         [&cassUuid](IndependentVariableM* indepVar)
+    {
+            return AssessmentsModelManager::cassUuidToQString(cassUuid) == AssessmentsModelManager::cassUuidToQString(indepVar->getCassUuid());
     });
 
-    if (indeVarIt != _independentVariables.end())
+    if (indepVarIterator != _independentVariables.end())
     {
-        indeVar = *indeVarIt;
+        indepVar = *indepVarIterator;
     }
 
-    return indeVar;
+    return indepVar;
 }
 
 

@@ -124,10 +124,10 @@ public:
 
     /**
      * @brief Set the value of the given independent variable into the QQmlPropertyMap
-     * @param indeVar
+     * @param indepVar
      * @param value
      */
-    void setIndependentVariableValue(IndependentVariableM* indeVar, const QString& value);
+    void setIndependentVariableValue(IndependentVariableM* indepVar, const QString& value);
 
     /**
      * @brief Static factory method to create a task instance from a CassandraDB record

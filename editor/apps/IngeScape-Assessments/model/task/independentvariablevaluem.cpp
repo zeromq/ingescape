@@ -61,21 +61,21 @@ IndependentVariableValueM::IndependentVariableValueM(const CassUuid& experimenta
 
 IndependentVariableValueM* IndependentVariableValueM::createFromCassandraRow(const CassRow* row)
 {
-    IndependentVariableValueM* indeVarValue = nullptr;
+    IndependentVariableValueM* indepVarValue = nullptr;
 
     if (row != nullptr)
     {
         // Get independent variable uuid
-        CassUuid experimentationUuid, taskInstanceUuid, indeVarUuid;
+        CassUuid experimentationUuid, taskInstanceUuid, indepVarUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task_instance"), &taskInstanceUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_independent_var"), &indeVarUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_independent_var"), &indepVarUuid);
         QString valueString = AssessmentsModelManager::getStringValueFromColumnName(row, "independent_var_value");
 
-        indeVarValue = new IndependentVariableValueM(experimentationUuid, taskInstanceUuid, indeVarUuid, valueString);
+        indepVarValue = new IndependentVariableValueM(experimentationUuid, taskInstanceUuid, indepVarUuid, valueString);
     }
 
-    return indeVarValue;
+    return indepVarValue;
 }
 
 /**

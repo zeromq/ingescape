@@ -173,17 +173,17 @@ void TaskInstanceM::setcomments(QString value)
 
 /**
  * @brief Set the value of the given independent variable into the QQmlPropertyMap
- * @param indeVar
+ * @param indepVar
  * @param value
  */
-void TaskInstanceM::setIndependentVariableValue(IndependentVariableM* indeVar, const QString& value)
+void TaskInstanceM::setIndependentVariableValue(IndependentVariableM* indepVar, const QString& value)
 {
-    if (indeVar != nullptr)
+    if (indepVar != nullptr)
     {
-        _mapIndependentVariableValues->insert(indeVar->name(), value);
+        _mapIndependentVariableValues->insert(indepVar->name(), value);
 
         // Call SLOT manually since valueChanged() signal is only emitted from QML
-        _onIndependentVariableValueChanged(indeVar->name(), value);
+        _onIndependentVariableValueChanged(indepVar->name(), value);
     }
 }
 
@@ -287,10 +287,10 @@ CassStatement* TaskInstanceM::createBoundUpdateStatement(const TaskInstanceM& ta
 
 void TaskInstanceM::_onIndependentVariableValueChanged(const QString& key, const QVariant& value)
 {
-    IndependentVariableM* indeVar = _mapIndependentVarByName.value(key, nullptr);
-    if (indeVar != nullptr)
+    IndependentVariableM* indepVar = _mapIndependentVarByName.value(key, nullptr);
+    if (indepVar != nullptr)
     {
-        AssessmentsModelManager::update(IndependentVariableValueM(_experimentationCassUuid, _cassUuid, indeVar->getCassUuid(), value.toString()));
+        AssessmentsModelManager::update(IndependentVariableValueM(_experimentationCassUuid, _cassUuid, indepVar->getCassUuid(), value.toString()));
     }
     else {
         qCritical() << "Unknown independent variable" << key;

@@ -99,7 +99,7 @@ Item {
     }
 
     Text {
-        id: indeVarName
+        id: indepVarName
 
         anchors {
             left: parent.left
