@@ -89,11 +89,20 @@ public:
 
     /**
      * @brief Return true if the user can create an independent variable with the name
-     * Check if the name is not empty and if a independent variable with the same name does not already exist
+     * Check if the name is not empty and if an independent variable with the same name does not already exist
      * @param independentVariableName
      * @return
      */
     Q_INVOKABLE bool canCreateIndependentVariableWithName(QString independentVariableName);
+
+
+    /**
+     * @brief Return true if the user can create a dependent variable with the name
+     * Check if the name is not empty and if a dependent variable with the same name does not already exist
+     * @param dependentVariableName
+     * @return
+     */
+    Q_INVOKABLE bool canCreateDependentVariableWithName(QString dependentVariableName);
 
 
     /**
@@ -178,7 +187,8 @@ public:
      * @brief Delete an dependent variable
      * @param dependentVariable
      */
-    Q_INVOKABLE void deleteDependentVariable(DependentVariableM* dependentVariable);
+    // FIXME Unused
+    //Q_INVOKABLE void deleteDependentVariable(DependentVariableM* dependentVariable);
 
 
 private:

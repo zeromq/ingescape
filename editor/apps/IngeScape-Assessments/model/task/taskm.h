@@ -51,6 +51,9 @@ class TaskM : public QObject
     // Found in the platform (JSON file) of our task
     I2_QOBJECT_HASHMODEL(AgentNameAndOutputsM, hashFromAgentNameToSimplifiedAgent)
 
+    // Temporary independent variable used for edition rollbacks
+    I2_QML_PROPERTY(IndependentVariableM*, temporaryIndependentVariable)
+
     // Temporary dependent variable used for edition rollbacks
     I2_QML_PROPERTY(DependentVariableM*, temporaryDependentVariable)
 
@@ -58,10 +61,17 @@ class TaskM : public QObject
 public:
     /**
      * @brief Constructor
+     * @param experimentationUuid
+     * @param uid
      * @param name
+     * @param platformFile
      * @param parent
      */
-    explicit TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QString& name, const QUrl& platformFile, QObject *parent = nullptr);
+    explicit TaskM(const CassUuid& experimentationUuid,
+                   const CassUuid& uid,
+                   const QString& name,
+                   const QUrl& platformFile,
+                   QObject *parent = nullptr);
 
 
     /**
@@ -151,11 +161,20 @@ public:
      */
     static CassStatement* createBoundInsertStatement(const TaskM& task);
 
+
     /**
      * @brief Initialize the temporary dependent variable with the given dependent variable
      * @param baseVariable
      */
     Q_INVOKABLE void initTemporaryDependentVariable(DependentVariableM* baseVariable);
+
+
+    /**
+     * @brief Initialize the temporary independent variable with the given independent variable
+     * @param baseVariable
+     */
+    Q_INVOKABLE void initTemporaryIndependentVariable(IndependentVariableM* baseVariable);
+
 
     /**
      * @brief Apply the values from the temporary dependent variable to the givend dependent variable.
@@ -163,6 +182,7 @@ public:
      * @param variableToUpdate
      */
     Q_INVOKABLE void applyTemporaryDependentVariable(DependentVariableM* variableToUpdate);
+
 
     /**
      * @brief Delete the given dependent variable from the task and from the Cassandra DB

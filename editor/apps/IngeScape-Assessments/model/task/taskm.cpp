@@ -44,6 +44,7 @@ TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QSt
     , _name(name)
     , _platformFileUrl(QUrl())
     , _platformFileName("")
+    , _temporaryIndependentVariable(nullptr)
     , _temporaryDependentVariable(nullptr)
     , _cassExperimentationUuid(experimentationUuid)
     , _cassUuid(uid)
@@ -53,6 +54,8 @@ TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QSt
 
     setplatformFileUrl(platformFile);
 
+    // Create the temporary Independent & Dependent variables
+    _temporaryIndependentVariable = new IndependentVariableM(CassUuid(), CassUuid(), CassUuid(), "", "", IndependentVariableValueTypes::UNKNOWN);
     _temporaryDependentVariable = new DependentVariableM(CassUuid(), CassUuid(), CassUuid(), "", "", "", "");
 
     qInfo() << "New Model of Task" << _name;
@@ -71,6 +74,12 @@ TaskM::~TaskM()
     _dependentVariables.deleteAllItems();
     _hashFromAgentNameToSimplifiedAgent.deleteAllItems();
 
+    if (_temporaryIndependentVariable != nullptr)
+    {
+        IndependentVariableM* tmp = _temporaryIndependentVariable;
+        settemporaryIndependentVariable(nullptr);
+        delete tmp;
+    }
     if (_temporaryDependentVariable != nullptr)
     {
         DependentVariableM* tmp = _temporaryDependentVariable;
@@ -248,6 +257,7 @@ CassStatement* TaskM::createBoundInsertStatement(const TaskM& task)
     return cassStatement;
 }
 
+
 /**
  * @brief Initialize the temporary dependent variable with the given dependent variable
  * @param baseVariable
@@ -260,6 +270,22 @@ void TaskM::initTemporaryDependentVariable(DependentVariableM* baseVariable)
         _temporaryDependentVariable->setdescription(baseVariable->description());
         _temporaryDependentVariable->setagentName(baseVariable->agentName());
         _temporaryDependentVariable->setoutputName(baseVariable->outputName());
+    }
+}
+
+
+/**
+ * @brief Initialize the temporary independent variable with the given independent variable
+ * @param baseVariable
+ */
+void TaskM::initTemporaryIndependentVariable(IndependentVariableM* baseVariable)
+{
+    if ((_temporaryIndependentVariable != nullptr) && (baseVariable != nullptr))
+    {
+        _temporaryIndependentVariable->setname(baseVariable->name());
+        _temporaryIndependentVariable->setdescription(baseVariable->description());
+        _temporaryIndependentVariable->setvalueType(baseVariable->valueType());
+        _temporaryIndependentVariable->setenumValues(baseVariable->enumValues());
     }
 }
 
@@ -284,7 +310,7 @@ void TaskM::applyTemporaryDependentVariable(DependentVariableM* variableToUpdate
 
 /**
  * @brief Delete the given dependent variable from the task and from the Cassandra DB
- * @param variableToUpdate
+ * @param variableToDelete
  */
 void TaskM::deleteDependentVariable(DependentVariableM* variableToDelete)
 {
@@ -292,7 +318,12 @@ void TaskM::deleteDependentVariable(DependentVariableM* variableToDelete)
     {
         _dependentVariables.remove(variableToDelete);
 
-        AssessmentsModelManager::deleteEntry<DependentVariableM>({ variableToDelete->getExperimentationCassUuid(), variableToDelete->getTaskCassUuid(), variableToDelete->getCassUuid() });
+        AssessmentsModelManager::deleteEntry<DependentVariableM>({ variableToDelete->getExperimentationCassUuid(),
+                                                                   variableToDelete->getTaskCassUuid(),
+                                                                   variableToDelete->getCassUuid() });
+
+        // Free memory
+        delete variableToDelete;
     }
 }
 

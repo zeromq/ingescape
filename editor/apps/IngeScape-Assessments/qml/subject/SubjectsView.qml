@@ -43,7 +43,7 @@ I2PopupBase {
     // Width of the columns in the subject list view
     property real characteristicValueColumnWidth: 228
 
-    // Flag indicating if a subject, amongst all subjects, is being edited
+    // Flag indicating if a subject, among all subjects, is being edited
     property bool subjectEditionInProgress: false
 
     // Current subject delegate being edited

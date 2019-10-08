@@ -41,7 +41,7 @@ Item {
     // Flag indicating if the current subject is being edited
     property bool isCurrentlyEditing: false
 
-    // Flag indicating if a subject, amongst all subjects, is being edited
+    // Flag indicating if a subject, among all subjects, is being edited
     // Bound by the parent
     property bool subjectEditionInProgress: false
 

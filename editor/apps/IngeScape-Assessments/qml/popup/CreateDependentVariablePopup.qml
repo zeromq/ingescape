@@ -394,9 +394,7 @@ AssessmentsPopupBase {
 
             enabled: if (rootPopup.taskController && (txtDependentVariableName.text.length > 0) && comboBoxAgent.selectedItem && comboBoxOutput.selectedItem)
                      {
-                         // FIXME canCreateDependentVariableWithName
-                         //rootPopup.taskController.canCreateDependentVariableWithName(txtDependentVariableName.text);
-                         true;
+                         rootPopup.taskController.canCreateDependentVariableWithName(txtDependentVariableName.text);
                      }
                      else {
                          false;

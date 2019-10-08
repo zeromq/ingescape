@@ -31,17 +31,27 @@ Rectangle {
     //
     //--------------------------------------------------------
 
-    // Model to diplay
-    property var independentVarModel: null
-
     // Task controller
     property var taskController: null
+
+    // Model of protocol that contains our model of independent variable
+    property TaskM protocol: null
+
+    // Current model of independent variable
+    property IndependentVariableM independentVarModel: null
 
     // Flag indicating if the mouse is hovering the item
     property bool isMouseHovering: itemMouseArea.containsMouse || editIndepVarButton.containsMouse || deleteIndepVarButton.containsMouse
 
+    // Flag indicating if the current independent variable is being edited
+    property bool isCurrentlyEditing: false
+
     // Width of the columns (bound by the parent)
     property var columnWidths: [ 0, 0, 0 ]
+
+    // Flag indicating if an independent variable, among all independent variables, is being edited
+    // Bound by the parent
+    property bool indepVarEditionInProgress: false
 
     color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
 
@@ -61,10 +71,7 @@ Rectangle {
     }
 
     Row {
-        id: row
-        anchors {
-            fill: parent
-        }
+        anchors.fill: parent
 
         Repeater {
             model: rootItem.independentVarModel ? [ rootItem.independentVarModel.name, rootItem.independentVarModel.description, IndependentVariableValueTypes.enumToString(rootItem.independentVarModel.valueType) ] : ["", "", ""]
@@ -100,6 +107,10 @@ Rectangle {
         }
     }
 
+
+    //
+    // Buttons Edit / Delete
+    //
     Row {
         spacing: 12
 
@@ -116,8 +127,7 @@ Rectangle {
 
             property bool containsMouse: __behavior.containsMouse
 
-            //opacity: rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress ? 1 : 0
-            opacity: rootItem.isMouseHovering ? 1 : 0
+            opacity: (rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress) ? 1 : 0
             enabled: opacity > 0
 
             style: IngeScapeAssessmentsSvgButtonStyle {
@@ -126,11 +136,12 @@ Rectangle {
             }
 
             onClicked: {
-                /*if (rootItem.taskModel && rootItem.dependentVariableModel) {
-                    rootItem.taskModel.initTemporaryDependentVariable(rootItem.dependentVariableModel)
+                if (rootItem.protocol && rootItem.independentVarModel)
+                {
+                    rootItem.protocol.initTemporaryIndependentVariable(rootItem.independentVarModel)
                 }
 
-                rootItem.isCurrentlyEditing = true;*/
+                rootItem.isCurrentlyEditing = true;
             }
         }
 
@@ -142,8 +153,7 @@ Rectangle {
             height: 30
             width: 40
 
-            //opacity: rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress ? 1 : 0
-            opacity: rootItem.isMouseHovering ? 1 : 0
+            opacity: rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress ? 1 : 0
             enabled: opacity > 0
 
             style: IngeScapeAssessmentsSvgButtonStyle {
@@ -152,7 +162,8 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.taskController && rootItem.independentVarModel) {
+                if (rootItem.taskController && rootItem.independentVarModel)
+                {
                     rootItem.taskController.deleteIndependentVariable(rootItem.independentVarModel)
                 }
             }
@@ -167,6 +178,6 @@ Rectangle {
             bottom: parent.bottom
         }
         height: 2
-        color: IngeScapeTheme.veryLightGreyColor
+        color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.veryLightGreyColor
     }
 }
