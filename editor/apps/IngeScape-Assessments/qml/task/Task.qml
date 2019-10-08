@@ -175,7 +175,7 @@ Item {
             }
 
             onClicked: {
-                console.log("QML: New Independent Variable");
+                //console.log("QML: New Independent Variable");
 
                 // Open the popup
                 createIndependentVariablePopup.open();
@@ -323,11 +323,10 @@ Item {
             }
 
             onClicked: {
-                console.log("QML: New Dependent Variable");
+                //console.log("QML: New Dependent Variable");
 
-                if (taskController) {
-                    taskController.createNewDependentVariable();
-                }
+                // Open the popup
+                createDependentVariablePopup.open();
             }
         }
 
@@ -443,7 +442,7 @@ Item {
 
 
     //
-    // Create Characteristic Popup
+    // Create Independent Variable Popup
     //
     Popup.CreateIndependentVariablePopup {
         id: createIndependentVariablePopup
@@ -451,6 +450,19 @@ Item {
         layerObjectName: "overlay2Layer"
 
         taskController: rootItem.taskController
+    }
+
+
+    //
+    // Create Dependent Variable Popup
+    //
+    Popup.CreateDependentVariablePopup {
+        id: createDependentVariablePopup
+
+        layerObjectName: "overlay2Layer"
+
+        taskController: rootItem.taskController
+        protocolM: rootItem.modelM
     }
 
 }

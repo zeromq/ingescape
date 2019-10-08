@@ -163,8 +163,15 @@ public:
 
     /**
      * @brief Create a new dependent variable
+     * @param dependentVariableName
+     * @param dependentVariableDescription
+     * @param agentName
+     * @param outputName
      */
-    Q_INVOKABLE void createNewDependentVariable();
+    Q_INVOKABLE void createNewDependentVariable(QString dependentVariableName,
+                                                QString dependentVariableDescription,
+                                                QString agentName,
+                                                QString outputName);
 
 
     /**
