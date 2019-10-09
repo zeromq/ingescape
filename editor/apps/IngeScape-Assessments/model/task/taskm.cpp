@@ -308,6 +308,26 @@ void TaskM::applyTemporaryDependentVariable(DependentVariableM* variableToUpdate
     }
 }
 
+
+/**
+ * @brief Apply the values from the temporary independent variable to the given independent variable.
+ * Update said independent variable into the Cassandra DB
+ * @param variableToUpdate
+ */
+void TaskM::applyTemporaryIndependentVariable(IndependentVariableM* variableToUpdate)
+{
+    if ((variableToUpdate != nullptr) && (_temporaryIndependentVariable != nullptr))
+    {
+        variableToUpdate->setname(_temporaryIndependentVariable->name());
+        variableToUpdate->setdescription(_temporaryIndependentVariable->description());
+        variableToUpdate->setvalueType(_temporaryIndependentVariable->valueType());
+        variableToUpdate->setenumValues(_temporaryIndependentVariable->enumValues());
+
+        AssessmentsModelManager::update(*variableToUpdate);
+    }
+}
+
+
 /**
  * @brief Delete the given dependent variable from the task and from the Cassandra DB
  * @param variableToDelete

@@ -471,7 +471,7 @@ Rectangle {
 
             property bool containsMouse: __behavior.containsMouse
 
-            opacity: rootItem.isMouseHovering && !rootItem.depVarEditionInProgress ? 1 : 0
+            opacity: (rootItem.isMouseHovering && !rootItem.depVarEditionInProgress) ? 1 : 0
             enabled: opacity > 0
 
             style: IngeScapeAssessmentsSvgButtonStyle {
@@ -493,8 +493,10 @@ Rectangle {
         }
     }
 
+
     Rectangle {
         id: bottomSeparator
+
         anchors {
             left: parent.left
             right: parent.right

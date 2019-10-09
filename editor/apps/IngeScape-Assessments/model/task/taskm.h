@@ -177,11 +177,19 @@ public:
 
 
     /**
-     * @brief Apply the values from the temporary dependent variable to the givend dependent variable.
+     * @brief Apply the values from the temporary dependent variable to the given dependent variable.
      * Update said dependent variable into the Cassandra DB
      * @param variableToUpdate
      */
     Q_INVOKABLE void applyTemporaryDependentVariable(DependentVariableM* variableToUpdate);
+
+
+    /**
+     * @brief Apply the values from the temporary independent variable to the given independent variable.
+     * Update said independent variable into the Cassandra DB
+     * @param variableToUpdate
+     */
+    Q_INVOKABLE void applyTemporaryIndependentVariable(IndependentVariableM* variableToUpdate);
 
 
     /**

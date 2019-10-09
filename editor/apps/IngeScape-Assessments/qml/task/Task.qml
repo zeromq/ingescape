@@ -36,10 +36,8 @@ Item {
     //--------------------------------------------------------
 
     property TasksController taskController: null;
-    property TaskM modelM: taskController ? taskController.selectedTask : null;
 
-    property int indexPreviousSelectedDependentVariable: -1;
-    property int indexDependentVariableCurrentlyEditing: -1;
+    property TaskM modelM: taskController ? taskController.selectedTask : null;
 
     visible: rootItem.modelM
 
@@ -61,31 +59,6 @@ Item {
     //
     //
     //--------------------------------
-
-    /**
-     * Edit a dependent variable at a row index
-     */
-    function editDependentVariableAtRowIndex(rowIndex) {
-
-        console.log("QML: Edit the dependent variable at the row index " + rowIndex);
-
-        // Set the index
-        rootItem.indexDependentVariableCurrentlyEditing = rowIndex;
-    }
-
-
-    /**
-     * Stop the current edition of a dependent variable
-     */
-    function stopCurrentEditionOfDependentVariable() {
-        if (rootItem.indexDependentVariableCurrentlyEditing > -1)
-        {
-            console.log("QML: Stop the current edition of the dependent variable at the row index " + rootItem.indexDependentVariableCurrentlyEditing);
-
-            // Reset the index
-            rootItem.indexDependentVariableCurrentlyEditing = -1;
-        }
-    }
 
 
     //--------------------------------------------------------
@@ -226,6 +199,10 @@ Item {
         }
 
         Rectangle {
+            id: indepVarTable
+
+            property bool indepVarEditionInProgress: false
+
             anchors {
                 top: indepVarListHeader.bottom
                 left: parent.left
@@ -245,12 +222,20 @@ Item {
                     id: indepVarDelegate
 
                     taskController: rootItem.taskController
+                    protocol: rootItem.modelM
+                    independentVarModel: model ? model.QtObject : null
+                    indepVarEditionInProgress: indepVarTable.indepVarEditionInProgress
 
                     height: 40
                     width: indepVarColumn.width
-                    independentVarModel: model ? model.QtObject : null
 
                     columnWidths: indepVarListHeader.headerColumnWidths
+
+                    Binding {
+                        target: indepVarTable
+                        property: "indepVarEditionInProgress"
+                        value: indepVarDelegate.isCurrentlyEditing
+                    }
                 }
             }
         }
@@ -385,6 +370,9 @@ Item {
 
         Rectangle {
             id: depVarTable
+
+            property bool depVarEditionInProgress: false
+
             anchors {
                 top: depVarListHeader.bottom
                 left: parent.left
@@ -393,8 +381,6 @@ Item {
             }
 
             color: IngeScapeTheme.whiteColor
-
-            property bool depVarEditionInProgress: false
 
             ListView {
                 id: depVarColumn
@@ -405,22 +391,20 @@ Item {
                 delegate: DependentVariableDelegate {
                     id: depVarDelegate
 
+                    taskModel: rootItem.modelM
+                    dependentVariableModel: model ? model.QtObject : null
+                    depVarEditionInProgress: depVarTable.depVarEditionInProgress
+
                     height: 40
                     width: depVarColumn.width
 
                     columnWidths: depVarListHeader.headerColumnWidths
-
-                    taskModel: rootItem.modelM
-                    dependentVariableModel: model ? model.QtObject : null
-
-                    depVarEditionInProgress: depVarTable.depVarEditionInProgress
 
                     Binding {
                         target: depVarTable
                         property: "depVarEditionInProgress"
                         value: depVarDelegate.isCurrentlyEditing
                     }
-
                 }
             }
         }

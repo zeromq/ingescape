@@ -68,20 +68,24 @@ public:
      */
     virtual ~DependentVariableM();
 
+
     /**
      * @brief Dependent variable table name
      */
     static const QString table;
+
 
     /**
      * @brief Dependent variable table column names
      */
     static const QStringList columnNames;
 
+
     /**
      * @brief Dependent variable table primary keys IN ORDER
      */
     static const QStringList primaryKeys;
+
 
     /**
      * @brief Static factory method to create an dependent variable from a CassandraDB record
@@ -99,6 +103,7 @@ public:
      * @return
      */
     static CassStatement* createBoundInsertStatement(const DependentVariableM& dependentVariable);
+
 
     /**
      * @brief Create a CassStatement to update a DependentVariableM into the DB.

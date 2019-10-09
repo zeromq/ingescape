@@ -53,7 +53,9 @@ Rectangle {
     // Bound by the parent
     property bool indepVarEditionInProgress: false
 
-    color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
+    color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor
+                                       : (rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor
+                                                                   : IngeScapeTheme.whiteColor)
 
 
     //--------------------------------------------------------
@@ -100,9 +102,67 @@ Rectangle {
                         family: IngeScapeTheme.textFontFamily
                         weight: Font.Medium
                         pixelSize: 16
-                        bold: index == 0
+                        bold: index === 0
                     }
                 }
+            }
+        }
+    }
+
+
+    //
+    // Buttons Apply / Cancel
+    //
+    Row {
+        spacing: 12
+
+        anchors {
+            right: parent.right
+            rightMargin: 18
+            verticalCenter: parent.verticalCenter
+        }
+
+        Button {
+            id: aplpyEditionButton
+            height: 30
+            width: 86
+
+            opacity: rootItem.isCurrentlyEditing ? 1 : 0
+            enabled: opacity > 0
+
+            style: IngeScapeAssessmentsButtonStyle {
+                text: "APPLY"
+            }
+
+            onClicked: {
+                if (rootItem.protocol && rootItem.independentVarModel)
+                {
+                    rootItem.protocol.applyTemporaryIndependentVariable(rootItem.independentVarModel);
+                }
+
+                rootItem.isCurrentlyEditing = false
+            }
+        }
+
+        Button {
+            id: cancelEditionButton
+            anchors {
+                verticalCenter: parent.verticalCenter
+            }
+
+            height: 18
+            width: 18
+
+            opacity: rootItem.isCurrentlyEditing ? 1 : 0
+            enabled: opacity > 0
+
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "cancel-edition"
+                disabledID: releasedID
+            }
+
+            onClicked: {
+                rootItem.isCurrentlyEditing = false
             }
         }
     }
@@ -153,7 +213,7 @@ Rectangle {
             height: 30
             width: 40
 
-            opacity: rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress ? 1 : 0
+            opacity: (rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress) ? 1 : 0
             enabled: opacity > 0
 
             style: IngeScapeAssessmentsSvgButtonStyle {
@@ -170,8 +230,10 @@ Rectangle {
         }
     }
 
+
     Rectangle {
         id: bottomSeparator
+
         anchors {
             left: parent.left
             right: parent.right
