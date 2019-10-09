@@ -141,7 +141,7 @@ CassStatement* IndependentVariableM::createBoundInsertStatement(const Independen
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
     cass_statement_bind_uuid  (cassStatement, 0, independentVariable.getExperimentationCassUuid());
     cass_statement_bind_uuid  (cassStatement, 1, independentVariable.getTaskCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 2, independentVariable.getTaskCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 2, independentVariable.getCassUuid());
     cass_statement_bind_string(cassStatement, 3, independentVariable.name().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 4, independentVariable.description().toStdString().c_str());
     cass_statement_bind_int8  (cassStatement, 5, static_cast<int8_t>(independentVariable.valueType()));
