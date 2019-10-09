@@ -280,7 +280,7 @@ AssessmentsPopupBase {
             }
 
             Repeater {
-                model: rootPopup.taskController ? rootPopup.taskController.allIndependentVariableValueTypes : null
+                model: rootPopup.taskController ? rootPopup.taskController.independentVariableValueTypesWithoutEnum : null
 
                 delegate: RadioButton {
                     id: radioIndependentVariableValueType

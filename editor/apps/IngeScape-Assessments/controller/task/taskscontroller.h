@@ -29,8 +29,11 @@ class TasksController : public QObject
 {
     Q_OBJECT
 
-    // List of all types for independent variable value
+    // List of all types for independent variable value (without "UNKNOWN")
     I2_ENUM_LISTMODEL(IndependentVariableValueTypes, allIndependentVariableValueTypes)
+
+    // List of types for independent variable value without "ENUM" (and without "UNKNOWN")
+    I2_ENUM_LISTMODEL(IndependentVariableValueTypes, independentVariableValueTypesWithoutEnum)
 
     // Model of the current experimentation
     I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)

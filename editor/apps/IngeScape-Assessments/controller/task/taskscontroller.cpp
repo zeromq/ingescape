@@ -33,10 +33,14 @@ TasksController::TasksController(/*JsonHelper* jsonHelper, */QObject *parent)
 
     qInfo() << "New Tasks Controller";
 
-    // Fill without type "UNKNOWN" and "ENUM"
+    // Fill without type "UNKNOWN"
     _allIndependentVariableValueTypes.fillWithAllEnumValues();
     _allIndependentVariableValueTypes.removeEnumValue(IndependentVariableValueTypes::UNKNOWN);
-    _allIndependentVariableValueTypes.removeEnumValue(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
+
+    // Fill without type "ENUM" and "UNKNOWN"
+    _independentVariableValueTypesWithoutEnum.fillWithAllEnumValues();
+    _independentVariableValueTypesWithoutEnum.removeEnumValue(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
+    _independentVariableValueTypesWithoutEnum.removeEnumValue(IndependentVariableValueTypes::UNKNOWN);
 
 }
 

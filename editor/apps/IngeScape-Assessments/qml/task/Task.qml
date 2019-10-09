@@ -165,7 +165,12 @@ Item {
                 right: parent.right
             }
 
-            property var headerColumnWidths: [ 250, width - 250 - 250, 250]
+            property var headerColumnWidths: [
+                220,    // Name
+                width - 220 - 220 - 95,  // Description
+                220,    // Value type
+                95      // Buttons
+            ]
 
             Row {
                 anchors {
@@ -177,7 +182,12 @@ Item {
                 }
 
                 Repeater {
-                    model: [ "Name", "Description", "Type" ]
+                    model: [
+                        "Name",
+                        "Description",
+                        "Type",
+                        ""          // Buttons
+                    ]
 
                     Text {
                         anchors {
@@ -211,6 +221,7 @@ Item {
             }
 
             color: IngeScapeTheme.whiteColor
+            clip: true
 
             ListView {
                 id: indepVarListView
@@ -383,6 +394,7 @@ Item {
             }
 
             color: IngeScapeTheme.whiteColor
+            clip: true
 
             ListView {
                 id: depVarListView
