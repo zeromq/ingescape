@@ -223,6 +223,10 @@ I2PopupBase {
             radius: 5
         }
 
+
+        //
+        // Task
+        //
         Task {
             id: task
 
@@ -231,6 +235,10 @@ I2PopupBase {
             taskController: rootItem.taskController
         }
 
+
+        //
+        // Close button
+        //
         Button {
             id: btnClose
 

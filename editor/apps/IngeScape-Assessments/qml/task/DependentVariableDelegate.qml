@@ -64,22 +64,29 @@ Rectangle {
 
     Row {
         anchors.fill: parent
+        spacing: 0
 
         Item {
             id: nameColumn
 
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-            }
-
             width: rootItem.columnWidths[0]
+            height: parent.height
+
+            /*Rectangle {
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border {
+                    color: "red"
+                    width: 1
+                }
+            }*/
 
             Text {
                 anchors{
                     fill: parent
                     leftMargin: 15
-                    rightMargin: 15
+                    rightMargin: 5
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.name : ""
@@ -100,7 +107,6 @@ Rectangle {
                 anchors {
                     fill: parent
                     margins: 5
-                    rightMargin: 33
                 }
 
                 text: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable
@@ -141,18 +147,24 @@ Rectangle {
         Item {
             id: descriptionColumn
 
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-            }
-
             width: rootItem.columnWidths[1]
+            height: parent.height
+
+            /*Rectangle {
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border {
+                    color: "red"
+                    width: 1
+                }
+            }*/
 
             Text {
                 anchors{
                     fill: parent
                     leftMargin: 15
-                    rightMargin: 15
+                    rightMargin: 5
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.description : ""
@@ -172,7 +184,6 @@ Rectangle {
                 anchors {
                     fill: parent
                     margins: 5
-                    rightMargin: 33
                 }
 
                 text: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable
@@ -213,18 +224,24 @@ Rectangle {
         Item {
             id: agentColumn
 
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-            }
-
             width: rootItem.columnWidths[2]
+            height: parent.height
+
+            /*Rectangle {
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border {
+                    color: "red"
+                    width: 1
+                }
+            }*/
 
             Text {
                 anchors{
                     fill: parent
                     leftMargin: 15
-                    rightMargin: 15
+                    rightMargin: 5
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.agentName : ""
@@ -248,7 +265,6 @@ Rectangle {
                 anchors {
                     fill: parent
                     margins: 5
-                    rightMargin: 33
                 }
                 visible: rootItem.isCurrentlyEditing
 
@@ -290,18 +306,24 @@ Rectangle {
         Item {
             id: optputNameColumn
 
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-            }
-
             width: rootItem.columnWidths[2]
+            height: parent.height
+
+            /*Rectangle {
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border {
+                    color: "red"
+                    width: 1
+                }
+            }*/
 
             Text {
                 anchors{
                     fill: parent
                     leftMargin: 15
-                    rightMargin: 15
+                    rightMargin: 5
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.outputName : ""
@@ -329,7 +351,6 @@ Rectangle {
                 anchors {
                     fill: parent
                     margins: 5
-                    rightMargin: 33
                 }
                 visible: rootItem.isCurrentlyEditing
 
@@ -373,11 +394,11 @@ Rectangle {
     // Buttons Apply / Cancel
     //
     Row {
-        spacing: 12
+        spacing: 10
 
         anchors {
             right: parent.right
-            rightMargin: 18
+            rightMargin: 0
             verticalCenter: parent.verticalCenter
         }
 
@@ -431,11 +452,11 @@ Rectangle {
     // Buttons Edit / Delete
     //
     Row {
-        spacing: 12
+        spacing: 10
 
         anchors {
             right: parent.right
-            rightMargin: 15
+            rightMargin: 5
             verticalCenter: parent.verticalCenter
         }
 

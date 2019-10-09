@@ -82,7 +82,7 @@ Item {
             top: parent.top
             topMargin: 34
             left: parent.left
-            leftMargin: 26
+            leftMargin: 20
         }
 
         text: rootItem.modelM ? rootItem.modelM.name.toUpperCase() : "..."
@@ -107,7 +107,7 @@ Item {
             topMargin: 18
             left: taskName.left
             right: parent.right
-            rightMargin: 27
+            rightMargin: 20
         }
 
         // 34 => margin between popup.top and taskName.top
@@ -213,7 +213,7 @@ Item {
             color: IngeScapeTheme.whiteColor
 
             ListView {
-                id: indepVarColumn
+                id: indepVarListView
                 anchors.fill: parent
 
                 model: rootItem.modelM ? rootItem.modelM.independentVariables : null
@@ -227,7 +227,7 @@ Item {
                     indepVarEditionInProgress: indepVarTable.indepVarEditionInProgress
 
                     height: 40
-                    width: indepVarColumn.width
+                    width: indepVarListView.width
 
                     columnWidths: indepVarListHeader.headerColumnWidths
 
@@ -326,10 +326,11 @@ Item {
             }
 
             property var headerColumnWidths: [
-                225, // Name
-                width - 225 - 225 - 225, // Description
-                225, // Agent
-                225  // Output
+                220,    // Name
+                width - 220 - 220 - 220 - 95, // Description
+                220,    // Agent
+                220,    // Output
+                95      // Buttons
             ]
 
             Row {
@@ -346,7 +347,8 @@ Item {
                         "Name",
                         "Description",
                         "Agent",
-                        "Output"
+                        "Output",
+                        ""          // Buttons
                     ]
 
                     Text {
@@ -383,7 +385,8 @@ Item {
             color: IngeScapeTheme.whiteColor
 
             ListView {
-                id: depVarColumn
+                id: depVarListView
+
                 anchors.fill: parent
 
                 model: rootItem.modelM ? rootItem.modelM.dependentVariables : null
@@ -396,7 +399,7 @@ Item {
                     depVarEditionInProgress: depVarTable.depVarEditionInProgress
 
                     height: 40
-                    width: depVarColumn.width
+                    width: depVarListView.width
 
                     columnWidths: depVarListHeader.headerColumnWidths
 
