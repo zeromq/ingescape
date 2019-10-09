@@ -514,21 +514,23 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         
                          //check towards our own ip address (without port)
                         char *incomingIpAddress = endpointAddress + 6; //ignore tcp://
-#if defined __unix__ || defined __APPLE__ || defined __linux__
                         *insert = '\0';
                         bool useIPC = false;
                         const char *ipcAddress = NULL;
                         if (strcmp(agentElements->ipAddress, incomingIpAddress) == 0){
-                            //same IP address : we can try to use ipc instead of TCP
-                            //try to recover agent ipc address
+                            //same IP address : we can try to use ipc (or loopback on windows) instead of TCP
+                            //try to recover agent ipc/loopback address
+#if defined __unix__ || defined __APPLE__ || defined __linux__
                             ipcAddress = zyre_event_header(zyre_event, "ipc");
+#elif (defined WIN32 || defined _WIN32)
+                            ipcAddress = zyre_event_header(zyre_event, "loopback");
+#endif
                             if (ipcAddress != NULL){
                                 useIPC = true;
-                                igs_debug("Use ipc address (%s) to subscribe to %s", ipcAddress, name);
+                                igs_debug("Use address %s to subscribe to %s", ipcAddress, name);
                             }
                         }
                         *insert = ':';
-#endif
                         //add port to the endpoint to compose it fully
                         strcat(endpointAddress, v);
                         subscriber_t *subscriber;
@@ -1306,10 +1308,10 @@ initLoop (zsock_t *pipe, void *args){
         }
         zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
     }
-    
-#if defined __unix__ || defined __APPLE__ || defined __linux__
+
     //start ipc publisher
     char *ipcEndpoint = NULL;
+#if defined __unix__ || defined __APPLE__ || defined __linux__
     char *ipcFullPath = NULL;
     if (ipcFolderPath == NULL){
         ipcFolderPath = strdup(DEFAULT_IPC_PATH);
@@ -1322,14 +1324,20 @@ initLoop (zsock_t *pipe, void *args){
     sprintf(ipcFullPath, "%s/%s", ipcFolderPath, zyre_uuid(agentElements->node));
     ipcEndpoint = calloc(1, strlen(ipcFolderPath)+strlen(zyre_uuid(agentElements->node))+8);
     sprintf(ipcEndpoint, "ipc://%s/%s", ipcFolderPath, zyre_uuid(agentElements->node));
-    
     zsock_t *ipcPublisher = agentElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
     if (ipcPublisher == NULL){
         igs_warn("Could not create IPC publishing socket (%s)", ipcEndpoint);
     }else{
         zyre_set_header(agentElements->node, "ipc", "%s", ipcEndpoint);
     }
-    
+#elif (defined WIN32 || defined _WIN32)
+    ipcEndpoint = strdup("tcp://127.0.0.1:*");
+    zsock_t *ipcPublisher = agentElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
+    if (ipcPublisher == NULL){
+        igs_warn("Could not create loopback publishing socket (%s)", ipcEndpoint);
+    }else{
+        zyre_set_header(agentElements->node, "loopback", "%s", zsock_endpoint(ipcPublisher));
+    }
 #endif
     
     //start logger stream if needed
@@ -1500,15 +1508,18 @@ initLoop (zsock_t *pipe, void *args){
     zclock_sleep (100);
     zyre_destroy (&agentElements->node);
     zsock_destroy(&agentElements->publisher);
-#if defined __unix__ || defined __APPLE__ || defined __linux__
     if (agentElements->ipcPublisher != NULL){
         zsock_destroy(&agentElements->ipcPublisher);
-        zsys_file_delete(ipcFullPath); //destroy ipcPath in file system
-        //NB: ipcPath is based on peer id which is unique. It will never be used again.
-    }
-    free(ipcFullPath);
-    free(ipcEndpoint);
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+        if (ipcFullPath != NULL){
+            zsys_file_delete(ipcFullPath); //destroy ipcPath in file system
+            //NB: ipcPath is based on peer id which is unique. It will never be used again.
+            free(ipcFullPath);
+        }
 #endif
+    }
+    free(ipcEndpoint);
+    
     if (agentElements->logger != NULL){
         zsock_destroy(&agentElements->logger);
     }
@@ -2395,6 +2406,7 @@ void igs_setIpcFolderPath(char *path){
 const char* igs_getIpcFolderPath(void){
     return ipcFolderPath;
 }
+#endif
 
 void igs_setAllowIpc(bool allow){
     allowIpc = allow;
@@ -2403,4 +2415,3 @@ void igs_setAllowIpc(bool allow){
 bool igs_getAllowIpc(void){
     return allowIpc;
 }
-#endif

@@ -72,13 +72,8 @@ napi_value node_igs_getDefinition(napi_env env, napi_callback_info info) {
 
     // convert result into napi_value
     napi_value res_convert;
-    if (res != NULL) {
-        convert_string_to_napi(env, res, &res_convert);
-        free(res);
-    }
-    else {
-        convert_null_to_napi(env, &res_convert);
-    }
+    convert_string_to_napi(env, res, &res_convert);
+    free(res);
     return res_convert;
 }
 
@@ -90,13 +85,7 @@ napi_value node_igs_getDefinitionName(napi_env env, napi_callback_info info) {
 
     // convert result into napi_value
     napi_value res_convert;
-    if (res != NULL) {
-        convert_string_to_napi(env, res, &res_convert);
-        free(res);
-    }
-    else {
-        convert_null_to_napi(env, &res_convert);
-    }
+    convert_string_to_napi(env, res, &res_convert);
     return res_convert;
 }
 
@@ -108,13 +97,8 @@ napi_value node_igs_getDefinitionDescription(napi_env env, napi_callback_info in
 
     // convert result into napi_value
     napi_value res_convert;
-    if (res != NULL) {
-        convert_string_to_napi(env, res, &res_convert);
-        free(res);
-    }
-    else {
-        convert_null_to_napi(env, &res_convert);
-    }
+    convert_string_to_napi(env, res, &res_convert);
+    free(res);
     return res_convert;
 }
 
@@ -126,13 +110,8 @@ napi_value node_igs_getDefinitionVersion(napi_env env, napi_callback_info info) 
 
     // convert result into napi_value
     napi_value res_convert;
-    if (res != NULL) {
-        convert_string_to_napi(env, res, &res_convert);
-        free(res);
-    }
-    else {
-        convert_null_to_napi(env, &res_convert);
-    }
+    convert_string_to_napi(env, res, &res_convert);
+    free(res);
     return res_convert;
 }
 

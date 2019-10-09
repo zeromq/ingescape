@@ -14,6 +14,7 @@ char * convert_napi_to_string(napi_env env, napi_value value) {
     status = napi_get_value_string_utf8(env, value, NULL, 0, &length_value);
     if (status != napi_ok) {
     	napi_throw_error(env, NULL, "Invalid string was passed as argument");
+        return NULL;
     }
     char* value_converted = malloc(sizeof(char) * (length_value + 1));
     napi_get_value_string_utf8(env, value, value_converted, length_value + 1, &length_value);
@@ -44,8 +45,8 @@ int convert_napi_to_double(napi_env env, napi_value value, double* value_convert
     napi_status status;
     status = napi_get_value_double(env, value, value_converted);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Invalid double was passed as argument");
-    	return 0;
+        status = napi_throw_error(env, NULL, "Invalid double was passed as argument");
+        return 0;
     }
     return 1;
 }
@@ -69,6 +70,7 @@ int convert_napi_to_data(napi_env env, napi_value value, void ** value_converted
     return 1;
 }
 
+
 int convert_int_to_napi(napi_env env, int value, napi_value* value_converted) {
     napi_status status;
     status = napi_create_int32(env, value, value_converted);
@@ -91,6 +93,14 @@ int convert_bool_to_napi(napi_env env, bool value, napi_value* value_converted) 
 
 int convert_string_to_napi(napi_env env, const char * value, napi_value* value_converted) {
     napi_status status;
+    if (value == NULL) {
+        status = napi_get_null(env, value_converted);
+        if (status != napi_ok) {
+            napi_throw_error(env, NULL, "N-API : Unable to get null value into napi_value");
+            return 0;
+        }
+    }
+
     status = napi_create_string_utf8(env, value, strlen(value), value_converted);
     if (status != napi_ok) {
         napi_throw_error(env, NULL, "N-API : Unable to convert string value into napi_value");
@@ -125,6 +135,26 @@ int convert_data_to_napi(napi_env env, void * value, size_t size, napi_value* va
     if (status != napi_ok) {
         napi_throw_error(env, NULL, "N-API : Unable to create array buffer into napi_value");
         return 0;
+    }
+    return 1;
+}
+
+int convert_string_list_to_napi_array(napi_env env, char ** list, size_t length, napi_value* value_converted) {
+    napi_status status;
+    status = napi_create_array_with_length(env, length, value_converted);
+    if (status != napi_ok) {
+        napi_throw_error(env, NULL, "N-API : Unable to create array");
+        return 0;
+    }
+
+    for (size_t i = 0; i < length; i++) {
+        napi_value string_conv;
+        convert_string_to_napi(env, list[i], &string_conv);
+        status = napi_set_element(env, *value_converted, i, string_conv);
+        if (status != napi_ok) {
+            napi_throw_error(env, NULL, "Unable to write element into array");
+            return 0;
+        }
     }
     return 1;
 }
@@ -307,7 +337,6 @@ void getCallArgumentListFromArrayJS(napi_env env, napi_value array, igs_callArgu
                     // convert to data
                     igs_addDataToArgumentsList(firstArgument, NULL, 0);
                 default :
-                    
                     //check if it is an array buffer
                     status = napi_get_arraybuffer_info(env, elt, &eltC, &size);
                     if (status == napi_ok) {
