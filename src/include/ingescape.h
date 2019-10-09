@@ -319,15 +319,16 @@ PUBLIC void igs_setMappingPath(const char *path);
 PUBLIC void igs_writeDefinitionToPath(void);
 PUBLIC void igs_writeMappingToPath(void);
 
-#if defined __unix__ || defined __APPLE__ || defined __linux__
-//IPC is supported on UNIX systems only
-//set/get IPC folder path for the agent (default is /tmp/)
-PUBLIC void igs_setIpcFolderPath(char *path);
-PUBLIC const char* igs_getIpcFolderPath(void);
-
-//IPC is activated by default be can be deactivated here
+//Ingescape automatically detects agents on the same computer and uses
+//optimized communication for input/output data exchange.
+//IPC is supported on UNIX systems only. On windows, we use the loopback as an alternative.
+//IPC is activated by default be can be deactivated here.
 PUBLIC void igs_setAllowIpc(bool allow);
 PUBLIC bool igs_getAllowIpc(void);
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+//set IPC folder path for the agent on UNIX systems (default is /tmp/)
+PUBLIC void igs_setIpcFolderPath(char *path);
+PUBLIC const char* igs_getIpcFolderPath(void);
 #endif
 
 
