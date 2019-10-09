@@ -19,8 +19,8 @@ napi_value node_igs_addNumberToArgumentsList(napi_env env, napi_callback_info in
 
     // convert infos into C types
     igs_callArgument_t * list = NULL;
- 	getCallArgumentListFromArrayJS(env, argv[0], &list);
     double value;
+ 	getCallArgumentListFromArrayJS(env, argv[0], &list);
     convert_napi_to_double(env, argv[1], &value);
 
     // call igs function
@@ -44,8 +44,8 @@ napi_value node_igs_addBoolToArgumentsList(napi_env env, napi_callback_info info
 
     // convert infos into C types
     igs_callArgument_t * list = NULL;
- 	getCallArgumentListFromArrayJS(env, argv[0], &list);
     bool value;
+ 	getCallArgumentListFromArrayJS(env, argv[0], &list);
     convert_napi_to_bool(env, argv[1], &value);
 
     // call igs function
@@ -94,20 +94,19 @@ napi_value node_igs_addDataToArgumentsList(napi_env env, napi_callback_info info
 
     // convert infos into C types
     igs_callArgument_t * list = NULL;
+    void * value;
+    size_t size;
  	getCallArgumentListFromArrayJS(env, argv[0], &list);
- 	void * value;
- 	size_t size;
-    if (convert_napi_to_data(env, argv[1], &value, &size)) {
-        // call igs function
-        igs_addDataToArgumentsList(&list, value, size);
+    convert_napi_to_data(env, argv[1], &value, &size);
 
-        // return new array buffer
-        napi_value arrayReturn;
-        getArrayJSFromCallArgumentList(env, list, &arrayReturn);
-        igs_destroyArgumentsList(&list);
-        return arrayReturn;
-    }
-    return NULL;
+    // call igs function
+    igs_addDataToArgumentsList(&list, value, size);
+
+    // return new array buffer
+    napi_value arrayReturn;
+    getArrayJSFromCallArgumentList(env, list, &arrayReturn);
+    igs_destroyArgumentsList(&list);
+    return arrayReturn;
 }
 
 // Wrapper for : 
@@ -248,7 +247,6 @@ napi_value node_igs_checkCallExistence(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // PUBLIC char** igs_getCallsList(size_t *nbOfElements); //returned char** shall be freed by caller
 napi_value node_igs_getCallsList(napi_env env, napi_callback_info info) { 
-    napi_status status;
     size_t nbElement = 0;
 
     // call igs function
@@ -256,19 +254,7 @@ napi_value node_igs_getCallsList(napi_env env, napi_callback_info info) {
 
     // convert char** into napi_value
     napi_value arrayCalls;
-    status = napi_create_array_with_length(env, nbElement, &arrayCalls);
-    if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to create array");
-    }
-
-    for (size_t i = 0; i < nbElement; i++) {
-        napi_value name_conv;
-        convert_string_to_napi(env, callsList[i], &name_conv);
-        status = napi_set_element(env, arrayCalls, i, name_conv);
-        if (status != napi_ok) {
-            napi_throw_error(env, NULL, "Unable to write element into array");
-        }
-    }
+    convert_string_list_to_napi_array(env, callsList, nbElement, &arrayCalls);
     //free char ** 
     igs_freeCallsList(callsList, nbElement);
     return arrayCalls;

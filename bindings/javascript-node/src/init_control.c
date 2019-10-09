@@ -139,13 +139,8 @@ napi_value node_igs_getAgentName(napi_env env, napi_callback_info info) {
 
     // convert name into N-API value
     napi_value napi_name;
-    if (name != NULL) {
-        convert_string_to_napi(env, name, &napi_name);
-        free(name);
-    }
-    else {
-        convert_null_to_napi(env, &napi_name);
-    }
+    convert_string_to_napi(env, name, &napi_name);
+    free(name);
     return napi_name;
 }
 
@@ -179,13 +174,8 @@ napi_value node_igs_getAgentState(napi_env env, napi_callback_info info) {
 
     // convert state into N-API value
     napi_value napi_state;
-    if (state != NULL) {
-        convert_string_to_napi(env, state, &napi_state);
-        free(state);
-    }
-    else {
-        convert_null_to_napi(env, &napi_state);
-    }
+    convert_string_to_napi(env, state, &napi_state);
+    free(state);
     return napi_state;
 }
 
@@ -321,8 +311,6 @@ napi_value node_igs_setDiscoveryInterval(napi_env env, napi_callback_info info) 
     // convert infos into C types
     int interval;
     convert_napi_to_int(env, argv[0], &interval);
-
-    printf("GOOOOOO : %d\n", interval);
 
     // call igs function
     igs_setDiscoveryInterval(interval);

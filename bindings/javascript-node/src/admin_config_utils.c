@@ -14,7 +14,7 @@ napi_value node_igs_version(napi_env env, napi_callback_info info) {
     // call igs function
     int res = igs_version();
 
-    // convert result into napi_value & return
+    // convert result into napi_value
     napi_value res_convert;
     convert_int_to_napi(env, res, &res_convert);
     return res_convert;
@@ -23,8 +23,6 @@ napi_value node_igs_version(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // PUBLIC void igs_getNetdevicesList(char ***devices, int *nb);
 napi_value node_igs_getNetdevicesList(napi_env env, napi_callback_info info) {
-    napi_status status; //to check status of node_api
-
     // call igs function
     char **devices = NULL;
     int nb = 0;
@@ -32,22 +30,8 @@ napi_value node_igs_getNetdevicesList(napi_env env, napi_callback_info info) {
 
     // convert char ** into napi_value
     napi_value arrayNetdevices;
-    status = napi_create_array_with_length(env, nb, &arrayNetdevices);
-    if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to create array");
-    }
-
-    for (int i = 0; i < nb; i++) {
-        napi_value device_converted;
-        convert_string_to_napi(env, devices[i], &device_converted);
-
-        status = napi_set_element(env, arrayNetdevices, i, device_converted);
-        if (status != napi_ok) {
-            napi_throw_error(env, NULL, "Unable to write element into array");
-        }
-    }
-    //free devices
-    igs_freeNetdevicesList(devices, nb);
+    convert_string_list_to_napi_array(env, devices, nb, &arrayNetdevices);
+    igs_freeNetdevicesList(devices, nb); // free devices
     return arrayNetdevices;
 }
 
@@ -60,10 +44,8 @@ napi_value node_igs_setCommandLine(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     char * line = convert_napi_to_string(env, argv[0]);
-
-    // call igs function
     igs_setCommandLine(line);
     free(line);
     return NULL;
@@ -78,11 +60,9 @@ napi_value node_igs_setRequestOutputsFromMappedAgents(napi_env env, napi_callbac
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     bool reqOutputsFromMappedAgents;
     convert_napi_to_bool(env, argv[0], &reqOutputsFromMappedAgents);
-
-    // call igs function
     igs_setRequestOutputsFromMappedAgents(reqOutputsFromMappedAgents);
     return NULL;
 }
@@ -108,11 +88,9 @@ napi_value node_igs_setVerbose(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function 
     bool verbose;
     convert_napi_to_bool(env, argv[0], &verbose);
-
-    // call igs function
     igs_setVerbose(verbose);
     return NULL;
 }
@@ -123,7 +101,7 @@ napi_value node_igs_isVerbose(napi_env env, napi_callback_info info) {
     // call igs function
     bool return_value = igs_isVerbose();
 
-    // convert return value into N-API value
+    // convert return value into N-API value 
     napi_value napi_return;
     convert_bool_to_napi(env, return_value, &napi_return);
     return napi_return;
@@ -138,11 +116,9 @@ napi_value node_igs_setUseColorVerbose(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function 
     bool useColor;
     convert_napi_to_bool(env, argv[0], &useColor);
-
-    // call igs function
     igs_setUseColorVerbose(useColor);
     return NULL;
 }
@@ -168,11 +144,9 @@ napi_value node_igs_setLogStream(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function 
     bool logStream;
     convert_napi_to_bool(env, argv[0], &logStream);
-
-    // call igs function
     igs_setLogStream(logStream);
     return NULL;
 }
@@ -198,11 +172,9 @@ napi_value node_igs_setLogInFile(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     bool logInFile;
     convert_napi_to_bool(env, argv[0], &logInFile);
-
-    // call igs function
     igs_setLogInFile(logInFile);
     return NULL;
 }
@@ -228,10 +200,8 @@ napi_value node_igs_setLogPath(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     char * path = convert_napi_to_string(env, argv[0]);
-
-    // call igs function
     igs_setLogPath(path);
     free(path);
     return NULL;
@@ -245,13 +215,8 @@ napi_value node_igs_getLogPath(napi_env env, napi_callback_info info) {
 
     // convert result into napi_value
     napi_value res_convert;
-    if (res != NULL) {
-        convert_string_to_napi(env, res, &res_convert);
-        free(res);
-    }
-    else {
-        convert_null_to_napi(env, &res_convert);
-    }
+    convert_string_to_napi(env, res, &res_convert);
+    free(res);
     return res_convert;
 }
 
@@ -264,10 +229,9 @@ napi_value node_igs_setLogLevel(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     int level;
     convert_napi_to_int(env, argv[0], &level);
-
     igs_setLogLevel(level);
     return NULL;
 }
@@ -293,10 +257,8 @@ napi_value node_igs_trace(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     char * log = convert_napi_to_string(env, argv[0]);
-
-    // call igs function
     igs_trace("%s\n", log);
     free(log);
     return NULL;
@@ -311,10 +273,8 @@ napi_value node_igs_debug(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     char * log = convert_napi_to_string(env, argv[0]);
-
-    // call igs function
     igs_debug("%s\n", log);
     free(log);
     return NULL;
@@ -329,10 +289,8 @@ napi_value node_igs_info(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     char * log = convert_napi_to_string(env, argv[0]);
-
-    // call igs function
     igs_info("%s\n", log);
     free(log);
     return NULL;
@@ -347,10 +305,8 @@ napi_value node_igs_warn(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     char * log = convert_napi_to_string(env, argv[0]);
-
-    // call igs function
     igs_warn("%s\n", log);
     free(log);
     return NULL;
@@ -365,10 +321,8 @@ napi_value node_igs_error(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     char * log = convert_napi_to_string(env, argv[0]);
-
-    // call igs function
     igs_error("%s\n", log);
     free(log);
     return NULL;
@@ -383,10 +337,8 @@ napi_value node_igs_fatal(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function 
     char * log = convert_napi_to_string(env, argv[0]);
-
-    // call igs function
     igs_fatal("%s\n", log);
     free(log);
     return NULL;
@@ -401,10 +353,8 @@ napi_value node_igs_setDefinitionPath(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     char * def_path = convert_napi_to_string(env, argv[0]);
-
-    // call igs function
     igs_setDefinitionPath(def_path); 
     free(def_path);
     return NULL;
@@ -419,10 +369,8 @@ napi_value node_igs_setMappingPath(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function
     char * map_path = convert_napi_to_string(env, argv[0]);
-
-    // call igs function
     igs_setMappingPath(map_path); 
     free(map_path);
     return NULL;
@@ -453,10 +401,8 @@ napi_value node_igs_setIpcFolderPath(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types
+    // convert infos into C types & call igs function 
     char * ipc_path = convert_napi_to_string(env, argv[0]);
-
-    // call igs function
     igs_setIpcFolderPath(ipc_path); 
     free(ipc_path);
     return NULL;
@@ -470,12 +416,7 @@ napi_value node_igs_getIpcFolderPath(napi_env env, napi_callback_info info) {
 
     // convert result into napi_value
     napi_value res_convert;
-    if (res != NULL) {
-        convert_string_to_napi(env, res, &res_convert);
-    }
-    else {
-        convert_null_to_napi(env, &res_convert);
-    }
+    convert_string_to_napi(env, res, &res_convert);
     return res_convert;
 }
 
@@ -488,11 +429,9 @@ napi_value node_igs_setAllowIpc(napi_env env, napi_callback_info info) {
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
     
-    // convert infos into C types
+    // convert infos into C types & call igs function 
     bool ipc;
     convert_napi_to_bool(env, argv[0], &ipc);
-
-    // call igs function
     igs_setAllowIpc(ipc);
     return NULL;
 }
