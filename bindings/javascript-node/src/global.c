@@ -80,6 +80,9 @@ int convert_napi_to_data(napi_env env, napi_value value, void ** value_converted
     napi_status status;
     napi_valuetype valueType;
     status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "N-API : Unable to get napi value type of element.");
+    }
 
     if ((valueType == napi_undefined) || (valueType == napi_null)) {
         *value_converted = NULL;
@@ -88,7 +91,7 @@ int convert_napi_to_data(napi_env env, napi_value value, void ** value_converted
     else {
         status = napi_get_arraybuffer_info(env, value, value_converted, size_value_converted);
         if (status != napi_ok) {
-            triggerException(env, NULL, "Invalid array buffer was passed as argument.");
+            triggerException(env, NULL, "Invalid array buffer was passed as argument (null and undefined also accepted).");
             return 0;
         }
     }
@@ -309,7 +312,7 @@ void getCallArgumentListFromArrayJS(napi_env env, napi_value array, igs_callArgu
         bool isArray;
         status = napi_is_array(env, array, &isArray);
         if (status != napi_ok) {
-            triggerException(env, NULL, "napi_value must be an array or null or undefined.");
+            triggerException(env, NULL, "Invalid array buffer was passed as argument (null and undefined also accepted).");
         }
 
         // Rebuild list of igs_callArgument_t
@@ -319,23 +322,24 @@ void getCallArgumentListFromArrayJS(napi_env env, napi_value array, igs_callArgu
             triggerException(env, NULL, "N-API : Unable to get array length.");
         }
 
+        // Translate all the array elements to create list
         uint32_t i = 0;
         napi_value elt;
         napi_valuetype typeElt;
-        // Translate all the array elements to create list
+        void *eltC = NULL;
+        size_t size;
+
         while (i < length) {
             status = napi_get_element(env, array, i, &elt);
             if (status != napi_ok) {
                 triggerException(env, NULL, "N-API : Unable to get element in array.");
             }
-
             status = napi_typeof(env, elt, &typeElt);
             if (status != napi_ok) {
                 triggerException(env, NULL, "N-API : Unable to get napi value type of element.");
             }
 
-            void * eltC = NULL;
-            size_t size;
+            eltC = NULL;
             switch (typeElt) {
                 case napi_number :
                     // convert to double
