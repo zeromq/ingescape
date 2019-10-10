@@ -448,38 +448,6 @@ napi_value node_igs_getAllowIpc(napi_env env, napi_callback_info info) {
     return napi_return; 
 }
 
-//  Get enum types for iop types in js
-napi_value node_get_logLevel_js(napi_env env, napi_callback_info info) {
-    napi_value object;
-    napi_create_object(env, &object);
-
-    napi_value traceType;
-    convert_int_to_napi(env, IGS_LOG_TRACE, &traceType);
-    napi_set_named_property(env, object, "IGS_LOG_TRACE", traceType);
-
-    napi_value debugType;
-    convert_int_to_napi(env, IGS_LOG_DEBUG, &debugType);
-    napi_set_named_property(env, object, "IGS_LOG_DEBUG", debugType);
-
-    napi_value infoType;
-    convert_int_to_napi(env, IGS_LOG_INFO, &infoType);
-    napi_set_named_property(env, object, "IGS_LOG_INFO", infoType);
-
-    napi_value warnType;
-    convert_int_to_napi(env, IGS_LOG_WARN, &warnType);
-    napi_set_named_property(env, object, "IGS_LOG_WARN", warnType);
-
-    napi_value errorType;
-    convert_int_to_napi(env, IGS_LOG_ERROR, &errorType);
-    napi_set_named_property(env, object, "IGS_LOG_ERROR", errorType);
-
-    napi_value fatalType;
-    convert_int_to_napi(env, IGS_LOG_FATAL, &fatalType);
-    napi_set_named_property(env, object, "IGS_LOG_FATAL", fatalType);
-
-    return object;
-}
-
 // Allow callback for admin, config & utils ingescape code 
 napi_value init_admin_config_utils(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_version, "igsVersion", exports);
@@ -513,6 +481,5 @@ napi_value init_admin_config_utils(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_getIpcFolderPath, "getIpcFolderPath", exports);
     exports = enable_callback_into_js(env, node_igs_setAllowIpc, "setAllowIpc", exports);
     exports = enable_callback_into_js(env, node_igs_getAllowIpc, "getAllowIpc", exports);
-    exports = enable_callback_into_js(env, node_get_logLevel_js, "getLogLevels", exports);  
     return exports;
 }

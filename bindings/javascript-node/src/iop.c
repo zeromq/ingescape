@@ -961,54 +961,6 @@ napi_value node_igs_checkParameterExistence(napi_env env, napi_callback_info inf
     return res_convert;
 }
 
-//  Get enum types for iop types in js
-napi_value node_get_iopType_js(napi_env env, napi_callback_info info) {
-    napi_value object;
-    napi_create_object(env, &object);
-
-    napi_value numberType;
-    convert_int_to_napi(env, IGS_NUMBER_JS, &numberType);
-    napi_set_named_property(env, object, "IGS_NUMBER_T", numberType);
-
-    napi_value stringType;
-    convert_int_to_napi(env, IGS_STRING_JS, &stringType);
-    napi_set_named_property(env, object, "IGS_STRING_T", stringType);
-
-    napi_value boolType;
-    convert_int_to_napi(env, IGS_BOOL_JS, &boolType);
-    napi_set_named_property(env, object, "IGS_BOOL_T", boolType);
-
-    napi_value impulsionType;
-    convert_int_to_napi(env, IGS_IMPULSION_JS, &impulsionType);
-    napi_set_named_property(env, object, "IGS_IMPULSION_T", impulsionType);
-
-    napi_value dataType;
-    convert_int_to_napi(env, IGS_DATA_JS, &dataType);
-    napi_set_named_property(env, object, "IGS_DATA_T", dataType);
-
-    return object;
-}
-
-//  Get enum types for iop types in js
-napi_value node_get_iop_js(napi_env env, napi_callback_info info) {
-    napi_value object;
-    napi_create_object(env, &object);
-
-    napi_value input;
-    convert_int_to_napi(env, IGS_INPUT_T, &input);
-    napi_set_named_property(env, object, "IGS_INPUT_T", input);
-
-    napi_value output;
-    convert_int_to_napi(env, IGS_OUTPUT_T, &output);
-    napi_set_named_property(env, object, "IGS_OUTPUT_T", output);
-
-    napi_value parameter;
-    convert_int_to_napi(env, IGS_PARAMETER_T, &parameter);
-    napi_set_named_property(env, object, "IGS_PARAMETER_T", parameter);
-
-    return object;
-}
-
 // Allow callback for iop ingescape code 
 napi_value init_iop(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_readInputAsBool, "readInputAsBool", exports);
@@ -1055,8 +1007,5 @@ napi_value init_iop(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_checkInputExistence, "checkInputExistence", exports);
     exports = enable_callback_into_js(env, node_igs_checkOutputExistence, "checkOutputExistence", exports);
     exports = enable_callback_into_js(env, node_igs_checkParameterExistence, "checkParameterExistence", exports);  
-    exports = enable_callback_into_js(env, node_get_iopType_js, "getIopValueTypes", exports);  
-    exports = enable_callback_into_js(env, node_get_iop_js, "getIopTypes", exports);  
-    
     return exports;
 }

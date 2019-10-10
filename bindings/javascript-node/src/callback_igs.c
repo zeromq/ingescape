@@ -80,13 +80,13 @@ napi_value node_igs_observeForcedStop(napi_env env, napi_callback_info info) {
     if (status != napi_ok) {
         triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[1], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null.");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }  
 
@@ -169,13 +169,13 @@ napi_value node_igs_observeMute(napi_env env, napi_callback_info info) {
     if (status != napi_ok) {
         triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[1], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null.");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }  
 
@@ -260,13 +260,13 @@ napi_value node_igs_observeFreeze(napi_env env, napi_callback_info info) {
     if (status != napi_ok) {
         triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[1], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null.");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }  
 
@@ -390,13 +390,13 @@ napi_value node_igs_observeInput(napi_env env, napi_callback_info info) {
     if (status != napi_ok) {
         triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[2], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null.");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     } 
 
@@ -444,13 +444,13 @@ napi_value node_igs_observeOutput(napi_env env, napi_callback_info info) {
     if (status != napi_ok) {
         triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[2], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null.");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     } 
 
@@ -498,13 +498,13 @@ napi_value node_igs_observeParameter(napi_env env, napi_callback_info info) {
     if (status != napi_ok) {
         triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[2], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null.");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }
 
@@ -591,13 +591,13 @@ napi_value node_igs_observeLicense (napi_env env, napi_callback_info info) {
     if (status != napi_ok) {
         triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[1], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null.");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }
 
@@ -694,13 +694,13 @@ napi_value node_igs_initCall(napi_env env, napi_callback_info info) {
     if (status != napi_ok) {
         triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[2], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            triggerException(env, NULL, "3rd argument must be a JavaScript Object or an Array or null.");
+            triggerException(env, NULL, "3rd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }
 
