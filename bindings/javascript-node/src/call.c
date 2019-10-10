@@ -281,7 +281,7 @@ napi_value node_igs_getArgumentsForCall(napi_env env, napi_callback_info info) {
     napi_value arrayJS;
     status = napi_create_array(env, &arrayJS);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to create array");
+        triggerException(env, NULL, "N-API : Unable to create array.");
     }
 
     igs_callArgument_t * elt, * tmp;
@@ -292,7 +292,7 @@ napi_value node_igs_getArgumentsForCall(napi_env env, napi_callback_info info) {
         convert_string_to_napi(env, elt->name, &nameArg);
         status = napi_set_element(env, arrayJS, i, nameArg);
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "N-API : Unable to set element in array");
+            triggerException(env, NULL, "N-API : Unable to set element in array.");
         }
         i++;
     }

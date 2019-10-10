@@ -321,7 +321,7 @@ napi_value node_igs_writeInputAsDouble(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
     double value;
     convert_napi_to_double(env, argv[1], &value);
-
+    
     // call igs function
     int res = igs_writeInputAsDouble(name, value); 
     free(name);
@@ -330,7 +330,6 @@ napi_value node_igs_writeInputAsDouble(napi_env env, napi_callback_info info) {
     napi_value res_convert;
     convert_int_to_napi(env, res, &res_convert);
     return res_convert;
-    return NULL;
 }
 
 // Wrapper for : 

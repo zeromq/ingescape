@@ -24,6 +24,9 @@ typedef enum {
 } iopType_js;
 #endif
 
+// Trigger 'uncaughtException' in JavaScript
+void triggerException(napi_env env, const char * code, const char * message);
+
 // convert N-API to C
 char * convert_napi_to_string(napi_env env, napi_value value); //must be free by caller
 int convert_napi_to_bool(napi_env env, napi_value value, bool * converted_value);
