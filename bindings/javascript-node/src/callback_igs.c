@@ -661,6 +661,8 @@ void callCallback (const char *senderAgentName, const char *senderAgentUUID,
     napi_call_threadsafe_function(callback->threadsafe_func, callback, napi_tsfn_nonblocking);
 }   
 
+// Wrapper for : 
+// PUBLIC int igs_initCall(const char *name, igs_callFunction cb, void *myData);
 napi_value node_igs_initCall(napi_env env, napi_callback_info info) {
     size_t nb_arguments = 3;
     napi_status status; //to check status of node_api
@@ -713,6 +715,101 @@ napi_value node_igs_initCall(napi_env env, napi_callback_info info) {
     return res_convert;
 }
 
+CallbackMonitor *headMonitor = NULL;
+
+static void cbMonitor_into_js(napi_env env, napi_value js_callback, void* ctx, void* data) {
+    napi_status status;
+    CallbackMonitor * callback = (CallbackMonitor *) data;
+    napi_value argv[4];
+
+    // convert args to napi
+    convert_int_to_napi(env, callback->event, &argv[0]);
+    convert_string_to_napi(env, callback->device, &argv[1]);
+    convert_string_to_napi(env, callback->ipAddress, &argv[2]);
+
+    //get reference data from JS
+    if (callback->ref_myData == NULL) {
+        convert_null_to_napi(env, &argv[3]);
+    }
+    else {
+        status = napi_get_reference_value(env, callback->ref_myData, &argv[3]);
+        if (status != napi_ok) {
+            triggerException(env, NULL, "N-API : Unable to get reference value.");
+        }
+    }
+    
+    // Since a function call must have a receiver, we use undefined
+    napi_value undefined;
+    status = napi_get_undefined(env, &undefined);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Impossible to get undefined.");
+    }
+
+    // callback into JavaScript
+    status = napi_call_function(env, undefined, js_callback, 4, argv, NULL);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Unable to call javascript function.");
+    }
+}
+
+// type defined call C function
+void monitorCallback (igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData) {
+    // call threadsafe function
+    CallbackMonitor * callback = (CallbackMonitor *) myData;
+    callback->event = event;
+    callback->device = strndup(device, strlen(device));
+    callback->ipAddress = strndup(ipAddress, strlen(ipAddress));
+    napi_call_threadsafe_function(callback->threadsafe_func, callback, napi_tsfn_nonblocking);
+}   
+
+// Wrapper for
+// PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
+napi_value node_igs_monitor(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 2;
+    napi_status status; //to check status of node_api
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    // Initiate struct
+    CallbackMonitor * callback = calloc(1, sizeof(CallbackMonitor));
+    DL_APPEND(headMonitor, callback);
+
+    //create threadsafe function
+    napi_value async_name;
+    status = napi_create_string_utf8(env, "Ingescape/CallbackMonitor", NAPI_AUTO_LENGTH, &async_name);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Invalid name for async_name napi_value.");
+    }
+    status = napi_create_threadsafe_function(env, argv[0], NULL, async_name, 0, 1, NULL, NULL, NULL, 
+    cbMonitor_into_js, &(callback->threadsafe_func));
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Impossible to create threadsafe function.");
+    }
+
+    //create reference for arguments callback if not null
+    napi_valuetype value_type;
+    status = napi_typeof(env, argv[1], &value_type);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
+    }
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
+        callback->ref_myData = NULL;
+    }
+    else {
+        status = napi_create_reference(env, argv[1], 1, &(callback->ref_myData));
+        if (status != napi_ok) {
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
+        }
+    }
+
+    // call igs function
+    igs_monitor(monitorCallback, callback);
+    return NULL;
+}
+
 // Free allocated memory for callbacks during lifetime of the agent
 void free_data_cb() {
     CallbackForcedStopJS *eltFS, *tmpFS;
@@ -756,5 +853,6 @@ napi_value init_callback_igs(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_observeParameter, "observeParameter", exports);
     exports = enable_callback_into_js(env, node_igs_observeLicense, "observeLicense", exports);
     exports = enable_callback_into_js(env, node_igs_initCall, "initCall", exports);
+    exports = enable_callback_into_js(env, node_igs_monitor, "monitor", exports);
     return exports;
 }

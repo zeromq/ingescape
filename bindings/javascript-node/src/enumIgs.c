@@ -88,7 +88,7 @@ napi_value node_get_iops_js(napi_env env, napi_callback_info info) {
     return object;
 }
 
-//  Get enum types for license limit types 
+//  Get enum types for license limit  
 napi_value node_get_license_limit_types(napi_env env, napi_callback_info info) {
     napi_value object;
     napi_create_object(env, &object);
@@ -108,11 +108,36 @@ napi_value node_get_license_limit_types(napi_env env, napi_callback_info info) {
     return object;
 }
 
+// Get enum types for monitor events
+napi_value node_get_monitor_event_types(napi_env env, napi_callback_info info) {
+    napi_value object;
+    napi_create_object(env, &object);
+
+    napi_value okType;
+    convert_int_to_napi(env, IGS_NETWORK_OK, &okType);
+    napi_set_named_property(env, object, "IGS_NETWORK_OK", okType);
+
+    napi_value deviceNotAvailable;
+    convert_int_to_napi(env, IGS_NETWORK_DEVICE_NOT_AVAILABLE, &deviceNotAvailable);
+    napi_set_named_property(env, object, "IGS_NETWORK_DEVICE_NOT_AVAILABLE", deviceNotAvailable);
+
+    napi_value addressChanged;
+    convert_int_to_napi(env, IGS_NETWORK_ADDRESS_CHANGED, &addressChanged);
+    napi_set_named_property(env, object, "IGS_NETWORK_ADDRESS_CHANGED", addressChanged);
+
+    napi_value okAftertManualRestart;
+    convert_int_to_napi(env, IGS_NETWORK_OK_AFTER_MANUAL_RESTART, &okAftertManualRestart);
+    napi_set_named_property(env, object, "IGS_NETWORK_OK_AFTER_MANUAL_RESTART", okAftertManualRestart);
+
+    return object;
+}
+
 // Allow callback for ingescape enums
 napi_value init_enums(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_get_logLevels_js, "getLogLevels", exports);  
     exports = enable_callback_into_js(env, node_get_iopTypes_js, "getIopValueTypes", exports);  
     exports = enable_callback_into_js(env, node_get_iops_js, "getIopTypes", exports);  
     exports = enable_callback_into_js(env, node_get_license_limit_types, "getLicenseLimitTypes", exports);
+    exports = enable_callback_into_js(env, node_get_monitor_event_types, "getMonitorEventTypes", exports);
     return exports;
 }
