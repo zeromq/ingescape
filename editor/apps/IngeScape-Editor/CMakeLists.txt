@@ -169,7 +169,6 @@ find_package(Qt5 NO_MODULE COMPONENTS
     Svg
     Xml
     Concurrent
-    Sql
     Core
     Gui
     WebView
@@ -243,7 +242,6 @@ target_link_libraries(
     Qt5::Svg
     Qt5::Xml
     Qt5::Concurrent
-    Qt5::Sql
     Qt5::Core
     Qt5::Gui
     Qt5::WebView
