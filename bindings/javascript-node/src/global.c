@@ -299,42 +299,71 @@ iopType_js get_iop_type_js_from_iop_type_t(iopType_t type) {
 
 void getArrayJSFromCallArgumentList(napi_env env, igs_callArgument_t *firstArgument, napi_value *arrayJS) {
     napi_status status;
-    igs_callArgument_t * arg = firstArgument;
-    uint32_t i = 0;
-    napi_value argJS;
+
+    // Create array
     status = napi_create_array(env, arrayJS);
     if (status != napi_ok) {
         triggerException(env, NULL, "N-API : Unable to create array.");
     }
-    
-    while (arg != NULL) {
-        switch (arg->type) {
+
+    igs_callArgument_t * elt, * tmp;
+    igs_callArgument_t * head = firstArgument;
+    napi_value argumentCall, nameArg, typeArg, valueArg;
+    int i = 0;
+
+    LL_FOREACH_SAFE(head, elt, tmp) {
+        // Create argument call JS object 
+        status = napi_create_object(env, &argumentCall);
+        if (status != napi_ok) {
+            triggerException(env, NULL, "N-API : Unable to create object.");
+        }
+
+        // Add argument's name & argument's type
+        convert_string_to_napi(env, elt->name, &nameArg);
+        status = napi_set_named_property(env, argumentCall, "name", nameArg);
+        if (status != napi_ok) {
+            triggerException(env, NULL, "N-API : Unable to set name of argument call.");
+        }
+
+        convert_int_to_napi(env, get_iop_type_js_from_iop_type_t(elt->type), &typeArg);
+        status = napi_set_named_property(env, argumentCall, "type", typeArg);
+        if (status != napi_ok) {
+            triggerException(env, NULL, "N-API : Unable to set type of argument call.");
+        }
+
+        // Add argument's value
+        switch (elt->type) {
             case IGS_INTEGER_T :
-                convert_int_to_napi(env, arg->i, &argJS);
+                convert_int_to_napi(env, elt->i, &valueArg);
                 break;
             case IGS_DOUBLE_T  :
-                convert_double_to_napi(env, arg->d, &argJS);
+                convert_double_to_napi(env, elt->d, &valueArg);
                 break;
             case IGS_STRING_T  :
-                convert_string_to_napi(env, arg->c, &argJS);
+                convert_string_to_napi(env, elt->c, &valueArg);
                 break;
             case IGS_BOOL_T  :
-                convert_bool_to_napi(env, arg->b, &argJS);
+                convert_bool_to_napi(env, elt->b, &valueArg);
                 break;
             case IGS_IMPULSION_T  :
                 triggerException(env, NULL, "Type IMPULSION is not handling by calls.");
                 break;
             case IGS_DATA_T  :
-                convert_data_to_napi(env, arg->data, arg->size, &argJS);
+                convert_data_to_napi(env, elt->data, elt->size, &valueArg);
                 break;
             default : 
                 triggerException(env, NULL, "Type not handling in binding.");
         }
-        status = napi_set_element(env, *arrayJS, i, argJS);
+        status = napi_set_named_property(env, argumentCall, "value", valueArg);
+        if (status != napi_ok) {
+            triggerException(env, NULL, "N-API : Unable to set value of argument call.");
+        }
+
+        // Add object to array
+        status = napi_set_element(env, *arrayJS, i, argumentCall);
         if (status != napi_ok) {
             triggerException(env, NULL, "N-API : Unable to set element in array.");
         }
-        arg = arg->next;
         i++;
     }
 }
