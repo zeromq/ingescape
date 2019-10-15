@@ -42,6 +42,8 @@ int convert_double_to_napi(napi_env env, double value, napi_value* value_convert
 int convert_null_to_napi(napi_env env, napi_value* value_converted);
 int convert_data_to_napi(napi_env env, void * value, size_t size, napi_value* value_converted);
 int convert_string_list_to_napi_array(napi_env env, char ** list, size_t length, napi_value* value_converted);
+int convert_value_IOP_into_napi(napi_env env, iopType_t type, void * value, size_t size, napi_value * value_napi);
+
 // javascript callbacks 
 int get_function_arguments(napi_env env, napi_callback_info info, size_t argc, napi_value * argv);
 napi_value enable_callback_into_js(napi_env env, napi_callback cb, const char * js_name, napi_value exports);

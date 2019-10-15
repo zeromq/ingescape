@@ -157,13 +157,18 @@ int convert_null_to_napi(napi_env env, napi_value* value_converted) {
     return 1;
 }
 
+void arrayBufferCollected(napi_env env, void * finalize_data, void * finalize_hint) {
+    free(finalize_data);
+}
+
 int convert_data_to_napi(napi_env env, void * value, size_t size, napi_value* value_converted) {
     napi_status status;
-    status = napi_create_external_arraybuffer(env, value, size, NULL, NULL, value_converted);
+    status = napi_create_external_arraybuffer(env, value, size, arrayBufferCollected, NULL, value_converted);
     if (status != napi_ok) {
         triggerException(env, NULL, "N-API : Unable to create array buffer into napi_value.");
         return 0;
     }
+
     return 1;
 }
 
@@ -183,6 +188,44 @@ int convert_string_list_to_napi_array(napi_env env, char ** list, size_t length,
             triggerException(env, NULL, "Unable to write element into array.");
             return 0;
         }
+    }
+    return 1;
+}
+
+int convert_value_IOP_into_napi(napi_env env, iopType_t type, void * value, size_t size, napi_value * value_napi) {
+    if (value == NULL) {
+        convert_null_to_napi(env, value_napi);
+        return 1;
+    }
+
+    // convert in good type napi value
+    switch(type) {
+        case IGS_INTEGER_T  :
+            convert_int_to_napi(env, *((int *) value), value_napi);
+            free(value);
+            break;
+        case IGS_DOUBLE_T  :
+            convert_double_to_napi(env, *((double *) value), value_napi);
+            free(value);
+            break;
+        case IGS_STRING_T  :
+            convert_string_to_napi(env, (char *) value, value_napi);
+            free(value);
+            break;
+        case IGS_BOOL_T  : 
+            convert_bool_to_napi(env, *((bool *) value), value_napi);
+            free(value);
+            break;
+        case IGS_IMPULSION_T  :
+            convert_null_to_napi(env, value_napi);
+            break;
+        case IGS_DATA_T  :
+            convert_data_to_napi(env, value, size, value_napi);
+            // value will be freed by the function
+            break;
+        default : 
+            triggerException(env, NULL, "Unknown iopType_t.");
+            return 0;
     }
     return 1;
 }

@@ -561,15 +561,13 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         zagent->subscriber = subscriber;
                         subscriber->agentName = strdup(name);
                         subscriber->agentPeerId = strdup (peer);
-#if defined __unix__ || defined __APPLE__ || defined __linux__
                         if (allowIpc && useIPC){
                             subscriber->subscriber = zsock_new_sub(ipcAddress, NULL);
+                            igs_debug("Subscription created for %s at %s",subscriber->agentName,ipcAddress);
                         }else{
                             subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
+                            igs_debug("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
                         }
-#else
-                        subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
-#endif
                         assert(subscriber->subscriber);
                         subscriber->definition = NULL;
                         subscriber->mappingsFilters = NULL;
@@ -582,15 +580,6 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         subscriber->pollItem->revents = 0;
                         zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
                         zloop_poller_set_tolerant(loop, subscriber->pollItem);
-                        #if defined __unix__ || defined __APPLE__ || defined __linux__
-                        if (useIPC){
-                            igs_debug("Subscription created for %s at %s",subscriber->agentName,ipcAddress);
-                        }else{
-                            igs_debug("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
-                        }
-                        #else
-                        igs_debug("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
-                        #endif
                         #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
                         licEnforcement->currentAgentsNb++;
                         //igs_license("%ld agents (adding %s)", licEnforcement->currentAgentsNb, name);
