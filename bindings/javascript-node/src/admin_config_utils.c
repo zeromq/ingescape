@@ -448,36 +448,76 @@ napi_value node_igs_getAllowIpc(napi_env env, napi_callback_info info) {
     return napi_return; 
 }
 
-//  Get enum types for iop types in js
-napi_value node_get_logLevel_js(napi_env env, napi_callback_info info) {
-    napi_value object;
-    napi_create_object(env, &object);
+// Wrapper for : 
+// PUBLIC void igs_monitoringEnable(unsigned int period); //in milliseconds
+napi_value node_igs_monitoringEnable(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 1;
+    napi_value argv[nb_arguments];
+  
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
 
-    napi_value traceType;
-    convert_int_to_napi(env, IGS_LOG_TRACE, &traceType);
-    napi_set_named_property(env, object, "IGS_LOG_TRACE", traceType);
+    // convert infos into C types & call igs function
+    int period;
+    convert_napi_to_int(env, argv[0], &period);
+    igs_monitoringEnable(period);
+    return NULL;
+}
 
-    napi_value debugType;
-    convert_int_to_napi(env, IGS_LOG_DEBUG, &debugType);
-    napi_set_named_property(env, object, "IGS_LOG_DEBUG", debugType);
+// Wrapper for : 
+// PUBLIC void igs_monitoringEnableWithExpectedDevice(unsigned int period, const char* networkDevice, unsigned int port);
+napi_value node_igs_monitoringEnableWithExpectedDevice(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 3;
+    napi_value argv[nb_arguments];
+  
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
 
-    napi_value infoType;
-    convert_int_to_napi(env, IGS_LOG_INFO, &infoType);
-    napi_set_named_property(env, object, "IGS_LOG_INFO", infoType);
+    // convert infos into C types & call igs function
+    int period;
+    convert_napi_to_int(env, argv[0], &period);
+    char * networkDevice = convert_napi_to_string(env, argv[1]);
+    int port;
+    convert_napi_to_int(env, argv[2], &port);
+    igs_monitoringEnableWithExpectedDevice(period, networkDevice, port);
+    free(networkDevice);
+    return NULL;
+}
 
-    napi_value warnType;
-    convert_int_to_napi(env, IGS_LOG_WARN, &warnType);
-    napi_set_named_property(env, object, "IGS_LOG_WARN", warnType);
+// Wrapper for : 
+// PUBLIC void igs_monitoringDisable(void);
+napi_value node_igs_monitoringDisable(napi_env env, napi_callback_info info) {
+    // call igs function
+    igs_monitoringDisable();
+    return NULL;
+}
 
-    napi_value errorType;
-    convert_int_to_napi(env, IGS_LOG_ERROR, &errorType);
-    napi_set_named_property(env, object, "IGS_LOG_ERROR", errorType);
+// Wrapper for : 
+// PUBLIC bool igs_isMonitoringEnabled(void);
+napi_value node_igs_isMonitoringEnabled(napi_env env, napi_callback_info info) {
+    // call igs function
+    bool return_value = igs_isMonitoringEnabled();
 
-    napi_value fatalType;
-    convert_int_to_napi(env, IGS_LOG_FATAL, &fatalType);
-    napi_set_named_property(env, object, "IGS_LOG_FATAL", fatalType);
+    // convert return value into N-API value
+    napi_value napi_return;
+    convert_bool_to_napi(env, return_value, &napi_return);
+    return napi_return; 
+}
 
-    return object;
+// Wrapper for : 
+// PUBLIC void igs_monitoringShallStartStopAgent(bool flag);
+napi_value node_igs_monitoringShallStartStopAgent(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 1;
+    napi_value argv[nb_arguments];
+  
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+    
+    // convert infos into C types & call igs function 
+    bool flag;
+    convert_napi_to_bool(env, argv[0], &flag);
+    igs_monitoringShallStartStopAgent(flag);
+    return NULL;
 }
 
 // Allow callback for admin, config & utils ingescape code 
@@ -513,6 +553,10 @@ napi_value init_admin_config_utils(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_getIpcFolderPath, "getIpcFolderPath", exports);
     exports = enable_callback_into_js(env, node_igs_setAllowIpc, "setAllowIpc", exports);
     exports = enable_callback_into_js(env, node_igs_getAllowIpc, "getAllowIpc", exports);
-    exports = enable_callback_into_js(env, node_get_logLevel_js, "getLogLevels", exports);  
+    exports = enable_callback_into_js(env, node_igs_monitoringEnable, "monitoringEnable", exports);
+    exports = enable_callback_into_js(env, node_igs_monitoringEnableWithExpectedDevice, "monitoringEnableWithExpectedDevice", exports);
+    exports = enable_callback_into_js(env, node_igs_monitoringDisable, "monitoringDisable", exports);
+    exports = enable_callback_into_js(env, node_igs_isMonitoringEnabled, "isMonitoringEnabled", exports);
+    exports = enable_callback_into_js(env, node_igs_monitoringShallStartStopAgent, "monitoringShallStartStopAgent", exports);
     return exports;
 }

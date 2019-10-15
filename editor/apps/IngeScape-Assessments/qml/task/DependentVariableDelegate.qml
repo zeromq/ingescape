@@ -24,13 +24,10 @@ import INGESCAPE 1.0
 Rectangle {
     id: rootItem
 
-    // List with all the column widths
-    property var columnWidths: []
-
     // Task model the current dependent variable is in
     property var taskModel: null
 
-    // Current dependent variable model
+    // Current model of dependent variable
     property var dependentVariableModel: null
 
     // Flag indicating if the mouse is hovering the item
@@ -39,7 +36,10 @@ Rectangle {
     // Flag indicating if the current dependent variable is being edited
     property bool isCurrentlyEditing: false
 
-    // Flag indicating if a dependent variable, amongst all dependent variables, is being edited
+    // List with all the column widths
+    property var columnWidths: []
+
+    // Flag indicating if a dependent variable, among all dependent variables, is being edited
     // Bound by the parent
     property bool depVarEditionInProgress: false
 
@@ -48,16 +48,13 @@ Rectangle {
                                                                    : IngeScapeTheme.whiteColor)
 
 
+    //--------------------------------------------------------
     //
-    // Signals
-    //
-
-    signal deleteDepVariable();
-
-
     //
     // Content
     //
+    //
+    //--------------------------------------------------------
 
     MouseArea {
         id: itemMouseArea
@@ -66,25 +63,30 @@ Rectangle {
     }
 
     Row {
-        anchors {
-            fill: parent
-        }
+        anchors.fill: parent
+        spacing: 0
 
         Item {
             id: nameColumn
 
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-            }
-
             width: rootItem.columnWidths[0]
+            height: parent.height
+
+            /*Rectangle {
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border {
+                    color: "red"
+                    width: 1
+                }
+            }*/
 
             Text {
                 anchors{
                     fill: parent
                     leftMargin: 15
-                    rightMargin: 15
+                    rightMargin: 5
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.name : ""
@@ -105,7 +107,6 @@ Rectangle {
                 anchors {
                     fill: parent
                     margins: 5
-                    rightMargin: 33
                 }
 
                 text: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable
@@ -146,18 +147,24 @@ Rectangle {
         Item {
             id: descriptionColumn
 
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-            }
-
             width: rootItem.columnWidths[1]
+            height: parent.height
+
+            /*Rectangle {
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border {
+                    color: "red"
+                    width: 1
+                }
+            }*/
 
             Text {
                 anchors{
                     fill: parent
                     leftMargin: 15
-                    rightMargin: 15
+                    rightMargin: 5
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.description : ""
@@ -177,7 +184,6 @@ Rectangle {
                 anchors {
                     fill: parent
                     margins: 5
-                    rightMargin: 33
                 }
 
                 text: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable
@@ -218,18 +224,24 @@ Rectangle {
         Item {
             id: agentColumn
 
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-            }
-
             width: rootItem.columnWidths[2]
+            height: parent.height
+
+            /*Rectangle {
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border {
+                    color: "red"
+                    width: 1
+                }
+            }*/
 
             Text {
                 anchors{
                     fill: parent
                     leftMargin: 15
-                    rightMargin: 15
+                    rightMargin: 5
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.agentName : ""
@@ -253,7 +265,6 @@ Rectangle {
                 anchors {
                     fill: parent
                     margins: 5
-                    rightMargin: 33
                 }
                 visible: rootItem.isCurrentlyEditing
 
@@ -295,18 +306,24 @@ Rectangle {
         Item {
             id: optputNameColumn
 
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-            }
-
             width: rootItem.columnWidths[2]
+            height: parent.height
+
+            /*Rectangle {
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border {
+                    color: "red"
+                    width: 1
+                }
+            }*/
 
             Text {
                 anchors{
                     fill: parent
                     leftMargin: 15
-                    rightMargin: 15
+                    rightMargin: 5
                 }
 
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.outputName : ""
@@ -325,8 +342,7 @@ Rectangle {
             I2ComboboxStringList {
                 id: outputComboboxEditor
 
-                model: rootItem.taskModel
-                       && rootItem.taskModel.temporaryDependentVariable
+                model: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable
                        && (rootItem.taskModel.temporaryDependentVariable.agentName.length > 0)
                        && rootItem.taskModel.hashFromAgentNameToSimplifiedAgent.containsKey(rootItem.taskModel.temporaryDependentVariable.agentName)
                        ? rootItem.taskModel.hashFromAgentNameToSimplifiedAgent.value(rootItem.taskModel.temporaryDependentVariable.agentName).outputNamesList
@@ -335,7 +351,6 @@ Rectangle {
                 anchors {
                     fill: parent
                     margins: 5
-                    rightMargin: 33
                 }
                 visible: rootItem.isCurrentlyEditing
 
@@ -372,14 +387,19 @@ Rectangle {
                 }
             }
         }
+
     }
 
+
+    //
+    // Buttons Apply / Cancel
+    //
     Row {
-        spacing: 12
+        spacing: 10
 
         anchors {
             right: parent.right
-            rightMargin: 18
+            rightMargin: 0
             verticalCenter: parent.verticalCenter
         }
 
@@ -428,12 +448,16 @@ Rectangle {
         }
     }
 
+
+    //
+    // Buttons Edit / Delete
+    //
     Row {
-        spacing: 12
+        spacing: 10
 
         anchors {
             right: parent.right
-            rightMargin: 15
+            rightMargin: 5
             verticalCenter: parent.verticalCenter
         }
 
@@ -444,7 +468,7 @@ Rectangle {
 
             property bool containsMouse: __behavior.containsMouse
 
-            opacity: rootItem.isMouseHovering && !rootItem.depVarEditionInProgress ? 1 : 0
+            opacity: (rootItem.isMouseHovering && !rootItem.depVarEditionInProgress) ? 1 : 0
             enabled: opacity > 0
 
             style: IngeScapeAssessmentsSvgButtonStyle {
@@ -453,7 +477,8 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.taskModel && rootItem.dependentVariableModel) {
+                if (rootItem.taskModel && rootItem.dependentVariableModel)
+                {
                     rootItem.taskModel.initTemporaryDependentVariable(rootItem.dependentVariableModel)
                 }
 
@@ -468,7 +493,7 @@ Rectangle {
 
             property bool containsMouse: __behavior.containsMouse
 
-            opacity: rootItem.isMouseHovering && !rootItem.depVarEditionInProgress ? 1 : 0
+            opacity: (rootItem.isMouseHovering && !rootItem.depVarEditionInProgress) ? 1 : 0
             enabled: opacity > 0
 
             style: IngeScapeAssessmentsSvgButtonStyle {
@@ -477,6 +502,11 @@ Rectangle {
             }
 
             onClicked: {
+                /*if (rootItem.taskController && rootItem.dependentVariableModel)
+                {
+                    rootItem.taskController.deleteDependentVariable(rootItem.dependentVariableModel)
+                }*/
+
                 if (rootItem.taskModel && rootItem.dependentVariableModel)
                 {
                     rootItem.taskModel.deleteDependentVariable(rootItem.dependentVariableModel)
@@ -485,8 +515,10 @@ Rectangle {
         }
     }
 
+
     Rectangle {
         id: bottomSeparator
+
         anchors {
             left: parent.left
             right: parent.right

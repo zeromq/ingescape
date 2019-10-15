@@ -62,32 +62,10 @@ napi_value node_igs_checkLicenseForAgent(napi_env env, napi_callback_info info) 
     return res_convert;
 }
 
-//  Get enum types for license limit types 
-napi_value node_get_license_limit_types(napi_env env, napi_callback_info info) {
-    napi_value object;
-    napi_create_object(env, &object);
-
-    napi_value timeoutType;
-    convert_int_to_napi(env, IGS_LICENSE_TIMEOUT, &timeoutType);
-    napi_set_named_property(env, object, "IGS_LICENSE_TIMEOUT", timeoutType);
-
-    napi_value tooManyAgent;
-    convert_int_to_napi(env, IGS_LICENSE_TOO_MANY_AGENTS, &tooManyAgent);
-    napi_set_named_property(env, object, "IGS_LICENSE_TOO_MANY_AGENTS", tooManyAgent);
-
-    napi_value tooManyIOPs;
-    convert_int_to_napi(env, IGS_LICENSE_TOO_MANY_IOPS, &tooManyIOPs);
-    napi_set_named_property(env, object, "IGS_LICENSE_TOO_MANY_IOPS", tooManyIOPs);
-
-    return object;
-}
-
 // Allow callback for licenses ingescape code 
 napi_value init_licenses(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_setLicensePath, "setLicensePath", exports);
     exports = enable_callback_into_js(env, node_igs_getLicensePath, "getLicensePath", exports);
     exports = enable_callback_into_js(env, node_igs_checkLicenseForAgent, "checkLicenseForAgent", exports);
-    exports = enable_callback_into_js(env, node_get_license_limit_types, "getLicenseLimitTypes", exports);
-
     return exports;
 }

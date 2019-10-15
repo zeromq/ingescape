@@ -36,10 +36,8 @@ Item {
     //--------------------------------------------------------
 
     property TasksController taskController: null;
-    property TaskM modelM: taskController ? taskController.selectedTask : null;
 
-    property int indexPreviousSelectedDependentVariable: -1;
-    property int indexDependentVariableCurrentlyEditing: -1;
+    property TaskM modelM: taskController ? taskController.selectedTask : null;
 
     visible: rootItem.modelM
 
@@ -61,31 +59,6 @@ Item {
     //
     //
     //--------------------------------
-
-    /**
-     * Edit a dependent variable at a row index
-     */
-    function editDependentVariableAtRowIndex(rowIndex) {
-
-        console.log("QML: Edit the dependent variable at the row index " + rowIndex);
-
-        // Set the index
-        rootItem.indexDependentVariableCurrentlyEditing = rowIndex;
-    }
-
-
-    /**
-     * Stop the current edition of a dependent variable
-     */
-    function stopCurrentEditionOfDependentVariable() {
-        if (rootItem.indexDependentVariableCurrentlyEditing > -1)
-        {
-            console.log("QML: Stop the current edition of the dependent variable at the row index " + rootItem.indexDependentVariableCurrentlyEditing);
-
-            // Reset the index
-            rootItem.indexDependentVariableCurrentlyEditing = -1;
-        }
-    }
 
 
     //--------------------------------------------------------
@@ -109,7 +82,7 @@ Item {
             top: parent.top
             topMargin: 34
             left: parent.left
-            leftMargin: 26
+            leftMargin: 20
         }
 
         text: rootItem.modelM ? rootItem.modelM.name.toUpperCase() : "..."
@@ -134,7 +107,7 @@ Item {
             topMargin: 18
             left: taskName.left
             right: parent.right
-            rightMargin: 27
+            rightMargin: 20
         }
 
         // 34 => margin between popup.top and taskName.top
@@ -175,7 +148,7 @@ Item {
             }
 
             onClicked: {
-                console.log("QML: New Independent Variable");
+                //console.log("QML: New Independent Variable");
 
                 // Open the popup
                 createIndependentVariablePopup.open();
@@ -192,7 +165,12 @@ Item {
                 right: parent.right
             }
 
-            property var headerColumnWidths: [ 250, width - 250 - 250, 250]
+            property var headerColumnWidths: [
+                220,    // Name
+                width - 220 - 220 - 95,  // Description
+                220,    // Value type
+                95      // Buttons
+            ]
 
             Row {
                 anchors {
@@ -204,7 +182,12 @@ Item {
                 }
 
                 Repeater {
-                    model: [ "Name", "Description", "Type" ]
+                    model: [
+                        "Name",
+                        "Description",
+                        "Type",
+                        ""          // Buttons
+                    ]
 
                     Text {
                         anchors {
@@ -226,6 +209,10 @@ Item {
         }
 
         Rectangle {
+            id: indepVarTable
+
+            property bool indepVarEditionInProgress: false
+
             anchors {
                 top: indepVarListHeader.bottom
                 left: parent.left
@@ -234,9 +221,10 @@ Item {
             }
 
             color: IngeScapeTheme.whiteColor
+            clip: true
 
             ListView {
-                id: indepVarColumn
+                id: indepVarListView
                 anchors.fill: parent
 
                 model: rootItem.modelM ? rootItem.modelM.independentVariables : null
@@ -245,12 +233,20 @@ Item {
                     id: indepVarDelegate
 
                     taskController: rootItem.taskController
+                    protocol: rootItem.modelM
+                    independentVarModel: model ? model.QtObject : null
+                    indepVarEditionInProgress: indepVarTable.indepVarEditionInProgress
 
                     height: 40
-                    width: indepVarColumn.width
-                    independentVarModel: model ? model.QtObject : null
+                    width: indepVarListView.width
 
                     columnWidths: indepVarListHeader.headerColumnWidths
+
+                    Binding {
+                        target: indepVarTable
+                        property: "indepVarEditionInProgress"
+                        value: indepVarDelegate.isCurrentlyEditing
+                    }
                 }
             }
         }
@@ -323,11 +319,10 @@ Item {
             }
 
             onClicked: {
-                console.log("QML: New Dependent Variable");
+                //console.log("QML: New Dependent Variable");
 
-                if (taskController) {
-                    taskController.createNewDependentVariable();
-                }
+                // Open the popup
+                createDependentVariablePopup.open();
             }
         }
 
@@ -342,10 +337,11 @@ Item {
             }
 
             property var headerColumnWidths: [
-                225, // Name
-                width - 225 - 225 - 225, // Description
-                225, // Agent
-                225  // Output
+                220,    // Name
+                width - 220 - 220 - 220 - 95, // Description
+                220,    // Agent
+                220,    // Output
+                95      // Buttons
             ]
 
             Row {
@@ -362,7 +358,8 @@ Item {
                         "Name",
                         "Description",
                         "Agent",
-                        "Output"
+                        "Output",
+                        ""          // Buttons
                     ]
 
                     Text {
@@ -386,6 +383,9 @@ Item {
 
         Rectangle {
             id: depVarTable
+
+            property bool depVarEditionInProgress: false
+
             anchors {
                 top: depVarListHeader.bottom
                 left: parent.left
@@ -394,11 +394,11 @@ Item {
             }
 
             color: IngeScapeTheme.whiteColor
-
-            property bool depVarEditionInProgress: false
+            clip: true
 
             ListView {
-                id: depVarColumn
+                id: depVarListView
+
                 anchors.fill: parent
 
                 model: rootItem.modelM ? rootItem.modelM.dependentVariables : null
@@ -406,22 +406,20 @@ Item {
                 delegate: DependentVariableDelegate {
                     id: depVarDelegate
 
-                    height: 40
-                    width: depVarColumn.width
-
-                    columnWidths: depVarListHeader.headerColumnWidths
-
                     taskModel: rootItem.modelM
                     dependentVariableModel: model ? model.QtObject : null
-
                     depVarEditionInProgress: depVarTable.depVarEditionInProgress
+
+                    height: 40
+                    width: depVarListView.width
+
+                    columnWidths: depVarListHeader.headerColumnWidths
 
                     Binding {
                         target: depVarTable
                         property: "depVarEditionInProgress"
                         value: depVarDelegate.isCurrentlyEditing
                     }
-
                 }
             }
         }
@@ -443,7 +441,7 @@ Item {
 
 
     //
-    // Create Characteristic Popup
+    // Create Independent Variable Popup
     //
     Popup.CreateIndependentVariablePopup {
         id: createIndependentVariablePopup
@@ -451,6 +449,19 @@ Item {
         layerObjectName: "overlay2Layer"
 
         taskController: rootItem.taskController
+    }
+
+
+    //
+    // Create Dependent Variable Popup
+    //
+    Popup.CreateDependentVariablePopup {
+        id: createDependentVariablePopup
+
+        layerObjectName: "overlay2Layer"
+
+        taskController: rootItem.taskController
+        protocolM: rootItem.modelM
     }
 
 }

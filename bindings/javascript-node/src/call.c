@@ -9,107 +9,6 @@
 #include "../headers/call.h"
 
 // Wrapper for : 
-// PUBLIC void igs_addDoubleToArgumentsList(igs_callArgument_t **list, double value);
-napi_value node_igs_addNumberToArgumentsList(napi_env env, napi_callback_info info) {
-    size_t nb_arguments = 2;
-    napi_value argv[nb_arguments];
-
-    // get infos pass in argument
-    get_function_arguments(env, info, nb_arguments, argv);
-
-    // convert infos into C types
-    igs_callArgument_t * list = NULL;
-    double value;
- 	getCallArgumentListFromArrayJS(env, argv[0], &list);
-    convert_napi_to_double(env, argv[1], &value);
-
-    // call igs function
-    igs_addDoubleToArgumentsList(&list, value);
-
-    // return new array buffer
-    napi_value arrayReturn;
-	getArrayJSFromCallArgumentList(env, list, &arrayReturn);
-	igs_destroyArgumentsList(&list);
-    return arrayReturn;
-}
-
-// Wrapper for : 
-// PUBLIC void igs_addBoolToArgumentsList(igs_callArgument_t **list, bool value);
-napi_value node_igs_addBoolToArgumentsList(napi_env env, napi_callback_info info) {
-    size_t nb_arguments = 2;
-    napi_value argv[nb_arguments];
-
-    // get infos pass in argument
-    get_function_arguments(env, info, nb_arguments, argv);
-
-    // convert infos into C types
-    igs_callArgument_t * list = NULL;
-    bool value;
- 	getCallArgumentListFromArrayJS(env, argv[0], &list);
-    convert_napi_to_bool(env, argv[1], &value);
-
-    // call igs function
-    igs_addBoolToArgumentsList(&list, value);
-
-    // return new array buffer
-    napi_value arrayReturn;
-	getArrayJSFromCallArgumentList(env, list, &arrayReturn);
-	igs_destroyArgumentsList(&list);
-    return arrayReturn;
-}
-
-// Wrapper for : 
-// PUBLIC void igs_addStringToArgumentsList(igs_callArgument_t **list, const char *value);
-napi_value node_igs_addStringToArgumentsList(napi_env env, napi_callback_info info) {
-    size_t nb_arguments = 2;
-    napi_value argv[nb_arguments];
-
-    // get infos pass in argument
-    get_function_arguments(env, info, nb_arguments, argv);
-
-    // convert infos into C types
-    igs_callArgument_t * list = NULL;
- 	getCallArgumentListFromArrayJS(env, argv[0], &list);
-    char * value = convert_napi_to_string(env, argv[1]);
-
-    // call igs function
-    igs_addStringToArgumentsList(&list, value);
-    free(value);
-
-    // return new array buffer
-    napi_value arrayReturn;
-	getArrayJSFromCallArgumentList(env, list, &arrayReturn);
-	igs_destroyArgumentsList(&list);
-    return arrayReturn;
-}
-
-// Wrapper for : 
-// PUBLIC void igs_addDataToArgumentsList(igs_callArgument_t **list, void *value, size_t size);
-napi_value node_igs_addDataToArgumentsList(napi_env env, napi_callback_info info) {
-    size_t nb_arguments = 2;
-    napi_value argv[nb_arguments];
-
-    // get infos pass in argument
-    get_function_arguments(env, info, nb_arguments, argv);
-
-    // convert infos into C types
-    igs_callArgument_t * list = NULL;
-    void * value;
-    size_t size;
- 	getCallArgumentListFromArrayJS(env, argv[0], &list);
-    convert_napi_to_data(env, argv[1], &value, &size);
-
-    // call igs function
-    igs_addDataToArgumentsList(&list, value, size);
-
-    // return new array buffer
-    napi_value arrayReturn;
-    getArrayJSFromCallArgumentList(env, list, &arrayReturn);
-    igs_destroyArgumentsList(&list);
-    return arrayReturn;
-}
-
-// Wrapper for : 
 // PUBLIC int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
 // igs_callArgument_t * list = NULL;
 napi_value node_igs_sendCall(napi_env env, napi_callback_info info) {
@@ -281,18 +180,36 @@ napi_value node_igs_getArgumentsForCall(napi_env env, napi_callback_info info) {
     napi_value arrayJS;
     status = napi_create_array(env, &arrayJS);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to create array");
+        triggerException(env, NULL, "N-API : Unable to create array.");
     }
 
     igs_callArgument_t * elt, * tmp;
     int i = 0;
-    napi_value nameArg;
+    napi_value nameArg, typeArg, argumentCall;
+    
     LL_FOREACH_SAFE(head, elt, tmp) {
-        // Add argument's name to array
-        convert_string_to_napi(env, elt->name, &nameArg);
-        status = napi_set_element(env, arrayJS, i, nameArg);
+        // Create argument call JS object 
+        status = napi_create_object(env, &argumentCall);
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "N-API : Unable to set element in array");
+            triggerException(env, NULL, "N-API : Unable to create object.");
+        }
+
+        // Add argument's name & argument's type
+        convert_string_to_napi(env, elt->name, &nameArg);
+        status = napi_set_named_property(env, argumentCall, "name", nameArg);
+        if (status != napi_ok) {
+            triggerException(env, NULL, "N-API : Unable to set name of argument call.");
+        }
+
+        convert_int_to_napi(env, get_iop_type_js_from_iop_type_t(elt->type), &typeArg);
+        status = napi_set_named_property(env, argumentCall, "type", typeArg);
+        if (status != napi_ok) {
+            triggerException(env, NULL, "N-API : Unable to set type of argument call.");
+        }
+
+        status = napi_set_element(env, arrayJS, i, argumentCall);
+        if (status != napi_ok) {
+            triggerException(env, NULL, "N-API : Unable to set argument call in array.");
         }
         i++;
     }
@@ -345,12 +262,8 @@ napi_value node_igs_checkCallArgumentExistence(napi_env env, napi_callback_info 
     return res_convert;
 }
 
-// Allow callback for call/reply ingescape code 
+// Allow callback for calls ingescape code 
 napi_value init_call(napi_env env, napi_value exports) {
-    exports = enable_callback_into_js(env, node_igs_addNumberToArgumentsList, "addNumberToArgumentsList", exports);
-    exports = enable_callback_into_js(env, node_igs_addBoolToArgumentsList, "addBoolToArgumentsList", exports);
-    exports = enable_callback_into_js(env, node_igs_addStringToArgumentsList, "addStringToArgumentsList", exports);
-    exports = enable_callback_into_js(env, node_igs_addDataToArgumentsList, "addDataToArgumentsList", exports);
     exports = enable_callback_into_js(env, node_igs_sendCall, "sendCall", exports);
     exports = enable_callback_into_js(env, node_igs_removeCall, "removeCall", exports);
     exports = enable_callback_into_js(env, node_igs_addArgumentToCall, "addArgumentToCall", exports);

@@ -60,6 +60,16 @@ typedef struct CallbackCall {
     napi_ref ref_myData;
     struct CallbackCall *prev, *next;
 } CallbackCall;
+
+typedef struct CallbackMonitor {
+    igs_monitorEvent_t event;
+    char *device;
+    char *ipAddress;
+    
+    napi_threadsafe_function threadsafe_func;
+    napi_ref ref_myData;
+    struct CallbackMonitor *prev, *next;
+} CallbackMonitor;
 #endif
 
 // Free allocated memory for callbacks during lifetime of the agent

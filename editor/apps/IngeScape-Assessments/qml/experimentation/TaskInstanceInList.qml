@@ -25,6 +25,7 @@ import INGESCAPE 1.0
 
 Rectangle {
     id: rootItem
+
     height: 40
 
 
@@ -38,6 +39,14 @@ Rectangle {
 
     property TaskInstanceM modelM: null;
 
+    property real sessionColumnWidth: 0;
+    property real protocolColumnWidth: 0;
+    property real subjectColumnWidth: 0;
+    property real creationDateTimeColumnWidth: 0;
+
+    property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.containsMouse || btnOpen.containsMouse
+
+    color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
 
 
     //--------------------------------
@@ -54,15 +63,6 @@ Rectangle {
     // Delete Task Instance
     signal deleteTaskInstance();
 
-
-    property alias protocolColumnWidth: txtProtocolName.width
-    property alias subjectColumnWidth: subjectId.width
-    property alias creationDateTimeColumnWidth: creationDateTime.width
-    property alias buttonColumnWidth: buttonRow.width
-
-    property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.containsMouse || btnOpen.containsMouse
-
-    color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
 
     //--------------------------------------------------------
     //
@@ -91,84 +91,147 @@ Rectangle {
 
         anchors {
             left: parent.left
-            leftMargin: 15
             verticalCenter: parent.verticalCenter
         }
 
-        Text {
-            id: txtSessionName
+        Item {
+            width: sessionColumnWidth
+            height: rootItem.height
 
-            width: rootItem.width - row.anchors.leftMargin
-                   - protocolColumnWidth
-                   - subjectColumnWidth
-                   - creationDateTimeColumnWidth
-                   - buttonColumnWidth
+            /*color: "transparent"
+            border {
+                color: "red"
+                width: 1
+            }*/
 
-            text: rootItem.modelM ? rootItem.modelM.name : ""
-            elide: Text.ElideRight
+            Text {
+                id: txtSessionName
 
-            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Bold
-                pixelSize: 16
+                anchors {
+                    fill: parent
+                    leftMargin: 15
+                    rightMargin: 5
+                }
+                verticalAlignment: Text.AlignVCenter
+
+                text: rootItem.modelM ? rootItem.modelM.name : ""
+                elide: Text.ElideRight
+
+                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Bold
+                    pixelSize: 16
+                }
             }
         }
 
-        Text {
-            id: txtProtocolName
-
+        Item {
             width: protocolColumnWidth
-            elide: Text.ElideRight
-            text: (rootItem.modelM && rootItem.modelM.task) ? rootItem.modelM.task.name : ""
+            height: rootItem.height
 
-            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Bold
-                pixelSize: 16
+            /*color: "transparent"
+            border {
+                color: "red"
+                width: 1
+            }*/
+
+            Text {
+                id: txtProtocolName
+
+                anchors {
+                    fill: parent
+                    leftMargin: 15
+                    rightMargin: 5
+                }
+                verticalAlignment: Text.AlignVCenter
+
+                elide: Text.ElideRight
+                text: (rootItem.modelM && rootItem.modelM.task) ? rootItem.modelM.task.name : ""
+
+                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Bold
+                    pixelSize: 16
+                }
             }
         }
 
-        Text {
-            id: subjectId
-
+        Item {
             width: subjectColumnWidth
-            elide: Text.ElideRight
-            text: (rootItem.modelM && rootItem.modelM.subject) ? rootItem.modelM.subject.displayedId : ""
+            height: rootItem.height
 
-            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Bold
-                pixelSize: 16
+            /*color: "transparent"
+            border {
+                color: "red"
+                width: 1
+            }*/
+
+            Text {
+                id: txtSubjectId
+
+                anchors {
+                    fill: parent
+                    leftMargin: 15
+                    rightMargin: 5
+                }
+                verticalAlignment: Text.AlignVCenter
+
+                elide: Text.ElideRight
+                text: (rootItem.modelM && rootItem.modelM.subject) ? rootItem.modelM.subject.displayedId : ""
+
+                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Bold
+                    pixelSize: 16
+                }
             }
         }
 
-        Text {
-            id: creationDateTime
-
+        Item {
             width: creationDateTimeColumnWidth
-            elide: Text.ElideRight
-            text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "dd/MM/yyyy") + " " + rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "hh:mm:ss")
-                                  : "../../.... ..:..:.."
+            height: rootItem.height
 
-            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight: Font.Bold
-                pixelSize: 16
+            /*color: "transparent"
+            border {
+                color: "red"
+                width: 1
+            }*/
+
+            Text {
+                id: creationDateTime
+
+                anchors {
+                    fill: parent
+                    leftMargin: 15
+                    rightMargin: 5
+                }
+                verticalAlignment: Text.AlignVCenter
+
+                elide: Text.ElideRight
+                text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "dd/MM/yyyy") + " " + rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "hh:mm:ss")
+                                      : "../../.... ..:..:.."
+
+                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Bold
+                    pixelSize: 16
+                }
             }
         }
-
     }
 
     Row {
-        id: buttonRow
-        spacing: 14
+        id: buttonsRow
+
+        spacing: 10
 
         anchors {
             right: parent.right
+            rightMargin: 14     // sessionScrollView.scrollBarSize + sessionScrollView.verticalScrollbarMargin
         }
         height: parent.height
 

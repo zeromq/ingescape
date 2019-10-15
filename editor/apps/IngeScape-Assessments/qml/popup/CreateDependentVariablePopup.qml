@@ -15,22 +15,22 @@
 import QtQuick 2.9
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
-import QtQuick.Dialogs 1.2
 
 import I2Quick 1.0
 
 import INGESCAPE 1.0
 
+import "../theme" as Theme
 
 AssessmentsPopupBase {
     id: rootPopup
 
-    height: 267
-    width: 625
+    height: 721
+    width: 674
 
     anchors.centerIn: parent
 
-    title: "NEW PROTOCOL"
+    title: "NEW DEPENDENT VARIABLE"
 
 
     //--------------------------------------------------------
@@ -43,8 +43,8 @@ AssessmentsPopupBase {
 
     property TasksController taskController: null;
 
-    property url selectedPlatformUrl: "";
-
+    // Protocol model the new dependent variable will be in
+    property TaskM protocolM: null
 
 
     //--------------------------------
@@ -64,6 +64,12 @@ AssessmentsPopupBase {
     //
     //--------------------------------
 
+    onOpened: {
+        comboBoxAgent.selectedIndex = -1;
+        comboBoxOutput.selectedIndex = -1;
+    }
+
+
 
     //--------------------------------
     //
@@ -77,12 +83,13 @@ AssessmentsPopupBase {
     // Reset all user inputs and close the popup
     //
     function resetInputsAndClosePopup() {
-        console.log("QML: Reset all user inputs and close popup");
+        //console.log("QML: Reset all user inputs and close popup");
 
         // Reset all user inputs
-        txtTaskName.text = "";
-        //txtPlatformUrl.text = "";
-        rootPopup.selectedPlatformUrl = "";
+        txtDependentVariableName.text = "";
+        txtDependentVariableDescription.text = "";
+        comboBoxAgent.selectedIndex = -1;
+        comboBoxOutput.selectedIndex = -1;
 
         // Close the popup
         rootPopup.close();
@@ -95,12 +102,13 @@ AssessmentsPopupBase {
     //
     //--------------------------------
 
+    // Name
     Item {
-        id: rowName
+        id: itemName
 
         anchors {
             top: parent.top
-            topMargin: 30
+            topMargin: 34
             left: parent.left
             leftMargin: 28
             right: parent.right
@@ -125,15 +133,13 @@ AssessmentsPopupBase {
         }
 
         TextField {
-            id: txtTaskName
+            id: txtDependentVariableName
 
             anchors {
                 left: parent.left
-                leftMargin: 96
+                leftMargin: 112
                 right: parent.right
-                verticalCenter: parent.verticalCenter
             }
-
             height: 30
 
             text: ""
@@ -159,27 +165,25 @@ AssessmentsPopupBase {
         }
     }
 
+    // Description
     Item {
+        id: itemDescription
+
         anchors {
-            top: rowName.bottom
-            topMargin: 24
+            top: itemName.bottom
+            topMargin: 31
             left: parent.left
             leftMargin: 28
             right: parent.right
             rightMargin: 28
         }
 
-        height: 30
+        height: 115
 
         Text {
-            text: qsTr("Platform:")
-
-            anchors {
-                top: parent.top
-                left: parent.left
-            }
-
             height: 30
+
+            text: qsTr("Description:")
 
             verticalAlignment: Text.AlignVCenter
 
@@ -191,76 +195,138 @@ AssessmentsPopupBase {
             }
         }
 
-        TextField {
-            id: txtPlatformUrl
+        TextArea {
+            id: txtDependentVariableDescription
 
             anchors {
                 left: parent.left
-                leftMargin: 96
-                right: btnSelectPlatformFile.left
-                rightMargin: 7
-                verticalCenter: parent.verticalCenter
+                leftMargin: 112
+                top: parent.top
+                right: parent.right
             }
+            height: 115
 
+            text: ""
+            wrapMode: Text.WordWrap
+
+            style: IngeScapeAssessmentsTextAreaStyle {}
+        }
+    }
+
+    // Agent
+    Item {
+        id: itemAgent
+
+        anchors {
+            top: itemDescription.bottom
+            topMargin: 31
+            left: parent.left
+            leftMargin: 28
+            right: parent.right
+            rightMargin: 28
+        }
+
+        height: 30
+
+        Text {
             height: 30
 
-            //verticalAlignment: TextInput.AlignVCenter
-            text: rootPopup.selectedPlatformUrl
+            text: qsTr("Agent:")
 
-            style: I2TextFieldStyle {
-                backgroundColor: IngeScapeTheme.veryLightGreyColor
-                borderColor: IngeScapeAssessmentsTheme.blueButton
-                borderErrorColor: IngeScapeTheme.redColor
-                radiusTextBox: 5
-                borderWidth: 0;
-                borderWidthActive: 2
-                textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader;
-                textDisabledColor: IngeScapeAssessmentsTheme.lighterDarkBlueHeader
+            verticalAlignment: Text.AlignVCenter
 
-                placeholderCustomText: qsTr("Import a platform")
-                placeholderMarginLeft: 15
-                placeholderColor: IngeScapeTheme.lightGreyColor
-                placeholderFont {
-                    pixelSize: 16
-                    family: IngeScapeTheme.textFontFamily
-                    italic: true
-                }
-
-                padding.left: 16
-                padding.right: 16
-
-                font {
-                    pixelSize: 16
-                    family: IngeScapeTheme.textFontFamily
-                }
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 16
             }
         }
 
-        Button {
-            id: btnSelectPlatformFile
+        I2ComboboxStringList {
+            id: comboBoxAgent
 
             anchors {
-                verticalCenter: txtPlatformUrl.verticalCenter
-                right: parent.right
+                top: parent.top
+                left: parent.left
+                leftMargin: 112
             }
 
-            width: 40
+            model: rootPopup.protocolM ? rootPopup.protocolM.hashFromAgentNameToSimplifiedAgent.keys : []
+
+            style: IngeScapeAssessmentsComboboxStyle {
+                frameVisible: false
+                listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+            }
+            scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+                scrollBarSize: 4
+                verticalScrollbarMargin: 2
+            }
+        }
+    }
+
+    // Output
+    Item {
+        id: itemOutput
+
+        anchors {
+            top: itemAgent.bottom
+            topMargin: 31
+            left: parent.left
+            leftMargin: 28
+            right: parent.right
+            rightMargin: 28
+        }
+
+        height: 30
+
+        Text {
             height: 30
 
-            style: IngeScapeAssessmentsSvgButtonStyle {
-                releasedID: "file"
-                disabledID: releasedID
+            text: qsTr("Output:")
+
+            verticalAlignment: Text.AlignVCenter
+
+            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight: Font.Medium
+                pixelSize: 16
+            }
+        }
+
+        I2ComboboxStringList {
+            id: comboBoxOutput
+
+            anchors {
+                top: parent.top
+                left: parent.left
+                leftMargin: 112
             }
 
-            onClicked: {
-                // Open the file dialog
-                fileDialog.open();
+            model: rootPopup.protocolM && comboBoxAgent.selectedItem
+                   && rootPopup.protocolM.hashFromAgentNameToSimplifiedAgent.containsKey(comboBoxAgent.selectedItem)
+                   ? rootPopup.protocolM.hashFromAgentNameToSimplifiedAgent.value(comboBoxAgent.selectedItem).outputNamesList
+                   : []
+
+            style: IngeScapeAssessmentsComboboxStyle {
+                frameVisible: false
+                listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+            }
+            scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+                scrollBarSize: 4
+                verticalScrollbarMargin: 2
             }
         }
     }
 
 
+    //
+    // Buttons
+    //
     Row {
+        id: buttons
+
         anchors {
             right: parent.right
             rightMargin: 28
@@ -269,6 +335,7 @@ AssessmentsPopupBase {
         }
         spacing : 15
 
+        // Cancel button
         Button {
             id: cancelButton
 
@@ -310,6 +377,7 @@ AssessmentsPopupBase {
             }
         }
 
+        // OK button
         Button {
             id: okButton
 
@@ -324,8 +392,13 @@ AssessmentsPopupBase {
 
             activeFocusOnPress: true
 
-            enabled: ( (txtTaskName.text.length > 0) && (txtPlatformUrl.text.length > 0)
-                      && rootPopup.taskController && rootPopup.taskController.canCreateProtocolWithName(txtTaskName.text) )
+            enabled: if (rootPopup.taskController && (txtDependentVariableName.text.length > 0) && comboBoxAgent.selectedItem && comboBoxOutput.selectedItem)
+                     {
+                         rootPopup.taskController.canCreateDependentVariableWithName(txtDependentVariableName.text);
+                     }
+                     else {
+                         false;
+                     }
 
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OK"
@@ -334,29 +407,17 @@ AssessmentsPopupBase {
             onClicked: {
                 if (rootPopup.taskController)
                 {
-                    // Create a new protocol with an IngeScape platform file path
-                    rootPopup.taskController.createNewProtocolWithIngeScapePlatformFilePath(txtTaskName.text, txtPlatformUrl.text);
-                }
+                    console.log("QML: create a new Dependent Variable " + txtDependentVariableName.text + " on output " + comboBoxOutput.selectedItem + " of agent " + comboBoxAgent.selectedItem);
 
-                // Reset all user inputs and close the popup
-                rootPopup.resetInputsAndClosePopup();
+                    rootPopup.taskController.createNewDependentVariable(txtDependentVariableName.text,
+                                                                        txtDependentVariableDescription.text,
+                                                                        comboBoxAgent.selectedItem,
+                                                                        comboBoxOutput.selectedItem);
+
+                    // Reset all user inputs and close the popup
+                    rootPopup.resetInputsAndClosePopup();
+                }
             }
         }
     }
-
-    FileDialog {
-        id: fileDialog
-
-        title: "Select an IngeScape platform file"
-
-        folder: shortcuts.documents + "/IngeScape/platforms"
-
-        nameFilters: [ qsTr("Platform (*.igsplatform *.json)") ]
-
-        onAccepted: {
-            // Set the selected platform URL
-            rootPopup.selectedPlatformUrl = fileDialog.fileUrl;
-        }
-    }
-
 }

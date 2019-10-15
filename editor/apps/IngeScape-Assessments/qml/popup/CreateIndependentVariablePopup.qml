@@ -52,12 +52,6 @@ AssessmentsPopupBase {
     property string errorMessage: ""
     property int errorEnumIndex: -1
 
-    // Our popup is used:
-    // - to create a new independent variable
-    // OR
-    // - to edit an existing independent variable...in this case, this property must be set
-    property IndependentVariableM independentVariableCurrentlyEdited: null;
-
 
     //--------------------------------
     //
@@ -66,9 +60,6 @@ AssessmentsPopupBase {
     //
     //
     //--------------------------------
-
-    //
-    //signal cancelTODO();
 
 
     //--------------------------------
@@ -80,16 +71,7 @@ AssessmentsPopupBase {
     //--------------------------------
 
     onOpened: {
-        if (rootPopup.independentVariableCurrentlyEdited)
-        {
-            // Update controls
-            txtIndependentVariableName.text = rootPopup.independentVariableCurrentlyEdited.name;
-            txtIndependentVariableDescription.text = rootPopup.independentVariableCurrentlyEdited.description;
-            spinBoxValuesNumber.value = rootPopup.independentVariableCurrentlyEdited.enumValues.length;
 
-            rootPopup.selectedType = rootPopup.independentVariableCurrentlyEdited.valueType;
-            rootPopup.enumTexts = rootPopup.independentVariableCurrentlyEdited.enumValues;
-        }
     }
 
 
@@ -116,7 +98,6 @@ AssessmentsPopupBase {
         // Reset properties
         rootPopup.selectedType = -1;
         rootPopup.enumTexts = [];
-        rootPopup.independentVariableCurrentlyEdited = null;
 
         // Reset error status
         errorDetected = false
@@ -299,7 +280,7 @@ AssessmentsPopupBase {
             }
 
             Repeater {
-                model: rootPopup.taskController ? rootPopup.taskController.allIndependentVariableValueTypes : null
+                model: rootPopup.taskController ? rootPopup.taskController.independentVariableValueTypesWithoutEnum : null
 
                 delegate: RadioButton {
                     id: radioIndependentVariableValueType
@@ -621,9 +602,15 @@ AssessmentsPopupBase {
                 }
             }
         }
-
     }
+
+
+    //
+    // Buttons
+    //
     Row {
+        id: buttons
+
         anchors {
             right: parent.right
             rightMargin: 28
@@ -632,6 +619,7 @@ AssessmentsPopupBase {
         }
         spacing : 15
 
+        // Cancel button
         Button {
             id: cancelButton
 
@@ -673,6 +661,7 @@ AssessmentsPopupBase {
             }
         }
 
+        // OK button
         Button {
             id: okButton
 
@@ -688,16 +677,8 @@ AssessmentsPopupBase {
             activeFocusOnPress: true
 
             enabled: if (rootPopup.taskController && (txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > -1))
-                     { // Edit an existing independent variable
-                         if (rootPopup.independentVariableCurrentlyEdited)
-                         {
-                             rootPopup.taskController.canEditIndependentVariableWithName(rootPopup.independentVariableCurrentlyEdited, txtIndependentVariableName.text);
-                         }
-                         // Create a new independent variable
-                         else
-                         {
-                             rootPopup.taskController.canCreateIndependentVariableWithName(txtIndependentVariableName.text);
-                         }
+                     {
+                         rootPopup.taskController.canCreateIndependentVariableWithName(txtIndependentVariableName.text);
                      }
                      else {
                          false;
@@ -763,25 +744,11 @@ AssessmentsPopupBase {
 
                         if (!rootPopup.errorDetected)
                         {
-                            // Edit an existing independent variable
-                            if (rootPopup.independentVariableCurrentlyEdited)
-                            {
-                                //console.log("QML: edit an existing Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
+                            //console.log("QML: create a new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
 
-                                rootPopup.taskController.saveModificationsOfIndependentVariableEnum(rootPopup.independentVariableCurrentlyEdited,
-                                                                                                    txtIndependentVariableName.text,
-                                                                                                    txtIndependentVariableDescription.text,
-                                                                                                    displayedEnumTexts);
-                            }
-                            // Create a new independent variable
-                            else
-                            {
-                                //console.log("QML: create a new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
-
-                                rootPopup.taskController.createNewIndependentVariableEnum(txtIndependentVariableName.text,
-                                                                                          txtIndependentVariableDescription.text,
-                                                                                          displayedEnumTexts);
-                            }
+                            rootPopup.taskController.createNewIndependentVariableEnum(txtIndependentVariableName.text,
+                                                                                      txtIndependentVariableDescription.text,
+                                                                                      displayedEnumTexts);
 
                             // Reset all user inputs and close the popup
                             rootPopup.resetInputsAndClosePopup();
@@ -790,25 +757,11 @@ AssessmentsPopupBase {
                     // Selected type is NOT ENUM
                     else
                     {
-                        // Edit an existing independent variable
-                        if (rootPopup.independentVariableCurrentlyEdited)
-                        {
-                            //console.log("QML: edit an existing Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
+                        //console.log("QML: create a new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
 
-                            rootPopup.taskController.saveModificationsOfIndependentVariable(rootPopup.independentVariableCurrentlyEdited,
-                                                                                            txtIndependentVariableName.text,
-                                                                                            txtIndependentVariableDescription.text,
-                                                                                            rootPopup.selectedType);
-                        }
-                        // Create a new independent variable
-                        else
-                        {
-                            //console.log("QML: create a new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
-
-                            rootPopup.taskController.createNewIndependentVariable(txtIndependentVariableName.text,
-                                                                                  txtIndependentVariableDescription.text,
-                                                                                  rootPopup.selectedType);
-                        }
+                        rootPopup.taskController.createNewIndependentVariable(txtIndependentVariableName.text,
+                                                                              txtIndependentVariableDescription.text,
+                                                                              rootPopup.selectedType);
 
                         // Reset all user inputs and close the popup
                         rootPopup.resetInputsAndClosePopup();

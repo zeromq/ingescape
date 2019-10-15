@@ -38,5 +38,6 @@
         <file>qml/theme/IngeScapeAssessmentsTextAreaStyle.qml</file>
         <file>qml/popup/DatabaseConfigurationPopup.qml</file>
         <file>resources/SVG/ingescape_assessments-pictos.svg</file>
+        <file>qml/popup/CreateDependentVariablePopup.qml</file>
     </qresource>
 </RCC>

@@ -31,19 +31,31 @@ Rectangle {
     //
     //--------------------------------------------------------
 
-    // Model to diplay
-    property var independentVarModel: null
-
     // Task controller
     property var taskController: null
+
+    // Model of protocol that contains our model of independent variable
+    property TaskM protocol: null
+
+    // Current model of independent variable
+    property IndependentVariableM independentVarModel: null
 
     // Flag indicating if the mouse is hovering the item
     property bool isMouseHovering: itemMouseArea.containsMouse || editIndepVarButton.containsMouse || deleteIndepVarButton.containsMouse
 
+    // Flag indicating if the current independent variable is being edited
+    property bool isCurrentlyEditing: false
+
     // Width of the columns (bound by the parent)
     property var columnWidths: [ 0, 0, 0 ]
 
-    color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
+    // Flag indicating if an independent variable, among all independent variables, is being edited
+    // Bound by the parent
+    property bool indepVarEditionInProgress: false
+
+    color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor
+                                       : (rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor
+                                                                   : IngeScapeTheme.whiteColor)
 
 
     //--------------------------------------------------------
@@ -61,51 +73,314 @@ Rectangle {
     }
 
     Row {
-        id: row
-        anchors {
-            fill: parent
-        }
+        anchors.fill: parent
+        spacing: 0
 
-        Repeater {
-            model: rootItem.independentVarModel ? [ rootItem.independentVarModel.name, rootItem.independentVarModel.description, IndependentVariableValueTypes.enumToString(rootItem.independentVarModel.valueType) ] : ["", "", ""]
+        Item {
+            id: nameColumn
 
-            delegate: Item {
+            width: rootItem.columnWidths[0]
+            height: parent.height
 
-                anchors.verticalCenter: parent.verticalCenter
+            /*Rectangle {
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border {
+                    color: "red"
+                    width: 1
+                }
+            }*/
 
-                width: rootItem.columnWidths[index]
-                height: 30
+            Text {
+                anchors{
+                    fill: parent
+                    leftMargin: 15
+                    rightMargin: 5
+                }
 
-                Text {
-                    anchors{
-                        fill: parent
-                        leftMargin: 15
-                        rightMargin: 15
-                    }
+                text: rootItem.independentVarModel ? rootItem.independentVarModel.name : ""
 
-                    verticalAlignment: Text.AlignVCenter
-                    elide: Text.ElideRight
+                verticalAlignment: Text.AlignVCenter
+                visible: !rootItem.isCurrentlyEditing
 
-                    text: modelData
+                elide: Text.ElideRight
+                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Medium
+                    pixelSize: 16
+                }
+            }
 
-                    color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+            TextField {
+                anchors {
+                    fill: parent
+                    margins: 5
+                }
+
+                text: rootItem.protocol && rootItem.protocol.temporaryIndependentVariable
+                      ? rootItem.protocol.temporaryIndependentVariable.name
+                      : ""
+                visible: rootItem.isCurrentlyEditing
+
+                style: I2TextFieldStyle {
+                    backgroundColor: IngeScapeTheme.whiteColor
+                    borderColor: IngeScapeTheme.lightGreyColor
+                    borderErrorColor: IngeScapeTheme.redColor
+                    radiusTextBox: 5
+                    borderWidth: 0
+                    borderWidthActive: 1
+                    textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                    textDisabledColor: IngeScapeTheme.veryLightGreyColor
+
+                    padding.left: 10
+                    padding.right: 5
+
                     font {
                         family: IngeScapeTheme.textFontFamily
                         weight: Font.Medium
                         pixelSize: 16
-                        bold: index == 0
+                    }
+                }
+
+                onTextChanged: {
+                    if (rootItem.protocol && rootItem.protocol.temporaryIndependentVariable)
+                    {
+                        rootItem.protocol.temporaryIndependentVariable.name = text
                     }
                 }
             }
         }
+
+
+        Item {
+            id: descriptionColumn
+
+            width: rootItem.columnWidths[1]
+            height: parent.height
+
+            /*Rectangle {
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border {
+                    color: "red"
+                    width: 1
+                }
+            }*/
+
+            Text {
+                anchors{
+                    fill: parent
+                    leftMargin: 15
+                    rightMargin: 5
+                }
+
+                text: rootItem.independentVarModel ? rootItem.independentVarModel.description : ""
+
+                verticalAlignment: Text.AlignVCenter
+                visible: !rootItem.isCurrentlyEditing
+
+                elide: Text.ElideRight
+                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    pixelSize: 16
+                }
+            }
+
+            TextField {
+                anchors {
+                    fill: parent
+                    margins: 5
+                }
+
+                text: rootItem.protocol && rootItem.protocol.temporaryIndependentVariable
+                      ? rootItem.protocol.temporaryIndependentVariable.description
+                      : ""
+                visible: rootItem.isCurrentlyEditing
+
+                style: I2TextFieldStyle {
+                    backgroundColor: IngeScapeTheme.whiteColor
+                    borderColor: IngeScapeTheme.lightGreyColor
+                    borderErrorColor: IngeScapeTheme.redColor
+                    radiusTextBox: 5
+                    borderWidth: 0
+                    borderWidthActive: 1
+                    textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                    textDisabledColor: IngeScapeTheme.veryLightGreyColor
+
+                    padding.left: 10
+                    padding.right: 5
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight: Font.Medium
+                        pixelSize: 16
+                    }
+                }
+
+                onTextChanged: {
+                    if (rootItem.protocol && rootItem.protocol.temporaryIndependentVariable)
+                    {
+                        rootItem.protocol.temporaryIndependentVariable.description = text
+                    }
+                }
+            }
+        }
+
+
+        Item {
+            id: typeColumn
+
+            width: rootItem.columnWidths[2]
+            height: parent.height
+
+            /*Rectangle {
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border {
+                    color: "red"
+                    width: 1
+                }
+            }*/
+
+            Text {
+                anchors{
+                    fill: parent
+                    leftMargin: 15
+                    rightMargin: 5
+                }
+
+                text: rootItem.independentVarModel ? IndependentVariableValueTypes.enumToString(rootItem.independentVarModel.valueType)
+                                                   : ""
+
+                verticalAlignment: Text.AlignVCenter
+                visible: !rootItem.isCurrentlyEditing
+
+                elide: Text.ElideRight
+                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    pixelSize: 16
+                }
+            }
+
+            // Combo to select the type of the value comparison
+            I2ComboboxItemModel {
+                id: comboBoxValueTypes
+
+                anchors {
+                    fill: parent
+                    margins: 5
+                }
+
+                model: rootItem.taskController ? rootItem.taskController.allIndependentVariableValueTypes : null
+
+                visible: rootItem.isCurrentlyEditing
+
+                style: IngeScapeAssessmentsComboboxStyle {
+                    frameVisible: false
+                    listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+                }
+                scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+                    scrollBarSize: 4
+                    verticalScrollbarMargin: 2
+                }
+
+                function modelToString(entry)
+                {
+                    return entry.name;
+                }
+
+                Binding {
+                    target: comboBoxValueTypes
+                    property: "selectedIndex"
+                    value: (rootItem.taskController && rootItem.protocol && rootItem.protocol.temporaryIndependentVariable) ? rootItem.taskController.allIndependentVariableValueTypes.indexOfEnumValue(rootItem.protocol.temporaryIndependentVariable.valueType)
+                                                                                                                            : -1
+                }
+
+                onSelectedItemChanged: {
+                    if ((comboBoxValueTypes.selectedIndex >= 0) && rootItem.protocol && rootItem.protocol.temporaryIndependentVariable)
+                    {
+                        rootItem.protocol.temporaryIndependentVariable.valueType = comboBoxValueTypes.selectedItem.value;
+                    }
+                }
+            }
+        }
+
     }
 
+
+    //
+    // Buttons Apply / Cancel
+    //
     Row {
-        spacing: 12
+        spacing: 10
 
         anchors {
             right: parent.right
-            rightMargin: 15
+            rightMargin: 0
+            verticalCenter: parent.verticalCenter
+        }
+
+        Button {
+            id: aplpyEditionButton
+            height: 30
+            width: 86
+
+            opacity: rootItem.isCurrentlyEditing ? 1 : 0
+            enabled: opacity > 0
+
+            style: IngeScapeAssessmentsButtonStyle {
+                text: "APPLY"
+            }
+
+            onClicked: {
+                if (rootItem.protocol && rootItem.independentVarModel)
+                {
+                    rootItem.protocol.applyTemporaryIndependentVariable(rootItem.independentVarModel);
+                }
+
+                rootItem.isCurrentlyEditing = false
+            }
+        }
+
+        Button {
+            id: cancelEditionButton
+            anchors {
+                verticalCenter: parent.verticalCenter
+            }
+
+            height: 18
+            width: 18
+
+            opacity: rootItem.isCurrentlyEditing ? 1 : 0
+            enabled: opacity > 0
+
+            style: IngeScapeAssessmentsSvgButtonStyle {
+                releasedID: "cancel-edition"
+                disabledID: releasedID
+            }
+
+            onClicked: {
+                rootItem.isCurrentlyEditing = false
+            }
+        }
+    }
+
+
+    //
+    // Buttons Edit / Delete
+    //
+    Row {
+        spacing: 10
+
+        anchors {
+            right: parent.right
+            rightMargin: 5
             verticalCenter: parent.verticalCenter
         }
 
@@ -116,8 +391,7 @@ Rectangle {
 
             property bool containsMouse: __behavior.containsMouse
 
-            //opacity: rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress ? 1 : 0
-            opacity: rootItem.isMouseHovering ? 1 : 0
+            opacity: (rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress) ? 1 : 0
             enabled: opacity > 0
 
             style: IngeScapeAssessmentsSvgButtonStyle {
@@ -126,11 +400,12 @@ Rectangle {
             }
 
             onClicked: {
-                /*if (rootItem.taskModel && rootItem.dependentVariableModel) {
-                    rootItem.taskModel.initTemporaryDependentVariable(rootItem.dependentVariableModel)
+                if (rootItem.protocol && rootItem.independentVarModel)
+                {
+                    rootItem.protocol.initTemporaryIndependentVariable(rootItem.independentVarModel)
                 }
 
-                rootItem.isCurrentlyEditing = true;*/
+                rootItem.isCurrentlyEditing = true;
             }
         }
 
@@ -142,8 +417,7 @@ Rectangle {
             height: 30
             width: 40
 
-            //opacity: rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress ? 1 : 0
-            opacity: rootItem.isMouseHovering ? 1 : 0
+            opacity: (rootItem.isMouseHovering && !rootItem.indepVarEditionInProgress) ? 1 : 0
             enabled: opacity > 0
 
             style: IngeScapeAssessmentsSvgButtonStyle {
@@ -152,21 +426,24 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.taskController && rootItem.independentVarModel) {
+                if (rootItem.taskController && rootItem.independentVarModel)
+                {
                     rootItem.taskController.deleteIndependentVariable(rootItem.independentVarModel)
                 }
             }
         }
     }
 
+
     Rectangle {
         id: bottomSeparator
+
         anchors {
             left: parent.left
             right: parent.right
             bottom: parent.bottom
         }
         height: 2
-        color: IngeScapeTheme.veryLightGreyColor
+        color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.veryLightGreyColor
     }
 }

@@ -210,7 +210,7 @@ void * convertValueWithGoodType(napi_env env, napi_value value, iopType_js type,
         default : 
             *size_convert = 0;
             p_value = NULL;
-            napi_throw_error(env, NULL, "Unknow iopType_js");
+            triggerException(env, NULL, "Unknow iopType_js.");
     }
     return p_value;
 }

@@ -101,7 +101,6 @@ void ExperimentationController::setcurrentExperimentation(ExperimentationM *valu
  */
 void ExperimentationController::createNewSessionForSubjectAndProtocol(SubjectM* subject, TaskM* protocol)
 {
-    //if (!taskInstanceName.isEmpty() && (subject != nullptr) && (task != nullptr) && (_currentExperimentation != nullptr))
     if ((subject != nullptr) && (protocol != nullptr) && (_currentExperimentation != nullptr))
     {
         QString sessionName = QString("%1 - %2 - %3").arg(protocol->name(), subject->displayedId(), QDate::currentDate().toString("dd/MM/yy"));
@@ -109,7 +108,6 @@ void ExperimentationController::createNewSessionForSubjectAndProtocol(SubjectM* 
         qInfo() << "Create new session" << sessionName << "for subject" << subject->displayedId() << "and protocol" << protocol->name();
 
         // Create a new (experimentation) task instance
-        //TaskInstanceM* taskInstance = _insertTaskInstanceIntoDB(taskInstanceName, subject, task);
         TaskInstanceM* session = _insertTaskInstanceIntoDB(sessionName, subject, protocol);
 
         if (session != nullptr)

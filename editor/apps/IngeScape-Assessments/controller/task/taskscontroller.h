@@ -29,8 +29,11 @@ class TasksController : public QObject
 {
     Q_OBJECT
 
-    // List of all types for independent variable value
+    // List of all types for independent variable value (without "UNKNOWN")
     I2_ENUM_LISTMODEL(IndependentVariableValueTypes, allIndependentVariableValueTypes)
+
+    // List of types for independent variable value without "ENUM" (and without "UNKNOWN")
+    I2_ENUM_LISTMODEL(IndependentVariableValueTypes, independentVariableValueTypesWithoutEnum)
 
     // Model of the current experimentation
     I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)
@@ -89,11 +92,20 @@ public:
 
     /**
      * @brief Return true if the user can create an independent variable with the name
-     * Check if the name is not empty and if a independent variable with the same name does not already exist
+     * Check if the name is not empty and if an independent variable with the same name does not already exist
      * @param independentVariableName
      * @return
      */
     Q_INVOKABLE bool canCreateIndependentVariableWithName(QString independentVariableName);
+
+
+    /**
+     * @brief Return true if the user can create a dependent variable with the name
+     * Check if the name is not empty and if a dependent variable with the same name does not already exist
+     * @param dependentVariableName
+     * @return
+     */
+    Q_INVOKABLE bool canCreateDependentVariableWithName(QString dependentVariableName);
 
 
     /**
@@ -163,15 +175,23 @@ public:
 
     /**
      * @brief Create a new dependent variable
+     * @param dependentVariableName
+     * @param dependentVariableDescription
+     * @param agentName
+     * @param outputName
      */
-    Q_INVOKABLE void createNewDependentVariable();
+    Q_INVOKABLE void createNewDependentVariable(QString dependentVariableName,
+                                                QString dependentVariableDescription,
+                                                QString agentName,
+                                                QString outputName);
 
 
     /**
      * @brief Delete an dependent variable
      * @param dependentVariable
      */
-    Q_INVOKABLE void deleteDependentVariable(DependentVariableM* dependentVariable);
+    // FIXME Unused
+    //Q_INVOKABLE void deleteDependentVariable(DependentVariableM* dependentVariable);
 
 
 private:

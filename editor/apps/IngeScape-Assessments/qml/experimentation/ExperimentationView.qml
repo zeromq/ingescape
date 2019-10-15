@@ -312,14 +312,14 @@ Item {
         //FIXME Minimum size not handled
         property real protocolColumnWidth: 280
         property real subjectColumnWidth: 180
-        property real creationDateTimeColumnWidth: 150
+        property real creationDateTimeColumnWidth: 165
+        property real buttonsColumnWidth: 135
 
-        property real buttonColumnWidth: 158
-        property real sessionNameColumnWidth: taskInstancesPanel.width - taskInstanceScrollView.scrollBarSize - taskInstanceScrollView.verticalScrollbarMargin
-                                              - protocolColumnWidth
-                                              - subjectColumnWidth
-                                              - creationDateTimeColumnWidth
-                                              - buttonColumnWidth
+        property real sessionColumnWidth: taskInstancesPanel.width - taskInstanceScrollView.scrollBarSize - taskInstanceScrollView.verticalScrollbarMargin
+                                          - protocolColumnWidth
+                                          - subjectColumnWidth
+                                          - creationDateTimeColumnWidth
+                                          - buttonsColumnWidth
 
         //
         // Configuration Panel
@@ -521,13 +521,14 @@ Item {
                         right: parent.right
                         bottom: parent.bottom
                     }
+                    spacing: 0
 
                     Text {
                         anchors {
                             verticalCenter: parent.verticalCenter
                         }
 
-                        width: mainView.sessionNameColumnWidth
+                        width: mainView.sessionColumnWidth
 
                         text: qsTr("Name")
                         color: IngeScapeTheme.whiteColor
@@ -626,10 +627,11 @@ Item {
                             model: rootItem.experimentation ? rootItem.experimentation.allTaskInstances : null
 
                             delegate: TaskInstanceInList {
+                                sessionColumnWidth: mainView.sessionColumnWidth
                                 protocolColumnWidth: mainView.protocolColumnWidth
                                 subjectColumnWidth: mainView.subjectColumnWidth
                                 creationDateTimeColumnWidth: mainView.creationDateTimeColumnWidth
-                                buttonColumnWidth: mainView.buttonColumnWidth
+                                //buttonsColumnWidth: mainView.buttonsColumnWidth
 
                                 anchors {
                                     left: parent.left

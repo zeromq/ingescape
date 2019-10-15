@@ -33,10 +33,14 @@ TasksController::TasksController(/*JsonHelper* jsonHelper, */QObject *parent)
 
     qInfo() << "New Tasks Controller";
 
-    // Fill without type "UNKNOWN" and "ENUM"
+    // Fill without type "UNKNOWN"
     _allIndependentVariableValueTypes.fillWithAllEnumValues();
     _allIndependentVariableValueTypes.removeEnumValue(IndependentVariableValueTypes::UNKNOWN);
-    _allIndependentVariableValueTypes.removeEnumValue(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
+
+    // Fill without type "ENUM" and "UNKNOWN"
+    _independentVariableValueTypesWithoutEnum.fillWithAllEnumValues();
+    _independentVariableValueTypesWithoutEnum.removeEnumValue(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
+    _independentVariableValueTypesWithoutEnum.removeEnumValue(IndependentVariableValueTypes::UNKNOWN);
 
 }
 
@@ -204,19 +208,35 @@ void TasksController::duplicateTask(TaskM* task)
 
 /**
  * @brief Return true if the user can create an independent variable with the name
- * Check if the name is not empty and if a independent variable with the same name does not already exist
+ * Check if the name is not empty and if an independent variable with the same name does not already exist
  * @param independentVariableName
  * @return
  */
 bool TasksController::canCreateIndependentVariableWithName(QString independentVariableName)
 {
     const QList<IndependentVariableM*>& varList = _selectedTask->independentVariables()->toList();
-    auto hasGivenName = [independentVariableName](IndependentVariableM* independentVariable){
+    auto hasGivenName = [independentVariableName](IndependentVariableM* independentVariable) {
         return (independentVariable != nullptr) && (independentVariable->name() == independentVariableName);
     };
 
-    return !independentVariableName.isEmpty() && (_selectedTask != nullptr)
-            && std::none_of(varList.begin(), varList.end(), hasGivenName);
+    return !independentVariableName.isEmpty() && (_selectedTask != nullptr) && std::none_of(varList.begin(), varList.end(), hasGivenName);
+}
+
+
+/**
+ * @brief Return true if the user can create a dependent variable with the name
+ * Check if the name is not empty and if a dependent variable with the same name does not already exist
+ * @param dependentVariableName
+ * @return
+ */
+bool TasksController::canCreateDependentVariableWithName(QString dependentVariableName)
+{
+    const QList<DependentVariableM*>& varList = _selectedTask->dependentVariables()->toList();
+    auto hasGivenName = [dependentVariableName](DependentVariableM* dependentVariable) {
+        return (dependentVariable != nullptr) && (dependentVariable->name() == dependentVariableName);
+    };
+
+    return !dependentVariableName.isEmpty() && (_selectedTask != nullptr) && std::none_of(varList.begin(), varList.end(), hasGivenName);
 }
 
 
@@ -349,7 +369,7 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
 {
     if ((independentVariable != nullptr) && (_selectedTask != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
-        // Delete independent variable valuesfrom Cassandra DB
+        // Delete independent variable values from Cassandra DB
         QList<CassUuid> taskInstanceUuidList;
         for (TaskInstanceM* taskInstance : _currentExperimentation->allTaskInstances()->toList())
         {
@@ -359,7 +379,9 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
             }
         }
 
-        AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ { _currentExperimentation->getCassUuid() }, taskInstanceUuidList, { independentVariable->getCassUuid() } });
+        AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ { _currentExperimentation->getCassUuid() },
+                                                                          taskInstanceUuidList,
+                                                                          { independentVariable->getCassUuid() } });
 
         // Delete independent variable from Cassandra DB
         IndependentVariableM::deleteIndependentVariableFromCassandra(*independentVariable);
@@ -375,17 +397,30 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
 
 /**
  * @brief Create a new dependent variable
+ * @param dependentVariableName
+ * @param dependentVariableDescription
+ * @param agentName
+ * @param outputName
  */
-void TasksController::createNewDependentVariable()
+void TasksController::createNewDependentVariable(QString dependentVariableName,
+                                                 QString dependentVariableDescription,
+                                                 QString agentName,
+                                                 QString outputName)
 {
-    if ((_selectedTask != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
+    if (!dependentVariableName.isEmpty() && !agentName.isEmpty() && !outputName.isEmpty()
+            && (_selectedTask != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
-        qDebug() << "Create a new dependent variable";
+        qInfo() << "Create a new dependent variable" << dependentVariableName << "on output" << outputName << "of agent" << agentName;
 
         CassUuid dependentVarUuid;
         cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &dependentVarUuid);
 
-        DependentVariableM* dependentVariable = _insertDependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid(), "Dep. Var.", "", "", "");
+        DependentVariableM* dependentVariable = _insertDependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(),
+                                                                               _selectedTask->getCassUuid(),
+                                                                               dependentVariableName,
+                                                                               dependentVariableDescription,
+                                                                               agentName,
+                                                                               outputName);
 
         if (dependentVariable != nullptr)
         {
@@ -397,10 +432,11 @@ void TasksController::createNewDependentVariable()
 
 
 /**
- * @brief Delete an dependent variable
+ * @brief Delete a dependent variable
  * @param dependentVariable
  */
-void TasksController::deleteDependentVariable(DependentVariableM* dependentVariable)
+// FIXME Unused
+/*void TasksController::deleteDependentVariable(DependentVariableM* dependentVariable)
 {
     if ((dependentVariable != nullptr) && (_selectedTask != nullptr))
     {
@@ -408,12 +444,13 @@ void TasksController::deleteDependentVariable(DependentVariableM* dependentVaria
         _selectedTask->removeDependentVariable(dependentVariable);
 
         // Remove from DB
-        AssessmentsModelManager::deleteEntry<DependentVariableM>({ _selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid() });
+        AssessmentsModelManager::deleteEntry<DependentVariableM>({ _selectedTask->getExperimentationCassUuid(),
+                                                                   _selectedTask->getCassUuid() });
 
         // Free memory
         delete dependentVariable;
     }
-}
+}*/
 
 
 /**
@@ -490,9 +527,20 @@ IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid
  * @param enumValues
  * @return
  */
-DependentVariableM* TasksController::_insertDependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, const QString& agentName, const QString& outputName)
+DependentVariableM* TasksController::_insertDependentVariableIntoDB(CassUuid experimentationUuid,
+                                                                    CassUuid taskUuid,
+                                                                    const QString& name,
+                                                                    const QString& description,
+                                                                    const QString& agentName,
+                                                                    const QString& outputName)
 {
-    DependentVariableM* dependentVariable = new DependentVariableM(experimentationUuid, taskUuid, AssessmentsModelManager::genCassUuid(), name, description, agentName, outputName);
+    DependentVariableM* dependentVariable = new DependentVariableM(experimentationUuid,
+                                                                   taskUuid,
+                                                                   AssessmentsModelManager::genCassUuid(),
+                                                                   name,
+                                                                   description,
+                                                                   agentName,
+                                                                   outputName);
     if (dependentVariable == nullptr || !AssessmentsModelManager::insert(*dependentVariable))
     {
         delete dependentVariable;

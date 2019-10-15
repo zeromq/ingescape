@@ -23,7 +23,7 @@ static void cbForcedStop_into_js(napi_env env, napi_value js_callback, void* ctx
     else {
         status = napi_get_reference_value(env, callback->ref_myData, &argv[0]);
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "N-API : Unable to get reference value");
+            triggerException(env, NULL, "N-API : Unable to get reference value.");
         }
     }
 
@@ -31,13 +31,13 @@ static void cbForcedStop_into_js(napi_env env, napi_value js_callback, void* ctx
     napi_value undefined;
     status = napi_get_undefined(env, &undefined);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to get undefined");
+        triggerException(env, NULL, "Impossible to get undefined.");
     }
 
     // callback into JavaScript
     status = napi_call_function(env, undefined, js_callback, 1, argv, NULL);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Unable to call javascript function");
+        triggerException(env, NULL, "Unable to call javascript function.");
     }
 }
 
@@ -66,27 +66,27 @@ napi_value node_igs_observeForcedStop(napi_env env, napi_callback_info info) {
     napi_value async_name;
     status = napi_create_string_utf8(env, "Ingescape/CallbackForcedStop", NAPI_AUTO_LENGTH, &async_name);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Invalid name for async_name napi_value");
+        triggerException(env, NULL, "Invalid name for async_name napi_value.");
     }
     status = napi_create_threadsafe_function(env, argv[0], NULL, async_name, 0, 1, NULL, NULL, NULL, 
     cbForcedStop_into_js, &(callback->threadsafe_func));
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to create threadsafe function");
+        triggerException(env, NULL, "Impossible to create threadsafe function.");
     }
 
     // create reference for arguments callback if not null
     napi_valuetype value_type;
     status = napi_typeof(env, argv[1], &value_type);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to get napi value type of 2nd argument");
+        triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[1], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "2nd argument must be a JavaScript Object or an Array or null");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }  
 
@@ -111,7 +111,7 @@ static void cbMute_into_js(napi_env env, napi_value js_callback, void* ctx, void
     else {
         status = napi_get_reference_value(env, callback->ref_myData, &argv[1]);
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "N-API : Unable to get reference value");
+            triggerException(env, NULL, "N-API : Unable to get reference value.");
         }
     }
 
@@ -119,13 +119,13 @@ static void cbMute_into_js(napi_env env, napi_value js_callback, void* ctx, void
     napi_value undefined;
     status = napi_get_undefined(env, &undefined);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to get undefined");
+        triggerException(env, NULL, "Impossible to get undefined.");
     }
 
     // callback into JavaScript
     status = napi_call_function(env, undefined, js_callback, 2, argv, NULL);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Unable to call javascript function");
+        triggerException(env, NULL, "Unable to call javascript function.");
     }
 }
 
@@ -155,27 +155,27 @@ napi_value node_igs_observeMute(napi_env env, napi_callback_info info) {
     napi_value async_name;
     status = napi_create_string_utf8(env, "Ingescape/CallbackMute", NAPI_AUTO_LENGTH, &async_name);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Invalid name for async_name napi_value");
+        triggerException(env, NULL, "Invalid name for async_name napi_value.");
     }
     status = napi_create_threadsafe_function(env, argv[0], NULL, async_name, 0, 1, NULL, NULL, NULL, 
     cbMute_into_js, &(callback->threadsafe_func));
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to create threadsafe function");
+        triggerException(env, NULL, "Impossible to create threadsafe function.");
     }
 
     //create reference for arguments callback if not null
     napi_valuetype value_type;
     status = napi_typeof(env, argv[1], &value_type);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to get napi value type of 2nd argument");
+        triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[1], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "2nd argument must be a JavaScript Object or an Array or null");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }  
 
@@ -202,7 +202,7 @@ static void cbFreeze_into_js(napi_env env, napi_value js_callback, void* ctx, vo
     else {
         status = napi_get_reference_value(env, callback->ref_myData, &argv[1]);
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "N-API : Unable to get reference value");
+            triggerException(env, NULL, "N-API : Unable to get reference value.");
         }
     }
 
@@ -210,13 +210,13 @@ static void cbFreeze_into_js(napi_env env, napi_value js_callback, void* ctx, vo
     napi_value undefined;
     status = napi_get_undefined(env, &undefined);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to get undefined");
+        triggerException(env, NULL, "Impossible to get undefined.");
     }
 
     // callback into JavaScript
     status = napi_call_function(env, undefined, js_callback, 2, argv, NULL);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Unable to call javascript function");
+        triggerException(env, NULL, "Unable to call javascript function.");
     }
 }
 
@@ -246,27 +246,27 @@ napi_value node_igs_observeFreeze(napi_env env, napi_callback_info info) {
     napi_value async_name;
     status = napi_create_string_utf8(env, "Ingescape/CallbackFreeze", NAPI_AUTO_LENGTH, &async_name);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Invalid name for async_name napi_value");
+        triggerException(env, NULL, "Invalid name for async_name napi_value.");
     }
     status = napi_create_threadsafe_function(env, argv[0], NULL, async_name, 0, 1, NULL, NULL, NULL, 
     cbFreeze_into_js, &(callback->threadsafe_func));
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to create threadsafe function");
+        triggerException(env, NULL, "Impossible to create threadsafe function.");
     }
 
     //create reference for arguments callback if not null
     napi_valuetype value_type;
     status = napi_typeof(env, argv[1], &value_type);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to get napi value type of 2nd argument");
+        triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[1], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "2nd argument must be a JavaScript Object or an Array or null");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }  
 
@@ -303,7 +303,7 @@ napi_value createValueWithGoodType(napi_env env, void * value, size_t size, iopT
             convert_data_to_napi(env, value, size, &res);
             break;
         default : 
-            napi_throw_error(env, NULL, "Unknow iopType_t passed as type");
+            triggerException(env, NULL, "Unknow iopType_t passed as type.");
     }
     return res;
 }
@@ -325,7 +325,7 @@ static void cbIOP_into_js(napi_env env, napi_value js_callback, void* ctx, void*
     else {
         status = napi_get_reference_value(env, callback->ref_myData, &argv[4]);
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "N-API : Unable to get reference value");
+            triggerException(env, NULL, "N-API : Unable to get reference value.");
         }
     }
     
@@ -333,13 +333,13 @@ static void cbIOP_into_js(napi_env env, napi_value js_callback, void* ctx, void*
     napi_value undefined;
     status = napi_get_undefined(env, &undefined);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to get undefined");
+        triggerException(env, NULL, "Impossible to get undefined.");
     }
 
     // callback into JavaScript
     status = napi_call_function(env, undefined, js_callback, 5, argv, NULL);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Unable to call javascript function");
+        triggerException(env, NULL, "Unable to call javascript function.");
     }
 }
 
@@ -376,27 +376,27 @@ napi_value node_igs_observeInput(napi_env env, napi_callback_info info) {
     napi_value async_name;
     status = napi_create_string_utf8(env, "Ingescape/CallbackInput", NAPI_AUTO_LENGTH, &async_name);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Invalid name for async_name napi_value");
+        triggerException(env, NULL, "Invalid name for async_name napi_value.");
     }
     status = napi_create_threadsafe_function(env, argv[1], NULL, async_name, 0, 1, NULL, NULL, NULL, 
     cbIOP_into_js, &(callback->threadsafe_func));
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to create threadsafe function");
+        triggerException(env, NULL, "Impossible to create threadsafe function.");
     }
 
     //create reference for arguments callback if not null
     napi_valuetype value_type;
     status = napi_typeof(env, argv[2], &value_type);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to get napi value type of 2nd argument");
+        triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[2], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "2nd argument must be a JavaScript Object or an Array or null");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     } 
 
@@ -430,27 +430,27 @@ napi_value node_igs_observeOutput(napi_env env, napi_callback_info info) {
     napi_value async_name;
     status = napi_create_string_utf8(env, "Ingescape/CallbackOutput", NAPI_AUTO_LENGTH, &async_name);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Invalid name for async_name napi_value");
+        triggerException(env, NULL, "Invalid name for async_name napi_value.");
     }
     status = napi_create_threadsafe_function(env, argv[1], NULL, async_name, 0, 1, NULL, NULL, NULL, 
     cbIOP_into_js, &(callback->threadsafe_func));
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to create threadsafe function");
+        triggerException(env, NULL, "Impossible to create threadsafe function.");
     }
 
     //create reference for arguments callback if not null
     napi_valuetype value_type;
     status = napi_typeof(env, argv[2], &value_type);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to get napi value type of 2nd argument");
+        triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[2], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "2nd argument must be a JavaScript Object or an Array or null");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     } 
 
@@ -484,27 +484,27 @@ napi_value node_igs_observeParameter(napi_env env, napi_callback_info info) {
     napi_value async_name;
     status = napi_create_string_utf8(env, "Ingescape/CallbackParameter", NAPI_AUTO_LENGTH, &async_name);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Invalid name for async_name napi_value");
+        triggerException(env, NULL, "Invalid name for async_name napi_value.");
     }
     status = napi_create_threadsafe_function(env, argv[1], NULL, async_name, 0, 1, NULL, NULL, NULL, 
     cbIOP_into_js, &(callback->threadsafe_func));
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to create threadsafe function");
+        triggerException(env, NULL, "Impossible to create threadsafe function.");
     }
 
     //create reference for arguments callback if not null
     napi_valuetype value_type;
     status = napi_typeof(env, argv[2], &value_type);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to get napi value type of 2nd argument");
+        triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[2], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "2nd argument must be a JavaScript Object or an Array or null");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }
 
@@ -532,7 +532,7 @@ static void cbLicense_into_js(napi_env env, napi_value js_callback, void* ctx, v
     else {
         status = napi_get_reference_value(env, callback->ref_myData, &argv[1]);
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "N-API : Unable to get reference value");
+            triggerException(env, NULL, "N-API : Unable to get reference value.");
         }
     }
     
@@ -540,13 +540,13 @@ static void cbLicense_into_js(napi_env env, napi_value js_callback, void* ctx, v
     napi_value undefined;
     status = napi_get_undefined(env, &undefined);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to get undefined");
+        triggerException(env, NULL, "Impossible to get undefined.");
     }
 
     // callback into JavaScript
     status = napi_call_function(env, undefined, js_callback, 2, argv, NULL);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Unable to call javascript function");
+        triggerException(env, NULL, "Unable to call javascript function.");
     }
 }
 
@@ -577,27 +577,27 @@ napi_value node_igs_observeLicense (napi_env env, napi_callback_info info) {
     napi_value async_name;
     status = napi_create_string_utf8(env, "Ingescape/CallbackLicense", NAPI_AUTO_LENGTH, &async_name);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Invalid name for async_name napi_value");
+        triggerException(env, NULL, "Invalid name for async_name napi_value.");
     }
     status = napi_create_threadsafe_function(env, argv[0], NULL, async_name, 0, 1, NULL, NULL, NULL, 
     cbLicense_into_js, &(callback->threadsafe_func));
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to create threadsafe function");
+        triggerException(env, NULL, "Impossible to create threadsafe function.");
     }
 
     //create reference for arguments callback if not null
     napi_valuetype value_type;
     status = napi_typeof(env, argv[1], &value_type);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to get napi value type of 2nd argument");
+        triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[1], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "2nd argument must be a JavaScript Object or an Array or null");
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }
 
@@ -629,7 +629,7 @@ static void cbCall_into_js(napi_env env, napi_value js_callback, void* ctx, void
     else {
         status = napi_get_reference_value(env, callback->ref_myData, &argv[4]);
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "N-API : Unable to get reference value");
+            triggerException(env, NULL, "N-API : Unable to get reference value.");
         }
     }
     
@@ -637,13 +637,13 @@ static void cbCall_into_js(napi_env env, napi_value js_callback, void* ctx, void
     napi_value undefined;
     status = napi_get_undefined(env, &undefined);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to get undefined");
+        triggerException(env, NULL, "Impossible to get undefined.");
     }
 
     // callback into JavaScript
     status = napi_call_function(env, undefined, js_callback, 5, argv, NULL);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Unable to call javascript function");
+        triggerException(env, NULL, "Unable to call javascript function.");
     }
 }
 
@@ -661,6 +661,8 @@ void callCallback (const char *senderAgentName, const char *senderAgentUUID,
     napi_call_threadsafe_function(callback->threadsafe_func, callback, napi_tsfn_nonblocking);
 }   
 
+// Wrapper for : 
+// PUBLIC int igs_initCall(const char *name, igs_callFunction cb, void *myData);
 napi_value node_igs_initCall(napi_env env, napi_callback_info info) {
     size_t nb_arguments = 3;
     napi_status status; //to check status of node_api
@@ -680,27 +682,27 @@ napi_value node_igs_initCall(napi_env env, napi_callback_info info) {
     napi_value async_name;
     status = napi_create_string_utf8(env, "Ingescape/CallbackCall", NAPI_AUTO_LENGTH, &async_name);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Invalid name for async_name napi_value");
+        triggerException(env, NULL, "Invalid name for async_name napi_value.");
     }
     status = napi_create_threadsafe_function(env, argv[1], NULL, async_name, 0, 1, NULL, NULL, NULL, 
     cbCall_into_js, &(callback->threadsafe_func));
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "Impossible to create threadsafe function");
+        triggerException(env, NULL, "Impossible to create threadsafe function.");
     }
 
     //create reference for arguments callback if not null
     napi_valuetype value_type;
     status = napi_typeof(env, argv[2], &value_type);
     if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to get napi value type of 2nd argument");
+        triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
     }
-    if (value_type == napi_null) {
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
         callback->ref_myData = NULL;
     }
     else {
         status = napi_create_reference(env, argv[2], 1, &(callback->ref_myData));
         if (status != napi_ok) {
-            napi_throw_error(env, NULL, "3rd argument must be a JavaScript Object or an Array or null");
+            triggerException(env, NULL, "3rd argument must be a JavaScript Object or an Array or null or undefined.");
         }
     }
 
@@ -711,6 +713,101 @@ napi_value node_igs_initCall(napi_env env, napi_callback_info info) {
     napi_value res_convert;
     convert_int_to_napi(env, res, &res_convert);
     return res_convert;
+}
+
+CallbackMonitor *headMonitor = NULL;
+
+static void cbMonitor_into_js(napi_env env, napi_value js_callback, void* ctx, void* data) {
+    napi_status status;
+    CallbackMonitor * callback = (CallbackMonitor *) data;
+    napi_value argv[4];
+
+    // convert args to napi
+    convert_int_to_napi(env, callback->event, &argv[0]);
+    convert_string_to_napi(env, callback->device, &argv[1]);
+    convert_string_to_napi(env, callback->ipAddress, &argv[2]);
+
+    //get reference data from JS
+    if (callback->ref_myData == NULL) {
+        convert_null_to_napi(env, &argv[3]);
+    }
+    else {
+        status = napi_get_reference_value(env, callback->ref_myData, &argv[3]);
+        if (status != napi_ok) {
+            triggerException(env, NULL, "N-API : Unable to get reference value.");
+        }
+    }
+    
+    // Since a function call must have a receiver, we use undefined
+    napi_value undefined;
+    status = napi_get_undefined(env, &undefined);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Impossible to get undefined.");
+    }
+
+    // callback into JavaScript
+    status = napi_call_function(env, undefined, js_callback, 4, argv, NULL);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Unable to call javascript function.");
+    }
+}
+
+// type defined call C function
+void monitorCallback (igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData) {
+    // call threadsafe function
+    CallbackMonitor * callback = (CallbackMonitor *) myData;
+    callback->event = event;
+    callback->device = strndup(device, strlen(device));
+    callback->ipAddress = strndup(ipAddress, strlen(ipAddress));
+    napi_call_threadsafe_function(callback->threadsafe_func, callback, napi_tsfn_nonblocking);
+}   
+
+// Wrapper for
+// PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
+napi_value node_igs_monitor(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 2;
+    napi_status status; //to check status of node_api
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    // Initiate struct
+    CallbackMonitor * callback = calloc(1, sizeof(CallbackMonitor));
+    DL_APPEND(headMonitor, callback);
+
+    //create threadsafe function
+    napi_value async_name;
+    status = napi_create_string_utf8(env, "Ingescape/CallbackMonitor", NAPI_AUTO_LENGTH, &async_name);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Invalid name for async_name napi_value.");
+    }
+    status = napi_create_threadsafe_function(env, argv[0], NULL, async_name, 0, 1, NULL, NULL, NULL, 
+    cbMonitor_into_js, &(callback->threadsafe_func));
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Impossible to create threadsafe function.");
+    }
+
+    //create reference for arguments callback if not null
+    napi_valuetype value_type;
+    status = napi_typeof(env, argv[1], &value_type);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
+    }
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
+        callback->ref_myData = NULL;
+    }
+    else {
+        status = napi_create_reference(env, argv[1], 1, &(callback->ref_myData));
+        if (status != napi_ok) {
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
+        }
+    }
+
+    // call igs function
+    igs_monitor(monitorCallback, callback);
+    return NULL;
 }
 
 // Free allocated memory for callbacks during lifetime of the agent
@@ -756,5 +853,6 @@ napi_value init_callback_igs(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_observeParameter, "observeParameter", exports);
     exports = enable_callback_into_js(env, node_igs_observeLicense, "observeLicense", exports);
     exports = enable_callback_into_js(env, node_igs_initCall, "initCall", exports);
+    exports = enable_callback_into_js(env, node_igs_monitor, "monitor", exports);
     return exports;
 }
