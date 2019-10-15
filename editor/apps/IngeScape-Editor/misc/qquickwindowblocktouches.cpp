@@ -1,8 +1,26 @@
 #include "qquickwindowblocktouches.h"
 
+/**
+ * @brief Constructor
+ * @param parent
+ */
 QQuickWindowBlockTouches::QQuickWindowBlockTouches(QWindow *parent) : QQuickWindow(parent)
 {
     connect(this, SIGNAL(closing(QQuickCloseEvent*)), this, SIGNAL(closingVersion()));
+    connect(this, &QQuickWindow::activeFocusItemChanged, this, &QQuickWindowBlockTouches::_onActiveFocusItemChanged);
+}
+
+
+/**
+ * @brief Destructor
+ */
+QQuickWindowBlockTouches::~QQuickWindowBlockTouches()
+{
+    disconnect(this, SIGNAL(closing(QQuickCloseEvent*)), this, SIGNAL(closingVersion()));
+    disconnect(this, &QQuickWindow::activeFocusItemChanged, this, &QQuickWindowBlockTouches::_onActiveFocusItemChanged);
+
+    // Mother class is automatically called
+    //QQuickWindow::~QQuickWindow();
 }
 
 
@@ -32,5 +50,22 @@ bool QQuickWindowBlockTouches::event(QEvent* evt)
 
         return QQuickWindow::event(evt);
     }
+}
+
+
+/**
+ * @brief Slot called when the property "Active Focus Item" changed
+ */
+void QQuickWindowBlockTouches::_onActiveFocusItemChanged()
+{
+    if (activeFocusItem() == nullptr)
+    {
+        //qDebug() << "NONE item of our window has the focus";
+        Q_EMIT focusLost();
+    }
+    /*else
+    {
+        qDebug() << "An item of our window has the focus";
+    }*/
 }
 

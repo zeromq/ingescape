@@ -30,7 +30,17 @@ class QQuickWindowBlockTouches : public QQuickWindow
 
 
 public:
+    /**
+     * @brief Constructor
+     * @param parent
+     */
     explicit QQuickWindowBlockTouches(QWindow *parent = nullptr);
+
+
+    /**
+     * @brief Destructor
+     */
+    ~QQuickWindowBlockTouches() Q_DECL_OVERRIDE;
 
 
     /**
@@ -47,6 +57,20 @@ Q_SIGNALS:
      * @brief Same signal "closing" but allow to workaround "onClosing is not available in version"
      */
     void closingVersion();
+
+
+    /**
+     * @brief Signal emitted when our window has lost the focus
+     */
+    void focusLost();
+
+
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the property "Active Focus Item" changed
+     */
+    void _onActiveFocusItemChanged();
 
 
 };

@@ -1104,9 +1104,9 @@ WindowBlockTouches {
                 property bool isOpened : false
 
                 Connections {
-                    target : rootItem
+                    target: rootItem
 
-                    onActiveChanged : {
+                    onActiveChanged: {
                         // make the conditions list visible if there are conditions
                         if (rootItem.active && actionM && (actionM.conditionsList.count > 0)) {
                             conditionsItem.isOpened = true;

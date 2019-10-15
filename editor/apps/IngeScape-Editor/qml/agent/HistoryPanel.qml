@@ -114,6 +114,17 @@ WindowBlockTouches {
 
     //--------------------------------
     //
+    // Slots
+    //
+    //--------------------------------
+
+    onFocusLost: {
+        dropDown.close();
+    }
+
+
+    //--------------------------------
+    //
     // Content
     //
     //--------------------------------
@@ -189,6 +200,7 @@ WindowBlockTouches {
         // Agents Filter
         DropDownCheckboxes {
             id: dropDown
+
             anchors {
                 right : parent.right
                 rightMargin: 20
@@ -204,9 +216,9 @@ WindowBlockTouches {
 
             placeholderText: enabled ? "- Select an agent -" : "- No agent -"
 
-            text: (enabled && rootItem.controller && rootItem.controller.selectedAgentNamesList.length > 0) ?
+            text: (enabled && rootItem.controller && (rootItem.controller.selectedAgentNamesList.length > 0)) ?
                       (rootItem.controller.selectedAgentNamesList.length < rootItem.controller.allAgentNamesList.length) ?
-                          (rootItem.controller.selectedAgentNamesList.length === 1 ? "- " + rootItem.controller.selectedAgentNamesList.length + " agent selected -" : "- " + rootItem.controller.selectedAgentNamesList.length + " agents selected -")
+                          ((rootItem.controller.selectedAgentNamesList.length === 1) ? "- " + rootItem.controller.selectedAgentNamesList.length + " agent selected -" : "- " + rootItem.controller.selectedAgentNamesList.length + " agents selected -")
                         : "- All agents selected -"
             : "";
 
@@ -605,7 +617,7 @@ WindowBlockTouches {
 
                         }
 
-                        //separator
+                        // Separator
                         Rectangle {
                             anchors {
                                 left : parent.left

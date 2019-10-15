@@ -67,6 +67,7 @@ ApplicationWindow {
     //----------------------------------
 
     menuBar: MenuBar {
+
         // File
         Menu {
             id: menuFile
@@ -79,6 +80,10 @@ ApplicationWindow {
                 shortcut: StandardKey.New
 
                 onTriggered: {
+                    // Allows to give the focus to the main window
+                    // (to close the popup with agents list in the history panel if it is opened)
+                    mainWindow.requestActivate();
+
                     IngeScapeEditorC.clearCurrentPlatform();
                 }
             }
@@ -89,6 +94,10 @@ ApplicationWindow {
                 shortcut: StandardKey.Open
 
                 onTriggered: {
+                    // Allows to give the focus to the main window
+                    // (to close the popup with agents list in the history panel if it is opened)
+                    mainWindow.requestActivate();
+
                     IngeScapeEditorC.loadPlatformFromSelectedFile();
                 }
             }
