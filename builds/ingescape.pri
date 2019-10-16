@@ -18,6 +18,7 @@ SOURCES += \
     $$PWD/../src/license.c \
     $$PWD/../src/monitor.c \
     $$PWD/../src/json.c \
+    $$PWD/../src/performance.c \
     $$PWD/../dependencies/yajl/src/yajl_alloc.c \
     $$PWD/../dependencies/yajl/src/yajl_buf.c \
     $$PWD/../dependencies/yajl/src/yajl_encode.c \
