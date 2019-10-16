@@ -1110,6 +1110,50 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         }
                     }
                 }
+                //Performance
+                else if (strcmp (message, "PING") == 0){
+                    //we are pinged by another agent
+                    zframe_t *countF = zmsg_pop(msgDuplicate);
+                    size_t count = 0;
+                    memcpy(&count, zframe_data(countF), sizeof(size_t));
+                    zframe_t *payload = zmsg_pop(msgDuplicate);
+                    //igs_info("ping %zu from %s", count, peer);
+                    zmsg_t *back = zmsg_new();
+                    zmsg_addstr(back, "PONG");
+                    zmsg_addmem(back, &count, sizeof(size_t));
+                    zmsg_append(back, &payload);
+                    zyre_whisper(node, peer, &back);
+                }
+                else if (strcmp (message, "PONG") == 0){
+                    //continue performance measurement
+                    zframe_t *countF = zmsg_pop(msgDuplicate);
+                    size_t count = 0;
+                    memcpy(&count, zframe_data(countF), sizeof(size_t));
+                    zframe_t *payload = zmsg_pop(msgDuplicate);
+                    //igs_info("pong %zu from %s", count, peer);
+                    if (count != performanceMsgCounter){
+                        igs_error("pong message lost at index %zu from %s", count, peer);
+                    } else if (count == performanceMsgCountTarget){
+                        //last message received
+                        performanceStop = zclock_usecs();
+                        igs_info("message size: %zu bytes", performanceMsgSize);
+                        igs_info("roundtrip count: %zu", performanceMsgCountTarget);
+                        igs_info("average latency: %.3f µs", ((double) performanceStop - (double) performanceStart) / performanceMsgCountTarget);
+                        double throughput = (size_t) ((double) performanceMsgCountTarget / ((double) performanceStop - (double) performanceStart) * 1000000);
+                        double megabytes = (double) throughput * performanceMsgSize / (1024*1024);
+                        igs_info("average roundtrip throughput: %d msg/s", (int)throughput);
+                        igs_info("average roundtrip throughput: %.3f MB/s", megabytes);
+                        performanceMsgCountTarget = 0;
+                    } else {
+                        performanceMsgCounter++;
+                        zmsg_t *back = zmsg_new();
+                        zmsg_addstr(back, "PING");
+                        zmsg_addmem(back, &performanceMsgCounter, sizeof(size_t));
+                        zmsg_append(back, &payload);
+                        zyre_whisper(node, peer, &back);
+                    }
+                    
+                }
             }
             free(message);
         } else if (streq (event, "EXIT")){

@@ -43,6 +43,8 @@ PUBLIC void igs_setPublishingPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 
+PUBLIC void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg);
+
 //IngeScape provides an integrated monitor to detect events relative to the network
 //Warning: once igs_monitoringEnable has been called, igs_monitoringDisable must be
 //called to actually stop the monitor. If not stopped, it may cause an error when

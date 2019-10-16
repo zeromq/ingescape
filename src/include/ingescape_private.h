@@ -306,6 +306,13 @@ void license_cleanLicense(void);
 void license_readLicense(void);
 #endif
 
+//performance
+extern size_t performanceMsgCounter;
+extern size_t performanceMsgCountTarget;
+extern size_t performanceMsgSize;
+extern int64_t performanceStart;
+extern int64_t performanceStop;
+
 #ifdef __cplusplus
 }
 #endif

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		970670DF1EDC187900CCDFDC /* ingescape_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 97C926AB1EB23ED100D2B0CE /* ingescape_private.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9725395A23564B230071A9BA /* performance.c in Sources */ = {isa = PBXBuildFile; fileRef = 9725395923564B230071A9BA /* performance.c */; };
+		9725395B23564B230071A9BA /* performance.c in Sources */ = {isa = PBXBuildFile; fileRef = 9725395923564B230071A9BA /* performance.c */; };
 		972A52641FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
 		972A52651FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
 		973D1BB32226920700D363BF /* yajl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 973D1BB22226916D00D363BF /* yajl.framework */; };
@@ -330,6 +332,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9725395923564B230071A9BA /* performance.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = performance.c; sourceTree = "<group>"; };
 		972A52631FD1733E00711352 /* admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = admin.c; sourceTree = "<group>"; };
 		973D1BAA2226916D00D363BF /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = yajl.xcodeproj; path = ../../dependencies/yajl/yajl.xcodeproj; sourceTree = "<group>"; };
 		973DC287207A93E6004C1D80 /* bus.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bus.c; sourceTree = "<group>"; };
@@ -1295,6 +1298,7 @@
 				97FAC32C2247BE920036293B /* license.c */,
 				97ABC93B2282EC5D00215310 /* monitor.c */,
 				9768B2AD22830F0E00310410 /* json.c */,
+				9725395923564B230071A9BA /* performance.c */,
 			);
 			name = src;
 			path = ../../src;
@@ -2720,6 +2724,7 @@
 				97ABC93D2282EC5D00215310 /* monitor.c in Sources */,
 				973DC289207A93E6004C1D80 /* bus.c in Sources */,
 				9762EDDC1EAE547B002062A1 /* model.c in Sources */,
+				9725395B23564B230071A9BA /* performance.c in Sources */,
 				972A52651FD1733E00711352 /* admin.c in Sources */,
 				9762EDDD1EAE547B002062A1 /* network.c in Sources */,
 				9762EDDF1EAE547B002062A1 /* parser.c in Sources */,
@@ -2736,6 +2741,7 @@
 				979A79A01EA7B112003153EF /* model.c in Sources */,
 				973DC288207A93E6004C1D80 /* bus.c in Sources */,
 				9768B2AE22830F0E00310410 /* json.c in Sources */,
+				9725395A23564B230071A9BA /* performance.c in Sources */,
 				979A799F1EA7B112003153EF /* mapping.c in Sources */,
 				972A52641FD1733E00711352 /* admin.c in Sources */,
 				979A79A31EA7B112003153EF /* parser.c in Sources */,
