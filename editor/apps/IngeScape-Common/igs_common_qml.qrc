@@ -36,5 +36,7 @@
         <file>qml/widgets/SvgImage.qml</file>
         <file>qml/widgets/LabellessSvgButtonCachedImage.qml</file>
         <file>qml/LicenseEventPopup.qml</file>
+        <file>qml/popup/MenuPopup.qml</file>
+        <file>qml/theme/ButtonStyleOfOption.qml</file>
     </qresource>
 </RCC>

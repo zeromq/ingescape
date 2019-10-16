@@ -30,7 +30,7 @@ import "../theme" as Theme;
 
 // parent-directory
 import ".." as Editor;
-import "../popup" as Popup
+//import "../popup" as Popup
 
 
 Item {
@@ -416,7 +416,7 @@ Item {
     //
     // Menu popup with options about our host
     //
-    Popup.MenuPopup {
+    MenuPopup {
         id : popupHostOptions
 
         anchors {
@@ -478,7 +478,7 @@ Item {
                     //enabled: (rootItem.host && !rootItem.host.isON)
                     enabled: false
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
                     }
 
                     onClicked: {
@@ -499,7 +499,7 @@ Item {
 
                     enabled: (rootItem.host && !rootItem.host.isON)
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
                     }
 
                     onClicked: {
@@ -519,7 +519,7 @@ Item {
                     text: qsTr("Reboot...")
                     enabled: false
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
@@ -539,7 +539,7 @@ Item {
                     text: qsTr("View Screen")
                     enabled: false
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
                         isVisibleSeparation: false
                     }
 
@@ -557,7 +557,7 @@ Item {
     //
     // Menu popup with options about an agent of our host
     //
-    Popup.MenuPopup {
+    MenuPopup {
         id : popupAgentOptions
 
         anchors {
@@ -617,7 +617,7 @@ Item {
 
                     text: (popupAgentOptions.agent && popupAgentOptions.agent.isON) ? qsTr("Stop") : qsTr("Start")
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
                     }
 
                     onClicked: {
@@ -651,7 +651,7 @@ Item {
 
                     visible: (popupAgentOptions.agent && popupAgentOptions.agent.isON)
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
@@ -675,7 +675,7 @@ Item {
 
                     enabled: (popupAgentOptions.agent && !popupAgentOptions.agent.isON)
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
                     }
 
                     onClicked: {
@@ -697,7 +697,7 @@ Item {
                     //enabled: (popupAgentOptions.agent && !popupAgentOptions.agent.isON)
                     visible: (popupAgentOptions.agent && !popupAgentOptions.agent.isON)
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
                     }
 
                     onClicked: {
@@ -716,7 +716,7 @@ Item {
 
                     text: qsTr("Duplicate with edited command line...")
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
                         isVisibleSeparation: false
                     }
 

@@ -22,7 +22,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 import "../theme" as Theme
-import "../popup" as Popup
+//import "../popup" as Popup
 
 
 Item {
@@ -526,11 +526,9 @@ Item {
                 }
             }
         }
-
-
     }
 
-    Popup.MenuPopup {
+    MenuPopup {
         id : popupOptions
 
         anchors {
@@ -588,7 +586,7 @@ Item {
 
                     text: qsTr("Upload Definition...")
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
@@ -609,7 +607,7 @@ Item {
 
                     text: qsTr("Upload Mapping...")
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
@@ -632,7 +630,7 @@ Item {
 
                     enabled: (rootItem.agent && rootItem.agent.definition) ? true : false
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
@@ -653,7 +651,7 @@ Item {
 
                     text: qsTr("Download Mapping...")
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
@@ -674,7 +672,7 @@ Item {
 
                     text: qsTr("Set local paths...")
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
@@ -696,7 +694,7 @@ Item {
 
                     text: qsTr("Save Definition to local path")
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
@@ -717,7 +715,7 @@ Item {
 
                     text: qsTr("Save Mapping to local path")
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
@@ -738,7 +736,7 @@ Item {
 
                     text: (rootItem.agent && rootItem.agent.hasLogInFile) ? qsTr("Disable log file") : qsTr("Enable log file")
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
@@ -759,7 +757,7 @@ Item {
 
                     text: (rootItem.agent && rootItem.agent.hasLogInStream) ? qsTr("Disable Log Stream") : qsTr("Enable Log Stream")
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
@@ -782,7 +780,7 @@ Item {
 
                     text: qsTr("Open log stream")
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
                         isVisibleSeparation: false
                     }
 

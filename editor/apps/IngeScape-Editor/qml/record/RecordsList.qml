@@ -29,7 +29,7 @@ import "../theme" as Theme;
 // parent-directory
 import ".." as Editor;
 
-import "../popup" as Popup
+//import "../popup" as Popup
 
 
 Item {
@@ -590,7 +590,7 @@ Item {
     //
     // Menu popup with options
     //
-    Popup.MenuPopup  {
+    MenuPopup  {
         id : popupOptions
 
         anchors {
@@ -649,7 +649,7 @@ Item {
                     text: qsTr("Export")
                     enabled: true
 
-                    style: Theme.ButtonStyleOfOption {
+                    style: ButtonStyleOfOption {
 
                     }
 
