@@ -115,6 +115,13 @@ public:
 
 
     /**
+     * @brief Open the action editor with a duplicate model of action
+     * @param The duplicated action
+     */
+    Q_INVOKABLE void openActionEditorToDuplicateModel(ActionM* action);
+
+
+    /**
       * @brief Open the action editor with a model of action
       * @param action
       */
@@ -204,6 +211,13 @@ private:
      * @brief Get a new action name
      */
     QString _buildNewActionName();
+
+
+    /**
+     * @brief Get a name for a new copied action
+     * @param the duplicate action name
+     */
+    QString _buildDuplicateActionName(QString actionName);
 
 
     /**

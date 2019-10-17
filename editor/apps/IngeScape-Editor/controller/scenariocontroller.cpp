@@ -14,6 +14,7 @@
 
 #include "scenariocontroller.h"
 
+#include <misc/ingescapeutils.h>
 #include <QDebug>
 #include <QFileDialog>
 
@@ -239,6 +240,26 @@ bool ScenarioController::isAgentUsedInScenario(QString agentName)
     return isUsed;
 }
 
+/**
+  * @brief Open the action editor with a duplicate model of action
+  * @param action to duplicate
+  */
+void ScenarioController::openActionEditorToDuplicateModel(ActionM* action)
+{
+    if (action != nullptr)
+    {
+        // Create the model of duplicated action
+        int uid = IngeScapeUtils::getUIDforNewActionM();
+        QString name = _buildDuplicateActionName(action->name());
+        ActionM* duplicateAction= new ActionM(uid, name);
+        duplicateAction->copyFrom(action);
+        duplicateAction->setuid(uid);
+        duplicateAction->setname(name);
+
+        // Open the editor of the new action
+        openActionEditorWithModel(duplicateAction);
+    }
+}
 
 /**
   * @brief Open the action editor with a model of action
@@ -722,6 +743,43 @@ QString ScenarioController::_buildNewActionName()
     {
         index++;
         tmpName = QString("Action_%1").arg(index, 3, 10, QChar('0'));
+    }
+
+    return tmpName;
+}
+
+/**
+ * @brief Get a name for a new copied action
+ * @param the duplicate action name
+ */
+QString ScenarioController::_buildDuplicateActionName(QString actionName)
+{
+    int index = 1;
+
+    // Clean name if it contains "_copy_XXX" at the end
+    QString originalName;
+    QStringList nameSplitted = actionName.split('_');
+    int length = nameSplitted.length();
+    if (length == 1) {
+        originalName = actionName;
+    }
+    else {
+        if (nameSplitted.at(length-1) == "copy") {
+            nameSplitted.removeAt(length-1);
+        }
+        else if (nameSplitted.at(length-2) == "copy") {
+            nameSplitted.removeAt(length-1);
+            nameSplitted.removeAt(length-2);
+        }
+        originalName = nameSplitted.join("");
+    }
+
+    // Create new name with "_copy_XXX" at the end
+    QString tmpName = QString(originalName + "_copy");
+    while (_allActionNames.contains(tmpName))
+    {
+        index++;
+        tmpName = originalName + "_copy_" + QString::number(index);
     }
 
     return tmpName;
