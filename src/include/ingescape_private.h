@@ -270,6 +270,7 @@ extern bool network_needToUpdateMapping;
 extern subscriber_t *subscribers;
 extern zyreloopElements_t *agentElements;
 extern char *ipcFolderPath;
+extern int network_hwmValue;
 int network_publishOutput (const agent_iop_t *iop);
 
 // parser
@@ -305,6 +306,13 @@ extern license_callback_t *licenseCallbacks;
 void license_cleanLicense(void);
 void license_readLicense(void);
 #endif
+
+//performance
+extern size_t performanceMsgCounter;
+extern size_t performanceMsgCountTarget;
+extern size_t performanceMsgSize;
+extern int64_t performanceStart;
+extern int64_t performanceStop;
 
 #ifdef __cplusplus
 }

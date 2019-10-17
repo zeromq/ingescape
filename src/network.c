@@ -127,6 +127,7 @@ bool network_needToUpdateMapping = false;
 unsigned int network_discoveryInterval = 1000;
 unsigned int network_agentTimeout = 30000;
 unsigned int network_publishingPort = 0;
+int network_hwmValue = 1000;
 char *ipcFolderPath = NULL;
 #define DEFAULT_IPC_PATH "/tmp/"
 
@@ -563,9 +564,11 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         subscriber->agentPeerId = strdup (peer);
                         if (allowIpc && useIPC){
                             subscriber->subscriber = zsock_new_sub(ipcAddress, NULL);
+                            zsock_set_rcvhwm(subscriber->subscriber, network_hwmValue);
                             igs_debug("Subscription created for %s at %s",subscriber->agentName,ipcAddress);
                         }else{
                             subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
+                            zsock_set_rcvhwm(subscriber->subscriber, network_hwmValue);
                             igs_debug("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
                         }
                         assert(subscriber->subscriber);
@@ -1110,6 +1113,50 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         }
                     }
                 }
+                //Performance
+                else if (strcmp (message, "PING") == 0){
+                    //we are pinged by another agent
+                    zframe_t *countF = zmsg_pop(msgDuplicate);
+                    size_t count = 0;
+                    memcpy(&count, zframe_data(countF), sizeof(size_t));
+                    zframe_t *payload = zmsg_pop(msgDuplicate);
+                    //igs_info("ping %zu from %s", count, peer);
+                    zmsg_t *back = zmsg_new();
+                    zmsg_addstr(back, "PONG");
+                    zmsg_addmem(back, &count, sizeof(size_t));
+                    zmsg_append(back, &payload);
+                    zyre_whisper(node, peer, &back);
+                }
+                else if (strcmp (message, "PONG") == 0){
+                    //continue performance measurement
+                    zframe_t *countF = zmsg_pop(msgDuplicate);
+                    size_t count = 0;
+                    memcpy(&count, zframe_data(countF), sizeof(size_t));
+                    zframe_t *payload = zmsg_pop(msgDuplicate);
+                    //igs_info("pong %zu from %s", count, peer);
+                    if (count != performanceMsgCounter){
+                        igs_error("pong message lost at index %zu from %s", count, peer);
+                    } else if (count == performanceMsgCountTarget){
+                        //last message received
+                        performanceStop = zclock_usecs();
+                        igs_info("message size: %zu bytes", performanceMsgSize);
+                        igs_info("roundtrip count: %zu", performanceMsgCountTarget);
+                        igs_info("average latency: %.3f µs", ((double) performanceStop - (double) performanceStart) / performanceMsgCountTarget);
+                        double throughput = (size_t) ((double) performanceMsgCountTarget / ((double) performanceStop - (double) performanceStart) * 1000000);
+                        double megabytes = (double) throughput * performanceMsgSize / (1024*1024);
+                        igs_info("average roundtrip throughput: %d msg/s", (int)throughput);
+                        igs_info("average roundtrip throughput: %.3f MB/s", megabytes);
+                        performanceMsgCountTarget = 0;
+                    } else {
+                        performanceMsgCounter++;
+                        zmsg_t *back = zmsg_new();
+                        zmsg_addstr(back, "PING");
+                        zmsg_addmem(back, &performanceMsgCounter, sizeof(size_t));
+                        zmsg_append(back, &payload);
+                        zyre_whisper(node, peer, &back);
+                    }
+                    
+                }
             }
             free(message);
         } else if (streq (event, "EXIT")){
@@ -1286,6 +1333,7 @@ initLoop (zsock_t *pipe, void *args){
         snprintf(endpoint, 511, "tcp://%s:%d", agentElements->ipAddress, network_publishingPort);
     }
     agentElements->publisher = zsock_new_pub(endpoint);
+    zsock_set_sndhwm(agentElements->publisher, network_hwmValue);
     if (agentElements->publisher == NULL){
         igs_error("Could not create publishing socket (%s): Agent will interrupt immediately.", endpoint);
         canContinue = false;
@@ -1314,6 +1362,7 @@ initLoop (zsock_t *pipe, void *args){
     ipcEndpoint = calloc(1, strlen(ipcFolderPath)+strlen(zyre_uuid(agentElements->node))+8);
     sprintf(ipcEndpoint, "ipc://%s/%s", ipcFolderPath, zyre_uuid(agentElements->node));
     zsock_t *ipcPublisher = agentElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
+    zsock_set_sndhwm(agentElements->ipcPublisher, network_hwmValue);
     if (ipcPublisher == NULL){
         igs_warn("Could not create IPC publishing socket (%s)", ipcEndpoint);
     }else{
@@ -1322,6 +1371,7 @@ initLoop (zsock_t *pipe, void *args){
 #elif (defined WIN32 || defined _WIN32)
     ipcEndpoint = strdup("tcp://127.0.0.1:*");
     zsock_t *ipcPublisher = agentElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
+    zsock_set_sndhwm(agentElements->ipcPublisher, network_hwmValue);
     if (ipcPublisher == NULL){
         igs_warn("Could not create loopback publishing socket (%s)", ipcEndpoint);
     }else{
@@ -1333,6 +1383,7 @@ initLoop (zsock_t *pipe, void *args){
     if (admin_logInStream){
         sprintf(endpoint, "tcp://%s:*", agentElements->ipAddress);
         agentElements->logger = zsock_new_pub(endpoint);
+        zsock_set_sndhwm(agentElements->logger, network_hwmValue);
         strncpy(endpoint, zsock_endpoint(agentElements->logger), 256);
         char *insert = endpoint + strlen(endpoint) - 1;
         while (*insert != ':' && insert > endpoint) {
@@ -2403,4 +2454,20 @@ void igs_setAllowIpc(bool allow){
 
 bool igs_getAllowIpc(void){
     return allowIpc;
+}
+
+void igs_setHighWaterMarks(int hwmValue){
+    if (hwmValue < 0){
+        igs_error("HWM value must be zero or higher");
+        return;
+    }
+    if (agentElements != NULL && agentElements->publisher != NULL){
+        zsock_set_sndhwm(agentElements->publisher, hwmValue);
+        zsock_set_sndhwm(agentElements->logger, hwmValue);
+        subscriber_t *tmp = NULL, *subs = NULL;
+        HASH_ITER(hh, subscribers, subs, tmp){
+            zsock_set_rcvhwm(subs->subscriber, hwmValue);
+        }
+    }
+    network_hwmValue = hwmValue;
 }
