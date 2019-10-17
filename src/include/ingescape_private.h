@@ -270,6 +270,7 @@ extern bool network_needToUpdateMapping;
 extern subscriber_t *subscribers;
 extern zyreloopElements_t *agentElements;
 extern char *ipcFolderPath;
+extern int network_hwmValue;
 int network_publishOutput (const agent_iop_t *iop);
 
 // parser

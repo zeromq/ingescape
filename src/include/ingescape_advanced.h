@@ -45,6 +45,10 @@ PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 
 PUBLIC void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg);
 
+//Set high water marks (HWM) for the publish/subscribe sockets.
+//Setting HWM to 0 means that they are disabled.
+PUBLIC void igs_setHighWaterMarks(int hwmValue);
+
 //IngeScape provides an integrated monitor to detect events relative to the network
 //Warning: once igs_monitoringEnable has been called, igs_monitoringDisable must be
 //called to actually stop the monitor. If not stopped, it may cause an error when
