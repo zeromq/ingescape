@@ -179,7 +179,7 @@ find_package(Qt5 NO_MODULE COMPONENTS
 
 if (APPLE)
     find_package(Qt5 NO_MODULE COMPONENTS
-	Qt5QuickWidgets
+	QuickWidgets
 	REQUIRED
     )
 endif()
