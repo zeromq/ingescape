@@ -14,7 +14,6 @@
 
 #include "scenariocontroller.h"
 
-#include <misc/ingescapeutils.h>
 #include <QDebug>
 #include <QFileDialog>
 
@@ -246,18 +245,15 @@ bool ScenarioController::isAgentUsedInScenario(QString agentName)
   */
 void ScenarioController::openActionEditorToDuplicateModel(ActionM* action)
 {
-    if (action != nullptr)
+    if ((action != nullptr) && (_modelManager != nullptr))
     {
-        // Create the model of duplicated action
-        int uid = IngeScapeUtils::getUIDforNewActionM();
-        QString name = _buildDuplicateActionName(action->name());
-        ActionM* duplicateAction= new ActionM(uid, name);
-        duplicateAction->copyFrom(action);
-        duplicateAction->setuid(uid);
-        duplicateAction->setname(name);
+        // Create an action editor
+        ActionEditorController* actionEditorC = new ActionEditorController(_buildDuplicateActionName(action->name()), action, _modelManager->allAgentsGroupsByName()->toList(), true);
 
-        // Open the editor of the new action
-        openActionEditorWithModel(duplicateAction);
+        _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
+
+        // Add to the list of opened action editors
+        _openedActionsEditorsControllers.append(actionEditorC);
     }
 }
 
@@ -288,7 +284,7 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
                 setselectedAction(action);
 
                 // Create an action editor
-                actionEditorC = new ActionEditorController(_buildNewActionName(), action, _modelManager->allAgentsGroupsByName()->toList());
+                actionEditorC = new ActionEditorController(_buildNewActionName(), action, _modelManager->allAgentsGroupsByName()->toList(), false);
 
                 _hashActionEditorControllerFromModelOfAction.insert(action, actionEditorC);
 
@@ -299,7 +295,7 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
         else
         {
             // Create an action editor
-            actionEditorC = new ActionEditorController(_buildNewActionName(), nullptr, _modelManager->allAgentsGroupsByName()->toList());
+            actionEditorC = new ActionEditorController(_buildNewActionName(), nullptr, _modelManager->allAgentsGroupsByName()->toList(), false);
 
             _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
 
@@ -332,7 +328,7 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
             setselectedAction(action->modelM());
 
             // Create an action editor
-            actionEditorC = new ActionEditorController(_buildNewActionName(), action->modelM(), _modelManager->allAgentsGroupsByName()->toList());
+            actionEditorC = new ActionEditorController(_buildNewActionName(), action->modelM(), _modelManager->allAgentsGroupsByName()->toList(), false);
 
             _hashActionEditorControllerFromViewModelOfAction.insert(action, actionEditorC);
 

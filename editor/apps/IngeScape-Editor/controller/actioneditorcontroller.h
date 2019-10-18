@@ -36,6 +36,9 @@ class ActionEditorController: public QObject
 {
     Q_OBJECT
 
+    // ActionEditor to duplicate another action ?
+    I2_QML_PROPERTY(bool, toDuplicate)
+
     // Original model of action
     I2_QML_PROPERTY(ActionM*, originalAction)
 
@@ -61,6 +64,7 @@ public:
     explicit ActionEditorController(QString actionName,
                                     ActionM* originalAction,
                                     QList<AgentsGroupedByNameVM*> allAgentsGroupsByName,
+                                    bool toDuplicate,
                                     QObject *parent = nullptr);
 
 

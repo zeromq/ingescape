@@ -27,7 +27,9 @@
 ActionEditorController::ActionEditorController(QString actionName,
                                                ActionM* originalAction,
                                                QList<AgentsGroupedByNameVM*> allAgentsGroupsByName,
+                                               bool toDuplicate,
                                                QObject *parent) : QObject(parent),
+    _toDuplicate(toDuplicate),
     _originalAction(originalAction),
     _editedAction(nullptr),
     _originalViewModel(nullptr),
@@ -46,9 +48,17 @@ ActionEditorController::ActionEditorController(QString actionName,
     {
         _editedAction->copyFrom(_originalAction);
 
-        // Cancel the increment because the edited action uses now (after the call to "copyFrom") the uid of the original action
-        // Free the UID of the action model
-        IngeScapeUtils::freeUIDofActionM(uid);
+        if (toDuplicate) {
+            // Keep uid & name
+            _editedAction->setuid(uid);
+            _editedAction->setname(actionName);
+            // No more original action
+            _originalAction = nullptr;
+        }
+        else { // Cancel the increment because the edited action uses now (after the call to "copyFrom") the uid of the original action
+            // Free the UID of the action model
+            IngeScapeUtils::freeUIDofActionM(uid);
+        }
     }
 }
 
