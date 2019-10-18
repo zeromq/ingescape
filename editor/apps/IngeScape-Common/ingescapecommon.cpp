@@ -187,6 +187,9 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     // - Scrollview style
     qmlRegisterType(QUrl("qrc:/qml/theme/IngeScapeScrollViewStyle.qml"), "INGESCAPE", 1, 0, "IngeScapeScrollViewStyle");
 
+    // - Style of button for options in (popup) menu
+    qmlRegisterType(QUrl("qrc:/qml/theme/ButtonStyleOfOption.qml"), "INGESCAPE", 1, 0, "ButtonStyleOfOption");
+
     // - Combobox delegate with tooltip
     qmlRegisterType(QUrl("qrc:/qml/IngeScapeToolTipComboboxDelegate.qml"), "INGESCAPE", 1, 0, "IngeScapeToolTipComboboxDelegate");
 
@@ -197,6 +200,7 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterType(QUrl("qrc:/qml/ConfirmationPopup.qml"), "INGESCAPE", 1, 0, "ConfirmationPopup");
     qmlRegisterType(QUrl("qrc:/qml/LicensePopup.qml"), "INGESCAPE", 1, 0, "LicensePopup");
     qmlRegisterType(QUrl("qrc:/qml/SystemInformationPopup.qml"), "INGESCAPE", 1, 0, "SystemInformationPopup");
+    qmlRegisterType(QUrl("qrc:/qml/popup/MenuPopup.qml"), "INGESCAPE", 1, 0, "MenuPopup");
 
     // - Text area with timer to delay processing of edited text while the user is editing it
     qmlRegisterType(QUrl("qrc:/qml/TextAreaWithTimer.qml"), "INGESCAPE", 1, 0, "TextAreaWithTimer");

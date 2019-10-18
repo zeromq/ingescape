@@ -24,9 +24,7 @@
         <file>settings/IngeScape-Editor.ini</file>
         <file>qml/record/RecordsList.qml</file>
         <file>qml/agent/AgentFilesPaths.qml</file>
-        <file>qml/theme/ButtonStyleOfOption.qml</file>
         <file>qml/agent/LogStreamPanel.qml</file>
-        <file>qml/popup/MenuPopup.qml</file>
         <file>qml/popup/MessagePopup.qml</file>
         <file>qml/popup/MappingModificationsPopup.qml</file>
         <file>qml/scenario/IngeScapeComboboxItemModel.qml</file>

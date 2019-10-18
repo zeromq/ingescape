@@ -6,7 +6,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
-//import "./theme" as Theme
+//import "../theme" as Theme
 
 Item {
     id: rootItem
@@ -30,7 +30,7 @@ Item {
     property bool actionItemIsPressed: false;
 
     // Flag indicating if our action is selected
-    property bool actionItemIsSelected: rootItem.controller && rootItem.action && (rootItem.controller.selectedAction === rootItem.action);
+    property bool actionItemIsSelected: controller && action && (controller.selectedAction === action);
 
     //width: parent.width
     height: 42
@@ -57,7 +57,7 @@ Item {
             fill: parent
         }
 
-        color: actionItemIsHovered ? IngeScapeTheme.actionsListItemRollOverBackgroundColor : IngeScapeTheme.actionsListItemBackgroundColor
+        color: rootItem.actionItemIsHovered ? IngeScapeTheme.actionsListItemRollOverBackgroundColor : IngeScapeTheme.actionsListItemBackgroundColor
 
         Rectangle {
             anchors {
@@ -194,7 +194,7 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                visible: rootItem.actionItemIsHovered
+                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "list-play"
@@ -209,12 +209,28 @@ Item {
             }
 
             LabellessSvgButton {
+                id: btnOptions
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
+
+                releasedID: "button-options"
+                pressedID: releasedID + "-pressed"
+                disabledID : releasedID
+
+                onClicked: {
+                    popupActionOptions.openInScreen();
+                }
+            }
+
+            LabellessSvgButton {
                 id: removeButton
 
                 anchors.verticalCenter: parent.verticalCenter
 
                 //visible: rootItem.actionItemIsSelected
-                visible: rootItem.actionItemIsHovered
+                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "delete"
@@ -233,6 +249,88 @@ Item {
                             // Delete our action
                             controller.deleteAction(rootItem.action);
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    //
+    // Menu popup with options about the action
+    //
+    MenuPopup {
+        id : popupActionOptions
+
+        anchors {
+            top: rootItem.top
+            left: rootItem.right
+            leftMargin: 2
+        }
+
+        readonly property int optionHeight: 30
+
+        // Get height from children
+        height: bgPopupActionOptions.y + bgPopupActionOptions.height
+        width: 230
+
+        isModal: true;
+        layerColor: "transparent"
+        dismissOnOutsideTap : true;
+
+        keepRelativePositionToInitialParent : true;
+
+        onClosed: {
+
+        }
+        onOpened: {
+
+        }
+
+        Rectangle {
+            id: bgPopupActionOptions
+
+            height: actionOptions.y + actionOptions.height
+            anchors {
+                right: parent.right
+                left: parent.left
+            }
+            color: IngeScapeTheme.veryDarkGreyColor
+            radius: 5
+            border {
+                color: IngeScapeTheme.blueGreyColor2
+                width: 1
+            }
+
+            Column {
+                id: actionOptions
+
+                anchors {
+                    right: parent.right
+                    left: parent.left
+                }
+
+                Button {
+                    id: optionDuplicate
+
+                    height: popupActionOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Duplicate...")
+
+                    //enabled: (rootItem.host && !rootItem.host.isON)
+                    enabled: true
+
+                    style: ButtonStyleOfOption {
+                    }
+
+                    // Model of action
+                    property ActionM duplicateAction: null;
+
+                    onClicked: {
+                        if (rootItem.controller && rootItem.action) {
+                            rootItem.controller.openActionEditorToDuplicateModel(rootItem.action);
+                        }
+                        popupActionOptions.close();
                     }
                 }
             }
