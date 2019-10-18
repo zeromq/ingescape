@@ -163,6 +163,13 @@ find_package(Qt5 NO_MODULE COMPONENTS
     REQUIRED
 )
 
+if (APPLE)
+    find_package(Qt5 NO_MODULE COMPONENTS
+	Qt5QuickWidgets
+	REQUIRED
+    )
+endif()
+
 if (UNIX AND NOT APPLE)
     find_package(Qt5 NO_MODULE COMPONENTS
         DBus
@@ -240,6 +247,7 @@ if (UNIX AND NOT APPLE)
 endif()
 
 if (APPLE)
+    target_link_libraries(${PROJECT_NAME} Qt5::QuickWidgets)
     target_link_libraries(${PROJECT_NAME} "-framework Foundation -framework AppKit")
 endif()
 
