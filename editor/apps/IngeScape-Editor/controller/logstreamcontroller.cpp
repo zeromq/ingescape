@@ -15,6 +15,11 @@
 #include "logstreamcontroller.h"
 
 
+static const int LOG_MAXIMUM_STRING_LENGTH = 4096;
+
+
+
+
 /**
  * @brief Incoming event callback from the parent thread
  * @param loop
@@ -69,10 +74,10 @@ int incomingEventCallback(zloop_t *loop, zmq_pollitem_t *item, void *args)
 
     if ((item != nullptr) && (args != nullptr) && (item->revents & ZMQ_POLLIN))
     {
-        LogStreamController* logStreamC = (LogStreamController*)args;
+        LogStreamController* logStreamC = static_cast<LogStreamController*>(args);
         if (logStreamC != nullptr)
         {
-            zmsg_t *msg = zmsg_recv((zsock_t *)item->socket);
+            zmsg_t *msg = zmsg_recv(static_cast<zsock_t *>(item->socket));
 
             if (!msg) {
                 printf("Error while reading message from agent.");
@@ -82,16 +87,19 @@ int incomingEventCallback(zloop_t *loop, zmq_pollitem_t *item, void *args)
             }
 
             char *message = zmsg_popstr(msg);
-
-            QString log = QString(message);
-            if (!log.isEmpty())
+            if (message != nullptr)
             {
-                //qDebug() << "Incoming log:" << log;
+                QString log = QString::fromUtf8(message, qMin(static_cast<int>(strlen(message)), LOG_MAXIMUM_STRING_LENGTH));
+                if (!log.isEmpty())
+                {
+                    //qDebug() << "Incoming log:" << log;
 
-                Q_EMIT logStreamC->logReceived(QDateTime::currentDateTime(), log.split(';'));
+                    Q_EMIT logStreamC->logReceived(QDateTime::currentDateTime(), log.split(';'));
+                }
+
+                free(message);
             }
 
-            free(message);
             zmsg_destroy(&msg);
         }
     }

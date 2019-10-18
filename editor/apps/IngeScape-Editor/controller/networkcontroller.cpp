@@ -49,6 +49,9 @@ static const QString prefix_LoadPlatformFile = "LOAD_PLATFORM_FROM_PATH=";
 static const QString prefix_UpdateTimeLineState = "UPDATE_TIMELINE_STATE=";
 static const QString prefix_UpdateRecordState = "UPDATE_RECORD_STATE=";
 
+static const int PUBLISHED_VALUE_MAXIMUM_STRING_LENGTH = 4096;
+
+
 
 /**
  * @brief Callback for Observing Inputs of our agent "IngeScape Editor"
@@ -64,12 +67,12 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
     Q_UNUSED(value)
     Q_UNUSED(valueSize)
 
-    NetworkController* networkController = (NetworkController*)myData;
+    NetworkController* networkController = static_cast<NetworkController*>(myData);
     if (networkController != nullptr)
     {
         if (iopType == IGS_INPUT_T)
         {
-            QString inputName = name;
+            QString inputName(name);
 
             QStringList agentNameAndIOP = inputName.split(SEPARATOR_AGENT_NAME_AND_IOP);
             if (agentNameAndIOP.count() == 2)
@@ -85,7 +88,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                 {
                 // INTEGER
                 case IGS_INTEGER_T: {
-                    int newValue = igs_readInputAsInt(name);
+                    int newValue = *(static_cast<int *>(value));
 
                     currentValue = QVariant(newValue);
                     isValid = true;
@@ -95,7 +98,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                 }
                 // DOUBLE
                 case IGS_DOUBLE_T: {
-                    double newValue = igs_readInputAsDouble(name);
+                    double newValue = *(static_cast<double*>(value));
 
                     currentValue = QVariant(newValue);
                     isValid = true;
@@ -105,7 +108,8 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                 }
                 // STRING
                 case IGS_STRING_T: {
-                    QString newValue = igs_readInputAsString(name);
+                    char *rawNewValue = static_cast<char *>(value);
+                    QString newValue = QString::fromUtf8(rawNewValue, qMin(static_cast<int>(strlen(rawNewValue)), PUBLISHED_VALUE_MAXIMUM_STRING_LENGTH));
 
                     currentValue = QVariant(newValue);
                     isValid = true;
@@ -115,7 +119,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                 }
                 // BOOL
                 case IGS_BOOL_T: {
-                    bool newValue = igs_readInputAsBool(name);
+                    bool newValue = *(static_cast<bool*>(value));
 
                     currentValue = QVariant(newValue);
                     isValid = true;
