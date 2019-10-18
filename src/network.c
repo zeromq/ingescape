@@ -270,13 +270,15 @@ void sendMappingToAgent(const char *peerId, const char *mapping)
 
 void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
     igs_debug("cleaning subscription to %s\n", subscriber->agentName);
+    #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
+    licEnforcement->currentAgentsNb--;
+    #endif
     // clean the agent definition
     if(subscriber->definition != NULL){
         #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
         licEnforcement->currentIOPNb -= (HASH_COUNT(subscriber->definition->inputs_table) +
                                          HASH_COUNT(subscriber->definition->outputs_table) +
                                          HASH_COUNT(subscriber->definition->params_table));
-        licEnforcement->currentAgentsNb--;
         //igs_license("license: %ld agents and %ld iops (%s)", licEnforcement->currentAgentsNb, licEnforcement->currentIOPNb, subscriber->agentName);
         #endif
         definition_freeDefinition(subscriber->definition);
@@ -473,133 +475,133 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 zagent->hasJoinedPrivateChannel = false;
                 strncpy(zagent->peerId, peer, NAME_BUFFER_SIZE-1);
                 HASH_ADD_STR(zyreAgents, peerId, zagent);
+                strncpy(zagent->name, name, NAME_BUFFER_SIZE-1);
+                assert(headers);
+                char *k;
+                const char *v;
+                zlist_t *keys = zhash_keys(headers);
+                size_t s = zlist_size(keys);
+                if (s > 0){
+                    igs_debug("Handling headers for agent %s", name);
+                }
+                while ((k = (char *)zlist_pop(keys))) {
+                    v = zyre_event_header (zyre_event,k);
+                    igs_debug("\t%s -> %s", k, v);
+                    
+                    // we extract the publisher adress to subscribe to from the zyre message header
+                    if(strncmp(k,"publisher", strlen("publisher")) == 0)
+                    {
+                        char endpointAddress[128];
+                        strncpy(endpointAddress, address, 127);
+                        
+                        // IP adress extraction
+                        char *insert = endpointAddress + strlen(endpointAddress);
+                        bool extractOK = true;
+                        while (*insert != ':'){
+                            insert--;
+                            if (insert == endpointAddress){
+                                igs_error("Could not extract port from address %s", address);
+                                extractOK = false;
+                                break;
+                            }
+                        }
+                        
+                        if (extractOK){
+                            //we found a possible publisher to subscribe to
+                            *(insert + 1) = '\0'; //close endpointAddress string after ':' location
+                            
+                            //check towards our own ip address (without port)
+                            char *incomingIpAddress = endpointAddress + 6; //ignore tcp://
+                            *insert = '\0';
+                            bool useIPC = false;
+                            const char *ipcAddress = NULL;
+                            if (strcmp(agentElements->ipAddress, incomingIpAddress) == 0){
+                                //same IP address : we can try to use ipc (or loopback on windows) instead of TCP
+                                //try to recover agent ipc/loopback address
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+                                ipcAddress = zyre_event_header(zyre_event, "ipc");
+#elif (defined WIN32 || defined _WIN32)
+                                ipcAddress = zyre_event_header(zyre_event, "loopback");
+#endif
+                                if (ipcAddress != NULL){
+                                    useIPC = true;
+                                    igs_debug("Use address %s to subscribe to %s", ipcAddress, name);
+                                }
+                            }
+                            *insert = ':';
+                            //add port to the endpoint to compose it fully
+                            strcat(endpointAddress, v);
+                            subscriber_t *subscriber;
+                            HASH_FIND_STR(subscribers, peer, subscriber);
+                            if (subscriber != NULL){
+                                //we have a reconnection with same peerId
+                                igs_debug("Peer id %s was connected before with agent name %s : reset and recreate subscription", peer, subscriber->agentName);
+                                HASH_DEL(subscribers, subscriber);
+                                zloop_poller_end(agentElements->loop , subscriber->pollItem);
+                                zsock_destroy(&subscriber->subscriber);
+                                free((char*)subscriber->agentName);
+                                free((char*)subscriber->agentPeerId);
+                                free(subscriber->pollItem);
+                                free(subscriber->subscriber);
+                                if (subscriber->definition != NULL){
+                                    definition_freeDefinition(subscriber->definition);
+                                    subscriber->definition = NULL;
+                                }
+                                subscriber->subscriber = NULL;
+                                if (subscriber->timerId != -1){
+                                    zloop_timer_end(agentElements->loop, subscriber->timerId);
+                                    subscriber->timerId = -1;
+                                }
+                                free(subscriber);
+                                subscriber = NULL;
+                            }
+                            subscriber = calloc(1, sizeof(subscriber_t));
+                            zagent->subscriber = subscriber;
+                            subscriber->agentName = strdup(name);
+                            subscriber->agentPeerId = strdup (peer);
+                            if (allowIpc && useIPC){
+                                subscriber->subscriber = zsock_new_sub(ipcAddress, NULL);
+                                zsock_set_rcvhwm(subscriber->subscriber, network_hwmValue);
+                                igs_debug("Subscription created for %s at %s",subscriber->agentName,ipcAddress);
+                            }else{
+                                subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
+                                zsock_set_rcvhwm(subscriber->subscriber, network_hwmValue);
+                                igs_debug("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
+                            }
+                            assert(subscriber->subscriber);
+                            subscriber->definition = NULL;
+                            subscriber->mappingsFilters = NULL;
+                            subscriber->timerId = -1;
+                            HASH_ADD_STR(subscribers, agentPeerId, subscriber);
+                            subscriber->pollItem = calloc(1, sizeof(zmq_pollitem_t));
+                            subscriber->pollItem->socket = zsock_resolve(subscriber->subscriber);
+                            subscriber->pollItem->fd = 0;
+                            subscriber->pollItem->events = ZMQ_POLLIN;
+                            subscriber->pollItem->revents = 0;
+                            zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
+                            zloop_poller_set_tolerant(loop, subscriber->pollItem);
+#if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
+                            licEnforcement->currentAgentsNb++;
+                            //igs_license("%ld agents (adding %s)", licEnforcement->currentAgentsNb, name);
+                            if (licEnforcement->currentAgentsNb > license->platformNbAgents){
+                                igs_license("Maximum number of allowed agents (%d) is exceeded : agent will stop", license->platformNbAgents);
+                                license_callback_t *el = NULL;
+                                DL_FOREACH(licenseCallbacks, el){
+                                    el->callback_ptr(IGS_LICENSE_TOO_MANY_AGENTS, el->data);
+                                }
+                                return -1;
+                            }
+#endif
+                        }
+                    }
+                    free(k);
+                }
+                zlist_destroy(&keys);
             }else{
                 //Agent already exists, we set its reconnected flag
                 //(this is used below to avoid agent destruction on EXIT received after timeout)
                 zagent->reconnected++;
             }
-            strncpy(zagent->name, name, NAME_BUFFER_SIZE-1);
-            assert(headers);
-            char *k;
-            const char *v;
-            zlist_t *keys = zhash_keys(headers);
-            size_t s = zlist_size(keys);
-            if (s > 0){
-                igs_debug("Handling headers for agent %s", name);
-            }
-            while ((k = (char *)zlist_pop(keys))) {
-                v = zyre_event_header (zyre_event,k);
-                igs_debug("\t%s -> %s", k, v);
-
-                // we extract the publisher adress to subscribe to from the zyre message header
-                if(strncmp(k,"publisher", strlen("publisher")) == 0)
-                {
-                    char endpointAddress[128];
-                    strncpy(endpointAddress, address, 127);
-
-                    // IP adress extraction 
-                    char *insert = endpointAddress + strlen(endpointAddress);
-                    bool extractOK = true;
-                    while (*insert != ':'){
-                        insert--;
-                        if (insert == endpointAddress){
-                            igs_error("Could not extract port from address %s", address);
-                            extractOK = false;
-                            break;
-                        }
-                    }
-
-                    if (extractOK){
-                        //we found a possible publisher to subscribe to
-                        *(insert + 1) = '\0'; //close endpointAddress string after ':' location
-                        
-                         //check towards our own ip address (without port)
-                        char *incomingIpAddress = endpointAddress + 6; //ignore tcp://
-                        *insert = '\0';
-                        bool useIPC = false;
-                        const char *ipcAddress = NULL;
-                        if (strcmp(agentElements->ipAddress, incomingIpAddress) == 0){
-                            //same IP address : we can try to use ipc (or loopback on windows) instead of TCP
-                            //try to recover agent ipc/loopback address
-#if defined __unix__ || defined __APPLE__ || defined __linux__
-                            ipcAddress = zyre_event_header(zyre_event, "ipc");
-#elif (defined WIN32 || defined _WIN32)
-                            ipcAddress = zyre_event_header(zyre_event, "loopback");
-#endif
-                            if (ipcAddress != NULL){
-                                useIPC = true;
-                                igs_debug("Use address %s to subscribe to %s", ipcAddress, name);
-                            }
-                        }
-                        *insert = ':';
-                        //add port to the endpoint to compose it fully
-                        strcat(endpointAddress, v);
-                        subscriber_t *subscriber;
-                        HASH_FIND_STR(subscribers, peer, subscriber);
-                        if (subscriber != NULL){
-                            //we have a reconnection with same peerId
-                            igs_debug("Peer id %s was connected before with agent name %s : reset and recreate subscription", peer, subscriber->agentName);
-                            HASH_DEL(subscribers, subscriber);
-                            zloop_poller_end(agentElements->loop , subscriber->pollItem);
-                            zsock_destroy(&subscriber->subscriber);
-                            free((char*)subscriber->agentName);
-                            free((char*)subscriber->agentPeerId);
-                            free(subscriber->pollItem);
-                            free(subscriber->subscriber);
-                            if (subscriber->definition != NULL){
-                                definition_freeDefinition(subscriber->definition);
-                                subscriber->definition = NULL;
-                            }
-                            subscriber->subscriber = NULL;
-                            if (subscriber->timerId != -1){
-                                zloop_timer_end(agentElements->loop, subscriber->timerId);
-                                subscriber->timerId = -1;
-                            }
-                            free(subscriber);
-                            subscriber = NULL;
-                        }
-                        subscriber = calloc(1, sizeof(subscriber_t));
-                        zagent->subscriber = subscriber;
-                        subscriber->agentName = strdup(name);
-                        subscriber->agentPeerId = strdup (peer);
-                        if (allowIpc && useIPC){
-                            subscriber->subscriber = zsock_new_sub(ipcAddress, NULL);
-                            zsock_set_rcvhwm(subscriber->subscriber, network_hwmValue);
-                            igs_debug("Subscription created for %s at %s",subscriber->agentName,ipcAddress);
-                        }else{
-                            subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
-                            zsock_set_rcvhwm(subscriber->subscriber, network_hwmValue);
-                            igs_debug("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
-                        }
-                        assert(subscriber->subscriber);
-                        subscriber->definition = NULL;
-                        subscriber->mappingsFilters = NULL;
-                        subscriber->timerId = -1;
-                        HASH_ADD_STR(subscribers, agentPeerId, subscriber);
-                        subscriber->pollItem = calloc(1, sizeof(zmq_pollitem_t));
-                        subscriber->pollItem->socket = zsock_resolve(subscriber->subscriber);
-                        subscriber->pollItem->fd = 0;
-                        subscriber->pollItem->events = ZMQ_POLLIN;
-                        subscriber->pollItem->revents = 0;
-                        zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
-                        zloop_poller_set_tolerant(loop, subscriber->pollItem);
-                        #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
-                        licEnforcement->currentAgentsNb++;
-                        //igs_license("%ld agents (adding %s)", licEnforcement->currentAgentsNb, name);
-                        if (licEnforcement->currentAgentsNb > license->platformNbAgents){
-                            igs_license("Maximum number of allowed agents (%d) is exceeded : agent will stop", license->platformNbAgents);
-                            license_callback_t *el = NULL;
-                            DL_FOREACH(licenseCallbacks, el){
-                                el->callback_ptr(IGS_LICENSE_TOO_MANY_AGENTS, el->data);
-                            }
-                            return -1;
-                        }
-                        #endif
-                    }
-                }
-                free(k);
-            }
-            zlist_destroy(&keys);
         } else if (streq (event, "JOIN")){
             igs_debug("+%s has joined %s", name, group);
             if (streq(group, CHANNEL)){
