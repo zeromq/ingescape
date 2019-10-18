@@ -15,20 +15,68 @@
 
 serviceHeader_t *serviceHeaders = NULL;
 
+#if defined(__unix__) || defined(__linux__) || \
+(defined(__APPLE__) && defined(__MACH__))
+pthread_mutex_t *bus_zyreMutex = NULL;
+#else
+#define W_OK 02
+pthread_mutex_t bus_zyreMutex = NULL;
+#endif
+
+////////////////////////////////////////////////////////////////////////
+// INTERNAL FUNCTIONS
+////////////////////////////////////////////////////////////////////////
+
+void bus_zyreLock(void)   {
+#if defined(__unix__) || defined(__linux__) || \
+(defined(__APPLE__) && defined(__MACH__))
+    if (bus_zyreMutex == NULL){
+        bus_zyreMutex = calloc(1, sizeof(pthread_mutex_t));
+        if (pthread_mutex_init(bus_zyreMutex, NULL) != 0){
+            igs_error("mutex init failed");
+            return;
+        }
+    }
+#elif (defined WIN32 || defined _WIN32)
+    if (bus_zyreMutex == NULL){
+        if (pthread_mutex_init(&bus_zyreMutex) != 0){
+            igs_error("mutex init failed");
+            return;
+        }
+    }
+#endif
+    pthread_mutex_lock(bus_zyreMutex);
+}
+
+void bus_zyreUnlock(void) {
+    if (bus_zyreMutex != NULL){
+        pthread_mutex_unlock(bus_zyreMutex);
+    }else{
+        igs_error("mutex was NULL");
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+// PUBLIC FUNCTIONS
+////////////////////////////////////////////////////////////////////////
 void igs_busJoinChannel(const char *channel){
     if (strcmp(CHANNEL, channel) == 0){
         igs_error("channel name %s is reserved and cannot be joined", channel);
         return;
     }
     if (agentElements != NULL && agentElements->node != NULL){
+        bus_zyreLock();
         zyre_join(agentElements->node, channel);
+        bus_zyreUnlock();
     }else{
         igs_error("igs_startWithDevice or igs_startWithIP must be called before joining a channel");
     }
 }
 void igs_busLeaveChannel(const char *channel){
     if (agentElements != NULL && agentElements->node != NULL){
+        bus_zyreLock();
         zyre_leave(agentElements->node, channel);
+        bus_zyreUnlock();
     }else{
         igs_error("igs_startWithDevice or igs_startWithIP must be called before leaving a channel");
     }
@@ -53,8 +101,10 @@ int igs_busSendStringToChannel(const char *channel, const char *msg, ...){
     va_start(list, msg);
     vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, msg, list);
     va_end(list);
+    bus_zyreLock();
     if (zyre_shouts(agentElements->node, channel, "%s", content) != 0)
         res = -1;
+    bus_zyreUnlock();
     return res;
 }
 
@@ -75,8 +125,10 @@ int igs_busSendDataToChannel(const char *channel, void *data, size_t size){
     zframe_t *frame = zframe_new(data, size);
     zmsg_t *msg = zmsg_new();
     zmsg_append(msg, &frame);
+    bus_zyreLock();
     if(zyre_shout(agentElements->node, channel, &msg) != 0)
         res = -1;
+    bus_zyreUnlock();
     return res;
 }
 
@@ -94,8 +146,10 @@ int igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p){
         return -1;
     }
     int res = 1;
+    bus_zyreLock();
     if (zyre_shout(agentElements->node, channel, msg_p) != 0)
         res = -1;
+    bus_zyreUnlock();
     return res;
 }
 
@@ -117,8 +171,10 @@ int igs_busSendStringToAgent(const char *agentNameOrPeerID, const char *msg, ...
             va_start(list, msg);
             vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, msg, list);
             va_end(list);
+            bus_zyreLock();
             if (zyre_whispers(agentElements->node, el->peerId, "%s", content) != 0)
                 res = -1;
+            bus_zyreUnlock();
         }
     }
     return res;
@@ -140,8 +196,10 @@ int igs_busSendDataToAgent(const char *agentNameOrPeerID, void *data, size_t siz
             zframe_t *frame = zframe_new(data, size);
             zmsg_t *msg = zmsg_new();
             zmsg_append(msg, &frame);
+            bus_zyreLock();
             if (zyre_whisper(agentElements->node, el->peerId, &msg) <= 0)
                 res = -1;
+            bus_zyreUnlock();
         }
     }
     return res;
@@ -161,8 +219,10 @@ int igs_busSendZMQMsgToAgent(const char *agentNameOrPeerID, zmsg_t **msg_p){
     HASH_ITER(hh, zyreAgents, el, tmp){
         if (strcmp(el->name, agentNameOrPeerID) == 0 || strcmp(el->peerId, agentNameOrPeerID) == 0){
             zmsg_t *msg = zmsg_dup(*msg_p);
+            bus_zyreLock();
             if (zyre_whisper(agentElements->node, el->peerId, &msg) <= 0)
                 res = -1;
+            bus_zyreUnlock();
         }
     }
     zmsg_destroy(msg_p);

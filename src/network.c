@@ -200,7 +200,9 @@ int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg)
 
     subscriber_t *subscriber = (subscriber_t *) arg;
     if (subscriber->mappedNotificationToSend){
+        bus_zyreLock();
         zyre_whispers(agentElements->node, subscriber->agentPeerId, "REQUEST_OUPUTS");
+        bus_zyreUnlock();
         subscriber->mappedNotificationToSend = false;
     }
     return 0;
@@ -250,7 +252,9 @@ void sendDefinitionToAgent(const char *peerId, const char *def)
     {
         if(agentElements->node != NULL)
         {
+            bus_zyreLock();
             zyre_whispers(agentElements->node, peerId, "%s%s", definitionPrefix, def);
+            bus_zyreUnlock();
         } else {
             igs_warn("Could not send our definition to %s : our agent is not connected",peerId);
         }
@@ -261,7 +265,9 @@ void sendMappingToAgent(const char *peerId, const char *mapping)
 {
     if(peerId != NULL &&  mapping != NULL){
         if(agentElements->node != NULL){
+            bus_zyreLock();
             zyre_whispers(agentElements->node, peerId, "%s%s", mappingPrefix, mapping);
+            bus_zyreUnlock();
         } else {
             igs_warn("Could not send our mapping to %s : our agent is not connected",peerId);
         }
@@ -623,34 +629,50 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }
                 //we also send our frozen and muted states, and other usefull information
                 if (isWholeAgentMuted){
+                    bus_zyreLock();
                     zyre_whispers(agentElements->node, peer, "MUTED=1");
+                    bus_zyreUnlock();
                 }
                 if (isFrozen){
+                    bus_zyreLock();
                     zyre_whispers(agentElements->node, peer, "FROZEN=1");
+                    bus_zyreUnlock();
                 }
                 if (strlen(igsAgentState) > 0){
+                    bus_zyreLock();
                     zyre_whispers(agentElements->node, peer, "STATE=%s", igsAgentState);
+                    bus_zyreUnlock();
                 }
                 if (igs_internal_definition != NULL){
                     agent_iop_t *current_iop, *tmp_iop;
                     HASH_ITER(hh, igs_internal_definition->outputs_table, current_iop, tmp_iop) {
                         if (current_iop->is_muted && current_iop->name != NULL){
+                            bus_zyreLock();
                             zyre_whispers(agentElements->node, peer, "OUTPUT_MUTED %s", current_iop->name);
+                            bus_zyreUnlock();
                         }
                     }
                 }
                 if (admin_logInStream){
+                    bus_zyreLock();
                     zyre_whispers(agentElements->node, peer, "LOG_IN_STREAM=1");
+                    bus_zyreUnlock();
                 }
                 if (admin_logInFile){
+                    bus_zyreLock();
                     zyre_whispers(agentElements->node, peer, "LOG_IN_FILE=1");
                     zyre_whispers(agentElements->node, peer, "LOG_FILE_PATH=%s", admin_logFile);
+                    bus_zyreUnlock();
                 }
                 if (strlen(definitionPath) > 0){
+                    bus_zyreLock();
                     zyre_whispers(agentElements->node, peer, "DEFINITION_FILE_PATH=%s", definitionPath);
+                    bus_zyreUnlock();
                 }
                 if (strlen(mappingPath) > 0){
+                    bus_zyreLock();
                     zyre_whispers(agentElements->node, peer, "MAPPING_FILE_PATH=%s", mappingPath);
+                    bus_zyreUnlock();
                 }
                 
                 zyreAgent_t *zagent = NULL;
@@ -897,7 +919,9 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             free(outputsList[i]);
                         }
                     }
+                    bus_zyreLock();
                     zyre_whisper(node, peer, &omsg);
+                    bus_zyreUnlock();
                     free(outputsList);
                 }else if (strlen("OUTPUTS") == strlen(message) && strncmp (message, "OUTPUTS", strlen("OUTPUTS")) == 0){
                     handleSubscriptionMessage(msgDuplicate, peer);
@@ -914,7 +938,9 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         zmsg_addmem(resp, &current->value, current->valueSize);
                     }
                     model_readWriteUnlock();
+                    bus_zyreLock();
                     zyre_whisper(node, peer, &resp);
+                    bus_zyreUnlock();
                     igs_debug("send input values to %s", peer);
                 }else if (strlen("GET_CURRENT_PARAMETERS") == strlen(message) && strncmp (message, "GET_CURRENT_PARAMETERS", strlen("GET_CURRENT_PARAMETERS")) == 0){
                     zmsg_t *resp = zmsg_new();
@@ -928,7 +954,9 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         zmsg_addmem(resp, &current->value, current->valueSize);
                     }
                     model_readWriteUnlock();
+                    bus_zyreLock();
                     zyre_whisper(node, peer, &resp);
+                    bus_zyreUnlock();
                     igs_debug("send parameters values to %s", peer);
                 }else if (strlen("LICENSE_INFO") == strlen(message) && strncmp (message, "LICENSE_INFO", strlen("LICENSE_INFO")) == 0){
 #if !TARGET_OS_IOS
@@ -970,7 +998,9 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             agent = zhash_next(license->agents);
                         }
                     }
+                    bus_zyreLock();
                     zyre_whisper(node, peer, &resp);
+                    bus_zyreUnlock();
                     igs_debug("send license information to %s", peer);
 #endif
                 }else if (strlen("STOP") == strlen(message) && strncmp (message, "STOP", strlen("STOP")) == 0){
@@ -1127,7 +1157,9 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     zmsg_addstr(back, "PONG");
                     zmsg_addmem(back, &count, sizeof(size_t));
                     zmsg_append(back, &payload);
+                    bus_zyreLock();
                     zyre_whisper(node, peer, &back);
+                    bus_zyreUnlock();
                 }
                 else if (strcmp (message, "PONG") == 0){
                     //continue performance measurement
@@ -1155,7 +1187,9 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         zmsg_addstr(back, "PING");
                         zmsg_addmem(back, &performanceMsgCounter, sizeof(size_t));
                         zmsg_append(back, &payload);
+                        bus_zyreLock();
                         zyre_whisper(node, peer, &back);
+                        bus_zyreUnlock();
                     }
                     
                 }
@@ -1296,36 +1330,50 @@ initLoop (zsock_t *pipe, void *args){
 
     bool canContinue = true;
     //prepare zyre
+    bus_zyreLock();
     agentElements->node = zyre_new (igsAgentName);
+    bus_zyreUnlock();
     if (strlen(agentElements->brokerEndPoint) > 0){
+        bus_zyreLock();
         zyre_set_verbose(agentElements->node);
         zyre_gossip_connect(agentElements->node,
                             "%s", agentElements->brokerEndPoint);
+        bus_zyreUnlock();
     }else{
         if (agentElements->node == NULL){
             igs_fatal("Could not create bus node : Agent will interrupt immediately.");
             return;
         }else{
+            bus_zyreLock();
             zyre_set_interface(agentElements->node, agentElements->networkDevice);
             zyre_set_port(agentElements->node, agentElements->zyrePort);
+            bus_zyreUnlock();
         }
     }
+    bus_zyreLock();
     zyre_set_interval(agentElements->node, network_discoveryInterval);
     zyre_set_expired_timeout(agentElements->node, network_agentTimeout);
+    bus_zyreUnlock();
     
     //create channel for replay
     snprintf(replayChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-REPLAY", igsAgentName);
+    bus_zyreLock();
     zyre_join(agentElements->node, replayChannel);
+    bus_zyreUnlock();
     
     //Add version and protocol to headers
+    bus_zyreLock();
     zyre_set_header(agentElements->node, "ingescape", "v%d.%d.%d", (int)igs_version()/10000, (int)(igs_version() %10000)/100, (int)(igs_version() %100));
     zyre_set_header(agentElements->node, "protocol", "v%d", igs_protocol());
+    bus_zyreUnlock();
     
     //Add stored headers to zyre
     serviceHeader_t *el, *tmp;
+    bus_zyreLock();
     HASH_ITER(hh, serviceHeaders, el, tmp){
         zyre_set_header(agentElements->node, el->key, "%s", el->value);
     }
+    bus_zyreUnlock();
     
     //start TCP publisher
     char endpoint[512];
@@ -1345,7 +1393,9 @@ initLoop (zsock_t *pipe, void *args){
         while (*insert != ':' && insert > endpoint) {
             insert--;
         }
+        bus_zyreLock();
         zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
+        bus_zyreUnlock();
     }
 
     //start ipc publisher
@@ -1359,16 +1409,20 @@ initLoop (zsock_t *pipe, void *args){
     if(stat(ipcFolderPath,&st) != 0){
         igs_warn("Expected IPC directory %s does not exist : create it to remove this warning", ipcFolderPath);
     }
+    bus_zyreLock();
     ipcFullPath = calloc(1, strlen(ipcFolderPath)+strlen(zyre_uuid(agentElements->node))+2);
     sprintf(ipcFullPath, "%s/%s", ipcFolderPath, zyre_uuid(agentElements->node));
     ipcEndpoint = calloc(1, strlen(ipcFolderPath)+strlen(zyre_uuid(agentElements->node))+8);
     sprintf(ipcEndpoint, "ipc://%s/%s", ipcFolderPath, zyre_uuid(agentElements->node));
+    bus_zyreUnlock();
     zsock_t *ipcPublisher = agentElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
     zsock_set_sndhwm(agentElements->ipcPublisher, network_hwmValue);
     if (ipcPublisher == NULL){
         igs_warn("Could not create IPC publishing socket (%s)", ipcEndpoint);
     }else{
+        bus_zyreLock();
         zyre_set_header(agentElements->node, "ipc", "%s", ipcEndpoint);
+        bus_zyreUnlock();
     }
 #elif (defined WIN32 || defined _WIN32)
     ipcEndpoint = strdup("tcp://127.0.0.1:*");
@@ -1377,7 +1431,9 @@ initLoop (zsock_t *pipe, void *args){
     if (ipcPublisher == NULL){
         igs_warn("Could not create loopback publishing socket (%s)", ipcEndpoint);
     }else{
+        bus_zyreLock();
         zyre_set_header(agentElements->node, "loopback", "%s", zsock_endpoint(ipcPublisher));
+        bus_zyreUnlock();
     }
 #endif
     
@@ -1391,17 +1447,23 @@ initLoop (zsock_t *pipe, void *args){
         while (*insert != ':' && insert > endpoint) {
             insert--;
         }
+        bus_zyreLock();
         zyre_set_header(agentElements->node, "logger", "%s", insert + 1);
+        bus_zyreUnlock();
     }
     
     //set other headers for agent
+    bus_zyreLock();
     zyre_set_header(agentElements->node, "canBeFrozen", "%i", agentCanBeFrozen);
+    bus_zyreUnlock();
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
     ssize_t ret;
     pid_t pid;
     pid = getpid();
+    bus_zyreLock();
     zyre_set_header(agentElements->node, "pid", "%i", pid);
+    bus_zyreUnlock();
     
     if (strlen(commandLine) == 0){
         //command line was not set manually : we try to get exec path instead
@@ -1423,9 +1485,13 @@ initLoop (zsock_t *pipe, void *args){
         } else {
             igs_trace("proc %d: %s", pid, pathbuf);
         }
+        bus_zyreLock();
         zyre_set_header(agentElements->node, "commandline", "%s", pathbuf);
+        bus_zyreUnlock();
     }else{
+        bus_zyreLock();
         zyre_set_header(agentElements->node, "commandline", "%s", commandLine);
+        bus_zyreUnlock();
     }
 #endif
     
@@ -1445,13 +1511,19 @@ initLoop (zsock_t *pipe, void *args){
 #else
         GetModuleFileName(NULL,exeFilePath,IGS_MAX_PATH);
 #endif
-
+        
+        bus_zyreLock();
         zyre_set_header(agentElements->node, "commandline", "%s", exeFilePath);
+        bus_zyreUnlock();
     }else{
+        bus_zyreLock();
         zyre_set_header(agentElements->node, "commandline", "%s", commandLine);
+        bus_zyreUnlock();
     }
     DWORD pid = GetCurrentProcessId();
+    bus_zyreLock();
     zyre_set_header(agentElements->node, "pid", "%i", (int)pid);
+    bus_zyreUnlock();
 #endif
 
 
@@ -1461,7 +1533,9 @@ initLoop (zsock_t *pipe, void *args){
     #if (defined WIN32 || defined _WIN32)
         WSACleanup();
     #endif
+    bus_zyreLock();
     zyre_set_header(agentElements->node, "hostname", "%s", hostname);
+    bus_zyreUnlock();
     //code for Fully Qualified Domain Name if needed someday
 //    struct addrinfo hints, *info, *p;
 //    int gai_result;
@@ -1479,11 +1553,16 @@ initLoop (zsock_t *pipe, void *args){
 //    freeaddrinfo(info);
     
     //finally start zyre now that everything is set
-    if (zyre_start (agentElements->node) == -1){
+    bus_zyreLock();
+    int zyreStartRes = zyre_start (agentElements->node);
+    bus_zyreUnlock();
+    if (zyreStartRes == -1){
         igs_error("Could not start bus node : Agent will interrupt immediately.");
         canContinue = false;
     }
+    bus_zyreLock();
     zyre_join(agentElements->node, CHANNEL);
+    bus_zyreUnlock();
     zsock_signal (pipe, 0); //notify main thread that we are ready
     
     zmq_pollitem_t zpipePollItem;
@@ -1546,7 +1625,9 @@ initLoop (zsock_t *pipe, void *args){
     HASH_ITER(hh, subscribers, s, tmps) {
         network_cleanAndFreeSubscriber(s);
     }
+    bus_zyreLock();
     zyre_stop (agentElements->node);
+    bus_zyreUnlock();
     zclock_sleep (100);
     zyre_destroy (&agentElements->node);
     zsock_destroy(&agentElements->publisher);
@@ -2014,7 +2095,9 @@ int igs_freeze(){
     {
         igs_debug("Agent frozen");
         if ((agentElements != NULL) && (agentElements->node != NULL)){
+            bus_zyreLock();
             zyre_shouts(agentElements->node, CHANNEL, "FROZEN=1");
+            bus_zyreUnlock();
         }
         isFrozen = true;
         freezeCallback_t *elt;
@@ -2047,7 +2130,9 @@ int igs_unfreeze(){
     {
         igs_debug("Agent resumed (unfrozen)");
         if ((agentElements != NULL) && (agentElements->node != NULL)){
+            bus_zyreLock();
             zyre_shouts(agentElements->node, CHANNEL, "FROZEN=0");
+            bus_zyreUnlock();
         }
         isFrozen = false;
         freezeCallback_t *elt;
@@ -2101,7 +2186,9 @@ int igs_setAgentState(const char *state){
         strncpy(igsAgentState, state, MAX_AGENT_NAME_LENGTH-1);
         igs_debug("changed to %s", igsAgentState);
         if (agentElements != NULL && agentElements->node != NULL){
+            bus_zyreLock();
             zyre_shouts(agentElements->node, CHANNEL, "STATE=%s", igsAgentState);
+            bus_zyreUnlock();
         }
     }
     return 1;
@@ -2128,10 +2215,12 @@ char *igs_getAgentState(){
 void igs_setCanBeFrozen (bool canBeFrozen){
     agentCanBeFrozen = canBeFrozen;
     if (agentElements != NULL && agentElements->node != NULL){
+        bus_zyreLock();
         //update header for information to agents not arrived yet
         zyre_set_header(agentElements->node, "canBeFrozen", "%i", agentCanBeFrozen);
         //send real time notification for agents already there
         zyre_shouts(agentElements->node, CHANNEL, "CANBEFROZEN=%i", canBeFrozen);
+        bus_zyreUnlock();
         igs_debug("changed to %d", canBeFrozen);
     }
 }
@@ -2162,7 +2251,9 @@ int igs_mute(){
     {
         isWholeAgentMuted = true;
         if ((agentElements != NULL) && (agentElements->node != NULL)){
+            bus_zyreLock();
             zyre_shouts(agentElements->node, CHANNEL, "MUTED=%i", isWholeAgentMuted);
+            bus_zyreUnlock();
         }
         muteCallback_t *elt;
         DL_FOREACH(muteCallbacks,elt){
@@ -2183,7 +2274,9 @@ int igs_unmute(){
     {
         isWholeAgentMuted = false;
         if ((agentElements != NULL) && (agentElements->node != NULL)){
+            bus_zyreLock();
             zyre_shouts(agentElements->node, CHANNEL, "MUTED=%i", isWholeAgentMuted);
+            bus_zyreUnlock();
         }
         muteCallback_t *elt;
         DL_FOREACH(muteCallbacks,elt){
@@ -2404,14 +2497,18 @@ void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData){
 
 void igs_setDiscoveryInterval(unsigned int interval){
     if (agentElements != NULL && agentElements->node != NULL){
+        bus_zyreLock();
         zyre_set_interval(agentElements->node, interval);
+        bus_zyreUnlock();
     }
     network_discoveryInterval = interval;
 }
 
 void igs_setAgentTimeout(unsigned int duration){
     if (agentElements != NULL && agentElements->node != NULL){
+        bus_zyreLock();
         zyre_set_expired_timeout(agentElements->node, duration);
+        bus_zyreUnlock();
     }
     network_agentTimeout = duration;
 }

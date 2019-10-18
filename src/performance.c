@@ -45,6 +45,8 @@ void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg){
     zyre_t *node = agentElements->node;
     
     performanceStart = zclock_usecs();
+    bus_zyreLock();
     zyre_whisper(node, peerId, &msg);
+    bus_zyreUnlock();
     free(mem);
 }

@@ -388,7 +388,9 @@ int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgu
                         zmsg_add(msg, frame);
                     }
                 }
+                bus_zyreLock();
                 zyre_whisper(agentElements->node, agent->peerId, &msg);
+                bus_zyreUnlock();
                 igs_debug("sent call %s to %s", callName, agentNameOrUUID);
             }else{
                 igs_error("could not find call named %s for %s", callName, agentNameOrUUID);

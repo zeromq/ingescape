@@ -178,7 +178,9 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
             printf("creating default log file %s\n", admin_logFile);
             free(name);
             if (agentElements != NULL && agentElements->node != NULL){
+                bus_zyreLock();
                 zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
+                bus_zyreUnlock();
             }
         }
         if (fp == NULL){
@@ -234,11 +236,13 @@ void igs_setLogInFile (bool allow){
     if (allow != admin_logInFile){
         admin_logInFile = allow;
         if (agentElements != NULL && agentElements->node != NULL){
+            bus_zyreLock();
             if (allow){
                 zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=1");
             }else{
                 zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=0");
             }
+            bus_zyreUnlock();
         }
     }
 }
@@ -275,11 +279,13 @@ void igs_setLogStream(bool stream){
         }
         admin_logInStream = stream;
         if (agentElements != NULL && agentElements->node != NULL){
+            bus_zyreLock();
             if (stream){
                 zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=1");
             }else{
                 zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=0");
             }
+            bus_zyreUnlock();
         }
     }
 }
@@ -317,7 +323,9 @@ void igs_setLogPath(const char *path){
             printf("switching to new log file: %s\n", admin_logFile);
         }
         if (fp != NULL && agentElements != NULL && agentElements->node != NULL){
+            bus_zyreLock();
             zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
+            bus_zyreUnlock();
         }
         admin_unlock();
     }else{

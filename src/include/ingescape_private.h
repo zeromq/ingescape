@@ -289,6 +289,8 @@ void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
 
 //bus
 extern serviceHeader_t *serviceHeaders;
+void bus_zyreLock(void);
+void bus_zyreUnlock(void);
 
 //call
 void call_freeCall(igs_call_t *t);

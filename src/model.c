@@ -1404,7 +1404,9 @@ int igs_muteOutput(const char *name){
     }
     iop->is_muted = true;
     if (agentElements != NULL && agentElements->node != NULL){
+        bus_zyreLock();
         zyre_shouts(agentElements->node, CHANNEL, "OUTPUT_MUTED %s", name);
+        bus_zyreUnlock();
     }
     return 1;
 }
@@ -1417,7 +1419,9 @@ int igs_unmuteOutput(const char *name){
     }
     iop->is_muted = false;
     if (agentElements != NULL && agentElements->node != NULL){
+        bus_zyreLock();
         zyre_shouts(agentElements->node, CHANNEL, "OUTPUT_UNMUTED %s", name);
+        bus_zyreUnlock();
     }
     return 1;
 }
