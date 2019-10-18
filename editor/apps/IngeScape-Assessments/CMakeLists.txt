@@ -168,6 +168,13 @@ find_package(Qt5 NO_MODULE COMPONENTS
     REQUIRED
 )
 
+if (APPLE)
+    find_package(Qt5 NO_MODULE COMPONENTS
+	QuickWidgets
+	REQUIRED
+    )
+endif()
+
 if (UNIX AND NOT APPLE)
     find_package(Qt5 NO_MODULE COMPONENTS
         DBus
@@ -283,9 +290,16 @@ target_link_libraries(
     cassandra
 )
 
+if (UNIX AND NOT APPLE)
+    target_link_libraries(${PROJECT_NAME} Qt5::DBus)
+endif()
+
 if (APPLE)
+    target_link_libraries(${PROJECT_NAME} Qt5::QuickWidgets)
     target_link_libraries(${PROJECT_NAME} "-framework Foundation -framework AppKit")
-elseif (WIN32)
+endif()
+
+if (WIN32)
     target_link_libraries(${PROJECT_NAME} Wtsapi32 user32 Advapi32)
 endif()
 
