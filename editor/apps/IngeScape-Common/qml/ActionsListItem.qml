@@ -323,9 +323,6 @@ Item {
                     style: ButtonStyleOfOption {
                     }
 
-                    // Model of action
-                    property ActionM duplicateAction: null;
-
                     onClicked: {
                         if (rootItem.controller && rootItem.action) {
                             rootItem.controller.openActionEditorToDuplicateModel(rootItem.action);

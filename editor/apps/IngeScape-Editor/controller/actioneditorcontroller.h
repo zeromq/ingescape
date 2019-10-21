@@ -36,9 +36,6 @@ class ActionEditorController: public QObject
 {
     Q_OBJECT
 
-    // ActionEditor to duplicate another action ?
-    I2_QML_PROPERTY(bool, toDuplicate)
-
     // Original model of action
     I2_QML_PROPERTY(ActionM*, originalAction)
 

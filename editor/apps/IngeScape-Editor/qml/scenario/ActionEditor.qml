@@ -124,6 +124,8 @@ WindowBlockTouches {
                 margins : 20
             }
 
+            focus:true
+
             Text {
                 id: txtTitle
 
@@ -198,6 +200,17 @@ WindowBlockTouches {
 
                 height: textFieldName.height
 
+                Connections {
+                    target: rootItem
+
+                    Component.onCompleted: {
+                        // Set focus on action's name if new action is edited
+                        if (rootItem.active && panelController && panelController.originalAction === null) {
+                            textFieldName.forceActiveFocus();
+                        }
+                    }
+                }
+
                 TextField {
                     id: textFieldName
 
@@ -248,8 +261,7 @@ WindowBlockTouches {
                         else {
                             textFieldName.selectAll();
                         }
-                    }
-
+                    }                
 
                     Binding {
                         target: textFieldName
@@ -1106,7 +1118,7 @@ WindowBlockTouches {
                 Connections {
                     target: rootItem
 
-                    onActiveChanged: {
+                    Component.onCompleted: {
                         // make the conditions list visible if there are conditions
                         if (rootItem.active && actionM && (actionM.conditionsList.count > 0)) {
                             conditionsItem.isOpened = true;
@@ -2477,8 +2489,14 @@ WindowBlockTouches {
                     rootItem.close();
                 }
             }
-        }
 
+            Keys.onReturnPressed : {
+                okButton.clicked();
+            }
+            Keys.onEscapePressed : {
+                cancelButton.clicked();
+            }
+        }
     }
 
 

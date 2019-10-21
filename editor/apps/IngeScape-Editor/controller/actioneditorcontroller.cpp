@@ -29,7 +29,6 @@ ActionEditorController::ActionEditorController(QString actionName,
                                                QList<AgentsGroupedByNameVM*> allAgentsGroupsByName,
                                                bool toDuplicate,
                                                QObject *parent) : QObject(parent),
-    _toDuplicate(toDuplicate),
     _originalAction(originalAction),
     _editedAction(nullptr),
     _originalViewModel(nullptr),
@@ -49,10 +48,10 @@ ActionEditorController::ActionEditorController(QString actionName,
         _editedAction->copyFrom(_originalAction);
 
         if (toDuplicate) {
-            // Keep uid & name
+            // Keep uid & name of the new duplicated action
             _editedAction->setuid(uid);
             _editedAction->setname(actionName);
-            // No more original action
+            // Reset original action (it's a duplication : action does not exist yet)
             _originalAction = nullptr;
         }
         else { // Cancel the increment because the edited action uses now (after the call to "copyFrom") the uid of the original action
