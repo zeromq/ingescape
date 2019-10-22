@@ -48,6 +48,12 @@ class ActionEditorController: public QObject
     // Temporary view model of action
     I2_QML_PROPERTY(ActionVM*, editedViewModel)
 
+    // Last agent selected to use it for next effect or condition
+    I2_QML_PROPERTY(AgentsGroupedByNameVM*, lastAgentSelected)
+
+    // Last iop selected to use it for next effect or condition
+    I2_QML_PROPERTY(AgentIOPVM*, lastIOPSelected)
+
 
 public:
 

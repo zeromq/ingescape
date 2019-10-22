@@ -424,7 +424,7 @@ WindowBlockTouches {
                     color : IngeScapeTheme.whiteColor
                 }
 
-                /// Effects List
+                // Effects List
                 ScrollView {
                     id : scrollView
 
@@ -442,7 +442,7 @@ WindowBlockTouches {
                     // Prevent drag overshoot on Windows
                     flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                    /// Effects List
+                    // Effects List
                     contentItem: Column {
                         id: effectsList
                         spacing: 6
@@ -549,7 +549,6 @@ WindowBlockTouches {
                                                 }
                                             }
 
-
                                             Binding {
                                                 target: effectTypeCB
                                                 property: "checked"
@@ -599,6 +598,12 @@ WindowBlockTouches {
                                             if ((agentEffectCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.agent = agentEffectCombo.selectedItem;
+
+                                                // Register agent selected to choose it for the next effect or condition
+                                                // Do it only here, because it is updated everytime agent model of effect change
+                                                if (rootItem.panelController) {
+                                                    rootItem.panelController.lastAgentSelected = agentEffectCombo.selectedItem;
+                                                }
                                             }
                                         }
                                     }
@@ -636,6 +641,11 @@ WindowBlockTouches {
                                             if ((iopEffectsCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.agentIOP = iopEffectsCombo.selectedItem;
+
+                                                // Register agent IOP selected to choose it for the next effect or condition
+                                                if (rootItem.panelController) {
+                                                    panelController.lastIOPSelected = iopEffectsCombo.selectedItem;
+                                                }
 
                                                 // Revalidate text field and combo entry regarding which one is visible and the type of the selected IOP.
                                                 userInputItem.revalidateInput()
@@ -1006,7 +1016,7 @@ WindowBlockTouches {
                                         }
                                     }
 
-                                    // Intputs (of input agent)
+                                    // Inputs (of input agent)
                                     IngeScapeComboboxItemModelAgentsIOP {
                                         id: comboEffectOnMapping_Input
 
@@ -1061,8 +1071,6 @@ WindowBlockTouches {
                                         }
                                     }
                                 }
-
-
                             }
                         }
 
@@ -1354,7 +1362,6 @@ WindowBlockTouches {
                     flickableItem.boundsBehavior: Flickable.OvershootBounds
 
 
-
                     //
                     // Conditions List
                     //
@@ -1522,6 +1529,12 @@ WindowBlockTouches {
                                                 if (agentCombo.selectedIndex >= 0 && actionM)
                                                 {
                                                     myCondition.modelM.agent = agentCombo.selectedItem;
+
+                                                    // Register agent selected to choose it for the next effect or condition
+                                                    // Do it only here, because it is updated everytime agent model of condition change
+                                                    if (rootItem.panelController) {
+                                                        rootItem.panelController.lastAgentSelected = agentCombo.selectedItem;
+                                                    }
                                                 }
                                             }
                                         }
@@ -1551,7 +1564,12 @@ WindowBlockTouches {
                                                 {
                                                     myCondition.modelM.agentIOP = ioCombo.selectedItem;
 
-                                                    inputComparisonItem.revalidateInput()
+                                                    // Register agent IOP selected to choose it for the next effect or condition
+                                                    if (rootItem.panelController) {
+                                                        panelController.lastIOPSelected = ioCombo.selectedItem;
+                                                    }
+
+                                                    inputComparisonItem.revalidateInput();
                                                 }
                                             }
                                         }

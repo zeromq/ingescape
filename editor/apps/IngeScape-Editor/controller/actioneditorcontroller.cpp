@@ -33,6 +33,8 @@ ActionEditorController::ActionEditorController(QString actionName,
     _editedAction(nullptr),
     _originalViewModel(nullptr),
     _editedViewModel(nullptr),
+    _lastAgentSelected(nullptr),
+    _lastIOPSelected(nullptr),
     _allAgentsGroupsByName(allAgentsGroupsByName)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -130,14 +132,29 @@ void ActionEditorController::createNewCondition()
 {
     ActionConditionVM* conditionVM = new ActionConditionVM();
 
-    // Set a condition model (by default: condition on value)
-    conditionVM->setmodelM(new IOPValueConditionM());
-    //conditionVM->setmodelM(new ConditionOnAgentM());
+    // Configure new condition model (by default: condition on value)
+    IOPValueConditionM* conditionModel = new IOPValueConditionM();
+    //ConditionOnAgentM* conditionModel = new ConditionOnAgentM();
 
     // List of agents is NOT empty
     if (!_allAgentsGroupsByName.isEmpty()) {
-        conditionVM->modelM()->setagent(_allAgentsGroupsByName.at(0));
+
+        // Set last agent selected if it exists
+        if ((_lastAgentSelected != nullptr) && (_allAgentsGroupsByName.contains(_lastAgentSelected))) {
+            conditionModel->setagent(_lastAgentSelected);
+        }
+        else {
+            conditionModel->setagent(_allAgentsGroupsByName.at(0));
+        }
+
+        // Set last iop selected if it exists (only if it is a condition on value)
+        if ((_lastIOPSelected != nullptr) && (conditionModel->iopMergedList()->contains(_lastIOPSelected))) {
+            conditionModel->setagentIOP(_lastIOPSelected);
+        }
     }
+
+    // Set condition model
+    conditionVM->setmodelM(conditionModel);
 
     _editedAction->addConditionToList(conditionVM);
 
@@ -166,18 +183,33 @@ void ActionEditorController::createNewEffect()
 {
     ActionEffectVM* effectVM = new ActionEffectVM();
 
-    // Set an effect model
-    effectVM->setmodelM(new IOPValueEffectM());
+    // Configure new effect model
+    IOPValueEffectM* effectModel = new IOPValueEffectM();
 
     // List of agents is NOT empty
     if (!_allAgentsGroupsByName.isEmpty())
     {
-        effectVM->modelM()->setagent(_allAgentsGroupsByName.at(0));
+        // Set last agent selected if it exists
+        if ((_lastAgentSelected != nullptr) && (_allAgentsGroupsByName.contains(_lastAgentSelected))) {
+            effectModel->setagent(_lastAgentSelected);
+        }
+        else {
+            effectModel->setagent(_allAgentsGroupsByName.at(0));
+        }
 
+        // Select second agent for mapping effect
         if (_allAgentsGroupsByName.count() > 1) {
             effectVM->setsecondAgentForMapping(_allAgentsGroupsByName.at(1));
         }
+
+        // Set last iop selected
+        if ((_lastIOPSelected != nullptr) && (effectModel->iopMergedList()->contains(_lastIOPSelected))) {
+            effectModel->setagentIOP(_lastIOPSelected);
+        }
     }
+
+    // Set effect model
+    effectVM->setmodelM(effectModel);
 
     _editedAction->addEffectToList(effectVM);
 
@@ -195,4 +227,3 @@ void ActionEditorController::removeEffect(ActionEffectVM* effectVM)
         _editedAction->effectsList()->remove(effectVM);
     }
 }
-

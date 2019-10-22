@@ -102,21 +102,21 @@ Item {
         }
 
         // Feedback visible if all conditions are valids
-        Rectangle {
-            id: feedbackValidConditions
+//        Rectangle {
+//            id: feedbackValidConditions
 
-            anchors {
-                left: grip.right
-                leftMargin: 8
-                verticalCenter: parent.verticalCenter
-            }
-            height: 4
-            width: 4
-            radius: 2
+//            anchors {
+//                left: grip.right
+//                leftMargin: 8
+//                verticalCenter: parent.verticalCenter
+//            }
+//            height: 4
+//            width: 4
+//            radius: 2
 
-            color: IngeScapeTheme.orangeColor
-            opacity: (rootItem.action && rootItem.action.isValid) ? 1 : 0
-        }
+//            color: IngeScapeTheme.orangeColor
+//            opacity: (rootItem.action && rootItem.action.isValid) ? 1 : 0
+//        }
 
         // Action name
         MouseArea {
