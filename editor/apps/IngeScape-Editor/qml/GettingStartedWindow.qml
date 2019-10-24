@@ -156,7 +156,7 @@ Window {
             id: loadingFailedFeedback
 
             anchors {
-                top: btnCloseEditor.bottom
+                top: parent.top
                 left: parent.left
                 right: parent.right
                 bottom: showOnStartupCheckbox.top
