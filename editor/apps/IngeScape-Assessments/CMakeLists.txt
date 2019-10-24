@@ -345,6 +345,17 @@ if (APPLE)
             COMMENT "Deploying Qt..."
         )
 
+        if (Qt5Core_VERSION VERSION_LESS 5.12.0)
+            # Patch macdeployqt for version 5.9 : It does not update libcrypto path in libssl
+            # use otool |grep | cut to avoid absolute path
+            add_custom_command(
+                TARGET ${PROJECT_NAME}
+                POST_BUILD
+                COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change `otool -L $<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/libssl.1.0.0.dylib | grep libcrypto.1.0.0.dylib | cut -f 1 -d ' '` "@executable_path/../Frameworks/libcrypto.1.0.0.dylib" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/libssl.1.0.0.dylib"
+            )
+        endif()
+
+
         set(CMAKE_SKIP_INSTALL_RPATH TRUE)
     endif ()
 elseif (WIN32)
