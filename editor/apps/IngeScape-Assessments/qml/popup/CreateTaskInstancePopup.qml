@@ -263,7 +263,7 @@ AssessmentsPopupBase {
 
             height: 30
 
-            text: qsTr("Task :")
+            text: qsTr("Protocol :")
 
             verticalAlignment: Text.AlignVCenter
 
