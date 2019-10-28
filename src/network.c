@@ -1416,10 +1416,10 @@ initLoop (zsock_t *pipe, void *args){
     sprintf(ipcEndpoint, "ipc://%s/%s", ipcFolderPath, zyre_uuid(agentElements->node));
     bus_zyreUnlock();
     zsock_t *ipcPublisher = agentElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
-    zsock_set_sndhwm(agentElements->ipcPublisher, network_hwmValue);
     if (ipcPublisher == NULL){
         igs_warn("Could not create IPC publishing socket (%s)", ipcEndpoint);
     }else{
+        zsock_set_sndhwm(agentElements->ipcPublisher, network_hwmValue);
         bus_zyreLock();
         zyre_set_header(agentElements->node, "ipc", "%s", ipcEndpoint);
         bus_zyreUnlock();
