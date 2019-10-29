@@ -25,11 +25,8 @@
 #arm64, i386, x86_64) by commenting the call to build it below for the corresponding
 #architecture.
 
-#FIXME: find a way to add include path -I$COMPILE_DESTINATION/output/$target/include/
-#in CFLAGS or other without it being ignored (adding -L path in LDFLAGS worked right away)
-
 #just in case:
-#codesign -s 'iPhone Develoer' ./path/to/binary
+#codesign -s 'iPhone Developer' ./path/to/binary
 
 if [ $# -ne 2 ]; then
 echo usage: $0 /Users/steph/tmp/ libmylib.a
@@ -70,13 +67,11 @@ target=$1
 hosttarget=$1
 platform=$2
 
-if [[ $hosttarget == "x86_64" ]]; then
-hostarget="i386"
-elif [[ $hosttarget == "arm64" ]]; then
+if [[ $hosttarget == "arm64" ]]; then
 hosttarget="arm"
 fi
 
-export CC="$(xcrun -sdk iphoneos -find clang) -I${COMPILE_DESTINATION}/output/${target}/include/"
+export CC="$(xcrun -sdk iphoneos -find clang) -I${COMPILE_DESTINATION}/output/${target}/include/" #-I${COMPILE_DESTINATION}/../curl/include/"
 export CPP="$CC -E"
 export CFLAGS="-arch ${target} -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$SDKVERSION"
 export AR=$(xcrun -sdk iphoneos -find ar)
@@ -99,11 +94,12 @@ cd $1
 
 findLatestSDKVersion iPhoneOS
 
-buildit armv7 iPhoneOS
-buildit armv7s iPhoneOS
+#buildit armv7 iPhoneOS
+#buildit armv7s iPhoneOS
 buildit arm64 iPhoneOS
-buildit i386 iPhoneSimulator
+#buildit i386 iPhoneSimulator
 buildit x86_64 iPhoneSimulator
 
 LIPO=$(xcrun -sdk iphoneos -find lipo)
-$LIPO -create $COMPILE_DESTINATION/output/armv7/lib/${LIBNAME}  $COMPILE_DESTINATION/output/armv7s/lib/${LIBNAME} $COMPILE_DESTINATION/output/arm64/lib/${LIBNAME} $COMPILE_DESTINATION/output/x86_64/lib/${LIBNAME} $COMPILE_DESTINATION/output/i386/lib/${LIBNAME} -output $COMPILE_DESTINATION/${LIBNAME}
+#$LIPO -create $COMPILE_DESTINATION/output/armv7/lib/${LIBNAME}  $COMPILE_DESTINATION/output/armv7s/lib/${LIBNAME} $COMPILE_DESTINATION/output/arm64/lib/${LIBNAME} $COMPILE_DESTINATION/output/x86_64/lib/${LIBNAME} $COMPILE_DESTINATION/output/i386/lib/${LIBNAME} -output $COMPILE_DESTINATION/${LIBNAME}
+$LIPO -create $COMPILE_DESTINATION/output/arm64/lib/${LIBNAME} $COMPILE_DESTINATION/output/x86_64/lib/${LIBNAME} -output $COMPILE_DESTINATION/${LIBNAME}

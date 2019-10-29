@@ -129,7 +129,6 @@
 		979A7D801EA8A9CB003153EF /* crypto_sign_ed25519.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79E71EA8A86F003153EF /* crypto_sign_ed25519.h */; };
 		979A7D811EA8A9CB003153EF /* crypto_sign_edwards25519sha512batch.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79E81EA8A86F003153EF /* crypto_sign_edwards25519sha512batch.h */; };
 		979A7D821EA8A9CB003153EF /* crypto_stream.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79E91EA8A86F003153EF /* crypto_stream.h */; };
-		979A7D831EA8A9CB003153EF /* crypto_stream_aes128ctr.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79EA1EA8A86F003153EF /* crypto_stream_aes128ctr.h */; };
 		979A7D841EA8A9CB003153EF /* crypto_stream_chacha20.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79EB1EA8A86F003153EF /* crypto_stream_chacha20.h */; };
 		979A7D851EA8A9CB003153EF /* crypto_stream_salsa20.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79EC1EA8A86F003153EF /* crypto_stream_salsa20.h */; };
 		979A7D861EA8A9CB003153EF /* crypto_stream_salsa2012.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79ED1EA8A86F003153EF /* crypto_stream_salsa2012.h */; };
@@ -141,7 +140,6 @@
 		979A7D8C1EA8A9CB003153EF /* crypto_verify_64.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F31EA8A86F003153EF /* crypto_verify_64.h */; };
 		979A7D8D1EA8A9CB003153EF /* export.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F41EA8A86F003153EF /* export.h */; };
 		979A7D8E1EA8A9CB003153EF /* randombytes.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F51EA8A86F003153EF /* randombytes.h */; };
-		979A7D8F1EA8A9CB003153EF /* randombytes_salsa20_random.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F61EA8A86F003153EF /* randombytes_salsa20_random.h */; };
 		979A7D901EA8A9CB003153EF /* randombytes_sysrandom.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F71EA8A86F003153EF /* randombytes_sysrandom.h */; };
 		979A7D911EA8A9CB003153EF /* runtime.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F81EA8A86F003153EF /* runtime.h */; };
 		979A7D921EA8A9CB003153EF /* utils.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F91EA8A86F003153EF /* utils.h */; };
@@ -299,7 +297,6 @@
 				979A7D801EA8A9CB003153EF /* crypto_sign_ed25519.h in CopyFiles */,
 				979A7D811EA8A9CB003153EF /* crypto_sign_edwards25519sha512batch.h in CopyFiles */,
 				979A7D821EA8A9CB003153EF /* crypto_stream.h in CopyFiles */,
-				979A7D831EA8A9CB003153EF /* crypto_stream_aes128ctr.h in CopyFiles */,
 				979A7D841EA8A9CB003153EF /* crypto_stream_chacha20.h in CopyFiles */,
 				979A7D851EA8A9CB003153EF /* crypto_stream_salsa20.h in CopyFiles */,
 				979A7D861EA8A9CB003153EF /* crypto_stream_salsa2012.h in CopyFiles */,
@@ -311,7 +308,6 @@
 				979A7D8C1EA8A9CB003153EF /* crypto_verify_64.h in CopyFiles */,
 				979A7D8D1EA8A9CB003153EF /* export.h in CopyFiles */,
 				979A7D8E1EA8A9CB003153EF /* randombytes.h in CopyFiles */,
-				979A7D8F1EA8A9CB003153EF /* randombytes_salsa20_random.h in CopyFiles */,
 				979A7D901EA8A9CB003153EF /* randombytes_sysrandom.h in CopyFiles */,
 				979A7D911EA8A9CB003153EF /* runtime.h in CopyFiles */,
 				979A7D921EA8A9CB003153EF /* utils.h in CopyFiles */,
@@ -406,7 +402,6 @@
 		979A79E71EA8A86F003153EF /* crypto_sign_ed25519.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypto_sign_ed25519.h; sourceTree = "<group>"; };
 		979A79E81EA8A86F003153EF /* crypto_sign_edwards25519sha512batch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypto_sign_edwards25519sha512batch.h; sourceTree = "<group>"; };
 		979A79E91EA8A86F003153EF /* crypto_stream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypto_stream.h; sourceTree = "<group>"; };
-		979A79EA1EA8A86F003153EF /* crypto_stream_aes128ctr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypto_stream_aes128ctr.h; sourceTree = "<group>"; };
 		979A79EB1EA8A86F003153EF /* crypto_stream_chacha20.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypto_stream_chacha20.h; sourceTree = "<group>"; };
 		979A79EC1EA8A86F003153EF /* crypto_stream_salsa20.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypto_stream_salsa20.h; sourceTree = "<group>"; };
 		979A79ED1EA8A86F003153EF /* crypto_stream_salsa2012.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypto_stream_salsa2012.h; sourceTree = "<group>"; };
@@ -418,7 +413,6 @@
 		979A79F31EA8A86F003153EF /* crypto_verify_64.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypto_verify_64.h; sourceTree = "<group>"; };
 		979A79F41EA8A86F003153EF /* export.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = export.h; sourceTree = "<group>"; };
 		979A79F51EA8A86F003153EF /* randombytes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = randombytes.h; sourceTree = "<group>"; };
-		979A79F61EA8A86F003153EF /* randombytes_salsa20_random.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = randombytes_salsa20_random.h; sourceTree = "<group>"; };
 		979A79F71EA8A86F003153EF /* randombytes_sysrandom.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = randombytes_sysrandom.h; sourceTree = "<group>"; };
 		979A79F81EA8A86F003153EF /* runtime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime.h; sourceTree = "<group>"; };
 		979A79F91EA8A86F003153EF /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
@@ -1435,7 +1429,6 @@
 				979A79E71EA8A86F003153EF /* crypto_sign_ed25519.h */,
 				979A79E81EA8A86F003153EF /* crypto_sign_edwards25519sha512batch.h */,
 				979A79E91EA8A86F003153EF /* crypto_stream.h */,
-				979A79EA1EA8A86F003153EF /* crypto_stream_aes128ctr.h */,
 				979A79EB1EA8A86F003153EF /* crypto_stream_chacha20.h */,
 				979A79EC1EA8A86F003153EF /* crypto_stream_salsa20.h */,
 				979A79ED1EA8A86F003153EF /* crypto_stream_salsa2012.h */,
@@ -1447,7 +1440,6 @@
 				979A79F31EA8A86F003153EF /* crypto_verify_64.h */,
 				979A79F41EA8A86F003153EF /* export.h */,
 				979A79F51EA8A86F003153EF /* randombytes.h */,
-				979A79F61EA8A86F003153EF /* randombytes_salsa20_random.h */,
 				979A79F71EA8A86F003153EF /* randombytes_sysrandom.h */,
 				979A79F81EA8A86F003153EF /* runtime.h */,
 				979A79F91EA8A86F003153EF /* utils.h */,
