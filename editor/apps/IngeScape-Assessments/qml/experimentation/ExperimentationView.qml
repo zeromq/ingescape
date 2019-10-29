@@ -15,6 +15,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
+//import QtQuick.Controls 2.5
 
 import I2Quick 1.0
 
@@ -47,6 +48,12 @@ Item {
     property int rightMarginToAvoidToBeHiddenByNetworkConnectionInfo: 220
 
     property int subScreensMargin: 35
+
+    // Flag indicating if we are currently selecting the sessions to export
+    property bool _isSelectingSessionsToExport: false
+
+    // Duration of the animation about appearance of the check box to select sessions
+    property int _appearanceAnimationDuration: 250
 
 
     //--------------------------------
@@ -309,15 +316,16 @@ Item {
             right: parent.right
         }
 
-        //FIXME Minimum size not handled
-        property real protocolColumnWidth: 280
+        property real selectionColumnWidth: _isSelectingSessionsToExport ? 30 : 0
         property real subjectColumnWidth: 180
+        property real protocolColumnWidth: 280
         property real creationDateTimeColumnWidth: 165
         property real buttonsColumnWidth: 135
 
         property real sessionColumnWidth: taskInstancesPanel.width - taskInstanceScrollView.scrollBarSize - taskInstanceScrollView.verticalScrollbarMargin
-                                          - protocolColumnWidth
+                                          - selectionColumnWidth
                                           - subjectColumnWidth
+                                          - protocolColumnWidth
                                           - creationDateTimeColumnWidth
                                           - buttonsColumnWidth
 
@@ -435,10 +443,19 @@ Item {
                     }
 
                     onClicked: {
-                        console.log("QML: Open the 'Export View' popup");
+                        //console.log("QML: Open the 'Export View' popup");
 
                         // Open the popup "Export View"
-                        exportViewPopup.open();
+                        //exportViewPopup.open();
+
+                        if (!_isSelectingSessionsToExport) {
+                            // Start selection
+                            _isSelectingSessionsToExport = true;
+                        }
+                        else {
+                            // Stop selection
+                            _isSelectingSessionsToExport = false;
+                        }
                     }
                 }
             }
@@ -517,25 +534,68 @@ Item {
                     anchors {
                         top: parent.top
                         left: parent.left
-                        leftMargin: 15
+                        //leftMargin: 15
                         right: parent.right
                         bottom: parent.bottom
                     }
                     spacing: 0
 
-                    Text {
-                        anchors {
-                            verticalCenter: parent.verticalCenter
+                    I2CustomRectangle {
+                    //Rectangle {
+                        width: mainView.selectionColumnWidth
+                        height: parent.height
+
+                        color: IngeScapeAssessmentsTheme.blueButton_pressed
+                        topLeftRadius: 5
+
+                        Behavior on width {
+                            NumberAnimation {
+                                duration: rootItem._appearanceAnimationDuration
+                            }
                         }
 
-                        width: mainView.sessionColumnWidth
+                        Text {
+                            anchors {
+                                horizontalCenter: parent.horizontalCenter
+                                verticalCenter: parent.verticalCenter
+                            }
 
-                        text: qsTr("Name")
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 18
-                            weight: Font.Black
+                            text: qsTr("-->")
+                            opacity: rootItem._isSelectingSessionsToExport ? 1 : 0
+
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 18
+                                weight: Font.Black
+                            }
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: rootItem._appearanceAnimationDuration
+                                }
+                            }
+                        }
+                    }
+
+                    Item {
+                        width: mainView.subjectColumnWidth
+                        height: parent.height
+
+                        Text {
+                            anchors {
+                                left: parent.left
+                                leftMargin: 15
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            text: qsTr("Subject")
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 18
+                                weight: Font.Black
+                            }
                         }
                     }
 
@@ -560,9 +620,9 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
 
-                        width: mainView.subjectColumnWidth
+                        width: mainView.creationDateTimeColumnWidth
 
-                        text: qsTr("Subject")
+                        text: qsTr("Creation date")
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
@@ -576,9 +636,9 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
 
-                        width: mainView.creationDateTimeColumnWidth
+                        width: mainView.sessionColumnWidth
 
-                        text: qsTr("Creation date")
+                        text: qsTr("Description")
                         color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
@@ -627,10 +687,14 @@ Item {
                             model: rootItem.experimentation ? rootItem.experimentation.allTaskInstances : null
 
                             delegate: TaskInstanceInList {
-                                sessionColumnWidth: mainView.sessionColumnWidth
-                                protocolColumnWidth: mainView.protocolColumnWidth
+                                isSelectingSessionsToExport: rootItem._isSelectingSessionsToExport
+                                appearanceAnimationDuration: rootItem._appearanceAnimationDuration
+
+                                selectionColumnWidth: mainView.selectionColumnWidth
                                 subjectColumnWidth: mainView.subjectColumnWidth
+                                protocolColumnWidth: mainView.protocolColumnWidth
                                 creationDateTimeColumnWidth: mainView.creationDateTimeColumnWidth
+                                sessionColumnWidth: mainView.sessionColumnWidth
                                 //buttonsColumnWidth: mainView.buttonsColumnWidth
 
                                 anchors {
@@ -738,7 +802,7 @@ Item {
     //
     // Export View (popup)
     //
-    Export.ExportView {
+    /*Export.ExportView {
         id: exportViewPopup
 
         anchors.centerIn: parent
@@ -747,7 +811,7 @@ Item {
         height: parent.height - subScreensMargin
 
         controller: IngeScapeAssessmentsC.exportC
-    }
+    }*/
 
 
     Popup.DeleteConfirmationPopup {

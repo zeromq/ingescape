@@ -37,12 +37,19 @@ Rectangle {
     //
     //--------------------------------------------------------
 
-    property TaskInstanceM modelM: null;
+    property TaskInstanceM modelM: null
 
-    property real sessionColumnWidth: 0;
-    property real protocolColumnWidth: 0;
-    property real subjectColumnWidth: 0;
-    property real creationDateTimeColumnWidth: 0;
+    // Flag indicating if we are currently selecting the sessions to export
+    property bool isSelectingSessionsToExport: false
+
+    // Duration of the animation about appearance of the check box to select sessions
+    property int appearanceAnimationDuration: 250
+
+    property real selectionColumnWidth: 0
+    property real subjectColumnWidth: 0
+    property real protocolColumnWidth: 0
+    property real creationDateTimeColumnWidth: 0
+    property real sessionColumnWidth: 0
 
     property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.containsMouse || btnOpen.containsMouse
 
@@ -94,8 +101,43 @@ Rectangle {
             verticalCenter: parent.verticalCenter
         }
 
+        Rectangle {
+            width: selectionColumnWidth
+            //height: rootItem.height - 2
+            height: rootItem.height
+
+            color: IngeScapeAssessmentsTheme.blueButton_pressed
+            /*border {
+                color: "red"
+                width: 1
+            }*/
+
+            Behavior on width {
+                NumberAnimation {
+                    duration: rootItem.appearanceAnimationDuration
+                }
+            }
+
+            CheckBox {
+                id: checkBoxSelection
+
+                anchors {
+                    fill: parent
+                    margins: 5
+                }
+
+                opacity: rootItem.isSelectingSessionsToExport ? 1.0 : 0.0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: rootItem.appearanceAnimationDuration
+                    }
+                }
+            }
+        }
+
         Item {
-            width: sessionColumnWidth
+            width: subjectColumnWidth
             height: rootItem.height
 
             /*color: "transparent"
@@ -105,7 +147,7 @@ Rectangle {
             }*/
 
             Text {
-                id: txtSessionName
+                id: txtSubjectId
 
                 anchors {
                     fill: parent
@@ -114,8 +156,8 @@ Rectangle {
                 }
                 verticalAlignment: Text.AlignVCenter
 
-                text: rootItem.modelM ? rootItem.modelM.name : ""
                 elide: Text.ElideRight
+                text: (rootItem.modelM && rootItem.modelM.subject) ? rootItem.modelM.subject.displayedId : ""
 
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
@@ -159,38 +201,6 @@ Rectangle {
         }
 
         Item {
-            width: subjectColumnWidth
-            height: rootItem.height
-
-            /*color: "transparent"
-            border {
-                color: "red"
-                width: 1
-            }*/
-
-            Text {
-                id: txtSubjectId
-
-                anchors {
-                    fill: parent
-                    leftMargin: 15
-                    rightMargin: 5
-                }
-                verticalAlignment: Text.AlignVCenter
-
-                elide: Text.ElideRight
-                text: (rootItem.modelM && rootItem.modelM.subject) ? rootItem.modelM.subject.displayedId : ""
-
-                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight: Font.Bold
-                    pixelSize: 16
-                }
-            }
-        }
-
-        Item {
             width: creationDateTimeColumnWidth
             height: rootItem.height
 
@@ -213,6 +223,38 @@ Rectangle {
                 elide: Text.ElideRight
                 text: rootItem.modelM ? rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "dd/MM/yyyy") + " " + rootItem.modelM.startDateTime.toLocaleString(Qt.locale(), "hh:mm:ss")
                                       : "../../.... ..:..:.."
+
+                color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight: Font.Bold
+                    pixelSize: 16
+                }
+            }
+        }
+
+        Item {
+            width: sessionColumnWidth
+            height: rootItem.height
+
+            /*color: "transparent"
+            border {
+                color: "red"
+                width: 1
+            }*/
+
+            Text {
+                id: txtSessionName
+
+                anchors {
+                    fill: parent
+                    leftMargin: 15
+                    rightMargin: 5
+                }
+                verticalAlignment: Text.AlignVCenter
+
+                text: rootItem.modelM ? rootItem.modelM.name : ""
+                elide: Text.ElideRight
 
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
