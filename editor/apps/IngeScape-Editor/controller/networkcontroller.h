@@ -298,14 +298,6 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when a command must be sent on the network to a recorder
-     * @param peerIdOfRecorder
-     * @param commandAndParameters
-     */
-    void onCommandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters);
-
-
-    /**
      * @brief Slot called when a command must be sent on the network to an agent
      * @param peerIdsList
      * @param command

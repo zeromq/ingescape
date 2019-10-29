@@ -35,6 +35,15 @@ class ExperimentationController : public QObject
     // Model of the current experimentation
     I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
 
+    // Peer id of the recorder
+    I2_CPP_NOSIGNAL_PROPERTY(QString, peerIdOfRecorder)
+
+    // Peer name of the recorder
+    I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfRecorder)
+
+    // Flag indicating is there is a recorder with state ON
+    I2_QML_PROPERTY_READONLY(bool, isRecorderON)
+
 
 public:
 
@@ -76,6 +85,42 @@ public:
     Q_INVOKABLE void deleteTaskInstance(TaskInstanceM* taskInstance);
 
 
+    /**
+     * @brief Export a list of selected sessions
+     */
+    Q_INVOKABLE void exportSelectedSessions();
+
+
+Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to the recorder
+     * @param peerIdOfRecorder
+     * @param commandAndParameters
+     */
+    void commandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters);
+
+
+public Q_SLOTS:
+
+    /**
+     * @brief Slot called when a recorder enter the network
+     * @param peerId
+     * @param peerName
+     * @param ipAddress
+     * @param hostname
+     */
+    void onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
+
+
+    /**
+     * @brief Slot called when a recorder quit the network
+     * @param peerId
+     * @param peerName
+     */
+    void onRecorderExited(QString peerId, QString peerName);
+
+
 private Q_SLOTS:
 
     /**
@@ -83,6 +128,7 @@ private Q_SLOTS:
      * @param currentExperimentation
      */
     void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
+
 
 protected: // Methods
     /**
@@ -150,6 +196,7 @@ protected: // Methods
      * @param experimentation
      */
     void _retrieveIndependentVariableValuesForTaskInstancesInExperimentation(ExperimentationM* experimentation);
+
 
 protected: // Attributes
     // Helper to manage JSON files

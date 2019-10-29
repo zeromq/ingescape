@@ -134,10 +134,16 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     // Connect to signals from the experimentation controller to the rest of the controllers
     connect(_experimentationC, &ExperimentationController::currentExperimentationChanged,
             this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
+    connect(_experimentationC, &ExperimentationController::commandAskedToRecorder,
+            _networkC, &NetworkController::onCommandAskedToRecorder);
 
     // Connect to signals from the network controller
-    /*connect(_networkC, &NetworkController::agentEntered, _modelManager, &AssessmentsModelManager::onAgentEntered);
-    connect(_networkC, &NetworkController::agentExited, _modelManager, &AssessmentsModelManager::onAgentExited);*/
+    //connect(_networkC, &NetworkController::agentEntered, _modelManager, &EditorModelManager::onAgentEntered);
+    //connect(_networkC, &NetworkController::agentExited, _modelManager, &EditorModelManager::onAgentExited);
+    //connect(_networkC, &NetworkController::launcherEntered, _modelManager, &EditorModelManager::onLauncherEntered);
+    //connect(_networkC, &NetworkController::launcherExited, _modelManager, &EditorModelManager::onLauncherExited);
+    connect(_networkC, &NetworkController::recorderEntered, _experimentationC, &ExperimentationController::onRecorderEntered);
+    connect(_networkC, &NetworkController::recorderExited, _experimentationC, &ExperimentationController::onRecorderExited);
 
 
     // Update the list of available network devices

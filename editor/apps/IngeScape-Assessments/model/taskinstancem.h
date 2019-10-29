@@ -160,14 +160,17 @@ public:
      */
     static CassStatement* createBoundUpdateStatement(const TaskInstanceM& taskInstance);
 
+
 private Q_SLOTS:
     void _onIndependentVariableValueChanged(const QString& key, const QVariant& value);
+
 
 private:
     /**
      * @brief For debug purpose: Print the value of all independent variables
      */
     void _printIndependentVariableValues();
+
 
 private:
     QHash<QString, IndependentVariableM*> _mapIndependentVarByName;

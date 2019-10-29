@@ -30,6 +30,9 @@ ExperimentationController::ExperimentationController(JsonHelper* jsonHelper,
                                                      QObject *parent) : QObject(parent),
     _taskInstanceC(nullptr),
     _currentExperimentation(nullptr),
+    _peerIdOfRecorder(""),
+    _peerNameOfRecorder(""),
+    _isRecorderON(false),
     _jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -156,6 +159,80 @@ void ExperimentationController::deleteTaskInstance(TaskInstanceM* taskInstance)
 
         // Free memory
         delete taskInstance;
+    }
+}
+
+
+/**
+ * @brief Export a list of selected sessions
+ */
+void ExperimentationController::exportSelectedSessions()
+{
+    if (_currentExperimentation != nullptr)
+    {
+        QStringList sessionIds;
+
+        // FIXME: only selected sessions
+        for (TaskInstanceM *session : _currentExperimentation->allTaskInstances()->toList())
+        {
+            if (session != nullptr)
+            {
+                QString sessionUID = AssessmentsModelManager::cassUuidToQString(session->getCassUuid());
+                sessionIds.append(sessionUID);
+            }
+        }
+
+        if (_isRecorderON && !sessionIds.isEmpty())
+        {
+            QString commandAndParameters = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
+
+            Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+
+            qDebug() << "Emit commandAskedToRecorder" << commandAndParameters;
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when a recorder enter the network
+ * @param peerId
+ * @param peerName
+ * @param ipAddress
+ * @param hostname
+ */
+void ExperimentationController::onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
+{
+    qInfo() << "Recorder entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
+
+    if (!_isRecorderON && !peerId.isEmpty() && !peerName.isEmpty())
+    {
+        setpeerIdOfRecorder(peerId);
+        setpeerNameOfRecorder(peerName);
+
+        setisRecorderON(true);
+    }
+    else {
+        qCritical() << "We are already connected to a recorder:" << _peerNameOfRecorder << "(" << _peerIdOfRecorder << ")";
+    }
+}
+
+
+/**
+ * @brief Slot called when a recorder quit the network
+ * @param peerId
+ * @param peerName
+ */
+void ExperimentationController::onRecorderExited(QString peerId, QString peerName)
+{
+    qInfo() << "Recorder exited (" << peerId << ")" << peerName;
+
+    if (_isRecorderON && (_peerIdOfRecorder == peerId))
+    {
+        setpeerIdOfRecorder("");
+        setpeerNameOfRecorder("");
+
+        setisRecorderON(false);
     }
 }
 

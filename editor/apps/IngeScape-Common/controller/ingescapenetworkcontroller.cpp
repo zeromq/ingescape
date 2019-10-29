@@ -790,3 +790,20 @@ void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString 
 
     qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
 }
+
+
+/**
+ * @brief Slot called when a command must be sent on the network to a recorder
+ * @param peerIdOfRecorder
+ * @param commandAndParameters
+ */
+void IngeScapeNetworkController::onCommandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters)
+{
+    if (!peerIdOfRecorder.isEmpty() && !commandAndParameters.isEmpty())
+    {
+        // Send the command (and parameters) to the peer id of the recorder
+        int success = igs_busSendStringToAgent(peerIdOfRecorder.toStdString().c_str(), "%s", commandAndParameters.toStdString().c_str());
+
+        qInfo() << "Send command (and parameters)" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
+    }
+}
