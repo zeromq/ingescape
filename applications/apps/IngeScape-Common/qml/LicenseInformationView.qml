@@ -200,7 +200,7 @@ Column {
     Repeater {
         model: rootItem.licenseInformation ? rootItem.licenseInformation.features : null
 
-        Text {
+        delegate: Text {
             text: " - " + modelData
 
             color: IngeScapeTheme.whiteColor
