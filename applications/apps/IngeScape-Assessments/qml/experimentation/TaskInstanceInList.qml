@@ -53,6 +53,8 @@ Rectangle {
 
     property bool isMouseHovering: itemMouseArea.containsMouse || btnDelete.containsMouse || btnOpen.containsMouse
 
+    property alias isSelectedSession: checkBoxSelection.checked
+
     color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.whiteColor
 
 
@@ -69,6 +71,21 @@ Rectangle {
 
     // Delete Task Instance
     signal deleteTaskInstance();
+
+
+    //--------------------------------
+    //
+    //
+    // Slots
+    //
+    //
+    //--------------------------------
+
+    onIsSelectingSessionsToExportChanged: {
+        if (!isSelectingSessionsToExport && checkBoxSelection.checked) {
+            checkBoxSelection.checked = false;
+        }
+    }
 
 
     //--------------------------------------------------------
@@ -105,6 +122,7 @@ Rectangle {
             width: selectionColumnWidth
             //height: rootItem.height - 2
             height: rootItem.height
+            clip: true
 
             color: IngeScapeAssessmentsTheme.blueButton_pressed
             /*border {

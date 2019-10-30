@@ -433,6 +433,8 @@ Item {
                     width: parent.width
                     height: 62
 
+                    enabled: rootItem.controller && rootItem.controller.isRecorderON
+
                     style: IngeScapeAssessmentsSvgAndTextButtonStyle {
                         text: qsTr("EXPORT")
 
@@ -448,14 +450,7 @@ Item {
                         // Open the popup "Export View"
                         //exportViewPopup.open();
 
-                        if (!_isSelectingSessionsToExport) {
-                            // Start selection
-                            _isSelectingSessionsToExport = true;
-                        }
-                        else {
-                            // Stop selection
-                            _isSelectingSessionsToExport = false;
-                        }
+                        _isSelectingSessionsToExport = !_isSelectingSessionsToExport;
                     }
                 }
             }
@@ -547,6 +542,7 @@ Item {
 
                         color: IngeScapeAssessmentsTheme.blueButton_pressed
                         topLeftRadius: 5
+                        clip: true
 
                         Behavior on width {
                             NumberAnimation {
@@ -599,59 +595,190 @@ Item {
                         }
                     }
 
-                    Text {
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                        }
-
+                    Item {
                         width: mainView.protocolColumnWidth
+                        height: parent.height
 
-                        text: qsTr("Protocol")
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 18
-                            weight: Font.Black
+                        Text {
+                            anchors {
+                                left: parent.left
+                                leftMargin: 15
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            text: qsTr("Protocol")
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 18
+                                weight: Font.Black
+                            }
                         }
                     }
 
-                    Text {
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                        }
-
+                    Item {
                         width: mainView.creationDateTimeColumnWidth
+                        height: parent.height
 
-                        text: qsTr("Creation date")
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 18
-                            weight: Font.Black
+                        Text {
+                            anchors {
+                                left: parent.left
+                                leftMargin: 15
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            text: qsTr("Creation date")
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 18
+                                weight: Font.Black
+                            }
                         }
                     }
 
-                    Text {
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                        }
-
+                    Item {
                         width: mainView.sessionColumnWidth
+                        height: parent.height
 
-                        text: qsTr("Description")
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.labelFontFamily
-                            pixelSize: 18
-                            weight: Font.Black
+                        Text {
+                            anchors {
+                                left: parent.left
+                                leftMargin: 15
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            text: qsTr("Description")
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.labelFontFamily
+                                pixelSize: 18
+                                weight: Font.Black
+                            }
                         }
                     }
                 }
             }
 
             Rectangle {
+                id: rectExportRow
                 anchors {
                     top: listHeader.bottom
+                    left: parent.left
+                    right: parent.right
+                }
+                height: rootItem._isSelectingSessionsToExport ? 40 : 0
+                clip: true
+
+                color: IngeScapeAssessmentsTheme.blueButton_pressed
+                /*border {
+                    color: IngeScapeTheme.veryLightGreyColor
+                    width: 1
+                }*/
+
+                Behavior on height {
+                    NumberAnimation {
+                        duration: rootItem._appearanceAnimationDuration
+                    }
+                }
+
+                Text {
+                    anchors {
+                        left: parent.left
+                        leftMargin: 5
+                        verticalCenter: parent.verticalCenter
+                    }
+
+                    text: qsTr("Select sessions to export")
+
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.labelFontFamily
+                        pixelSize: 18
+                        weight: Font.Black
+                    }
+                }
+
+                Button {
+                    id: cancelButton
+
+                    property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+                    anchors {
+                        right: exportToFileButton.left
+                        rightMargin: 10
+                        verticalCenter: parent.verticalCenter
+                    }
+                    height: boundingBox.height
+                    width: boundingBox.width
+
+                    activeFocusOnPress: true
+
+                    style: ButtonStyle {
+                        background: Rectangle {
+                            anchors.fill: parent
+                            radius: 5
+                            color: control.pressed ? IngeScapeTheme.lightGreyColor : (control.hovered ? IngeScapeTheme.veryLightGreyColor : "transparent")
+                        }
+
+                        label: Text {
+                            text: "Cancel"
+                            verticalAlignment: Text.AlignVCenter
+                            horizontalAlignment: Text.AlignHCenter
+                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight: Font.Medium
+                                pixelSize: 16
+                            }
+                        }
+                    }
+                    /*style: IngeScapeAssessmentsButtonStyle {
+                            text: "Cancel"
+                        }*/
+
+                    onClicked: {
+                        _isSelectingSessionsToExport = false;
+                    }
+                }
+
+                Button {
+                    id: exportToFileButton
+
+                    property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+                    anchors {
+                        right: parent.right
+                        rightMargin: 10
+                        verticalCenter: parent.verticalCenter
+                    }
+                    height: boundingBox.height
+                    width: 150 // boundingBox.width
+
+                    activeFocusOnPress: true
+                    enabled: rootItem.controller && (rootItem.controller.selectedSessions.count > 0)
+
+                    style: IngeScapeAssessmentsButtonStyle {
+                        text: "Export to file"
+                    }
+
+                    onClicked: {
+                        if (rootItem.controller)
+                        {
+                            //console.log("QML: Export " + rootItem.controller.selectedSessions.count + " selected sessions (to file)...");
+
+                            // Export selected sessions
+                            rootItem.controller.exportSelectedSessions();
+                        }
+                    }
+                }
+
+            }
+
+            Rectangle {
+                anchors {
+                    top: rectExportRow.bottom
                     bottom: parent.bottom
                     left: parent.left
                     right: parent.right
@@ -716,6 +843,20 @@ Item {
                                 onDeleteTaskInstance: {
                                     deleteTaskInstancePopup.taskInstance = modelM
                                     deleteTaskInstancePopup.open()
+                                }
+
+                                onIsSelectedSessionChanged: {
+                                    if (rootItem.controller)
+                                    {
+                                        if (isSelectedSession) {
+                                            //console.log("session " + modelM.name + " selected");
+                                            rootItem.controller.selectedSessions.insert(rootItem.controller.selectedSessions.count, modelM);
+                                        }
+                                        else {
+                                            //console.log("session " + modelM.name + " UN-selected");
+                                            rootItem.controller.selectedSessions.remove(modelM);
+                                        }
+                                    }
                                 }
                             }
                         }

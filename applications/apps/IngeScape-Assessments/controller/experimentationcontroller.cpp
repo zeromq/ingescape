@@ -164,16 +164,17 @@ void ExperimentationController::deleteTaskInstance(TaskInstanceM* taskInstance)
 
 
 /**
- * @brief Export a list of selected sessions
+ * @brief Export the list of selected sessions
  */
 void ExperimentationController::exportSelectedSessions()
 {
-    if (_currentExperimentation != nullptr)
+    if ((_currentExperimentation != nullptr) && !_selectedSessions.isEmpty())
     {
+        qInfo() << "Export" << _selectedSessions.count() << "selected sessions of" << _currentExperimentation->name() << "(to file)...";
+
         QStringList sessionIds;
 
-        // FIXME: only selected sessions
-        for (TaskInstanceM *session : _currentExperimentation->allTaskInstances()->toList())
+        for (TaskInstanceM *session : _selectedSessions)
         {
             if (session != nullptr)
             {
@@ -186,9 +187,10 @@ void ExperimentationController::exportSelectedSessions()
         {
             QString commandAndParameters = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
 
-            Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+            //QString experimentationUID = AssessmentsModelManager::cassUuidToQString(_currentExperimentation->getCassUuid());
+            //QString commandAndParameters = QString("%1=%2 [%3]").arg(command_ExportSessions, experimentationUID, sessionIds.join('|'));
 
-            qDebug() << "Emit commandAskedToRecorder" << commandAndParameters;
+            Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
         }
     }
 }
@@ -243,9 +245,12 @@ void ExperimentationController::onRecorderExited(QString peerId, QString peerNam
  */
 void ExperimentationController::_onCurrentExperimentationChanged(ExperimentationM* currentExperimentation)
 {
-    if (currentExperimentation != nullptr && AssessmentsModelManager::Instance() != nullptr)
+    if ((currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
     {
         qDebug() << "_on Current Experimentation Changed" << currentExperimentation->name();
+
+        // First, clear the list of selected sessions
+        _selectedSessions.clear();
 
         _retrieveTasksForExperimentation(currentExperimentation);
 

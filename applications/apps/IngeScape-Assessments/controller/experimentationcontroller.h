@@ -44,6 +44,9 @@ class ExperimentationController : public QObject
     // Flag indicating is there is a recorder with state ON
     I2_QML_PROPERTY_READONLY(bool, isRecorderON)
 
+    // List of selected sessions
+    I2_QOBJECT_LISTMODEL(TaskInstanceM, selectedSessions)
+
 
 public:
 
@@ -86,7 +89,7 @@ public:
 
 
     /**
-     * @brief Export a list of selected sessions
+     * @brief Export the list of selected sessions
      */
     Q_INVOKABLE void exportSelectedSessions();
 
