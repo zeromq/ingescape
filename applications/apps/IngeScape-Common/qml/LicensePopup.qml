@@ -376,10 +376,14 @@ I2PopupBase {
                             }
 
                             onClicked: {
-                                if (model && rootPopup.licenseController) {
-                                    rootPopup.licenseController.deleteLicense(model.QtObject)
-                                }
+                                // Disable root popup while other popup isn't closed
+                                rootPopup.enabled = false;
+
+                                // Open delete confirmation popup
+                                deleteConfirmationPopup.license = model
+                                deleteConfirmationPopup.open();
                             }
+
                         }
                     }
 
@@ -556,6 +560,37 @@ I2PopupBase {
                     rootPopup.validate();
                 }
             }
+        }
+    }
+
+    // Feedback layer on root popup when it is disabled
+    Rectangle {
+        anchors.fill: parent
+
+        visible : !rootPopup.enabled
+
+        color: '#99000000';
+    }
+
+    //
+    // Delete Confirmation
+    //
+    ConfirmationPopup {
+        id: deleteConfirmationPopup
+
+        property var license: null
+
+        confirmationText: "You will definitely lose all the rights this license grants you.\nDo you want to delete it completely?"
+
+        onConfirmed: {
+            rootPopup.enabled = true;
+            if (license && rootPopup.licenseController) {
+                rootPopup.licenseController.deleteLicense(license.QtObject);
+            }
+        }
+
+        onCancelled: {
+            rootPopup.enabled = true;
         }
     }
 }
