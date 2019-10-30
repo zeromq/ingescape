@@ -1200,20 +1200,19 @@ editor-delivery-all:
     - umask 077
     - echo ${SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
-    - mv editor _editor
     - echo "Deliver Mac OS x64 editor"
     - mkdir --parents editor/macos
-    - mv _applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
+    - mv applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
          editor/macos/
     - ls editor/macos/ | grep -v 'latest_delivery' > editor/macos/latest_delivery
     - echo "Deliver Windows x86 editor"
     - mkdir --parents editor/win32
-    - mv _applications/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
+    - mv applications/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
          editor/win32/
     - ls editor/win32/ | grep -v 'latest_delivery' > editor/win32/latest_delivery
     - echo "Deliver Windows x64 editor"
     - mkdir --parents editor/win64
-    - mv _applications/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
+    - mv applications/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
          editor/win64/
     - ls editor/win64/ | grep -v 'latest_delivery' > editor/win64/latest_delivery
     - echo "Synchronization"
@@ -1237,20 +1236,19 @@ assessments-delivery-all:
     - umask 077
     - echo ${SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
-    - mv editor _editor
     - echo "Deliver Mac OS x64 assessments"
     - mkdir --parents assessments/macos
-    - mv _applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+    - mv applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
          assessments/macos/
     - ls assessments/macos/ | grep -v 'latest_delivery' > assessments/macos/latest_delivery
     - echo "Deliver Windows x86 assessments"
     - mkdir --parents assessments/win32
-    - mv _applications/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
+    - mv applications/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
          assessments/win32/
     - ls assessments/win32/ | grep -v 'latest_delivery' > assessments/win32/latest_delivery
     - echo "Deliver Windows x64 assessments"
     - mkdir --parents assessments/win64
-    - mv _applications/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
+    - mv applications/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
          assessments/win64/
     - ls assessments/win64/ | grep -v 'latest_delivery' > assessments/win64/latest_delivery
     - echo "Synchronization"
@@ -1274,20 +1272,19 @@ expe-delivery-all:
     - umask 077
     - echo ${SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
-    - mv editor _editor
     - echo "Deliver Mac OS x64 expe"
     - mkdir --parents expe/macos
-    - mv _applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
+    - mv applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
          expe/macos/
     - ls expe/macos/ | grep -v 'latest_delivery' > expe/macos/latest_delivery
     - echo "Deliver Windows x86 expe"
     - mkdir --parents expe/win32
-    - mv _applications/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
+    - mv applications/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
          expe/win32/
     - ls expe/win32/ | grep -v 'latest_delivery' > expe/win32/latest_delivery
     - echo "Deliver Windows x64 expe"
     - mkdir --parents expe/win64
-    - mv _applications/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
+    - mv applications/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
          expe/win64/
     - ls expe/win64/ | grep -v 'latest_delivery' > expe/win64/latest_delivery
     - echo "Synchronization"
@@ -1432,20 +1429,19 @@ editor-delivery-all-stable:
     - umask 077
     - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
-    - mv editor _editor
     - echo "Deliver Mac OS x64 editor"
     - mkdir --parents editor/macos
-    - mv _applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
+    - mv applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
          editor/macos/
     - ls editor/macos/ | grep -v 'latest_delivery' > editor/macos/latest_delivery
     - echo "Deliver Windows x86 editor"
     - mkdir --parents editor/win32
-    - mv _applications/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
+    - mv applications/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
          editor/win32/
     - ls editor/win32/ | grep -v 'latest_delivery' > editor/win32/latest_delivery
     - echo "Deliver Windows x64 editor"
     - mkdir --parents editor/win64
-    - mv _applications/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
+    - mv applications/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
          editor/win64/
     - ls editor/win64/ | grep -v 'latest_delivery' > editor/win64/latest_delivery
     - echo "Synchronization"
@@ -1471,20 +1467,19 @@ assessments-delivery-all-stable:
     - umask 077
     - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
-    - mv editor _editor
     - echo "Deliver Mac OS x64 assessments"
     - mkdir --parents assessments/macos
-    - mv _applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+    - mv applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
          assessments/macos/
     - ls assessments/macos/ | grep -v 'latest_delivery' > assessments/macos/latest_delivery
     - echo "Deliver Windows x86 assessments"
     - mkdir --parents assessments/win32
-    - mv _applications/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
+    - mv applications/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
          assessments/win32/
     - ls assessments/win32/ | grep -v 'latest_delivery' > assessments/win32/latest_delivery
     - echo "Deliver Windows x64 assessments"
     - mkdir --parents assessments/win64
-    - mv _applications/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
+    - mv applications/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
          assessments/win64/
     - ls assessments/win64/ | grep -v 'latest_delivery' > assessments/win64/latest_delivery
     - echo "Synchronization"
@@ -1510,20 +1505,19 @@ expe-delivery-all-stable:
     - umask 077
     - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
-    - mv editor _editor
     - echo "Deliver Mac OS x64 expe"
     - mkdir --parents expe/macos
-    - mv _applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
+    - mv applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
          expe/macos/
     - ls expe/macos/ | grep -v 'latest_delivery' > expe/macos/latest_delivery
     - echo "Deliver Windows x86 expe"
     - mkdir --parents expe/win32
-    - mv _applications/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
+    - mv applications/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
          expe/win32/
     - ls expe/win32/ | grep -v 'latest_delivery' > expe/win32/latest_delivery
     - echo "Deliver Windows x64 expe"
     - mkdir --parents expe/win64
-    - mv _applications/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
+    - mv applications/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
          expe/win64/
     - ls expe/win64/ | grep -v 'latest_delivery' > expe/win64/latest_delivery
     - echo "Synchronization"
