@@ -58,9 +58,9 @@ stages:
       - dependencies/yajl/**/*
       - dependencies/unix/*
       - dependencies/windows/unix/*
-      - editor/frameworks/**/*
-      - editor/apps/IngeScape-Common/**/*
-      - editor/apps/IngeScape-Editor/**/*
+      - applications/frameworks/**/*
+      - applications/apps/IngeScape-Common/**/*
+      - applications/apps/IngeScape-Editor/**/*
     refs:
       - master
       - stable
@@ -75,9 +75,9 @@ stages:
       - dependencies/yajl/**/*
       - dependencies/unix/*
       - dependencies/windows/unix/*
-      - editor/frameworks/**/*
-      - editor/apps/IngeScape-Common/**/*
-      - editor/apps/IngeScape-Assessments/**/*
+      - applications/frameworks/**/*
+      - applications/apps/IngeScape-Common/**/*
+      - applications/apps/IngeScape-Assessments/**/*
     refs:
       - master
       - stable
@@ -92,9 +92,9 @@ stages:
       - dependencies/yajl/**/*
       - dependencies/unix/*
       - dependencies/windows/unix/*
-      - editor/frameworks/**/*
-      - editor/apps/IngeScape-Common/**/*
-      - editor/apps/IngeScape-Expe/**/*
+      - applications/frameworks/**/*
+      - applications/apps/IngeScape-Common/**/*
+      - applications/apps/IngeScape-Expe/**/*
     refs:
       - master
       - stable
@@ -300,12 +300,12 @@ editor-macos-release-x64:
     - osx
   script:
     - git clean -xfd
-    - mkdir editor/apps/IngeScape-Editor/build
-    - cmake -S editor/apps/IngeScape-Editor/ -B editor/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release
-    - make -C editor/apps/IngeScape-Editor/build
+    - mkdir applications/apps/IngeScape-Editor/build
+    - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release
+    - make -C applications/apps/IngeScape-Editor/build
   artifacts:
     paths:
-      - editor/apps/IngeScape-Editor/build
+      - applications/apps/IngeScape-Editor/build
     name: "editor-macos-release-x64"
     expire_in: 1 day
   dependencies: []
@@ -321,12 +321,12 @@ assessments-macos-release-x64:
     - osx
   script:
     - git clean -xfd
-    - mkdir editor/apps/IngeScape-Assessments/build
-    - cmake -S editor/apps/IngeScape-Assessments/ -B editor/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release
-    - make -C editor/apps/IngeScape-Assessments/build
+    - mkdir applications/apps/IngeScape-Assessments/build
+    - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release
+    - make -C applications/apps/IngeScape-Assessments/build
   artifacts:
     paths:
-      - editor/apps/IngeScape-Assessments/build
+      - applications/apps/IngeScape-Assessments/build
     name: "assessments-macos-release-x64"
     expire_in: 1 day
   dependencies: []
@@ -342,12 +342,12 @@ expe-macos-release-x64:
     - osx
   script:
     - git clean -xfd
-    - mkdir editor/apps/IngeScape-Expe/build
-    - cmake -S editor/apps/IngeScape-Expe/ -B editor/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release
-    - make -C editor/apps/IngeScape-Expe/build
+    - mkdir applications/apps/IngeScape-Expe/build
+    - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release
+    - make -C applications/apps/IngeScape-Expe/build
   artifacts:
     paths:
-      - editor/apps/IngeScape-Expe/build
+      - applications/apps/IngeScape-Expe/build
     name: "expe-macos-release-x64"
     expire_in: 1 day
   dependencies: []
@@ -453,12 +453,12 @@ editor-windows-release-x86:
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Editor\build\ReleaseX86
-    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Editor\build\ReleaseX86 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Editor\build\ReleaseX86
+    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build applications\apps\IngeScape-Editor\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Editor\build
+      - applications\apps\IngeScape-Editor\build
     name: "editor-windows-release-x86"
     expire_in: 1 day
   dependencies: []
@@ -476,12 +476,12 @@ editor-windows-release-x64:
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Editor\build\ReleaseX64
-    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Editor\build\ReleaseX64 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Editor\build\ReleaseX64
+    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build applications\apps\IngeScape-Editor\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Editor\build
+      - applications\apps\IngeScape-Editor\build
     name: "editor-windows-release-x64"
     expire_in: 1 day
   dependencies: []
@@ -500,12 +500,12 @@ assessments-windows-release-x86:
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Assessments\build\ReleaseX86
-    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Assessments\build\ReleaseX86 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX86
+    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build applications\apps\IngeScape-Assessments\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Assessments\build
+      - applications\apps\IngeScape-Assessments\build
     name: "assessments-windows-release-x86"
     expire_in: 1 day
   dependencies: []
@@ -524,12 +524,12 @@ assessments-windows-release-x64:
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Assessments\build\ReleaseX64
-    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Assessments\build\ReleaseX64 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX64
+    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build applications\apps\IngeScape-Assessments\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Assessments\build
+      - applications\apps\IngeScape-Assessments\build
     name: "assessments-windows-release-x64"
     expire_in: 1 day
   dependencies: []
@@ -548,12 +548,12 @@ expe-windows-release-x86:
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Expe\build\ReleaseX86
-    - cmake editor\apps\IngeScape-Expe\ -B editor\apps\IngeScape-Expe\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Expe\build\ReleaseX86 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Expe\build\ReleaseX86
+    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build applications\apps\IngeScape-Expe\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Expe\build
+      - applications\apps\IngeScape-Expe\build
     name: "expe-windows-release-x86"
     expire_in: 1 day
   dependencies: []
@@ -572,12 +572,12 @@ expe-windows-release-x64:
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Expe\build\ReleaseX64
-    - cmake editor\apps\IngeScape-Expe\ -B editor\apps\IngeScape-Expe\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Expe\build\ReleaseX64 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Expe\build\ReleaseX64
+    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build applications\apps\IngeScape-Expe\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Expe\build
+      - applications\apps\IngeScape-Expe\build
     name: "expe-windows-release-x64"
     expire_in: 1 day
   dependencies: []
@@ -676,11 +676,11 @@ editor-installer-macos-x64:
   tags:
     - osx
   script:
-    - make -C editor/apps/IngeScape-Editor/build package
-  #  - make -C editor/apps/IngeScape-Editor/build package_source
+    - make -C applications/apps/IngeScape-Editor/build package
+  #  - make -C applications/apps/IngeScape-Editor/build package_source
   artifacts:
     paths:
-      - editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
+      - applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
     name: "editor-installer-macos-x64"
   dependencies:
     - editor-macos-release-x64
@@ -693,10 +693,10 @@ editor-installer-windows-x86:
     - windows
     - "2"
   script:
-    - cd editor\apps\IngeScape-Editor\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Editor\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Editor\build\ReleaseX86\IngeScape-Editor-*
+      - applications\apps\IngeScape-Editor\build\ReleaseX86\IngeScape-Editor-*
     name: "editor-installer-windows-x86"
   dependencies:
     - editor-windows-release-x86
@@ -709,10 +709,10 @@ editor-installer-windows-x64:
     - windows
     - "1"
   script:
-    - cd editor\apps\IngeScape-Editor\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Editor\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Editor\build\ReleaseX64\IngeScape-Editor-*
+      - applications\apps\IngeScape-Editor\build\ReleaseX64\IngeScape-Editor-*
     name: "editor-installer-windows-x64"
   dependencies:
     - editor-windows-release-x64
@@ -724,11 +724,11 @@ assessments-installer-macos-x64:
   tags:
     - osx
   script:
-    - make -C editor/apps/IngeScape-Assessments/build package
-  #  - make -C editor/apps/IngeScape-Assessments/build package_source
+    - make -C applications/apps/IngeScape-Assessments/build package
+  #  - make -C applications/apps/IngeScape-Assessments/build package_source
   artifacts:
     paths:
-      - editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+      - applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
     name: "assessments-installer-macos-x64"
   dependencies:
     - assessments-macos-release-x64
@@ -741,10 +741,10 @@ assessments-installer-windows-x86:
     - windows
     - "2"
   script:
-    - cd editor\apps\IngeScape-Assessments\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Assessments\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Assessments\build\ReleaseX86\IngeScape-Assessments-*
+      - applications\apps\IngeScape-Assessments\build\ReleaseX86\IngeScape-Assessments-*
     name: "assessments-installer-windows-x86"
   dependencies:
     - assessments-windows-release-x86
@@ -757,10 +757,10 @@ assessments-installer-windows-x64:
     - windows
     - "1"
   script:
-    - cd editor\apps\IngeScape-Assessments\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Assessments\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Assessments\build\ReleaseX64\IngeScape-Assessments-*
+      - applications\apps\IngeScape-Assessments\build\ReleaseX64\IngeScape-Assessments-*
     name: "assessments-installer-windows-x64"
   dependencies:
     - assessments-windows-release-x64
@@ -772,11 +772,11 @@ expe-installer-macos-x64:
   tags:
     - osx
   script:
-    - make -C editor/apps/IngeScape-Expe/build package
-  #  - make -C editor/apps/IngeScape-Expe/build package_source
+    - make -C applications/apps/IngeScape-Expe/build package
+  #  - make -C applications/apps/IngeScape-Expe/build package_source
   artifacts:
     paths:
-      - editor/apps/IngeScape-Expe/build/IngeScape-Expe-*
+      - applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
     name: "expe-installer-macos-x64"
   dependencies:
     - expe-macos-release-x64
@@ -789,10 +789,10 @@ expe-installer-windows-x86:
     - windows
     - "2"
   script:
-    - cd editor\apps\IngeScape-Expe\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Expe\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Expe\build\ReleaseX86\IngeScape-Expe-*
+      - applications\apps\IngeScape-Expe\build\ReleaseX86\IngeScape-Expe-*
     name: "expe-installer-windows-x86"
   dependencies:
     - expe-windows-release-x86
@@ -805,10 +805,10 @@ expe-installer-windows-x64:
     - windows
     - "1"
   script:
-    - cd editor\apps\IngeScape-Expe\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Expe\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Expe\build\ReleaseX64\IngeScape-Expe-*
+      - applications\apps\IngeScape-Expe\build\ReleaseX64\IngeScape-Expe-*
     name: "expe-installer-windows-x64"
   dependencies:
     - expe-windows-release-x64
@@ -1203,17 +1203,17 @@ editor-delivery-all:
     - mv editor _editor
     - echo "Deliver Mac OS x64 editor"
     - mkdir --parents editor/macos
-    - mv _editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
+    - mv _applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
          editor/macos/
     - ls editor/macos/ | grep -v 'latest_delivery' > editor/macos/latest_delivery
     - echo "Deliver Windows x86 editor"
     - mkdir --parents editor/win32
-    - mv _editor/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
+    - mv _applications/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
          editor/win32/
     - ls editor/win32/ | grep -v 'latest_delivery' > editor/win32/latest_delivery
     - echo "Deliver Windows x64 editor"
     - mkdir --parents editor/win64
-    - mv _editor/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
+    - mv _applications/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
          editor/win64/
     - ls editor/win64/ | grep -v 'latest_delivery' > editor/win64/latest_delivery
     - echo "Synchronization"
@@ -1240,17 +1240,17 @@ assessments-delivery-all:
     - mv editor _editor
     - echo "Deliver Mac OS x64 assessments"
     - mkdir --parents assessments/macos
-    - mv _editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+    - mv _applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
          assessments/macos/
     - ls assessments/macos/ | grep -v 'latest_delivery' > assessments/macos/latest_delivery
     - echo "Deliver Windows x86 assessments"
     - mkdir --parents assessments/win32
-    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
+    - mv _applications/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
          assessments/win32/
     - ls assessments/win32/ | grep -v 'latest_delivery' > assessments/win32/latest_delivery
     - echo "Deliver Windows x64 assessments"
     - mkdir --parents assessments/win64
-    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
+    - mv _applications/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
          assessments/win64/
     - ls assessments/win64/ | grep -v 'latest_delivery' > assessments/win64/latest_delivery
     - echo "Synchronization"
@@ -1277,17 +1277,17 @@ expe-delivery-all:
     - mv editor _editor
     - echo "Deliver Mac OS x64 expe"
     - mkdir --parents expe/macos
-    - mv _editor/apps/IngeScape-Expe/build/IngeScape-Expe-*
+    - mv _applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
          expe/macos/
     - ls expe/macos/ | grep -v 'latest_delivery' > expe/macos/latest_delivery
     - echo "Deliver Windows x86 expe"
     - mkdir --parents expe/win32
-    - mv _editor/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
+    - mv _applications/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
          expe/win32/
     - ls expe/win32/ | grep -v 'latest_delivery' > expe/win32/latest_delivery
     - echo "Deliver Windows x64 expe"
     - mkdir --parents expe/win64
-    - mv _editor/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
+    - mv _applications/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
          expe/win64/
     - ls expe/win64/ | grep -v 'latest_delivery' > expe/win64/latest_delivery
     - echo "Synchronization"
@@ -1435,17 +1435,17 @@ editor-delivery-all-stable:
     - mv editor _editor
     - echo "Deliver Mac OS x64 editor"
     - mkdir --parents editor/macos
-    - mv _editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
+    - mv _applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
          editor/macos/
     - ls editor/macos/ | grep -v 'latest_delivery' > editor/macos/latest_delivery
     - echo "Deliver Windows x86 editor"
     - mkdir --parents editor/win32
-    - mv _editor/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
+    - mv _applications/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
          editor/win32/
     - ls editor/win32/ | grep -v 'latest_delivery' > editor/win32/latest_delivery
     - echo "Deliver Windows x64 editor"
     - mkdir --parents editor/win64
-    - mv _editor/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
+    - mv _applications/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
          editor/win64/
     - ls editor/win64/ | grep -v 'latest_delivery' > editor/win64/latest_delivery
     - echo "Synchronization"
@@ -1474,17 +1474,17 @@ assessments-delivery-all-stable:
     - mv editor _editor
     - echo "Deliver Mac OS x64 assessments"
     - mkdir --parents assessments/macos
-    - mv _editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+    - mv _applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
          assessments/macos/
     - ls assessments/macos/ | grep -v 'latest_delivery' > assessments/macos/latest_delivery
     - echo "Deliver Windows x86 assessments"
     - mkdir --parents assessments/win32
-    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
+    - mv _applications/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
          assessments/win32/
     - ls assessments/win32/ | grep -v 'latest_delivery' > assessments/win32/latest_delivery
     - echo "Deliver Windows x64 assessments"
     - mkdir --parents assessments/win64
-    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
+    - mv _applications/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
          assessments/win64/
     - ls assessments/win64/ | grep -v 'latest_delivery' > assessments/win64/latest_delivery
     - echo "Synchronization"
@@ -1513,17 +1513,17 @@ expe-delivery-all-stable:
     - mv editor _editor
     - echo "Deliver Mac OS x64 expe"
     - mkdir --parents expe/macos
-    - mv _editor/apps/IngeScape-Expe/build/IngeScape-Expe-*
+    - mv _applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
          expe/macos/
     - ls expe/macos/ | grep -v 'latest_delivery' > expe/macos/latest_delivery
     - echo "Deliver Windows x86 expe"
     - mkdir --parents expe/win32
-    - mv _editor/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
+    - mv _applications/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
          expe/win32/
     - ls expe/win32/ | grep -v 'latest_delivery' > expe/win32/latest_delivery
     - echo "Deliver Windows x64 expe"
     - mkdir --parents expe/win64
-    - mv _editor/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
+    - mv _applications/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
          expe/win64/
     - ls expe/win64/ | grep -v 'latest_delivery' > expe/win64/latest_delivery
     - echo "Synchronization"

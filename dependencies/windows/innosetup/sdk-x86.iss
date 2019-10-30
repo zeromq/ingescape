@@ -40,7 +40,7 @@ Source: "C:\ingescape\libs\release\*"; DestDir: "{app}\libs"; Flags: ignoreversi
 ; headers
 Source: "C:\ingescape\include\*"; DestDir: "{app}\include\ingescape"; Flags: ignoreversion
 ;icon file
-Source: "..\..\..\editor\apps\IngeScape-Editor\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\applications\apps\IngeScape-Editor\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 ;TODO : add samples
 
 ;TODO : add documentation

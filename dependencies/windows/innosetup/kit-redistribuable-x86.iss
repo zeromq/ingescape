@@ -39,7 +39,7 @@ Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 [Files]
 Source: "C:\ingescape\libs\release\*"; DestDir: "{app}\libs"; Flags: ignoreversion
 ;icon file
-Source: "..\..\..\editor\apps\IngeScape-Editor\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\applications\apps\IngeScape-Editor\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]

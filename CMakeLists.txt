@@ -364,7 +364,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 
   set(
     CPACK_SOURCE_IGNORE_FILES
-    "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/editor/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/"
+    "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/applications/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/"
     )
 
   if(WIN32)
