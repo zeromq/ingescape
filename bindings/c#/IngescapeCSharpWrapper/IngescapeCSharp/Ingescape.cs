@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -15,35 +14,6 @@ namespace Ingescape
 
     #endregion
 
-    #region Struct
-
-    public struct igs_callArgument_t
-    {
-        [MarshalAs(UnmanagedType.LPStr)] public string name;
-        private union_callArgument union;
-        //union
-        public bool b { get { return union._b; } set { union._b = value; } }
-        public int i { get { return union._i; } set { union._i = value; } }
-        public double d { get { return union._d; } set { union._d = value; } }
-        public string c { get { return union._c; } set { union._c = value; } }
-        public IntPtr data { get { return union._data; } set { union._data = value; } }
-        //end union
-        public uint size;
-        public IntPtr next;
-    }
-
-    [StructLayout(LayoutKind.Explicit)]
-    public struct union_callArgument
-    {
-        [FieldOffset(0)] public bool _b;
-        [FieldOffset(0)] public int _i;
-        [FieldOffset(0)] public double _d;
-        [FieldOffset(0)] [MarshalAs(UnmanagedType.LPStr)] public string _c;
-        [FieldOffset(0)] public IntPtr _data;
-    }
-
-    #endregion
-
     #region Callbacks
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -54,14 +24,6 @@ namespace Ingescape
                                         int valueSize,
                                         IntPtr myData);
 
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void igs_callFunction(string senderAgentName,
-                                                string senderAgentUUID,
-                                                string callName,
-                                                igs_callArgument_t firstArgument,
-                                                uint nbArgs,
-                                                IntPtr myData);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void igs_forcedStopCallback(IntPtr myData);
@@ -242,8 +204,8 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_readParameter(string name, IntPtr[] value, ref uint size);
-        public static int readParameter(string name, IntPtr[] value, ref uint size) { return igs_readParameter(name, value, ref size); }
-
+        public static int readParameter(string name, IntPtr[] value, ref uint size){ return igs_readParameter(name, value, ref size); }
+    
         //read per type
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool igs_readInputAsBool([MarshalAs(UnmanagedType.LPStr)]  string name);
@@ -400,11 +362,11 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeInputAsImpulsion([MarshalAs(UnmanagedType.LPStr)]  string name);
-        public static int writeInputAsImpulsion(string name) { return igs_writeInputAsImpulsion(name); }
+        public static int writeInputAsImpulsion(string name) { return igs_writeInputAsImpulsion(name);  }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeInputAsData([MarshalAs(UnmanagedType.LPStr)]  string name, byte[] value, uint size);
-        public static int writeInputAsData(string name, byte[] value, uint size) { return igs_writeInputAsData(name, value, size); }
+        public static int writeInputAsData(string name, byte[] value, uint size) { return igs_writeInputAsData(name, value, size);  }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeOutputAsBool([MarshalAs(UnmanagedType.LPStr)]  string name, bool value);
@@ -480,13 +442,13 @@ namespace Ingescape
         public static void observeInput(string name, igs_observeCallback cb, IntPtr myData) { igs_observeInput(name, cb, myData); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_observeOutput([MarshalAs(UnmanagedType.LPStr)]  string name,
+        private static extern int igs_observeOutput([MarshalAs(UnmanagedType.LPStr)]  string name, 
             igs_observeCallback cb,
             IntPtr myData);
         public static int observeOutput(string name, igs_observeCallback cb, IntPtr myData) { return igs_observeOutput(name, cb, myData); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_observeParameter([MarshalAs(UnmanagedType.LPStr)]  string name,
+        private static extern int igs_observeParameter([MarshalAs(UnmanagedType.LPStr)]  string name, 
             igs_observeCallback cb,
             IntPtr myData);
         public static int observeParameter(string name, igs_observeCallback cb, IntPtr myData) { return igs_observeParameter(name, cb, myData); }
@@ -716,7 +678,7 @@ namespace Ingescape
         // Edit the definition using the API
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_createInput([MarshalAs(UnmanagedType.LPStr)]  string name, iopType_t value_type, IntPtr value, uint size); //value must be copied in function
-        public static int createInput(string name, iopType_t value_type, IntPtr value, uint size) { return igs_createInput(name, value_type, value, size); } //value must be copied in function
+        public static int createInput(string name, iopType_t value_type, IntPtr value, uint size) { return igs_createInput(name, value_type, value, size) ;} //value must be copied in function
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_createOutput([MarshalAs(UnmanagedType.LPStr)]  string name, iopType_t type, IntPtr value, uint size); //value must be copied in function
@@ -791,12 +753,12 @@ namespace Ingescape
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr igs_getMappingVersion();
+        private static extern IntPtr igs_getMappingVersion(); 
         public static string getMappingVersion()
         {
             IntPtr ptr = igs_getMappingVersion();
             return Marshal.PtrToStringAnsi(ptr);
-        }
+        }       
 
         // Edit the mapping using the API
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -838,124 +800,6 @@ namespace Ingescape
         #endregion
 
         //////////////////////////////////////////////////
-        #region Advanced
-
-
-        //////////////////////////////////////////////////
-        //Calls Model : create, remove, call, react
-        /*NOTES:
-		 - one and only one mandatory callback per call, set using igs_handleCall : generates warning if cb missing when loading definition or receiving call
-		 - one optional reply per call
-		 - reply shall be sent in callabck, using igs_sendCall with sender's UUID or name
-		 - call names shall be unique for a given agent
-		 */
-
-
-        //STRUCT dans region struct plus haut.
-
-        //send a call to another agent
-        //requires to pass agent name or UUID, call name and a list of arguments
-        //passed arguments list will be deallocated and destroyed
-
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_sendCall([MarshalAs(UnmanagedType.LPStr)] string agentNameOrUUID, [MarshalAs(UnmanagedType.LPStr)] string callName, ref IntPtr list);
-        /*
-		public static int sendCall(string agentNameOrUUID,
-										string callName,
-                                        List<dynamic> list)
-		{
-
-            
-            igs_callArgument_t igs_list = new igs_callArgument_t();
-            GCHandle gcHandle = GCHandle.Alloc(igs_list);
-            IntPtr pList = GCHandle.ToIntPtr(gcHandle);
-
-            foreach (var value in list)
-			{
-
-				Type t = value.GetType();
-                if (t == typeof(int)) { igs_addIntToArgumentsList(ref pList, value); }
-                if (t == typeof(bool)) { igs_addBoolToArgumentsList(ref pList, value); }
-                if (t == typeof(double)) { igs_addDoubleToArgumentsList(ref pList, value); }
-                if (t == typeof(string)) { igs_addStringToArgumentsList(ref pList, value); }
-                if (t == typeof(IntPtr)) { igs_addDataToArgumentsList(ref pList, value); }
-                
-			}
-			return igs_sendCall(agentNameOrUUID, callName, ref pList);
-		}*/
-
-        public static int sendCall(string agentNameOrUUID,
-                                        string callName,
-                                        ref igs_callArgument_t list)
-        {
-            GCHandle gcHandleList = GCHandle.Alloc(list);
-            IntPtr pList = GCHandle.ToIntPtr(gcHandleList);
-            return igs_sendCall(agentNameOrUUID, callName, ref pList);
-        }
-
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        //private static extern int igs_addIntToArgumentsList(igs_callArgument_t list, int value);
-        private static extern int igs_addIntToArgumentsList(ref IntPtr list, int value);
-        public static int addIntToArgumentList(ref IntPtr list, int value) { return igs_addIntToArgumentsList(ref list, value); }
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_addBoolToArgumentsList(ref IntPtr list, bool value);
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_addDoubleToArgumentsList(ref IntPtr list, double value);
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_addStringToArgumentsList(ref IntPtr list, [MarshalAs(UnmanagedType.LPStr)] string value);
-        public static int addStringToArgumentsList(ref IntPtr list, string value) { return igs_addStringToArgumentsList(ref list, value); }
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_addDataToArgumentsList(ref IntPtr list, IntPtr data);
-
-
-        //manage calls supported by our agent
-        //Calls can be created either by code or by loading a definition. The function below will
-        //create a call if it does not exist or will attach callback and data if they are
-        //stil undefined. Warning: only one callback can be attached to a call (further attempts
-        //will be ignored and signaled by an error log).
-
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_initCall([MarshalAs(UnmanagedType.LPStr)] string name, igs_callFunction cb, IntPtr myData);
-
-        public static int initCall(string name, igs_callFunction cb, IntPtr myData)
-        {
-            return igs_initCall(name, cb, myData);
-        }
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_removeCall([MarshalAs(UnmanagedType.LPStr)] string name);
-
-        public static int removeCall(string name)
-        {
-            return igs_removeCall(name);
-        }
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_addArgumentToCall([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName, iopType_t type);
-
-        public static int addArgumentToCall(string callName, string argName, iopType_t type)
-        {
-            return igs_addArgumentToCall(callName, argName, type);
-        }
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_removeArgumentFromCall([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName);
-
-        public static int removeArgumentFromCall(string callName, string argName)
-        {
-            return igs_removeArgumentFromCall(callName, argName);
-        }
-
-        #endregion
-
-        //////////////////////////////////////////////////
         // Administration, configuration & utilities
 
         //IngeScape library version
@@ -971,7 +815,7 @@ namespace Ingescape
         //
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_getNetdevicesList(IntPtr[,] devices, ref int nb);
-        public static string[] getNetDevicesList()
+        public static string [] getNetDevicesList()
         {
             // Get network devices list
             IntPtr[,] ptrTab = new IntPtr[1, 1];
@@ -1126,7 +970,7 @@ namespace Ingescape
         public static void igs_info(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_INFO, memberName, message); }
         public static void igs_warn(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_WARN, memberName, message); }
         public static void igs_error(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_ERROR, memberName, message); }
-        public static void igs_fatal(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_FATAL, memberName, message); }
+        public static void igs_fatal(string message, [CallerMemberName] string memberName = "") {igs_log(igs_logLevel_t.IGS_LOG_FATAL, memberName, message); }
 
         #endregion
 
