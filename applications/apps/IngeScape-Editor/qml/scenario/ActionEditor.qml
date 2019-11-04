@@ -447,8 +447,6 @@ WindowBlockTouches {
                     ListView {
                         id: effectsList
 
-                        contentWidth: scrollView.width - 9 // scrollbar size
-
                         spacing: 6
 
                         model: actionM ? actionM.effectsList : 0
@@ -483,621 +481,627 @@ WindowBlockTouches {
                 Component {
                     id: componentEffectsListItem
 
-                    Rectangle {
+                    // Effects items are draggable to reorganize list order
+                    Editor.DraggableListItem {
                         id: effectListItem
 
-                        // my effect
+                        parentItemWhenDragged: effectsListItem
+                        keysDragNDrop: ["OrganizeEffectsList"]
+
+                        // Reorganize actions list model when an item is moved
+                        onMoveItemRequested: {
+                            actionM.effectsList.move(from, to, 1);
+                        }
+
                         property var myEffect: model.QtObject
+//                        property var myEffectIopIsNotImpulsion: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && ( myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPValueType !== AgentIOPValueTypes.IMPULSION) )
+//                        property var myEffectIopIsBool: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && ( myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPValueType === AgentIOPValueTypes.BOOL) )
 
-                        property var myEffectIopIsNotImpulsion: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && ( myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPValueType !== AgentIOPValueTypes.IMPULSION) )
-                        property var myEffectIopIsBool: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && ( myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPValueType === AgentIOPValueTypes.BOOL) )
+                        Rectangle {
+                            height: (myEffect && (myEffect.effectType === ActionEffectTypes.MAPPING)) ? 90 : 62
+                            width: scrollView.width - 9 // scrollbar size
 
-                        height: (myEffect && (myEffect.effectType === ActionEffectTypes.MAPPING)) ? 90 : 62
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                        }
-
-                        color : "transparent"
-                        radius: 5
-                        border {
-                            width : 1
-                            color : IngeScapeTheme.blackColor
-                        }
-
-                        // Effect Type
-                        Row {
-                            id : rowEffectsTypes
-
-                            anchors {
-                                right : parent.right
-                                left : parent.left
-                                leftMargin: 10
-                                top : parent.top
-                                topMargin: 6
-                            }
-                            height : 14
-                            spacing : 15
-
-                            ExclusiveGroup {
-                                id : effectTypesExclusifGroup
+                            color : IngeScapeTheme.editorsBackgroundColor
+                            radius: 5
+                            border {
+                                width : 1
+                                color : IngeScapeTheme.blackColor
                             }
 
-                            Repeater {
-                                model : controller ? controller.effectsTypesList : 0
+                            // Effect Type
+                            Row {
+                                id : rowEffectsTypes
 
-                                CheckBox {
-                                    id : effectTypeCB
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter;
-                                    }
+                                anchors {
+                                    right : parent.right
+                                    left : parent.left
+                                    leftMargin: 10
+                                    top : parent.top
+                                    topMargin: 6
+                                }
+                                height : 14
+                                spacing : 15
 
-                                    checked: myEffect && (myEffect.effectType === model.value)
-                                    exclusiveGroup: effectTypesExclusifGroup
-                                    activeFocusOnPress: true;
+                                ExclusiveGroup {
+                                    id : effectTypesExclusifGroup
+                                }
 
-                                    style: CheckBoxStyle {
-                                        label: Text {
-                                            anchors {
-                                                verticalCenter: parent.verticalCenter
-                                                verticalCenterOffset: 2
-                                            }
-                                            color: control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                                Repeater {
+                                    model : controller ? controller.effectsTypesList : 0
 
-                                            text: model.name
-                                            elide: Text.ElideRight
-
-                                            font {
-                                                family: IngeScapeTheme.textFontFamily
-                                                pixelSize: 15
-                                            }
+                                    CheckBox {
+                                        id : effectTypeCB
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter;
                                         }
 
-                                        indicator: Rectangle {
-                                            implicitWidth: 14
-                                            implicitHeight: 14
-                                            radius: height / 2
-                                            border.width: 0
-                                            color: IngeScapeTheme.darkBlueGreyColor
+                                        checked: myEffect && (myEffect.effectType === model.value)
+                                        exclusiveGroup: effectTypesExclusifGroup
+                                        activeFocusOnPress: true;
 
-                                            Rectangle {
-                                                anchors.centerIn: parent
-                                                visible : control.checked
-                                                width: 8
-                                                height: 8
+                                        style: CheckBoxStyle {
+                                            label: Text {
+                                                anchors {
+                                                    verticalCenter: parent.verticalCenter
+                                                    verticalCenterOffset: 2
+                                                }
+                                                color: control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+
+                                                text: model.name
+                                                elide: Text.ElideRight
+
+                                                font {
+                                                    family: IngeScapeTheme.textFontFamily
+                                                    pixelSize: 15
+                                                }
+                                            }
+
+                                            indicator: Rectangle {
+                                                implicitWidth: 14
+                                                implicitHeight: 14
                                                 radius: height / 2
-
                                                 border.width: 0
-                                                color: IngeScapeTheme.whiteColor
+                                                color: IngeScapeTheme.darkBlueGreyColor
+
+                                                Rectangle {
+                                                    anchors.centerIn: parent
+                                                    visible : control.checked
+                                                    width: 8
+                                                    height: 8
+                                                    radius: height / 2
+
+                                                    border.width: 0
+                                                    color: IngeScapeTheme.whiteColor
+                                                }
+                                            }
+
+                                        }
+
+                                        onCheckedChanged: {
+                                            if (myEffect && checked) {
+                                                myEffect.effectType = model.value
                                             }
                                         }
 
-                                    }
-
-                                    onCheckedChanged: {
-                                        if (myEffect && checked) {
-                                            myEffect.effectType = model.value
-                                        }
-                                    }
-
-                                    Binding {
-                                        target: effectTypeCB
-                                        property: "checked"
-                                        value: (myEffect && (myEffect.effectType === model.value))
-                                    }
-                                }
-                            }
-                        }
-
-
-                        //
-                        // Effect Details for Agent and Value
-                        //
-                        Item {
-                            anchors {
-                                right: parent.right
-                                rightMargin: 10
-                                left: rowEffectsTypes.left
-                                bottom: parent.bottom
-                                bottomMargin: 6
-                            }
-                            height: 25
-
-                            visible: (myEffect && myEffect.effectType !== ActionEffectTypes.MAPPING)
-
-                            // Agent
-                            IngeScapeComboboxItemModel {
-                                id: agentEffectCombo
-
-                                anchors {
-                                    left: parent.left
-                                    verticalCenter : parent.verticalCenter
-                                }
-                                height: parent.height
-                                width: 148
-
-                                model: rootItem.allAgentsGroupsByName
-
-                                Binding {
-                                    target: agentEffectCombo
-                                    property: "selectedIndex"
-                                    value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myEffect.modelM.agent)
-                                                                                                            : -1
-                                }
-
-                                onSelectedItemChanged: {
-                                    if ((agentEffectCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
-                                    {
-                                        myEffect.modelM.agent = agentEffectCombo.selectedItem;
-
-                                        // Register agent selected to choose it for the next effect or condition
-                                        // Do it only here, because it is updated everytime agent model of effect change
-                                        if (rootItem.panelController) {
-                                            rootItem.panelController.lastAgentSelected = agentEffectCombo.selectedItem;
+                                        Binding {
+                                            target: effectTypeCB
+                                            property: "checked"
+                                            value: (myEffect && (myEffect.effectType === model.value))
                                         }
                                     }
                                 }
                             }
 
-                            // Agent's Inputs/Outputs/Parameters
-                            IngeScapeComboboxItemModelAgentsIOP {
-                                id: iopEffectsCombo
 
-                                anchors {
-                                    left: agentEffectCombo.right
-                                    leftMargin: 6
-                                    verticalCenter : parent.verticalCenter
-                                }
-
-                                height: 25
-                                width: 148
-
-                                inputsNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.inputsNumber : 0
-                                outputsNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.outputsNumber : 0
-                                parametersNumber: (myEffect && myEffect.modelM) ? myEffect.modelM.parametersNumber : 0
-
-                                visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE)
-                                enabled: visible
-
-                                model: (myEffect && myEffect.modelM) ? myEffect.modelM.iopMergedList : 0
-
-                                Binding {
-                                    target: iopEffectsCombo
-                                    property: "selectedIndex"
-                                    value: (myEffect && myEffect.modelM && myEffect.modelM.agentIOP) ? myEffect.modelM.iopMergedList.indexOf(myEffect.modelM.agentIOP)
-                                                                                                     : -1
-                                }
-
-                                onSelectedItemChanged: {
-                                    if ((iopEffectsCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
-                                    {
-                                        myEffect.modelM.agentIOP = iopEffectsCombo.selectedItem;
-
-                                        // Register agent IOP selected to choose it for the next effect or condition
-                                        if (rootItem.panelController) {
-                                            panelController.lastIOPSelected = iopEffectsCombo.selectedItem;
-                                        }
-
-                                        // Revalidate text field and combo entry regarding which one is visible and the type of the selected IOP.
-                                        userInputItem.revalidateInput()
-                                    }
-                                }
-                            }
-
-                            // Target Value
-                            InputIOPValueField {
-                                id: userInputItem
-
-                                anchors {
-                                    left: iopEffectsCombo.right
-                                    leftMargin: 6
-
-                                    right: (btnWarningActionEditor.visible ? btnWarningActionEditor.left : parent.right)
-                                    rightMargin: (btnWarningActionEditor.visible ? 6 : 0)
-
-                                    verticalCenter: parent.verticalCenter
-                                }
-
-                                iopVM: (effectListItem.myEffect && effectListItem.myEffect.modelM) ? effectListItem.myEffect.modelM.agentIOP : undefined
-                                forceHide: !effectListItem.myEffect || (effectListItem.myEffect.effectType !== ActionEffectTypes.VALUE)
-
-                                function getModelValue() {
-                                    if (effectListItem.myEffect && effectListItem.myEffect.modelM)
-                                    {
-                                        return effectListItem.myEffect.modelM.value
-                                    }
-                                    else
-                                    {
-                                        return ""
-                                    }
-
-                                }
-
-                                function setModelValue(value) {
-                                    if (effectListItem.myEffect && effectListItem.myEffect.modelM)
-                                    {
-                                        effectListItem.myEffect.modelM.value = value
-                                    }
-                                }
-                            }
-
-                            LabellessSvgButton {
-                                id: btnWarningActionEditor
-
+                            //
+                            // Effect Details for Agent and Value
+                            //
+                            Item {
                                 anchors {
                                     right: parent.right
-                                    rightMargin: 0
-                                    verticalCenter: parent.verticalCenter
+                                    rightMargin: 10
+                                    left: rowEffectsTypes.left
+                                    bottom: parent.bottom
+                                    bottomMargin: 6
+                                }
+                                height: 25
+
+                                visible: (myEffect && myEffect.effectType !== ActionEffectTypes.MAPPING)
+
+                                // Agent
+                                IngeScapeComboboxItemModel {
+                                    id: agentEffectCombo
+
+                                    anchors {
+                                        left: parent.left
+                                        verticalCenter : parent.verticalCenter
+                                    }
+                                    height: parent.height
+                                    width: 148
+
+                                    model: rootItem.allAgentsGroupsByName
+
+                                    Binding {
+                                        target: agentEffectCombo
+                                        property: "selectedIndex"
+                                        value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myEffect.modelM.agent)
+                                                                                                                : -1
+                                    }
+
+                                    onSelectedItemChanged: {
+                                        if ((agentEffectCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
+                                        {
+                                            myEffect.modelM.agent = agentEffectCombo.selectedItem;
+
+                                            // Register agent selected to choose it for the next effect or condition
+                                            // Do it only here, because it is updated everytime agent model of effect change
+                                            if (rootItem.panelController) {
+                                                rootItem.panelController.lastAgentSelected = agentEffectCombo.selectedItem;
+                                            }
+                                        }
+                                    }
                                 }
 
-                                visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPType !== AgentIOPTypes.OUTPUT)
+                                // Agent's Inputs/Outputs/Parameters
+                                IngeScapeComboboxItemModelAgentsIOP {
+                                    id: iopEffectsCombo
+
+                                    anchors {
+                                        left: agentEffectCombo.right
+                                        leftMargin: 6
+                                        verticalCenter : parent.verticalCenter
+                                    }
+
+                                    height: 25
+                                    width: 148
+
+                                    visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE)
+                                    enabled: visible
+
+                                    inputsNumber: (myEffect && myEffect.modelM && (myEffect.effectType === ActionEffectTypes.VALUE)) ? myEffect.modelM.inputsNumber : 0
+                                    outputsNumber: (myEffect && myEffect.modelM && (myEffect.effectType === ActionEffectTypes.VALUE)) ? myEffect.modelM.outputsNumber : 0
+                                    parametersNumber: (myEffect && myEffect.modelM && (myEffect.effectType === ActionEffectTypes.VALUE)) ? myEffect.modelM.parametersNumber : 0
+
+                                    model: (myEffect && myEffect.modelM) ? myEffect.modelM.iopMergedList : 0
+
+                                    Binding {
+                                        target: iopEffectsCombo
+                                        property: "selectedIndex"
+                                        value: (myEffect && myEffect.modelM && myEffect.modelM.agentIOP) ? myEffect.modelM.iopMergedList.indexOf(myEffect.modelM.agentIOP)
+                                                                                                         : -1
+                                    }
+
+                                    onSelectedItemChanged: {
+                                        if ((iopEffectsCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
+                                        {
+                                            myEffect.modelM.agentIOP = iopEffectsCombo.selectedItem;
+
+                                            // Register agent IOP selected to choose it for the next effect or condition
+                                            if (rootItem.panelController) {
+                                                panelController.lastIOPSelected = iopEffectsCombo.selectedItem;
+                                            }
+
+                                            // Revalidate text field and combo entry regarding which one is visible and the type of the selected IOP.
+                                            userInputItem.revalidateInput()
+                                        }
+                                    }
+                                }
+
+                                // Target Value
+                                InputIOPValueField {
+                                    id: userInputItem
+
+                                    anchors {
+                                        left: iopEffectsCombo.right
+                                        leftMargin: 6
+
+                                        right: (btnWarningActionEditor.visible ? btnWarningActionEditor.left : parent.right)
+                                        rightMargin: (btnWarningActionEditor.visible ? 6 : 0)
+
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    iopVM: (effectListItem.myEffect && effectListItem.myEffect.modelM) ? effectListItem.myEffect.modelM.agentIOP : undefined
+                                    forceHide: !effectListItem.myEffect || (effectListItem.myEffect.effectType !== ActionEffectTypes.VALUE)
+
+                                    function getModelValue() {
+                                        if (effectListItem.myEffect && effectListItem.myEffect.modelM)
+                                        {
+                                            return effectListItem.myEffect.modelM.value
+                                        }
+                                        else
+                                        {
+                                            return ""
+                                        }
+
+                                    }
+
+                                    function setModelValue(value) {
+                                        if (effectListItem.myEffect && effectListItem.myEffect.modelM)
+                                        {
+                                            effectListItem.myEffect.modelM.value = value
+                                        }
+                                    }
+                                }
+
+                                LabellessSvgButton {
+                                    id: btnWarningActionEditor
+
+                                    anchors {
+                                        right: parent.right
+                                        rightMargin: 0
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPType !== AgentIOPTypes.OUTPUT)
 
 
-                                checkable: true
+                                    checkable: true
+
+                                    pressedID: releasedID + "-pressed"
+                                    releasedID: "warningActionEditor"
+                                    disabledID : releasedID
+
+
+                                    onClicked: {
+                                        infosBulle.open();
+                                    }
+
+
+
+                                    I2PopupBase {
+                                        id: infosBulle
+
+                                        height : backgroundPopup.height
+                                        width : backgroundPopup.width
+                                        keepRelativePositionToInitialParent: true
+                                        layerColor : 'transparent'
+
+                                        onOpened: {
+                                            infosBulle.visible = true
+                                            infosBulle.x = infosBulle.x - infosBulle.width + 25
+                                            infosBulle.y = infosBulle.y - infosBulle.height - 3
+                                        }
+
+                                        onClosed: {
+                                            // the pop up moves otherwise before being not visible
+                                            infosBulle.visible = false
+                                        }
+
+                                        I2SvgItem {
+                                            id : backgroundPopup
+
+                                            svgFileCache: IngeScapeTheme.svgFileIngeScape
+                                            svgElementId: "tooltip"
+                                        }
+
+                                        Text {
+                                            id : textInfos
+                                            anchors {
+                                                fill : parent
+                                                margins: 6
+                                            }
+
+                                            color : IngeScapeTheme.veryDarkGreyColor
+                                            wrapMode: Text.Wrap
+                                            text : qsTr("Writing to inputs or parameters cannot be reverted.")
+                                            font {
+                                                family : IngeScapeTheme.textFontFamily
+                                                pixelSize: 13
+                                            }
+                                        }
+                                    }
+
+                                }
+
+                                // Effect Type (on Agent)
+                                IngeScapeComboboxItemModel {
+                                    id: effectTypeCombo
+
+                                    anchors {
+                                        left: agentEffectCombo.right
+                                        leftMargin: 6
+                                        verticalCenter : parent.verticalCenter
+                                    }
+                                    height: 25
+                                    width: 98
+
+                                    visible: (myEffect && (myEffect.effectType === ActionEffectTypes.AGENT))
+                                    enabled: visible
+
+                                    model: (controller ? controller.agentEffectValuesList : 0)
+
+                                    Binding {
+                                        target: effectTypeCombo
+                                        property: "selectedIndex"
+                                        value: (myEffect && myEffect.modelM && controller) ? controller.agentEffectValuesList.indexOfEnumValue(myEffect.modelM.agentEffectValue)
+                                                                                           : -1
+                                    }
+
+                                    onSelectedItemChanged: {
+                                        if ((effectTypeCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
+                                        {
+                                            myEffect.modelM.agentEffectValue = effectTypeCombo.selectedItem.value;
+                                        }
+                                    }
+                                }
+                            }
+
+                            //
+                            // Effect Details for Mapping
+                            //
+                            Item {
+                                anchors {
+                                    right : parent.right
+                                    rightMargin: 10
+                                    left : rowEffectsTypes.left
+                                    bottom : parent.bottom
+                                    bottomMargin: 6
+                                }
+                                visible: (myEffect && myEffect.effectType === ActionEffectTypes.MAPPING)
+
+                                // Output Agent
+                                IngeScapeComboboxItemModel {
+                                    id: comboEffectOnMapping_OutputAgent
+
+                                    anchors {
+                                        left : parent.left
+                                        bottom : comboEffectOnMapping_Output.top
+                                        bottomMargin: 6
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model: rootItem.allAgentsGroupsByName
+
+                                    enabled: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count > 0))
+                                    placeholderText: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count === 0) ? "- No Item -"
+                                                                                                                                       : "- Select an item -")
+
+                                    Binding {
+                                        target: comboEffectOnMapping_OutputAgent
+                                        property: "selectedIndex"
+                                        value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myEffect.modelM.outputAgent)
+                                                                                                               : -1
+                                    }
+
+                                    onSelectedItemChanged: {
+                                        if ((comboEffectOnMapping_OutputAgent.selectedIndex >= 0) && myEffect && myEffect.modelM)
+                                        {
+                                            myEffect.modelM.outputAgent = comboEffectOnMapping_OutputAgent.selectedItem;
+                                        }
+                                    }
+                                }
+
+                                // Outputs (of output agent)
+                                IngeScapeComboboxItemModelAgentsIOP {
+                                    id: comboEffectOnMapping_Output
+
+                                    anchors {
+                                        left : parent.left
+                                        bottom : parent.bottom
+                                    }
+                                    height : 25
+                                    width : 148
+
+                                    model : (myEffect && myEffect.modelM) ? myEffect.modelM.outputsList : 0
+                                    enabled: visible
+
+                                    Binding {
+                                        target: comboEffectOnMapping_Output
+                                        property: "selectedIndex"
+                                        value: (myEffect && myEffect.modelM && myEffect.modelM.outputsList) ? myEffect.modelM.outputsList.indexOf(myEffect.modelM.output)
+                                                                             : -1
+                                    }
+
+                                    onSelectedItemChanged: {
+                                        if ((comboEffectOnMapping_Output.selectedIndex >= 0) && myEffect && myEffect.modelM)
+                                        {
+                                            myEffect.modelM.output = comboEffectOnMapping_Output.selectedItem;
+                                        }
+                                    }
+                                }
+
+                                // ON/OFF slider
+                                Item {
+                                    id: disableMappingItem
+
+                                    anchors {
+                                        left : comboEffectOnMapping_OutputAgent.right
+                                        right : comboEffectOnMapping_InputAgent.left
+                                        top : comboEffectOnMapping_OutputAgent.top
+                                        bottom : parent.bottom
+                                    }
+                                    clip : true
+
+                                    Rectangle {
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                            right : rectRight.right
+                                            left : rectLeft.left
+                                        }
+                                        color : IngeScapeTheme.blackColor
+                                        height : 1
+                                    }
+
+                                    Rectangle {
+                                        id : rectLeft
+                                        anchors {
+                                            horizontalCenter: parent.left
+                                            top : parent.top
+                                            bottom : parent.bottom
+                                            topMargin: comboEffectOnMapping_OutputAgent.height/2
+                                            bottomMargin: comboEffectOnMapping_OutputAgent.height/2
+                                        }
+                                        width : 12
+                                        color : IngeScapeTheme.veryDarkGreyColor
+                                        border {
+                                            width: 1
+                                            color : IngeScapeTheme.blackColor
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id : rectRight
+                                        anchors {
+                                            horizontalCenter: parent.right
+                                            top : parent.top
+                                            bottom : parent.bottom
+                                            topMargin: comboEffectOnMapping_OutputAgent.height/2
+                                            bottomMargin: comboEffectOnMapping_OutputAgent.height/2
+                                        }
+                                        width : 12
+                                        color : IngeScapeTheme.veryDarkGreyColor
+                                        border {
+                                            width: 1
+                                            color : IngeScapeTheme.blackColor
+                                        }
+                                    }
+
+                                    Button {
+                                        id : enabledbutton
+                                        anchors.centerIn: parent
+
+                                        style: I2SvgToggleButtonStyle {
+                                            fileCache: IngeScapeTheme.svgFileIngeScape
+
+                                            toggleCheckedReleasedID: "enabledToggle-checked";
+                                            toggleCheckedPressedID: "enabledToggle-checked-pressed";
+                                            toggleUncheckedReleasedID: "enabledToggle";
+                                            toggleUncheckedPressedID: "enabledToggle-pressed";
+
+                                            // No disabled states
+                                            toggleCheckedDisabledID: ""
+                                            toggleUncheckedDisabledID: ""
+
+                                            labelMargin: 0;
+                                        }
+
+                                        onCheckedChanged: {
+                                            if (myEffect && myEffect.modelM)
+                                            {
+                                                if (checked) {
+                                                    myEffect.modelM.mappingEffectValue = MappingEffectValues.MAPPED;
+                                                }
+                                                else {
+                                                    myEffect.modelM.mappingEffectValue = MappingEffectValues.UNMAPPED;
+                                                }
+                                            }
+                                        }
+
+                                        Binding {
+                                            target: enabledbutton
+                                            property: "checked"
+                                            value: (myEffect && myEffect.modelM && (myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED)) ? true
+                                                                                                                                                        : false
+                                        }
+                                    }
+
+
+                                    Text {
+                                        anchors {
+                                            horizontalCenter: enabledbutton.horizontalCenter
+                                            top: enabledbutton.bottom
+                                            topMargin: 3
+                                        }
+
+                                        text: (myEffect && myEffect.modelM && (myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED)) ? "Mapped"
+                                                                                                                                                    : "Not mapped"
+                                        color: IngeScapeTheme.whiteColor
+                                        font {
+                                            family: IngeScapeTheme.textFontFamily
+                                            pixelSize: 12
+                                        }
+                                    }
+                                }
+
+                                // Input Agent
+                                IngeScapeComboboxItemModel {
+                                    id: comboEffectOnMapping_InputAgent
+
+                                    anchors {
+                                        right : parent.right
+                                        bottom : comboEffectOnMapping_Input.top
+                                        bottomMargin: 6
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : rootItem.allAgentsGroupsByName
+
+                                    enabled: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count > 0))
+                                    placeholderText: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count === 0) ? "- No Item -"
+                                                                                                                                       : "- Select an item -")
+
+                                    Binding {
+                                        target: comboEffectOnMapping_InputAgent
+                                        property: "selectedIndex"
+                                        value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myEffect.modelM.agent)
+                                                                                                                : -1
+                                    }
+
+                                    onSelectedItemChanged: {
+                                        if ((comboEffectOnMapping_InputAgent.selectedIndex >= 0) && myEffect && myEffect.modelM)
+                                        {
+                                            myEffect.modelM.agent = comboEffectOnMapping_InputAgent.selectedItem;
+                                        }
+                                    }
+                                }
+
+                                // Inputs (of input agent)
+                                IngeScapeComboboxItemModelAgentsIOP {
+                                    id: comboEffectOnMapping_Input
+
+                                    anchors {
+                                        right : parent.right
+                                        bottom : parent.bottom
+                                    }
+                                    height : 25
+                                    width : 148
+
+                                    model : (myEffect && myEffect.modelM) ? myEffect.modelM.inputsList : 0
+                                    enabled: visible
+
+                                    Binding {
+                                        target: comboEffectOnMapping_Input
+                                        property: "selectedIndex"
+                                        value: (myEffect && myEffect.modelM && myEffect.modelM.inputsList) ? myEffect.modelM.inputsList.indexOf(myEffect.modelM.input)
+                                                                                                           : -1
+                                    }
+
+                                    onSelectedItemChanged: {
+                                        if ((comboEffectOnMapping_Input.selectedIndex >= 0) && myEffect && myEffect.modelM)
+                                        {
+                                            myEffect.modelM.input = comboEffectOnMapping_Input.selectedItem;
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Delete Effect
+                            LabellessSvgButton {
+                                id: btnDeleteEffect
+
+                                height : 10
+                                width : 10
+                                anchors {
+                                    top: parent.top
+                                    right : parent.right
+                                    margins: 5
+                                }
 
                                 pressedID: releasedID + "-pressed"
-                                releasedID: "warningActionEditor"
+                                releasedID: "closeEditor"
                                 disabledID : releasedID
 
 
                                 onClicked: {
-                                    infosBulle.open();
-                                }
-
-
-
-                                I2PopupBase {
-                                    id: infosBulle
-
-                                    height : backgroundPopup.height
-                                    width : backgroundPopup.width
-                                    keepRelativePositionToInitialParent: true
-                                    layerColor : 'transparent'
-
-                                    onOpened: {
-                                        infosBulle.visible = true
-                                        infosBulle.x = infosBulle.x - infosBulle.width + 25
-                                        infosBulle.y = infosBulle.y - infosBulle.height - 3
-                                    }
-
-                                    onClosed: {
-                                        // the pop up moves otherwise before being not visible
-                                        infosBulle.visible = false
-                                    }
-
-                                    I2SvgItem {
-                                        id : backgroundPopup
-
-                                        svgFileCache: IngeScapeTheme.svgFileIngeScape
-                                        svgElementId: "tooltip"
-                                    }
-
-                                    Text {
-                                        id : textInfos
-                                        anchors {
-                                            fill : parent
-                                            margins: 6
-                                        }
-
-                                        color : IngeScapeTheme.veryDarkGreyColor
-                                        wrapMode: Text.Wrap
-                                        text : qsTr("Writing to inputs or parameters cannot be reverted.")
-                                        font {
-                                            family : IngeScapeTheme.textFontFamily
-                                            pixelSize: 13
-                                        }
-                                    }
-                                }
-
-                            }
-
-                            // Effect Type (on Agent)
-                            IngeScapeComboboxItemModel {
-                                id: effectTypeCombo
-
-                                anchors {
-                                    left: agentEffectCombo.right
-                                    leftMargin: 6
-                                    verticalCenter : parent.verticalCenter
-                                }
-                                height: 25
-                                width: 98
-
-                                visible: (myEffect && (myEffect.effectType === ActionEffectTypes.AGENT))
-                                enabled: visible
-
-                                model: (controller ? controller.agentEffectValuesList : 0)
-
-                                Binding {
-                                    target: effectTypeCombo
-                                    property: "selectedIndex"
-                                    value: (myEffect && myEffect.modelM && controller) ? controller.agentEffectValuesList.indexOfEnumValue(myEffect.modelM.agentEffectValue)
-                                                                                       : -1
-                                }
-
-                                onSelectedItemChanged: {
-                                    if ((effectTypeCombo.selectedIndex >= 0) && myEffect && myEffect.modelM)
+                                    if (panelController && myEffect)
                                     {
-                                        myEffect.modelM.agentEffectValue = effectTypeCombo.selectedItem.value;
+                                        panelController.removeEffect(myEffect);
                                     }
-                                }
-                            }
-                        }
-
-                        //
-                        // Effect Details for Mapping
-                        //
-                        Item {
-                            anchors {
-                                right : parent.right
-                                rightMargin: 10
-                                left : rowEffectsTypes.left
-                                bottom : parent.bottom
-                                bottomMargin: 6
-                            }
-                            visible: (myEffect && myEffect.effectType === ActionEffectTypes.MAPPING)
-
-                            // Output Agent
-                            IngeScapeComboboxItemModel {
-                                id: comboEffectOnMapping_OutputAgent
-
-                                anchors {
-                                    left : parent.left
-                                    bottom : comboEffectOnMapping_Output.top
-                                    bottomMargin: 6
-                                }
-
-                                height : 25
-                                width : 148
-
-                                model: rootItem.allAgentsGroupsByName
-
-                                enabled: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count > 0))
-                                placeholderText: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count === 0) ? "- No Item -"
-                                                                                                                                   : "- Select an item -")
-
-                                Binding {
-                                    target: comboEffectOnMapping_OutputAgent
-                                    property: "selectedIndex"
-                                    value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myEffect.modelM.outputAgent)
-                                                                                                           : -1
-                                }
-
-                                onSelectedItemChanged: {
-                                    if ((comboEffectOnMapping_OutputAgent.selectedIndex >= 0) && myEffect && myEffect.modelM)
-                                    {
-                                        myEffect.modelM.outputAgent = comboEffectOnMapping_OutputAgent.selectedItem;
-                                    }
-                                }
-                            }
-
-                            // Outputs (of output agent)
-                            IngeScapeComboboxItemModelAgentsIOP {
-                                id: comboEffectOnMapping_Output
-
-                                anchors {
-                                    left : parent.left
-                                    bottom : parent.bottom
-                                }
-                                height : 25
-                                width : 148
-
-                                model : (myEffect && myEffect.modelM) ? myEffect.modelM.outputsList : 0
-                                enabled: visible
-
-                                Binding {
-                                    target: comboEffectOnMapping_Output
-                                    property: "selectedIndex"
-                                    value: (myEffect && myEffect.modelM && myEffect.modelM.outputsList) ? myEffect.modelM.outputsList.indexOf(myEffect.modelM.output)
-                                                                         : -1
-                                }
-
-                                onSelectedItemChanged: {
-                                    if ((comboEffectOnMapping_Output.selectedIndex >= 0) && myEffect && myEffect.modelM)
-                                    {
-                                        myEffect.modelM.output = comboEffectOnMapping_Output.selectedItem;
-                                    }
-                                }
-                            }
-
-                            // ON/OFF slider
-                            Item {
-                                id: disableMappingItem
-
-                                anchors {
-                                    left : comboEffectOnMapping_OutputAgent.right
-                                    right : comboEffectOnMapping_InputAgent.left
-                                    top : comboEffectOnMapping_OutputAgent.top
-                                    bottom : parent.bottom
-                                }
-                                clip : true
-
-                                Rectangle {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                        right : rectRight.right
-                                        left : rectLeft.left
-                                    }
-                                    color : IngeScapeTheme.blackColor
-                                    height : 1
-                                }
-
-                                Rectangle {
-                                    id : rectLeft
-                                    anchors {
-                                        horizontalCenter: parent.left
-                                        top : parent.top
-                                        bottom : parent.bottom
-                                        topMargin: comboEffectOnMapping_OutputAgent.height/2
-                                        bottomMargin: comboEffectOnMapping_OutputAgent.height/2
-                                    }
-                                    width : 12
-                                    color : IngeScapeTheme.veryDarkGreyColor
-                                    border {
-                                        width: 1
-                                        color : IngeScapeTheme.blackColor
-                                    }
-                                }
-
-                                Rectangle {
-                                    id : rectRight
-                                    anchors {
-                                        horizontalCenter: parent.right
-                                        top : parent.top
-                                        bottom : parent.bottom
-                                        topMargin: comboEffectOnMapping_OutputAgent.height/2
-                                        bottomMargin: comboEffectOnMapping_OutputAgent.height/2
-                                    }
-                                    width : 12
-                                    color : IngeScapeTheme.veryDarkGreyColor
-                                    border {
-                                        width: 1
-                                        color : IngeScapeTheme.blackColor
-                                    }
-                                }
-
-                                Button {
-                                    id : enabledbutton
-                                    anchors.centerIn: parent
-
-                                    style: I2SvgToggleButtonStyle {
-                                        fileCache: IngeScapeTheme.svgFileIngeScape
-
-                                        toggleCheckedReleasedID: "enabledToggle-checked";
-                                        toggleCheckedPressedID: "enabledToggle-checked-pressed";
-                                        toggleUncheckedReleasedID: "enabledToggle";
-                                        toggleUncheckedPressedID: "enabledToggle-pressed";
-
-                                        // No disabled states
-                                        toggleCheckedDisabledID: ""
-                                        toggleUncheckedDisabledID: ""
-
-                                        labelMargin: 0;
-                                    }
-
-                                    onCheckedChanged: {
-                                        if (myEffect && myEffect.modelM)
-                                        {
-                                            if (checked) {
-                                                myEffect.modelM.mappingEffectValue = MappingEffectValues.MAPPED;
-                                            }
-                                            else {
-                                                myEffect.modelM.mappingEffectValue = MappingEffectValues.UNMAPPED;
-                                            }
-                                        }
-                                    }
-
-                                    Binding {
-                                        target: enabledbutton
-                                        property: "checked"
-                                        value: (myEffect && myEffect.modelM && (myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED)) ? true
-                                                                                                                                                    : false
-                                    }
-                                }
-
-
-                                Text {
-                                    anchors {
-                                        horizontalCenter: enabledbutton.horizontalCenter
-                                        top: enabledbutton.bottom
-                                        topMargin: 3
-                                    }
-
-                                    text: (myEffect && myEffect.modelM && (myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED)) ? "Mapped"
-                                                                                                                                                : "Not mapped"
-                                    color: IngeScapeTheme.whiteColor
-                                    font {
-                                        family: IngeScapeTheme.textFontFamily
-                                        pixelSize: 12
-                                    }
-                                }
-                            }
-
-                            // Input Agent
-                            IngeScapeComboboxItemModel {
-                                id: comboEffectOnMapping_InputAgent
-
-                                anchors {
-                                    right : parent.right
-                                    bottom : comboEffectOnMapping_Input.top
-                                    bottomMargin: 6
-                                }
-
-                                height : 25
-                                width : 148
-
-                                model : rootItem.allAgentsGroupsByName
-
-                                enabled: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count > 0))
-                                placeholderText: (rootItem.allAgentsGroupsByName && (rootItem.allAgentsGroupsByName.count === 0) ? "- No Item -"
-                                                                                                                                   : "- Select an item -")
-
-                                Binding {
-                                    target: comboEffectOnMapping_InputAgent
-                                    property: "selectedIndex"
-                                    value: (myEffect && myEffect.modelM && rootItem.allAgentsGroupsByName) ? rootItem.allAgentsGroupsByName.indexOf(myEffect.modelM.agent)
-                                                                                                            : -1
-                                }
-
-                                onSelectedItemChanged: {
-                                    if ((comboEffectOnMapping_InputAgent.selectedIndex >= 0) && myEffect && myEffect.modelM)
-                                    {
-                                        myEffect.modelM.agent = comboEffectOnMapping_InputAgent.selectedItem;
-                                    }
-                                }
-                            }
-
-                            // Inputs (of input agent)
-                            IngeScapeComboboxItemModelAgentsIOP {
-                                id: comboEffectOnMapping_Input
-
-                                anchors {
-                                    right : parent.right
-                                    bottom : parent.bottom
-                                }
-                                height : 25
-                                width : 148
-
-                                model : (myEffect && myEffect.modelM) ? myEffect.modelM.inputsList : 0
-                                enabled: visible
-
-                                Binding {
-                                    target: comboEffectOnMapping_Input
-                                    property: "selectedIndex"
-                                    value: (myEffect && myEffect.modelM && myEffect.modelM.inputsList) ? myEffect.modelM.inputsList.indexOf(myEffect.modelM.input)
-                                                                                                       : -1
-                                }
-
-                                onSelectedItemChanged: {
-                                    if ((comboEffectOnMapping_Input.selectedIndex >= 0) && myEffect && myEffect.modelM)
-                                    {
-                                        myEffect.modelM.input = comboEffectOnMapping_Input.selectedItem;
-                                    }
-                                }
-                            }
-                        }
-
-                        // Delete Effect
-                        LabellessSvgButton {
-                            id: btnDeleteEffect
-
-                            height : 10
-                            width : 10
-                            anchors {
-                                top: parent.top
-                                right : parent.right
-                                margins: 5
-                            }
-
-                            pressedID: releasedID + "-pressed"
-                            releasedID: "closeEditor"
-                            disabledID : releasedID
-
-
-                            onClicked: {
-                                if (panelController && myEffect)
-                                {
-                                    panelController.removeEffect(myEffect);
                                 }
                             }
                         }
