@@ -1017,9 +1017,16 @@ namespace Ingescape
         /// <returns>UTF-8 string</returns>
         private static string _stringFromANSI_ToUTF8(string strANSI)
         {
-            // https://docs.microsoft.com/en-gb/dotnet/api/system.text.encoding.default
-            byte[] bytes = Encoding.Default.GetBytes(strANSI);
-            return Encoding.UTF8.GetString(bytes);
+            if (!string.IsNullOrEmpty(strANSI))
+            {
+                // https://docs.microsoft.com/en-gb/dotnet/api/system.text.encoding.default
+                byte[] bytes = Encoding.Default.GetBytes(strANSI);
+                return Encoding.UTF8.GetString(bytes);
+            }
+            else
+            {
+                return "";
+            }
         }
 
 
@@ -1031,9 +1038,16 @@ namespace Ingescape
         /// <returns>ANSI string</returns>
         private static string _stringFromUTF8_ToANSI(string strUTF8)
         {
-            // https://docs.microsoft.com/en-gb/dotnet/api/system.text.encoding.default
-            byte[] bytes = Encoding.UTF8.GetBytes(strUTF8);
-            return Encoding.Default.GetString(bytes);
+            if (!string.IsNullOrEmpty(strUTF8))
+            {
+                // https://docs.microsoft.com/en-gb/dotnet/api/system.text.encoding.default
+                byte[] bytes = Encoding.UTF8.GetBytes(strUTF8);
+                return Encoding.Default.GetString(bytes);
+            }
+            else
+            {
+                return "";
+            }
         }
 
         #endregion
