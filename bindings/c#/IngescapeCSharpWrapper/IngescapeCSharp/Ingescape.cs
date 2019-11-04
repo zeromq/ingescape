@@ -204,8 +204,8 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_readParameter(string name, IntPtr[] value, ref uint size);
-        public static int readParameter(string name, IntPtr[] value, ref uint size){ return igs_readParameter(name, value, ref size); }
-    
+        public static int readParameter(string name, IntPtr[] value, ref uint size) { return igs_readParameter(name, value, ref size); }
+
         //read per type
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool igs_readInputAsBool([MarshalAs(UnmanagedType.LPStr)]  string name);
@@ -678,7 +678,7 @@ namespace Ingescape
         // Edit the definition using the API
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_createInput([MarshalAs(UnmanagedType.LPStr)]  string name, iopType_t value_type, IntPtr value, uint size); //value must be copied in function
-        public static int createInput(string name, iopType_t value_type, IntPtr value, uint size) { return igs_createInput(name, value_type, value, size) ;} //value must be copied in function
+        public static int createInput(string name, iopType_t value_type, IntPtr value, uint size) { return igs_createInput(name, value_type, value, size); } //value must be copied in function
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_createOutput([MarshalAs(UnmanagedType.LPStr)]  string name, iopType_t type, IntPtr value, uint size); //value must be copied in function
@@ -815,7 +815,7 @@ namespace Ingescape
         //
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_getNetdevicesList(IntPtr[,] devices, ref int nb);
-        public static string [] getNetDevicesList()
+        public static string[] getNetDevicesList()
         {
             // Get network devices list
             IntPtr[,] ptrTab = new IntPtr[1, 1];
@@ -970,7 +970,7 @@ namespace Ingescape
         public static void igs_info(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_INFO, memberName, message); }
         public static void igs_warn(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_WARN, memberName, message); }
         public static void igs_error(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_ERROR, memberName, message); }
-        public static void igs_fatal(string message, [CallerMemberName] string memberName = "") {igs_log(igs_logLevel_t.IGS_LOG_FATAL, memberName, message); }
+        public static void igs_fatal(string message, [CallerMemberName] string memberName = "") { igs_log(igs_logLevel_t.IGS_LOG_FATAL, memberName, message); }
 
         #endregion
 
