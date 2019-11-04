@@ -837,19 +837,46 @@ namespace Ingescape
 
 
         // Arguments management
-        /*PUBLIC void igs_addIntToArgumentsList(igs_callArgument_t** list, int value);
-        PUBLIC void igs_addBoolToArgumentsList(igs_callArgument_t** list, bool value);
-        PUBLIC void igs_addDoubleToArgumentsList(igs_callArgument_t** list, double value);
-        PUBLIC void igs_addStringToArgumentsList(igs_callArgument_t** list, const char* value);
-        PUBLIC void igs_addDataToArgumentsList(igs_callArgument_t** list, void* value, size_t size);
-        PUBLIC void igs_destroyArgumentsList(igs_callArgument_t** list);
-        PUBLIC igs_callArgument_t * igs_cloneArgumentsList(igs_callArgument_t* list);*/
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_addIntToArgumentsList(ref IntPtr list, int value);
+        public static void addIntToArgumentsList(ref IntPtr list, int value) { igs_addIntToArgumentsList(ref list, value); }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_addBoolToArgumentsList(ref IntPtr list, bool value);
+        public static void addBoolToArgumentsList(ref IntPtr list, bool value) { igs_addBoolToArgumentsList(ref list, value); }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_addDoubleToArgumentsList(ref IntPtr list, double value);
+        public static void addDoubleToArgumentsList(ref IntPtr list, double value) { igs_addDoubleToArgumentsList(ref list, value); }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_addStringToArgumentsList(ref IntPtr list, [MarshalAs(UnmanagedType.LPStr)] string value);
+        public static void addStringToArgumentsList(ref IntPtr list, string value) { igs_addStringToArgumentsList(ref list, value); }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_addDataToArgumentsList(ref IntPtr list, byte[] value, uint size);
+        public static void addDataToArgumentsList(ref IntPtr list, byte[] value, uint size) { igs_addDataToArgumentsList(ref list, value, size); }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_destroyArgumentsList(ref IntPtr list);
+        public static void destroyArgumentsList(ref IntPtr list) { igs_destroyArgumentsList(ref list); }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_cloneArgumentsList(IntPtr list);
+        public static IntPtr cloneArgumentsList(IntPtr list) { return igs_cloneArgumentsList(list); }
+
 
         // Send a call to another agent
         //requires to pass agent name or UUID, call name and a list of arguments
         //passed arguments list will be deallocated and destroyed
-        //PUBLIC int igs_sendCall(const char* agentNameOrUUID, const char* callName, igs_callArgument_t** list);
-
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int igs_sendCall([MarshalAs(UnmanagedType.LPStr)] string agentNameOrUUID,
+                                               [MarshalAs(UnmanagedType.LPStr)] string callName,
+                                               ref IntPtr list);
+        public static int sendCall(string agentNameOrUUID, string callName, ref IntPtr list)
+        {
+            return igs_sendCall(agentNameOrUUID, callName, ref list);
+        }
 
         // Create CALLS for our agent
 
@@ -859,7 +886,6 @@ namespace Ingescape
         //stil undefined. Warning: only one callback can be attached to a call (further attempts
         //will be ignored and signaled by an error log).
 
-        //PUBLIC int igs_initCall(const char* name, igs_callFunction cb, void* myData);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_initCall([MarshalAs(UnmanagedType.LPStr)] string name,
                                                [MarshalAs(UnmanagedType.FunctionPtr)] igs_callFunction cb,
@@ -870,17 +896,14 @@ namespace Ingescape
         }
 
 
-        //PUBLIC int igs_removeCall(const char* name);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_removeCall([MarshalAs(UnmanagedType.LPStr)] string name);
         public static int removeCall(string name) { return igs_removeCall(name); }
 
-        //PUBLIC int igs_addArgumentToCall(const char* callName, const char* argName, iopType_t type);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_addArgumentToCall([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName, iopType_t type);
         public static int addArgumentToCall(string callName, string argName, iopType_t type) { return igs_addArgumentToCall(callName, argName, type); }
 
-        //PUBLIC int igs_removeArgumentFromCall(const char* callName, const char* argName);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_removeArgumentFromCall([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName);
         public static int removeArgumentFromCall(string callName, string argName) { return igs_removeArgumentFromCall(callName, argName); }
@@ -928,7 +951,6 @@ namespace Ingescape
         private static extern void igs_freeCallsList(ref IntPtr list, uint nbOfElements);
         public static void freeCallsList(ref IntPtr list, uint nbOfElements) { igs_freeCallsList(ref list, nbOfElements); }*/
 
-        // igs_callArgument_t* igs_getFirstArgumentForCall(const char* callName);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getFirstArgumentForCall([MarshalAs(UnmanagedType.LPStr)] string name);
         public static IntPtr getFirstArgumentForCall(string name) { return igs_getFirstArgumentForCall(name); }

@@ -47,7 +47,7 @@ namespace CSharpSampleAgent
             //string msg = null;
             while (true)
             {
-                Console.Write("Press  'X' to quit \nPress  'A' to write in log \n");
+                Console.Write("Press 'X' to quit \nPress 'A' to write in log \n Press 'S' to send a call \n");
 
                 // Start a console read operation. Do not display the input.
                 cki = Console.ReadKey(true);
@@ -58,14 +58,18 @@ namespace CSharpSampleAgent
                     igsAgent.stop();
                     break;
                 }
-
-                // Exit if the user pressed the 'A' key.
-                if (cki.Key == ConsoleKey.A)
+                // If the user pressed the 'A' key.
+                else if (cki.Key == ConsoleKey.A)
                 {
                     //Loop of potential functions raising memory leaks
                     //Write input type int, double, impulsion, string 1000 times
                     //The memory increase. it seems to have no relation with the c# but more with the C implementation
                     igsAgent.memoryleakstest();
+                }
+                // If the user pressed the 'S' key.
+                else if (cki.Key == ConsoleKey.S)
+                {
+                    igsAgent.testSendCall();
                 }
             }
         }

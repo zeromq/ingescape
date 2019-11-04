@@ -9,6 +9,12 @@ namespace CSharpSampleAgent
 {
     class IgsAgent
     {
+        #region Attributes
+
+        private int _count = 0;
+
+        #endregion
+
         #region Callbacks
 
         public igs_observeCallback _callbackPtr;
@@ -154,6 +160,7 @@ namespace CSharpSampleAgent
             //
             // CALLS
             //
+            #region Calls
 
             _functionCallPtr = cSharpCallFunction;
 
@@ -199,6 +206,9 @@ namespace CSharpSampleAgent
             {
                 Console.WriteLine("First arg is NOT defined !");
             }
+
+            #endregion
+
 
             // Get agent state
             //string checkAgentName = Igs.getAgentName();
@@ -389,6 +399,10 @@ namespace CSharpSampleAgent
             Igs.addMappingEntry("impulsion", "Csharp-Sample", "impulsion-out");
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void writeOnInputs()
         {
             //Integer
@@ -408,6 +422,10 @@ namespace CSharpSampleAgent
             result = Igs.writeInputAsImpulsion("impulsion");
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void writeAndReadData()
         {
             byte[] fooBytes;
@@ -443,6 +461,15 @@ namespace CSharpSampleAgent
 
 
         /// <summary>
+        /// Stop our agent
+        /// </summary>
+        public void stop()
+        {
+            Igs.stop();
+        }
+
+
+        /// <summary>
         /// 
         /// </summary>
         public void memoryleakstest()
@@ -468,9 +495,34 @@ namespace CSharpSampleAgent
             }
         }
 
-        public void stop()
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void testSendCall()
         {
-            Igs.stop();
+            IntPtr argsList = IntPtr.Zero;
+
+            _count++;
+            bool even = ((_count % 2) == 0);
+
+            Igs.addIntToArgumentsList(ref argsList, _count);
+            Igs.addBoolToArgumentsList(ref argsList, even);
+
+            Console.WriteLine("call macosAgent-->OTHER_CALL");
+            Igs.sendCall("macosAgent", "OTHER_CALL", ref argsList);
+
+            Igs.destroyArgumentsList(ref argsList);
+
+
+            /*Igs.addStringToArgumentsList(ref argsList, "peyruqueou@ingenuity.io");
+            Igs.addStringToArgumentsList(ref argsList, "v.peyruqueou@gmail.com");
+            Igs.addStringToArgumentsList(ref argsList, "");
+            Igs.addStringToArgumentsList(ref argsList, "Test envoi via IngeScape call");
+            Igs.addStringToArgumentsList(ref argsList, "Salut Vincent, Cordialement, Vincent P.");
+
+            Console.WriteLine("call igsMail-->sendMail");
+            Igs.sendCall("igsMail", "sendMail", ref argsList);*/
         }
 
         #endregion
