@@ -60,6 +60,7 @@ namespace Ingescape
 
         // Library 64 bits
         //private const string ingescapeDLLPath = "C:\\Program Files\\ingescape\\lib\\ingescape.dll";
+        //private const string ingescapeDLLPath = "C:\\Program Files\\ingescape\\lib\\Debug\\ingescaped.dll";
 
         // Library MAC OS
         //private const string ingescapeDLLPath = "/usr/local/lib/libingescape.dylib";
@@ -75,6 +76,8 @@ namespace Ingescape
         #endregion
 
         //////////////////////////////////////////////////
+        #region Initialization and control
+
         // Initialization and control
 
         //start & stop the agent
@@ -195,6 +198,8 @@ namespace Ingescape
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool igs_canBeFrozen();
         public static bool canBeFrozen() { return igs_canBeFrozen(); }
+
+        #endregion
 
 
         //////////////////////////////////////////////////

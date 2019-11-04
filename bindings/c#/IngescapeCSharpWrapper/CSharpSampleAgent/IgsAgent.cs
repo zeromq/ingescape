@@ -84,8 +84,11 @@ namespace CSharpSampleAgent
                                 uint nbArgs,
                                 IntPtr myData)
         {
-            Console.WriteLine("\n\n-----------------\n\ncSharpCallFunction has been called !!!");
-            Console.WriteLine("senderAgentName={0} -- senderAgentUUID={1} -- callName={2} -- nbArgs={3}", senderAgentName, senderAgentUUID, callName, nbArgs);
+            Console.WriteLine("'{2}' called from '{0}' ({1}) with {3} args:", senderAgentName, senderAgentUUID, callName, nbArgs);
+            if (firstArgument != IntPtr.Zero)
+            {
+                Console.WriteLine("Iterate on args...");
+            }
         }
 
 
@@ -134,6 +137,7 @@ namespace CSharpSampleAgent
                 Console.WriteLine("ERROR: The loading of the mapping failed !");
             }
 
+            //"name": "C#-Sample (é ç partï)"
             //Igs.setMappingName("A (éç) A");
             string mapName = Igs.getMappingName();
             string mapDescription = Igs.getMappingDescription();

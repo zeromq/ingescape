@@ -1,6 +1,6 @@
 {
 	"definition": {
-		"name": "C#-Sample (é ç partï)",
+		"name": "C#-Sample",
 		"description": "this module is the C# sample agent (é ç partï)",
 		"version": "1.0",
 		"parameters": [{
