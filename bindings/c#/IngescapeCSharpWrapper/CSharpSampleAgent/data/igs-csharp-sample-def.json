@@ -43,6 +43,88 @@
                    "name": "boolean-out",
                    "type": "BOOL",
                    "value": "true"
-                   }]
+                   }],
+		"calls": [
+            {
+                "name": "sendMail",
+				"description": "allows to send an email",
+                "arguments": [
+                    {
+                        "name": "from",
+                        "type": "STRING"
+                    },
+                    {
+                        "name": "to",
+                        "type": "STRING"
+                    },
+                    {
+                        "name": "cc",
+                        "type": "STRING"
+                    },
+                    {
+                        "name": "subject",
+                        "type": "STRING"
+                    },
+                    {
+                        "name": "body",
+                        "type": "STRING"
+                    }
+                ]
+            },
+			{
+                "arguments": [
+                    {
+                        "name": "param1",
+                        "type": "INTEGER"
+                    },
+                    {
+                        "name": "param2",
+                        "type": "DOUBLE"
+                    },
+                    {
+                        "name": "param3",
+                        "type": "BOOL"
+                    },
+                    {
+                        "name": "param4",
+                        "type": "STRING"
+                    },
+                    {
+                        "name": "param5",
+                        "type": "DATA"
+                    }
+                ],
+                "description": "this call is used to blah blah blah",
+                "name": "MAC_CALL",
+                "reply": {
+                    "arguments": [
+                        {
+                            "name": "param1",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "param2",
+                            "type": "STRING"
+                        }
+                    ],
+                    "description": "",
+                    "name": "MY_REPLY"
+                }
+            },
+            {
+                "arguments": [
+                    {
+                        "name": "arg1",
+                        "type": "INTEGER"
+                    },
+                    {
+                        "name": "arg2",
+                        "type": "BOOL"
+                    }
+                ],
+                "description": "",
+                "name": "OTHER_CALL"
+            }
+        ]		   
 	}
 }

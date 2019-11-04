@@ -11,7 +11,9 @@ namespace CSharpSampleAgent
     {
         #region Callbacks
 
-        public igs_observeCallback callbckPtr;
+        public igs_observeCallback _callbackPtr;
+
+        public igs_callFunction _functionCallPtr;
 
         /// <summary>
         /// 
@@ -23,7 +25,7 @@ namespace CSharpSampleAgent
         /// <param name="valueSize"></param>
         /// <param name="myData"></param>
         void genericCallback(iop_t iopType,
-        [MarshalAs(UnmanagedType.LPStr)] string name,
+        string name,
         iopType_t valueType,
         IntPtr value,
         int valueSize,
@@ -64,6 +66,28 @@ namespace CSharpSampleAgent
             }
 
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="senderAgentName"></param>
+        /// <param name="senderAgentUUID"></param>
+        /// <param name="callName"></param>
+        /// <param name="firstArgument"></param>
+        /// <param name="nbArgs"></param>
+        /// <param name="myData"></param>
+        void cSharpCallFunction(string senderAgentName,
+                                string senderAgentUUID,
+                                string callName,
+                                IntPtr firstArgument,
+                                uint nbArgs,
+                                IntPtr myData)
+        {
+            Console.WriteLine("\n\n-----------------\n\ncSharpCallFunction has been called !!!");
+            Console.WriteLine("senderAgentName={0} -- senderAgentUUID={1} -- callName={2} -- nbArgs={3}", senderAgentName, senderAgentUUID, callName, nbArgs);
+        }
+
 
         // License Callback
         public igs_licenseCallback ptrOnLicenseCallbck;
@@ -121,6 +145,56 @@ namespace CSharpSampleAgent
             //Get agent name
             string agentName = Igs.getAgentName();
             //Igs.setAgentName("test-é-ç");
+
+
+            //
+            // CALLS
+            //
+
+            _functionCallPtr = cSharpCallFunction;
+
+            string callName = "cSharpCall";
+
+            string myData = "My Data";
+            IntPtr myDataPtr = Marshal.StringToHGlobalAnsi(myData);
+
+            Igs.initCall(callName, _functionCallPtr, myDataPtr);
+            Igs.addArgumentToCall(callName, "monArgInt1", iopType_t.IGS_INTEGER_T);
+            Igs.addArgumentToCall(callName, "monArgInt2", iopType_t.IGS_INTEGER_T);
+
+            uint numberOfCalls = Igs.getNumberOfCalls();
+
+            //bool exist1 = Igs.checkCallExistence("sendMail");
+            //bool exist1 = Igs.checkCallExistence("BIDON");
+            //bool exist2 = Igs.checkCallExistence("BIDON");
+            bool exist1 = Igs.checkCallArgumentExistence("sendMail", "subject");
+            bool exist2 = Igs.checkCallArgumentExistence("sendMail", "BIDON");
+
+            //bool exist1 = Igs.checkInputExistence("a");
+            //bool exist2 = Igs.checkInputExistence("boolean");
+            //bool exist2 = Igs.checkInputExistence("b");
+
+            Console.WriteLine("numberOfCalls={0} -- exist1={1} -- exist2={2}", numberOfCalls, exist1, exist2);
+
+            string[] callsList = Igs.getCallsList();
+            for (int i = 0; i < callsList.Length; i++)
+            {
+                string tmpCallName = callsList[i];
+                uint argsNb = Igs.getNumberOfArgumentsForCall(tmpCallName);
+
+                Console.WriteLine("call {0} -- args nb = {1}", tmpCallName, argsNb);
+            }
+
+            //IntPtr listOfArguments;
+            IntPtr firstArg = Igs.getFirstArgumentForCall("sendMail");
+            if (firstArg != IntPtr.Zero)
+            {
+                Console.WriteLine("First arg is defined: {0}", firstArg);
+            }
+            else
+            {
+                Console.WriteLine("First arg is NOT defined !");
+            }
 
             // Get agent state
             //string checkAgentName = Igs.getAgentName();
@@ -274,7 +348,7 @@ namespace CSharpSampleAgent
 
         public void observeInputs()
         {
-            callbckPtr = genericCallback;
+            _callbackPtr = genericCallback;
 
             //Listing of input
             int nbOfElement = -1;
@@ -287,7 +361,7 @@ namespace CSharpSampleAgent
             for (int i = 0; i < nbOfElement; i++)
             {
                 //Observe the current input    
-                Igs.observeInput(inputsList[i], callbckPtr, myDataPtr);
+                Igs.observeInput(inputsList[i], _callbackPtr, myDataPtr);
             }
         }
 

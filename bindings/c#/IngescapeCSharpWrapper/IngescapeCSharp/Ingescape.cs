@@ -21,8 +21,17 @@ namespace Ingescape
                                         [MarshalAs(UnmanagedType.LPStr)] string name,
                                         iopType_t valueType,
                                         IntPtr value,
-                                        int valueSize,
+                                        int valueSize, // FIXME uint
                                         IntPtr myData);
+
+    // Callback model to handle calls received by our agent
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void igs_callFunction([MarshalAs(UnmanagedType.LPStr)] string senderAgentName,
+                                          [MarshalAs(UnmanagedType.LPStr)] string senderAgentUUID,
+                                          [MarshalAs(UnmanagedType.LPStr)] string callName,
+                                          IntPtr firstArgument,
+                                          uint nbArgs,
+                                          IntPtr myData);
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -434,7 +443,7 @@ namespace Ingescape
         private static extern void igs_clearDataForParameter(string name);
         public static void clearDataForParameter(string name) { igs_clearDataForParameter(name); }
 
-        //observe writing to an IOP
+        // Observe writing to an IOP
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_observeInput([MarshalAs(UnmanagedType.LPStr)] string name,
             [MarshalAs(UnmanagedType.FunctionPtr)] igs_observeCallback cb,
@@ -796,6 +805,141 @@ namespace Ingescape
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_removeMappingEntryWithName([MarshalAs(UnmanagedType.LPStr)] string fromOurInput, [MarshalAs(UnmanagedType.LPStr)] string toAgent, [MarshalAs(UnmanagedType.LPStr)] string withOutput);
         public static int removeMappingEntryWithName(string fromOurInput, string toAgent, string withOutput) { return igs_removeMappingEntryWithName(fromOurInput, toAgent, withOutput); }
+
+        #endregion
+
+
+        //////////////////////////////////////////////////
+        #region Calls
+
+        // Send CALLS to other agents
+
+        //call arguments are provided as a chained list
+        /*typedef struct igs_callArgument
+        {
+            char* name;
+            iopType_t type;
+            union{
+                bool b;
+                int i;
+                double d;
+                char* c;
+                void* data;
+            };
+            size_t size;
+            struct igs_callArgument *next;
+        } igs_callArgument_t;*/
+
+
+        // Arguments management
+        /*PUBLIC void igs_addIntToArgumentsList(igs_callArgument_t** list, int value);
+        PUBLIC void igs_addBoolToArgumentsList(igs_callArgument_t** list, bool value);
+        PUBLIC void igs_addDoubleToArgumentsList(igs_callArgument_t** list, double value);
+        PUBLIC void igs_addStringToArgumentsList(igs_callArgument_t** list, const char* value);
+        PUBLIC void igs_addDataToArgumentsList(igs_callArgument_t** list, void* value, size_t size);
+        PUBLIC void igs_destroyArgumentsList(igs_callArgument_t** list);
+        PUBLIC igs_callArgument_t * igs_cloneArgumentsList(igs_callArgument_t* list);*/
+
+        // Send a call to another agent
+        //requires to pass agent name or UUID, call name and a list of arguments
+        //passed arguments list will be deallocated and destroyed
+        //PUBLIC int igs_sendCall(const char* agentNameOrUUID, const char* callName, igs_callArgument_t** list);
+
+
+        // Create CALLS for our agent
+
+        // Manage CALLS supported by our agent
+        //Calls can be created either by code or by loading a definition. The function below will
+        //create a call if it does not exist or will attach callback and data if they are
+        //stil undefined. Warning: only one callback can be attached to a call (further attempts
+        //will be ignored and signaled by an error log).
+
+        //PUBLIC int igs_initCall(const char* name, igs_callFunction cb, void* myData);
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int igs_initCall([MarshalAs(UnmanagedType.LPStr)] string name,
+                                               [MarshalAs(UnmanagedType.FunctionPtr)] igs_callFunction cb,
+                                               IntPtr myData);
+        public static int initCall(string name, igs_callFunction cb, IntPtr myData)
+        {
+            return igs_initCall(name, cb, myData);
+        }
+
+
+        //PUBLIC int igs_removeCall(const char* name);
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int igs_removeCall([MarshalAs(UnmanagedType.LPStr)] string name);
+        public static int removeCall(string name) { return igs_removeCall(name); }
+
+        //PUBLIC int igs_addArgumentToCall(const char* callName, const char* argName, iopType_t type);
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int igs_addArgumentToCall([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName, iopType_t type);
+        public static int addArgumentToCall(string callName, string argName, iopType_t type) { return igs_addArgumentToCall(callName, argName, type); }
+
+        //PUBLIC int igs_removeArgumentFromCall(const char* callName, const char* argName);
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int igs_removeArgumentFromCall([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName);
+        public static int removeArgumentFromCall(string callName, string argName) { return igs_removeArgumentFromCall(callName, argName); }
+
+        // Introspection for calls, arguments and replies
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern uint igs_getNumberOfCalls();
+        public static uint getNumberOfCalls() { return igs_getNumberOfCalls(); }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool igs_checkCallExistence([MarshalAs(UnmanagedType.LPStr)] string name);
+        public static bool checkCallExistence(string name)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(name);
+            return igs_checkCallExistence(strANSI);
+        }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_getCallsList(ref int nbOfElements);
+        public static string[] getCallsList()
+        {
+            int nbOfElements = 0;
+
+            IntPtr intPtr = igs_getCallsList(ref nbOfElements);
+
+            IntPtr[] intPtrArray = new IntPtr[nbOfElements];
+            string[] list = new string[nbOfElements];
+
+            // Copy the pointer to the array of pointers
+            Marshal.Copy(intPtr, intPtrArray, 0, nbOfElements);
+
+            // Fill the string array
+            for (int i = 0; i < nbOfElements; i++)
+            {
+                list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
+            }
+            
+            // FIXME Release memory ?
+
+            return list;
+        }
+
+        // FIXME TODO: void igs_freeCallsList(char** list, size_t nbOfCalls);
+        /*[DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_freeCallsList(ref IntPtr list, uint nbOfElements);
+        public static void freeCallsList(ref IntPtr list, uint nbOfElements) { igs_freeCallsList(ref list, nbOfElements); }*/
+
+        // igs_callArgument_t* igs_getFirstArgumentForCall(const char* callName);
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_getFirstArgumentForCall([MarshalAs(UnmanagedType.LPStr)] string name);
+        public static IntPtr getFirstArgumentForCall(string name) { return igs_getFirstArgumentForCall(name); }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern uint igs_getNumberOfArgumentsForCall([MarshalAs(UnmanagedType.LPStr)] string name);
+        public static uint getNumberOfArgumentsForCall(string name) { return igs_getNumberOfArgumentsForCall(name); }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool igs_checkCallArgumentExistence([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName);
+        public static bool checkCallArgumentExistence(string callName, string argName)
+        {
+            string strANSI_callName = _stringFromUTF8_ToANSI(callName);
+            string strANSI_argName = _stringFromUTF8_ToANSI(argName);
+            return igs_checkCallArgumentExistence(strANSI_callName, strANSI_argName);
+        }
 
         #endregion
 
