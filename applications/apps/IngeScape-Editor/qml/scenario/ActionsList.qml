@@ -47,6 +47,9 @@ Item {
     // Flag indicating if the user have a valid license for the editor
     property bool isEditorLicenseValid: mainWindow.licensesController && mainWindow.licensesController.mergedLicense && mainWindow.licensesController.mergedLicense.editorLicenseValidity
 
+    // Flag indicating if the user wants to organizate actions list or manipulate actions in editor views
+    property bool organizeActionMode: false
+
 
     //-----------------------------------------
     //
@@ -133,7 +136,7 @@ Item {
         ListView {
             id: actionsList
 
-            model: scenarioController.actionsList
+            model: scenarioController ? scenarioController.actionsList : 0
 
             delegate: componentActionsListItem
 
@@ -146,21 +149,21 @@ Item {
                 NumberAnimation { property: "scale"; from: 0.0; to: 1.0 }
             }
 
-            displaced: Transition {
-                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+//            displaced: Transition {
+//                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
 
-                // ensure opacity and scale values return to 1.0
-                NumberAnimation { property: "opacity"; to: 1.0 }
-                NumberAnimation { property: "scale"; to: 1.0 }
-            }
+//                // ensure opacity and scale values return to 1.0
+//                NumberAnimation { property: "opacity"; to: 1.0 }
+//                NumberAnimation { property: "scale"; to: 1.0 }
+//            }
 
-            move: Transition {
-                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+//            move: Transition {
+//                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
 
-                // ensure opacity and scale values return to 1.0
-                NumberAnimation { property: "opacity"; to: 1.0 }
-                NumberAnimation { property: "scale"; to: 1.0 }
-            }
+//                // ensure opacity and scale values return to 1.0
+//                NumberAnimation { property: "opacity"; to: 1.0 }
+//                NumberAnimation { property: "scale"; to: 1.0 }
+//            }
 
             remove: Transition {
                 // ensure opacity and scale values return to 0.0
@@ -170,6 +173,7 @@ Item {
 
         }
     }
+
 
     //
     // Header
@@ -226,10 +230,42 @@ Item {
                     {
                         scenarioController.openActionEditorWithModel(null);
                     }
-
                 }
             }
+        }
 
+        Row {
+            id: headerRowOrganize
+
+            height: btnOrganizeActions.height
+            spacing : 8
+
+            anchors {
+                top: parent.top
+                topMargin: 23
+                left: headerRow.right
+                leftMargin: 10
+            }
+
+            LabellessSvgButton {
+                id: btnOrganizeActions
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+
+                enabled: scenarioController ? scenarioController.actionsList.count > 1 : false
+
+                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+
+                pressedID: releasedID + "-pressed"
+                releasedID: rootItem.organizeActionMode ? "new-agent" : "import"
+                disabledID : releasedID + "-disabled"
+
+                onClicked: {
+                    rootItem.organizeActionMode = !rootItem.organizeActionMode
+                }
+            }
         }
 
         Row {
@@ -291,204 +327,214 @@ Item {
     Component {
         id: componentActionsListItem
 
+        // Set content action list item draggable
+        Editor.DraggableListItem {
+            dragEnable: organizeActionMode // Only when we are in organize action list mode
+            parentItemWhenDragged : rootItem
+            keysDragNDrop: ["OrganizeActionItem"]
 
-        Item {
-            id : actionListItem
-
-            width: IngeScapeEditorTheme.leftPanelWidth
-            height: 42
-
-            // Not Draggable Action Item
-            ActionsListItem {
-                id : notDraggableItem
-
-                anchors.fill : parent
-
-                action : model.QtObject
-                controller: rootItem.scenarioController
-
-                // visible: mouseArea.drag.active
-
-                actionItemIsHovered: mouseArea.containsMouse
-                actionItemIsPressed: mouseArea.pressed
+            // Reorganize actions list model when an item is moved
+            onMoveItemRequested: {
+                scenarioController.actionsList.move(from, to, 1);
             }
 
-            // Draggable Action Item
             Item {
-                id : draggableItem
+                id : actionListItem
 
-                height : notDraggableItem.height
-                width : notDraggableItem.width
+                width: IngeScapeEditorTheme.leftPanelWidth
+                height: 42
 
-                // Reference to our action that can be used by a DropArea item
-                property var action: model.QtObject
+                // Not Draggable Action Item
+                ActionsListItem {
+                    id : notDraggableItem
 
-                // StartTime of the action when it is dragged in timeline
-                property var temporaryStartTime: null;
+                    anchors.fill : parent
 
-                Drag.active: mouseArea.drag.active
-                Drag.hotSpot.x: mouseArea.mouseX
-                Drag.hotSpot.y: mouseArea.mouseY
-                Drag.keys: ["ActionsListItem"]
+                    action : model.QtObject
+                    controller: rootItem.scenarioController
 
-                MouseArea {
-                    id: mouseArea
+                    // visible: mouseArea.drag.active
 
-                    anchors.fill: draggableItem
-
-                    hoverEnabled: true
-
-                    drag.smoothed: false
-                    drag.target: draggableItem
-                    cursorShape: mouseArea.drag.active ? Qt.PointingHandCursor : Qt.OpenHandCursor
-
-                    onPressed: {
-                        if (scenarioController)
-                        {
-                            if (scenarioController.selectedAction === model.QtObject) {
-                                scenarioController.selectedAction = null;
-                            }
-                            else {
-                                scenarioController.selectedAction = model.QtObject;
-                            }
-                        }
-
-                        // Find our layer and reparent our popup in it
-                        draggableItem.parent = rootItem.findLayerRootByObjectName(draggableItem, "overlayLayerDraggableItem");
-
-                        // Compute new position if needed
-                        if (draggableItem.parent != null)
-                        {
-                            var newPosition = actionListItem.mapToItem(parent, 0, 0);
-                            draggableItem.x = newPosition.x;
-                            draggableItem.y = newPosition.y;
-                        }
-                    }
-
-                    onPositionChanged: {
-                        //itemDragged.x = mouseX - 12 - itemDragged.width;
-                        //itemDragged.y = mouseY - 12 - itemDragged.height;
-                        itemDragged.x = mouseX - itemDragged.width / 2.0;
-                        itemDragged.y = mouseY - itemDragged.height - 20;
-                    }
-
-                    onCanceled: {
-                        draggableItem.Drag.drop();
-
-                        //
-                        // Reset the position of our draggable item
-                        //
-                        // - restore our parent if needed
-                        draggableItem.parent = actionListItem;
-
-                        // - restore our previous position in parent
-                        draggableItem.x = 0;
-                        draggableItem.y = 0;
-                    }
-
-                    onReleased: {
-                        draggableItem.Drag.drop();
-
-                        //
-                        // Reset the position of our draggable item
-                        //
-                        // - restore our parent if needed
-                        draggableItem.parent = actionListItem;
-
-                        // - restore our previous position in parent
-                        draggableItem.x = 0;
-                        draggableItem.y = 0;
-                    }
-
-
-                    ActionsListItem {
-                        height: notDraggableItem.height
-                        width: notDraggableItem.width
-
-                        action: model.QtObject
-                        controller: rootItem.scenarioController
-
-                        actionItemIsHovered: mouseArea.containsMouse
-                        actionItemIsPressed: mouseArea.pressed
-
-                        visible: !mouseArea.drag.active
-
-
-                        //
-                        // Slot on signal "Need Confirmation to Delete Action"
-                        //
-                        onNeedConfirmationToDeleteAction: {
-                            deleteConfirmationPopup.myAction = action;
-                            deleteConfirmationPopup.open();
-                        }
-                    }
-
-                    I2CustomRectangle {
-                        id: itemDragged
-
-                        width: Math.max(IngeScapeTheme.timeWidth, nameAction.width + 10)
-                        //width: Math.min(Math.max(IngeScapeTheme.timeWidth, nameAction.width + 10), 250)
-                        height: columnText.height + 8
-
-                        color: IngeScapeTheme.darkBlueGreyColor
-
-                        visible: mouseArea.drag.active
-
-                        // - fuzzy radius around our rectangle
-                        fuzzyRadius: 2
-                        fuzzyColor : IngeScapeTheme.blackColor
-
-                        Column {
-                            id: columnText
-
-                            anchors.centerIn: parent
-                            height: temporaryStartTimeAction.visible ? (nameAction.height + temporaryStartTimeAction.height + 3)
-                                                                     : nameAction.height
-
-                            spacing: 6
-
-                            Text {
-                                id: nameAction
-
-                                anchors {
-                                    horizontalCenter: parent.horizontalCenter
-                                    //left: parent.left
-                                    //right: parent.right
-                                }
-                                horizontalAlignment: Text.AlignHCenter
-
-                                text: model.name
-                                //elide: Text.ElideRight
-
-                                color: IngeScapeTheme.lightGreyColor
-                                font {
-                                    family : IngeScapeTheme.textFontFamily
-                                    pixelSize: 14
-                                }
-                            }
-
-                            Text {
-                                id: temporaryStartTimeAction
-
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                horizontalAlignment: Text.AlignHCenter
-
-                                visible: (text !== "")
-                                text: draggableItem.temporaryStartTime ? draggableItem.temporaryStartTime.toLocaleString(Qt.locale(), "HH:mm:ss.zzz")
-                                                                       : ""
-
-                                color: IngeScapeTheme.lightGreyColor
-                                font {
-                                    family : IngeScapeTheme.textFontFamily
-                                    pixelSize: 14
-                                }
-                            }
-                        }
-
-                    }
-
+                    actionItemIsHovered: mouseArea.containsMouse /*|| dragArea.containsMouse*/
+                    actionItemIsPressed: mouseArea.pressed /*|| dragArea.pressed*/
                 }
 
+                // Draggable Action Item
+                Item {
+                    id : draggableItem
+
+                    height : notDraggableItem.height
+                    width : notDraggableItem.width
+
+                    // Reference to our action that can be used by a DropArea item
+                    property var action: model.QtObject
+
+                    // StartTime of the action when it is dragged in timeline
+                    property var temporaryStartTime: null;
+
+                    Drag.active: mouseArea.drag.active
+                    Drag.hotSpot.x: mouseArea.mouseX
+                    Drag.hotSpot.y: mouseArea.mouseY
+                    Drag.keys: ["ActionsListItem"]
+
+                    MouseArea {
+                        id: mouseArea
+
+                        anchors.fill: draggableItem
+
+                        enabled: !rootItem.organizeActionMode
+
+                        hoverEnabled: true
+
+                        drag.smoothed: false
+                        drag.target: rootItem.organizeActionMode ? undefined : draggableItem
+                        cursorShape: mouseArea.drag.active ? Qt.PointingHandCursor : Qt.OpenHandCursor
+
+                        onPressed: {
+                            if (scenarioController)
+                            {
+                                if (scenarioController.selectedAction === model.QtObject) {
+                                    scenarioController.selectedAction = null;
+                                }
+                                else {
+                                    scenarioController.selectedAction = model.QtObject;
+                                }
+                            }
+
+                            // Find our layer and reparent our popup in it
+                            draggableItem.parent = rootItem.findLayerRootByObjectName(draggableItem, "overlayLayerDraggableItem");
+
+                            // Compute new position if needed
+                            if (draggableItem.parent != null)
+                            {
+                                var newPosition = actionListItem.mapToItem(parent, 0, 0);
+                                draggableItem.x = newPosition.x;
+                                draggableItem.y = newPosition.y;
+                            }
+                        }
+
+                        onPositionChanged: {
+                            //itemDragged.x = mouseX - 12 - itemDragged.width;
+                            //itemDragged.y = mouseY - 12 - itemDragged.height;
+                            itemDragged.x = mouseX - itemDragged.width / 2.0;
+                            itemDragged.y = mouseY - itemDragged.height - 20;
+                        }
+
+                        onCanceled: {
+                            draggableItem.Drag.drop();
+
+                            //
+                            // Reset the position of our draggable item
+                            //
+                            // - restore our parent if needed
+                            draggableItem.parent = actionListItem;
+
+                            // - restore our previous position in parent
+                            draggableItem.x = 0;
+                            draggableItem.y = 0;
+                        }
+
+                        onReleased: {
+                            draggableItem.Drag.drop();
+
+                            //
+                            // Reset the position of our draggable item
+                            //
+                            // - restore our parent if needed
+                            draggableItem.parent = actionListItem;
+
+                            // - restore our previous position in parent
+                            draggableItem.x = 0;
+                            draggableItem.y = 0;
+                        }
+
+
+                        ActionsListItem {
+                            height: notDraggableItem.height
+                            width: notDraggableItem.width
+
+                            action: model.QtObject
+                            controller: rootItem.scenarioController
+
+                            actionItemIsHovered: mouseArea.containsMouse /*|| dragArea.containsMouse*/
+                            actionItemIsPressed: mouseArea.pressed /*|| dragArea.pressed*/
+
+                            visible: !mouseArea.drag.active
+
+
+                            //
+                            // Slot on signal "Need Confirmation to Delete Action"
+                            //
+                            onNeedConfirmationToDeleteAction: {
+                                deleteConfirmationPopup.myAction = action;
+                                deleteConfirmationPopup.open();
+                            }
+                        }
+
+                        I2CustomRectangle {
+                            id: itemDragged
+
+                            width: Math.max(IngeScapeTheme.timeWidth, nameAction.width + 10)
+                            //width: Math.min(Math.max(IngeScapeTheme.timeWidth, nameAction.width + 10), 250)
+                            height: columnText.height + 8
+
+                            color: IngeScapeTheme.darkBlueGreyColor
+
+                            visible: mouseArea.drag.active
+
+                            // - fuzzy radius around our rectangle
+                            fuzzyRadius: 2
+                            fuzzyColor : IngeScapeTheme.blackColor
+
+                            Column {
+                                id: columnText
+
+                                anchors.centerIn: parent
+                                height: temporaryStartTimeAction.visible ? (nameAction.height + temporaryStartTimeAction.height + 3)
+                                                                         : nameAction.height
+
+                                spacing: 6
+
+                                Text {
+                                    id: nameAction
+
+                                    anchors {
+                                        horizontalCenter: parent.horizontalCenter
+                                        //left: parent.left
+                                        //right: parent.right
+                                    }
+                                    horizontalAlignment: Text.AlignHCenter
+
+                                    text: model.name
+                                    //elide: Text.ElideRight
+
+                                    color: IngeScapeTheme.lightGreyColor
+                                    font {
+                                        family : IngeScapeTheme.textFontFamily
+                                        pixelSize: 14
+                                    }
+                                }
+
+                                Text {
+                                    id: temporaryStartTimeAction
+
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    horizontalAlignment: Text.AlignHCenter
+
+                                    visible: (text !== "")
+                                    text: draggableItem.temporaryStartTime ? draggableItem.temporaryStartTime.toLocaleString(Qt.locale(), "HH:mm:ss.zzz")
+                                                                           : ""
+
+                                    color: IngeScapeTheme.lightGreyColor
+                                    font {
+                                        family : IngeScapeTheme.textFontFamily
+                                        pixelSize: 14
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -519,6 +565,5 @@ Item {
         width: 300
 
         message: qsTr("The editor has no valid license.\nYou cannot create any more actions.")
-
     }
 }

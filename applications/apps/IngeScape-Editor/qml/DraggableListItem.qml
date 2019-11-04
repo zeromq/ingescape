@@ -128,7 +128,8 @@ Item {
        }
        height: 0
 
-       radius: contents[0].radius
+       // Take the radius of the content to drag so that placeholder look at him
+       radius: contents[0].radius ? contents[0].radius : 0
 
        color: root.placeholderColor
    }
@@ -222,7 +223,9 @@ Item {
         }
         height: 0
 
-        radius: contents[0].radius
+        // Take the radius of the content to drag so that placeholder look at him
+        radius: contents[0].radius ? contents[0].radius : 0
+
         color: root.placeholderColor
     }
 
