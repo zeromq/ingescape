@@ -126,11 +126,7 @@ namespace Ingescape
         public static string getAgentName()
         {
             IntPtr ptr = igs_getAgentName();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         // Agent state
@@ -147,11 +143,7 @@ namespace Ingescape
         public static string getAgentState()
         {
             IntPtr ptr = igs_getAgentState();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         // Mute the agent ouputs
@@ -239,11 +231,7 @@ namespace Ingescape
         public static string readInputAsString(string name)
         {
             IntPtr ptr = igs_readInputAsString(name);
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -283,11 +271,7 @@ namespace Ingescape
         public static string readOutputAsString(string name)
         {
             IntPtr ptr = igs_readOutputAsString(name);
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -327,11 +311,7 @@ namespace Ingescape
         public static string readParameterAsString(string name)
         {
             IntPtr ptr = igs_readParameterAsString(name);
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -642,11 +622,7 @@ namespace Ingescape
         public static string getDefinitionName()
         {
             IntPtr ptr = igs_getDefinitionName();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -654,11 +630,7 @@ namespace Ingescape
         public static string getDefinitionDescription()
         {
             IntPtr ptr = igs_getDefinitionDescription();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -748,11 +720,7 @@ namespace Ingescape
         public static string getMappingName()
         {
             IntPtr ptr = igs_getMappingName();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -760,11 +728,7 @@ namespace Ingescape
         public static string getMappingDescription()
         {
             IntPtr ptr = igs_getMappingDescription();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -1223,6 +1187,7 @@ namespace Ingescape
 
                     case iopType_t.IGS_STRING_T:
                         value = Marshal.PtrToStringAnsi(structArgument.union.c);
+                        //value = getStringFromPointer(structArgument.union.c);
                         break;
 
                     case iopType_t.IGS_DATA_T:
@@ -1250,6 +1215,34 @@ namespace Ingescape
             }
 
             return callArgumentsList;
+        }
+
+
+        /// <summary>
+        /// Get an UTF-8 string from a pointer
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <returns></returns>
+        public static string getStringFromPointer(IntPtr ptr)
+        {
+            // Return a managed string with default encoding from the unmanaged ANSI string
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            return _stringFromANSI_ToUTF8(strANSI);
+        }
+
+
+        /// <summary>
+        /// Get a pointer from an UTF-8 string
+        /// </summary>
+        /// <param name="strUTF8"></param>
+        /// <returns></returns>
+        public static IntPtr getPointerFromString(string strUTF8)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(strUTF8);
+
+            // TODO comment
+            return Marshal.StringToHGlobalAnsi(strANSI);
         }
 
 

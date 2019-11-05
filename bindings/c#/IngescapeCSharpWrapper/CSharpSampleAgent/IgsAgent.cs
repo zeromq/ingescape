@@ -94,7 +94,16 @@ namespace CSharpSampleAgent
         {
             Console.WriteLine("'{2}' called from '{0}' ({1}) with {3} args:", senderAgentName, senderAgentUUID, callName, nbArgs);
 
-            if ((nbArgs == 5) && (firstArgument != IntPtr.Zero))
+            if (myData != IntPtr.Zero)
+            {
+                string utf8 = Igs.getStringFromPointer(myData);
+                if (!string.IsNullOrEmpty(utf8))
+                {
+                    Console.WriteLine("myData = {0}", utf8);
+                }
+            }
+
+            if (nbArgs == 5)
             {
                 List<CallArgument> callArgumentsList = Igs.getCallArgumentsList(firstArgument);
                 int i = 0;
@@ -192,10 +201,10 @@ namespace CSharpSampleAgent
 
             string callName = "cSharpCall";
 
-            string myData = "My Data";
-            IntPtr myDataPtr = Marshal.StringToHGlobalAnsi(myData);
+            string strMyData = "My Data (é ç parti)";
+            IntPtr ptrMyData = Igs.getPointerFromString(strMyData);
 
-            Igs.initCall(callName, _functionCallPtr, myDataPtr);
+            Igs.initCall(callName, _functionCallPtr, ptrMyData);
             Igs.addArgumentToCall(callName, "argBool1", iopType_t.IGS_BOOL_T);
             Igs.addArgumentToCall(callName, "argInt2", iopType_t.IGS_INTEGER_T);
             Igs.addArgumentToCall(callName, "argDouble3", iopType_t.IGS_DOUBLE_T);
