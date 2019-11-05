@@ -1166,7 +1166,7 @@ namespace Ingescape
 
             while (ptrArgument != IntPtr.Zero)
             {
-                // 
+                // Marshals data from an unmanaged block of memory to a newly allocated managed object of the type specified by a generic type parameter.
                 StructCallArgument structArgument = Marshal.PtrToStructure<StructCallArgument>(ptrArgument);
 
                 object value = null;
@@ -1207,6 +1207,7 @@ namespace Ingescape
 
                 if (value != null)
                 {
+                    // Create a new C# call argument and add it to the list
                     CallArgument callArgument = new CallArgument(structArgument.name, structArgument.type, value);
                     callArgumentsList.Add(callArgument);
                 }
@@ -1225,7 +1226,7 @@ namespace Ingescape
         /// <returns></returns>
         public static string getStringFromPointer(IntPtr ptr)
         {
-            // Return a managed string with default encoding from the unmanaged ANSI string
+            // Copies all characters up to the first null character from an unmanaged ANSI string to a managed String, and widens each ANSI character to Unicode.
             string strANSI = Marshal.PtrToStringAnsi(ptr);
 
             return _stringFromANSI_ToUTF8(strANSI);
@@ -1241,7 +1242,7 @@ namespace Ingescape
         {
             string strANSI = _stringFromUTF8_ToANSI(strUTF8);
 
-            // TODO comment
+            // Copies the contents of a managed String into unmanaged memory, converting into ANSI format as it copies.
             return Marshal.StringToHGlobalAnsi(strANSI);
         }
 
