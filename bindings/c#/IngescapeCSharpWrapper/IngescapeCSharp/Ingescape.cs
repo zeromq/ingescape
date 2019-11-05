@@ -226,6 +226,7 @@ namespace Ingescape
         private static extern double igs_readInputAsDouble([MarshalAs(UnmanagedType.LPStr)] string name);
         public static double readInputAsDouble(string name) { return igs_readInputAsDouble(name); }
 
+        // PUBLIC char* igs_readInputAsString(const char* name); //returned char* must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_readInputAsString([MarshalAs(UnmanagedType.LPStr)] string name);
         public static string readInputAsString(string name)
@@ -234,22 +235,21 @@ namespace Ingescape
             return getStringFromPointer(ptr);
         }
 
+        // PUBLIC int igs_readInputAsData(const char* name, void** data, size_t *size); //returned data must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_readInputAsData([MarshalAs(UnmanagedType.LPStr)] string name, IntPtr[] data, ref uint size);
+        private static extern int igs_readInputAsData([MarshalAs(UnmanagedType.LPStr)] string name, ref IntPtr data, ref uint size);
         public static int readInputAsData(string name, ref byte[] data)
         {
-            uint sizeRead = 0;
-            IntPtr[] intPtrArray = new IntPtr[1];
+            uint size = 0;
+            IntPtr ptr = IntPtr.Zero;
+            int success = igs_readInputAsData(name, ref ptr, ref size);
 
-            // Read input as data
-            int success = igs_readInputAsData(name, intPtrArray, ref sizeRead);
-
-            data = new byte[sizeRead];
+            data = new byte[size];
 
             // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
             // Copy the content of the IntPtr to the byte array
             // FIXME: size has type "size_t" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
-            Marshal.Copy(intPtrArray[0], data, 0, (int)sizeRead);
+            Marshal.Copy(ptr, data, 0, (int)size);
 
             return success;
         }
@@ -266,6 +266,7 @@ namespace Ingescape
         private static extern double igs_readOutputAsDouble([MarshalAs(UnmanagedType.LPStr)] string name);
         public static double readOutputAsDouble(string name) { return igs_readOutputAsDouble(name); }
 
+        // PUBLIC char* igs_readOutputAsString(const char* name); //returned char* must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_readOutputAsString([MarshalAs(UnmanagedType.LPStr)] string name);
         public static string readOutputAsString(string name)
@@ -274,22 +275,21 @@ namespace Ingescape
             return getStringFromPointer(ptr);
         }
 
+        // PUBLIC int igs_readOutputAsData(const char* name, void** data, size_t *size); //returned data must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_readOutputAsData([MarshalAs(UnmanagedType.LPStr)] string name, IntPtr[] data, ref uint size);
+        private static extern int igs_readOutputAsData([MarshalAs(UnmanagedType.LPStr)] string name, ref IntPtr data, ref uint size);
         public static int readOutputAsData([MarshalAs(UnmanagedType.LPStr)] string name, ref byte[] data)
         {
-            uint sizeRead = 0;
-            IntPtr[] intPtrArray = new IntPtr[1];
+            uint size = 0;
+            IntPtr ptr = IntPtr.Zero;
+            int success = igs_readOutputAsData(name, ref ptr, ref size);
 
-            // Read output as data
-            int success = igs_readOutputAsData(name, intPtrArray, ref sizeRead);
-
-            data = new byte[sizeRead];
+            data = new byte[size];
 
             // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
             // Copy the content of the IntPtr to the byte array
             // FIXME: size has type "size_t" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
-            Marshal.Copy(intPtrArray[0], data, 0, (int)sizeRead);
+            Marshal.Copy(ptr, data, 0, (int)size);
 
             return success;
         }
@@ -306,6 +306,7 @@ namespace Ingescape
         private static extern double igs_readParameterAsDouble([MarshalAs(UnmanagedType.LPStr)] string name);
         public static double readParameterAsDouble(string name) { return igs_readParameterAsDouble(name); }
 
+        // PUBLIC char* igs_readParameterAsString(const char* name); //returned char* must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_readParameterAsString([MarshalAs(UnmanagedType.LPStr)] string name);
         public static string readParameterAsString(string name)
@@ -314,22 +315,21 @@ namespace Ingescape
             return getStringFromPointer(ptr);
         }
 
+        // PUBLIC int igs_readParameterAsData(const char* name, void** data, size_t *size); //returned data must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_readParameterAsData([MarshalAs(UnmanagedType.LPStr)] string name, IntPtr[] data, ref uint size);
+        private static extern int igs_readParameterAsData([MarshalAs(UnmanagedType.LPStr)] string name, ref IntPtr data, ref uint size);
         public static int readParameterAsData([MarshalAs(UnmanagedType.LPStr)] string name, ref byte[] data)
         {
-            uint sizeRead = 0;
-            IntPtr[] intPtrArray = new IntPtr[1];
+            uint size = 0;
+            IntPtr ptr = IntPtr.Zero;
+            int success = igs_readParameterAsData(name, ref ptr, ref size);
 
-            // Read parameter as data
-            int success = igs_readParameterAsData(name, intPtrArray, ref sizeRead);
-
-            data = new byte[sizeRead];
+            data = new byte[size];
 
             // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
             // Copy the content of the IntPtr to the byte array
             // FIXME: size has type "size_t" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
-            Marshal.Copy(intPtrArray[0], data, 0, (int)sizeRead);
+            Marshal.Copy(ptr, data, 0, (int)size);
 
             return success;
         }
@@ -968,7 +968,7 @@ namespace Ingescape
             // Get network devices list
             IntPtr ptrDevices = IntPtr.Zero;
             int nb = 0;
-            Igs.igs_getNetdevicesList(ref ptrDevices, ref nb);
+            igs_getNetdevicesList(ref ptrDevices, ref nb);
 
             IntPtr[] ptrArrayOfDevices = new IntPtr[nb];
 
@@ -998,7 +998,7 @@ namespace Ingescape
             // Get network addresses list
             IntPtr ptrAddresses = IntPtr.Zero;
             int nb = 0;
-            Igs.igs_getNetaddressesList(ref ptrAddresses, ref nb);
+            igs_getNetaddressesList(ref ptrAddresses, ref nb);
 
             IntPtr[] ptrArrayOfAddresses = new IntPtr[nb];
 
