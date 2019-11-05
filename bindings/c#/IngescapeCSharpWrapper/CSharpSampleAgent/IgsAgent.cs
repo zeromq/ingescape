@@ -33,11 +33,11 @@ namespace CSharpSampleAgent
         /// <param name="valueSize"></param>
         /// <param name="myData"></param>
         void genericCallback(iop_t iopType,
-        string name,
-        iopType_t valueType,
-        IntPtr value,
-        int valueSize,
-        IntPtr myData)
+                             string name,
+                             iopType_t valueType,
+                             IntPtr value,
+                             int valueSize,
+                             IntPtr myData)
         {
             Console.WriteLine("callback test");
             switch (valueType)

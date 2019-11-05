@@ -896,35 +896,37 @@ namespace Ingescape
             return igs_checkCallExistence(strANSI);
         }
 
+        // PUBLIC char** igs_getCallsList(size_t *nbOfElements); //returned char** shall be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr igs_getCallsList(ref int nbOfElements);
+        private static extern IntPtr igs_getCallsList(ref uint nbOfElements);
         public static string[] getCallsList()
         {
-            int nbOfElements = 0;
+            uint nbOfElements = 0;
 
             IntPtr intPtr = igs_getCallsList(ref nbOfElements);
 
             IntPtr[] intPtrArray = new IntPtr[nbOfElements];
-            string[] list = new string[nbOfElements];
 
             // Copy the pointer to the array of pointers
-            Marshal.Copy(intPtr, intPtrArray, 0, nbOfElements);
+            Marshal.Copy(intPtr, intPtrArray, 0, (int)nbOfElements);
 
             // Fill the string array
+            string[] list = new string[nbOfElements];
             for (int i = 0; i < nbOfElements; i++)
             {
                 list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
             }
-            
-            // FIXME Release memory ?
+
+            // Release memory
+            igs_freeCallsList(intPtr, nbOfElements);
 
             return list;
         }
 
-        // FIXME TODO: void igs_freeCallsList(char** list, size_t nbOfCalls);
-        /*[DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_freeCallsList(ref IntPtr list, uint nbOfElements);
-        public static void freeCallsList(ref IntPtr list, uint nbOfElements) { igs_freeCallsList(ref list, nbOfElements); }*/
+        // PUBLIC void igs_freeCallsList(char **list, size_t nbOfCalls);
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_freeCallsList(IntPtr list, uint nbOfCalls);
+        //public static void freeCallsList(IntPtr list, uint nbOfCalls) { igs_freeCallsList(list, nbOfCalls); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getFirstArgumentForCall([MarshalAs(UnmanagedType.LPStr)] string name);
@@ -960,64 +962,64 @@ namespace Ingescape
         // Utility functions to find network adapters with broadcast capabilities to be used in igs_startWithDevice
         //
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_getNetdevicesList(IntPtr[,] devices, ref int nb);
+        private static extern void igs_getNetdevicesList(ref IntPtr devices, ref int nb);
         public static string[] getNetDevicesList()
         {
             // Get network devices list
-            IntPtr[,] ptrTab = new IntPtr[1, 1];
+            IntPtr ptrDevices = IntPtr.Zero;
             int nb = 0;
-            Igs.igs_getNetdevicesList(ptrTab, ref nb);
+            Igs.igs_getNetdevicesList(ref ptrDevices, ref nb);
 
-            //IntPtr to byte array
-            IntPtr[] devicesPtrList = new IntPtr[nb];
-            Marshal.Copy(ptrTab[0, 0], devicesPtrList, 0, nb);
+            IntPtr[] ptrArrayOfDevices = new IntPtr[nb];
 
-            //List of string inputs
-            string[] devicesList = new string[nb];
+            Marshal.Copy(ptrDevices, ptrArrayOfDevices, 0, nb);
 
-            //Fill the string tab
+            // Fill the strings array
+            string[] devicesArray = new string[nb];
             for (int i = 0; i < nb; i++)
             {
-                devicesList[i] = Marshal.PtrToStringAnsi(devicesPtrList[i]);
+                devicesArray[i] = Marshal.PtrToStringAnsi(ptrArrayOfDevices[i]);
             }
-            //HOTFIX : release the memory
-            //Igs.igs_freeNetdevicesList(devicesPtrList, nb);
 
-            return devicesList;
+            // Free the memory
+            igs_freeNetdevicesList(ptrDevices, nb);
+
+            return devicesArray;
         }
 
+        // PUBLIC void igs_freeNetdevicesList(char **devices, int nb);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_freeNetdevicesList(IntPtr[] devices, int nb);
-        public static void freeNetDevicesList(IntPtr[] devices, int nb) { igs_freeNetdevicesList(devices, nb); }
+        private static extern void igs_freeNetdevicesList(IntPtr devices, int nb);
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_getNetaddressesList(IntPtr[,] addresses, ref int nb);
+        private static extern void igs_getNetaddressesList(ref IntPtr addresses, ref int nb);
         public static string[] getNetAddressesList()
         {
             // Get network addresses list
-            IntPtr[,] ptrTab = new IntPtr[1, 1];
+            IntPtr ptrAddresses = IntPtr.Zero;
             int nb = 0;
-            Igs.igs_getNetaddressesList(ptrTab, ref nb);
+            Igs.igs_getNetaddressesList(ref ptrAddresses, ref nb);
 
-            //IntPtr to byte array
-            IntPtr[] addressesPtrList = new IntPtr[nb];
-            Marshal.Copy(ptrTab[0, 0], addressesPtrList, 0, nb);
+            IntPtr[] ptrArrayOfAddresses = new IntPtr[nb];
 
-            //List of string inputs
-            string[] addressesList = new string[nb];
+            Marshal.Copy(ptrAddresses, ptrArrayOfAddresses, 0, nb);
 
-            //Fill the string tab
+            // Fill the strings array
+            string[] addressesArray = new string[nb];
             for (int i = 0; i < nb; i++)
             {
-                addressesList[i] = Marshal.PtrToStringAnsi(addressesPtrList[i]);
+                addressesArray[i] = Marshal.PtrToStringAnsi(ptrArrayOfAddresses[i]);
             }
 
-            return addressesList;
+            // Free the memory
+            igs_freeNetaddressesList(ptrAddresses, nb);
+
+            return addressesArray;
         }
 
+        // PUBLIC void igs_freeNetaddressesList(char **addresses, int nb);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_freeNetaddressesList(IntPtr[] addresses, int nb);
-        public static void freeNetAddressesList(IntPtr[] addresses, int nb) { igs_freeNetaddressesList(addresses, nb); }
+        private static extern void igs_freeNetaddressesList(IntPtr addresses, int nb);
 
         //Command line for the agent can be passed here for inclusion in the
         //agent's headers. If not used, header is initialized with exec path.
