@@ -1,18 +1,26 @@
-﻿using Ingescape;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Ingescape
 {
+    /// <summary>
+    /// Argument of Call (for IngeScape C#)
+    /// </summary>
     public class CallArgument
     {
         #region Properties
 
+        /// <summary>
+        /// Name of our argument
+        /// </summary>
         public string Name { get; }
 
+        /// <summary>
+        /// Type of the value
+        /// </summary>
         public iopType_t Type { get; }
 
+        /// <summary>
+        /// Can be a bool, an int, a double, a string or a byte[]
+        /// </summary>
         public object Value { get; }
 
         #endregion
