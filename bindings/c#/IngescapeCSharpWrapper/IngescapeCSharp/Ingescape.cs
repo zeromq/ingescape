@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -836,7 +837,7 @@ namespace Ingescape
 
         // Call arguments are provided as a chained list
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        public struct CallArgument
+        public struct StructCallArgument
         {
             [MarshalAs(UnmanagedType.LPStr)]
             public string name;
@@ -1189,6 +1190,68 @@ namespace Ingescape
 
         //////////////////////////////////////////////////
         #region Helpers
+
+        /// <summary>
+        /// Get a list of CallArgument from a pointer on the first argument of an IngeScape call
+        /// </summary>
+        /// <param name="ptrArgument"></param>
+        /// <returns></returns>
+        public static List<CallArgument> getCallArgumentsList(IntPtr ptrArgument)
+        {
+            List<CallArgument> callArgumentsList = new List<CallArgument>();
+
+            while (ptrArgument != IntPtr.Zero)
+            {
+                // 
+                StructCallArgument structArgument = Marshal.PtrToStructure<StructCallArgument>(ptrArgument);
+
+                object value = null;
+
+                switch (structArgument.type)
+                {
+                    case iopType_t.IGS_BOOL_T:
+                        value = structArgument.union.b;
+                        break;
+
+                    case iopType_t.IGS_INTEGER_T:
+                        value = structArgument.union.i;
+                        break;
+
+                    case iopType_t.IGS_DOUBLE_T:
+                        value = structArgument.union.d;
+                        break;
+
+                    case iopType_t.IGS_STRING_T:
+                        value = Marshal.PtrToStringAnsi(structArgument.union.c);
+                        break;
+
+                    case iopType_t.IGS_DATA_T:
+                        byte[] byteArray = new byte[structArgument.size];
+
+                        // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
+                        // Copy the content of the IntPtr to the byte array
+                        // FIXME: size has type "size_t" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
+                        Marshal.Copy(structArgument.union.data, byteArray, 0, (int)structArgument.size);
+
+                        value = byteArray;
+                        break;
+
+                    default:
+                        break;
+                }
+
+                if (value != null)
+                {
+                    CallArgument callArgument = new CallArgument(structArgument.name, structArgument.type, value);
+                    callArgumentsList.Add(callArgument);
+                }
+
+                ptrArgument = structArgument.next;
+            }
+
+            return callArgumentsList;
+        }
+
 
         /// <summary>
         /// Convert string from ANSI to UTF-8.

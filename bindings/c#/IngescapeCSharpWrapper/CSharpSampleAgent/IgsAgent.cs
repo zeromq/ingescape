@@ -1,5 +1,6 @@
 ﻿using Ingescape;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -95,59 +96,29 @@ namespace CSharpSampleAgent
 
             if ((nbArgs == 5) && (firstArgument != IntPtr.Zero))
             {
-                Igs.CallArgument arg1 = (Igs.CallArgument)Marshal.PtrToStructure(firstArgument, typeof(Igs.CallArgument));
-                if (arg1.type == iopType_t.IGS_BOOL_T)
-                {
-                    Console.WriteLine("1: {0} = {1} ({2})", arg1.name, arg1.union.b, arg1.size);
-                }
+                List<CallArgument> callArgumentsList = Igs.getCallArgumentsList(firstArgument);
+                int i = 0;
 
-                if (arg1.next != IntPtr.Zero)
+                foreach (CallArgument callArgument in callArgumentsList)
                 {
-                    Igs.CallArgument arg2 = (Igs.CallArgument)Marshal.PtrToStructure(arg1.next, typeof(Igs.CallArgument));
-                    if (arg2.type == iopType_t.IGS_INTEGER_T)
+                    if (callArgument != null)
                     {
-                        Console.WriteLine("2: {0} = {1} ({2})", arg2.name, arg2.union.i, arg2.size);
-                    } 
-
-                    if (arg2.next != IntPtr.Zero)
-                    {
-                        Igs.CallArgument arg3 = (Igs.CallArgument)Marshal.PtrToStructure(arg2.next, typeof(Igs.CallArgument));
-                        if (arg3.type == iopType_t.IGS_DOUBLE_T)
+                        if (callArgument.Type != iopType_t.IGS_DATA_T)
                         {
-                            Console.WriteLine("3: {0} = {1} ({2})", arg3.name, arg3.union.d, arg3.size);
+                            Console.WriteLine("{0}: {1} = {2} ({3})", i, callArgument.Name, callArgument.Value, callArgument.Type);
                         }
-
-                        if (arg3.next != IntPtr.Zero)
+                        else
                         {
-                            Igs.CallArgument arg4 = (Igs.CallArgument)Marshal.PtrToStructure(arg3.next, typeof(Igs.CallArgument));
-                            if ((arg4.type == iopType_t.IGS_STRING_T) && (arg4.union.c != IntPtr.Zero))
-                            {
-                                string s = Marshal.PtrToStringAnsi(arg4.union.c);
+                            byte[] byteArray = (byte[])callArgument.Value;
 
-                                Console.WriteLine("4: {0} = {1} ({2})", arg4.name, s, arg4.size);
-                            }
+                            // WARNING Special case: We know that the data is a string, so we can convert from byte[] to string
+                            string stringData = Encoding.UTF8.GetString(byteArray);
+                            stringData = stringData.TrimEnd('\0');
 
-                            if (arg4.next != IntPtr.Zero)
-                            {
-                                Igs.CallArgument arg5 = (Igs.CallArgument)Marshal.PtrToStructure(arg4.next, typeof(Igs.CallArgument));
-                                if ((arg5.type == iopType_t.IGS_DATA_T) && (arg5.union.data != IntPtr.Zero))
-                                {
-                                    byte[] byteArray = new byte[arg5.size];
-
-                                    // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
-                                    // Copy the content of the IntPtr to the byte array
-                                    // FIXME: size has type "size_t" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
-                                    Marshal.Copy(arg5.union.data, byteArray, 0, (int)arg5.size);
-
-                                    // WARNING Special case: We know that the data is a string, so we can convert from byte[] to string
-                                    string stringData = Encoding.UTF8.GetString(byteArray);
-                                    stringData = stringData.TrimEnd('\0');
-
-                                    Console.WriteLine("5: {0} = {1} ({2})", arg5.name, stringData, arg5.size);
-                                }
-                            }
+                            Console.WriteLine("{0}: {1} = {2} ({3})", i, callArgument.Name, stringData, callArgument.Type);
                         }
                     }
+                    i++;
                 }
             }
         }
