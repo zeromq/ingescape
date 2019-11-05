@@ -835,6 +835,31 @@ namespace Ingescape
             struct igs_callArgument *next;
         } igs_callArgument_t;*/
 
+        [StructLayout(LayoutKind.Explicit)]
+        public struct UnionCallArgument
+        {
+            [FieldOffset(0)]
+            public bool b;
+            [FieldOffset(0)]
+            public int i;
+            [FieldOffset(0)]
+            public double d;
+            [FieldOffset(0)]
+            public IntPtr c;
+            [FieldOffset(0)]
+            public IntPtr data;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct CallArgument
+        {
+            [MarshalAs(UnmanagedType.LPStr)]
+            public string name;
+            public iopType_t type;
+            public UnionCallArgument union;
+            public uint size;
+            public IntPtr next;
+        }
 
         // Arguments management
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]

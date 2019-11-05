@@ -91,9 +91,60 @@ namespace CSharpSampleAgent
                                 IntPtr myData)
         {
             Console.WriteLine("'{2}' called from '{0}' ({1}) with {3} args:", senderAgentName, senderAgentUUID, callName, nbArgs);
-            if (firstArgument != IntPtr.Zero)
+
+            if ((nbArgs == 5) && (firstArgument != IntPtr.Zero))
             {
-                Console.WriteLine("Iterate on args...");
+                Igs.CallArgument arg1 = (Igs.CallArgument)Marshal.PtrToStructure(firstArgument, typeof(Igs.CallArgument));
+                if (arg1.type == iopType_t.IGS_BOOL_T)
+                {
+                    Console.WriteLine("1: {0} = {1} ({2})", arg1.name, arg1.union.b, arg1.size);
+                }
+
+                if (arg1.next != IntPtr.Zero)
+                {
+                    Igs.CallArgument arg2 = (Igs.CallArgument)Marshal.PtrToStructure(arg1.next, typeof(Igs.CallArgument));
+                    if (arg2.type == iopType_t.IGS_INTEGER_T)
+                    {
+                        Console.WriteLine("2: {0} = {1} ({2})", arg2.name, arg2.union.i, arg2.size);
+                    } 
+
+                    if (arg2.next != IntPtr.Zero)
+                    {
+                        Igs.CallArgument arg3 = (Igs.CallArgument)Marshal.PtrToStructure(arg2.next, typeof(Igs.CallArgument));
+                        if (arg3.type == iopType_t.IGS_DOUBLE_T)
+                        {
+                            Console.WriteLine("3: {0} = {1} ({2})", arg3.name, arg3.union.d, arg3.size);
+                        }
+
+                        if (arg3.next != IntPtr.Zero)
+                        {
+                            Igs.CallArgument arg4 = (Igs.CallArgument)Marshal.PtrToStructure(arg3.next, typeof(Igs.CallArgument));
+                            if (arg4.type == iopType_t.IGS_STRING_T)
+                            {
+                                string s = Marshal.PtrToStringAnsi(arg4.union.c);
+
+                                Console.WriteLine("4: {0} = {1} ({2})", arg4.name, s, arg4.size);
+                            }
+
+                            if (arg4.next != IntPtr.Zero)
+                            {
+                                Igs.CallArgument arg5 = (Igs.CallArgument)Marshal.PtrToStructure(arg4.next, typeof(Igs.CallArgument));
+                                if (arg5.type == iopType_t.IGS_DATA_T)
+                                {
+                                    /*byte[] byteArray = new byte[arg5.size];
+                                    Igs.readInputAsData(name, ref byteArray);
+
+                                    string stringData = Encoding.UTF8.GetString(byteArray);
+                                    stringData = stringData.TrimEnd('\0');*/
+
+                                    string s = Marshal.PtrToStringAnsi(arg5.union.data);
+
+                                    Console.WriteLine("5: {0} = {1} ({2})", arg5.name, s, arg5.size);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -170,8 +221,11 @@ namespace CSharpSampleAgent
             IntPtr myDataPtr = Marshal.StringToHGlobalAnsi(myData);
 
             Igs.initCall(callName, _functionCallPtr, myDataPtr);
-            Igs.addArgumentToCall(callName, "monArgInt1", iopType_t.IGS_INTEGER_T);
-            Igs.addArgumentToCall(callName, "monArgInt2", iopType_t.IGS_INTEGER_T);
+            Igs.addArgumentToCall(callName, "argBool1", iopType_t.IGS_BOOL_T);
+            Igs.addArgumentToCall(callName, "argInt2", iopType_t.IGS_INTEGER_T);
+            Igs.addArgumentToCall(callName, "argDouble3", iopType_t.IGS_DOUBLE_T);
+            Igs.addArgumentToCall(callName, "argString4", iopType_t.IGS_STRING_T);
+            Igs.addArgumentToCall(callName, "argData5", iopType_t.IGS_DATA_T);
 
             uint numberOfCalls = Igs.getNumberOfCalls();
 
