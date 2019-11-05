@@ -819,22 +819,6 @@ namespace Ingescape
 
         // Send CALLS to other agents
 
-        //call arguments are provided as a chained list
-        /*typedef struct igs_callArgument
-        {
-            char* name;
-            iopType_t type;
-            union{
-                bool b;
-                int i;
-                double d;
-                char* c;
-                void* data;
-            };
-            size_t size;
-            struct igs_callArgument *next;
-        } igs_callArgument_t;*/
-
         [StructLayout(LayoutKind.Explicit)]
         public struct UnionCallArgument
         {
@@ -850,6 +834,7 @@ namespace Ingescape
             public IntPtr data;
         }
 
+        // Call arguments are provided as a chained list
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct CallArgument
         {

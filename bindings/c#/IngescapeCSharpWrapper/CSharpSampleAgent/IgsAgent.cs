@@ -4,6 +4,7 @@ using System.Configuration;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 
 namespace CSharpSampleAgent
 {
@@ -119,7 +120,7 @@ namespace CSharpSampleAgent
                         if (arg3.next != IntPtr.Zero)
                         {
                             Igs.CallArgument arg4 = (Igs.CallArgument)Marshal.PtrToStructure(arg3.next, typeof(Igs.CallArgument));
-                            if (arg4.type == iopType_t.IGS_STRING_T)
+                            if ((arg4.type == iopType_t.IGS_STRING_T) && (arg4.union.c != IntPtr.Zero))
                             {
                                 string s = Marshal.PtrToStringAnsi(arg4.union.c);
 
@@ -129,17 +130,20 @@ namespace CSharpSampleAgent
                             if (arg4.next != IntPtr.Zero)
                             {
                                 Igs.CallArgument arg5 = (Igs.CallArgument)Marshal.PtrToStructure(arg4.next, typeof(Igs.CallArgument));
-                                if (arg5.type == iopType_t.IGS_DATA_T)
+                                if ((arg5.type == iopType_t.IGS_DATA_T) && (arg5.union.data != IntPtr.Zero))
                                 {
-                                    /*byte[] byteArray = new byte[arg5.size];
-                                    Igs.readInputAsData(name, ref byteArray);
+                                    byte[] byteArray = new byte[arg5.size];
 
+                                    // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
+                                    // Copy the content of the IntPtr to the byte array
+                                    // FIXME: size has type "size_t" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
+                                    Marshal.Copy(arg5.union.data, byteArray, 0, (int)arg5.size);
+
+                                    // WARNING Special case: We know that the data is a string, so we can convert from byte[] to string
                                     string stringData = Encoding.UTF8.GetString(byteArray);
-                                    stringData = stringData.TrimEnd('\0');*/
+                                    stringData = stringData.TrimEnd('\0');
 
-                                    string s = Marshal.PtrToStringAnsi(arg5.union.data);
-
-                                    Console.WriteLine("5: {0} = {1} ({2})", arg5.name, s, arg5.size);
+                                    Console.WriteLine("5: {0} = {1} ({2})", arg5.name, stringData, arg5.size);
                                 }
                             }
                         }
