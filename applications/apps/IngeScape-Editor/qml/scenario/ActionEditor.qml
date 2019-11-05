@@ -439,7 +439,6 @@ WindowBlockTouches {
                     style: IngeScapeScrollViewStyle {
                     }
 
-
                     // Prevent drag overshoot on Windows
                     flickableItem.boundsBehavior: Flickable.OvershootBounds
 
@@ -485,7 +484,6 @@ WindowBlockTouches {
                     Editor.DraggableListItem {
                         id: effectListItem
 
-                        parentItemWhenDragged: effectsListItem
                         keysDragNDrop: ["OrganizeEffectsList"]
 
                         // Reorganize actions list model when an item is moved
