@@ -49,6 +49,7 @@ message(STATUS "Detected INGESCAPE binding Version - ${INGESCAPE_VERSION}")
 
 set (ingescape_csharp_sources
   ${SOURCE_DIR}/Ingescape.cs
+  ${SOURCE_DIR}/CallArgument.cs
 )
 
 source_group("Source Files" FILES ${ingescape_csharp_sources})
@@ -104,12 +105,12 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_VERSION_MAJOR}")
   set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_VERSION_MINOR}")
   set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_VERSION_PATCH}")
-  
+
   if (WIN32)
     # On windows put all agents in ingescape directory
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "ingescape")
   endif (WIN32)
-  
+
   # set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 
   # Installers for 32- vs. 64-bit CMake:
