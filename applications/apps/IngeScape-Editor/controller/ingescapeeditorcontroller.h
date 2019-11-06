@@ -124,6 +124,9 @@ class IngeScapeEditorController : public QObject
     // The local URL to access the version of the getting started web page that was delivered with the editor
     I2_QML_PROPERTY_READONLY(QString, gettingStartedLocalUrl)
 
+    // The remote URL to access editor notification
+    I2_QML_PROPERTY_READONLY(QString, notificationRemoteUrl)
+
     // Flag indicating if we must show the getting started page on startup
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, gettingStartedShowAtStartup)
 
@@ -499,17 +502,14 @@ private:
     bool _beforeNetworkStop_isMappingConnected;
     bool _beforeNetworkStop_isMappingControlled;
 
+    // The remote url to send user's informations
+    QString _statsRemoteUrl;
+
     // Default name to save the platform when exiting
     static const QString EXAMPLE_PLATFORM_NAME;
 
     // Default name when creating a new platform
     static const QString NEW_PLATFORM_NAME;
-
-    // Default remote URL for the getting started page
-    static const QString DEFAULT_REMOTE_URL_GETTING_STARTED;
-
-    // Default local URL for the getting started page
-    static const QString DEFAULT_LOCAL_URL_GETTING_STARTED;
 
     // Default name when creating a new platform
     static const QString SPECIAL_EMPTY_LAST_PLATFORM;

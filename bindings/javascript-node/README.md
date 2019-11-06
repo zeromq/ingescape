@@ -30,9 +30,9 @@ const igs = require(/path_to/ingescape.node);
 ### Install Node JS (if it is not already)
 https://nodejs.org/en/
 
-### Build module
+### Install module globally (will be installed on npm root directory "node_modules")
 
-To build the module, run on command line into project root dir :
+To build the module and install it globally, run on command line into project root dir :
 ```
-$ npm run build
+$ npm install -g
 ```

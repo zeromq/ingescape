@@ -330,7 +330,7 @@ Item {
         // Set content action list item draggable
         Editor.DraggableListItem {
             dragEnable: organizeActionMode // Only when we are in organize action list mode
-            parentItemWhenDragged : rootItem
+
             keysDragNDrop: ["OrganizeActionItem"]
 
             // Reorganize actions list model when an item is moved
