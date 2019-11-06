@@ -38,13 +38,6 @@ const QString IngeScapeEditorController::NEW_PLATFORM_NAME = "New Platform";
 // Default name when creating a new platform
 const QString IngeScapeEditorController::SPECIAL_EMPTY_LAST_PLATFORM = "empty";
 
-// Default remote URL for the getting started page
-const QString IngeScapeEditorController::DEFAULT_REMOTE_URL_GETTING_STARTED = ""; //FIXME Define default URL ?
-
-// Default local URL for the getting started page
-const QString IngeScapeEditorController::DEFAULT_LOCAL_URL_GETTING_STARTED = ""; //FIXME Define default URL ?
-
-
 
 /**
  * @brief Constructor
@@ -73,6 +66,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _hasAPlatformBeenLoadedByUser(false),
     _gettingStartedRemoteUrl(""),
     _gettingStartedLocalUrl(""),
+    _notificationRemoteUrl(""),
     _gettingStartedShowAtStartup(true),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
@@ -81,7 +75,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _currentPlatformFilePath(""),
     // Connect mapping in observe mode
     _beforeNetworkStop_isMappingConnected(true),
-    _beforeNetworkStop_isMappingControlled(false)
+    _beforeNetworkStop_isMappingControlled(false),
+    _statsRemoteUrl("")
 {
     qInfo() << "New IngeScape Editor Controller";
 
@@ -126,6 +121,20 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Create the (sub) directory "exports" if not exist (the directory contains CSV files about exports)
     IngeScapeUtils::getExportsPath();
 
+    // Directory for getting started
+     QString getStartedPath = IngeScapeUtils::getGettingStartedPath();
+
+     QDir getStartedDir(getStartedPath);
+     if (!getStartedDir.exists())
+     {
+         qCritical() << "ERROR: could not create directory at '" << getStartedPath << "' !";
+     }
+     else
+     {
+         _gettingStartedLocalUrl = QString("%1%2").arg(getStartedPath, "gettingStarted.html");
+     }
+
+
 
     //------------------
     //
@@ -169,15 +178,23 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _currentPlatformFilePath = settings.value("last", _platformDefaultFilePath).toString();
     settings.endGroup();
 
+
     //
     // Settings about "Help"
     //
     settings.beginGroup("help");
-    _gettingStartedRemoteUrl = settings.value("remoteUrlGettingStarted", DEFAULT_REMOTE_URL_GETTING_STARTED).toString();
-    _gettingStartedLocalUrl = settings.value("localUrlGettingStarted", DEFAULT_LOCAL_URL_GETTING_STARTED).toString();
+    _gettingStartedRemoteUrl = settings.value("gettingStartedUrl", QVariant("")).toString();
     _gettingStartedShowAtStartup = settings.value("showAtStartup", true).toBool();
     settings.endGroup();
 
+
+    //
+    // Settings about "Remote"
+    //
+    settings.beginGroup("remote");
+    _notificationRemoteUrl = settings.value("notificationUrl", QVariant("")).toString();
+    _statsRemoteUrl = settings.value("statsUrl", QVariant("")).toString();
+    settings.endGroup();
 
 
     //
@@ -241,7 +258,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, this);
 
     // Create the controller to manage the call home at startup
-    _callHomeC = new CallHomeController(this);
+    _callHomeC = new CallHomeController(_statsRemoteUrl , this);
 
     // Create the controller to manage the scenario
     _scenarioC = new ScenarioController(_modelManager, _jsonHelper, this);
