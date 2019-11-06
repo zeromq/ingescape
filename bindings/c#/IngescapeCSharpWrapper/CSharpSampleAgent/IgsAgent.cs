@@ -1,9 +1,11 @@
 ﻿using Ingescape;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 
 namespace CSharpSampleAgent
 {
@@ -31,11 +33,11 @@ namespace CSharpSampleAgent
         /// <param name="valueSize"></param>
         /// <param name="myData"></param>
         void genericCallback(iop_t iopType,
-        string name,
-        iopType_t valueType,
-        IntPtr value,
-        int valueSize,
-        IntPtr myData)
+                             string name,
+                             iopType_t valueType,
+                             IntPtr value,
+                             int valueSize,
+                             IntPtr myData)
         {
             Console.WriteLine("callback test");
             switch (valueType)
@@ -91,9 +93,42 @@ namespace CSharpSampleAgent
                                 IntPtr myData)
         {
             Console.WriteLine("'{2}' called from '{0}' ({1}) with {3} args:", senderAgentName, senderAgentUUID, callName, nbArgs);
-            if (firstArgument != IntPtr.Zero)
+
+            if (myData != IntPtr.Zero)
             {
-                Console.WriteLine("Iterate on args...");
+                string utf8 = Igs.getStringFromPointer(myData);
+                if (!string.IsNullOrEmpty(utf8))
+                {
+                    Console.WriteLine("myData = {0}", utf8);
+                }
+            }
+
+            if (nbArgs == 5)
+            {
+                List<CallArgument> callArgumentsList = Igs.getCallArgumentsList(firstArgument);
+                int i = 0;
+
+                foreach (CallArgument callArgument in callArgumentsList)
+                {
+                    if (callArgument != null)
+                    {
+                        if (callArgument.Type != iopType_t.IGS_DATA_T)
+                        {
+                            Console.WriteLine("{0}: {1} = {2} ({3})", i, callArgument.Name, callArgument.Value, callArgument.Type);
+                        }
+                        else
+                        {
+                            byte[] byteArray = (byte[])callArgument.Value;
+
+                            // WARNING Special case: We know that the data is a string, so we can convert from byte[] to string
+                            string stringData = Encoding.UTF8.GetString(byteArray);
+                            stringData = stringData.TrimEnd('\0');
+
+                            Console.WriteLine("{0}: {1} = {2} ({3})", i, callArgument.Name, stringData, callArgument.Type);
+                        }
+                    }
+                    i++;
+                }
             }
         }
 
@@ -166,12 +201,15 @@ namespace CSharpSampleAgent
 
             string callName = "cSharpCall";
 
-            string myData = "My Data";
-            IntPtr myDataPtr = Marshal.StringToHGlobalAnsi(myData);
+            string strMyData = "My Data (é ç parti)";
+            IntPtr ptrMyData = Igs.getPointerFromString(strMyData);
 
-            Igs.initCall(callName, _functionCallPtr, myDataPtr);
-            Igs.addArgumentToCall(callName, "monArgInt1", iopType_t.IGS_INTEGER_T);
-            Igs.addArgumentToCall(callName, "monArgInt2", iopType_t.IGS_INTEGER_T);
+            Igs.initCall(callName, _functionCallPtr, ptrMyData);
+            Igs.addArgumentToCall(callName, "argBool1", iopType_t.IGS_BOOL_T);
+            Igs.addArgumentToCall(callName, "argInt2", iopType_t.IGS_INTEGER_T);
+            Igs.addArgumentToCall(callName, "argDouble3", iopType_t.IGS_DOUBLE_T);
+            Igs.addArgumentToCall(callName, "argString4", iopType_t.IGS_STRING_T);
+            Igs.addArgumentToCall(callName, "argData5", iopType_t.IGS_DATA_T);
 
             uint numberOfCalls = Igs.getNumberOfCalls();
 

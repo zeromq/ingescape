@@ -1,5 +1,5 @@
 #!/bin/sh
-members=("stephaneVales" "alexandreLemort" "vincentPeyrqueou" "heloiseBacle" "justineLimoges" "emmaChartier" "fabienEsteveny" "claireDhoosche" "natanaelVaugien" "mathieuSoum" "emilieEscalie" "laetitiaBornes" "chloeRoumieu" "aurelienBroutin" "patxiBerard" "pcWindows1" "surfaceProCockpit")
+members=("stephaneVales" "alexandreLemort" "vincentPeyrqueou" "heloiseBacle" "justineLimoges" "emmaChartier" "fabienEsteveny" "claireDhoosche" "natanaelVaugien" "mathieuSoum" "emilieEscalie" "laetitiaBornes" "chloeRoumieu" "aurelienBroutin" "patxiBerard" "pcWindows1" "surfaceProCockpit" "albePCWindows")
 
 mkdir licenses
 

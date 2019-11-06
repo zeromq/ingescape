@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -125,11 +126,7 @@ namespace Ingescape
         public static string getAgentName()
         {
             IntPtr ptr = igs_getAgentName();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         // Agent state
@@ -146,11 +143,7 @@ namespace Ingescape
         public static string getAgentState()
         {
             IntPtr ptr = igs_getAgentState();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         // Mute the agent ouputs
@@ -233,34 +226,30 @@ namespace Ingescape
         private static extern double igs_readInputAsDouble([MarshalAs(UnmanagedType.LPStr)] string name);
         public static double readInputAsDouble(string name) { return igs_readInputAsDouble(name); }
 
+        // PUBLIC char* igs_readInputAsString(const char* name); //returned char* must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_readInputAsString([MarshalAs(UnmanagedType.LPStr)] string name);
         public static string readInputAsString(string name)
         {
             IntPtr ptr = igs_readInputAsString(name);
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
+        // PUBLIC int igs_readInputAsData(const char* name, void** data, size_t *size); //returned data must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_readInputAsData([MarshalAs(UnmanagedType.LPStr)] string name, IntPtr[] data, ref uint size);
+        private static extern int igs_readInputAsData([MarshalAs(UnmanagedType.LPStr)] string name, ref IntPtr data, ref uint size);
         public static int readInputAsData(string name, ref byte[] data)
         {
-            uint sizeRead = 0;
-            IntPtr[] intPtrArray = new IntPtr[1];
+            uint size = 0;
+            IntPtr ptr = IntPtr.Zero;
+            int success = igs_readInputAsData(name, ref ptr, ref size);
 
-            // Read input as data
-            int success = igs_readInputAsData(name, intPtrArray, ref sizeRead);
-
-            data = new byte[sizeRead];
+            data = new byte[size];
 
             // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
             // Copy the content of the IntPtr to the byte array
             // FIXME: size has type "size_t" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
-            Marshal.Copy(intPtrArray[0], data, 0, (int)sizeRead);
+            Marshal.Copy(ptr, data, 0, (int)size);
 
             return success;
         }
@@ -277,34 +266,30 @@ namespace Ingescape
         private static extern double igs_readOutputAsDouble([MarshalAs(UnmanagedType.LPStr)] string name);
         public static double readOutputAsDouble(string name) { return igs_readOutputAsDouble(name); }
 
+        // PUBLIC char* igs_readOutputAsString(const char* name); //returned char* must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_readOutputAsString([MarshalAs(UnmanagedType.LPStr)] string name);
         public static string readOutputAsString(string name)
         {
             IntPtr ptr = igs_readOutputAsString(name);
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
+        // PUBLIC int igs_readOutputAsData(const char* name, void** data, size_t *size); //returned data must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_readOutputAsData([MarshalAs(UnmanagedType.LPStr)] string name, IntPtr[] data, ref uint size);
+        private static extern int igs_readOutputAsData([MarshalAs(UnmanagedType.LPStr)] string name, ref IntPtr data, ref uint size);
         public static int readOutputAsData([MarshalAs(UnmanagedType.LPStr)] string name, ref byte[] data)
         {
-            uint sizeRead = 0;
-            IntPtr[] intPtrArray = new IntPtr[1];
+            uint size = 0;
+            IntPtr ptr = IntPtr.Zero;
+            int success = igs_readOutputAsData(name, ref ptr, ref size);
 
-            // Read output as data
-            int success = igs_readOutputAsData(name, intPtrArray, ref sizeRead);
-
-            data = new byte[sizeRead];
+            data = new byte[size];
 
             // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
             // Copy the content of the IntPtr to the byte array
             // FIXME: size has type "size_t" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
-            Marshal.Copy(intPtrArray[0], data, 0, (int)sizeRead);
+            Marshal.Copy(ptr, data, 0, (int)size);
 
             return success;
         }
@@ -321,34 +306,30 @@ namespace Ingescape
         private static extern double igs_readParameterAsDouble([MarshalAs(UnmanagedType.LPStr)] string name);
         public static double readParameterAsDouble(string name) { return igs_readParameterAsDouble(name); }
 
+        // PUBLIC char* igs_readParameterAsString(const char* name); //returned char* must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_readParameterAsString([MarshalAs(UnmanagedType.LPStr)] string name);
         public static string readParameterAsString(string name)
         {
             IntPtr ptr = igs_readParameterAsString(name);
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
+        // PUBLIC int igs_readParameterAsData(const char* name, void** data, size_t *size); //returned data must be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_readParameterAsData([MarshalAs(UnmanagedType.LPStr)] string name, IntPtr[] data, ref uint size);
+        private static extern int igs_readParameterAsData([MarshalAs(UnmanagedType.LPStr)] string name, ref IntPtr data, ref uint size);
         public static int readParameterAsData([MarshalAs(UnmanagedType.LPStr)] string name, ref byte[] data)
         {
-            uint sizeRead = 0;
-            IntPtr[] intPtrArray = new IntPtr[1];
+            uint size = 0;
+            IntPtr ptr = IntPtr.Zero;
+            int success = igs_readParameterAsData(name, ref ptr, ref size);
 
-            // Read parameter as data
-            int success = igs_readParameterAsData(name, intPtrArray, ref sizeRead);
-
-            data = new byte[sizeRead];
+            data = new byte[size];
 
             // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
             // Copy the content of the IntPtr to the byte array
             // FIXME: size has type "size_t" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
-            Marshal.Copy(intPtrArray[0], data, 0, (int)sizeRead);
+            Marshal.Copy(ptr, data, 0, (int)size);
 
             return success;
         }
@@ -641,11 +622,7 @@ namespace Ingescape
         public static string getDefinitionName()
         {
             IntPtr ptr = igs_getDefinitionName();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -653,11 +630,7 @@ namespace Ingescape
         public static string getDefinitionDescription()
         {
             IntPtr ptr = igs_getDefinitionDescription();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -747,11 +720,7 @@ namespace Ingescape
         public static string getMappingName()
         {
             IntPtr ptr = igs_getMappingName();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -759,11 +728,7 @@ namespace Ingescape
         public static string getMappingDescription()
         {
             IntPtr ptr = igs_getMappingDescription();
-
-            // Return a managed string with default encoding from the unmanaged ANSI string
-            string strANSI = Marshal.PtrToStringAnsi(ptr);
-
-            return _stringFromANSI_ToUTF8(strANSI);
+            return getStringFromPointer(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -819,22 +784,32 @@ namespace Ingescape
 
         // Send CALLS to other agents
 
-        //call arguments are provided as a chained list
-        /*typedef struct igs_callArgument
+        [StructLayout(LayoutKind.Explicit)]
+        public struct UnionCallArgument
         {
-            char* name;
-            iopType_t type;
-            union{
-                bool b;
-                int i;
-                double d;
-                char* c;
-                void* data;
-            };
-            size_t size;
-            struct igs_callArgument *next;
-        } igs_callArgument_t;*/
+            [FieldOffset(0)]
+            public bool b;
+            [FieldOffset(0)]
+            public int i;
+            [FieldOffset(0)]
+            public double d;
+            [FieldOffset(0)]
+            public IntPtr c;
+            [FieldOffset(0)]
+            public IntPtr data;
+        }
 
+        // Call arguments are provided as a chained list
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct StructCallArgument
+        {
+            [MarshalAs(UnmanagedType.LPStr)]
+            public string name;
+            public iopType_t type;
+            public UnionCallArgument union;
+            public uint size;
+            public IntPtr next;
+        }
 
         // Arguments management
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -921,35 +896,37 @@ namespace Ingescape
             return igs_checkCallExistence(strANSI);
         }
 
+        // PUBLIC char** igs_getCallsList(size_t *nbOfElements); //returned char** shall be freed by caller
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr igs_getCallsList(ref int nbOfElements);
+        private static extern IntPtr igs_getCallsList(ref uint nbOfElements);
         public static string[] getCallsList()
         {
-            int nbOfElements = 0;
+            uint nbOfElements = 0;
 
             IntPtr intPtr = igs_getCallsList(ref nbOfElements);
 
             IntPtr[] intPtrArray = new IntPtr[nbOfElements];
-            string[] list = new string[nbOfElements];
 
             // Copy the pointer to the array of pointers
-            Marshal.Copy(intPtr, intPtrArray, 0, nbOfElements);
+            Marshal.Copy(intPtr, intPtrArray, 0, (int)nbOfElements);
 
             // Fill the string array
+            string[] list = new string[nbOfElements];
             for (int i = 0; i < nbOfElements; i++)
             {
                 list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
             }
-            
-            // FIXME Release memory ?
+
+            // Release memory
+            igs_freeCallsList(intPtr, nbOfElements);
 
             return list;
         }
 
-        // FIXME TODO: void igs_freeCallsList(char** list, size_t nbOfCalls);
-        /*[DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_freeCallsList(ref IntPtr list, uint nbOfElements);
-        public static void freeCallsList(ref IntPtr list, uint nbOfElements) { igs_freeCallsList(ref list, nbOfElements); }*/
+        // PUBLIC void igs_freeCallsList(char **list, size_t nbOfCalls);
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_freeCallsList(IntPtr list, uint nbOfCalls);
+        //public static void freeCallsList(IntPtr list, uint nbOfCalls) { igs_freeCallsList(list, nbOfCalls); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getFirstArgumentForCall([MarshalAs(UnmanagedType.LPStr)] string name);
@@ -985,64 +962,64 @@ namespace Ingescape
         // Utility functions to find network adapters with broadcast capabilities to be used in igs_startWithDevice
         //
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_getNetdevicesList(IntPtr[,] devices, ref int nb);
+        private static extern void igs_getNetdevicesList(ref IntPtr devices, ref int nb);
         public static string[] getNetDevicesList()
         {
             // Get network devices list
-            IntPtr[,] ptrTab = new IntPtr[1, 1];
+            IntPtr ptrDevices = IntPtr.Zero;
             int nb = 0;
-            Igs.igs_getNetdevicesList(ptrTab, ref nb);
+            igs_getNetdevicesList(ref ptrDevices, ref nb);
 
-            //IntPtr to byte array
-            IntPtr[] devicesPtrList = new IntPtr[nb];
-            Marshal.Copy(ptrTab[0, 0], devicesPtrList, 0, nb);
+            IntPtr[] ptrArrayOfDevices = new IntPtr[nb];
 
-            //List of string inputs
-            string[] devicesList = new string[nb];
+            Marshal.Copy(ptrDevices, ptrArrayOfDevices, 0, nb);
 
-            //Fill the string tab
+            // Fill the strings array
+            string[] devicesArray = new string[nb];
             for (int i = 0; i < nb; i++)
             {
-                devicesList[i] = Marshal.PtrToStringAnsi(devicesPtrList[i]);
+                devicesArray[i] = Marshal.PtrToStringAnsi(ptrArrayOfDevices[i]);
             }
-            //HOTFIX : release the memory
-            //Igs.igs_freeNetdevicesList(devicesPtrList, nb);
 
-            return devicesList;
+            // Free the memory
+            igs_freeNetdevicesList(ptrDevices, nb);
+
+            return devicesArray;
         }
 
+        // PUBLIC void igs_freeNetdevicesList(char **devices, int nb);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_freeNetdevicesList(IntPtr[] devices, int nb);
-        public static void freeNetDevicesList(IntPtr[] devices, int nb) { igs_freeNetdevicesList(devices, nb); }
+        private static extern void igs_freeNetdevicesList(IntPtr devices, int nb);
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_getNetaddressesList(IntPtr[,] addresses, ref int nb);
+        private static extern void igs_getNetaddressesList(ref IntPtr addresses, ref int nb);
         public static string[] getNetAddressesList()
         {
             // Get network addresses list
-            IntPtr[,] ptrTab = new IntPtr[1, 1];
+            IntPtr ptrAddresses = IntPtr.Zero;
             int nb = 0;
-            Igs.igs_getNetaddressesList(ptrTab, ref nb);
+            igs_getNetaddressesList(ref ptrAddresses, ref nb);
 
-            //IntPtr to byte array
-            IntPtr[] addressesPtrList = new IntPtr[nb];
-            Marshal.Copy(ptrTab[0, 0], addressesPtrList, 0, nb);
+            IntPtr[] ptrArrayOfAddresses = new IntPtr[nb];
 
-            //List of string inputs
-            string[] addressesList = new string[nb];
+            Marshal.Copy(ptrAddresses, ptrArrayOfAddresses, 0, nb);
 
-            //Fill the string tab
+            // Fill the strings array
+            string[] addressesArray = new string[nb];
             for (int i = 0; i < nb; i++)
             {
-                addressesList[i] = Marshal.PtrToStringAnsi(addressesPtrList[i]);
+                addressesArray[i] = Marshal.PtrToStringAnsi(ptrArrayOfAddresses[i]);
             }
 
-            return addressesList;
+            // Free the memory
+            igs_freeNetaddressesList(ptrAddresses, nb);
+
+            return addressesArray;
         }
 
+        // PUBLIC void igs_freeNetaddressesList(char **addresses, int nb);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_freeNetaddressesList(IntPtr[] addresses, int nb);
-        public static void freeNetAddressesList(IntPtr[] addresses, int nb) { igs_freeNetaddressesList(addresses, nb); }
+        private static extern void igs_freeNetaddressesList(IntPtr addresses, int nb);
 
         //Command line for the agent can be passed here for inclusion in the
         //agent's headers. If not used, header is initialized with exec path.
@@ -1179,6 +1156,98 @@ namespace Ingescape
 
         //////////////////////////////////////////////////
         #region Helpers
+
+        /// <summary>
+        /// Get a list of CallArgument from a pointer on the first argument of an IngeScape call
+        /// </summary>
+        /// <param name="ptrArgument"></param>
+        /// <returns></returns>
+        public static List<CallArgument> getCallArgumentsList(IntPtr ptrArgument)
+        {
+            List<CallArgument> callArgumentsList = new List<CallArgument>();
+
+            while (ptrArgument != IntPtr.Zero)
+            {
+                // Marshals data from an unmanaged block of memory to a newly allocated managed object of the type specified by a generic type parameter.
+                StructCallArgument structArgument = Marshal.PtrToStructure<StructCallArgument>(ptrArgument);
+
+                object value = null;
+
+                switch (structArgument.type)
+                {
+                    case iopType_t.IGS_BOOL_T:
+                        value = structArgument.union.b;
+                        break;
+
+                    case iopType_t.IGS_INTEGER_T:
+                        value = structArgument.union.i;
+                        break;
+
+                    case iopType_t.IGS_DOUBLE_T:
+                        value = structArgument.union.d;
+                        break;
+
+                    case iopType_t.IGS_STRING_T:
+                        value = Marshal.PtrToStringAnsi(structArgument.union.c);
+                        //value = getStringFromPointer(structArgument.union.c);
+                        break;
+
+                    case iopType_t.IGS_DATA_T:
+                        byte[] byteArray = new byte[structArgument.size];
+
+                        // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
+                        // Copy the content of the IntPtr to the byte array
+                        // FIXME: size has type "size_t" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
+                        Marshal.Copy(structArgument.union.data, byteArray, 0, (int)structArgument.size);
+
+                        value = byteArray;
+                        break;
+
+                    default:
+                        break;
+                }
+
+                if (value != null)
+                {
+                    // Create a new C# call argument and add it to the list
+                    CallArgument callArgument = new CallArgument(structArgument.name, structArgument.type, value);
+                    callArgumentsList.Add(callArgument);
+                }
+
+                ptrArgument = structArgument.next;
+            }
+
+            return callArgumentsList;
+        }
+
+
+        /// <summary>
+        /// Get an UTF-8 string from a pointer
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <returns></returns>
+        public static string getStringFromPointer(IntPtr ptr)
+        {
+            // Copies all characters up to the first null character from an unmanaged ANSI string to a managed String, and widens each ANSI character to Unicode.
+            string strANSI = Marshal.PtrToStringAnsi(ptr);
+
+            return _stringFromANSI_ToUTF8(strANSI);
+        }
+
+
+        /// <summary>
+        /// Get a pointer from an UTF-8 string
+        /// </summary>
+        /// <param name="strUTF8"></param>
+        /// <returns></returns>
+        public static IntPtr getPointerFromString(string strUTF8)
+        {
+            string strANSI = _stringFromUTF8_ToANSI(strUTF8);
+
+            // Copies the contents of a managed String into unmanaged memory, converting into ANSI format as it copies.
+            return Marshal.StringToHGlobalAnsi(strANSI);
+        }
+
 
         /// <summary>
         /// Convert string from ANSI to UTF-8.
