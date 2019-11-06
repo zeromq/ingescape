@@ -76,6 +76,7 @@ namespace Ingescape
 
         #endregion
 
+
         //////////////////////////////////////////////////
         #region Initialization and control
 
@@ -817,27 +818,22 @@ namespace Ingescape
         // Arguments management
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_addIntToArgumentsList(ref IntPtr list, int value);
-        public static void addIntToArgumentsList(ref IntPtr list, int value) { igs_addIntToArgumentsList(ref list, value); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_addBoolToArgumentsList(ref IntPtr list, bool value);
-        public static void addBoolToArgumentsList(ref IntPtr list, bool value) { igs_addBoolToArgumentsList(ref list, value); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_addDoubleToArgumentsList(ref IntPtr list, double value);
-        public static void addDoubleToArgumentsList(ref IntPtr list, double value) { igs_addDoubleToArgumentsList(ref list, value); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_addStringToArgumentsList(ref IntPtr list, [MarshalAs(UnmanagedType.LPStr)] string value);
-        public static void addStringToArgumentsList(ref IntPtr list, string value) { igs_addStringToArgumentsList(ref list, value); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_addDataToArgumentsList(ref IntPtr list, byte[] value, uint size);
-        public static void addDataToArgumentsList(ref IntPtr list, byte[] value, uint size) { igs_addDataToArgumentsList(ref list, value, size); }
 
+        // PUBLIC void igs_destroyArgumentsList(igs_callArgument_t **list);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_destroyArgumentsList(ref IntPtr list);
-        public static void destroyArgumentsList(ref IntPtr list) { igs_destroyArgumentsList(ref list); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_cloneArgumentsList(IntPtr list);
@@ -845,16 +841,74 @@ namespace Ingescape
 
 
         // Send a call to another agent
-        //requires to pass agent name or UUID, call name and a list of arguments
-        //passed arguments list will be deallocated and destroyed
+        // requires to pass agent name or UUID, call name and a list of arguments
+        // passed arguments list will be deallocated and destroyed
+        // PUBLIC int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_sendCall([MarshalAs(UnmanagedType.LPStr)] string agentNameOrUUID,
                                                [MarshalAs(UnmanagedType.LPStr)] string callName,
                                                ref IntPtr list);
-        public static int sendCall(string agentNameOrUUID, string callName, ref IntPtr list)
+
+
+        /// <summary>
+        /// Send a call to another agent
+        /// Requires to pass agent name or UUID, call name and a list of arguments
+        /// </summary>
+        /// <param name="agentNameOrUUID"></param>
+        /// <param name="callName"></param>
+        /// <param name="argumentsList"></param>
+        /// <returns></returns>
+        public static int sendCall(string agentNameOrUUID, string callName, List<CallArgument> argumentsList)
         {
-            return igs_sendCall(agentNameOrUUID, callName, ref list);
+            IntPtr ptr = IntPtr.Zero;
+
+            // Traverse the list of arguments
+            foreach (CallArgument callArgument in argumentsList)
+            {
+                if (callArgument != null)
+                {
+                    switch (callArgument.Type)
+                    {
+                        case iopType_t.IGS_BOOL_T:
+                            igs_addBoolToArgumentsList(ref ptr, (bool)callArgument.Value);
+                            break;
+
+                        case iopType_t.IGS_INTEGER_T:
+                            igs_addIntToArgumentsList(ref ptr, (int)callArgument.Value);
+                            break;
+
+                        case iopType_t.IGS_DOUBLE_T:
+                            igs_addDoubleToArgumentsList(ref ptr, (double)callArgument.Value);
+                            break;
+
+                        case iopType_t.IGS_STRING_T:
+                            igs_addStringToArgumentsList(ref ptr, (string)callArgument.Value);
+                            break;
+
+                        case iopType_t.IGS_DATA_T:
+                            {
+                                byte[] data = (byte[])callArgument.Value;
+                                igs_addDataToArgumentsList(ref ptr, (byte[])data, (uint)data.Length);
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            Console.WriteLine("call {0}-->{1}", agentNameOrUUID, callName);
+            //Igs.sendCall("macosAgent", "OTHER_CALL", ref argsList);
+            
+            int success = igs_sendCall(agentNameOrUUID, callName, ref ptr);
+
+            // Free memory
+            igs_destroyArgumentsList(ref ptr);
+
+            return success;
         }
+
 
         // Create CALLS for our agent
 

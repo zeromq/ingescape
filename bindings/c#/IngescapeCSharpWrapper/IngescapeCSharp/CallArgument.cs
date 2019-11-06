@@ -30,6 +30,18 @@ namespace Ingescape
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        public CallArgument(iopType_t type, object value)
+        {
+            Name = "";
+            Type = type;
+            Value = value;
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         /// <param name="name"></param>
         /// <param name="type"></param>
         /// <param name="value"></param>

@@ -586,23 +586,20 @@ namespace CSharpSampleAgent
             _count++;
             bool even = ((_count % 2) == 0);
 
-            Igs.addIntToArgumentsList(ref argsList, _count);
-            Igs.addBoolToArgumentsList(ref argsList, even);
+            List<CallArgument> argumentsList = new List<CallArgument>();
+            argumentsList.Add(new CallArgument(iopType_t.IGS_INTEGER_T, _count));
+            argumentsList.Add(new CallArgument(iopType_t.IGS_BOOL_T, even));
+            int success = Igs.sendCall("macosAgent", "OTHER_CALL", argumentsList);
+            Console.WriteLine("Send call success ?= {0}", success);
 
-            Console.WriteLine("call macosAgent-->OTHER_CALL");
-            Igs.sendCall("macosAgent", "OTHER_CALL", ref argsList);
-
-            Igs.destroyArgumentsList(ref argsList);
-
-
-            /*Igs.addStringToArgumentsList(ref argsList, "peyruqueou@ingenuity.io");
-            Igs.addStringToArgumentsList(ref argsList, "v.peyruqueou@gmail.com");
-            Igs.addStringToArgumentsList(ref argsList, "");
-            Igs.addStringToArgumentsList(ref argsList, "Test envoi via IngeScape call");
-            Igs.addStringToArgumentsList(ref argsList, "Salut Vincent, Cordialement, Vincent P.");
-
-            Console.WriteLine("call igsMail-->sendMail");
-            Igs.sendCall("igsMail", "sendMail", ref argsList);*/
+            /*List<CallArgument> argumentsList2 = new List<CallArgument>();
+            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "peyruqueou@ingenuity.io"));
+            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "v.peyruqueou@gmail.com"));
+            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, ""));
+            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "Test envoi via IngeScape call"));
+            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "Salut Vincent, Cordialement, Vincent P."));
+            int success2 = Igs.sendCall("igsMail", "sendMail", argumentsList2);
+            Console.WriteLine("Send call success ?= {0}", success2);*/
         }
 
         #endregion
