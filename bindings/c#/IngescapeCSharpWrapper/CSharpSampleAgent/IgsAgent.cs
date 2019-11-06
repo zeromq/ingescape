@@ -199,31 +199,58 @@ namespace CSharpSampleAgent
 
             _functionCallPtr = cSharpCallFunction;
 
+            //string callName = "çShàrpCàll";
             string callName = "cSharpCall";
+            //string callArgName = "àrgÏnt2";
+            string callArgName = "argInt2";
 
             string strMyData = "My Data (é ç parti)";
             IntPtr ptrMyData = Igs.getPointerFromString(strMyData);
 
             Igs.initCall(callName, _functionCallPtr, ptrMyData);
             Igs.addArgumentToCall(callName, "argBool1", iopType_t.IGS_BOOL_T);
-            Igs.addArgumentToCall(callName, "argInt2", iopType_t.IGS_INTEGER_T);
+            Igs.addArgumentToCall(callName, callArgName, iopType_t.IGS_INTEGER_T);
+            //Igs.addArgumentToCall(callName, "argDoùble3", iopType_t.IGS_DOUBLE_T);
             Igs.addArgumentToCall(callName, "argDouble3", iopType_t.IGS_DOUBLE_T);
             Igs.addArgumentToCall(callName, "argString4", iopType_t.IGS_STRING_T);
             Igs.addArgumentToCall(callName, "argData5", iopType_t.IGS_DATA_T);
 
             uint numberOfCalls = Igs.getNumberOfCalls();
+            Console.WriteLine("Number of Calls = {0}", numberOfCalls);
 
-            //bool exist1 = Igs.checkCallExistence("sendMail");
-            //bool exist1 = Igs.checkCallExistence("BIDON");
-            //bool exist2 = Igs.checkCallExistence("BIDON");
-            bool exist1 = Igs.checkCallArgumentExistence("sendMail", "subject");
-            bool exist2 = Igs.checkCallArgumentExistence("sendMail", "BIDON");
+            //string callName1 = "séndMail";
+            string callName1 = "sendMail";
+            string callName2 = "Call_BIDON";
+            //string callArgName1 = "sùbjéct";
+            string callArgName1 = "subject";
+            string callArgName2 = "Arg_BIDON";
+            
+            bool existCall1 = Igs.checkCallExistence(callName1);
+            bool existCall2 = Igs.checkCallExistence(callName2);
+            bool existCall = Igs.checkCallExistence(callName);
 
-            //bool exist1 = Igs.checkInputExistence("a");
-            //bool exist2 = Igs.checkInputExistence("boolean");
-            //bool exist2 = Igs.checkInputExistence("b");
+            Console.WriteLine("\nExist Calls: {0}={1} -- {2}={3} -- {4}={5}", callName1, existCall1, callName2, existCall2, callName, existCall);
 
-            Console.WriteLine("numberOfCalls={0} -- exist1={1} -- exist2={2}", numberOfCalls, exist1, exist2);
+            bool existCallArg1 = Igs.checkCallArgumentExistence(callName1, callArgName1);
+            bool existCallArg2 = Igs.checkCallArgumentExistence(callName1, callArgName2);
+            bool existCallArg3 = Igs.checkCallArgumentExistence(callName2, callArgName2);
+            bool existCallArg = Igs.checkCallArgumentExistence(callName, callArgName);
+
+            Console.WriteLine("\nExist Call Arg:");
+            Console.WriteLine("{0}.{1}={2}\n{3}.{4}={5}\n{6}.{7}={8}",
+                callName1, callArgName1, existCallArg1,
+                callName1, callArgName2, existCallArg2,
+                callName2, callArgName2, existCallArg3);
+            Console.WriteLine("{0}.{1}={2}",
+                callName, callArgName, existCallArg);
+
+            string inputName1 = "boolean";
+            string inputName2 = "zzzzz";
+
+            bool existIn1 = Igs.checkInputExistence(inputName1);
+            bool existIn2 = Igs.checkInputExistence(inputName2);
+
+            Console.WriteLine("\nExist Inputs: {0}={1} -- {2}={3}", inputName1, existIn1, inputName2, existIn2);
 
             string[] callsList = Igs.getCallsList();
             for (int i = 0; i < callsList.Length; i++)
@@ -234,11 +261,26 @@ namespace CSharpSampleAgent
                 Console.WriteLine("call {0} -- args nb = {1}", tmpCallName, argsNb);
             }
 
-            //IntPtr listOfArguments;
+
             IntPtr firstArg = Igs.getFirstArgumentForCall("sendMail");
             if (firstArg != IntPtr.Zero)
             {
-                Console.WriteLine("First arg is defined: {0}", firstArg);
+                Console.WriteLine("First arg is defined:");
+
+                List<CallArgument> callArgumentsList = Igs.getCallArgumentsList(firstArg);
+                int i = 0;
+
+                foreach (CallArgument callArgument in callArgumentsList)
+                {
+                    if (callArgument != null)
+                    {
+                        if (callArgument.Type != iopType_t.IGS_DATA_T)
+                        {
+                            Console.WriteLine("{0}: {1} = {2} ({3})", i, callArgument.Name, callArgument.Value, callArgument.Type);
+                        }
+                    }
+                    i++;
+                }
             }
             else
             {

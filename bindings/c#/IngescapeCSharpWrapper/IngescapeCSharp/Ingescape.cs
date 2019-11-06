@@ -578,14 +578,17 @@ namespace Ingescape
         public static void freeIOPList(ref IntPtr list, int nbOfElements) { igs_freeIOPList(ref list, nbOfElements); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_checkInputExistence([MarshalAs(UnmanagedType.LPStr)] string name);
         public static bool checkInputExistence(string name) { return igs_checkInputExistence(name); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_checkOutputExistence([MarshalAs(UnmanagedType.LPStr)] string name);
         public static bool checkOutputExistence(string name) { return igs_checkOutputExistence(name); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_checkParameterExistence([MarshalAs(UnmanagedType.LPStr)] string name);
         public static bool checkParameterExistence(string name) { return igs_checkParameterExistence(name); }
 
@@ -889,11 +892,13 @@ namespace Ingescape
         public static uint getNumberOfCalls() { return igs_getNumberOfCalls(); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_checkCallExistence([MarshalAs(UnmanagedType.LPStr)] string name);
         public static bool checkCallExistence(string name)
         {
-            string strANSI = _stringFromUTF8_ToANSI(name);
-            return igs_checkCallExistence(strANSI);
+            //string strANSI = _stringFromUTF8_ToANSI(name);
+            //return igs_checkCallExistence(strANSI);
+            return igs_checkCallExistence(name);
         }
 
         // PUBLIC char** igs_getCallsList(size_t *nbOfElements); //returned char** shall be freed by caller
@@ -936,13 +941,16 @@ namespace Ingescape
         private static extern uint igs_getNumberOfArgumentsForCall([MarshalAs(UnmanagedType.LPStr)] string name);
         public static uint getNumberOfArgumentsForCall(string name) { return igs_getNumberOfArgumentsForCall(name); }
 
+        // PUBLIC bool igs_checkCallArgumentExistence(const char* callName, const char* argName);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_checkCallArgumentExistence([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName);
         public static bool checkCallArgumentExistence(string callName, string argName)
         {
-            string strANSI_callName = _stringFromUTF8_ToANSI(callName);
-            string strANSI_argName = _stringFromUTF8_ToANSI(argName);
-            return igs_checkCallArgumentExistence(strANSI_callName, strANSI_argName);
+            //string strANSI_callName = _stringFromUTF8_ToANSI(callName);
+            //string strANSI_argName = _stringFromUTF8_ToANSI(argName);
+            //return igs_checkCallArgumentExistence(strANSI_callName, strANSI_argName);
+            return igs_checkCallArgumentExistence(callName, argName);
         }
 
         #endregion
@@ -1189,6 +1197,10 @@ namespace Ingescape
 
                     case iopType_t.IGS_STRING_T:
                         value = Marshal.PtrToStringAnsi(structArgument.union.c);
+                        if (value == null)
+                        {
+                            value = "";
+                        }
                         //value = getStringFromPointer(structArgument.union.c);
                         break;
 
@@ -1209,8 +1221,12 @@ namespace Ingescape
 
                 if (value != null)
                 {
+                    //byte[] bytes = Encoding.Default.GetBytes(structArgument.name);
+                    //string name = Encoding.UTF8.GetString(bytes);
+
                     // Create a new C# call argument and add it to the list
                     CallArgument callArgument = new CallArgument(structArgument.name, structArgument.type, value);
+                    //CallArgument callArgument = new CallArgument(name, structArgument.type, value);
                     callArgumentsList.Add(callArgument);
                 }
 
