@@ -64,9 +64,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _peerNameOfExpe(""),
     _currentPlatformName(EXAMPLE_PLATFORM_NAME),
     _hasAPlatformBeenLoadedByUser(false),
-    _gettingStartedRemoteUrl(""),
-    _gettingStartedLocalUrl(""),
-    _notificationRemoteUrl(""),
     _gettingStartedShowAtStartup(true),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
@@ -75,8 +72,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _currentPlatformFilePath(""),
     // Connect mapping in observe mode
     _beforeNetworkStop_isMappingConnected(true),
-    _beforeNetworkStop_isMappingControlled(false),
-    _statsRemoteUrl("")
+    _beforeNetworkStop_isMappingControlled(false)
 {
     qInfo() << "New IngeScape Editor Controller";
 
@@ -120,20 +116,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // Create the (sub) directory "exports" if not exist (the directory contains CSV files about exports)
     IngeScapeUtils::getExportsPath();
-
-    // Directory for getting started
-     QString getStartedPath = IngeScapeUtils::getGettingStartedPath();
-
-     QDir getStartedDir(getStartedPath);
-     if (!getStartedDir.exists())
-     {
-         qCritical() << "ERROR: could not create directory at '" << getStartedPath << "' !";
-     }
-     else
-     {
-         _gettingStartedLocalUrl = QString("%1%2").arg(getStartedPath, "gettingStarted.html");
-     }
-
 
 
     //------------------
@@ -183,17 +165,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Settings about "Help"
     //
     settings.beginGroup("help");
-    _gettingStartedRemoteUrl = settings.value("gettingStartedUrl", QVariant("")).toString();
     _gettingStartedShowAtStartup = settings.value("showAtStartup", true).toBool();
-    settings.endGroup();
-
-
-    //
-    // Settings about "Remote"
-    //
-    settings.beginGroup("remote");
-    _notificationRemoteUrl = settings.value("notificationUrl", QVariant("")).toString();
-    _statsRemoteUrl = settings.value("statsUrl", QVariant("")).toString();
     settings.endGroup();
 
 
@@ -258,7 +230,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, this);
 
     // Create the controller to manage the call home at startup
-    _callHomeC = new CallHomeController(_statsRemoteUrl , this);
+    _callHomeC = new CallHomeController(this);
 
     // Create the controller to manage the scenario
     _scenarioC = new ScenarioController(_modelManager, _jsonHelper, this);

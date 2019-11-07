@@ -15,13 +15,16 @@
 #include "callhomecontroller.h"
 
 /**
+ * @brief Url to call to call home
+ */
+const QString CallHomeController::URL_TO_CALL_HOME = "https://services.ingescape.com/editor/stats";
+
+/**
  * @brief Basic constructor
  * @param callHomeRemoteUrl
  * @param parent
  */
-CallHomeController::CallHomeController(QString callHomeRemoteUrl, QObject *parent)
-    : QObject(parent),
-   _urlToCall(callHomeRemoteUrl)
+CallHomeController::CallHomeController(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -49,7 +52,7 @@ CallHomeController::~CallHomeController()
  */
 void CallHomeController::editorLaunched(LicenseInformationM* license)
 {
-    if ((_accessManager != nullptr) && (license != nullptr) && (_urlToCall != nullptr))
+    if ((_accessManager != nullptr) && (license != nullptr))
     {
         // Build JSON Body
         QByteArray jsonString = "{\"user_id\":\"";
@@ -57,7 +60,7 @@ void CallHomeController::editorLaunched(LicenseInformationM* license)
         jsonString.append("\"}");
 
         // Prepare request
-        QNetworkRequest request(QUrl(this->_urlToCall));
+        QNetworkRequest request(QUrl(this->URL_TO_CALL_HOME));
 
         // Add the headers
         request.setRawHeader("Content-Type", "application/json");

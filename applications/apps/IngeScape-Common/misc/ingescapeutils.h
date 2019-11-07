@@ -91,14 +91,6 @@ namespace IngeScapeUtils
 
 
     /**
-     * @brief Get (and create if needed) the path with files about gettingStarted
-     * "[DocumentsLocation]/IngeScape/gettingStarted/"
-     * @return
-     */
-    QString getGettingStartedPath();
-
-
-    /**
      * @brief Get an UID for a new model of action
      * @return
      */

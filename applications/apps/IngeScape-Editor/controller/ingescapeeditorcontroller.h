@@ -118,15 +118,6 @@ class IngeScapeEditorController : public QObject
     // Flag indicating if a platform has been loaded (opened) by the user or if we are in a "new" or "last" state
     I2_QML_PROPERTY_READONLY(bool, hasAPlatformBeenLoadedByUser)
 
-    // The remote URL to access the latest version of the getting started web page
-    I2_QML_PROPERTY_READONLY(QString, gettingStartedRemoteUrl)
-
-    // The local URL to access the version of the getting started web page that was delivered with the editor
-    I2_QML_PROPERTY_READONLY(QString, gettingStartedLocalUrl)
-
-    // The remote URL to access editor notification
-    I2_QML_PROPERTY_READONLY(QString, notificationRemoteUrl)
-
     // Flag indicating if we must show the getting started page on startup
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, gettingStartedShowAtStartup)
 
@@ -501,9 +492,6 @@ private:
     // States of our mapping when our network was stopped
     bool _beforeNetworkStop_isMappingConnected;
     bool _beforeNetworkStop_isMappingControlled;
-
-    // The remote url to send user's informations
-    QString _statsRemoteUrl;
 
     // Default name to save the platform when exiting
     static const QString EXAMPLE_PLATFORM_NAME;

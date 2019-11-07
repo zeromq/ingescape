@@ -29,7 +29,7 @@ public:
      * @param callHomeRemoteUrl
      * @param parent
      */
-    explicit CallHomeController(QString callHomeRemoteUrl, QObject *parent = nullptr);
+    explicit CallHomeController(QObject *parent = nullptr);
 
     /**
      * @brief Destructor
@@ -61,8 +61,7 @@ private:
     /**
      * @brief Url to call to call home
      */
-    QString _urlToCall;
-
+    static const QString URL_TO_CALL_HOME;
 };
 
 #endif // CALLHOMECONTROLLER_H
