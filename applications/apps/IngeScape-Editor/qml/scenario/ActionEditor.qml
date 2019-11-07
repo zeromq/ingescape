@@ -2486,7 +2486,7 @@ WindowBlockTouches {
                 height: boundingBox.height
                 width: boundingBox.width
 
-                enabled: visible
+                enabled: visible && textFieldName.text !== ""
                 activeFocusOnPress: true
                 text: "OK"
 
@@ -2523,11 +2523,21 @@ WindowBlockTouches {
                 }
             }
 
+
+
+            //
+            // Keys handling
+            //
             Keys.onReturnPressed : {
-                okButton.clicked();
+                if (okButton.enabled) {
+                    okButton.clicked();
+                }
             }
+
             Keys.onEscapePressed : {
-                cancelButton.clicked();
+                if (cancelButton.enabled) {
+                    cancelButton.clicked();
+                }
             }
         }
     }
