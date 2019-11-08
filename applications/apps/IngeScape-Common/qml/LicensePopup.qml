@@ -578,6 +578,8 @@ I2PopupBase {
     ConfirmationPopup {
         id: deleteConfirmationPopup
 
+        z: 1 // Delete confirmation must be always in front of the license window
+
         property var license: null
 
         confirmationText: "You will definitely lose all the rights this license grants you.\nDo you want to delete it completely?"
