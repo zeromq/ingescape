@@ -38,13 +38,6 @@ const QString IngeScapeEditorController::NEW_PLATFORM_NAME = "New Platform";
 // Default name when creating a new platform
 const QString IngeScapeEditorController::SPECIAL_EMPTY_LAST_PLATFORM = "empty";
 
-// Default remote URL for the getting started page
-const QString IngeScapeEditorController::DEFAULT_REMOTE_URL_GETTING_STARTED = ""; //FIXME Define default URL ?
-
-// Default local URL for the getting started page
-const QString IngeScapeEditorController::DEFAULT_LOCAL_URL_GETTING_STARTED = ""; //FIXME Define default URL ?
-
-
 
 /**
  * @brief Constructor
@@ -71,8 +64,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _peerNameOfExpe(""),
     _currentPlatformName(EXAMPLE_PLATFORM_NAME),
     _hasAPlatformBeenLoadedByUser(false),
-    _gettingStartedRemoteUrl(""),
-    _gettingStartedLocalUrl(""),
     _gettingStartedShowAtStartup(true),
     _terminationSignalWatcher(nullptr),
     _jsonHelper(nullptr),
@@ -169,15 +160,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _currentPlatformFilePath = settings.value("last", _platformDefaultFilePath).toString();
     settings.endGroup();
 
+
     //
     // Settings about "Help"
     //
     settings.beginGroup("help");
-    _gettingStartedRemoteUrl = settings.value("remoteUrlGettingStarted", DEFAULT_REMOTE_URL_GETTING_STARTED).toString();
-    _gettingStartedLocalUrl = settings.value("localUrlGettingStarted", DEFAULT_LOCAL_URL_GETTING_STARTED).toString();
     _gettingStartedShowAtStartup = settings.value("showAtStartup", true).toBool();
     settings.endGroup();
-
 
 
     //

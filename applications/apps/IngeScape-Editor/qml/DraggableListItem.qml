@@ -30,9 +30,6 @@ Item {
     //     of content and not only visual items (data is a list<Object> AND children is a list<Item>)
     default property alias contents: contentItem.data
 
-    // The item that will become the parent of our draggable item during a drag operation
-    property Item parentItemWhenDragged: null
-
     // Keys: the list of drag keys our DropArea will accept
     property alias keysDragNDrop: bottomDropArea.keys
 
@@ -48,6 +45,9 @@ Item {
     // Internal: shortcut to access the attached ListView from everywhere.
     // Shorter than root.ListView.view
     property ListView _listView: ListView.view
+
+    // The item that will become the parent of our draggable item during a drag operation
+    property Item parentItemWhenDragged: _listView ? _listView.parent : null
 
     // Color of placeholders
     property color placeholderColor: "lightgrey" // IngeScapeTheme.editorsBackgroundColor
@@ -105,7 +105,7 @@ Item {
 
         property: "contentY"
 
-        to: root._listView ? (root._listView.contentHeight - root._listView.height) : 0
+        to: root._listView ? ((contentItem.height + _listView.spacing) * (root._listView.count) - _listView.height) : 0
 
         running: (root._scrollingDirection === 1)
     }
@@ -124,7 +124,6 @@ Item {
        anchors {
            left: parent.left
            right: parent.right
-           top: parent.top
        }
        height: 0
 
@@ -167,12 +166,25 @@ Item {
                 enabled: dragEnable && _listView.count > 1 // Allow it only if there is more than one item in the list
 
                 drag.target: parent
+
                 // NB: we disable smoothed drag to ensure that our item will remain under the mouse cursor (no latency)
                 drag.smoothed: false
 
-                // Constraints on Y axis to drag
-                drag.minimumY: _listView ? _listView.y + contentItem.height/2 - 1 : 0
-                drag.maximumY: _listView ? _listView.y + _listView.height - contentItem.height/2 : undefinedÒÒ
+                // Constraints on Y axis to drag only in listview
+                drag.minimumY: _listView ? _listView.y - 2 : 0 // 2 = small margin to be able to overtake listview
+                drag.maximumY: {
+                    if (root._listView) {
+                        ((contentItem.height + _listView.spacing) * (root._listView.count- 1) > root._listView.height)
+                                // If listview is full of item (all along its height) => drag the element all along the list
+                                ? (_listView.y + _listView.height - contentItem.height + 2) // 2 = small margin to be able to overtake listview
+
+                                // If not => drag the element all along number of elements
+                                : ((contentItem.height + _listView.spacing) * (root._listView.count- 1) + 2); // 2 = small margin to be able to overtake listview
+                     }
+                    else {
+                        0;
+                    }
+                }
 
                 onReleased: {
                     forceActiveFocus();
@@ -263,6 +275,7 @@ Item {
         }
     }
 
+
     //
     // Drop area below our item
     //
@@ -333,18 +346,21 @@ Item {
             PropertyChanges {
                 target: root
                 _scrollingDirection: {
-                    if (root._listView) {
+                    if ((root._listView) && (contentItem.height * root._listView.count > root._listView.height)) {
                         var yCoord = root._listView.mapFromItem(dragArea, 0, dragArea.mouseY).y;
-
-                        if (yCoord < scrollEdgeSize) { // Top edge: scroll up
-                            -1;
-                        } else if (yCoord > _listView.height - scrollEdgeSize) {  // Bottom edge: scroll down
-                            1;
-                        } else { // No scroll
-                            0;
+                        if (yCoord < scrollEdgeSize) {
+                            // Top edge: scroll up
+                            return -1;
+                        } else if (yCoord > _listView.height - scrollEdgeSize) {
+                            // Bottom edge: scroll down
+                            return 1;
+                        } else {
+                            // No scroll
+                            return 0;
                         }
                     }
                     else {
+                        // No listview or listview not full of items (all along its height) => no scroll
                         return 0;
                     }
                 }
@@ -392,31 +408,27 @@ Item {
     //
     //---------------------------------------
 
-//    transitions: [
-//        // NB: We must use transitions to animate 'height' changes. Otherwise, behavior animations
-//        //     may be interrupted improperly by Qt
-//        Transition {
-//            PropertyAnimation {
-//                target: topPlaceholder
-//                properties: "height"
-//            }
+    transitions: [
+        // NB: We must use transitions to animate 'height' changes. Otherwise, behavior animations
+        //     may be interrupted improperly by Qt
+        Transition {
+            from: "*"
+            to: "droppingTop, droppingBelow"
 
-//            PropertyAnimation {
-//                target: bottomPlaceholder
-//                properties: "height"
-//            }
+            PropertyAnimation {
+                target: topPlaceholder
+                properties: "height"
+            }
 
-//            PropertyAnimation {
-//                target: wrapperParent
-//                properties: "height"
-//            }
-//        },
+            PropertyAnimation {
+                target: bottomPlaceholder
+                properties: "height"
+            }
 
-
-//        // Avoid animations when we switch from 'dragging' state to our default state
-//        Transition {
-//            from: "dragging"
-//            to: ""
-//        }
-//    ]
+            PropertyAnimation {
+                target: wrapperParent
+                properties: "height"
+            }
+        }
+    ]
 }

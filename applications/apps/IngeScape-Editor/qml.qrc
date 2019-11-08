@@ -46,5 +46,8 @@
         <file>qml/popup/RenamePopup.qml</file>
         <file>qml/popup/EditCommandLinePopup.qml</file>
         <file>qml/DraggableListItem.qml</file>
+        <file>resources/gettingStarted/gettingStarted.html</file>
+        <file>resources/gettingStarted/gettingStarted.js</file>
+        <file>resources/gettingStarted/styles.css</file>
     </qresource>
 </RCC>

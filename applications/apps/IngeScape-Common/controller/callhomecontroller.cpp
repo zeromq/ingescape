@@ -15,11 +15,16 @@
 #include "callhomecontroller.h"
 
 /**
+ * @brief Url to call to call home
+ */
+const QString CallHomeController::URL_TO_CALL_HOME = "https://services.ingescape.com/editor/stats";
+
+/**
  * @brief Basic constructor
+ * @param callHomeRemoteUrl
  * @param parent
  */
-CallHomeController::CallHomeController(QObject *parent)
-    : QObject(parent)
+CallHomeController::CallHomeController(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -49,9 +54,20 @@ void CallHomeController::editorLaunched(LicenseInformationM* license)
 {
     if ((_accessManager != nullptr) && (license != nullptr))
     {
-        qDebug() << "License user(s): " << license->editorOwners();
-        //FIXME Use correct URL
-        _accessManager->get(QNetworkRequest(QUrl("https://ingescape.com")));
+        // Build JSON Body
+        QByteArray jsonString = "{\"user_id\":\"";
+        jsonString.append(license->licenseId());
+        jsonString.append("\"}");
+
+        // Prepare request
+        QNetworkRequest request(QUrl(this->URL_TO_CALL_HOME));
+
+        // Add the headers
+        request.setRawHeader("Content-Type", "application/json");
+        QByteArray postDataSize = QByteArray::number(jsonString.size());
+        request.setRawHeader("Content-Length", postDataSize);
+
+        _accessManager->post(request, jsonString);
     }
 }
 
@@ -61,5 +77,6 @@ void CallHomeController::editorLaunched(LicenseInformationM* license)
  */
 void CallHomeController::replyFinished(QNetworkReply* reply)
 {
+    // Do nothing if failed
     qDebug() << "Reply arrived with error code:" << reply->error();
 }

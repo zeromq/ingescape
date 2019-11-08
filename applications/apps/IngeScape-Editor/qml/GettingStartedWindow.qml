@@ -27,8 +27,8 @@ Window {
 
     title: qsTr("Getting started")
 
-    property string gettingStartedRemoteUrl: IngeScapeEditorC.gettingStartedRemoteUrl
-    property string gettingStartedLocalUrl: IngeScapeEditorC.gettingStartedLocalUrl
+    property string gettingStartedRemoteUrl: "https://services.ingescape.com/editor/getting_started"
+    property string gettingStartedLocalUrl: "qrc:///resources/gettingStarted/gettingStarted.html"
 
     height: minimumHeight
     width: minimumWidth

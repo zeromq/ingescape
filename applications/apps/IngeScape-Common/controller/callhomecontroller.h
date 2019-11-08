@@ -26,6 +26,7 @@ class CallHomeController : public QObject
 public:
     /**
      * @brief Basic constructor
+     * @param callHomeRemoteUrl
      * @param parent
      */
     explicit CallHomeController(QObject *parent = nullptr);
@@ -56,6 +57,11 @@ private:
      * @brief Access manager handling GET/POST requests to the server
      */
     QNetworkAccessManager* _accessManager;
+
+    /**
+     * @brief Url to call to call home
+     */
+    static const QString URL_TO_CALL_HOME;
 };
 
 #endif // CALLHOMECONTROLLER_H
