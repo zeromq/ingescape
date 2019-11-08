@@ -255,9 +255,9 @@ binding-csharp-windows-x64:
   stage: build-binding
   tags:
     - windows
-    - "1"
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    ARCH: "x64"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
@@ -275,9 +275,9 @@ binding-csharp-windows-x86:
   stage: build-binding
   tags:
     - windows
-    - "2"
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    ARCH: "x86"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
@@ -358,9 +358,9 @@ lib-windows-release-x64:
   stage: build-lib
   tags:
     - windows
-    - "1"
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    ARCH: "x64"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -380,9 +380,9 @@ lib-windows-release-x86:
   stage: build-lib
   tags:
     - windows
-    - "2"
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    ARCH: "x86"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -402,9 +402,9 @@ lib-windows-debug-x64:
   stage: build-lib
   tags:
     - windows
-    - "1"
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    ARCH: "x64"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -424,9 +424,9 @@ lib-windows-debug-x86:
   stage: build-lib
   tags:
     - windows
-    - "2"
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    ARCH: "x86"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -447,9 +447,9 @@ editor-windows-release-x86:
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+    ARCH: "x86"
   tags:
     - windows
-    - "2"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -470,9 +470,9 @@ editor-windows-release-x64:
   variables:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
+    ARCH: "x64"
   tags:
     - windows
-    - "1"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -494,9 +494,9 @@ assessments-windows-release-x86:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
+    ARCH: "x86"
   tags:
     - windows
-    - "2"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -518,9 +518,9 @@ assessments-windows-release-x64:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
+    ARCH: "x64"
   tags:
     - windows
-    - "1"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -542,9 +542,9 @@ expe-windows-release-x86:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
+    ARCH: "x86"
   tags:
     - windows
-    - "2"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -566,9 +566,9 @@ expe-windows-release-x64:
     DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
+    ARCH: "x64"
   tags:
     - windows
-    - "1"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
     - git clean -xfd
@@ -586,9 +586,10 @@ expe-windows-release-x64:
 lib-installer-runtime-windows-x86:
   <<: *build-lib-files
   stage: installer-lib
+  variables:
+    ARCH: "x86"
   tags:
     - windows
-    - "2"
   script:
     - cd build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..
   artifacts:
@@ -603,9 +604,10 @@ lib-installer-runtime-windows-x86:
 lib-installer-runtime-windows-x64:
   <<: *build-lib-files
   stage: installer-lib
+  variables:
+    ARCH: "x64"
   tags:
     - windows
-    - "1"
   script:
     - cd build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..
   artifacts:
@@ -639,9 +641,10 @@ lib-installer-runtime-macos-x64:
 binding-csharp-installer-windows-x64:
   <<: *build-csharp-files
   stage: installer-binding
+  variables:
+    ARCH: "x64"
   tags:
     - windows
-    - "1"
   script:
     - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..\..
   artifacts:
@@ -656,9 +659,10 @@ binding-csharp-installer-windows-x64:
 binding-csharp-installer-windows-x86:
   <<: *build-csharp-files
   stage: installer-binding
+  variables:
+    ARCH: "x86"
   tags:
     - windows
-    - "2"
   script:
     - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..\..
   artifacts:
@@ -689,9 +693,10 @@ editor-installer-macos-x64:
 editor-installer-windows-x86:
   <<: *build-editor-files
   stage: installer-apps
+  variables:
+    ARCH: "x86"
   tags:
     - windows
-    - "2"
   script:
     - cd applications\apps\IngeScape-Editor\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
@@ -705,9 +710,10 @@ editor-installer-windows-x86:
 editor-installer-windows-x64:
   <<: *build-editor-files
   stage: installer-apps
+  variables:
+    ARCH: "x64"
   tags:
     - windows
-    - "1"
   script:
     - cd applications\apps\IngeScape-Editor\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
@@ -737,9 +743,10 @@ assessments-installer-macos-x64:
 assessments-installer-windows-x86:
   <<: *build-assessments-files
   stage: installer-apps
+  variables:
+    ARCH: "x86"
   tags:
     - windows
-    - "2"
   script:
     - cd applications\apps\IngeScape-Assessments\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
@@ -753,9 +760,10 @@ assessments-installer-windows-x86:
 assessments-installer-windows-x64:
   <<: *build-assessments-files
   stage: installer-apps
+  variables:
+    ARCH: "x64"
   tags:
     - windows
-    - "1"
   script:
     - cd applications\apps\IngeScape-Assessments\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
@@ -785,9 +793,10 @@ expe-installer-macos-x64:
 expe-installer-windows-x86:
   <<: *build-expe-files
   stage: installer-apps
+  variables:
+    ARCH: "x86"
   tags:
     - windows
-    - "2"
   script:
     - cd applications\apps\IngeScape-Expe\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
@@ -801,9 +810,10 @@ expe-installer-windows-x86:
 expe-installer-windows-x64:
   <<: *build-expe-files
   stage: installer-apps
+  variables:
+    ARCH: "x64"
   tags:
     - windows
-    - "1"
   script:
     - cd applications\apps\IngeScape-Expe\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
@@ -1031,9 +1041,10 @@ lib-deploy-linux-release-armhf:
 lib-deploy-windows-release-x64:
   <<: *build-lib-files
   stage: deploy-lib
+  variables:
+    ARCH: "x64"
   tags:
     - windows
-    - "1"
   script:
     - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
     - copy /y build\ReleaseX64\Release\* C:\Users\admin\dev\Builds\Release\x64\
@@ -1044,9 +1055,10 @@ lib-deploy-windows-release-x64:
 lib-deploy-windows-release-x86:
   <<: *build-lib-files
   stage: deploy-lib
+  variables:
+    ARCH: "x86"
   tags:
     - windows
-    - "2"
   script:
     - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
     - copy /y build\ReleaseX86\Release\* C:\Users\admin\dev\Builds\Release\x86\
@@ -1057,6 +1069,8 @@ lib-deploy-windows-release-x86:
 lib-deploy-windows-debug-x64:
   <<: *build-lib-files
   stage: deploy-lib
+  variables:
+    ARCH: "x64"
   tags:
     - windows
   script:
@@ -1069,6 +1083,8 @@ lib-deploy-windows-debug-x64:
 lib-deploy-windows-debug-x86:
   <<: *build-lib-files
   stage: deploy-lib
+  variables:
+    ARCH: "x86"
   tags:
     - windows
   script:
@@ -1081,9 +1097,10 @@ lib-deploy-windows-debug-x86:
 binding-deploy-windows-release-x64:
   <<: *build-csharp-files
   stage: deploy-binding
+  variables:
+    ARCH: "x64"
   tags:
     - windows
-    - "1"
   script:
     - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll C:\Users\admin\dev\Builds\Release\x64\
   dependencies:
@@ -1093,9 +1110,10 @@ binding-deploy-windows-release-x64:
 binding-deploy-windows-release-x86:
   <<: *build-csharp-files
   stage: deploy-binding
+  variables:
+    ARCH: "x86"
   tags:
     - windows
-    - "2"
   script:
     - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll C:\Users\admin\dev\Builds\Release\x86\
   dependencies:
