@@ -575,7 +575,7 @@ lib-installer-runtime-windows-x86:
   <<: *build-lib-files
   stage: installer-lib
   variables:
-    ARCH: "x86"
+    ARCH: "Release_x86"
   tags:
     - windows
   script:
@@ -593,7 +593,7 @@ lib-installer-runtime-windows-x64:
   <<: *build-lib-files
   stage: installer-lib
   variables:
-    ARCH: "x64"
+    ARCH: "Release_x64"
   tags:
     - windows
   script:
