@@ -1034,8 +1034,8 @@ lib-deploy-windows-release-x64:
   tags:
     - windows
   script:
-    - copy /y src\include\*.h S:\deployment\Builds\include\ingescape\
-    - copy /y build\ReleaseX64\Release\* S:\deployment\Builds\Release\x64\
+    - copy /y src\include\*.h \\autan\gitlab_workspace\deployment\Builds\include\ingescape\
+    - copy /y build\ReleaseX64\Release\* \\autan\gitlab_workspace\deployment\Builds\Release\x64\
   dependencies:
     - lib-windows-release-x64
 
@@ -1048,8 +1048,8 @@ lib-deploy-windows-release-x86:
   tags:
     - windows
   script:
-    - copy /y src\include\*.h S:\deployment\Builds\include\ingescape\
-    - copy /y build\ReleaseX86\Release\* S:\deployment\Builds\Release\x86\
+    - copy /y src\include\*.h \\autan\gitlab_workspace\deployment\Builds\include\ingescape\
+    - copy /y build\ReleaseX86\Release\* \\autan\gitlab_workspace\deployment\Builds\Release\x86\
   dependencies:
     - lib-windows-release-x86
 
@@ -1062,8 +1062,8 @@ lib-deploy-windows-debug-x64:
   tags:
     - windows
   script:
-    - copy /y src\include\*.h S:\deployment\Builds\include\ingescape\
-    - copy /y build\DebugX64\Debug\* S:\deployment\Builds\Debug\x64\
+    - copy /y src\include\*.h \\autan\gitlab_workspace\deployment\Builds\include\ingescape\
+    - copy /y build\DebugX64\Debug\* \\autan\gitlab_workspace\deployment\Builds\Debug\x64\
   dependencies:
     - lib-windows-debug-x64
 
@@ -1076,8 +1076,8 @@ lib-deploy-windows-debug-x86:
   tags:
     - windows
   script:
-    - copy /y src\include\*.h S:\deployment\Builds\include\ingescape\
-    - copy /y build\DebugX86\Debug\* S:\deployment\Builds\Debug\x86\
+    - copy /y src\include\*.h \\autan\gitlab_workspace\deployment\Builds\include\ingescape\
+    - copy /y build\DebugX86\Debug\* \\autan\gitlab_workspace\deployment\Builds\Debug\x86\
   dependencies:
     - lib-windows-debug-x86
 
@@ -1090,7 +1090,7 @@ binding-deploy-windows-release-x64:
   tags:
     - windows
   script:
-    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll S:\deployment\Builds\Release\x64\
+    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll \\autan\gitlab_workspace\deployment\Builds\Release\x64\
   dependencies:
     - binding-csharp-windows-x64
 
@@ -1103,7 +1103,7 @@ binding-deploy-windows-release-x86:
   tags:
     - windows
   script:
-    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll S:\deployment\Builds\Release\x86\
+    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll \\autan\gitlab_workspace\deployment\Builds\Release\x86\
   dependencies:
     - binding-csharp-windows-x86
 
