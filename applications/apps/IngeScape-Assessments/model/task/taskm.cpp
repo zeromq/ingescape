@@ -423,7 +423,7 @@ void TaskM::_updateAgentsFromPlatformFilePath(QString platformFilePath)
                                 }
                             }
 
-                            if (!_hashFromAgentNameToSimplifiedAgent.containsKey(agentName))
+                            if (!_hashFromAgentNameToSimplifiedAgent.containsKey(agentName) && !outputNamesList.isEmpty())
                             {
                                 // Create the (simplified) agent with a name and a list of output names
                                 AgentNameAndOutputsM* agentNameAndOutputs = new AgentNameAndOutputsM(agentName, outputNamesList);
