@@ -312,7 +312,7 @@ get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
 
 if (APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE YES)
-
+    set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/macos-Info.plist.in)
     # Mac OS X bundle specific settings
     set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${INGESCAPE_ASSESSMENTS_VERSION}")
