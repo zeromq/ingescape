@@ -258,6 +258,7 @@ binding-csharp-windows-x64:
   variables:
     ARCH: "x64"
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
@@ -277,6 +278,7 @@ binding-csharp-windows-x86:
   variables:
     ARCH: "x86"
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
@@ -359,6 +361,7 @@ lib-windows-release-x64:
   variables:
     ARCH: "Release_x64"
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\ReleaseX64
@@ -380,6 +383,7 @@ lib-windows-release-x86:
   variables:
     ARCH: "Release_x86"
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\ReleaseX86
@@ -401,6 +405,7 @@ lib-windows-debug-x64:
   variables:
     ARCH: "Debug_x64"
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\DebugX64
@@ -422,6 +427,7 @@ lib-windows-debug-x86:
   variables:
     ARCH: "Debug_x86"
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\DebugX86
@@ -444,6 +450,7 @@ editor-windows-release-x86:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Editor\build\ReleaseX86
@@ -466,6 +473,7 @@ editor-windows-release-x64:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Editor\build\ReleaseX64
@@ -489,6 +497,7 @@ assessments-windows-release-x86:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX86
@@ -512,6 +521,7 @@ assessments-windows-release-x64:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX64
@@ -535,6 +545,7 @@ expe-windows-release-x86:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Expe\build\ReleaseX86
@@ -558,6 +569,7 @@ expe-windows-release-x64:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Expe\build\ReleaseX64
