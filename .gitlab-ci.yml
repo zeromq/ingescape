@@ -360,7 +360,7 @@ lib-windows-release-x64:
     - windows
   variables:
     DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
-    ARCH: "x64"
+    ARCH: "Release_x64"
   script:
     - set PATH=%PATH%;S:\deployment\Builds\Release\x64;S:\deployment\Builds
     - git clean -xfd
@@ -382,7 +382,7 @@ lib-windows-release-x86:
     - windows
   variables:
     DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
-    ARCH: "x86"
+    ARCH: "Release_x86"
   script:
     - set PATH=%PATH%;S:\deployment\Builds\Release\x86;S:\deployment\Builds
     - git clean -xfd
@@ -404,7 +404,7 @@ lib-windows-debug-x64:
     - windows
   variables:
     DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
-    ARCH: "x64"
+    ARCH: "Debug_x64"
   script:
     - set PATH=%PATH%;S:\deployment\Builds\Debug\x64;S:\deployment\Builds
     - git clean -xfd
@@ -426,7 +426,7 @@ lib-windows-debug-x86:
     - windows
   variables:
     DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
-    ARCH: "x86"
+    ARCH: "Debug_x86"
   script:
     - set PATH=%PATH%;S:\deployment\Builds\Debug\x86;S:\deployment\Builds
     - git clean -xfd
