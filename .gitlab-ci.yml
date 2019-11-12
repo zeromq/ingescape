@@ -258,7 +258,7 @@ binding-csharp-windows-x64:
   variables:
     ARCH: "x64"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
@@ -277,7 +277,7 @@ binding-csharp-windows-x86:
   variables:
     ARCH: "x86"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 --target IngescapeCSharp --config Release
@@ -359,7 +359,7 @@ lib-windows-release-x64:
   variables:
     ARCH: "Release_x64"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\ReleaseX64
     - cmake -S . -B build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF
@@ -380,7 +380,7 @@ lib-windows-release-x86:
   variables:
     ARCH: "Release_x86"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\ReleaseX86
     - cmake -S . -B build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF
@@ -401,7 +401,7 @@ lib-windows-debug-x64:
   variables:
     ARCH: "Debug_x64"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x64;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\DebugX64
     - cmake -S . -B build\DebugX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF
@@ -422,7 +422,7 @@ lib-windows-debug-x86:
   variables:
     ARCH: "Debug_x86"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x86;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\DebugX86
     - cmake -S . -B build\DebugX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF
@@ -444,7 +444,7 @@ editor-windows-release-x86:
   tags:
     - windows
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Editor\build\ReleaseX86
     - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
@@ -466,7 +466,7 @@ editor-windows-release-x64:
   tags:
     - windows
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Editor\build\ReleaseX64
     - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
@@ -489,7 +489,7 @@ assessments-windows-release-x86:
   tags:
     - windows
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX86
     - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
@@ -512,7 +512,7 @@ assessments-windows-release-x64:
   tags:
     - windows
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX64
     - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
@@ -535,7 +535,7 @@ expe-windows-release-x86:
   tags:
     - windows
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Expe\build\ReleaseX86
     - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
@@ -558,7 +558,7 @@ expe-windows-release-x64:
   tags:
     - windows
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Expe\build\ReleaseX64
     - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
@@ -1034,8 +1034,8 @@ lib-deploy-windows-release-x64:
   tags:
     - windows
   script:
-    - copy /y src\include\*.h \\autan\gitlab_workspace\deployment\Builds\include\ingescape\
-    - copy /y build\ReleaseX64\Release\* \\autan\gitlab_workspace\deployment\Builds\Release\x64\
+    - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
+    - copy /y build\ReleaseX64\Release\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\
   dependencies:
     - lib-windows-release-x64
 
@@ -1048,8 +1048,8 @@ lib-deploy-windows-release-x86:
   tags:
     - windows
   script:
-    - copy /y src\include\*.h \\autan\gitlab_workspace\deployment\Builds\include\ingescape\
-    - copy /y build\ReleaseX86\Release\* \\autan\gitlab_workspace\deployment\Builds\Release\x86\
+    - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
+    - copy /y build\ReleaseX86\Release\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\
   dependencies:
     - lib-windows-release-x86
 
@@ -1062,8 +1062,8 @@ lib-deploy-windows-debug-x64:
   tags:
     - windows
   script:
-    - copy /y src\include\*.h \\autan\gitlab_workspace\deployment\Builds\include\ingescape\
-    - copy /y build\DebugX64\Debug\* \\autan\gitlab_workspace\deployment\Builds\Debug\x64\
+    - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
+    - copy /y build\DebugX64\Debug\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64\
   dependencies:
     - lib-windows-debug-x64
 
@@ -1076,8 +1076,8 @@ lib-deploy-windows-debug-x86:
   tags:
     - windows
   script:
-    - copy /y src\include\*.h \\autan\gitlab_workspace\deployment\Builds\include\ingescape\
-    - copy /y build\DebugX86\Debug\* \\autan\gitlab_workspace\deployment\Builds\Debug\x86\
+    - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
+    - copy /y build\DebugX86\Debug\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86\
   dependencies:
     - lib-windows-debug-x86
 
@@ -1090,7 +1090,7 @@ binding-deploy-windows-release-x64:
   tags:
     - windows
   script:
-    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll \\autan\gitlab_workspace\deployment\Builds\Release\x64\
+    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\
   dependencies:
     - binding-csharp-windows-x64
 
@@ -1103,7 +1103,7 @@ binding-deploy-windows-release-x86:
   tags:
     - windows
   script:
-    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll \\autan\gitlab_workspace\deployment\Builds\Release\x86\
+    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\
   dependencies:
     - binding-csharp-windows-x86
 
