@@ -81,6 +81,19 @@ Window {
         }
     }
 
+    function changeUrl(currentUrl) {
+        if (currentUrl === rootItem.gettingStartedRemoteUrl)
+        {
+            console.log(qsTr("Fail loading 'Getting Started' internet URL. Switching to local URL."))
+            rootItem.switchToLocalUrl()
+        }
+        else if (currentUrl === rootItem.gettingStartedLocalUrl)
+        {
+            console.log(qsTr("Fail loading 'Getting Started' local URL. Showing feedback text."))
+            loadingComplete(false)
+        }
+    }
+
 
     //--------------------------------
     //
@@ -93,9 +106,8 @@ Window {
     }
 
     onLoadingComplete: {
-        rootItem.loadingError = !success
+        rootItem.loadingError = !success;
     }
-
 
     //--------------------------------
     //
@@ -131,24 +143,21 @@ Window {
             visible: !rootItem.loadingError
 
             onLoadingChanged: {
-                if (loadRequest.status === 3)
+                if (loadRequest.status === WebEngineLoadRequest.LoadFailedStatus)
+                { // Failed to load url
+                    changeUrl(loadRequest.url.toString());
+                }
+                else if (loadRequest.status === WebEngineLoadRequest.LoadSucceededStatus)
                 {
-                    if (loadRequest.url.toString() === rootItem.gettingStartedRemoteUrl)
-                    {
-                        console.log(qsTr("Fail loading 'Getting Started' internet URL. Switching to local URL."))
-                        rootItem.switchToLocalUrl()
+                    if ((loadRequest.errorCode) && (loadRequest.errorCode !== 200))
+                    { // Request sent error
+                        changeUrl(loadRequest.url.toString());
                     }
-                    else if (loadRequest.url.toString() === rootItem.gettingStartedLocalUrl)
-                    {
-                        console.log(qsTr("Fail loading 'Getting Started' local URL. Showing feedback text."))
-                        loadingComplete(false)
+                    else
+                    { // Success of the request
+                        loadingComplete(true)
                     }
                 }
-                else if (loadRequest.status == 2)
-                {
-                    loadingComplete(true)
-                }
-
             }
         }
 
@@ -212,7 +221,6 @@ Window {
                         family: IngeScapeTheme.textFontFamily
                         pixelSize: 16
                     }
-
                 }
             }
         }

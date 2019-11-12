@@ -128,7 +128,6 @@ Item {
             var window = component.createObject("rootItem");
 
             gettingStartedWindow = window;
-            gettingStartedWindow.resetInternetUrl();
             gettingStartedWindow.show()
             gettingStartedOpen = true;
         }
@@ -171,19 +170,17 @@ Item {
             openLicensePopup();
         }
 
-        // ...we check if we must open the getting started window
-        if (IngeScapeEditorC.gettingStartedShowAtStartup)
-        {
-            openGettingStarted();
-        }
-
         // ...we silently call home to signal the license user launched the editor
         if (IngeScapeEditorC.licensesC && IngeScapeEditorC.callHomeC)
         {
             IngeScapeEditorC.callHomeC.editorLaunched(IngeScapeEditorC.licensesC.mergedLicense)
         }
-    }
 
+        // ...we open notification popup
+        // NB : If no notification, popup will close
+        // NB 2 : Getting started window will be open on notification popup closed event to see only notification
+        notifPopup.open();
+    }
 
 
     Connections {
@@ -221,6 +218,18 @@ Item {
 
         onVisibleChanged: {
             rootItem.gettingStartedOpen = gettingStartedWindow.visible;
+        }
+    }
+
+    Connections {
+        target: notifPopup
+
+        onClosed: {
+            // We check if we must open the getting started window
+            if (IngeScapeEditorC.gettingStartedShowAtStartup)
+            {
+                openGettingStarted();
+            }
         }
     }
 
@@ -682,6 +691,14 @@ Item {
         }
     }
 
+    //
+    // Remote notification popup
+    //
+    Popup.RemoteNotificationPopup {
+        id: notifPopup
+
+        anchors.centerIn: parent
+    }
 
     // Overlay layer used to display streaming
     I2Layer {
