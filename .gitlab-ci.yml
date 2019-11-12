@@ -1030,7 +1030,7 @@ lib-deploy-windows-release-x64:
   <<: *build-lib-files
   stage: deploy-lib
   variables:
-    ARCH: "x64"
+    ARCH: "Release_x64"
   tags:
     - windows
   script:
@@ -1044,7 +1044,7 @@ lib-deploy-windows-release-x86:
   <<: *build-lib-files
   stage: deploy-lib
   variables:
-    ARCH: "x86"
+    ARCH: "Release_x86"
   tags:
     - windows
   script:
@@ -1058,7 +1058,7 @@ lib-deploy-windows-debug-x64:
   <<: *build-lib-files
   stage: deploy-lib
   variables:
-    ARCH: "x64"
+    ARCH: "Debug_x64"
   tags:
     - windows
   script:
@@ -1072,7 +1072,7 @@ lib-deploy-windows-debug-x86:
   <<: *build-lib-files
   stage: deploy-lib
   variables:
-    ARCH: "x86"
+    ARCH: "Debug_x86"
   tags:
     - windows
   script:
