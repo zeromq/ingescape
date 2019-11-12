@@ -256,7 +256,6 @@ binding-csharp-windows-x64:
   tags:
     - windows
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     ARCH: "x64"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
@@ -276,7 +275,6 @@ binding-csharp-windows-x86:
   tags:
     - windows
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     ARCH: "x86"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
@@ -359,7 +357,6 @@ lib-windows-release-x64:
   tags:
     - windows
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     ARCH: "Release_x64"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
@@ -381,7 +378,6 @@ lib-windows-release-x86:
   tags:
     - windows
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     ARCH: "Release_x86"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
@@ -403,7 +399,6 @@ lib-windows-debug-x64:
   tags:
     - windows
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     ARCH: "Debug_x64"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x64;C:\Users\admin\dev\Builds
@@ -425,7 +420,6 @@ lib-windows-debug-x86:
   tags:
     - windows
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     ARCH: "Debug_x86"
   script:
     - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x86;C:\Users\admin\dev\Builds
@@ -445,7 +439,6 @@ editor-windows-release-x86:
   <<: *build-editor-files
   stage: build-apps
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     ARCH: "x86"
   tags:
@@ -468,7 +461,6 @@ editor-windows-release-x64:
   <<: *build-editor-files
   stage: build-apps
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     ARCH: "x64"
   tags:
@@ -491,7 +483,6 @@ assessments-windows-release-x86:
   <<: *build-assessments-files
   stage: build-apps
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "x86"
@@ -515,7 +506,6 @@ assessments-windows-release-x64:
   <<: *build-assessments-files
   stage: build-apps
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "x64"
@@ -539,7 +529,6 @@ expe-windows-release-x86:
   <<: *build-expe-files
   stage: build-apps
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "x86"
@@ -563,7 +552,6 @@ expe-windows-release-x64:
   <<: *build-expe-files
   stage: build-apps
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "S:\\deployment\\Builds"
     Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "x64"
