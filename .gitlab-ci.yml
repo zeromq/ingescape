@@ -439,7 +439,7 @@ editor-windows-release-x86:
   <<: *build-editor-files
   stage: build-apps
   variables:
-    Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     ARCH: "x86"
   tags:
     - windows
@@ -461,7 +461,7 @@ editor-windows-release-x64:
   <<: *build-editor-files
   stage: build-apps
   variables:
-    Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     ARCH: "x64"
   tags:
     - windows
@@ -483,7 +483,7 @@ assessments-windows-release-x86:
   <<: *build-assessments-files
   stage: build-apps
   variables:
-    Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "x86"
   tags:
@@ -506,7 +506,7 @@ assessments-windows-release-x64:
   <<: *build-assessments-files
   stage: build-apps
   variables:
-    Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "x64"
   tags:
@@ -529,7 +529,7 @@ expe-windows-release-x86:
   <<: *build-expe-files
   stage: build-apps
   variables:
-    Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "x86"
   tags:
@@ -552,7 +552,7 @@ expe-windows-release-x64:
   <<: *build-expe-files
   stage: build-apps
   variables:
-    Qt5_DIR: S:\\deployment\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "x64"
   tags:
