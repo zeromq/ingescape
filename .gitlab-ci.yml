@@ -1034,6 +1034,7 @@ lib-deploy-windows-release-x64:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
     - copy /y build\ReleaseX64\Release\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\
   dependencies:
@@ -1048,6 +1049,7 @@ lib-deploy-windows-release-x86:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
     - copy /y build\ReleaseX86\Release\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\
   dependencies:
@@ -1062,6 +1064,7 @@ lib-deploy-windows-debug-x64:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
     - copy /y build\DebugX64\Debug\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64\
   dependencies:
@@ -1076,6 +1079,7 @@ lib-deploy-windows-debug-x86:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
     - copy /y build\DebugX86\Debug\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86\
   dependencies:
@@ -1090,6 +1094,7 @@ binding-deploy-windows-release-x64:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\
   dependencies:
     - binding-csharp-windows-x64
@@ -1103,6 +1108,7 @@ binding-deploy-windows-release-x86:
   tags:
     - windows
   script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\
   dependencies:
     - binding-csharp-windows-x86
