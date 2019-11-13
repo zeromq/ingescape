@@ -175,11 +175,6 @@ Item {
         {
             IngeScapeEditorC.callHomeC.editorLaunched(IngeScapeEditorC.licensesC.mergedLicense)
         }
-
-        // ...we open notification popup
-        // NB : If no notification, popup will close
-        // NB 2 : Getting started window will be open on notification popup closed event to see only notification
-        notifPopup.open();
     }
 
 
@@ -221,10 +216,19 @@ Item {
         }
     }
 
+    // Connection to open getting started window only when notification popup is closed
     Connections {
         target: notifPopup
 
         onClosed: {
+            // We check if we must open the getting started window
+            if (IngeScapeEditorC.gettingStartedShowAtStartup)
+            {
+                openGettingStarted();
+            }
+        }
+
+        onNoNotification : {
             // We check if we must open the getting started window
             if (IngeScapeEditorC.gettingStartedShowAtStartup)
             {

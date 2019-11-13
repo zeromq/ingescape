@@ -39,7 +39,31 @@ I2PopupBase {
 
     property string notificationUrl : "https://services.ingescape.com/editor/notification"
 
-    property bool notificationAvailable : false
+
+    //--------------------------------
+    //
+    // Signals
+    //
+    //--------------------------------
+
+    // Emitted when notification is available after request
+    signal notificationAvailable();
+
+    // Emitted when there is no notification after request
+    signal noNotification();
+
+
+    //--------------------------------
+    //
+    // Behavior
+    //
+    //--------------------------------
+
+    // Popup only open itself when there is a remote notification
+    onNotificationAvailable: {
+        popupNotification.open();
+    }
+
 
     //--------------------------------
     //
@@ -73,18 +97,13 @@ I2PopupBase {
             }
 
             onLoadingChanged: {
-                if (loadRequest.status === WebEngineLoadRequest.LoadFailedStatus)
-                {
-                    popupNotification.visible = false;
-                    popupNotification.close();
-                }
-                else if (loadRequest.status === WebEngineLoadRequest.LoadSucceededStatus) {
-                    if ((loadRequest.errorCode)&&(loadRequest.errorCode !== 200)) {
-                        popupNotification.visible = false;
-                        popupNotification.close();
+                // If our page is not currently loading
+                if (loadRequest.status !== WebEngineLoadRequest.LoadStartedStatus) {
+                    if ((loadRequest.status === WebEngineLoadRequest.LoadSucceededStatus) && (loadRequest.errorCode) && (loadRequest.errorCode === 200)) { // Loading succeed
+                        popupNotification.notificationAvailable();
                     }
-                    else {
-                        popupNotification.visible = true;
+                    else { // Loading failed
+                        popupNotification.noNotification();
                     }
                 }
             }

@@ -37,10 +37,8 @@ Window {
     minimumHeight: 880
 
     // Flag indicating if neither the Internet URL nor the locale URL could be loaded
-    property bool loadingError: false
+    property bool noContent : false
 
-    // Signal emitted when the page is loaded or failed to load
-    signal loadingComplete(bool success);
 
     //--------------------------------
     //
@@ -77,7 +75,7 @@ Window {
         else
         {
             console.log("Empty local URL -> Loading failed")
-            loadingComplete(false)
+            noContent = true;
         }
     }
 
@@ -90,7 +88,7 @@ Window {
         else if (currentUrl === rootItem.gettingStartedLocalUrl)
         {
             console.log(qsTr("Fail loading 'Getting Started' local URL. Showing feedback text."))
-            loadingComplete(false)
+            noContent = true;
         }
     }
 
@@ -105,9 +103,6 @@ Window {
         resetInternetUrl();
     }
 
-    onLoadingComplete: {
-        rootItem.loadingError = !success;
-    }
 
     //--------------------------------
     //
@@ -140,7 +135,7 @@ Window {
                 offTheRecord: true
             }
 
-            visible: !rootItem.loadingError
+            visible: false
 
             onLoadingChanged: {
                 if (loadRequest.status === WebEngineLoadRequest.LoadFailedStatus)
@@ -148,14 +143,14 @@ Window {
                     changeUrl(loadRequest.url.toString());
                 }
                 else if (loadRequest.status === WebEngineLoadRequest.LoadSucceededStatus)
-                {
+                { // Succeed to load url
                     if ((loadRequest.errorCode) && (loadRequest.errorCode !== 200))
-                    { // Request sent error
+                    { // Request sent error (only for remote url)
                         changeUrl(loadRequest.url.toString());
                     }
                     else
                     { // Success of the request
-                        loadingComplete(true)
+                        webview.visible = true
                     }
                 }
             }
@@ -172,7 +167,7 @@ Window {
                 margins: 15
             }
 
-            visible: !webview.visible
+            visible: noContent
 
             text: "Unable to load the 'Getting started' page.\nPlease try using a web browser to access <URL> directly." //FIXME Fallback URL to define
             verticalAlignment: Text.AlignVCenter
