@@ -234,39 +234,36 @@ Item {
             }
         }
 
-        Row {
-            id: headerRowOrganize
+        // TODO design button and show it in Editor
+//        Row {
+//            id: headerRowOrganize
 
-            height: btnOrganizeActions.height
-            spacing : 8
+//            height: btnOrganizeActions.height
+//            spacing : 8
 
-            anchors {
-                top: parent.top
-                topMargin: 23
-                left: headerRow.right
-                leftMargin: 10
-            }
+//            anchors {
+//                top: parent.top
+//                topMargin: 23
+//                left: headerRow.right
+//                leftMargin: 10
+//            }
 
-            LabellessSvgButton {
-                id: btnOrganizeActions
+//            Button {
+//                id: btnOrganizeActions
 
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
+//                anchors {
+//                    verticalCenter: parent.verticalCenter
+//                }
 
-                enabled: scenarioController ? scenarioController.actionsList.count > 1 : false
+//                enabled: scenarioController ? scenarioController.actionsList.count > 1 : false
 
-                fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
+//                text: rootItem.organizeActionMode ? "Disable Organize Mode" : "Enable Organize Mode"
 
-                pressedID: releasedID + "-pressed"
-                releasedID: rootItem.organizeActionMode ? "new-agent" : "import"
-                disabledID : releasedID + "-disabled"
-
-                onClicked: {
-                    rootItem.organizeActionMode = !rootItem.organizeActionMode
-                }
-            }
-        }
+//                onClicked: {
+//                    rootItem.organizeActionMode = !rootItem.organizeActionMode
+//                }
+//            }
+//        }
 
         Row {
             id: headerRow2
