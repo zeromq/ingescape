@@ -1038,63 +1038,22 @@ lib-deploy-linux-release-armhf:
     - lib-linux-release-armhf
 
 # Deploy ingescape in windows to be able to compile agents
-lib-deploy-windows-release-x64:
+lib-deploy-windows:
   <<: *build-lib-files
   stage: deploy-lib
-  variables:
-    ARCH: "Release_x64"
   tags:
     - windows
   script:
     - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
     - copy /y build\ReleaseX64\Release\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\
-  dependencies:
-    - lib-windows-release-x64
-
-# Deploy ingescape in windows to be able to compile agents
-lib-deploy-windows-release-x86:
-  <<: *build-lib-files
-  stage: deploy-lib
-  variables:
-    ARCH: "Release_x86"
-  tags:
-    - windows
-  script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
     - copy /y build\ReleaseX86\Release\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\
-  dependencies:
-    - lib-windows-release-x86
-
-# Deploy ingescape in windows to be able to compile agents
-lib-deploy-windows-debug-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
-  variables:
-    ARCH: "Debug_x64"
-  tags:
-    - windows
-  script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
     - copy /y build\DebugX64\Debug\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64\
-  dependencies:
-    - lib-windows-debug-x64
-
-# Deploy ingescape in windows to be able to compile agents
-lib-deploy-windows-debug-x86:
-  <<: *build-lib-files
-  stage: deploy-lib
-  variables:
-    ARCH: "Debug_x86"
-  tags:
-    - windows
-  script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
     - copy /y build\DebugX86\Debug\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86\
   dependencies:
+    - lib-windows-release-x64
+    - lib-windows-release-x86
+    - lib-windows-debug-x64
     - lib-windows-debug-x86
 
 # Deploy ingescape binding in windows to be able to compile agents
