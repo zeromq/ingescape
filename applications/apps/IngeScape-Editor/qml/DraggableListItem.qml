@@ -13,9 +13,19 @@
 
 
 import QtQuick 2.0
+import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 
 import INGESCAPE 1.0
 
+
+//
+// Drag-n-droppable listview item
+// - It only works with vertical listviews (TODO horizontal listviews)
+// - It MUST not have any anchors or a predefined size (width and height properties must not be set)
+// - It MUST have a content
+// - Its content MUST have a predefined size (width and height properties must be set) AND MUST not use anchors
+//
 Item {
     id: root
 
@@ -39,21 +49,37 @@ Item {
     // Size of the area at the top and bottom of the list that will trigger autoscrolling
     property int scrollEdgeSize: 10
 
-    // Internal: set to -1 when drag-scrolling up and 1 when drag-scrolling down
-    property int _scrollingDirection: 0
-
-    // Internal: shortcut to access the attached ListView from everywhere.
-    // Shorter than root.ListView.view
-    property ListView _listView: ListView.view
-
     // The item that will become the parent of our draggable item during a drag operation
     property Item parentItemWhenDragged: _listView ? _listView.parent : null
 
     // Color of placeholders
     property color placeholderColor: "lightgrey" // IngeScapeTheme.editorsBackgroundColor
 
+    // Radius of placeholders
+    property real placeholderRadius : 0
+
+    // Index of our item
+    property int itemIndex: model.index
+
+
+    // Set dimensions of our item
     width: contentItem.width
     height: topPlaceholder.height + wrapperParent.height + bottomPlaceholder.height
+
+
+    //---------------------------------------
+    //
+    // Private properties
+    //
+    //---------------------------------------
+
+    // Internal: set to -1 when drag-scrolling up and 1 when drag-scrolling down, 0 means no scrolling
+    property int _scrollingDirection: 0
+
+    // Internal: shortcut to access the attached ListView from everywhere.
+    // Shorter than root.ListView.view
+    property ListView _listView: ListView.view
+
 
     //---------------------------------------
     //
@@ -75,11 +101,12 @@ Item {
     Timer {
         id: makeDroppedItemVisibleTimer
 
-        interval: 0
+        // TODO: define the minimum delay
+        interval: 1
 
         onTriggered: {
             if (root._listView) {
-                root._listView.positionViewAtIndex(model.index, ListView.Contain);
+                root._listView.positionViewAtIndex(root.itemIndex, ListView.Contain);
             }
         }
     }
@@ -110,6 +137,7 @@ Item {
         running: (root._scrollingDirection === 1)
     }
 
+
     //---------------------------------------
     //
     // Content
@@ -121,20 +149,29 @@ Item {
     //
     Rectangle {
        id: topPlaceholder
+
        anchors {
            left: parent.left
            right: parent.right
        }
-       height: 0
 
-       // Take the radius of the content to drag so that placeholder look at him
-       radius: contents[0].radius ? contents[0].radius : 0
+       height: (topDropAreaLoader.item && topDropAreaLoader.item.containsDrag && (root.itemIndex === 0))
+               ? contentItem.height : 0
+
+       radius: placeholderRadius
 
        color: root.placeholderColor
+
+       // Animation only when user is dragging an item (not dropping)
+       Behavior on height {
+           enabled : (topDropAreaLoader.item && !topDropAreaLoader.item.containsDrag)
+           NumberAnimation {}
+       }
    }
 
-    // Item used to wrap our contentItem. This item will be drag-n-dropped
-    // and reparented during drag-n-drop
+    //
+    // Default parent of our contentItem wrapper
+    //
     Item {
         id: wrapperParent
 
@@ -143,8 +180,11 @@ Item {
             right: parent.right
             top: topPlaceholder.bottom
         }
+
         height: contentItem.height
 
+        // Item used to wrap our contentItem. This item will be drag-n-dropped
+        // and reparented during drag-n-drop
         Item {
             id: contentItemWrapper
 
@@ -152,7 +192,6 @@ Item {
 
             // Configure drag
             Drag.keys: root.keysDragNDrop
-            Drag.source: wrapperParent
             Drag.active: dragArea.drag.active
             Drag.hotSpot {
                 x: contentItem.width/2
@@ -166,47 +205,98 @@ Item {
                 enabled: dragEnable && _listView.count > 1 // Allow it only if there is more than one item in the list
 
                 drag.target: parent
-
                 // NB: we disable smoothed drag to ensure that our item will remain under the mouse cursor (no latency)
                 drag.smoothed: false
-
-                // Constraints on Y axis to drag only in listview
-                drag.minimumY: _listView ? _listView.y - 2 : 0 // 2 = small margin to be able to overtake listview
-                drag.maximumY: {
-                    if (root._listView) {
-                        ((contentItem.height + _listView.spacing) * (root._listView.count- 1) > root._listView.height)
-                                // If listview is full of item (all along its height) => drag the element all along the list
-                                ? (_listView.y + _listView.height - contentItem.height + 2) // 2 = small margin to be able to overtake listview
-
-                                // If not => drag the element all along number of elements
-                                : ((contentItem.height + _listView.spacing) * (root._listView.count- 1) + 2); // 2 = small margin to be able to overtake listview
-                     }
-                    else {
-                        0;
-                    }
-                }
 
                 onReleased: {
                     forceActiveFocus();
 
                     // Check if a drag-n-drop is in progress
-                    if (drag.active) {
-                        var dropArea = contentItemWrapper.Drag.target;
-                        if (!dropArea) {
-                            return;
-                        }
-                        var dropIndex = dropArea.dropIndex;
+                    if (drag.active)
+                    {
+                        var dropIndex = -1;
 
-                        // If the target item is below us, then decrement dropIndex because the target item is going to move up when
-                        // our item leaves its place
-                        if (model.index < dropIndex) {
-                            dropIndex--;
+                        // Get our current index
+                        var currentIndex = root.itemIndex;
+
+                        // Try to get our drop area
+                        var dropArea = contentItemWrapper.Drag.target;
+                        if (dropArea)
+                        {
+                            // Get our drop index
+                            dropIndex = dropArea.dropIndex;
                         }
-                        if (model.index === dropIndex) {
-                            return;
+                        else
+                        {
+                            // No drop area, we will try to find an index
+
+                            // Get oordinate of our drag hotspot
+                            var y = contentItemWrapper.y + contentItem.height/2;
+
+                            if (root._listView !== null)
+                            {
+                                // Check if we are above our listview
+                                if (y <= root._listView.y)
+                                {
+                                    dropIndex = 0;
+                                }
+                                // Check if we are below our listview
+                                else if (y >= (root._listView.y + root._listView.height))
+                                {
+                                    // NB: We assume that we drop our item at the last position of our listview
+                                    dropIndex = root._listView.count;
+                                }
+                                // Check if we are below the last item of our listview
+                                else if ((y - root._listView.y + root._listView.originY) >= root._listView.contentHeight)
+                                {
+                                    dropIndex = root._listView.count;
+                                }
+                                else
+                                {
+                                    // Try to find the item at this ordinate
+                                    dropIndex = root._listView.indexAt(contentItem.width/2, y - root._listView.y + root._listView.contentY);
+                                    if (dropIndex >= 0)
+                                    {
+                                        // Check if we must drop our item above or below
+                                        var dropIndex2 = root._listView.indexAt(contentItem.width/2, contentItemWrapper.y - root._listView.y + root._listView.contentY);
+                                        if (dropIndex === dropIndex2)
+                                        {
+                                            // Same item, we must drop our item below the first drop index
+                                            dropIndex++;
+                                        }
+                                        // Else: different items, we will replace our first item
+                                    }
+                                }
+                            }
                         }
-                        root.moveItemRequested(model.index, dropIndex);
-                        makeDroppedItemVisibleTimer.start();
+
+                        // Check if we have a drop index
+                        if (dropIndex >= 0)
+                        {
+                            // If our item is dropped below, we must correct the drop index
+                            // to take into account the displacement of our item
+                            // i.e. our item will leave its place
+                            if (currentIndex < dropIndex)
+                            {
+                                dropIndex--;
+                            }
+
+                            // Check if our index has really changed
+                            if (currentIndex !== dropIndex)
+                            {
+                                // Request an update of index
+                                root.moveItemRequested(currentIndex, dropIndex);
+
+                                // Scroll our list view to ensure that our item will be visible
+                                makeDroppedItemVisibleTimer.start();
+                            }
+                            // Else: nothing to do
+                        }
+                        else
+                        {
+                            // No drop index, we don't know where to insert our item
+                            console.log(root + " error: can not perform drop")
+                        }
                     }
                 }
             }
@@ -228,15 +318,16 @@ Item {
     //
     Rectangle {
         id: bottomPlaceholder
+
         anchors {
             left: parent.left
             right: parent.right
             top: wrapperParent.bottom
         }
+
         height: 0
 
-        // Take the radius of the content to drag so that placeholder look at him
-        radius: contents[0].radius ? contents[0].radius : 0
+        radius: placeholderRadius
 
         color: root.placeholderColor
     }
@@ -253,28 +344,30 @@ Item {
 
         // NB: we only need a top drop area for our first listview item.
         //     Otherwise, we have a conflict with the bottom drop area of the previous listview item
-        active: model.index === 0
+        active: root.itemIndex === 0
         enabled: active
 
         anchors {
             left: parent.left
             right: parent.right
-            bottom: wrapperParent.verticalCenter
+            bottom: (dragArea.drag.active && topDropAreaLoader.active) ? wrapperParent.bottom : wrapperParent.verticalCenter
         }
-        height: contentItem.height
+
+        height: (root.itemIndex === 0)
+                ? ((item && item.containsDrag) ? contentItem.height * 4 : contentItem.height)
+                : 0
 
         sourceComponent: Component {
             DropArea {
+                id: topDropArea
+
                 keys: root.keysDragNDrop
 
                 // NB: property used to know where a dragged item must be inserted
                 property int dropIndex: 0
-
-                enabled: !dragArea.drag.active
             }
         }
     }
-
 
     //
     // Drop area below our item
@@ -284,22 +377,23 @@ Item {
     //
     DropArea {
         id: bottomDropArea
+
         anchors {
             left: parent.left
             right: parent.right
             top: wrapperParent.verticalCenter
         }
 
-        property bool isLast: model.index === _listView.count - 1
-
-        height: isLast ? _listView.contentHeight - y : contentItem.height
-
-        keys: root.keysDragNDrop
+        height: (root._listView && (root.itemIndex === (root._listView.count - 1)))
+                ? Math.max(root._listView.height - y, contentItem.height)
+                : contentItem.height
 
         enabled: !dragArea.drag.active
 
+        keys: root.keysDragNDrop
+
         // NB: property used to know where a dragged item must be inserted
-        property int dropIndex: model.index + 1
+        property int dropIndex: root.itemIndex + 1
     }
 
 
@@ -334,17 +428,13 @@ Item {
             // Resize the parent of our customItem wrapper to collapse it
             PropertyChanges {
                 target: wrapperParent
-                height: 0
-            }
-
-            PropertyChanges {
-                target: wrapperParent
-                focus: true
+                height:  (root.itemIndex === 0) ? Math.max(contentItem.height / 4, 5)  : 0
             }
 
             // Auto-scroll
             PropertyChanges {
                 target: root
+
                 _scrollingDirection: {
                     if ((root._listView) && (contentItem.height * root._listView.count > root._listView.height)) {
                         var yCoord = root._listView.mapFromItem(dragArea, 0, dragArea.mouseY).y;
@@ -380,23 +470,11 @@ Item {
 
             PropertyChanges {
                 target: bottomDropArea
-                height: contentItem.height * 2
-            }
-        },
 
-       // Our contentItem has been dropped above our item
-        State {
-            name: "droppingAbove"
-            when: topDropAreaLoader.item.containsDrag
-
-            PropertyChanges {
-                target: topPlaceholder
-                height: contentItem.height
-            }
-
-            PropertyChanges {
-                target: topDropAreaLoader
-                height: contentItem.height * 2
+                // Ensure that we have enough space
+                height: root._listView && (root.itemIndex === (root._listView.count - 1))
+                        ? Math.max(root._listView.height - y, contentItem.height * 2)
+                        : contentItem.height * 2
             }
         }
     ]
@@ -413,12 +491,7 @@ Item {
         //     may be interrupted improperly by Qt
         Transition {
             from: "*"
-            to: "droppingTop, droppingBelow"
-
-            PropertyAnimation {
-                target: topPlaceholder
-                properties: "height"
-            }
+            to: "droppingBelow"
 
             PropertyAnimation {
                 target: bottomPlaceholder

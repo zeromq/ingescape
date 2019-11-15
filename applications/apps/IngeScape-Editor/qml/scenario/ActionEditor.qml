@@ -366,7 +366,6 @@ WindowBlockTouches {
                         value: (actionVM ? actionVM.startTimeString : "")
                     }
                 }
-
             }
 
 
@@ -381,17 +380,17 @@ WindowBlockTouches {
                     top : (startTimeItem.visible) ? startTimeItem.bottom : nameItem.bottom
                     topMargin: 15
                 }
-                height: Math.min(titleEffects.height + 6 + scrollView.anchors.topMargin + effectsList.contentHeight + scrollView.anchors.bottomMargin + addEffects.height,
+
+                // This property allow us to know real content effects list height (to give enough height for ScrollView, even when user drag out of the list a list item)
+                // NB : Listview.contentHeight give only visible content height and when user drag an item, it can become "invisible"
+                property real realContentEffectsListHeight : 0
+
+                height: Math.min(titleEffects.height + 6 + scrollView.anchors.topMargin + realContentEffectsListHeight + scrollView.anchors.bottomMargin + addEffects.height,
                                  mainItem.height - (txtTitle.height + nameItem.height + nameItem.anchors.topMargin + heightStartTime + effectsListItem.anchors.topMargin + conditionsItem.height + conditionsItem.anchors.topMargin + advancedModesItem.height + advancedModesItem.anchors.topMargin + 10 + okButton.height))
 
                 Behavior on height {
                     NumberAnimation {}
                 }
-
-//                Rectangle {
-//                    color: "red"
-//                    anchors.fill: parent
-//                }
 
                 // Title
                 Text {
@@ -495,6 +494,20 @@ WindowBlockTouches {
 //                        property var myEffectIopIsNotImpulsion: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && ( myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPValueType !== AgentIOPValueTypes.IMPULSION) )
 //                        property var myEffectIopIsBool: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && ( myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPValueType === AgentIOPValueTypes.BOOL) )
 
+
+                        // Update real height of listview when there is an effect added or removed of effects list
+                        Component.onCompleted: {
+                            effectsListItem.realContentEffectsListHeight += effectsList.count !== 1 ? effectListItem.height + effectsList.spacing
+                                                                                                    : effectListItem.height
+                        }
+
+                        Component.onDestruction: {
+                            effectsListItem.realContentEffectsListHeight -= effectsList.count !== 1 ? effectListItem.height + effectsList.spacing
+                                                                                                    : effectListItem.height
+                        }
+
+
+                        // Content of our effect list item
                         Rectangle {
                             height: (myEffect && (myEffect.effectType === ActionEffectTypes.MAPPING)) ? 90 : 62
                             width: scrollView.width - 9 // scrollbar size
@@ -2522,7 +2535,6 @@ WindowBlockTouches {
                     rootItem.close();
                 }
             }
-
 
 
             //
