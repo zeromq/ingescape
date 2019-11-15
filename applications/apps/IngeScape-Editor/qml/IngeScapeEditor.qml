@@ -119,7 +119,6 @@ Item {
         if (gettingStartedOpen && gettingStartedWindow)
         {
             gettingStartedWindow.raise();
-            gettingStartedWindow.active = true;
         }
         else
         {

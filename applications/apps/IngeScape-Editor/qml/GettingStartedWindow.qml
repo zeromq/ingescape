@@ -144,14 +144,22 @@ Window {
                 }
                 else if (loadRequest.status === WebEngineLoadRequest.LoadSucceededStatus)
                 { // Succeed to load url
-                    if ((loadRequest.errorCode) && (loadRequest.errorCode !== 200))
-                    { // Request sent error (only for remote url)
-                        changeUrl(loadRequest.url.toString());
+                    if (loadRequest.url.toString() === rootItem.gettingStartedRemoteUrl)
+                    { // If remote request, check error code
+                        if ((!loadRequest.errorCode) || ((loadRequest.errorCode) && (loadRequest.errorCode !== 200)))
+                        { // Request sent error (only for remote url)
+                            changeUrl(loadRequest.url.toString());
+                        }
+                        else
+                        { // Success of the request
+                            webview.visible = true;
+                        }
                     }
                     else
-                    { // Success of the request
-                        webview.visible = true
+                    { // If local request, succeed
+                        webview.visible = true;
                     }
+
                 }
             }
         }
