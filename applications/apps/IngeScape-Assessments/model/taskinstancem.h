@@ -56,12 +56,6 @@ class TaskInstanceM : public QObject
     // "Qml Property Map" allows to set key-value pairs that can be used in QML bindings
     I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, mapIndependentVariableValues)
 
-    // Hash table from a (unique) id of independent variable to the independent variable value
-    //I2_QOBJECT_HASHMODEL(QVariant, hashFromIndependentVariableIdToValue)
-
-    // DependentVariableValues (TODO ?): Les valeurs des VD (sorties d’agents)
-    // sont stockées avec le temps correspondant au changement de la valeur d’une sortie
-
 
 public:
 
@@ -162,6 +156,11 @@ public:
 
 
 private Q_SLOTS:
+    /**
+     * @brief Slot called when a value of the Qml Property Map "map Independent Variable Values" changed
+     * @param key
+     * @param value
+     */
     void _onIndependentVariableValueChanged(const QString& key, const QVariant& value);
 
 

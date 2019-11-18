@@ -23,7 +23,7 @@
  * @param parent
  */
 TaskInstanceController::TaskInstanceController(JsonHelper* jsonHelper,
-                                   QObject *parent) : QObject(parent),
+                                               QObject *parent) : QObject(parent),
     _timeLineC(nullptr),
     _scenarioC(nullptr),
     _currentTaskInstance(nullptr),
@@ -120,17 +120,31 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
 {
     if ((AssessmentsModelManager::Instance() != nullptr) && (_scenarioC != nullptr))
     {
-        // Clean the previous task instance
+        AssessmentsModelManager* modelManager = AssessmentsModelManager::Instance();
+
+        //
+        // Clean the previous session
+        //
         if (previousTaskInstance != nullptr)
         {
             // Clear the previous scenario
             _scenarioC->clearScenario();
 
+            // Delete all published values
+            modelManager->deleteAllPublishedValues();
+
             // Delete all (models of) actions
-            AssessmentsModelManager::Instance()->deleteAllActions();
+            modelManager->deleteAllActions();
+
+            // Delete agents OFF
+            QStringList namesListOfAgentsON = modelManager->deleteAgentsOFF();
+            qDebug() << "Remaining agents ON:" << namesListOfAgentsON;
         }
 
-        // Manage the new (current) record
+
+        //
+        // Manage the new (current) session
+        //
         if ((currentTaskInstance != nullptr) && (currentTaskInstance->task() != nullptr))
         {
             if (currentTaskInstance->task()->platformFileUrl().isValid())
@@ -146,13 +160,33 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
                         jsonFile.close();
 
                         QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
-
-                        QJsonObject jsonRoot = jsonDocument.object();
-
-                        // Import the scenario from JSON
-                        if (jsonRoot.contains("scenario"))
+                        if (jsonDocument.isObject())
                         {
-                            _scenarioC->importScenarioFromJson(jsonRoot.value("scenario").toObject());
+                            QJsonObject jsonRoot = jsonDocument.object();
+
+                            // Version
+                            QString versionJsonPlatform = "";
+                            if (jsonRoot.contains("version"))
+                            {
+                                versionJsonPlatform = jsonRoot.value("version").toString();
+
+                                qDebug() << "Version of JSON platform is" << versionJsonPlatform;
+                            }
+                            else {
+                                qDebug() << "UNDEFINED version of JSON platform";
+                            }
+
+                            // Import the agents list from JSON
+                            if (jsonRoot.contains("agents"))
+                            {
+                                modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
+                            }
+
+                            // Import the scenario from JSON
+                            if (jsonRoot.contains("scenario"))
+                            {
+                                _scenarioC->importScenarioFromJson(jsonRoot.value("scenario").toObject());
+                            }
                         }
                     }
                     else {
