@@ -83,7 +83,7 @@ TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
     // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
     _mapIndependentVariableValues = new QQmlPropertyMap(this);
 
-    // Connect to signal "Value Changed" fro the "Qml Property Map"
+    // Connect to signal "Value Changed" from the "Qml Property Map"
     connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &TaskInstanceM::_onIndependentVariableValueChanged);
 
     // Connect to task change to reset the independent variables values
@@ -285,6 +285,11 @@ CassStatement* TaskInstanceM::createBoundUpdateStatement(const TaskInstanceM& ta
 }
 
 
+/**
+ * @brief Slot called when a value of the Qml Property Map "map Independent Variable Values" changed
+ * @param key
+ * @param value
+ */
 void TaskInstanceM::_onIndependentVariableValueChanged(const QString& key, const QVariant& value)
 {
     IndependentVariableM* indepVar = _mapIndependentVarByName.value(key, nullptr);
