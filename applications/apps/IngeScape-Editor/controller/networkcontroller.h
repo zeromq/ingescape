@@ -22,8 +22,6 @@
 
 #include "I2PropertyHelpers.h"
 #include <controller/ingescapenetworkcontroller.h>
-#include <model/agent/agentm.h>
-#include <model/publishedvaluem.h>
 
 
 /**
@@ -32,9 +30,6 @@
 class NetworkController: public IngeScapeNetworkController
 {
     Q_OBJECT
-
-    // Model of our agent "IngeScape Editor"
-    I2_QML_PROPERTY_READONLY(AgentM*, agentEditor)
 
 
 public:
@@ -96,13 +91,6 @@ public:
 
 
 Q_SIGNALS:
-
-    /**
-     * @brief Signal emitted when a new value is published
-     * @param publishedValue
-     */
-    void valuePublished(PublishedValueM* publishedValue);
-
 
     /**
      * @brief Signal emitted when the "Recorder app" started to record
@@ -333,31 +321,6 @@ public Q_SLOTS:
      * @param outputName
      */
     void onCommandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
-
-
-    /**
-     * @brief Slot called when the flag "is Mapping Activated" changed
-     * @param isMappingConnected
-     */
-    void onIsMappingConnectedChanged(bool isMappingConnected);
-
-
-    /**
-     * @brief Slot called when inputs must be added to our application for a list of agent outputs
-     * @param agentName
-     * @param newOutputsIds
-     * @param isMappingConnected
-     */
-    void onAddInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected);
-
-
-    /**
-     * @brief Slot called when inputs must be removed from our application for a list of agent outputs
-     * @param agentName
-     * @param oldOutputsIds
-     * @param isMappingConnected
-     */
-    void onRemoveInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected);
 
 
 private:

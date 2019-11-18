@@ -68,7 +68,28 @@ NetworkController::~NetworkController()
  * @param peerName
  * @param zMessage
  */
-/*void NetworkController::manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
+void NetworkController::manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
 {
+    std::unique_ptr<char> zmsg_str(zmsg_popstr(zMessage));
+    QString message(zmsg_str.get());
 
-}*/
+    // An agent DEFINITION has been received
+    if (message.startsWith(prefix_Definition))
+    {
+        QString definitionJSON = message.remove(0, prefix_Definition.length());
+
+        Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
+    }
+    // An agent MAPPING has been received
+    else if (message.startsWith(prefix_Mapping))
+    {
+        QString mappingJSON = message.remove(0, prefix_Mapping.length());
+
+        Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
+    }
+    // Unknown
+    else
+    {
+        qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+    }
+}

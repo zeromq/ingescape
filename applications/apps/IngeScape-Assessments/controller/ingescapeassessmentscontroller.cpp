@@ -131,6 +131,13 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     connect(_modelManager, &AssessmentsModelManager::isConnectedToDatabaseChanged,
             this, &IngeScapeAssessmentsController::_onIsConnectedToDatabaseChanged);
 
+    connect(_modelManager, &AssessmentsModelManager::isMappingConnectedChanged,
+            _networkC, &NetworkController::onIsMappingConnectedChanged);
+    connect(_modelManager, &AssessmentsModelManager::addInputsToOurApplicationForAgentOutputs,
+            _networkC, &NetworkController::onAddInputsToOurApplicationForAgentOutputs);
+    connect(_modelManager, &AssessmentsModelManager::removeInputsFromOurApplicationForAgentOutputs,
+            _networkC, &NetworkController::onRemoveInputsFromOurApplicationForAgentOutputs);
+
     // Connect to signals from the experimentation controller to the rest of the controllers
     connect(_experimentationC, &ExperimentationController::currentExperimentationChanged,
             this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
@@ -138,12 +145,19 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
             _networkC, &NetworkController::onCommandAskedToRecorder);
 
     // Connect to signals from the network controller
-    //connect(_networkC, &NetworkController::agentEntered, _modelManager, &EditorModelManager::onAgentEntered);
-    //connect(_networkC, &NetworkController::agentExited, _modelManager, &EditorModelManager::onAgentExited);
+    connect(_networkC, &NetworkController::agentEntered, _modelManager, &AssessmentsModelManager::onAgentEntered);
+    connect(_networkC, &NetworkController::agentExited, _modelManager, &AssessmentsModelManager::onAgentExited);
     //connect(_networkC, &NetworkController::launcherEntered, _modelManager, &EditorModelManager::onLauncherEntered);
     //connect(_networkC, &NetworkController::launcherExited, _modelManager, &EditorModelManager::onLauncherExited);
     connect(_networkC, &NetworkController::recorderEntered, _experimentationC, &ExperimentationController::onRecorderEntered);
     connect(_networkC, &NetworkController::recorderExited, _experimentationC, &ExperimentationController::onRecorderExited);
+
+    connect(_networkC, &NetworkController::definitionReceived, _modelManager, &AssessmentsModelManager::onDefinitionReceived);
+    connect(_networkC, &NetworkController::mappingReceived, _modelManager, &AssessmentsModelManager::onMappingReceived);
+    connect(_networkC, &NetworkController::valuePublished, _modelManager, &AssessmentsModelManager::onValuePublished);
+
+
+
 
 
     // Update the list of available network devices
